@@ -37,10 +37,10 @@ void read_IV(const char          * filename,
              std::vector<double> & xyz,
              std::vector<u_int>  & tri);
 
+}
+
 #ifndef  CINO_STATIC_LIB
 #include "read_IV.cpp"
 #endif
-
-}
 
 #endif // READ_IV

@@ -37,10 +37,10 @@ void write_TET(const char               * filename,
                const std::vector<double> & xyz,
                const std::vector<u_int>  & tets);
 
+}
+
 #ifndef  CINO_STATIC_LIB
 #include "write_TET.cpp"
 #endif
-
-}
 
 #endif // WRITE_TET

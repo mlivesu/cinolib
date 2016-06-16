@@ -37,10 +37,10 @@ void write_MESH(const char               * filename,
                const std::vector<double> & xyz,
                const std::vector<u_int>  & tets);
 
+}
+
 #ifndef  CINO_STATIC_LIB
 #include "write_MESH.cpp"
 #endif
-
-}
 
 #endif // WRITE_MESH

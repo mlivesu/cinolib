@@ -37,10 +37,10 @@ void write_OBJ(const char                * filename,
                const std::vector<double> & xyz,
                const std::vector<u_int>  & tri);
 
+}
+
 #ifndef  CINO_STATIC_LIB
 #include "write_OBJ.cpp"
 #endif
-
-}
 
 #endif // WRITE_OBJ

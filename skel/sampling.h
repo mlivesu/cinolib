@@ -21,26 +21,22 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_MESH_H
-#define READ_MESH_H
+#ifndef SAMPLING_H
+#define SAMPLING_H
 
 #include "../cino_inline.h"
-
-#include <sys/types.h>
-#include <vector>
+#include "skel.h"
 
 namespace cinolib
 {
 
 CINO_INLINE
-void read_MESH(const char          * filename,
-               std::vector<double> & xyz,
-               std::vector<u_int>  & tet);
+void radius_based_mid_sampling(Skel & skel);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "read_MESH.cpp"
+#include "sampling.cpp"
 #endif
 
-#endif // READ_MESH
+#endif // SAMPLING_H

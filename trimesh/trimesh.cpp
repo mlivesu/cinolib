@@ -231,19 +231,19 @@ void Trimesh::load(const char * filename)
     if (filetype.compare("off") == 0 ||
         filetype.compare("OFF") == 0)
     {
-        cinolib::read_OFF(filename, coords, tris);
+        read_OFF(filename, coords, tris);
     }
     else
     if (filetype.compare("obj") == 0 ||
         filetype.compare("OBJ") == 0)
     {
-        cinolib::read_OBJ(filename, coords, tris);
+        read_OBJ(filename, coords, tris);
     }
     else
     if (filetype.compare(".iv") == 0 ||
         filetype.compare(".IV") == 0)
     {
-        cinolib::read_IV(filename, coords, tris, t_label);
+        read_IV(filename, coords, tris, t_label);
     }
     else
     {
@@ -270,13 +270,13 @@ void Trimesh::save(const char * filename) const
     if (filetype.compare("off") == 0 ||
         filetype.compare("OFF") == 0)
     {
-        cinolib::write_OFF(filename, coords, tris);
+        write_OFF(filename, coords, tris);
     }
     else
     if (filetype.compare("obj") == 0 ||
         filetype.compare("OBJ") == 0)
     {
-        cinolib::write_OBJ(filename, coords, tris);
+        write_OBJ(filename, coords, tris);
     }
     else
     {

@@ -37,10 +37,10 @@ void write_OFF(const char                * filename,
                const std::vector<double> & xyz,
                const std::vector<u_int>  & tri);
 
+}
+
 #ifndef  CINO_STATIC_LIB
 #include "write_OFF.cpp"
 #endif
-
-}
 
 #endif // WRITE_OFF

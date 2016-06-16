@@ -37,10 +37,10 @@ void read_TET(const char          * filename,
               std::vector<double> & xyz,
               std::vector<u_int>  & tet);
 
+}
+
 #ifndef  CINO_STATIC_LIB
 #include "read_TET.cpp"
 #endif
-
-}
 
 #endif // READ_TET
