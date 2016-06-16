@@ -21,33 +21,24 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_WRITE_H
-#define READ_WRITE_H
+#ifndef WRITE_LIVESU2012_H
+#define WRITE_LIVESU2012_H
 
-// SURFACE READERS
-#include "read_OBJ.h"
-#include "read_OFF.h"
-#include "read_IV.h"
-//
-// VOLUME READERS
-#include "read_MESH.h"
-#include "read_TET.h"
-//
-// SKELETON READERS
-#include "read_LIVESU2012.h"
-#include "read_TAGLIASACCHI2012.h"
-#include "read_DEYSUN2006.h"
-#include "read_CSV.h"
+#include "../cino_inline.h"
 
-// SURFACE WRITERS
-#include "write_OBJ.h"
-#include "write_OFF.h"
-//
-// VOLUME WRITERS
-#include "write_MESH.h"
-#include "write_TET.h"
-//
-// SKELETON WRITERS
-#include "write_LIVESU2012.h"
+namespace cinolib
+{
 
-#endif // READ_WRITE
+CINO_INLINE
+void write_Livesu2012(const char                          * filename,
+                      const std::vector<double>             coords,
+                      const std::vector<double>             max_spheres,
+                      const std::vector< std::vector<int> > adj_vtx2vtx);
+
+}
+
+#ifndef  CINO_STATIC_LIB
+#include "write_LIVESU2012.cpp"
+#endif
+
+#endif // WRITE_LIVESU2012

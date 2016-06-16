@@ -55,19 +55,19 @@ void Skel::load(const char * filename)
 
     if (last_five.compare(".skel") == 0)
     {
-//        read_Livesu2012(filename, coords, segments, max_spheres);
+        read_Livesu2012(filename, coords, segments, max_spheres);
     }
     else if (last_three.compare(".cg") == 0)
     {
-//        load_Tagliasacchi2012(filename, coords, segments, max_spheres);
+        read_Tagliasacchi2012(filename, coords, segments, max_spheres);
     }
     else if (last_four.compare(".skc") == 0)
     {
-//        load_DeyandSun2006(filename, coords, segments, max_spheres);
+        read_DeyandSun2006(filename, coords, segments, max_spheres);
     }
     else if (last_four.compare(".csv") == 0)
     {
-//        load_gesture(filename, coords, segments, max_spheres);
+        read_CSV(filename, coords, segments, max_spheres);
     }
     else
     {
@@ -94,7 +94,7 @@ void Skel::load(const std::vector<double> & coords, const std::vector<int> & seg
 CINO_INLINE
 void Skel::save(const char * filename) const
 {
-    //write_Livesu2012(filename, *this);
+    write_Livesu2012(filename, coords, max_spheres, vtx2vtx);
 }
 
 CINO_INLINE

@@ -21,33 +21,68 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_WRITE_H
-#define READ_WRITE_H
-
-// SURFACE READERS
-#include "read_OBJ.h"
-#include "read_OFF.h"
-#include "read_IV.h"
-//
-// VOLUME READERS
-#include "read_MESH.h"
-#include "read_TET.h"
-//
-// SKELETON READERS
-#include "read_LIVESU2012.h"
-#include "read_TAGLIASACCHI2012.h"
 #include "read_DEYSUN2006.h"
-#include "read_CSV.h"
 
-// SURFACE WRITERS
-#include "write_OBJ.h"
-#include "write_OFF.h"
-//
-// VOLUME WRITERS
-#include "write_MESH.h"
-#include "write_TET.h"
-//
-// SKELETON WRITERS
-#include "write_LIVESU2012.h"
 
-#endif // READ_WRITE
+namespace cinolib
+{
+
+CINO_INLINE
+void read_DeyandSun2006(const char          * filename,
+                        std::vector<double> & coords,
+                        std::vector<int>    & arcs,
+                        std::vector<double> & radius)
+{
+    coords.clear();
+    arcs.clear();
+    radius.clear();
+
+    FILE *f = fopen(filename,"r");
+
+    if (!f)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_Livesu2012() : error while reading file " << filename << std::endl;
+        exit(-1);
+    }
+
+    int nv, ne;
+    fscanf(f, "%d %d\n", &nv, &ne);
+
+    for (int i=0; i<nv; ++i)
+    {
+        double x, y, z;
+        fscanf(f, "%lf %lf %lf", &x, &y, &z);
+
+        coords.push_back(x);
+        coords.push_back(y);
+        coords.push_back(z);
+        radius.push_back(0); // not supported
+    }
+
+    for (int i=0; i<ne; ++i)
+    {
+        int v0, v1;
+
+        fscanf(f, "%d %d", &v0, &v1);
+
+        arcs.push_back(v0);
+        arcs.push_back(v1);
+
+        // some stuff we don't need at all
+        //
+        float dummyF;
+        int dummyD1, dummyD2;
+        fscanf(f, "%f", &dummyF);
+        fscanf(f, "%f", &dummyF);
+        fscanf(f, "%f", &dummyF);
+        fscanf(f, "%d", &dummyD1);
+        for(int j = 0; j < dummyD1; ++j) fscanf(f, "%d", &dummyD2);
+    }
+
+    fclose(f);
+
+    std::cout << coords.size() / 3 << " skel points read" << std::endl;
+    std::cout << arcs.size()   / 2 << " skel arcs   read" << std::endl;
+}
+
+}

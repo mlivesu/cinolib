@@ -21,33 +21,51 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_WRITE_H
-#define READ_WRITE_H
-
-// SURFACE READERS
-#include "read_OBJ.h"
-#include "read_OFF.h"
-#include "read_IV.h"
-//
-// VOLUME READERS
-#include "read_MESH.h"
-#include "read_TET.h"
-//
-// SKELETON READERS
-#include "read_LIVESU2012.h"
-#include "read_TAGLIASACCHI2012.h"
-#include "read_DEYSUN2006.h"
 #include "read_CSV.h"
 
-// SURFACE WRITERS
-#include "write_OBJ.h"
-#include "write_OFF.h"
-//
-// VOLUME WRITERS
-#include "write_MESH.h"
-#include "write_TET.h"
-//
-// SKELETON WRITERS
-#include "write_LIVESU2012.h"
+namespace cinolib
+{
 
-#endif // READ_WRITE
+CINO_INLINE
+void read_CSV(const char          * filename,
+              std::vector<double> & coords,
+              std::vector<int>    & arcs,
+              std::vector<double> & radius)
+{
+    coords.clear();
+    arcs.clear();
+    radius.clear();
+
+    FILE *f = fopen(filename,"r");
+
+    if (!f)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : error while reading file " << filename << std::endl;
+        exit(-1);
+    }
+
+    char line[1024];
+
+    while(fgets(line, 1024, f))
+    {
+        double x, y, z;
+        sscanf( line, "%lf %lf %lf %*d", &x, &y, &z);
+        coords.push_back(x);
+        coords.push_back(y);
+        coords.push_back(z);
+    }
+
+    fclose(f);
+
+    for(int i=1; i<(int)coords.size()/3; ++i)
+    {
+        arcs.push_back(i-1);
+        arcs.push_back(i);
+    }
+
+    std::cout << std::endl;
+    std::cout << "Gesture Loaded - " << coords.size()/3 << " points" << std::endl;
+    std::cout << std::endl;
+}
+
+}

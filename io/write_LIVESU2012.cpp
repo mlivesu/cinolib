@@ -21,33 +21,57 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_WRITE_H
-#define READ_WRITE_H
-
-// SURFACE READERS
-#include "read_OBJ.h"
-#include "read_OFF.h"
-#include "read_IV.h"
-//
-// VOLUME READERS
-#include "read_MESH.h"
-#include "read_TET.h"
-//
-// SKELETON READERS
-#include "read_LIVESU2012.h"
-#include "read_TAGLIASACCHI2012.h"
-#include "read_DEYSUN2006.h"
-#include "read_CSV.h"
-
-// SURFACE WRITERS
-#include "write_OBJ.h"
-#include "write_OFF.h"
-//
-// VOLUME WRITERS
-#include "write_MESH.h"
-#include "write_TET.h"
-//
-// SKELETON WRITERS
 #include "write_LIVESU2012.h"
 
-#endif // READ_WRITE
+#include <vector>
+
+namespace cinolib
+{
+
+CINO_INLINE
+void write_Livesu2012(const char                          * filename,
+                      const std::vector<double>             coords,
+                      const std::vector<double>             max_spheres,
+                      const std::vector< std::vector<int> > adj_vtx2vtx)
+{
+    FILE *f = fopen(filename,"w");
+
+    if (!f)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_Livesu2012() : error while opening file " << filename << std::endl;
+        exit(-1);
+    }
+
+    int nv = adj_vtx2vtx.size();
+
+    fprintf( f, "ID Cx Cy Cz RADIUS #NEIGHBORS NEIGHBORS_LIST\n%d\n", nv);
+
+    for(int vid=0; vid<nv; ++vid)
+    {
+        vec3d pos(coords[3*vid+0],
+                  coords[3*vid+1],
+                  coords[3*vid+2]);
+
+        std::vector<int> nbrs = adj_vtx2vtx.at(vid);
+
+        fprintf(f,
+                "%d %f %f %f %f %d ",
+                vid,
+                pos.x(),
+                pos.y(),
+                pos.z(),
+                max_spheres.at(vid),
+                nbrs.size());
+
+        for(int i=0; i<(int)nbrs.size(); ++i)
+        {
+            fprintf(f, "%d ", nbrs[i]);
+        }
+
+        fprintf(f, "\n");
+    }
+
+    fclose(f);
+}
+
+}
