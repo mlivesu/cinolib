@@ -24,7 +24,7 @@
 #ifndef ISOCONTOUR_H
 #define ISOCONTOUR_H
 
-#include "cino_inline.h"
+#include "cinolib.h"
 #include "trimesh/trimesh.h"
 
 namespace cinolib

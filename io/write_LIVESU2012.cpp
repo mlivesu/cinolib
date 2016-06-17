@@ -61,7 +61,7 @@ void write_Livesu2012(const char                          * filename,
                 pos.y(),
                 pos.z(),
                 max_spheres.at(vid),
-                nbrs.size());
+                (int)nbrs.size());
 
         for(int i=0; i<(int)nbrs.size(); ++i)
         {

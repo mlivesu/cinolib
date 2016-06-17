@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "cino_inline.h"
+#include "cinolib.h"
 #include "scalar_field.h"
 #include "vector_field.h"
 #include "gradient.h"

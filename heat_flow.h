@@ -24,7 +24,7 @@
 #ifndef HEAT_FLOW_H
 #define HEAT_FLOW_H
 
-#include "cino_inline.h"
+#include "cinolib.h"
 #include "scalar_field.h"
 #include "laplacian.h"
 #include "vertex_mass.h"

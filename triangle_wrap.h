@@ -24,7 +24,7 @@
 #ifndef TRIANGLE_WRAP_H
 #define TRIANGLE_WRAP_H
 
-#include "cino_inline.h"
+#include "cinolib.h"
 
 #include <vector>
 #include <sys/types.h>

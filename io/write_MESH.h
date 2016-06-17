@@ -24,7 +24,7 @@
 #ifndef WRITE_MESH_H
 #define WRITE_MESH_H
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 
 #include <sys/types.h>
 #include <vector>

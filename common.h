@@ -29,7 +29,7 @@
 #include <vector>
 #include <eigen3/Eigen/Dense>
 
-#include "cino_inline.h"
+#include "cinolib.h"
 #include "vec3.h"
 
 namespace cinolib

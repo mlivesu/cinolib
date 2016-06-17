@@ -24,7 +24,7 @@
 #ifndef SPHERE_COVERAGE_H
 #define SPHERE_COVERAGE_H
 
-#include "cino_inline.h"
+#include "cinolib.h"
 #include "vec3.h"
 
 #include <vector>

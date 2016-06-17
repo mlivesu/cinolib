@@ -24,7 +24,7 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 
 #ifdef __APPLE__
 #include <gl.h>

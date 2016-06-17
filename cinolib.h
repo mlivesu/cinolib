@@ -21,25 +21,16 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_CSV_H
-#define READ_CSV_H
+#ifndef CINO_LIB_H
+#define CINO_LIB_H
 
-#include "../cinolib.h"
-
-#include <vector>
+#include "cino_inline.h"
+#include "common.h"
+#include "logger.h"
 
 namespace cinolib
 {
-
-CINO_INLINE
-void read_CSV(const char          * filename,
-              std::vector<double> & coords,
-              std::vector<int>    & arcs,
-              std::vector<double> & radius);
+    static Logger logger;
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "read_CSV.cpp"
-#endif
-
-#endif // READ_CSV_H
+#endif // CINO_LIB_H

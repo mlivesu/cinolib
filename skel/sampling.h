@@ -24,7 +24,7 @@
 #ifndef SAMPLING_H
 #define SAMPLING_H
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 #include "skel.h"
 
 namespace cinolib

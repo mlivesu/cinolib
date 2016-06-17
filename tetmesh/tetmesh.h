@@ -27,8 +27,7 @@
 #include <sys/types.h>
 #include <vector>
 
-#include "../cino_inline.h"
-#include "../common.h"
+#include "../cinolib.h"
 #include "../bbox.h"
 #include "../vec3.h"
 #include "../trimesh/trimesh.h"

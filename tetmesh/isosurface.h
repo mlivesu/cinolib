@@ -24,7 +24,7 @@
 #ifndef ISOSURFACE_H
 #define ISOSURFACE_H
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 #include "tetmesh.h"
 
 

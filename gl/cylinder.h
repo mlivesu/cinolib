@@ -24,7 +24,7 @@
 #ifndef CYLINDER_H
 #define CYLINDER_H
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 
 #ifdef __APPLE__
 #include <gl.h>

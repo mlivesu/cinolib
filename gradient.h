@@ -24,7 +24,7 @@
 #ifndef GRADIENT_H
 #define GRADIENT_H
 
-#include "cino_inline.h"
+#include "cinolib.h"
 #include "scalar_field.h"
 #include "vector_field.h"
 #include "trimesh/trimesh.h"

@@ -23,8 +23,7 @@
 ****************************************************************************/
 #include "drawable_skel.h"
 
-#include "../cino_inline.h"
-#include "../common.h"
+#include "../cinolib.h"
 #include "../colors.h"
 #include "../gl/cylinder.h"
 #include "../gl/sphere.h"

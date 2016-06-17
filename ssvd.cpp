@@ -22,7 +22,6 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include "ssvd.h"
-#include "common.h"
 
 #include <iostream>
 
@@ -35,7 +34,7 @@ void ssvd(const Eigen::Matrix3d                 & m,
                 Eigen::DiagonalMatrix<double,3> & s,
                 Eigen::Matrix3d                 & v)
 {
-    Eigen::JacobiSVD<Matrix3d> svd(m, ComputeFullU | ComputeFullV);
+    Eigen::JacobiSVD<Eigen::Matrix3d> svd(m, ComputeFullU | ComputeFullV);
 
     s = Eigen::DiagonalMatrix<double,3>(svd.singularValues());
     u = svd.matrixU();

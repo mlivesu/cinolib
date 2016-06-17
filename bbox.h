@@ -26,7 +26,7 @@
 
 #include <float.h>
 #include "vec3.h"
-#include "cino_inline.h"
+#include "cinolib.h"
 
 namespace cinolib
 {

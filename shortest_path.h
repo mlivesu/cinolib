@@ -24,8 +24,7 @@
 #ifndef SHORTEST_PATH_H
 #define SHORTEST_PATH_H
 
-#include "cino_inline.h"
-#include "common.h"
+#include "cinolib.h"
 
 #include <float.h>
 #include <vector>

@@ -24,7 +24,7 @@
 #ifndef QUALITY
 #define QUALITY
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 #include "../vec3.h"
 #include <float.h>
 

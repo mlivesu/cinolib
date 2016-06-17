@@ -21,25 +21,80 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_CSV_H
-#define READ_CSV_H
-
-#include "../cinolib.h"
-
-#include <vector>
+#include "logger.h"
+#include "cino_inline.h"
 
 namespace cinolib
 {
 
 CINO_INLINE
-void read_CSV(const char          * filename,
-              std::vector<double> & coords,
-              std::vector<int>    & arcs,
-              std::vector<double> & radius);
+Logger::Logger() : std::ostream(this)
+{
+    enable();
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "read_CSV.cpp"
-#endif
+CINO_INLINE
+int Logger::overflow(int c)
+{
+    if (dispatch_to_cout) dispatch_cout(c);
+    if (dispatch_to_file) dispatch_file(c);
+    return 0;
+}
 
-#endif // READ_CSV_H
+CINO_INLINE
+void Logger::dispatch_cout(char c)
+{
+    std::cout.put(c);
+}
+
+CINO_INLINE
+void Logger::dispatch_file(char c)
+{
+    f.put(c);
+}
+
+CINO_INLINE
+void Logger::enable()
+{
+    dispatch_to_cout = true;
+    dispatch_to_file = f.is_open();
+}
+
+CINO_INLINE
+void Logger::disable()
+{
+    dispatch_to_cout = false;
+    dispatch_to_file = false;
+}
+
+CINO_INLINE
+void Logger::set_log_file(const char * filename)
+{
+    f.open(filename);
+    if (f.is_open()) dispatch_to_file = true;
+}
+
+// https://github.com/isocpp/CppCoreGuidelines/issues/357
+//
+CINO_INLINE
+std::ostream & newl(std::ostream & os)
+{
+    return os << "\n";
+}
+
+CINO_INLINE
+std::ostream & flush(std::ostream & os)
+{
+    os.flush();
+    return os;
+}
+
+CINO_INLINE
+std::ostream & endl(std::ostream & os)
+{
+    newl(os);
+    flush(os);
+    return os;
+}
+
+}

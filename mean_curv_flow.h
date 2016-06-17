@@ -24,7 +24,7 @@
 #ifndef MEAN_CURV_FLOW_H
 #define MEAN_CURV_FLOW_H
 
-#include "cino_inline.h"
+#include "cinolib.h"
 #include "trimesh/trimesh.h"
 
 namespace cinolib

@@ -22,7 +22,6 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include "isocontour.h"
-#include "common.h"
 
 namespace cinolib
 {

@@ -25,7 +25,11 @@
 #undef CINO_INLINE
 #endif
 
-#ifndef  CINO_STATIC_LIB
+/*
+ * NOTE: do not include this file directly in your project, incude cinolib.h instead.
+*/
+
+#ifndef CINO_STATIC_LIB
 #define CINO_INLINE inline
 #else
 #define CINO_INLINE

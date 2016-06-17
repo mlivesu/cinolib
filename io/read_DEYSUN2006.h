@@ -24,7 +24,7 @@
 #ifndef READ_DEYSUN2006_H
 #define READ_DEYSUN2006_H
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 
 #include <vector>
 

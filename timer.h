@@ -24,7 +24,7 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include "cino_inline.h"
+#include "cinolib.h"
 
 namespace cinolib
 {

@@ -24,10 +24,9 @@
 #ifndef TRIMESH_H
 #define TRIMESH_H
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 #include "../bbox.h"
 #include "../vec3.h"
-#include "../common.h"
 
 #include <assert.h>
 #include <float.h>

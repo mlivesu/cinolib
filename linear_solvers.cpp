@@ -23,7 +23,6 @@
 ****************************************************************************/
 #include "linear_solvers.h"
 #include "timer.h"
-#include "common.h"
 
 namespace cinolib
 {

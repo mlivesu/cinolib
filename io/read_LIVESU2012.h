@@ -24,7 +24,7 @@
 #ifndef READ_LIVESU2012_H
 #define READ_LIVESU2012_H
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 
 #include <vector>
 

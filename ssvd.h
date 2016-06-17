@@ -24,7 +24,7 @@
 #ifndef SSVD_H
 #define SSVD_H
 
-#include "cino_inline.h"
+#include "cinolib.h"
 
 #include <eigen3/Eigen/Dense>
 

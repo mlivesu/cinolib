@@ -24,7 +24,7 @@
 #ifndef DRAWABLE_ISOCONTOUR_H
 #define DRAWABLE_ISOCONTOUR_H
 
-#include "cino_inline.h"
+#include "cinolib.h"
 #include "drawable_object.h"
 #include "trimesh/trimesh.h"
 #include "isocontour.h"

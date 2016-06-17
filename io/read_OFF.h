@@ -24,7 +24,7 @@
 #ifndef READ_OFF_H
 #define READ_OFF_H
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 
 #include <sys/types.h>
 #include <vector>

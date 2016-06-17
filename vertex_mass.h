@@ -24,7 +24,7 @@
 #ifndef VERTEX_MASS_H
 #define VERTEX_MASS_H
 
-#include "cino_inline.h"
+#include "cinolib.h"
 #include <eigen3/Eigen/Sparse>
 
 namespace cinolib

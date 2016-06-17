@@ -24,7 +24,7 @@
 #ifndef ARROW_H
 #define ARROW_H
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 #include "cylinder.h"
 
 namespace cinolib

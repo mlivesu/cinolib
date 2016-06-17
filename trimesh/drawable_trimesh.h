@@ -31,7 +31,7 @@
 #include <GL/gl.h>
 #endif
 
-#include "../cino_inline.h"
+#include "../cinolib.h"
 #include "../drawable_object.h"
 #include "trimesh.h"
 

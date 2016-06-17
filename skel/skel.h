@@ -29,7 +29,7 @@
 #include <set>
 #include <assert.h>
 
-#include "../common.h"
+#include "../cinolib.h"
 #include "../vec3.h"
 #include "../bbox.h"
 #include "../drawable_object.h"
