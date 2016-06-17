@@ -26,6 +26,21 @@
 namespace cinolib
 {
 
+// http://stackoverflow.com/questions/3738384/stable-cotangent
+//
+CINO_INLINE double cot(double x) { return tan(M_PI_2 - x); }
+
+
+/* Template Specializations.
+ *
+ * As a reference for the tetmesh version of cotangent weights, see:
+ *
+ * Gradient field based inhomogeneous volumetric mesh deformation for maxillofacial surgery simulation
+ * Sheng-hui Liao, Ruo-feng Tong, Jin-xiang Dong, Fu-dong Zhu
+ * Computer & Graphics, 2009
+*/
+
+
 template<>
 CINO_INLINE
 void cotangent_weights<Trimesh>(const Trimesh       & m,

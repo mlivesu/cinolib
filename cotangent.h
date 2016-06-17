@@ -36,33 +36,9 @@ template<class Mesh>
 CINO_INLINE
 void cotangent_weights(const Mesh &, const int, std::vector<int> &, std::vector<double> &)
 {
-    std::cerr << "WARNING! - Cotangent weights are not available for this mesh type yet!" << std::endl;
+    std::cerr << "WARNING! - Cotangent weights are not available for this mesh type!" << std::endl;
     assert(false);
 }
-
-
-/* Template Specializations.
- *
- * As a reference for the tetmesh version of cotangent weights, see:
- *
- * Gradient field based inhomogeneous volumetric mesh deformation for maxillofacial surgery simulation
- * Sheng-hui Liao, Ruo-feng Tong, Jin-xiang Dong, Fu-dong Zhu
- * Computer & Graphics, 2009
-*/
-
-template<>
-CINO_INLINE
-void cotangent_weights<Trimesh>(const Trimesh       & m,
-                                const int             vid,
-                                std::vector<int>    & nbrs,
-                                std::vector<double> & wgts);
-
-template<>
-CINO_INLINE
-void cotangent_weights<Tetmesh>(const Tetmesh       & m,
-                                const int             vid,
-                                std::vector<int>    & nbrs,
-                                std::vector<double> & wgts);
 
 }
 

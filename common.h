@@ -67,13 +67,10 @@ CINO_INLINE std::ostream & operator<<(std::ostream & in, const ipair & p)
     return in;
 }
 
-// http://stackoverflow.com/questions/3738384/stable-cotangent
-//
-CINO_INLINE double cot(double x) { return tan(M_PI_2 - x); }
-
 template<typename C>
 CINO_INLINE void CHECK_BOUNDS(const C & container, int index)
 {
+    assert(index >= 0);
     assert(index < (int)container.size());
 }
 
