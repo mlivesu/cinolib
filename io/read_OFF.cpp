@@ -39,7 +39,7 @@ void read_OFF(const char          * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OFF() : couldn't open input file " << filename << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OFF() : couldn't open input file " << filename << endl;
         exit(-1);
     }
 

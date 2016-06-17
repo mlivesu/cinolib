@@ -56,7 +56,7 @@ void read_OBJ(const char           * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OBJ() : couldn't open input file " << filename << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OBJ() : couldn't open input file " << filename << endl;
         exit(-1);
     }
 

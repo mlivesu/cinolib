@@ -37,7 +37,7 @@ void write_MESH(const char                * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_MESH() : couldn't write output file " << filename << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_MESH() : couldn't write output file " << filename << endl;
         exit(-1);
     }
 

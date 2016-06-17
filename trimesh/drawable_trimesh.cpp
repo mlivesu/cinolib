@@ -499,7 +499,7 @@ void DrawableTrimesh::unglue_face_colors()
             }
         }
     }
-    //std::cout << borders.size() / 2 << " border egdes found" << std::endl;
+    //logger << borders.size() / 2 << " border egdes found" << endl;
 }
 
 CINO_INLINE

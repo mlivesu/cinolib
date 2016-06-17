@@ -41,7 +41,7 @@ void read_DeyandSun2006(const char          * filename,
 
     if (!f)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_Livesu2012() : error while reading file " << filename << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_Livesu2012() : error while reading file " << filename << endl;
         exit(-1);
     }
 
@@ -81,8 +81,8 @@ void read_DeyandSun2006(const char          * filename,
 
     fclose(f);
 
-    std::cout << coords.size() / 3 << " skel points read" << std::endl;
-    std::cout << arcs.size()   / 2 << " skel arcs   read" << std::endl;
+    logger << coords.size() / 3 << " skel points read" << endl;
+    logger << arcs.size()   / 2 << " skel arcs   read" << endl;
 }
 
 }

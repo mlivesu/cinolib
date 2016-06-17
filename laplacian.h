@@ -80,7 +80,7 @@ std::vector< Eigen::Triplet<double> > laplacian_matrix_entries(const Mesh & m, c
         }
         if (sum == 0.0)
         {
-            std::cerr << "WARNING: null row in the matrix! (disconnected vertex? I put 1 in the diagonal)" << std::endl;
+            std::cerr << "WARNING: null row in the matrix! (disconnected vertex? I put 1 in the diagonal)" << endl;
             sum = 1.0;
         }
         entries.push_back(Entry(vid, vid, sum));

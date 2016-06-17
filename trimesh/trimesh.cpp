@@ -160,9 +160,9 @@ void Trimesh::update_adjacency()
         }
     }
 
-    std::cout << num_vertices()  << "\tvertices"  << std::endl;
-    std::cout << num_triangles() << "\ttriangles" << std::endl;
-    std::cout << num_edges()     << "\tedges"     << std::endl;
+    logger << num_vertices()  << "\tvertices"  << endl;
+    logger << num_triangles() << "\ttriangles" << endl;
+    logger << num_edges()     << "\tedges"     << endl;
 
     timer_stop("Build adjacency");
 }
@@ -247,12 +247,12 @@ void Trimesh::load(const char * filename)
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
         exit(-1);
     }
 
-    std::cout << tris.size() / 3   << " triangles read" << std::endl;
-    std::cout << coords.size() / 3 << " vertices  read" << std::endl;
+    logger << tris.size() / 3   << " triangles read" << endl;
+    logger << coords.size() / 3 << " vertices  read" << endl;
 
     this->filename = std::string(filename);
 
@@ -280,12 +280,12 @@ void Trimesh::save(const char * filename) const
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save() : file format not supported yet " << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save() : file format not supported yet " << endl;
         exit(-1);
     }
 
-    std::cout << tris.size() / 3   << " triangles written" << std::endl;
-    std::cout << coords.size() / 3 << " vertices  written" << std::endl;
+    logger << tris.size() / 3   << " triangles written" << endl;
+    logger << coords.size() / 3 << " vertices  written" << endl;
 
     timer_stop("Save Trimesh");
 }
@@ -561,7 +561,7 @@ void Trimesh::remove_duplicated_triangles()
         new_tris.push_back(tri[2]);
     }
 
-    std::cout << (tris.size() - new_tris.size())/3 << " duplicated triangles have been removed" << std::endl;
+    logger << (tris.size() - new_tris.size())/3 << " duplicated triangles have been removed" << endl;
 
     clear();
     coords = new_coords;
@@ -595,7 +595,7 @@ void Trimesh::normalize_area()
     }
     if (area < 1e-4)
     {
-        std::cerr << "\nWARNING!! Trimesh Area is close to zero: " << area << std::endl << std::endl;
+        std::cerr << "\nWARNING!! Trimesh Area is close to zero: " << area << endl << endl;
         area = 1e-4;
     }
     double s = 1.0 / sqrt(area);
@@ -787,13 +787,13 @@ std::vector<int> Trimesh::adj_vtx2vtx_ordered(const int vid) const
     int curr_t  = adj_edg2tri(curr_e).front();
     int start_t = curr_t;
 
-    std::cout << "curr_e " << curr_e << std::endl;
-    std::cout << "curr_v " << curr_v << std::endl;
-    std::cout << "curr_t " << curr_t << std::endl;
+    logger << "curr_e " << curr_e << endl;
+    logger << "curr_v " << curr_v << endl;
+    logger << "curr_t " << curr_t << endl;
 
     do
     {
-        std::cout << "iter" << std::endl;
+        logger << "iter" << endl;
         ordered_onering.push_back(curr_v);
 
         std::vector<int> adj_tri = adj_edg2tri(curr_e);
@@ -803,10 +803,10 @@ std::vector<int> Trimesh::adj_vtx2vtx_ordered(const int vid) const
         curr_t = (adj_tri[0] == curr_t) ? adj_tri[1] : adj_tri[0];
         curr_v = vertex_opposite_to(curr_e, vid);
 
-        std::cout << "-------" << std::endl;
-        std::cout << "curr_e " << curr_e << std::endl;
-        std::cout << "curr_v " << curr_v << std::endl;
-        std::cout << "curr_t " << curr_t << std::endl;
+        logger << "-------" << endl;
+        logger << "curr_e " << curr_e << endl;
+        logger << "curr_v " << curr_v << endl;
+        logger << "curr_t " << curr_t << endl;
     }
     while(curr_t != start_t);
 

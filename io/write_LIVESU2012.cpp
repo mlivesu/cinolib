@@ -38,7 +38,7 @@ void write_Livesu2012(const char                          * filename,
 
     if (!f)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_Livesu2012() : error while opening file " << filename << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_Livesu2012() : error while opening file " << filename << endl;
         exit(-1);
     }
 

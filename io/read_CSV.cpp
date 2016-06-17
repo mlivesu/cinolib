@@ -40,7 +40,7 @@ void read_CSV(const char          * filename,
 
     if (!f)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : error while reading file " << filename << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : error while reading file " << filename << endl;
         exit(-1);
     }
 
@@ -63,9 +63,9 @@ void read_CSV(const char          * filename,
         arcs.push_back(i);
     }
 
-    std::cout << std::endl;
-    std::cout << "Gesture Loaded - " << coords.size()/3 << " points" << std::endl;
-    std::cout << std::endl;
+    logger << endl;
+    logger << "Gesture Loaded - " << coords.size()/3 << " points" << endl;
+    logger << endl;
 }
 
 }

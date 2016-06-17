@@ -37,7 +37,7 @@ void write_TET(const char                * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_TET() : couldn't write output file " << filename << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_TET() : couldn't write output file " << filename << endl;
         exit(-1);
     }
 

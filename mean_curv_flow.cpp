@@ -81,7 +81,7 @@ void MCF(Trimesh      & m,
             m.set_vertex(vid, new_pos);
         }
 
-        std::cout << "MCF iter: " << i << " residual: " << residual << std::endl;
+        logger << "MCF iter: " << i << " residual: " << residual << endl;
 
         if (i<n_iters) // update matrices for the next iteration
         {

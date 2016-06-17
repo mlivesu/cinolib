@@ -75,16 +75,16 @@ void timer_stop(const char * msg)
 
     if (key == first_call)
     {
-        std::cout << "\n" << msgs[key] << " (" << secs(key) << " secs)" << std::endl;
+        logger << "\n" << msgs[key] << " (" << secs(key) << " secs)" << endl;
 
         for(auto obj : t_start)
         {
             if (obj.first != first_call)
             {
-                std::cout << "   - " << msgs[key] << " (" << secs(key) << " secs)" << std::endl;
+                logger << "   - " << msgs[key] << " (" << secs(key) << " secs)" << endl;
             }
         }
-        std::cout << std::endl;
+        logger << endl;
 
         // reset timer
         //

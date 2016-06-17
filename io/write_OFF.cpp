@@ -39,7 +39,7 @@ void write_OFF(const char                * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OFF() : couldn't save file " << filename << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OFF() : couldn't save file " << filename << endl;
         exit(-1);
     }
 

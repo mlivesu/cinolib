@@ -82,7 +82,7 @@ template<class Mesh>
 CINO_INLINE
 Eigen::SparseMatrix<double> gradient(const Mesh &)
 {
-    std::cerr << "WARNING! - Gradient is not available for this mesh type yet!" << std::endl;
+    std::cerr << "WARNING! - Gradient is not available for this mesh type yet!" << endl;
     assert(false);
 }
 

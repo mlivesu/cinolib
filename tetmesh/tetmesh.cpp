@@ -69,12 +69,12 @@ void Tetmesh::load(const char * filename)
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
         exit(-1);
     }
 
-    std::cout << tets.size()   / 4 << " tetrahedra read" << std::endl;
-    std::cout << coords.size() / 3 << " vertices   read" << std::endl;
+    logger << tets.size()   / 4 << " tetrahedra read" << endl;
+    logger << coords.size() / 3 << " vertices   read" << endl;
 
     this->filename = std::string(filename);
 
@@ -101,7 +101,7 @@ void Tetmesh::save(const char * filename) const
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
         exit(-1);
     }
 
@@ -158,8 +158,8 @@ void Tetmesh::init()
     update_surface_adjacency();
     update_t_normals();
 
-    std::cout << "BB min: " << bb.min << std::endl;
-    std::cout << "BB max: " << bb.max << std::endl;
+    logger << "BB min: " << bb.min << endl;
+    logger << "BB max: " << bb.max << endl;
 }
 
 CINO_INLINE
@@ -274,9 +274,9 @@ void Tetmesh::update_interior_adjacency()
 //        }
     }
 
-    std::cout << num_vertices()   << "\tvertices"   << std::endl;
-    std::cout << num_tetrahedra() << "\ttetrahedra" << std::endl;
-    std::cout << num_edges()      << "\tedges"      << std::endl;
+    logger << num_vertices()   << "\tvertices"   << endl;
+    logger << num_tetrahedra() << "\ttetrahedra" << endl;
+    logger << num_edges()      << "\tedges"      << endl;
 
     timer_stop("Build adjacency");
 }
@@ -370,8 +370,8 @@ void Tetmesh::update_surface_adjacency()
         std::vector<int> tris = edg2tri[eid];
         if (!(tris.empty() || tris.size() == 2))
         {
-            std::cout << "\tedge " << eid << " is non manifold! " << tris.size() << std::endl;
-            std::cout << edge_vertex(eid,0) << "\t" << edge_vertex(eid,1) << std::endl;
+            logger << "\tedge " << eid << " is non manifold! " << tris.size() << endl;
+            logger << edge_vertex(eid,0) << "\t" << edge_vertex(eid,1) << endl;
             u_text[edge_vertex_id(eid,0)] = 10.0;
             u_text[edge_vertex_id(eid,1)] = 10.0;
         }
@@ -390,7 +390,7 @@ void Tetmesh::update_surface_adjacency()
 
     timer_stop("Build Surface");
 
-    std::cout << tris.size() / 3 << " triangles were generated" << std::endl;
+    logger << tris.size() / 3 << " triangles were generated" << endl;
 }
 
 CINO_INLINE
@@ -451,7 +451,7 @@ void Tetmesh::print_quality_statistics(bool list_folded_elements) const
     double msj = FLT_MAX;
     int    inv = 0;
 
-    if (list_folded_elements) std::cout << "Folded Tets: ";
+    if (list_folded_elements) logger << "Folded Tets: ";
 
     for(int tid=0; tid<num_tetrahedra(); ++tid)
     {
@@ -464,18 +464,18 @@ void Tetmesh::print_quality_statistics(bool list_folded_elements) const
         {
             ++inv;
 
-            if (list_folded_elements) std::cout << tid << " - ";
+            if (list_folded_elements) logger << tid << " - ";
         }
     }
     asj /= double(num_tetrahedra());
 
-    if (list_folded_elements) std::cout << std::endl << std::endl;
+    if (list_folded_elements) logger << endl << endl;
 
-    std::cout << std::endl;
-    std::cout << "MIN SJ : " << msj << std::endl;
-    std::cout << "AVG SJ : " << asj << std::endl;
-    std::cout << "INV EL : " << inv << " (out of " << num_tetrahedra() << ")" << std::endl;
-    std::cout << std::endl;
+    logger << endl;
+    logger << "MIN SJ : " << msj << endl;
+    logger << "AVG SJ : " << asj << endl;
+    logger << "INV EL : " << inv << " (out of " << num_tetrahedra() << ")" << endl;
+    logger << endl;
 }
 
 CINO_INLINE
@@ -995,10 +995,10 @@ void Tetmesh::normalize_volume()
     {
         vol += tet_volume(tid);
     }
-    std::cout << "volume before: " << vol << std::endl;
+    logger << "volume before: " << vol << endl;
     if (vol < 1e-4)
     {
-        std::cerr << "\nWARNING!! Tetmesh Volume is close to zero: " << vol << std::endl << std::endl;
+        std::cerr << "\nWARNING!! Tetmesh Volume is close to zero: " << vol << endl << endl;
         vol = 1e-4;
     }
     double s = 1.0 / pow(vol, 1.0/3.0);
@@ -1012,7 +1012,7 @@ void Tetmesh::normalize_volume()
         {
             vol += tet_volume(tid);
         }
-        std::cout << "volume after: " << vol << std::endl;
+        logger << "volume after: " << vol << endl;
     }
     update_bbox();
 }
