@@ -77,7 +77,7 @@ void read_OBJ(const char           * filename,
                     // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
                     //
                     double x, y, z;
-                    sscanf( line, "%*c %.17g %.17g %.17g", &x, &y, &z );
+                    sscanf( line, "%*c %lf %lf %lf", &x, &y, &z );
                     xyz.push_back(x);
                     xyz.push_back(y);
                     xyz.push_back(z);

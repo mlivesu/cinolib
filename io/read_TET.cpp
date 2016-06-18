@@ -58,7 +58,7 @@ void read_TET(const char          * filename,
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         double x,y,z;
-        sscanf(line, "%.17g %.17g %.17g ", &x, &y, &z);
+        sscanf(line, "%lf %lf %lf ", &x, &y, &z);
 
         xyz.push_back(x);
         xyz.push_back(y);

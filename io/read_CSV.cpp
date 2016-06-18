@@ -53,7 +53,7 @@ void read_CSV(const char          * filename,
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         double x, y, z;
-        sscanf( line, "%.17g %.17g %.17g %*d", &x, &y, &z);
+        sscanf( line, "%lf %lf %lf %*d", &x, &y, &z);
         coords.push_back(x);
         coords.push_back(y);
         coords.push_back(z);

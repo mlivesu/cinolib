@@ -63,7 +63,7 @@ void read_MESH(const char          * filename,
                 // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
                 //
                 fgets(line, 1024, fp);
-                sscanf(line, "%.17g %.17g %.17g", &x, &y, &z);
+                sscanf(line, "%lf %lf %lf", &x, &y, &z);
                 xyz.push_back(x);
                 xyz.push_back(y);
                 xyz.push_back(z);

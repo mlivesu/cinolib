@@ -73,7 +73,7 @@ void read_Livesu2012(const char          * filename,
 
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
-        fscanf(f, "%d %.17g %.17g %.17g %.17g %d ", &id, &x, &y, &z, &r, &n_arcs);
+        fscanf(f, "%d %lf %lf %lf %lf %d ", &id, &x, &y, &z, &r, &n_arcs);
 
         for (int j=0; j<n_arcs; ++j)
         {

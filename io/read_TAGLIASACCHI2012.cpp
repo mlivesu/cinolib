@@ -55,7 +55,7 @@ void read_Tagliasacchi2012(const char          * filename,
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         double x, y, z;
-        fscanf(f, "v %.17g %.17g %.17g\n", &x, &y, &z);
+        fscanf(f, "v %lf %lf %lf\n", &x, &y, &z);
         coords.push_back(x);
         coords.push_back(y);
         coords.push_back(z);

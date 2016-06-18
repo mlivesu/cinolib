@@ -59,7 +59,7 @@ void read_IV(const char          * filename,
     // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
     //
     double x,y,z;
-    while (fscanf(fp, "%.17g %.17g %.17g,", &x, &y, &z) == 3)
+    while (fscanf(fp, "%lf %lf %lf,", &x, &y, &z) == 3)
     {
         xyz.push_back(x);
         xyz.push_back(y);
