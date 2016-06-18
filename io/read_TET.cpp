@@ -32,6 +32,8 @@ void read_TET(const char          * filename,
               std::vector<double> & xyz,
               std::vector<u_int>  & tets)
 {
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
     FILE *fp = fopen(filename, "r");
 
     if(!fp)
@@ -53,8 +55,10 @@ void read_TET(const char          * filename,
     {
         fgets(line, 1024, fp);
 
+        // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+        //
         double x,y,z;
-        sscanf(line, "%lf %lf %lf ", &x, &y, &z);
+        sscanf(line, "%.17g %.17g %.17g ", &x, &y, &z);
 
         xyz.push_back(x);
         xyz.push_back(y);

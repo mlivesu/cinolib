@@ -50,7 +50,7 @@ void read_OBJ(const char           * filename,
               std::vector<double>  & xyz,
               std::vector<u_int>   & tri)
 {
-    setlocale(LC_NUMERIC, "en_US.UTF-8");
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
     FILE *fp = fopen(filename, "r");
 
@@ -74,8 +74,10 @@ void read_OBJ(const char           * filename,
                 if(!isspace(line[1])) continue;
                 if(line[1] != 't' && line[1] != 'n' )
                 {
+                    // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+                    //
                     double x, y, z;
-                    sscanf( line, "%*c%lf%lf%lf", &x, &y, &z );
+                    sscanf( line, "%*c %.17g %.17g %.17g", &x, &y, &z );
                     xyz.push_back(x);
                     xyz.push_back(y);
                     xyz.push_back(z);

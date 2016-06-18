@@ -33,6 +33,8 @@ void write_MESH(const char                * filename,
                 const std::vector<double> & xyz,
                 const std::vector<u_int>  & tets)
 {
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
     FILE *fp = fopen(filename, "w");
 
     if(!fp)
@@ -54,7 +56,9 @@ void write_MESH(const char                * filename,
 
         for(size_t i=0; i<xyz.size(); i+=3)
         {
-            fprintf( fp, "%lf %lf %lf 0\n", xyz[i], xyz[i+1], xyz[i+2]);
+            // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+            //
+            fprintf( fp, "%.17g %.17g %.17g 0\n", xyz[i], xyz[i+1], xyz[i+2]);
         }
     }
 

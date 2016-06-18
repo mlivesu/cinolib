@@ -34,6 +34,8 @@ void write_Livesu2012(const char                          * filename,
                       const std::vector<double>             max_spheres,
                       const std::vector< std::vector<int> > adj_vtx2vtx)
 {
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
     FILE *f = fopen(filename,"w");
 
     if (!f)

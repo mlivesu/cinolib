@@ -33,6 +33,8 @@ void read_MESH(const char          * filename,
                std::vector<double> & xyz,
                std::vector<u_int>  & tets)
 {
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
     FILE *fp = fopen(filename, "r");
 
     if(!fp)
@@ -58,8 +60,10 @@ void read_MESH(const char          * filename,
             sscanf(line, "%d", &nverts);
             for(int i=0; i<nverts; ++i)
             {
+                // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+                //
                 fgets(line, 1024, fp);
-                sscanf(line, "%lf %lf %lf", &x, &y, &z);
+                sscanf(line, "%.17g %.17g %.17g", &x, &y, &z);
                 xyz.push_back(x);
                 xyz.push_back(y);
                 xyz.push_back(z);

@@ -44,6 +44,8 @@ void read_Livesu2012(const char          * filename,
                      std::vector<int>    & arcs,
                      std::vector<double> & radius)
 {
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
     coords.clear();
     arcs.clear();
     radius.clear();
@@ -69,7 +71,9 @@ void read_Livesu2012(const char          * filename,
         double      x, y, z, r;
         int         id, n_arcs;
 
-        fscanf(f, "%d %lf %lf %lf %lf %d ", &id, &x, &y, &z, &r, &n_arcs);
+        // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+        //
+        fscanf(f, "%d %.17g %.17g %.17g %.17g %d ", &id, &x, &y, &z, &r, &n_arcs);
 
         for (int j=0; j<n_arcs; ++j)
         {

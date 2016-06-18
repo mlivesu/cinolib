@@ -33,7 +33,7 @@ void read_OFF(const char          * filename,
               std::vector<double> & xyz,
               std::vector<u_int>  & tri)
 {
-    setlocale(LC_NUMERIC, "en_US.UTF-8");
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
     FILE *fp = fopen(filename, "r");
 
@@ -50,8 +50,10 @@ void read_OFF(const char          * filename,
 
     for(int i=0; i<nv; ++i)
     {
+        // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+        //
         double x, y, z;
-        fscanf(fp, "%lf %lf %lf\n", &x, &y, &z);
+        fscanf(fp, "%.17g %.17g %.17g\n", &x, &y, &z);
         xyz.push_back(x);
         xyz.push_back(y);
         xyz.push_back(z);

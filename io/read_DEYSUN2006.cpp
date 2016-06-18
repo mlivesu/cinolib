@@ -33,6 +33,8 @@ void read_DeyandSun2006(const char          * filename,
                         std::vector<int>    & arcs,
                         std::vector<double> & radius)
 {
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
     coords.clear();
     arcs.clear();
     radius.clear();
@@ -50,8 +52,10 @@ void read_DeyandSun2006(const char          * filename,
 
     for (int i=0; i<nv; ++i)
     {
+        // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+        //
         double x, y, z;
-        fscanf(f, "%lf %lf %lf", &x, &y, &z);
+        fscanf(f, "%.17g %.17g %.17g", &x, &y, &z);
 
         coords.push_back(x);
         coords.push_back(y);
