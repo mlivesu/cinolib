@@ -117,6 +117,7 @@ class Tetmesh
 
         std::string loaded_file() const { return filename; }
 
+        Trimesh export_surface() const;
         Trimesh export_surface(std::map<int,int> & tet2tri_map, std::map<int,int> & tri2tet_map) const;
 
         virtual void operator+=(const Tetmesh & m);

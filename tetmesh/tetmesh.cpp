@@ -893,6 +893,14 @@ Trimesh Tetmesh::export_surface(std::map<int,int> & tet2tri_map,
 }
 
 CINO_INLINE
+Trimesh Tetmesh::export_surface() const
+{
+    std::map<int,int> tet2tri, tri2tet;
+    return export_surface(tet2tri, tri2tet);
+}
+
+
+CINO_INLINE
 void Tetmesh::operator+=(const Tetmesh & m)
 {
     int nv = num_vertices();

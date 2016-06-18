@@ -322,6 +322,9 @@ class Trimesh
 
         void remove_duplicated_vertices(const double eps = 1e-7);
         void remove_duplicated_triangles();
+
+        int connected_components(std::vector< std::set<int> > & ccs) const;
+        int connected_components() const;
 };
 
 }

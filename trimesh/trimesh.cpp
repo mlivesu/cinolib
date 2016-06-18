@@ -22,6 +22,7 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include "trimesh.h"
+#include "../bfs.h"
 #include "../timer.h"
 #include "../io/read_write.h"
 
@@ -845,6 +846,37 @@ std::set<int> Trimesh::vertex_n_ring(const int vid, const int n) const
     //vector<int> ring;
     //std::copy(unique_ring.begin(), unique_ring.end(), std::back_inserter(ring));
     //return ring;
+}
+
+CINO_INLINE
+int Trimesh::connected_components(std::vector< std::set<int> > & ccs) const
+{
+    assert(ccs.empty());
+
+    int seed = 0;
+    std::vector<bool> visited(num_vertices(), false);
+
+    do
+    {
+        std::set<int> cc;
+        bfs_exahustive<Trimesh>(*this, seed, cc);
+
+        ccs.push_back(cc);
+        for(int vid : cc) visited[vid] = true;
+
+        seed = 0;
+        while (seed < num_vertices() && visited[seed]) ++seed;
+    }
+    while (seed < num_vertices());
+
+    return ccs.size();
+}
+
+CINO_INLINE
+int Trimesh::connected_components() const
+{
+    std::vector< std::set<int> > ccs;
+    return connected_components(ccs);
 }
 
 }
