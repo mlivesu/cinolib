@@ -36,8 +36,22 @@ class IntegralCurve : public DrawableObject
 {
     public:
 
-        IntegralCurve( Mesh & m, const VectorField & grad, const int source);
+        IntegralCurve(const Mesh        & m,
+                      const VectorField & grad,
+                      const int           source_tid,
+                      const vec3d       & source_pos);
 
+        IntegralCurve(const Mesh        & m,
+                      const VectorField & grad,
+                      const int           source_tid,
+                      const vec3d       & source_pos,
+                      const float         stop_at_this_value);
+
+        IntegralCurve(const Mesh        & m,
+                      const VectorField & grad,
+                      const int           source_tid,
+                      const vec3d       & source_pos,
+                      const int           stop_at_this_vertex);
 
         vec3d scene_center() const { return m_ptr->bbox().center(); }
         float scene_radius() const { return m_ptr->bbox().diag();   }
@@ -69,9 +83,8 @@ class IntegralCurve : public DrawableObject
 
     private:
 
-        std::vector<vec3d> curve;
-
-         Mesh        * m_ptr;
+        std::vector<vec3d>  curve;
+        const Mesh        * m_ptr;
         const VectorField * grad_ptr;
 };
 

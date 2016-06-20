@@ -32,16 +32,20 @@ namespace cinolib
 
 template<class Mesh>
 CINO_INLINE
-IntegralCurve<Mesh>::IntegralCurve( Mesh &m, const VectorField & grad, const int source)
+IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
+                                   const VectorField & grad,
+                                   const int           source_tid,
+                                   const vec3d       & source_pos)
     : m_ptr(&m)
     , grad_ptr(&grad)
 {
     type = ISOCURVE;
 
-    int   curr_tid = source;
-    vec3d curr_pos = m.element_barycenter(source);
+    int   curr_tid = source_tid;
+    vec3d curr_pos = source_pos;
+    bool converged = false;
 
-    for(int i=0; i<120; ++i)
+    do
     {
         curve.push_back(curr_pos);
         int   next_tid;
@@ -49,7 +53,85 @@ IntegralCurve<Mesh>::IntegralCurve( Mesh &m, const VectorField & grad, const int
         traverse_element(curr_tid, curr_pos, next_tid, next_pos);
         curr_tid = next_tid;
         curr_pos = next_pos;
-    }
+
+        for(int i=0; i<3; ++i)
+        {
+            converged = (m_ptr->is_local_maxima(m_ptr->triangle_vertex_id(curr_tid,i)));
+        }
+
+    } while (!converged);
+}
+
+
+template<class Mesh>
+CINO_INLINE
+IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
+                                   const VectorField & grad,
+                                   const int           source_tid,
+                                   const vec3d       & source_pos,
+                                   const float         stop_at_this_value)
+    : m_ptr(&m)
+    , grad_ptr(&grad)
+{
+    type = ISOCURVE;
+
+    int   curr_tid = source_tid;
+    vec3d curr_pos = source_pos;
+    bool converged = false;
+
+    do
+    {
+        curve.push_back(curr_pos);
+        int   next_tid;
+        vec3d next_pos;
+        traverse_element(curr_tid, curr_pos, next_tid, next_pos);
+        curr_tid = next_tid;
+        curr_pos = next_pos;
+
+        float fmin = FLT_MAX;
+        for(int i=0; i<3; ++i)
+        {
+            int vid   = m_ptr->triangle_vertex_id(curr_tid,i);
+            converged = (m_ptr->is_local_maxima(vid));
+            fmin      = std::min(fmin, m_ptr->vertex_u_text(vid));
+        }
+        if (fmin > stop_at_this_value) converged = true;
+
+    } while (!converged);
+}
+
+template<class Mesh>
+CINO_INLINE
+IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
+                                   const VectorField & grad,
+                                   const int           source_tid,
+                                   const vec3d       & source_pos,
+                                   const int           stop_at_this_vertex)
+    : m_ptr(&m)
+    , grad_ptr(&grad)
+{
+    type = ISOCURVE;
+
+    int   curr_tid = source_tid;
+    vec3d curr_pos = source_pos;
+    bool converged = false;
+
+    do
+    {
+        curve.push_back(curr_pos);
+        int   next_tid;
+        vec3d next_pos;
+        traverse_element(curr_tid, curr_pos, next_tid, next_pos);
+        curr_tid = next_tid;
+        curr_pos = next_pos;
+
+        for(int i=0; i<3; ++i)
+        {
+            converged = (m_ptr->is_local_maxima(m_ptr->triangle_vertex_id(curr_tid,i)));
+        }
+        if (m_ptr->triangle_contains_vertex(curr_tid, stop_at_this_vertex)) converged = true;
+
+    } while (!converged);
 }
 
 
