@@ -31,7 +31,8 @@ namespace cinolib
 CINO_INLINE
 void read_OFF(const char          * filename,
               std::vector<double> & xyz,
-              std::vector<u_int>  & tri)
+              std::vector<u_int>  & tri,
+              std::vector<u_int>  & quad)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -43,10 +44,10 @@ void read_OFF(const char          * filename,
         exit(-1);
     }
 
-    int nv, nt, dummy;
+    int nv, npoly, dummy;
 
     fscanf(fp, "OFF\n");
-    fscanf(fp, "%d %d %d\n", &nv, &nt, &dummy);
+    fscanf(fp, "%d %d %d\n", &nv, &npoly, &dummy);
 
     for(int i=0; i<nv; ++i)
     {
@@ -59,13 +60,28 @@ void read_OFF(const char          * filename,
         xyz.push_back(z);
     }
 
-    for(int i=0; i<nt; ++i)
+    for(int i=0; i<npoly; ++i)
     {
-        int v0, v1, v2;
-        fscanf(fp, "%*d %d %d %d\n", &v0, &v1, &v2);
-        tri.push_back(v0);
-        tri.push_back(v1);
-        tri.push_back(v2);
+        int n_corners, v0, v1, v2, v3;
+        fscanf(fp, "%d %d %d %d %d\n", &n_corners, &v0, &v1, &v2, &v3);
+        if (n_corners == 3)
+        {
+            tri.push_back(v0);
+            tri.push_back(v1);
+            tri.push_back(v2);
+        }
+        else if (n_corners == 4)
+        {
+            quad.push_back(v0);
+            quad.push_back(v1);
+            quad.push_back(v2);
+            quad.push_back(v3);
+        }
+        else
+        {
+            std::cerr << "read_OFF: polygons with " << n_corners << " are not supported!" << std::endl;
+            assert("Unsupported polygon" && false);
+        }
     }
 
     fclose(fp);

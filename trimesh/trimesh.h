@@ -39,7 +39,7 @@
 namespace cinolib
 {
 
-static int TRI_EDGES[3][2] =
+static const int TRI_EDGES[3][2] =
 {
     { 0, 1 }, // 0
     { 1, 2 }, // 1
@@ -91,240 +91,102 @@ class Trimesh
         std::vector< std::vector<int> > tri2tri;
 
         void load(const char * filename);
+        void init();
 
     public:
 
-        void init();
-        void clear();
-        void update_adjacency();
-        void update_t_normals();
-        void update_v_normals();
-
-        std::string loaded_file() const { return filename; }
-
-        int num_vertices()  const { return coords.size()/3; }
-        int num_triangles() const { return tris.size()  /3; }
-        int num_elements()  const { return tris.size()  /3; }
-        int num_edges()     const { return edges.size() /2; }
-
-        const std::vector<int> & adj_vtx2vtx(const int vid) const { return vtx2vtx.at(vid); }
-        const std::vector<int> & adj_vtx2edg(const int vid) const { return vtx2edg.at(vid); }
-        const std::vector<int> & adj_vtx2tri(const int vid) const { return vtx2tri.at(vid); }
-        const std::vector<int> & adj_edg2tri(const int eid) const { return edg2tri.at(eid); }
-        const std::vector<int> & adj_tri2edg(const int tid) const { return tri2edg.at(tid); }
-        const std::vector<int> & adj_tri2tri(const int tid) const { return tri2tri.at(tid); }
-
-        std::vector<int> adj_vtx2vtx_ordered(const int vid) const;
-
-        const std::vector<double> & vector_coords()    const { return coords; }
-        const std::vector<u_int>  & vector_triangles() const { return tris;   }
-        const std::vector<u_int>  & vector_edges()     const { return edges;  }
-        const Bbox                & bbox()             const { return bb;     }
-
-        const std::vector<float> & vector_v_float_scalar() const { return u_text; }
-        const std::vector<int>   & vector_t_int_scalar() const { return t_label; }
-
-        void save(const char * filename) const;
-
-        virtual int add_vertex(const vec3d & v, const float scalar = 0.0);
-        virtual int add_triangle(const int vid0, const int vid1, const int vid2, const int scalar);
-
-        void set_triangle(const int tid, const int vid0, const int vid1, const int vid2);
-
-        std::set<int> vertex_n_ring(const int vid, const int n) const;
-
-        double element_mass(const int tid) const;
-        double vertex_mass (const int vid) const;
-
-        std::vector<int>  get_boundary_vertices() const;
-        std::vector<ipair> get_boundary_edges()    const;
-
-        int vertex_opposite_to(const int tid, const int vid0, const int vid1) const;
-        int vertex_opposite_to(const int eid, const int vid) const;
-        int edge_opposite_to(const int tid, const int vid) const;
-
-        double angle_at_vertex(const int tid, const int vid) const;
-
-        double edge_length(const int eid) const;
-        double avg_edge_length() const;
-        double max_edge_length() const;
-        double min_edge_length() const;
-
-        vec3d triangle_vertex(const int tid, const int offset) const
-        {
-            int tid_ptr = tid * 3;
-            int vid     = tris[tid_ptr + offset];
-            int vid_ptr = vid * 3;
-            return vec3d(coords[vid_ptr + 0], coords[vid_ptr + 1], coords[vid_ptr + 2]);
-        }
-
-        bool edge_contains_vertex(const int eid, const int vid) const
-        {
-            if (edge_vertex_id(eid,0) == vid) return true;
-            if (edge_vertex_id(eid,1) == vid) return true;
-            return false;
-        }
-
-        vec3d edge_vertex(const int eid, const int offset) const
-        {
-            int eid_ptr = eid * 2;
-            int vid     = edges[eid_ptr + offset];
-            int vid_ptr = vid * 3;
-            return vec3d(coords[vid_ptr + 0], coords[vid_ptr + 1], coords[vid_ptr + 2]);
-        }
-
-        bool vertex_is_border(const int vid) const; // has adjacent triangles with different per triangle iscalars
-
-        bool vertex_is_boundary(const int vid) const; // is along an open boundary
-
-        bool edge_is_manifold(const int eid) const
-        {
-            return (adj_edg2tri(eid).size() == 2);
-        }
-
-        bool edge_is_boundary(const int eid) const
-        {
-            return (adj_edg2tri(eid).size() < 2);
-        }
-
-        bool edge_is_border(const int eid) const
-        {
-            assert(edge_is_manifold(eid));
-
-            int tid_0 = adj_edg2tri(eid)[0];
-            int tid_1 = adj_edg2tri(eid)[1];
-
-            return (triangle_label(tid_0) != triangle_label(tid_1));
-        }
-
-        bool triangle_is_boundary(const int tid) const
-        {
-            return (adj_tri2tri(tid).size() < 3);
-        }
-
-        int edge_vertex_id(const int eid, const int offset) const
-        {
-            int eid_ptr = eid * 2;
-            return edges[eid_ptr + offset];
-        }
-
-        int triangle_vertex_id(const int tid, const int offset) const
-        {
-            int tid_ptr = tid * 3;
-            return tris[tid_ptr + offset];
-        }
-
-        vec3d triangle_normal(const int tid) const
-        {
-            int tid_ptr = tid * 3;
-            return vec3d(t_norm[tid_ptr + 0], t_norm[tid_ptr + 1], t_norm[tid_ptr + 2]);
-        }
-
-        vec3d vertex_normal(const int vid) const
-        {
-            int vid_ptr = vid * 3;
-            return vec3d(v_norm[vid_ptr+0], v_norm[vid_ptr+1], v_norm[vid_ptr+2]);
-        }
-
-        vec3d vertex(const int vid) const
-        {
-            int vid_ptr = vid * 3;
-            return vec3d(coords[vid_ptr+0], coords[vid_ptr+1], coords[vid_ptr+2]);
-        }
-
-        void set_vertex(const int vid, const vec3d & pos)
-        {
-            int vid_ptr = vid * 3;
-            coords[vid_ptr + 0] = pos.x();
-            coords[vid_ptr + 1] = pos.y();
-            coords[vid_ptr + 2] = pos.z();
-        }
-
-        int vertex_valence(const int vid) const
-        {
-            return adj_vtx2vtx(vid).size();
-        }
-
-        float triangle_min_u_text(const int tid) const
-        {
-            float vals[3] =
-            {
-                vertex_u_text(triangle_vertex_id(tid,0)),
-                vertex_u_text(triangle_vertex_id(tid,1)),
-                vertex_u_text(triangle_vertex_id(tid,2)),
-            };
-            return *std::min_element(vals, vals+3);
-        }
-
-        float vertex_u_text(const int vid) const
-        {
-            CHECK_BOUNDS(u_text, vid);
-            return u_text[vid];
-        }
-
-        void set_vertex_u_text(const int vid, const float s)
-        {
-            CHECK_BOUNDS(u_text, vid);
-            u_text[vid] = s;
-        }
-
-        int vertex_with_min_u_text() const
-        {
-            return (std::min_element(u_text.begin(), u_text.end()) - u_text.begin());
-        }
-
-        int triangle_label(const int tid) const
-        {
-            CHECK_BOUNDS(t_label, tid);
-            return t_label[tid];
-        }
-
-        void set_triangle_label(const int tid, const int i)
-        {
-            CHECK_BOUNDS(t_label, tid);
-            t_label[tid] = i;
-        }
-
-        void update_normals()
-        {
-            update_t_normals();
-            update_v_normals();
-        }
-
-        bool triangle_contains_vertex(const int tid, const int vid) const
-        {
-            if (triangle_vertex_id(tid, 0) == vid) return true;
-            if (triangle_vertex_id(tid, 1) == vid) return true;
-            if (triangle_vertex_id(tid, 2) == vid) return true;
-            return false;
-        }
-
-        ipair shared_edge(const int tid0, const int tid1) const;
-
-        int shared_vertex(const int eid0, const int eid1) const;
-
-        int shared_triangle(const int eid0, const int eid1) const;
-
-        bool edges_share_same_triangle(const int eid1, const int eid2) const;
-
-        int triangle_adjacent_along(const int tid, const int vid0, const int vid1) const;
-
-        vec3d element_barycenter(const int tid) const;
-
-        void normalize_area();
-        void center_bbox();
-        void update_bbox();        
-
-        void translate(const vec3d & delta);
-        void rotate(const vec3d & axis, const double angle);
-
-        virtual void operator+=(const Trimesh & m);
-
-        void remove_duplicated_vertices(const double eps = 1e-7);
-        void remove_duplicated_triangles();
-
-        int connected_components(std::vector< std::set<int> > & ccs) const;
-        int connected_components() const;
+        void                        clear();
+        void                        update_adjacency();
+        void                        update_normals();
+        void                        update_t_normals();
+        void                        update_v_normals();
+        void                        update_bbox();
+        void                        normalize_area();
+        void                        center_bbox();
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        virtual void                operator+=(const Trimesh & m);
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        std::string                 loaded_file() const;
+        void                        save(const char * filename) const;
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        int                         num_vertices()  const;
+        int                         num_triangles() const;
+        int                         num_elements()  const;
+        int                         num_edges()     const;
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        const std::vector<int> &    adj_vtx2vtx(const int vid) const;
+        const std::vector<int> &    adj_vtx2edg(const int vid) const;
+        const std::vector<int> &    adj_vtx2tri(const int vid) const;
+        const std::vector<int> &    adj_edg2tri(const int eid) const;
+        const std::vector<int> &    adj_tri2edg(const int tid) const;
+        const std::vector<int> &    adj_tri2tri(const int tid) const;
+        std::vector<int>            adj_vtx2vtx_ordered(const int vid) const;
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        const Bbox                & bbox()                  const;
+        const std::vector<double> & vector_coords()         const;
+        const std::vector<u_int>  & vector_triangles()      const;
+        const std::vector<u_int>  & vector_edges()          const;
+        const std::vector<float>  & vector_v_float_scalar() const;
+        const std::vector<int>    & vector_t_int_scalar()   const;
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        void                        translate(const vec3d & delta);
+        void                        rotate   (const vec3d & axis, const double angle);
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        int                         connected_components(std::vector< std::set<int> > & ccs) const;
+        int                         connected_components() const;
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        std::vector<ipair>          get_boundary_edges()    const;
+        int                         edge_vertex_id(const int eid, const int offset) const;
+        int                         edge_opposite_to(const int tid, const int vid) const;
+        bool                        edge_contains_vertex(const int eid, const int vid) const;
+        bool                        edge_is_manifold(const int eid) const;
+        bool                        edge_is_boundary(const int eid) const;
+        bool                        edge_is_border(const int eid) const;
+        bool                        edges_share_same_triangle(const int eid1, const int eid2) const;
+        double                      edge_length(const int eid) const;
+        double                      avg_edge_length() const;
+        double                      max_edge_length() const;
+        double                      min_edge_length() const;
+        vec3d                       edge_vertex(const int eid, const int offset) const;
+        ipair                       shared_edge(const int tid0, const int tid1) const;
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        void                        remove_duplicated_triangles();
+        vec3d                       triangle_vertex(const int tid, const int offset) const;
+        bool                        triangle_is_boundary(const int tid) const;
+        int                         triangle_vertex_id(const int tid, const int offset) const;
+        vec3d                       triangle_normal(const int tid) const;
+        float                       triangle_min_u_text(const int tid) const;
+        int                         triangle_label(const int tid) const;
+        void                        triangle_set_label(const int tid, const int i);
+        int                         shared_triangle(const int eid0, const int eid1) const;
+        bool                        triangle_contains_vertex(const int tid, const int vid) const;
+        int                         triangle_adjacent_along(const int tid, const int vid0, const int vid1) const;
+        double                      element_mass(const int tid) const;
+        vec3d                       element_barycenter(const int tid) const;
+        void                        set_triangle(const int tid, const int vid0, const int vid1, const int vid2);
+        virtual int                 add_triangle(const int vid0, const int vid1, const int vid2, const int scalar);
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        std::set<int>               vertex_n_ring(const int vid, const int n) const;
+        double                      vertex_mass (const int vid) const;
+        int                         vertex_opposite_to(const int tid, const int vid0, const int vid1) const;
+        int                         vertex_opposite_to(const int eid, const int vid) const;
+        double                      angle_at_vertex(const int tid, const int vid) const;
+        bool                        vertex_is_border(const int vid) const;
+        bool                        vertex_is_boundary(const int vid) const;
+        vec3d                       vertex_normal(const int vid) const;
+        vec3d                       vertex(const int vid) const;
+        void                        set_vertex(const int vid, const vec3d & pos);
+        int                         vertex_valence(const int vid) const;
+        float                       vertex_u_text(const int vid) const;
+        void                        set_vertex_u_text(const int vid, const float s);
+        int                         vertex_with_min_u_text() const;
+        int                         shared_vertex(const int eid0, const int eid1) const;
+        bool                        vertex_is_local_minima(const int vid) const;
+        bool                        vertex_is_local_maxima(const int vid) const;
+        bool                        vertex_is_critical_point(const int vid) const;
+        void                        remove_duplicated_vertices(const double eps = 1e-7);
+        std::vector<int>            get_boundary_vertices() const;
+        virtual int                 add_vertex(const vec3d & v, const float scalar = 0.0);
 };
 
 }

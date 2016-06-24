@@ -37,6 +37,8 @@ typedef enum
     ABSTRACT      ,
     TRIMESH       ,
     TETMESH       ,
+    QUADMESH      ,
+    HEXMESH       ,
     SKELETON      ,
     GESTURE       ,
     ISOCURVE      ,

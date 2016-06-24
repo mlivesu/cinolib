@@ -31,7 +31,8 @@ namespace cinolib
 CINO_INLINE
 void write_OFF(const char                * filename,
               const std::vector<double> & xyz,
-              const std::vector<u_int>  & tri)
+              const std::vector<u_int>  & tri,
+              const std::vector<u_int>  & quad)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -43,7 +44,8 @@ void write_OFF(const char                * filename,
         exit(-1);
     }
 
-    fprintf (fp, "OFF\n%zu %zu 0\n", xyz.size()/3, tri.size()/3);
+    int n_poly = tri.size()/3 + quad.size()/4;
+    fprintf (fp, "OFF\n%zu %zu 0\n", xyz.size()/3, n_poly);
 
     for(size_t i=0; i<xyz.size(); i+=3)
     {
@@ -55,6 +57,11 @@ void write_OFF(const char                * filename,
     for(size_t i=0; i<tri.size(); i+=3)
     {
         fprintf(fp, "3 %d %d %d\n", tri[i], tri[i+1], tri[i+2]);
+    }
+
+    for(size_t i=0; i<quad.size(); i+=4)
+    {
+        fprintf(fp, "4 %d %d %d %d\n", quad[i], quad[i+1], quad[i+2], quad[i+3]);
     }
 
     fclose(fp);

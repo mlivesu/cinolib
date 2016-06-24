@@ -35,7 +35,8 @@ namespace cinolib
 CINO_INLINE
 void write_OFF(const char                * filename,
                const std::vector<double> & xyz,
-               const std::vector<u_int>  & tri);
+               const std::vector<u_int>  & tri,
+               const std::vector<u_int>  & quad);
 
 }
 

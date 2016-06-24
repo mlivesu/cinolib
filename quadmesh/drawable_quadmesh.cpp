@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "drawable_trimesh.h"
+#include "drawable_quadmesh.h"
 #include "../textures/quality_ramp_texture.h"
 #include "../textures/quality_ramp_texture_plus_isolines.h"
 #include "../textures/isolines_texture.h"
@@ -31,28 +31,28 @@ namespace cinolib
 {
 
 CINO_INLINE
-DrawableTrimesh::DrawableTrimesh() : Trimesh()
+DrawableQuadmesh::DrawableQuadmesh() : Quadmesh()
 {
     init();
 }
 
 CINO_INLINE
-DrawableTrimesh::DrawableTrimesh(const char *filename) : Trimesh(filename)
+DrawableQuadmesh::DrawableQuadmesh(const char *filename) : Quadmesh(filename)
 {
     init();
 }
 
 CINO_INLINE
-DrawableTrimesh::DrawableTrimesh(const std::vector<double> &coords,
-                                 const std::vector<u_int>  &tris) : Trimesh(coords, tris)
+DrawableQuadmesh::DrawableQuadmesh(const std::vector<double> &coords,
+                                   const std::vector<u_int>  &quads) : Quadmesh(coords, quads)
 {
     init();
 }
 
 CINO_INLINE
-void DrawableTrimesh::init()
+void DrawableQuadmesh::init()
 {
-    type               = TRIMESH;
+    type               = QUADMESH;
     draw_mode          = DRAW_MESH | DRAW_SMOOTH | DRAW_FACECOLOR | DRAW_BORDERS;
 
     texture_id         = 0;
@@ -70,32 +70,32 @@ void DrawableTrimesh::init()
     border_color[3]    = 1.0;
 
     set_v_color(0.1, 0.8, 0.1);
-    set_t_color(0.1, 0.8, 0.1);
-    //color_wrt_triangle_scalar();
+    set_q_color(0.1, 0.8, 0.1);
+    //color_wrt_quad_scalar();
 }
 
 CINO_INLINE
-void DrawableTrimesh::clear()
+void DrawableQuadmesh::clear()
 {
-    Trimesh::clear();
+    Quadmesh::clear();
     v_colors.clear();
-    t_colors.clear();
+    q_colors.clear();
 }
 
 CINO_INLINE
-vec3d DrawableTrimesh::scene_center() const
+vec3d DrawableQuadmesh::scene_center() const
 {
     return bb.center();
 }
 
 CINO_INLINE
-float DrawableTrimesh::scene_radius() const
+float DrawableQuadmesh::scene_radius() const
 {
     return bb.diag() * 0.5;
 }
 
 CINO_INLINE
-void DrawableTrimesh::render_pass() const
+void DrawableQuadmesh::render_pass() const
 {
     if (draw_mode & DRAW_POINTS)
     {
@@ -116,25 +116,30 @@ void DrawableTrimesh::render_pass() const
         //
         if (draw_mode & DRAW_FACECOLOR)
         {
-            int n_tris = tris.size()/3;
-            for(int tid=0; tid<n_tris; ++tid)
+            int n_quads = quads.size()/4;
+            for(int qid=0; qid<n_quads; ++qid)
             {
-                int tid_ptr  = 3 * tid;
-                int vid0     = tris[tid_ptr + 0];
-                int vid1     = tris[tid_ptr + 1];
-                int vid2     = tris[tid_ptr + 2];
-                int vid0_ptr = 3 * vid0;
-                int vid1_ptr = 3 * vid1;
-                int vid2_ptr = 3 * vid2;
+                int qid_vid_ptr  = 4 * qid;
+                int qid_col_ptr  = 3 * qid;
+                int vid0         = quads[qid_vid_ptr + 0];
+                int vid1         = quads[qid_vid_ptr + 1];
+                int vid2         = quads[qid_vid_ptr + 2];
+                int vid3         = quads[qid_vid_ptr + 3];
+                int vid0_ptr     = 3 * vid0;
+                int vid1_ptr     = 3 * vid1;
+                int vid2_ptr     = 3 * vid2;
+                int vid3_ptr     = 3 * vid3;
 
-                glBegin(GL_TRIANGLES);
-                glColor3fv(&(t_colors[tid_ptr]));
+                glBegin(GL_QUADS);
+                glColor3fv(&(q_colors[qid_col_ptr]));
                 glNormal3dv(&(v_norm[vid0_ptr]));
                 glVertex3dv(&(coords[vid0_ptr]));
                 glNormal3dv(&(v_norm[vid1_ptr]));
                 glVertex3dv(&(coords[vid1_ptr]));
                 glNormal3dv(&(v_norm[vid2_ptr]));
                 glVertex3dv(&(coords[vid2_ptr]));
+                glNormal3dv(&(v_norm[vid3_ptr]));
+                glVertex3dv(&(coords[vid3_ptr]));
                 glEnd();
             }
         }
@@ -158,7 +163,7 @@ void DrawableTrimesh::render_pass() const
                 glColor3f(1.0,1.0,1.0);
             }
 
-            glDrawElements(GL_TRIANGLES, tris.size(), GL_UNSIGNED_INT, tris.data());
+            glDrawElements(GL_QUADS, quads.size(), GL_UNSIGNED_INT, quads.data());
 
             if (draw_mode & DRAW_TEXTURE1D)   glDisableClientState(GL_TEXTURE_COORD_ARRAY); else
             if (draw_mode & DRAW_VERTEXCOLOR) glDisableClientState(GL_COLOR_ARRAY);
@@ -179,7 +184,7 @@ void DrawableTrimesh::render_pass() const
         glLineWidth(wireframe_width);
         glColor4fv(wireframe_color);
 
-        glDrawElements(GL_TRIANGLES, tris.size(), GL_UNSIGNED_INT, tris.data());
+        glDrawElements(GL_QUADS, quads.size(), GL_UNSIGNED_INT, quads.data());
 
         glDisableClientState(GL_VERTEX_ARRAY);
     }
@@ -215,7 +220,7 @@ void DrawableTrimesh::render_pass() const
 
 
 CINO_INLINE
-void DrawableTrimesh::draw() const
+void DrawableQuadmesh::draw() const
 {
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glDisable(GL_CULL_FACE);
@@ -302,28 +307,28 @@ void DrawableTrimesh::draw() const
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_draw_mesh(bool b)
+void DrawableQuadmesh::set_draw_mesh(bool b)
 {
     if (b) draw_mode |=  DRAW_MESH;
     else   draw_mode &= ~DRAW_MESH;
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_wireframe(bool b)
+void DrawableQuadmesh::set_wireframe(bool b)
 {
     if (b) draw_mode |=  DRAW_WIREFRAME;
     else   draw_mode &= ~DRAW_WIREFRAME;
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_border(bool b)
+void DrawableQuadmesh::set_border(bool b)
 {
     if (b) draw_mode |=  DRAW_BORDERS;
     else   draw_mode &= ~DRAW_BORDERS;
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_flat_shading()
+void DrawableQuadmesh::set_flat_shading()
 {
     draw_mode |=  DRAW_FLAT;
     draw_mode &= ~DRAW_SMOOTH;
@@ -331,7 +336,7 @@ void DrawableTrimesh::set_flat_shading()
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_smooth_shading()
+void DrawableQuadmesh::set_smooth_shading()
 {
     draw_mode |=  DRAW_SMOOTH;
     draw_mode &= ~DRAW_FLAT;
@@ -339,7 +344,7 @@ void DrawableTrimesh::set_smooth_shading()
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_points_shading()
+void DrawableQuadmesh::set_points_shading()
 {
     draw_mode |=  DRAW_POINTS;
     draw_mode &= ~DRAW_FLAT;
@@ -347,7 +352,7 @@ void DrawableTrimesh::set_points_shading()
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_enable_vertex_color()
+void DrawableQuadmesh::set_enable_vertex_color()
 {
     draw_mode |=  DRAW_VERTEXCOLOR;
     draw_mode &= ~DRAW_FACECOLOR;
@@ -356,7 +361,7 @@ void DrawableTrimesh::set_enable_vertex_color()
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_enable_triangle_color()
+void DrawableQuadmesh::set_enable_quad_color()
 {
     draw_mode |=  DRAW_FACECOLOR;
     draw_mode &= ~DRAW_VERTEXCOLOR;
@@ -365,7 +370,7 @@ void DrawableTrimesh::set_enable_triangle_color()
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_enable_texture1D(int texture)
+void DrawableQuadmesh::set_enable_texture1D(int texture)
 {
     draw_mode |=  DRAW_TEXTURE1D;
     draw_mode &= ~DRAW_VERTEXCOLOR;
@@ -410,7 +415,7 @@ void DrawableTrimesh::set_enable_texture1D(int texture)
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_wireframe_color(float r, float g, float b)
+void DrawableQuadmesh::set_wireframe_color(float r, float g, float b)
 {
     wireframe_color[0] = r;
     wireframe_color[1] = g;
@@ -418,19 +423,19 @@ void DrawableTrimesh::set_wireframe_color(float r, float g, float b)
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_wireframe_width(float width)
+void DrawableQuadmesh::set_wireframe_width(float width)
 {
     wireframe_width = width;
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_wireframe_transparency(float alpha)
+void DrawableQuadmesh::set_wireframe_transparency(float alpha)
 {
     wireframe_color[3] = alpha;
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_border_color(float r, float g, float b)
+void DrawableQuadmesh::set_border_color(float r, float g, float b)
 {
     border_color[0] = r;
     border_color[1] = g;
@@ -438,19 +443,19 @@ void DrawableTrimesh::set_border_color(float r, float g, float b)
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_border_width(float width)
+void DrawableQuadmesh::set_border_width(float width)
 {
     border_width = width;
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_border_transparency(float alpha)
+void DrawableQuadmesh::set_border_transparency(float alpha)
 {
     border_color[3] = alpha;
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_v_color(float r, float g, float b)
+void DrawableQuadmesh::set_v_color(float r, float g, float b)
 {
     v_colors.resize(num_vertices()*3);
     for(int i=0; i<(int)v_colors.size(); i+=3)
@@ -462,31 +467,31 @@ void DrawableTrimesh::set_v_color(float r, float g, float b)
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_t_color(float r, float g, float b)
+void DrawableQuadmesh::set_q_color(float r, float g, float b)
 {
-    t_colors.resize(num_triangles()*3);
-    for(int i=0; i<(int)t_colors.size(); i+=3)
+    q_colors.resize(num_quads()*3);
+    for(int i=0; i<(int)q_colors.size(); i+=3)
     {
-        t_colors[i + 0] = r;
-        t_colors[i + 1] = g;
-        t_colors[i + 2] = b;
+        q_colors[i + 0] = r;
+        q_colors[i + 1] = g;
+        q_colors[i + 2] = b;
     }
 }
 
 CINO_INLINE
-const float *DrawableTrimesh::vertex_color(const int vid) const
+const float *DrawableQuadmesh::vertex_color(const int vid) const
 {
     return &(v_colors[vid*3]);
 }
 
 CINO_INLINE
-const float *DrawableTrimesh::triangle_color(const int tid) const
+const float *DrawableQuadmesh::quad_color(const int qid) const
 {
-    return &(t_colors[tid*3]);
+    return &(q_colors[qid*3]);
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_vertex_color(const int vid, const float *color)
+void DrawableQuadmesh::set_vertex_color(const int vid, const float *color)
 {
     int vid_ptr = vid * 3;
     v_colors.at(vid_ptr + 0) = color[0];
@@ -495,128 +500,12 @@ void DrawableTrimesh::set_vertex_color(const int vid, const float *color)
 }
 
 CINO_INLINE
-void DrawableTrimesh::set_triangle_color(const int tid, const float *color)
+void DrawableQuadmesh::set_quad_color(const int qid, const float *color)
 {
-    int tid_ptr = tid * 3;
-    t_colors.at(tid_ptr + 0) = color[0];
-    t_colors.at(tid_ptr + 1) = color[1];
-    t_colors.at(tid_ptr + 2) = color[2];
-}
-
-CINO_INLINE
-void DrawableTrimesh::unglue_face_colors()
-{
-    borders.clear();
-
-    for(int tid=0; tid<num_triangles(); ++tid)
-    {
-        std::vector<int> nbrs = adj_tri2tri(tid);
-
-        for(int i=0; i<(int)nbrs.size(); ++i)
-        {
-            int nbr = nbrs[i];
-
-            const float *tid_rgb = triangle_color(tid);
-            const float *nbr_rgb = triangle_color(nbr);
-
-            if (tid_rgb[0] != nbr_rgb[0] ||
-                tid_rgb[1] != nbr_rgb[1] ||
-                tid_rgb[2] != nbr_rgb[2])
-            {
-                ipair e = shared_edge(tid, nbr);
-                borders.push_back(e.first);
-                borders.push_back(e.second);
-            }
-        }
-    }
-    //logger << borders.size() / 2 << " border egdes found" << endl;
-}
-
-CINO_INLINE
-void DrawableTrimesh::unglue_boundary_edges()
-{
-    std::vector<ipair> boundary = get_boundary_edges();
-
-    borders.clear();
-    for(int i=0; i<(int)boundary.size(); ++i)
-    {
-        borders.push_back(boundary[i].first);
-        borders.push_back(boundary[i].second);
-    }
-}
-
-CINO_INLINE
-void DrawableTrimesh::color_wrt_triangle_scalar()
-{    
-    if (num_triangles() == 0) return;
-
-    // labels may not be from 0 to n-1....
-    //
-    std::map<int,int> l_map;
-    for(int l : t_label)
-    {
-        auto it = l_map.find(l);
-        if (it == l_map.end()) l_map[l] = l_map.size();
-    }
-
-    t_colors.resize(num_triangles()*3);
-    for(int tid=0; tid<num_triangles(); ++tid)
-    {
-        float rgb[3];
-        scattered_color(l_map.size(), l_map[triangle_label(tid)], rgb);
-        set_triangle_color(tid, rgb);
-    }
-
-    unglue_face_colors();
-}
-
-CINO_INLINE
-std::vector<int> DrawableTrimesh::get_border_vertices() const
-{
-    return borders;
-}
-
-CINO_INLINE
-int DrawableTrimesh::add_vertex(const vec3d & v, const float scalar)
-{
-    v_colors.push_back(0.0);
-    v_colors.push_back(0.0);
-    v_colors.push_back(0.0);
-    return Trimesh::add_vertex(v, scalar);
-}
-
-CINO_INLINE
-int DrawableTrimesh::add_triangle(const int vid0, const int vid1, const int vid2, const int scalar)
-{    
-    t_colors.push_back(0.0);
-    t_colors.push_back(0.0);
-    t_colors.push_back(0.0);
-    return Trimesh::add_triangle(vid0, vid1, vid2, scalar);
-}
-
-CINO_INLINE
-void DrawableTrimesh::operator+=(const DrawableTrimesh & m)
-{
-    Trimesh::operator+=(m);
-
-    int nv = num_vertices();
-
-    for(int tid=0; tid<m.num_triangles(); ++tid)
-    {
-        t_colors.push_back(m.t_colors[3*tid + 0]);
-        t_colors.push_back(m.t_colors[3*tid + 1]);
-        t_colors.push_back(m.t_colors[3*tid + 2]);
-    }
-    for(int vid=0; vid<m.num_vertices(); ++vid)
-    {
-        v_colors.push_back(m.v_colors[3*vid + 0]);
-        v_colors.push_back(m.v_colors[3*vid + 1]);
-        v_colors.push_back(m.v_colors[3*vid + 2]);
-    }
-    for(int b : m.borders)
-    {
-        borders.push_back(nv + b);
-    }
+    int qid_ptr = qid * 3;
+    q_colors.at(qid_ptr + 0) = color[0];
+    q_colors.at(qid_ptr + 1) = color[1];
+    q_colors.at(qid_ptr + 2) = color[2];
 }
 
 }

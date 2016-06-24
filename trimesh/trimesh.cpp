@@ -220,6 +220,74 @@ void Trimesh::update_v_normals()
 }
 
 CINO_INLINE
+std::string Trimesh::loaded_file() const
+{
+    return filename;
+}
+
+CINO_INLINE
+int Trimesh::num_vertices() const
+{
+    return coords.size()/3;
+}
+
+CINO_INLINE
+int Trimesh::num_triangles() const
+{
+    return tris.size()  /3;
+}
+
+CINO_INLINE
+int Trimesh::num_elements() const
+{
+    return tris.size()  /3;
+}
+
+CINO_INLINE
+int Trimesh::num_edges() const
+{
+    return edges.size() /2;
+}
+
+CINO_INLINE
+const std::vector<int> &Trimesh::adj_vtx2vtx(const int vid) const
+{
+    return vtx2vtx.at(vid);
+}
+
+CINO_INLINE
+const std::vector<int> &Trimesh::adj_vtx2edg(const int vid) const
+{
+    return vtx2edg.at(vid);
+}
+
+CINO_INLINE
+const std::vector<int> &Trimesh::adj_vtx2tri(const int vid) const
+{
+    return vtx2tri.at(vid);
+}
+
+CINO_INLINE
+const std::vector<int> &Trimesh::adj_edg2tri(const int eid) const
+{
+    return edg2tri.at(eid);
+}
+
+CINO_INLINE
+const std::vector<int> &Trimesh::adj_tri2edg(const int tid) const
+{
+    return tri2edg.at(tid);
+}
+
+
+
+CINO_INLINE
+const std::vector<int> &Trimesh::adj_tri2tri(const int tid) const
+{
+    return tri2tri.at(tid);
+}
+
+CINO_INLINE
 void Trimesh::load(const char * filename)
 {
     timer_start("Load Trimesh");
@@ -232,13 +300,15 @@ void Trimesh::load(const char * filename)
     if (filetype.compare("off") == 0 ||
         filetype.compare("OFF") == 0)
     {
-        read_OFF(filename, coords, tris);
+        std::vector<uint> quads; // ignored here
+        read_OFF(filename, coords, tris, quads);
     }
     else
     if (filetype.compare("obj") == 0 ||
         filetype.compare("OBJ") == 0)
     {
-        read_OBJ(filename, coords, tris);
+        std::vector<uint> quads; // ignored here
+        read_OBJ(filename, coords, tris, quads);
     }
     else
     if (filetype.compare(".iv") == 0 ||
@@ -271,13 +341,15 @@ void Trimesh::save(const char * filename) const
     if (filetype.compare("off") == 0 ||
         filetype.compare("OFF") == 0)
     {
-        write_OFF(filename, coords, tris);
+        std::vector<uint> quads; // empty
+        write_OFF(filename, coords, tris, quads);
     }
     else
     if (filetype.compare("obj") == 0 ||
         filetype.compare("OBJ") == 0)
     {
-        write_OBJ(filename, coords, tris);
+        std::vector<uint> quads; // empty
+        write_OBJ(filename, coords, tris, quads);
     }
     else
     {
@@ -366,6 +438,7 @@ double Trimesh::vertex_mass(const int vid) const
     return mass;
 }
 
+// has adjacent triangles with different per triangle iscalars
 CINO_INLINE
 bool Trimesh::vertex_is_border(const int vid) const
 {
@@ -378,6 +451,7 @@ bool Trimesh::vertex_is_border(const int vid) const
     return (tri_scalars.size() > 1);
 }
 
+// is along an open boundary
 CINO_INLINE
 bool Trimesh::vertex_is_boundary(const int vid) const
 {
@@ -386,6 +460,143 @@ bool Trimesh::vertex_is_boundary(const int vid) const
     {
         if (edge_is_boundary(edges[i])) return true;
     }
+    return false;
+}
+
+CINO_INLINE
+bool Trimesh::edge_is_manifold(const int eid) const
+{
+    return (adj_edg2tri(eid).size() == 2);
+}
+
+CINO_INLINE
+bool Trimesh::edge_is_boundary(const int eid) const
+{
+    return (adj_edg2tri(eid).size() < 2);
+}
+
+CINO_INLINE
+bool Trimesh::edge_is_border(const int eid) const
+{
+    assert(edge_is_manifold(eid));
+
+    int tid_0 = adj_edg2tri(eid).at(0);
+    int tid_1 = adj_edg2tri(eid).at(1);
+
+    return (triangle_label(tid_0) != triangle_label(tid_1));
+}
+
+CINO_INLINE
+bool Trimesh::triangle_is_boundary(const int tid) const
+{
+    return (adj_tri2tri(tid).size() < 3);
+}
+
+CINO_INLINE
+int Trimesh::edge_vertex_id(const int eid, const int offset) const
+{
+    int eid_ptr = eid * 2;
+    return edges.at(eid_ptr + offset);
+}
+
+CINO_INLINE
+int Trimesh::triangle_vertex_id(const int tid, const int offset) const
+{
+    int tid_ptr = tid * 3;
+    return tris.at(tid_ptr + offset);
+}
+
+CINO_INLINE
+vec3d Trimesh::triangle_normal(const int tid) const
+{
+    int tid_ptr = tid * 3;
+    return vec3d(t_norm.at(tid_ptr + 0), t_norm.at(tid_ptr + 1), t_norm.at(tid_ptr + 2));
+}
+
+CINO_INLINE
+vec3d Trimesh::vertex_normal(const int vid) const
+{
+    int vid_ptr = vid * 3;
+    return vec3d(v_norm.at(vid_ptr+0), v_norm.at(vid_ptr+1), v_norm.at(vid_ptr+2));
+}
+
+CINO_INLINE
+vec3d Trimesh::vertex(const int vid) const
+{
+    int vid_ptr = vid * 3;
+    return vec3d(coords.at(vid_ptr+0), coords.at(vid_ptr+1), coords.at(vid_ptr+2));
+}
+
+CINO_INLINE
+void Trimesh::set_vertex(const int vid, const vec3d &pos)
+{
+    int vid_ptr = vid * 3;
+    coords.at(vid_ptr + 0) = pos.x();
+    coords.at(vid_ptr + 1) = pos.y();
+    coords.at(vid_ptr + 2) = pos.z();
+}
+
+CINO_INLINE
+int Trimesh::vertex_valence(const int vid) const
+{
+    return adj_vtx2vtx(vid).size();
+}
+
+CINO_INLINE
+float Trimesh::triangle_min_u_text(const int tid) const
+{
+    float vals[3] =
+    {
+        vertex_u_text(triangle_vertex_id(tid,0)),
+        vertex_u_text(triangle_vertex_id(tid,1)),
+        vertex_u_text(triangle_vertex_id(tid,2)),
+    };
+    return *std::min_element(vals, vals+3);
+}
+
+CINO_INLINE
+float Trimesh::vertex_u_text(const int vid) const
+{
+    return u_text.at(vid);
+}
+
+CINO_INLINE
+void Trimesh::set_vertex_u_text(const int vid, const float s)
+{
+    u_text.at(vid) = s;
+}
+
+CINO_INLINE
+int Trimesh::vertex_with_min_u_text() const
+{
+    return (std::min_element(u_text.begin(), u_text.end()) - u_text.begin());
+}
+
+CINO_INLINE
+int Trimesh::triangle_label(const int tid) const
+{
+    return t_label.at(tid);
+}
+
+CINO_INLINE
+void Trimesh::triangle_set_label(const int tid, const int i)
+{
+    t_label.at(tid) = i;
+}
+
+CINO_INLINE
+void Trimesh::update_normals()
+{
+    update_t_normals();
+    update_v_normals();
+}
+
+CINO_INLINE
+bool Trimesh::triangle_contains_vertex(const int tid, const int vid) const
+{
+    if (triangle_vertex_id(tid, 0) == vid) return true;
+    if (triangle_vertex_id(tid, 1) == vid) return true;
+    if (triangle_vertex_id(tid, 2) == vid) return true;
     return false;
 }
 
@@ -680,6 +891,32 @@ double Trimesh::min_edge_length() const
 }
 
 CINO_INLINE
+vec3d Trimesh::triangle_vertex(const int tid, const int offset) const
+{
+    int tid_ptr = tid * 3;
+    int vid     = tris.at(tid_ptr + offset);
+    int vid_ptr = vid * 3;
+    return vec3d(coords.at(vid_ptr + 0), coords.at(vid_ptr + 1), coords.at(vid_ptr + 2));
+}
+
+CINO_INLINE
+bool Trimesh::edge_contains_vertex(const int eid, const int vid) const
+{
+    if (edge_vertex_id(eid,0) == vid) return true;
+    if (edge_vertex_id(eid,1) == vid) return true;
+    return false;
+}
+
+CINO_INLINE
+vec3d Trimesh::edge_vertex(const int eid, const int offset) const
+{
+    int eid_ptr = eid * 2;
+    int vid     = edges.at(eid_ptr + offset);
+    int vid_ptr = vid * 3;
+    return vec3d(coords.at(vid_ptr + 0), coords.at(vid_ptr + 1), coords.at(vid_ptr + 2));
+}
+
+CINO_INLINE
 int Trimesh::shared_vertex(const int eid0, const int eid1) const
 {
     int e00 = edge_vertex_id(eid0,0);
@@ -816,6 +1053,44 @@ std::vector<int> Trimesh::adj_vtx2vtx_ordered(const int vid) const
 }
 
 CINO_INLINE
+const std::vector<double> &Trimesh::vector_coords() const
+{
+    return coords;
+}
+
+CINO_INLINE
+const std::vector<u_int> &Trimesh::vector_triangles() const
+{
+    return tris;
+}
+
+CINO_INLINE
+const std::vector<u_int> &Trimesh::vector_edges() const
+{
+    return edges;
+}
+
+
+CINO_INLINE
+const Bbox &Trimesh::bbox() const
+{
+    return bb;
+}
+
+CINO_INLINE
+const std::vector<float> &Trimesh::vector_v_float_scalar() const
+{
+    return u_text;
+}
+
+CINO_INLINE
+const std::vector<int> &Trimesh::vector_t_int_scalar() const
+{
+    return t_label;
+}
+
+
+CINO_INLINE
 std::set<int> Trimesh::vertex_n_ring(const int vid, const int n) const
 {
     std::set<int> active_set;
@@ -877,6 +1152,34 @@ int Trimesh::connected_components() const
 {
     std::vector< std::set<int> > ccs;
     return connected_components(ccs);
+}
+
+CINO_INLINE
+bool Trimesh::vertex_is_local_minima(const int vid) const
+{
+    float v = vertex_u_text(vid);
+    for(int nbr : adj_vtx2vtx(vid))
+    {
+        if (vertex_u_text(nbr) <= v) return false;
+    }
+    return true;
+}
+
+CINO_INLINE
+bool Trimesh::vertex_is_local_maxima(const int vid) const
+{
+    float v = vertex_u_text(vid);
+    for(int nbr : adj_vtx2vtx(vid))
+    {
+        if (vertex_u_text(nbr) >= v) return false;
+    }
+    return true;
+}
+
+CINO_INLINE
+bool Trimesh::vertex_is_critical_point(const int vid) const
+{
+    return (vertex_is_local_maxima(vid) || vertex_is_local_minima(vid));
 }
 
 }

@@ -48,7 +48,8 @@ uint read_point_id(char *s)
 CINO_INLINE
 void read_OBJ(const char           * filename,
               std::vector<double>  & xyz,
-              std::vector<u_int>   & tri)
+              std::vector<u_int>   & tri,
+              std::vector<u_int>   & quad)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -60,10 +61,7 @@ void read_OBJ(const char           * filename,
         exit(-1);
     }
 
-    char line[1024],
-          s0[1024],
-          s1[1024],
-          s2[1024];
+    char line[1024], s0[1024], s1[1024], s2[1024], s3[1024];
 
     while(fgets(line, 1024, fp))
     {
@@ -85,10 +83,25 @@ void read_OBJ(const char           * filename,
                 break;
 
             case 'f':
-                sscanf(line, "%*c%s%s%s", s0, s1, s2);
-                tri.push_back(read_point_id(s0));
-                tri.push_back(read_point_id(s1));
-                tri.push_back(read_point_id(s2));
+                int n_corners = sscanf(line, "%*c %s %s %s %s", s0, s1, s2, s3);
+                if (n_corners == 3)
+                {
+                    tri.push_back(read_point_id(s0));
+                    tri.push_back(read_point_id(s1));
+                    tri.push_back(read_point_id(s2));
+                }
+                else if (n_corners = 4)
+                {
+                    quad.push_back(read_point_id(s0));
+                    quad.push_back(read_point_id(s1));
+                    quad.push_back(read_point_id(s2));
+                    quad.push_back(read_point_id(s3));
+                }
+                else
+                {
+                    std::cerr << "read_OBJ: polygons with " << n_corners << " are not supported!" << std::endl;
+                    assert("Unsupported polygon" && false);
+                }
                 break;
         }
     }

@@ -32,7 +32,8 @@ namespace cinolib
 CINO_INLINE
 void write_OBJ(const char                * filename,
                const std::vector<double> & xyz,
-               const std::vector<u_int>  & tri)
+               const std::vector<u_int>  & tri,
+               const std::vector<u_int>  & quad)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -54,6 +55,11 @@ void write_OBJ(const char                * filename,
     for(size_t i=0; i<tri.size(); i+=3)
     {
         fprintf(fp, "f %d %d %d\n", tri[i] + 1, tri[i+1] + 1, tri[i+2] + 1);
+    }
+
+    for(size_t i=0; i<quad.size(); i+=4)
+    {
+        fprintf(fp, "f %d %d %d %d\n", quad[i] + 1, quad[i+1] + 1, quad[i+2] + 1, quad[i+3] + 1);
     }
 
     fclose(fp);

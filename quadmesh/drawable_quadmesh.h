@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_TRIMESH_H
-#define DRAWABLE_TRIMESH_H
+#ifndef DRAWABLE_QUADMESH_H
+#define DRAWABLE_QUADMESH_H
 
 #include <vector>
 #ifdef __APPLE__
@@ -33,12 +33,12 @@
 
 #include "../cinolib.h"
 #include "../drawable_object.h"
-#include "trimesh.h"
+#include "quadmesh.h"
 
 namespace cinolib
 {
 
-class DrawableTrimesh : public Trimesh , public DrawableObject
+class DrawableQuadmesh : public Quadmesh , public DrawableObject
 {
     public:
 
@@ -62,10 +62,10 @@ class DrawableTrimesh : public Trimesh , public DrawableObject
             TEXTURE_QUALITY_RAMP_W_ISOLINES = 2
         };
 
-        DrawableTrimesh();
-        DrawableTrimesh(const char *filename);
-        DrawableTrimesh(const std::vector<double> & coords,
-                        const std::vector<u_int>  & tris);
+        DrawableQuadmesh();
+        DrawableQuadmesh(const char *filename);
+        DrawableQuadmesh(const std::vector<double> & coords,
+                         const std::vector<u_int>  & quads);
 
         void init();
         void clear();
@@ -92,27 +92,16 @@ class DrawableTrimesh : public Trimesh , public DrawableObject
         void set_border_width(float width);
         void set_border_transparency(float alpha);
         void set_enable_vertex_color();
-        void set_enable_triangle_color();
+        void set_enable_quad_color();
         void set_enable_texture1D(int texture);
         void set_v_color(float r, float g, float b);
-        void set_t_color(float r, float g, float b);
+        void set_q_color(float r, float g, float b);
 
         const float * vertex_color  (const int vid) const;
-        const float * triangle_color(const int tid) const;
+        const float * quad_color(const int qid) const;
 
         void set_vertex_color(const int vid, const float * color);
-        void set_triangle_color(const int tid, const float * color);
-
-        void color_wrt_triangle_scalar();
-        void unglue_face_colors();
-        void unglue_boundary_edges();
-
-        std::vector<int> get_border_vertices() const;
-
-        int add_vertex(const vec3d & v, const float scalar = 0.0);
-        int add_triangle(const int vid0, const int vid1, const int vid2, const int scalar = 0);
-
-        void operator+=(const DrawableTrimesh & m);
+        void set_quad_color(const int qid, const float * color);
 
     protected:
 
@@ -127,13 +116,13 @@ class DrawableTrimesh : public Trimesh , public DrawableObject
 
         std::vector<int>   borders;
         std::vector<float> v_colors;
-        std::vector<float> t_colors;
+        std::vector<float> q_colors;
 };
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "drawable_trimesh.cpp"
+#include "drawable_quadmesh.cpp"
 #endif
 
-#endif // DRAWABLE_TRIMESH_H
+#endif // DRAWABLE_QUADMESH_H
