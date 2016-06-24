@@ -31,7 +31,8 @@ namespace cinolib
 CINO_INLINE
 void read_MESH(const char          * filename,
                std::vector<double> & xyz,
-               std::vector<u_int>  & tets)
+               std::vector<u_int>  & tets,
+               std::vector<u_int>  & hexa)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -85,6 +86,28 @@ void read_MESH(const char          * filename,
                 tets.push_back(v1 - 1);
                 tets.push_back(v2 - 1);
                 tets.push_back(v3 - 1);
+            }
+        }
+
+        // read hexahedra
+        //
+        if (line[0] == 'H' && line[1] == 'e')
+        {
+            int nhexa, v0, v1, v2, v3, v4, v5, v6, v7;
+            fgets(line, 1024, fp);
+            sscanf(line, "%d", &nhexa);
+            for( int i=0; i<nhexa; i++ )
+            {
+                fgets(line,1024,fp);
+                sscanf(line, "%d %d %d %d %d %d %d %d", &v0, &v1, &v2, &v3, &v4, &v5, &v6, &v7);
+                hexa.push_back(v0 - 1);
+                hexa.push_back(v1 - 1);
+                hexa.push_back(v2 - 1);
+                hexa.push_back(v3 - 1);
+                hexa.push_back(v4 - 1);
+                hexa.push_back(v5 - 1);
+                hexa.push_back(v6 - 1);
+                hexa.push_back(v7 - 1);
             }
         }
     }

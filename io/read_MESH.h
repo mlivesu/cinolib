@@ -35,7 +35,8 @@ namespace cinolib
 CINO_INLINE
 void read_MESH(const char          * filename,
                std::vector<double> & xyz,
-               std::vector<u_int>  & tet);
+               std::vector<u_int>  & tet,
+               std::vector<u_int>  & hexa);
 
 }
 

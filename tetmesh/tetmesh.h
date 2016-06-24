@@ -108,14 +108,13 @@ class Tetmesh
 
     public:
 
-        const std::vector<double> & vector_coords()    const { return coords; }
-        const std::vector<uint>   & vector_tris()    const { return tris; }
+        const std::vector<double> & vector_coords()         const;
+        const std::vector<uint>   & vector_tris()           const;
+        const std::vector<float>  & vector_v_float_scalar() const;
+        const std::vector<int>    & vector_t_int_scalar()   const;
 
-        const std::vector<float> & vector_v_float_scalar() const { return u_text; }
-        const std::vector<int>   & vector_t_int_scalar() const { return t_label; }
 
-
-        std::string loaded_file() const { return filename; }
+        std::string loaded_file() const;
 
         Trimesh export_surface() const;
         Trimesh export_surface(std::map<int,int> & tet2tri_map, std::map<int,int> & tri2tet_map) const;
@@ -129,178 +128,81 @@ class Tetmesh
 
         void normalize_volume();
 
-        bool empty() const { return coords.size() == 0; }
+        bool empty() const;
 
         void update_bbox();
         void center_bbox();
         void update_interior_adjacency();
         void update_surface_adjacency();
-
         void update_t_normals();
 
-        int num_vertices()      const { return coords.size()/3; }
-        int num_tetrahedra()    const { return tets.size()  /4; }
-        int num_elements()      const { return tets.size()  /4; }
-        int num_edges()         const { return edges.size() /2; }
-        int num_srf_triangles() const { return tris.size()  /3; }
+        int num_vertices()      const;
+        int num_tetrahedra()    const;
+        int num_elements()      const;
+        int num_edges()         const;
+        int num_srf_triangles() const;
 
-        const std::vector<int> & adj_vtx2vtx(const int vid) const { return vtx2vtx.at(vid); }
-        const std::vector<int> & adj_vtx2edg(const int vid) const { return vtx2edg.at(vid); }
-        const std::vector<int> & adj_vtx2tri(const int vid) const { return vtx2tri.at(vid); }
-        const std::vector<int> & adj_vtx2tet(const int vid) const { return vtx2tet.at(vid); }
-        const std::vector<int> & adj_edg2tet(const int eid) const { return edg2tet.at(eid); }
-        const std::vector<int> & adj_edg2tri(const int eid) const { return edg2tri.at(eid); }
-        const std::vector<int> & adj_tet2edg(const int tid) const { return tet2edg.at(tid); }
-        const std::vector<int> & adj_tet2tet(const int tid) const { return tet2tet.at(tid); }
-        const std::vector<int> & adj_tet2tri(const int tid) const { return tet2tri.at(tid); }
-        const std::vector<int> & adj_tri2tri(const int tid) const { return tri2tri.at(tid); }
-        const std::vector<int> & adj_tri2edg(const int tid) const { return tri2edg.at(tid); }
-        const int              & adj_tri2tet(const int tid) const { return tri2tet.at(tid); }
+        const std::vector<int> & adj_vtx2vtx(const int vid) const;
+        const std::vector<int> & adj_vtx2edg(const int vid) const;
+        const std::vector<int> & adj_vtx2tri(const int vid) const;
+        const std::vector<int> & adj_vtx2tet(const int vid) const;
+        const std::vector<int> & adj_edg2tet(const int eid) const;
+        const std::vector<int> & adj_edg2tri(const int eid) const;
+        const std::vector<int> & adj_tet2edg(const int tid) const;
+        const std::vector<int> & adj_tet2tet(const int tid) const;
+        const std::vector<int> & adj_tet2tri(const int tid) const;
+        const std::vector<int> & adj_tri2tri(const int tid) const;
+        const std::vector<int> & adj_tri2edg(const int tid) const;
+        const int              & adj_tri2tet(const int tid) const;
 
-        vec3d vertex(const int vid) const
-        {
-            int vid_ptr = vid * 3;
-            return vec3d(coords[vid_ptr+0], coords[vid_ptr+1], coords[vid_ptr+2]);
-        }
+        vec3d vertex(const int vid) const;
 
-        void set_vertex_u_text(const int vid, const float val)
-        {
-            u_text.at(vid) = val;
-        }
+        void set_vertex_u_text(const int vid, const float val);
 
-        void set_tet_label(const int tid, const int label)
-        {
-            t_label.at(tid) = label;
-        }
+        void set_tet_label(const int tid, const int label);
 
-        int tet_label(const int tid) const
-        {
-            return t_label.at(tid);
-        }
+        int tet_label(const int tid) const;
 
-        float vertex_u_text(const int vid) const
-        {
-            return u_text.at(vid);
-        }
+        float vertex_u_text(const int vid) const;
 
-        float min_u_text() const
-        {
-            return *std::min_element(u_text.begin(), u_text.end());
-        }
+        float min_u_text() const;
 
-        float max_u_text() const
-        {
-            return *std::max_element(u_text.begin(), u_text.end());
-        }
+        float max_u_text() const;
 
-        int max_t_label() const
-        {
-            return *std::max_element(t_label.begin(), t_label.end());
-        }
+        int max_t_label() const;
 
-        void set_vertex(const int vid, const vec3d & pos)
-        {
-            int vid_ptr = vid * 3;
-            coords[vid_ptr + 0] = pos.x();
-            coords[vid_ptr + 1] = pos.y();
-            coords[vid_ptr + 2] = pos.z();
-        }
+        void set_vertex(const int vid, const vec3d & pos);
 
-        bool is_surface_vertex(const int vid) const
-        {
-            return v_on_srf[vid];
-        }
+        bool is_surface_vertex(const int vid) const;
 
-        bool is_surface_edge(const int eid) const
-        {
-            return e_on_srf[eid];
-        }
+        bool is_surface_edge(const int eid) const;
 
-        vec3d triangle_normal(const int tid) const
-        {
-            int tid_ptr = tid * 3;
-            return vec3d(t_norm[tid_ptr + 0], t_norm[tid_ptr + 1], t_norm[tid_ptr + 2]);
-        }
+        vec3d triangle_normal(const int tid) const;
 
-        vec3d tet_centroid(const int tid) const
-        {
-            return (tet_vertex(tid,0) +
-                    tet_vertex(tid,1) +
-                    tet_vertex(tid,2) +
-                    tet_vertex(tid,3))* 0.25;
-        }
+        vec3d tet_centroid(const int tid) const;
 
-        int tet_vertex_id(const int tid, const int offset) const
-        {
-            int tid_ptr = tid * 4;
-            return tets[tid_ptr + offset];
-        }
+        int tet_vertex_id(const int tid, const int offset) const;
 
-        vec3d tet_vertex(const int tid, const int offset) const
-        {
-            int tid_ptr = tid * 4;
-            return vertex(tets[tid_ptr + offset]);
-        }
+        vec3d tet_vertex(const int tid, const int offset) const;
 
-        int tri_vertex_id(const int tid, const int offset) const
-        {
-            int tid_ptr = tid * 3;
-            return tris[tid_ptr + offset];
-        }
+        int tri_vertex_id(const int tid, const int offset) const;
 
-        vec3d tri_vertex(const int tid, const int offset) const
-        {
-            int tid_ptr = tid * 3;
-            return vertex(tris[tid_ptr + offset]);
-        }
+        vec3d tri_vertex(const int tid, const int offset) const;
 
-        bool tet_contains_vertex(const int tid, const std::set<int> & vids) const
-        {
-            for(int vid : vids)
-            {
-                if (tet_contains_vertex(tid, vid)) return true;
-            }
-            return false;
-        }
+        bool tet_contains_vertex(const int tid, const std::set<int> & vids) const;
 
-        bool tet_contains_vertex(const int tid, const int vid) const
-        {
-            if (tet_vertex_id(tid, 0) == vid) return true;
-            if (tet_vertex_id(tid, 1) == vid) return true;
-            if (tet_vertex_id(tid, 2) == vid) return true;
-            if (tet_vertex_id(tid, 3) == vid) return true;
-            return false;
-        }
+        bool tet_contains_vertex(const int tid, const int vid) const;
 
-        bool tet_contains_edge(const int tid, const int eid) const
-        {
-            for(int nbr : adj_tet2edg(tid))
-            {
-                if (nbr == eid) return true;
-            }
-            return false;
-        }
+        bool tet_contains_edge(const int tid, const int eid) const;
 
         vec3d element_barycenter(const int tid) const;
 
         double avg_edge_length() const;
         double edge_length(const int eid) const;
 
-        vec3d edge_vertex(const int eid, const int offset) const
-        {
-            int eid_ptr = eid * 2;
-            int vid     = edges[eid_ptr + offset];
-            int vid_ptr = vid * 3;
-            return vec3d(coords[vid_ptr + 0], coords[vid_ptr + 1], coords[vid_ptr + 2]);
-        }
+        vec3d edge_vertex(const int eid, const int offset) const;
 
-        double tet_quality(const int tid) const
-        {
-            return tet_scaled_jacobian(tet_vertex(tid,0),
-                                       tet_vertex(tid,1),
-                                       tet_vertex(tid,2),
-                                       tet_vertex(tid,3));
-        }
+        double tet_quality(const int tid) const;
 
         bool tet_is_adjacent_to(const int tid, const int nbr) const;
 
@@ -308,19 +210,9 @@ class Tetmesh
 
         int vertex_inverted_elements(const int vid) const;
 
-        double tet_volume(const int tid) const
-        {
-            return tet_unsigned_volume(tet_vertex(tid,0),
-                                       tet_vertex(tid,1),
-                                       tet_vertex(tid,2),
-                                       tet_vertex(tid,3));
-        }
+        double tet_volume(const int tid) const;
 
-        int edge_vertex_id(const int eid, const int offset) const
-        {
-            int eid_ptr = eid * 2;
-            return edges[eid_ptr + offset];
-        }
+        int edge_vertex_id(const int eid, const int offset) const;
 
         void print_quality_statistics(bool list_folded_elements = false) const;
 
@@ -330,10 +222,7 @@ class Tetmesh
 
         double vertex_mass(const int vid) const;
 
-        int vertex_valence(const int vid) const
-        {
-            return adj_vtx2vtx(vid).size();
-        }
+        int vertex_valence(const int vid) const;
 
         double tet_dihedral_angle(const int tid, const int fid0, const int fid1) const;
 

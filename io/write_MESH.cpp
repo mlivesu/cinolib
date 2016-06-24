@@ -31,7 +31,8 @@ namespace cinolib
 CINO_INLINE
 void write_MESH(const char                * filename,
                 const std::vector<double> & xyz,
-                const std::vector<u_int>  & tets)
+                const std::vector<u_int>  & tets,
+                const std::vector<u_int>  & hexa)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -48,6 +49,7 @@ void write_MESH(const char                * filename,
 
     int nv = (int)xyz.size()/3;
     int nt = (int)tets.size()/4;
+    int nh = (int)hexa.size()/8;
 
     if (nv > 0)
     {
@@ -70,6 +72,18 @@ void write_MESH(const char                * filename,
         for(size_t i=0; i<tets.size(); i+=4)
         {
             fprintf(fp, "%d %d %d %d 0\n", tets[i+0]+1, tets[i+1]+1, tets[i+2]+1, tets[i+3]+1);
+        }
+    }
+
+    if (nh > 0)
+    {
+        fprintf(fp, "Hexahedra\n" );
+        fprintf(fp, "%d\n", nh );
+
+        for(size_t i=0; i<hexa.size(); i+=8)
+        {
+            fprintf(fp, "%d %d %d %d %d %d %d %d 0\n", hexa[i+0]+1, hexa[i+1]+1, hexa[i+2]+1, hexa[i+3]+1,
+                                                       hexa[i+4]+1, hexa[i+5]+1, hexa[i+6]+1, hexa[i+7]+1);
         }
     }
 
