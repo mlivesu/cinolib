@@ -237,6 +237,10 @@ class Hexmesh
         int hex_edge_opposite_to(const int tid, const int vid0, const int vid1) const;
 
         double hex_edge_length(const int tid, const int eid) const;
+
+        double minimum_SJ() const;
+        double average_SJ() const;
+        void print_quality_statistics(bool list_folded_elements = false) const;
 };
 
 }

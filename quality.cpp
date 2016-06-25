@@ -1,0 +1,140 @@
+/****************************************************************************
+* Italian National Research Council                                         *
+* Institute for Applied Mathematics and Information Technologies, Genoa     *
+* IMATI-GE / CNR                                                            *
+*                                                                           *
+* Author: Marco Livesu (marco.livesu@gmail.com)                             *
+*                                                                           *
+* Copyright(C) 2016                                                         *
+* All rights reserved.                                                      *
+*                                                                           *
+* This file is part of CinoLib                                              *
+*                                                                           *
+* CinoLib is free software; you can redistribute it and/or modify           *
+* it under the terms of the GNU General Public License as published by      *
+* the Free Software Foundation; either version 3 of the License, or         *
+* (at your option) any later version.                                       *
+*                                                                           *
+* This program is distributed in the hope that it will be useful,           *
+* but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+* GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
+* for more details.                                                         *
+****************************************************************************/
+#include "quality.h"
+
+/*
+ * Scaled Jacobian and Volume computations are all based on:
+ *
+ * The Verdict Geometric Quality Library
+ * SANDIA Report SAND2007-1751
+ *
+*/
+
+namespace cinolib
+{
+
+static const double sqrt_2 = 1.414213562373095;
+
+CINO_INLINE
+double tet_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3)
+{
+    vec3d L0 = p1 - p0;
+    vec3d L1 = p2 - p1;
+    vec3d L2 = p0 - p2;
+    vec3d L3 = p3 - p0;
+    vec3d L4 = p3 - p1;
+    vec3d L5 = p3 - p2;
+
+    double L0_length = L0.length();
+    double L1_length = L1.length();
+    double L2_length = L2.length();
+    double L3_length = L3.length();
+    double L4_length = L4.length();
+    double L5_length = L5.length();
+
+    double J = (L2.cross(L0)).dot(L3);
+
+    double lambda[] =
+    {
+        L0_length * L2_length * L3_length,
+        L0_length * L1_length * L4_length,
+        L1_length * L2_length * L5_length,
+        L3_length * L4_length * L5_length,
+        J
+    };
+
+    double max = *std::max_element(lambda, lambda + 5);
+
+    if (max < DBL_MIN) return -1.0;
+    return  (J * sqrt_2 / max);
+}
+
+CINO_INLINE
+double tet_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3)
+{
+    vec3d L0 = p1 - p0;
+    vec3d L2 = p0 - p2;
+    vec3d L3 = p3 - p0;
+
+    return fabs((L2.cross(L0)).dot(L3) / 6.0);
+}
+
+
+
+CINO_INLINE
+double hex_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                           const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7)
+{
+    // edges
+    vec3d L0  = p1 - p0;    vec3d L4  = p4 - p0;    vec3d L8  = p5 - p4;
+    vec3d L1  = p2 - p1;    vec3d L5  = p5 - p1;    vec3d L9  = p6 - p5;
+    vec3d L2  = p3 - p2;    vec3d L6  = p6 - p2;    vec3d L10 = p7 - p6;
+    vec3d L3  = p3 - p0;    vec3d L7  = p7 - p3;    vec3d L11 = p7 - p4;
+
+    // cross-derivatives
+    vec3d X1  = (p1 - p0) + (p2 - p3) + (p5 - p4) + (p6 - p7);
+    vec3d X2  = (p3 - p0) + (p2 - p1) + (p7 - p4) + (p6 - p5);
+    vec3d X3  = (p4 - p0) + (p5 - p1) + (p6 - p2) + (p7 - p3);
+
+    L0.normalize();     L4.normalize();     L8.normalize();
+    L1.normalize();     L5.normalize();     L9.normalize();
+    L2.normalize();     L6.normalize();     L10.normalize();
+    L3.normalize();     L7.normalize();     L11.normalize();
+    X1.normalize();     X2.normalize();     X3.normalize();
+
+    // normalized jacobian matrices determinants
+    double alpha[9] =
+    {
+         L0.dot (  L3.cross ( L4) ),
+         L1.dot ( -L0.cross ( L5) ),
+         L2.dot ( -L1.cross ( L6) ),
+        -L3.dot ( -L2.cross ( L7) ),
+         L11.dot(  L8.cross (-L4) ),
+        -L8.dot (  L9.cross (-L5) ),
+        -L9.dot (  L10.cross(-L6) ),
+        -L10.dot( -L11.cross(-L7) ),
+         X1.dot (  X2.cross ( X3) )
+    };
+
+    double msj = *std::min_element(alpha, alpha+9);
+
+    if (msj > 1.1) msj = -1.0;
+
+    return msj;
+}
+
+
+CINO_INLINE
+double hex_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                           const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7)
+{
+    // cross-derivatives
+    vec3d X1  = (p1 - p0) + (p2 - p3) + (p5 - p4) + (p6 - p7);
+    vec3d X2  = (p3 - p0) + (p2 - p1) + (p7 - p4) + (p6 - p5);
+    vec3d X3  = (p4 - p0) + (p5 - p1) + (p6 - p2) + (p7 - p3);
+
+    return X1.dot (  X2.cross ( X3) ) / 64.0;
+}
+
+}

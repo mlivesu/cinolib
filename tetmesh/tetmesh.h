@@ -31,7 +31,7 @@
 #include "../bbox.h"
 #include "../vec3.h"
 #include "../trimesh/trimesh.h"
-#include "quality.h"
+#include "../quality.h"
 
 namespace cinolib
 {

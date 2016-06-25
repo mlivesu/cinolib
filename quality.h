@@ -21,53 +21,47 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "quality.h"
+#ifndef QUALITY
+#define QUALITY
+
+#include "cinolib.h"
+#include "vec3.h"
+#include <float.h>
+
+
+/*
+ * Scaled Jacobian and Volume computations are all based on:
+ *
+ * The Verdict Geometric Quality Library
+ * SANDIA Report SAND2007-1751
+ *
+*/
+
 
 namespace cinolib
 {
 
 CINO_INLINE
-double tet_scaled_jacobian(const vec3d & a, const vec3d & b, const vec3d & c, const vec3d & d)
-{
-    vec3d L0 = b - a;
-    vec3d L1 = c - b;
-    vec3d L2 = a - c;
-    vec3d L3 = d - a;
-    vec3d L4 = d - b;
-    vec3d L5 = d - c;
+double tet_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3);
 
-    double L0_length = L0.length();
-    double L1_length = L1.length();
-    double L2_length = L2.length();
-    double L3_length = L3.length();
-    double L4_length = L4.length();
-    double L5_length = L5.length();
-
-    double J = (L2.cross(L0)).dot(L3);
-
-    double lambda[] =
-    {
-        L0_length * L2_length * L3_length,
-        L0_length * L1_length * L4_length,
-        L1_length * L2_length * L5_length,
-        L3_length * L4_length * L5_length,
-        J
-    };
-
-    double max = *std::max_element(lambda, lambda + 5);
-
-    if (max < DBL_MIN) return -1.0;
-    return  (J * sqrt_2 / max);
-}
 
 CINO_INLINE
-double tet_unsigned_volume(const vec3d & a, const vec3d & b, const vec3d & c, const vec3d & d)
-{
-    vec3d L0 = b - a;
-    vec3d L2 = a - c;
-    vec3d L3 = d - a;
+double tet_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3);
 
-    return fabs((L2.cross(L0)).dot(L3) / 6.0);
+
+CINO_INLINE
+double hex_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                           const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+CINO_INLINE
+double hex_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                           const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
 }
 
-}
+
+#ifndef  CINO_STATIC_LIB
+#include "quality.cpp"
+#endif
+
+
+#endif // QUALITY

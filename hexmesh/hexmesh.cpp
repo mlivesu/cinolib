@@ -22,13 +22,14 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include "hexmesh.h"
+#include "../quality.h"
 #include "../timer.h"
+#include "../io/read_write.h"
 
 #include <float.h>
 #include <map>
 #include <set>
 
-#include "../io/read_write.h"
 
 namespace cinolib
 {
@@ -41,6 +42,8 @@ Hexmesh::Hexmesh(const char * filename)
 
     load(filename);
     init();
+
+    print_quality_statistics();
 
     timer_stop("load hexmesh");
 }
@@ -740,6 +743,28 @@ double Hexmesh::hex_edge_length(const int hid, const int eid) const
     return (A-B).length();
 }
 
+CINO_INLINE
+double Hexmesh::minimum_SJ() const
+{
+    double min_sj = -FLT_MAX;
+    for(int hid=0; hid<num_hexahedra(); ++hid)
+    {
+        min_sj = std::min(min_sj, hex_quality(hid));
+    }
+    assert(min_sj > -FLT_MAX);
+    return min_sj;
+}
+
+CINO_INLINE
+double Hexmesh::average_SJ() const
+{
+    double avg_sj = 0.0;
+    for(int hid=0; hid<num_hexahedra(); ++hid)
+    {
+        avg_sj += hex_quality(hid);
+    }
+    return avg_sj/double(num_hexahedra());
+}
 
 CINO_INLINE
 vec3d Hexmesh::hex_face_normal(const int tid, const int fid) const
@@ -768,13 +793,10 @@ vec3d Hexmesh::edge_vertex(const int eid, const int offset) const
 }
 
 CINO_INLINE
-double Hexmesh::hex_quality(const int tid) const
+double Hexmesh::hex_quality(const int hid) const
 {
-    return 0.0;
-//    return hex_scaled_jacobian(hex_vertex(tid,0),
-//                               hex_vertex(tid,1),
-//                               hex_vertex(tid,2),
-//                               hex_vertex(tid,3));
+    return hex_scaled_jacobian(hex_vertex(hid,0), hex_vertex(hid,1), hex_vertex(hid,2), hex_vertex(hid,3),
+                               hex_vertex(hid,4), hex_vertex(hid,5), hex_vertex(hid,6), hex_vertex(hid,7));
 }
 
 CINO_INLINE
@@ -835,13 +857,16 @@ int Hexmesh::vertex_inverted_elements(const int vid) const
 }
 
 CINO_INLINE
-double Hexmesh::hex_volume(const int tid) const
+double Hexmesh::hex_volume(const int hid) const
 {
-    return 0.0;
-//    return hex_unsigned_volume(hex_vertex(tid,0),
-//                               hex_vertex(tid,1),
-//                               hex_vertex(tid,2),
-//                               hex_vertex(tid,3));
+    return hex_unsigned_volume(hex_vertex(hid,0),
+                               hex_vertex(hid,1),
+                               hex_vertex(hid,2),
+                               hex_vertex(hid,3),
+                               hex_vertex(hid,4),
+                               hex_vertex(hid,5),
+                               hex_vertex(hid,6),
+                               hex_vertex(hid,7));
 }
 
 CINO_INLINE
@@ -996,5 +1021,41 @@ void Hexmesh::center_bbox()
     bb.min -= center;
     bb.max -= center;
 }
+
+
+CINO_INLINE
+void Hexmesh::print_quality_statistics(bool list_folded_elements) const
+{
+    double asj = 0.0;
+    double msj = FLT_MAX;
+    int    inv = 0;
+
+    if (list_folded_elements) logger << "Folded Hexa: ";
+
+    for(int hid=0; hid<num_hexahedra(); ++hid)
+    {
+        double q = hex_quality(hid);
+
+        asj += q;
+        msj = std::min(msj, q);
+
+        if (q <= 0.0)
+        {
+            ++inv;
+
+            if (list_folded_elements) logger << hid << " - ";
+        }
+    }
+    asj /= double(num_hexahedra());
+
+    if (list_folded_elements) logger << endl << endl;
+
+    logger << endl;
+    logger << "MIN SJ : " << msj << endl;
+    logger << "AVG SJ : " << asj << endl;
+    logger << "INV EL : " << inv << " (out of " << num_hexahedra() << ")" << endl;
+    logger << endl;
+}
+
 
 }
