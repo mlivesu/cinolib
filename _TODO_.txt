@@ -1,0 +1,26 @@
+- aggiungi show triangle IDs and vertex IDs!!!!! (stile remesher panozzo/tarini)
+- aggiungi due spinboxes per controllare gli estremi degli isovalori per il generatore delle isosuperfici
+- aggiungi controlli sulla mesh delle isosuperfici (colore, wireframe, ecc)
+- sposta tutte le implementazioni sui cpp (duplicando gli inline sia su .h che su .cpp, come fanno in libIGL)
+- crea una curve_netowrk class e usala per scheletri, gestures e sharp features
+- aggiungi cache per solver, in modo da recuperare tempo e non rifattorizzare la stessa matrice più volte
+- PASSA A COORDINATE FLOAT PER LE MESH!
+- passa a robust geometric computations (volumi, angoli diedri…) (vedi Lecture Notes on
+Geometric Robustness di Jonathan Richard Shewchuk)
+- aggiungi classe quad layout, per navigare un quad layout
+- genera classe base Mesh, che possiede tutte le caratteristiche comuni 
+  alle varie mesh (chiama tris, quads, ecc, => elements)
+- IMPORTANTE: riscrivi creazione matrice quadrata con BCs, è lenta da paura!
+- aggiungi normalizzazione per il cotan laplacian, after
+https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html
+- passa a C++11 ovunque non lo hai ancora fatto
+- passa agli iteratori al posto di restituire vettori con le adiacenze
+- add shaders
+- improve on mesh rendering (use VBOs, add different rendering modalities…)
+- ambient occlusion (with/without floor)
+- elimina render pass e fai rendering tutto in una passata (per il wireframe usa i vertici displaced lungo la loro normale, come fatto per il border)
+-copia/incolla punti di vista
+-add a text box with debug messages
+-add perspective/orthographic camera option, with field of view control (libQGLViewer has everything necessary)
+-Sistema la GUI in modo tale che si ricordi le impostazioni e non si disallinei con il core quando carico una nuova mesh/skeletro
+-sistema timer in modo da mostrare la gerarchia delle chiamate!
