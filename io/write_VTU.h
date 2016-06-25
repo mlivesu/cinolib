@@ -21,61 +21,27 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef GLCANVAS_H
-#define GLCANVAS_H
-
-#ifdef CINOLIB_USES_QGLVIEWER
-
-#include <QGLWidget>
-#include <vector>
+#ifndef WRITE_VTU_H
+#define WRITE_VTU_H
 
 #include "../cinolib.h"
-#include "../bbox.h"
-#include "../drawable_object.h"
 
-
-#include <qglviewer.h>
-
-#ifdef __APPLE__
-#include <gl.h>
-#else
-#include <GL/gl.h>
-#endif
+#include <sys/types.h>
+#include <vector>
 
 namespace cinolib
 {
 
-
-class GLcanvas : public QGLViewer
-{
-    public:
-
-        GLcanvas(QWidget * parent = 0);
-
-        void init();
-        void draw();
-        void clear();
-        void fit_scene();
-        void set_clear_color(const QColor & color);
-
-        void push_obj(const DrawableObject * obj, bool refit_scene = true);
-
-        bool pop_first_occurrence_of(int type);
-        bool pop_all_occurrences_of (int type);
-
-    private:
-
-        QColor clear_color;
-        std::vector<const DrawableObject *> drawlist;
-};
-
+CINO_INLINE
+void write_VTU(const char                * filename,
+               const std::vector<double> & xyz,
+               const std::vector<u_int>  & tets,
+               const std::vector<u_int>  & hexa);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "glcanvas.cpp"
+#include "write_VTU.cpp"
 #endif
 
-#endif
-
-#endif // GLCANVAS_H
+#endif // WRITE_VTU

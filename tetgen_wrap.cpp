@@ -22,7 +22,10 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include "tetgen_wrap.h"
+
+#ifdef CINOLIB_USES_TETGEN
 #include <tetgen.h>
+#endif
 
 namespace cinolib
 {
@@ -36,6 +39,8 @@ void tetgen_wrap(const std::vector<double> & coords_in,
                        std::vector<double> & coords_out,
                        std::vector<uint>   & tets_out)
 {
+#ifdef CINOLIB_USES_TETGEN
+
     assert(!coords_in.empty());
     assert(!tris_in.empty());
     assert(coords_out.empty());
@@ -109,6 +114,11 @@ void tetgen_wrap(const std::vector<double> & coords_in,
         tets_out.push_back(out.tetrahedronlist[tid_ptr + 2]);
         tets_out.push_back(out.tetrahedronlist[tid_ptr + 3]);
     }
+
+#else
+    std::cerr << "ERROR : Tetgen missing. Install Tetgen and recompile defining symbol CINOLIB_USES_TETGEN" << endl;
+    exit(-1);
+#endif
 }
 
 }

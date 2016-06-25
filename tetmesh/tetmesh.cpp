@@ -61,12 +61,18 @@ void Tetmesh::load(const char * filename)
         filetype.compare("MESH") == 0)
     {
         std::vector<uint> hexa; // not used here
-        cinolib::read_MESH(filename, coords, tets, hexa);
+        read_MESH(filename, coords, tets, hexa);
     }
     else if (filetype.compare(".tet") == 0 ||
              filetype.compare(".TET") == 0)
     {
-        cinolib::read_TET(filename, coords, tets);
+        read_TET(filename, coords, tets);
+    }
+    else if (filetype.compare(".vtu") == 0 ||
+             filetype.compare(".VTU") == 0)
+    {
+        std::vector<uint> hexa; // not used here
+        read_VTU(filename, coords, tets, hexa);
     }
     else
     {
@@ -94,12 +100,18 @@ void Tetmesh::save(const char * filename) const
         filetype.compare("MESH") == 0)
     {
         std::vector<uint> hexa; // empty
-        cinolib::write_MESH(filename, coords, tets, hexa);
+        write_MESH(filename, coords, tets, hexa);
     }
     else if (filetype.compare(".tet") == 0 ||
              filetype.compare(".TET") == 0)
     {
-        cinolib::write_TET(filename, coords, tets);
+        write_TET(filename, coords, tets);
+    }
+    else if (filetype.compare(".vtu") == 0 ||
+             filetype.compare(".VTU") == 0)
+    {
+        std::vector<uint> hexa; // empty
+        write_VTU(filename, coords, tets, hexa);
     }
     else
     {

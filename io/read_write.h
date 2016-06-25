@@ -32,6 +32,7 @@
 // VOLUME READERS
 #include "read_MESH.h"
 #include "read_TET.h"
+#include "read_VTU.h"
 //
 // SKELETON READERS
 #include "read_LIVESU2012.h"
@@ -46,6 +47,7 @@
 // VOLUME WRITERS
 #include "write_MESH.h"
 #include "write_TET.h"
+#include "write_VTU.h"
 //
 // SKELETON WRITERS
 #include "write_LIVESU2012.h"

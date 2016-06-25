@@ -62,7 +62,13 @@ void Hexmesh::load(const char * filename)
         filetype.compare("MESH") == 0)
     {
         std::vector<uint> tets; // not used here
-        cinolib::read_MESH(filename, coords, tets, hexa);
+        read_MESH(filename, coords, tets, hexa);
+    }
+    else if (filetype.compare(".vtu") == 0 ||
+             filetype.compare(".VTU") == 0)
+    {
+        std::vector<uint> tets; // not used here
+        read_VTU(filename, coords, tets, hexa);
     }
     else
     {
@@ -90,11 +96,17 @@ void Hexmesh::save(const char * filename) const
         filetype.compare("MESH") == 0)
     {
         std::vector<uint> tets; // empty
-        cinolib::write_MESH(filename, coords, tets, hexa);
+        write_MESH(filename, coords, tets, hexa);
+    }
+    else if (filetype.compare(".vtu") == 0 ||
+             filetype.compare(".VTU") == 0)
+    {
+        std::vector<uint> tets; // empty
+        write_VTU(filename, coords, tets, hexa);
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
         exit(-1);
     }
 
