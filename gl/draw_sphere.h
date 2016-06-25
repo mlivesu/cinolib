@@ -21,48 +21,40 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "drawable_isocontour.h"
-#include "colors.h"
-#include "gl/draw_sphere.h"
-#include "gl/draw_cylinder.h"
+#ifndef DRAW_SPHERE_H
+#define DRAW_SPHERE_H
+
+#include "../cinolib.h"
+
+#ifdef __APPLE__
+#include <gl.h>
+#include <glu.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 
 namespace cinolib
 {
 
+template <typename vec3>
 CINO_INLINE
-DrawableIsocontour::DrawableIsocontour()
+static void sphere(const vec3  & center,
+                   float         radius,
+                   const float * color)
 {
-    type = ISOCURVE;
-}
-
-CINO_INLINE
-DrawableIsocontour::DrawableIsocontour(Trimesh & m, float value) : Isocontour(m, value)
-{
-    type = ISOCURVE;
-
-    sample_rad = m_ptr->bbox().diag()*0.004;
-    cylind_rad = m_ptr->bbox().diag()*0.002;
-
-    for(int i=0; i<3; ++i)
-    {
-        cylind_rgb[i] = YELLOW[i];
-        centre_rgb[i] = BLUE[i];
-        sample_rgb[i] = RED[i];
-    }
-}
-
-
-CINO_INLINE
-void DrawableIsocontour::draw() const
-{
-    for(int i=0; i<(int)curves_vertices.size(); ++i)
-    {
-        for(int j=0; j<(int)curves_vertices[i].size()-1; ++j)
-        {
-            cylinder<vec3d>(curves_vertices[i][j], curves_vertices[i][j+1], cylind_rad, cylind_rad, cylind_rgb);
-        }
-        sphere<vec3d>(curve_centroid(i), sample_rad, centre_rgb);
-    }
+    glEnable(GL_LIGHTING);
+    glShadeModel(GL_SMOOTH);
+    glColor3fv(color);
+    glPushMatrix();
+    glTranslated(center[0], center[1], center[2]);
+    GLUquadric *sphere = gluNewQuadric();
+    gluQuadricNormals(sphere, GLU_SMOOTH);
+    gluQuadricOrientation(sphere, GLU_OUTSIDE);
+    gluSphere(sphere, radius, 30, 30);
+    glPopMatrix();
 }
 
 }
+
+#endif // DRAW_SPHERE_H

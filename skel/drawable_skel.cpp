@@ -25,8 +25,8 @@
 
 #include "../cinolib.h"
 #include "../colors.h"
-#include "../gl/cylinder.h"
-#include "../gl/sphere.h"
+#include "../gl/draw_cylinder.h"
+#include "../gl/draw_sphere.h"
 
 #include <cstdlib>
 

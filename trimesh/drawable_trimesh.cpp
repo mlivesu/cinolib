@@ -53,7 +53,7 @@ CINO_INLINE
 void DrawableTrimesh::init()
 {
     type               = TRIMESH;
-    draw_mode          = DRAW_MESH | DRAW_SMOOTH | DRAW_FACECOLOR | DRAW_BORDERS;
+    draw_mode          = DRAW_MESH | DRAW_SMOOTH | DRAW_FACECOLOR;
 
     texture_id         = 0;
 
@@ -95,210 +95,25 @@ float DrawableTrimesh::scene_radius() const
 }
 
 CINO_INLINE
-void DrawableTrimesh::render_pass() const
-{
-    if (draw_mode & DRAW_POINTS)
-    {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_DOUBLE, 0, coords.data());
-
-        glEnableClientState(GL_COLOR_ARRAY);
-        glColorPointer (3, GL_FLOAT, 0, v_colors.data());
-
-        glDrawArrays(GL_POINTS, 0, num_vertices());
-
-        glDisableClientState(GL_COLOR_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
-    else if (draw_mode & DRAW_SMOOTH || draw_mode & DRAW_FLAT)
-    {
-        // Old fashioned (orrible) rendering
-        //
-        if (draw_mode & DRAW_FACECOLOR)
-        {
-            int n_tris = tris.size()/3;
-            for(int tid=0; tid<n_tris; ++tid)
-            {
-                int tid_ptr  = 3 * tid;
-                int vid0     = tris[tid_ptr + 0];
-                int vid1     = tris[tid_ptr + 1];
-                int vid2     = tris[tid_ptr + 2];
-                int vid0_ptr = 3 * vid0;
-                int vid1_ptr = 3 * vid1;
-                int vid2_ptr = 3 * vid2;
-
-                glBegin(GL_TRIANGLES);
-                glColor3fv(&(t_colors[tid_ptr]));
-                glNormal3dv(&(v_norm[vid0_ptr]));
-                glVertex3dv(&(coords[vid0_ptr]));
-                glNormal3dv(&(v_norm[vid1_ptr]));
-                glVertex3dv(&(coords[vid1_ptr]));
-                glNormal3dv(&(v_norm[vid2_ptr]));
-                glVertex3dv(&(coords[vid2_ptr]));
-                glEnd();
-            }
-        }
-        else
-        {
-            glEnableClientState(GL_VERTEX_ARRAY);
-            glVertexPointer(3, GL_DOUBLE, 0, coords.data());
-
-            glEnableClientState(GL_NORMAL_ARRAY);
-            glNormalPointer(GL_DOUBLE, 0, v_norm.data());
-
-            if (draw_mode & DRAW_VERTEXCOLOR)
-            {
-                glEnableClientState(GL_COLOR_ARRAY);
-                glColorPointer(3, GL_FLOAT, 0, v_colors.data());
-            }
-            else if (draw_mode & DRAW_TEXTURE1D)
-            {
-                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-                glTexCoordPointer(1, GL_FLOAT, 0, u_text.data());
-                glColor3f(1.0,1.0,1.0);
-            }
-
-            glDrawElements(GL_TRIANGLES, tris.size(), GL_UNSIGNED_INT, tris.data());
-
-            if (draw_mode & DRAW_TEXTURE1D)   glDisableClientState(GL_TEXTURE_COORD_ARRAY); else
-            if (draw_mode & DRAW_VERTEXCOLOR) glDisableClientState(GL_COLOR_ARRAY);
-
-            glDisableClientState(GL_NORMAL_ARRAY);
-            glDisableClientState(GL_VERTEX_ARRAY);
-        }
-    }
-
-    if (draw_mode & DRAW_WIREFRAME)
-    {
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_DOUBLE, 0, coords.data());
-
-        glLineWidth(wireframe_width);
-        glColor4fv(wireframe_color);
-
-        glDrawElements(GL_TRIANGLES, tris.size(), GL_UNSIGNED_INT, tris.data());
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
-
-    if (draw_mode & DRAW_BORDERS)
-    {
-        glDisable(GL_LIGHTING);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-
-        float delta = bb.diag() * 0.0005;
-        for(int i=0; i<(int)borders.size(); i+=2)
-        {
-            vec3d v0 = vertex(borders[i]);
-            vec3d v1 = vertex(borders[i+1]);
-
-            vec3d n0 = vertex_normal(borders[i]);
-            vec3d n1 = vertex_normal(borders[i+1]);
-
-            v0 = v0 + n0 * delta;
-            v1 = v1 + n1 * delta;
-
-            glLineWidth(border_width);
-            glColor4fv(border_color);
-
-            glBegin(GL_LINES);
-            glVertex3f(v0.x(), v0.y(), v0.z());
-            glVertex3f(v1.x(), v1.y(), v1.z());
-            glEnd();
-        }
-    }
-}
-
-
-CINO_INLINE
 void DrawableTrimesh::draw() const
 {
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-    glDisable(GL_CULL_FACE);
+    RenderFaceData data;
+    data.face_type       = GL_TRIANGLES;
+    data.draw_mode       = draw_mode;
+    data.coords          = &coords;
+    data.faces           = &tris;
+    data.v_norms         = &v_norm;
+    data.v_colors        = &v_colors;
+    data.f_colors        = &t_colors;
+    data.text1D          = &u_text;
+    data.border_coords   = &border_coords;
+    data.border_segs     = &border_segs;
+    data.wireframe_color = wireframe_color;
+    data.wireframe_width = wireframe_width;
+    data.border_color    = border_color;
+    data.border_width    = border_width;
 
-    if (draw_mode & DRAW_MESH)
-    {
-        if (draw_mode & DRAW_WIREFRAME)
-        {
-            if (draw_mode & DRAW_POINTS)
-            {
-                glDisable(GL_LIGHTING);
-                glShadeModel(GL_FLAT);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                glDepthRange(0.0, 1.0);
-                render_pass();
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-
-            else
-
-            if (draw_mode & DRAW_FLAT)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_FLAT);
-                glDepthRange(0.01, 1.0);
-                render_pass();
-
-                glDisable(GL_LIGHTING);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                glDepthRange(0.0, 1.0);
-                glDepthFunc(GL_LEQUAL);
-                render_pass();
-                glDepthFunc(GL_LESS);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-
-            else
-
-            if (draw_mode & DRAW_SMOOTH)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_SMOOTH);
-                glDepthRange(0.01, 1.0);
-                render_pass();
-
-                glDisable(GL_LIGHTING);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                glDepthRange(0.0, 1.0);
-                glDepthFunc(GL_LEQUAL);
-                render_pass();
-                glDepthFunc(GL_LESS);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-        }
-
-        else
-
-        {
-            if (draw_mode & DRAW_POINTS)
-            {
-                glDisable(GL_LIGHTING);
-                render_pass();
-            }
-
-            else
-
-            if (draw_mode & DRAW_FLAT)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_FLAT);
-                render_pass();
-            }
-
-            else
-
-            if (draw_mode & DRAW_SMOOTH)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_SMOOTH);
-                render_pass();
-            }
-        }
-    }
+    render_faces(data);
 }
 
 CINO_INLINE
@@ -318,8 +133,8 @@ void DrawableTrimesh::set_wireframe(bool b)
 CINO_INLINE
 void DrawableTrimesh::set_border(bool b)
 {
-    if (b) draw_mode |=  DRAW_BORDERS;
-    else   draw_mode &= ~DRAW_BORDERS;
+    if (b) draw_mode |=  DRAW_BORDER;
+    else   draw_mode &= ~DRAW_BORDER;
 }
 
 CINO_INLINE
@@ -506,7 +321,7 @@ void DrawableTrimesh::set_triangle_color(const int tid, const float *color)
 CINO_INLINE
 void DrawableTrimesh::unglue_face_colors()
 {
-    borders.clear();
+    border_vertices.clear();
 
     for(int tid=0; tid<num_triangles(); ++tid)
     {
@@ -524,12 +339,12 @@ void DrawableTrimesh::unglue_face_colors()
                 tid_rgb[2] != nbr_rgb[2])
             {
                 ipair e = shared_edge(tid, nbr);
-                borders.push_back(e.first);
-                borders.push_back(e.second);
+                border_vertices.push_back(e.first);
+                border_vertices.push_back(e.second);
             }
         }
     }
-    //logger << borders.size() / 2 << " border egdes found" << endl;
+    update_border();
 }
 
 CINO_INLINE
@@ -537,12 +352,13 @@ void DrawableTrimesh::unglue_boundary_edges()
 {
     std::vector<ipair> boundary = get_boundary_edges();
 
-    borders.clear();
+    border_vertices.clear();
     for(int i=0; i<(int)boundary.size(); ++i)
     {
-        borders.push_back(boundary[i].first);
-        borders.push_back(boundary[i].second);
+        border_vertices.push_back(boundary[i].first);
+        border_vertices.push_back(boundary[i].second);
     }
+    update_border();
 }
 
 CINO_INLINE
@@ -573,7 +389,7 @@ void DrawableTrimesh::color_wrt_triangle_scalar()
 CINO_INLINE
 std::vector<int> DrawableTrimesh::get_border_vertices() const
 {
-    return borders;
+    return border_vertices;
 }
 
 CINO_INLINE
@@ -613,9 +429,39 @@ void DrawableTrimesh::operator+=(const DrawableTrimesh & m)
         v_colors.push_back(m.v_colors[3*vid + 1]);
         v_colors.push_back(m.v_colors[3*vid + 2]);
     }
-    for(int b : m.borders)
+    for(int b : m.border_vertices)
     {
-        borders.push_back(nv + b);
+        border_vertices.push_back(nv + b);
+    }
+}
+
+CINO_INLINE
+void DrawableTrimesh::update_border()
+{
+    border_coords.clear();
+    border_segs.clear();
+    float delta = bb.diag() * 0.0005;
+    for(size_t i=0; i<border_vertices.size(); i+=2)
+    {
+        vec3d v0 = vertex(border_vertices[i]);
+        vec3d v1 = vertex(border_vertices[i+1]);
+        vec3d n0 = vertex_normal(border_vertices[i]);
+        vec3d n1 = vertex_normal(border_vertices[i+1]);
+
+        v0 = v0 + n0 * delta;
+        v1 = v1 + n1 * delta;
+
+        int base_addr = border_coords.size()/3;
+
+        border_segs.push_back(base_addr);
+        border_segs.push_back(base_addr+1);
+
+        border_coords.push_back(v0.x());
+        border_coords.push_back(v0.y());
+        border_coords.push_back(v0.z());
+        border_coords.push_back(v1.x());
+        border_coords.push_back(v1.y());
+        border_coords.push_back(v1.z());
     }
 }
 

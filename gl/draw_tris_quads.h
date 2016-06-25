@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef CYLINDER_H
-#define CYLINDER_H
+#ifndef DRAW_TRIS_QUADS_H
+#define DRAW_TRIS_QUADS_H
 
 #include "../cinolib.h"
 
@@ -39,33 +39,46 @@
 namespace cinolib
 {
 
-template <typename vec3>
-CINO_INLINE
-static void cylinder(const vec3  & a,
-                     const vec3  & b,
-                     float         top_radius,
-                     float         bottom_radius,
-                     const float * color)
+typedef enum
 {
-    vec3 dir     = b - a; dir.normalize();
-    vec3 z       = vec3(0,0,1);
-    vec3 normal  = dir.cross(z);
-    double angle = acos(dir.dot(z)) * 180 / M_PI;
+    DRAW_MESH        = 0x00000001,
+    DRAW_POINTS      = 0x00000002,
+    DRAW_FLAT        = 0x00000004,
+    DRAW_SMOOTH      = 0x00000008,
+    DRAW_WIREFRAME   = 0x00000010,
+    DRAW_FACECOLOR   = 0x00000020,
+    DRAW_VERTEXCOLOR = 0x00000040,
+    DRAW_TEXTURE1D   = 0x00000080,
+    DRAW_BORDER      = 0x00000100,
+}
+DrawMode;
 
-    glColor3fv(color);
-    glPushMatrix();
-    glTranslated(a[0], a[1], a[2]);
-    glRotatef(-angle, normal[0], normal[1], normal[2]);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glPolygonMode(GL_FRONT, GL_FILL);
-    GLUquadric *cylinder = gluNewQuadric();
-    gluQuadricNormals(cylinder, GLU_SMOOTH);
-    gluQuadricOrientation(cylinder, GLU_OUTSIDE);
-    gluCylinder(cylinder, top_radius, bottom_radius, (a-b).length(), 10, 5);
-    glPopMatrix();
+typedef struct
+{
+          int                  draw_mode;
+          GLenum               face_type;
+    const std::vector<double> *coords;
+    const std::vector<uint>   *faces;
+    const std::vector<double> *v_norms;
+    const std::vector<float>  *v_colors;
+    const std::vector<float>  *f_colors;
+    const std::vector<float>  *text1D;
+    const std::vector<double> *border_coords;
+    const std::vector<uint>   *border_segs;
+    const float               *wireframe_color;
+    const float               *border_color;
+          int                  wireframe_width;
+          int                  border_width;
+}
+RenderFaceData;
+
+
+CINO_INLINE
+void render_faces(const RenderFaceData & data);
 }
 
-}
+#ifndef  CINO_STATIC_LIB
+#include "draw_tris_quads.cpp"
+#endif
 
-#endif // CYLINDER_H
+#endif // DRAW_TRIS_QUADS_H

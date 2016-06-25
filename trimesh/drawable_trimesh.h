@@ -33,7 +33,9 @@
 
 #include "../cinolib.h"
 #include "../drawable_object.h"
+#include "../gl/draw_tris_quads.h"
 #include "trimesh.h"
+
 
 namespace cinolib
 {
@@ -41,19 +43,6 @@ namespace cinolib
 class DrawableTrimesh : public Trimesh , public DrawableObject
 {
     public:
-
-        enum
-        {
-            DRAW_MESH        = 0x00000001,
-            DRAW_POINTS      = 0x00000002,
-            DRAW_FLAT        = 0x00000004,
-            DRAW_SMOOTH      = 0x00000008,
-            DRAW_WIREFRAME   = 0x00000010,
-            DRAW_FACECOLOR   = 0x00000020,
-            DRAW_VERTEXCOLOR = 0x00000040,
-            DRAW_BORDERS     = 0x00000080,
-            DRAW_TEXTURE1D   = 0x00000100
-        };
 
         enum
         {
@@ -117,6 +106,7 @@ class DrawableTrimesh : public Trimesh , public DrawableObject
     protected:
 
         void render_pass() const;
+        void update_border();
 
         int    draw_mode;
         int    wireframe_width;
@@ -125,9 +115,11 @@ class DrawableTrimesh : public Trimesh , public DrawableObject
         float  border_color[4];
         GLuint texture_id;
 
-        std::vector<int>   borders;
-        std::vector<float> v_colors;
-        std::vector<float> t_colors;
+        std::vector<int>    border_vertices;
+        std::vector<double> border_coords;
+        std::vector<u_int>  border_segs;
+        std::vector<float>  v_colors;
+        std::vector<float>  t_colors;
 };
 
 }

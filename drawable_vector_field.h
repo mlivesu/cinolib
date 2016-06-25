@@ -27,7 +27,7 @@
 #include "vector_field.h"
 #include "drawable_object.h"
 #include "colors.h"
-#include "gl/arrow.h"
+#include "gl/draw_arrow.h"
 
 namespace cinolib
 {

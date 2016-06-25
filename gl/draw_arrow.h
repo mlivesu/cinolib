@@ -21,40 +21,28 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SPHERE_H
-#define SPHERE_H
+#ifndef DRAW_ARROW_H
+#define DRAW_ARROW_H
 
 #include "../cinolib.h"
-
-#ifdef __APPLE__
-#include <gl.h>
-#include <glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#include "draw_cylinder.h"
 
 namespace cinolib
 {
 
 template <typename vec3>
 CINO_INLINE
-static void sphere(const vec3  & center,
-                   float         radius,
-                   const float * color)
+void arrow(const vec3  & base,
+           const vec3  & tip,
+           float         radius,
+           const float * color)
 {
-    glEnable(GL_LIGHTING);
-    glShadeModel(GL_SMOOTH);
-    glColor3fv(color);
-    glPushMatrix();
-    glTranslated(center[0], center[1], center[2]);
-    GLUquadric *sphere = gluNewQuadric();
-    gluQuadricNormals(sphere, GLU_SMOOTH);
-    gluQuadricOrientation(sphere, GLU_OUTSIDE);
-    gluSphere(sphere, radius, 30, 30);
-    glPopMatrix();
+    vec3 tip_base = 0.3 * tip + 0.7 * base;
+
+    cylinder<vec3>(tip_base, tip, radius, 0.0, color);
+    cylinder<vec3>(base, tip_base, radius * 0.2,  radius * 0.2, color);
 }
 
 }
 
-#endif // SPHERE_H
+#endif // DRAW_ARROW_H

@@ -21,28 +21,51 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef ARROW_H
-#define ARROW_H
+#ifndef DRAW_CYLINDER_H
+#define DRAW_CYLINDER_H
 
 #include "../cinolib.h"
-#include "cylinder.h"
+
+#ifdef __APPLE__
+#include <gl.h>
+#include <glu.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
+
+#include <cmath>
 
 namespace cinolib
 {
 
 template <typename vec3>
 CINO_INLINE
-void arrow(const vec3  & base,
-           const vec3  & tip,
-           float         radius,
-           const float * color)
+static void cylinder(const vec3  & a,
+                     const vec3  & b,
+                     float         top_radius,
+                     float         bottom_radius,
+                     const float * color)
 {
-    vec3 tip_base = 0.3 * tip + 0.7 * base;
+    vec3 dir     = b - a; dir.normalize();
+    vec3 z       = vec3(0,0,1);
+    vec3 normal  = dir.cross(z);
+    double angle = acos(dir.dot(z)) * 180 / M_PI;
 
-    cylinder<vec3>(tip_base, tip, radius, 0.0, color);
-    cylinder<vec3>(base, tip_base, radius * 0.2,  radius * 0.2, color);
+    glColor3fv(color);
+    glPushMatrix();
+    glTranslated(a[0], a[1], a[2]);
+    glRotatef(-angle, normal[0], normal[1], normal[2]);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glPolygonMode(GL_FRONT, GL_FILL);
+    GLUquadric *cylinder = gluNewQuadric();
+    gluQuadricNormals(cylinder, GLU_SMOOTH);
+    gluQuadricOrientation(cylinder, GLU_OUTSIDE);
+    gluCylinder(cylinder, top_radius, bottom_radius, (a-b).length(), 10, 5);
+    glPopMatrix();
 }
 
 }
 
-#endif // ARROW_H
+#endif // DRAW_CYLINDER_H

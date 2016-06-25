@@ -53,7 +53,7 @@ CINO_INLINE
 void DrawableQuadmesh::init()
 {
     type               = QUADMESH;
-    draw_mode          = DRAW_MESH | DRAW_SMOOTH | DRAW_FACECOLOR | DRAW_BORDERS;
+    draw_mode          = DRAW_MESH | DRAW_SMOOTH | DRAW_FACECOLOR;
 
     texture_id         = 0;
 
@@ -95,215 +95,25 @@ float DrawableQuadmesh::scene_radius() const
 }
 
 CINO_INLINE
-void DrawableQuadmesh::render_pass() const
-{
-    if (draw_mode & DRAW_POINTS)
-    {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_DOUBLE, 0, coords.data());
-
-        glEnableClientState(GL_COLOR_ARRAY);
-        glColorPointer (3, GL_FLOAT, 0, v_colors.data());
-
-        glDrawArrays(GL_POINTS, 0, num_vertices());
-
-        glDisableClientState(GL_COLOR_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
-    else if (draw_mode & DRAW_SMOOTH || draw_mode & DRAW_FLAT)
-    {
-        // Old fashioned (orrible) rendering
-        //
-        if (draw_mode & DRAW_FACECOLOR)
-        {
-            int n_quads = quads.size()/4;
-            for(int qid=0; qid<n_quads; ++qid)
-            {
-                int qid_vid_ptr  = 4 * qid;
-                int qid_col_ptr  = 3 * qid;
-                int vid0         = quads[qid_vid_ptr + 0];
-                int vid1         = quads[qid_vid_ptr + 1];
-                int vid2         = quads[qid_vid_ptr + 2];
-                int vid3         = quads[qid_vid_ptr + 3];
-                int vid0_ptr     = 3 * vid0;
-                int vid1_ptr     = 3 * vid1;
-                int vid2_ptr     = 3 * vid2;
-                int vid3_ptr     = 3 * vid3;
-
-                glBegin(GL_QUADS);
-                glColor3fv(&(q_colors[qid_col_ptr]));
-                glNormal3dv(&(v_norm[vid0_ptr]));
-                glVertex3dv(&(coords[vid0_ptr]));
-                glNormal3dv(&(v_norm[vid1_ptr]));
-                glVertex3dv(&(coords[vid1_ptr]));
-                glNormal3dv(&(v_norm[vid2_ptr]));
-                glVertex3dv(&(coords[vid2_ptr]));
-                glNormal3dv(&(v_norm[vid3_ptr]));
-                glVertex3dv(&(coords[vid3_ptr]));
-                glEnd();
-            }
-        }
-        else
-        {
-            glEnableClientState(GL_VERTEX_ARRAY);
-            glVertexPointer(3, GL_DOUBLE, 0, coords.data());
-
-            glEnableClientState(GL_NORMAL_ARRAY);
-            glNormalPointer(GL_DOUBLE, 0, v_norm.data());
-
-            if (draw_mode & DRAW_VERTEXCOLOR)
-            {
-                glEnableClientState(GL_COLOR_ARRAY);
-                glColorPointer(3, GL_FLOAT, 0, v_colors.data());
-            }
-            else if (draw_mode & DRAW_TEXTURE1D)
-            {
-                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-                glTexCoordPointer(1, GL_FLOAT, 0, u_text.data());
-                glColor3f(1.0,1.0,1.0);
-            }
-
-            glDrawElements(GL_QUADS, quads.size(), GL_UNSIGNED_INT, quads.data());
-
-            if (draw_mode & DRAW_TEXTURE1D)   glDisableClientState(GL_TEXTURE_COORD_ARRAY); else
-            if (draw_mode & DRAW_VERTEXCOLOR) glDisableClientState(GL_COLOR_ARRAY);
-
-            glDisableClientState(GL_NORMAL_ARRAY);
-            glDisableClientState(GL_VERTEX_ARRAY);
-        }
-    }
-
-    if (draw_mode & DRAW_WIREFRAME)
-    {
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_DOUBLE, 0, coords.data());
-
-        glLineWidth(wireframe_width);
-        glColor4fv(wireframe_color);
-
-        glDrawElements(GL_QUADS, quads.size(), GL_UNSIGNED_INT, quads.data());
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
-
-    if (draw_mode & DRAW_BORDERS)
-    {
-        glDisable(GL_LIGHTING);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-
-        float delta = bb.diag() * 0.0005;
-        for(int i=0; i<(int)borders.size(); i+=2)
-        {
-            vec3d v0 = vertex(borders[i]);
-            vec3d v1 = vertex(borders[i+1]);
-
-            vec3d n0 = vertex_normal(borders[i]);
-            vec3d n1 = vertex_normal(borders[i+1]);
-
-            v0 = v0 + n0 * delta;
-            v1 = v1 + n1 * delta;
-
-            glLineWidth(border_width);
-            glColor4fv(border_color);
-
-            glBegin(GL_LINES);
-            glVertex3f(v0.x(), v0.y(), v0.z());
-            glVertex3f(v1.x(), v1.y(), v1.z());
-            glEnd();
-        }
-    }
-}
-
-
-CINO_INLINE
 void DrawableQuadmesh::draw() const
 {
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-    glDisable(GL_CULL_FACE);
+    RenderFaceData data;
+    data.face_type       = GL_QUADS;
+    data.draw_mode       = draw_mode;
+    data.coords          = &coords;
+    data.faces           = &quads;
+    data.v_norms         = &v_norm;
+    data.v_colors        = &v_colors;
+    data.f_colors        = &q_colors;
+    data.text1D          = &u_text;
+    data.border_coords   = &border_coords;
+    data.border_segs     = &border_segs;
+    data.wireframe_color = wireframe_color;
+    data.wireframe_width = wireframe_width;
+    data.border_color    = border_color;
+    data.border_width    = border_width;
 
-    if (draw_mode & DRAW_MESH)
-    {
-        if (draw_mode & DRAW_WIREFRAME)
-        {
-            if (draw_mode & DRAW_POINTS)
-            {
-                glDisable(GL_LIGHTING);
-                glShadeModel(GL_FLAT);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                glDepthRange(0.0, 1.0);
-                render_pass();
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-
-            else
-
-            if (draw_mode & DRAW_FLAT)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_FLAT);
-                glDepthRange(0.01, 1.0);
-                render_pass();
-
-                glDisable(GL_LIGHTING);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                glDepthRange(0.0, 1.0);
-                glDepthFunc(GL_LEQUAL);
-                render_pass();
-                glDepthFunc(GL_LESS);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-
-            else
-
-            if (draw_mode & DRAW_SMOOTH)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_SMOOTH);
-                glDepthRange(0.01, 1.0);
-                render_pass();
-
-                glDisable(GL_LIGHTING);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                glDepthRange(0.0, 1.0);
-                glDepthFunc(GL_LEQUAL);
-                render_pass();
-                glDepthFunc(GL_LESS);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-        }
-
-        else
-
-        {
-            if (draw_mode & DRAW_POINTS)
-            {
-                glDisable(GL_LIGHTING);
-                render_pass();
-            }
-
-            else
-
-            if (draw_mode & DRAW_FLAT)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_FLAT);
-                render_pass();
-            }
-
-            else
-
-            if (draw_mode & DRAW_SMOOTH)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_SMOOTH);
-                render_pass();
-            }
-        }
-    }
+    render_faces(data);
 }
 
 CINO_INLINE
@@ -323,8 +133,8 @@ void DrawableQuadmesh::set_wireframe(bool b)
 CINO_INLINE
 void DrawableQuadmesh::set_border(bool b)
 {
-    if (b) draw_mode |=  DRAW_BORDERS;
-    else   draw_mode &= ~DRAW_BORDERS;
+    if (b) draw_mode |=  DRAW_BORDER;
+    else   draw_mode &= ~DRAW_BORDER;
 }
 
 CINO_INLINE
