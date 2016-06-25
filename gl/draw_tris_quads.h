@@ -57,16 +57,16 @@ typedef struct
 {
           int                  draw_mode;
           GLenum               face_type;
-    const std::vector<double> *coords;
-    const std::vector<uint>   *faces;
-    const std::vector<double> *v_norms;
-    const std::vector<float>  *v_colors;
-    const std::vector<float>  *f_colors;
-    const std::vector<float>  *text1D;
-    const std::vector<double> *border_coords;
-    const std::vector<uint>   *border_segs;
-    const float               *wireframe_color;
-    const float               *border_color;
+    const std::vector<double> *coords           = NULL;
+    const std::vector<uint>   *faces            = NULL;
+    const std::vector<double> *v_norms          = NULL;
+    const std::vector<float>  *v_colors         = NULL;
+    const std::vector<float>  *f_colors         = NULL;
+    const std::vector<float>  *text1D           = NULL;
+    const std::vector<double> *border_coords    = NULL;
+    const std::vector<uint>   *border_segs      = NULL;
+    const float               *wireframe_color  = NULL;
+    const float               *border_color     = NULL;
           int                  wireframe_width;
           int                  border_width;
 }

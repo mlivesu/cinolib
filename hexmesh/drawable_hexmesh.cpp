@@ -27,8 +27,6 @@
 #include "../textures/isolines_texture.h"
 #include "../colors.h"
 
-#include <iostream>
-
 
 namespace cinolib
 {
@@ -55,9 +53,10 @@ DrawableHexmesh::DrawableHexmesh(const std::vector<double> & coords,
 CINO_INLINE
 void DrawableHexmesh::init()
 {
-    type      = HEXMESH;
-    draw_mode = DRAW_MESH | DRAW_OUT_FLAT | DRAW_OUT_FACECOLOR | DRAW_OUT_WIREFRAME
-                          | DRAW_IN_FLAT  | DRAW_IN_FACECOLOR  | DRAW_IN_WIREFRAME;
+    type          = HEXMESH;
+
+    draw_mode_out = DRAW_MESH | DRAW_FLAT | DRAW_FACECOLOR | DRAW_WIREFRAME;
+    draw_mode_in  =             DRAW_FLAT | DRAW_FACECOLOR | DRAW_WIREFRAME;
 
     wireframe_out_width    = 1;
     wireframe_out_color[0] = 0.1;
@@ -130,329 +129,36 @@ float DrawableHexmesh::scene_radius() const
 CINO_INLINE
 void DrawableHexmesh::draw() const
 {
-    draw_out();
+    RenderFaceData data_out;
+    data_out.face_type       = GL_QUADS;
+    data_out.draw_mode       = draw_mode_out;
+    data_out.coords          = &outer_visible_coords;
+    data_out.faces           = &outer_visible_quads;
+    data_out.v_norms         = &outer_visible_v_norms;
+    data_out.f_colors        = &outer_visible_h_colors;
+    data_out.text1D          = &outer_visible_f_values;
+    data_out.wireframe_color = wireframe_out_color;
+    data_out.wireframe_width = wireframe_out_width;
 
-    if (draw_mode & DRAW_IN_SLICE)
+    render_faces(data_out);
+
+    if (draw_mode_in & DRAW_MESH)
     {
-        draw_in();
+        RenderFaceData data_in;
+        data_in.face_type       = GL_QUADS;
+        data_in.draw_mode       = draw_mode_in;
+        data_in.coords          = &inner_slice_coords;
+        data_in.faces           = &inner_slice_quads;
+        data_in.v_norms         = &inner_slice_v_norms;
+        data_in.f_colors        = &inner_slice_h_colors;
+        data_in.text1D          = &inner_slice_f_values;
+        data_in.wireframe_color = wireframe_in_color;
+        data_in.wireframe_width = wireframe_in_width;
+
+        render_faces(data_in);
     }
 }
 
-CINO_INLINE
-void DrawableHexmesh::draw_out() const
-{
-    if (draw_mode & DRAW_MESH)
-    {
-        if (draw_mode & DRAW_OUT_WIREFRAME)
-        {
-            if (draw_mode & DRAW_OUT_POINTS)
-            {
-                glDisable(GL_LIGHTING);
-                glShadeModel(GL_FLAT);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                glDepthRange(0.0, 1.0);
-                render_pass_out();
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-
-            else
-
-            if (draw_mode & DRAW_OUT_FLAT)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_FLAT);
-                glDepthRange(0.01, 1.0);
-                render_pass_out();
-
-                glDisable(GL_LIGHTING);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                glDepthRange(0.0, 1.0);
-                glDepthFunc(GL_LEQUAL);
-                render_pass_out();
-                glDepthFunc(GL_LESS);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-
-            else
-
-            if (draw_mode & DRAW_OUT_SMOOTH)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_SMOOTH);
-                glDepthRange(0.01, 1.0);
-                render_pass_out();
-
-                glDisable(GL_LIGHTING);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                glDepthRange(0.0, 1.0);
-                glDepthFunc(GL_LEQUAL);
-                render_pass_out();
-                glDepthFunc(GL_LESS);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-        }
-
-        else
-
-        {
-            if (draw_mode & DRAW_OUT_POINTS)
-            {
-                glDisable(GL_LIGHTING);
-                render_pass_out();
-            }
-
-            else
-
-            if (draw_mode & DRAW_OUT_FLAT)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_FLAT);
-                render_pass_out();
-            }
-
-            else
-
-            if (draw_mode & DRAW_OUT_SMOOTH)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_SMOOTH);
-                render_pass_out();
-            }
-        }
-    }
-}
-
-CINO_INLINE
-void DrawableHexmesh::draw_in() const
-{
-    if (draw_mode & DRAW_MESH)
-    {
-        if (draw_mode & DRAW_IN_WIREFRAME)
-        {
-            if (draw_mode & DRAW_IN_FLAT)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_FLAT);
-                glDepthRange(0.01, 1.0);
-                render_pass_in();
-
-                glDisable(GL_LIGHTING);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                glDepthRange(0.0, 1.0);
-                glDepthFunc(GL_LEQUAL);
-                render_pass_in();
-                glDepthFunc(GL_LESS);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-
-            else
-
-            if (draw_mode & DRAW_IN_SMOOTH)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_SMOOTH);
-                glDepthRange(0.01, 1.0);
-                render_pass_in();
-
-                glDisable(GL_LIGHTING);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                glDepthRange(0.0, 1.0);
-                glDepthFunc(GL_LEQUAL);
-                render_pass_in();
-                glDepthFunc(GL_LESS);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-        }
-
-        else
-
-        {
-            if (draw_mode & DRAW_IN_FLAT)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_FLAT);
-                render_pass_in();
-            }
-
-            else
-
-            if (draw_mode & DRAW_IN_SMOOTH)
-            {
-                glEnable(GL_LIGHTING);
-                glShadeModel(GL_SMOOTH);
-                render_pass_in();
-            }
-        }
-    }
-}
-
-CINO_INLINE
-void DrawableHexmesh::render_pass_out() const
-{
-    if (draw_mode & DRAW_OUT_POINTS)
-    {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_DOUBLE, 0, outer_visible_coords.data());
-
-        glColor3f(1.0, 1.0, 1.0);
-        glDrawArrays(GL_POINTS, 0, outer_visible_coords.size() / 3);
-
-        glDisableClientState(GL_COLOR_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
-    else if (draw_mode & DRAW_OUT_SMOOTH || draw_mode & DRAW_OUT_FLAT)
-    {
-        // Old fashioned (orrible) rendering
-        //
-        if (draw_mode & DRAW_OUT_FACECOLOR)
-        {
-            int n_quads = outer_visible_quads.size()/4;
-            for(int qid=0; qid<n_quads; ++qid)
-            {
-                int qid_vtx_ptr  = 4 * qid;
-                int qid_col_ptr  = 3 * qid;
-                int vid0     = outer_visible_quads[qid_vtx_ptr + 0];
-                int vid1     = outer_visible_quads[qid_vtx_ptr + 1];
-                int vid2     = outer_visible_quads[qid_vtx_ptr + 2];
-                int vid3     = outer_visible_quads[qid_vtx_ptr + 3];
-                int vid0_ptr = 3 * vid0;
-                int vid1_ptr = 3 * vid1;
-                int vid2_ptr = 3 * vid2;
-                int vid3_ptr = 3 * vid3;
-
-                glBegin(GL_QUADS);
-                glColor3fv(&(outer_visible_t_colors[qid_col_ptr]));
-                glNormal3dv(&(outer_visible_v_norms[vid0_ptr]));
-                glVertex3dv(&(outer_visible_coords[vid0_ptr]));
-                glNormal3dv(&(outer_visible_v_norms[vid1_ptr]));
-                glVertex3dv(&(outer_visible_coords[vid1_ptr]));
-                glNormal3dv(&(outer_visible_v_norms[vid2_ptr]));
-                glVertex3dv(&(outer_visible_coords[vid2_ptr]));
-                glNormal3dv(&(outer_visible_v_norms[vid3_ptr]));
-                glVertex3dv(&(outer_visible_coords[vid3_ptr]));
-                glEnd();
-            }
-        }
-        else
-        {
-            glEnableClientState(GL_VERTEX_ARRAY);
-            glVertexPointer(3, GL_DOUBLE, 0, outer_visible_coords.data());
-
-            glEnableClientState(GL_NORMAL_ARRAY);
-            glNormalPointer(GL_DOUBLE, 0, outer_visible_v_norms.data());
-
-            if (draw_mode & DRAW_OUT_TEXTURE1D)
-            {
-                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-                glTexCoordPointer(1, GL_FLOAT, 0, outer_visible_f_values.data());
-                glColor3f(1.0,1.0,1.0);
-            }
-
-            glDrawElements(GL_QUADS, outer_visible_quads.size(), GL_UNSIGNED_INT, outer_visible_quads.data());
-
-            if (draw_mode & DRAW_OUT_TEXTURE1D)   glDisableClientState(GL_TEXTURE_COORD_ARRAY); else
-            if (draw_mode & DRAW_OUT_VERTEXCOLOR) glDisableClientState(GL_COLOR_ARRAY);
-
-            glDisableClientState(GL_NORMAL_ARRAY);
-            glDisableClientState(GL_VERTEX_ARRAY);
-        }
-    }
-
-    if (draw_mode & DRAW_OUT_WIREFRAME)
-    {
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_DOUBLE, 0, outer_visible_coords.data());
-
-        glLineWidth(wireframe_out_width);
-        glColor4fv(wireframe_out_color);
-
-        glDrawElements(GL_QUADS, outer_visible_quads.size(), GL_UNSIGNED_INT, outer_visible_quads.data());
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
-}
-
-CINO_INLINE
-void DrawableHexmesh::render_pass_in() const
-{
-    if (draw_mode & DRAW_IN_SMOOTH || draw_mode & DRAW_IN_FLAT)
-    {
-        // Old fashioned (orrible) rendering
-        //
-        if (draw_mode & DRAW_IN_FACECOLOR)
-        {
-            int n_quads = inner_slice_quads.size()/4;
-            for(int qid=0; qid<n_quads; ++qid)
-            {
-                int qid_vtx_ptr  = 4 * qid;
-                int qid_col_ptr  = 3 * qid;
-                int vid0     = inner_slice_quads[qid_vtx_ptr + 0];
-                int vid1     = inner_slice_quads[qid_vtx_ptr + 1];
-                int vid2     = inner_slice_quads[qid_vtx_ptr + 2];
-                int vid3     = inner_slice_quads[qid_vtx_ptr + 3];
-                int vid0_ptr = 3 * vid0;
-                int vid1_ptr = 3 * vid1;
-                int vid2_ptr = 3 * vid2;
-                int vid3_ptr = 3 * vid3;
-
-                glBegin(GL_QUADS);
-                glColor3fv(&(inner_slice_h_colors[qid_col_ptr]));
-                glNormal3dv(&(inner_slice_v_norms[vid0_ptr]));
-                glVertex3dv(&(inner_slice_coords[vid0_ptr]));
-                glNormal3dv(&(inner_slice_v_norms[vid1_ptr]));
-                glVertex3dv(&(inner_slice_coords[vid1_ptr]));
-                glNormal3dv(&(inner_slice_v_norms[vid2_ptr]));
-                glVertex3dv(&(inner_slice_coords[vid2_ptr]));
-                glNormal3dv(&(inner_slice_v_norms[vid3_ptr]));
-                glVertex3dv(&(inner_slice_coords[vid3_ptr]));
-                glEnd();
-            }
-        }
-        else
-        {
-            glEnableClientState(GL_VERTEX_ARRAY);
-            glVertexPointer(3, GL_DOUBLE, 0, inner_slice_coords.data());
-
-            glEnableClientState(GL_NORMAL_ARRAY);
-            glNormalPointer(GL_DOUBLE, 0, inner_slice_v_norms.data());
-
-            if (draw_mode & DRAW_IN_TEXTURE1D)
-            {
-                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-                glTexCoordPointer(1, GL_FLOAT, 0, inner_slice_f_values.data());
-                glColor3f(1.0,1.0,1.0);
-            }
-
-            glDrawElements(GL_QUADS, inner_slice_quads.size(), GL_UNSIGNED_INT, inner_slice_quads.data());
-
-            if (draw_mode & DRAW_IN_TEXTURE1D)   glDisableClientState(GL_TEXTURE_COORD_ARRAY); else
-            if (draw_mode & DRAW_IN_VERTEXCOLOR) glDisableClientState(GL_COLOR_ARRAY);
-
-            glDisableClientState(GL_NORMAL_ARRAY);
-            glDisableClientState(GL_VERTEX_ARRAY);
-        }
-    }
-
-    if (draw_mode & DRAW_IN_WIREFRAME)
-    {
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_DOUBLE, 0, inner_slice_coords.data());
-
-        glLineWidth(wireframe_in_width);
-        glColor4fv(wireframe_in_color);
-
-        glDrawElements(GL_QUADS, inner_slice_quads.size(), GL_UNSIGNED_INT, inner_slice_quads.data());
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
-
-}
 
 CINO_INLINE
 void DrawableHexmesh::set_h_out_color(const float r, const float g, const float b)
@@ -483,7 +189,7 @@ void DrawableHexmesh::set_h_in_color(const float r, const float g, const float b
 CINO_INLINE
 void DrawableHexmesh::set_slice_parameters(const float thresh, const int item, const bool dir, const bool mode)
 {
-    if (draw_mode & DRAW_IN_SLICE)
+    if (draw_mode_in & DRAW_MESH)
     {
         switch (item)
         {
@@ -532,7 +238,7 @@ void DrawableHexmesh::update_inner_slice()
 
     for(int hid=0; hid<num_hexahedra(); ++hid)
     {
-        if ((draw_mode & DRAW_IN_SLICE) && (slice_mask[hid])) continue;
+        if ((draw_mode_in & DRAW_MESH) && (slice_mask[hid])) continue;
 
         for(auto nbr : adj_hexa2hexa(hid))
         {
@@ -557,43 +263,10 @@ void DrawableHexmesh::update_inner_slice()
                 inner_slice_quads.push_back(base_addr + 2);
                 inner_slice_quads.push_back(base_addr + 3);
 
-                if (draw_mode & DRAW_IN_EL_QUALITY)
-                {
-                    double q = hex_quality(hid);
-                    float  r,g,b;
-
-                    if (q < 0)
-                    {
-                        r = 1.0;
-                        g = 0.0;
-                        b = 0.0;
-                    }
-                    else if (q <= 0.5)
-                    {
-                        q *= 2.0;
-                        r = WHITE[0] * q + RED[0] * (1.0 - q);
-                        g = WHITE[1] * q + RED[1] * (1.0 - q);
-                        b = WHITE[2] * q + RED[2] * (1.0 - q);
-                    }
-                    else
-                    {
-                        q = 2.0 * q - 1.0;
-                        r = BLUE[0] * q + WHITE[0] * (1.0 - q);
-                        g = BLUE[1] * q + WHITE[1] * (1.0 - q);
-                        b = BLUE[2] * q + WHITE[2] * (1.0 - q);
-                    }
-
-                    inner_slice_h_colors.push_back(r);
-                    inner_slice_h_colors.push_back(g);
-                    inner_slice_h_colors.push_back(b);
-                }
-                else
-                {
-                    int hid_ptr = hid * 3;
-                    inner_slice_h_colors.push_back(h_in_colors[hid_ptr + 0]);
-                    inner_slice_h_colors.push_back(h_in_colors[hid_ptr + 1]);
-                    inner_slice_h_colors.push_back(h_in_colors[hid_ptr + 2]);
-                }
+                int hid_ptr = hid * 3;
+                inner_slice_h_colors.push_back(h_in_colors[hid_ptr + 0]);
+                inner_slice_h_colors.push_back(h_in_colors[hid_ptr + 1]);
+                inner_slice_h_colors.push_back(h_in_colors[hid_ptr + 2]);
 
                 inner_slice_coords.push_back(coords[vid0_ptr + 0]);
                 inner_slice_coords.push_back(coords[vid0_ptr + 1]);
@@ -645,11 +318,11 @@ void DrawableHexmesh::update_outer_visible_mesh()
     outer_visible_quads.clear();
     outer_visible_v_norms.clear();
     outer_visible_f_values.clear();
-    outer_visible_t_colors.clear();
+    outer_visible_h_colors.clear();
 
     for(int qid=0; qid<num_srf_quads(); ++qid)
     {
-        if ((draw_mode & DRAW_IN_SLICE) && (slice_mask[adj_quad2hexa(qid)])) continue;
+        if ((draw_mode_in & DRAW_MESH) && (slice_mask[adj_quad2hexa(qid)])) continue;
 
         int qid_vid_ptr   = 4 * qid;
         int vid0          = quads[qid_vid_ptr + 0];
@@ -700,45 +373,10 @@ void DrawableHexmesh::update_outer_visible_mesh()
         outer_visible_f_values.push_back(vertex_u_text(vid2));
         outer_visible_f_values.push_back(vertex_u_text(vid3));
 
-        if (draw_mode & DRAW_OUT_EL_QUALITY)
-        {
-            int    hid = adj_quad2hexa(qid);
-            double q   = hex_quality(hid);
-
-            float r,g,b;
-
-            if (q < 0)
-            {
-                r = 1.0;
-                g = 0.0;
-                b = 0.0;
-            }
-            else if (q <= 0.5)
-            {
-                q *= 2.0;
-                r = WHITE[0] * q + RED[0] * (1.0 - q);
-                g = WHITE[1] * q + RED[1] * (1.0 - q);
-                b = WHITE[2] * q + RED[2] * (1.0 - q);
-            }
-            else
-            {
-                q = 2.0 * q - 1.0;
-                r = BLUE[0] * q + WHITE[0] * (1.0 - q);
-                g = BLUE[1] * q + WHITE[1] * (1.0 - q);
-                b = BLUE[2] * q + WHITE[2] * (1.0 - q);
-            }
-
-            outer_visible_t_colors.push_back(r);
-            outer_visible_t_colors.push_back(g);
-            outer_visible_t_colors.push_back(b);
-        }
-        else
-        {
-            int hid_ptr = adj_quad2hexa(qid) * 3;
-            outer_visible_t_colors.push_back(h_out_colors[hid_ptr + 0]);
-            outer_visible_t_colors.push_back(h_out_colors[hid_ptr + 1]);
-            outer_visible_t_colors.push_back(h_out_colors[hid_ptr + 2]);
-        }
+        int hid_ptr = adj_quad2hexa(qid) * 3;
+        outer_visible_h_colors.push_back(h_out_colors[hid_ptr + 0]);
+        outer_visible_h_colors.push_back(h_out_colors[hid_ptr + 1]);
+        outer_visible_h_colors.push_back(h_out_colors[hid_ptr + 2]);
     }
 }
 
@@ -785,62 +423,80 @@ void DrawableHexmesh::set_in_wireframe_transparency(float alpha)
 CINO_INLINE
 void DrawableHexmesh::set_draw_mesh(bool b)
 {
-    if (b) draw_mode |=  DRAW_MESH;
-    else   draw_mode &= ~DRAW_MESH;
+    if (b)
+    {
+        draw_mode_out |=  DRAW_MESH;
+    }
+    else
+    {
+        draw_mode_out &= ~DRAW_MESH;
+        draw_mode_in  &= ~DRAW_MESH;
+    }
 }
 
 CINO_INLINE
 void DrawableHexmesh::set_out_wireframe(bool b)
 {
-    if (b) draw_mode |=  DRAW_OUT_WIREFRAME;
-    else   draw_mode &= ~DRAW_OUT_WIREFRAME;
+    if (b) draw_mode_out |=  DRAW_WIREFRAME;
+    else   draw_mode_out &= ~DRAW_WIREFRAME;
 }
 
 CINO_INLINE
 void DrawableHexmesh::set_in_wireframe(bool b)
 {
-    if (b) draw_mode |=  DRAW_IN_WIREFRAME;
-    else   draw_mode &= ~DRAW_IN_WIREFRAME;
+    if (b) draw_mode_in |=  DRAW_WIREFRAME;
+    else   draw_mode_in &= ~DRAW_WIREFRAME;
 }
 
 CINO_INLINE
 void DrawableHexmesh::set_flat_shading()
 {
-    draw_mode |=  DRAW_OUT_FLAT;
-    draw_mode &= ~DRAW_OUT_SMOOTH;
-    draw_mode &= ~DRAW_OUT_POINTS;
+    draw_mode_out |=  DRAW_FLAT;
+    draw_mode_out &= ~DRAW_SMOOTH;
+    draw_mode_out &= ~DRAW_POINTS;
+
+    draw_mode_in  |=  DRAW_FLAT;
+    draw_mode_in  &= ~DRAW_SMOOTH;
+    draw_mode_in  &= ~DRAW_POINTS;
 }
 
 CINO_INLINE
 void DrawableHexmesh::set_smooth_shading()
 {
-    draw_mode |=  DRAW_OUT_SMOOTH;
-    draw_mode &= ~DRAW_OUT_FLAT;
-    draw_mode &= ~DRAW_OUT_POINTS;
+    draw_mode_out |=  DRAW_SMOOTH;
+    draw_mode_out &= ~DRAW_FLAT;
+    draw_mode_out &= ~DRAW_POINTS;
+
+    draw_mode_in  |=  DRAW_SMOOTH;
+    draw_mode_in  &= ~DRAW_FLAT;
+    draw_mode_in  &= ~DRAW_POINTS;
 }
 
 CINO_INLINE
 void DrawableHexmesh::set_points_shading()
 {
-    draw_mode |=  DRAW_OUT_POINTS;
-    draw_mode &= ~DRAW_OUT_FLAT;
-    draw_mode &= ~DRAW_OUT_SMOOTH;
+    draw_mode_out |=  DRAW_POINTS;
+    draw_mode_out &= ~DRAW_FLAT;
+    draw_mode_out &= ~DRAW_SMOOTH;
+
+    draw_mode_in  |=  DRAW_POINTS;
+    draw_mode_in  &= ~DRAW_FLAT;
+    draw_mode_in  &= ~DRAW_SMOOTH;
 }
 
 CINO_INLINE
 void DrawableHexmesh::set_draw_slice(bool b)
 {
-    if (b) draw_mode |=  DRAW_IN_SLICE;
-    else   draw_mode &= ~DRAW_IN_SLICE;
+    if (b) draw_mode_in |=  DRAW_MESH;
+    else   draw_mode_in &= ~DRAW_MESH;
 }
 
 CINO_INLINE
 void DrawableHexmesh::set_enable_out_face_color()
 {
-    draw_mode |=  DRAW_OUT_FACECOLOR;
-    draw_mode &= ~DRAW_OUT_VERTEXCOLOR;
-    draw_mode &= ~DRAW_OUT_TEXTURE1D;
-    draw_mode &= ~DRAW_OUT_EL_QUALITY;
+    draw_mode_out |=  DRAW_FACECOLOR;
+    draw_mode_out &= ~DRAW_VERTEXCOLOR;
+    draw_mode_out &= ~DRAW_TEXTURE1D;
     glDisable(GL_TEXTURE_1D);
 }
 
@@ -848,39 +504,40 @@ void DrawableHexmesh::set_enable_out_face_color()
 CINO_INLINE
 void DrawableHexmesh::set_enable_in_face_color()
 {
-    draw_mode |=  DRAW_IN_FACECOLOR;
-    draw_mode &= ~DRAW_IN_VERTEXCOLOR;
-    draw_mode &= ~DRAW_IN_TEXTURE1D;
-    draw_mode &= ~DRAW_IN_EL_QUALITY;
+    draw_mode_in |=  DRAW_FACECOLOR;
+    draw_mode_in &= ~DRAW_VERTEXCOLOR;
+    draw_mode_in &= ~DRAW_TEXTURE1D;
     glDisable(GL_TEXTURE_1D);
 }
 
 CINO_INLINE
 void DrawableHexmesh::set_enable_out_quality_color()
 {
-    draw_mode |=  DRAW_OUT_EL_QUALITY;
-    draw_mode |=  DRAW_OUT_FACECOLOR;
-    draw_mode &= ~DRAW_OUT_VERTEXCOLOR;
-    draw_mode &= ~DRAW_OUT_TEXTURE1D;
+    draw_mode_out |=  DRAW_FACECOLOR;
+    draw_mode_out &= ~DRAW_VERTEXCOLOR;
+    draw_mode_out &= ~DRAW_TEXTURE1D;
     glDisable(GL_TEXTURE_1D);
+
+    color_tets_wrt_quality(false, true);
 }
 
 CINO_INLINE
 void DrawableHexmesh::set_enable_in_quality_color()
 {
-    draw_mode |=  DRAW_IN_EL_QUALITY;
-    draw_mode |=  DRAW_IN_FACECOLOR;
-    draw_mode &= ~DRAW_IN_VERTEXCOLOR;
-    draw_mode &= ~DRAW_IN_TEXTURE1D;
+    draw_mode_in |=  DRAW_FACECOLOR;
+    draw_mode_in &= ~DRAW_VERTEXCOLOR;
+    draw_mode_in &= ~DRAW_TEXTURE1D;
     glDisable(GL_TEXTURE_1D);
+
+    color_tets_wrt_quality(true, false);
 }
 
 CINO_INLINE
 void DrawableHexmesh::set_enable_out_texture1D(int texture)
 {
-    draw_mode |=  DRAW_OUT_TEXTURE1D;
-    draw_mode &= ~DRAW_OUT_VERTEXCOLOR;
-    draw_mode &= ~DRAW_OUT_FACECOLOR;
+    draw_mode_out |=  DRAW_TEXTURE1D;
+    draw_mode_out &= ~DRAW_VERTEXCOLOR;
+    draw_mode_out &= ~DRAW_FACECOLOR;
 
     if (texture_out_id > 0)
     {
@@ -923,9 +580,9 @@ void DrawableHexmesh::set_enable_out_texture1D(int texture)
 CINO_INLINE
 void DrawableHexmesh::set_enable_in_texture1D(int texture)
 {
-    draw_mode |=  DRAW_IN_TEXTURE1D;
-    draw_mode &= ~DRAW_IN_VERTEXCOLOR;
-    draw_mode &= ~DRAW_IN_FACECOLOR;
+    draw_mode_in |=  DRAW_TEXTURE1D;
+    draw_mode_in &= ~DRAW_VERTEXCOLOR;
+    draw_mode_in &= ~DRAW_FACECOLOR;
 
     if (texture_in_id > 0)
     {
@@ -987,6 +644,54 @@ void DrawableHexmesh::color_wrt_hex_scalar()
         h_in_colors[hid_ptr + 2] = rgb[2];
     }
     update_slice();
+}
+
+CINO_INLINE
+void DrawableHexmesh::color_tets_wrt_quality(const bool in, const bool out)
+{
+    if (out) h_out_colors.resize(num_hexahedra()*3);
+    if (in)  h_in_colors.resize(num_hexahedra()*3);
+
+    for(int tid=0; tid<num_hexahedra(); ++tid)
+    {
+        float r,g,b;
+        double q = hex_quality(tid);
+
+        if (q < 0)
+        {
+            r = 1.0;
+            g = 0.0;
+            b = 0.0;
+        }
+        else if (q <= 0.5)
+        {
+            q *= 2.0;
+            r = WHITE[0] * q + RED[0] * (1.0 - q);
+            g = WHITE[1] * q + RED[1] * (1.0 - q);
+            b = WHITE[2] * q + RED[2] * (1.0 - q);
+        }
+        else
+        {
+            q = 2.0 * q - 1.0;
+            r = BLUE[0] * q + WHITE[0] * (1.0 - q);
+            g = BLUE[1] * q + WHITE[1] * (1.0 - q);
+            b = BLUE[2] * q + WHITE[2] * (1.0 - q);
+        }
+
+        if (out)
+        {
+            h_out_colors[3*tid+0] = r;
+            h_out_colors[3*tid+1] = g;
+            h_out_colors[3*tid+2] = b;
+        }
+
+        if (in)
+        {
+            h_in_colors[3*tid+0] = r;
+            h_in_colors[3*tid+1] = g;
+            h_in_colors[3*tid+2] = b;
+        }
+    }
 }
 
 }

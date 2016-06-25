@@ -31,11 +31,14 @@ void render_faces_pvt(const RenderFaceData & data)
 {
     if (data.draw_mode & DRAW_POINTS)
     {
+
+        assert(data.coords != NULL);
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_DOUBLE, 0, data.coords->data());
 
-        glEnableClientState(GL_COLOR_ARRAY);
-        glColorPointer (3, GL_FLOAT, 0, data.v_colors->data());
+        assert(data.wireframe_color != NULL);
+        glPointSize(data.wireframe_width);
+        glColor4fv(data.wireframe_color);
 
         glDrawArrays(GL_POINTS, 0, data.coords->size()/3);
 
@@ -48,6 +51,11 @@ void render_faces_pvt(const RenderFaceData & data)
         //
         if (data.draw_mode & DRAW_FACECOLOR)
         {
+            assert(data.faces    != NULL);
+            assert(data.v_norms  != NULL);
+            assert(data.f_colors != NULL);
+            assert(data.coords   != NULL);
+
             bool quads   = (data.face_type == GL_QUADS);
             int  n_faces = (quads) ? data.faces->size()/4 : data.faces->size()/3;
 
@@ -81,24 +89,29 @@ void render_faces_pvt(const RenderFaceData & data)
         }
         else
         {
+            assert(data.coords != NULL);
             glEnableClientState(GL_VERTEX_ARRAY);
             glVertexPointer(3, GL_DOUBLE, 0, data.coords->data());
 
+            assert(data.v_norms != NULL);
             glEnableClientState(GL_NORMAL_ARRAY);
             glNormalPointer(GL_DOUBLE, 0, data.v_norms->data());
 
             if (data.draw_mode & DRAW_VERTEXCOLOR)
             {
+                assert(data.v_colors != NULL);
                 glEnableClientState(GL_COLOR_ARRAY);
                 glColorPointer(3, GL_FLOAT, 0, data.v_colors->data());
             }
             else if (data.draw_mode & DRAW_TEXTURE1D)
             {
+                assert(data.text1D != NULL);
                 glEnableClientState(GL_TEXTURE_COORD_ARRAY);
                 glTexCoordPointer(1, GL_FLOAT, 0, data.text1D->data());
                 glColor3f(1.0,1.0,1.0);
             }
 
+            assert(data.faces != NULL);
             glDrawElements(data.face_type, data.faces->size(), GL_UNSIGNED_INT, data.faces->data());
 
             if (data.draw_mode & DRAW_VERTEXCOLOR) glDisableClientState(GL_COLOR_ARRAY);   else
@@ -115,12 +128,15 @@ void render_faces_pvt(const RenderFaceData & data)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
 
+        assert(data.coords != NULL);
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_DOUBLE, 0, data.coords->data());
 
+        assert(data.wireframe_color != NULL);
         glLineWidth(data.wireframe_width);
         glColor4fv(data.wireframe_color);
 
+        assert(data.faces != NULL);
         glDrawElements(data.face_type, data.faces->size(), GL_UNSIGNED_INT, data.faces->data());
 
         glDisableClientState(GL_VERTEX_ARRAY);
@@ -132,12 +148,15 @@ void render_faces_pvt(const RenderFaceData & data)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
 
+        assert(data.border_coords != NULL);
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_DOUBLE, 0, data.border_coords->data());
 
+        assert(data.border_color != NULL);
         glLineWidth(data.border_width);
         glColor4fv(data.border_color);
 
+        assert(data.border_segs != NULL);
         glDrawElements(GL_LINES, data.border_segs->size(), GL_UNSIGNED_INT, data.border_segs->data());
 
         glDisableClientState(GL_VERTEX_ARRAY);

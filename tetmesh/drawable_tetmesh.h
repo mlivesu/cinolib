@@ -32,6 +32,7 @@
 
 #include "../cinolib.h"
 #include "../drawable_object.h"
+#include "../gl/draw_tris_quads.h"
 #include "tetmesh.h"
 
 namespace cinolib
@@ -41,28 +42,6 @@ class DrawableTetmesh : public Tetmesh, public DrawableObject
 {
 
     public:
-
-        enum
-        {
-            DRAW_MESH            = 0x00000001,
-            DRAW_OUT_POINTS      = 0x00000002,
-            DRAW_OUT_FLAT        = 0x00000004,
-            DRAW_OUT_SMOOTH      = 0x00000008,
-            DRAW_OUT_WIREFRAME   = 0x00000010,
-            DRAW_OUT_FACECOLOR   = 0x00000020,
-            DRAW_OUT_VERTEXCOLOR = 0x00000040,
-            DRAW_OUT_TEXTURE1D   = 0x00000080,
-            DRAW_OUT_EL_QUALITY  = 0x00000100,
-            DRAW_IN_SLICE        = 0x00000200,
-            DRAW_IN_POINTS       = 0x00000400,
-            DRAW_IN_FLAT         = 0x00000800,
-            DRAW_IN_SMOOTH       = 0x00001000,
-            DRAW_IN_WIREFRAME    = 0x00002000,
-            DRAW_IN_FACECOLOR    = 0x00004000,
-            DRAW_IN_VERTEXCOLOR  = 0x00008000,
-            DRAW_IN_TEXTURE1D    = 0x00010000,
-            DRAW_IN_EL_QUALITY   = 0x00020000,
-        };
 
         enum
         {
@@ -126,10 +105,8 @@ class DrawableTetmesh : public Tetmesh, public DrawableObject
 
     protected:
 
-        void render_pass_out() const;
-        void render_pass_in()  const;
-
-        int    draw_mode;
+        int    draw_mode_in;
+        int    draw_mode_out;
         int    wireframe_out_width;
         float  wireframe_out_color[4];
         GLuint texture_out_id;
@@ -138,6 +115,7 @@ class DrawableTetmesh : public Tetmesh, public DrawableObject
         float  wireframe_in_color[4];
         GLuint texture_in_id;
 
+        void color_tets_wrt_quality(const bool in, const bool out);
         void update_outer_visible_mesh();
         void update_inner_slice();
 
