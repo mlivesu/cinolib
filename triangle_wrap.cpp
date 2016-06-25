@@ -25,23 +25,25 @@
 #include "vec3.h"
 #include "timer.h"
 
-/*
- * triangle.h is written in an old fashioned C style. As such, it requires
- * some annoying adjustment to comply with C++ standards
-*/
-#ifndef ANSI_DECLARATORS
-#define ANSI_DECLARATORS
+#ifdef CINOLIB_USES_TRIANGLE
+    /*
+     * triangle.h is written in an old fashioned C style. As such, it requires
+     * some annoying adjustment to comply with C++ standards
+    */
+    #ifndef ANSI_DECLARATORS
+    #define ANSI_DECLARATORS
+    #endif
+    #ifndef REAL
+    #define REAL double
+    #endif
+    #ifndef VOID
+    #define VOID void
+    #endif
+    extern "C" // set C-like linking style (i.e. no name mungling)
+    {
+    #include <triangle.h>
+    }
 #endif
-#ifndef REAL
-#define REAL double
-#endif
-#ifndef VOID
-#define VOID void
-#endif
-extern "C" // set C-like linking style (i.e. no name mungling)
-{
-#include <triangle.h>
-}
 
 namespace cinolib
 {
@@ -50,12 +52,12 @@ CINO_INLINE
 void triangle_wrap(const std::vector<double> & coords_in,   // serialized xy coordinates
                    const std::vector<uint>   & segs_in,     // serialized segment endpoint ids
                    const std::vector<double> & holes_in,    // serialized xy holes innerpoints
-                   const double                z_coord,    // z coord for coords_out
+                   const double                z_coord,     // z coord for coords_out
                    const std::string         & flags,       // options
                          std::vector<double> & coords_out,  // serialized xyz's (z = z_coord)
                          std::vector<uint>   & tris_out)    // serialized triangle vertex ids
 {
-    //timer_start("Triangulate 2D polygon");
+#ifdef CINOLIB_USES_TRIANGLE
 
     triangulateio in, out;
 
@@ -130,11 +132,16 @@ void triangle_wrap(const std::vector<double> & coords_in,   // serialized xy coo
     free(out.trianglelist);
     free(out.segmentlist);
 
-    //timer_stop("Triangulate 2D polygon");
+#else
+    std::cerr << "ERROR : Triangle missing. Install Triangle and recompile defining symbol CINOLIB_USES_TRIANGLE" << endl;
+    exit(-1);
+#endif
 }
 
 }
 
-#undef ANSI_DECLARATORS
-#undef REAL
-#undef VOID
+#ifdef CINOLIB_USES_TRIANGLE
+    #undef ANSI_DECLARATORS
+    #undef REAL
+    #undef VOID
+#endif

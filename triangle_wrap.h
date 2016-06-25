@@ -36,10 +36,10 @@ CINO_INLINE
 void triangle_wrap(const std::vector<double> & coords_in,   // serialized xy coordinates
                    const std::vector<uint>   & segs_in,     // serialized segment endpoint ids
                    const std::vector<double> & holes_in,    // serialized xy holes innerpoints
-                   const double                z_coord,    // z coord for coords_out
+                   const double                z_coord,     // z coord for coords_out
                    const std::string         & flags,       // options
                          std::vector<double> & coords_out,  // serialized xyz's (z = z_coord)
-                         std::vector<uint>   & tris_out);    // serialized triangle vertex ids
+                         std::vector<uint>   & tris_out);   // serialized triangle vertex ids
 
 }
 
