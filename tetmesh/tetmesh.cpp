@@ -74,6 +74,12 @@ void Tetmesh::load(const char * filename)
         std::vector<uint> hexa; // not used here
         read_VTU(filename, coords, tets, hexa);
     }
+    else if (filetype.compare(".vtk") == 0 ||
+             filetype.compare(".VTK") == 0)
+    {
+        std::vector<uint> hexa; // not used here
+        read_VTK(filename, coords, tets, hexa);
+    }
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
@@ -112,6 +118,12 @@ void Tetmesh::save(const char * filename) const
     {
         std::vector<uint> hexa; // empty
         write_VTU(filename, coords, tets, hexa);
+    }
+    else if (filetype.compare(".vtk") == 0 ||
+             filetype.compare(".VTK") == 0)
+    {
+        std::vector<uint> hexa; // empty
+        write_VTK(filename, coords, tets, hexa);
     }
     else
     {

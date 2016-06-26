@@ -21,37 +21,58 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_WRITE_H
-#define READ_WRITE_H
-
-// SURFACE READERS
-#include "read_OBJ.h"
-#include "read_OFF.h"
-#include "read_IV.h"
-//
-// VOLUME READERS
-#include "read_MESH.h"
-#include "read_TET.h"
-#include "read_VTU.h"
 #include "read_VTK.h"
-//
-// SKELETON READERS
-#include "read_LIVESU2012.h"
-#include "read_TAGLIASACCHI2012.h"
-#include "read_DEYSUN2006.h"
-#include "read_CSV.h"
 
-// SURFACE WRITERS
-#include "write_OBJ.h"
-#include "write_OFF.h"
-//
-// VOLUME WRITERS
-#include "write_MESH.h"
-#include "write_TET.h"
-#include "write_VTU.h"
-#include "write_VTK.h"
-//
-// SKELETON WRITERS
-#include "write_LIVESU2012.h"
+#ifdef CINOLIB_USES_VTK
+#include <vtkGenericDataObjectReader.h>
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+#include <string>
+#endif
 
-#endif // READ_WRITE
+namespace cinolib
+{
+
+CINO_INLINE
+void read_VTK(const char          * filename,
+               std::vector<double> & xyz,
+               std::vector<u_int>  & tets,
+               std::vector<u_int>  & hexa)
+{
+#ifdef CINOLIB_USES_VTK
+
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    vtkSmartPointer<vtkGenericDataObjectReader> reader = vtkSmartPointer<vtkGenericDataObjectReader>::New();
+    reader->SetFileName(filename);
+    reader->Update();
+    vtkSmartPointer<vtkUnstructuredGrid> grid(reader->GetUnstructuredGridOutput());
+
+    for(int i=0; i<grid->GetNumberOfPoints(); ++i)
+    {
+        double pnt[3];
+        grid->GetPoint(i, pnt);
+
+        xyz.push_back(pnt[0]);
+        xyz.push_back(pnt[1]);
+        xyz.push_back(pnt[2]);
+    }
+
+    for(int i=0; i<grid->GetNumberOfCells(); ++i)
+    {
+        vtkCell *c = grid->GetCell(i);
+
+        switch (c->GetCellType())
+        {
+            case VTK_TETRA:      for(int j=0; j<4; ++j) tets.push_back(c->GetPointId(j)); break;
+            case VTK_HEXAHEDRON: for(int j=0; j<8; ++j) hexa.push_back(c->GetPointId(j)); break;
+        }
+    }
+
+#else
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    exit(-1);
+#endif
+}
+
+}

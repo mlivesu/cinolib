@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "write_VTU.h"
+#include "write_VTK.h"
 
 #ifdef CINOLIB_USES_VTK
 #include <vtkSmartPointer.h>
@@ -29,14 +29,14 @@
 #include <vtkCellData.h>
 #include <vtkIntArray.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkUnstructuredGridWriter.h>
 #endif
 
 namespace cinolib
 {
 
 CINO_INLINE
-void write_VTU(const char                * filename,
+void write_VTK(const char                * filename,
                const std::vector<double> & xyz,
                const std::vector<u_int>  & tets,
                const std::vector<u_int>  & hexa)
@@ -45,16 +45,9 @@ void write_VTU(const char                * filename,
 
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
-    vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
-    vtkSmartPointer<vtkUnstructuredGrid>          grid   = vtkSmartPointer<vtkUnstructuredGrid>::New();
-    vtkSmartPointer<vtkPoints>                    points = vtkSmartPointer<vtkPoints>::New();
-
-    // generate some arrays that allow each element type to be viewed alone by thresholding
-    //
-    vtkSmartPointer<vtkIntArray> tetselector = vtkSmartPointer<vtkIntArray>::New();
-    vtkSmartPointer<vtkIntArray> hexselector = vtkSmartPointer<vtkIntArray>::New();
-    tetselector->SetName("tet_selector");
-    hexselector->SetName("hex_selector");
+    vtkSmartPointer<vtkUnstructuredGridWriter> writer = vtkSmartPointer<vtkUnstructuredGridWriter>::New();
+    vtkSmartPointer<vtkUnstructuredGrid>       grid   = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    vtkSmartPointer<vtkPoints>                 points = vtkSmartPointer<vtkPoints>::New();
 
     // write the vertex coordinates
     //
@@ -69,8 +62,6 @@ void write_VTU(const char                * filename,
     {
         vtkIdType pid[] = { tets[i+0], tets[i+1], tets[i+2], tets[i+3] };
         grid->InsertNextCell(VTK_TETRA, 4, pid);
-        tetselector->InsertNextValue(1);
-        hexselector->InsertNextValue(0);
     }
 
     // write the hexahedra
@@ -80,19 +71,14 @@ void write_VTU(const char                * filename,
         vtkIdType pid[] = { hexa[i+0], hexa[i+1], hexa[i+2], hexa[i+3],
                             hexa[i+4], hexa[i+5], hexa[i+6], hexa[i+7] };
         grid->InsertNextCell(VTK_HEXAHEDRON, 8, pid);
-        tetselector->InsertNextValue(0);
-        hexselector->InsertNextValue(1);
     }
 
     // create the output mesh
     //
     grid->SetPoints(points);
 
-    if (tets.size() > 0) grid->GetCellData()->AddArray(tetselector);
-    if (hexa.size() > 0) grid->GetCellData()->AddArray(hexselector);
-
 #if VTK_MAJOR_VERSION < 6
-    writer->SetInput( grid );
+    writer->SetInput(grid);
 #else
     writer->SetInputData(grid);
 #endif
