@@ -21,11 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SMOOTHING_H
-#define SMOOTHING_H
-
-#include "cinolib.h"
-#include "laplacian.h"
+#include "smoothing.h"
 
 namespace cinolib
 {
@@ -47,12 +43,64 @@ void smooth_taubin(Mesh                & m,
                    const int             mode          =  COTANGENT,
                    const int             n_iters       =  10,
                    const double          lambda        =  0.9,
-                   const double          mu            = -0.9);
+                   const double          mu            = -0.9)
+{
+    assert(lambda > 0.0);
+    assert(mu     < 0.0);
 
+    std::vector<vec3d>  delta(m.num_vertices(), vec3d(0,0,0));
+    std::vector<double> sum(m.num_vertices(), 0.0);
+
+    for(int iter=0; iter<n_iters; ++iter)
+    {
+        // shrink
+        //
+        for(int vid=0; vid<m.num_vertices(); ++vid)
+        {
+            if (CONTAINS(do_not_smooth, vid)) continue;
+
+            std::vector<int>    nbrs;
+            std::vector<double> wgts;
+            if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
+            if (mode & COTANGENT) cotangent_weights<Mesh>(m, vid, nbrs, wgts); else
+            assert(false);
+            for(size_t i=0; i<nbrs.size(); ++i)
+            {
+                delta[vid] += (m.vertex(vid) - m.vertex(nbrs[i])) * wgts[i];
+                sum[vid]   += wgts[i];
+            }
+        }
+        for(int vid=0; vid<m.num_vertices(); ++vid)
+        {
+            m.set_vertex(vid, m.vertex(vid) + delta[vid] * lambda / sum[vid]);
+            delta[vid] = vec3d(0,0,0);
+            sum[vid]   = 0.0;
+        }
+
+        // inflate
+        //
+        for(int vid=0; vid<m.num_vertices(); ++vid)
+        {
+            if (CONTAINS(do_not_smooth, vid)) continue;
+
+            std::vector<int>    nbrs;
+            std::vector<double> wgts;
+            if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
+            if (mode & COTANGENT) cotangent_weights<Mesh>(m, vid, nbrs, wgts); else
+            assert(false);
+            for(size_t i=0; i<nbrs.size(); ++i)
+            {
+                delta[vid] += (m.vertex(vid) - m.vertex(nbrs[i])) * wgts[i];
+                sum[vid]   += wgts[i];
+            }
+        }
+        for(int vid=0; vid<m.num_vertices(); ++vid)
+        {
+            m.set_vertex(vid, m.vertex(vid) + delta[vid] * mu / sum[vid]);
+            delta[vid] = vec3d(0,0,0);
+            sum[vid]   = 0.0;
+        }
+   }    
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "smoothing.cpp"
-#endif
-
-#endif // SMOOTHING_H
+}

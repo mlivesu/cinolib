@@ -32,23 +32,12 @@ namespace cinolib
 
 template<class Mesh>
 CINO_INLINE
-Eigen::SparseMatrix<double> mass_matrix(const Mesh & m)
-{
-    typedef Eigen::Triplet<double> Entry;
-
-    std::vector<Entry>  entries;
-    for(int vid=0; vid<m.num_vertices(); ++vid)
-    {
-        entries.push_back(Entry(vid, vid, m.vertex_mass(vid)));
-    }
-
-    Eigen::SparseMatrix<double> M(m.num_vertices(), m.num_vertices());
-    M.setFromTriplets(entries.begin(), entries.end());
-
-    return M;
-}
-
+Eigen::SparseMatrix<double> mass_matrix(const Mesh & m);
 
 }
+
+#ifndef  CINO_STATIC_LIB
+#include "vertex_mass.cpp"
+#endif
 
 #endif // VERTEX_MASS_H

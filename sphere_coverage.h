@@ -37,26 +37,13 @@ namespace cinolib
 //
 // http://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere
 //
-CINO_INLINE void sphere_coverage(const int n_samples, std::vector<vec3d> & points)
-{
-    assert(points.empty());
-
-    srand(time(NULL));
-    double rnd      = rand() * n_samples;
-    double offset   = 2.0/double(n_samples);
-    double increment = M_PI * (3.0 - sqrt(5.0));
-
-    for(int i=0; i<n_samples; ++i)
-    {
-        double y   = ((i * offset) - 1) + (offset / 2);
-        double r   = sqrt(1 - pow(y,2));
-        double phi = ((i + int(rnd)) % n_samples) * increment;
-        double x   = cos(phi) * r;
-        double z   = sin(phi) * r;
-
-        points.push_back(vec3d(x,y,z));
-    }
-}
+CINO_INLINE
+void sphere_coverage(const int n_samples, std::vector<vec3d> & points);
 
 }
+
+#ifndef  CINO_STATIC_LIB
+#include "sphere_coverage.cpp"
+#endif
+
 #endif // SPHERE_COVERAGE_H

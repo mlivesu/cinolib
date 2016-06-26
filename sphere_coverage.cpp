@@ -1,3 +1,4 @@
+
 /****************************************************************************
 * Italian National Research Council                                         *
 * Institute for Applied Mathematics and Information Technologies, Genoa     *
@@ -21,48 +22,36 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef VECTOR_FIELD_H
-#define VECTOR_FIELD_H
-
-#include "vec3.h"
-#include <eigen3/Eigen/Dense>
+#include "sphere_coverage.h"
 
 namespace cinolib
 {
 
-class VectorField : public Eigen::VectorXd
+// Compute an approximate (though good) approximation of the even
+// coverage of a sphere. Reference:
+//
+// http://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere
+//
+CINO_INLINE
+void sphere_coverage(const int n_samples, std::vector<vec3d> & points)
 {
-    public:
+    assert(points.empty());
 
-        VectorField();
-        VectorField(const int size);
+    srand(time(NULL));
+    double rnd      = rand() * n_samples;
+    double offset   = 2.0/double(n_samples);
+    double increment = M_PI * (3.0 - sqrt(5.0));
 
-        vec3d vec_at(const int pos) const;
+    for(int i=0; i<n_samples; ++i)
+    {
+        double y   = ((i * offset) - 1) + (offset / 2);
+        double r   = sqrt(1 - pow(y,2));
+        double phi = ((i + int(rnd)) % n_samples) * increment;
+        double x   = cos(phi) * r;
+        double z   = sin(phi) * r;
 
-        void set(const int pos, const vec3d & vec);
-
-        void normalize();
-
-        // for more info, see:
-        // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
-        //
-        // This method allows you to assign Eigen expressions to VectorField
-        //
-        template<typename OtherDerived>
-        VectorField & operator= (const Eigen::MatrixBase<OtherDerived>& other);
-
-        //
-        // This constructor allows you to construct VectorField from Eigen expressions
-        //
-        template<typename OtherDerived>
-        VectorField(const Eigen::MatrixBase<OtherDerived>& other);
-};
-
+        points.push_back(vec3d(x,y,z));
+    }
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "vector_field.cpp"
-#endif
-
-
-#endif // VECTOR_FIELD_H
+}
