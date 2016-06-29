@@ -256,6 +256,8 @@ class Tetmesh
         double tet_face_area(const int tid, const int fid) const;
 
         void scale(const double x_scale, const double y_scale, const double z_scale);
+
+        void normalize_u_text_field();
 };
 
 }

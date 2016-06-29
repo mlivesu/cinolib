@@ -45,7 +45,7 @@ void write_OFF(const char                * filename,
     }
 
     int n_poly = tri.size()/3 + quad.size()/4;
-    fprintf (fp, "OFF\n%zu %zu 0\n", xyz.size()/3, n_poly);
+    fprintf (fp, "OFF\n%zu %d 0\n", xyz.size()/3, n_poly);
 
     for(size_t i=0; i<xyz.size(); i+=3)
     {

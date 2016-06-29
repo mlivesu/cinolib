@@ -4,7 +4,6 @@
 - sposta tutte le implementazioni sui cpp (duplicando gli inline sia su .h che su .cpp, come fanno in libIGL)
 - crea una curve_netowrk class e usala per scheletri, gestures e sharp features
 - aggiungi cache per solver, in modo da recuperare tempo e non rifattorizzare la stessa matrice più volte
-- PASSA A COORDINATE FLOAT PER LE MESH!
 - passa a robust geometric computations (volumi, angoli diedri…) (vedi Lecture Notes on
 Geometric Robustness di Jonathan Richard Shewchuk)
 - aggiungi classe quad layout, per navigare un quad layout

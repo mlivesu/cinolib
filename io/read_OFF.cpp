@@ -63,15 +63,18 @@ void read_OFF(const char          * filename,
     for(int i=0; i<npoly; ++i)
     {
         int n_corners, v0, v1, v2, v3;
-        fscanf(fp, "%d %d %d %d %d\n", &n_corners, &v0, &v1, &v2, &v3);
+        fscanf(fp, "%d", &n_corners);
+
         if (n_corners == 3)
         {
+            fscanf(fp, "%d %d %d\n", &v0, &v1, &v2);
             tri.push_back(v0);
             tri.push_back(v1);
             tri.push_back(v2);
         }
         else if (n_corners == 4)
         {
+            fscanf(fp, "%d %d %d %d\n", &v0, &v1, &v2, &v3);
             quad.push_back(v0);
             quad.push_back(v1);
             quad.push_back(v2);
@@ -79,7 +82,7 @@ void read_OFF(const char          * filename,
         }
         else
         {
-            std::cerr << "read_OFF: polygons with " << n_corners << " are not supported!" << std::endl;
+            std::cerr << "read_OFF: polygons with " << n_corners << " corners are not supported!" << std::endl;
             assert("Unsupported polygon" && false);
         }
     }

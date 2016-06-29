@@ -203,7 +203,7 @@ std::vector<int> Isocontour::tessellate(Trimesh & m) const
     {
         int   eid    = it->first;
         vec3d pos    = it->second;
-        int   newvid = m.add_vertex(pos, 1.0);
+        int   newvid = m.add_vertex(pos, iso_value);
         edgesplit2newvid[eid] = newvid;
         newly_generated_vertices.push_back(newvid);
     }
@@ -246,9 +246,6 @@ std::vector<int> Isocontour::tessellate(Trimesh & m) const
             }
         }
     }
-
-    m.update_adjacency();
-    m.update_normals();
 
     return newly_generated_vertices;
 }

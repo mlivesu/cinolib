@@ -60,47 +60,47 @@ template<typename real> class vec3
             set(x, y, z);
         }
 
-        inline const real *ptr() const
+        const real *ptr() const
         {
             return m_v;
         }
 
-        inline void set( const real x, const real y, const real z )
+        void set( const real x, const real y, const real z )
         {
             m_x = x;
             m_y = y;
             m_z = z;
         }
 
-        inline real dot(const vec3<real> & in) const
+        real dot(const vec3<real> & in) const
         {
             return m_x * in.m_x +
                    m_y * in.m_y +
                    m_z * in.m_z;
         }
 
-        inline vec3<real> cross(const vec3<real> & in) const
+        vec3<real> cross(const vec3<real> & in) const
         {
             return vec3<real>(m_y * in.m_z - m_z * in.m_y,
                               m_z * in.m_x - m_x * in.m_z,
                               m_x * in.m_y - m_y * in.m_x);
         }
 
-        inline real length_squared() const
+        real length_squared() const
         {
             return m_x * m_x +
                    m_y * m_y +
                    m_z * m_z;
         }
 
-        inline real length() const
+        real length() const
         {
             return sqrt(m_x * m_x +
                         m_y * m_y +
                         m_z * m_z);
         }
 
-        inline real normalize()
+        real normalize()
         {
             real len = std::max(length(), 1e-5);
             m_x /= len;
@@ -109,46 +109,46 @@ template<typename real> class vec3
             return len;
         }
 
-        inline real &x() { return m_x; }
-        inline real &y() { return m_y; }
-        inline real &z() { return m_z; }
+        real &x() { return m_x; }
+        real &y() { return m_y; }
+        real &z() { return m_z; }
 
-        inline const real &x() const { return m_x; }
-        inline const real &y() const { return m_y; }
-        inline const real &z() const { return m_z; }
+        const real &x() const { return m_x; }
+        const real &y() const { return m_y; }
+        const real &z() const { return m_z; }
 
-        inline real &operator[](const int id)
+        real &operator[](const int id)
         {
             return m_v[id];
         }
 
-        inline const real &operator[](const int id) const
+        const real &operator[](const int id) const
         {
             return m_v[id];
         }
 
-        inline vec3<real> operator-() const
+        vec3<real> operator-() const
         {
             return vec3<real>(-m_x,
                               -m_y,
                               -m_z);
         }
 
-        inline vec3<real> operator+(const vec3<real> b) const
+        vec3<real> operator+(const vec3<real> b) const
         {
             return vec3<real>(m_x + b.m_x,
                               m_y + b.m_y,
                               m_z + b.m_z);
         }
 
-        inline vec3<real> operator-(const vec3<real> b) const
+        vec3<real> operator-(const vec3<real> b) const
         {
             return vec3<real>(m_x - b.m_x,
                               m_y - b.m_y,
                               m_z - b.m_z);
         }
 
-        inline vec3<real> operator*(const real b) const
+        vec3<real> operator*(const real b) const
         {
             return vec3<real>(m_x * b,
                               m_y * b,
@@ -156,7 +156,7 @@ template<typename real> class vec3
         }
 
 
-        inline vec3<real> operator*(const vec3<real> b) const
+        vec3<real> operator*(const vec3<real> b) const
         {
             return vec3<real>(m_x * b.x(),
                               m_y * b.y(),
@@ -164,14 +164,14 @@ template<typename real> class vec3
         }
 
 
-        inline vec3<real> operator/(const real b) const
+        vec3<real> operator/(const real b) const
         {
             return vec3<real>(m_x / b,
                               m_y / b,
                               m_z / b);
         }
 
-        inline vec3<real> operator+=(const vec3<real> b)
+        vec3<real> operator+=(const vec3<real> b)
         {
             vec3<real> tmp(m_x + b.m_x,
                            m_y + b.m_y,
@@ -180,7 +180,7 @@ template<typename real> class vec3
             return tmp;
         }
 
-        inline vec3<real> operator-=(const vec3<real> b)
+        vec3<real> operator-=(const vec3<real> b)
         {
             vec3<real> tmp(m_x - b.m_x,
                            m_y - b.m_y,
@@ -189,7 +189,7 @@ template<typename real> class vec3
             return tmp;
         }
 
-        inline vec3<real> operator*=(const real b)
+        vec3<real> operator*=(const real b)
         {
             vec3<real> tmp(m_x * b,
                            m_y * b,
@@ -198,7 +198,7 @@ template<typename real> class vec3
             return tmp;
         }
 
-        inline vec3<real> operator/=(const real b)
+        vec3<real> operator/=(const real b)
         {
             vec3<real> tmp(m_x / b,
                            m_y / b,
@@ -207,7 +207,7 @@ template<typename real> class vec3
             return tmp;
         }
 
-        inline bool operator<(const vec3<real> in) const
+        bool operator<(const vec3<real> in) const
         {
             for( int i=0; i<3; ++i)
             {
@@ -217,32 +217,46 @@ template<typename real> class vec3
             return false;
         }
 
-        inline double min_entry() const
+        double min_entry() const
         {
             if (m_x < m_y && m_x < m_z) return m_x;
             if (m_y < m_z) return m_y;
             return m_z;
         }
 
-        inline double max_entry() const
+        double max_entry() const
         {
             if (m_x > m_y && m_x > m_z) return m_x;
             if (m_y > m_z) return m_y;
             return m_z;
         }
 
-        inline vec3<real> min(const vec3<real> &in) const
+        vec3<real> min(const vec3<real> &in) const
         {
             return vec3<real>(std::min(x(), in.x()),
                               std::min(y(), in.y()),
                               std::min(z(), in.z()));
         }
 
-        inline vec3<real> max(const vec3<real> &in) const
+        vec3<real> max(const vec3<real> &in) const
         {
             return vec3<real>(std::max(x(), in.x()),
                               std::max(y(), in.y()),
                               std::max(z(), in.z()));
+        }
+
+        double angle_rad(const vec3<real> &in) const
+        {
+            vec3<real> u = *this; u.normalize();
+            vec3<real> v = in;    v.normalize();
+            double angle = acos(u.dot(v));
+            assert(!std::isnan(angle));
+            return angle;
+        }
+
+        double angle_deg(const vec3<real> &in) const
+        {
+            return angle_rad(in)*180.0/M_PI;
         }
 };
 

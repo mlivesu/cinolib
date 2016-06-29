@@ -33,7 +33,7 @@ namespace cinolib
 static std::map<int,clock_t>      t_start;
 static std::map<int,clock_t>      t_stop;
 static std::map<int,std::string>  msgs;
-static unsigned int               first_call = 0;
+static int                        first_call = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -70,7 +70,7 @@ void timer_start(const char * msg)
 CINO_INLINE
 void timer_stop(const char * msg)
 {
-    unsigned int key = hash(msg);
+    int key = hash(msg);
     t_stop[key]  = clock();
 
     if (key == first_call)

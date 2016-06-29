@@ -58,14 +58,14 @@ void write_VTU(const char                * filename,
 
     // write the vertex coordinates
     //
-    for(int i=0; i<xyz.size(); i+=3)
+    for(size_t i=0; i<xyz.size(); i+=3)
     {
         points->InsertNextPoint(xyz[i+0], xyz[i+1], xyz[i+2]);
     }
 
     // write the tetrahedra
     //
-    for(int i=0; i<tets.size(); i+=4)
+    for(size_t i=0; i<tets.size(); i+=4)
     {
         vtkIdType pid[] = { tets[i+0], tets[i+1], tets[i+2], tets[i+3] };
         grid->InsertNextCell(VTK_TETRA, 4, pid);
@@ -75,7 +75,7 @@ void write_VTU(const char                * filename,
 
     // write the hexahedra
     //
-    for(int i=0; i<hexa.size(); i+=8 )
+    for(size_t i=0; i<hexa.size(); i+=8 )
     {
         vtkIdType pid[] = { hexa[i+0], hexa[i+1], hexa[i+2], hexa[i+3],
                             hexa[i+4], hexa[i+5], hexa[i+6], hexa[i+7] };

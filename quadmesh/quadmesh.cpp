@@ -425,6 +425,12 @@ void Quadmesh::set_vertex_u_text(const int vid, const float s)
 }
 
 CINO_INLINE
+bool Quadmesh::vertex_is_singular(const int vid)
+{
+    return (adj_vtx2vtx(vid).size()!=4);
+}
+
+CINO_INLINE
 int Quadmesh::quad_label(const int qid) const
 {
     return q_label.at(qid);

@@ -143,6 +143,7 @@ class Quadmesh
         int                         vertex_valence(const int vid) const;
         float                       vertex_u_text(const int vid) const;
         void                        set_vertex_u_text(const int vid, const float s);
+        bool                        vertex_is_singular(const int vid);
 };
 
 }

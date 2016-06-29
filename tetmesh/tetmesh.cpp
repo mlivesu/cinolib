@@ -208,6 +208,7 @@ void Tetmesh::init()
     {
         u_text[vid] = vertex(vid).y();
     }
+    normalize_u_text_field();
 
     update_bbox();
     update_interior_adjacency();
@@ -872,6 +873,19 @@ void Tetmesh::scale(const double x_scale, const double y_scale, const double z_s
     }
     update_bbox();
     update_t_normals();
+}
+
+
+CINO_INLINE
+void Tetmesh::normalize_u_text_field()
+{
+    float min = *std::min_element(u_text.begin(), u_text.end());
+    float max = *std::max_element(u_text.begin(), u_text.end());
+    float den =  max-min;
+    for(float & val : u_text)
+    {
+        val = (val - min)/den;
+    }
 }
 
 CINO_INLINE

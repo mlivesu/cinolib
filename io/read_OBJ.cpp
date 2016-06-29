@@ -90,7 +90,7 @@ void read_OBJ(const char           * filename,
                     tri.push_back(read_point_id(s1));
                     tri.push_back(read_point_id(s2));
                 }
-                else if (n_corners = 4)
+                else if (n_corners == 4)
                 {
                     quad.push_back(read_point_id(s0));
                     quad.push_back(read_point_id(s1));
@@ -99,7 +99,7 @@ void read_OBJ(const char           * filename,
                 }
                 else
                 {
-                    std::cerr << "read_OBJ: polygons with " << n_corners << " are not supported!" << std::endl;
+                    std::cerr << "read_OBJ: polygons with " << n_corners << " corners are not supported!" << std::endl;
                     assert("Unsupported polygon" && false);
                 }
                 break;

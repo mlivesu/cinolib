@@ -66,7 +66,7 @@ void cotangent_weights<Trimesh>(const Trimesh       & m,
         double wgt = 0.0;
         for(int j=0; j<(int)tris.size(); ++j)
         {
-            double alpha = m.angle_at_vertex(tris[j], m.vertex_opposite_to(tris[j], vid, nbr));
+            double alpha = m.triangle_angle_at_vertex(tris[j], m.vertex_opposite_to(tris[j], vid, nbr));
             wgt += cot(alpha);
         }
         wgt = (tris.size() == 2) ? wgt * 0.5 : wgt;

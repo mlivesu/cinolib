@@ -34,6 +34,7 @@
 #include <GL/glu.h>
 #endif
 
+#include <sys/types.h>
 #include <cmath>
 
 namespace cinolib
