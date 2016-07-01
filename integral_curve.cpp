@@ -22,7 +22,8 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include "integral_curve.h"
-#include "gl/cylinder.h"
+#include "gl/draw_cylinder.h"
+#include "gl/draw_arrow.h"
 #include "colors.h"
 #include "intersection.h"
 #include "trimesh/drawable_trimesh.h"
@@ -41,25 +42,11 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
 {
     type = ISOCURVE;
 
-    int   curr_tid = source_tid;
-    vec3d curr_pos = source_pos;
-    bool converged = false;
+    opt.source_tid = source_tid;
+    opt.source_pos = source_pos;
+    opt.convergence_criterion = STOP_AT_LOCAL_MAX;
 
-    do
-    {
-        curve.push_back(curr_pos);
-        int   next_tid;
-        vec3d next_pos;
-        traverse_element(curr_tid, curr_pos, next_tid, next_pos);
-        curr_tid = next_tid;
-        curr_pos = next_pos;
-
-        for(int i=0; i<3; ++i)
-        {
-            converged = (m_ptr->is_local_maxima(m_ptr->triangle_vertex_id(curr_tid,i)));
-        }
-
-    } while (!converged);
+    make_curve();
 }
 
 
@@ -75,29 +62,12 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
 {
     type = ISOCURVE;
 
-    int   curr_tid = source_tid;
-    vec3d curr_pos = source_pos;
-    bool converged = false;
+    opt.source_tid            = source_tid;
+    opt.source_pos            = source_pos;
+    opt.convergence_criterion = STOP_AT_GIVEN_VAL;
+    opt.stop_at_this_value    = stop_at_this_value;
 
-    do
-    {
-        curve.push_back(curr_pos);
-        int   next_tid;
-        vec3d next_pos;
-        traverse_element(curr_tid, curr_pos, next_tid, next_pos);
-        curr_tid = next_tid;
-        curr_pos = next_pos;
-
-        float fmin = FLT_MAX;
-        for(int i=0; i<3; ++i)
-        {
-            int vid   = m_ptr->triangle_vertex_id(curr_tid,i);
-            converged = (m_ptr->is_local_maxima(vid));
-            fmin      = std::min(fmin, m_ptr->vertex_u_text(vid));
-        }
-        if (fmin > stop_at_this_value) converged = true;
-
-    } while (!converged);
+    make_curve();
 }
 
 template<class Mesh>
@@ -112,26 +82,48 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
 {
     type = ISOCURVE;
 
-    int   curr_tid = source_tid;
-    vec3d curr_pos = source_pos;
-    bool converged = false;
+    opt.source_tid            = source_tid;
+    opt.source_pos            = source_pos;
+    opt.convergence_criterion = STOP_AT_GIVEN_VTX;
+    opt.stop_at_this_vertex   = stop_at_this_vertex; // if you ever run into it....
+
+    make_curve();
+}
+
+
+template<class Mesh>
+CINO_INLINE
+void IntegralCurve<Mesh>::make_curve()
+{
+    int   curr_tid = opt.source_tid;
+    vec3d curr_pos = opt.source_pos;
+    curve_samples.push_back(curr_pos);
 
     do
     {
-        curve.push_back(curr_pos);
         int   next_tid;
         vec3d next_pos;
         traverse_element(curr_tid, curr_pos, next_tid, next_pos);
         curr_tid = next_tid;
-        curr_pos = next_pos;
-
-        for(int i=0; i<3; ++i)
+        if ((curr_pos - next_pos).length() > 0)
         {
-            converged = (m_ptr->is_local_maxima(m_ptr->triangle_vertex_id(curr_tid,i)));
+            curr_pos = next_pos;
+            curve_samples.push_back(curr_pos);
         }
-        if (m_ptr->triangle_contains_vertex(curr_tid, stop_at_this_vertex)) converged = true;
+    }
+    while (!is_converged(curr_tid, STOP_AT_LOCAL_MAX) && // in any case you can't go any further...
+           !is_converged(curr_tid, opt.convergence_criterion));
 
-    } while (!converged);
+    // append the final segment to the curve
+    //
+    if (is_converged(curr_tid, STOP_AT_LOCAL_MAX))
+    {
+        for(int i=0; i<3; ++i)
+        if (m_ptr->vertex_is_local_maxima(m_ptr->triangle_vertex_id(curr_tid,i)))
+        {
+            curve_samples.push_back(m_ptr->triangle_vertex(curr_tid,i));
+        }
+    }
 }
 
 
@@ -257,12 +249,47 @@ template<class Mesh>
 CINO_INLINE
 void IntegralCurve<Mesh>::draw() const
 {
-    double cylind_rad = m_ptr->bbox().diag()*0.0005;
+    double cylind_rad = m_ptr->bbox().diag()*0.001;
 
-    for(size_t i=1; i<curve.size(); ++i)
+    for(size_t i=1; i<curve_samples.size(); ++i)
     {
-        cylinder<vec3d>(curve[i-1], curve[i], cylind_rad, cylind_rad, RED);
+        //cylinder<vec3d>(curve_samples[i-1], curve_samples[i], cylind_rad, cylind_rad, RED);
+        arrow<vec3d>(curve_samples[i-1], curve_samples[i], cylind_rad, RED);
     }
+}
+
+template <>
+CINO_INLINE
+bool IntegralCurve<Trimesh>::is_converged(const int curr_tid, const int convergence_criterion) const
+{
+    switch (convergence_criterion)
+    {
+        case STOP_AT_LOCAL_MAX :
+        {
+            for(int i=0; i<3; ++i)
+            {
+                int vid = m_ptr->triangle_vertex_id(curr_tid,i);
+                if (m_ptr->vertex_is_local_maxima(vid)) return true;
+            }
+        }
+        break;
+
+        case STOP_AT_GIVEN_VAL :
+        {
+            if (m_ptr->triangle_min_u_text(curr_tid) > opt.stop_at_this_value) return true;
+        }
+        break;
+
+        case STOP_AT_GIVEN_VTX :
+        {
+            if (m_ptr->triangle_contains_vertex(curr_tid, opt.stop_at_this_vertex)) return true;
+        }
+        break;
+
+        default: assert("Integral Curve Convergence Error" && false);
+    }
+
+    return false;
 }
 
 }

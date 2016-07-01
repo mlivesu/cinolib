@@ -58,7 +58,11 @@ class IntegralCurve : public DrawableObject
         void  draw() const;
 
 
-    protected:
+    private:
+
+        void make_curve();
+
+        bool is_converged(const int curr_tid, const int convergence_criterion) const;
 
         void find_exit_door(const int     tid,
                             const vec3d & pos,
@@ -66,12 +70,10 @@ class IntegralCurve : public DrawableObject
                                   int   & exit_edge,
                                   int   & exit_backup) const;
 
-
         void traverse_element(const int     tid,
                               const vec3d & pos,
                                     int   & next_tid,
                                     vec3d & next_pos) const;
-
 
         void handle_corner_cases(const int     curr_tid,
                                  const vec3d & A,
@@ -80,10 +82,28 @@ class IntegralCurve : public DrawableObject
                                        int   & next_tid,
                                        vec3d & next_pos) const;
 
-
     private:
 
-        std::vector<vec3d>  curve;
+        enum
+        {
+            STOP_AT_LOCAL_MAX,
+            STOP_AT_GIVEN_VTX,
+            STOP_AT_GIVEN_VAL,
+        };
+
+        typedef struct
+        {
+            int   convergence_criterion;
+            int   source_tid;
+            vec3d source_pos;
+            float stop_at_this_value;
+            float stop_at_this_vertex;
+        } Options;
+
+        Options             opt;
+        std::vector<int>    traversed_faces;
+        std::vector<vec3d>  curve_samples;
+
         const Mesh        * m_ptr;
         const VectorField * grad_ptr;
 };
