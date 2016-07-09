@@ -36,14 +36,15 @@ CINO_INLINE
 IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
                                    const VectorField & grad,
                                    const int           source_tid,
-                                   const vec3d       & source_pos)
+                                   const int           source_vid)
     : m_ptr(&m)
     , grad_ptr(&grad)
 {
     type = INTEGRAL_CURVE;
 
-    opt.source_tid = source_tid;
-    opt.source_pos = source_pos;
+    opt.source_tid            = source_tid;
+    opt.source_vid            = source_vid;
+    opt.source_pos            = m.vertex(source_vid);
     opt.convergence_criterion = STOP_AT_LOCAL_MAX;
 
     make_curve();
@@ -55,7 +56,7 @@ CINO_INLINE
 IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
                                    const VectorField & grad,
                                    const int           source_tid,
-                                   const vec3d       & source_pos,
+                                   const int           source_vid,
                                    const float         stop_at_this_value)
     : m_ptr(&m)
     , grad_ptr(&grad)
@@ -63,7 +64,8 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
     type = INTEGRAL_CURVE;
 
     opt.source_tid            = source_tid;
-    opt.source_pos            = source_pos;
+    opt.source_vid            = source_vid;
+    opt.source_pos            = m.vertex(source_vid);
     opt.convergence_criterion = STOP_AT_GIVEN_VAL;
     opt.stop_at_this_value    = stop_at_this_value;
 
@@ -75,7 +77,7 @@ CINO_INLINE
 IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
                                    const VectorField & grad,
                                    const int           source_tid,
-                                   const vec3d       & source_pos,
+                                   const int           source_vid,
                                    const int           stop_at_this_vertex)
     : m_ptr(&m)
     , grad_ptr(&grad)
@@ -83,7 +85,8 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
     type = INTEGRAL_CURVE;
 
     opt.source_tid            = source_tid;
-    opt.source_pos            = source_pos;
+    opt.source_vid            = source_vid;
+    opt.source_pos            = m.vertex(source_vid);
     opt.convergence_criterion = STOP_AT_GIVEN_VTX;
     opt.stop_at_this_vertex   = stop_at_this_vertex; // if you ever run into it....
 
@@ -97,11 +100,13 @@ void IntegralCurve<Mesh>::make_curve()
 {
     int   curr_tid = opt.source_tid;
     vec3d curr_pos = opt.source_pos;
+
     CurveSample cs;
-    cs.pos = curr_pos;
-    cs.fid = curr_tid;
+    cs.pos = opt.source_pos;
+    cs.tid = opt.source_tid;
+    cs.vid = opt.source_vid;
     cs.eid = -1;
-    curve_samples.push_back(cs);
+    curve.push_back(cs);
 
     do
     {
@@ -109,15 +114,16 @@ void IntegralCurve<Mesh>::make_curve()
         vec3d next_pos;
         traverse_element(curr_tid, curr_pos, next_tid, next_pos);
         curr_tid = next_tid;
+
         if ((curr_pos - next_pos).length() > 0)
         {
             curr_pos = next_pos;
 
             CurveSample cs;
             cs.pos = curr_pos;
-            cs.fid = curr_tid;
+            cs.tid = curr_tid;
             cs.eid = -1;
-            curve_samples.push_back(cs);
+            curve.push_back(cs);
         }
     }
     while (!is_converged(curr_tid, STOP_AT_LOCAL_MAX) && // in any case you can't go any further...
@@ -132,9 +138,9 @@ void IntegralCurve<Mesh>::make_curve()
         {
             CurveSample cs;
             cs.pos = m_ptr->triangle_vertex(curr_tid,i);
-            cs.fid = curr_tid;
+            cs.tid = curr_tid;
             cs.eid = -1;
-            curve_samples.push_back(cs);
+            curve.push_back(cs);
         }
     }
 }
@@ -264,9 +270,9 @@ void IntegralCurve<Mesh>::draw() const
 {
     double cylind_rad = m_ptr->bbox().diag()*0.001;
 
-    for(size_t i=1; i<curve_samples.size(); ++i)
+    for(size_t i=1; i<curve.size(); ++i)
     {
-        cylinder<vec3d>(curve_samples[i-1].pos, curve_samples[i].pos, cylind_rad, cylind_rad, RED);
+        cylinder<vec3d>(curve[i-1].pos, curve[i].pos, cylind_rad, cylind_rad, RED);
         //arrow<vec3d>(curve_samples[i-1].pos, curve_samples[i].pos, cylind_rad, RED);
     }
 }

@@ -39,18 +39,18 @@ class IntegralCurve : public DrawableObject
         IntegralCurve(const Mesh        & m,
                       const VectorField & grad,
                       const int           source_tid,
-                      const vec3d       & source_pos);
+                      const int           source_vid);
 
         IntegralCurve(const Mesh        & m,
                       const VectorField & grad,
                       const int           source_tid,
-                      const vec3d       & source_pos,
+                      const int           source_vid,
                       const float         stop_at_this_value);
 
         IntegralCurve(const Mesh        & m,
                       const VectorField & grad,
                       const int           source_tid,
-                      const vec3d       & source_pos,
+                      const int           source_vid,
                       const int           stop_at_this_vertex);
 
         vec3d scene_center() const { return m_ptr->bbox().center(); }
@@ -95,6 +95,7 @@ class IntegralCurve : public DrawableObject
         {
             int   convergence_criterion;
             int   source_tid;
+            int   source_vid;
             vec3d source_pos;
             float stop_at_this_value;
             float stop_at_this_vertex;
@@ -105,11 +106,12 @@ class IntegralCurve : public DrawableObject
         typedef struct
         {
             vec3d pos;
-            int   fid; // face
+            int   tid; // face
             int   eid; // edge
+            int   vid; // vertex
         } CurveSample;
 
-        std::vector<CurveSample> curve_samples;
+        std::vector<CurveSample> curve;
 
         const Mesh        * m_ptr;
         const VectorField * grad_ptr;
