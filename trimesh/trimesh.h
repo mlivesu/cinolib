@@ -100,9 +100,12 @@ class Trimesh
         void                        update_normals();
         void                        update_t_normals();
         void                        update_v_normals();
+        void                        update_t_normal(const int tid);
+        void                        update_v_normal(const int vid);
         void                        update_bbox();
         void                        normalize_area();
         void                        center_bbox();
+        void                        check_topology() const;
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         virtual void                operator+=(const Trimesh & m);
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -149,8 +152,10 @@ class Trimesh
         double                      min_edge_length() const;
         vec3d                       edge_vertex(const int eid, const int offset) const;
         ipair                       shared_edge(const int tid0, const int tid1) const;
+        virtual bool                edge_collapse(const int eid);
+        virtual void                edge_switch_id(const int eid0, const int eid1);
+        virtual void                remove_unreferenced_edge(const int eid);
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        void                        remove_duplicated_triangles();
         vec3d                       triangle_vertex(const int tid, const int offset) const;
         bool                        triangle_is_boundary(const int tid) const;
         int                         triangle_vertex_id(const int tid, const int offset) const;
@@ -165,7 +170,12 @@ class Trimesh
         double                      element_mass(const int tid) const;
         vec3d                       element_barycenter(const int tid) const;
         void                        set_triangle(const int tid, const int vid0, const int vid1, const int vid2);
+        double                      triangle_angle_at_vertex(const int tid, const int vid, const bool rad = true) const;
+        bool                        triangle_is_cap(const int tid, const double angle_thresh_deg = 177.0) const;
+        bool                        triangle_is_needle(const int tid, const double angle_thresh_deg = 3.0) const;
         virtual int                 add_triangle(const int vid0, const int vid1, const int vid2, const int scalar);
+        virtual void                triangle_switch_id(const int tid0, const int tid1);
+        virtual void                remove_unreferenced_triangle(const int eid);
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         std::set<int>               vertex_n_ring(const int vid, const int n) const;
         double                      vertex_mass (const int vid) const;
@@ -173,6 +183,7 @@ class Trimesh
         int                         vertex_opposite_to(const int eid, const int vid) const;
         bool                        vertex_is_border(const int vid) const;
         bool                        vertex_is_boundary(const int vid) const;
+        bool                        vertices_are_adjacent(const int vid0, const int vid1) const;
         vec3d                       vertex_normal(const int vid) const;
         vec3d                       vertex(const int vid) const;
         void                        set_vertex(const int vid, const vec3d & pos);
@@ -184,9 +195,10 @@ class Trimesh
         bool                        vertex_is_local_minima(const int vid) const;
         bool                        vertex_is_local_maxima(const int vid) const;
         bool                        vertex_is_critical_point(const int vid) const;
-        void                        remove_duplicated_vertices(const double eps = 1e-7);
         std::vector<int>            get_boundary_vertices() const;
         virtual int                 add_vertex(const vec3d & v, const float scalar = 0.0);
+        virtual void                vertex_switch_id(const int vid0, const int vid1);
+        virtual void                remove_unreferenced_vertex(const int vid);
 };
 
 }

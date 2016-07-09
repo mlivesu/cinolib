@@ -79,7 +79,7 @@ void Trimesh::init()
     update_normals();
 
     u_text.resize(num_vertices(), 0.0);
-    if (t_label.empty()) t_label.resize(num_triangles(), 0);
+    if (static_cast<int>(t_label.size()) != num_triangles()) t_label.resize(num_triangles(), 0);
 }
 
 CINO_INLINE
@@ -169,54 +169,61 @@ void Trimesh::update_adjacency()
 }
 
 CINO_INLINE
+void Trimesh::update_t_normal(const int tid)
+{
+    int tid_ptr = tid * 3;
+
+    vec3d v0 = vertex(tris.at(tid_ptr+0));
+    vec3d v1 = vertex(tris.at(tid_ptr+1));
+    vec3d v2 = vertex(tris.at(tid_ptr+2));
+
+    vec3d u = v1 - v0;    u.normalize();
+    vec3d v = v2 - v0;    v.normalize();
+    vec3d n = u.cross(v); n.normalize();
+
+    t_norm.at(tid_ptr + 0) = n.x();
+    t_norm.at(tid_ptr + 1) = n.y();
+    t_norm.at(tid_ptr + 2) = n.z();
+}
+
+CINO_INLINE
 void Trimesh::update_t_normals()
 {
-    t_norm.clear();
     t_norm.resize(num_triangles()*3);
-
     for(int tid=0; tid<num_triangles(); ++tid)
     {
-        int tid_ptr = tid * 3;
-
-        vec3d v0 = vertex(tris[tid_ptr+0]);
-        vec3d v1 = vertex(tris[tid_ptr+1]);
-        vec3d v2 = vertex(tris[tid_ptr+2]);
-
-        vec3d u = v1 - v0;    u.normalize();
-        vec3d v = v2 - v0;    v.normalize();
-        vec3d n = u.cross(v); n.normalize();
-
-        t_norm[tid_ptr + 0] = n.x();
-        t_norm[tid_ptr + 1] = n.y();
-        t_norm[tid_ptr + 2] = n.z();
+        update_t_normal(tid);
     }
 }
 
 CINO_INLINE
 void Trimesh::update_v_normals()
 {
-    v_norm.clear();
     v_norm.resize(num_vertices()*3);
-
     for(int vid=0; vid<num_vertices(); ++vid)
     {
-        std::vector<int> nbrs = adj_vtx2tri(vid);
-
-        vec3d sum(0,0,0);
-        for(int i=0; i<(int)nbrs.size(); ++i)
-        {
-            sum += triangle_normal(nbrs[i]);
-        }
-
-        //assert(nbrs.size() > 0);
-        sum /= nbrs.size();
-        sum.normalize();
-
-        int vid_ptr = vid * 3;
-        v_norm[vid_ptr + 0] = sum.x();
-        v_norm[vid_ptr + 1] = sum.y();
-        v_norm[vid_ptr + 2] = sum.z();
+        update_v_normal(vid);
     }
+}
+
+CINO_INLINE
+void Trimesh::update_v_normal(const int vid)
+{
+    if (adj_vtx2tri(vid).empty()) return;
+
+    vec3d sum(0,0,0);
+    for(int nbr : adj_vtx2tri(vid))
+    {
+        sum += triangle_normal(nbr);
+    }
+
+    sum /= double(adj_vtx2tri(vid).size());
+    sum.normalize();
+
+    int vid_ptr = vid * 3;
+    v_norm.at(vid_ptr + 0) = sum.x();
+    v_norm.at(vid_ptr + 1) = sum.y();
+    v_norm.at(vid_ptr + 2) = sum.z();
 }
 
 CINO_INLINE
@@ -397,7 +404,7 @@ int Trimesh::edge_opposite_to(const int tid, const int vid) const
 }
 
 CINO_INLINE
-double Trimesh::triangle_angle_at_vertex(const int tid, const int vid) const
+double Trimesh::triangle_angle_at_vertex(const int tid, const int vid, const bool rad) const
 {
     int i;
 
@@ -407,11 +414,57 @@ double Trimesh::triangle_angle_at_vertex(const int tid, const int vid) const
     else assert(false);
 
     vec3d P = vertex(vid);
-    vec3d u = triangle_vertex(tid, (i+1)%3) - P; u.normalize();
-    vec3d v = triangle_vertex(tid, (i+2)%3) - P; v.normalize();
+    vec3d u = triangle_vertex(tid, (i+1)%3) - P;
+    vec3d v = triangle_vertex(tid, (i+2)%3) - P;
 
-    double angle = acos(u.dot(v)); assert(!std::isnan(angle));
-    return angle;
+    if (rad) return u.angle_rad(v);
+    return u.angle_deg(v);
+}
+
+/* For a definition of caps and needles please refer to:
+ * A Robust Procedure to Eliminate Degenerate Faces from Triangle Meshes
+ * Mario Botsch and Leif P. Kobbelt
+ * VMW 2001
+*/
+CINO_INLINE
+bool Trimesh::triangle_is_cap(const int tid, const double angle_thresh_deg) const
+{
+    vec3d vtx[3] =
+    {
+        triangle_vertex(tid,0),
+        triangle_vertex(tid,1),
+        triangle_vertex(tid,2)
+    };
+    for(int i=0; i<3; ++i)
+    {
+        vec3d  u = vtx[(i+1)%3] - vtx[i];
+        vec3d  v = vtx[(i+2)%3] - vtx[i];
+        if (u.angle_deg(v) > angle_thresh_deg) return true;
+    }
+    return false;
+}
+
+/* For a definition of caps and needles please refer to:
+ * A Robust Procedure to Eliminate Degenerate Faces from Triangle Meshes
+ * Mario Botsch and Leif P. Kobbelt
+ * VMW 2001
+*/
+CINO_INLINE
+bool Trimesh::triangle_is_needle(const int tid, const double angle_thresh_deg) const
+{
+    vec3d vtx[3] =
+    {
+        triangle_vertex(tid,0),
+        triangle_vertex(tid,1),
+        triangle_vertex(tid,2)
+    };
+    for(int i=0; i<3; ++i)
+    {
+        vec3d  u = vtx[(i+1)%3] - vtx[i];
+        vec3d  v = vtx[(i+2)%3] - vtx[i];
+        if (u.angle_deg(v) < angle_thresh_deg) return true;
+    }
+    return false;
 }
 
 CINO_INLINE
@@ -459,6 +512,16 @@ bool Trimesh::vertex_is_boundary(const int vid) const
     for(int i=0; i<(int)edges.size(); ++i)
     {
         if (edge_is_boundary(edges[i])) return true;
+    }
+    return false;
+}
+
+CINO_INLINE
+bool Trimesh::vertices_are_adjacent(const int vid0, const int vid1) const
+{
+    for(int nbr : adj_vtx2vtx(vid0))
+    {
+        if (nbr == vid1) return true;
     }
     return false;
 }
@@ -746,44 +809,6 @@ void Trimesh::operator+=(const Trimesh & m)
 }
 
 CINO_INLINE
-void Trimesh::remove_duplicated_triangles()
-{
-    timer_start("Remove duplicated triangles from trimesh");
-
-    std::set< std::vector<int> > unique_tris;
-    for(int tid=0; tid<num_triangles(); ++tid)
-    {
-        std::vector<int> tri(3);
-        tri[0] = triangle_vertex_id(tid,0);
-        tri[1] = triangle_vertex_id(tid,1);
-        tri[2] = triangle_vertex_id(tid,2);
-        sort(tri.begin(), tri.end());
-        if (DOES_NOT_CONTAIN(unique_tris, tri))
-        {
-            unique_tris.insert(tri);
-        }
-    }
-
-    std::vector<double> new_coords = coords;
-    std::vector<uint>   new_tris;
-    for(auto tri : unique_tris)
-    {
-        new_tris.push_back(tri[0]);
-        new_tris.push_back(tri[1]);
-        new_tris.push_back(tri[2]);
-    }
-
-    logger << (tris.size() - new_tris.size())/3 << " duplicated triangles have been removed" << endl;
-
-    clear();
-    coords = new_coords;
-    tris   = new_tris;
-    init();
-
-    timer_stop("Remove duplicated triangles from trimesh");
-}
-
-CINO_INLINE
 void Trimesh::center_bbox()
 {
     update_bbox();
@@ -795,6 +820,31 @@ void Trimesh::center_bbox()
     }
     bb.min -= center;
     bb.max -= center;
+}
+
+CINO_INLINE
+void Trimesh::check_topology() const
+{
+    for(int vid=0; vid<num_vertices(); ++vid)
+    {
+        for(int nbr : adj_vtx2vtx(vid)) assert(nbr >= 0 && nbr < num_vertices());
+        for(int nbr : adj_vtx2edg(vid)) assert(nbr >= 0 && nbr < num_edges());
+        for(int nbr : adj_vtx2tri(vid)) assert(nbr >= 0 && nbr < num_triangles());
+    }
+    for(int eid=0; eid<num_edges(); ++eid)
+    {
+        assert(edge_vertex_id(eid,0) >= 0 && edge_vertex_id(eid,0) < num_vertices());
+        assert(edge_vertex_id(eid,1) >= 0 && edge_vertex_id(eid,1) < num_vertices());
+        for(int nbr : adj_edg2tri(eid)) assert(nbr >= 0 && nbr < num_triangles());
+    }
+    for(int tid=0; tid<num_triangles(); ++tid)
+    {
+        assert(triangle_vertex_id(tid,0) >= 0 && triangle_vertex_id(tid,0) < num_vertices());
+        assert(triangle_vertex_id(tid,1) >= 0 && triangle_vertex_id(tid,1) < num_vertices());
+        assert(triangle_vertex_id(tid,2) >= 0 && triangle_vertex_id(tid,2) < num_vertices());
+        for(int nbr : adj_tri2tri(tid)) assert(nbr >= 0 && nbr < num_triangles());
+        for(int nbr : adj_tri2edg(tid)) assert(nbr >= 0 && nbr < num_edges());
+    }
 }
 
 CINO_INLINE
@@ -849,6 +899,236 @@ ipair Trimesh::shared_edge(const int tid0, const int tid1) const
     e.second = shared_vertices[1];
 
     return e;
+}
+
+CINO_INLINE
+bool Trimesh::edge_collapse(const int eid)
+{
+    // define what to keep and what to remove
+    //
+    uint vid_keep   = edge_vertex_id(eid, 0);
+    uint vid_remove = edge_vertex_id(eid, 1);
+    std::set<int> tid_remove(adj_edg2tri(eid).begin(), adj_edg2tri(eid).end());
+    std::set<int> edg_keep, edg_remove;
+    for(int tid: tid_remove)
+    {
+        edg_keep.insert(edge_opposite_to(tid, vid_remove));
+        edg_remove.insert(edge_opposite_to(tid, vid_keep));
+    }
+    edg_remove.insert(eid);
+
+    // Migrate references from vid_remove to vid_keep
+    //
+    for(uint vid : adj_vtx2vtx(vid_remove))
+    {
+        if (vid == vid_keep) continue;
+        if (!vertices_are_adjacent(vid_keep,vid))
+        {
+            vtx2vtx.at(vid_keep).push_back(vid);
+            vtx2vtx.at(vid).push_back(vid_keep);
+        }
+    }
+    //
+    for(int eid : adj_vtx2edg(vid_remove))
+    {
+        if (CONTAINS(edg_remove, eid)) continue;
+        vtx2edg.at(vid_keep).push_back(eid);
+        if (edges.at(eid*2+0) == vid_remove) edges.at(eid*2+0) = vid_keep; else
+        if (edges.at(eid*2+1) == vid_remove) edges.at(eid*2+1) = vid_keep; else
+        assert("Something is off here" && false);
+    }
+    //
+    for(int tid : adj_vtx2tri(vid_remove))
+    {
+        if (CONTAINS(tid_remove, tid)) continue;
+        vtx2tri.at(vid_keep).push_back(tid);
+        if (tris.at(tid*3+0) == vid_remove) tris.at(tid*3+0) = vid_keep; else
+        if (tris.at(tid*3+1) == vid_remove) tris.at(tid*3+1) = vid_keep; else
+        if (tris.at(tid*3+2) == vid_remove) tris.at(tid*3+2) = vid_keep; else
+        assert("Something is off here" && false);
+    }
+
+    // Migrate references from edge_remove to edge_keep
+    //
+    for(int tid : tid_remove)
+    {
+        int e_take = edge_opposite_to(tid, vid_remove);
+        int e_give = edge_opposite_to(tid, vid_keep);
+        assert(CONTAINS(edg_remove, e_give));
+
+        for(int inc_tri : adj_edg2tri(e_give))
+        {
+            if (CONTAINS(tid_remove, inc_tri)) continue;
+            edg2tri.at(e_take).push_back(inc_tri);
+            tri2edg.at(inc_tri).push_back(e_take);
+        }
+    }
+
+    // remove references to vid_remove
+    //
+    for(int vid : adj_vtx2vtx(vid_remove))
+    {
+        assert(uint(vid)!=vid_remove);
+        assert(vid>= 0   && vid< num_vertices());
+        auto beg = vtx2vtx.at(vid).begin();
+        auto end = vtx2vtx.at(vid).end();
+        vtx2vtx.at(vid).erase(std::remove(beg, end, vid_remove), end); // Erase-Remove idiom
+    }
+    //
+    // remove references to any edge in edg_remove.
+    //
+    for(int edg_rem : edg_remove)
+    {
+        assert(edg_rem>=0 && edg_rem< num_edges());
+        for(int tid : adj_edg2tri(edg_rem))
+        {
+            assert(tid>= 0 && tid<num_triangles());
+            auto beg = tri2edg.at(tid).begin();
+            auto end = tri2edg.at(tid).end();
+            tri2edg.at(tid).erase(std::remove(beg, end, edg_rem), end); // Erase-Remove idiom
+        }
+
+        for(int i=0; i<2; ++i)
+        {
+            int  vid = edge_vertex_id(edg_rem, i);
+            auto beg = vtx2edg.at(vid).begin();
+            auto end = vtx2edg.at(vid).end();
+            vtx2edg.at(vid).erase(std::remove(beg, end, edg_rem), end); // Erase-Remove idiom
+        }
+    }
+    //
+    // remove references to any triangle in tri_remove.
+    //
+    for(int tid_rem : tid_remove)
+    {
+        for(int i=0; i<3; ++i)
+        {
+            int  vid = triangle_vertex_id(tid_rem,i);
+            auto beg = vtx2tri.at(vid).begin();
+            auto end = vtx2tri.at(vid).end();
+            vtx2tri.at(vid).erase(std::remove(beg, end, tid_rem), end); // Erase-Remove idiom
+        }
+
+        for(int eid : adj_tri2edg(tid_rem))
+        {
+            auto beg = edg2tri.at(eid).begin();
+            auto end = edg2tri.at(eid).end();
+            edg2tri.at(eid).erase(std::remove(beg, end, tid_rem), end); // Erase-Remove idiom
+        }
+
+        for(int tid : adj_tri2tri(tid_rem))
+        {
+            auto beg = tri2tri.at(tid).begin();
+            auto end = tri2tri.at(tid).end();
+            tri2tri.at(tid).erase(std::remove(beg, end, tid_rem), end); // Erase-Remove idiom
+        }
+    }
+
+    // clear
+    vtx2vtx.at(vid_remove).clear();
+    vtx2edg.at(vid_remove).clear();
+    vtx2tri.at(vid_remove).clear();
+    for(int eid : edg_remove)
+    {
+        edg2tri.at(eid).clear();
+        edges.at(eid*2+0) = 0;
+        edges.at(eid*2+1) = 0;
+    }
+    for(int tid : tid_remove)
+    {
+        tri2edg.at(tid).clear();
+        tri2tri.at(tid).clear();
+        tris.at(tid*3+0) = 0;
+        tris.at(tid*3+1) = 0;
+        tris.at(tid*3+2) = 0;
+    }
+
+    // clean vectors...
+    remove_unreferenced_vertex(vid_remove);
+    for(int eid : edg_remove) remove_unreferenced_edge(eid);
+    for(int tid : tid_remove) remove_unreferenced_triangle(tid);
+
+    //check_topology();
+
+    return true;
+}
+
+CINO_INLINE
+void Trimesh::edge_switch_id(const int eid0, const int eid1)
+{
+    for(int i=0; i<2; ++i)
+    {
+        std::swap(edges[2*eid0+i], edges[2*eid1+i]);
+    }
+
+    std::swap(edg2tri[eid0], edg2tri[eid1]);
+
+    for(std::vector<int> & nbrs : vtx2edg)
+    for(int & curr : nbrs)
+    {
+        if (curr == eid0) curr = eid1; else
+        if (curr == eid1) curr = eid0;
+    }
+
+    for(std::vector<int> & nbrs : tri2edg)
+    for(int & curr : nbrs)
+    {
+        if (curr == eid0) curr = eid1; else
+        if (curr == eid1) curr = eid0;
+    }
+}
+
+CINO_INLINE
+void Trimesh::remove_unreferenced_edge(const int eid)
+{
+    edge_switch_id(eid, num_edges()-1);
+    edges.resize(edges.size()-2);
+    edg2tri.pop_back();
+}
+
+CINO_INLINE
+void Trimesh::vertex_switch_id(const int vid0, const int vid1)
+{
+    for(uint & curr : edges)
+    {
+        if (curr == (uint)vid0) curr = vid1; else
+        if (curr == (uint)vid1) curr = vid0;
+    }
+
+    for(uint & curr : tris)
+    {
+        if (curr == (uint)vid0) curr = vid1; else
+        if (curr == (uint)vid1) curr = vid0;
+    }
+
+    for(int i=0; i<3; ++i)
+    {
+        std::swap(coords[3*vid0+i], coords[3*vid1+i]);
+        std::swap(v_norm[3*vid0+i], v_norm[3*vid1+i]);
+    }
+    std::swap(u_text[vid0],  u_text[vid1]);
+    std::swap(vtx2vtx[vid0], vtx2vtx[vid1]);
+    std::swap(vtx2edg[vid0], vtx2edg[vid1]);
+    std::swap(vtx2tri[vid0], vtx2tri[vid1]);
+
+    for(std::vector<int> & nbrs : vtx2vtx)
+    for(int & curr : nbrs)
+    {
+        if (curr == vid0) curr = vid1; else
+        if (curr == vid1) curr = vid0;
+    }
+}
+
+CINO_INLINE
+void Trimesh::remove_unreferenced_vertex(const int vid)
+{
+    vertex_switch_id(vid, num_vertices()-1);
+    coords.resize(coords.size()-3);
+    v_norm.resize(v_norm.size()-3);
+    u_text.resize(u_text.size()-1);
+    vtx2vtx.pop_back();
+    vtx2edg.pop_back();
+    vtx2tri.pop_back();
 }
 
 CINO_INLINE
@@ -950,10 +1230,24 @@ CINO_INLINE
 int Trimesh::add_vertex(const vec3d & v, const float scalar)
 {
     int vid = num_vertices();
+    //
     coords.push_back(v.x());
     coords.push_back(v.y());
     coords.push_back(v.z());
+    //
     u_text.push_back(scalar);
+    //
+    v_norm.push_back(0); // vnx
+    v_norm.push_back(0); // vny
+    v_norm.push_back(0); // vnz
+    //
+    vtx2vtx.push_back(std::vector<int>());
+    vtx2edg.push_back(std::vector<int>());
+    vtx2tri.push_back(std::vector<int>());
+    //
+    bb.min = bb.min.min(v);
+    bb.max = bb.max.max(v);
+
     return vid;
 }
 
@@ -1003,16 +1297,107 @@ int Trimesh::triangle_adjacent_along(const int tid, const int vid0, const int vi
 CINO_INLINE
 int Trimesh::add_triangle(const int vid0, const int vid1, const int vid2, const int scalar)
 {
-    assert(vid0 < num_vertices());
-    assert(vid1 < num_vertices());
-    assert(vid2 < num_vertices());
+    assert(vid0 >= 0 && vid0 < num_vertices());
+    assert(vid1 >= 0 && vid1 < num_vertices());
+    assert(vid2 >= 0 && vid2 < num_vertices());
 
     int tid = num_triangles();
+    //
     tris.push_back(vid0);
     tris.push_back(vid1);
     tris.push_back(vid2);
+    //
     t_label.push_back(scalar);
+    //
+    tri2edg.push_back(std::vector<int>());
+    tri2tri.push_back(std::vector<int>());
+    //
+    vtx2tri.at(vid0).push_back(tid);
+    vtx2tri.at(vid1).push_back(tid);
+    vtx2tri.at(vid2).push_back(tid);
+    //
+    ipair new_e[3]   = { unique_pair(vid0, vid1), unique_pair(vid1, vid2), unique_pair(vid2, vid0) };
+    int   new_eid[3] = { -1, -1, -1 };
+    for(int eid=0; eid<num_edges(); ++eid)
+    {
+        ipair e = unique_pair(edge_vertex_id(eid, 0), edge_vertex_id(eid, 1));
+        for(int i=0; i<3; ++i) if (e == new_e[i]) new_eid[i] = eid;
+    }
+    //
+    for(int i=0; i<3; ++i)
+    {
+        if (new_eid[i] == -1)
+        {
+            new_eid[i] = num_edges();
+            edges.push_back(new_e[i].first);
+            edges.push_back(new_e[i].second);
+            edg2tri.push_back(std::vector<int>());
+        }
+        //
+        for(int nbr : edg2tri.at(new_eid[i]))
+        {
+            tri2tri.at(nbr).push_back(tid);
+            tri2tri.at(tid).push_back(nbr);
+        }
+        edg2tri.at(new_eid[i]).push_back(tid);
+        tri2edg.at(tid).push_back(new_eid[i]);
+    }
+    //
+    t_norm.push_back(0); //tnx
+    t_norm.push_back(0); //tny
+    t_norm.push_back(0); //tnz
+    //
+    update_t_normal(tid);
+    update_v_normal(vid0);
+    update_v_normal(vid1);
+    update_v_normal(vid2);
+
     return tid;
+}
+
+CINO_INLINE
+void Trimesh::triangle_switch_id(const int tid0, const int tid1)
+{
+    for(int i=0; i<3; ++i)
+    {
+        std::swap(tris[3*tid0+i],   tris[3*tid1+i]);
+        std::swap(t_norm[3*tid0+i], t_norm[3*tid1+i]);
+    }
+    std::swap(t_label[tid0], t_label[tid1]);
+    std::swap(tri2edg[tid0], tri2edg[tid1]);
+    std::swap(tri2tri[tid0], tri2tri[tid1]);
+
+    for(std::vector<int> & nbrs : vtx2tri)
+    for(int & curr : nbrs)
+    {
+        if (curr == tid0) curr = tid1; else
+        if (curr == tid1) curr = tid0;
+    }
+
+    for(std::vector<int> & nbrs : edg2tri)
+    for(int & curr : nbrs)
+    {
+        if (curr == tid0) curr = tid1; else
+        if (curr == tid1) curr = tid0;
+    }
+
+    for(std::vector<int> & nbrs : tri2tri)
+    for(int & curr : nbrs)
+    {
+        if (curr == tid0) curr = tid1; else
+        if (curr == tid1) curr = tid0;
+    }
+}
+
+CINO_INLINE
+void Trimesh::remove_unreferenced_triangle(const int tid)
+{
+    triangle_switch_id(tid, num_triangles()-1);
+    tris.resize(tris.size()-3);
+    t_norm.resize(t_norm.size()-3);
+    t_label.resize(t_label.size()-1);
+    tri2edg.pop_back();
+    tri2tri.pop_back();
 }
 
 CINO_INLINE

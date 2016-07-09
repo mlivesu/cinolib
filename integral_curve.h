@@ -101,8 +101,15 @@ class IntegralCurve : public DrawableObject
         } Options;
 
         Options             opt;
-        std::vector<int>    traversed_faces;
-        std::vector<vec3d>  curve_samples;
+
+        typedef struct
+        {
+            vec3d pos;
+            int   fid; // face
+            int   eid; // edge
+        } CurveSample;
+
+        std::vector<CurveSample> curve_samples;
 
         const Mesh        * m_ptr;
         const VectorField * grad_ptr;

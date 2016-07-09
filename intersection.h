@@ -21,46 +21,43 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_OBJECT_H
-#define DRAWABLE_OBJECT_H
+#ifndef INTERSECTION_H
+#define INTERSECTION_H
 
-#include <float.h>
-
+#include "cinolib.h"
+#include "vec2.h"
 #include "vec3.h"
-
+#include "plane.h"
 
 namespace cinolib
 {
-
-typedef enum
+namespace intersection
 {
-    ABSTRACT      ,
-    TRIMESH       ,
-    TETMESH       ,
-    QUADMESH      ,
-    HEXMESH       ,
-    SKELETON      ,
-    GESTURE       ,
-    INTEGRAL_CURVE,
-    ISOCURVE      ,
-    ISOSURFACE    ,
-    VECTOR_FIELD
-}
-ObjectType;
 
-class DrawableObject
-{
-    public :
+CINO_INLINE
+bool segment2D(const vec2d        & s0_beg,
+               const vec2d        & s0_end,
+               const vec2d        & s1_beg,
+               const vec2d        & s1_end,
+               std::vector<vec2d> & inters);
 
-        ObjectType type;
 
-        DrawableObject() { type = ABSTRACT; }
+//CINO_INLINE
+//bool planes(const std::vector<Plane> & planes, vec3d & inters);
 
-        virtual void  draw()         const = 0;  // do rendering
-        virtual vec3d scene_center() const = 0;  // get position in space
-        virtual float scene_radius() const = 0;  // get size (approx. radius of the bounding sphere)
-};
+
+//CINO_INLINE
+//bool lines3D(const vec3d   l0_p,
+//             const vec3d   l0_dir,
+//             const vec3d   l1_p,
+//             const vec3d   l1_dir,
+//                   vec3d & inters);
 
 }
+}
 
-#endif // DRAWABLE_OBJECT_H
+#ifndef  CINO_STATIC_LIB
+#include "intersection.cpp"
+#endif
+
+#endif // INTERSECTION_H

@@ -40,7 +40,7 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
     : m_ptr(&m)
     , grad_ptr(&grad)
 {
-    type = ISOCURVE;
+    type = INTEGRAL_CURVE;
 
     opt.source_tid = source_tid;
     opt.source_pos = source_pos;
@@ -60,7 +60,7 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
     : m_ptr(&m)
     , grad_ptr(&grad)
 {
-    type = ISOCURVE;
+    type = INTEGRAL_CURVE;
 
     opt.source_tid            = source_tid;
     opt.source_pos            = source_pos;
@@ -80,7 +80,7 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
     : m_ptr(&m)
     , grad_ptr(&grad)
 {
-    type = ISOCURVE;
+    type = INTEGRAL_CURVE;
 
     opt.source_tid            = source_tid;
     opt.source_pos            = source_pos;
@@ -97,7 +97,11 @@ void IntegralCurve<Mesh>::make_curve()
 {
     int   curr_tid = opt.source_tid;
     vec3d curr_pos = opt.source_pos;
-    curve_samples.push_back(curr_pos);
+    CurveSample cs;
+    cs.pos = curr_pos;
+    cs.fid = curr_tid;
+    cs.eid = -1;
+    curve_samples.push_back(cs);
 
     do
     {
@@ -108,7 +112,12 @@ void IntegralCurve<Mesh>::make_curve()
         if ((curr_pos - next_pos).length() > 0)
         {
             curr_pos = next_pos;
-            curve_samples.push_back(curr_pos);
+
+            CurveSample cs;
+            cs.pos = curr_pos;
+            cs.fid = curr_tid;
+            cs.eid = -1;
+            curve_samples.push_back(cs);
         }
     }
     while (!is_converged(curr_tid, STOP_AT_LOCAL_MAX) && // in any case you can't go any further...
@@ -121,7 +130,11 @@ void IntegralCurve<Mesh>::make_curve()
         for(int i=0; i<3; ++i)
         if (m_ptr->vertex_is_local_maxima(m_ptr->triangle_vertex_id(curr_tid,i)))
         {
-            curve_samples.push_back(m_ptr->triangle_vertex(curr_tid,i));
+            CurveSample cs;
+            cs.pos = m_ptr->triangle_vertex(curr_tid,i);
+            cs.fid = curr_tid;
+            cs.eid = -1;
+            curve_samples.push_back(cs);
         }
     }
 }
@@ -253,8 +266,8 @@ void IntegralCurve<Mesh>::draw() const
 
     for(size_t i=1; i<curve_samples.size(); ++i)
     {
-        //cylinder<vec3d>(curve_samples[i-1], curve_samples[i], cylind_rad, cylind_rad, RED);
-        arrow<vec3d>(curve_samples[i-1], curve_samples[i], cylind_rad, RED);
+        cylinder<vec3d>(curve_samples[i-1].pos, curve_samples[i].pos, cylind_rad, cylind_rad, RED);
+        //arrow<vec3d>(curve_samples[i-1].pos, curve_samples[i].pos, cylind_rad, RED);
     }
 }
 

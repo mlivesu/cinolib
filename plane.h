@@ -21,46 +21,49 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_OBJECT_H
-#define DRAWABLE_OBJECT_H
+#ifndef PLANE_H
+#define PLANE_H
 
-#include <float.h>
-
+#include "cinolib.h"
 #include "vec3.h"
 
+#include <ostream>
 
 namespace cinolib
 {
 
-typedef enum
+// represents a plane with equation : a*x + b*y + c*z = d
+//
+class Plane
 {
-    ABSTRACT      ,
-    TRIMESH       ,
-    TETMESH       ,
-    QUADMESH      ,
-    HEXMESH       ,
-    SKELETON      ,
-    GESTURE       ,
-    INTEGRAL_CURVE,
-    ISOCURVE      ,
-    ISOSURFACE    ,
-    VECTOR_FIELD
-}
-ObjectType;
+    public:
 
-class DrawableObject
-{
-    public :
+        vec3d  n; // plane normal (i.e. a,b,c, coefficients of the plane equation)
+        double d; // d coefficient of the plane equation
+        vec3d  p; // any point on the plane (useful for point_plane_dist)
 
-        ObjectType type;
+        Plane(const vec3d & p0,
+              const vec3d & p1,
+              const vec3d & p2);
 
-        DrawableObject() { type = ABSTRACT; }
+        Plane(const vec3d & point,
+              const vec3d & normal);
 
-        virtual void  draw()         const = 0;  // do rendering
-        virtual vec3d scene_center() const = 0;  // get position in space
-        virtual float scene_radius() const = 0;  // get size (approx. radius of the bounding sphere)
+        void set_plane(const vec3d & point,
+                       const vec3d & normal);
+
+        double operator[](const vec3d & p) const;
+
+        double point_plane_dist(const vec3d & p) const;
 };
 
+CINO_INLINE
+std::ostream & operator<<(std::ostream & in, const Plane & plane);
+
 }
 
-#endif // DRAWABLE_OBJECT_H
+#ifndef  CINO_STATIC_LIB
+#include "plane.cpp"
+#endif
+
+#endif // PLANE_H

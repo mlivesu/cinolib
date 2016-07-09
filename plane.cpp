@@ -21,46 +21,70 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_OBJECT_H
-#define DRAWABLE_OBJECT_H
-
-#include <float.h>
-
-#include "vec3.h"
-
+#include "plane.h"
 
 namespace cinolib
 {
 
-typedef enum
+CINO_INLINE
+std::ostream & operator<<(std::ostream & in, const Plane & plane)
 {
-    ABSTRACT      ,
-    TRIMESH       ,
-    TETMESH       ,
-    QUADMESH      ,
-    HEXMESH       ,
-    SKELETON      ,
-    GESTURE       ,
-    INTEGRAL_CURVE,
-    ISOCURVE      ,
-    ISOSURFACE    ,
-    VECTOR_FIELD
-}
-ObjectType;
-
-class DrawableObject
-{
-    public :
-
-        ObjectType type;
-
-        DrawableObject() { type = ABSTRACT; }
-
-        virtual void  draw()         const = 0;  // do rendering
-        virtual vec3d scene_center() const = 0;  // get position in space
-        virtual float scene_radius() const = 0;  // get size (approx. radius of the bounding sphere)
-};
-
+    in << "[Plane] " << plane.n.x() << " * x + "
+                     << plane.n.y() << " * y + "
+                     << plane.n.z() << " * z = "
+                     << plane.d << "\n";
+    return in;
 }
 
-#endif // DRAWABLE_OBJECT_H
+
+CINO_INLINE
+Plane::Plane(const vec3d & p0, const vec3d & p1, const vec3d & p2)
+{
+    vec3d u = p1 - p0;
+    vec3d v = p2 - p0;
+    set_plane(p0, u.cross(v));
+    assert(fabs(operator[](p0)) < 1e-10);
+    assert(fabs(operator[](p1)) < 1e-10);
+    assert(fabs(operator[](p2)) < 1e-10);
+}
+
+
+CINO_INLINE
+Plane::Plane(const vec3d & point, const vec3d & normal)
+{
+    set_plane(point, normal);
+    assert(fabs(operator[](point)) < 1e-10);
+}
+
+
+CINO_INLINE
+void Plane::set_plane(const vec3d & point, const vec3d & normal)
+{
+    p = point;
+    n = normal;
+    n.normalize();
+    d = n.dot(point);
+    assert(fabs(operator[](point)) < 1e-10);
+}
+
+
+CINO_INLINE
+double Plane::operator[](const vec3d & p) const
+{
+    return (n.dot(p) - d);
+}
+
+
+// http://mathworld.wolfram.com/Point-PlaneDistance.html (eq. 13)
+//
+CINO_INLINE
+double Plane::point_plane_dist(const vec3d & p) const
+{
+    assert(fabs(n.length()-1.0) < 1e-10);
+    vec3d u = p - this->p;
+    double dist = fabs(u.dot(n));
+    assert(dist >= 0);
+    return dist;
+}
+
+}

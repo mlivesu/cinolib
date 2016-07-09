@@ -395,19 +395,32 @@ std::vector<int> DrawableTrimesh::get_border_vertices() const
 CINO_INLINE
 int DrawableTrimesh::add_vertex(const vec3d & v, const float scalar)
 {
-    v_colors.push_back(0.0);
-    v_colors.push_back(0.0);
-    v_colors.push_back(0.0);
+    v_colors.push_back(0);
+    v_colors.push_back(1);
+    v_colors.push_back(0);
     return Trimesh::add_vertex(v, scalar);
 }
 
 CINO_INLINE
 int DrawableTrimesh::add_triangle(const int vid0, const int vid1, const int vid2, const int scalar)
 {    
-    t_colors.push_back(0.0);
-    t_colors.push_back(0.0);
-    t_colors.push_back(0.0);
-    return Trimesh::add_triangle(vid0, vid1, vid2, scalar);
+    int tid = Trimesh::add_triangle(vid0, vid1, vid2, scalar);
+
+    float r = 0.0, g = 0.0, b = 0.0;
+    for(int nbr : adj_tri2tri(tid))
+    {
+        r += triangle_color(nbr)[0];
+        g += triangle_color(nbr)[1];
+        b += triangle_color(nbr)[2];
+    }
+    r /= double(adj_tri2tri(tid).size());
+    g /= double(adj_tri2tri(tid).size());
+    b /= double(adj_tri2tri(tid).size());
+    t_colors.push_back(r);
+    t_colors.push_back(g);
+    t_colors.push_back(b);
+
+    return tid;
 }
 
 CINO_INLINE
