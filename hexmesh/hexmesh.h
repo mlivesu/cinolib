@@ -124,8 +124,8 @@ class Hexmesh
 
         std::string loaded_file() const;
 
-        Trimesh export_surface() const;
-        Trimesh export_surface(std::map<int,int> & hexa2quad_map, std::map<int,int> & quad2hex_map) const;
+        Quadmesh export_surface() const;
+        Quadmesh export_surface(std::map<int,int> & hexa2quad_map, std::map<int,int> & quad2hex_map) const;
 
         virtual void operator+=(const Hexmesh & m);
 
