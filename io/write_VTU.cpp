@@ -35,13 +35,26 @@
 namespace cinolib
 {
 
+#ifndef CINOLIB_USES_VTK
+
+CINO_INLINE
+void write_VTU(const char                *,
+               const std::vector<double> &,
+               const std::vector<u_int>  &,
+               const std::vector<u_int>  &)
+{
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    exit(-1);
+}
+
+#else
+
 CINO_INLINE
 void write_VTU(const char                * filename,
                const std::vector<double> & xyz,
                const std::vector<u_int>  & tets,
                const std::vector<u_int>  & hexa)
 {
-#ifdef CINOLIB_USES_VTK
 
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -98,11 +111,7 @@ void write_VTU(const char                * filename,
 #endif
     writer->SetFileName(filename);
     writer->Write();
-
-#else
-    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
-    exit(-1);
-#endif
 }
+#endif
 
 }

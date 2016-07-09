@@ -33,14 +33,26 @@
 namespace cinolib
 {
 
+#ifndef CINOLIB_USES_VTK
+
+CINO_INLINE
+void read_VTK(const char          * ,
+               std::vector<double> &,
+               std::vector<u_int>  &,
+               std::vector<u_int>  &)
+{
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    exit(-1);
+}
+
+#else
+
 CINO_INLINE
 void read_VTK(const char          * filename,
                std::vector<double> & xyz,
                std::vector<u_int>  & tets,
                std::vector<u_int>  & hexa)
 {
-#ifdef CINOLIB_USES_VTK
-
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
     vtkSmartPointer<vtkGenericDataObjectReader> reader = vtkSmartPointer<vtkGenericDataObjectReader>::New();
@@ -69,10 +81,7 @@ void read_VTK(const char          * filename,
         }
     }
 
-#else
-    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
-    exit(-1);
-#endif
 }
+#endif
 
 }

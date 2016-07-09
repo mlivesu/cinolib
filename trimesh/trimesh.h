@@ -164,7 +164,6 @@ class Trimesh
         int                         triangle_label(const int tid) const;
         void                        triangle_set_label(const int tid, const int i);
         int                         shared_triangle(const int eid0, const int eid1) const;
-        double                      triangle_angle_at_vertex(const int tid, const int vid) const;
         bool                        triangle_contains_vertex(const int tid, const int vid) const;
         int                         triangle_adjacent_along(const int tid, const int vid0, const int vid1) const;
         double                      element_mass(const int tid) const;
