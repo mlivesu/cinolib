@@ -397,7 +397,7 @@ int Trimesh::edge_opposite_to(const int tid, const int vid) const
 }
 
 CINO_INLINE
-double Trimesh::angle_at_vertex(const int tid, const int vid) const
+double Trimesh::triangle_angle_at_vertex(const int tid, const int vid) const
 {
     int i;
 

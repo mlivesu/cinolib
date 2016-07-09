@@ -159,6 +159,7 @@ class Trimesh
         int                         triangle_label(const int tid) const;
         void                        triangle_set_label(const int tid, const int i);
         int                         shared_triangle(const int eid0, const int eid1) const;
+        double                      triangle_angle_at_vertex(const int tid, const int vid) const;
         bool                        triangle_contains_vertex(const int tid, const int vid) const;
         int                         triangle_adjacent_along(const int tid, const int vid0, const int vid1) const;
         double                      element_mass(const int tid) const;
@@ -170,7 +171,6 @@ class Trimesh
         double                      vertex_mass (const int vid) const;
         int                         vertex_opposite_to(const int tid, const int vid0, const int vid1) const;
         int                         vertex_opposite_to(const int eid, const int vid) const;
-        double                      angle_at_vertex(const int tid, const int vid) const;
         bool                        vertex_is_border(const int vid) const;
         bool                        vertex_is_boundary(const int vid) const;
         vec3d                       vertex_normal(const int vid) const;
