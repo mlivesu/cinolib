@@ -31,10 +31,48 @@
 namespace cinolib
 {
 
+// floodfill
+//
 template<class Mesh>
 CINO_INLINE
-void bfs_exahustive(const Mesh & m, const int seed, std::set<int> & visited);
+void bfs_exahustive(const Mesh          & m,
+                    const int             source,
+                          std::set<int> & visited);
 
+
+// shortest path on unweighted graph, essentially dijkstra with constaint weights.
+//
+template<class Mesh>
+CINO_INLINE
+void bfs(const Mesh             & m,
+         const int                source,
+         const int                dest,
+               std::vector<int> & path);
+
+
+// shortest path (with barriers) on unweighted graph.
+// The path cannot pass throuh vertices for which mask[v] = true
+//
+template<class Mesh>
+CINO_INLINE
+void bfs(const Mesh              & m,
+         const int                 source,
+         const int                 dest,
+         const std::vector<bool> & mask,
+               std::vector<int>  & path);
+
+
+// shortest path (with barriers and multiple destinatins) on unweighted graph.
+// The path cannot pass throuh vertices for which mask[v] = true
+// The algorithm stops as soon as it reaches of of the destinations
+//
+template<class Mesh>
+CINO_INLINE
+void bfs(const Mesh              & m,
+         const int                 source,
+         const std::set<int>     & dest,
+         const std::vector<bool> & mask,
+               std::vector<int>  & path);
 }
 
 
