@@ -89,30 +89,21 @@ class IntegralCurve : public DrawableObject
 
         bool is_converged(const int curr_tid, const int convergence_criterion) const;
 
-        void find_exit_door(const int     tid,
+        void find_exit_gate(const int     tid,
                             const vec3d & pos,
                             const vec3d & target_dir,
                                   vec3d & exit_pos,
-                                  int   & exit_edge,
-                                  int   & exit_backup) const;
+                                  int   & exit_edge) const;
 
-        void find_exit_door(const int     tid,
+        void find_exit_gate(const int     tid,
                             const vec3d & pos,
                             const vec3d & target_dir,
-                                  int   & exit_edge,
-                                  int   & exit_backup) const;
+                                  int   & exit_edge) const;
 
         void traverse_element(const CurveSample & curr_sample,
                                     CurveSample & next_sample) const;
 
-        void handle_corner_cases(const int     curr_tid,
-                                 const vec3d & A,
-                                 const vec3d & B,
-                                 const int     exit_backup,
-                                       int   & next_tid,
-                                       vec3d & next_pos) const;
-
-        void handle_corner_cases(const CurveSample & curr_sample,
+        bool gradient_skins_into(const CurveSample & curr_sample,
                                        CurveSample & next_sample) const;
 
     private:
