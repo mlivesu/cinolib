@@ -118,10 +118,8 @@ void IntegralCurve<Mesh>::draw() const
 
 template<>
 CINO_INLINE
-void IntegralCurve<Trimesh>::find_exit_gate(const int     tid,
-                                            const vec3d & pos,
-                                            const vec3d & target_dir,
-                                                  int   & exit_edge) const
+int IntegralCurve<Trimesh>::find_exit_gate(const CurveSample & curr_sample,
+                                           const vec3d       & target_dir) const
 {
     /* Split the triangle into three sub triangles meeting at <pos>,
      * then find, among the three edges incident to <pos>, the one
@@ -133,9 +131,9 @@ void IntegralCurve<Trimesh>::find_exit_gate(const int     tid,
 
     vec3d uvw[3] =
     {
-        m_ptr->triangle_vertex(tid,0) - pos,
-        m_ptr->triangle_vertex(tid,1) - pos,
-        m_ptr->triangle_vertex(tid,2) - pos
+        m_ptr->triangle_vertex(curr_sample.elem_id, 0) - curr_sample.pos,
+        m_ptr->triangle_vertex(curr_sample.elem_id, 1) - curr_sample.pos,
+        m_ptr->triangle_vertex(curr_sample.elem_id, 2) - curr_sample.pos
     };
 
     std::set< std::pair<double,int> > sorted_by_angle;
@@ -145,9 +143,11 @@ void IntegralCurve<Trimesh>::find_exit_gate(const int     tid,
     }
 
     int   vert  = (*sorted_by_angle.begin()).second;
-    vec3d tn    = m_ptr->triangle_normal(tid);
+    vec3d tn    = m_ptr->triangle_normal(curr_sample.elem_id);
     vec3d cross = target_dir.cross(uvw[vert]);
-    exit_edge   = (cross.dot(tn) >= 0) ? (vert+2)%3 : vert; // see TRI_EDGES to understand why....
+
+    if (cross.dot(tn) >= 0) return (vert+2)%3; // see TRI_EDGES to understand why....
+    return vert;
 }
 
 
@@ -160,12 +160,10 @@ bool IntegralCurve<Trimesh>::gradient_skins_into(const CurveSample & curr_sample
     vec3d next_target_dir = grad_ptr->vec_at(next_sample.elem_id);
     next_target_dir.normalize();
 
-    int next_exit_edge;
-    find_exit_gate(next_sample.elem_id, next_sample.pos, next_target_dir, next_exit_edge);
-
-    int next_vidA     = m_ptr->triangle_vertex_id(next_sample.elem_id, TRI_EDGES[next_exit_edge][0]);
-    int next_vidB     = m_ptr->triangle_vertex_id(next_sample.elem_id, TRI_EDGES[next_exit_edge][1]);
-    int next_next_tid = m_ptr->triangle_adjacent_along(next_sample.elem_id, next_vidA, next_vidB);
+    int next_exit_edge = find_exit_gate(next_sample, next_target_dir);
+    int next_vidA      = m_ptr->triangle_vertex_id(next_sample.elem_id, TRI_EDGES[next_exit_edge][0]);
+    int next_vidB      = m_ptr->triangle_vertex_id(next_sample.elem_id, TRI_EDGES[next_exit_edge][1]);
+    int next_next_tid  = m_ptr->triangle_adjacent_along(next_sample.elem_id, next_vidA, next_vidB);
 
     if (next_next_tid == curr_sample.elem_id)
     {
@@ -177,34 +175,32 @@ bool IntegralCurve<Trimesh>::gradient_skins_into(const CurveSample & curr_sample
 
 template<>
 CINO_INLINE
-void IntegralCurve<Trimesh>::traverse_element(const CurveSample & curr_sample,
-                                                    CurveSample & next_sample) const
+IntegralCurve<Trimesh>::CurveSample IntegralCurve<Trimesh>::traverse_element(const CurveSample & curr_sample) const
 {
     vec3d target_dir = grad_ptr->vec_at(curr_sample.elem_id);
     target_dir.normalize();
 
-    int exit_edge;
-    find_exit_gate(curr_sample.elem_id, curr_sample.pos, target_dir, exit_edge);
+    int   exit_edge = find_exit_gate(curr_sample, target_dir);
+    int   vidA      = m_ptr->triangle_vertex_id(curr_sample.elem_id, TRI_EDGES[exit_edge][0]);
+    int   vidB      = m_ptr->triangle_vertex_id(curr_sample.elem_id, TRI_EDGES[exit_edge][1]);
+    vec3d A         = m_ptr->vertex(vidA);
+    vec3d B         = m_ptr->vertex(vidB);
 
-    int    vidA  = m_ptr->triangle_vertex_id(curr_sample.elem_id, TRI_EDGES[exit_edge][0]);
-    int    vidB  = m_ptr->triangle_vertex_id(curr_sample.elem_id, TRI_EDGES[exit_edge][1]);
-    vec3d  A     = m_ptr->vertex(vidA);
-    vec3d  B     = m_ptr->vertex(vidB);
+    vec3d  V0       = curr_sample.pos;
+    vec3d  V1       = A;
+    vec3d  e0_dir   = B - A; e0_dir.normalize();
+    vec3d  e1_dir   = -target_dir;
+    vec3d  e2_dir   = V1 - V0; e2_dir.normalize();
 
-    vec3d  V0      = curr_sample.pos;
-    vec3d  V1      = A;
-    vec3d  e0_dir  = B - A;   e0_dir.normalize();
-    vec3d  e1_dir  = -target_dir;
-    vec3d  e2_dir  = V1 - V0; e2_dir.normalize();
+    double V0_ang   = e2_dir.angle_rad(-e1_dir);
+    double V2_ang   = e1_dir.angle_rad(-e0_dir);
+    double e2_len   = (V1 - V0).length();
+    double e0_len   = triangle_law_of_sines(V2_ang, V0_ang, e2_len);
 
-    double V0_ang  = e2_dir.angle_rad(-e1_dir);
-    double V2_ang  = e1_dir.angle_rad(-e0_dir);
-    double e2_len  = (V1 - V0).length();
-    double e0_len  = triangle_law_of_sines(V2_ang, V0_ang, e2_len);
+    vec3d next_pos  = V1 + e0_len * e0_dir;
+    int   next_tid  = m_ptr->triangle_adjacent_along(curr_sample.elem_id, vidA, vidB);
 
-    vec3d next_pos = V1 + e0_len * e0_dir;
-    int   next_tid = m_ptr->triangle_adjacent_along(curr_sample.elem_id, vidA, vidB);
-
+    CurveSample next_sample;
     next_sample.pos     = next_pos;
     next_sample.elem_id = next_tid;
     next_sample.gate_id = exit_edge;
@@ -227,6 +223,8 @@ void IntegralCurve<Trimesh>::traverse_element(const CurveSample & curr_sample,
         }
         assert(next_sample.elem_id != -1);
     }
+
+    return next_sample;
 }
 
 template <>
@@ -274,29 +272,30 @@ void IntegralCurve<Trimesh>::make_curve()
     cs.vert_id = opt.source_vid;
     curve.push_back(cs);
 
+    bool border_reached, locmax_reached, target_reached;
+
     do
     {
-        CurveSample next;
-        traverse_element(curve.back(), next);
-        curve.push_back(next);
-    }
-    while ( curve.back().elem_id != -1 && // it may happen if the gradient points towards the border foa boudnary mesh...
-           !is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX) && // in any case you can't go any further...
-           !is_converged(curve.back().elem_id, opt.convergence_criterion));
+        curve.push_back( traverse_element(curve.back()) );
 
-    // append the final segment to the curve
-    //
-    if (is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX))
+        border_reached = (curve.back().elem_id == -1);
+        locmax_reached = !border_reached && is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX);
+        target_reached = !border_reached && is_converged(curve.back().elem_id, opt.convergence_criterion);
+    }
+    while (!border_reached && !locmax_reached && !target_reached);
+
+    if (locmax_reached)
     {
+        // append the final segment to the curve
+        //
         for(int i=0; i<3; ++i)
+        if (m_ptr->vertex_is_local_maxima(m_ptr->triangle_vertex_id(curve.back().elem_id,i)))
         {
-            if (m_ptr->vertex_is_local_maxima(m_ptr->triangle_vertex_id(curve.back().elem_id,i)))
-            {
-                CurveSample cs;
-                cs.pos = m_ptr->triangle_vertex(curve.back().elem_id,i);
-                cs.elem_id = curve.back().elem_id;
-                curve.push_back(cs);
-            }
+            CurveSample cs;
+            cs.vert_id = m_ptr->triangle_vertex_id(curve.back().elem_id, i);
+            cs.pos     = m_ptr->vertex(cs.vert_id);
+            cs.elem_id = curve.back().elem_id;
+            curve.push_back(cs);
         }
     }
 }

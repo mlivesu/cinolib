@@ -22,9 +22,11 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include "triangle.h"
+#include "../vec3.h"
 
 namespace cinolib
 {
+
 
 // https://en.wikipedia.org/wiki/Law_of_sines
 //

@@ -53,7 +53,7 @@ class IntegralCurve : public DrawableObject
 
     typedef struct
     {
-        vec3d pos = vec3d(0,0,0);
+        vec3d pos     = vec3d(0,0,0);
         int   elem_id = -1; // element (triangle, tet,...)
         int   gate_id = -1; // gate (edge, tet facet, ...)
         int   vert_id = -1; // vertex
@@ -95,10 +95,11 @@ class IntegralCurve : public DrawableObject
                                   vec3d & exit_pos,
                                   int   & exit_edge) const;
 
-        void find_exit_gate(const int     tid,
-                            const vec3d & pos,
-                            const vec3d & target_dir,
-                                  int   & exit_edge) const;
+        int find_exit_gate(const CurveSample & curr_sample,
+                           const vec3d       & target_dir) const;
+
+
+        CurveSample traverse_element(const CurveSample & curr_sample) const;
 
         void traverse_element(const CurveSample & curr_sample,
                                     CurveSample & next_sample) const;
