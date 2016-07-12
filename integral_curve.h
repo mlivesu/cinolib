@@ -54,9 +54,9 @@ class IntegralCurve : public DrawableObject
     typedef struct
     {
         vec3d pos = vec3d(0,0,0);
-        int   tid = -1; // face
-        int   eid = -1; // edge
-        int   vid = -1; // vertex
+        int   elem_id = -1; // element (triangle, tet,...)
+        int   gate_id = -1; // gate (edge, tet facet, ...)
+        int   vert_id = -1; // vertex
     } CurveSample;
 
     public:

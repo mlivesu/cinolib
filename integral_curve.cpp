@@ -203,14 +203,14 @@ CINO_INLINE
 void IntegralCurve<Trimesh>::traverse_element(const CurveSample & curr_sample,
                                                     CurveSample & next_sample) const
 {
-    vec3d target_dir = grad_ptr->vec_at(curr_sample.tid);
+    vec3d target_dir = grad_ptr->vec_at(curr_sample.elem_id);
     target_dir.normalize();
 
     int exit_edge, exit_backup;
-    find_exit_door(curr_sample.tid, curr_sample.pos, target_dir, exit_edge, exit_backup);
+    find_exit_door(curr_sample.elem_id, curr_sample.pos, target_dir, exit_edge, exit_backup);
 
-    int    vidA  = m_ptr->triangle_vertex_id(curr_sample.tid, TRI_EDGES[exit_edge][0]);
-    int    vidB  = m_ptr->triangle_vertex_id(curr_sample.tid, TRI_EDGES[exit_edge][1]);
+    int    vidA  = m_ptr->triangle_vertex_id(curr_sample.elem_id, TRI_EDGES[exit_edge][0]);
+    int    vidB  = m_ptr->triangle_vertex_id(curr_sample.elem_id, TRI_EDGES[exit_edge][1]);
     vec3d  A     = m_ptr->vertex(vidA);
     vec3d  B     = m_ptr->vertex(vidB);
 
@@ -226,13 +226,13 @@ void IntegralCurve<Trimesh>::traverse_element(const CurveSample & curr_sample,
     double e0_len  = sin(V0_ang) * e2_len / sin(V2_ang);
 
     vec3d next_pos = V1 + e0_len * e0_dir;
-    int   next_tid = m_ptr->triangle_adjacent_along(curr_sample.tid, vidA, vidB);
+    int   next_tid = m_ptr->triangle_adjacent_along(curr_sample.elem_id, vidA, vidB);
 
-    handle_corner_cases(curr_sample.tid, A, B, exit_backup, next_tid, next_pos);
+    handle_corner_cases(curr_sample.elem_id, A, B, exit_backup, next_tid, next_pos);
 
-    next_sample.tid = next_tid;
+    next_sample.elem_id = next_tid;
     next_sample.pos = next_pos;
-    next_sample.eid = exit_edge;
+    next_sample.gate_id = exit_edge;
 }
 
 template <>
@@ -276,9 +276,9 @@ void IntegralCurve<Trimesh>::make_curve()
 {
     CurveSample cs;
     cs.pos = opt.source_pos;
-    cs.tid = opt.source_tid;
-    cs.vid = opt.source_vid;
-    cs.eid = -1;
+    cs.elem_id = opt.source_tid;
+    cs.vert_id = opt.source_vid;
+    cs.gate_id = -1;
     curve.push_back(cs);
 
     do
@@ -286,22 +286,22 @@ void IntegralCurve<Trimesh>::make_curve()
         CurveSample next;
         traverse_element(curve.back(), next);
         if ((curve.back().pos - next.pos).length() > 0) curve.push_back(next);
-        else                                            curve.back().tid = next.tid;
+        else                                            curve.back().elem_id = next.elem_id;
     }
-    while (!is_converged(curve.back().tid, STOP_AT_LOCAL_MAX) && // in any case you can't go any further...
-           !is_converged(curve.back().tid, opt.convergence_criterion));
+    while (!is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX) && // in any case you can't go any further...
+           !is_converged(curve.back().elem_id, opt.convergence_criterion));
 
     // append the final segment to the curve
     //
-    if (is_converged(curve.back().tid, STOP_AT_LOCAL_MAX))
+    if (is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX))
     {
         for(int i=0; i<3; ++i)
-        if (m_ptr->vertex_is_local_maxima(m_ptr->triangle_vertex_id(curve.back().tid,i)))
+        if (m_ptr->vertex_is_local_maxima(m_ptr->triangle_vertex_id(curve.back().elem_id,i)))
         {
             CurveSample cs;
-            cs.pos = m_ptr->triangle_vertex(curve.back().tid,i);
-            cs.tid = curve.back().tid;
-            cs.eid = -1;
+            cs.pos = m_ptr->triangle_vertex(curve.back().elem_id,i);
+            cs.elem_id = curve.back().elem_id;
+            cs.gate_id = -1;
             curve.push_back(cs);
         }
     }
@@ -342,14 +342,14 @@ void IntegralCurve<Tetmesh>::find_exit_door(const int     tid,
             if ((exit_pos - pos).length() > (exit.pos - pos).length())
             {
                 exit.pos = exit_pos;
-                exit.eid = facet;
-                exit.tid = m_ptr->adjacent_tet_through_facet(tid, facet);
+                exit.gate_id = facet;
+                exit.elem_id = m_ptr->adjacent_tet_through_facet(tid, facet);
             }
         }
     }
 
     exit_pos  = exit.pos;
-    exit_edge = exit.eid;
+    exit_edge = exit.gate_id;
 }
 
 template<>
@@ -357,20 +357,20 @@ CINO_INLINE
 void IntegralCurve<Tetmesh>::handle_corner_cases(const CurveSample & curr_sample,
                                                        CurveSample & next_sample) const
 {
-    if (next_sample.tid == -1) return;
+    if (next_sample.elem_id == -1) return;
 
-    vec3d next_target_dir = grad_ptr->vec_at(next_sample.tid);
+    vec3d next_target_dir = grad_ptr->vec_at(next_sample.elem_id);
     next_target_dir.normalize();
 
     vec3d exit_pos;
     int exit_face, exit_backup;
-    find_exit_door(next_sample.tid, next_sample.pos, next_target_dir, exit_pos, exit_face, exit_backup);
+    find_exit_door(next_sample.elem_id, next_sample.pos, next_target_dir, exit_pos, exit_face, exit_backup);
 
-    if (m_ptr->adjacent_tet_through_facet(next_sample.tid, exit_face) == curr_sample.tid)
+    if (m_ptr->adjacent_tet_through_facet(next_sample.elem_id, exit_face) == curr_sample.elem_id)
     {
         std::cout << "CORNER CASE TET!" << std::endl;
 
-        vec3d avg_target_dir = next_target_dir + grad_ptr->vec_at(curr_sample.tid);
+        vec3d avg_target_dir = next_target_dir + grad_ptr->vec_at(curr_sample.elem_id);
         avg_target_dir.normalize();
 
         vec3d  pos        = next_sample.pos;
@@ -379,7 +379,7 @@ void IntegralCurve<Tetmesh>::handle_corner_cases(const CurveSample & curr_sample
 
         for(int i=0; i<3; ++i)
         {
-            vec3d  u     = m_ptr->tet_vertex(next_sample.tid, TET_FACES[next_sample.eid][i]) - pos;
+            vec3d  u     = m_ptr->tet_vertex(next_sample.elem_id, TET_FACES[next_sample.gate_id][i]) - pos;
             double angle = u.angle_rad(avg_target_dir);
 
             if (angle < best_angle)
@@ -390,15 +390,15 @@ void IntegralCurve<Tetmesh>::handle_corner_cases(const CurveSample & curr_sample
         }
         assert(best_vtx > -1);
 
-        next_sample.pos = m_ptr->tet_vertex(next_sample.tid, TET_FACES[next_sample.eid][best_vtx]);
-        next_sample.eid = 0; // mmmm, boh - verifica se va bene!
+        next_sample.pos = m_ptr->tet_vertex(next_sample.elem_id, TET_FACES[next_sample.gate_id][best_vtx]);
+        next_sample.gate_id = 0; // mmmm, boh - verifica se va bene!
 
-        for(int tid : m_ptr->adj_vtx2tet(m_ptr->tet_vertex_id(next_sample.tid, TET_FACES[next_sample.eid][best_vtx])))
+        for(int tid : m_ptr->adj_vtx2tet(m_ptr->tet_vertex_id(next_sample.elem_id, TET_FACES[next_sample.gate_id][best_vtx])))
         {
-            if (tid != next_sample.tid ||
-                tid != curr_sample.tid)
+            if (tid != next_sample.elem_id ||
+                tid != curr_sample.elem_id)
             {
-                next_sample.tid = tid;
+                next_sample.elem_id = tid;
             }
         }
     }
@@ -410,29 +410,29 @@ CINO_INLINE
 void IntegralCurve<Tetmesh>::traverse_element(const CurveSample & curr_sample,
                                                     CurveSample & next_sample) const
 {
-    vec3d target_dir = grad_ptr->vec_at(curr_sample.tid);
+    vec3d target_dir = grad_ptr->vec_at(curr_sample.elem_id);
     target_dir.normalize();
 
     vec3d exit_pos;
     int exit_face, exit_backup;
-    find_exit_door(curr_sample.tid, curr_sample.pos, target_dir, exit_pos, exit_face, exit_backup);
+    find_exit_door(curr_sample.elem_id, curr_sample.pos, target_dir, exit_pos, exit_face, exit_backup);
 
-    next_sample.tid = m_ptr->adjacent_tet_through_facet(curr_sample.tid, exit_face);
+    next_sample.elem_id = m_ptr->adjacent_tet_through_facet(curr_sample.elem_id, exit_face);
     next_sample.pos = exit_pos;
-    next_sample.eid = exit_face;
+    next_sample.gate_id = exit_face;
 
     std::cout << "pos: " << next_sample.pos << std::endl;
-    std::cout << "tet: " << next_sample.tid << std::endl;
-    std::cout << "tri: " << next_sample.eid << std::endl;
-    std::cout << "vid: " << next_sample.vid << std::endl;
+    std::cout << "tet: " << next_sample.elem_id << std::endl;
+    std::cout << "tri: " << next_sample.gate_id << std::endl;
+    std::cout << "vid: " << next_sample.vert_id << std::endl;
     std::cout << std::endl;
 
     handle_corner_cases(curr_sample, next_sample);
 
     std::cout << "pos: " << next_sample.pos << std::endl;
-    std::cout << "tet: " << next_sample.tid << std::endl;
-    std::cout << "tri: " << next_sample.eid << std::endl;
-    std::cout << "vid: " << next_sample.vid << std::endl;
+    std::cout << "tet: " << next_sample.elem_id << std::endl;
+    std::cout << "tri: " << next_sample.gate_id << std::endl;
+    std::cout << "vid: " << next_sample.vert_id << std::endl;
     std::cout << "::::::::::::::" << std::endl;
     std::cout << std::endl;
 }
@@ -479,9 +479,9 @@ void IntegralCurve<Tetmesh>::make_curve()
 {
     CurveSample cs;
     cs.pos = opt.source_pos;
-    cs.tid = opt.source_tid;
-    cs.vid = opt.source_vid;
-    cs.eid = -1;
+    cs.elem_id = opt.source_tid;
+    cs.vert_id = opt.source_vid;
+    cs.gate_id = -1;
     curve.push_back(cs);
 
     do
@@ -489,23 +489,23 @@ void IntegralCurve<Tetmesh>::make_curve()
         CurveSample next;
         traverse_element(curve.back(), next);
         if ((curve.back().pos - next.pos).length() > 0) curve.push_back(next);
-        else curve.back().tid = next.tid;
+        else curve.back().elem_id = next.elem_id;
     }
-    while((curve.back().tid != -1) && // the integral line points outside of the volume
-          !is_converged(curve.back().tid, STOP_AT_LOCAL_MAX) && // in any case you can't go any further...
-          !is_converged(curve.back().tid, opt.convergence_criterion));
+    while((curve.back().elem_id != -1) && // the integral line points outside of the volume
+          !is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX) && // in any case you can't go any further...
+          !is_converged(curve.back().elem_id, opt.convergence_criterion));
 
     // append the final segment to the curve
     //
-    if (curve.back().tid != -1 && is_converged(curve.back().tid, STOP_AT_LOCAL_MAX))
+    if (curve.back().elem_id != -1 && is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX))
     {
         for(int i=0; i<3; ++i)
-        if (m_ptr->vertex_is_local_maxima(m_ptr->tet_vertex_id(curve.back().tid,i)))
+        if (m_ptr->vertex_is_local_maxima(m_ptr->tet_vertex_id(curve.back().elem_id,i)))
         {
             CurveSample cs;
-            cs.pos = m_ptr->tet_vertex(curve.back().tid,i);
-            cs.tid = curve.back().tid;
-            cs.eid = -1;
+            cs.pos = m_ptr->tet_vertex(curve.back().elem_id,i);
+            cs.elem_id = curve.back().elem_id;
+            cs.gate_id = -1;
             curve.push_back(cs);
         }
     }
