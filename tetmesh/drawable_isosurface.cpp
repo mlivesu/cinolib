@@ -69,13 +69,13 @@ void DrawableIsosurface::draw() const
 CINO_INLINE
 vec3d DrawableIsosurface::scene_center() const
 {
-    return m_ptr->bb.center();
+    return m_ptr->bbox().center();
 }
 
 CINO_INLINE
 float DrawableIsosurface::scene_radius() const
 {
-    return m_ptr->bb.diag();
+    return m_ptr->bbox().diag();
 }
 
 }
