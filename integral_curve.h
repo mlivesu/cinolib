@@ -34,6 +34,31 @@ namespace cinolib
 template<class Mesh>
 class IntegralCurve : public DrawableObject
 {
+    enum
+    {
+        STOP_AT_LOCAL_MAX,
+        STOP_AT_GIVEN_VTX,
+        STOP_AT_GIVEN_VAL,
+    };
+
+    typedef struct
+    {
+        int   convergence_criterion;
+        int   source_tid;
+        int   source_vid;
+        vec3d source_pos;
+        float stop_at_this_value;
+        float stop_at_this_vertex;
+    } Options;
+
+    typedef struct
+    {
+        vec3d pos = vec3d(0,0,0);
+        int   tid = -1; // face
+        int   eid = -1; // edge
+        int   vid = -1; // vertex
+    } CurveSample;
+
     public:
 
         IntegralCurve(const Mesh        & m,
@@ -67,13 +92,18 @@ class IntegralCurve : public DrawableObject
         void find_exit_door(const int     tid,
                             const vec3d & pos,
                             const vec3d & target_dir,
+                                  vec3d & exit_pos,
                                   int   & exit_edge,
                                   int   & exit_backup) const;
 
-        void traverse_element(const int     tid,
-                              const vec3d & pos,
-                                    int   & next_tid,
-                                    vec3d & next_pos) const;
+        void find_exit_door(const int     tid,
+                            const vec3d & pos,
+                            const vec3d & target_dir,
+                                  int   & exit_edge,
+                                  int   & exit_backup) const;
+
+        void traverse_element(const CurveSample & curr_sample,
+                                    CurveSample & next_sample) const;
 
         void handle_corner_cases(const int     curr_tid,
                                  const vec3d & A,
@@ -82,34 +112,12 @@ class IntegralCurve : public DrawableObject
                                        int   & next_tid,
                                        vec3d & next_pos) const;
 
+        void handle_corner_cases(const CurveSample & curr_sample,
+                                       CurveSample & next_sample) const;
+
     private:
 
-        enum
-        {
-            STOP_AT_LOCAL_MAX,
-            STOP_AT_GIVEN_VTX,
-            STOP_AT_GIVEN_VAL,
-        };
-
-        typedef struct
-        {
-            int   convergence_criterion;
-            int   source_tid;
-            int   source_vid;
-            vec3d source_pos;
-            float stop_at_this_value;
-            float stop_at_this_vertex;
-        } Options;
-
-        Options             opt;
-
-        typedef struct
-        {
-            vec3d pos;
-            int   tid; // face
-            int   eid; // edge
-            int   vid; // vertex
-        } CurveSample;
+        Options opt;
 
         std::vector<CurveSample> curve;
 
