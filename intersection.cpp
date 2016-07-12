@@ -62,73 +62,61 @@ bool segment2D(const vec2d        & s0_beg,
 }
 
 
-//CINO_INLINE
-//bool lines3D(const vec3d   l0_pos,
-//             const vec3d   l0_dir,
-//             const vec3d   l1_pos,
-//             const vec3d   l1_dir,
-//                   vec3d & inters)
-//{
-//    assert(l0_dir.length() == 1);
-//    assert(l1_dir.length() == 1);
+CINO_INLINE
+bool line_triangle_intersection(const vec3d   P,
+                                const vec3d   dir,
+                                const vec3d   V0,
+                                const vec3d   V1,
+                                const vec3d   V2,
+                                      vec3d & inters)
+{
+    assert(fabs(dir.length() - 1.0) < 1e-5); // dir should be normalized
 
-//    if (l0_dir.dot(l1_dir) == 1) return false;
+    // compute ray plane intersection
+    // https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld017.htm
+    //
+    Plane  plane(V0, V1, V2);
+    double den = dir.dot(plane.n);
+    if (fabs(den) == 0) return false;
+    double t = -(P.dot(plane.n) - plane.d) / den;
+    inters   = P + t * dir;
+    assert(fabs(plane[inters]) < 1e-5);
 
-//    vec3d n00( -l0_dir.y(),  l0_dir.x(),          0); n00.normalize();
-//    vec3d n01(           0, -l0_dir.z(), l0_dir.y()); n01.normalize();
-//    vec3d n10( -l1_dir.y(),  l1_dir.x(),          0); n10.normalize();
-//    vec3d n11(           0, -l1_dir.z(), l1_dir.y()); n11.normalize();
+    // check whether intersection is inside triangle
+    //
+    vec3d V[3]     = { V0, V1, V2 };
+    vec3d centroid = (V0 + V1 + V2) / 3.0;
+    for(int i=0; i<3; ++i)
+    {
+        vec3d n = V[(i+1)%3] - V[i];
+        n = n.cross(plane.n);
+        n.normalize();
+        Plane test(V[i], n);
+        if (test[centroid] * test[inters] < 0) return false;
+    }
 
-//    assert(n00.dot(l0_dir) == 0);
-//    assert(n01.dot(l0_dir) == 0);
-//    assert(n10.dot(l1_dir) == 0);
-//    assert(n11.dot(l1_dir) == 0);
-
-//    Plane P00(l0_pos, n00);
-//    Plane P01(l0_pos, n01);
-//    Plane P10(l1_pos, n10);
-//    Plane P11(l1_pos, n11);
-
-//    Eigen::Matrix<double,4,4> A;
-//    Eigen::Vector4d b;
-//    A(0,0) = P00.n[0]; A(0,1) = P00.n[1]; A(0,2) = P00.n[2]; b[0] = P00.d;
-//    A(1,0) = P01.n[0]; A(1,1) = P01.n[1]; A(1,2) = P01.n[2]; b[1] = P01.d;
-//    A(2,0) = P10.n[0]; A(2,1) = P10.n[1]; A(2,2) = P10.n[2]; b[2] = P10.d;
-//    A(3,0) = P11.n[0]; A(3,1) = P11.n[1]; A(3,2) = P11.n[2]; b[3] = P11.d;
-//    assert(A.determinant() != 0);
-
-//    Eigen::ColPivHouseholderQR<Eigen::MatrixXd> solver(A);
-//    assert(solver.info() == Eigen::Success);
-//    Eigen::Vector3d x = solver.solve(b);
-//    inters = vec3d(x[0],x[1],x[2]);
-
-//    return true;
-//}
+    return true;
+}
 
 
-//CINO_INLINE
-//bool planes(const std::vector<Plane> & planes, vec3d & inters)
-//{
-//    Eigen::MatrixXd A(planes.size(), 3);
-//    Eigen::VectorXd b(planes.size());
 
-//    int row = 0;
-//    for(const Plane p : planes)
-//    {
-//        A.coeffRef(row,0) = p.n[0];
-//        A.coeffRef(row,1) = p.n[1];
-//        A.coeffRef(row,2) = p.n[2];
-//        b[row] = p.d;
-//        ++row;
-//    }
+CINO_INLINE
+bool ray_triangle_intersection(const vec3d   P,
+                               const vec3d   dir,
+                               const vec3d   V0,
+                               const vec3d   V1,
+                               const vec3d   V2,
+                                     vec3d & inters)
+{
+    if (line_triangle_intersection(P, dir, V0, V1, V2, inters))
+    {
+        vec3d u = inters - P;
+        if (u.dot(dir) < 0) return false;
+        return true;
+    }
 
-//    Eigen::ColPivHouseholderQR<Eigen::MatrixXd> solver(A);
-//    assert(solver.info() == Eigen::Success);
-//    Eigen::Vector3d x = solver.solve(b);
-
-//    inters = vec3d(x[0],x[1],x[2]);
-//    return true;
-//}
+    return false;
+}
 
 }
 }

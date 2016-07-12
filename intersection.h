@@ -42,16 +42,21 @@ bool segment2D(const vec2d        & s0_beg,
                std::vector<vec2d> & inters);
 
 
-//CINO_INLINE
-//bool planes(const std::vector<Plane> & planes, vec3d & inters);
+CINO_INLINE
+bool line_triangle_intersection(const vec3d   P,
+                                const vec3d   dir,
+                                const vec3d   V0,
+                                const vec3d   V1,
+                                const vec3d   V2,
+                                      vec3d & inters);
 
-
-//CINO_INLINE
-//bool lines3D(const vec3d   l0_p,
-//             const vec3d   l0_dir,
-//             const vec3d   l1_p,
-//             const vec3d   l1_dir,
-//                   vec3d & inters);
+CINO_INLINE
+bool ray_triangle_intersection(const vec3d   P,
+                               const vec3d   dir,
+                               const vec3d   V0,
+                               const vec3d   V1,
+                               const vec3d   V2,
+                                     vec3d & inters);
 
 }
 }
