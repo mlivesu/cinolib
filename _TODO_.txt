@@ -1,3 +1,4 @@
+_ metti calcolo normali e altri utilities dentro trimesh/triangle.h
 - aggiungi show triangle IDs and vertex IDs!!!!! (stile remesher panozzo/tarini)
 - aggiungi due spinboxes per controllare gli estremi degli isovalori per il generatore delle isosuperfici
 - aggiungi controlli sulla mesh delle isosuperfici (colore, wireframe, ecc)
