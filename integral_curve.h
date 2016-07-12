@@ -43,12 +43,12 @@ class IntegralCurve : public DrawableObject
 
     typedef struct
     {
-        int   convergence_criterion;
-        int   source_tid;
-        int   source_vid;
-        vec3d source_pos;
-        float stop_at_this_value;
-        float stop_at_this_vertex;
+        int   convergence_criterion = STOP_AT_LOCAL_MAX;
+        int   source_tid            = -1;
+        int   source_vid            = -1;
+        vec3d source_pos            = vec3d();
+        float stop_at_this_value    = -1;
+        float stop_at_this_vertex   = -1;
     } Options;
 
     typedef struct

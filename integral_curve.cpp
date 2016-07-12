@@ -94,6 +94,26 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
     make_curve();
 }
 
+template<class Mesh>
+CINO_INLINE
+void IntegralCurve<Mesh>::draw() const
+{
+    double cylind_rad = m_ptr->bbox().diag()*0.001;
+
+    for(size_t i=1; i<curve.size(); ++i)
+    {
+        cylinder<vec3d>(curve[i-1].pos, curve[i].pos, cylind_rad, cylind_rad, RED);
+        //arrow<vec3d>(curve_samples[i-1].pos, curve_samples[i].pos, cylind_rad, RED);
+    }
+}
+
+
+/**********************************
+ *
+ * TRIMESH TEMPLATE SPECIALIZATIONS
+ *
+************************************/
+
 
 template<>
 CINO_INLINE
@@ -145,43 +165,6 @@ void IntegralCurve<Trimesh>::find_exit_door(const int     tid,
 }
 
 
-template<>
-CINO_INLINE
-void IntegralCurve<Tetmesh>::find_exit_door(const int     tid,
-                                            const vec3d & pos,
-                                            const vec3d & target_dir,
-                                                  vec3d & exit_pos,
-                                                  int   & exit_edge,
-                                                  int   & exit_backup) const
-{
-    CurveSample exit;
-    exit.pos = pos;
-
-    for(int facet=0; facet<4; ++facet)
-    {
-        vec3d f[3] =
-        {
-            m_ptr->tet_vertex(tid, TET_FACES[facet][0]),
-            m_ptr->tet_vertex(tid, TET_FACES[facet][1]),
-            m_ptr->tet_vertex(tid, TET_FACES[facet][2])
-        };
-
-        bool b = intersection::ray_triangle_intersection(pos, target_dir, f[0], f[1], f[2], exit_pos);
-
-        if (b)
-        {
-            if ((exit_pos - pos).length() > (exit.pos - pos).length())
-            {
-                exit.pos = exit_pos;
-                exit.eid = facet;
-                exit.tid = m_ptr->adjacent_tet_through_facet(tid, facet);
-            }
-        }
-    }
-
-    exit_pos  = exit.pos;
-    exit_edge = exit.eid;
-}
 
 template<>
 CINO_INLINE
@@ -252,6 +235,122 @@ void IntegralCurve<Trimesh>::traverse_element(const CurveSample & curr_sample,
     next_sample.eid = exit_edge;
 }
 
+template <>
+CINO_INLINE
+bool IntegralCurve<Trimesh>::is_converged(const int curr_tid, const int convergence_criterion) const
+{
+    switch (convergence_criterion)
+    {
+        case STOP_AT_LOCAL_MAX :
+        {
+            for(int i=0; i<3; ++i)
+            {
+                int vid = m_ptr->triangle_vertex_id(curr_tid,i);
+                if (m_ptr->vertex_is_local_maxima(vid)) return true;
+            }
+        }
+        break;
+
+        case STOP_AT_GIVEN_VAL :
+        {
+            if (m_ptr->triangle_min_u_text(curr_tid) > opt.stop_at_this_value) return true;
+        }
+        break;
+
+        case STOP_AT_GIVEN_VTX :
+        {
+            if (m_ptr->triangle_contains_vertex(curr_tid, opt.stop_at_this_vertex)) return true;
+        }
+        break;
+
+        default: assert("Integral Curve Convergence Error" && false);
+    }
+
+    return false;
+}
+
+
+template<>
+CINO_INLINE
+void IntegralCurve<Trimesh>::make_curve()
+{
+    CurveSample cs;
+    cs.pos = opt.source_pos;
+    cs.tid = opt.source_tid;
+    cs.vid = opt.source_vid;
+    cs.eid = -1;
+    curve.push_back(cs);
+
+    do
+    {
+        CurveSample next;
+        traverse_element(curve.back(), next);
+        if ((curve.back().pos - next.pos).length() > 0) curve.push_back(next);
+        else                                            curve.back().tid = next.tid;
+    }
+    while (!is_converged(curve.back().tid, STOP_AT_LOCAL_MAX) && // in any case you can't go any further...
+           !is_converged(curve.back().tid, opt.convergence_criterion));
+
+    // append the final segment to the curve
+    //
+    if (is_converged(curve.back().tid, STOP_AT_LOCAL_MAX))
+    {
+        for(int i=0; i<3; ++i)
+        if (m_ptr->vertex_is_local_maxima(m_ptr->triangle_vertex_id(curve.back().tid,i)))
+        {
+            CurveSample cs;
+            cs.pos = m_ptr->triangle_vertex(curve.back().tid,i);
+            cs.tid = curve.back().tid;
+            cs.eid = -1;
+            curve.push_back(cs);
+        }
+    }
+}
+
+
+/**********************************
+ *
+ * TETMESH TEMPLATE SPECIALIZATIONS
+ *
+************************************/
+
+template<>
+CINO_INLINE
+void IntegralCurve<Tetmesh>::find_exit_door(const int     tid,
+                                            const vec3d & pos,
+                                            const vec3d & target_dir,
+                                                  vec3d & exit_pos,
+                                                  int   & exit_edge,
+                                                  int   & exit_backup) const
+{
+    CurveSample exit;
+    exit.pos = pos;
+
+    for(int facet=0; facet<4; ++facet)
+    {
+        vec3d f[3] =
+        {
+            m_ptr->tet_vertex(tid, TET_FACES[facet][0]),
+            m_ptr->tet_vertex(tid, TET_FACES[facet][1]),
+            m_ptr->tet_vertex(tid, TET_FACES[facet][2])
+        };
+
+        bool b = intersection::ray_triangle_intersection(pos, target_dir, f[0], f[1], f[2], exit_pos);
+
+        if (b)
+        {
+            if ((exit_pos - pos).length() > (exit.pos - pos).length())
+            {
+                exit.pos = exit_pos;
+                exit.eid = facet;
+                exit.tid = m_ptr->adjacent_tet_through_facet(tid, facet);
+            }
+        }
+    }
+
+    exit_pos  = exit.pos;
+    exit_edge = exit.eid;
+}
 
 template<>
 CINO_INLINE
@@ -339,55 +438,6 @@ void IntegralCurve<Tetmesh>::traverse_element(const CurveSample & curr_sample,
 }
 
 
-
-template<class Mesh>
-CINO_INLINE
-void IntegralCurve<Mesh>::draw() const
-{
-    double cylind_rad = m_ptr->bbox().diag()*0.001;
-
-    for(size_t i=1; i<curve.size(); ++i)
-    {
-        cylinder<vec3d>(curve[i-1].pos, curve[i].pos, cylind_rad, cylind_rad, RED);
-        //arrow<vec3d>(curve_samples[i-1].pos, curve_samples[i].pos, cylind_rad, RED);
-    }
-}
-
-template <>
-CINO_INLINE
-bool IntegralCurve<Trimesh>::is_converged(const int curr_tid, const int convergence_criterion) const
-{
-    switch (convergence_criterion)
-    {
-        case STOP_AT_LOCAL_MAX :
-        {
-            for(int i=0; i<3; ++i)
-            {
-                int vid = m_ptr->triangle_vertex_id(curr_tid,i);
-                if (m_ptr->vertex_is_local_maxima(vid)) return true;
-            }
-        }
-        break;
-
-        case STOP_AT_GIVEN_VAL :
-        {
-            if (m_ptr->triangle_min_u_text(curr_tid) > opt.stop_at_this_value) return true;
-        }
-        break;
-
-        case STOP_AT_GIVEN_VTX :
-        {
-            if (m_ptr->triangle_contains_vertex(curr_tid, opt.stop_at_this_vertex)) return true;
-        }
-        break;
-
-        default: assert("Integral Curve Convergence Error" && false);
-    }
-
-    return false;
-}
-
-
 template <>
 CINO_INLINE
 bool IntegralCurve<Tetmesh>::is_converged(const int curr_tid, const int convergence_criterion) const
@@ -420,44 +470,6 @@ bool IntegralCurve<Tetmesh>::is_converged(const int curr_tid, const int converge
     }
 
     return false;
-}
-
-
-template<>
-CINO_INLINE
-void IntegralCurve<Trimesh>::make_curve()
-{
-    CurveSample cs;
-    cs.pos = opt.source_pos;
-    cs.tid = opt.source_tid;
-    cs.vid = opt.source_vid;
-    cs.eid = -1;
-    curve.push_back(cs);
-
-    do
-    {
-        CurveSample next;
-        traverse_element(curve.back(), next);
-        if ((curve.back().pos - next.pos).length() > 0) curve.push_back(next);
-        else                                            curve.back().tid = next.tid;
-    }
-    while (!is_converged(curve.back().tid, STOP_AT_LOCAL_MAX) && // in any case you can't go any further...
-           !is_converged(curve.back().tid, opt.convergence_criterion));
-
-    // append the final segment to the curve
-    //
-    if (is_converged(curve.back().tid, STOP_AT_LOCAL_MAX))
-    {
-        for(int i=0; i<3; ++i)
-        if (m_ptr->vertex_is_local_maxima(m_ptr->triangle_vertex_id(curve.back().tid,i)))
-        {
-            CurveSample cs;
-            cs.pos = m_ptr->triangle_vertex(curve.back().tid,i);
-            cs.tid = curve.back().tid;
-            cs.eid = -1;
-            curve.push_back(cs);
-        }
-    }
 }
 
 
