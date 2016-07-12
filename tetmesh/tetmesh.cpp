@@ -48,6 +48,13 @@ Tetmesh::Tetmesh(const char * filename)
 }
 
 CINO_INLINE
+const Bbox & Tetmesh::bbox() const
+{
+    return bb;
+}
+
+
+CINO_INLINE
 void Tetmesh::load(const char * filename)
 {
     timer_start("Load Tetmesh");
@@ -721,7 +728,7 @@ bool Tetmesh::tet_contains_edge(const int tid, const int eid) const
 }
 
 CINO_INLINE
-int Tetmesh::adjacent_tet_through_facet(const int tid, const int facet)
+int Tetmesh::adjacent_tet_through_facet(const int tid, const int facet) const
 {
     std::vector<int> nbrs = adj_tet2tet(tid);
     for(size_t i=0; i<nbrs.size(); ++i)
@@ -1412,5 +1419,48 @@ void Tetmesh::translate(const vec3d & delta)
     }
     update_bbox();
 }
+
+
+CINO_INLINE
+bool Tetmesh::vertex_is_local_minima(const int vid) const
+{
+    float v = vertex_u_text(vid);
+    for(int nbr : adj_vtx2vtx(vid))
+    {
+        if (vertex_u_text(nbr) <= v) return false;
+    }
+    return true;
+}
+
+CINO_INLINE
+bool Tetmesh::vertex_is_local_maxima(const int vid) const
+{
+    float v = vertex_u_text(vid);
+    for(int nbr : adj_vtx2vtx(vid))
+    {
+        if (vertex_u_text(nbr) >= v) return false;
+    }
+    return true;
+}
+
+CINO_INLINE
+bool Tetmesh::vertex_is_critical_point(const int vid) const
+{
+    return (vertex_is_local_maxima(vid) || vertex_is_local_minima(vid));
+}
+
+CINO_INLINE
+float Tetmesh::tet_min_u_text(const int tid) const
+{
+    float vals[4] =
+    {
+        vertex_u_text(tet_vertex_id(tid,0)),
+        vertex_u_text(tet_vertex_id(tid,1)),
+        vertex_u_text(tet_vertex_id(tid,2)),
+        vertex_u_text(tet_vertex_id(tid,3))
+    };
+    return *std::min_element(vals, vals+4);
+}
+
 
 }

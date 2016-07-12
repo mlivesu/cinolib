@@ -1045,8 +1045,14 @@ bool Trimesh::edge_collapse(const int eid)
 
     // clean vectors...
     remove_unreferenced_vertex(vid_remove);
-    for(int eid : edg_remove) remove_unreferenced_edge(eid);
-    for(int tid : tid_remove) remove_unreferenced_triangle(tid);
+    std::vector<int> edg_remove_vec(edg_remove.begin(), edg_remove.end());
+    std::sort(edg_remove_vec.begin(), edg_remove_vec.end());
+    std::reverse(edg_remove_vec.begin(), edg_remove_vec.end());
+    for(int eid : edg_remove_vec) remove_unreferenced_edge(eid);
+    std::vector<int> tid_remove_vec(tid_remove.begin(), tid_remove.end());
+    std::sort(tid_remove_vec.begin(), tid_remove_vec.end());
+    std::reverse(tid_remove_vec.begin(), tid_remove_vec.end());
+    for(int tid : tid_remove_vec) remove_unreferenced_triangle(tid);
 
     //check_topology();
 

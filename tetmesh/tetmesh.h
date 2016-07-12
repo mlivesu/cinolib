@@ -66,11 +66,13 @@ class Tetmesh
 
         std::string filename;
 
+        const Bbox & bbox() const;
+
+    protected:
+
         // bounding box
         //
         Bbox bb;
-
-    protected:
 
         // serialized xyz coordinates, tets and edges
         //
@@ -216,7 +218,7 @@ class Tetmesh
 
         void print_quality_statistics(bool list_folded_elements = false) const;
 
-        int adjacent_tet_through_facet(const int tid, const int facet);
+        int adjacent_tet_through_facet(const int tid, const int facet) const;
 
         int shared_facet(const int tid0, const int tid1) const;
 
@@ -258,6 +260,12 @@ class Tetmesh
         void scale(const double x_scale, const double y_scale, const double z_scale);
 
         void normalize_u_text_field();
+
+        bool vertex_is_local_minima(const int vid) const;
+        bool vertex_is_local_maxima(const int vid) const;
+        bool vertex_is_critical_point(const int vid) const;
+        float tet_min_u_text(const int tid) const;
+
 };
 
 }
