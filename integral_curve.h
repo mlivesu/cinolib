@@ -57,7 +57,7 @@ class IntegralCurve : public DrawableObject
         int   elem_id = -1; // element (triangle, tet,...)
         int   gate_id = -1; // gate (edge, tet facet, ...)
         int   vert_id = -1; // vertex
-    } CurveSample;
+    }   CurveSample;
 
     public:
 
@@ -89,11 +89,9 @@ class IntegralCurve : public DrawableObject
 
         bool is_converged(const int curr_tid, const int convergence_criterion) const;
 
-        void find_exit_gate(const int     tid,
-                            const vec3d & pos,
-                            const vec3d & target_dir,
-                                  vec3d & exit_pos,
-                                  int   & exit_edge) const;
+        int find_exit_gate(const CurveSample  & curr_sample,
+                            const vec3d       & target_dir,
+                                  vec3d       & exit_pos) const;
 
         int find_exit_gate(const CurveSample & curr_sample,
                            const vec3d       & target_dir) const;
@@ -105,7 +103,7 @@ class IntegralCurve : public DrawableObject
                                     CurveSample & next_sample) const;
 
         bool gradient_skins_into(const CurveSample & curr_sample,
-                                       CurveSample & next_sample) const;
+                                 const CurveSample & next_sample) const;
 
     private:
 

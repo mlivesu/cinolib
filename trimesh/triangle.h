@@ -27,8 +27,28 @@
 #include "../cinolib.h"
 #include "../vec3.h"
 
+#include <set>
+
 namespace cinolib
 {
+
+CINO_INLINE
+vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C);
+
+
+
+// Given a triangle t(A,B,C) and a ray r(P,dir) compute both
+// the edge and position where r exits from t
+//
+// NOTE: r is assumed to live "within" t, like in a gradient field for example...
+//
+CINO_INLINE
+void triangle_traverse_with_ray(const vec3d   tri[3],
+                                const vec3d   P,
+                                const vec3d   dir,
+                                      vec3d & exit_pos,
+                                      int   & exit_edge);
+
 
 // https://en.wikipedia.org/wiki/Law_of_sines
 //

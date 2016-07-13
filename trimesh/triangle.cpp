@@ -27,6 +27,64 @@
 namespace cinolib
 {
 
+CINO_INLINE
+vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C)
+{
+    vec3d n = (B-A).cross(C-A);
+    n.normalize();
+    return n;
+}
+
+
+
+// Given a triangle t(A,B,C) and a ray r(P,dir) compute both
+// the edge and position where r exits from t
+//
+// NOTE: r is assumed to live "within" t, like in a gradient field for example...
+//
+CINO_INLINE
+void triangle_traverse_with_ray(const vec3d   tri[3],
+                                const vec3d   P,
+                                const vec3d   dir,
+                                      vec3d & exit_pos,
+                                      int   & exit_edge)
+{
+    // 1) Find the exit edge
+    //
+
+    vec3d uvw[3] = { tri[0]-P, tri[1]-P, tri[2]-P };
+
+    std::set< std::pair<double,int> > sorted_by_angle;
+    for(int i=0; i<3; ++i)
+    {
+        sorted_by_angle.insert(std::make_pair(dir.angle_rad(uvw[i]),i));
+    }
+
+    int   vert      = (*sorted_by_angle.begin()).second;
+    vec3d tn        = triangle_normal(tri[0], tri[1], tri[2]);
+    vec3d cross     = dir.cross(uvw[vert]);
+
+    exit_edge = (cross.dot(tn) >= 0) ? (vert+2)%3 : vert; // it's because e_i = ( v_i, v_(i+1)%3 )
+
+    //
+    // 2) Find the exit point using the law of sines
+    //
+
+    vec3d  app      = tri[TRI_EDGES[exit_edge][1]];
+    vec3d  V1       = tri[TRI_EDGES[exit_edge][0]];
+    vec3d  V0       = P;
+    vec3d  e0_dir   = app - V1; e0_dir.normalize();
+    vec3d  e1_dir   = -dir;
+    vec3d  e2_dir   = V1 - V0; e2_dir.normalize();
+
+    double V0_ang   = e2_dir.angle_rad(-e1_dir);
+    double V2_ang   = e1_dir.angle_rad(-e0_dir);
+    double e2_len   = (V1 - V0).length();
+    double e0_len   = triangle_law_of_sines(V2_ang, V0_ang, e2_len);
+
+    exit_pos =  V1 + e0_len * e0_dir;
+}
+
 
 // https://en.wikipedia.org/wiki/Law_of_sines
 //

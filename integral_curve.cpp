@@ -155,7 +155,7 @@ int IntegralCurve<Trimesh>::find_exit_gate(const CurveSample & curr_sample,
 template<>
 CINO_INLINE
 bool IntegralCurve<Trimesh>::gradient_skins_into(const CurveSample & curr_sample,
-                                                       CurveSample & next_sample) const
+                                                 const CurveSample & next_sample) const
 {
     vec3d next_target_dir = grad_ptr->vec_at(next_sample.elem_id);
     next_target_dir.normalize();
@@ -309,126 +309,118 @@ void IntegralCurve<Trimesh>::make_curve()
 
 template<>
 CINO_INLINE
-void IntegralCurve<Tetmesh>::find_exit_gate(const int     tid,
-                                            const vec3d & pos,
-                                            const vec3d & target_dir,
-                                                  vec3d & exit_pos,
-                                                  int   & exit_edge) const
+int IntegralCurve<Tetmesh>::find_exit_gate(const CurveSample & curr_sample,
+                                           const vec3d       & target_dir,
+                                                 vec3d       & exit_pos) const
 {
-    CurveSample exit;
-    exit.pos = pos;
+    std::cout << curr_sample.elem_id << std::endl;
+
+        exit_pos   = curr_sample.pos;
+    int exit_facet = -1;
 
     for(int facet=0; facet<4; ++facet)
     {
         vec3d f[3] =
         {
-            m_ptr->tet_vertex(tid, TET_FACES[facet][0]),
-            m_ptr->tet_vertex(tid, TET_FACES[facet][1]),
-            m_ptr->tet_vertex(tid, TET_FACES[facet][2])
+            m_ptr->tet_vertex(curr_sample.elem_id, TET_FACES[facet][0]),
+            m_ptr->tet_vertex(curr_sample.elem_id, TET_FACES[facet][1]),
+            m_ptr->tet_vertex(curr_sample.elem_id, TET_FACES[facet][2])
         };
 
-        bool b = intersection::ray_triangle_intersection(pos, target_dir, f[0], f[1], f[2], exit_pos);
+        vec3d inters;
+        bool b = intersection::ray_triangle_intersection(curr_sample.pos, target_dir, f[0], f[1], f[2], inters);
 
         if (b)
         {
-            if ((exit_pos - pos).length() > (exit.pos - pos).length())
+            std::cout << curr_sample.elem_id << " intersection found!" << inters << "\t" << curr_sample.pos << std::endl;
+            if ((inters - curr_sample.pos).length() >= (exit_pos - curr_sample.pos).length())
             {
-                exit.pos = exit_pos;
-                exit.gate_id = facet;
-                exit.elem_id = m_ptr->adjacent_tet_through_facet(tid, facet);
+                exit_pos   = inters;
+                exit_facet = facet;
             }
         }
     }
+    assert(exit_facet != -1);
 
-    exit_pos  = exit.pos;
-    exit_edge = exit.gate_id;
+    return exit_facet;
 }
 
 template<>
 CINO_INLINE
 bool IntegralCurve<Tetmesh>::gradient_skins_into(const CurveSample & curr_sample,
-                                                       CurveSample & next_sample) const
+                                                 const CurveSample & next_sample) const
 {
-    if (next_sample.elem_id == -1) return true;
+    if (next_sample.elem_id == -1) return false;
 
     vec3d next_target_dir = grad_ptr->vec_at(next_sample.elem_id);
     next_target_dir.normalize();
 
     vec3d exit_pos;
-    int exit_face;
-    find_exit_gate(next_sample.elem_id, next_sample.pos, next_target_dir, exit_pos, exit_face);
+    int exit_face = find_exit_gate(next_sample, next_target_dir, exit_pos);
 
     if (m_ptr->adjacent_tet_through_facet(next_sample.elem_id, exit_face) == curr_sample.elem_id)
     {
-        std::cout << "CORNER CASE TET!" << std::endl;
-
-        vec3d avg_target_dir = next_target_dir + grad_ptr->vec_at(curr_sample.elem_id);
-        avg_target_dir.normalize();
-
-        vec3d  pos        = next_sample.pos;
-        int    best_vtx   = -1;
-        double best_angle = -FLT_MAX;
-
-        for(int i=0; i<3; ++i)
-        {
-            vec3d  u     = m_ptr->tet_vertex(next_sample.elem_id, TET_FACES[next_sample.gate_id][i]) - pos;
-            double angle = u.angle_rad(avg_target_dir);
-
-            if (angle < best_angle)
-            {
-                best_angle = angle;
-                best_vtx   = i;
-            }
-        }
-        assert(best_vtx > -1);
-
-        next_sample.pos = m_ptr->tet_vertex(next_sample.elem_id, TET_FACES[next_sample.gate_id][best_vtx]);
-        next_sample.gate_id = 0; // mmmm, boh - verifica se va bene!
-
-        for(int tid : m_ptr->adj_vtx2tet(m_ptr->tet_vertex_id(next_sample.elem_id, TET_FACES[next_sample.gate_id][best_vtx])))
-        {
-            if (tid != next_sample.elem_id ||
-                tid != curr_sample.elem_id)
-            {
-                next_sample.elem_id = tid;
-            }
-        }
+        return true;
     }
-
-    return true;
+    return false;
 }
 
 
 template<>
 CINO_INLINE
-void IntegralCurve<Tetmesh>::traverse_element(const CurveSample & curr_sample,
-                                                    CurveSample & next_sample) const
+IntegralCurve<Tetmesh>::CurveSample IntegralCurve<Tetmesh>::traverse_element(const CurveSample & curr_sample) const
 {
     vec3d target_dir = grad_ptr->vec_at(curr_sample.elem_id);
     target_dir.normalize();
 
-    vec3d exit_pos;
-    int exit_face;
-    find_exit_gate(curr_sample.elem_id, curr_sample.pos, target_dir, exit_pos, exit_face);
+    CurveSample next_sample;
+    next_sample.gate_id = find_exit_gate(curr_sample, target_dir, next_sample.pos);
+    next_sample.elem_id = m_ptr->adjacent_tet_through_facet(curr_sample.elem_id, next_sample.gate_id);
 
-    next_sample.elem_id = m_ptr->adjacent_tet_through_facet(curr_sample.elem_id, exit_face);
-    next_sample.pos = exit_pos;
-    next_sample.gate_id = exit_face;
+    std::cout << "check if gradient skins into..." << std::endl;
 
-    std::cout << "pos: " << next_sample.pos << std::endl;
-    std::cout << "tet: " << next_sample.elem_id << std::endl;
-    std::cout << "tri: " << next_sample.gate_id << std::endl;
-    std::cout << "vid: " << next_sample.vert_id << std::endl;
-    std::cout << std::endl;
+    if (gradient_skins_into(curr_sample, next_sample))
+    {
+        std::cout << "GRADIENT SKINS INTO!" << std::endl;
 
-    gradient_skins_into(curr_sample, next_sample);
+        vec3d avg_target_dir = grad_ptr->vec_at(curr_sample.elem_id) + grad_ptr->vec_at(next_sample.elem_id);
+        avg_target_dir.normalize();
 
-    std::cout << "pos: " << next_sample.pos << std::endl;
-    std::cout << "tet: " << next_sample.elem_id << std::endl;
-    std::cout << "tri: " << next_sample.gate_id << std::endl;
-    std::cout << "vid: " << next_sample.vert_id << std::endl;
-    std::cout << "::::::::::::::" << std::endl;
-    std::cout << std::endl;
+        vec3d tri[3] = // interface between curr and next element...
+        {
+            m_ptr->tet_vertex(curr_sample.elem_id, TET_FACES[next_sample.gate_id][0]),
+            m_ptr->tet_vertex(curr_sample.elem_id, TET_FACES[next_sample.gate_id][1]),
+            m_ptr->tet_vertex(curr_sample.elem_id, TET_FACES[next_sample.gate_id][2]),
+        };
+
+        std::set< std::pair<double,int> > sorted_by_angle;
+        for(int i=0; i<3; ++i)
+        {
+            sorted_by_angle.insert(std::make_pair(avg_target_dir.angle_rad(tri[i]-next_sample.pos),i));
+        }
+
+        int best = (*sorted_by_angle.begin()).second;
+        next_sample.vert_id = m_ptr->tet_vertex_id(curr_sample.elem_id, TET_FACES[next_sample.gate_id][best]);
+        next_sample.pos     = m_ptr->vertex(next_sample.vert_id);
+        next_sample.gate_id = -1;
+        next_sample.elem_id = -1;
+
+        int new_next_elem = -1;
+        for(int tid : m_ptr->adj_vtx2tet(next_sample.vert_id))
+        {
+            if (tid != next_sample.elem_id && tid != curr_sample.elem_id)
+            {
+                new_next_elem = tid;
+            }
+        }
+        //assert(new_next_elem!=-1);
+
+        next_sample.elem_id = new_next_elem;
+    }
+
+    std::cout << "check if gradient skins into...done\n" << std::endl;
+
+    return next_sample;
 }
 
 
@@ -475,25 +467,25 @@ void IntegralCurve<Tetmesh>::make_curve()
     cs.pos = opt.source_pos;
     cs.elem_id = opt.source_tid;
     cs.vert_id = opt.source_vid;
-    cs.gate_id = -1;
     curve.push_back(cs);
+
+    bool border_reached, locmax_reached, target_reached;
 
     do
     {
-        CurveSample next;
-        traverse_element(curve.back(), next);
-        if ((curve.back().pos - next.pos).length() > 0) curve.push_back(next);
-        else curve.back().elem_id = next.elem_id;
+        curve.push_back( traverse_element(curve.back()) );
+
+        border_reached = (curve.back().elem_id == -1);
+        locmax_reached = !border_reached && is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX);
+        target_reached = !border_reached && is_converged(curve.back().elem_id, opt.convergence_criterion);
     }
-    while((curve.back().elem_id != -1) && // the integral line points outside of the volume
-          !is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX) && // in any case you can't go any further...
-          !is_converged(curve.back().elem_id, opt.convergence_criterion));
+    while (!border_reached && !locmax_reached && !target_reached);
 
     // append the final segment to the curve
     //
-    if (curve.back().elem_id != -1 && is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX))
+    if (locmax_reached)
     {
-        for(int i=0; i<3; ++i)
+        for(int i=0; i<4; ++i)
         if (m_ptr->vertex_is_local_maxima(m_ptr->tet_vertex_id(curve.back().elem_id,i)))
         {
             CurveSample cs;
