@@ -70,16 +70,18 @@ bool line_triangle_intersection(const vec3d   P,
                                 const vec3d   V2,
                                       vec3d & inters)
 {
-    assert(fabs(dir.length() - 1.0) < 1e-5); // dir should be normalized
+    vec3d dir_norm = dir;
+    dir_norm.normalize();
 
     // compute ray plane intersection
     // https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld017.htm
     //
     Plane  plane(V0, V1, V2);
-    double den = dir.dot(plane.n);
-    if (fabs(den) == 0) return false;
-    double t = -(P.dot(plane.n) - plane.d) / den;
-    inters   = P + t * dir;
+    double den = dir_norm.dot(plane.n);
+    if (den == 0) return false;
+    double t = -(P.dot(plane.n)-plane.d)/den;
+    t = std::max(t, -1e-15); // avoid roundoff issues...
+    inters   = P + t * dir_norm;
     assert(fabs(plane[inters]) < 1e-5);
 
     // check whether intersection is inside triangle

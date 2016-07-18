@@ -327,12 +327,18 @@ int IntegralCurve<Tetmesh>::find_exit_gate(const CurveSample & curr_sample,
             m_ptr->tet_vertex(curr_sample.elem_id, TET_FACES[facet][2])
         };
 
+        std::cout.precision(20);
+        std::cout << "ray:\n" << curr_sample.pos << "\n" << target_dir << std::endl;
+        std::cout << "tri:\n" << f[0] << "\n" << f[1] << "\n" << f[2] << "\n" << std::endl;
+
         vec3d inters;
         bool b = intersection::ray_triangle_intersection(curr_sample.pos, target_dir, f[0], f[1], f[2], inters);
 
+        std::cout << b << "\n" << inters << std::endl << std::endl;
+
         if (b)
         {
-            std::cout << curr_sample.elem_id << " intersection found!" << inters << "\t" << curr_sample.pos << std::endl;
+            //std::cout << curr_sample.elem_id << " intersection found!" << inters << "\t" << curr_sample.pos << std::endl;
             if ((inters - curr_sample.pos).length() >= (exit_pos - curr_sample.pos).length())
             {
                 exit_pos   = inters;
@@ -401,21 +407,38 @@ IntegralCurve<Tetmesh>::CurveSample IntegralCurve<Tetmesh>::traverse_element(con
 
         int best = (*sorted_by_angle.begin()).second;
         next_sample.vert_id = m_ptr->tet_vertex_id(curr_sample.elem_id, TET_FACES[next_sample.gate_id][best]);
-        next_sample.pos     = m_ptr->vertex(next_sample.vert_id);
+        next_sample.pos     = tri[best];
         next_sample.gate_id = -1;
-        next_sample.elem_id = -1;
+        //next_sample.elem_id = -1;
 
         int new_next_elem = -1;
         for(int tid : m_ptr->adj_vtx2tet(next_sample.vert_id))
         {
             if (tid != next_sample.elem_id && tid != curr_sample.elem_id)
             {
-                new_next_elem = tid;
+                std::cout << "TID: " << tid << std::endl;
+                vec3d exit_pos;
+                CurveSample sample;
+                sample.elem_id = tid;
+                sample.pos = tri[best];
+                vec3d dir = grad_ptr->vec_at(tid);
+                dir.normalize();
+                /*
+                 * ci siamo quasi ma occhio a ray_intersection che si perde intersezioni se parti
+                 * da uno dei vetici del tet! succede quando gate=-1 .... verifica perchè
+                */
+                int gate = find_exit_gate(sample, dir, exit_pos);
+                if (gate != -1)
+                {
+                    new_next_elem = tid;
+                }
             }
         }
-        //assert(new_next_elem!=-1);
+        assert(new_next_elem!=-1);
 
         next_sample.elem_id = new_next_elem;
+
+        assert(m_ptr->tet_contains_vertex(next_sample.elem_id, next_sample.vert_id));
     }
 
     std::cout << "check if gradient skins into...done\n" << std::endl;
