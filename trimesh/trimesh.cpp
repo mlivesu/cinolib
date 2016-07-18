@@ -152,12 +152,22 @@ void Trimesh::update_adjacency()
             tri2edg[tid].push_back(eid);
             edg2tri[eid].push_back(tid);
         }
-        if (tids.size() == 2)
+
+        if (tids.size() >= 2)
         {
-            tri2tri[tids[0]].push_back(tids[1]);
-            tri2tri[tids[1]].push_back(tids[0]);
-            assert(tri2tri[tids[0]].size() <= 3);
-            assert(tri2tri[tids[1]].size() <= 3);
+            for (int i=0; i < tids.size() -1; i++)
+            {
+                tri2tri[tids[i]].push_back(tids[i+1]);
+                tri2tri[tids[i+1]].push_back(tids[i]);
+        //    assert(tri2tri[tids[0]].size() <= 3);
+        //    assert(tri2tri[tids[1]].size() <= 3);
+            }
+
+            if (tids.size() > 2)
+            {
+                tri2tri[tids[0]].push_back(tids[tids.size()-1]);
+                tri2tri[tids[tids.size()-1]].push_back(tids[0]);
+            }
         }
     }
 
@@ -400,6 +410,9 @@ int Trimesh::edge_opposite_to(const int tid, const int vid) const
         int eid = edges[i];
         if (edge_vertex_id(eid, 0) != vid && edge_vertex_id(eid, 1) != vid) return eid;
     }
+
+    logger << " Triangle: " << tid << " [ " << tris.at(tid*3+0) << " " << tris.at(tid*3+1) << " " << tris.at(tid*3+2) << " ] " <<std::endl;
+
     assert(false);
 }
 
@@ -904,31 +917,103 @@ ipair Trimesh::shared_edge(const int tid0, const int tid1) const
 CINO_INLINE
 bool Trimesh::edge_collapse(const int eid)
 {
+
     // define what to keep and what to remove
     //
     uint vid_keep   = edge_vertex_id(eid, 0);
     uint vid_remove = edge_vertex_id(eid, 1);
+
     std::set<int> tid_remove(adj_edg2tri(eid).begin(), adj_edg2tri(eid).end());
+
     std::set<int> edg_keep, edg_remove;
+
     for(int tid: tid_remove)
     {
-        edg_keep.insert(edge_opposite_to(tid, vid_remove));
-        edg_remove.insert(edge_opposite_to(tid, vid_keep));
+        int keep = edge_opposite_to(tid, vid_remove);
+        int rem = edge_opposite_to(tid, vid_keep);
+
+        edg_keep.insert(keep);
+        edg_remove.insert(rem);
     }
     edg_remove.insert(eid);
 
-    // Migrate references from vid_remove to vid_keep
+    // Pre-processing : check edges
     //
-    for(uint vid : adj_vtx2vtx(vid_remove))
+    for(int eid : adj_vtx2edg(vid_remove))
     {
-        if (vid == vid_keep) continue;
-        if (!vertices_are_adjacent(vid_keep,vid))
+        if (CONTAINS(edg_remove, eid)) continue;
+
+        int vid0 = edges.at(eid*2+0);
+        int vid1 = edges.at(eid*2+1);
+
+        int vid0_mod = vid0;
+        int vid1_mod = vid1;
+
+        if (vid0 == vid_remove) vid0_mod = vid_keep; else
+        if (vid1 == vid_remove) vid1_mod = vid_keep; else
+        assert("Something is off here" && false);
+
+        // check edge
+
+        for (int i=0; i < num_edges(); i++)
         {
-            vtx2vtx.at(vid_keep).push_back(vid);
-            vtx2vtx.at(vid).push_back(vid_keep);
+            if (i == eid) continue;
+
+            if ((vid0_mod == vid0 && vid1_mod  == vid1) || (vid0_mod == vid1 && vid1_mod == vid0))
+            {
+                logger << "WARNING : duplicared edge " << eid << " : Impossible to perform edge collapse. " << std::endl;
+
+                //logger << " NEW EDGE: " << eid << " -- " << copy_edges.at(eid*2+0) << " " << copy_edges.at(eid*2+1) << std::endl;
+                //logger << " ORIGINAL EDGE: " << i << " -- " << copy_edges.at(i*2+0) << " " << copy_edges.at(i*2+1) << std::endl;
+
+                return false;
+            }
         }
     }
+
+    // Pre-processing : check triangles
     //
+    for(int tid : adj_vtx2tri(vid_remove))
+    {
+        if (CONTAINS(tid_remove, tid)) continue;
+
+        //copy_vtx2tri.at(vid_keep).push_back(tid);
+        vec3d n_old = triangle_normal(tid);
+
+        int vid0 = triangle_vertex_id(tid, 0);
+        int vid1 = triangle_vertex_id(tid, 1);
+        int vid2 = triangle_vertex_id(tid, 2);
+
+        if (vid0 == vid_remove) vid0 = vid_keep; else
+        if (vid1 == vid_remove) vid1 = vid_keep; else
+        if (vid2 == vid_remove) vid2 = vid_keep; else
+        assert("Something is off here" && false);
+
+        // check triangle flip
+        vec3d v0 = vertex(vid0);
+        vec3d v1 = vertex(vid1);
+        vec3d v2 = vertex(vid2);
+
+        vec3d u = v1 - v0;    u.normalize();
+        vec3d v = v2 - v0;    v.normalize();
+        vec3d n = u.cross(v); n.normalize();
+
+        if (n.x() == 0 && n.y() == 0 && n.z() == 0)     // triangle area == 0
+        {
+            logger << "WARNING : triangle on collinear points " << tid << " : Impossible to perform edge collapse. " << std::endl;
+            return false;
+        }
+
+        if (n.dot(n_old) < 0 )       // triangle inversion
+        {
+            logger << "WARNING : triangle inversion " << tid << " : Impossible to perform edge collapse. " << std::endl;
+            return false;
+        }
+    }
+
+    // Everything is ok
+    // The edge can be collapsed
+
     for(int eid : adj_vtx2edg(vid_remove))
     {
         if (CONTAINS(edg_remove, eid)) continue;
@@ -948,6 +1033,7 @@ bool Trimesh::edge_collapse(const int eid)
         assert("Something is off here" && false);
     }
 
+
     // Migrate references from edge_remove to edge_keep
     //
     for(int tid : tid_remove)
@@ -959,6 +1045,15 @@ bool Trimesh::edge_collapse(const int eid)
         for(int inc_tri : adj_edg2tri(e_give))
         {
             if (CONTAINS(tid_remove, inc_tri)) continue;
+
+            for (int adj_tri : adj_edg2tri(e_take))
+            {
+                if (CONTAINS (tid_remove, adj_tri)) continue;
+
+                tri2tri.at(inc_tri).push_back(adj_tri);
+                tri2tri.at(adj_tri).push_back(inc_tri);
+            }
+
             edg2tri.at(e_take).push_back(inc_tri);
             tri2edg.at(inc_tri).push_back(e_take);
         }
@@ -970,9 +1065,17 @@ bool Trimesh::edge_collapse(const int eid)
     {
         assert(uint(vid)!=vid_remove);
         assert(vid>= 0   && vid< num_vertices());
+
         auto beg = vtx2vtx.at(vid).begin();
         auto end = vtx2vtx.at(vid).end();
         vtx2vtx.at(vid).erase(std::remove(beg, end, vid_remove), end); // Erase-Remove idiom
+
+        if (vid == vid_keep) continue;
+        if (!vertices_are_adjacent(vid_keep,vid))
+        {
+            vtx2vtx.at(vid_keep).push_back(vid);
+            vtx2vtx.at(vid).push_back(vid_keep);
+        }
     }
     //
     // remove references to any edge in edg_remove.
@@ -980,6 +1083,7 @@ bool Trimesh::edge_collapse(const int eid)
     for(int edg_rem : edg_remove)
     {
         assert(edg_rem>=0 && edg_rem< num_edges());
+
         for(int tid : adj_edg2tri(edg_rem))
         {
             assert(tid>= 0 && tid<num_triangles());
@@ -1024,37 +1128,48 @@ bool Trimesh::edge_collapse(const int eid)
         }
     }
 
+
     // clear
     vtx2vtx.at(vid_remove).clear();
     vtx2edg.at(vid_remove).clear();
     vtx2tri.at(vid_remove).clear();
+
     for(int eid : edg_remove)
     {
         edg2tri.at(eid).clear();
-        edges.at(eid*2+0) = 0;
-        edges.at(eid*2+1) = 0;
+        edges.at(eid*2+0) = INT_MAX;
+        edges.at(eid*2+1) = INT_MAX;
     }
+
     for(int tid : tid_remove)
     {
         tri2edg.at(tid).clear();
         tri2tri.at(tid).clear();
-        tris.at(tid*3+0) = 0;
-        tris.at(tid*3+1) = 0;
-        tris.at(tid*3+2) = 0;
+        tris.at(tid*3+0) = INT_MAX;
+        tris.at(tid*3+1) = INT_MAX;
+        tris.at(tid*3+2) = INT_MAX;
     }
+
+    // Finalize
 
     // clean vectors...
     remove_unreferenced_vertex(vid_remove);
+
     std::vector<int> edg_remove_vec(edg_remove.begin(), edg_remove.end());
     std::sort(edg_remove_vec.begin(), edg_remove_vec.end());
     std::reverse(edg_remove_vec.begin(), edg_remove_vec.end());
     for(int eid : edg_remove_vec) remove_unreferenced_edge(eid);
+
     std::vector<int> tid_remove_vec(tid_remove.begin(), tid_remove.end());
     std::sort(tid_remove_vec.begin(), tid_remove_vec.end());
     std::reverse(tid_remove_vec.begin(), tid_remove_vec.end());
     for(int tid : tid_remove_vec) remove_unreferenced_triangle(tid);
 
     //check_topology();
+
+    update_normals();
+
+    logger << " Completed!" << std::endl;
 
     return true;
 }
@@ -1129,6 +1244,7 @@ CINO_INLINE
 void Trimesh::remove_unreferenced_vertex(const int vid)
 {
     vertex_switch_id(vid, num_vertices()-1);
+
     coords.resize(coords.size()-3);
     v_norm.resize(v_norm.size()-3);
     u_text.resize(u_text.size()-1);
@@ -1398,7 +1514,16 @@ void Trimesh::triangle_switch_id(const int tid0, const int tid1)
 CINO_INLINE
 void Trimesh::remove_unreferenced_triangle(const int tid)
 {
+    int v1 = tris.at(tid*3+0);
+    int v2 = tris.at(tid*3+1);
+    int v3 = tris.at(tid*3+2);
+
     triangle_switch_id(tid, num_triangles()-1);
+
+    assert (tris.at((num_triangles()-1)*3+0) == v1);
+    assert (tris.at((num_triangles()-1)*3+1) == v2);
+    assert (tris.at((num_triangles()-1)*3+2) == v3);
+
     tris.resize(tris.size()-3);
     t_norm.resize(t_norm.size()-3);
     t_label.resize(t_label.size()-1);
