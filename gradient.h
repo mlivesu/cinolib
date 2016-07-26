@@ -27,8 +27,8 @@
 #include "cinolib.h"
 #include "scalar_field.h"
 #include "vector_field.h"
-#include "trimesh/trimesh.h"
-#include "tetmesh/tetmesh.h"
+#include "meshes/trimesh/trimesh.h"
+#include "meshes/tetmesh/tetmesh.h"
 #include <eigen3/Eigen/Sparse>
 
 namespace cinolib

@@ -25,7 +25,7 @@
 #define SPHERE_COVERAGE_H
 
 #include "cinolib.h"
-#include "vec3.h"
+#include "geometry/vec3.h"
 
 #include <vector>
 

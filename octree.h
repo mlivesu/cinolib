@@ -24,7 +24,7 @@
 #ifndef OCTREE_H
 #define OCTREE_H
 
-#include "vec3.h"
+#include "geometry/vec3.h"
 #include <set>
 #include <vector>
 

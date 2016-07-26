@@ -21,44 +21,29 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_ISOCONTOUR_H
-#define DRAWABLE_ISOCONTOUR_H
+#ifndef MARCHING_TETS_H
+#define MARCHING_TETS_H
 
-#include "cinolib.h"
-#include "drawable_object.h"
-#include "meshes/trimesh/trimesh.h"
-#include "isocontour.h"
+#include "../../cinolib.h"
+#include "tetmesh.h"
 
 namespace cinolib
 {
 
-class DrawableIsocontour : public Isocontour, public DrawableObject
-{
-    public:
 
-        DrawableIsocontour();
-        DrawableIsocontour(Trimesh & m_ptr, float iso_value);
-
-        // Implement DrawableObject interface
-        //
-        void  draw()         const;
-        vec3d scene_center() const { return vec3d(); }
-        float scene_radius() const { return 0.0;     }
-
-    private:
-
-        float sample_rad;
-        float cylind_rad;
-
-        float sample_rgb[3];
-        float centre_rgb[3];
-        float cylind_rgb[3];
-};
+CINO_INLINE
+void marching_tets(const Tetmesh       & m,
+                   const double          isovalue,
+                   std::vector<double> & coords,
+                   std::vector<u_int>  & tris,
+                   std::vector<double> & norm);
 
 }
 
+
 #ifndef  CINO_STATIC_LIB
-#include "drawable_isocontour.cpp"
+#include "marching_tets.cpp"
 #endif
 
-#endif // DRAWABLE_ISOCONTOUR_H
+
+#endif // MARCHING_TETS_H

@@ -21,44 +21,49 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_ISOCONTOUR_H
-#define DRAWABLE_ISOCONTOUR_H
+#ifndef PLANE_H
+#define PLANE_H
 
-#include "cinolib.h"
-#include "drawable_object.h"
-#include "meshes/trimesh/trimesh.h"
-#include "isocontour.h"
+#include "../cinolib.h"
+#include "vec3.h"
+
+#include <ostream>
 
 namespace cinolib
 {
 
-class DrawableIsocontour : public Isocontour, public DrawableObject
+// represents a plane with equation : a*x + b*y + c*z = d
+//
+class Plane
 {
     public:
 
-        DrawableIsocontour();
-        DrawableIsocontour(Trimesh & m_ptr, float iso_value);
+        vec3d  n; // plane normal (i.e. a,b,c, coefficients of the plane equation)
+        double d; // d coefficient of the plane equation
+        vec3d  p; // any point on the plane (useful for point_plane_dist)
 
-        // Implement DrawableObject interface
-        //
-        void  draw()         const;
-        vec3d scene_center() const { return vec3d(); }
-        float scene_radius() const { return 0.0;     }
+        Plane(const vec3d & p0,
+              const vec3d & p1,
+              const vec3d & p2);
 
-    private:
+        Plane(const vec3d & point,
+              const vec3d & normal);
 
-        float sample_rad;
-        float cylind_rad;
+        void set_plane(const vec3d & point,
+                       const vec3d & normal);
 
-        float sample_rgb[3];
-        float centre_rgb[3];
-        float cylind_rgb[3];
+        double operator[](const vec3d & p) const;
+
+        double point_plane_dist(const vec3d & p) const;
 };
+
+CINO_INLINE
+std::ostream & operator<<(std::ostream & in, const Plane & plane);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "drawable_isocontour.cpp"
+#include "plane.cpp"
 #endif
 
-#endif // DRAWABLE_ISOCONTOUR_H
+#endif // PLANE_H

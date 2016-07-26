@@ -21,44 +21,59 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_ISOCONTOUR_H
-#define DRAWABLE_ISOCONTOUR_H
+#include "tetrahedron.h"
+#include "../geometry/vec3.h"
+#include "../geometry/segment.h"
 
-#include "cinolib.h"
-#include "drawable_object.h"
-#include "meshes/trimesh/trimesh.h"
-#include "isocontour.h"
+#include <set>
 
 namespace cinolib
 {
 
-class DrawableIsocontour : public Isocontour, public DrawableObject
+CINO_INLINE
+void tet_closest_vertex(const vec3d  & A,
+                        const vec3d  & B,
+                        const vec3d  & C,
+                        const vec3d  & D,
+                        const vec3d  & query,
+                              int    & id,
+                              double & dist)
 {
-    public:
+    vec3d tet[4] = { A, B, C, D };
 
-        DrawableIsocontour();
-        DrawableIsocontour(Trimesh & m_ptr, float iso_value);
+    std::set< std::pair<double,int> > sorted_verts;
+    for(int i=0; i<4; ++i)
+    {
+        sorted_verts.insert(std::make_pair(tet[i].dist(query),i));
+    }
 
-        // Implement DrawableObject interface
-        //
-        void  draw()         const;
-        vec3d scene_center() const { return vec3d(); }
-        float scene_radius() const { return 0.0;     }
+    dist = (*sorted_verts.begin()).first;
+    id   = (*sorted_verts.begin()).second;
+}
 
-    private:
 
-        float sample_rad;
-        float cylind_rad;
+CINO_INLINE
+void tet_closest_edge(const vec3d  & A,
+                      const vec3d  & B,
+                      const vec3d  & C,
+                      const vec3d  & D,
+                      const vec3d  & query,
+                            int    & id,
+                            double & dist)
+{
+    vec3d tet[4] = { A, B, C, D };
 
-        float sample_rgb[3];
-        float centre_rgb[3];
-        float cylind_rgb[3];
-};
+    std::set< std::pair<double,int> > sorted_segs;
+    for(int i=0; i<6; ++i)
+    {
+        Segment s(tet[TET_EDGES[i][0]], tet[TET_EDGES[i][1]]);
+        sorted_segs.insert(std::make_pair(s.dist_to_point(query),i));
+    }
+
+    dist = (*sorted_segs.begin()).first;
+    id   = (*sorted_segs.begin()).second;
+}
+
 
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "drawable_isocontour.cpp"
-#endif
-
-#endif // DRAWABLE_ISOCONTOUR_H

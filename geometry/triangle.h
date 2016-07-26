@@ -21,44 +21,52 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_ISOCONTOUR_H
-#define DRAWABLE_ISOCONTOUR_H
+#ifndef TRIANGLE_H
+#define TRIANGLE_H
 
-#include "cinolib.h"
-#include "drawable_object.h"
-#include "meshes/trimesh/trimesh.h"
-#include "isocontour.h"
+#include "../cinolib.h"
+#include "../geometry/vec3.h"
+
+#include <set>
 
 namespace cinolib
 {
 
-class DrawableIsocontour : public Isocontour, public DrawableObject
+static const int TRI_EDGES[3][2] =
 {
-    public:
-
-        DrawableIsocontour();
-        DrawableIsocontour(Trimesh & m_ptr, float iso_value);
-
-        // Implement DrawableObject interface
-        //
-        void  draw()         const;
-        vec3d scene_center() const { return vec3d(); }
-        float scene_radius() const { return 0.0;     }
-
-    private:
-
-        float sample_rad;
-        float cylind_rad;
-
-        float sample_rgb[3];
-        float centre_rgb[3];
-        float cylind_rgb[3];
+    { 0, 1 }, // 0
+    { 1, 2 }, // 1
+    { 2, 0 }, // 2
 };
+
+
+CINO_INLINE
+vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C);
+
+
+
+// Given a triangle t(A,B,C) and a ray r(P,dir) compute both
+// the edge and position where r exits from t
+//
+// NOTE: r is assumed to live "within" t, like in a gradient field for example...
+//
+CINO_INLINE
+void triangle_traverse_with_ray(const vec3d   tri[3],
+                                const vec3d   P,
+                                const vec3d   dir,
+                                      vec3d & exit_pos,
+                                      int   & exit_edge);
+
+
+// https://en.wikipedia.org/wiki/Law_of_sines
+//
+CINO_INLINE
+double triangle_law_of_sines(const double angle_0, const double angle_1, const double length_0); // returns length_1
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "drawable_isocontour.cpp"
+#include "triangle.cpp"
 #endif
 
-#endif // DRAWABLE_ISOCONTOUR_H
+#endif // TRIANGLE_H

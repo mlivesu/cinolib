@@ -21,44 +21,38 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_ISOCONTOUR_H
-#define DRAWABLE_ISOCONTOUR_H
+#ifndef DRAWABLE_ISOSURFACE_H
+#define DRAWABLE_ISOSURFACE_H
 
-#include "cinolib.h"
-#include "drawable_object.h"
-#include "meshes/trimesh/trimesh.h"
-#include "isocontour.h"
+#ifdef __APPLE__
+#include <gl.h>
+#else
+#include <GL/gl.h>
+#endif
+
+#include "../../cinolib.h"
+#include "../../drawable_object.h"
+#include "isosurface.h"
 
 namespace cinolib
 {
 
-class DrawableIsocontour : public Isocontour, public DrawableObject
+class DrawableIsosurface : public Isosurface, public DrawableObject
 {
     public:
 
-        DrawableIsocontour();
-        DrawableIsocontour(Trimesh & m_ptr, float iso_value);
+        DrawableIsosurface();
+        DrawableIsosurface(const Tetmesh & m, const float iso_value);
 
-        // Implement DrawableObject interface
-        //
-        void  draw()         const;
-        vec3d scene_center() const { return vec3d(); }
-        float scene_radius() const { return 0.0;     }
-
-    private:
-
-        float sample_rad;
-        float cylind_rad;
-
-        float sample_rgb[3];
-        float centre_rgb[3];
-        float cylind_rgb[3];
+        void   draw() const;
+        vec3d scene_center() const;
+        float scene_radius() const;
 };
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "drawable_isocontour.cpp"
+#include "drawable_isosurface.cpp"
 #endif
 
-#endif // DRAWABLE_ISOCONTOUR_H
+#endif // DRAWABLE_ISOSURFACE_H

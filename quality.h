@@ -25,7 +25,7 @@
 #define QUALITY
 
 #include "cinolib.h"
-#include "vec3.h"
+#include "geometry/vec3.h"
 #include <float.h>
 
 

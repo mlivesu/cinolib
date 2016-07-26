@@ -1,4 +1,4 @@
-_ metti calcolo normali e altri utilities dentro trimesh/triangle.h
+- aggiungi classe RAY per gestire raggi e classe line per gestire linee
 - aggiungi show triangle IDs and vertex IDs!!!!! (stile remesher panozzo/tarini)
 - aggiungi due spinboxes per controllare gli estremi degli isovalori per il generatore delle isosuperfici
 - aggiungi controlli sulla mesh delle isosuperfici (colore, wireframe, ecc)
@@ -13,7 +13,6 @@ Geometric Robustness di Jonathan Richard Shewchuk)
 - IMPORTANTE: riscrivi creazione matrice quadrata con BCs, è lenta da paura!
 - aggiungi normalizzazione per il cotan laplacian, after
 https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html
-- passa a C++11 ovunque non lo hai ancora fatto
 - passa agli iteratori al posto di restituire vettori con le adiacenze
 - add shaders
 - improve on mesh rendering (use VBOs, add different rendering modalities…)

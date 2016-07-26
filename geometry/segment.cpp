@@ -21,44 +21,50 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_ISOCONTOUR_H
-#define DRAWABLE_ISOCONTOUR_H
-
-#include "cinolib.h"
-#include "drawable_object.h"
-#include "meshes/trimesh/trimesh.h"
-#include "isocontour.h"
+#include "segment.h"
 
 namespace cinolib
 {
 
-class DrawableIsocontour : public Isocontour, public DrawableObject
+CINO_INLINE
+std::ostream & operator<<(std::ostream & in, const Segment & s)
 {
-    public:
-
-        DrawableIsocontour();
-        DrawableIsocontour(Trimesh & m_ptr, float iso_value);
-
-        // Implement DrawableObject interface
-        //
-        void  draw()         const;
-        vec3d scene_center() const { return vec3d(); }
-        float scene_radius() const { return 0.0;     }
-
-    private:
-
-        float sample_rad;
-        float cylind_rad;
-
-        float sample_rgb[3];
-        float centre_rgb[3];
-        float cylind_rgb[3];
-};
-
+    in << s.first << "\t" << s.second << "\n";
+    return in;
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "drawable_isocontour.cpp"
-#endif
 
-#endif // DRAWABLE_ISOCONTOUR_H
+CINO_INLINE
+Segment::Segment(const vec3d & P0, const vec3d & P1)
+{
+    first  = P0;
+    second = P1;
+}
+
+
+CINO_INLINE
+double Segment::operator[](const vec3d & p) const
+{
+    return dist_to_point(p);
+}
+
+
+CINO_INLINE
+double Segment::dist_to_point(const vec3d & p) const
+{
+    vec3d v = second - first;
+    vec3d w = p  - first;
+
+    float cos_wv = w.dot(v);
+    float cos_vv = v.dot(v);
+
+    if (cos_wv <= 0.0)    return (p-first).length();
+    if (cos_vv <= cos_wv) return (p-second).length();
+
+    float b  = cos_wv / cos_vv;
+    vec3d Pb = first + v*b;
+    return (p-Pb).length();
+}
+
+
+}

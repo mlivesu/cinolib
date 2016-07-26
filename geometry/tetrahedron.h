@@ -21,44 +21,56 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_ISOCONTOUR_H
-#define DRAWABLE_ISOCONTOUR_H
+#ifndef TETRAHEDRON_H
+#define TETRAHEDRON_H
 
-#include "cinolib.h"
-#include "drawable_object.h"
-#include "meshes/trimesh/trimesh.h"
-#include "isocontour.h"
+#include "../cinolib.h"
+#include "../geometry/vec3.h"
 
 namespace cinolib
 {
 
-class DrawableIsocontour : public Isocontour, public DrawableObject
+static int TET_FACES[4][3] =
 {
-    public:
-
-        DrawableIsocontour();
-        DrawableIsocontour(Trimesh & m_ptr, float iso_value);
-
-        // Implement DrawableObject interface
-        //
-        void  draw()         const;
-        vec3d scene_center() const { return vec3d(); }
-        float scene_radius() const { return 0.0;     }
-
-    private:
-
-        float sample_rad;
-        float cylind_rad;
-
-        float sample_rgb[3];
-        float centre_rgb[3];
-        float cylind_rgb[3];
+    { 0, 2, 1 } ,
+    { 0, 1, 3 } ,
+    { 0, 3, 2 } ,
+    { 1, 2, 3 }
 };
 
+static int TET_EDGES[6][2] =
+{
+    { 0, 2 }, // 0
+    { 2, 1 }, // 1
+    { 1, 0 }, // 2
+    { 1, 3 }, // 3
+    { 3, 0 }, // 4
+    { 3, 2 }  // 5
+};
+
+
+CINO_INLINE
+void tet_closest_vertex(const vec3d  & A,
+                        const vec3d  & B,
+                        const vec3d  & C,
+                        const vec3d  & D,
+                        const vec3d  & query,
+                              int    & id,
+                              double & dist);
+
+
+CINO_INLINE
+void tet_closest_edge(const vec3d  & A,
+                      const vec3d  & B,
+                      const vec3d  & C,
+                      const vec3d  & D,
+                      const vec3d  & query,
+                            int    & id,
+                            double & dist);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "drawable_isocontour.cpp"
+#include "tetrahedron.cpp"
 #endif
 
-#endif // DRAWABLE_ISOCONTOUR_H
+#endif // TETRAHEDRON_H

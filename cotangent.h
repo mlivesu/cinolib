@@ -25,8 +25,8 @@
 #define COTANGENT_H
 
 #include "cinolib.h"
-#include "trimesh/trimesh.h"
-#include "tetmesh/tetmesh.h"
+#include "meshes/trimesh/trimesh.h"
+#include "meshes/tetmesh/tetmesh.h"
 
 
 namespace cinolib

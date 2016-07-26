@@ -25,9 +25,9 @@
 #define INTERSECTION_H
 
 #include "cinolib.h"
-#include "vec2.h"
-#include "vec3.h"
-#include "plane.h"
+#include "geometry/vec2.h"
+#include "geometry/vec3.h"
+#include "geometry/plane.h"
 
 namespace cinolib
 {

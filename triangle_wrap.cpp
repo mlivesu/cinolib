@@ -22,7 +22,7 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include "triangle_wrap.h"
-#include "vec3.h"
+#include "geometry/vec3.h"
 #include "timer.h"
 
 #ifdef CINOLIB_USES_TRIANGLE
