@@ -70,33 +70,33 @@ bool line_triangle_intersection(const vec3d   P,
                                 const vec3d   V2,
                                       vec3d & inters)
 {
-    vec3d dir_norm = dir;
-    dir_norm.normalize();
+    // just to avoid numerical imprecision...
+    if ((P-V0).length() == 0) { inters = V0; return true; }
+    if ((P-V1).length() == 0) { inters = V1; return true; }
+    if ((P-V2).length() == 0) { inters = V2; return true; }
 
     // compute ray plane intersection
     // https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld017.htm
     //
-    Plane  plane(V0, V1, V2);
-    double den = dir_norm.dot(plane.n);
-    if (den == 0) return false;
-    double t = -(P.dot(plane.n)-plane.d)/den;
-    t = std::max(t, -1e-15); // avoid roundoff issues...
-    inters   = P + t * dir_norm;
-    assert(fabs(plane[inters]) < 1e-5);
+    Plane tri_supp_plane(V0, V1, V2);
+    double den = dir.dot(tri_supp_plane.n);
+    if (fabs(den) < 1e-5) return false;
+    double t = -(P.dot(tri_supp_plane.n)-tri_supp_plane.d)/den;
+    inters   = P + t * dir;
+    assert(tri_supp_plane.point_plane_dist(inters) < 1e-7);
 
     // check whether intersection is inside triangle
+    // (agnostic of the vertices winding order)
     //
-    vec3d V[3]     = { V0, V1, V2 };
-    vec3d centroid = (V0 + V1 + V2) / 3.0;
+    vec3d tri_centr = (V0 + V1 + V2) / 3.0;
+    vec3d V[3] = { V0, V1, V2 };
     for(int i=0; i<3; ++i)
     {
-        vec3d n = V[(i+1)%3] - V[i];
-        n = n.cross(plane.n);
-        n.normalize();
+        vec3d e = V[(i+1)%3] - V[i];
+        vec3d n = e.cross(tri_supp_plane.n);
         Plane test(V[i], n);
-        if (test[centroid] * test[inters] < 0) return false;
+        if (test[tri_centr] * test[inters] < 0) return false;
     }
-
     return true;
 }
 
