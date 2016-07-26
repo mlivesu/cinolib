@@ -1037,8 +1037,9 @@ bool Trimesh::edge_collapse(const int eid)
         if (tris.at(tid*3+1) == vid_remove) tris.at(tid*3+1) = vid_keep; else
         if (tris.at(tid*3+2) == vid_remove) tris.at(tid*3+2) = vid_keep; else
         assert("Something is off here" && false);
-    }
 
+        update_t_normal(tid);
+    }
 
     // Migrate references from edge_remove to edge_keep
     //
@@ -1117,6 +1118,8 @@ bool Trimesh::edge_collapse(const int eid)
             auto beg = vtx2tri.at(vid).begin();
             auto end = vtx2tri.at(vid).end();
             vtx2tri.at(vid).erase(std::remove(beg, end, tid_rem), end); // Erase-Remove idiom
+
+            update_v_normal(vid);
         }
 
         for(int eid : adj_tri2edg(tid_rem))
@@ -1172,8 +1175,6 @@ bool Trimesh::edge_collapse(const int eid)
     for(int tid : tid_remove_vec) remove_unreferenced_triangle(tid);
 
     update_normals();
-
-    logger << " Completed!" << std::endl;
 
     return true;
 }
