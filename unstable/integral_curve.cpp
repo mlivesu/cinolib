@@ -22,16 +22,16 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include "integral_curve.h"
-#include "gl/draw_cylinder.h"
-#include "gl/draw_arrow.h"
-#include "gl/draw_sphere.h"
-#include "colors.h"
+#include "../gl/draw_cylinder.h"
+#include "../gl/draw_arrow.h"
+#include "../gl/draw_sphere.h"
+#include "../colors.h"
 #include "intersection.h"
-#include "meshes/trimesh/drawable_trimesh.h"
-#include "meshes/tetmesh/drawable_tetmesh.h"
-#include "geometry/triangle.h"
-#include "geometry/segment.h"
-#include "geometry/tetrahedron.h"
+#include "../meshes/trimesh/drawable_trimesh.h"
+#include "../meshes/tetmesh/drawable_tetmesh.h"
+#include "../geometry/triangle.h"
+#include "../geometry/segment.h"
+#include "../geometry/tetrahedron.h"
 
 namespace cinolib
 {
