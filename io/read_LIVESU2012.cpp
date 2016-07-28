@@ -23,6 +23,8 @@
 ****************************************************************************/
 #include "read_LIVESU2012.h"
 
+#include <map>
+#include <set>
 
 namespace cinolib
 {
