@@ -21,46 +21,21 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef QUALITY
-#define QUALITY
-
-#include "cinolib.h"
-#include "geometry/vec3.h"
-#include <float.h>
-
-
-/*
- * Scaled Jacobian and Volume computations are all based on:
- *
- * The Verdict Geometric Quality Library
- * SANDIA Report SAND2007-1751
- *
-*/
-
+#ifndef SERIALIZABLE_H
+#define SERIALIZABLE_H
 
 namespace cinolib
 {
 
-CINO_INLINE
-double tet_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3);
+// serializable interface (each serializable class MUST implement it)
+//
+class Serializable
+{
+    public :
+    virtual void serialize  (const char *filename) const = 0;
+    virtual void deserialize(const char *filename)       = 0;
+};
 
-
-CINO_INLINE
-double tet_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3);
-
-
-CINO_INLINE
-double hex_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
-                           const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
-
-CINO_INLINE
-double hex_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
-                           const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
 }
 
-
-#ifndef  CINO_STATIC_LIB
-#include "quality.cpp"
-#endif
-
-#endif // QUALITY
+#endif // SERIALIZABLE_H
