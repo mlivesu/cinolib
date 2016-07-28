@@ -36,8 +36,8 @@ CINO_INLINE void scattered_color(int n_colors, int pos, float * rgb)
 {
     float fpos  = float(pos)/float(n_colors - 1) * 255.0;
     float alpha = fpos - floor(fpos);
-    int   prev  = (int)floor(fpos);
-    int   next  = std::min(prev + 1, 255); // just to avoid "index out of bounds" errors...
+    int   prev  = std::max((int)floor(fpos),0); // just to avoid "index out of bounds" errors...
+    int   next  = std::min(prev + 1, 255);      // just to avoid "index out of bounds" errors...
 
     int r = (1.0 - alpha) * quality_ramp_texture1D[prev*3 + 0] + alpha * quality_ramp_texture1D[next*3 + 0];
     int g = (1.0 - alpha) * quality_ramp_texture1D[prev*3 + 1] + alpha * quality_ramp_texture1D[next*3 + 1];
