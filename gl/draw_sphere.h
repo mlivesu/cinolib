@@ -24,7 +24,7 @@
 #ifndef DRAW_SPHERE_H
 #define DRAW_SPHERE_H
 
-#include "../cinolib.h"
+#include <cinolib/cinolib.h>
 
 #ifdef __APPLE__
 #include <gl.h>

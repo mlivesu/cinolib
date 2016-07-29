@@ -24,7 +24,7 @@
 #ifndef OCTREE_H
 #define OCTREE_H
 
-#include "geometry/vec3.h"
+#include <cinolib/geometry/vec3.h>
 #include <set>
 #include <vector>
 

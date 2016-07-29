@@ -21,8 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "sampling.h"
-
+#include <cinolib/meshes/skel/sampling.h>
 #include <set>
 
 namespace cinolib

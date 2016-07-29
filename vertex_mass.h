@@ -24,7 +24,7 @@
 #ifndef VERTEX_MASS_H
 #define VERTEX_MASS_H
 
-#include "cinolib.h"
+#include <cinolib/cinolib.h>
 #include <eigen3/Eigen/Sparse>
 
 namespace cinolib
@@ -37,7 +37,7 @@ Eigen::SparseMatrix<double> mass_matrix(const Mesh & m);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "vertex_mass.cpp"
+#include <cinolib/vertex_mass.h>
 #endif
 
 #endif // VERTEX_MASS_H

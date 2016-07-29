@@ -24,7 +24,7 @@
 #ifndef READ_TET_H
 #define READ_TET_H
 
-#include "../cinolib.h"
+#include <cinolib/cinolib.h>
 
 #include <sys/types.h>
 #include <vector>

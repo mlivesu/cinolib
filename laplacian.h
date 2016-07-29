@@ -24,8 +24,8 @@
 #ifndef LAPLACIAN_TEMPLATED_H
 #define LAPLACIAN_TEMPLATED_H
 
-#include "cinolib.h"
-#include "cotangent.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/cotangent.h>
 #include <eigen3/Eigen/Sparse>
 
 namespace cinolib

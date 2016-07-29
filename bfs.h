@@ -24,8 +24,7 @@
 #ifndef BFS_H
 #define BFS_H
 
-#include "cinolib.h"
-
+#include <cinolib/cinolib.h>
 #include <set>
 
 namespace cinolib

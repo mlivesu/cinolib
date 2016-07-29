@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "write_OBJ.h"
+#include <cinolib/io/write_OBJ.h>
 
 #include <iostream>
 

@@ -24,10 +24,10 @@
 #ifndef HARMONIC_MAP_H
 #define HARMONIC_MAP_H
 
-#include "scalar_field.h"
-#include "laplacian.h"
-#include "linear_solvers.h"
-#include "timer.h"
+#include <cinolib/scalar_field.h>
+#include <cinolib/laplacian.h>
+#include <cinolib/linear_solvers.h>
+#include <cinolib/timer.h>
 #include <eigen3/Eigen/Sparse>
 
 

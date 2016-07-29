@@ -24,10 +24,10 @@
 #ifndef DRAWABLE_ISOCONTOUR_H
 #define DRAWABLE_ISOCONTOUR_H
 
-#include "cinolib.h"
-#include "drawable_object.h"
-#include "meshes/trimesh/trimesh.h"
-#include "isocontour.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/meshes/trimesh/trimesh.h>
+#include <cinolib/isocontour.h>
 
 namespace cinolib
 {

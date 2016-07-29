@@ -24,8 +24,8 @@
 #ifndef POINT_INSIDE_MESH_H
 #define POINT_INSIDE_MESH_H
 
-#include "../cinolib.h"
-#include "../octree.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/octree.h>
 
 namespace cinolib
 {

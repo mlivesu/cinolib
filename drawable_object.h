@@ -24,10 +24,8 @@
 #ifndef DRAWABLE_OBJECT_H
 #define DRAWABLE_OBJECT_H
 
+#include <cinolib/geometry/vec3.h>
 #include <float.h>
-
-#include "geometry/vec3.h"
-
 
 namespace cinolib
 {

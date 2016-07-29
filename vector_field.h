@@ -24,7 +24,7 @@
 #ifndef VECTOR_FIELD_H
 #define VECTOR_FIELD_H
 
-#include "geometry/vec3.h"
+#include <cinolib/geometry/vec3.h>
 #include <eigen3/Eigen/Dense>
 
 namespace cinolib

@@ -24,9 +24,9 @@
 #ifndef INTEGRAL_CURVE_H
 #define INTEGRAL_CURVE_H
 
-#include "../cinolib.h"
-#include "../vector_field.h"
-#include "../drawable_object.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/vector_field.h>
+#include <cinolib/drawable_object.h>
 
 namespace cinolib
 {

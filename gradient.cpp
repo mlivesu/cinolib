@@ -1,5 +1,5 @@
-#include "gradient.h"
-#include "timer.h"
+#include <cinolib/gradient.h>
+#include <cinolib/timer.h>
 
 
 namespace cinolib

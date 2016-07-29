@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "isocontour.h"
+#include <cinolib/isocontour.h>
 
 namespace cinolib
 {

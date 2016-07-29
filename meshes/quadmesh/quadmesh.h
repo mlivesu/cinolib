@@ -24,9 +24,9 @@
 #ifndef QUADMESH_H
 #define QUADMESH_H
 
-#include "../../cinolib.h"
-#include "../../bbox.h"
-#include "../../geometry/vec3.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/bbox.h>
+#include <cinolib/geometry/vec3.h>
 
 #include <assert.h>
 #include <float.h>

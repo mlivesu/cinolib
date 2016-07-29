@@ -24,10 +24,10 @@
 #ifndef INTERSECTION_H
 #define INTERSECTION_H
 
-#include "../cinolib.h"
-#include "../geometry/vec2.h"
-#include "../geometry/vec3.h"
-#include "../geometry/plane.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec2.h>
+#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/plane.h>
 
 namespace cinolib
 {

@@ -24,7 +24,7 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include "cinolib.h"
+#include <cinolib/cinolib.h>
 
 namespace cinolib
 {
@@ -37,7 +37,7 @@ CINO_INLINE void timer_stop (const char * msg);
 
 
 #ifndef  CINO_STATIC_LIB
-#include "timer.cpp"
+#include "cinolib/timer.cpp"
 #endif
 
 #endif // TIMER_H

@@ -24,7 +24,7 @@
 #ifndef WRITE_VTK_H
 #define WRITE_VTK_H
 
-#include "../cinolib.h"
+#include <cinolib/cinolib.h>
 
 #include <sys/types.h>
 #include <vector>

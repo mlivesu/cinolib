@@ -21,9 +21,9 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "tetrahedron.h"
-#include "../geometry/vec3.h"
-#include "../geometry/segment.h"
+#include <cinolib/geometry/tetrahedron.h>
+#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/segment.h>
 
 #include <set>
 

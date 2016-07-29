@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "quality.h"
+#include <cinolib/quality.h>
 
 /*
  * Scaled Jacobian and Volume computations are all based on:

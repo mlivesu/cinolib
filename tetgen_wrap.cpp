@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "tetgen_wrap.h"
+#include <cinolib/tetgen_wrap.h>
 
 #ifdef CINOLIB_USES_TETGEN
 #include <tetgen.h>

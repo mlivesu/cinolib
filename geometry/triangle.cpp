@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "triangle.h"
-#include "../geometry/vec3.h"
+#include <cinolib/geometry/triangle.h>
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {

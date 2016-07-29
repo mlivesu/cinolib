@@ -21,10 +21,10 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "drawable_isocontour.h"
-#include "colors.h"
-#include "gl/draw_sphere.h"
-#include "gl/draw_cylinder.h"
+#include <cinolib/drawable_isocontour.h>
+#include <cinolib/colors.h>
+#include <cinolib/gl/draw_sphere.h>
+#include <cinolib/gl/draw_cylinder.h>
 
 namespace cinolib
 {

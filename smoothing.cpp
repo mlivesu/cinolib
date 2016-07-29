@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "smoothing.h"
+#include <cinolib/smoothing.h>
 
 namespace cinolib
 {

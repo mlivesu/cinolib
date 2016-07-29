@@ -24,8 +24,8 @@
 #ifndef DRAWABLE_SKEL_H
 #define DRAWABLE_SKEL_H
 
-#include "skel.h"
-#include "../../drawable_object.h"
+#include <cinolib/drawable_object.h>
+#include <cinolib/meshes/skel/skel.h>
 
 namespace cinolib
 {

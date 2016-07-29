@@ -24,8 +24,8 @@
 #ifndef SMOOTHING_H
 #define SMOOTHING_H
 
-#include "cinolib.h"
-#include "laplacian.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/laplacian.h>
 
 namespace cinolib
 {

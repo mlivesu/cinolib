@@ -24,7 +24,7 @@
 #ifndef LINEAR_SOLVERS_H
 #define LINEAR_SOLVERS_H
 
-#include "cinolib.h"
+#include <cinolib/cinolib.h>
 #include <eigen3/Eigen/Sparse>
 #include <string>
 

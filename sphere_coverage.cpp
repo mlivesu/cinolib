@@ -1,4 +1,3 @@
-
 /****************************************************************************
 * Italian National Research Council                                         *
 * Institute for Applied Mathematics and Information Technologies, Genoa     *
@@ -22,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "sphere_coverage.h"
+#include <cinolib/sphere_coverage.h>
 
 namespace cinolib
 {

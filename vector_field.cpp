@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "vector_field.h"
+#include <cinolib/vector_field.h>
 
 namespace cinolib
 {

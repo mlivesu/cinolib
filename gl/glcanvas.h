@@ -29,9 +29,9 @@
 #include <QGLWidget>
 #include <vector>
 
-#include "../cinolib.h"
-#include "../bbox.h"
-#include "../drawable_object.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/bbox.h>
+#include <cinolib/drawable_object.h>
 
 
 #include <qglviewer.h>

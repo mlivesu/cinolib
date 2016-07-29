@@ -24,8 +24,8 @@
 #ifndef SCALAR_FIELD_V_H
 #define SCALAR_FIELD_V_H
 
-#include "cinolib.h"
-#include "serializable.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/serializable.h>
 
 #include <iostream>
 #include <float.h>

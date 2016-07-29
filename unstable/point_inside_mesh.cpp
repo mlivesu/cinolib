@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "point_inside_mesh.h"
-#include "../meshes/tetmesh/tetmesh.h"
+#include <cinolib/unstable/point_inside_mesh.h>
+#include <cinolib/meshes/tetmesh/tetmesh.h>
 
 namespace cinolib
 {

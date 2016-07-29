@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "write_OFF.h"
+#include <cinolib/io/write_OFF.h>
 
 #include <iostream>
 

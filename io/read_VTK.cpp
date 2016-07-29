@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "read_VTK.h"
+#include <cinolib/io/read_VTK.h>
 
 #ifdef CINOLIB_USES_VTK
 #include <vtkGenericDataObjectReader.h>

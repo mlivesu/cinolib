@@ -24,7 +24,7 @@
 #ifndef READ_CSV_H
 #define READ_CSV_H
 
-#include "../cinolib.h"
+#include <cinolib/cinolib.h>
 
 #include <vector>
 

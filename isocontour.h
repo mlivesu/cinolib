@@ -24,8 +24,8 @@
 #ifndef ISOCONTOUR_H
 #define ISOCONTOUR_H
 
-#include "cinolib.h"
-#include "meshes/trimesh/trimesh.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/meshes/trimesh/trimesh.h>
 
 namespace cinolib
 {

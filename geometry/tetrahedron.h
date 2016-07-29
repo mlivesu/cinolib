@@ -24,8 +24,8 @@
 #ifndef TETRAHEDRON_H
 #define TETRAHEDRON_H
 
-#include "../cinolib.h"
-#include "../geometry/vec3.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {

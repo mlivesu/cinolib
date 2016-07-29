@@ -24,8 +24,8 @@
 #ifndef ISOSURFACE_H
 #define ISOSURFACE_H
 
-#include "../../cinolib.h"
-#include "tetmesh.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/meshes/tetmesh/tetmesh.h>
 
 
 namespace cinolib

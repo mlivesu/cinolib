@@ -24,7 +24,7 @@
 #ifndef COLORS_H
 #define COLORS_H
 
-#include "cinolib.h"
+#include <cinolib/cinolib.h>
 
 namespace cinolib
 {

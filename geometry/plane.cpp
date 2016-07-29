@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "plane.h"
+#include <cinolib/geometry/plane.h>
 
 namespace cinolib
 {

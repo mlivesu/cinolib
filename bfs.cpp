@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "bfs.h"
+#include <cinolib/bfs.h>
 
 namespace cinolib
 {
@@ -190,7 +190,7 @@ void bfs(const Mesh              & m,
                std::vector<int>  & path)
 {
     assert(path.empty());
-    assert(mask.size() == m.num_vertices());
+    assert(mask.size() == (size_t)m.num_vertices());
 
     int inf_dist = m.num_edges()+1;
     std::vector<int> prev(m.num_vertices(), -1);

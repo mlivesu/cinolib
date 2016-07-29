@@ -24,10 +24,10 @@
 #ifndef TRIMESH_H
 #define TRIMESH_H
 
-#include "../../cinolib.h"
-#include "../../bbox.h"
-#include "../../geometry/vec3.h"
-#include "../../geometry/triangle.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/bbox.h>
+#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/triangle.h>
 
 #include <assert.h>
 #include <float.h>

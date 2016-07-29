@@ -21,10 +21,10 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "quadmesh.h"
-#include "../../bfs.h"
-#include "../../timer.h"
-#include "../../io/read_write.h"
+#include <cinolib/meshes/quadmesh/quadmesh.h>
+#include <cinolib/bfs.h>
+#include <cinolib/timer.h>
+#include <cinolib/io/read_write.h>
 
 #include <queue>
 

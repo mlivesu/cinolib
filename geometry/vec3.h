@@ -24,7 +24,7 @@
 #ifndef VEC3_H
 #define VEC3_H
 
-#include "../cinolib.h"
+#include <cinolib/cinolib.h>
 
 #include <cmath>
 #include <iostream>

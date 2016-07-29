@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "write_LIVESU2012.h"
+#include <cinolib/io/write_LIVESU2012.h>
 
 #include <vector>
 

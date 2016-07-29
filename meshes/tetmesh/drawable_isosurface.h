@@ -30,9 +30,9 @@
 #include <GL/gl.h>
 #endif
 
-#include "../../cinolib.h"
-#include "../../drawable_object.h"
-#include "isosurface.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/meshes/tetmesh/isosurface.h>
 
 namespace cinolib
 {

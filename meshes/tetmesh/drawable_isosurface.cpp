@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "drawable_isosurface.h"
+#include <cinolib/meshes/tetmesh/drawable_isosurface.h>
 
 namespace cinolib
 {

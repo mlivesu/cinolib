@@ -24,8 +24,8 @@
 #ifndef DRAW_ARROW_H
 #define DRAW_ARROW_H
 
-#include "../cinolib.h"
-#include "draw_cylinder.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/gl/draw_cylinder.h>
 
 namespace cinolib
 {

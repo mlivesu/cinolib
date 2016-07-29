@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "segment.h"
+#include <cinolib/geometry/segment.h>
 
 namespace cinolib
 {

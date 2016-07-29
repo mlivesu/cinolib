@@ -24,9 +24,9 @@
 #ifndef BBOX_H
 #define BBOX_H
 
+#include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
 #include <float.h>
-#include "geometry/vec3.h"
-#include "cinolib.h"
 
 namespace cinolib
 {

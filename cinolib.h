@@ -24,9 +24,9 @@
 #ifndef CINO_LIB_H
 #define CINO_LIB_H
 
-#include "cino_inline.h"
-#include "common.h"
-#include "logger.h"
+#include <cinolib/cino_inline.h>
+#include <cinolib/common.h>
+#include <cinolib/logger.h>
 
 namespace cinolib
 {

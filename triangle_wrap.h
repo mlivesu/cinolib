@@ -24,7 +24,7 @@
 #ifndef TRIANGLE_WRAP_H
 #define TRIANGLE_WRAP_H
 
-#include "cinolib.h"
+#include <cinolib/cinolib.h>
 
 #include <vector>
 #include <sys/types.h>
@@ -44,7 +44,7 @@ void triangle_wrap(const std::vector<double> & coords_in,   // serialized xy coo
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "triangle_wrap.cpp"
+#include <cinolib/triangle_wrap.cpp>
 #endif
 
 #endif // TRIANGLE_WRAP_H

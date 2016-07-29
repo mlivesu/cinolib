@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "read_TAGLIASACCHI2012.h"
+#include <cinolib/io/read_TAGLIASACCHI2012.h>
 
 
 namespace cinolib

@@ -21,11 +21,11 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "drawable_hexmesh.h"
-#include "../../textures/quality_ramp_texture.h"
-#include "../../textures/quality_ramp_texture_plus_isolines.h"
-#include "../../textures/isolines_texture.h"
-#include "../../colors.h"
+#include <cinolib/meshes/hexmesh/drawable_hexmesh.h>
+#include <cinolib/textures/quality_ramp_texture.h>
+#include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
+#include <cinolib/textures/isolines_texture.h>
+#include <cinolib/colors.h>
 
 
 namespace cinolib

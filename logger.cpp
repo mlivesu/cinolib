@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "logger.h"
-#include "cino_inline.h"
+#include <cinolib/logger.h>
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {

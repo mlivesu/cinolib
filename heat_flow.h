@@ -24,12 +24,12 @@
 #ifndef HEAT_FLOW_H
 #define HEAT_FLOW_H
 
-#include "cinolib.h"
-#include "scalar_field.h"
-#include "laplacian.h"
-#include "vertex_mass.h"
-#include "linear_solvers.h"
-#include "timer.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/scalar_field.h>
+#include <cinolib/laplacian.h>
+#include <cinolib/vertex_mass.h>
+#include <cinolib/linear_solvers.h>
+#include <cinolib/timer.h>
 #include <eigen3/Eigen/Sparse>
 
 namespace cinolib

@@ -24,15 +24,15 @@
 #ifndef SKEL_H
 #define SKEL_H
 
+#include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
+#include <cinolib/bbox.h>
+#include <cinolib/drawable_object.h>
+
 #include <vector>
 #include <queue>
 #include <set>
 #include <assert.h>
-
-#include "../../cinolib.h"
-#include "../../geometry/vec3.h"
-#include "../../bbox.h"
-#include "../../drawable_object.h"
 
 namespace cinolib
 {

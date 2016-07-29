@@ -31,10 +31,10 @@
 #include <GL/gl.h>
 #endif
 
-#include "../../cinolib.h"
-#include "../../drawable_object.h"
-#include "../../gl/draw_tris_quads.h"
-#include "quadmesh.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/gl/draw_tris_quads.h>
+#include <cinolib/meshes/quadmesh/quadmesh.h>
 
 namespace cinolib
 {

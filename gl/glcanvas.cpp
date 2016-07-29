@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "glcanvas.h"
+#include <cinolib/gl/glcanvas.h>
 
 namespace cinolib
 {

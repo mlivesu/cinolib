@@ -21,9 +21,9 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "tetmesh.h"
-#include "../../timer.h"
-#include "../../io/read_write.h"
+#include <cinolib/meshes/tetmesh/tetmesh.h>
+#include <cinolib/timer.h>
+#include <cinolib/io/read_write.h>
 
 #include <float.h>
 #include <map>

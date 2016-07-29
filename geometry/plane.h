@@ -24,8 +24,8 @@
 #ifndef PLANE_H
 #define PLANE_H
 
-#include "../cinolib.h"
-#include "vec3.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
 
 #include <ostream>
 

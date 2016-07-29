@@ -24,8 +24,8 @@
 #ifndef MARCHING_TETS_H
 #define MARCHING_TETS_H
 
-#include "../../cinolib.h"
-#include "tetmesh.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/meshes/tetmesh/tetmesh.h>
 
 namespace cinolib
 {

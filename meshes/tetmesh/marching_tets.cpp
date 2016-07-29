@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "marching_tets.h"
+#include <cinolib/meshes/tetmesh/marching_tets.h>
 
 
 namespace cinolib

@@ -24,8 +24,8 @@
 #ifndef SEGMENT_H
 #define SEGMENT_H
 
-#include "../cinolib.h"
-#include "vec3.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
 #include <vector>
 
 namespace cinolib

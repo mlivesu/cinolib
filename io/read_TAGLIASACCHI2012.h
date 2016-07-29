@@ -24,7 +24,7 @@
 #ifndef READ_TAGLIASACCHI2012_H
 #define READ_TAGLIASACCHI2012_H
 
-#include "../cinolib.h"
+#include <cinolib/cinolib.h>
 
 #include <vector>
 

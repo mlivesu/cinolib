@@ -25,33 +25,33 @@
 #define READ_WRITE_H
 
 // SURFACE READERS
-#include "read_OBJ.h"
-#include "read_OFF.h"
-#include "read_IV.h"
+#include <cinolib/io/read_OBJ.h>
+#include <cinolib/io/read_OFF.h>
+#include <cinolib/io/read_IV.h>
 //
 // VOLUME READERS
-#include "read_MESH.h"
-#include "read_TET.h"
-#include "read_VTU.h"
-#include "read_VTK.h"
+#include <cinolib/io/read_MESH.h>
+#include <cinolib/io/read_TET.h>
+#include <cinolib/io/read_VTU.h>
+#include <cinolib/io/read_VTK.h>
 //
 // SKELETON READERS
-#include "read_LIVESU2012.h"
-#include "read_TAGLIASACCHI2012.h"
-#include "read_DEYSUN2006.h"
-#include "read_CSV.h"
+#include <cinolib/io/read_LIVESU2012.h>
+#include <cinolib/io/read_TAGLIASACCHI2012.h>
+#include <cinolib/io/read_DEYSUN2006.h>
+#include <cinolib/io/read_CSV.h>
 
 // SURFACE WRITERS
-#include "write_OBJ.h"
-#include "write_OFF.h"
+#include <cinolib/io/write_OBJ.h>
+#include <cinolib/io/write_OFF.h>
 //
 // VOLUME WRITERS
-#include "write_MESH.h"
-#include "write_TET.h"
-#include "write_VTU.h"
-#include "write_VTK.h"
+#include <cinolib/io/write_MESH.h>
+#include <cinolib/io/write_TET.h>
+#include <cinolib/io/write_VTU.h>
+#include <cinolib/io/write_VTK.h>
 //
 // SKELETON WRITERS
-#include "write_LIVESU2012.h"
+#include <cinolib/io/write_LIVESU2012.h>
 
 #endif // READ_WRITE

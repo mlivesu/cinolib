@@ -24,10 +24,9 @@
 #ifndef COTANGENT_H
 #define COTANGENT_H
 
-#include "cinolib.h"
-#include "meshes/trimesh/trimesh.h"
-#include "meshes/tetmesh/tetmesh.h"
-
+#include <cinolib/cinolib.h>
+#include <cinolib/meshes/trimesh/trimesh.h>
+#include <cinolib/meshes/tetmesh/tetmesh.h>
 
 namespace cinolib
 {

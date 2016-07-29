@@ -27,10 +27,10 @@
 #include <sys/types.h>
 #include <vector>
 
-#include "../../cinolib.h"
-#include "../../bbox.h"
-#include "../../geometry/vec3.h"
-#include "../quadmesh/quadmesh.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/bbox.h>
+#include <cinolib/geometry/vec3.h>
+#include <cinolib/meshes/quadmesh/quadmesh.h>
 //#include "quality.h"
 
 namespace cinolib

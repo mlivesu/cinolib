@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "colors.h"
-#include "textures/quality_ramp_texture.h"
+#include <cinolib/colors.h>
+#include <cinolib/textures/quality_ramp_texture.h>
 
 #include <algorithm>
 #include <assert.h>

@@ -21,10 +21,10 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "hexmesh.h"
-#include "../../quality.h"
-#include "../../timer.h"
-#include "../../io/read_write.h"
+#include <cinolib/meshes/hexmesh/hexmesh.h>
+#include <cinolib/quality.h>
+#include <cinolib/timer.h>
+#include <cinolib/io/read_write.h>
 
 #include <float.h>
 #include <map>

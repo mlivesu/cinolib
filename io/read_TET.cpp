@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "read_TET.h"
+#include <cinolib/io/read_TET.h>
 #include <iostream>
 
 namespace cinolib

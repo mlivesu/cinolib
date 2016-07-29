@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "vertex_mass.h"
+#include <cinolib/vertex_mass.h>
 
 namespace cinolib
 {

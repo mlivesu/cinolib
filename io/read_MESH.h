@@ -24,7 +24,7 @@
 #ifndef READ_MESH_H
 #define READ_MESH_H
 
-#include "../cinolib.h"
+#include <cinolib/cinolib.h>
 
 #include <sys/types.h>
 #include <vector>

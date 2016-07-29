@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "read_OFF.h"
+#include <cinolib/io/read_OFF.h>
 
 #include <iostream>
 

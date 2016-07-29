@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "scalar_field.h"
+#include <cinolib/scalar_field.h>
 
 
 namespace cinolib

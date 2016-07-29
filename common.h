@@ -29,7 +29,7 @@
 #include <vector>
 #include <eigen3/Eigen/Dense>
 
-#include "geometry/vec3.h"
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {

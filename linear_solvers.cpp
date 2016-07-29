@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "linear_solvers.h"
-#include "timer.h"
+#include <cinolib/linear_solvers.h>
+#include <cinolib/timer.h>
 
 namespace cinolib
 {

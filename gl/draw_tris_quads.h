@@ -24,7 +24,7 @@
 #ifndef DRAW_TRIS_QUADS_H
 #define DRAW_TRIS_QUADS_H
 
-#include "../cinolib.h"
+#include <cinolib/cinolib.h>
 
 #ifdef __APPLE__
 #include <gl.h>

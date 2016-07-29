@@ -24,10 +24,10 @@
 #ifndef DRAWABLE_VECTOR_FIELD_H
 #define DRAWABLE_VECTOR_FIELD_H
 
-#include "vector_field.h"
-#include "drawable_object.h"
-#include "colors.h"
-#include "gl/draw_arrow.h"
+#include <cinolib/vector_field.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/colors.h>
+#include <cinolib/gl/draw_arrow.h>
 
 namespace cinolib
 {

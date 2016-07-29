@@ -24,7 +24,7 @@
 #ifndef READ_OBJ_H
 #define READ_OBJ_H
 
-#include "../cinolib.h"
+#include <cinolib/cinolib.h>
 
 #include <sys/types.h>
 #include <vector>

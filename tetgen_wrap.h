@@ -24,7 +24,7 @@
 #ifndef TETGEN_WRAP_H
 #define TETGEN_WRAP_H
 
-#include "cinolib.h"
+#include <cinolib/cinolib.h>
 
 #include <vector>
 #include <sys/types.h>

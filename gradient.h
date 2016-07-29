@@ -24,11 +24,11 @@
 #ifndef GRADIENT_H
 #define GRADIENT_H
 
-#include "cinolib.h"
-#include "scalar_field.h"
-#include "vector_field.h"
-#include "meshes/trimesh/trimesh.h"
-#include "meshes/tetmesh/tetmesh.h"
+#include <cinolib/cinolib.h>
+#include <cinolib/scalar_field.h>
+#include <cinolib/vector_field.h>
+#include <cinolib/meshes/trimesh/trimesh.h>
+#include <cinolib/meshes/tetmesh/tetmesh.h>
 #include <eigen3/Eigen/Sparse>
 
 namespace cinolib

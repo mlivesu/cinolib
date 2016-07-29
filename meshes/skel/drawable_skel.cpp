@@ -21,12 +21,11 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "drawable_skel.h"
-
-#include "../../cinolib.h"
-#include "../../colors.h"
-#include "../../gl/draw_cylinder.h"
-#include "../../gl/draw_sphere.h"
+#include <cinolib/meshes/skel/drawable_skel.h>
+#include <cinolib/cinolib.h>
+#include <cinolib/colors.h>
+#include <cinolib/gl/draw_cylinder.h>
+#include <cinolib/gl/draw_sphere.h>
 
 #include <cstdlib>
 

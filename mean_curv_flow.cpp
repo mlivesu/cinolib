@@ -21,11 +21,11 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "mean_curv_flow.h"
-#include "laplacian.h"
-#include "linear_solvers.h"
-#include "vertex_mass.h"
-#include "timer.h"
+#include <cinolib/mean_curv_flow.h>
+#include <cinolib/laplacian.h>
+#include <cinolib/linear_solvers.h>
+#include <cinolib/vertex_mass.h>
+#include <cinolib/timer.h>
 
 namespace cinolib
 {
