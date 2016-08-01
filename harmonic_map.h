@@ -64,6 +64,8 @@ ScalarField harmonic_map(const Mesh           & m,
 {
     assert(n > 0);
     assert(bc.size() > 0);
+    assert(laplacian_mode == COTANGENT || laplacian_mode == UNIFORM);
+    assert(solver == SIMPLICIAL_LLT || solver == SIMPLICIAL_LDLT || solver == SparseLU || solver == BiCGSTAB);
 
     timer_start("Compute Harmonic Map");
 
