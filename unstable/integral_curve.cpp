@@ -42,10 +42,11 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
                                    const VectorField & grad,
                                    const int           source_tid,
                                    const int           source_vid)
-    : m_ptr(&m)
+    : DrawableCurve()
+    , m_ptr(&m)
     , grad_ptr(&grad)
 {
-    type = INTEGRAL_CURVE;
+    type = CURVE;
 
     opt.source_tid            = source_tid;
     opt.source_vid            = source_vid;
@@ -53,6 +54,7 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
     opt.convergence_criterion = STOP_AT_LOCAL_MAX;
 
     make_curve();
+    for(CurveSample & s : curve) append_sample(s.pos);
 }
 
 
@@ -63,10 +65,11 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
                                    const int           source_tid,
                                    const int           source_vid,
                                    const float         stop_at_this_value)
-    : m_ptr(&m)
+    : DrawableCurve()
+    , m_ptr(&m)
     , grad_ptr(&grad)
 {
-    type = INTEGRAL_CURVE;
+    type = CURVE;
 
     opt.source_tid            = source_tid;
     opt.source_vid            = source_vid;
@@ -75,6 +78,7 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
     opt.stop_at_this_value    = stop_at_this_value;
 
     make_curve();
+    for(CurveSample & s : curve) append_sample(s.pos);
 }
 
 template<class Mesh>
@@ -84,10 +88,11 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
                                    const int           source_tid,
                                    const int           source_vid,
                                    const int           stop_at_this_vertex)
-    : m_ptr(&m)
+    : DrawableCurve()
+    , m_ptr(&m)
     , grad_ptr(&grad)
 {
-    type = INTEGRAL_CURVE;
+    type = CURVE;
 
     opt.source_tid            = source_tid;
     opt.source_vid            = source_vid;
@@ -96,23 +101,7 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
     opt.stop_at_this_vertex   = stop_at_this_vertex; // if you ever run into it....
 
     make_curve();
-}
-
-template<class Mesh>
-CINO_INLINE
-void IntegralCurve<Mesh>::draw() const
-{
-    double cylind_rad = m_ptr->bbox().diag()*0.001;
-
-    for(size_t i=0; i<curve.size(); ++i)
-    {
-        sphere<vec3d>(curve[i].pos, cylind_rad*2, RED);
-    }
-    for(size_t i=1; i<curve.size(); ++i)
-    {
-        cylinder<vec3d>(curve[i-1].pos, curve[i].pos, cylind_rad, cylind_rad, RED);
-        //arrow<vec3d>(curve_samples[i-1].pos, curve_samples[i].pos, cylind_rad, RED);
-    }
+    for(CurveSample & s : curve) append_sample(s.pos);
 }
 
 
@@ -483,7 +472,7 @@ void IntegralCurve<Tetmesh>::make_curve()
 
     do
     {
-        curve.push_back( traverse_element(curve.back()) );
+        curve.push_back( traverse_element(curve.back()) );        
 
         border_reached = (curve.back().elem_id == -1);
         locmax_reached = !border_reached && is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX);

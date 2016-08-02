@@ -26,13 +26,13 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/vector_field.h>
-#include <cinolib/drawable_object.h>
+#include <cinolib/unstable/drawable_curve.h>
 
 namespace cinolib
 {
 
 template<class Mesh>
-class IntegralCurve : public DrawableObject
+class IntegralCurve : public DrawableCurve
 {
     enum
     {
@@ -77,11 +77,6 @@ class IntegralCurve : public DrawableObject
                       const int           source_tid,
                       const int           source_vid,
                       const int           stop_at_this_vertex);
-
-        vec3d scene_center() const { return m_ptr->bbox().center(); }
-        float scene_radius() const { return m_ptr->bbox().diag();   }
-        void  draw() const;
-
 
     private:
 
