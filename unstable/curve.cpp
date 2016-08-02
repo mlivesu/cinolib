@@ -84,7 +84,6 @@ vec3d Curve::sample_curve_at(const float t, const double tot_length) const
 {
     assert(t>=0.0);
     assert(t<=1.0);
-
     double curr_l = 0.0;
     double curr_t = 0.0;
     for(size_t i=1; i<curve_samples.size(); ++i)
@@ -103,7 +102,10 @@ vec3d Curve::sample_curve_at(const float t, const double tot_length) const
             curr_l += seg_l;
         }
     }
+    assert(false);
+    return vec3d();
 }
+
 
 CINO_INLINE
 void Curve::resample_curve(const int n_samples)
