@@ -75,8 +75,6 @@ CINO_INLINE void GLcanvas::fit_scene()
     {
         const DrawableObject * obj = drawlist[i];
 
-        //if (obj->type != TRIMESH) continue;
-
         center += obj->scene_center();
         radius  = std::max(radius, obj->scene_radius());
         ++count;
