@@ -32,13 +32,13 @@ namespace cinolib
 CINO_INLINE
 DrawableIsocontour::DrawableIsocontour()
 {
-    type = ISOCURVE;
+    type = CURVE;
 }
 
 CINO_INLINE
 DrawableIsocontour::DrawableIsocontour(Trimesh & m, float value) : Isocontour(m, value)
 {
-    type = ISOCURVE;
+    type = CURVE;
 
     sample_rad = m_ptr->bbox().diag()*0.004;
     cylind_rad = m_ptr->bbox().diag()*0.002;

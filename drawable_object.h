@@ -38,9 +38,7 @@ typedef enum
     QUADMESH      ,
     HEXMESH       ,
     SKELETON      ,
-    GESTURE       ,
-    INTEGRAL_CURVE,
-    ISOCURVE      ,
+    CURVE         ,
     ISOSURFACE    ,
     VECTOR_FIELD
 }
