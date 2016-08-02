@@ -43,6 +43,12 @@ DrawableTrimesh::DrawableTrimesh(const char *filename) : Trimesh(filename)
 }
 
 CINO_INLINE
+DrawableTrimesh::DrawableTrimesh(const Trimesh & m) : Trimesh(m.vector_coords(), m.vector_triangles())
+{
+    init();
+}
+
+CINO_INLINE
 DrawableTrimesh::DrawableTrimesh(const std::vector<double> &coords,
                                  const std::vector<u_int>  &tris) : Trimesh(coords, tris)
 {

@@ -52,6 +52,7 @@ class DrawableTrimesh : public Trimesh , public DrawableObject
         };
 
         DrawableTrimesh();
+        DrawableTrimesh(const Trimesh & m);
         DrawableTrimesh(const char *filename);
         DrawableTrimesh(const std::vector<double> & coords,
                         const std::vector<u_int>  & tris);
