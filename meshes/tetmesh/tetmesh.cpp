@@ -1089,38 +1089,38 @@ void Tetmesh::export_submesh_with_label(const int             label,
     assert(vid2sub_vid.empty());
     assert(sub_vid2vid.empty());
 
-    int fresh_id = 0;
-
+    std::vector<int> selected_tets;
     for(int tid=0; tid<num_tetrahedra(); ++tid)
     {
-        if (tet_label(tid) != label) continue;
+        if (tet_label(tid) == label) selected_tets.push_back(tid);
+    }
 
-        for(int i=0; i<4; ++i)
-        {
-            int  vid = tet_vertex_id(tid,i);
-            int  sub_vid;
+    std::set<int> vids;
+    for(int tid : selected_tets)
+    {
+        vids.insert(tet_vertex_id(tid,0));
+        vids.insert(tet_vertex_id(tid,1));
+        vids.insert(tet_vertex_id(tid,2));
+        vids.insert(tet_vertex_id(tid,3));
+    }
 
-            auto query = vid2sub_vid.find(vid);
-            if (query == vid2sub_vid.end())
-            {
-                vec3d pos = vertex(vid);
-                sub_coords.push_back(pos.x());
-                sub_coords.push_back(pos.y());
-                sub_coords.push_back(pos.z());
+    int fresh_id = 0;
+    for(int vid : vids)
+    {
+        sub_coords.push_back(vertex(vid).x());
+        sub_coords.push_back(vertex(vid).y());
+        sub_coords.push_back(vertex(vid).z());
+        vid2sub_vid[vid] = fresh_id;
+        sub_vid2vid[fresh_id] = vid;
+        ++fresh_id;
+    }
 
-                vid2sub_vid[vid] = fresh_id;
-                sub_vid2vid[fresh_id] = vid;
-
-                sub_vid = fresh_id;
-                ++fresh_id;
-            }
-            else
-            {
-                sub_vid = query->second;
-            }
-
-            sub_tets.push_back(sub_vid);
-        }
+    for(int tid : selected_tets)
+    {
+        sub_tets.push_back( vid2sub_vid.at(tet_vertex_id(tid,0)) );
+        sub_tets.push_back( vid2sub_vid.at(tet_vertex_id(tid,1)) );
+        sub_tets.push_back( vid2sub_vid.at(tet_vertex_id(tid,2)) );
+        sub_tets.push_back( vid2sub_vid.at(tet_vertex_id(tid,3)) );
     }
 }
 
