@@ -889,6 +889,8 @@ void Trimesh::normalize_area()
 CINO_INLINE
 vec3d Trimesh::element_barycenter(const int tid) const
 {
+    assert(tid >= 0);
+    assert(tid < num_triangles());
     vec3d b(0,0,0);
     for(int i=0; i<3; ++i)
     {
@@ -1681,7 +1683,7 @@ bool Trimesh::vertex_is_local_minima(const int vid) const
     float v = vertex_u_text(vid);
     for(int nbr : adj_vtx2vtx(vid))
     {
-        if (vertex_u_text(nbr) <= v) return false;
+        if (vertex_u_text(nbr) < v) return false;
     }
     return true;
 }
@@ -1692,7 +1694,7 @@ bool Trimesh::vertex_is_local_maxima(const int vid) const
     float v = vertex_u_text(vid);
     for(int nbr : adj_vtx2vtx(vid))
     {
-        if (vertex_u_text(nbr) >= v) return false;
+        if (vertex_u_text(nbr) > v) return false;
     }
     return true;
 }
