@@ -37,7 +37,7 @@ Eigen::SparseMatrix<double> mass_matrix(const Mesh & m);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include <cinolib/vertex_mass.h>
+#include "vertex_mass.h"
 #endif
 
 #endif // VERTEX_MASS_H
