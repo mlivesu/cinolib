@@ -241,7 +241,7 @@ void IntegralCurve<Trimesh>::make_curve()
     cs.vert_id = opt.source_vid;
     curve.push_back(cs);
 
-    bool border_reached, locmax_reached, target_reached;
+    bool border_reached, locmax_reached, target_reached, infinite_loop;
 
     do
     {
@@ -250,8 +250,9 @@ void IntegralCurve<Trimesh>::make_curve()
         border_reached = (curve.back().elem_id == -1);
         locmax_reached = !border_reached && is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX);
         target_reached = !border_reached && is_converged(curve.back().elem_id, opt.convergence_criterion);
+        infinite_loop  = int(curve.size()) > m_ptr->num_elements();
     }
-    while (!border_reached && !locmax_reached && !target_reached);
+    while (!border_reached && !locmax_reached && !target_reached && !infinite_loop);
 
     if (locmax_reached)
     {
@@ -468,7 +469,7 @@ void IntegralCurve<Tetmesh>::make_curve()
     cs.vert_id = opt.source_vid;
     curve.push_back(cs);
 
-    bool border_reached, locmax_reached, target_reached;
+    bool border_reached, locmax_reached, target_reached, infinite_loop;
 
     do
     {
@@ -477,8 +478,9 @@ void IntegralCurve<Tetmesh>::make_curve()
         border_reached = (curve.back().elem_id == -1);
         locmax_reached = !border_reached && is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX);
         target_reached = !border_reached && is_converged(curve.back().elem_id, opt.convergence_criterion);
+        infinite_loop  = int(curve.size()) > m_ptr->num_elements();
     }
-    while (!border_reached && !locmax_reached && !target_reached);
+    while (!border_reached && !locmax_reached && !target_reached && !infinite_loop);
 
     // append the final segment to the curve
     //
