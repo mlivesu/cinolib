@@ -97,13 +97,13 @@ vec3d Curve::sample_curve_at(const float t, const double tot_length) const
     double curr_t = 0.0;
     for(size_t i=1; i<curve_samples.size(); ++i)
     {
-        double seg_l   = curve_samples[i-1].dist(curve_samples[i]);
+        double seg_l   = curve_samples.at(i-1).dist(curve_samples[i]);
         double delta_t = seg_l / tot_length;
 
         if (curr_t + delta_t >= t - 1e-7)
         {
             double alpha = (t-curr_t)/(delta_t);
-            return (1.0-alpha)*curve_samples[i-1] + alpha*curve_samples[i];
+            return (1.0-alpha)*curve_samples.at(i-1) + alpha*curve_samples.at(i);
         }
         else
         {
@@ -125,8 +125,8 @@ void Curve::resample_curve(const int n_samples)
     double delta_t    = 1.0/double(n_samples);
     double t          = 0.0;
 
-    if (size()   < 2)    return;
-    if (length() < 1e-7) return;
+    if (size()  < 2) return;
+    if (length()<=0) return;
 
     std::vector<vec3d> new_samples;
     for(int i=0; i<=n_samples; ++i)
