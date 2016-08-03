@@ -44,6 +44,7 @@ class Curve
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        int    size() const;
         double length() const;
         void   append_sample(const vec3d & s);
 

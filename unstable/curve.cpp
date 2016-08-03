@@ -46,9 +46,15 @@ const Bbox & Curve::bbox() const
 
 
 CINO_INLINE
-const std::vector<vec3d> &Curve::samples() const
+const std::vector<vec3d> & Curve::samples() const
 {
     return curve_samples;
+}
+
+CINO_INLINE
+int Curve::size() const
+{
+    return curve_samples.size();
 }
 
 
@@ -116,7 +122,7 @@ void Curve::resample_curve(const int n_samples)
     double delta_t    = 1.0/double(n_samples);
     double t          = 0.0;
 
-    for(int i=0; i<n_samples; ++i)
+    for(int i=0; i<=n_samples; ++i)
     {
         new_samples.push_back( sample_curve_at(t,tot_length) );
         t += delta_t;
