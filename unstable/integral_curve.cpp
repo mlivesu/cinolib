@@ -41,6 +41,26 @@ CINO_INLINE
 IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
                                    const VectorField & grad,
                                    const int           source_tid,
+                                   const vec3d         start_pos)
+    : DrawableCurve()
+    , m_ptr(&m)
+    , grad_ptr(&grad)
+{
+    type = CURVE;
+
+    opt.source_tid            = source_tid;
+    opt.source_pos            = start_pos;
+    opt.convergence_criterion = STOP_AT_LOCAL_MAX;
+
+    make_curve();
+    for(CurveSample & s : curve) append_sample(s.pos);
+}
+
+template<class Mesh>
+CINO_INLINE
+IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
+                                   const VectorField & grad,
+                                   const int           source_tid,
                                    const int           source_vid)
     : DrawableCurve()
     , m_ptr(&m)
@@ -464,7 +484,7 @@ CINO_INLINE
 void IntegralCurve<Tetmesh>::make_curve()
 {
     CurveSample cs;
-    cs.pos = opt.source_pos;
+    cs.pos     = opt.source_pos;
     cs.elem_id = opt.source_tid;
     cs.vert_id = opt.source_vid;
     curve.push_back(cs);
