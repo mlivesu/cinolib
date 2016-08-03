@@ -1,3 +1,4 @@
+- aggiungi DrawableOctree
 - aggiungi classe RAY per gestire raggi e classe line per gestire linee
 - aggiungi show triangle IDs and vertex IDs!!!!! (stile remesher panozzo/tarini)
 - aggiungi due spinboxes per controllare gli estremi degli isovalori per il generatore delle isosuperfici
