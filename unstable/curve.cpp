@@ -88,8 +88,11 @@ vec3d Curve::sample_curve_at(const float t) const
 CINO_INLINE
 vec3d Curve::sample_curve_at(const float t, const double tot_length) const
 {
+    assert(size() > 1);
+    assert(tot_length > 1e-7);
     assert(t>=0.0);
     assert(t<=1.0);
+
     double curr_l = 0.0;
     double curr_t = 0.0;
     for(size_t i=1; i<curve_samples.size(); ++i)
@@ -97,7 +100,7 @@ vec3d Curve::sample_curve_at(const float t, const double tot_length) const
         double seg_l   = curve_samples[i-1].dist(curve_samples[i]);
         double delta_t = seg_l / tot_length;
 
-        if (curr_t + delta_t >= t)
+        if (curr_t + delta_t >= t - 1e-7)
         {
             double alpha = (t-curr_t)/(delta_t);
             return (1.0-alpha)*curve_samples[i-1] + alpha*curve_samples[i];
@@ -116,18 +119,21 @@ vec3d Curve::sample_curve_at(const float t, const double tot_length) const
 CINO_INLINE
 void Curve::resample_curve(const int n_samples)
 {
-    std::vector<vec3d> new_samples;
+    assert(n_samples >= 1);
 
     double tot_length = length();
     double delta_t    = 1.0/double(n_samples);
     double t          = 0.0;
 
+    if (size()   < 2)    return;
+    if (length() < 1e-7) return;
+
+    std::vector<vec3d> new_samples;
     for(int i=0; i<=n_samples; ++i)
     {
         new_samples.push_back( sample_curve_at(t,tot_length) );
         t += delta_t;
     }
-
     curve_samples = new_samples;
 }
 
