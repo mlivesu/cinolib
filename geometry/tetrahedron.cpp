@@ -30,6 +30,67 @@
 namespace cinolib
 {
 
+// http://steve.hollasch.net/cgindex/geometry/ptintet.html
+//
+CINO_INLINE
+bool tet_barycentric_coords(const vec3d & A,
+                            const vec3d & B,
+                            const vec3d & C,
+                            const vec3d & D,
+                            const vec3d & P,
+                            std::vector<double> & wgts,
+                            const double  tol)
+{
+    //Eigen::Matrix<double,4,4> M;
+    //M(0,0) = A[0]; M(0,1) = A[1]; M(0,2) = A[2]; M(0,3) = 1;
+    //M(1,0) = B[0]; M(1,1) = B[1]; M(1,2) = B[2]; M(1,3) = 1;
+    //M(2,0) = C[0]; M(2,1) = C[1]; M(2,2) = C[2]; M(2,3) = 1;
+    //M(3,0) = D[0]; M(3,1) = D[1]; M(3,2) = D[2]; M(3,3) = 1;
+
+    Eigen::Matrix<double,4,4> M0;
+    M0(0,0) = P[0]; M0(0,1) = P[1]; M0(0,2) = P[2]; M0(0,3) = 1;
+    M0(1,0) = B[0]; M0(1,1) = B[1]; M0(1,2) = B[2]; M0(1,3) = 1;
+    M0(2,0) = C[0]; M0(2,1) = C[1]; M0(2,2) = C[2]; M0(2,3) = 1;
+    M0(3,0) = D[0]; M0(3,1) = D[1]; M0(3,2) = D[2]; M0(3,3) = 1;
+
+    Eigen::Matrix<double,4,4> M1;
+    M1(0,0) = A[0]; M1(0,1) = A[1]; M1(0,2) = A[2]; M1(0,3) = 1;
+    M1(1,0) = P[0]; M1(1,1) = P[1]; M1(1,2) = P[2]; M1(1,3) = 1;
+    M1(2,0) = C[0]; M1(2,1) = C[1]; M1(2,2) = C[2]; M1(2,3) = 1;
+    M1(3,0) = D[0]; M1(3,1) = D[1]; M1(3,2) = D[2]; M1(3,3) = 1;
+
+    Eigen::Matrix<double,4,4> M2;
+    M2(0,0) = A[0]; M2(0,1) = A[1]; M2(0,2) = A[2]; M2(0,3) = 1;
+    M2(1,0) = B[0]; M2(1,1) = B[1]; M2(1,2) = B[2]; M2(1,3) = 1;
+    M2(2,0) = P[0]; M2(2,1) = P[1]; M2(2,2) = P[2]; M2(2,3) = 1;
+    M2(3,0) = D[0]; M2(3,1) = D[1]; M2(3,2) = D[2]; M2(3,3) = 1;
+
+    Eigen::Matrix<double,4,4> M3;
+    M3(0,0) = A[0]; M3(0,1) = A[1]; M3(0,2) = A[2]; M3(0,3) = 1;
+    M3(1,0) = B[0]; M3(1,1) = B[1]; M3(1,2) = B[2]; M3(1,3) = 1;
+    M3(2,0) = C[0]; M3(2,1) = C[1]; M3(2,2) = C[2]; M3(2,3) = 1;
+    M3(3,0) = P[0]; M3(3,1) = P[1]; M3(3,2) = P[2]; M3(3,3) = 1;
+
+    //double det_M  = M.determinant();
+    double det_M0 = M0.determinant();
+    double det_M1 = M1.determinant();
+    double det_M2 = M2.determinant();
+    double det_M3 = M3.determinant();
+
+    double sum = det_M0 + det_M1 + det_M2 + det_M3;
+    if (sum==0) return false; // degenerate
+
+    wgts.resize(4);
+    wgts[0] = det_M0/sum; assert(!std::isnan(wgts[0]));
+    wgts[1] = det_M1/sum; assert(!std::isnan(wgts[1]));
+    wgts[2] = det_M2/sum; assert(!std::isnan(wgts[2]));
+    wgts[3] = det_M3/sum; assert(!std::isnan(wgts[3]));
+
+    for(double w : wgts) if (w < -tol) return false; // outside
+    return true; // inside
+}
+
+
 CINO_INLINE
 void tet_closest_vertex(const vec3d  & A,
                         const vec3d  & B,
@@ -73,7 +134,6 @@ void tet_closest_edge(const vec3d  & A,
     dist = (*sorted_segs.begin()).first;
     id   = (*sorted_segs.begin()).second;
 }
-
 
 }
 

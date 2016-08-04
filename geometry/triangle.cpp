@@ -23,6 +23,7 @@
 ****************************************************************************/
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/plane.h>
 
 namespace cinolib
 {
@@ -60,9 +61,9 @@ void triangle_traverse_with_ray(const vec3d   tri[3],
         sorted_by_angle.insert(std::make_pair(dir.angle_rad(uvw[i]),i));
     }
 
-    int   vert      = (*sorted_by_angle.begin()).second;
-    vec3d tn        = triangle_normal(tri[0], tri[1], tri[2]);
-    vec3d cross     = dir.cross(uvw[vert]);
+    int   vert  = (*sorted_by_angle.begin()).second;
+    vec3d tn    = triangle_normal(tri[0], tri[1], tri[2]);
+    vec3d cross = dir.cross(uvw[vert]);
 
     exit_edge = (cross.dot(tn) >= 0) ? (vert+2)%3 : vert; // it's because e_i = ( v_i, v_(i+1)%3 )
 
@@ -70,17 +71,17 @@ void triangle_traverse_with_ray(const vec3d   tri[3],
     // 2) Find the exit point using the law of sines
     //
 
-    vec3d  app      = tri[TRI_EDGES[exit_edge][1]];
-    vec3d  V1       = tri[TRI_EDGES[exit_edge][0]];
-    vec3d  V0       = P;
-    vec3d  e0_dir   = app - V1; e0_dir.normalize();
-    vec3d  e1_dir   = -dir;
-    vec3d  e2_dir   = V1 - V0; e2_dir.normalize();
+    vec3d  app     = tri[TRI_EDGES[exit_edge][1]];
+    vec3d  V1      = tri[TRI_EDGES[exit_edge][0]];
+    vec3d  V0      = P;
+    vec3d  e0_dir  = app - V1; e0_dir.normalize();
+    vec3d  e1_dir  = -dir;
+    vec3d  e2_dir  = V1 - V0; e2_dir.normalize();
 
-    double V0_ang   = e2_dir.angle_rad(-e1_dir);
-    double V2_ang   = e1_dir.angle_rad(-e0_dir);
-    double e2_len   = (V1 - V0).length();
-    double e0_len   = triangle_law_of_sines(V2_ang, V0_ang, e2_len);
+    double V0_ang  = e2_dir.angle_rad(-e1_dir);
+    double V2_ang  = e1_dir.angle_rad(-e0_dir);
+    double e2_len  = (V1 - V0).length();
+    double e0_len  = triangle_law_of_sines(V2_ang, V0_ang, e2_len);
 
     exit_pos =  V1 + e0_len * e0_dir;
 }
@@ -92,6 +93,38 @@ CINO_INLINE
 double triangle_law_of_sines(const double angle_0, const double angle_1, const double length_0) // returns length_1
 {
     return sin(angle_1) * length_0 / sin(angle_0);
+}
+
+
+
+// http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+//
+CINO_INLINE
+bool triangle_barycentric_coords(const vec3d  & A,
+                                 const vec3d  & B,
+                                 const vec3d  & C,
+                                 const vec3d  & P,
+                                 std::vector<double> & wgts,
+                                 const double   tol)
+{
+    vec3d  u    = B - A;
+    vec3d  v    = C - A;
+    vec3d  w    = P - A;
+    double d00  = u.dot(u);
+    double d01  = u.dot(v);
+    double d11  = v.dot(v);
+    double d20  = w.dot(u);
+    double d21  = w.dot(v);
+    double den  = d00 * d11 - d01 * d01;
+    if (den==0) return false; // degenerate
+
+    wgts.resize(3);
+    wgts[0] = (d11 * d20 - d01 * d21) / den;    assert(!std::isnan(wgts[0]));
+    wgts[1] = (d00 * d21 - d01 * d20) / den;    assert(!std::isnan(wgts[1]));
+    wgts[2] = 1.0f - wgts[0] - wgts[1];         assert(!std::isnan(wgts[2]));
+
+    for(double w : wgts) if (w < -tol) return false; // outside
+    return true; // inside
 }
 
 }

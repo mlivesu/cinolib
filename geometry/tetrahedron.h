@@ -50,6 +50,16 @@ static int TET_EDGES[6][2] =
 
 
 CINO_INLINE
+bool tet_barycentric_coords(const vec3d & A,
+                            const vec3d & B,
+                            const vec3d & C,
+                            const vec3d & D,
+                            const vec3d & P,
+                            std::vector<double> & wgts,
+                            const double  tol = 1e-5);
+
+
+CINO_INLINE
 void tet_closest_vertex(const vec3d  & A,
                         const vec3d  & B,
                         const vec3d  & C,

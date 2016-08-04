@@ -41,7 +41,9 @@ static const int TRI_EDGES[3][2] =
 
 
 CINO_INLINE
-vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C);
+vec3d triangle_normal(const vec3d A,
+                      const vec3d B,
+                      const vec3d C);
 
 
 
@@ -61,8 +63,19 @@ void triangle_traverse_with_ray(const vec3d   tri[3],
 // https://en.wikipedia.org/wiki/Law_of_sines
 //
 CINO_INLINE
-double triangle_law_of_sines(const double angle_0, const double angle_1, const double length_0); // returns length_1
+double triangle_law_of_sines(const double angle_0,
+                             const double angle_1,
+                             const double length_0); // returns length_1
 
+
+
+CINO_INLINE
+bool triangle_barycentric_coords(const vec3d  & A,
+                                 const vec3d  & B,
+                                 const vec3d  & C,
+                                 const vec3d  & P,
+                                 std::vector<double> & wgts,
+                                 const double   tol = 1e-5);
 }
 
 #ifndef  CINO_STATIC_LIB
