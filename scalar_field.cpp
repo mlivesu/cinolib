@@ -113,6 +113,7 @@ void ScalarField::serialize(const char *filename) const
     std::ofstream f;
     f.precision(std::numeric_limits<double>::digits10+1);
     f.open(filename);
+    assert(f.is_open());
     f << "SCALAR_FIELD " << size() << "\n";
     for(int i=0; i<rows(); ++i)
     {
@@ -128,7 +129,8 @@ void ScalarField::deserialize(const char *filename)
     std::ifstream f;
     f.precision(std::numeric_limits<double>::digits10+1);
     f.open(filename);
-    int         size;
+    assert(f.is_open());
+    int size;
     std::string dummy;
     f >> dummy >> size;
     resize(size);
