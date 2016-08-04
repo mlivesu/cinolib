@@ -1,3 +1,6 @@
+- re-ingegnerizza PointInsideMeshCache, dovrebbe restituire TUTTI gli elementi 
+  che contengono un punto e lasciare la selezione dell’elemento migliore alle 
+  applicazioni che lo utilizzano….
 - aggiungi DrawableOctree
 - aggiungi classe RAY per gestire raggi e classe line per gestire linee
 - aggiungi show triangle IDs and vertex IDs!!!!! (stile remesher panozzo/tarini)
