@@ -23,89 +23,87 @@
 ****************************************************************************/
 #include <cinolib/unstable/point_inside_mesh.h>
 #include <cinolib/meshes/tetmesh/tetmesh.h>
+#include <cinolib/geometry/tetrahedron.h>
 
 namespace cinolib
 {
 
-template<>
+template<class Mesh>
 CINO_INLINE
-PointInsideMeshCache<Tetmesh>::PointInsideMeshCache(const Tetmesh & m) : m(m)
+PointInsideMeshCache<Mesh>::PointInsideMeshCache(const Mesh & m, const int octree_depth) : m_ptr(&m)
 {
     octree = Octree<int>(m.bbox().min, m.bbox().max);
-    octree.subdivide_n_levels(5);
-    for(int tid=0; tid<m.num_tetrahedra(); ++tid)
+    octree.subdivide_n_levels(octree_depth);
+
+    for(int tid=0; tid<m.num_elements(); ++tid)
     {
-        vec3d min = m.tet_vertex(tid, 0);
+        vec3d min = m.elem_vertex(tid, 0);
         vec3d max = min;
-        for(int i=1; i<4; ++i)
+        for(int i=1; i<m.verts_per_element; ++i)
         {
-            min = min.min(m.tet_vertex(tid, i));
-            max = max.max(m.tet_vertex(tid, i));
+            min = min.min(m.elem_vertex(tid, i));
+            max = max.max(m.elem_vertex(tid, i));
         }
         octree.add_item(tid, min, max);
     }
 }
 
-template<>
+
+/* WARNING: this will return the *FIRST* element that contains p
+ * For correctness this should return *ALL* the elements containing
+ * p, and let the caller choose the best element depending on the needs...
+*/
+template<class Mesh>
 CINO_INLINE
-void PointInsideMeshCache<Tetmesh>::locate(const vec3d p, int & tid, double wgts[4]) const
+void PointInsideMeshCache<Mesh>::locate(const vec3d p, int & tid, std::vector<double> & wgts) const
 {
     std::set<int> items;
     octree.get_items(p, items);
 
-    if (items.empty())
+    for(int tet : items)
     {
-        std::cerr << "WARNING! point " << p << " not found inside tetmesh! " << std::endl;
-        std::cerr << "BBmin: " << m.bbox().min << std::endl;
-        std::cerr << "BBmax: " << m.bbox().max << std::endl;
-    }
-    assert(!items.empty());
-
-    int    best_item = -1;
-    double best_qual = -FLT_MAX;
-    double best_wgts[4];
-
-    for(int item : items)
-    {
-        assert(item >= 0 || item < m.num_elements());
-
-        double q = m.barycentric_coordinates(item, p, wgts);
-
-        if (q > best_qual)
+        if (m_ptr->barycentric_coordinates(tet, p, wgts)) // if is inside...
         {
-            best_item    = item;
-            best_qual    = q;
-            best_wgts[0] = wgts[0];
-            best_wgts[1] = wgts[1];
-            best_wgts[2] = wgts[2];
-            best_wgts[3] = wgts[3];
+            tid = tet;
+            return;
         }
     }
-    assert(best_item != -1);
 
-    tid = best_item;
-    wgts[0] = best_wgts[0];
-    wgts[1] = best_wgts[1];
-    wgts[2] = best_wgts[2];
-    wgts[3] = best_wgts[3];
+    /* this should not be here... it's a matter of the application, not of the data structure
+     * to handle corner cases...
+    */
+    std::cerr << "WARNING! point " << p << " is not inside the mesh! " << std::endl;
+    std::cerr << "I'll assign it to its closest mesh element         " << std::endl;
+    std::cerr << "BBmin: " << m_ptr->bbox().min << std::endl;
+    std::cerr << "BBmax: " << m_ptr->bbox().max << std::endl;
+
+    std::set< std::pair<double,int>,std::greater< std::pair<double,int> > > ordered_items;
+    for(int item : items)
+    {
+        ordered_items.insert(std::make_pair(m_ptr->element_barycenter(item).dist(p),item));
+    }
+    tid = (*ordered_items.begin()).second;
+    wgts = std::vector<double>(m_ptr->verts_per_element, 1.0/double(m_ptr->verts_per_element)); // centroid
 }
 
 
-template<>
+/* WARNING: this will return the *FIRST* element that contains p
+ * For correctness this should return *ALL* the elements containing
+ * p, and let the caller choose the best element depending on the needs...
+*/
+template<class Mesh>
 CINO_INLINE
-vec3d PointInsideMeshCache<Tetmesh>::locate(const vec3d p, const Tetmesh & obj) const
+vec3d PointInsideMeshCache<Mesh>::locate(const vec3d p, const Mesh & m) const
 {
-    int    tid;
-    double wgts[4];
+    int tid;
+    std::vector<double> wgts(m.verts_per_element);
     locate(p, tid, wgts);
 
-    assert(tid >= 0 && obj.num_elements() > tid);
-
-    vec3d tmp = wgts[0] * obj.tet_vertex(tid, 0) +
-                wgts[1] * obj.tet_vertex(tid, 1) +
-                wgts[2] * obj.tet_vertex(tid, 2) +
-                wgts[3] * obj.tet_vertex(tid, 3);
-
+    vec3d tmp(0,0,0);
+    for(int i=0; i<m.verts_per_element; ++i)
+    {
+        tmp += wgts.at(i) * m.elem_vertex(tid,i);
+    }
     return tmp;
 }
 

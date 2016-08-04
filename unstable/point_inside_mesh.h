@@ -35,15 +35,15 @@ class PointInsideMeshCache
 {
     private:
 
-        Mesh        m;
+        const Mesh *m_ptr;
         Octree<int> octree;
 
     public:
 
-        PointInsideMeshCache(const Mesh & m);
+        PointInsideMeshCache(const Mesh & m, const int octree_depth = 5);
 
-        void  locate(const vec3d p, int & tid, double wgts[4]) const;
-        vec3d locate(const vec3d p, const Mesh & obj) const;
+        void  locate(const vec3d p, int & tid, std::vector<double> & wgts) const;
+        vec3d locate(const vec3d p, const Mesh & m) const;
 };
 
 }
