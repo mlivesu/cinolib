@@ -50,6 +50,9 @@ class Tetmesh
 
         const Bbox & bbox() const;
 
+        static const int verts_per_element = 4;
+        static const int edges_per_element = 6;
+
     protected:
 
         // bounding box
@@ -169,6 +172,7 @@ class Tetmesh
         int tet_vertex_id(const int tid, const int offset) const;
 
         vec3d tet_vertex(const int tid, const int offset) const;
+        vec3d elem_vertex(const int eid, const int offset) const;
 
         int tri_vertex_id(const int tid, const int offset) const;
 
@@ -188,6 +192,7 @@ class Tetmesh
         vec3d edge_vertex(const int eid, const int offset) const;
 
         double tet_quality(const int tid) const;
+        double elem_quality(const int eid) const;
 
         bool tet_is_adjacent_to(const int tid, const int nbr) const;
 
@@ -234,7 +239,7 @@ class Tetmesh
 
         std::vector<int> edge_ordered_tet_ring(const int eid) const;
 
-        double barycentric_coordinates(const int tid, const vec3d & P, double wgt[4]) const;
+        bool barycentric_coordinates(const int tid, const vec3d & P, std::vector<double> & wgts) const;
 
         void translate(const vec3d & delta);
 

@@ -78,6 +78,9 @@ class Hexmesh
         //
         Bbox bb;
 
+        static const int verts_per_element = 8;
+        static const int edges_per_element = 12;
+
     protected:
 
         // serialized xyz coordinates, hexa and edges

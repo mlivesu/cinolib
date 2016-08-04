@@ -51,6 +51,9 @@ class Trimesh
         Trimesh(const std::vector<double> & coords,
                 const std::vector<u_int>  & tris);
 
+        static const int verts_per_element = 3;
+        static const int edges_per_element = 3;
+
     protected:
 
         std::string filename;
@@ -150,7 +153,9 @@ class Trimesh
         virtual void                edge_switch_id(const int eid0, const int eid1);
         virtual void                remove_unreferenced_edge(const int eid);
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        bool                        barycentric_coordinates(const int tid, const vec3d & P, std::vector<double> & wgts) const;
         vec3d                       triangle_vertex(const int tid, const int offset) const;
+        vec3d                       elem_vertex(const int eid, const int offset) const;
         bool                        triangle_is_boundary(const int tid) const;
         int                         triangle_vertex_id(const int tid, const int offset) const;
         vec3d                       triangle_normal(const int tid) const;

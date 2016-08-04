@@ -490,25 +490,25 @@ int Tetmesh::num_vertices() const
 CINO_INLINE
 int Tetmesh::num_tetrahedra() const
 {
-    return tets.size()  /4;
+    return tets.size()/4;
 }
 
 CINO_INLINE
 int Tetmesh::num_elements() const
 {
-    return tets.size()  /4;
+    return tets.size()/4;
 }
 
 CINO_INLINE
 int Tetmesh::num_edges() const
 {
-    return edges.size() /2;
+    return edges.size()/2;
 }
 
 CINO_INLINE
 int Tetmesh::num_srf_triangles() const
 {
-    return tris.size()  /3;
+    return tris.size()/3;
 }
 
 CINO_INLINE
@@ -687,6 +687,12 @@ vec3d Tetmesh::tet_vertex(const int tid, const int offset) const
 {
     int tid_ptr = tid * 4;
     return vertex(tets[tid_ptr + offset]);
+}
+
+CINO_INLINE
+vec3d Tetmesh::elem_vertex(const int eid, const int offset) const
+{
+    return tet_vertex(eid, offset);
 }
 
 CINO_INLINE
@@ -963,6 +969,12 @@ double Tetmesh::tet_quality(const int tid) const
 }
 
 CINO_INLINE
+double Tetmesh::elem_quality(const int eid) const
+{
+    return tet_quality(eid);
+}
+
+CINO_INLINE
 bool Tetmesh::tet_is_adjacent_to(const int tid, const int nbr) const
 {
     for(int t : adj_tet2tet(tid))
@@ -1159,91 +1171,17 @@ std::vector<int> Tetmesh::edge_ordered_tet_ring(const int eid) const
 }
 
 CINO_INLINE
-double Tetmesh::barycentric_coordinates(const int tid, const vec3d & P, double wgt[4]) const
+bool Tetmesh::barycentric_coordinates(const int tid, const vec3d & P, std::vector<double> & wgts) const
 {
-    vec3d v0 = tet_vertex(tid, 0);
-    vec3d v1 = tet_vertex(tid, 1);
-    vec3d v2 = tet_vertex(tid, 2);
-    vec3d v3 = tet_vertex(tid, 3);
-
-    Eigen::Matrix<double,4,4> D;
-    D(0,0) = v0[0]; D(0,1) = v0[1]; D(0,2) = v0[2]; D(0,3) = 1;
-    D(1,0) = v1[0]; D(1,1) = v1[1]; D(1,2) = v1[2]; D(1,3) = 1;
-    D(2,0) = v2[0]; D(2,1) = v2[1]; D(2,2) = v2[2]; D(2,3) = 1;
-    D(3,0) = v3[0]; D(3,1) = v3[1]; D(3,2) = v3[2]; D(3,3) = 1;
-
-    Eigen::Matrix<double,4,4> D0;
-    D0(0,0) =  P[0]; D0(0,1) =  P[1]; D0(0,2) =  P[2]; D0(0,3) = 1;
-    D0(1,0) = v1[0]; D0(1,1) = v1[1]; D0(1,2) = v1[2]; D0(1,3) = 1;
-    D0(2,0) = v2[0]; D0(2,1) = v2[1]; D0(2,2) = v2[2]; D0(2,3) = 1;
-    D0(3,0) = v3[0]; D0(3,1) = v3[1]; D0(3,2) = v3[2]; D0(3,3) = 1;
-
-    Eigen::Matrix<double,4,4> D1;
-    D1(0,0) = v0[0]; D1(0,1) = v0[1]; D1(0,2) = v0[2]; D1(0,3) = 1;
-    D1(1,0) =  P[0]; D1(1,1) =  P[1]; D1(1,2) =  P[2]; D1(1,3) = 1;
-    D1(2,0) = v2[0]; D1(2,1) = v2[1]; D1(2,2) = v2[2]; D1(2,3) = 1;
-    D1(3,0) = v3[0]; D1(3,1) = v3[1]; D1(3,2) = v3[2]; D1(3,3) = 1;
-
-    Eigen::Matrix<double,4,4> D2;
-    D2(0,0) = v0[0]; D2(0,1) = v0[1]; D2(0,2) = v0[2]; D2(0,3) = 1;
-    D2(1,0) = v1[0]; D2(1,1) = v1[1]; D2(1,2) = v1[2]; D2(1,3) = 1;
-    D2(2,0) =  P[0]; D2(2,1) =  P[1]; D2(2,2) =  P[2]; D2(2,3) = 1;
-    D2(3,0) = v3[0]; D2(3,1) = v3[1]; D2(3,2) = v3[2]; D2(3,3) = 1;
-
-    Eigen::Matrix<double,4,4> D3;
-    D3(0,0) = v0[0]; D3(0,1) = v0[1]; D3(0,2) = v0[2]; D3(0,3) = 1;
-    D3(1,0) = v1[0]; D3(1,1) = v1[1]; D3(1,2) = v1[2]; D3(1,3) = 1;
-    D3(2,0) = v2[0]; D3(2,1) = v2[1]; D3(2,2) = v2[2]; D3(2,3) = 1;
-    D3(3,0) =  P[0]; D3(3,1) =  P[1]; D3(3,2) =  P[2]; D3(3,3) = 1;
-
-    double det_D  = D.determinant();
-    double det_D0 = D0.determinant();
-    double det_D1 = D1.determinant();
-    double det_D2 = D2.determinant();
-    double det_D3 = D3.determinant();
-
-    double eps = 1e-10;
-
-    bool is_inside_pos = (det_D >= -eps && det_D0 >= -eps && det_D1 >= -eps && det_D2 >= -eps && det_D3 >= -eps);
-    bool is_inside_neg = (det_D <=  eps && det_D0 <=  eps && det_D1 <=  eps && det_D2 <=  eps && det_D3 <=  eps);
-
-    if (is_inside_pos || is_inside_neg)
-    {
-        double sum = det_D0 + det_D1 + det_D2 + det_D3;
-
-        wgt[0] = det_D0 / sum;
-        wgt[1] = det_D1 / sum;
-        wgt[2] = det_D2 / sum;
-        wgt[3] = det_D3 / sum;
-
-        for(int i=0; i<4; ++i)
-        {
-            if (std::isnan(wgt[i]))
-            {
-                assert(fabs(det_D) < 1e-10);
-                //cerr << "WARNING : nan barycentric coordinate! P: " <<  P << endl;
-                wgt[0] = 0.25;
-                wgt[1] = 0.25;
-                wgt[2] = 0.25;
-                wgt[3] = 0.25;
-                return 0.0;
-            }
-        }
-
-        // the idea is: among the tets that contain the query vertex rely on the best one
-        // that is the one with the highest MSJ
-        //
-        return tet_quality(tid);
-    }
-    else // P is outside
-    {
-        wgt[0] = 0.25;
-        wgt[1] = 0.25;
-        wgt[2] = 0.25;
-        wgt[3] = 0.25;
-        return -FLT_MAX;
-    }
+    assert(tid>=0);
+    assert(tid<num_tetrahedra());
+    return tet_barycentric_coords(tet_vertex(tid,0),
+                                  tet_vertex(tid,1),
+                                  tet_vertex(tid,2),
+                                  tet_vertex(tid,3),
+                                  P, wgts);
 }
+
 
 CINO_INLINE
 Trimesh Tetmesh::export_surface(std::map<int,int> & tet2tri_map,

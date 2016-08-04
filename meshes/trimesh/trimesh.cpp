@@ -887,14 +887,14 @@ void Trimesh::normalize_area()
 }
 
 CINO_INLINE
-vec3d Trimesh::element_barycenter(const int tid) const
+vec3d Trimesh::element_barycenter(const int eid) const
 {
-    assert(tid >= 0);
-    assert(tid < num_triangles());
+    assert(eid >= 0);
+    assert(eid < num_triangles());
     vec3d b(0,0,0);
     for(int i=0; i<3; ++i)
     {
-        b += triangle_vertex(tid,i);
+        b += triangle_vertex(eid,i);
     }
     b /= 3.0;
     return b;
@@ -1214,6 +1214,18 @@ void Trimesh::remove_unreferenced_edge(const int eid)
     edg2tri.pop_back();
 }
 
+
+CINO_INLINE
+bool Trimesh::barycentric_coordinates(const int tid, const vec3d & P, std::vector<double> & wgts) const
+{
+    assert(tid >= 0);
+    assert(tid < num_triangles());
+    return triangle_barycentric_coords(triangle_vertex(tid,0),
+                                       triangle_vertex(tid,1),
+                                       triangle_vertex(tid,2),
+                                       P, wgts);
+}
+
 CINO_INLINE
 void Trimesh::vertex_switch_id(const int vid0, const int vid1)
 {
@@ -1306,6 +1318,12 @@ vec3d Trimesh::triangle_vertex(const int tid, const int offset) const
     int vid     = tris.at(tid_ptr + offset);
     int vid_ptr = vid * 3;
     return vec3d(coords.at(vid_ptr + 0), coords.at(vid_ptr + 1), coords.at(vid_ptr + 2));
+}
+
+CINO_INLINE
+vec3d Trimesh::elem_vertex(const int eid, const int offset) const
+{
+    return triangle_vertex(eid, offset);
 }
 
 CINO_INLINE

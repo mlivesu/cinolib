@@ -58,6 +58,9 @@ class Quadmesh
         Quadmesh(const std::vector<double> & coords,
                  const std::vector<u_int>  & quads);
 
+        static const int verts_per_element = 4;
+        static const int edges_per_element = 4;
+
     protected:
 
         std::string filename;
