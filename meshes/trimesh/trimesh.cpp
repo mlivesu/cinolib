@@ -267,7 +267,7 @@ int Trimesh::num_edges() const
 }
 
 CINO_INLINE
-const std::vector<int> &Trimesh::adj_vtx2vtx(const int vid) const
+const std::vector<int> & Trimesh::adj_vtx2vtx(const int vid) const
 {
     return vtx2vtx.at(vid);
 }

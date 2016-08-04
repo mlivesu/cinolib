@@ -89,7 +89,7 @@ CINO_INLINE
 vec3d Curve::sample_curve_at(const float t, const double tot_length) const
 {
     assert(size() > 1);
-    assert(tot_length > 1e-7);
+    assert(tot_length > 0);
     assert(t>=0.0);
     assert(t<=1.0);
 

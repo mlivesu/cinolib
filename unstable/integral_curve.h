@@ -61,10 +61,10 @@ class IntegralCurve : public DrawableCurve
 
     public:
 
-    IntegralCurve(const Mesh        & m,
-                  const VectorField & grad,
-                  const int           source_tid,
-                  const vec3d         start_pos);
+        IntegralCurve(const Mesh        & m,
+                      const VectorField & grad,
+                      const int           source_tid,
+                      const vec3d         start_pos);
 
         IntegralCurve(const Mesh        & m,
                       const VectorField & grad,
