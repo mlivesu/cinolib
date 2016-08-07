@@ -41,6 +41,8 @@ bool tet_barycentric_coords(const vec3d & A,
                             std::vector<double> & wgts,
                             const double  tol)
 {
+    wgts = std::vector<double>(4, 0.0);
+
     //Eigen::Matrix<double,4,4> M;
     //M(0,0) = A[0]; M(0,1) = A[1]; M(0,2) = A[2]; M(0,3) = 1;
     //M(1,0) = B[0]; M(1,1) = B[1]; M(1,2) = B[2]; M(1,3) = 1;
@@ -76,17 +78,16 @@ bool tet_barycentric_coords(const vec3d & A,
     double det_M1 = M1.determinant();
     double det_M2 = M2.determinant();
     double det_M3 = M3.determinant();
+    double sum    = det_M0 + det_M1 + det_M2 + det_M3;
 
-    double sum = det_M0 + det_M1 + det_M2 + det_M3;
     if (sum==0) return false; // degenerate
 
-    wgts.resize(4);
     wgts[0] = det_M0/sum; assert(!std::isnan(wgts[0]));
     wgts[1] = det_M1/sum; assert(!std::isnan(wgts[1]));
     wgts[2] = det_M2/sum; assert(!std::isnan(wgts[2]));
     wgts[3] = det_M3/sum; assert(!std::isnan(wgts[3]));
 
-    for(double w : wgts) if (w < -tol) return false; // outside
+    for(double w : wgts) if (w < -tol || w > 1.0+tol) return false; // outside
     return true; // inside
 }
 

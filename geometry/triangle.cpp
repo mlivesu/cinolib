@@ -107,6 +107,8 @@ bool triangle_barycentric_coords(const vec3d  & A,
                                  std::vector<double> & wgts,
                                  const double   tol)
 {
+    wgts = std::vector<double>(3, 0.0);
+
     vec3d  u    = B - A;
     vec3d  v    = C - A;
     vec3d  w    = P - A;
@@ -116,14 +118,14 @@ bool triangle_barycentric_coords(const vec3d  & A,
     double d20  = w.dot(u);
     double d21  = w.dot(v);
     double den  = d00 * d11 - d01 * d01;
+
     if (den==0) return false; // degenerate
 
-    wgts.resize(3);
-    wgts[0] = (d11 * d20 - d01 * d21) / den;    assert(!std::isnan(wgts[0]));
-    wgts[1] = (d00 * d21 - d01 * d20) / den;    assert(!std::isnan(wgts[1]));
-    wgts[2] = 1.0f - wgts[0] - wgts[1];         assert(!std::isnan(wgts[2]));
+    wgts[2] = (d00 * d21 - d01 * d20) / den; assert(!std::isnan(wgts[2]));
+    wgts[1] = (d11 * d20 - d01 * d21) / den; assert(!std::isnan(wgts[1]));
+    wgts[0] = 1.0f - wgts[1] - wgts[2];      assert(!std::isnan(wgts[0]));
 
-    for(double w : wgts) if (w < -tol) return false; // outside
+    for(double w : wgts) if (w < -tol || w > 1.0+tol) return false; // outside
     return true; // inside
 }
 
