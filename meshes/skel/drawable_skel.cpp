@@ -46,13 +46,19 @@ DrawableSkel::DrawableSkel() : Skel()
 }
 
 CINO_INLINE
+DrawableSkel::DrawableSkel(const Skel & s) : Skel(s.vector_coords(), s.vector_segments())
+{
+    init();
+}
+
+CINO_INLINE
 DrawableSkel::DrawableSkel(const char *filename) : Skel(filename)
 {
     init();
 }
 
 CINO_INLINE
-DrawableSkel::DrawableSkel(std::vector<double> &coords, std::vector<int> &segs) : Skel(coords, segs)
+DrawableSkel::DrawableSkel(const std::vector<double> & coords, const std::vector<int> &segs) : Skel(coords, segs)
 {
     init();
 }

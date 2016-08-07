@@ -44,6 +44,58 @@ void Skel::clear()
 }
 
 CINO_INLINE
+void Skel::operator+=(const Skel & s)
+{
+    int nv = num_vertices();
+    int ns = num_segments();
+    int nb = num_bones();
+
+    for(int sid=0; sid<s.num_segments(); ++sid)
+    {
+        segments.push_back(ns + s.segment_vertex_id(sid,0));
+        segments.push_back(ns + s.segment_vertex_id(sid,1));
+
+        std::vector<int> tmp;
+        for(int sid : s.seg2seg[sid]) tmp.push_back(ns + sid);
+        seg2seg.push_back(tmp);
+
+        seg_bone_ids.push_back(nb + s.seg_bone_ids.at(sid));
+    }
+
+    for(int vid=0; vid<s.num_vertices(); ++vid)
+    {
+        vec3d pos = s.vertex(vid);
+        coords.push_back(pos.x());
+        coords.push_back(pos.y());
+        coords.push_back(pos.z());
+
+        max_spheres.push_back(s.max_spheres.at(vid));
+        vtx_bone_ids.push_back(nb + s.vtx_bone_ids.at(vid));
+
+        std::vector<int> tmp;
+        for(int sid : s.vtx2seg[vid]) tmp.push_back(ns + sid);
+        vtx2seg.push_back(tmp);
+
+        tmp.clear();
+        for(int nbr : s.vtx2vtx[vid]) tmp.push_back(nv + nbr);
+        vtx2vtx.push_back(tmp);
+    }
+
+    for(auto obj : s.vtx_bones)
+    {
+        for(int & vid : obj) vid += nv;
+        vtx_bones.push_back(obj);
+    }
+
+    for(auto obj : s.seg_bones)
+    {
+        for(int & vid : obj) vid += ns;
+        seg_bones.push_back(obj);
+    }
+    update_bbox();
+}
+
+CINO_INLINE
 void Skel::load(const char * filename)
 {
     clear();
@@ -98,8 +150,7 @@ void Skel::save(const char * filename) const
 }
 
 CINO_INLINE
-Skel::Skel(std::vector<double> & coords,
-           std::vector<int>    & segs)
+Skel::Skel(const std::vector<double> & coords, const std::vector<int> & segs)
 {
     load(coords, segs);
 }

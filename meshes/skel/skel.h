@@ -45,7 +45,7 @@ class Skel
 
         Skel(){}
         Skel(const char * filename) { load(filename); }
-        Skel(std::vector<double> & coords, std::vector<int> & segs);
+        Skel(const std::vector<double> & coords, const std::vector<int> & segs);
 
     protected:
 
@@ -67,6 +67,8 @@ class Skel
         void clear();
 
     public:
+
+        virtual void operator+=(const Skel & s);
 
         void load(const std::vector<double> & coords, const std::vector<int> & segments);
         void load(const char * filename);
