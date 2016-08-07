@@ -26,6 +26,7 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/bbox.h>
+#include <cinolib/meshes/skel/skel.h>
 
 namespace cinolib
 {
@@ -36,6 +37,10 @@ class Curve
 
         Curve();
         Curve(const std::vector<vec3d> & samples);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        Skel export_as_skeleton() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

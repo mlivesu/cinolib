@@ -37,6 +37,28 @@ Curve::Curve(const std::vector<vec3d> & samples)
     this->curve_samples = samples;
 }
 
+CINO_INLINE
+Skel Curve::export_as_skeleton() const
+{
+    std::vector<double> coords;
+    std::vector<int>    segs;
+
+    for(size_t i=0; i<curve_samples.size(); ++i)
+    {
+        coords.push_back(curve_samples.at(i).x());
+        coords.push_back(curve_samples.at(i).y());
+        coords.push_back(curve_samples.at(i).z());
+
+        if (i>0)
+        {
+            segs.push_back(i-1);
+            segs.push_back( i );
+        }
+    }
+
+    return Skel(coords, segs);
+}
+
 
 CINO_INLINE
 const Bbox & Curve::bbox() const
@@ -99,6 +121,8 @@ vec3d Curve::sample_curve_at(const float t, const double tot_length) const
     {
         double seg_l   = curve_samples.at(i-1).dist(curve_samples[i]);
         double delta_t = seg_l / tot_length;
+
+        if (delta_t == 0) continue;
 
         if (curr_t + delta_t >= t - 1e-7)
         {
