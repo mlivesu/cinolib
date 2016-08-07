@@ -230,6 +230,8 @@ class Tetmesh
 
         std::vector<int> get_flipped_tets() const;
 
+        Tetmesh export_submesh_with_label(const int label) const;
+
         void export_submesh_with_label(const int             label,
                                        std::vector<double> & sub_coords,
                                        std::vector<u_int>  & sub_tets,

@@ -1137,6 +1137,17 @@ void Tetmesh::export_submesh_with_label(const int             label,
 }
 
 CINO_INLINE
+Tetmesh Tetmesh::export_submesh_with_label(const int label) const
+{
+    std::vector<double> sub_coords;
+    std::vector<u_int>  sub_tets;
+    std::map<int, int>  vid2sub_vid;
+    std::map<int, int>  sub_vid2vid;
+    export_submesh_with_label(label, sub_coords, sub_tets, vid2sub_vid, sub_vid2vid);
+    return Tetmesh(sub_coords, sub_tets);
+}
+
+CINO_INLINE
 std::vector<int> Tetmesh::edge_ordered_tet_ring(const int eid) const
 {
     std::vector<int> ring = adj_edg2tet(eid);
