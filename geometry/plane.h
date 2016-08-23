@@ -49,12 +49,18 @@ class Plane
         Plane(const vec3d & point,
               const vec3d & normal);
 
+        double a() const { return n.x(); }
+        double b() const { return n.y(); }
+        double c() const { return n.z(); }
+
         void set_plane(const vec3d & point,
                        const vec3d & normal);
 
         double operator[](const vec3d & p) const;
 
         double point_plane_dist(const vec3d & p) const;
+
+        vec3d project_onto(const vec3d & p);
 };
 
 CINO_INLINE

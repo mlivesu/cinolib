@@ -26,6 +26,7 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/plane.h>
 #include <vector>
 
 namespace cinolib
@@ -37,9 +38,15 @@ class Segment : public std::pair<vec3d,vec3d>
 
         Segment(const vec3d & P0, const vec3d & P1);
 
+        std::vector<Plane> to_planes() const;
+
+        vec3d dir() const;
+
         double operator[](const vec3d & p) const;
 
         double dist_to_point(const vec3d & p) const;
+
+        bool is_in_between(const vec3d & p) const;
 };
 
 CINO_INLINE

@@ -87,4 +87,22 @@ double Plane::point_plane_dist(const vec3d & p) const
     return dist;
 }
 
+
+CINO_INLINE
+vec3d Plane::project_onto(const vec3d & p)
+{
+    vec3d res;
+    if (this->operator [](p) > 0)
+    {
+        res = p - n * point_plane_dist(p);
+        assert(point_plane_dist(res) < 1e-7);
+    }
+    else
+    {
+        res = p + n * point_plane_dist(p);
+        assert(point_plane_dist(res) < 1e-7);
+    }
+    return res;
+}
+
 }
