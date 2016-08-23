@@ -63,7 +63,7 @@ class DrawableTrimesh : public Trimesh , public DrawableObject
         // Implementation of the
         // DrawableObject interface
         //
-        void  draw()         const;
+        void  draw(const float scene_size=1) const;
         vec3d scene_center() const;
         float scene_radius() const;
 

@@ -95,7 +95,7 @@ float DrawableQuadmesh::scene_radius() const
 }
 
 CINO_INLINE
-void DrawableQuadmesh::draw() const
+void DrawableQuadmesh::draw(const float) const
 {
     RenderFaceData data;
     data.face_type       = GL_QUADS;

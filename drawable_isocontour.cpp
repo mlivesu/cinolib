@@ -40,9 +40,6 @@ DrawableIsocontour::DrawableIsocontour(Trimesh & m, float value) : Isocontour(m,
 {
     type = CURVE;
 
-    sample_rad = m_ptr->bbox().diag()*0.004;
-    cylind_rad = m_ptr->bbox().diag()*0.002;
-
     for(int i=0; i<3; ++i)
     {
         cylind_rgb[i] = YELLOW[i];
@@ -53,8 +50,11 @@ DrawableIsocontour::DrawableIsocontour(Trimesh & m, float value) : Isocontour(m,
 
 
 CINO_INLINE
-void DrawableIsocontour::draw() const
+void DrawableIsocontour::draw(const float scene_size) const
 {
+    float sample_rad = /*m_ptr->bbox().diag()*/scene_size*0.004;
+    float cylind_rad = /*m_ptr->bbox().diag()*/scene_size*0.002;
+
     for(int i=0; i<(int)curves_vertices.size(); ++i)
     {
         for(int j=0; j<(int)curves_vertices[i].size()-1; ++j)

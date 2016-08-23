@@ -54,7 +54,7 @@ class DrawableVectorField : public VectorField, public DrawableObject
         }
 
 
-        void draw() const
+        void draw(const float) const
         {
             if (m_ptr)
             {

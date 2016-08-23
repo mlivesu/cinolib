@@ -49,7 +49,7 @@ CINO_INLINE void GLcanvas::draw()
 
     for(int i=0; i<(int)drawlist.size(); ++i)
     {
-        drawlist[i]->draw();
+        drawlist[i]->draw( sceneRadius() );
     }
 }
 
@@ -71,10 +71,8 @@ CINO_INLINE void GLcanvas::fit_scene()
     float radius = 0.0;
     int   count  = 0;
 
-    for(int i=0; i<(int)drawlist.size(); ++i)
+    for(const DrawableObject *obj : drawlist)
     {
-        const DrawableObject * obj = drawlist[i];
-
         center += obj->scene_center();
         radius  = std::max(radius, obj->scene_radius());
         ++count;

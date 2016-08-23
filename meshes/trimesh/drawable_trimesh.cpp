@@ -101,7 +101,7 @@ float DrawableTrimesh::scene_radius() const
 }
 
 CINO_INLINE
-void DrawableTrimesh::draw() const
+void DrawableTrimesh::draw(const float) const
 {
     RenderFaceData data;
     data.face_type       = GL_TRIANGLES;

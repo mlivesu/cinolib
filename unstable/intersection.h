@@ -28,6 +28,9 @@
 #include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/geometry/plane.h>
+#include <cinolib/geometry/line.h>
+#include <cinolib/geometry/ray.h>
+#include <cinolib/geometry/segment.h>
 
 namespace cinolib
 {
@@ -57,6 +60,13 @@ bool ray_triangle_intersection(const vec3d   P,
                                const vec3d   V1,
                                const vec3d   V2,
                                      vec3d & inters);
+
+
+CINO_INLINE
+bool least_squares_intersection(const std::vector<Plane> & planes, vec3d & inters);
+
+CINO_INLINE
+bool intersection(const Ray & r, const Segment & s, vec3d & inters, const double tol = 1e-7);
 
 }
 }

@@ -40,7 +40,7 @@ class DrawableCurve : public Curve, public DrawableObject
         DrawableCurve();
         DrawableCurve(const std::vector<vec3d> & samples);
 
-        void  draw()         const;
+        void  draw(const float scene_size=1) const;
         vec3d scene_center() const;
         float scene_radius() const;
 };

@@ -51,7 +51,7 @@ class DrawableSkel : public Skel, public DrawableObject
         DrawableSkel(const char * filename);
         DrawableSkel(const std::vector<double> & coords, const std::vector<int> & segs);
 
-        void  draw()         const;
+        void  draw(const float scene_size=1)         const;
         vec3d scene_center() const { return bbox.center();     }
         float scene_radius() const { return bbox.diag() * 0.5; }
 

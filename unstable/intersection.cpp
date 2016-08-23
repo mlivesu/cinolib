@@ -36,7 +36,7 @@ namespace intersection
 
 namespace bg = boost::geometry;
 typedef   bg::model::point<double,3,bg::cs::cartesian> Point;
-typedef   bg::model::segment<Point>                    Segment;
+typedef   bg::model::segment<Point>                    Segment2D;
 
 CINO_INLINE
 bool segment2D(const vec2d        & s0_beg,
@@ -48,10 +48,10 @@ bool segment2D(const vec2d        & s0_beg,
     assert(inters.empty());
 
     std::vector<Point> res;
-    bg::intersection(Segment(Point(s0_beg.x(), s0_beg.y()),
-                             Point(s0_end.x(), s0_end.y())),
-                     Segment(Point(s1_beg.x(), s1_beg.y()),
-                             Point(s1_end.x(), s1_end.y())),
+    bg::intersection(Segment2D(Point(s0_beg.x(), s0_beg.y()),
+                               Point(s0_end.x(), s0_end.y())),
+                     Segment2D(Point(s1_beg.x(), s1_beg.y()),
+                               Point(s1_end.x(), s1_end.y())),
                      res);
 
     // if s1 and s2 are colinear returns the endpoints of the shared portion
@@ -117,6 +117,54 @@ bool ray_triangle_intersection(const vec3d   P,
         return true;
     }
 
+    return false;
+}
+
+
+CINO_INLINE
+bool least_squares_intersection(const std::vector<Plane> & planes, vec3d & inters)
+{
+    if (planes.size() < 3) return false;
+
+    Eigen::MatrixXd A(planes.size(), 3);
+    Eigen::VectorXd b(planes.size());
+
+    int row = 0;
+    for(const Plane & p : planes)
+    {
+        A.coeffRef(row, 0) = p.a();
+        A.coeffRef(row, 1) = p.b();
+        A.coeffRef(row, 2) = p.c();
+        b[row] = p.d;
+        ++row;
+    }
+
+    // https://eigen.tuxfamily.org/dox-devel/group__LeastSquares.html
+    Eigen::Vector3d res = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+
+    inters[0] = res[0];
+    inters[1] = res[1];
+    inters[2] = res[2];
+
+    return true;
+}
+
+
+CINO_INLINE
+bool intersection(const Ray & r, const Segment & s, vec3d & inters, const double tol)
+{
+    if (((r.dir()).cross(s.dir())).length() == 0) return false;
+
+    std::vector<Plane> r_planes = r.to_planes();
+    std::vector<Plane> s_planes = s.to_planes();
+
+    std::vector<Plane> planes;
+    std::copy(r_planes.begin(), r_planes.end(), std::back_inserter(planes));
+    std::copy(s_planes.begin(), s_planes.end(), std::back_inserter(planes));
+
+    least_squares_intersection(planes, inters);
+
+    if (s.dist_to_point(inters) < tol && r.dist_to_point(inters) < tol) return true;
     return false;
 }
 

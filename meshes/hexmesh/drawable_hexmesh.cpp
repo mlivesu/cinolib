@@ -127,7 +127,7 @@ float DrawableHexmesh::scene_radius() const
 }
 
 CINO_INLINE
-void DrawableHexmesh::draw() const
+void DrawableHexmesh::draw(const float) const
 {
     RenderFaceData data_out;
     data_out.face_type       = GL_QUADS;

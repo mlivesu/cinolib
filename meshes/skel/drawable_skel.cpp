@@ -80,7 +80,7 @@ void DrawableSkel::init()
 }
 
 CINO_INLINE
-void DrawableSkel::draw() const
+void DrawableSkel::draw(const float) const
 {
     if (draw_mode & DRAW_SKEL)
     {

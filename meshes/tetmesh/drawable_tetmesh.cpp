@@ -127,7 +127,7 @@ float DrawableTetmesh::scene_radius() const
 }
 
 CINO_INLINE
-void DrawableTetmesh::draw() const
+void DrawableTetmesh::draw(const float) const
 {
     RenderFaceData data_out;
     data_out.face_type       = GL_TRIANGLES;

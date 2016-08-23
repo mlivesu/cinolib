@@ -40,7 +40,7 @@ DrawableIsosurface::DrawableIsosurface(const Tetmesh & m, const float iso_value)
 }
 
 CINO_INLINE
-void DrawableIsosurface::draw() const
+void DrawableIsosurface::draw(const float) const
 {
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glDisable(GL_CULL_FACE);

@@ -36,9 +36,11 @@ DrawableCurve::DrawableCurve(const std::vector<vec3d> & samples) : Curve(samples
 
 
 CINO_INLINE
-void DrawableCurve::draw() const
+void DrawableCurve::draw(const float scene_size) const
 {
-    double cylind_rad = bbox().diag()*0.001;
+    double cylind_rad = scene_size*0.001;
+
+    //for(vec3d s : samples()) std::cout << s << std::endl;
 
     for(size_t i=1; i<samples().size(); ++i)
     {

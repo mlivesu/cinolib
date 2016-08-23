@@ -52,7 +52,7 @@ class DrawableObject
 
         DrawableObject() { type = ABSTRACT; }
 
-        virtual void  draw()         const = 0;  // do rendering
+        virtual void  draw(const float scene_size = 1) const = 0;  // do rendering
         virtual vec3d scene_center() const = 0;  // get position in space
         virtual float scene_radius() const = 0;  // get size (approx. radius of the bounding sphere)
 };

@@ -41,14 +41,11 @@ class DrawableIsocontour : public Isocontour, public DrawableObject
 
         // Implement DrawableObject interface
         //
-        void  draw()         const;
+        void  draw(const float scene_size=1)         const;
         vec3d scene_center() const { return vec3d(); }
         float scene_radius() const { return 0.0;     }
 
     private:
-
-        float sample_rad;
-        float cylind_rad;
 
         float sample_rgb[3];
         float centre_rgb[3];
