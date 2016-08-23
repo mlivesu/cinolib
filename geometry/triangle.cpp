@@ -125,8 +125,34 @@ bool triangle_barycentric_coords(const vec3d  & A,
     wgts[1] = (d11 * d20 - d01 * d21) / den; assert(!std::isnan(wgts[1]));
     wgts[0] = 1.0f - wgts[1] - wgts[2];      assert(!std::isnan(wgts[0]));
 
-    for(double w : wgts) if (w < -tol || w > 1.0+tol) return false; // outside
+    for(double w : wgts) if (w < -tol || w > 1.0 + tol) return false; // outside
     return true; // inside
+}
+
+
+CINO_INLINE
+bool triangle_bary_is_vertex(const std::vector<double> & bary,
+                             int                       & vid,
+                             const double                tol)
+{
+    assert(bary.size()==3);
+    if (bary[0]>tol && bary[1]<=tol && bary[2]<=tol) { vid = 0; return true; }
+    if (bary[1]>tol && bary[0]<=tol && bary[2]<=tol) { vid = 1; return true; }
+    if (bary[2]>tol && bary[0]<=tol && bary[1]<=tol) { vid = 2; return true; }
+    return false;
+}
+
+
+CINO_INLINE
+bool triangle_bary_is_edge(const std::vector<double> & bary,
+                             int                     & eid,
+                             const double              tol)
+{
+    assert(bary.size()==3);
+    if (bary[0]>tol && bary[1]>tol && bary[2]<=tol) { eid = 0; return true; }
+    if (bary[1]>tol && bary[2]>tol && bary[0]<=tol) { eid = 1; return true; }
+    if (bary[2]>tol && bary[0]>tol && bary[1]<=tol) { eid = 2; return true; }
+    return false;
 }
 
 }

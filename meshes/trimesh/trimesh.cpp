@@ -145,22 +145,18 @@ void Trimesh::update_adjacency()
         //assert(tids.size() >= 1 && "Non manifold edge!");
         //if (tids.size() > 2 || tids.size() < 1) cerr << "Non manifold edge! " << edge_vertex(eid, 0) << "\t" << edge_vertex(eid, 1) << endl;
 
-        for(int i=0; i<(int)tids.size(); ++i)
+        for(int tid : tids)
         {
-            int tid = tids[i];
-
             tri2edg[tid].push_back(eid);
             edg2tri[eid].push_back(tid);
         }
 
         if (tids.size() >= 2)
         {
-            for (size_t i=0; i<tids.size() -1; i++)
+            for (size_t i=0; i<tids.size()-1; i++)
             {
                 tri2tri[tids[i]].push_back(tids[i+1]);
                 tri2tri[tids[i+1]].push_back(tids[i]);
-        //    assert(tri2tri[tids[0]].size() <= 3);
-        //    assert(tri2tri[tids[1]].size() <= 3);
             }
 
             if (tids.size() > 2)
@@ -296,7 +292,11 @@ const std::vector<int> &Trimesh::adj_tri2edg(const int tid) const
     return tri2edg.at(tid);
 }
 
-
+CINO_INLINE
+const std::vector<int> &Trimesh::adj_ele2edg(const int tid) const
+{
+    return adj_tri2edg(tid);
+}
 
 CINO_INLINE
 const std::vector<int> &Trimesh::adj_tri2tri(const int tid) const
@@ -411,8 +411,7 @@ int Trimesh::edge_opposite_to(const int tid, const int vid) const
         if (edge_vertex_id(eid, 0) != vid && edge_vertex_id(eid, 1) != vid) return eid;
     }
 
-    logger << " Triangle: " << tid << " [ " << tris.at(tid*3+0) << " " << tris.at(tid*3+1) << " " << tris.at(tid*3+2) << " ] " <<std::endl;
-
+    logger << " Triangle: " << tid << " [ " << tris.at(tid*3+0) << " " << tris.at(tid*3+1) << " " << tris.at(tid*3+2) << " ] " << endl;
     assert(false);
 }
 
@@ -583,6 +582,13 @@ int Trimesh::triangle_vertex_id(const int tid, const int offset) const
 }
 
 CINO_INLINE
+int Trimesh::elem_vertex_id(const int tid, const int offset) const
+{
+    return triangle_vertex_id(tid, offset);
+}
+
+
+CINO_INLINE
 vec3d Trimesh::triangle_normal(const int tid) const
 {
     int tid_ptr = tid * 3;
@@ -628,6 +634,36 @@ float Trimesh::triangle_min_u_text(const int tid) const
         vertex_u_text(triangle_vertex_id(tid,2)),
     };
     return *std::min_element(vals, vals+3);
+}
+
+CINO_INLINE
+int Trimesh::triangle_edge_local_to_global(const int tid, const int off) const
+{
+    assert(off>=0 && off <=2);
+
+    int vid0 = triangle_vertex_id(tid, TRI_EDGES[off][0]);
+    int vid1 = triangle_vertex_id(tid, TRI_EDGES[off][1]);
+
+    for(int eid : adj_tri2edg(tid))
+    {
+        if (edge_contains_vertex(eid, vid0) && edge_contains_vertex(eid, vid1))
+        {
+            return eid;
+        }
+    }
+    assert(false && "Something is off here...");
+}
+
+CINO_INLINE
+int Trimesh::triangle_vertex_global_to_local(const int tid, const int vid) const
+{
+    assert(vid>=0 && vid<=num_vertices());
+    assert(triangle_contains_vertex(tid, vid));
+    if (triangle_vertex_id(tid,0) == vid) return 0;
+    if (triangle_vertex_id(tid,1) == vid) return 1;
+    if (triangle_vertex_id(tid,2) == vid) return 2;
+    assert(false && "Something is off here...");
+    return -1;
 }
 
 CINO_INLINE
@@ -1227,6 +1263,38 @@ bool Trimesh::barycentric_coordinates(const int tid, const vec3d & P, std::vecto
 }
 
 CINO_INLINE
+bool Trimesh::elem_bary_is_vertex(const int                   tid,
+                                  const std::vector<double> & wgts,
+                                  int                       & vid,
+                                  const double                tol) const
+{
+    int off;
+    if (triangle_bary_is_vertex(wgts, off, tol))
+    {
+        vid = triangle_vertex_id(tid, off);
+        return true;
+    }
+    return false;
+}
+
+
+CINO_INLINE
+bool Trimesh::elem_bary_is_edge(const int                   tid,
+                                const std::vector<double> & wgts,
+                                int                       & eid,
+                                const double                tol) const
+{
+    int off;
+    if (triangle_bary_is_edge(wgts, off, tol))
+    {
+        eid = triangle_edge_local_to_global(tid, off);
+        return true;
+    }
+    return false;
+}
+
+
+CINO_INLINE
 void Trimesh::vertex_switch_id(const int vid0, const int vid1)
 {
     for(uint & curr : edges)
@@ -1401,6 +1469,8 @@ int Trimesh::add_vertex(const vec3d & v, const float scalar)
 CINO_INLINE
 void Trimesh::set_triangle(const int tid, const int vid0, const int vid1, const int vid2)
 {
+    /* WARNING!!!! This completely screws up edge connectivity!!!!!! */
+
     assert(vid0 < num_vertices());
     assert(vid1 < num_vertices());
     assert(vid2 < num_vertices());
@@ -1410,6 +1480,8 @@ void Trimesh::set_triangle(const int tid, const int vid0, const int vid1, const 
     tris[tid_ptr + 0] = vid0;
     tris[tid_ptr + 1] = vid1;
     tris[tid_ptr + 2] = vid2;
+
+    update_t_normal(tid);
 }
 
 CINO_INLINE

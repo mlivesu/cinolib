@@ -27,6 +27,7 @@
 #include <cinolib/cinolib.h>
 #include <cinolib/bbox.h>
 #include <cinolib/meshes/skel/skel.h>
+#include <cinolib/meshes/trimesh/trimesh.h>
 
 namespace cinolib
 {
@@ -35,17 +36,36 @@ class Curve
 {
     public:
 
+        // OPTIONAL - Connection to the Mesh
+        // For each curve sample we associate an element id (tid)
+        // and we express the position of the sample as a weighted
+        // sum (barycentric coordinates) of its vertices.
+        //
+        // This is important to embed the curve in the mesh tessellation..
+        //
+        typedef struct
+        {
+            int                 tid  = -1;
+            std::vector<double> bary = std::vector<double>();
+        }
+        MeshSample;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         Curve();
         Curve(const std::vector<vec3d> & samples);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Skel export_as_skeleton() const;
+        Skel             export_as_skeleton()    const;
+        std::vector<int> tessellate(Trimesh & m) const;
+        void             tessellate(Trimesh & m, const std::vector<int> & split_list) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const Bbox               & bbox()    const;
-        const std::vector<vec3d> & samples() const;
+        const Bbox                    & bbox()      const;
+        const std::vector<vec3d>      & samples()   const;
+        const std::vector<MeshSample> & mesh_link() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -63,11 +83,14 @@ class Curve
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    private:
+    protected:
 
         Bbox bb;
-        std::vector<vec3d> curve_samples;
+        std::vector<vec3d>      curve_samples;
+        std::vector<MeshSample> link_to_mesh;
 };
+
+CINO_INLINE std::ostream & operator<<(std::ostream & in, const Curve & c);
 
 }
 

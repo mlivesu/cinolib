@@ -119,6 +119,7 @@ class Trimesh
         const std::vector<int> &    adj_vtx2tri(const int vid) const;
         const std::vector<int> &    adj_edg2tri(const int eid) const;
         const std::vector<int> &    adj_tri2edg(const int tid) const;
+        const std::vector<int> &    adj_ele2edg(const int tid) const; // equal to adj_tri2edg - just for template compatibility
         const std::vector<int> &    adj_tri2tri(const int tid) const;
         std::vector<int>            adj_vtx2vtx_ordered(const int vid) const;
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -154,12 +155,17 @@ class Trimesh
         virtual void                remove_unreferenced_edge(const int eid);
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         bool                        barycentric_coordinates(const int tid, const vec3d & P, std::vector<double> & wgts) const;
+        bool                        elem_bary_is_vertex(const int tid, const std::vector<double> & wgts, int & vid, const double tol = 1e-5) const;
+        bool                        elem_bary_is_edge(const int tid, const std::vector<double> & wgts, int & eid, const double tol = 1e-5) const;
         vec3d                       triangle_vertex(const int tid, const int offset) const;
         vec3d                       elem_vertex(const int eid, const int offset) const;
         bool                        triangle_is_boundary(const int tid) const;
         int                         triangle_vertex_id(const int tid, const int offset) const;
+        int                         elem_vertex_id(const int tid, const int offset) const;
         vec3d                       triangle_normal(const int tid) const;
         float                       triangle_min_u_text(const int tid) const;
+        int                         triangle_edge_local_to_global(const int tid, const int off) const;
+        int                         triangle_vertex_global_to_local(const int tid, const int vid) const;
         int                         triangle_label(const int tid) const;
         int                         elem_label(const int tid) const;
         void                        triangle_set_label(const int tid, const int i);
@@ -172,7 +178,7 @@ class Trimesh
         double                      triangle_angle_at_vertex(const int tid, const int vid, const bool rad = true) const;
         bool                        triangle_is_cap(const int tid, const double angle_thresh_deg = 177.0) const;
         bool                        triangle_is_needle(const int tid, const double angle_thresh_deg = 3.0) const;
-        virtual int                 add_triangle(const int vid0, const int vid1, const int vid2, const int scalar);
+        virtual int                 add_triangle(const int vid0, const int vid1, const int vid2, const int scalar = 0);
         virtual void                triangle_switch_id(const int tid0, const int tid1);
         virtual void                remove_unreferenced_triangle(const int eid);
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

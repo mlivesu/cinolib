@@ -76,6 +76,16 @@ bool triangle_barycentric_coords(const vec3d  & A,
                                  const vec3d  & P,
                                  std::vector<double> & wgts,
                                  const double   tol = 1e-5);
+
+CINO_INLINE
+bool triangle_bary_is_vertex(const std::vector<double> & bary,
+                             int                       & vid, // 0,1,2
+                             const double                tol = 1e-5);
+
+CINO_INLINE
+bool triangle_bary_is_edge(const std::vector<double> & bary,
+                             int                     & eid, // 0,1,2 (see TRI_EDGES)
+                             const double              tol = 1e-5);
 }
 
 #ifndef  CINO_STATIC_LIB

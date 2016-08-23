@@ -27,6 +27,19 @@ namespace cinolib
 {
 
 CINO_INLINE
+std::ostream & operator<<(std::ostream & in, const Curve & c)
+{
+    for(vec3d p : c.samples()) in << p << std::endl;
+    for(Curve::MeshSample s : c.mesh_link())
+    {
+        in << s.tid << " \t ";
+        for(double w : s.bary) in << w << "  ";
+        in << std::endl;
+    }
+    in << std::endl;
+}
+
+CINO_INLINE
 Curve::Curve()
 {}
 
@@ -59,7 +72,6 @@ Skel Curve::export_as_skeleton() const
     return Skel(coords, segs);
 }
 
-
 CINO_INLINE
 const Bbox & Curve::bbox() const
 {
@@ -71,6 +83,13 @@ CINO_INLINE
 const std::vector<vec3d> & Curve::samples() const
 {
     return curve_samples;
+}
+
+
+CINO_INLINE
+const std::vector<Curve::MeshSample> & Curve::mesh_link() const
+{
+    return link_to_mesh;
 }
 
 CINO_INLINE
@@ -159,6 +178,168 @@ void Curve::resample_curve(const int n_samples)
         t += delta_t;
     }
     curve_samples = new_samples;
+}
+
+
+CINO_INLINE
+std::vector<int> Curve::tessellate(Trimesh & m) const
+{
+    if (link_to_mesh.size() != curve_samples.size())
+    {
+        std::cerr << "WARNING: no link between mesh and curve existing." << std::endl;
+        assert(false && "Impossible to tessellate the curve");
+    }
+
+    // 1) Split edges
+    //
+    // ordered list of mesh vertices belonging to the curve
+    //
+    std::vector<int>  curve_vids;
+    std::map<int,int> edges_split;
+    for(size_t i=0; i<link_to_mesh.size(); ++i)
+    {
+        const MeshSample & s = link_to_mesh.at(i);
+        int off;
+        if (triangle_bary_is_edge(s.bary, off))
+        {
+            int   eid         = m.triangle_edge_local_to_global(s.tid, off);
+            int   vid0        = m.triangle_vertex_id(s.tid, TRI_EDGES[off][0]);
+            int   vid1        = m.triangle_vertex_id(s.tid, TRI_EDGES[off][1]);
+            float f0          = m.vertex_u_text(vid0);
+            float f1          = m.vertex_u_text(vid1);
+            float f_new       = f0 * s.bary.at(TRI_EDGES[off][0]) + f1 * s.bary.at(TRI_EDGES[off][1]);
+            int fresh_id      = m.add_vertex(samples().at(i), f_new);
+            edges_split[eid]  = fresh_id;
+            curve_vids.push_back(fresh_id);
+        }
+        else if (triangle_bary_is_vertex(s.bary, off))
+        {
+            curve_vids.push_back(m.triangle_vertex_id(s.tid, off));
+        }
+        else assert(false && "Inner samples are not supported for tessellation yet");
+    }
+
+    // 2) Form triangles
+    //
+    // Serialized triangle split instructions. Structure:
+    // tid | # of sub-triangles | first tri (three entries each) | next tris (three entries each)
+    // the first tri will be generated using the set_triangle() routine
+    // the next tris will be generated using the add_triangle() routine
+    //
+    std::vector<int> split_list;
+    for(size_t i=1; i<link_to_mesh.size(); ++i)
+    {
+        const MeshSample & s0 = link_to_mesh.at(i-1);
+        const MeshSample & s1 = link_to_mesh.at( i );
+
+        int  id0, id1;
+        bool id0_is_edge = m.elem_bary_is_edge(s0.tid, s0.bary, id0);
+        bool id1_is_edge = m.elem_bary_is_edge(s1.tid, s1.bary, id1);
+
+        if (id0_is_edge && id1_is_edge)
+        {
+            int tid   = m.shared_triangle(id0, id1);
+            int pivot = m.shared_vertex(id0, id1);
+            int new0  = edges_split.at(id0);
+            int new1  = edges_split.at(id1);
+            int old0  = m.edge_vertex_id(id0,0); if (old0==pivot) old0 = m.edge_vertex_id(id0,1);
+            int old1  = m.edge_vertex_id(id1,0); if (old1==pivot) old1 = m.edge_vertex_id(id1,1);
+
+            split_list.push_back(tid);  // triangle to split
+            split_list.push_back(3);    // # of sub-triangles to create
+            split_list.push_back(new0);  split_list.push_back(new1);  split_list.push_back(old0); // t0
+            split_list.push_back(old0);  split_list.push_back(new1);  split_list.push_back(old1); // t1
+            split_list.push_back(pivot); split_list.push_back(new1);  split_list.push_back(new0); // t2
+        }
+        else if (id0_is_edge && !id1_is_edge)
+        {
+            // it might also be internal, but this is should not happen so far....
+            assert(m.elem_bary_is_vertex(s1.tid, s1.bary, id1));
+
+            // fint the triangle containing both vertex (id1) and edge (id0)
+            int tid = -1;
+            for(int id : m.adj_edg2tri(id0)) if (m.triangle_contains_vertex(id, id1)) tid = id;
+            assert(tid!=-1);
+
+            int old0  = m.edge_vertex_id(id0,0);
+            int old1  = m.edge_vertex_id(id0,1);
+            int pivot = m.vertex_opposite_to(tid, old0, old1);
+            int new_v = edges_split.at(id0);
+
+            split_list.push_back(tid);  // triangle to split
+            split_list.push_back(2);    // # of sub-triangles to create
+            split_list.push_back(old0);  split_list.push_back(pivot); split_list.push_back(new_v); // t0
+            split_list.push_back(old1);  split_list.push_back(new_v); split_list.push_back(pivot); // t1
+        }
+        else if (!id0_is_edge && id1_is_edge)
+        {
+            // it might also be internal, but this is should not happen so far....
+            assert(m.elem_bary_is_vertex(s0.tid, s0.bary, id0));
+
+            // fint the triangle containing both vertex (id0) and edge (id1)
+            int tid = -1;
+            for(int id : m.adj_edg2tri(id1)) if (m.triangle_contains_vertex(id, id0)) tid = id;
+            assert(tid!=-1);
+
+            int old0  = m.edge_vertex_id(id1,0);
+            int old1  = m.edge_vertex_id(id1,1);
+            int pivot = m.vertex_opposite_to(tid, old0, old1);
+            int new_v = edges_split.at(id1);
+
+            split_list.push_back(tid);  // triangle to split
+            split_list.push_back(2);    // # of sub-triangles to create
+            split_list.push_back(old0);  split_list.push_back(pivot); split_list.push_back(new_v); // t0
+            split_list.push_back(old1);  split_list.push_back(new_v); split_list.push_back(pivot); // t1
+        }
+        else assert(false && "Unsupported tessellation configuration! (to be added, probably)");
+    }
+
+    tessellate(m, split_list);
+    return curve_vids;
+}
+
+
+CINO_INLINE
+void Curve::tessellate(Trimesh & m, const std::vector<int> & split_list) const
+{
+    // Serialized triangle split. Structure:
+    //
+    //      tid | # of sub-triangles | first tri (three entries each) | next tris (three entries each)
+    //
+    //      the first tri will be generated using the set_triangle() routine
+    //      the next tris will be generated using the add_triangle() routine
+    //
+    for(size_t i=0; i<split_list.size();)
+    {
+        int tid     = split_list.at(i);
+        int subtris = split_list.at(i+1);
+        int v0      = split_list.at(i+2);
+        int v1      = split_list.at(i+3);
+        int v2      = split_list.at(i+4);
+        vec3d n_og  = m.triangle_normal(tid);
+        vec3d n     = triangle_normal(m.vertex(v0), m.vertex(v1), m.vertex(v2));
+        bool flip   = (n_og.dot(n) < 0); // if the normal is opposite flip them all...
+
+        if (flip) std::swap(v1,v2);
+        m.set_triangle(tid, v0, v1, v2);
+
+        int base = i+5;
+        for(int j=0; j<subtris-1; ++j)
+        {
+            v0 = split_list.at(base+3*j);
+            v1 = split_list.at(base+3*j+1);
+            v2 = split_list.at(base+3*j+2);
+            if (flip) std::swap(v1,v2);
+            m.add_triangle(v0, v1, v2);
+        }
+
+        i+=2+3*subtris;
+    }
+
+    // sanitize edge connectivity...
+    logger.disable();
+    m.update_adjacency();
+    logger.enable();
 }
 
 }
