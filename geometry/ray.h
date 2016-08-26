@@ -41,6 +41,8 @@ class Ray
 
         const vec3d & dir() const;
 
+        const vec3d & begin() const;
+
         bool on_positive_half_space(const vec3d & p) const;
 
         double dist_to_point(const vec3d & p) const;

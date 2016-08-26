@@ -59,6 +59,13 @@ const vec3d & Ray::dir() const
     return direction;
 }
 
+
+CINO_INLINE
+const vec3d & Ray::begin() const
+{
+    return start;
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
