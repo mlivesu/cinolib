@@ -56,6 +56,7 @@ class IntegralCurveDebug : public DrawableCurve
         Curve::MeshSample move_forward             (const MeshSample & s);
         Curve::MeshSample move_forward_from_vertex (const int vid) ;
         Curve::MeshSample move_forward_from_edge   (const int eid, const vec3d & p);
+        Curve::MeshSample move_forward_from_face   (const int tid, const vec3d & p);
         Curve::MeshSample move_forward_from_face   (const int tid, const int fid, const vec3d & p);
         Curve::MeshSample move_forward_from_cell   (const int cid, const vec3d & p);
 
@@ -63,6 +64,7 @@ class IntegralCurveDebug : public DrawableCurve
 
         bool is_on_vertex (const MeshSample & s, int & vid, const double tol = 1e-7) const;
         bool is_on_edge   (const MeshSample & s, int & eid, const double tol = 1e-7) const;
+        bool is_on_face   (const MeshSample & s, int & tid, const double tol = 1e-7) const;
         bool is_on_face   (const MeshSample & s, int & tid, int & fid, const double tol = 1e-7) const;
         bool is_on_cell   (const MeshSample & s, int & cid, const double tol = 1e-7) const;
 
