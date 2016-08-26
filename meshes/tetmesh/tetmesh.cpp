@@ -899,10 +899,12 @@ int Tetmesh::tet_edge_opposite_to(const int tid, const int vid0, const int vid1)
 {
     assert(tet_contains_vertex(tid,vid0));
     assert(tet_contains_vertex(tid,vid1));
-    for(int e=0; e<6; ++e)
+
+    for(int i=0; i<6; ++i)
     {
-        if ((tet_vertex_id(tid, TET_EDGES[e][0]) == vid0 && tet_vertex_id(tid, TET_EDGES[e][1]) != vid1)) return e;
-        if ((tet_vertex_id(tid, TET_EDGES[e][0]) == vid1 && tet_vertex_id(tid, TET_EDGES[e][1]) != vid0)) return e;
+        int e0 = tet_vertex_id(tid,TET_EDGES[i][0]);
+        int e1 = tet_vertex_id(tid,TET_EDGES[i][1]);
+        if ((e0!=vid0 && e1!=vid1)  || (e0!=vid1 && e1!=vid0)) return i;
     }
     assert(false);
 }
