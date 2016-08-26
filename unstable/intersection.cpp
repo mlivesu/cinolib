@@ -118,7 +118,9 @@ bool line_triangle_intersection(const Line    l,
         std::vector<double> wgts;
         if (triangle_barycentric_coords(V0,V1,V2,inters, wgts, tol)) return true;
         return false;
-    }
+    }    
+    assert(false && "Something is off here...");
+    return false;
 }
 
 CINO_INLINE

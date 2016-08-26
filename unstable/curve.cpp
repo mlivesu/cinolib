@@ -37,6 +37,7 @@ std::ostream & operator<<(std::ostream & in, const Curve & c)
         in << std::endl;
     }
     in << std::endl;
+    return in;
 }
 
 CINO_INLINE
