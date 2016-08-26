@@ -536,6 +536,12 @@ const std::vector<int> &Tetmesh::adj_vtx2tet(const int vid) const
 }
 
 CINO_INLINE
+const std::vector<int> &Tetmesh::adj_vtx2ele(const int vid) const
+{
+    return adj_vtx2tet(vid);
+}
+
+CINO_INLINE
 const std::vector<int> &Tetmesh::adj_edg2tet(const int eid) const
 {
     return edg2tet.at(eid);
@@ -551,6 +557,12 @@ CINO_INLINE
 const std::vector<int> &Tetmesh::adj_tet2edg(const int tid) const
 {
     return tet2edg.at(tid);
+}
+
+CINO_INLINE
+const std::vector<int> &Tetmesh::adj_ele2edg(const int eid) const
+{
+    return tet2edg.at(eid);
 }
 
 CINO_INLINE
@@ -683,6 +695,12 @@ int Tetmesh::tet_vertex_id(const int tid, const int offset) const
 }
 
 CINO_INLINE
+int Tetmesh::elem_vertex_id(const int eid, const int offset) const
+{
+    return tet_vertex_id(eid, offset);
+}
+
+CINO_INLINE
 vec3d Tetmesh::tet_vertex(const int tid, const int offset) const
 {
     int tid_ptr = tid * 4;
@@ -740,12 +758,19 @@ bool Tetmesh::tet_contains_edge(const int tid, const int eid) const
 }
 
 CINO_INLINE
+bool Tetmesh::edge_contains_vertex(const int eid, const int vid) const
+{
+    if (edge_vertex_id(eid,0) == vid) return true;
+    if (edge_vertex_id(eid,1) == vid) return true;
+    return false;
+}
+
+CINO_INLINE
 int Tetmesh::adjacent_tet_through_facet(const int tid, const int facet) const
 {
-    std::vector<int> nbrs = adj_tet2tet(tid);
-    for(size_t i=0; i<nbrs.size(); ++i)
+    for(int nbr : adj_tet2tet(tid))
     {
-        if (shared_facet(tid, nbrs[i]) == facet) return nbrs[i];
+        if (shared_facet(tid, nbr) == facet) return nbr;
     }
     return -1;
 }
@@ -872,10 +897,12 @@ int Tetmesh::tet_edge_id(const int tid, const int vid0, const int vid1) const
 CINO_INLINE
 int Tetmesh::tet_edge_opposite_to(const int tid, const int vid0, const int vid1) const
 {
+    assert(tet_contains_vertex(tid,vid0));
+    assert(tet_contains_vertex(tid,vid1));
     for(int e=0; e<6; ++e)
     {
-        if ((tet_vertex_id(tid, TET_EDGES[e][0]) == vid0 && tet_vertex_id(tid, TET_EDGES[e][1]) == vid1)) return e;
-        if ((tet_vertex_id(tid, TET_EDGES[e][0]) == vid1 && tet_vertex_id(tid, TET_EDGES[e][1]) == vid0)) return e;
+        if ((tet_vertex_id(tid, TET_EDGES[e][0]) == vid0 && tet_vertex_id(tid, TET_EDGES[e][1]) != vid1)) return e;
+        if ((tet_vertex_id(tid, TET_EDGES[e][0]) == vid1 && tet_vertex_id(tid, TET_EDGES[e][1]) != vid0)) return e;
     }
     assert(false);
 }

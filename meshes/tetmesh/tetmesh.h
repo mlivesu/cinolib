@@ -133,9 +133,11 @@ class Tetmesh
         const std::vector<int> & adj_vtx2edg(const int vid) const;
         const std::vector<int> & adj_vtx2tri(const int vid) const;
         const std::vector<int> & adj_vtx2tet(const int vid) const;
+        const std::vector<int> & adj_vtx2ele(const int vid) const; // equal to adj_vtx2tet - just for template compatibility
         const std::vector<int> & adj_edg2tet(const int eid) const;
         const std::vector<int> & adj_edg2tri(const int eid) const;
         const std::vector<int> & adj_tet2edg(const int tid) const;
+        const std::vector<int> & adj_ele2edg(const int eid) const; // equal to adj_tet2edg - just for template compatibility
         const std::vector<int> & adj_tet2tet(const int tid) const;
         const std::vector<int> & adj_tet2tri(const int tid) const;
         const std::vector<int> & adj_tri2tri(const int tid) const;
@@ -170,6 +172,7 @@ class Tetmesh
         vec3d tet_centroid(const int tid) const;
 
         int tet_vertex_id(const int tid, const int offset) const;
+        int elem_vertex_id(const int eid, const int offset) const;
 
         vec3d tet_vertex(const int tid, const int offset) const;
         vec3d elem_vertex(const int eid, const int offset) const;
@@ -183,6 +186,8 @@ class Tetmesh
         bool tet_contains_vertex(const int tid, const int vid) const;
 
         bool tet_contains_edge(const int tid, const int eid) const;
+
+        bool edge_contains_vertex(const int eid, const int vid) const;
 
         vec3d element_barycenter(const int tid) const;
 

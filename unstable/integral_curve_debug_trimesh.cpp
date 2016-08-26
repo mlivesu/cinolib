@@ -33,7 +33,7 @@ namespace cinolib
 
 template<>
 CINO_INLINE
-Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_vertex(const int & vid) const
+Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_vertex(const int vid)
 {
     vec3d v = m_ptr->vertex(vid);
     vec3d n = m_ptr->vertex_normal(vid);
@@ -79,7 +79,7 @@ Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_vertex(const in
 
 template<>
 CINO_INLINE
-Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_edge(const int & eid, const vec3d & p) const
+Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_edge(const int eid, const vec3d & p)
 {
     assert(m_ptr->edge_is_manifold(eid));
 

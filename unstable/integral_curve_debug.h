@@ -37,12 +37,12 @@ class IntegralCurveDebug : public DrawableCurve
 
     public:
 
-        IntegralCurveDebug(const Mesh                & m,
+        IntegralCurveDebug( Mesh                & m,
                            const VectorField         & grad,
                            const int                   tid,
                            const std::vector<double> & bary);
 
-        IntegralCurveDebug(const Mesh        & m,
+        IntegralCurveDebug( Mesh        & m,
                            const VectorField & grad,
                            const int           vid);
 
@@ -53,22 +53,22 @@ class IntegralCurveDebug : public DrawableCurve
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Curve::MeshSample move_forward             (const MeshSample & s) const;
-        Curve::MeshSample move_forward_from_vertex (const int & vid) const;
-        Curve::MeshSample move_forward_from_edge   (const int & eid, const vec3d & p) const;
-        //Curve::MeshSample move_forward_from_face   (const int        & fid) const;
-        //Curve::MeshSample move_forward_from_cell   (const int        & cid) const;
+        Curve::MeshSample move_forward             (const MeshSample & s);
+        Curve::MeshSample move_forward_from_vertex (const int vid) ;
+        Curve::MeshSample move_forward_from_edge   (const int eid, const vec3d & p);
+        Curve::MeshSample move_forward_from_face   (const int tid, const int fid, const vec3d & p);
+        Curve::MeshSample move_forward_from_cell   (const int cid, const vec3d & p);
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         bool is_on_vertex (const MeshSample & s, int & vid, const double tol = 1e-7) const;
         bool is_on_edge   (const MeshSample & s, int & eid, const double tol = 1e-7) const;
-        bool is_on_face   (const MeshSample & s, int & fid, const double tol = 1e-7) const;
+        bool is_on_face   (const MeshSample & s, int & tid, int & fid, const double tol = 1e-7) const;
         bool is_on_cell   (const MeshSample & s, int & cid, const double tol = 1e-7) const;
 
     protected:
 
-         const Mesh        * m_ptr;
+          Mesh        * m_ptr;
          const VectorField * grad_ptr;
 };
 
@@ -77,6 +77,7 @@ class IntegralCurveDebug : public DrawableCurve
 #ifndef  CINO_STATIC_LIB
 #include "integral_curve_debug.cpp"
 #include "integral_curve_debug_trimesh.cpp" // template speializations for Trimesh
+#include "integral_curve_debug_tetmesh.cpp" // template speializations for Trimesh
 #endif
 
 #endif // INTEGRAL_CURVE_DEBUG_H

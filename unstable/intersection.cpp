@@ -22,6 +22,7 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include <cinolib/unstable/intersection.h>
+#include <cinolib/geometry/triangle.h>
 
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/segment.hpp>
@@ -101,6 +102,42 @@ bool line_triangle_intersection(const vec3d   P,
 }
 
 
+CINO_INLINE
+bool line_triangle_intersection(const Line    l,
+                                const vec3d   V0,
+                                const vec3d   V1,
+                                const vec3d   V2,
+                                      vec3d & inters,
+                                const double  tol)
+{
+    std::vector<Plane> planes = l.to_planes();
+    planes.push_back(Plane(V0,V1,V2));
+
+    if (least_squares_intersection(planes, inters))
+    {
+        std::vector<double> wgts;
+        if (triangle_barycentric_coords(V0,V1,V2,inters, wgts, tol)) return true;
+        return false;
+    }
+}
+
+CINO_INLINE
+bool ray_triangle_intersection(const Ray     r,
+                               const vec3d   V0,
+                               const vec3d   V1,
+                               const vec3d   V2,
+                                     vec3d & inters,
+                               const double  tol)
+{
+    Line l(r.begin(), r.begin() + r.dir());
+    if (line_triangle_intersection(l, V0, V1, V2, inters, tol))
+    {
+        vec3d u = inters - r.begin();
+        if (u.dot(r.dir()) < 0) return false;
+        return true;
+    }
+    return false;
+}
 
 CINO_INLINE
 bool ray_triangle_intersection(const vec3d   P,

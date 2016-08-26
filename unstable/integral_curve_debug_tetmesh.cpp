@@ -21,45 +21,14 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include <cinolib/unstable/drawable_curve.h>
+#include "cinolib/unstable/integral_curve_debug.h"
+
+#include <cinolib/unstable/intersection.h>
+#include <cinolib/geometry/triangle.h>
+#include <cinolib/geometry/segment.h>
+#include <cinolib/geometry/ray.h>
 
 namespace cinolib
 {
-
-CINO_INLINE
-DrawableCurve::DrawableCurve() : Curve()
-{}
-
-CINO_INLINE
-DrawableCurve::DrawableCurve(const std::vector<vec3d> & samples) : Curve(samples)
-{}
-
-
-CINO_INLINE
-void DrawableCurve::draw(const float scene_size) const
-{
-    double cylind_rad = scene_size*0.001;
-
-    for(size_t i=1; i<samples().size(); ++i)
-    {
-        cylinder<vec3d>(samples()[i-1], samples()[i], cylind_rad, cylind_rad, RED);
-    }
-}
-
-
-CINO_INLINE
-vec3d DrawableCurve::scene_center() const
-{
-    return bbox().center();
-}
-
-
-CINO_INLINE
-float DrawableCurve::scene_radius() const
-{
-    return bbox().diag();
-}
-
-
 
 }

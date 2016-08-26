@@ -281,6 +281,12 @@ const std::vector<int> &Trimesh::adj_vtx2tri(const int vid) const
 }
 
 CINO_INLINE
+const std::vector<int> &Trimesh::adj_vtx2ele(const int vid) const
+{
+    return adj_vtx2tri(vid);
+}
+
+CINO_INLINE
 const std::vector<int> &Trimesh::adj_edg2tri(const int eid) const
 {
     return edg2tri.at(eid);

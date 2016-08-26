@@ -53,6 +53,23 @@ bool line_triangle_intersection(const vec3d   P,
                                 const vec3d   V2,
                                       vec3d & inters);
 
+
+CINO_INLINE
+bool line_triangle_intersection(const Line    l,
+                                const vec3d   V0,
+                                const vec3d   V1,
+                                const vec3d   V2,
+                                      vec3d & inters,
+                                const double  tol = 1e-5);
+
+CINO_INLINE
+bool ray_triangle_intersection(const Ray     r,
+                               const vec3d   V0,
+                               const vec3d   V1,
+                               const vec3d   V2,
+                                     vec3d & inters,
+                               const double  tol = 1e-5);
+
 CINO_INLINE
 bool ray_triangle_intersection(const vec3d   P,
                                const vec3d   dir,

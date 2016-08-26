@@ -117,6 +117,7 @@ class Trimesh
         const std::vector<int> &    adj_vtx2vtx(const int vid) const;
         const std::vector<int> &    adj_vtx2edg(const int vid) const;
         const std::vector<int> &    adj_vtx2tri(const int vid) const;
+        const std::vector<int> &    adj_vtx2ele(const int vid) const; // equal to adj_vtx2tri - just for template compatibility
         const std::vector<int> &    adj_edg2tri(const int eid) const;
         const std::vector<int> &    adj_tri2edg(const int tid) const;
         const std::vector<int> &    adj_ele2edg(const int tid) const; // equal to adj_tri2edg - just for template compatibility
