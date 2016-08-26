@@ -76,8 +76,6 @@ class IntegralCurveDebug : public DrawableCurve
 
 #ifndef  CINO_STATIC_LIB
 #include "integral_curve_debug.cpp"
-#include "integral_curve_debug_trimesh.cpp" // template speializations for Trimesh
-#include "integral_curve_debug_tetmesh.cpp" // template speializations for Trimesh
 #endif
 
 #endif // INTEGRAL_CURVE_DEBUG_H
