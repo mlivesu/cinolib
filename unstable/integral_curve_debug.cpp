@@ -40,7 +40,7 @@ namespace cinolib
 
 template<class Mesh>
 CINO_INLINE
-IntegralCurveDebug<Mesh>::IntegralCurveDebug( Mesh                & m,
+IntegralCurveDebug<Mesh>::IntegralCurveDebug(const Mesh                & m,
                                              const VectorField         & grad,
                                              const int                   tid,
                                              const std::vector<double> & bary)
@@ -53,12 +53,12 @@ IntegralCurveDebug<Mesh>::IntegralCurveDebug( Mesh                & m,
     seed.bary = bary;
     for(int off=0; off<m.verts_per_element; ++off) seed.pos += bary.at(off) * m.elem_vertex(tid, off);
 
-    make_curve(seed);
+    trace_curve(seed);
 }
 
 template<class Mesh>
 CINO_INLINE
-IntegralCurveDebug<Mesh>::IntegralCurveDebug( Mesh        & m,
+IntegralCurveDebug<Mesh>::IntegralCurveDebug(const Mesh        & m,
                                              const VectorField & grad,
                                              const int           vid)
     : DrawableCurve()
@@ -80,14 +80,14 @@ IntegralCurveDebug<Mesh>::IntegralCurveDebug( Mesh        & m,
     seed.tid  = tid;
     seed.bary = bary;
 
-    make_curve(seed);
+    trace_curve(seed);
 }
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
-void IntegralCurveDebug<Mesh>::make_curve(const Sample & seed)
+void IntegralCurveDebug<Mesh>::trace_curve(const Sample & seed)
 {
     append_sample(seed);
 
@@ -463,8 +463,6 @@ Curve::Sample IntegralCurveDebug<Tetmesh>::move_forward_from_vertex(const int vi
 
     for(int tid : m_ptr->adj_vtx2tet(vid))
     {
-        m_ptr->set_tet_label(tid, 1); // debug
-
         int     fid = m_ptr->tet_face_opposite_to(tid, vid);
         vec3d   v0  = m_ptr->tet_vertex(tid, TET_FACES[fid][0]);
         vec3d   v1  = m_ptr->tet_vertex(tid, TET_FACES[fid][1]);
@@ -579,8 +577,6 @@ Curve::Sample IntegralCurveDebug<Tetmesh>::move_forward_from_face(const int tid,
 
     for(int curr_tid : tets)
     {
-        m_ptr->set_tet_label(curr_tid, 1);
-
         for(int f=0; f<4; ++f)
         {
             std::vector<int> curr_f;

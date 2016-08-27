@@ -37,19 +37,19 @@ class IntegralCurveDebug : public DrawableCurve
 
     public:
 
-        IntegralCurveDebug( Mesh                & m,
+        IntegralCurveDebug(const Mesh                & m,
                            const VectorField         & grad,
                            const int                   tid,
                            const std::vector<double> & bary);
 
-        IntegralCurveDebug( Mesh        & m,
+        IntegralCurveDebug(const Mesh        & m,
                            const VectorField & grad,
                            const int           vid);
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void make_curve  (const Sample & seed);
-        bool is_converged(const Sample & sample);
+        void trace_curve  (const Sample & seed);
+        bool is_converged (const Sample & sample);
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -70,7 +70,7 @@ class IntegralCurveDebug : public DrawableCurve
 
     protected:
 
-          Mesh        * m_ptr;
+         const Mesh        * m_ptr;
          const VectorField * grad_ptr;
 };
 
