@@ -46,6 +46,11 @@ class IntegralCurveDebug : public DrawableCurve
                            const VectorField & grad,
                            const int           vid);
 
+    protected:
+
+        const Mesh        * m_ptr;
+        const VectorField * grad_ptr;
+
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void trace_curve  (const Sample & seed);
@@ -67,11 +72,6 @@ class IntegralCurveDebug : public DrawableCurve
         bool is_on_face   (const Sample & s, int & tid, const double tol = 1e-7) const;
         bool is_on_face   (const Sample & s, int & tid, int & fid, const double tol = 1e-7) const;
         bool is_on_cell   (const Sample & s, int & cid, const double tol = 1e-7) const;
-
-    protected:
-
-         const Mesh        * m_ptr;
-         const VectorField * grad_ptr;
 };
 
 }
