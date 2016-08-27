@@ -48,9 +48,10 @@ IntegralCurveDebug<Mesh>::IntegralCurveDebug( Mesh                & m,
     , m_ptr(&m)
     , grad_ptr(&grad)
 {
-    MeshSample seed;
+    Sample seed;
     seed.tid  = tid;
     seed.bary = bary;
+    for(int off=0; off<m.verts_per_element; ++off) seed.pos += bary.at(off) * m.elem_vertex(tid, off);
 
     make_curve(seed);
 }
@@ -74,7 +75,8 @@ IntegralCurveDebug<Mesh>::IntegralCurveDebug( Mesh        & m,
     std::vector<double> bary = std::vector<double>(m.verts_per_element,0);
     bary[off] = 1.0;
 
-    MeshSample seed;
+    Sample seed;
+    seed.pos  = m.vertex(vid);
     seed.tid  = tid;
     seed.bary = bary;
 
@@ -85,37 +87,27 @@ IntegralCurveDebug<Mesh>::IntegralCurveDebug( Mesh        & m,
 
 template<class Mesh>
 CINO_INLINE
-void IntegralCurveDebug<Mesh>::make_curve(const MeshSample & seed)
+void IntegralCurveDebug<Mesh>::make_curve(const Sample & seed)
 {
-    link_to_mesh.push_back(seed);
+    append_sample(seed);
 
     do
     {
-        MeshSample s = move_forward( link_to_mesh.back() );
-        link_to_mesh.push_back(s);
+        Sample s = move_forward(samples().back());
+        append_sample(s);
     }
-    while (!is_converged(link_to_mesh.back()));
-
-    for(const MeshSample & s : link_to_mesh)
-    {
-        vec3d s_pos(0,0,0);
-        for(int off=0; off<m_ptr->verts_per_element; ++off)
-        {
-            s_pos += s.bary.at(off) * m_ptr->elem_vertex(s.tid, off);
-        }
-        append_sample(s_pos);
-    }
+    while (!is_converged(samples().back()));
 }
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
-bool IntegralCurveDebug<Mesh>::is_converged(const MeshSample & sample)
+bool IntegralCurveDebug<Mesh>::is_converged(const Sample & sample)
 {
     if (sample.tid == -1) // i.e. boundary reached. Remove dummy sample
     {
-        link_to_mesh.pop_back();
+        pop_back();
         return true;
     }
 
@@ -128,11 +120,12 @@ bool IntegralCurveDebug<Mesh>::is_converged(const MeshSample & sample)
 
         if (m_ptr->vertex_is_local_maxima(vid))
         {
-            MeshSample s;
+            Sample s;
+            s.pos  = m_ptr->vertex(vid);
             s.tid  = sample.tid;
             s.bary = std::vector<double>(m_ptr->verts_per_element,0);
             s.bary.at(off) = 1.0;
-            link_to_mesh.push_back(s);
+            append_sample(s);
             return true;
         }
     }
@@ -143,7 +136,7 @@ bool IntegralCurveDebug<Mesh>::is_converged(const MeshSample & sample)
 
 template<class Mesh>
 CINO_INLINE
-bool IntegralCurveDebug<Mesh>::is_on_vertex(const MeshSample & s, int & vid, const double tol) const
+bool IntegralCurveDebug<Mesh>::is_on_vertex(const Sample & s, int & vid, const double tol) const
 {
     assert(s.tid!=-1);
 
@@ -165,7 +158,7 @@ bool IntegralCurveDebug<Mesh>::is_on_vertex(const MeshSample & s, int & vid, con
 
 template<class Mesh>
 CINO_INLINE
-bool IntegralCurveDebug<Mesh>::is_on_edge(const MeshSample & s, int & eid, const double tol) const
+bool IntegralCurveDebug<Mesh>::is_on_edge(const Sample & s, int & eid, const double tol) const
 {
     assert(s.tid!=-1);
 
@@ -203,7 +196,7 @@ bool IntegralCurveDebug<Mesh>::is_on_edge(const MeshSample & s, int & eid, const
 
 template<>
 CINO_INLINE
-bool IntegralCurveDebug<Trimesh>::is_on_face(const MeshSample & s, int & tid, const double tol) const
+bool IntegralCurveDebug<Trimesh>::is_on_face(const Sample & s, int & tid, const double tol) const
 {
     assert(s.tid!=-1);
 
@@ -225,7 +218,7 @@ bool IntegralCurveDebug<Trimesh>::is_on_face(const MeshSample & s, int & tid, co
 
 template<>
 CINO_INLINE
-Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_vertex(const int vid)
+Curve::Sample IntegralCurveDebug<Trimesh>::move_forward_from_vertex(const int vid)
 {
     vec3d v = m_ptr->vertex(vid);
     vec3d n = m_ptr->vertex_normal(vid);
@@ -252,7 +245,8 @@ Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_vertex(const in
         vec3d   inters;
         if (intersection::intersection(Ray(v,grad), Segment(e0,e1), inters))
         {
-            MeshSample sample;
+            Sample sample;
+            sample.pos = inters;
             sample.tid = tid;
             triangle_barycentric_coords(tangent_space.at( m_ptr->triangle_vertex_id(tid,0) ),
                                         tangent_space.at( m_ptr->triangle_vertex_id(tid,1) ),
@@ -263,7 +257,7 @@ Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_vertex(const in
     }
     assert(false && "Integral curve - Something is off here...");
 
-    MeshSample dummy;
+    Sample dummy;
     return dummy;
 }
 
@@ -271,7 +265,7 @@ Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_vertex(const in
 
 template<>
 CINO_INLINE
-Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_edge(const int eid, const vec3d & p)
+Curve::Sample IntegralCurveDebug<Trimesh>::move_forward_from_edge(const int eid, const vec3d & p)
 {
     assert(m_ptr->edge_is_manifold(eid));
 
@@ -308,7 +302,8 @@ Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_edge(const int 
         vec3d   inters;
         if (intersection::intersection(Ray(p,grad), Segment(e0,e1), inters))
         {
-            MeshSample sample;
+            Sample sample;
+            sample.pos = inters;
             sample.tid = tid;
             triangle_barycentric_coords(tangent_space.at( m_ptr->triangle_vertex_id(tid,0) ),
                                         tangent_space.at( m_ptr->triangle_vertex_id(tid,1) ),
@@ -319,7 +314,7 @@ Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_edge(const int 
     }
     assert(false && "Integral curve - Something is off here...");
 
-    MeshSample dummy;
+    Sample dummy;
     return dummy;
 }
 
@@ -327,7 +322,7 @@ Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_edge(const int 
 
 template<>
 CINO_INLINE
-Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_face(const int tid, const vec3d & p)
+Curve::Sample IntegralCurveDebug<Trimesh>::move_forward_from_face(const int tid, const vec3d & p)
 {
     vec3d grad = grad_ptr->vec_at(tid);
     grad.normalize();
@@ -339,7 +334,8 @@ Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_face(const int 
         vec3d   inters;
         if (intersection::intersection(Ray(p,grad), Segment(e0,e1), inters))
         {
-            MeshSample sample;
+            Sample sample;
+            sample.pos = inters;
             sample.tid = tid;
             triangle_barycentric_coords(m_ptr->triangle_vertex(tid,0),
                                         m_ptr->triangle_vertex(tid,1),
@@ -351,7 +347,7 @@ Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_face(const int 
 
     assert(false && "Integral curve - Something is off here...");
 
-    MeshSample dummy;
+    Sample dummy;
     return dummy;
 }
 
@@ -361,36 +357,24 @@ Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward_from_face(const int 
 
 template<>
 CINO_INLINE
-Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward(const MeshSample & s)
+Curve::Sample IntegralCurveDebug<Trimesh>::move_forward(const Sample & s)
 {
     int id;
     if (is_on_vertex(s,id))
     {
         return move_forward_from_vertex(id);
     }
-    else
-    if (is_on_edge(s,id))
+    else if (is_on_edge(s,id))
     {
-        vec3d pos(0,0,0);
-        for(int off=0; off<m_ptr->verts_per_element; ++off)
-        {
-            pos += s.bary.at(off) * m_ptr->elem_vertex(s.tid, off);
-        }
-        return move_forward_from_edge(id, pos);
+        return move_forward_from_edge(id, s.pos);
     }
-    else
-    if (is_on_face(s,id))
+    else if (is_on_face(s,id))
     {
-        vec3d pos(0,0,0);
-        for(int off=0; off<m_ptr->verts_per_element; ++off)
-        {
-            pos += s.bary.at(off) * m_ptr->elem_vertex(s.tid, off);
-        }
-        return move_forward_from_face(id, pos);
+        return move_forward_from_face(id, s.pos);
     }
     else assert(false && "Integral curve - Something is off here...");
 
-    MeshSample dummy;
+    Sample dummy;
     return dummy;
 }
 
@@ -405,7 +389,7 @@ Curve::MeshSample IntegralCurveDebug<Trimesh>::move_forward(const MeshSample & s
 
 template<>
 CINO_INLINE
-bool IntegralCurveDebug<Tetmesh>::is_on_face(const MeshSample & s, int & tid, int & fid, const double tol) const
+bool IntegralCurveDebug<Tetmesh>::is_on_face(const Sample & s, int & tid, int & fid, const double tol) const
 {
     assert(s.tid!=-1);
 
@@ -447,7 +431,7 @@ bool IntegralCurveDebug<Tetmesh>::is_on_face(const MeshSample & s, int & tid, in
 
 template<>
 CINO_INLINE
-bool IntegralCurveDebug<Tetmesh>::is_on_cell(const MeshSample & s, int & tid, const double tol) const
+bool IntegralCurveDebug<Tetmesh>::is_on_cell(const Sample & s, int & tid, const double tol) const
 {
     assert(s.tid!=-1);
 
@@ -469,7 +453,7 @@ bool IntegralCurveDebug<Tetmesh>::is_on_cell(const MeshSample & s, int & tid, co
 
 template<>
 CINO_INLINE
-Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_vertex(const int vid)
+Curve::Sample IntegralCurveDebug<Tetmesh>::move_forward_from_vertex(const int vid)
 {
     vec3d p = m_ptr->vertex(vid);
     vec3d grad(0,0,0);
@@ -488,7 +472,8 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_vertex(const in
         vec3d   inters;
         if (intersection::ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
         {
-            MeshSample sample;
+            Sample sample;
+            sample.pos = inters;
             sample.tid = tid;
             tet_barycentric_coords(m_ptr->tet_vertex(tid, 0),
                                    m_ptr->tet_vertex(tid, 1),
@@ -502,7 +487,7 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_vertex(const in
     // this may actually happen if the point is on the surface and the gradient points outside of the domain...
     // assert(false && "Integral curve - Something is off here...");
 
-    MeshSample dummy;
+    Sample dummy;
     return dummy;
 }
 
@@ -510,7 +495,7 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_vertex(const in
 
 template<>
 CINO_INLINE
-Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_edge(const int eid, const vec3d & p)
+Curve::Sample IntegralCurveDebug<Tetmesh>::move_forward_from_edge(const int eid, const vec3d & p)
 {
     vec3d grad(0,0,0);
     for(int tid : m_ptr->adj_edg2tet(eid)) grad += grad_ptr->vec_at(tid);
@@ -545,14 +530,14 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_edge(const int 
             vec3d inters;
             if (intersection::ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
             {
-                MeshSample sample;
+                Sample sample;
+                sample.pos = inters;
                 sample.tid = tid;
                 tet_barycentric_coords(m_ptr->tet_vertex(tid, 0),
                                        m_ptr->tet_vertex(tid, 1),
                                        m_ptr->tet_vertex(tid, 2),
                                        m_ptr->tet_vertex(tid, 3),
                                        inters, sample.bary);
-
                 return sample;
             }
         }
@@ -561,7 +546,7 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_edge(const int 
     // this may actually happen if the point is on the surface and the gradient points outside of the domain...
     // assert(false && "Integral curve - Something is off here...");
 
-    MeshSample dummy;
+    Sample dummy;
     return dummy;
 }
 
@@ -569,7 +554,7 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_edge(const int 
 
 template<>
 CINO_INLINE
-Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_face(const int tid, const int fid, const vec3d & p)
+Curve::Sample IntegralCurveDebug<Tetmesh>::move_forward_from_face(const int tid, const int fid, const vec3d & p)
 {
     std::vector<int> tets;
     tets.push_back(tid);
@@ -613,14 +598,14 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_face(const int 
             vec3d inters;
             if (intersection::ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
             {
-                MeshSample sample;
+                Sample sample;
+                sample.pos = inters;
                 sample.tid = curr_tid;
                 tet_barycentric_coords(m_ptr->tet_vertex(curr_tid, 0),
                                        m_ptr->tet_vertex(curr_tid, 1),
                                        m_ptr->tet_vertex(curr_tid, 2),
                                        m_ptr->tet_vertex(curr_tid, 3),
                                        inters, sample.bary);
-
                 return sample;
             }
         }
@@ -629,7 +614,7 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_face(const int 
     // this may actually happen if the point is on the surface and the gradient points outside of the domain...
     // assert(false && "Integral curve - Something is off here...");
 
-    MeshSample dummy;
+    Sample dummy;
     return dummy;
 }
 
@@ -637,7 +622,7 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_face(const int 
 
 template<>
 CINO_INLINE
-Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_cell(const int tid, const vec3d & p)
+Curve::Sample IntegralCurveDebug<Tetmesh>::move_forward_from_cell(const int tid, const vec3d & p)
 {
     vec3d grad = grad_ptr->vec_at(tid);
     grad.normalize();
@@ -650,7 +635,8 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_cell(const int 
         vec3d inters;
         if (intersection::ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
         {
-            MeshSample sample;
+            Sample sample;
+            sample.pos = inters;
             sample.tid = tid;
             tet_barycentric_coords(m_ptr->tet_vertex(tid,0),
                                    m_ptr->tet_vertex(tid,1),
@@ -663,7 +649,7 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_cell(const int 
 
     assert(false && "Integral curve - Something is off here...");
 
-    MeshSample dummy;
+    Sample dummy;
     return dummy;
 }
 
@@ -671,46 +657,28 @@ Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward_from_cell(const int 
 
 template<>
 CINO_INLINE
-Curve::MeshSample IntegralCurveDebug<Tetmesh>::move_forward(const MeshSample & s)
+Curve::Sample IntegralCurveDebug<Tetmesh>::move_forward(const Sample & s)
 {
     int id, id2;
-    if (is_on_vertex(s,id))
+    if (is_on_vertex(s,id)) // vid
     {
         return move_forward_from_vertex(id);
     }
-    else
-    if (is_on_edge(s,id))
+    else if (is_on_edge(s,id)) // eid
     {
-        vec3d pos(0,0,0);
-        for(int off=0; off<m_ptr->verts_per_element; ++off)
-        {
-            pos += s.bary.at(off) * m_ptr->elem_vertex(s.tid, off);
-        }
-        return move_forward_from_edge(id, pos);
+        return move_forward_from_edge(id, s.pos);
     }
-    else
-    if (is_on_face(s,id,id2))
+    else if (is_on_face(s,id,id2)) // tet id, facet id
     {
-        vec3d pos(0,0,0);
-        for(int off=0; off<m_ptr->verts_per_element; ++off)
-        {
-            pos += s.bary.at(off) * m_ptr->elem_vertex(s.tid, off);
-        }
-        return move_forward_from_face(id, id2, pos);
+        return move_forward_from_face(id, id2, s.pos);
     }
-    else
-    if (is_on_cell(s,id))
+    else if (is_on_cell(s,id)) // tet id
     {
-        vec3d pos(0,0,0);
-        for(int off=0; off<m_ptr->verts_per_element; ++off)
-        {
-            pos += s.bary.at(off) * m_ptr->elem_vertex(s.tid, off);
-        }
-        return move_forward_from_cell(id, pos);
+        return move_forward_from_cell(id, s.pos);
     }
     else assert(false && "Integral curve - Something is off here...");
 
-    MeshSample dummy;
+    Sample dummy;
     return dummy;
 }
 

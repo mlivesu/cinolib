@@ -48,25 +48,25 @@ class IntegralCurveDebug : public DrawableCurve
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void make_curve  (const MeshSample & seed);
-        bool is_converged(const MeshSample & sample);
+        void make_curve  (const Sample & seed);
+        bool is_converged(const Sample & sample);
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Curve::MeshSample move_forward             (const MeshSample & s);
-        Curve::MeshSample move_forward_from_vertex (const int vid) ;
-        Curve::MeshSample move_forward_from_edge   (const int eid, const vec3d & p);
-        Curve::MeshSample move_forward_from_face   (const int tid, const vec3d & p);
-        Curve::MeshSample move_forward_from_face   (const int tid, const int fid, const vec3d & p);
-        Curve::MeshSample move_forward_from_cell   (const int cid, const vec3d & p);
+        Curve::Sample move_forward             (const Sample & s);
+        Curve::Sample move_forward_from_vertex (const int vid) ;
+        Curve::Sample move_forward_from_edge   (const int eid, const vec3d & p);
+        Curve::Sample move_forward_from_face   (const int tid, const vec3d & p);
+        Curve::Sample move_forward_from_face   (const int tid, const int fid, const vec3d & p);
+        Curve::Sample move_forward_from_cell   (const int cid, const vec3d & p);
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool is_on_vertex (const MeshSample & s, int & vid, const double tol = 1e-7) const;
-        bool is_on_edge   (const MeshSample & s, int & eid, const double tol = 1e-7) const;
-        bool is_on_face   (const MeshSample & s, int & tid, const double tol = 1e-7) const;
-        bool is_on_face   (const MeshSample & s, int & tid, int & fid, const double tol = 1e-7) const;
-        bool is_on_cell   (const MeshSample & s, int & cid, const double tol = 1e-7) const;
+        bool is_on_vertex (const Sample & s, int & vid, const double tol = 1e-7) const;
+        bool is_on_edge   (const Sample & s, int & eid, const double tol = 1e-7) const;
+        bool is_on_face   (const Sample & s, int & tid, const double tol = 1e-7) const;
+        bool is_on_face   (const Sample & s, int & tid, int & fid, const double tol = 1e-7) const;
+        bool is_on_cell   (const Sample & s, int & cid, const double tol = 1e-7) const;
 
     protected:
 

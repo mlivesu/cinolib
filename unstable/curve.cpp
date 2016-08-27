@@ -29,10 +29,9 @@ namespace cinolib
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const Curve & c)
 {
-    for(vec3d p : c.samples()) in << p << std::endl;
-    for(Curve::MeshSample s : c.mesh_link())
+    for(Curve::Sample s : c.samples())
     {
-        in << s.tid << " \t ";
+        in << s.pos <<  " \t " << s.tid << " \t ";
         for(double w : s.bary) in << w << "  ";
         in << std::endl;
     }
@@ -48,7 +47,7 @@ Curve::Curve()
 CINO_INLINE
 Curve::Curve(const std::vector<vec3d> & samples)
 {
-    this->curve_samples = samples;
+    for(vec3d p : samples) append_sample(p);
 }
 
 CINO_INLINE
@@ -57,11 +56,11 @@ Skel Curve::export_as_skeleton() const
     std::vector<double> coords;
     std::vector<int>    segs;
 
-    for(size_t i=0; i<curve_samples.size(); ++i)
+    for(size_t i=0; i<sample_list.size(); ++i)
     {
-        coords.push_back(curve_samples.at(i).x());
-        coords.push_back(curve_samples.at(i).y());
-        coords.push_back(curve_samples.at(i).z());
+        coords.push_back(sample_list.at(i).pos.x());
+        coords.push_back(sample_list.at(i).pos.y());
+        coords.push_back(sample_list.at(i).pos.z());
 
         if (i>0)
         {
@@ -81,22 +80,16 @@ const Bbox & Curve::bbox() const
 
 
 CINO_INLINE
-const std::vector<vec3d> & Curve::samples() const
+const std::vector<Curve::Sample> & Curve::samples() const
 {
-    return curve_samples;
+    return sample_list;
 }
 
-
-CINO_INLINE
-const std::vector<Curve::MeshSample> & Curve::mesh_link() const
-{
-    return link_to_mesh;
-}
 
 CINO_INLINE
 int Curve::size() const
 {
-    return curve_samples.size();
+    return sample_list.size();
 }
 
 
@@ -104,9 +97,9 @@ CINO_INLINE
 double Curve::length() const
 {
     double l = 0.0;
-    for(size_t i=1; i<curve_samples.size(); ++i)
+    for(size_t i=1; i<sample_list.size(); ++i)
     {
-        l += curve_samples.at(i).dist(curve_samples.at(i-1));
+        l += sample_list.at(i).pos.dist(sample_list.at(i-1).pos);
     }
     return l;
 }
@@ -114,11 +107,24 @@ double Curve::length() const
 CINO_INLINE
 void Curve::append_sample(const vec3d & s)
 {
-    curve_samples.push_back(s);
-    bb.min = bb.min.min(s);
-    bb.max = bb.max.max(s);
+    Sample sample;
+    sample.pos = s;
+    append_sample(sample);
 }
 
+CINO_INLINE
+void Curve::append_sample(const Sample & s)
+{
+    sample_list.push_back(s);
+    bb.min = bb.min.min(s.pos);
+    bb.max = bb.max.max(s.pos);
+}
+
+CINO_INLINE
+void Curve::pop_back()
+{
+    sample_list.pop_back();
+}
 
 CINO_INLINE
 vec3d Curve::sample_curve_at(const float t) const
@@ -137,9 +143,9 @@ vec3d Curve::sample_curve_at(const float t, const double tot_length) const
 
     double curr_l = 0.0;
     double curr_t = 0.0;
-    for(size_t i=1; i<curve_samples.size(); ++i)
+    for(size_t i=1; i<sample_list.size(); ++i)
     {
-        double seg_l   = curve_samples.at(i-1).dist(curve_samples[i]);
+        double seg_l   = sample_list.at(i-1).pos.dist(sample_list[i].pos);
         double delta_t = seg_l / tot_length;
 
         if (delta_t == 0) continue;
@@ -147,7 +153,7 @@ vec3d Curve::sample_curve_at(const float t, const double tot_length) const
         if (curr_t + delta_t >= t - 1e-7)
         {
             double alpha = (t-curr_t)/(delta_t);
-            return (1.0-alpha)*curve_samples.at(i-1) + alpha*curve_samples.at(i);
+            return (1.0-alpha)*sample_list.at(i-1).pos + alpha*sample_list.at(i).pos;
         }
         else
         {
@@ -172,23 +178,28 @@ void Curve::resample_curve(const int n_samples)
     if (size()  < 2) return;
     if (length()<=0) return;
 
-    std::vector<vec3d> new_samples;
+    std::vector<Sample> new_samples;
     for(int i=0; i<=n_samples; ++i)
     {
-        new_samples.push_back( sample_curve_at(t,tot_length) );
+        Sample s;
+        s.pos = sample_curve_at(t,tot_length);
+        new_samples.push_back(s);
         t += delta_t;
     }
-    curve_samples = new_samples;
+    sample_list = new_samples;
 }
 
 
 CINO_INLINE
 std::vector<int> Curve::tessellate(Trimesh & m) const
 {
-    if (link_to_mesh.size() != curve_samples.size())
+    for(Sample s : sample_list)
     {
-        std::cerr << "WARNING: no link between mesh and curve existing." << std::endl;
-        assert(false && "Impossible to tessellate the curve");
+        if (s.tid == -1 || s.bary.size() < m.verts_per_element)
+        {
+            std::cerr << "WARNING: no link between mesh and curve existing." << std::endl;
+            assert(false && "Impossible to tessellate the curve");
+        }
     }
 
     // 1) Split edges
@@ -197,9 +208,9 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
     //
     std::vector<int>  curve_vids;
     std::map<int,int> edges_split;
-    for(size_t i=0; i<link_to_mesh.size(); ++i)
+    for(size_t i=0; i<sample_list.size(); ++i)
     {
-        const MeshSample & s = link_to_mesh.at(i);
+        const Sample & s = sample_list.at(i);
         int off;
         if (triangle_bary_is_edge(s.bary, off))
         {
@@ -209,7 +220,7 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
             float f0          = m.vertex_u_text(vid0);
             float f1          = m.vertex_u_text(vid1);
             float f_new       = f0 * s.bary.at(TRI_EDGES[off][0]) + f1 * s.bary.at(TRI_EDGES[off][1]);
-            int fresh_id      = m.add_vertex(samples().at(i), f_new);
+            int fresh_id      = m.add_vertex(sample_list.at(i).pos, f_new);
             edges_split[eid]  = fresh_id;
             curve_vids.push_back(fresh_id);
         }
@@ -228,10 +239,10 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
     // the next tris will be generated using the add_triangle() routine
     //
     std::vector<int> split_list;
-    for(size_t i=1; i<link_to_mesh.size(); ++i)
+    for(size_t i=1; i<sample_list.size(); ++i)
     {
-        const MeshSample & s0 = link_to_mesh.at(i-1);
-        const MeshSample & s1 = link_to_mesh.at( i );
+        const Sample & s0 = sample_list.at(i-1);
+        const Sample & s1 = sample_list.at( i );
 
         int  id0, id1;
         bool id0_is_edge = m.elem_bary_is_edge(s0.tid, s0.bary, id0);
