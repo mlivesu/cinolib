@@ -350,7 +350,6 @@ Curve::Sample IntegralCurve<Trimesh>::move_forward_from_face(const int tid, cons
     }
 
     assert(false && "Integral curve - Something is off here...");
-
     Sample dummy;
     return dummy;
 }
@@ -486,9 +485,6 @@ Curve::Sample IntegralCurve<Tetmesh>::move_forward_from_vertex(const int vid)
         }
     }
 
-    // this may actually happen if the point is on the surface and the gradient points outside of the domain...
-    // assert(false && "Integral curve - Something is off here...");
-
     Sample dummy;
     return dummy;
 }
@@ -545,9 +541,6 @@ Curve::Sample IntegralCurve<Tetmesh>::move_forward_from_edge(const int eid, cons
         }
     }
 
-    // this may actually happen if the point is on the surface and the gradient points outside of the domain...
-    // assert(false && "Integral curve - Something is off here...");
-
     Sample dummy;
     return dummy;
 }
@@ -569,8 +562,7 @@ Curve::Sample IntegralCurve<Tetmesh>::move_forward_from_face(const int tid, cons
         grad += grad_ptr->vec_at(nbr);
     }
     grad.normalize();
-    //assert(grad.length() > 0);
-    if (grad.length() == 0)
+    if (grad.length() == 0) // need to understand when and why this may happen....
     {
         Sample dummy;
         return dummy;
