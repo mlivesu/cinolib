@@ -246,12 +246,14 @@ Curve::Sample IntegralCurveDebug<Trimesh>::move_forward_from_vertex(const int vi
         if (intersection::intersection(Ray(v,grad), Segment(e0,e1), inters))
         {
             Sample sample;
-            sample.pos = inters;
             sample.tid = tid;
             triangle_barycentric_coords(tangent_space.at( m_ptr->triangle_vertex_id(tid,0) ),
                                         tangent_space.at( m_ptr->triangle_vertex_id(tid,1) ),
                                         tangent_space.at( m_ptr->triangle_vertex_id(tid,2) ),
                                         inters, sample.bary);
+
+            for(int i=0; i<3; ++i) sample.pos += sample.bary.at(i) * m_ptr->triangle_vertex(tid, i);
+
             return sample;
         }
     }
@@ -297,18 +299,20 @@ Curve::Sample IntegralCurveDebug<Trimesh>::move_forward_from_edge(const int eid,
     {
         int     e   = obj.first;
         int     tid = obj.second;
-        vec3d   e0  = tangent_space.at( m_ptr->edge_vertex_id(e,0) );
-        vec3d   e1  = tangent_space.at( m_ptr->edge_vertex_id(e,1) );
+        vec3d   v0  = tangent_space.at( m_ptr->edge_vertex_id(e,0) );
+        vec3d   v1  = tangent_space.at( m_ptr->edge_vertex_id(e,1) );
         vec3d   inters;
-        if (intersection::intersection(Ray(p,grad), Segment(e0,e1), inters))
+        if (intersection::intersection(Ray(p,grad), Segment(v0,v1), inters))
         {
             Sample sample;
-            sample.pos = inters;
             sample.tid = tid;
             triangle_barycentric_coords(tangent_space.at( m_ptr->triangle_vertex_id(tid,0) ),
                                         tangent_space.at( m_ptr->triangle_vertex_id(tid,1) ),
                                         tangent_space.at( m_ptr->triangle_vertex_id(tid,2) ),
                                         inters, sample.bary);
+
+            for(int i=0; i<3; ++i) sample.pos += sample.bary.at(i) * m_ptr->triangle_vertex(tid, i);
+
             return sample;
         }
     }
@@ -554,19 +558,22 @@ template<>
 CINO_INLINE
 Curve::Sample IntegralCurveDebug<Tetmesh>::move_forward_from_face(const int tid, const int fid, const vec3d & p)
 {
-    std::vector<int> tets;
-    tets.push_back(tid);
-
+    std::vector<int> tets_to_process;
+    tets_to_process.push_back(tid);
     vec3d grad = grad_ptr->vec_at(tid);
 
     int nbr = m_ptr->adjacent_tet_through_facet(tid, fid);
     if (nbr != -1)
     {
-        tets.push_back(nbr);
-
+        tets_to_process.push_back(nbr);
         grad += grad_ptr->vec_at(nbr);
-        grad.normalize();
-        assert(grad.length() > 0);
+    }
+    grad.normalize();
+    //assert(grad.length() > 0);
+    if (grad.length() == 0)
+    {
+        Sample dummy;
+        return dummy;
     }
 
     std::vector<int> illegal_f;
@@ -575,7 +582,7 @@ Curve::Sample IntegralCurveDebug<Tetmesh>::move_forward_from_face(const int tid,
     illegal_f.push_back(m_ptr->tet_vertex_id(tid, TET_FACES[fid][2]));
     std::sort(illegal_f.begin(), illegal_f.end());
 
-    for(int curr_tid : tets)
+    for(int curr_tid : tets_to_process)
     {
         for(int f=0; f<4; ++f)
         {
@@ -587,9 +594,9 @@ Curve::Sample IntegralCurveDebug<Tetmesh>::move_forward_from_face(const int tid,
 
             if (curr_f == illegal_f) continue;
 
-            vec3d v0  = m_ptr->vertex(curr_f[0]);
-            vec3d v1  = m_ptr->vertex(curr_f[1]);
-            vec3d v2  = m_ptr->vertex(curr_f[2]);
+            vec3d v0 = m_ptr->vertex(curr_f[0]);
+            vec3d v1 = m_ptr->vertex(curr_f[1]);
+            vec3d v2 = m_ptr->vertex(curr_f[2]);
 
             vec3d inters;
             if (intersection::ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
