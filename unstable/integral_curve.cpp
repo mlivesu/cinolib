@@ -21,7 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include <cinolib/unstable/integral_curve.h>
+#include "cinolib/unstable/integral_curve.h"
+
 #include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/gl/draw_arrow.h>
 #include <cinolib/gl/draw_sphere.h>
@@ -31,6 +32,7 @@
 #include <cinolib/meshes/tetmesh/drawable_tetmesh.h>
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/geometry/segment.h>
+#include <cinolib/geometry/ray.h>
 #include <cinolib/geometry/tetrahedron.h>
 
 namespace cinolib
@@ -38,484 +40,649 @@ namespace cinolib
 
 template<class Mesh>
 CINO_INLINE
-IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
-                                   const VectorField & grad,
-                                   const int           source_tid,
-                                   const vec3d         start_pos)
+IntegralCurve<Mesh>::IntegralCurve(const Mesh                & m,
+                                   const VectorField         & grad,
+                                   const int                   tid,
+                                   const std::vector<double> & bary)
     : DrawableCurve()
     , m_ptr(&m)
     , grad_ptr(&grad)
 {
-    type = CURVE;
+    Sample seed;
+    seed.tid  = tid;
+    seed.bary = bary;
+    for(int off=0; off<m.verts_per_element; ++off) seed.pos += bary.at(off) * m.elem_vertex(tid, off);
 
-    opt.source_tid            = source_tid;
-    opt.source_pos            = start_pos;
-    opt.convergence_criterion = STOP_AT_LOCAL_MAX;
-
-    make_curve();
-    for(CurveSample & s : curve) append_sample(s.pos);
+    trace_curve(seed);
 }
 
 template<class Mesh>
 CINO_INLINE
 IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
                                    const VectorField & grad,
-                                   const int           source_tid,
-                                   const int           source_vid)
+                                   const int           vid)
     : DrawableCurve()
     , m_ptr(&m)
     , grad_ptr(&grad)
 {
-    type = CURVE;
+    assert(!m.adj_vtx2ele(vid).empty());
+    int tid = m.adj_vtx2ele(vid).front();
 
-    opt.source_tid            = source_tid;
-    opt.source_vid            = source_vid;
-    opt.source_pos            = m.vertex(source_vid);
-    opt.convergence_criterion = STOP_AT_LOCAL_MAX;
+    int off = 0;
+    while(off<m.verts_per_element && m.elem_vertex_id(tid,off)!=vid) ++off;
+    assert(m.elem_vertex_id(tid,off)==vid && "Cannot find incident element to begin with");
 
-    make_curve();
-    for(CurveSample & s : curve) append_sample(s.pos);
+    std::vector<double> bary = std::vector<double>(m.verts_per_element,0);
+    bary[off] = 1.0;
+
+    Sample seed;
+    seed.pos  = m.vertex(vid);
+    seed.tid  = tid;
+    seed.bary = bary;
+
+    trace_curve(seed);
 }
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
-IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
-                                   const VectorField & grad,
-                                   const int           source_tid,
-                                   const int           source_vid,
-                                   const float         stop_at_this_value)
-    : DrawableCurve()
-    , m_ptr(&m)
-    , grad_ptr(&grad)
+void IntegralCurve<Mesh>::trace_curve(const Sample & seed)
 {
-    type = CURVE;
-
-    opt.source_tid            = source_tid;
-    opt.source_vid            = source_vid;
-    opt.source_pos            = m.vertex(source_vid);
-    opt.convergence_criterion = STOP_AT_GIVEN_VAL;
-    opt.stop_at_this_value    = stop_at_this_value;
-
-    make_curve();
-    for(CurveSample & s : curve) append_sample(s.pos);
-}
-
-template<class Mesh>
-CINO_INLINE
-IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
-                                   const VectorField & grad,
-                                   const int           source_tid,
-                                   const int           source_vid,
-                                   const int           stop_at_this_vertex)
-    : DrawableCurve()
-    , m_ptr(&m)
-    , grad_ptr(&grad)
-{
-    type = CURVE;
-
-    opt.source_tid            = source_tid;
-    opt.source_vid            = source_vid;
-    opt.source_pos            = m.vertex(source_vid);
-    opt.convergence_criterion = STOP_AT_GIVEN_VTX;
-    opt.stop_at_this_vertex   = stop_at_this_vertex; // if you ever run into it....
-
-    make_curve();
-    for(CurveSample & s : curve) append_sample(s.pos);
-}
-
-
-/**********************************
- *
- * TRIMESH TEMPLATE SPECIALIZATIONS
- *
-************************************/
-
-
-template<>
-CINO_INLINE
-void IntegralCurve<Trimesh>::find_exit_gate(const CurveSample & sample,
-                                            const vec3d       & dir,
-                                                  int         & exit_gate,
-                                                  vec3d       & exit_pos) const
-{
-    assert(sample.elem_id >= 0);
-    assert(sample.elem_id <  m_ptr->num_triangles());
-
-    vec3d tri[3] =
-    {
-        m_ptr->triangle_vertex(sample.elem_id, 0),
-        m_ptr->triangle_vertex(sample.elem_id, 1),
-        m_ptr->triangle_vertex(sample.elem_id, 2),
-    };
-
-    triangle_traverse_with_ray(tri, sample.pos, dir, exit_pos, exit_gate);
-}
-
-
-
-template<>
-CINO_INLINE
-bool IntegralCurve<Trimesh>::gradient_skins_into(const CurveSample & curr,
-                                                 const CurveSample & next) const
-{
-    if (next.elem_id == -1) return false;
-
-    vec3d grad_dir = grad_ptr->vec_at(next.elem_id);
-    grad_dir.normalize();
-
-    int   next_exit_edge;
-    vec3d next_exit_pos;
-    find_exit_gate(next, grad_dir, next_exit_edge, next_exit_pos);
-
-    int  next_vidA     = m_ptr->triangle_vertex_id(next.elem_id, TRI_EDGES[next_exit_edge][0]);
-    int  next_vidB     = m_ptr->triangle_vertex_id(next.elem_id, TRI_EDGES[next_exit_edge][1]);
-    int  next_next_tid = m_ptr->triangle_adjacent_along(next.elem_id, next_vidA, next_vidB);
-
-    if (next_next_tid == curr.elem_id) return true;
-    return false;
-}
-
-
-template<>
-CINO_INLINE
-IntegralCurve<Trimesh>::CurveSample IntegralCurve<Trimesh>::traverse_element(const CurveSample & sample)
-{
-    vec3d grad_dir = grad_ptr->vec_at(sample.elem_id);
-    grad_dir.normalize();
-
-    CurveSample next;
-    find_exit_gate(sample, grad_dir, next.gate_id, next.pos);
-
-    int  vidA     = m_ptr->triangle_vertex_id(sample.elem_id, TRI_EDGES[next.gate_id][0]);
-    int  vidB     = m_ptr->triangle_vertex_id(sample.elem_id, TRI_EDGES[next.gate_id][1]);
-    int  next_tid = m_ptr->triangle_adjacent_along(sample.elem_id, vidA, vidB);
-    next.elem_id  = next_tid;
-
-    if (gradient_skins_into(sample, next))
-    {
-        // follow the exit edge until the endpoint best aligned
-        // with the gradient dir...
-        //
-        vec3d A      = m_ptr->vertex(vidA);
-        vec3d B      = m_ptr->vertex(vidB);
-        next.vert_id = ((B-A).dot(grad_dir)>0) ? vidB : vidA;
-        next.pos     = m_ptr->vertex(next.vert_id);
-        next.gate_id = -1;
-        next.elem_id = -1;
-        for(int tid : m_ptr->adj_vtx2tri(next.vert_id))
-        {
-            if (tid != next_tid && tid != sample.elem_id)
-            {
-                next.elem_id = tid;
-            }
-        }
-        assert(next.elem_id != -1);
-    }
-
-    return next;
-}
-
-template <>
-CINO_INLINE
-bool IntegralCurve<Trimesh>::is_converged(const int curr_tid, const int convergence_criterion) const
-{
-    switch (convergence_criterion)
-    {
-        case STOP_AT_LOCAL_MAX :
-        {
-            for(int i=0; i<3; ++i)
-            {
-                int vid = m_ptr->triangle_vertex_id(curr_tid,i);
-                if (m_ptr->vertex_is_local_maxima(vid)) return true;
-            }
-        }
-        break;
-
-        case STOP_AT_GIVEN_VAL :
-        {
-            if (m_ptr->triangle_min_u_text(curr_tid) > opt.stop_at_this_value) return true;
-        }
-        break;
-
-        case STOP_AT_GIVEN_VTX :
-        {
-            if (m_ptr->triangle_contains_vertex(curr_tid, opt.stop_at_this_vertex)) return true;
-        }
-        break;
-
-        default: assert("Integral Curve Convergence Error" && false);
-    }
-
-    return false;
-}
-
-
-template<>
-CINO_INLINE
-void IntegralCurve<Trimesh>::make_curve()
-{
-    CurveSample cs;
-    cs.pos     = opt.source_pos;
-    cs.elem_id = opt.source_tid;
-    cs.vert_id = opt.source_vid;
-    curve.push_back(cs);
-
-    bool border_reached, locmax_reached, target_reached, infinite_loop;
+    append_sample(seed);
 
     do
     {
-        curve.push_back( traverse_element(curve.back()) );
-
-        border_reached = (curve.back().elem_id == -1);
-        locmax_reached = !border_reached && is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX);
-        target_reached = !border_reached && is_converged(curve.back().elem_id, opt.convergence_criterion);
-        infinite_loop  = int(curve.size()) > m_ptr->num_elements();
+        Sample s = move_forward(samples().back());
+        append_sample(s);
     }
-    while (!border_reached && !locmax_reached && !target_reached && !infinite_loop);
-
-    if (locmax_reached)
-    {
-        // append the final segment to the curve
-        //
-        for(int i=0; i<3; ++i)
-        if (m_ptr->vertex_is_local_maxima(m_ptr->triangle_vertex_id(curve.back().elem_id,i)))
-        {
-            CurveSample cs;
-            cs.vert_id = m_ptr->triangle_vertex_id(curve.back().elem_id, i);
-            cs.pos     = m_ptr->vertex(cs.vert_id);
-            cs.elem_id = curve.back().elem_id;
-            curve.push_back(cs);
-        }
-    }
+    while (!is_converged(samples().back()));
 }
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-/**********************************
- *
- * TETMESH TEMPLATE SPECIALIZATIONS
- *
-************************************/
-
-template<>
+template<class Mesh>
 CINO_INLINE
-void IntegralCurve<Tetmesh>::find_exit_gate(const CurveSample & sample,
-                                           const vec3d        & dir,
-                                                 int          & exit_gate,
-                                                 vec3d        & exit_pos) const
+bool IntegralCurve<Mesh>::is_converged(const Sample & sample)
 {
-    assert(sample.elem_id >= 0);
-    assert(sample.elem_id < m_ptr->num_tetrahedra());
-
-    exit_pos  = sample.pos;
-    exit_gate = -1;
-
-    for(int facet=0; facet<4; ++facet)
+    if (sample.tid == -1) // i.e. boundary reached. Remove dummy sample
     {
-        vec3d f[3] =
-        {
-            m_ptr->tet_vertex(sample.elem_id, TET_FACES[facet][0]),
-            m_ptr->tet_vertex(sample.elem_id, TET_FACES[facet][1]),
-            m_ptr->tet_vertex(sample.elem_id, TET_FACES[facet][2])
-        };
-
-        vec3d inters;
-        bool b = intersection::ray_triangle_intersection(sample.pos, dir, f[0], f[1], f[2], inters);
-
-        if (b && inters.dist(sample.pos) > exit_pos.dist(sample.pos))
-        {
-            exit_pos  = inters;
-            exit_gate = facet;
-        }
+        pop_back();
+        return true;
     }
 
-    if (exit_gate == -1)
-    {
-        exit_gate = sample.gate_id;
-        exit_pos  = sample.pos;
-    }
-}
-
-
-template<>
-CINO_INLINE
-IntegralCurve<Tetmesh>::CurveSample IntegralCurve<Tetmesh>::traverse_element(const CurveSample & curr)
-{
-    vec3d grad_dir = grad_ptr->vec_at(curr.elem_id);
-    grad_dir.normalize();
-
-    int   exit_gate;
-    vec3d exit_pos;
-    find_exit_gate(curr, grad_dir, exit_gate, exit_pos);
-
-    if (exit_pos.dist(curr.pos) > 0)
-    {
-        CurveSample next;
-        next.elem_id = m_ptr->adjacent_tet_through_facet(curr.elem_id, exit_gate);
-        next.gate_id = m_ptr->shared_facet(next.elem_id, curr.elem_id);
-        next.pos     = exit_pos;
-        return next;
-    }
-    else
-    {
-        int tet_vid[4] =
-        {
-            m_ptr->tet_vertex_id(curr.elem_id, 0),
-            m_ptr->tet_vertex_id(curr.elem_id, 1),
-            m_ptr->tet_vertex_id(curr.elem_id, 2),
-            m_ptr->tet_vertex_id(curr.elem_id, 3),
-        };
-
-        vec3d tet_xyz[4] =
-        {
-            m_ptr->tet_vertex(curr.elem_id, 0),
-            m_ptr->tet_vertex(curr.elem_id, 1),
-            m_ptr->tet_vertex(curr.elem_id, 2),
-            m_ptr->tet_vertex(curr.elem_id, 3),
-        };
-
-        std::vector<int> elem_list;
-
-        int    id;
-        double dist;
-        tet_closest_vertex(tet_xyz[0], tet_xyz[1], tet_xyz[2], tet_xyz[3], curr.pos, id, dist);
-
-        if (dist < 1e-7) // we are at a vertex
-        {
-            int vid = tet_vid[id];
-            for(int tid : m_ptr->adj_vtx2tet(vid)) elem_list.push_back(tid);
-        }
-        else
-        {
-            tet_closest_edge(tet_xyz[0], tet_xyz[1], tet_xyz[2], tet_xyz[3], curr.pos, id, dist);
-
-            if (dist < 1e-7) // we are at an edge
-            {
-                int vidA = tet_vid[TET_EDGES[id][0]];
-                int vidB = tet_vid[TET_EDGES[id][1]];
-                int eid  = m_ptr->tet_edge_id(curr.elem_id, vidA, vidB);
-                for(int tid : m_ptr->adj_edg2tet(eid)) elem_list.push_back(tid);
-            }
-            else // we are at a triangle
-            {
-                assert(curr.elem_id != -1);
-                assert(curr.gate_id != -1);
-                elem_list.push_back(curr.elem_id);
-                int opp = m_ptr->adjacent_tet_through_facet(curr.elem_id, curr.gate_id);
-                if (opp!=-1) elem_list.push_back(opp);
-            }
-        }
-
-        assert(!elem_list.empty());
-
-        vec3d avg_grad;
-        for(int tid : elem_list)
-        {
-            avg_grad += grad_ptr->vec_at(tid);
-        }
-        avg_grad.normalize();
-
-        for(int tid : elem_list)
-        {
-            CurveSample test;
-            test.elem_id   = tid;
-            test.pos       = curr.pos;
-
-            vec3d exit_pos;
-            int   exit_gate;
-            find_exit_gate(test, avg_grad, exit_gate, exit_pos);
-
-            if (curr.pos.dist(exit_pos) > 0)
-            {
-                CurveSample next;
-                next.elem_id = m_ptr->adjacent_tet_through_facet(tid, exit_gate);
-                next.gate_id = m_ptr->shared_facet(next.elem_id, tid);
-                next.pos     = exit_pos;
-                return next;
-            }
-        }
-
-        std::cerr << "Mmmmm - this is still not perfect!" << std::endl;
-
-        CurveSample next;
-        next.pos = exit_pos;
-        return next;
-    }
-}
-
-
-template <>
-CINO_INLINE
-bool IntegralCurve<Tetmesh>::is_converged(const int curr_tid, const int convergence_criterion) const
-{
-    switch (convergence_criterion)
-    {
-        case STOP_AT_LOCAL_MAX :
-        {
-            for(int i=0; i<4; ++i)
-            {
-                int vid = m_ptr->tet_vertex_id(curr_tid,i);
-                if (m_ptr->vertex_is_local_maxima(vid)) return true;
-            }
-        }
-        break;
-
-        case STOP_AT_GIVEN_VAL :
-        {
-            if (m_ptr->tet_min_u_text(curr_tid) > opt.stop_at_this_value) return true;
-        }
-        break;
-
-        case STOP_AT_GIVEN_VTX :
-        {
-            if (m_ptr->tet_contains_vertex(curr_tid, opt.stop_at_this_vertex)) return true;
-        }
-        break;
-
-        default: assert("Integral Curve Convergence Error" && false);
-    }
-
-    return false;
-}
-
-
-template<>
-CINO_INLINE
-void IntegralCurve<Tetmesh>::make_curve()
-{
-    CurveSample cs;
-    cs.pos     = opt.source_pos;
-    cs.elem_id = opt.source_tid;
-    cs.vert_id = opt.source_vid;
-    curve.push_back(cs);
-
-    bool border_reached, locmax_reached, target_reached, infinite_loop;
-
-    do
-    {
-        curve.push_back( traverse_element(curve.back()) );        
-
-        border_reached = (curve.back().elem_id == -1);
-        locmax_reached = !border_reached && is_converged(curve.back().elem_id, STOP_AT_LOCAL_MAX);
-        target_reached = !border_reached && is_converged(curve.back().elem_id, opt.convergence_criterion);
-        infinite_loop  = int(curve.size()) > m_ptr->num_elements();
-    }
-    while (!border_reached && !locmax_reached && !target_reached && !infinite_loop);
-
-    // append the final segment to the curve
+    // i.e. local maxima reached. Connect to it
+    // WARNING: there can be many! This picks up an arbitrary one...
     //
-    if (locmax_reached)
+    for(int off=0; off<m_ptr->verts_per_element; ++off)
     {
-        for(int i=0; i<4; ++i)
-        if (m_ptr->vertex_is_local_maxima(m_ptr->tet_vertex_id(curve.back().elem_id,i)))
+        int vid = m_ptr->elem_vertex_id(sample.tid, off);
+
+        if (m_ptr->vertex_is_local_maxima(vid))
         {
-            CurveSample cs;
-            cs.pos = m_ptr->tet_vertex(curve.back().elem_id,i);
-            cs.elem_id = curve.back().elem_id;
-            cs.gate_id = -1;
-            curve.push_back(cs);
+            Sample s;
+            s.pos  = m_ptr->vertex(vid);
+            s.tid  = sample.tid;
+            s.bary = std::vector<double>(m_ptr->verts_per_element,0);
+            s.bary.at(off) = 1.0;
+            append_sample(s);
+            return true;
         }
     }
+    return false;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+bool IntegralCurve<Mesh>::is_on_vertex(const Sample & s, int & vid, const double tol) const
+{
+    assert(s.tid!=-1);
+
+    std::vector<int> non_zero_coords;
+    for(size_t off=0; off<s.bary.size(); ++off)
+    {
+        if (s.bary.at(off) > tol) non_zero_coords.push_back(off);
+    }
+
+    if (non_zero_coords.size() == 1)
+    {
+        vid = m_ptr->elem_vertex_id(s.tid, non_zero_coords.front());
+        return true;
+    }
+    return false;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+bool IntegralCurve<Mesh>::is_on_edge(const Sample & s, int & eid, const double tol) const
+{
+    assert(s.tid!=-1);
+
+    std::vector<int> non_zero_coords;
+    for(size_t off=0; off<s.bary.size(); ++off)
+    {
+        if (s.bary.at(off) > tol) non_zero_coords.push_back(off);
+    }
+
+    if (non_zero_coords.size() == 2)
+    {
+        int vid0 = m_ptr->elem_vertex_id(s.tid, non_zero_coords.at(0));
+        int vid1 = m_ptr->elem_vertex_id(s.tid, non_zero_coords.at(1));
+        for(int id : m_ptr->adj_ele2edg(s.tid))
+        {
+            if (m_ptr->edge_contains_vertex(id, vid0) &&
+                m_ptr->edge_contains_vertex(id, vid1))
+            {
+                eid = id;
+                return true;
+            }
+        }
+        assert(false && "Integral curve - Something is off here...");
+    }
+    return false;
+}
+
+// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::                                              :::::::::::::::::::: //
+// :::::::::::::::::::: TEMPLATE SPECIALIZATIONS FOR TRIANGLE MESHES :::::::::::::::::::: //
+// ::::::::::::::::::::                                              :::::::::::::::::::: //
+// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+template<>
+CINO_INLINE
+bool IntegralCurve<Trimesh>::is_on_face(const Sample & s, int & tid, const double tol) const
+{
+    assert(s.tid!=-1);
+
+    std::vector<int> non_zero_coords;
+    for(size_t off=0; off<s.bary.size(); ++off)
+    {
+        if (s.bary.at(off) > tol) non_zero_coords.push_back(off);
+    }
+
+    if (non_zero_coords.size() == 3)
+    {
+        tid = s.tid;
+        return true;
+    }
+    return false;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<>
+CINO_INLINE
+Curve::Sample IntegralCurve<Trimesh>::move_forward_from_vertex(const int vid)
+{
+    vec3d v = m_ptr->vertex(vid);
+    vec3d n = m_ptr->vertex_normal(vid);
+    Plane tangent_plane(v,n);
+
+    vec3d grad(0,0,0);
+    for(int tid : m_ptr->adj_vtx2tri(vid)) grad += grad_ptr->vec_at(tid);
+    grad = tangent_plane.project_onto(v+grad) - v;
+    grad.normalize();
+    assert(grad.length() > 0);
+
+    std::map<int,vec3d> tangent_space;
+    for(int nbr : m_ptr->adj_vtx2vtx(vid))
+    {
+        tangent_space[nbr] = tangent_plane.project_onto(m_ptr->vertex(nbr));
+    }
+    tangent_space[vid] = m_ptr->vertex(vid);
+
+    for(int tid : m_ptr->adj_vtx2tri(vid))
+    {
+        int     eid = m_ptr->edge_opposite_to(tid, vid);
+        vec3d   e0  = tangent_space.at( m_ptr->edge_vertex_id(eid,0) );
+        vec3d   e1  = tangent_space.at( m_ptr->edge_vertex_id(eid,1) );
+        vec3d   inters;
+        if (intersection(Ray(v,grad), Segment(e0,e1), inters))
+        {
+            Sample sample;
+            sample.tid = tid;
+            triangle_barycentric_coords(tangent_space.at( m_ptr->triangle_vertex_id(tid,0) ),
+                                        tangent_space.at( m_ptr->triangle_vertex_id(tid,1) ),
+                                        tangent_space.at( m_ptr->triangle_vertex_id(tid,2) ),
+                                        inters, sample.bary);
+
+            for(int i=0; i<3; ++i) sample.pos += sample.bary.at(i) * m_ptr->triangle_vertex(tid, i);
+
+            return sample;
+        }
+    }
+    assert(false && "Integral curve - Something is off here...");
+
+    Sample dummy;
+    return dummy;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<>
+CINO_INLINE
+Curve::Sample IntegralCurve<Trimesh>::move_forward_from_edge(const int eid, const vec3d & p)
+{
+    assert(m_ptr->edge_is_manifold(eid));
+
+    int   t0 = m_ptr->adj_edg2tri(eid).front();
+    int   t1 = m_ptr->adj_edg2tri(eid).back();
+    vec3d n  = m_ptr->triangle_normal(t0) + m_ptr->triangle_normal(t1); n.normalize();
+    Plane tangent_plane(p,n);
+
+    vec3d grad = grad_ptr->vec_at(t0) + grad_ptr->vec_at(t1);
+    grad = tangent_plane.project_onto(p + grad) - p;
+    grad.normalize();
+    assert(grad.length() > 0);
+
+    std::map<int,vec3d> tangent_space;
+    int v0 = m_ptr->edge_vertex_id(eid,0);
+    int v1 = m_ptr->edge_vertex_id(eid,1);
+    int v2 = m_ptr->vertex_opposite_to(t0, v0, v1);
+    int v3 = m_ptr->vertex_opposite_to(t1, v0, v1);
+    tangent_space[v0] = m_ptr->vertex(v0);
+    tangent_space[v1] = m_ptr->vertex(v1);
+    tangent_space[v2] = tangent_plane.project_onto(m_ptr->vertex(v2));
+    tangent_space[v3] = tangent_plane.project_onto(m_ptr->vertex(v3));
+
+    std::vector< std::pair<int,int> > edges_to_check;
+    for(int e : m_ptr->adj_tri2edg(t0)) if (e!=eid) edges_to_check.push_back(std::make_pair(e,t0));
+    for(int e : m_ptr->adj_tri2edg(t1)) if (e!=eid) edges_to_check.push_back(std::make_pair(e,t1));
+
+    for(auto obj : edges_to_check)
+    {
+        int     e   = obj.first;
+        int     tid = obj.second;
+        vec3d   v0  = tangent_space.at( m_ptr->edge_vertex_id(e,0) );
+        vec3d   v1  = tangent_space.at( m_ptr->edge_vertex_id(e,1) );
+        vec3d   inters;
+        if (intersection(Ray(p,grad), Segment(v0,v1), inters))
+        {
+            Sample sample;
+            sample.tid = tid;
+            triangle_barycentric_coords(tangent_space.at( m_ptr->triangle_vertex_id(tid,0) ),
+                                        tangent_space.at( m_ptr->triangle_vertex_id(tid,1) ),
+                                        tangent_space.at( m_ptr->triangle_vertex_id(tid,2) ),
+                                        inters, sample.bary);
+
+            for(int i=0; i<3; ++i) sample.pos += sample.bary.at(i) * m_ptr->triangle_vertex(tid, i);
+
+            return sample;
+        }
+    }
+    assert(false && "Integral curve - Something is off here...");
+
+    Sample dummy;
+    return dummy;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<>
+CINO_INLINE
+Curve::Sample IntegralCurve<Trimesh>::move_forward_from_face(const int tid, const vec3d & p)
+{
+    vec3d grad = grad_ptr->vec_at(tid);
+    grad.normalize();
+
+    for(int e=0; e<3; ++e)
+    {
+        vec3d   e0  = m_ptr->triangle_vertex(tid,  TRI_EDGES[e][0]);
+        vec3d   e1  = m_ptr->triangle_vertex(tid,  TRI_EDGES[e][1]);
+        vec3d   inters;
+        if (intersection(Ray(p,grad), Segment(e0,e1), inters))
+        {
+            Sample sample;
+            sample.pos = inters;
+            sample.tid = tid;
+            triangle_barycentric_coords(m_ptr->triangle_vertex(tid,0),
+                                        m_ptr->triangle_vertex(tid,1),
+                                        m_ptr->triangle_vertex(tid,2),
+                                        inters, sample.bary);
+            return sample;
+        }
+    }
+
+    assert(false && "Integral curve - Something is off here...");
+
+    Sample dummy;
+    return dummy;
+}
+
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+template<>
+CINO_INLINE
+Curve::Sample IntegralCurve<Trimesh>::move_forward(const Sample & s)
+{
+    int id;
+    if (is_on_vertex(s,id))
+    {
+        return move_forward_from_vertex(id);
+    }
+    else if (is_on_edge(s,id))
+    {
+        return move_forward_from_edge(id, s.pos);
+    }
+    else if (is_on_face(s,id))
+    {
+        return move_forward_from_face(id, s.pos);
+    }
+    else assert(false && "Integral curve - Something is off here...");
+
+    Sample dummy;
+    return dummy;
+}
+
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::                                                 :::::::::::::::::::: //
+// :::::::::::::::::::: TEMPLATE SPECIALIZATIONS FOR TETRAHEDRAL MESHES :::::::::::::::::::: //
+// ::::::::::::::::::::                                                 :::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+template<>
+CINO_INLINE
+bool IntegralCurve<Tetmesh>::is_on_face(const Sample & s, int & tid, int & fid, const double tol) const
+{
+    assert(s.tid!=-1);
+
+    std::vector<int> non_zero_coords;
+    for(size_t off=0; off<s.bary.size(); ++off)
+    {
+        if (s.bary.at(off) > tol) non_zero_coords.push_back(off);
+    }
+
+    if (non_zero_coords.size() == 3)
+    {
+        std::vector<int> my_f;
+        my_f.push_back(m_ptr->elem_vertex_id(s.tid, non_zero_coords.at(0)));
+        my_f.push_back(m_ptr->elem_vertex_id(s.tid, non_zero_coords.at(1)));
+        my_f.push_back(m_ptr->elem_vertex_id(s.tid, non_zero_coords.at(2)));
+        std::sort(my_f.begin(), my_f.end());
+
+        for(int f=0; f<4; ++f)
+        {
+            std::vector<int> curr_f;
+            curr_f.push_back(m_ptr->elem_vertex_id(s.tid, TET_FACES[f][0]));
+            curr_f.push_back(m_ptr->elem_vertex_id(s.tid, TET_FACES[f][1]));
+            curr_f.push_back(m_ptr->elem_vertex_id(s.tid, TET_FACES[f][2]));
+            std::sort(curr_f.begin(), curr_f.end());
+
+            if (my_f == curr_f)
+            {
+                tid = s.tid;
+                fid = f;
+                return true;
+            }
+        }
+        assert(false && "Integral curve - Something is off here...");
+    }
+    return false;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<>
+CINO_INLINE
+bool IntegralCurve<Tetmesh>::is_on_cell(const Sample & s, int & tid, const double tol) const
+{
+    assert(s.tid!=-1);
+
+    std::vector<int> non_zero_coords;
+    for(size_t off=0; off<s.bary.size(); ++off)
+    {
+        if (s.bary.at(off) > tol) non_zero_coords.push_back(off);
+    }
+
+    if (non_zero_coords.size() == 4)
+    {
+        tid = s.tid;
+        return true;
+    }
+    return false;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<>
+CINO_INLINE
+Curve::Sample IntegralCurve<Tetmesh>::move_forward_from_vertex(const int vid)
+{
+    vec3d p = m_ptr->vertex(vid);
+    vec3d grad(0,0,0);
+    for(int tid : m_ptr->adj_vtx2tet(vid)) grad += grad_ptr->vec_at(tid);
+    grad.normalize();
+    assert(grad.length() > 0);
+
+    for(int tid : m_ptr->adj_vtx2tet(vid))
+    {
+        int     fid = m_ptr->tet_face_opposite_to(tid, vid);
+        vec3d   v0  = m_ptr->tet_vertex(tid, TET_FACES[fid][0]);
+        vec3d   v1  = m_ptr->tet_vertex(tid, TET_FACES[fid][1]);
+        vec3d   v2  = m_ptr->tet_vertex(tid, TET_FACES[fid][2]);
+        vec3d   inters;
+        if (ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
+        {
+            Sample sample;
+            sample.pos = inters;
+            sample.tid = tid;
+            tet_barycentric_coords(m_ptr->tet_vertex(tid, 0),
+                                   m_ptr->tet_vertex(tid, 1),
+                                   m_ptr->tet_vertex(tid, 2),
+                                   m_ptr->tet_vertex(tid, 3),
+                                   inters, sample.bary);
+            return sample;
+        }
+    }
+
+    // this may actually happen if the point is on the surface and the gradient points outside of the domain...
+    // assert(false && "Integral curve - Something is off here...");
+
+    Sample dummy;
+    return dummy;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<>
+CINO_INLINE
+Curve::Sample IntegralCurve<Tetmesh>::move_forward_from_edge(const int eid, const vec3d & p)
+{
+    vec3d grad(0,0,0);
+    for(int tid : m_ptr->adj_edg2tet(eid)) grad += grad_ptr->vec_at(tid);
+    grad.normalize();
+    assert(grad.length() > 0);
+
+    int v0  = m_ptr->edge_vertex_id(eid, 0);
+    int v1  = m_ptr->edge_vertex_id(eid, 1);
+
+    for(int tid : m_ptr->adj_edg2tet(eid))
+    {
+        for(int f=0; f<4; ++f)
+        {
+            // skip faces containing the edge eid
+            if (m_ptr->tet_vertex_id(tid, TET_FACES[f][0]) == v0 &&
+                m_ptr->tet_vertex_id(tid, TET_FACES[f][1]) == v1) continue;
+            if (m_ptr->tet_vertex_id(tid, TET_FACES[f][0]) == v1 &&
+                m_ptr->tet_vertex_id(tid, TET_FACES[f][1]) == v0) continue;
+            if (m_ptr->tet_vertex_id(tid, TET_FACES[f][1]) == v0 &&
+                m_ptr->tet_vertex_id(tid, TET_FACES[f][2]) == v1) continue;
+            if (m_ptr->tet_vertex_id(tid, TET_FACES[f][1]) == v1 &&
+                m_ptr->tet_vertex_id(tid, TET_FACES[f][2]) == v0) continue;
+            if (m_ptr->tet_vertex_id(tid, TET_FACES[f][2]) == v0 &&
+                m_ptr->tet_vertex_id(tid, TET_FACES[f][0]) == v1) continue;
+            if (m_ptr->tet_vertex_id(tid, TET_FACES[f][2]) == v1 &&
+                m_ptr->tet_vertex_id(tid, TET_FACES[f][0]) == v0) continue;
+
+            vec3d v0  = m_ptr->tet_vertex(tid, TET_FACES[f][0]);
+            vec3d v1  = m_ptr->tet_vertex(tid, TET_FACES[f][1]);
+            vec3d v2  = m_ptr->tet_vertex(tid, TET_FACES[f][2]);
+
+            vec3d inters;
+            if (ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
+            {
+                Sample sample;
+                sample.pos = inters;
+                sample.tid = tid;
+                tet_barycentric_coords(m_ptr->tet_vertex(tid, 0),
+                                       m_ptr->tet_vertex(tid, 1),
+                                       m_ptr->tet_vertex(tid, 2),
+                                       m_ptr->tet_vertex(tid, 3),
+                                       inters, sample.bary);
+                return sample;
+            }
+        }
+    }
+
+    // this may actually happen if the point is on the surface and the gradient points outside of the domain...
+    // assert(false && "Integral curve - Something is off here...");
+
+    Sample dummy;
+    return dummy;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<>
+CINO_INLINE
+Curve::Sample IntegralCurve<Tetmesh>::move_forward_from_face(const int tid, const int fid, const vec3d & p)
+{
+    std::vector<int> tets_to_process;
+    tets_to_process.push_back(tid);
+    vec3d grad = grad_ptr->vec_at(tid);
+
+    int nbr = m_ptr->adjacent_tet_through_facet(tid, fid);
+    if (nbr != -1)
+    {
+        tets_to_process.push_back(nbr);
+        grad += grad_ptr->vec_at(nbr);
+    }
+    grad.normalize();
+    //assert(grad.length() > 0);
+    if (grad.length() == 0)
+    {
+        Sample dummy;
+        return dummy;
+    }
+
+    std::vector<int> illegal_f;
+    illegal_f.push_back(m_ptr->tet_vertex_id(tid, TET_FACES[fid][0]));
+    illegal_f.push_back(m_ptr->tet_vertex_id(tid, TET_FACES[fid][1]));
+    illegal_f.push_back(m_ptr->tet_vertex_id(tid, TET_FACES[fid][2]));
+    std::sort(illegal_f.begin(), illegal_f.end());
+
+    for(int curr_tid : tets_to_process)
+    {
+        for(int f=0; f<4; ++f)
+        {
+            std::vector<int> curr_f;
+            curr_f.push_back(m_ptr->tet_vertex_id(curr_tid, TET_FACES[f][0]));
+            curr_f.push_back(m_ptr->tet_vertex_id(curr_tid, TET_FACES[f][1]));
+            curr_f.push_back(m_ptr->tet_vertex_id(curr_tid, TET_FACES[f][2]));
+            std::sort(curr_f.begin(), curr_f.end());
+
+            if (curr_f == illegal_f) continue;
+
+            vec3d v0 = m_ptr->vertex(curr_f[0]);
+            vec3d v1 = m_ptr->vertex(curr_f[1]);
+            vec3d v2 = m_ptr->vertex(curr_f[2]);
+
+            vec3d inters;
+            if (ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
+            {
+                Sample sample;
+                sample.pos = inters;
+                sample.tid = curr_tid;
+                tet_barycentric_coords(m_ptr->tet_vertex(curr_tid, 0),
+                                       m_ptr->tet_vertex(curr_tid, 1),
+                                       m_ptr->tet_vertex(curr_tid, 2),
+                                       m_ptr->tet_vertex(curr_tid, 3),
+                                       inters, sample.bary);
+                return sample;
+            }
+        }
+    }
+
+    // this may actually happen if the point is on the surface and the gradient points outside of the domain...
+    // assert(false && "Integral curve - Something is off here...");
+
+    Sample dummy;
+    return dummy;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<>
+CINO_INLINE
+Curve::Sample IntegralCurve<Tetmesh>::move_forward_from_cell(const int tid, const vec3d & p)
+{
+    vec3d grad = grad_ptr->vec_at(tid);
+    grad.normalize();
+
+    for(int f=0; f<4; ++f)
+    {
+        vec3d v0 = m_ptr->tet_vertex(tid, TET_FACES[f][0]);
+        vec3d v1 = m_ptr->tet_vertex(tid, TET_FACES[f][1]);
+        vec3d v2 = m_ptr->tet_vertex(tid, TET_FACES[f][2]);
+        vec3d inters;
+        if (ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
+        {
+            Sample sample;
+            sample.pos = inters;
+            sample.tid = tid;
+            tet_barycentric_coords(m_ptr->tet_vertex(tid,0),
+                                   m_ptr->tet_vertex(tid,1),
+                                   m_ptr->tet_vertex(tid,2),
+                                   m_ptr->tet_vertex(tid,3),
+                                   inters, sample.bary);
+            return sample;
+        }
+    }
+
+    assert(false && "Integral curve - Something is off here...");
+
+    Sample dummy;
+    return dummy;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<>
+CINO_INLINE
+Curve::Sample IntegralCurve<Tetmesh>::move_forward(const Sample & s)
+{
+    int id, id2;
+    if (is_on_vertex(s,id)) // vid
+    {
+        return move_forward_from_vertex(id);
+    }
+    else if (is_on_edge(s,id)) // eid
+    {
+        return move_forward_from_edge(id, s.pos);
+    }
+    else if (is_on_face(s,id,id2)) // tet id, facet id
+    {
+        return move_forward_from_face(id, id2, s.pos);
+    }
+    else if (is_on_cell(s,id)) // tet id
+    {
+        return move_forward_from_cell(id, s.pos);
+    }
+    else assert(false && "Integral curve - Something is off here...");
+
+    Sample dummy;
+    return dummy;
 }
 
 }

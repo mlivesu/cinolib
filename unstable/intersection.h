@@ -34,58 +34,41 @@
 
 namespace cinolib
 {
-namespace intersection
-{
 
 CINO_INLINE
-bool segment2D(const vec2d        & s0_beg,
-               const vec2d        & s0_end,
-               const vec2d        & s1_beg,
-               const vec2d        & s1_end,
-               std::vector<vec2d> & inters);
+bool segment2D_intersection(const vec2d        & s0_beg,
+                            const vec2d        & s0_end,
+                            const vec2d        & s1_beg,
+                            const vec2d        & s1_end,
+                            std::vector<vec2d> & inters);
 
 
 CINO_INLINE
-bool line_triangle_intersection(const vec3d   P,
-                                const vec3d   dir,
-                                const vec3d   V0,
-                                const vec3d   V1,
-                                const vec3d   V2,
-                                      vec3d & inters);
-
-
-CINO_INLINE
-bool line_triangle_intersection(const Line    l,
-                                const vec3d   V0,
-                                const vec3d   V1,
-                                const vec3d   V2,
+bool line_triangle_intersection(const Line  & l,
+                                const vec3d & V0,
+                                const vec3d & V1,
+                                const vec3d & V2,
                                       vec3d & inters,
                                 const double  tol = 1e-5);
 
 CINO_INLINE
-bool ray_triangle_intersection(const Ray     r,
-                               const vec3d   V0,
-                               const vec3d   V1,
-                               const vec3d   V2,
+bool ray_triangle_intersection(const Ray   & r,
+                               const vec3d & V0,
+                               const vec3d & V1,
+                               const vec3d & V2,
                                      vec3d & inters,
                                const double  tol = 1e-5);
 
 CINO_INLINE
-bool ray_triangle_intersection(const vec3d   P,
-                               const vec3d   dir,
-                               const vec3d   V0,
-                               const vec3d   V1,
-                               const vec3d   V2,
-                                     vec3d & inters);
-
+bool least_squares_intersection(const std::vector<Plane> & planes,
+                                      vec3d              & inters);
 
 CINO_INLINE
-bool least_squares_intersection(const std::vector<Plane> & planes, vec3d & inters);
+bool intersection(const Ray     & r,
+                  const Segment & s,
+                        vec3d   & inters,
+                  const double    tol = 1e-7);
 
-CINO_INLINE
-bool intersection(const Ray & r, const Segment & s, vec3d & inters, const double tol = 1e-7);
-
-}
 }
 
 #ifndef  CINO_STATIC_LIB

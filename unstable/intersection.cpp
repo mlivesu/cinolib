@@ -32,19 +32,17 @@
 
 namespace cinolib
 {
-namespace intersection
-{
 
 namespace bg = boost::geometry;
 typedef   bg::model::point<double,3,bg::cs::cartesian> Point;
 typedef   bg::model::segment<Point>                    Segment2D;
 
 CINO_INLINE
-bool segment2D(const vec2d        & s0_beg,
-               const vec2d        & s0_end,
-               const vec2d        & s1_beg,
-               const vec2d        & s1_end,
-               std::vector<vec2d> & inters)
+bool segment2D_intersection(const vec2d        & s0_beg,
+                            const vec2d        & s0_end,
+                            const vec2d        & s1_beg,
+                            const vec2d        & s1_end,
+                            std::vector<vec2d> & inters)
 {
     assert(inters.empty());
 
@@ -64,49 +62,10 @@ bool segment2D(const vec2d        & s0_beg,
 
 
 CINO_INLINE
-bool line_triangle_intersection(const vec3d   P,
-                                const vec3d   dir,
-                                const vec3d   V0,
-                                const vec3d   V1,
-                                const vec3d   V2,
-                                      vec3d & inters)
-{
-    // just to avoid numerical imprecision...
-    if ((P-V0).length() == 0) { inters = V0; return true; }
-    if ((P-V1).length() == 0) { inters = V1; return true; }
-    if ((P-V2).length() == 0) { inters = V2; return true; }
-
-    // compute ray plane intersection
-    // https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld017.htm
-    //
-    Plane tri_supp_plane(V0, V1, V2);
-    double den = dir.dot(tri_supp_plane.n);
-    if (fabs(den) < 1e-5) return false;
-    double t = -(P.dot(tri_supp_plane.n)-tri_supp_plane.d)/den;
-    inters   = P + t * dir;
-    assert(tri_supp_plane.point_plane_dist(inters) < 1e-7);
-
-    // check whether intersection is inside triangle
-    // (agnostic of the vertices winding order)
-    //
-    vec3d tri_centr = (V0 + V1 + V2) / 3.0;
-    vec3d V[3] = { V0, V1, V2 };
-    for(int i=0; i<3; ++i)
-    {
-        vec3d e = V[(i+1)%3] - V[i];
-        vec3d n = e.cross(tri_supp_plane.n);
-        Plane test(V[i], n);
-        if (test[tri_centr] * test[inters] < 0) return false;
-    }
-    return true;
-}
-
-
-CINO_INLINE
-bool line_triangle_intersection(const Line    l,
-                                const vec3d   V0,
-                                const vec3d   V1,
-                                const vec3d   V2,
+bool line_triangle_intersection(const Line  & l,
+                                const vec3d & V0,
+                                const vec3d & V1,
+                                const vec3d & V2,
                                       vec3d & inters,
                                 const double  tol)
 {
@@ -124,10 +83,10 @@ bool line_triangle_intersection(const Line    l,
 }
 
 CINO_INLINE
-bool ray_triangle_intersection(const Ray     r,
-                               const vec3d   V0,
-                               const vec3d   V1,
-                               const vec3d   V2,
+bool ray_triangle_intersection(const Ray   & r,
+                               const vec3d & V0,
+                               const vec3d & V1,
+                               const vec3d & V2,
                                      vec3d & inters,
                                const double  tol)
 {
@@ -138,24 +97,6 @@ bool ray_triangle_intersection(const Ray     r,
         if (u.dot(r.dir()) < 0) return false;
         return true;
     }
-    return false;
-}
-
-CINO_INLINE
-bool ray_triangle_intersection(const vec3d   P,
-                               const vec3d   dir,
-                               const vec3d   V0,
-                               const vec3d   V1,
-                               const vec3d   V2,
-                                     vec3d & inters)
-{
-    if (line_triangle_intersection(P, dir, V0, V1, V2, inters))
-    {
-        vec3d u = inters - P;
-        if (u.dot(dir) < 0) return false;
-        return true;
-    }
-
     return false;
 }
 
@@ -207,5 +148,4 @@ bool intersection(const Ray & r, const Segment & s, vec3d & inters, const double
     return false;
 }
 
-}
 }

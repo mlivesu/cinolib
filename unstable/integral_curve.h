@@ -34,82 +34,44 @@ namespace cinolib
 template<class Mesh>
 class IntegralCurve : public DrawableCurve
 {
-    enum
-    {
-        STOP_AT_LOCAL_MAX,
-        STOP_AT_GIVEN_VTX,
-        STOP_AT_GIVEN_VAL,
-    };
-
-    typedef struct
-    {
-        int   convergence_criterion = STOP_AT_LOCAL_MAX;
-        int   source_tid            = -1;
-        int   source_vid            = -1;
-        vec3d source_pos            = vec3d();
-        float stop_at_this_value    = -1;
-        float stop_at_this_vertex   = -1;
-    } Options;
-
-    typedef struct
-    {
-        vec3d pos     = vec3d(0,0,0);
-        int   elem_id = -1; // element (triangle, tet,...)
-        int   gate_id = -1; // gate (edge, tet facet, ...)
-        int   vert_id = -1; // vertex
-    } CurveSample;
 
     public:
 
-        IntegralCurve(const Mesh        & m,
-                      const VectorField & grad,
-                      const int           source_tid,
-                      const vec3d         start_pos);
+        IntegralCurve(const Mesh                & m,
+                      const VectorField         & grad,
+                      const int                   tid,
+                      const std::vector<double> & bary);
 
         IntegralCurve(const Mesh        & m,
                       const VectorField & grad,
-                      const int           source_tid,
-                      const int           source_vid);
+                      const int           vid);
 
-        IntegralCurve(const Mesh        & m,
-                      const VectorField & grad,
-                      const int           source_tid,
-                      const int           source_vid,
-                      const float         stop_at_this_value);
-
-        IntegralCurve(const Mesh        & m,
-                      const VectorField & grad,
-                      const int           source_tid,
-                      const int           source_vid,
-                      const int           stop_at_this_vertex);
-
-    private:
-
-        void make_curve();
-
-        bool is_converged(const int curr_tid, const int convergence_criterion) const;
-
-        void find_exit_gate(const CurveSample & sample,
-                            const vec3d       & dir,
-                                  int         & exit_gate,
-                                  vec3d       & exit_pos) const;
-
-        CurveSample traverse_element(const CurveSample & curr);
-
-        void traverse_element(const CurveSample & curr_sample,
-                                    CurveSample & next_sample) const;
-
-        bool gradient_skins_into(const CurveSample & curr,
-                                 const CurveSample & next) const;
-
-    private:
-
-        Options opt;
-
-        std::vector<CurveSample> curve;
+    protected:
 
         const Mesh        * m_ptr;
         const VectorField * grad_ptr;
+
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void trace_curve  (const Sample & seed);
+        bool is_converged (const Sample & sample);
+
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        Curve::Sample move_forward             (const Sample & s);
+        Curve::Sample move_forward_from_vertex (const int vid) ;
+        Curve::Sample move_forward_from_edge   (const int eid, const vec3d & p);
+        Curve::Sample move_forward_from_face   (const int tid, const vec3d & p);
+        Curve::Sample move_forward_from_face   (const int tid, const int fid, const vec3d & p);
+        Curve::Sample move_forward_from_cell   (const int cid, const vec3d & p);
+
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        bool is_on_vertex (const Sample & s, int & vid, const double tol = 1e-7) const;
+        bool is_on_edge   (const Sample & s, int & eid, const double tol = 1e-7) const;
+        bool is_on_face   (const Sample & s, int & tid, const double tol = 1e-7) const;
+        bool is_on_face   (const Sample & s, int & tid, int & fid, const double tol = 1e-7) const;
+        bool is_on_cell   (const Sample & s, int & cid, const double tol = 1e-7) const;
 };
 
 }
