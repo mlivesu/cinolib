@@ -21,9 +21,9 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include <cinolib/unstable/intersection.h>
-#include <cinolib/geometry/triangle.h>
+#include "intersection.h"
 
+#include <cinolib/geometry/triangle.h>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/segment.hpp>
 #include <boost/geometry/algorithms/intersection.hpp>

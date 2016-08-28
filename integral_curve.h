@@ -26,7 +26,7 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/vector_field.h>
-#include <cinolib/unstable/drawable_curve.h>
+#include <cinolib/drawable_curve.h>
 
 namespace cinolib
 {

@@ -26,7 +26,7 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/unstable/curve.h>
+#include <cinolib/curve.h>
 #include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/colors.h>
 

@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include <cinolib/unstable/curve.h>
+#include <cinolib/curve.h>
 
 namespace cinolib
 {

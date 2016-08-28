@@ -21,13 +21,13 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include "cinolib/unstable/integral_curve.h"
+#include "integral_curve.h"
 
 #include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/gl/draw_arrow.h>
 #include <cinolib/gl/draw_sphere.h>
 #include <cinolib/colors.h>
-#include <cinolib/unstable/intersection.h>
+#include <cinolib/intersection.h>
 #include <cinolib/meshes/trimesh/drawable_trimesh.h>
 #include <cinolib/meshes/tetmesh/drawable_tetmesh.h>
 #include <cinolib/geometry/triangle.h>
