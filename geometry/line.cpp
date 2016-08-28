@@ -21,7 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include <cinolib/geometry/line.h>
+#include "cinolib/geometry/line.h"
 
 namespace cinolib
 {
@@ -36,6 +36,7 @@ Line::Line(const vec3d & p0, const vec3d & p1)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 std::vector<Plane> Line::to_planes() const
 {
     vec3d d = dir();
@@ -55,6 +56,7 @@ std::vector<Plane> Line::to_planes() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 vec3d Line::dir() const
 {
     vec3d d = p0-p1;

@@ -36,6 +36,7 @@ Ray::Ray(const vec3d & p, const vec3d & dir)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 std::vector<Plane> Ray::to_planes() const
 {
     vec3d n0(-direction.y(),  direction.x(),             0);
@@ -59,6 +60,7 @@ const vec3d & Ray::dir() const
     return direction;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 const vec3d & Ray::begin() const
