@@ -47,9 +47,9 @@ CINO_INLINE void GLcanvas::draw()
 {
     setBackgroundColor(clear_color);
 
-    for(int i=0; i<(int)drawlist.size(); ++i)
+    for(auto obj : drawlist)
     {
-        drawlist[i]->draw( sceneRadius() );
+        obj->draw( sceneRadius() );
     }
 }
 

@@ -1252,7 +1252,10 @@ Trimesh Tetmesh::export_surface(std::map<int,int> & tet2tri_map,
     {
         srf.push_back(tet2tri_map[tris[i]]);
     }
-    return Trimesh(coords, tris);
+    logger.disable();
+    Trimesh m(coords, tris);
+    logger.enable();
+    return m;
 }
 
 CINO_INLINE

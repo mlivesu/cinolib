@@ -49,9 +49,7 @@ Quadmesh::Quadmesh(const std::vector<double> & coords,
     clear();
     this->coords = coords;
     this->quads   = quads;
-    logger << "quadmesh init call" << endl;
     init();
-    logger << "quadmesh init ok" << endl;
 }
 
 CINO_INLINE
