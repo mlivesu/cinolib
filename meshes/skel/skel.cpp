@@ -30,7 +30,7 @@ namespace cinolib
 CINO_INLINE
 void Skel::clear()
 {
-    bbox.reset();
+    bb.reset();
     coords.clear();
     segments.clear();
     max_spheres.clear();
@@ -281,12 +281,12 @@ void Skel::build_bones()
 CINO_INLINE
 void Skel::update_bbox()
 {
-    bbox.reset();
+    bb.reset();
     for(int vid=0; vid<num_vertices(); ++vid)
     {
         vec3<double> v = vertex(vid);
-        bbox.min = bbox.min.min(v);
-        bbox.max = bbox.max.max(v);
+        bb.min = bb.min.min(v);
+        bb.max = bb.max.max(v);
     }
 }
 

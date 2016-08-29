@@ -49,7 +49,7 @@ class Skel
 
     protected:
 
-        Bbox                            bbox;
+        Bbox                            bb;
         std::vector<double>             coords;
         std::vector<int>                segments;
         std::vector<double>             max_spheres;
@@ -82,6 +82,8 @@ class Skel
 
         int add_vertex(const vec3d & v);
         int add_segment(int vid0, int vid1);
+
+        const Bbox & bbox() const { return bb; }
 
         vec3d get_bone_sample   (int bid, float q) const;
         vec3d get_segment_sample(int sid, float q) const;
