@@ -52,8 +52,8 @@ class DrawableSkel : public Skel, public DrawableObject
         DrawableSkel(const std::vector<double> & coords, const std::vector<int> & segs);
 
         void  draw(const float scene_size=1)         const;
-        vec3d scene_center() const { return bbox.center();     }
-        float scene_radius() const { return bbox.diag() * 0.5; }
+        vec3d scene_center() const { return bb.center();     }
+        float scene_radius() const { return bb.diag() * 0.5; }
 
         void init();
 
@@ -106,22 +106,22 @@ class DrawableSkel : public Skel, public DrawableObject
 
         inline void set_bone_thickness(float scalar)
         {
-            bone_thickness = bbox.diag() * BONE_SCALAR() * scalar;
+            bone_thickness_modifier = scalar;
         }
 
         inline void set_sphere_radius(float scalar)
         {
-            sphere_radius = bbox.diag() * BALL_SCALAR() * scalar;
+            sphere_radius_modifier = scalar;
         }
 
     private:
 
-        inline float BONE_SCALAR() { return 0.004; }
-        inline float BALL_SCALAR() { return 0.008; }
+        inline float BONE_SCALAR() const { return 0.004; }
+        inline float BALL_SCALAR() const { return 0.008; }
 
         int   draw_mode;
-        float bone_thickness; // useful for rendering
-        float sphere_radius;  // useful for rendering
+        float bone_thickness_modifier; // useful for rendering
+        float sphere_radius_modifier;  // useful for rendering
 
         float std_bone_color[3];
         float std_leaf_color[3];

@@ -69,8 +69,8 @@ void DrawableSkel::init()
     type      = SKELETON;
     draw_mode = DRAW_SKEL | DRAW_BONES | DRAW_STD_COLOR | DRAW_FEATURE_POINTS;
 
-    bone_thickness = bbox.diag() * BONE_SCALAR();
-    sphere_radius  = bbox.diag() * BALL_SCALAR();
+    bone_thickness_modifier = 1.0;
+    sphere_radius_modifier  = 1.0;
 
     set_std_bone_color (1.0, 1.0, 1.0);
     set_std_leaf_color (0.0, 1.0, 0.0);
@@ -80,8 +80,11 @@ void DrawableSkel::init()
 }
 
 CINO_INLINE
-void DrawableSkel::draw(const float) const
+void DrawableSkel::draw(const float scene_size) const
 {
+    float bone_thickness = scene_size * BONE_SCALAR() * bone_thickness_modifier;
+    float sphere_radius  = scene_size * BALL_SCALAR() * sphere_radius_modifier;
+
     if (draw_mode & DRAW_SKEL)
     {
         if (draw_mode & DRAW_MAX_SPHERES)
