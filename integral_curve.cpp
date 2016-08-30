@@ -129,6 +129,13 @@ bool IntegralCurve<Mesh>::is_converged(const Sample & sample)
             return true;
         }
     }
+
+    if ((int)samples().size() >= m_ptr->num_vertices())
+    {
+        std::cerr << "INTEGRAL CURVE ERROR - Infinite loop. Something is REALLY off here!" << std::endl;
+        return true;
+    }
+
     return false;
 }
 
