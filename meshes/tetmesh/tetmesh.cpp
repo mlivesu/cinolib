@@ -1430,7 +1430,7 @@ bool Tetmesh::vertex_is_local_minima(const int vid) const
     float v = vertex_u_text(vid);
     for(int nbr : adj_vtx2vtx(vid))
     {
-        if (vertex_u_text(nbr) <= v) return false;
+        if (vertex_u_text(nbr) < v) return false;
     }
     return true;
 }
@@ -1441,7 +1441,7 @@ bool Tetmesh::vertex_is_local_maxima(const int vid) const
     float v = vertex_u_text(vid);
     for(int nbr : adj_vtx2vtx(vid))
     {
-        if (vertex_u_text(nbr) >= v) return false;
+        if (vertex_u_text(nbr) > v) return false;
     }
     return true;
 }
