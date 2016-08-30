@@ -701,6 +701,23 @@ int Tetmesh::elem_vertex_id(const int eid, const int offset) const
 }
 
 CINO_INLINE
+int Tetmesh::tet_vertex_offset(const int tid, const int vid) const
+{
+    assert(tet_contains_vertex(tid, vid));
+    for(int off=0; off<verts_per_element; ++off)
+    {
+        if (tet_vertex_id(tid,off) == vid) return off;
+    }
+    assert(false);
+}
+
+CINO_INLINE
+int Tetmesh::elem_vertex_offset(const int eid, const int vid) const
+{
+    return tet_vertex_offset(eid, vid);
+}
+
+CINO_INLINE
 vec3d Tetmesh::tet_vertex(const int tid, const int offset) const
 {
     int tid_ptr = tid * 4;

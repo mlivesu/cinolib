@@ -103,46 +103,6 @@ void IntegralCurve<Mesh>::trace_curve(const Sample & seed)
 
 template<class Mesh>
 CINO_INLINE
-bool IntegralCurve<Mesh>::is_converged(const Sample & sample)
-{
-    if (sample.tid == -1) // i.e. boundary reached. Remove dummy sample
-    {
-        pop_back();
-        return true;
-    }
-
-    // i.e. local maxima reached. Connect to it
-    // WARNING: there can be many! This picks up an arbitrary one...
-    //
-    for(int off=0; off<m_ptr->verts_per_element; ++off)
-    {
-        int vid = m_ptr->elem_vertex_id(sample.tid, off);
-
-        if (m_ptr->vertex_is_local_maxima(vid))
-        {
-            Sample s;
-            s.pos  = m_ptr->vertex(vid);
-            s.tid  = sample.tid;
-            s.bary = std::vector<double>(m_ptr->verts_per_element,0);
-            s.bary.at(off) = 1.0;
-            append_sample(s);
-            return true;
-        }
-    }
-
-    if ((int)samples().size() >= m_ptr->num_vertices())
-    {
-        std::cerr << "INTEGRAL CURVE ERROR - Infinite loop. Something is REALLY off here!" << std::endl;
-        return true;
-    }
-
-    return false;
-}
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class Mesh>
-CINO_INLINE
 bool IntegralCurve<Mesh>::is_on_vertex(const Sample & s, int & vid, const double tol) const
 {
     assert(s.tid!=-1);
@@ -191,6 +151,23 @@ bool IntegralCurve<Mesh>::is_on_edge(const Sample & s, int & eid, const double t
         assert(false && "Integral curve - Something is off here...");
     }
     return false;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+Curve::Sample IntegralCurve<Mesh>::make_sample(const int vid) const
+{
+    assert(!m_ptr->adj_vtx2ele(vid).empty());
+    int tid = m_ptr->adj_vtx2ele(vid).front();
+    int off = m_ptr->elem_vertex_offset(tid, vid);
+    Sample s;
+    s.pos  = m_ptr->vertex(vid);
+    s.tid  = tid;
+    s.bary = std::vector<double>(m_ptr->verts_per_element,0);
+    s.bary.at(off) = 1.0;
+    return s;
 }
 
 // :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -388,6 +365,56 @@ Curve::Sample IntegralCurve<Trimesh>::move_forward(const Sample & s)
     return dummy;
 }
 
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<>
+CINO_INLINE
+bool IntegralCurve<Trimesh>::is_converged(const Sample & sample)
+{
+    if (sample.tid == -1) // i.e. boundary reached. Remove dummy sample
+    {
+        pop_back();
+        return true;
+    }
+
+    int id;
+    if (is_on_vertex(sample, id))
+    {
+        // if the vertex is a local maxima, just stay there
+        if (m_ptr->vertex_is_local_maxima(id)) return true;
+    }
+    else if (is_on_edge(sample, id))
+    {
+        int  vid0        = m_ptr->edge_vertex_id(id,0);
+        int  vid1        = m_ptr->edge_vertex_id(id,1);
+        bool vid0_is_max = m_ptr->vertex_is_local_maxima(vid0);
+        bool vid1_is_max = m_ptr->vertex_is_local_maxima(vid1);
+
+        // if the whole edge is a local maxima, stay where you are;
+        if (vid0_is_max && vid1_is_max) return true;
+    }
+    else if (is_on_face(sample, id))
+    {
+        int  vid0        = m_ptr->triangle_vertex_id(id,0);
+        int  vid1        = m_ptr->triangle_vertex_id(id,1);
+        int  vid2        = m_ptr->triangle_vertex_id(id,2);
+        bool vid0_is_max = m_ptr->vertex_is_local_maxima(vid0);
+        bool vid1_is_max = m_ptr->vertex_is_local_maxima(vid1);
+        bool vid2_is_max = m_ptr->vertex_is_local_maxima(vid2);
+
+        // if the whole face is a local maxima, stay where you are
+        if (vid0_is_max && vid1_is_max && vid2_is_max) return true;
+    }
+
+    if ((int)samples().size() >= m_ptr->num_vertices())
+    {
+        std::cerr << "INTEGRAL CURVE ERROR - Infinite loop. Something is REALLY off here!" << std::endl;
+        return true;
+    }
+
+    return false;
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -682,6 +709,70 @@ Curve::Sample IntegralCurve<Tetmesh>::move_forward(const Sample & s)
 
     Sample dummy;
     return dummy;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<>
+CINO_INLINE
+bool IntegralCurve<Tetmesh>::is_converged(const Sample & sample)
+{
+    if (sample.tid == -1) // i.e. boundary reached. Remove dummy sample
+    {
+        pop_back();
+        return true;
+    }
+
+    int id, id1;
+    if (is_on_vertex(sample, id))
+    {
+        // if the vertex is a local maxima, just stay there
+        if (m_ptr->vertex_is_local_maxima(id)) return true;
+    }
+    else if (is_on_edge(sample, id))
+    {
+        int  vid0        = m_ptr->edge_vertex_id(id,0);
+        int  vid1        = m_ptr->edge_vertex_id(id,1);
+        bool vid0_is_max = m_ptr->vertex_is_local_maxima(vid0);
+        bool vid1_is_max = m_ptr->vertex_is_local_maxima(vid1);
+
+        // if the whole edge is a local maxima, stay where you are;
+        if (vid0_is_max && vid1_is_max) return true;
+    }
+    else if (is_on_face(sample, id, id1))
+    {
+        int  vid0        = m_ptr->tet_vertex_id(id, TET_FACES[id1][0]);
+        int  vid1        = m_ptr->tet_vertex_id(id, TET_FACES[id1][1]);
+        int  vid2        = m_ptr->tet_vertex_id(id, TET_FACES[id1][2]);
+        bool vid0_is_max = m_ptr->vertex_is_local_maxima(vid0);
+        bool vid1_is_max = m_ptr->vertex_is_local_maxima(vid1);
+        bool vid2_is_max = m_ptr->vertex_is_local_maxima(vid2);
+
+        // if the whole face is a local maxima, stay where you are
+        if (vid0_is_max && vid1_is_max && vid2_is_max) return true;
+    }
+    else if (is_on_cell(sample, id))
+    {
+        int  vid0        = m_ptr->tet_vertex_id(id,0);
+        int  vid1        = m_ptr->tet_vertex_id(id,1);
+        int  vid2        = m_ptr->tet_vertex_id(id,2);
+        int  vid3        = m_ptr->tet_vertex_id(id,3);
+        bool vid0_is_max = m_ptr->vertex_is_local_maxima(vid0);
+        bool vid1_is_max = m_ptr->vertex_is_local_maxima(vid1);
+        bool vid2_is_max = m_ptr->vertex_is_local_maxima(vid2);
+        bool vid3_is_max = m_ptr->vertex_is_local_maxima(vid3);
+
+        // if the whole tet is a local maxima, stay where you are
+        if (vid0_is_max && vid1_is_max && vid2_is_max && vid3_is_max) return true;
+    }
+
+    if ((int)samples().size() >= m_ptr->num_vertices())
+    {
+        std::cerr << "INTEGRAL CURVE ERROR - Infinite loop. Something is REALLY off here!" << std::endl;
+        return true;
+    }
+
+    return false;
 }
 
 }

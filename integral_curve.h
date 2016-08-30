@@ -72,6 +72,10 @@ class IntegralCurve : public DrawableCurve
         bool is_on_face   (const Sample & s, int & tid, const double tol = 1e-7) const;
         bool is_on_face   (const Sample & s, int & tid, int & fid, const double tol = 1e-7) const;
         bool is_on_cell   (const Sample & s, int & cid, const double tol = 1e-7) const;
+
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        Curve::Sample make_sample(const int vid) const;
 };
 
 }

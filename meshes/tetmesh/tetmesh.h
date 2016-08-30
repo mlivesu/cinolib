@@ -174,6 +174,9 @@ class Tetmesh
         int tet_vertex_id(const int tid, const int offset) const;
         int elem_vertex_id(const int eid, const int offset) const;
 
+        int tet_vertex_offset(const int tid, const int vid) const;
+        int elem_vertex_offset(const int eid, const int vid) const;
+
         vec3d tet_vertex(const int tid, const int offset) const;
         vec3d elem_vertex(const int eid, const int offset) const;
 

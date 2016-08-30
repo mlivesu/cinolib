@@ -595,6 +595,23 @@ int Trimesh::elem_vertex_id(const int tid, const int offset) const
 
 
 CINO_INLINE
+int Trimesh::triangle_vertex_offset(const int tid, const int vid) const
+{
+    assert(triangle_contains_vertex(tid, vid));
+    for(int off=0; off<verts_per_element; ++off)
+    {
+        if (triangle_vertex_id(tid,off) == vid) return off;
+    }
+    assert(false);
+}
+
+CINO_INLINE
+int Trimesh::elem_vertex_offset(const int eid, const int vid) const
+{
+    return triangle_vertex_offset(eid, vid);
+}
+
+CINO_INLINE
 vec3d Trimesh::triangle_normal(const int tid) const
 {
     int tid_ptr = tid * 3;

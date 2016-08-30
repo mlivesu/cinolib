@@ -163,6 +163,8 @@ class Trimesh
         bool                        triangle_is_boundary(const int tid) const;
         int                         triangle_vertex_id(const int tid, const int offset) const;
         int                         elem_vertex_id(const int tid, const int offset) const;
+        int                         triangle_vertex_offset(const int tid, const int vid) const;
+        int                         elem_vertex_offset(const int tid, const int vid) const;
         vec3d                       triangle_normal(const int tid) const;
         float                       triangle_min_u_text(const int tid) const;
         int                         triangle_edge_local_to_global(const int tid, const int off) const;
