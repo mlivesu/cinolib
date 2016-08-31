@@ -256,38 +256,49 @@ Curve::Sample IntegralCurve<Trimesh>::move_forward_from_edge(const int eid, cons
     assert(m_ptr->edge_is_manifold(eid));
     int   t0 = m_ptr->adj_edg2tri(eid).front();
     int   t1 = m_ptr->adj_edg2tri(eid).back();
-    vec3d n0 = m_ptr->triangle_normal(t0);
-    vec3d n1 = m_ptr->triangle_normal(t1);
-    vec3d g0 = grad_ptr->vec_at(t0); g0.normalize();
-    vec3d g1 = grad_ptr->vec_at(t1); g1.normalize();
+    int   v0 = m_ptr->edge_vertex_id(eid,0);
+    int   v1 = m_ptr->edge_vertex_id(eid,1);
+    int   v2 = m_ptr->vertex_opposite_to(t0, v0, v1);
+    int   v3 = m_ptr->vertex_opposite_to(t1, v0, v1);
+    vec3d n  = m_ptr->triangle_normal(t0) + m_ptr->triangle_normal(t1); n.normalize();
+
+    Plane tangent_plane(p,n);
+
+    std::map<int,vec3d> tangent_space;
+    tangent_space[v0] = m_ptr->vertex(v0);
+    tangent_space[v1] = m_ptr->vertex(v1);
+    tangent_space[v2] = tangent_plane.project_onto(m_ptr->vertex(v2));
+    tangent_space[v3] = tangent_plane.project_onto(m_ptr->vertex(v3));
+
+    vec3d n0 = triangle_normal(tangent_space.at( m_ptr->triangle_vertex_id(t0,0) ),
+                               tangent_space.at( m_ptr->triangle_vertex_id(t0,1) ),
+                               tangent_space.at( m_ptr->triangle_vertex_id(t0,2) ));
+
+    vec3d n1 = triangle_normal(tangent_space.at( m_ptr->triangle_vertex_id(t1,0) ),
+                               tangent_space.at( m_ptr->triangle_vertex_id(t1,1) ),
+                               tangent_space.at( m_ptr->triangle_vertex_id(t1,2) ));
+
+    vec3d g0 = tangent_plane.project_onto(p + grad_ptr->vec_at(t0)) - p;
+    vec3d g1 = tangent_plane.project_onto(p + grad_ptr->vec_at(t1)) - p;
+
     vec3d e  = m_ptr->edge_vertex(eid,0) - m_ptr->edge_vertex(eid,1); e.normalize();
 
     // if the gradient skins into, move along the edge towards the vertex
     // best aligned along the gradient direction
-    //
-    if (n0.dot(e.cross(g0)) * n1.dot(e.cross(g1)) < 0) // gradient skins into
+
+    if (n0.dot(e.cross(g0)) * n1.dot(e.cross(g1)) < 0) // gradient skins into condition
     {
         if (e.dot(g0) > 0) return make_sample(m_ptr->edge_vertex_id(eid,0));
         else               return make_sample(m_ptr->edge_vertex_id(eid,1));
     }
 
-    vec3d n  = m_ptr->triangle_normal(t0) + m_ptr->triangle_normal(t1); n.normalize();
-    Plane tangent_plane(p,n);
+    // otherwise go for the stanrdard way: compute the average gradient between the
+    // triangles incident to the edge and step into the triangle pointed by the arrow
 
     vec3d grad = g0 + g1;
-    grad = tangent_plane.project_onto(p + grad) - p;
+    grad = tangent_plane.project_onto(p + grad) - p; // this should be redundant...
     grad.normalize();
     assert(grad.length() > 0);
-
-    std::map<int,vec3d> tangent_space;
-    int v0 = m_ptr->edge_vertex_id(eid,0);
-    int v1 = m_ptr->edge_vertex_id(eid,1);
-    int v2 = m_ptr->vertex_opposite_to(t0, v0, v1);
-    int v3 = m_ptr->vertex_opposite_to(t1, v0, v1);
-    tangent_space[v0] = m_ptr->vertex(v0);
-    tangent_space[v1] = m_ptr->vertex(v1);
-    tangent_space[v2] = tangent_plane.project_onto(m_ptr->vertex(v2));
-    tangent_space[v3] = tangent_plane.project_onto(m_ptr->vertex(v3));
 
     std::vector< std::pair<int,int> > edges_to_check;
     for(int e : m_ptr->adj_tri2edg(t0)) if (e!=eid) edges_to_check.push_back(std::make_pair(e,t0));
