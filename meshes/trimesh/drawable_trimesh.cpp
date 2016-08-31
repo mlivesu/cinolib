@@ -45,6 +45,10 @@ DrawableTrimesh::DrawableTrimesh(const char *filename) : Trimesh(filename)
 CINO_INLINE
 DrawableTrimesh::DrawableTrimesh(const Trimesh & m) : Trimesh(m.vector_coords(), m.vector_triangles())
 {
+    //filename = m.filename;
+    u_text  = m.vector_v_float_scalar();
+    t_label = m.vector_t_int_scalar();
+
     init();
 }
 
