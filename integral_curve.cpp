@@ -254,13 +254,27 @@ CINO_INLINE
 Curve::Sample IntegralCurve<Trimesh>::move_forward_from_edge(const int eid, const vec3d & p)
 {
     assert(m_ptr->edge_is_manifold(eid));
-
     int   t0 = m_ptr->adj_edg2tri(eid).front();
     int   t1 = m_ptr->adj_edg2tri(eid).back();
+    vec3d n0 = m_ptr->triangle_normal(t0);
+    vec3d n1 = m_ptr->triangle_normal(t1);
+    vec3d g0 = grad_ptr->vec_at(t0); g0.normalize();
+    vec3d g1 = grad_ptr->vec_at(t1); g1.normalize();
+    vec3d e  = m_ptr->edge_vertex(eid,0) - m_ptr->edge_vertex(eid,1); e.normalize();
+
+    // if the gradient skins into, move along the edge towards the vertex
+    // best aligned along the gradient direction
+    //
+    if (n0.dot(e.cross(g0)) * n1.dot(e.cross(g1)) < 0) // gradient skins into
+    {
+        if (e.dot(g0) > 0) return make_sample(m_ptr->edge_vertex_id(eid,0));
+        else               return make_sample(m_ptr->edge_vertex_id(eid,1));
+    }
+
     vec3d n  = m_ptr->triangle_normal(t0) + m_ptr->triangle_normal(t1); n.normalize();
     Plane tangent_plane(p,n);
 
-    vec3d grad = grad_ptr->vec_at(t0) + grad_ptr->vec_at(t1);
+    vec3d grad = g0 + g1;
     grad = tangent_plane.project_onto(p + grad) - p;
     grad.normalize();
     assert(grad.length() > 0);
@@ -381,7 +395,6 @@ bool IntegralCurve<Trimesh>::is_converged(const Sample & sample)
     int id;
     if (is_on_vertex(sample, id))
     {
-        // if the vertex is a local maxima, just stay there
         if (m_ptr->vertex_is_local_maxima(id)) return true;
     }
     else if (is_on_edge(sample, id))
@@ -391,7 +404,6 @@ bool IntegralCurve<Trimesh>::is_converged(const Sample & sample)
         bool vid0_is_max = m_ptr->vertex_is_local_maxima(vid0);
         bool vid1_is_max = m_ptr->vertex_is_local_maxima(vid1);
 
-        // if the whole edge is a local maxima, stay where you are;
         if (vid0_is_max && vid1_is_max) return true;
     }
     else if (is_on_face(sample, id))
@@ -403,7 +415,6 @@ bool IntegralCurve<Trimesh>::is_converged(const Sample & sample)
         bool vid1_is_max = m_ptr->vertex_is_local_maxima(vid1);
         bool vid2_is_max = m_ptr->vertex_is_local_maxima(vid2);
 
-        // if the whole face is a local maxima, stay where you are
         if (vid0_is_max && vid1_is_max && vid2_is_max) return true;
     }
 
