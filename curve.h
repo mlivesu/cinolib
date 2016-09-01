@@ -61,6 +61,7 @@ class Curve
         int                         size()    const;
         double                      length()  const;
         const std::vector<Sample> & samples() const;
+              std::vector<Sample> & samples();
         const Bbox                & bbox()    const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -73,14 +74,26 @@ class Curve
 
         // Arc-length parameterization (t \in [0,1])
         //
-        vec3d sample_curve_at(const float t) const;
-        vec3d sample_curve_at(const float t, const double tot_length) const;
-        void  resample_curve(const int n_samples);
+        vec3d  sample_curve_at(const float t) const;
+        vec3d  sample_curve_at(const float t, const double tot_length) const;
+        void   resample_curve(const int n_samples);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         std::vector<int> tessellate(Trimesh & m) const;
         void             tessellate(Trimesh & m, const std::vector<int> & split_list) const;
+
+        int split_in_4(const Trimesh           & m,
+                       const int                 eid0,
+                       const int                 eid1,
+                       const std::map<int,int> & new_vids_map,
+                             std::vector<int>  & split_list) const;
+
+        int split_in_3(const Trimesh           & m,
+                       const int                 eid,
+                       const int                 vid,
+                       const std::map<int,int> & new_vids_map,
+                             std::vector<int>  & split_list) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -94,7 +107,8 @@ class Curve
         std::vector<Sample> sample_list;
 };
 
-CINO_INLINE std::ostream & operator<<(std::ostream & in, const Curve & c);
+CINO_INLINE std::ostream & operator<<(std::ostream & in, const Curve::Sample & s);
+CINO_INLINE std::ostream & operator<<(std::ostream & in, const Curve         & c);
 
 }
 
