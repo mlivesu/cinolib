@@ -1440,6 +1440,21 @@ void Tetmesh::translate(const vec3d & delta)
     update_bbox();
 }
 
+CINO_INLINE
+void Tetmesh::rotate(const vec3d & axis, const double angle_rad)
+{
+    double M[3][3];
+    bake_rotation_matrix(axis, angle_rad, M);
+    for(int vid=0; vid<num_vertices(); ++vid)
+    {
+        vec3d pos = vertex(vid);
+        transform(pos, M);
+        set_vertex(vid, pos);
+    }
+    update_bbox();
+    update_t_normals();
+}
+
 
 CINO_INLINE
 bool Tetmesh::vertex_is_local_minima(const int vid) const

@@ -252,6 +252,7 @@ class Tetmesh
         bool barycentric_coordinates(const int tid, const vec3d & P, std::vector<double> & wgts) const;
 
         void translate(const vec3d & delta);
+        void rotate(const vec3d & axis, const double angle_rad);
 
         double tet_face_area(const int tid, const int fid) const;
 
