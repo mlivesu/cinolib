@@ -77,6 +77,7 @@ class Curve
         vec3d  sample_curve_at(const float t) const;
         vec3d  sample_curve_at(const float t, const double tot_length) const;
         void   resample_curve(const int n_samples);
+        std::vector<int> select_n_samples(const int n_samples) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

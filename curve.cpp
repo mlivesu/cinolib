@@ -228,6 +228,101 @@ void Curve::resample_curve(const int n_samples)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+std::vector<int> Curve::select_n_samples(const int n_samples) const
+{
+    assert(size() >= n_samples);
+
+    float i    = 0;
+    float step = float(size()-1) / float(n_samples-1);
+
+    std::vector<int> list;
+
+    do
+    {
+        int new_pos = std::ceil(i);
+        if (new_pos == (int)samples().size()) --new_pos; // this may happen due to roundoff errors...
+        list.push_back(new_pos);
+        i += step;
+    }
+    while ((int)list.size() < n_samples);
+
+    return list;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<int> Curve::tessellate(Trimesh & m) const
+{
+    for(Sample s : sample_list)
+    {
+        if (s.tid == -1 || s.bary.size() < m.verts_per_element)
+        {
+            std::cerr << "WARNING: no link between mesh and curve existing." << std::endl;
+            assert(false && "Impossible to tessellate the curve");
+        }
+    }
+
+    // 1) Split all the edges crossed by the curve
+    //
+    std::vector<int>  curve_vids;    // ordered list of mesh vertices belonging to the curve
+    std::map<int,int> new_vids_map;  // for each edge, vid of the new vertex created
+    std::set<int>     tris_to_split; // list of the triangles that will require splitting
+    for(size_t i=0; i<sample_list.size(); ++i)
+    {
+        const Sample & s = sample_list.at(i);
+        int off;
+        if (triangle_bary_is_edge(s.bary, off))
+        {
+            int   eid         = m.triangle_edge_local_to_global(s.tid, off);
+            int   vid0        = m.triangle_vertex_id(s.tid, TRI_EDGES[off][0]);
+            int   vid1        = m.triangle_vertex_id(s.tid, TRI_EDGES[off][1]);
+            float f0          = m.vertex_u_text(vid0);
+            float f1          = m.vertex_u_text(vid1);
+            float f_new       = f0 * s.bary.at(TRI_EDGES[off][0]) + f1 * s.bary.at(TRI_EDGES[off][1]);
+            int fresh_id      = m.add_vertex(sample_list.at(i).pos, f_new);
+            new_vids_map[eid] = fresh_id;
+
+            curve_vids.push_back(fresh_id);
+            for(int tid : m.adj_edg2tri(eid)) tris_to_split.insert(tid);
+        }
+        else if (triangle_bary_is_vertex(s.bary, off))
+        {
+            curve_vids.push_back(m.triangle_vertex_id(s.tid, off));
+        }
+        else assert(false && "Inner samples are not supported for tessellation yet");
+    }
+
+    // 2) Subdivide triangles according to the number of incident edges being split
+    //
+    std::vector<int> split_list;
+    for(int tid : tris_to_split)
+    {
+        std::vector< std::pair<int,int> > split_edges;
+        for(int eid : m.adj_tri2edg(tid))
+        {
+            auto query = new_vids_map.find(eid);
+            if (query != new_vids_map.end())
+            {
+                split_edges.push_back(std::make_pair(eid, query->second));
+            }
+        }
+
+        switch (split_edges.size())
+        {
+            case 1 : split_in_2(m, tid, split_edges.front(), split_list); break;
+            case 2 : split_in_3(m, tid, split_edges.front(), split_edges.back(), split_list); break;
+            default: assert(false && "Unsupported tessellation configuration! (to be added, probably)");
+        }
+    }
+
+    tessellate(m, split_list);
+    return curve_vids;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void Curve::tessellate(Trimesh & m, const std::vector<int> & split_list) const
 {
     // Serialized triangle split. Structure:
@@ -268,77 +363,6 @@ void Curve::tessellate(Trimesh & m, const std::vector<int> & split_list) const
     logger.disable();
     m.update_adjacency();
     logger.enable();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-std::vector<int> Curve::tessellate(Trimesh & m) const
-{
-    for(Sample s : sample_list)
-    {
-        if (s.tid == -1 || s.bary.size() < m.verts_per_element)
-        {
-            std::cerr << "WARNING: no link between mesh and curve existing." << std::endl;
-            assert(false && "Impossible to tessellate the curve");
-        }
-    }
-
-    // 1) Split all the edges crossed by the curveedges
-    //
-    std::vector<int>  curve_vids;    // ordered list of mesh vertices belonging to the curve
-    std::map<int,int> new_vids_map;  // for each edge, vid of the new vertex created
-    std::set<int>     tris_to_split; // list of the triangles that will require splitting
-    for(size_t i=0; i<sample_list.size(); ++i)
-    {
-        const Sample & s = sample_list.at(i);
-        int off;
-        if (triangle_bary_is_edge(s.bary, off))
-        {
-            int   eid         = m.triangle_edge_local_to_global(s.tid, off);
-            int   vid0        = m.triangle_vertex_id(s.tid, TRI_EDGES[off][0]);
-            int   vid1        = m.triangle_vertex_id(s.tid, TRI_EDGES[off][1]);
-            float f0          = m.vertex_u_text(vid0);
-            float f1          = m.vertex_u_text(vid1);
-            float f_new       = f0 * s.bary.at(TRI_EDGES[off][0]) + f1 * s.bary.at(TRI_EDGES[off][1]);
-            int fresh_id      = m.add_vertex(sample_list.at(i).pos, f_new);
-            new_vids_map[eid] = fresh_id;
-
-            curve_vids.push_back(fresh_id);
-            for(int tid : m.adj_edg2tri(eid)) tris_to_split.insert(tid);
-        }
-        else if (triangle_bary_is_vertex(s.bary, off))
-        {
-            curve_vids.push_back(m.triangle_vertex_id(s.tid, off));
-        }
-        else assert(false && "Inner samples are not supported for tessellation yet");
-    }
-
-    // 2) Split triangles
-    //
-    std::vector<int> split_list;
-    for(int tid : tris_to_split)
-    {
-        std::vector< std::pair<int,int> > split_edges;
-        for(int eid : m.adj_tri2edg(tid))
-        {
-            auto query = new_vids_map.find(eid);
-            if (query != new_vids_map.end())
-            {
-                split_edges.push_back(std::make_pair(eid, query->second));
-            }
-        }
-
-        switch (split_edges.size())
-        {
-            case 1 : split_in_2(m, tid, split_edges.front(), split_list); break;
-            case 2 : split_in_3(m, tid, split_edges.front(), split_edges.back(), split_list); break;
-            default: assert(false && "Unsupported tessellation configuration! (to be added, probably)");
-        }
-    }
-
-    tessellate(m, split_list);
-    return curve_vids;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
