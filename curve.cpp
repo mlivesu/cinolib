@@ -202,6 +202,52 @@ void Curve::resample_curve(const int n_samples)
     assert((int)new_samples.size() == n_samples);
 }
 
+
+
+CINO_INLINE
+void Curve::tessellate(Trimesh & m, const std::vector<int> & split_list) const
+{
+    // Serialized triangle split. Structure:
+    //
+    //      tid | # of sub-triangles | first tri (three entries each) | next tris (three entries each)
+    //
+    //      the first tri will be generated using the set_triangle() routine
+    //      the next tris will be generated using the add_triangle() routine
+    //
+    for(size_t i=0; i<split_list.size();)
+    {
+        int tid     = split_list.at(i);
+        int subtris = split_list.at(i+1);
+        int v0      = split_list.at(i+2);
+        int v1      = split_list.at(i+3);
+        int v2      = split_list.at(i+4);
+        vec3d n_og  = m.triangle_normal(tid);
+        vec3d n     = triangle_normal(m.vertex(v0), m.vertex(v1), m.vertex(v2));
+        bool flip   = (n_og.dot(n) < 0); // if the normal is opposite flip them all...
+
+        if (flip) std::swap(v1,v2);
+        m.set_triangle(tid, v0, v1, v2);
+
+        int base = i+5;
+        for(int j=0; j<subtris-1; ++j)
+        {
+            v0 = split_list.at(base+3*j);
+            v1 = split_list.at(base+3*j+1);
+            v2 = split_list.at(base+3*j+2);
+            if (flip) std::swap(v1,v2);
+            m.add_triangle(v0, v1, v2);
+        }
+
+        i+=2+3*subtris;
+    }
+
+    // sanitize edge connectivity...
+    logger.disable();
+    m.update_adjacency();
+    logger.enable();
+}
+
+
 /* WARNING: shit can happen if a triangle needs be split more than once... */
 CINO_INLINE
 std::vector<int> Curve::tessellate(Trimesh & m) const
@@ -250,13 +296,20 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
     std::vector<int> split_list;
     for(int tid : tris_to_split)
     {
-        std::vector<int> split_edges;
-        for(int eid : m.adj_tri2edg(tid)) if (CONTAINS(new_vids_map, eid)) split_edges.push_back(eid);
+        std::vector< std::pair<int,int> > split_edges;
+        for(int eid : m.adj_tri2edg(tid))
+        {
+            auto query = new_vids_map.find(eid);
+            if (query != new_vids_map.end())
+            {
+                split_edges.push_back(std::make_pair(eid, query->second));
+            }
+        }
 
         switch (split_edges.size())
         {
-            case 1 : split_in_2(m, tid, split_edges.front(), new_vids_map, split_list); break;
-            case 2 : split_in_3(m, tid, split_edges.front(), split_edges.back(), new_vids_map, split_list); break;
+            case 1 : split_in_2(m, tid, split_edges.front(), split_list); break;
+            case 2 : split_in_3(m, tid, split_edges.front(), split_edges.back(), split_list); break;
             default: assert(false && "Unsupported tessellation configuration! (to be added, probably)");
         }
     }
@@ -267,91 +320,44 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
 
 
 CINO_INLINE
-void Curve::tessellate(Trimesh & m, const std::vector<int> & split_list) const
+void Curve::split_in_2(const Trimesh            & m,
+                       const int                  tid,
+                       const std::pair<int,int> & edg,
+                             std::vector<int>   & split_list) const
 {
-    // Serialized triangle split. Structure:
-    //
-    //      tid | # of sub-triangles | first tri (three entries each) | next tris (three entries each)
-    //
-    //      the first tri will be generated using the set_triangle() routine
-    //      the next tris will be generated using the add_triangle() routine
-    //
-    for(size_t i=0; i<split_list.size();)
-    {
-        int tid     = split_list.at(i);
-        int subtris = split_list.at(i+1);
-        int v0      = split_list.at(i+2);
-        int v1      = split_list.at(i+3);
-        int v2      = split_list.at(i+4);
-        vec3d n_og  = m.triangle_normal(tid);
-        vec3d n     = triangle_normal(m.vertex(v0), m.vertex(v1), m.vertex(v2));
-        bool flip   = (n_og.dot(n) < 0); // if the normal is opposite flip them all...
+    int eid   = edg.first;
+    int newv  = edg.second;
+    int old0  = m.edge_vertex_id(eid,0);
+    int old1  = m.edge_vertex_id(eid,1);
+    int pivot = m.vertex_opposite_to(tid, old0, old1);
 
-        if (flip) std::swap(v1,v2);
-        m.set_triangle(tid, v0, v1, v2);
-
-        int base = i+5;
-        for(int j=0; j<subtris-1; ++j)
-        {
-            v0 = split_list.at(base+3*j);
-            v1 = split_list.at(base+3*j+1);
-            v2 = split_list.at(base+3*j+2);
-            if (flip) std::swap(v1,v2);
-            m.add_triangle(v0, v1, v2);
-        }
-
-        i+=2+3*subtris;
-    }
-
-    // sanitize edge connectivity...
-    logger.disable();
-    m.update_adjacency();
-    logger.enable();
+    split_list.push_back(tid);  // triangle to split
+    split_list.push_back(2);    // # of sub-triangles to create
+    split_list.push_back(old0);  split_list.push_back(pivot); split_list.push_back(newv); // t0
+    split_list.push_back(old1);  split_list.push_back(newv); split_list.push_back(pivot); // t1
 }
 
 
 CINO_INLINE
-int Curve::split_in_3(const Trimesh           & m,
-                      const int                 tid,
-                      const int                 eid0,
-                      const int                 eid1,
-                      const std::map<int,int> & new_vids_map,
-                            std::vector<int>  & split_list) const
+void Curve::split_in_3(const Trimesh            & m,
+                       const int                  tid,
+                       const std::pair<int,int> & edg0,
+                       const std::pair<int,int> & edg1,
+                             std::vector<int>   & split_list) const
 {
+    int eid0  = edg0.first;
+    int eid1  = edg1.first;
+    int newv0 = edg0.second;
+    int newv1 = edg1.second;
     int pivot = m.shared_vertex(eid0, eid1);
-    int new0  = new_vids_map.at(eid0);
-    int new1  = new_vids_map.at(eid1);
     int old0  = m.edge_vertex_id(eid0,0); if (old0==pivot) old0 = m.edge_vertex_id(eid0,1);
     int old1  = m.edge_vertex_id(eid1,0); if (old1==pivot) old1 = m.edge_vertex_id(eid1,1);
 
     split_list.push_back(tid);  // triangle to split
     split_list.push_back(3);    // # of sub-triangles to create
-    split_list.push_back(new0);  split_list.push_back(new1);  split_list.push_back(old0); // t0
-    split_list.push_back(old0);  split_list.push_back(new1);  split_list.push_back(old1); // t1
-    split_list.push_back(pivot); split_list.push_back(new1);  split_list.push_back(new0); // t2
-
-    return tid;
-}
-
-
-CINO_INLINE
-int Curve::split_in_2(const Trimesh           & m,
-                      const int                 tid,
-                      const int                 eid,
-                      const std::map<int,int> & new_vids_map,
-                            std::vector<int>  & split_list) const
-{
-    int old0  = m.edge_vertex_id(eid,0);
-    int old1  = m.edge_vertex_id(eid,1);
-    int pivot = m.vertex_opposite_to(tid, old0, old1);
-    int new_v = new_vids_map.at(eid);
-
-    split_list.push_back(tid);  // triangle to split
-    split_list.push_back(2);    // # of sub-triangles to create
-    split_list.push_back(old0);  split_list.push_back(pivot); split_list.push_back(new_v); // t0
-    split_list.push_back(old1);  split_list.push_back(new_v); split_list.push_back(pivot); // t1
-
-    return tid;
+    split_list.push_back(newv0); split_list.push_back(newv1);  split_list.push_back(old0); // t0
+    split_list.push_back(old0);  split_list.push_back(newv1);  split_list.push_back(old1); // t1
+    split_list.push_back(pivot); split_list.push_back(newv1);  split_list.push_back(newv0); // t2
 }
 
 }
