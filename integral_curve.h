@@ -46,10 +46,24 @@ class IntegralCurve : public DrawableCurve
                       const VectorField & grad,
                       const int           vid);
 
+        typedef enum
+        {
+            COMPUTING,
+            END_ON_MAXIMA,
+            END_ON_BORDER,
+            INFINITE_LOOP,
+        }
+        Status;
+
+        int exit_status() const { return status; }
+
     protected:
+
+        Status status;
 
         const Mesh        * m_ptr;
         const VectorField * grad_ptr;
+
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

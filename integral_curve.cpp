@@ -45,6 +45,7 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh                & m,
                                    const int                   tid,
                                    const std::vector<double> & bary)
     : DrawableCurve()
+    , status(COMPUTING)
     , m_ptr(&m)
     , grad_ptr(&grad)
 {
@@ -62,6 +63,7 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
                                    const VectorField & grad,
                                    const int           vid)
     : DrawableCurve()
+    , status(COMPUTING)
     , m_ptr(&m)
     , grad_ptr(&grad)
 {
@@ -399,14 +401,17 @@ bool IntegralCurve<Trimesh>::is_converged(const Sample & sample)
 {
     if (sample.tid == -1) // i.e. boundary reached. Remove dummy sample
     {
+        status = END_ON_BORDER;
         pop_back();
         return true;
     }
 
+    bool maxima_reached = false;
+
     int id;
     if (is_on_vertex(sample, id))
     {
-        if (m_ptr->vertex_is_local_maxima(id)) return true;
+        if (m_ptr->vertex_is_local_maxima(id)) maxima_reached = true;
     }
     else if (is_on_edge(sample, id))
     {
@@ -415,7 +420,7 @@ bool IntegralCurve<Trimesh>::is_converged(const Sample & sample)
         bool vid0_is_max = m_ptr->vertex_is_local_maxima(vid0);
         bool vid1_is_max = m_ptr->vertex_is_local_maxima(vid1);
 
-        if (vid0_is_max && vid1_is_max) return true;
+        if (vid0_is_max && vid1_is_max) maxima_reached = true;
     }
     else if (is_on_face(sample, id))
     {
@@ -426,12 +431,19 @@ bool IntegralCurve<Trimesh>::is_converged(const Sample & sample)
         bool vid1_is_max = m_ptr->vertex_is_local_maxima(vid1);
         bool vid2_is_max = m_ptr->vertex_is_local_maxima(vid2);
 
-        if (vid0_is_max && vid1_is_max && vid2_is_max) return true;
+        if (vid0_is_max && vid1_is_max && vid2_is_max) maxima_reached = true;
+    }
+
+    if (maxima_reached)
+    {
+        status = END_ON_MAXIMA;
+        return true;
     }
 
     if ((int)samples().size() >= m_ptr->num_vertices())
     {
         std::cerr << "INTEGRAL CURVE ERROR - Infinite loop. Something is REALLY off here!" << std::endl;
+        status = INFINITE_LOOP;
         return true;
     }
 
@@ -741,15 +753,17 @@ bool IntegralCurve<Tetmesh>::is_converged(const Sample & sample)
 {
     if (sample.tid == -1) // i.e. boundary reached. Remove dummy sample
     {
+        status = END_ON_BORDER;
         pop_back();
         return true;
     }
 
+    bool maxima_reached = false;
+
     int id, id1;
     if (is_on_vertex(sample, id))
     {
-        // if the vertex is a local maxima, just stay there
-        if (m_ptr->vertex_is_local_maxima(id)) return true;
+        if (m_ptr->vertex_is_local_maxima(id))  maxima_reached = true;
     }
     else if (is_on_edge(sample, id))
     {
@@ -758,8 +772,7 @@ bool IntegralCurve<Tetmesh>::is_converged(const Sample & sample)
         bool vid0_is_max = m_ptr->vertex_is_local_maxima(vid0);
         bool vid1_is_max = m_ptr->vertex_is_local_maxima(vid1);
 
-        // if the whole edge is a local maxima, stay where you are;
-        if (vid0_is_max && vid1_is_max) return true;
+        if (vid0_is_max && vid1_is_max) maxima_reached = true;
     }
     else if (is_on_face(sample, id, id1))
     {
@@ -770,8 +783,7 @@ bool IntegralCurve<Tetmesh>::is_converged(const Sample & sample)
         bool vid1_is_max = m_ptr->vertex_is_local_maxima(vid1);
         bool vid2_is_max = m_ptr->vertex_is_local_maxima(vid2);
 
-        // if the whole face is a local maxima, stay where you are
-        if (vid0_is_max && vid1_is_max && vid2_is_max) return true;
+        if (vid0_is_max && vid1_is_max && vid2_is_max) maxima_reached = true;
     }
     else if (is_on_cell(sample, id))
     {
@@ -784,8 +796,13 @@ bool IntegralCurve<Tetmesh>::is_converged(const Sample & sample)
         bool vid2_is_max = m_ptr->vertex_is_local_maxima(vid2);
         bool vid3_is_max = m_ptr->vertex_is_local_maxima(vid3);
 
-        // if the whole tet is a local maxima, stay where you are
-        if (vid0_is_max && vid1_is_max && vid2_is_max && vid3_is_max) return true;
+        if (vid0_is_max && vid1_is_max && vid2_is_max && vid3_is_max) maxima_reached = true;
+    }
+
+    if (maxima_reached)
+    {
+        status = END_ON_MAXIMA;
+        return true;
     }
 
     if ((int)samples().size() >= m_ptr->num_vertices())
