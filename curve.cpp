@@ -35,6 +35,8 @@ std::ostream & operator<<(std::ostream & in, const Curve::Sample & s)
     return in;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const Curve & c)
 {
@@ -42,6 +44,8 @@ std::ostream & operator<<(std::ostream & in, const Curve & c)
     in << std::endl;
     return in;
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 Curve::Curve()
@@ -53,6 +57,8 @@ Curve::Curve(const std::vector<vec3d> & samples)
 {
     for(vec3d p : samples) append_sample(p);
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 Skel Curve::export_as_skeleton() const
@@ -77,12 +83,15 @@ Skel Curve::export_as_skeleton() const
     return s;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 const Bbox & Curve::bbox() const
 {
     return bb;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 const std::vector<Curve::Sample> & Curve::samples() const
@@ -90,12 +99,15 @@ const std::vector<Curve::Sample> & Curve::samples() const
     return sample_list;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 std::vector<Curve::Sample> & Curve::samples()
 {
     return sample_list;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 int Curve::size() const
@@ -103,6 +115,7 @@ int Curve::size() const
     return sample_list.size();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 double Curve::length() const
@@ -115,6 +128,8 @@ double Curve::length() const
     return l;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void Curve::append_sample(const vec3d & s)
 {
@@ -122,6 +137,8 @@ void Curve::append_sample(const vec3d & s)
     sample.pos = s;
     append_sample(sample);
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void Curve::append_sample(const Sample & s)
@@ -131,11 +148,15 @@ void Curve::append_sample(const Sample & s)
     bb.max = bb.max.max(s.pos);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void Curve::pop_back()
 {
     sample_list.pop_back();
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 vec3d Curve::sample_curve_at(const float t) const
@@ -143,6 +164,7 @@ vec3d Curve::sample_curve_at(const float t) const
     return sample_curve_at(t, length());
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 vec3d Curve::sample_curve_at(const float t, const double tot_length) const
@@ -176,6 +198,7 @@ vec3d Curve::sample_curve_at(const float t, const double tot_length) const
     return vec3d();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void Curve::resample_curve(const int n_samples)
@@ -202,7 +225,7 @@ void Curve::resample_curve(const int n_samples)
     assert((int)new_samples.size() == n_samples);
 }
 
-
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void Curve::tessellate(Trimesh & m, const std::vector<int> & split_list) const
@@ -247,8 +270,8 @@ void Curve::tessellate(Trimesh & m, const std::vector<int> & split_list) const
     logger.enable();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-/* WARNING: shit can happen if a triangle needs be split more than once... */
 CINO_INLINE
 std::vector<int> Curve::tessellate(Trimesh & m) const
 {
@@ -318,6 +341,7 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
     return curve_vids;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void Curve::split_in_2(const Trimesh            & m,
@@ -337,6 +361,7 @@ void Curve::split_in_2(const Trimesh            & m,
     split_list.push_back(old1);  split_list.push_back(newv); split_list.push_back(pivot); // t1
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void Curve::split_in_3(const Trimesh            & m,
