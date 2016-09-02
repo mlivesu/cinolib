@@ -83,15 +83,16 @@ class Curve
         std::vector<int> tessellate(Trimesh & m) const;
         void             tessellate(Trimesh & m, const std::vector<int> & split_list) const;
 
-        int split_in_4(const Trimesh           & m,
-                       const int                 eid0,
-                       const int                 eid1,
+        int split_in_2(const Trimesh           & m,
+                       const int                 eid,
+                       const int                 vid,
                        const std::map<int,int> & new_vids_map,
                              std::vector<int>  & split_list) const;
 
         int split_in_3(const Trimesh           & m,
-                       const int                 eid,
-                       const int                 vid,
+                       const int                 tid,
+                       const int                 eid0,
+                       const int                 eid1,
                        const std::map<int,int> & new_vids_map,
                              std::vector<int>  & split_list) const;
 

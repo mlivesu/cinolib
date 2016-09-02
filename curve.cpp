@@ -215,12 +215,11 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
         }
     }
 
-    // 1) Split edges
+    // 1) Split all the edges crossed by the curveedges
     //
-    // ordered list of mesh vertices belonging to the curve
-    //
-    std::vector<int>  curve_vids;
-    std::map<int,int> new_vids_map;
+    std::vector<int>  curve_vids;    // ordered list of mesh vertices belonging to the curve
+    std::map<int,int> new_vids_map;  // for each edge, vid of the new vertex created
+    std::set<int>     tris_to_split; // list of the triangles that will require splitting
     for(size_t i=0; i<sample_list.size(); ++i)
     {
         const Sample & s = sample_list.at(i);
@@ -235,7 +234,9 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
             float f_new       = f0 * s.bary.at(TRI_EDGES[off][0]) + f1 * s.bary.at(TRI_EDGES[off][1]);
             int fresh_id      = m.add_vertex(sample_list.at(i).pos, f_new);
             new_vids_map[eid] = fresh_id;
+
             curve_vids.push_back(fresh_id);
+            for(int tid : m.adj_edg2tri(eid)) tris_to_split.insert(tid);
         }
         else if (triangle_bary_is_vertex(s.bary, off))
         {
@@ -244,72 +245,20 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
         else assert(false && "Inner samples are not supported for tessellation yet");
     }
 
-    // 2) Form triangles
+    // 2) Split triangles
     //
-    // Serialized triangle split instructions. Structure:
-    // tid | # of sub-triangles | first tri (three entries each) | next tris (three entries each)
-    // the first tri will be generated using the set_triangle() routine
-    // the next tris will be generated using the add_triangle() routine
-    //
-    std::set<int>    split_triangles;
     std::vector<int> split_list;
-    for(size_t i=1; i<sample_list.size(); ++i)
+    for(int tid : tris_to_split)
     {
-        const Sample & s0 = sample_list.at(i-1);
-        const Sample & s1 = sample_list.at( i );
+        std::vector<int> split_edges;
+        for(int eid : m.adj_tri2edg(tid)) if (CONTAINS(new_vids_map, eid)) split_edges.push_back(eid);
 
-        int  id0, id1, tid;
-        bool id0_is_edge = m.elem_bary_is_edge(s0.tid, s0.bary, id0);
-        bool id1_is_edge = m.elem_bary_is_edge(s1.tid, s1.bary, id1);
-
-        if (id0_is_edge && id1_is_edge)
+        switch (split_edges.size())
         {
-            tid = split_in_4(m, id0, id1, new_vids_map, split_list);
+            case 1 : split_in_2(m, tid, split_edges.front(), new_vids_map, split_list); break;
+            case 2 : split_in_3(m, tid, split_edges.front(), split_edges.back(), new_vids_map, split_list); break;
+            default: assert(false && "Unsupported tessellation configuration! (to be added, probably)");
         }
-        else if (id0_is_edge && !id1_is_edge)
-        {
-            assert(m.elem_bary_is_vertex(s1.tid, s1.bary, id1));
-            tid = split_in_3(m, id0, id1, new_vids_map, split_list);
-        }
-        else if (!id0_is_edge && id1_is_edge)
-        {
-            assert(m.elem_bary_is_vertex(s0.tid, s0.bary, id0));
-            tid = split_in_3(m, id1, id0, new_vids_map, split_list);
-        }
-        else assert(false && "Unsupported tessellation configuration! (to be added, probably)");
-
-        split_triangles.insert(tid);
-    }
-
-    // 3) Handle curve endpoints. If the curve began at an edge even the adjacen triangle
-    //    not traversed by the curve needs be split....
-    //
-    const Sample & beg = sample_list.front();
-    const Sample & end = sample_list.back();
-    int   eid;
-    if (m.elem_bary_is_edge(beg.tid, beg.bary, eid))
-    {
-        assert(m.edge_is_manifold(eid));
-        int tid = m.adj_edg2tri(eid).front();
-        if (CONTAINS(split_triangles, tid)) tid = m.adj_edg2tri(eid).back();
-        assert(DOES_NOT_CONTAIN(split_triangles, tid));
-        int vid0 = m.edge_vertex_id(eid,0);
-        int vid1 = m.edge_vertex_id(eid,1);
-        int vid  = m.vertex_opposite_to(tid, vid0, vid1);
-
-        split_in_3(m, eid, vid, new_vids_map, split_list);
-    }
-    if (m.elem_bary_is_edge(end.tid, end.bary, eid))
-    {
-        assert(m.edge_is_manifold(eid));
-        int tid = m.adj_edg2tri(eid).front();
-        if (CONTAINS(split_triangles, tid)) tid = m.adj_edg2tri(eid).back();
-        assert(DOES_NOT_CONTAIN(split_triangles, tid));
-        int vid0 = m.edge_vertex_id(eid,0);
-        int vid1 = m.edge_vertex_id(eid,1);
-        int vid  = m.vertex_opposite_to(tid, vid0, vid1);
-
-        split_in_3(m, eid, vid, new_vids_map, split_list);
     }
 
     tessellate(m, split_list);
@@ -360,14 +309,15 @@ void Curve::tessellate(Trimesh & m, const std::vector<int> & split_list) const
     logger.enable();
 }
 
+
 CINO_INLINE
-int Curve::split_in_4(const Trimesh           & m,
+int Curve::split_in_3(const Trimesh           & m,
+                      const int                 tid,
                       const int                 eid0,
                       const int                 eid1,
                       const std::map<int,int> & new_vids_map,
                             std::vector<int>  & split_list) const
 {
-    int tid   = m.shared_triangle(eid0, eid1);
     int pivot = m.shared_vertex(eid0, eid1);
     int new0  = new_vids_map.at(eid0);
     int new1  = new_vids_map.at(eid1);
@@ -383,18 +333,14 @@ int Curve::split_in_4(const Trimesh           & m,
     return tid;
 }
 
+
 CINO_INLINE
-int Curve::split_in_3(const Trimesh           & m,
+int Curve::split_in_2(const Trimesh           & m,
+                      const int                 tid,
                       const int                 eid,
-                      const int                 vid,
                       const std::map<int,int> & new_vids_map,
                             std::vector<int>  & split_list) const
 {
-    // fint the triangle containing both vertex (id1) and edge (id0)
-    int tid = -1;
-    for(int id : m.adj_edg2tri(eid)) if (m.triangle_contains_vertex(id, vid)) tid = id;
-    assert(tid!=-1);
-
     int old0  = m.edge_vertex_id(eid,0);
     int old1  = m.edge_vertex_id(eid,1);
     int pivot = m.vertex_opposite_to(tid, old0, old1);
