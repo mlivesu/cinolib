@@ -43,8 +43,8 @@ namespace cinolib
 template<class Mesh>
 CINO_INLINE
 void smooth_taubin(Mesh                & m,
-                   const std::set<int>   do_not_smooth =  std::set<int>(),
                    const int             mode          =  COTANGENT,
+                   const std::set<int>   do_not_smooth =  std::set<int>(),
                    const int             n_iters       =  10,
                    const double          lambda        =  0.9,
                    const double          mu            = -0.9);
