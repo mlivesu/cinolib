@@ -61,6 +61,14 @@ Curve::Curve(const std::vector<vec3d> & samples)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void Curve::reverse()
+{
+    std::reverse(sample_list.begin(), sample_list.end());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 Skel Curve::export_as_skeleton() const
 {
     std::vector<double> coords;
