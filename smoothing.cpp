@@ -45,11 +45,9 @@ void smooth_taubin(Mesh                & m,
                    const double          lambda,
                    const double          mu)
 {
-    assert(lambda > 0.0);
-    assert(mu     < 0.0);
-
-    std::vector<vec3d>  delta(m.num_vertices(), vec3d(0,0,0));
-    std::vector<double> sum(m.num_vertices(), 0.0);
+    assert(lambda >  0 );
+    assert(lambda <  1 );
+    assert(lambda < -mu);
 
     for(int iter=0; iter<n_iters; ++iter)
     {
@@ -64,18 +62,17 @@ void smooth_taubin(Mesh                & m,
             if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
             if (mode & COTANGENT) cotangent_weights<Mesh>(m, vid, nbrs, wgts); else
             assert(false);
-            for(size_t i=0; i<nbrs.size(); ++i)
-            {
-                delta[vid] += (m.vertex(vid) - m.vertex(nbrs[i])) * wgts[i];
-                sum[vid]   += wgts[i];
-            }
+
+            // normalize weights...
+            double sum = 0;
+            for(double  w : wgts) sum += w;
+            for(double &w : wgts) w /= sum;
+
+            vec3d delta(0,0,0);
+            for(size_t i=0; i<nbrs.size(); ++i) delta += (m.vertex(nbrs[i]) - m.vertex(vid)) * wgts[i];
+            m.set_vertex(vid, m.vertex(vid) + delta * lambda);
         }
-        for(int vid=0; vid<m.num_vertices(); ++vid)
-        {
-            m.set_vertex(vid, m.vertex(vid) + delta[vid] * lambda / sum[vid]);
-            delta[vid] = vec3d(0,0,0);
-            sum[vid]   = 0.0;
-        }
+
 
         // inflate
         //
@@ -88,19 +85,17 @@ void smooth_taubin(Mesh                & m,
             if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
             if (mode & COTANGENT) cotangent_weights<Mesh>(m, vid, nbrs, wgts); else
             assert(false);
-            for(size_t i=0; i<nbrs.size(); ++i)
-            {
-                delta[vid] += (m.vertex(vid) - m.vertex(nbrs[i])) * wgts[i];
-                sum[vid]   += wgts[i];
-            }
+
+            // normalize weights...
+            double sum = 0;
+            for(double  w : wgts) sum += w;
+            for(double &w : wgts) w /= sum;
+
+            vec3d delta(0,0,0);
+            for(size_t i=0; i<nbrs.size(); ++i) delta += (m.vertex(nbrs[i]) - m.vertex(vid)) * wgts[i];
+            m.set_vertex(vid, m.vertex(vid) + delta * mu);
         }
-        for(int vid=0; vid<m.num_vertices(); ++vid)
-        {
-            m.set_vertex(vid, m.vertex(vid) + delta[vid] * mu / sum[vid]);
-            delta[vid] = vec3d(0,0,0);
-            sum[vid]   = 0.0;
-        }
-   }    
+   }
 }
 
 }
