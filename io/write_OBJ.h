@@ -38,6 +38,14 @@ void write_OBJ(const char                * filename,
                const std::vector<u_int>  & tri,
                const std::vector<u_int>  & quad);
 
+CINO_INLINE
+void write_OBJ(const char                * filename,
+               const std::vector<double> & xyz,
+               const std::vector<u_int>  & tri,
+               const std::vector<u_int>  & quad,
+               const std::vector<int>    & labels);
+
+
 }
 
 #ifndef  CINO_STATIC_LIB
