@@ -845,9 +845,9 @@ void Tetmesh::print_quality_statistics(bool list_folded_elements) const
 CINO_INLINE
 double Tetmesh::vertex_mass(const int vid) const
 {
-    std::vector<int> tets = adj_vtx2tri(vid);
+    std::vector<int> tets = adj_vtx2tet(vid);
     double mass = 0.0;
-    for(int i=0; i<(int)tets.size(); ++i)
+    for(int i=0; i<(int)tets.size(); ++i)    
     {
         int tid = tets[i];
         mass += tet_volume(tid);
@@ -1192,6 +1192,16 @@ Tetmesh Tetmesh::export_submesh_with_label(const int label) const
     export_submesh_with_label(label, sub_coords, sub_tets, vid2sub_vid, sub_vid2vid);
     return Tetmesh(sub_coords, sub_tets);
 }
+
+
+CINO_INLINE
+int Tetmesh::edge_vertex_opposite_to(const int eid, const int vid) const
+{
+    assert(edge_contains_vertex(eid, vid));
+    if (edge_vertex_id(eid,0) != vid) return edge_vertex_id(eid,0);
+    return edge_vertex_id(eid,1);
+}
+
 
 CINO_INLINE
 std::vector<int> Tetmesh::edge_ordered_tet_ring(const int eid) const

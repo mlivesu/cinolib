@@ -240,6 +240,8 @@ class Tetmesh
 
         Tetmesh export_submesh_with_label(const int label) const;
 
+        int edge_vertex_opposite_to(const int eid, const int vid) const;
+
         void export_submesh_with_label(const int             label,
                                        std::vector<double> & sub_coords,
                                        std::vector<u_int>  & sub_tets,
