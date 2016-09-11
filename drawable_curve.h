@@ -29,6 +29,7 @@
 #include <cinolib/curve.h>
 #include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/colors.h>
+#include <cinolib/meshes/skel/skel.h>
 
 namespace cinolib
 {
@@ -39,6 +40,7 @@ class DrawableCurve : public Curve, public DrawableObject
 
         DrawableCurve();
         DrawableCurve(const std::vector<vec3d> & samples);
+        DrawableCurve(const Skel & skel, const int bone);
 
         void  draw(const float scene_size=1) const;
         vec3d scene_center() const;

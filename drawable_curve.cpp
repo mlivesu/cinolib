@@ -34,6 +34,10 @@ CINO_INLINE
 DrawableCurve::DrawableCurve(const std::vector<vec3d> & samples) : Curve(samples)
 {}
 
+CINO_INLINE
+DrawableCurve::DrawableCurve(const Skel & skel, const int bone) : Curve(skel, bone)
+{}
+
 
 CINO_INLINE
 void DrawableCurve::draw(const float scene_size) const

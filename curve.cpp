@@ -58,6 +58,17 @@ Curve::Curve(const std::vector<vec3d> & samples)
     for(vec3d p : samples) append_sample(p);
 }
 
+CINO_INLINE
+Curve::Curve(const Skel & skel, const int bone)
+{
+    std::vector<vec3d> samples;
+    for(int vid : skel.vertex_bone(bone))
+    {
+        samples.push_back(skel.vertex(vid));
+    }
+    for(vec3d p : samples) append_sample(p);
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
@@ -71,24 +82,39 @@ void Curve::reverse()
 CINO_INLINE
 Skel Curve::export_as_skeleton() const
 {
+    logger.disable();
+    Skel s(vector_coords(), vector_segments());
+    logger.enable();
+    return s;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<double> Curve::vector_coords() const
+{
     std::vector<double> coords;
-    std::vector<int>    segs;
     for(size_t i=0; i<sample_list.size(); ++i)
     {
         coords.push_back(sample_list.at(i).pos.x());
         coords.push_back(sample_list.at(i).pos.y());
         coords.push_back(sample_list.at(i).pos.z());
-
-        if (i>0)
-        {
-            segs.push_back(i-1);
-            segs.push_back( i );
-        }
     }
-    logger.disable();
-    Skel s(coords, segs);
-    logger.enable();
-    return s;
+    return coords;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<int> Curve::vector_segments() const
+{
+    std::vector<int> segs;
+    for(size_t i=1; i<sample_list.size(); ++i)
+    {
+        segs.push_back(i-1);
+        segs.push_back( i );
+    }
+    return segs;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

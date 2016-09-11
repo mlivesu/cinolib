@@ -55,6 +55,7 @@ class Curve
 
         Curve();
         Curve(const std::vector<vec3d> & samples);
+        Curve(const Skel & skel, const int bone);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -101,7 +102,9 @@ class Curve
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Skel export_as_skeleton() const;
+        Skel                export_as_skeleton() const;
+        std::vector<double> vector_coords()      const;
+        std::vector<int>    vector_segments()    const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
