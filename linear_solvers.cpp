@@ -23,9 +23,13 @@
 ****************************************************************************/
 #include <cinolib/linear_solvers.h>
 #include <cinolib/timer.h>
+#include <time.h>
 
 namespace cinolib
 {
+
+typedef Eigen::Triplet<double> Entry;
+
 
 CINO_INLINE
 void solve_square_system(const Eigen::SparseMatrix<double> & A,
@@ -111,8 +115,8 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
 
     int size = A.rows() - bc.size();
 
-    Eigen::SparseMatrix<double> Aprime(size,size);
-    Eigen::VectorXd bprime(size);
+    std::vector<Entry> Aprime_entries;
+    Eigen::VectorXd    bprime(size);
 
     for(int row=0; row<A.rows(); ++row)
     {
@@ -130,22 +134,25 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
     {
         for (Eigen::SparseMatrix<double>::InnerIterator it(A,i); it; ++it)
         {
-            int row = it.row();
-            int col = it.col();
+            int    row = it.row();
+            int    col = it.col();
+            double val = it.value();
 
             if (col_map[row] < 0) continue;
 
             if (col_map[col] < 0)
             {
-                //assert(CONTAINS(bc, col));
-                bprime[ col_map[row] ] -= bc[col] * it.value();
+                bprime[ col_map[row] ] -= bc[col] * val;
             }
             else
             {
-                Aprime.coeffRef( col_map[row], col_map[col] ) = it.value();
+                Aprime_entries.push_back(Entry(col_map[row], col_map[col], val));
             }
         }
     }
+
+    Eigen::SparseMatrix<double> Aprime(size, size);
+    Aprime.setFromTriplets(Aprime_entries.begin(), Aprime_entries.end());
 
     timer_stop(msg);
 
@@ -162,7 +169,6 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
         }
         else
         {
-            //assert(CONTAINS(bc, col));
             x[col] = bc[col];
         }
     }
