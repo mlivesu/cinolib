@@ -96,6 +96,7 @@ class Tetmesh
     public:
 
         const std::vector<double> & vector_coords()         const;
+        const std::vector<uint>   & vector_tets()           const;
         const std::vector<uint>   & vector_tris()           const;
         const std::vector<float>  & vector_v_float_scalar() const;
         const std::vector<int>    & vector_t_int_scalar()   const;

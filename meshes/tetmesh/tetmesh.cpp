@@ -158,6 +158,12 @@ const std::vector<double> &Tetmesh::vector_coords() const
 }
 
 CINO_INLINE
+const std::vector<uint> &Tetmesh::vector_tets() const
+{
+    return tets;
+}
+
+CINO_INLINE
 const std::vector<uint> &Tetmesh::vector_tris() const
 {
     return tris;
