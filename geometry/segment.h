@@ -44,6 +44,8 @@ class Segment : public std::pair<vec3d,vec3d>
 
         double operator[](const vec3d & p) const;
 
+        vec3d project_onto(const vec3d & p) const;
+
         double dist_to_point(const vec3d & p) const;
 
         bool is_in_between(const vec3d & p) const;

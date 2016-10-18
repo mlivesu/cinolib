@@ -50,7 +50,7 @@ double Segment::operator[](const vec3d & p) const
 
 
 CINO_INLINE
-double Segment::dist_to_point(const vec3d & p) const
+vec3d Segment::project_onto(const vec3d &p) const
 {
     vec3d v = second - first;
     vec3d w = p  - first;
@@ -58,13 +58,22 @@ double Segment::dist_to_point(const vec3d & p) const
     float cos_wv = w.dot(v);
     float cos_vv = v.dot(v);
 
-    if (cos_wv <= 0.0)    return first.dist(p);
-    if (cos_vv <= cos_wv) return second.dist(p);
+    if (cos_wv <= 0.0)    return first;
+    if (cos_vv <= cos_wv) return second;
 
     float b  = cos_wv / cos_vv;
     vec3d Pb = first + v*b;
-    return (p-Pb).length();
+
+    return Pb;
 }
+
+
+CINO_INLINE
+double Segment::dist_to_point(const vec3d & p) const
+{
+    return p.dist(project_onto(p));
+}
+
 
 CINO_INLINE
 bool Segment::is_in_between(const vec3d &p) const
