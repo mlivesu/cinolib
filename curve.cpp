@@ -56,6 +56,7 @@ CINO_INLINE
 Curve::Curve(const std::vector<vec3d> & samples)
 {
     for(vec3d p : samples) append_sample(p);
+    update_arc_length_param();
 }
 
 CINO_INLINE
@@ -67,6 +68,7 @@ Curve::Curve(const Skel & skel, const int bone)
         samples.push_back(skel.vertex(vid));
     }
     for(vec3d p : samples) append_sample(p);
+    update_arc_length_param();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -115,6 +117,15 @@ std::vector<int> Curve::vector_segments() const
         segs.push_back( i );
     }
     return segs;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Curve::operator+=(const Curve & c)
+{
+    for(Sample s : c.samples()) append_sample(s);
+    update_arc_length_param();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -170,6 +181,7 @@ void Curve::append_sample(const vec3d & s)
     Sample sample;
     sample.pos = s;
     append_sample(sample);
+    update_arc_length_param();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -180,6 +192,7 @@ void Curve::append_sample(const Sample & s)
     sample_list.push_back(s);
     bb.min = bb.min.min(s.pos);
     bb.max = bb.max.max(s.pos);
+    update_arc_length_param();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -188,6 +201,74 @@ CINO_INLINE
 void Curve::pop_back()
 {
     sample_list.pop_back();
+    update_arc_length_param();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Curve::update_arc_length_param() // recomputes parameter t for each sample
+{
+    if (size() < 2) return;
+
+    double tot_length = length();
+    double curr_l     = 0.0;
+    double curr_t     = 0.0;
+
+    for(size_t i=1; i<sample_list.size()-1; ++i)
+    {
+        double seg_l   = sample_list.at(i-1).pos.dist(sample_list.at(i).pos);
+        double delta_t = seg_l / tot_length;
+
+        curr_t += delta_t;
+        curr_l += seg_l;
+
+        sample_list.at(i).t = curr_t;
+    }
+
+    sample_list.front().t = 0.0;
+    sample_list.back().t  = 1.0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+int Curve::last_sample_lower_equal_than(const float t) const
+{
+    assert(t>=0);
+    assert(t<=1);
+
+    for(size_t i=1; i<sample_list.size()-1; ++i)
+    {
+        if (sample_list.at(i).t > t) return i-1;
+    }
+
+    return sample_list.size()-1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+int Curve::sample_closest_to(const float t) const
+{
+    assert(t>=0);
+    assert(t<=1);
+
+    float best_err = FLT_MAX;
+    int   best_sam = 0;
+
+    for(size_t pos=0; pos<sample_list.size()-1; ++pos)
+    {
+        float err = fabs(sample_list.at(pos).t - t);
+        if (err < best_err)
+        {
+            best_err = err;
+            best_sam = pos;
+        }
+        else if (sample_list.at(pos).t > t) return best_sam;
+    }
+
+    return sample_list.size()-1;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
