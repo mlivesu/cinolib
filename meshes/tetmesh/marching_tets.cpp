@@ -111,10 +111,10 @@ void marching_tets(const Tetmesh       & m,
             case C_0110 : { if (func[1] == isovalue && func[2] == isovalue) c = C_0000; break; }
 
             // iso-surface passes on a face : make sure only one tet (here the one with highet tid) triggers triangle generation...
-            case C_1110 : { int nbr = m.adjacent_tet_through_facet(tid,0); if (func[0] == isovalue && func[1] == isovalue && func[2] == isovalue && tid < nbr) c = C_0000; break; }
-            case C_1101 : { int nbr = m.adjacent_tet_through_facet(tid,1); if (func[0] == isovalue && func[1] == isovalue && func[3] == isovalue && tid < nbr) c = C_0000; break; }
-            case C_1011 : { int nbr = m.adjacent_tet_through_facet(tid,2); if (func[0] == isovalue && func[2] == isovalue && func[3] == isovalue && tid < nbr) c = C_0000; break; }
-            case C_0111 : { int nbr = m.adjacent_tet_through_facet(tid,3); if (func[1] == isovalue && func[2] == isovalue && func[3] == isovalue && tid < nbr) c = C_0000; break; }
+            case C_1110 : { if (func[0] == isovalue && func[1] == isovalue && func[2] == isovalue) if (tid < m.adjacent_tet_through_facet(tid,0)) c = C_0000; break; }
+            case C_1101 : { if (func[0] == isovalue && func[1] == isovalue && func[3] == isovalue) if (tid < m.adjacent_tet_through_facet(tid,1)) c = C_0000; break; }
+            case C_1011 : { if (func[0] == isovalue && func[2] == isovalue && func[3] == isovalue) if (tid < m.adjacent_tet_through_facet(tid,2)) c = C_0000; break; }
+            case C_0111 : { if (func[1] == isovalue && func[2] == isovalue && func[3] == isovalue) if (tid < m.adjacent_tet_through_facet(tid,3)) c = C_0000; break; }
 
             default : break;
         }
