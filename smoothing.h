@@ -46,7 +46,7 @@ void smooth_taubin(Mesh                & m,
                    const int             mode          =  COTANGENT,
                    const std::set<int>   do_not_smooth =  std::set<int>(),
                    const int             n_iters       =  10,
-                   const double          lambda        =  0.9,
+                   const double          lambda        =  0.89,
                    const double          mu            = -0.9);
 
 }
