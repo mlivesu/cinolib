@@ -93,6 +93,33 @@ void marching_tets(const Tetmesh       & m,
         if (isovalue >= func[2]) c |= C_0010;
         if (isovalue >= func[3]) c |= C_0001;
 
+        // handle corner cases (i.e. when the iso-surface passes EXACTLY on a vertex/edge/face)...
+        switch (c)
+        {
+            // iso-surface passes on a vertex : do nothing
+            case C_1000 : { if (func[0] == isovalue) c = C_0000; break; }
+            case C_0100 : { if (func[1] == isovalue) c = C_0000; break; }
+            case C_0010 : { if (func[2] == isovalue) c = C_0000; break; }
+            case C_0001 : { if (func[3] == isovalue) c = C_0000; break; }
+
+            // iso-surface passes on a edge : do nothing
+            case C_0101 : { if (func[1] == isovalue && func[3] == isovalue) c = C_0000; break; }
+            case C_1010 : { if (func[0] == isovalue && func[2] == isovalue) c = C_0000; break; }
+            case C_0011 : { if (func[2] == isovalue && func[3] == isovalue) c = C_0000; break; }
+            case C_1100 : { if (func[0] == isovalue && func[1] == isovalue) c = C_0000; break; }
+            case C_1001 : { if (func[0] == isovalue && func[3] == isovalue) c = C_0000; break; }
+            case C_0110 : { if (func[1] == isovalue && func[2] == isovalue) c = C_0000; break; }
+
+            // iso-surface passes on a face : make sure only one tet (here the one with highet tid) triggers triangle generation...
+            case C_1110 : { int nbr = m.adjacent_tet_through_facet(tid,0); if (func[0] == isovalue && func[1] == isovalue && func[2] == isovalue && tid < nbr) c = C_0000; break; }
+            case C_1101 : { int nbr = m.adjacent_tet_through_facet(tid,1); if (func[0] == isovalue && func[1] == isovalue && func[3] == isovalue && tid < nbr) c = C_0000; break; }
+            case C_1011 : { int nbr = m.adjacent_tet_through_facet(tid,2); if (func[0] == isovalue && func[2] == isovalue && func[3] == isovalue && tid < nbr) c = C_0000; break; }
+            case C_0111 : { int nbr = m.adjacent_tet_through_facet(tid,3); if (func[1] == isovalue && func[2] == isovalue && func[3] == isovalue && tid < nbr) c = C_0000; break; }
+
+            default : break;
+        }
+
+        // triangle generation
         switch (c)
         {
             case C_1000 : { int e [] = { 2, 0, 4 }; make_triangle(m, isovalue, vids, func, e , edg2vid_map, coords, tris, norm); break; }
