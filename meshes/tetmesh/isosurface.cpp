@@ -30,7 +30,7 @@ namespace cinolib
 CINO_INLINE
 Isosurface::Isosurface(const Tetmesh & m, const float iso_value) : m_ptr(&m), iso_value(iso_value)
 {
-    marching_tets(m, iso_value, coords, tris, t_norms);
+    marching_tets(m, iso_value, coords, tris, t_norms, split_info);
 }
 
 CINO_INLINE

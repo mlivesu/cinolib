@@ -30,13 +30,16 @@
 namespace cinolib
 {
 
-
 CINO_INLINE
-void marching_tets(const Tetmesh       & m,
-                   const double          isovalue,
-                   std::vector<double> & coords,
-                   std::vector<u_int>  & tris,
-                   std::vector<double> & norm);
+void marching_tets(const Tetmesh          & m,
+                   const double             isovalue,
+                   std::vector<double>    & coords,
+                   std::vector<u_int>     & tris,
+                   std::vector<double>    & norm,
+                   std::map<ipair,double> & split_info); // (v0,v1) => lambda
+                                                         // meaning that the edge (v0,v1) should
+                                                         // be split at
+                                                         // lambda * v0 + (1 - lambda) * v1
 
 }
 

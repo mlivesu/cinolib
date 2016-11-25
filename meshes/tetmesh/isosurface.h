@@ -42,11 +42,12 @@ class Isosurface
 
     protected:
 
-        const Tetmesh      *m_ptr;
-        float               iso_value;
-        std::vector<double> coords;
-        std::vector<u_int>  tris;
-        std::vector<double> t_norms;
+        const Tetmesh         *m_ptr;
+        float                  iso_value;
+        std::vector<double>    coords;
+        std::vector<u_int>     tris;
+        std::vector<double>    t_norms;
+        std::map<ipair,double> split_info;
 };
 
 
