@@ -21,41 +21,38 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef ISOSURFACE_H
-#define ISOSURFACE_H
+#ifndef TETRAHEDRALIZATION_H
+#define TETRAHEDRALIZATION_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/tetmesh/tetmesh.h>
 
+/* The split schemes implemented here are largely based on:
+ *
+ * How to Subdivide Pyramids, Prisms and Hexahedra into Tetrahedra
+ * J.Dompierre, P.Labbé, M.G. Vallet, R.Camarero
+ * International Meshing Roundtable, pp.195-204, 1999
+*/
 
 namespace cinolib
 {
 
-class Isosurface
-{
-    public:
-
-        Isosurface(){}
-        Isosurface(const Tetmesh & m, const float iso_value);
-
-        Trimesh export_as_trimesh()     const;
-        void    tessellate(Tetmesh & m) const;
-
-protected:
-
-        const Tetmesh         *m_ptr;
-        float                  iso_value;
-        std::vector<double>    coords;
-        std::vector<u_int>     tris;
-        std::vector<double>    t_norms;
-        std::map<ipair,double> split_info;
-};
+/* This assumes the prism has a triangular cross-section.
+ * The vertices are ordered as follows:
+ *
+ *      v2             v5
+ *    /    \         /    \
+ *  v0 --- v1      v3 --- v4
+ *
+ *   bot base       top base
+*/
+CINO_INLINE
+void tetrahedralize_prism(int prism[], std::vector<uint> & tets);
 
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "isosurface.cpp"
+#include "tetrahedralization.cpp"
 #endif
 
-#endif // ISOSURFACE_H
+#endif // TETRAHEDRALIZATION_H
