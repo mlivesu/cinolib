@@ -46,6 +46,11 @@ class Isosurface
 
     protected:
 
+        void fix_subtet_orientation(const int                   tid,
+                                    const int                   n_subtets,
+                                    const std::vector<double> & coords,
+                                          std::vector<uint>   & tets) const;
+
         const Tetmesh         *m_ptr;
         float                  iso_value;
         std::vector<double>    coords;

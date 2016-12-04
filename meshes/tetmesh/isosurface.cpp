@@ -127,23 +127,7 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
                 new_tets.push_back(prism[4]);
                 new_tets.push_back(prism[5]);
                 //
-                bool og_tet_was_flipped = m_ptr->tet_quality(tid) < 0;
-                for(int i=1; i<=4; ++i)
-                {
-                    int   base_ptr = new_tets.size() - (4*i);
-                    int   v0_ptr   = new_tets.at(base_ptr+0);
-                    int   v1_ptr   = new_tets.at(base_ptr+1);
-                    int   v2_ptr   = new_tets.at(base_ptr+2);
-                    int   v3_ptr   = new_tets.at(base_ptr+3);
-                    vec3d v0(new_coords.at(3*v0_ptr+0), new_coords.at(3*v0_ptr+1), new_coords.at(3*v0_ptr+2));
-                    vec3d v1(new_coords.at(3*v1_ptr+0), new_coords.at(3*v1_ptr+1), new_coords.at(3*v1_ptr+2));
-                    vec3d v2(new_coords.at(3*v2_ptr+0), new_coords.at(3*v2_ptr+1), new_coords.at(3*v2_ptr+2));
-                    vec3d v3(new_coords.at(3*v3_ptr+0), new_coords.at(3*v3_ptr+1), new_coords.at(3*v3_ptr+2));
-                    if (tet_scaled_jacobian(v0,v1,v2,v3) < 0 && !og_tet_was_flipped)
-                    {
-                        std::swap(new_tets.at(base_ptr+1),new_tets.at(base_ptr+3));
-                    }
-                }
+                fix_subtet_orientation(tid, 4, new_coords, new_tets);
                 break;
             }
 
@@ -187,25 +171,8 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
                     };
                     //
                     tetrahedralize_prism(prism, new_tets);
-                    //
-                    bool og_tet_was_flipped = m_ptr->tet_quality(tid) < 0;
-                    for(int i=1; i<=6; ++i)
-                    {
-                        int   base_ptr = new_tets.size() - (4*i);
-                        int   v0_ptr   = new_tets.at(base_ptr+0);
-                        int   v1_ptr   = new_tets.at(base_ptr+1);
-                        int   v2_ptr   = new_tets.at(base_ptr+2);
-                        int   v3_ptr   = new_tets.at(base_ptr+3);
-                        vec3d v0(new_coords.at(3*v0_ptr+0), new_coords.at(3*v0_ptr+1), new_coords.at(3*v0_ptr+2));
-                        vec3d v1(new_coords.at(3*v1_ptr+0), new_coords.at(3*v1_ptr+1), new_coords.at(3*v1_ptr+2));
-                        vec3d v2(new_coords.at(3*v2_ptr+0), new_coords.at(3*v2_ptr+1), new_coords.at(3*v2_ptr+2));
-                        vec3d v3(new_coords.at(3*v3_ptr+0), new_coords.at(3*v3_ptr+1), new_coords.at(3*v3_ptr+2));
-                        if (tet_scaled_jacobian(v0,v1,v2,v3) < 0 && !og_tet_was_flipped)
-                        {
-                            std::swap(new_tets.at(base_ptr+1),new_tets.at(base_ptr+3));
-                        }
-                    }
                 }
+                fix_subtet_orientation(tid, 6, new_coords, new_tets);
                 break;
             }
 
@@ -214,6 +181,31 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
                 std::cerr << edges_split.size() << " edges attraversati!!!!!" << std::endl;
                 assert(false);
             }
+        }
+    }
+}
+
+CINO_INLINE
+void Isosurface::fix_subtet_orientation(const int                   tid,
+                                        const int                   n_subtets,
+                                        const std::vector<double> & coords,
+                                              std::vector<uint>   & tets) const
+{
+    bool og_tet_was_flipped = m_ptr->tet_quality(tid) < 0;
+    for(int i=1; i<=n_subtets; ++i)
+    {
+        int   base_ptr = tets.size() - (4*i);
+        int   v0_ptr   = tets.at(base_ptr+0);
+        int   v1_ptr   = tets.at(base_ptr+1);
+        int   v2_ptr   = tets.at(base_ptr+2);
+        int   v3_ptr   = tets.at(base_ptr+3);
+        vec3d v0(coords.at(3*v0_ptr+0), coords.at(3*v0_ptr+1), coords.at(3*v0_ptr+2));
+        vec3d v1(coords.at(3*v1_ptr+0), coords.at(3*v1_ptr+1), coords.at(3*v1_ptr+2));
+        vec3d v2(coords.at(3*v2_ptr+0), coords.at(3*v2_ptr+1), coords.at(3*v2_ptr+2));
+        vec3d v3(coords.at(3*v3_ptr+0), coords.at(3*v3_ptr+1), coords.at(3*v3_ptr+2));
+        if (tet_scaled_jacobian(v0,v1,v2,v3) < 0 && !og_tet_was_flipped)
+        {
+            std::swap(tets.at(base_ptr+1),tets.at(base_ptr+3));
         }
     }
 }
