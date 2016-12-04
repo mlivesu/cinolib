@@ -1095,6 +1095,7 @@ double Tetmesh::tet_volume(const int tid) const
 CINO_INLINE
 int Tetmesh::edge_vertex_id(const int eid, const int offset) const
 {
+    assert(offset >= 0 && offset<=1);
     int eid_ptr = eid * 2;
     return edges[eid_ptr + offset];
 }
@@ -1513,5 +1514,22 @@ float Tetmesh::tet_min_u_text(const int tid) const
     return *std::min_element(vals, vals+4);
 }
 
+CINO_INLINE
+int Tetmesh::tet_shared_vertex(const int tid, const std::vector<int> & incident_edges) const
+{
+    assert(incident_edges.size() > 1);
+    assert(incident_edges.size() < 4);
+    int v_count[4] = { 0, 0, 0, 0 };
+    for(int e : incident_edges)
+    {
+        ++v_count[TET_EDGES[e][0]];
+        ++v_count[TET_EDGES[e][1]];
+    }
+    for(int i=0; i<4; ++i)
+    {
+        if (v_count[i] == (int)incident_edges.size()) return tet_vertex_id(tid,i);
+    }
+    return -1;
+}
 
 }

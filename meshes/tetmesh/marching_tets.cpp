@@ -147,26 +147,6 @@ void marching_tets(const Tetmesh          & m,
                             int e1[] = { 3, 5, 0 }; make_triangle(m, isovalue, vids, func, e1, edg2vid_map, split_info, coords, tris, norm); break; }
             default : break;
         }
-
-        // split_info generation
-        switch (c)
-        {
-            case C_1000 : break;
-            case C_0111 : break;
-            case C_1011 : break;
-            case C_0100 : break;
-            case C_1101 : break;
-            case C_0010 : break;
-            case C_0001 : break;
-            case C_1110 : break;
-            case C_0101 : break;
-            case C_1010 : break;
-            case C_0011 : break;
-            case C_1100 : break;
-            case C_1001 : break;
-            case C_0110 : break;
-            default : break;
-        }
     }
 }
 
@@ -233,7 +213,7 @@ void make_triangle(const Tetmesh          & m,
             // Tells me what mesh edges should be split
             if (alpha > 0 && alpha < 1)
             {
-                split_info[pair] = (pair.first == v_a) ? 1.0-alpha : alpha;
+                split_info[pair] = (v_a == pair.first) ? 1.0-alpha : alpha;
             }
         }
     }

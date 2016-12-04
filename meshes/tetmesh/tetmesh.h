@@ -268,6 +268,8 @@ class Tetmesh
         bool vertex_is_critical_point(const int vid) const;
         float tet_min_u_text(const int tid) const;
         int tet_edge_id(const int tid, const int vid0, const int vid1) const;
+
+        int tet_shared_vertex(const int tid, const std::vector<int> & incident_edges) const;
 };
 
 }

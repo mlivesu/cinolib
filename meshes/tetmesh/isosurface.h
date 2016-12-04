@@ -38,10 +38,13 @@ class Isosurface
         Isosurface(){}
         Isosurface(const Tetmesh & m, const float iso_value);
 
-        Trimesh export_as_trimesh()     const;
-        void    tessellate(Tetmesh & m) const;
+        Trimesh export_as_trimesh() const;
 
-protected:
+        void tessellate(std::vector<double> & coords,
+                        std::vector<uint>   & tets,
+                        std::vector<float>  & new_field) const;
+
+    protected:
 
         const Tetmesh         *m_ptr;
         float                  iso_value;

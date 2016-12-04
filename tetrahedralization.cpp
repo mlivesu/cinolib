@@ -22,8 +22,7 @@
 * for more details.                                                         *
 ****************************************************************************/
 
-#include "tetrahedralization.h"
-
+#include <cinolib/tetrahedralization.h>
 #include <set>
 
 namespace cinolib

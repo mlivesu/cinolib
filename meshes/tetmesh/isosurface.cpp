@@ -41,154 +41,181 @@ Trimesh Isosurface::export_as_trimesh() const
 }
 
 CINO_INLINE
-void Isosurface::tessellate(Tetmesh & m) const
+void Isosurface::tessellate(std::vector<double> & new_coords,
+                            std::vector<uint>   & new_tets,
+                            std::vector<float>  & new_field) const
 {
-    std::vector<double> coords = m.vector_coords();
-    std::vector<u_int>  tets ; //= m.vector_tets();
+    assert(new_coords.empty() && new_tets.empty());
+
+    new_coords = m_ptr->vector_coords();
     std::map<ipair,int> v_map;
+
+    new_field = m_ptr->vector_v_float_scalar();
 
     // add vertices at split points
     for(auto obj : split_info)
     {
-        v_map[obj.first] = coords.size()/3;
+        v_map[obj.first] = new_coords.size()/3;
 
         int    v_a   = obj.first.first;
         int    v_b   = obj.first.second;
         double alpha = obj.second;
-        vec3d  pos   = alpha*m.vertex(v_a) + (1.0-alpha)*m.vertex(v_b);
+        vec3d  pos   = alpha*m_ptr->vertex(v_a) + (1.0-alpha)*m_ptr->vertex(v_b);
+        float  f     = alpha*m_ptr->vertex_u_text(v_a) + (1.0-alpha)*m_ptr->vertex_u_text(v_b);
 
-        coords.push_back(pos.x());
-        coords.push_back(pos.y());
-        coords.push_back(pos.z());
+        new_coords.push_back(pos.x());
+        new_coords.push_back(pos.y());
+        new_coords.push_back(pos.z());
+
+        new_field.push_back(f);
     }
 
-    for(int tid=0; tid<m.num_tetrahedra(); ++tid)
+    for(int tid=0; tid<m_ptr->num_tetrahedra(); ++tid)
     {
-        int vids[] =
+        std::vector<int>  edges_split;
+        std::vector<int>  edges_not_split;
+        std::map<int,int> edges_vids;
+
+        for(int e=0; e<6; ++e)
         {
-            m.tet_vertex_id(tid, 0),
-            m.tet_vertex_id(tid, 1),
-            m.tet_vertex_id(tid, 2),
-            m.tet_vertex_id(tid, 3)
-        };
+            int   v_a   = m_ptr->tet_vertex_id(tid, TET_EDGES[e][0]);
+            int   v_b   = m_ptr->tet_vertex_id(tid, TET_EDGES[e][1]);
+            ipair eid   = unique_pair(v_a,v_b);
+            auto  query = v_map.find(eid);
 
-        float func[] =
-        {
-            m.vertex_u_text(vids[0]),
-            m.vertex_u_text(vids[1]),
-            m.vertex_u_text(vids[2]),
-            m.vertex_u_text(vids[3])
-        };
-
-        u_char c = 0x0;
-        if (iso_value >= func[0]) c |= C_1000;
-        if (iso_value >= func[1]) c |= C_0100;
-        if (iso_value >= func[2]) c |= C_0010;
-        if (iso_value >= func[3]) c |= C_0001;
-
-        // handle corner cases (i.e. when the iso-surface passes EXACTLY on a vertex/edge/face)...
-        switch (c)
-        {
-            /* there are some other cases to take into account!
-             * like iso-srf passing on a vertex and two edges....
-            */
-
-            // iso-surface passes on a vertex : do nothing
-            case C_1000 : { if (func[0] == iso_value) c = C_0000; break; }
-            case C_0100 : { if (func[1] == iso_value) c = C_0000; break; }
-            case C_0010 : { if (func[2] == iso_value) c = C_0000; break; }
-            case C_0001 : { if (func[3] == iso_value) c = C_0000; break; }
-
-            // iso-surface passes on a edge : do nothing
-            case C_0101 : { if (func[1] == iso_value && func[3] == iso_value) c = C_0000; break; }
-            case C_1010 : { if (func[0] == iso_value && func[2] == iso_value) c = C_0000; break; }
-            case C_0011 : { if (func[2] == iso_value && func[3] == iso_value) c = C_0000; break; }
-            case C_1100 : { if (func[0] == iso_value && func[1] == iso_value) c = C_0000; break; }
-            case C_1001 : { if (func[0] == iso_value && func[3] == iso_value) c = C_0000; break; }
-            case C_0110 : { if (func[1] == iso_value && func[2] == iso_value) c = C_0000; break; }
-
-            // iso-surface passes on a face : do nothing
-            case C_1110 : { if (func[0] == iso_value && func[1] == iso_value && func[2] == iso_value) c = C_0000; break; }
-            case C_1101 : { if (func[0] == iso_value && func[1] == iso_value && func[3] == iso_value) c = C_0000; break; }
-            case C_1011 : { if (func[0] == iso_value && func[2] == iso_value && func[3] == iso_value) c = C_0000; break; }
-            case C_0111 : { if (func[1] == iso_value && func[2] == iso_value && func[3] == iso_value) c = C_0000; break; }
-
-            default : break;            
+            if (query != v_map.end())
+            {
+                edges_split.push_back(e);
+                edges_vids[e] = query->second;
+            }
+            else edges_not_split.push_back(e);
         }
 
-        switch (c)
+        switch (edges_split.size())
         {
-
-            /*
-             * TODO:
-             * - testa anche il caso in cui la superfice stacca un quad dal tetra e non un tri
-             *   (usando il campo X anzichè Y dovrebbe succedere....)
-             * - pensa a come compattare il codice per comprendere tutti le possibili permutazioni
-             *   dei vertici per i due casi base (4 split/6 split)
-            */
-
-            case C_1110 :
+            case 0 : // replicate the whole tet
             {
-                ipair e0 = unique_pair(vids[TET_EDGES[4][0]], vids[TET_EDGES[4][1]]); assert(CONTAINS(v_map,e0));
-                ipair e1 = unique_pair(vids[TET_EDGES[3][0]], vids[TET_EDGES[3][1]]); assert(CONTAINS(v_map,e1));
-                ipair e2 = unique_pair(vids[TET_EDGES[5][0]], vids[TET_EDGES[5][1]]); assert(CONTAINS(v_map,e2));                
-                //
-                int prism[] =
-                {
-                    m.tet_vertex_id(tid,0),
-                    m.tet_vertex_id(tid,1),
-                    m.tet_vertex_id(tid,2),
-                    v_map[e0],
-                    v_map[e1],
-                    v_map[e2]
-                };
-                //
-                tets.push_back(prism[3]);
-                tets.push_back(prism[4]);
-                tets.push_back(prism[5]);
-                tets.push_back(m.tet_vertex_id(tid,3));
-                //
-                tetrahedralize_prism(prism, tets);
+                new_tets.push_back(m_ptr->tet_vertex_id(tid, 0));
+                new_tets.push_back(m_ptr->tet_vertex_id(tid, 1));
+                new_tets.push_back(m_ptr->tet_vertex_id(tid, 2));
+                new_tets.push_back(m_ptr->tet_vertex_id(tid, 3));
                 break;
             }
 
-            case C_1010 :
+            case 3 : // decompose the tet into a tet and a prism having triangular section
             {
-                ipair e0 = unique_pair(vids[TET_EDGES[1][0]], vids[TET_EDGES[1][1]]); assert(CONTAINS(v_map,e0));
-                ipair e1 = unique_pair(vids[TET_EDGES[2][0]], vids[TET_EDGES[2][1]]); assert(CONTAINS(v_map,e1));
-                ipair e2 = unique_pair(vids[TET_EDGES[4][0]], vids[TET_EDGES[4][1]]); assert(CONTAINS(v_map,e2));
-                ipair e3 = unique_pair(vids[TET_EDGES[5][0]], vids[TET_EDGES[5][1]]); assert(CONTAINS(v_map,e2));
-                //
-                int prism_1[] =
+                assert(edges_vids.size() == 3);
+                auto vids_it  = edges_vids.begin();
+                int  tet_tip  = m_ptr->tet_shared_vertex(tid, edges_split); assert(tet_tip!=-1);
+                int  prism[6] =
                 {
-                    m.tet_vertex_id(tid,3),
-                    v_map[e2],
-                    v_map[e3],
-                    m.tet_vertex_id(tid,1),
-                    v_map[e1],
-                    v_map[e0],
+                    m_ptr->tet_vertex_id(tid, TET_EDGES[edges_split[0]][0]),
+                    m_ptr->tet_vertex_id(tid, TET_EDGES[edges_split[1]][0]),
+                    m_ptr->tet_vertex_id(tid, TET_EDGES[edges_split[2]][0]),
+                    (  vids_it)->second,
+                    (++vids_it)->second,
+                    (++vids_it)->second,
                 };
+                if (prism[0] == tet_tip) prism[0] = m_ptr->tet_vertex_id(tid, TET_EDGES[edges_split[0]][1]);
+                if (prism[1] == tet_tip) prism[1] = m_ptr->tet_vertex_id(tid, TET_EDGES[edges_split[1]][1]);
+                if (prism[2] == tet_tip) prism[2] = m_ptr->tet_vertex_id(tid, TET_EDGES[edges_split[2]][1]);
                 //
-                int prism_2[] =
+                tetrahedralize_prism(prism, new_tets);
+                //
+                new_tets.push_back(tet_tip);
+                new_tets.push_back(prism[3]);
+                new_tets.push_back(prism[4]);
+                new_tets.push_back(prism[5]);
+                //
+                bool og_tet_was_flipped = m_ptr->tet_quality(tid) < 0;
+                for(int i=1; i<=4; ++i)
                 {
-                    m.tet_vertex_id(tid,0),
-                    v_map[e1],
-                    v_map[e2],
-                    m.tet_vertex_id(tid,2),
-                    v_map[e0],
-                    v_map[e3],
-                };
-                //
-                tetrahedralize_prism(prism_1, tets);
-                tetrahedralize_prism(prism_2, tets);
+                    int   base_ptr = new_tets.size() - (4*i);
+                    int   v0_ptr   = new_tets.at(base_ptr+0);
+                    int   v1_ptr   = new_tets.at(base_ptr+1);
+                    int   v2_ptr   = new_tets.at(base_ptr+2);
+                    int   v3_ptr   = new_tets.at(base_ptr+3);
+                    vec3d v0(new_coords.at(3*v0_ptr+0), new_coords.at(3*v0_ptr+1), new_coords.at(3*v0_ptr+2));
+                    vec3d v1(new_coords.at(3*v1_ptr+0), new_coords.at(3*v1_ptr+1), new_coords.at(3*v1_ptr+2));
+                    vec3d v2(new_coords.at(3*v2_ptr+0), new_coords.at(3*v2_ptr+1), new_coords.at(3*v2_ptr+2));
+                    vec3d v3(new_coords.at(3*v3_ptr+0), new_coords.at(3*v3_ptr+1), new_coords.at(3*v3_ptr+2));
+                    if (tet_scaled_jacobian(v0,v1,v2,v3) < 0 && !og_tet_was_flipped)
+                    {
+                        std::swap(new_tets.at(base_ptr+1),new_tets.at(base_ptr+3));
+                    }
+                }
                 break;
             }
 
-            default : break;
+            case 4 : // decompose the tet into two prisms having triangular section
+            {
+                assert(edges_not_split.size() == 2);
+                for(int e : edges_not_split)
+                {
+                    int top = TET_EDGES[e][0];
+                    int bot = TET_EDGES[e][1];
+                    std::vector<int> split_edges_top;
+                    std::vector<int> split_edges_bot;
+                    for(int i=0; i<3; ++i)
+                    {
+                        if (TET_INCIDENT_EDEGES[top][i] != e) split_edges_top.push_back(TET_INCIDENT_EDEGES[top][i]);
+                        if (TET_INCIDENT_EDEGES[bot][i] != e) split_edges_bot.push_back(TET_INCIDENT_EDEGES[bot][i]);
+                    }
+                    assert(split_edges_top.size() == 2);
+                    assert(split_edges_bot.size() == 2);
+                    //
+                    std::vector<int> tmp;
+                    tmp.push_back(split_edges_top.front());
+                    tmp.push_back(split_edges_bot.front());
+                    if (m_ptr->tet_shared_vertex(tid, tmp) == -1)
+                    {
+                        std::swap(split_edges_top[0], split_edges_top[1]);
+                        tmp.clear();
+                        tmp.push_back(split_edges_top.front());
+                        tmp.push_back(split_edges_bot.front());
+                        assert(m_ptr->tet_shared_vertex(tid, tmp) != -1);
+                    }
+                    //
+                    int prism[6] =
+                    {
+                        m_ptr->tet_vertex_id(tid, top),
+                        edges_vids.at(split_edges_top[0]),
+                        edges_vids.at(split_edges_top[1]),
+                        m_ptr->tet_vertex_id(tid, bot),
+                        edges_vids.at(split_edges_bot[0]),
+                        edges_vids.at(split_edges_bot[1]),
+                    };
+                    //
+                    tetrahedralize_prism(prism, new_tets);
+                    //
+                    bool og_tet_was_flipped = m_ptr->tet_quality(tid) < 0;
+                    for(int i=1; i<=6; ++i)
+                    {
+                        int   base_ptr = new_tets.size() - (4*i);
+                        int   v0_ptr   = new_tets.at(base_ptr+0);
+                        int   v1_ptr   = new_tets.at(base_ptr+1);
+                        int   v2_ptr   = new_tets.at(base_ptr+2);
+                        int   v3_ptr   = new_tets.at(base_ptr+3);
+                        vec3d v0(new_coords.at(3*v0_ptr+0), new_coords.at(3*v0_ptr+1), new_coords.at(3*v0_ptr+2));
+                        vec3d v1(new_coords.at(3*v1_ptr+0), new_coords.at(3*v1_ptr+1), new_coords.at(3*v1_ptr+2));
+                        vec3d v2(new_coords.at(3*v2_ptr+0), new_coords.at(3*v2_ptr+1), new_coords.at(3*v2_ptr+2));
+                        vec3d v3(new_coords.at(3*v3_ptr+0), new_coords.at(3*v3_ptr+1), new_coords.at(3*v3_ptr+2));
+                        if (tet_scaled_jacobian(v0,v1,v2,v3) < 0 && !og_tet_was_flipped)
+                        {
+                            std::swap(new_tets.at(base_ptr+1),new_tets.at(base_ptr+3));
+                        }
+                    }
+                }
+                break;
+            }
+
+            default:
+            {
+                std::cerr << edges_split.size() << " edges attraversati!!!!!" << std::endl;
+                assert(false);
+            }
         }
     }
-
-    m = Tetmesh(coords, tets);
 }
 
 }
