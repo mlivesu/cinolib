@@ -178,7 +178,7 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
 
             default:
             {
-                std::cerr << edges_split.size() << " edges attraversati!!!!!" << std::endl;
+                std::cerr << edges_split.size() << " edges traversed!!!!!" << std::endl;
                 assert(false);
             }
         }
