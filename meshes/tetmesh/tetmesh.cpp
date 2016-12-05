@@ -1532,4 +1532,18 @@ int Tetmesh::tet_shared_vertex(const int tid, const std::vector<int> & incident_
     return -1;
 }
 
+CINO_INLINE
+int Tetmesh::edge_incidtent_to(const int vid_0, const int vid_1) const
+{
+    assert(vid_0 >= 0 && vid_0 < num_vertices());
+    assert(vid_1 >= 0 && vid_1 < num_vertices());
+
+    for(int eid : adj_vtx2edg(vid_0))
+    {
+        if (edge_contains_vertex(eid, vid_1)) return eid;
+    }
+    return -1;
+}
+
+
 }

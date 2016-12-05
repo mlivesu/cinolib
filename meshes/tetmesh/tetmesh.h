@@ -270,6 +270,8 @@ class Tetmesh
         int tet_edge_id(const int tid, const int vid0, const int vid1) const;
 
         int tet_shared_vertex(const int tid, const std::vector<int> & incident_edges) const;
+
+        int edge_incidtent_to(const int vid_0, const int vid_1) const;
 };
 
 }
