@@ -44,6 +44,8 @@ class Isosurface
                         std::vector<uint>   & tets,
                         std::vector<float>  & new_field) const;
 
+        const std::map<ipair,double> & edges_split() const { return split_info; }
+
     protected:
 
         void fix_subtet_orientation(const int                   tid,
