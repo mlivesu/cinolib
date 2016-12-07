@@ -371,8 +371,19 @@ void Trimesh::save(const char * filename) const
     if (filetype.compare("obj") == 0 ||
         filetype.compare("OBJ") == 0)
     {
+        int  min = *std::min_element(t_label.begin(), t_label.end());
+        int  max = *std::max_element(t_label.begin(), t_label.end());
+
         std::vector<uint> quads; // empty
-        write_OBJ(filename, coords, tris, quads);
+
+        if (max != min) // save colored mesh
+        {
+            write_OBJ(filename, coords, tris, quads, t_label);
+        }
+        else  // save mesh without colors
+        {
+            write_OBJ(filename, coords, tris, quads);
+        }
     }
     else
     {
