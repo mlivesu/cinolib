@@ -131,6 +131,20 @@ bool triangle_barycentric_coords(const vec3d  & A,
 
 
 CINO_INLINE
+bool triangle_point_is_inside(const vec3d  & A,
+                              const vec3d  & B,
+                              const vec3d  & C,
+                              const vec3d  & P,
+                              const double   tol)
+{
+    // NOTE : it assumes the four points are coplanar!
+    std::vector<double> wgts;
+    return triangle_barycentric_coords(A, B, C, P, wgts, tol);
+}
+
+
+
+CINO_INLINE
 bool triangle_bary_is_vertex(const std::vector<double> & bary,
                              int                       & vid,
                              const double                tol)

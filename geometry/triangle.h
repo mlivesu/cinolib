@@ -78,6 +78,13 @@ bool triangle_barycentric_coords(const vec3d  & A,
                                  const double   tol = 1e-5);
 
 CINO_INLINE
+bool triangle_point_is_inside(const vec3d  & A,
+                              const vec3d  & B,
+                              const vec3d  & C,
+                              const vec3d  & P,
+                              const double   tol = 0.0);
+
+CINO_INLINE
 bool triangle_bary_is_vertex(const std::vector<double> & bary,
                              int                       & vid, // 0,1,2
                              const double                tol = 1e-5);
