@@ -860,7 +860,7 @@ void Trimesh::operator+=(const Trimesh & m)
         tri2edg.push_back(tmp);
 
         tmp.clear();
-        for(int tid : m.tri2tri[tid]) tmp.push_back(nt + tid);
+        for(int nbr : m.tri2tri[tid]) tmp.push_back(nt + nbr);
         tri2tri.push_back(tmp);
     }
     for(int eid=0; eid<m.num_edges(); ++eid)
@@ -1152,7 +1152,7 @@ bool Trimesh::edge_collapse(const int eid)
     for(uint vid : adj_vtx2vtx(vid_remove))
     {
         assert(vid!=vid_remove);
-        assert(vid>=0 && int(vid)<num_vertices());
+        assert(/*vid>=0 && */int(vid)<num_vertices());
 
         auto beg = vtx2vtx.at(vid).begin();
         auto end = vtx2vtx.at(vid).end();
