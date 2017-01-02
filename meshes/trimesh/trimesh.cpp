@@ -919,26 +919,30 @@ void Trimesh::center_bbox()
 CINO_INLINE
 void Trimesh::check_topology() const
 {
+#ifndef NDEBUG
     for(int vid=0; vid<num_vertices(); ++vid)
     {
-        for(__attribute__((unused)) int nbr : adj_vtx2vtx(vid)) assert(nbr >= 0 && nbr < num_vertices());
-        for(__attribute__((unused)) int nbr : adj_vtx2edg(vid)) assert(nbr >= 0 && nbr < num_edges());
-        for(__attribute__((unused)) int nbr : adj_vtx2tri(vid)) assert(nbr >= 0 && nbr < num_triangles());
+        for(int nbr : adj_vtx2vtx(vid)) assert(nbr >= 0 && nbr < num_vertices());
+        for(int nbr : adj_vtx2edg(vid)) assert(nbr >= 0 && nbr < num_edges());
+        for(int nbr : adj_vtx2tri(vid)) assert(nbr >= 0 && nbr < num_triangles());
     }
     for(int eid=0; eid<num_edges(); ++eid)
     {
         assert(edge_vertex_id(eid,0) >= 0 && edge_vertex_id(eid,0) < num_vertices());
         assert(edge_vertex_id(eid,1) >= 0 && edge_vertex_id(eid,1) < num_vertices());
-        for(__attribute__((unused)) int nbr : adj_edg2tri(eid)) assert(nbr >= 0 && nbr < num_triangles());
+        for(int nbr : adj_edg2tri(eid)) assert(nbr >= 0 && nbr < num_triangles());
     }
     for(int tid=0; tid<num_triangles(); ++tid)
     {
         assert(triangle_vertex_id(tid,0) >= 0 && triangle_vertex_id(tid,0) < num_vertices());
         assert(triangle_vertex_id(tid,1) >= 0 && triangle_vertex_id(tid,1) < num_vertices());
         assert(triangle_vertex_id(tid,2) >= 0 && triangle_vertex_id(tid,2) < num_vertices());
-        for(__attribute__((unused)) int nbr : adj_tri2tri(tid)) assert(nbr >= 0 && nbr < num_triangles());
-        for(__attribute__((unused)) int nbr : adj_tri2edg(tid)) assert(nbr >= 0 && nbr < num_edges());
+        for(int nbr : adj_tri2tri(tid)) assert(nbr >= 0 && nbr < num_triangles());
+        for(int nbr : adj_tri2edg(tid)) assert(nbr >= 0 && nbr < num_edges());
     }
+#else
+    std::cerr << "Trimesh::check_topology() - disable NDEBUG!!!" << std::endl;
+#endif
 }
 
 CINO_INLINE
@@ -1653,15 +1657,17 @@ void Trimesh::triangle_switch_id(const int tid0, const int tid1)
 CINO_INLINE
 void Trimesh::remove_unreferenced_triangle(const int tid)
 {
-    __attribute__((unused)) uint v1 = tris.at(tid*3+0);
-    __attribute__((unused)) uint v2 = tris.at(tid*3+1);
-    __attribute__((unused)) uint v3 = tris.at(tid*3+2);
-
     triangle_switch_id(tid, num_triangles()-1);
+
+#ifndef NDEBUG
+    uint v1 = tris.at(tid*3+0);
+    uint v2 = tris.at(tid*3+1);
+    uint v3 = tris.at(tid*3+2);
 
     assert (tris.at((num_triangles()-1)*3+0) == v1);
     assert (tris.at((num_triangles()-1)*3+1) == v2);
     assert (tris.at((num_triangles()-1)*3+2) == v3);
+#endif
 
     tris.resize(tris.size()-3);
     t_norm.resize(t_norm.size()-3);
