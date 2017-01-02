@@ -438,12 +438,12 @@ int Trimesh::edge_opposite_to(const int tid, const int vid) const
 CINO_INLINE
 double Trimesh::triangle_angle_at_vertex(const int tid, const int vid, const bool rad) const
 {
-    __attribute__((unused)) int i;
+    int i;
 
          if (triangle_vertex_id(tid,0) == vid) i = 0;
     else if (triangle_vertex_id(tid,1) == vid) i = 1;
     else if (triangle_vertex_id(tid,2) == vid) i = 2;
-    else assert(false);
+    else assert(false); i=0;// sometimes-uninitialized warning killer
 
     vec3d P = vertex(vid);
     vec3d u = triangle_vertex(tid, (i+1)%3) - P;
