@@ -79,6 +79,7 @@ void Trimesh::init()
     update_normals();
 
     u_text.resize(num_vertices(), 0.0);
+    for(int vid=0; vid<num_vertices(); ++vid) set_vertex_u_text(vid, vertex(vid).z());
     if (static_cast<int>(t_label.size()) != num_triangles()) t_label.resize(num_triangles(), 0);
 }
 
@@ -406,6 +407,7 @@ int Trimesh::vertex_opposite_to(const int tid, const int vid0, const int vid1) c
         if (vid != vid0 && vid != vid1) return vid;
     }
     assert(false);
+    return -1;
 }
 
 CINO_INLINE
@@ -430,12 +432,13 @@ int Trimesh::edge_opposite_to(const int tid, const int vid) const
 
     logger << " Triangle: " << tid << " [ " << tris.at(tid*3+0) << " " << tris.at(tid*3+1) << " " << tris.at(tid*3+2) << " ] " << endl;
     assert(false);
+    return -1;
 }
 
 CINO_INLINE
 double Trimesh::triangle_angle_at_vertex(const int tid, const int vid, const bool rad) const
 {
-    int i;
+    __attribute__((unused)) int i;
 
          if (triangle_vertex_id(tid,0) == vid) i = 0;
     else if (triangle_vertex_id(tid,1) == vid) i = 1;
@@ -614,6 +617,7 @@ int Trimesh::triangle_vertex_offset(const int tid, const int vid) const
         if (triangle_vertex_id(tid,off) == vid) return off;
     }
     assert(false);
+    return -1;
 }
 
 CINO_INLINE
@@ -644,7 +648,7 @@ vec3d Trimesh::vertex(const int vid) const
 }
 
 CINO_INLINE
-void Trimesh::set_vertex(const int vid, const vec3d &pos)
+void Trimesh::set_vertex(const int vid, const vec3d & pos)
 {
     int vid_ptr = vid * 3;
     coords.at(vid_ptr + 0) = pos.x();
@@ -686,6 +690,7 @@ int Trimesh::triangle_edge_local_to_global(const int tid, const int off) const
         }
     }
     assert(false && "Something is off here...");
+    return -1;
 }
 
 CINO_INLINE
@@ -916,23 +921,23 @@ void Trimesh::check_topology() const
 {
     for(int vid=0; vid<num_vertices(); ++vid)
     {
-        for(int nbr : adj_vtx2vtx(vid)) assert(nbr >= 0 && nbr < num_vertices());
-        for(int nbr : adj_vtx2edg(vid)) assert(nbr >= 0 && nbr < num_edges());
-        for(int nbr : adj_vtx2tri(vid)) assert(nbr >= 0 && nbr < num_triangles());
+        for(__attribute__((unused)) int nbr : adj_vtx2vtx(vid)) assert(nbr >= 0 && nbr < num_vertices());
+        for(__attribute__((unused)) int nbr : adj_vtx2edg(vid)) assert(nbr >= 0 && nbr < num_edges());
+        for(__attribute__((unused)) int nbr : adj_vtx2tri(vid)) assert(nbr >= 0 && nbr < num_triangles());
     }
     for(int eid=0; eid<num_edges(); ++eid)
     {
         assert(edge_vertex_id(eid,0) >= 0 && edge_vertex_id(eid,0) < num_vertices());
         assert(edge_vertex_id(eid,1) >= 0 && edge_vertex_id(eid,1) < num_vertices());
-        for(int nbr : adj_edg2tri(eid)) assert(nbr >= 0 && nbr < num_triangles());
+        for(__attribute__((unused)) int nbr : adj_edg2tri(eid)) assert(nbr >= 0 && nbr < num_triangles());
     }
     for(int tid=0; tid<num_triangles(); ++tid)
     {
         assert(triangle_vertex_id(tid,0) >= 0 && triangle_vertex_id(tid,0) < num_vertices());
         assert(triangle_vertex_id(tid,1) >= 0 && triangle_vertex_id(tid,1) < num_vertices());
         assert(triangle_vertex_id(tid,2) >= 0 && triangle_vertex_id(tid,2) < num_vertices());
-        for(int nbr : adj_tri2tri(tid)) assert(nbr >= 0 && nbr < num_triangles());
-        for(int nbr : adj_tri2edg(tid)) assert(nbr >= 0 && nbr < num_edges());
+        for(__attribute__((unused)) int nbr : adj_tri2tri(tid)) assert(nbr >= 0 && nbr < num_triangles());
+        for(__attribute__((unused)) int nbr : adj_tri2edg(tid)) assert(nbr >= 0 && nbr < num_edges());
     }
 }
 
@@ -1457,6 +1462,7 @@ int Trimesh::shared_vertex(const int eid0, const int eid1) const
     if (e01 == e10 || e01 == e11) return e01;
 
     assert(false);
+    return -1;
 }
 
 CINO_INLINE
@@ -1472,6 +1478,7 @@ int Trimesh::shared_triangle(const int eid0, const int eid1) const
     }
 
     assert(false);
+    return -1;
 }
 
 
@@ -1545,6 +1552,7 @@ int Trimesh::triangle_adjacent_along(const int tid, const int vid0, const int vi
         }
     }
     assert(false);
+    return -1;
 }
 
 CINO_INLINE
@@ -1645,9 +1653,9 @@ void Trimesh::triangle_switch_id(const int tid0, const int tid1)
 CINO_INLINE
 void Trimesh::remove_unreferenced_triangle(const int tid)
 {
-    uint v1 = tris.at(tid*3+0);
-    uint v2 = tris.at(tid*3+1);
-    uint v3 = tris.at(tid*3+2);
+    __attribute__((unused)) uint v1 = tris.at(tid*3+0);
+    __attribute__((unused)) uint v2 = tris.at(tid*3+1);
+    __attribute__((unused)) uint v3 = tris.at(tid*3+2);
 
     triangle_switch_id(tid, num_triangles()-1);
 

@@ -715,6 +715,7 @@ int Tetmesh::tet_vertex_offset(const int tid, const int vid) const
         if (tet_vertex_id(tid,off) == vid) return off;
     }
     assert(false);
+    return -1;
 }
 
 CINO_INLINE
@@ -883,6 +884,7 @@ int Tetmesh::tet_vertex_opposite_to(const int tid, const int facet) const
         }
     }
     assert(false);
+    return -1;
 }
 
 CINO_INLINE
@@ -899,6 +901,7 @@ int Tetmesh::tet_face_opposite_to(const int tid, const int vid) const
         }
     }
     assert(false);
+    return -1;
 }
 
 CINO_INLINE
@@ -914,6 +917,7 @@ int Tetmesh::tet_edge_id(const int tid, const int vid0, const int vid1) const
         if (unique_pair(edge_vertex_id(eid,0), edge_vertex_id(eid,1))==ref) return eid;
     }
     assert(false);
+    return -1;
 }
 
 
@@ -930,6 +934,7 @@ int Tetmesh::tet_edge_opposite_to(const int tid, const int vid0, const int vid1)
         if ((e0!=vid0 && e1!=vid1)  || (e0!=vid1 && e1!=vid0)) return i;
     }
     assert(false);
+    return -1;
 }
 
 CINO_INLINE

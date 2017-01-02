@@ -326,7 +326,7 @@ void Isocontour::match(Isocontour & contour, std::set< std::pair<int,int> > & cu
                     int   vid0 = m_ptr->edge_vertex_id(eid, 0);
                     int   vid1 = m_ptr->edge_vertex_id(eid, 1);
                     float val0 = m_ptr->vertex_u_text(vid0);
-                    float val1 = m_ptr->vertex_u_text(vid1);
+                    __attribute__((unused)) float val1 = m_ptr->vertex_u_text(vid1);
 
                     std::vector<int> edges;
                     if (is_into_interval(val0, this->iso_value, contour.iso_value))

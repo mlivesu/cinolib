@@ -67,7 +67,7 @@ CINO_INLINE std::ostream & operator<<(std::ostream & in, const ipair & p)
 }
 
 template<typename C>
-CINO_INLINE void CHECK_BOUNDS(const C & container, int index)
+CINO_INLINE void CHECK_BOUNDS(__attribute__((unused)) const C & container, __attribute__((unused)) int index)
 {
     assert(index >= 0);
     assert(index < (int)container.size());
