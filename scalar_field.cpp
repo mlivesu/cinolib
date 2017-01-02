@@ -47,6 +47,11 @@ ScalarField::ScalarField(const int size)
     setZero(size);
 }
 
+CINO_INLINE
+ScalarField::ScalarField(const char *filename)
+{
+    deserialize(filename);
+}
 
 
 template<class Mesh>
