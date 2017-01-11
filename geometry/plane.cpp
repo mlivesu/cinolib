@@ -82,8 +82,9 @@ double Plane::point_plane_dist(const vec3d & p) const
 {
     assert(fabs(n.length()-1.0) < 1e-10);
     vec3d u = p - this->p;
+    if (u.length() == 0) return 0;
     double dist = fabs(u.dot(n));
-    //assert(dist >= 0);
+    assert(dist >= 0);
     return dist;
 }
 
