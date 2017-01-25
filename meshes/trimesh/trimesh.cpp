@@ -443,7 +443,7 @@ double Trimesh::triangle_angle_at_vertex(const int tid, const int vid, const boo
          if (triangle_vertex_id(tid,0) == vid) i = 0;
     else if (triangle_vertex_id(tid,1) == vid) i = 1;
     else if (triangle_vertex_id(tid,2) == vid) i = 2;
-    else assert(false); i=0;// sometimes-uninitialized warning killer
+    else { assert(false); i=0; } // sometimes-uninitialized warning killer
 
     vec3d P = vertex(vid);
     vec3d u = triangle_vertex(tid, (i+1)%3) - P;
