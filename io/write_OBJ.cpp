@@ -78,7 +78,8 @@ void write_OBJ(const char                * filename,
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
     std::string mtl_filename(filename);
-    mtl_filename.append(".mtl");
+    mtl_filename.resize(mtl_filename.size()-4);
+    mtl_filename.append(".mtu");
 
     FILE *f_mtl = fopen(mtl_filename.c_str(), "w");
     FILE *f_obj = fopen(filename, "w");
