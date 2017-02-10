@@ -1292,7 +1292,7 @@ Trimesh Tetmesh::export_surface(std::map<int,int> & tet2tri_map,
         srf.push_back(tet2tri_map[tris[i]]);
     }
     logger.disable();
-    Trimesh m(coords, tris);
+    Trimesh m(coords, srf);
     logger.enable();
     return m;
 }
