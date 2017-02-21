@@ -144,7 +144,7 @@ void Trimesh::update_adjacency()
         std::vector<int> tids = it->second;
         //assert(tids.size() <= 2 && "Non manifold edge!");
         //assert(tids.size() >= 1 && "Non manifold edge!");
-        //if (tids.size() > 2 || tids.size() < 1) cerr << "Non manifold edge! " << edge_vertex(eid, 0) << "\t" << edge_vertex(eid, 1) << endl;
+        if (tids.size() > 2 || tids.size() < 1) std::cerr << "Non manifold edge! " << edge_vertex(eid, 0) << "\t" << edge_vertex(eid, 1) << std::endl;
 
         for(int tid : tids)
         {

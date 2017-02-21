@@ -214,12 +214,18 @@ void Tetmesh::clear()
 CINO_INLINE
 void Tetmesh::init()
 {
+    if (num_vertices() == 0 || num_tetrahedra() == 0)
+    {
+        std::cerr << "WARNING: empty mesh!" << std::endl;
+        return;
+    }
+
     u_text.resize(num_vertices());
     t_label.resize(num_tetrahedra());
 
     for(int vid=0; vid<num_vertices(); ++vid)
     {
-        u_text[vid] = vertex(vid).y();
+        u_text.at(vid) = vertex(vid).y();
     }
     normalize_u_text_field();
 
@@ -605,7 +611,7 @@ CINO_INLINE
 vec3d Tetmesh::vertex(const int vid) const
 {
     int vid_ptr = vid * 3;
-    return vec3d(coords[vid_ptr+0], coords[vid_ptr+1], coords[vid_ptr+2]);
+    return vec3d(coords.at(vid_ptr+0), coords.at(vid_ptr+1), coords.at(vid_ptr+2));
 }
 
 CINO_INLINE

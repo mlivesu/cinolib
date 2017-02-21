@@ -1,3 +1,8 @@
+- transform timer in a profiler class with internal string to be printed at the end
+  and summary of times spent in each function… (it’s a tree!!!!!!)
+- ripensa a meshes per facilitare cambi topologia (add/remove/split elements)
+- template meshes su tre strutture v_data, e_data, f_data…
+- usa global toggles per abilitare/disablitare funzioni di log (e.g. nn manifoldness)
 - re-ingegnerizza PointInsideMeshCache, dovrebbe restituire TUTTI gli elementi 
   che contengono un punto e lasciare la selezione dell’elemento migliore alle 
   applicazioni che lo utilizzano….
@@ -14,7 +19,6 @@ Geometric Robustness di Jonathan Richard Shewchuk)
 - aggiungi classe quad layout, per navigare un quad layout
 - genera classe base Mesh, che possiede tutte le caratteristiche comuni 
   alle varie mesh (chiama tris, quads, ecc, => elements)
-- IMPORTANTE: riscrivi creazione matrice quadrata con BCs, è lenta da paura!
 - aggiungi normalizzazione per il cotan laplacian, after
 https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html
 - passa agli iteratori al posto di restituire vettori con le adiacenze

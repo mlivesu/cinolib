@@ -92,7 +92,7 @@ void tetgen_wrap(const std::vector<double> & coords_in,
 
     // tetgen options
     //
-    std::string s = flags + "p";
+    std::string s = "p" + flags;
 
     tetrahedralize(const_cast<char*>(s.c_str()), &in, &out);
 
