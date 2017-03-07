@@ -77,6 +77,7 @@ CINO_INLINE
 void Curve::reverse()
 {
     std::reverse(sample_list.begin(), sample_list.end());
+    update_arc_length_param();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -202,6 +203,16 @@ void Curve::pop_back()
 {
     sample_list.pop_back();
     update_arc_length_param();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Curve::pop_front() // inefficient! - do it properly
+{
+    reverse();
+    pop_back();
+    reverse();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

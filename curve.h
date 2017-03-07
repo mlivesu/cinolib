@@ -75,6 +75,7 @@ class Curve
         void append_sample(const vec3d  & s);
         void append_sample(const Sample & s);
         void pop_back();
+        void pop_front(); // inefficient! - do it properly
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
