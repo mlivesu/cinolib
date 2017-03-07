@@ -40,7 +40,7 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
     assert(A.rows() == A.cols());
 
     char msg[1024];
-    sprintf(msg, "Linear solve - %d x %d Matrix - %s", A.rows(), A.cols(), txt[solver].c_str());
+    sprintf(msg, "Linear solve - %ld x %ld Matrix - %s", A.rows(), A.cols(), txt[solver].c_str());
 
     timer_start(msg);
 
@@ -182,7 +182,7 @@ void solve_least_squares(const Eigen::SparseMatrix<double> & A,
                          int   solver)
 {
     char msg[1024];
-    sprintf(msg, "Least Squares Solve - %d x %d Matrix - %s", A.rows(), A.cols(), txt[solver].c_str());
+    sprintf(msg, "Least Squares Solve - %ld x %ld Matrix - %s", A.rows(), A.cols(), txt[solver].c_str());
 
     timer_start(msg);
 

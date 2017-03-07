@@ -239,13 +239,13 @@ void Hexmesh::update_interior_adjacency()
     typedef std::map<ipair, std::vector<int> > mymap;
     mymap edge_hex_map;
 
-    for(int hid=0; hid<num_hexahedra(); ++hid)
+    for(uint hid=0; hid<(uint)num_hexahedra(); ++hid)
     {
-        int hid_ptr = hid * 8;
-        int vids[8] =
+        uint hid_ptr = hid * 8;
+        uint vids[8] =
         {
-            hexa[hid_ptr + 0], hexa[hid_ptr + 1], hexa[hid_ptr + 2], hexa[hid_ptr + 3],
-            hexa[hid_ptr + 4], hexa[hid_ptr + 5], hexa[hid_ptr + 6], hexa[hid_ptr + 7],
+            hexa.at(hid_ptr + 0), hexa.at(hid_ptr + 1), hexa.at(hid_ptr + 2), hexa.at(hid_ptr + 3),
+            hexa.at(hid_ptr + 4), hexa.at(hid_ptr + 5), hexa.at(hid_ptr + 6), hexa.at(hid_ptr + 7),
         };
 
         for(int vid=0; vid<8; ++vid)
