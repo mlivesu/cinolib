@@ -94,7 +94,7 @@ void ScalarField::normalize_in_01()
 
 
 CINO_INLINE
-double ScalarField::min_element() const
+int ScalarField::min_element_index() const
 {
     double min_val =  FLT_MAX;
     int    min_el  = -1;
