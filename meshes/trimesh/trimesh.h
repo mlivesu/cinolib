@@ -176,6 +176,7 @@ class Trimesh
         bool                        triangle_contains_vertex(const int tid, const int vid) const;
         int                         triangle_adjacent_along(const int tid, const int vid0, const int vid1) const;
         double                      element_mass(const int tid) const;
+        double                      triangle_area(const int tid) const;
         vec3d                       element_barycenter(const int tid) const;
         void                        set_triangle(const int tid, const int vid0, const int vid1, const int vid2);
         double                      triangle_angle_at_vertex(const int tid, const int vid, const bool rad = true) const;

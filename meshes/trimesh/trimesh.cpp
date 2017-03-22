@@ -144,7 +144,7 @@ void Trimesh::update_adjacency()
         std::vector<int> tids = it->second;
         //assert(tids.size() <= 2 && "Non manifold edge!");
         //assert(tids.size() >= 1 && "Non manifold edge!");
-        if (tids.size() > 2 || tids.size() < 1) std::cerr << "Non manifold edge! " << edge_vertex(eid, 0) << "\t" << edge_vertex(eid, 1) << std::endl;
+        //if (tids.size() > 2 || tids.size() < 1) std::cerr << "Non manifold edge! " << edge_vertex(eid, 0) << "\t" << edge_vertex(eid, 1) << std::endl;
 
         for(int tid : tids)
         {
@@ -497,6 +497,12 @@ bool Trimesh::triangle_is_needle(const int tid, const double angle_thresh_deg) c
         if (u.angle_deg(v) < angle_thresh_deg) return true;
     }
     return false;
+}
+
+CINO_INLINE
+double Trimesh::triangle_area(const int tid) const
+{
+    return element_mass(tid);
 }
 
 CINO_INLINE
