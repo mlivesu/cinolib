@@ -446,8 +446,8 @@ void Tetmesh::update_surface_adjacency()
         std::vector<int> tris = edg2tri[eid];
         if (!(tris.empty() || tris.size() == 2))
         {
-            logger << "\tedge " << eid << " is non manifold! " << tris.size() << endl;
-            logger << edge_vertex(eid,0) << "\t" << edge_vertex(eid,1) << endl;
+            //logger << "\tedge " << eid << " is non manifold! " << tris.size() << endl;
+            //logger << edge_vertex(eid,0) << "\t" << edge_vertex(eid,1) << endl;
             u_text[edge_vertex_id(eid,0)] = 10.0;
             u_text[edge_vertex_id(eid,1)] = 10.0;
         }

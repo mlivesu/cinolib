@@ -414,8 +414,8 @@ void Hexmesh::update_surface_adjacency()
         std::vector<int> quads = edg2quad[eid];
         if (!(quads.empty() || quads.size() == 2))
         {
-            logger << "\tedge " << eid << " is non manifold! " << quads.size() << endl;
-            logger << edge_vertex(eid,0) << "\t" << edge_vertex(eid,1) << endl;
+            //logger << "\tedge " << eid << " is non manifold! " << quads.size() << endl;
+            //logger << edge_vertex(eid,0) << "\t" << edge_vertex(eid,1) << endl;
             u_text[edge_vertex_id(eid,0)] = 10.0;
             u_text[edge_vertex_id(eid,1)] = 10.0;
         }
