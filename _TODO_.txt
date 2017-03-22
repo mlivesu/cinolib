@@ -1,3 +1,32 @@
+USE THIS REPRESENTATION TO HANDLE ALL THE RENDERINGS… (volumetric meshes will have two instances of it, one for the skin and one for the exposed interior when in sliced mode)
+this will also enable slicing for surface meshes…
+typedef struct
+{
+          int                  draw_mode;
+          GLenum               face_type;
+    const std::vector<double> *coords           = NULL;
+    const std::vector<uint>   *faces            = NULL;
+    const std::vector<double> *v_norms          = NULL;
+    const std::vector<double> *f_norms          = NULL;
+    const std::vector<float>  *v_colors         = NULL;
+    const std::vector<float>  *f_colors         = NULL;
+    const float               *wireframe_color  = NULL;
+          int                  wireframe_width;
+          GLuint              *text1D_id        = NULL;
+    const std::vector<float>  *text1D_coords    = NULL;
+          GLuint              *text2D_id        = NULL;
+    const std::vector<float>  *text2D_coords    = NULL;
+    ———————————————————————————————————————————————————
+    const std::vector<double> *border_coords    = NULL;
+    const std::vector<uint>   *border_segs      = NULL;
+    const float               *border_color     = NULL;
+          int                  border_width;
+    ———————————————————————————————————————————————————
+          bool  	       udpate_v_normals = false;
+          bool  	       udpate_f_normals = false;
+	  bool     	       update_f_colors  = false; // (segmentation changed…)
+}
+
 - transform timer in a profiler class with internal string to be printed at the end
   and summary of times spent in each function… (it’s a tree!!!!!!)
 - ripensa a meshes per facilitare cambi topologia (add/remove/split elements)
@@ -7,11 +36,9 @@
   che contengono un punto e lasciare la selezione dell’elemento migliore alle 
   applicazioni che lo utilizzano….
 - aggiungi DrawableOctree
-- aggiungi classe RAY per gestire raggi e classe line per gestire linee
 - aggiungi show triangle IDs and vertex IDs!!!!! (stile remesher panozzo/tarini)
 - aggiungi due spinboxes per controllare gli estremi degli isovalori per il generatore delle isosuperfici
 - aggiungi controlli sulla mesh delle isosuperfici (colore, wireframe, ecc)
-- sposta tutte le implementazioni sui cpp (duplicando gli inline sia su .h che su .cpp, come fanno in libIGL)
 - crea una curve_netowrk class e usala per scheletri, gestures e sharp features
 - aggiungi cache per solver, in modo da recuperare tempo e non rifattorizzare la stessa matrice più volte
 - passa a robust geometric computations (volumi, angoli diedri…) (vedi Lecture Notes on
