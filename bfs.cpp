@@ -56,6 +56,43 @@ void bfs_exahustive(const Mesh          & m,
 }
 
 
+// floodfill (with barriers) on the dual mesh (faces instead of vertices)
+// The path cannot pass through faces for which mask[f] = true
+//
+template<class Mesh>
+CINO_INLINE
+void bfs_exahustive_on_dual(const Mesh              & m,
+                            const int                 source,
+                            const std::vector<bool> & mask,
+                                  std::set<int>     & visited)
+{
+    assert(visited.empty());
+
+    std::set<int> active_set;
+    active_set.insert(source);
+
+    int tid;
+    while (!active_set.empty())
+    {
+        tid = *active_set.begin();
+        active_set.erase(active_set.begin());
+
+        visited.insert(tid);
+
+        for(int nbr : m.adj_tri2tri(tid))
+        {
+            if (mask.at(nbr)) continue;
+            if (DOES_NOT_CONTAIN(visited,nbr))
+            {
+                active_set.insert(nbr);
+            }
+        }
+    }
+}
+
+
+
+
 // shortest path on unweighted graph, essentially dijkstra with constaint weights.
 //
 template<class Mesh>
