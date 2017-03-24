@@ -413,10 +413,10 @@ int Trimesh::vertex_opposite_to(const int tid, const int vid0, const int vid1) c
 CINO_INLINE
 int Trimesh::vertex_opposite_to(const int eid, const int vid) const
 {
+    assert(edge_contains_vertex(eid, vid));
     int v = edge_vertex_id(eid, 0);
     if (v != vid) return v;
-    return edge_vertex_id(eid, 1);
-    assert(false);
+    else          return edge_vertex_id(eid, 1);
 }
 
 CINO_INLINE
