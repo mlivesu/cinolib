@@ -74,20 +74,12 @@ void marching_tets(const Tetmesh          & m,
 
     for(int tid=0; tid<m.num_tetrahedra(); ++tid)
     {
-        int vids[] =
-        {
-            m.tet_vertex_id(tid, 0),
-            m.tet_vertex_id(tid, 1),
-            m.tet_vertex_id(tid, 2),
-            m.tet_vertex_id(tid, 3)
-        };
-
         float func[] =
         {
-            m.vertex_u_text(vids[0]),
-            m.vertex_u_text(vids[1]),
-            m.vertex_u_text(vids[2]),
-            m.vertex_u_text(vids[3])
+            m.vertex_u_text( m.tet_vertex_id(tid,0) ),
+            m.vertex_u_text( m.tet_vertex_id(tid,1) ),
+            m.vertex_u_text( m.tet_vertex_id(tid,2) ),
+            m.vertex_u_text( m.tet_vertex_id(tid,3) )
         };
 
         if (isovalue >= func[0]) c.at(tid) |= C_1000;
@@ -151,6 +143,7 @@ void marching_tets(const Tetmesh          & m,
         switch (c.at(tid))
         {
             // iso-surface passes on a face : make sure only one tet (MUST BE the one with higher tid) triggers triangle generation...
+            // Notice that if the adjacent tet is collapsed (C_1111), then it make sense to use the current one regardless the tid order
             case C_1110 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[2] && tid < adj_tet[0] && c.at(adj_tet[0]) != C_1111) c.at(tid) = C_0000; break;
             case C_1101 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[3] && tid < adj_tet[1] && c.at(adj_tet[1]) != C_1111) c.at(tid) = C_0000; break;
             case C_1011 : if (v_on_iso[0] && v_on_iso[2] && v_on_iso[3] && tid < adj_tet[2] && c.at(adj_tet[2]) != C_1111) c.at(tid) = C_0000; break;
