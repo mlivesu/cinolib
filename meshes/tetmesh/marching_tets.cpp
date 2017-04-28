@@ -70,7 +70,7 @@ void marching_tets(const Tetmesh          & m,
 {
     assert(split_info.empty());
 
-    std::map<ipair,int> edg2vid_map;
+    std::vector<u_char> c(m.num_tetrahedra(),0x0);
 
     for(int tid=0; tid<m.num_tetrahedra(); ++tid)
     {
@@ -90,56 +90,92 @@ void marching_tets(const Tetmesh          & m,
             m.vertex_u_text(vids[3])
         };
 
-        u_char c = 0x0;
-        if (isovalue >= func[0]) c |= C_1000;
-        if (isovalue >= func[1]) c |= C_0100;
-        if (isovalue >= func[2]) c |= C_0010;
-        if (isovalue >= func[3]) c |= C_0001;
+        if (isovalue >= func[0]) c.at(tid) |= C_1000;
+        if (isovalue >= func[1]) c.at(tid) |= C_0100;
+        if (isovalue >= func[2]) c.at(tid) |= C_0010;
+        if (isovalue >= func[3]) c.at(tid) |= C_0001;
 
         // In some degenerate cases (i.e. iso-surface touching an edge/face
         // exposed on the surface) one may get C_1111 and it is necessary to
         // invert the test sign to get it right (28th April @ EG2017)
         //
-        if (c == C_1111)
+        if (c.at(tid) == C_1111)
         {
-            c = 0x0;
-            if (isovalue <= func[0]) c |= C_1000;
-            if (isovalue <= func[1]) c |= C_0100;
-            if (isovalue <= func[2]) c |= C_0010;
-            if (isovalue <= func[3]) c |= C_0001;
+            c.at(tid) = 0x0;
+            if (isovalue <= func[0]) c.at(tid) |= C_1000;
+            if (isovalue <= func[1]) c.at(tid) |= C_0100;
+            if (isovalue <= func[2]) c.at(tid) |= C_0010;
+            if (isovalue <= func[3]) c.at(tid) |= C_0001;
         }
+    }
+
+    std::map<ipair,int> edg2vid_map;       
+
+    for(int tid=0; tid<m.num_tetrahedra(); ++tid)
+    {
+        int vids[] =
+        {
+            m.tet_vertex_id(tid, 0),
+            m.tet_vertex_id(tid, 1),
+            m.tet_vertex_id(tid, 2),
+            m.tet_vertex_id(tid, 3)
+        };
+
+        float func[] =
+        {
+            m.vertex_u_text(vids[0]),
+            m.vertex_u_text(vids[1]),
+            m.vertex_u_text(vids[2]),
+            m.vertex_u_text(vids[3])
+        };
+
+        bool v_on_iso[] =
+        {
+            func[0] == isovalue,
+            func[1] == isovalue,
+            func[2] == isovalue,
+            func[3] == isovalue
+        };
+
+        int adj_tet[]
+        {
+            m.adjacent_tet_through_facet(tid,0),
+            m.adjacent_tet_through_facet(tid,1),
+            m.adjacent_tet_through_facet(tid,2),
+            m.adjacent_tet_through_facet(tid,3),
+        };
 
         // Avoid triangle duplication and collapsed triangle generation when the iso-surface
         // passes EXACTLY on a vertex/edge/face shared between many tetrahedra.
         //
-        switch (c)
+        switch (c.at(tid))
         {
             // iso-surface passes on a face : make sure only one tet (MUST BE the one with higher tid) triggers triangle generation...
-            case C_1110 : if (func[0] == isovalue && func[1] == isovalue && func[2] == isovalue && tid < m.adjacent_tet_through_facet(tid,0)) c = C_0000; break;
-            case C_1101 : if (func[0] == isovalue && func[1] == isovalue && func[3] == isovalue && tid < m.adjacent_tet_through_facet(tid,1)) c = C_0000; break;
-            case C_1011 : if (func[0] == isovalue && func[2] == isovalue && func[3] == isovalue && tid < m.adjacent_tet_through_facet(tid,2)) c = C_0000; break;
-            case C_0111 : if (func[1] == isovalue && func[2] == isovalue && func[3] == isovalue && tid < m.adjacent_tet_through_facet(tid,3)) c = C_0000; break;
+            case C_1110 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[2] && tid < adj_tet[0] && c.at(adj_tet[0]) != C_1111) c.at(tid) = C_0000; break;
+            case C_1101 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[3] && tid < adj_tet[1] && c.at(adj_tet[1]) != C_1111) c.at(tid) = C_0000; break;
+            case C_1011 : if (v_on_iso[0] && v_on_iso[2] && v_on_iso[3] && tid < adj_tet[2] && c.at(adj_tet[2]) != C_1111) c.at(tid) = C_0000; break;
+            case C_0111 : if (v_on_iso[1] && v_on_iso[2] && v_on_iso[3] && tid < adj_tet[3] && c.at(adj_tet[3]) != C_1111) c.at(tid) = C_0000; break;
 
             // iso-surface passes on a edge : do nothing
-            case C_0101 : if (func[1] == isovalue && func[3] == isovalue) c = C_0000; break;
-            case C_1010 : if (func[0] == isovalue && func[2] == isovalue) c = C_0000; break;
-            case C_0011 : if (func[2] == isovalue && func[3] == isovalue) c = C_0000; break;
-            case C_1100 : if (func[0] == isovalue && func[1] == isovalue) c = C_0000; break;
-            case C_1001 : if (func[0] == isovalue && func[3] == isovalue) c = C_0000; break;
-            case C_0110 : if (func[1] == isovalue && func[2] == isovalue) c = C_0000; break;
+            case C_0101 : if (v_on_iso[1] && v_on_iso[3]) c.at(tid) = C_0000; break;
+            case C_1010 : if (v_on_iso[0] && v_on_iso[2]) c.at(tid) = C_0000; break;
+            case C_0011 : if (v_on_iso[2] && v_on_iso[3]) c.at(tid) = C_0000; break;
+            case C_1100 : if (v_on_iso[0] && v_on_iso[1]) c.at(tid) = C_0000; break;
+            case C_1001 : if (v_on_iso[0] && v_on_iso[3]) c.at(tid) = C_0000; break;
+            case C_0110 : if (v_on_iso[1] && v_on_iso[2]) c.at(tid) = C_0000; break;
 
             // iso-surface passes on a vertex : do nothing
-            case C_1000 : if (func[0] == isovalue) c = C_0000; break;
-            case C_0100 : if (func[1] == isovalue) c = C_0000; break;
-            case C_0010 : if (func[2] == isovalue) c = C_0000; break;
-            case C_0001 : if (func[3] == isovalue) c = C_0000; break;
+            case C_1000 : if (v_on_iso[0]) c.at(tid) = C_0000; break;
+            case C_0100 : if (v_on_iso[1]) c.at(tid) = C_0000; break;
+            case C_0010 : if (v_on_iso[2]) c.at(tid) = C_0000; break;
+            case C_0001 : if (v_on_iso[3]) c.at(tid) = C_0000; break;
 
             default : break;
         }
 
         // triangle generation
-        switch (c)
-        {
+        switch (c.at(tid))
+        {        
             case C_1000 : { int e [] = { 2, 0, 4 }; make_triangle(m, isovalue, vids, func, e , edg2vid_map, split_info, coords, tris, norm); break; }
             case C_0111 : { int e [] = { 0, 2, 4 }; make_triangle(m, isovalue, vids, func, e , edg2vid_map, split_info, coords, tris, norm); break; }
             case C_1011 : { int e [] = { 2, 1, 3 }; make_triangle(m, isovalue, vids, func, e , edg2vid_map, split_info, coords, tris, norm); break; }
