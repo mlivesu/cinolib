@@ -96,28 +96,43 @@ void marching_tets(const Tetmesh          & m,
         if (isovalue >= func[2]) c |= C_0010;
         if (isovalue >= func[3]) c |= C_0001;
 
-        // handle corner cases (i.e. when the iso-surface passes EXACTLY on a vertex/edge/face)...
+        // In some degenerate cases (i.e. iso-surface touching an edge/face
+        // exposed on the surface) one may get C_1111 and it is necessary to
+        // invert the test sign to get it right (28th April @ EG2017)
+        //
+        if (c == C_1111)
+        {
+            c = 0x0;
+            if (isovalue <= func[0]) c |= C_1000;
+            if (isovalue <= func[1]) c |= C_0100;
+            if (isovalue <= func[2]) c |= C_0010;
+            if (isovalue <= func[3]) c |= C_0001;
+        }
+
+        // Avoid triangle duplication and collapsed triangle generation when the iso-surface
+        // passes EXACTLY on a vertex/edge/face shared between many tetrahedra.
+        //
         switch (c)
         {
-            // iso-surface passes on a vertex : do nothing
-            case C_1000 : { if (func[0] == isovalue) c = C_0000; break; }
-            case C_0100 : { if (func[1] == isovalue) c = C_0000; break; }
-            case C_0010 : { if (func[2] == isovalue) c = C_0000; break; }
-            case C_0001 : { if (func[3] == isovalue) c = C_0000; break; }
+            // iso-surface passes on a face : make sure only one tet (MUST BE the one with higher tid) triggers triangle generation...
+            case C_1110 : if (func[0] == isovalue && func[1] == isovalue && func[2] == isovalue && tid < m.adjacent_tet_through_facet(tid,0)) c = C_0000; break;
+            case C_1101 : if (func[0] == isovalue && func[1] == isovalue && func[3] == isovalue && tid < m.adjacent_tet_through_facet(tid,1)) c = C_0000; break;
+            case C_1011 : if (func[0] == isovalue && func[2] == isovalue && func[3] == isovalue && tid < m.adjacent_tet_through_facet(tid,2)) c = C_0000; break;
+            case C_0111 : if (func[1] == isovalue && func[2] == isovalue && func[3] == isovalue && tid < m.adjacent_tet_through_facet(tid,3)) c = C_0000; break;
 
             // iso-surface passes on a edge : do nothing
-            case C_0101 : { if (func[1] == isovalue && func[3] == isovalue) c = C_0000; break; }
-            case C_1010 : { if (func[0] == isovalue && func[2] == isovalue) c = C_0000; break; }
-            case C_0011 : { if (func[2] == isovalue && func[3] == isovalue) c = C_0000; break; }
-            case C_1100 : { if (func[0] == isovalue && func[1] == isovalue) c = C_0000; break; }
-            case C_1001 : { if (func[0] == isovalue && func[3] == isovalue) c = C_0000; break; }
-            case C_0110 : { if (func[1] == isovalue && func[2] == isovalue) c = C_0000; break; }
+            case C_0101 : if (func[1] == isovalue && func[3] == isovalue) c = C_0000; break;
+            case C_1010 : if (func[0] == isovalue && func[2] == isovalue) c = C_0000; break;
+            case C_0011 : if (func[2] == isovalue && func[3] == isovalue) c = C_0000; break;
+            case C_1100 : if (func[0] == isovalue && func[1] == isovalue) c = C_0000; break;
+            case C_1001 : if (func[0] == isovalue && func[3] == isovalue) c = C_0000; break;
+            case C_0110 : if (func[1] == isovalue && func[2] == isovalue) c = C_0000; break;
 
-            // iso-surface passes on a face : make sure only one tet (here the one with highet tid) triggers triangle generation...
-            case C_1110 : { if (func[0] == isovalue && func[1] == isovalue && func[2] == isovalue) if (tid < m.adjacent_tet_through_facet(tid,0)) c = C_0000; break; }
-            case C_1101 : { if (func[0] == isovalue && func[1] == isovalue && func[3] == isovalue) if (tid < m.adjacent_tet_through_facet(tid,1)) c = C_0000; break; }
-            case C_1011 : { if (func[0] == isovalue && func[2] == isovalue && func[3] == isovalue) if (tid < m.adjacent_tet_through_facet(tid,2)) c = C_0000; break; }
-            case C_0111 : { if (func[1] == isovalue && func[2] == isovalue && func[3] == isovalue) if (tid < m.adjacent_tet_through_facet(tid,3)) c = C_0000; break; }
+            // iso-surface passes on a vertex : do nothing
+            case C_1000 : if (func[0] == isovalue) c = C_0000; break;
+            case C_0100 : if (func[1] == isovalue) c = C_0000; break;
+            case C_0010 : if (func[2] == isovalue) c = C_0000; break;
+            case C_0001 : if (func[3] == isovalue) c = C_0000; break;
 
             default : break;
         }
