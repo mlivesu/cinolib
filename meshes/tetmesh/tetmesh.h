@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef TETMESH_H
-#define TETMESH_H
+#ifndef CINO_TETMESH_H
+#define CINO_TETMESH_H
 
 #include <sys/types.h>
 #include <vector>
@@ -280,4 +280,4 @@ class Tetmesh
 #include "tetmesh.cpp"
 #endif
 
-#endif // TETMESH_H
+#endif // CINO_TETMESH_H

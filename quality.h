@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef QUALITY
-#define QUALITY
+#ifndef CINO_QUALITY
+#define CINO_QUALITY
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -63,4 +63,4 @@ double hex_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2,
 #include "quality.cpp"
 #endif
 
-#endif // QUALITY
+#endif // CINO_QUALITY

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef WRITE_OBJ_H
-#define WRITE_OBJ_H
+#ifndef CINO_WRITE_OBJ_H
+#define CINO_WRITE_OBJ_H
 
 #include <cinolib/cinolib.h>
 
@@ -52,4 +52,4 @@ void write_OBJ(const char                * filename,
 #include "write_OBJ.cpp"
 #endif
 
-#endif // WRITE_OBJ
+#endif // CINO_WRITE_OBJ

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef HEXMESH_H
-#define HEXMESH_H
+#ifndef CINO_HEXMESH_H
+#define CINO_HEXMESH_H
 
 #include <sys/types.h>
 #include <vector>
@@ -252,4 +252,4 @@ class Hexmesh
 #include "hexmesh.cpp"
 #endif
 
-#endif // HEXMESH_H
+#endif // CINO_HEXMESH_H

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef CINO_TIMER_H
+#define CINO_TIMER_H
 
 #include <cinolib/cinolib.h>
 
@@ -40,4 +40,4 @@ CINO_INLINE void timer_stop (const char * msg);
 #include "cinolib/timer.cpp"
 #endif
 
-#endif // TIMER_H
+#endif // CINO_TIMER_H

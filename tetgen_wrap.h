@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef TETGEN_WRAP_H
-#define TETGEN_WRAP_H
+#ifndef CINO_TETGEN_WRAP_H
+#define CINO_TETGEN_WRAP_H
 
 #include <cinolib/cinolib.h>
 
@@ -45,4 +45,4 @@ void tetgen_wrap(const std::vector<double> & coords_in,
 #include "tetgen_wrap.cpp"
 #endif
 
-#endif // TETGEN_WRAP_H
+#endif // CINO_TETGEN_WRAP_H

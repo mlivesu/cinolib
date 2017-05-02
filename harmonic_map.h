@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef HARMONIC_MAP_H
-#define HARMONIC_MAP_H
+#ifndef CINO_HARMONIC_MAP_H
+#define CINO_HARMONIC_MAP_H
 
 #include <cinolib/scalar_field.h>
 #include <cinolib/laplacian.h>
@@ -86,4 +86,4 @@ ScalarField harmonic_map(const Mesh           & m,
 
 }
 
-#endif // HARMONIC_MAP_H
+#endif // CINO_HARMONIC_MAP_H

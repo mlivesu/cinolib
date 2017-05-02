@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_OFF_H
-#define READ_OFF_H
+#ifndef CINO_READ_OFF_H
+#define CINO_READ_OFF_H
 
 #include <cinolib/cinolib.h>
 
@@ -44,4 +44,4 @@ void read_OFF(const char          * filename,
 #include "read_OFF.cpp"
 #endif
 
-#endif // READ_OFF
+#endif // CINO_READ_OFF

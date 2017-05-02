@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAW_ARROW_H
-#define DRAW_ARROW_H
+#ifndef CINO_DRAW_ARROW_H
+#define CINO_DRAW_ARROW_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/gl/draw_cylinder.h>
@@ -45,4 +45,4 @@ void arrow(const vec3  & base,
 
 }
 
-#endif // DRAW_ARROW_H
+#endif // CINO_DRAW_ARROW_H

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef WRITE_OFF_H
-#define WRITE_OFF_H
+#ifndef CINO_WRITE_OFF_H
+#define CINO_WRITE_OFF_H
 
 #include <cinolib/cinolib.h>
 
@@ -44,4 +44,4 @@ void write_OFF(const char                * filename,
 #include "write_OFF.cpp"
 #endif
 
-#endif // WRITE_OFF
+#endif // CINO_WRITE_OFF

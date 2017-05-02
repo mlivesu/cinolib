@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef VECTOR_FIELD_H
-#define VECTOR_FIELD_H
+#ifndef CINO_VECTOR_FIELD_H
+#define CINO_VECTOR_FIELD_H
 
 #include <cinolib/geometry/vec3.h>
 #include <eigen3/Eigen/Dense>
@@ -65,4 +65,4 @@ class VectorField : public Eigen::VectorXd
 #endif
 
 
-#endif // VECTOR_FIELD_H
+#endif // CINO_VECTOR_FIELD_H

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef GRADIENT_H
-#define GRADIENT_H
+#ifndef CINO_GRADIENT_H
+#define CINO_GRADIENT_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/scalar_field.h>
@@ -102,4 +102,4 @@ Eigen::SparseMatrix<double> gradient<Tetmesh>(const Tetmesh & m);
 #include "gradient.cpp"
 #endif
 
-#endif // GRADIENT_H
+#endif // CINO_GRADIENT_H

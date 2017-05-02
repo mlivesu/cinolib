@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef INTERSECTION_H
-#define INTERSECTION_H
+#ifndef CINO_INTERSECTION_H
+#define CINO_INTERSECTION_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec2.h>
@@ -75,4 +75,4 @@ bool intersection(const Ray     & r,
 #include "intersection.cpp"
 #endif
 
-#endif // INTERSECTION_H
+#endif // CINO_INTERSECTION_H

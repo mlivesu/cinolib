@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_TRIMESH_H
-#define DRAWABLE_TRIMESH_H
+#ifndef CINO_DRAWABLE_TRIMESH_H
+#define CINO_DRAWABLE_TRIMESH_H
 
 #include <vector>
 #ifdef __APPLE__
@@ -129,4 +129,4 @@ class DrawableTrimesh : public Trimesh , public DrawableObject
 #include "drawable_trimesh.cpp"
 #endif
 
-#endif // DRAWABLE_TRIMESH_H
+#endif // CINO_DRAWABLE_TRIMESH_H

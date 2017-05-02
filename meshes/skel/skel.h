@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SKEL_H
-#define SKEL_H
+#ifndef CINO_SKEL_H
+#define CINO_SKEL_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -282,4 +282,4 @@ class Skel
 #include "skel.cpp"
 #endif
 
-#endif // SKEL_H
+#endif // CINO_SKEL_H

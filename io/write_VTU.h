@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef WRITE_VTU_H
-#define WRITE_VTU_H
+#ifndef CINO_WRITE_VTU_H
+#define CINO_WRITE_VTU_H
 
 #include <cinolib/cinolib.h>
 
@@ -44,4 +44,4 @@ void write_VTU(const char                * filename,
 #include "write_VTU.cpp"
 #endif
 
-#endif // WRITE_VTU
+#endif // CINO_WRITE_VTU

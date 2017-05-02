@@ -1,3 +1,54 @@
+adj // maybe we can have two adj types for volume and surface and same mesh template :P
+{
+v,e,f,c (vertex, edge, face, cell)
+}
+
+typedef struct v_data
+{ 
+  (uchar 8bits for flags) (visited, deleted,… )
+  (uchar 8bits for marking flags as used) + 
+     methods 
+	bool using_bit(int)? 
+	void set_using_bit(int)
+  bool  sharp_feat
+  bool  boundary
+  bool  border
+  bool  visited
+  vec3d normal
+  float color[3]
+  float tex_u
+  float tex_v
+  float tex_w
+}
+
+e_data
+{
+  (uchar 8bits for flags) (visited, deleted,… )
+  (uchar 8bits for marking flags as used) + 
+     methods 
+	bool using_bit(int)? 
+	void set_using_bit(int)
+  bool  flagged
+  bool  sharp_feat
+  bool  boundary
+  bool  border
+  bool  visited
+}
+
+f_data
+{
+  (uchar 8bits for flags) (visited, deleted,… )
+  (uchar 8bits for marking flags as used) + 
+     methods 
+	bool using_bit(int)? 
+	void set_using_bit(int)
+  bool  flagged
+  bool  visited
+  vec3d normal
+  float color[3]
+  int   label
+}
+
 USE THIS REPRESENTATION TO HANDLE ALL THE RENDERINGS… (volumetric meshes will have two instances of it, one for the skin and one for the exposed interior when in sliced mode)
 this will also enable slicing for surface meshes…
 typedef struct

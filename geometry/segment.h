@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SEGMENT_H
-#define SEGMENT_H
+#ifndef CINO_SEGMENT_H
+#define CINO_SEGMENT_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -60,4 +60,4 @@ std::ostream & operator<<(std::ostream & in, const Segment & s);
 #include "segment.cpp"
 #endif
 
-#endif // SEGMENT_H
+#endif // CINO_SEGMENT_H

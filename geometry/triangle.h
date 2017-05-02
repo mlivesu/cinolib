@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef TRIANGLE_H
-#define TRIANGLE_H
+#ifndef CINO_TRIANGLE_H
+#define CINO_TRIANGLE_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -99,4 +99,4 @@ bool triangle_bary_is_edge(const std::vector<double> & bary,
 #include "triangle.cpp"
 #endif
 
-#endif // TRIANGLE_H
+#endif // CINO_TRIANGLE_H

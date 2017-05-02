@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef TETRAHEDRON_H
-#define TETRAHEDRON_H
+#ifndef CINO_TETRAHEDRON_H
+#define CINO_TETRAHEDRON_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -90,4 +90,4 @@ void tet_closest_edge(const vec3d  & A,
 #include "tetrahedron.cpp"
 #endif
 
-#endif // TETRAHEDRON_H
+#endif // CINO_TETRAHEDRON_H

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_IV_H
-#define READ_IV_H
+#ifndef CINO_READ_IV_H
+#define CINO_READ_IV_H
 
 #include <cinolib/cinolib.h>
 
@@ -43,4 +43,4 @@ void read_IV(const char          * filename,
 #include "read_IV.cpp"
 #endif
 
-#endif // READ_IV
+#endif // CINO_READ_IV

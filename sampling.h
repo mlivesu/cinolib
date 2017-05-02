@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SAMPLING_H
-#define SAMPLING_H
+#ifndef CINO_SAMPLING_H
+#define CINO_SAMPLING_H
 
 #include <cinolib/cinolib.h>
 
@@ -40,4 +40,4 @@ namespace cinolib
 #include "sampling.cpp"
 #endif
 
-#endif // SAMPLING_H
+#endif // CINO_SAMPLING_H

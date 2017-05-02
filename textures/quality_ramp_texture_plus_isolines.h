@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef QUALITY_RAMP_TEXTURE_PLUS_ISOLINES_H
-#define QUALITY_RAMP_TEXTURE_PLUS_ISOLINES_H
+#ifndef CINO_QUALITY_RAMP_TEXTURE_PLUS_ISOLINES_H
+#define CINO_QUALITY_RAMP_TEXTURE_PLUS_ISOLINES_H
 
 #ifdef __APPLE__
 #include <gl.h>
@@ -327,5 +327,5 @@ static const GLubyte quality_ramp_texture1D_with_isolines[768] =
 
 }
 
-#endif // QUALITY_RAMP_TEXTURE_PLUS_ISOLINES_H
+#endif // CINO_QUALITY_RAMP_TEXTURE_PLUS_ISOLINES_H
 

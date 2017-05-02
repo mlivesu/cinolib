@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_OBJECT_H
-#define DRAWABLE_OBJECT_H
+#ifndef CINO_DRAWABLE_OBJECT_H
+#define CINO_DRAWABLE_OBJECT_H
 
 #include <cinolib/geometry/vec3.h>
 #include <float.h>
@@ -59,4 +59,4 @@ class DrawableObject
 
 }
 
-#endif // DRAWABLE_OBJECT_H
+#endif // CINO_DRAWABLE_OBJECT_H

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef VEC3_H
-#define VEC3_H
+#ifndef CINO_VEC3_H
+#define CINO_VEC3_H
 
 #include <cinolib/cinolib.h>
 
@@ -383,4 +383,4 @@ double distance_to_segment(const vec3 & P,
 
 }
 
-#endif // VEC3_H
+#endif // CINO_VEC3_H

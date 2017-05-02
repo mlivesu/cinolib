@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef QUADMESH_H
-#define QUADMESH_H
+#ifndef CINO_QUADMESH_H
+#define CINO_QUADMESH_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/bbox.h>
@@ -155,4 +155,4 @@ class Quadmesh
 #include "quadmesh.cpp"
 #endif
 
-#endif // QUADMESH_H
+#endif // CINO_QUADMESH_H

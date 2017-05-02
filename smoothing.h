@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SMOOTHING_H
-#define SMOOTHING_H
+#ifndef CINO_SMOOTHING_H
+#define CINO_SMOOTHING_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/laplacian.h>
@@ -55,4 +55,4 @@ void smooth_taubin(Mesh                & m,
 #include "smoothing.cpp"
 #endif
 
-#endif // SMOOTHING_H
+#endif // CINO_SMOOTHING_H

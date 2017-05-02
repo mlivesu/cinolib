@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_TETMESH_H
-#define DRAWABLE_TETMESH_H
+#ifndef CINO_DRAWABLE_TETMESH_H
+#define CINO_DRAWABLE_TETMESH_H
 
 #ifdef __APPLE__
 #include <gl.h>
@@ -150,4 +150,4 @@ class DrawableTetmesh : public Tetmesh, public DrawableObject
 #include "drawable_tetmesh.cpp"
 #endif
 
-#endif // DRAWABLE_TETMESH_H
+#endif // CINO_DRAWABLE_TETMESH_H

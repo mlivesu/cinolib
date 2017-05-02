@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAW_CYLINDER_H
-#define DRAW_CYLINDER_H
+#ifndef CINO_DRAW_CYLINDER_H
+#define CINO_DRAW_CYLINDER_H
 
 #include <cinolib/cinolib.h>
 
@@ -68,4 +68,4 @@ static void cylinder(const vec3  & a,
 
 }
 
-#endif // DRAW_CYLINDER_H
+#endif // CINO_DRAW_CYLINDER_H

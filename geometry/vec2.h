@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef VEC2_H
-#define VEC2_H
+#ifndef CINO_VEC2_H
+#define CINO_VEC2_H
 
 #include <cinolib/cinolib.h>
 
@@ -242,4 +242,4 @@ typedef vec2<float>  vec2f;
 
 }
 
-#endif // VEC2_H
+#endif // CINO_VEC2_H

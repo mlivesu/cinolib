@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef TETRAHEDRALIZATION_H
-#define TETRAHEDRALIZATION_H
+#ifndef CINO_TETRAHEDRALIZATION_H
+#define CINO_TETRAHEDRALIZATION_H
 
 #include <cinolib/cinolib.h>
 
@@ -55,4 +55,4 @@ void tetrahedralize_prism(int prism[], std::vector<uint> & tets);
 #include "tetrahedralization.cpp"
 #endif
 
-#endif // TETRAHEDRALIZATION_H
+#endif // CINO_TETRAHEDRALIZATION_H

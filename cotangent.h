@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef COTANGENT_H
-#define COTANGENT_H
+#ifndef CINO_COTANGENT_H
+#define CINO_COTANGENT_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/meshes/trimesh/trimesh.h>
@@ -46,4 +46,4 @@ void cotangent_weights(const Mesh &, const int, std::vector<int> &, std::vector<
 #endif
 
 
-#endif // COTANGENT_H
+#endif // CINO_COTANGENT_H

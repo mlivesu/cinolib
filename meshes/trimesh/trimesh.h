@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef TRIMESH_H
-#define TRIMESH_H
+#ifndef CINO_TRIMESH_H
+#define CINO_TRIMESH_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/bbox.h>
@@ -217,4 +217,4 @@ class Trimesh
 #include "trimesh.cpp"
 #endif
 
-#endif // TRIMESH_H
+#endif // CINO_TRIMESH_H

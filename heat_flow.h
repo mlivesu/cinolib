@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef HEAT_FLOW_H
-#define HEAT_FLOW_H
+#ifndef CINO_HEAT_FLOW_H
+#define CINO_HEAT_FLOW_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/scalar_field.h>
@@ -71,4 +71,4 @@ ScalarField heat_flow(const Mesh             & m,
 
 }
 
-#endif // HEAT_FLOW_H
+#endif // CINO_HEAT_FLOW_H

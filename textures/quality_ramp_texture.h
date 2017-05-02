@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef QUALITY_RAMP_TEXTURE_H
-#define QUALITY_RAMP_TEXTURE_H
+#ifndef CINO_QUALITY_RAMP_TEXTURE_H
+#define CINO_QUALITY_RAMP_TEXTURE_H
 
 #ifdef __APPLE__
 #include <gl.h>
@@ -298,4 +298,4 @@ static const GLubyte quality_ramp_texture1D[768] =
 }
 
 
-#endif // QUALITY_RAMP_TEXTURE_H
+#endif // CINO_QUALITY_RAMP_TEXTURE_H

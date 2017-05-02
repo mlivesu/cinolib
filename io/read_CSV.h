@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_CSV_H
-#define READ_CSV_H
+#ifndef CINO_READ_CSV_H
+#define CINO_READ_CSV_H
 
 #include <cinolib/cinolib.h>
 
@@ -42,4 +42,4 @@ void read_CSV(const char          * filename,
 #include "read_CSV.cpp"
 #endif
 
-#endif // READ_CSV_H
+#endif // CINO_READ_CSV_H

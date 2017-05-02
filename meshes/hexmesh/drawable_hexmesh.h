@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_HEXMESH_H
-#define DRAWABLE_HEXMESH_H
+#ifndef CINO_DRAWABLE_HEXMESH_H
+#define CINO_DRAWABLE_HEXMESH_H
 
 #ifdef __APPLE__
 #include <gl.h>
@@ -153,4 +153,4 @@ class DrawableHexmesh : public Hexmesh, public DrawableObject
 #include "drawable_hexmesh.cpp"
 #endif
 
-#endif // DRAWABLE_HEXMESH_H
+#endif // CINO_DRAWABLE_HEXMESH_H

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_ISOCONTOUR_H
-#define DRAWABLE_ISOCONTOUR_H
+#ifndef CINO_DRAWABLE_ISOCONTOUR_H
+#define CINO_DRAWABLE_ISOCONTOUR_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
@@ -58,4 +58,4 @@ class DrawableIsocontour : public Isocontour, public DrawableObject
 #include "drawable_isocontour.cpp"
 #endif
 
-#endif // DRAWABLE_ISOCONTOUR_H
+#endif // CINO_DRAWABLE_ISOCONTOUR_H

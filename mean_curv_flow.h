@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef MEAN_CURV_FLOW_H
-#define MEAN_CURV_FLOW_H
+#ifndef CINO_MEAN_CURV_FLOW_H
+#define CINO_MEAN_CURV_FLOW_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/meshes/trimesh/trimesh.h>
@@ -50,4 +50,4 @@ void MCF(Trimesh      & m,
 #include "mean_curv_flow.cpp"
 #endif
 
-#endif // MEAN_CURV_FLOW_H
+#endif // CINO_MEAN_CURV_FLOW_H

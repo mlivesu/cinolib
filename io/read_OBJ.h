@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_OBJ_H
-#define READ_OBJ_H
+#ifndef CINO_READ_OBJ_H
+#define CINO_READ_OBJ_H
 
 #include <cinolib/cinolib.h>
 
@@ -44,4 +44,4 @@ void read_OBJ(const char          * filename,
 #include "read_OBJ.cpp"
 #endif
 
-#endif // READ_OBJ
+#endif // CINO_READ_OBJ

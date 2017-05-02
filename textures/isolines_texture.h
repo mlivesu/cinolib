@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef ISOLINES_TEXTURE_H
-#define ISOLINES_TEXTURE_H
+#ifndef CINO_ISOLINES_TEXTURE_H
+#define CINO_ISOLINES_TEXTURE_H
 
 #ifdef __APPLE__
 #include <gl.h>
@@ -296,4 +296,4 @@ static const GLubyte isolines_texture1D[768] =
 
 }
 
-#endif // ISOLINES_TEXTURE_H
+#endif // CINO_ISOLINES_TEXTURE_H

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef WRITE_MESH_H
-#define WRITE_MESH_H
+#ifndef CINO_WRITE_MESH_H
+#define CINO_WRITE_MESH_H
 
 #include <cinolib/cinolib.h>
 
@@ -44,4 +44,4 @@ void write_MESH(const char               * filename,
 #include "write_MESH.cpp"
 #endif
 
-#endif // WRITE_MESH
+#endif // CINO_WRITE_MESH

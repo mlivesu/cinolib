@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SCALAR_FIELD_V_H
-#define SCALAR_FIELD_V_H
+#ifndef CINO_SCALAR_FIELD_V_H
+#define CINO_SCALAR_FIELD_V_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/serializable.h>
@@ -60,4 +60,4 @@ class ScalarField : public Eigen::VectorXd, public Serializable
 #include "scalar_field.cpp"
 #endif
 
-#endif // SCALAR_FIELD_V_H
+#endif // CINO_SCALAR_FIELD_V_H

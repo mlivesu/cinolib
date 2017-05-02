@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef N_SIDED_POLYGON_H
-#define N_SIDED_POLYGON_H
+#ifndef CINO_N_SIDED_POLYGON_H
+#define CINO_N_SIDED_POLYGON_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -43,4 +43,4 @@ Trimesh n_sided_polygon(const vec3d  & center,
 #include "n_sided_poygon.cpp"
 #endif
 
-#endif // N_SIDED_POLYGON_H
+#endif // CINO_N_SIDED_POLYGON_H

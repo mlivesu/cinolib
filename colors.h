@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef COLORS_H
-#define COLORS_H
+#ifndef CINO_COLORS_H
+#define CINO_COLORS_H
 
 #include <cinolib/cinolib.h>
 
@@ -46,4 +46,4 @@ CINO_INLINE void scattered_color(int n_colors, int pos, float * rgb);
 #include "colors.cpp"
 #endif
 
-#endif // COLORS_H
+#endif // CINO_COLORS_H

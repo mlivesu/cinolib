@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef RAY_H
-#define RAY_H
+#ifndef CINO_RAY_H
+#define CINO_RAY_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -58,4 +58,4 @@ class Ray
 #include "ray.cpp"
 #endif
 
-#endif // RAY_H
+#endif // CINO_RAY_H

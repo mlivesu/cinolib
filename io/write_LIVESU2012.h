@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef WRITE_LIVESU2012_H
-#define WRITE_LIVESU2012_H
+#ifndef CINO_WRITE_LIVESU2012_H
+#define CINO_WRITE_LIVESU2012_H
 
 #include <cinolib/cinolib.h>
 
@@ -41,4 +41,4 @@ void write_Livesu2012(const char                          * filename,
 #include "write_LIVESU2012.cpp"
 #endif
 
-#endif // WRITE_LIVESU2012
+#endif // CINO_WRITE_LIVESU2012

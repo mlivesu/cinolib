@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SIMPLICIAL_MAP_H
-#define SIMPLICIAL_MAP_H
+#ifndef CINO_SIMPLICIAL_MAP_H
+#define CINO_SIMPLICIAL_MAP_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -56,4 +56,4 @@ void affine_simplicial_map(const vec3d & A0,
 #include "simplicial_map.cpp"
 #endif
 
-#endif // SIMPLICIAL_MAP_H
+#endif // CINO_SIMPLICIAL_MAP_H

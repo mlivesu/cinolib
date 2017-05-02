@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SERIALIZABLE_H
-#define SERIALIZABLE_H
+#ifndef CINO_SERIALIZABLE_H
+#define CINO_SERIALIZABLE_H
 
 namespace cinolib
 {
@@ -38,4 +38,4 @@ class Serializable
 
 }
 
-#endif // SERIALIZABLE_H
+#endif // CINO_SERIALIZABLE_H

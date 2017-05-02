@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_DEYSUN2006_H
-#define READ_DEYSUN2006_H
+#ifndef CINO_READ_DEYSUN2006_H
+#define CINO_READ_DEYSUN2006_H
 
 #include <cinolib/cinolib.h>
 
@@ -42,4 +42,4 @@ void read_DeyandSun2006(const char          * filename,
 #include "read_DEYSUN2006.cpp"
 #endif
 
-#endif // READ_DEYSUN2006
+#endif // CINO_READ_DEYSUN2006

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef LINEAR_SOLVERS_H
-#define LINEAR_SOLVERS_H
+#ifndef CINO_LINEAR_SOLVERS_H
+#define CINO_LINEAR_SOLVERS_H
 
 #include <cinolib/cinolib.h>
 #include <eigen3/Eigen/Sparse>
@@ -88,4 +88,4 @@ void solve_least_squares(const Eigen::SparseMatrix<double> & A,
 #include "linear_solvers.cpp"
 #endif
 
-#endif // LINEAR_SOLVERS_H
+#endif // CINO_LINEAR_SOLVERS_H

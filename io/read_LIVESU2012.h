@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_LIVESU2012_H
-#define READ_LIVESU2012_H
+#ifndef CINO_READ_LIVESU2012_H
+#define CINO_READ_LIVESU2012_H
 
 #include <cinolib/cinolib.h>
 
@@ -42,4 +42,4 @@ void read_Livesu2012(const char          * filename,
 #include "read_LIVESU2012.cpp"
 #endif
 
-#endif // READ_LIVESU2012
+#endif // CINO_READ_LIVESU2012

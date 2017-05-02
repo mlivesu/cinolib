@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef ISOSURFACE_H
-#define ISOSURFACE_H
+#ifndef CINO_ISOSURFACE_H
+#define CINO_ISOSURFACE_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/meshes/tetmesh/tetmesh.h>
@@ -68,4 +68,4 @@ class Isosurface
 #include "isosurface.cpp"
 #endif
 
-#endif // ISOSURFACE_H
+#endif // CINO_ISOSURFACE_H

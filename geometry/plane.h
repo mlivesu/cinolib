@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef PLANE_H
-#define PLANE_H
+#ifndef CINO_PLANE_H
+#define CINO_PLANE_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -72,4 +72,4 @@ std::ostream & operator<<(std::ostream & in, const Plane & plane);
 #include "plane.cpp"
 #endif
 
-#endif // PLANE_H
+#endif // CINO_PLANE_H

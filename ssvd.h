@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SSVD_H
-#define SSVD_H
+#ifndef CINO_SSVD_H
+#define CINO_SSVD_H
 
 #include <cinolib/cinolib.h>
 
@@ -57,4 +57,4 @@ void closest_pos_det_matrix(double T[3][3]);
 #include "ssvd.cpp"
 #endif
 
-#endif // SSVD_H
+#endif // CINO_SSVD_H

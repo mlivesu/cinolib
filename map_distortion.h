@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef MAP_DISTORTION_H
-#define MAP_DISTORTION_H
+#ifndef CINO_MAP_DISTORTION_H
+#define CINO_MAP_DISTORTION_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -59,4 +59,4 @@ double aspect_ratio_distortion(const double m[3][3]);
 #include "map_distortion.cpp"
 #endif
 
-#endif // MAP_DISTORTION_H
+#endif // CINO_MAP_DISTORTION_H

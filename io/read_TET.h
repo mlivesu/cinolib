@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_TET_H
-#define READ_TET_H
+#ifndef CINO_READ_TET_H
+#define CINO_READ_TET_H
 
 #include <cinolib/cinolib.h>
 
@@ -43,4 +43,4 @@ void read_TET(const char          * filename,
 #include "read_TET.cpp"
 #endif
 
-#endif // READ_TET
+#endif // CINO_READ_TET

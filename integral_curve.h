@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef INTEGRAL_CURVE_H
-#define INTEGRAL_CURVE_H
+#ifndef CINO_INTEGRAL_CURVE_H
+#define CINO_INTEGRAL_CURVE_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/vector_field.h>
@@ -98,4 +98,4 @@ class IntegralCurve : public DrawableCurve
 #include "integral_curve.cpp"
 #endif
 
-#endif // INTEGRAL_CURVE_H
+#endif // CINO_INTEGRAL_CURVE_H

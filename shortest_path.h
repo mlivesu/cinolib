@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SHORTEST_PATH_H
-#define SHORTEST_PATH_H
+#ifndef CINO_SHORTEST_PATH_H
+#define CINO_SHORTEST_PATH_H
 
 #include <cinolib/cinolib.h>
 
@@ -225,4 +225,4 @@ void dijkstra_shortest_path(const Mesh              & m,
 
 }
 
-#endif // SHORTEST_PATH_H
+#endif // CINO_SHORTEST_PATH_H

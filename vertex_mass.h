@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef VERTEX_MASS_H
-#define VERTEX_MASS_H
+#ifndef CINO_VERTEX_MASS_H
+#define CINO_VERTEX_MASS_H
 
 #include <cinolib/cinolib.h>
 #include <eigen3/Eigen/Sparse>
@@ -40,4 +40,4 @@ Eigen::SparseMatrix<double> mass_matrix(const Mesh & m);
 #include "vertex_mass.cpp"
 #endif
 
-#endif // VERTEX_MASS_H
+#endif // CINO_VERTEX_MASS_H

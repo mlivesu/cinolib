@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef OCTREE_H
-#define OCTREE_H
+#ifndef CINO_OCTREE_H
+#define CINO_OCTREE_H
 
 #include <cinolib/geometry/vec3.h>
 #include <set>
@@ -129,4 +129,4 @@ template<typename item_type> class Octree
 
 }
 
-#endif // OCTREE_H
+#endif // CINO_OCTREE_H

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_VTU_H
-#define READ_VTU_H
+#ifndef CINO_READ_VTU_H
+#define CINO_READ_VTU_H
 
 #include <cinolib/cinolib.h>
 
@@ -44,4 +44,4 @@ void read_VTU(const char          * filename,
 #include "read_VTU.cpp"
 #endif
 
-#endif // READ_VTU
+#endif // CINO_READ_VTU

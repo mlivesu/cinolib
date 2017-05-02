@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef BBOX_H
-#define BBOX_H
+#ifndef CINO_BBOX_H
+#define CINO_BBOX_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -62,4 +62,4 @@ CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb);
 #include "bbox.cpp"
 #endif
 
-#endif // BBOX_H
+#endif // CINO_BBOX_H

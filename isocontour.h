@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef ISOCONTOUR_H
-#define ISOCONTOUR_H
+#ifndef CINO_ISOCONTOUR_H
+#define CINO_ISOCONTOUR_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/meshes/trimesh/trimesh.h>
@@ -92,4 +92,4 @@ class Isocontour
 #include "isocontour.cpp"
 #endif
 
-#endif // ISOCONTOUR_H
+#endif // CINO_ISOCONTOUR_H

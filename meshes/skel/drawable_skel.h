@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_SKEL_H
-#define DRAWABLE_SKEL_H
+#ifndef CINO_DRAWABLE_SKEL_H
+#define CINO_DRAWABLE_SKEL_H
 
 #include <cinolib/drawable_object.h>
 #include <cinolib/meshes/skel/skel.h>
@@ -137,4 +137,4 @@ class DrawableSkel : public Skel, public DrawableObject
 #include "drawable_skel.cpp"
 #endif
 
-#endif // DRAWABLE_SKEL_H
+#endif // CINO_DRAWABLE_SKEL_H

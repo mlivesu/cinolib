@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef LINE_H
-#define LINE_H
+#ifndef CINO_LINE_H
+#define CINO_LINE_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -52,4 +52,4 @@ class Line
 #include "line.cpp"
 #endif
 
-#endif // LINE_H
+#endif // CINO_LINE_H

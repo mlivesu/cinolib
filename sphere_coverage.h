@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SPHERE_COVERAGE_H
-#define SPHERE_COVERAGE_H
+#ifndef CINO_SPHERE_COVERAGE_H
+#define CINO_SPHERE_COVERAGE_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
@@ -46,4 +46,4 @@ void sphere_coverage(const int n_samples, std::vector<vec3d> & points);
 #include "sphere_coverage.cpp"
 #endif
 
-#endif // SPHERE_COVERAGE_H
+#endif // CINO_SPHERE_COVERAGE_H

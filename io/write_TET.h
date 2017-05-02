@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef WRITE_TET_H
-#define WRITE_TET_H
+#ifndef CINO_WRITE_TET_H
+#define CINO_WRITE_TET_H
 
 #include <cinolib/cinolib.h>
 
@@ -43,4 +43,4 @@ void write_TET(const char               * filename,
 #include "write_TET.cpp"
 #endif
 
-#endif // WRITE_TET
+#endif // CINO_WRITE_TET

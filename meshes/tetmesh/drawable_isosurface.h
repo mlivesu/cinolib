@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_ISOSURFACE_H
-#define DRAWABLE_ISOSURFACE_H
+#ifndef CINO_DRAWABLE_ISOSURFACE_H
+#define CINO_DRAWABLE_ISOSURFACE_H
 
 #ifdef __APPLE__
 #include <gl.h>
@@ -55,4 +55,4 @@ class DrawableIsosurface : public Isosurface, public DrawableObject
 #include "drawable_isosurface.cpp"
 #endif
 
-#endif // DRAWABLE_ISOSURFACE_H
+#endif // CINO_DRAWABLE_ISOSURFACE_H

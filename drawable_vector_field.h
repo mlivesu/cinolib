@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_VECTOR_FIELD_H
-#define DRAWABLE_VECTOR_FIELD_H
+#ifndef CINO_DRAWABLE_VECTOR_FIELD_H
+#define CINO_DRAWABLE_VECTOR_FIELD_H
 
 #include <cinolib/vector_field.h>
 #include <cinolib/drawable_object.h>
@@ -115,4 +115,4 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
 }
 
-#endif // DRAWABLE_VECTOR_FIELD_H
+#endif // CINO_DRAWABLE_VECTOR_FIELD_H

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_WRITE_H
-#define READ_WRITE_H
+#ifndef CINO_READ_WRITE_H
+#define CINO_READ_WRITE_H
 
 // SURFACE READERS
 #include <cinolib/io/read_OBJ.h>
@@ -54,4 +54,4 @@
 // SKELETON WRITERS
 #include <cinolib/io/write_LIVESU2012.h>
 
-#endif // READ_WRITE
+#endif // CINO_READ_WRITE

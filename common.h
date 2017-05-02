@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef CINO_COMMON_H
+#define CINO_COMMON_H
 
 #include <assert.h>
 #include <cmath>
@@ -117,4 +117,4 @@ CINO_INLINE ipair deserialize_2D_index(const int i, const int n_cols)
 }
 
 
-#endif // COMMON_H
+#endif // CINO_COMMON_H

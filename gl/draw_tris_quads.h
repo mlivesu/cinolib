@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAW_TRIS_QUADS_H
-#define DRAW_TRIS_QUADS_H
+#ifndef CINO_DRAW_TRIS_QUADS_H
+#define CINO_DRAW_TRIS_QUADS_H
 
 #include <cinolib/cinolib.h>
 
@@ -82,4 +82,4 @@ void render_faces(const RenderFaceData & data);
 #include "draw_tris_quads.cpp"
 #endif
 
-#endif // DRAW_TRIS_QUADS_H
+#endif // CINO_DRAW_TRIS_QUADS_H

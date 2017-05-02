@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_VTK_H
-#define READ_VTK_H
+#ifndef CINO_READ_VTK_H
+#define CINO_READ_VTK_H
 
 #include <cinolib/cinolib.h>
 
@@ -44,4 +44,4 @@ void read_VTK(const char          * filename,
 #include "read_VTK.cpp"
 #endif
 
-#endif // READ_VTK
+#endif // CINO_READ_VTK

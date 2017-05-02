@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef MARCHING_TETS_H
-#define MARCHING_TETS_H
+#ifndef CINO_MARCHING_TETS_H
+#define CINO_MARCHING_TETS_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/meshes/tetmesh/tetmesh.h>
@@ -49,4 +49,4 @@ void marching_tets(const Tetmesh          & m,
 #endif
 
 
-#endif // MARCHING_TETS_H
+#endif // CINO_MARCHING_TETS_H

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef LAPLACIAN_TEMPLATED_H
-#define LAPLACIAN_TEMPLATED_H
+#ifndef CINO_LAPLACIAN_TEMPLATED_H
+#define CINO_LAPLACIAN_TEMPLATED_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/cotangent.h>
@@ -154,4 +154,4 @@ Eigen::SparseMatrix<double> laplacian_xyz(const Mesh & m, const int mode)
 
 }
 
-#endif // LAPLACIAN_TEMPLATED_H
+#endif // CINO_LAPLACIAN_TEMPLATED_H

@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef GEODESICS_H
-#define GEODESICS_H
+#ifndef CINO_GEODESICS_H
+#define CINO_GEODESICS_H
 
 #include <vector>
 
@@ -105,4 +105,4 @@ void compute_geodesics(const Mesh             & m,
 
 }
 
-#endif // GEODESICS_H
+#endif // CINO_GEODESICS_H

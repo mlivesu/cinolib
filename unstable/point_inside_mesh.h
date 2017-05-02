@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef POINT_INSIDE_MESH_H
-#define POINT_INSIDE_MESH_H
+#ifndef CINO_POINT_INSIDE_MESH_H
+#define CINO_POINT_INSIDE_MESH_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/octree.h>
@@ -52,4 +52,4 @@ class PointInsideMeshCache
 #include "point_inside_mesh.cpp"
 #endif
 
-#endif // POINT_INSIDE_MESH_H
+#endif // CINO_POINT_INSIDE_MESH_H

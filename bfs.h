@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef BFS_H
-#define BFS_H
+#ifndef CINO_BFS_H
+#define CINO_BFS_H
 
 #include <cinolib/cinolib.h>
 #include <set>
@@ -90,4 +90,4 @@ void bfs(const Mesh              & m,
 #include "bfs.cpp"
 #endif
 
-#endif // BFS_H
+#endif // CINO_BFS_H

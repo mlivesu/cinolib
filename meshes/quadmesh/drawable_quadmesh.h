@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAWABLE_QUADMESH_H
-#define DRAWABLE_QUADMESH_H
+#ifndef CINO_DRAWABLE_QUADMESH_H
+#define CINO_DRAWABLE_QUADMESH_H
 
 #include <vector>
 #ifdef __APPLE__
@@ -115,4 +115,4 @@ class DrawableQuadmesh : public Quadmesh , public DrawableObject
 #include "drawable_quadmesh.cpp"
 #endif
 
-#endif // DRAWABLE_QUADMESH_H
+#endif // CINO_DRAWABLE_QUADMESH_H

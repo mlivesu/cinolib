@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef DRAW_SPHERE_H
-#define DRAW_SPHERE_H
+#ifndef CINO_DRAW_SPHERE_H
+#define CINO_DRAW_SPHERE_H
 
 #include <cinolib/cinolib.h>
 
@@ -57,4 +57,4 @@ static void sphere(const vec3  & center,
 
 }
 
-#endif // DRAW_SPHERE_H
+#endif // CINO_DRAW_SPHERE_H

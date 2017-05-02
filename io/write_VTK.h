@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef WRITE_VTK_H
-#define WRITE_VTK_H
+#ifndef CINO_WRITE_VTK_H
+#define CINO_WRITE_VTK_H
 
 #include <cinolib/cinolib.h>
 
@@ -44,4 +44,4 @@ void write_VTK(const char                * filename,
 #include "write_VTK.cpp"
 #endif
 
-#endif // WRITE_VTK
+#endif // CINO_WRITE_VTK

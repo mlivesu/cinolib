@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_TAGLIASACCHI2012_H
-#define READ_TAGLIASACCHI2012_H
+#ifndef CINO_READ_TAGLIASACCHI2012_H
+#define CINO_READ_TAGLIASACCHI2012_H
 
 #include <cinolib/cinolib.h>
 
@@ -42,4 +42,4 @@ void read_Tagliasacchi2012(const char          * filename,
 #include "read_TAGLIASACCHI2012.cpp"
 #endif
 
-#endif // READ_TAGLIASACCHI2012
+#endif // CINO_READ_TAGLIASACCHI2012

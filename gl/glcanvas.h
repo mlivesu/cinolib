@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef GLCANVAS_H
-#define GLCANVAS_H
+#ifndef CINO_GLCANVAS_H
+#define CINO_GLCANVAS_H
 
 #ifdef CINOLIB_USES_QGLVIEWER
 
@@ -78,4 +78,4 @@ class GLcanvas : public QGLViewer
 
 #endif
 
-#endif // GLCANVAS_H
+#endif // CINO_GLCANVAS_H

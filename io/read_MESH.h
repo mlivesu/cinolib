@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef READ_MESH_H
-#define READ_MESH_H
+#ifndef CINO_READ_MESH_H
+#define CINO_READ_MESH_H
 
 #include <cinolib/cinolib.h>
 
@@ -44,4 +44,4 @@ void read_MESH(const char          * filename,
 #include "read_MESH.cpp"
 #endif
 
-#endif // READ_MESH
+#endif // CINO_READ_MESH

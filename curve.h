@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef CURVE_H
-#define CURVE_H
+#ifndef CINO_CURVE_H
+#define CINO_CURVE_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/bbox.h>
@@ -130,4 +130,4 @@ CINO_INLINE std::ostream & operator<<(std::ostream & in, const Curve         & c
 #include "curve.cpp"
 #endif
 
-#endif // CURVE_H
+#endif // CINO_CURVE_H

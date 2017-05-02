@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef SAMPLING_H
-#define SAMPLING_H
+#ifndef CINO_SAMPLING_H
+#define CINO_SAMPLING_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/meshes/skel/skel.h>
@@ -39,4 +39,4 @@ void radius_based_mid_sampling(Skel & skel);
 #include "sampling.cpp"
 #endif
 
-#endif // SAMPLING_H
+#endif // CINO_SAMPLING_H
