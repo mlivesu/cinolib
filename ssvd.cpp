@@ -63,8 +63,8 @@ void ssvd(const Eigen::Matrix3d                 & m,
     }
 
     assert(u.determinant() > 0);
-    assert(m.determinant() * (u * s * v.transpose()).determinant() > 0);
 
+    //assert(m.determinant() * (u * s * v.transpose()).determinant() > 0);
     //cout << "m :\n" << m << endl;
     //cout << endl;
     //cout << "m':\n" << u * s * v.transpose() << endl;
