@@ -824,11 +824,28 @@ void Trimesh::translate(const vec3d & delta)
 }
 
 CINO_INLINE
+vec3d Trimesh::barycenter() const
+{
+    vec3d bary(0,0,0);
+    for(int vid=0; vid<num_vertices(); ++vid)
+    {
+        bary += vertex(vid);
+    }
+    if (num_vertices() > 0) bary/=static_cast<double>(num_vertices());
+    return bary;
+}
+
+CINO_INLINE
 void Trimesh::rotate(const vec3d & axis, const double angle)
 {
     double R[3][3];
-    bake_rotation_matrix(axis, angle, R);
-    vec3d c = bb.center();
+    bake_rotation_matrix(axis, angle, R);    
+
+    // This used to be c = bbox.center()
+    // BUT: rotate(axis, angle);
+    //      rotate(axis, -angle);
+    // would not put the mesh back in its original position!!!
+    vec3d c = barycenter();
 
     for(int vid=0; vid<num_vertices(); ++vid)
     {

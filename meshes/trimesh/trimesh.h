@@ -131,6 +131,7 @@ class Trimesh
         const std::vector<float>  & vector_v_float_scalar() const;
         const std::vector<int>    & vector_t_int_scalar()   const;
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        vec3d                       barycenter() const;
         void                        translate(const vec3d & delta);
         void                        rotate   (const vec3d & axis, const double angle);
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
