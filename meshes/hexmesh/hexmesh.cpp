@@ -30,6 +30,51 @@
 #include <map>
 #include <set>
 
+/*  TO BE INCLUDED IN THE DATA STRUCTURE TO HANDLE ELEMENT SPLITTING
+
+// finds average point (adding it if needed)
+// the second parameters contains the already added vertices
+// as they should never be added twice
+int _find_avg(vector<int> &points, map<vector<int>, int> &new_vertices)
+{
+    if (points.size() == 1) return points[0];
+
+    sort(points.begin(), points.end());
+
+    if (new_vertices.count(points)) return new_vertices[points];
+
+    // add new point as the average of existing points
+    vec3<real> new_point(0, 0, 0);
+    for (int p: points)
+    {
+        new_point += vertex(p);
+    }
+    new_point /= points.size();
+    add_vertex(new_point);
+    int vertex_index = m_coords.size()/3 - 1;
+    new_vertices[points] = vertex_index;
+    return vertex_index;
+}
+
+void _apply_split_scheme(const vector<vector<vector<int>>> & split_scheme,
+                         const vector<int> & old_hexes, // linearized input hexa (8 entries per element)
+                         const int base_addr,           // 8 * hexa ID
+                         map<vector<int>,int> & new_vertices)
+{
+    for (auto &hex: split_scheme)
+    for (auto &hex_point: hex)
+    {
+        std::vector<int> points;  // points to be averaged
+        for (int j: hex_point)
+        {
+            points.push_back(old_hexes[base_addr+j]);
+        }
+        m_hexes.push_back(_find_avg(points, new_vertices));
+    }
+}
+
+*/
+
 
 namespace cinolib
 {

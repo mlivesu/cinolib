@@ -31,6 +31,7 @@
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/quadmesh/quadmesh.h>
+#include <cinolib/meshes/hexmesh/hexmesh_split_schemas.h>
 //#include "quality.h"
 
 namespace cinolib
