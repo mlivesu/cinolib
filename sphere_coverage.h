@@ -31,11 +31,16 @@
 
 namespace cinolib
 {
-
 // Compute an approximate (though good) approximation of the even
-// coverage of a sphere. Reference:
+// coverage of a sphere. It is based on the spherical Fibonacci lattice
 //
-// http://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere
+// References:
+//
+//    http://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere
+//
+//    Measurement of Areas on a Sphere Using Fibonacci and Latitude–Longitude Lattices
+//    Mathematical Geosciences 42(1) - 2010
+//    Springer
 //
 CINO_INLINE
 void sphere_coverage(const int n_samples, std::vector<vec3d> & points);
