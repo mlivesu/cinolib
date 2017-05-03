@@ -1,111 +1,20 @@
-adj // maybe we can have two adj types for volume and surface and same mesh template :P
-{
-v,e,f,c (vertex, edge, face, cell)
-}
-
-typedef struct v_data
-{ 
-  (uchar 8bits for flags) (visited, deleted,… )
-  (uchar 8bits for marking flags as used) + 
-     methods 
-	bool using_bit(int)? 
-	void set_using_bit(int)
-  bool  sharp_feat
-  bool  boundary
-  bool  border
-  bool  visited
-  vec3d normal
-  float color[3]
-  float tex_u
-  float tex_v
-  float tex_w
-}
-
-e_data
-{
-  (uchar 8bits for flags) (visited, deleted,… )
-  (uchar 8bits for marking flags as used) + 
-     methods 
-	bool using_bit(int)? 
-	void set_using_bit(int)
-  bool  flagged
-  bool  sharp_feat
-  bool  boundary
-  bool  border
-  bool  visited
-}
-
-f_data
-{
-  (uchar 8bits for flags) (visited, deleted,… )
-  (uchar 8bits for marking flags as used) + 
-     methods 
-	bool using_bit(int)? 
-	void set_using_bit(int)
-  bool  flagged
-  bool  visited
-  vec3d normal
-  float color[3]
-  int   label
-}
-
-USE THIS REPRESENTATION TO HANDLE ALL THE RENDERINGS… (volumetric meshes will have two instances of it, one for the skin and one for the exposed interior when in sliced mode)
-this will also enable slicing for surface meshes…
-typedef struct
-{
-          int                  draw_mode;
-          GLenum               face_type;
-    const std::vector<double> *coords           = NULL;
-    const std::vector<uint>   *faces            = NULL;
-    const std::vector<double> *v_norms          = NULL;
-    const std::vector<double> *f_norms          = NULL;
-    const std::vector<float>  *v_colors         = NULL;
-    const std::vector<float>  *f_colors         = NULL;
-    const float               *wireframe_color  = NULL;
-          int                  wireframe_width;
-          GLuint              *text1D_id        = NULL;
-    const std::vector<float>  *text1D_coords    = NULL;
-          GLuint              *text2D_id        = NULL;
-    const std::vector<float>  *text2D_coords    = NULL;
-    ———————————————————————————————————————————————————
-    const std::vector<double> *border_coords    = NULL;
-    const std::vector<uint>   *border_segs      = NULL;
-    const float               *border_color     = NULL;
-          int                  border_width;
-    ———————————————————————————————————————————————————
-          bool  	       udpate_v_normals = false;
-          bool  	       udpate_f_normals = false;
-	  bool     	       update_f_colors  = false; // (segmentation changed…)
-}
-
-- transform timer in a profiler class with internal string to be printed at the end
-  and summary of times spent in each function… (it’s a tree!!!!!!)
-- ripensa a meshes per facilitare cambi topologia (add/remove/split elements)
-- template meshes su tre strutture v_data, e_data, f_data…
-- usa global toggles per abilitare/disablitare funzioni di log (e.g. nn manifoldness)
-- re-ingegnerizza PointInsideMeshCache, dovrebbe restituire TUTTI gli elementi 
-  che contengono un punto e lasciare la selezione dell’elemento migliore alle 
-  applicazioni che lo utilizzano….
-- aggiungi DrawableOctree
-- aggiungi show triangle IDs and vertex IDs!!!!! (stile remesher panozzo/tarini)
-- aggiungi due spinboxes per controllare gli estremi degli isovalori per il generatore delle isosuperfici
-- aggiungi controlli sulla mesh delle isosuperfici (colore, wireframe, ecc)
-- crea una curve_netowrk class e usala per scheletri, gestures e sharp features
-- aggiungi cache per solver, in modo da recuperare tempo e non rifattorizzare la stessa matrice più volte
-- passa a robust geometric computations (volumi, angoli diedri…) (vedi Lecture Notes on
-Geometric Robustness di Jonathan Richard Shewchuk)
-- aggiungi classe quad layout, per navigare un quad layout
-- genera classe base Mesh, che possiede tutte le caratteristiche comuni 
-  alle varie mesh (chiama tris, quads, ecc, => elements)
-- aggiungi normalizzazione per il cotan laplacian, after
-https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html
-- passa agli iteratori al posto di restituire vettori con le adiacenze
-- add shaders
-- improve on mesh rendering (use VBOs, add different rendering modalities…)
-- ambient occlusion (with/without floor)
-- elimina render pass e fai rendering tutto in una passata (per il wireframe usa i vertici displaced lungo la loro normale, come fatto per il border)
--copia/incolla punti di vista
--add a text box with debug messages
--add perspective/orthographic camera option, with field of view control (libQGLViewer has everything necessary)
--Sistema la GUI in modo tale che si ricordi le impostazioni e non si disallinei con il core quando carico una nuova mesh/skeletro
--sistema timer in modo da mostrare la gerarchia delle chiamate!
+- Put the mesh slicer in a separate class, and make it available also for surfaces
+- Transform timer in a profiler class with internal string to be printed at the end
+  and summary of times spent in each function… (NOTE: it’s a tree!!!!!!)
+- Refactor PointInsideMeshCache, it should return ALL the elements containing the
+  query point and let the application choose the best one
+- make a DrawableOctree (and visually test the octree)
+- Add face IDs and vertex IDs!!!!! (like libigl)
+- Bake a CurveNetwork class and use it for skeletons, gestures, sharp features 
+  and coarse layouts
+- Add cache for eigen solvers - avoid refactoring matrices multiple times
+- Use robust geometric computations (volumes, dihedral angles ecc.) 
+  (ref. => Lecture Notes on Geometric Robustness di Jonathan Richard Shewchuk)
+- Add cotan laplacian  normalization
+  (ref => https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html)
+- Improve on mesh rendering (shaders, VBOs ecc)
+- Add ambient occlusion (with/without floor)
+- delete double render pass e do everything in a single pass
+- Copy/paste points of view
+- Add text box with debug messages
+- Add perspective/orthographic camera option, with field of view control (libQGLViewer has everything necessary)

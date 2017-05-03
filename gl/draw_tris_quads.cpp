@@ -117,7 +117,6 @@ void render_faces_pvt(const RenderFaceData & data)
             if (data.draw_mode & DRAW_VERTEXCOLOR) glDisableClientState(GL_COLOR_ARRAY);   else
             if (data.draw_mode & DRAW_TEXTURE1D)   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-
             glDisableClientState(GL_NORMAL_ARRAY);
             glDisableClientState(GL_VERTEX_ARRAY);
         }
@@ -144,7 +143,6 @@ void render_faces_pvt(const RenderFaceData & data)
 
     if (data.draw_mode & DRAW_BORDER)
     {
-        glDisable(GL_LIGHTING);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
 

@@ -5,7 +5,7 @@
 *                                                                           *
 * Author: Marco Livesu (marco.livesu@gmail.com)                             *
 *                                                                           *
-* Copyright(C) 2016                                                         *
+* Copyright(C) 2017                                                         *
 * All rights reserved.                                                      *
 *                                                                           *
 * This file is part of CinoLib                                              *
@@ -21,43 +21,71 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef CINO_DRAWABLE_OBJECT_H
-#define CINO_DRAWABLE_OBJECT_H
+#ifndef CINO_MESH_STD_DATA_H
+#define CINO_MESH_STD_DATA_H
 
 #include <cinolib/geometry/vec3.h>
-#include <float.h>
 
 namespace cinolib
 {
 
-typedef enum
+/* These are the MINIMAL attributes required by CinoLib.
+ * If omitted, the library would not compile!!!!!!!!!!!
+ *
+ * NOTE: you do not need to specify them, they have been
+ * set as default template arguments in any mesh available
+ * within the library. Meshes can therefore be declared as
+ * follows:
+ *
+ * Trimesh<>     my_trimesh;
+ * Quadmesh<>    my_quadmesh;
+ * Polygonmesh<> my_polymesh;
+ * Tetmesh<>     my_tetmesh;
+ * Hexmesh<>     my_hexmesh;
+ *
+ * Otherwise, if more attributes are necessary, you can always
+ * extend the current structures, and use explicit templates:
+ *
+ * Trimesh<Vdata,Edata,Fdata>     my_trimesh;
+ * Quadmesh<Vdata,Edata,Fdata>    my_quadmesh;
+ * Polygonmesh<Vdata,Edata,Fdata> my_polymesh;
+ * Tetmesh<Vdata,Edata,Cdata>     my_tetmesh;
+ * Hexmesh<Vdata,Edata,Cdata>     my_hexmesh;
+*/
+
+typedef struct
 {
-    ABSTRACT      ,
-    TRIMESH       ,
-    POLYGONMESH   ,
-    TETMESH       ,
-    QUADMESH      ,
-    HEXMESH       ,
-    SKELETON      ,
-    CURVE         ,
-    ISOSURFACE    ,
-    VECTOR_FIELD
+    vec3d  normal   = vec3d(0,0,0);
+    float  color[3] = { 1, 1, 1 };
+    float  uvw[3]   = { 0, 0, 0 };
 }
-ObjectType;
+Vert_std_data;
 
-class DrawableObject
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+typedef struct
+{}
+Edge_std_data;
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+typedef struct
 {
-    public :
+    vec3d  normal   = vec3d(0,0,0);
+    float  color[3] = { 1, 1, 1 };
+    int    label    = 0;
+}
+Face_std_data;
 
-        ObjectType type;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableObject() { type = ABSTRACT; }
-
-        virtual void  draw(const float scene_size = 1) const = 0;  // do rendering
-        virtual vec3d scene_center() const = 0;  // get position in space
-        virtual float scene_radius() const = 0;  // get size (approx. radius of the bounding sphere)
-};
+typedef struct
+{
+    float  color[3] = { 1, 1, 1 };
+    int    label    = 0;
+}
+Cell_std_data;
 
 }
 
-#endif // CINO_DRAWABLE_OBJECT_H
+#endif // CINO_MESH_STD_DATA_H

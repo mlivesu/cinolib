@@ -31,6 +31,10 @@
 namespace cinolib
 {
     static Logger logger;
+
+    /*** OPTIONS ***/
+    static bool support_non_manifold_edges = true;
+    static bool print_non_manifold_edges   = false;
 }
 
 #endif // CINO_LIB_H
