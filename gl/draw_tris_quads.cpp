@@ -146,6 +146,9 @@ void render_faces_pvt(const RenderFaceData & data)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
 
+        glDepthRange(0.0, 1.0);
+        glDepthFunc(GL_LEQUAL);
+
         assert(data.border_coords != NULL);
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_DOUBLE, 0, data.border_coords->data());
@@ -158,6 +161,8 @@ void render_faces_pvt(const RenderFaceData & data)
         glDrawElements(GL_LINES, data.border_segs->size(), GL_UNSIGNED_INT, data.border_segs->data());
 
         glDisableClientState(GL_VERTEX_ARRAY);
+
+        glDepthFunc(GL_LESS);
     }
 }
 
@@ -223,12 +228,14 @@ void render_faces(const RenderFaceData & data)
             {
                 glEnable(GL_LIGHTING);
                 glShadeModel(GL_FLAT);
+                glDepthRange(0.01, 1.0);
                 render_faces_pvt(data);
             }
             else if (data.draw_mode & DRAW_SMOOTH)
             {
                 glEnable(GL_LIGHTING);
                 glShadeModel(GL_SMOOTH);
+                glDepthRange(0.01, 1.0);
                 render_faces_pvt(data);
             }
         }
