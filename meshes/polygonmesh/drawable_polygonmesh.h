@@ -51,15 +51,6 @@ class DrawablePolygonmesh : public Polygonmesh<V_data,E_data,F_data>, public Dra
         DrawablePolygonmesh(const std::vector<double>            & coords,
                             const std::vector<std::vector<uint>> & faces);
 
-        void  draw(const float scene_size=1) const;
-        vec3d scene_center() const { return this->bb.center(); }
-        float scene_radius() const { return this->bb.diag();   }
-
-        void init_drawable_stuff();
-        void update_drawlist();
-
-        void slice(const float thresh, const int item, const int sign, const int mode);
-
     protected:
 
         MeshSlicer<Polygonmesh<V_data,E_data,F_data>> slicer;
@@ -82,6 +73,22 @@ class DrawablePolygonmesh : public Polygonmesh<V_data,E_data,F_data>, public Dra
         std::vector<float>  drawlist_f_colors;
         std::vector<double> drawlist_border_coords;
         std::vector<uint>   drawlist_border_segs;
+
+    public:
+
+        void  draw(const float scene_size=1) const;
+        vec3d scene_center() const { return this->bb.center(); }
+        float scene_radius() const { return this->bb.diag();   }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void init_drawable_stuff();
+        void update_drawlist();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void slice(const float thresh, const int item, const int sign, const int mode);
+
 };
 
 }

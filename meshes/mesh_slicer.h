@@ -48,8 +48,8 @@ class MeshSlicer
             L   = 4, // filter w.r.t. element label
             AND = 5, // put multiple slice constraints in AND
             OR  = 6, // put multiple slice constraints in OR
-            LEQ = 7, // use <= to evaluate element centroid
-            GEQ = 8  // use >= to evaluate element centroid
+            LEQ = 7, // use <= to evaluate X Y Z Q
+            GEQ = 8  // use >= to evaluate X Y Z Q
         };
 
         MeshSlicer(){ m_ptr = NULL; }
@@ -58,15 +58,15 @@ class MeshSlicer
 
         void update(const float         thresh,  // thresh on centroid
                     const int           item,    // X, Y, Z, Q, L
-                    const int           sign,    // either LEQ or GEQ
-                    const int           mode);   // true => element hidden
+                    const int           sign,    // either LEQ or GEQ (used for X Y Z Q)
+                    const int           mode);   // either AND or OR
 
         void update();
 
     protected:
 
         float slice_thresh[5]; // X Y Z Q L
-        int   slice_sign  [5]; // either LEQ or GEQ
+        int   slice_sign  [4]; // either LEQ or GEQ (used for X Y Z Q)
         int   slice_mode;      // either AND or OR
 
         Mesh *m_ptr;

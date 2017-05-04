@@ -91,7 +91,7 @@ class Polygonmesh
         uint num_verts() const { return static_cast<uint>(coords.size())/3; }
         uint num_edges() const { return static_cast<uint>(edges.size())/2;  }
         uint num_faces() const { return static_cast<uint>(faces.size());    }
-        uint num_elems() const { return static_cast<uint>(faces.size());    }
+        uint num_elems() const { return static_cast<uint>(faces.size());    } // elem == face!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -116,8 +116,8 @@ class Polygonmesh
               E_data & edge_data(const uint eid)       { return e_data.at(eid); }
         const F_data & face_data(const uint fid) const { return f_data.at(fid); }
               F_data & face_data(const uint fid)       { return f_data.at(fid); }
-        const F_data & elem_data(const uint fid) const { return f_data.at(fid); } // generic algorithm programming
-              F_data & elem_data(const uint fid)       { return f_data.at(fid); } // here elem == face!!
+        const F_data & elem_data(const uint fid) const { return f_data.at(fid); } // elem == face!!
+              F_data & elem_data(const uint fid)       { return f_data.at(fid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

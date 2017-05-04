@@ -256,6 +256,7 @@ vec3d Polygonmesh<V_data,E_data,F_data>::face_centroid(const uint fid) const
 {
     vec3d c(0,0,0);
     for(uint vid : faces.at(fid)) c += vert(vid);
+    c /= static_cast<double>(faces.size());
     return c;
 }
 

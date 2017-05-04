@@ -32,17 +32,16 @@ template<class Mesh>
 CINO_INLINE
 MeshSlicer<Mesh>::MeshSlicer(Mesh * m) : m_ptr(m)
 {
-    slice_thresh [ X ] = m_ptr->bbox().max.x();
-    slice_thresh [ Y ] = m_ptr->bbox().max.y();
-    slice_thresh [ Z ] = m_ptr->bbox().max.z();
-    slice_thresh [ L ] = -1.0;
-    slice_thresh [ Q ] = -1.0;
-    slice_sign   [ X ] = LEQ;
-    slice_sign   [ Y ] = LEQ;
-    slice_sign   [ Z ] = LEQ;
-    slice_sign   [ L ] = LEQ;
-    slice_sign   [ Q ] = LEQ;
-    slice_mode         = AND;
+    slice_thresh[ X ] = m_ptr->bbox().max.x();
+    slice_thresh[ Y ] = m_ptr->bbox().max.y();
+    slice_thresh[ Z ] = m_ptr->bbox().max.z();
+    slice_thresh[ Q ] = 0.0;
+    slice_thresh[ L ] = -1;
+    slice_sign  [ X ] = LEQ;
+    slice_sign  [ Y ] = LEQ;
+    slice_sign  [ Z ] = LEQ;
+    slice_sign  [ Q ] = LEQ;
+    slice_mode        = AND;
 
     m_ptr->elem_show_all();
 }
@@ -84,16 +83,18 @@ void MeshSlicer<Mesh>::update()
     {
         vec3d  c = m_ptr->elem_centroid(eid);
         float  q = m_ptr->elem_data(eid).quality;
-        int    l = static_cast<int>(slice_thresh[L]);
+        int    l = m_ptr->elem_data(eid).label;
 
-        bool pass_X = (slice_sign[X]) ? (c.x() <= slice_thresh[X]) : (c.x() >= slice_thresh[X]);
-        bool pass_Y = (slice_sign[Y]) ? (c.y() <= slice_thresh[Y]) : (c.y() >= slice_thresh[Y]);
-        bool pass_Z = (slice_sign[Z]) ? (c.z() <= slice_thresh[Z]) : (c.z() >= slice_thresh[Z]);
-        bool pass_Q = (slice_sign[Q]) ? (q     <= slice_thresh[Q]) : (q     >= slice_thresh[Q]);
-        bool pass_L = (l == -1 || m_ptr->elem_data(eid).label != l);
+        bool pass_X = (slice_sign[X] == LEQ) ? (c.x() <= slice_thresh[X]) : (c.x() >= slice_thresh[X]);
+        bool pass_Y = (slice_sign[Y] == LEQ) ? (c.y() <= slice_thresh[Y]) : (c.y() >= slice_thresh[Y]);
+        bool pass_Z = (slice_sign[Z] == LEQ) ? (c.z() <= slice_thresh[Z]) : (c.z() >= slice_thresh[Z]);
+        bool pass_Q = (slice_sign[Q] == LEQ) ? (q     <= slice_thresh[Q]) : (q     >= slice_thresh[Q]);
+        bool pass_L = (l == -1 ||  l != static_cast<int>(slice_thresh[L]));
 
-        m_ptr->elem_data(eid).visible = (slice_mode) ? ( pass_X &&  pass_Y &&  pass_Z &&  pass_L &&  pass_Q)
-                                                     : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
+        bool b = (slice_mode == AND) ? ( pass_X &&  pass_Y &&  pass_Z &&  pass_L &&  pass_Q)
+                                     : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
+
+        m_ptr->elem_data(eid).visible = b;
     }
 }
 
