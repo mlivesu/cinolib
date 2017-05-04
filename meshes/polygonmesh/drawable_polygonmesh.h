@@ -34,6 +34,7 @@
 #include <cinolib/drawable_object.h>
 #include <cinolib/gl/draw_tris_quads.h>
 #include <cinolib/meshes/polygonmesh/polygonmesh.h>
+#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
@@ -45,30 +46,23 @@ class DrawablePolygonmesh : public Polygonmesh<V_data,E_data,F_data>, public Dra
 {
     public:
 
-        // X : slice w.r.t. face centroid X coord
-        // Y : slice w.r.t. face centroid Y coord
-        // Z : slice w.r.t. face centroid Z coord
-        // L : slice w.r.t. face label
-        //
-        enum { slice_X  , slice_Y , slice_Z  , slice_L,
-               slice_AND, slice_OR, slice_LEQ, slice_GEQ };
-
         DrawablePolygonmesh();
 
         DrawablePolygonmesh(const std::vector<double>            & coords,
                             const std::vector<std::vector<uint>> & faces);
 
-        void init_drawable_stuff();
-        void update_drawlist();
-
         void  draw(const float scene_size=1) const;
         vec3d scene_center() const { return this->bb.center(); }
         float scene_radius() const { return this->bb.diag();   }
 
-        void set_slice(const float thresh, const int item, const int sign, const int mode);
-        void update_slice();
+        void init_drawable_stuff();
+        void update_drawlist();
+
+        void slice(const float thresh, const int item, const int sign, const int mode);
 
     protected:
+
+        MeshSlicer<Polygonmesh<V_data,E_data,F_data>> slicer;
 
         int    draw_mode;
         int    wireframe_width;
@@ -77,14 +71,10 @@ class DrawablePolygonmesh : public Polygonmesh<V_data,E_data,F_data>, public Dra
         float  border_color[4];
         GLuint texture_id;
 
-        // It would be nice to ha ve the slicer as a separate class
-        // that works for any mesh!
-
-        std::vector<bool> slice_mask;
-        float slice_thresh[4];
-        int   slice_sign  [4];
-        int   slice_mode;
-
+        // to be substituted with a new version of RenderFaceData
+        // (which will no longer take pointers to vectors, but rather concrete vectors)
+        // this will involce changes in the other data structures too.
+        // it has to be done at the very end of the refactoring
         std::vector<double> drawlist_coords;
         std::vector<uint>   drawlist_faces;
         std::vector<double> drawlist_v_norms;

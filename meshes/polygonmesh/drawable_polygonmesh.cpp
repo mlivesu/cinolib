@@ -67,17 +67,7 @@ void DrawablePolygonmesh<V_data,E_data,F_data>::init_drawable_stuff()
     border_color[2] = 0.1;
     border_color[3] = 1.0;
 
-    slice_mask = std::vector<bool>(this->num_faces(), false); // set all visible
-
-    slice_thresh [ slice_X ] = this->bb.max.x();
-    slice_thresh [ slice_Y ] = this->bb.max.y();
-    slice_thresh [ slice_Z ] = this->bb.max.z();
-    slice_thresh [ slice_L ] = -1.0;
-    slice_sign   [ slice_X ] = slice_LEQ;
-    slice_sign   [ slice_Y ] = slice_LEQ;
-    slice_sign   [ slice_Z ] = slice_LEQ;
-    slice_sign   [ slice_L ] = slice_LEQ;
-    slice_mode               = slice_AND;
+    slicer = MeshSlicer<Polygonmesh<V_data,E_data,F_data>>(this);
 
     update_drawlist();
 }
@@ -122,7 +112,7 @@ void DrawablePolygonmesh<V_data,E_data,F_data>::update_drawlist()
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        if ((draw_mode & DRAW_MESH) && (slice_mask.at(fid))) continue;
+        if ((draw_mode & DRAW_MESH) && !(this->face_data(fid).visible)) continue;
 
         uint n_sides = this->faces.at(fid).size();
         assert(n_sides>2);
@@ -182,8 +172,11 @@ void DrawablePolygonmesh<V_data,E_data,F_data>::update_drawlist()
     // bake wireframe as border
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        bool masked = false;
-        for(uint fid : this->adj_e2f(eid)) if (slice_mask.at(fid)) masked = true;
+        bool masked = true;
+        for(uint fid : this->adj_e2f(eid))
+        {
+            if (this->face_data(fid).visible) masked = false;
+        }
         if (masked) continue;
 
         int base_addr = drawlist_border_coords.size()/3;
@@ -206,44 +199,15 @@ void DrawablePolygonmesh<V_data,E_data,F_data>::update_drawlist()
 
 template<class V_data, class E_data, class F_data>
 CINO_INLINE
-void DrawablePolygonmesh<V_data,E_data,F_data>::set_slice(const float thresh,
-                                                          const int   item,
-                                                          const int   sign,
-                                                          const int   mode)
+void DrawablePolygonmesh<V_data,E_data,F_data>::slice(const float thresh, // thresh on centroids or quality
+                                                      const int   item,   // X, Y, Z, L, Q
+                                                      const int   sign,   // either LEQ or GEQ
+                                                      const int   mode)   // either AND or OR
 {
-    switch (item)
-    {
-        case slice_X:
-        case slice_Y:
-        case slice_Z: slice_thresh[item] = this->bb.min[item] + this->bb.delta()[item] * thresh; break;
-        case slice_L: slice_thresh[item] = thresh; break;
-        default: assert(false);
-    }
-    slice_sign[item] = sign; assert(sign == slice_LEQ || sign == slice_GEQ);
-    slice_mode       = mode; assert(mode == slice_AND || mode == slice_OR);
-    update_slice();
+    slicer.update(thresh, item, sign, mode); // update per element visibility flags
+    update_drawlist();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class V_data, class E_data, class F_data>
-CINO_INLINE
-void DrawablePolygonmesh<V_data,E_data,F_data>::update_slice()
-{
-    for(uint fid=0; fid<this->num_faces(); ++fid)
-    {
-        vec3d  c = this->face_centroid(fid);
-        int    l = static_cast<int>(slice_thresh[slice_L]);
-
-        bool pass_x = (slice_sign[slice_X]) ? (c.x() <= slice_thresh[slice_X]) : (c.x() >= slice_thresh[slice_X]);
-        bool pass_y = (slice_sign[slice_Y]) ? (c.y() <= slice_thresh[slice_Y]) : (c.y() >= slice_thresh[slice_Y]);
-        bool pass_z = (slice_sign[slice_Z]) ? (c.z() <= slice_thresh[slice_Z]) : (c.z() >= slice_thresh[slice_Z]);
-        bool pass_l = (l == -1 || this->face_data(fid).label != l);
-
-        slice_mask.at(fid) = (slice_mode) ? ( pass_x &&  pass_y &&  pass_z &&  pass_l)
-                                          : (!pass_x || !pass_y || !pass_z || !pass_l);
-    }
-    update_drawlist();
-}
 
 }

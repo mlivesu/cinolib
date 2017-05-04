@@ -263,6 +263,15 @@ vec3d Polygonmesh<V_data,E_data,F_data>::face_centroid(const uint fid) const
 
 template<class V_data, class E_data, class F_data>
 CINO_INLINE
+vec3d Polygonmesh<V_data,E_data,F_data>::elem_centroid(const uint fid) const
+{
+    return face_centroid(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class V_data, class E_data, class F_data>
+CINO_INLINE
 uint Polygonmesh<V_data,E_data,F_data>::edge_vert_id(const uint eid, const uint offset) const
 {
     uint   eid_ptr = eid * 2;
@@ -279,6 +288,18 @@ vec3d Polygonmesh<V_data,E_data,F_data>::edge_vert(const uint eid, const uint of
     uint vid     = edges.at(eid_ptr + offset);
     uint vid_ptr = vid * 3;
     return vec3d(coords.at(vid_ptr + 0), coords.at(vid_ptr + 1), coords.at(vid_ptr + 2));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class V_data, class E_data, class F_data>
+CINO_INLINE
+void Polygonmesh<V_data,E_data,F_data>::elem_show_all()
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        face_data(fid).visible = true;
+    }
 }
 
 }

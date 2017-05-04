@@ -21,75 +21,61 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef CINO_MESH_STD_DATA_H
-#define CINO_MESH_STD_DATA_H
+#ifndef CINO_MESH_SLICER_H
+#define CINO_MESH_SLICER_H
 
+#include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/gl/draw_tris_quads.h>
 
 namespace cinolib
 {
-
-/* These are the MINIMAL attributes required by CinoLib.
- * If omitted, the library would not compile!!!!!!!!!!!
- *
- * NOTE: you do not need to specify them, they have been
- * set as default template arguments in any mesh available
- * within the library. Meshes can therefore be declared as
- * follows:
- *
- * Trimesh<>     my_trimesh;
- * Quadmesh<>    my_quadmesh;
- * Polygonmesh<> my_polymesh;
- * Tetmesh<>     my_tetmesh;
- * Hexmesh<>     my_hexmesh;
- *
- * Otherwise, if more attributes are necessary, you can always
- * extend the current structures, and use explicit templates:
- *
- * Trimesh<Vdata,Edata,Fdata>     my_trimesh;
- * Quadmesh<Vdata,Edata,Fdata>    my_quadmesh;
- * Polygonmesh<Vdata,Edata,Fdata> my_polymesh;
- * Tetmesh<Vdata,Edata,Cdata>     my_tetmesh;
- * Hexmesh<Vdata,Edata,Cdata>     my_hexmesh;
+/* Filter mesh elements according to a number of different criteria.
+ * Useful to inspect the interior of volume meshes, or to isolate
+ * interesting portions of a complex surface mesh.
 */
-
-typedef struct
+template<class Mesh>
+class MeshSlicer
 {
-    vec3d  normal   = vec3d(0,0,0);
-    float  color[3] = { 1, 1, 1 };
-    float  uvw[3]   = { 0, 0, 0 };
+    public:
+
+        enum
+        {
+            X   = 0, // filter w.r.t. element centroid X coord
+            Y   = 1, // filter w.r.t. element centroid Y coord
+            Z   = 2, // filter w.r.t. element centroid Z coord
+            Q   = 3, // filter w.r.t. element quality
+            L   = 4, // filter w.r.t. element label
+            AND = 5, // put multiple slice constraints in AND
+            OR  = 6, // put multiple slice constraints in OR
+            LEQ = 7, // use <= to evaluate element centroid
+            GEQ = 8  // use >= to evaluate element centroid
+        };
+
+        MeshSlicer(){ m_ptr = NULL; }
+
+        MeshSlicer(Mesh *m);
+
+        void update(const float         thresh,  // thresh on centroid
+                    const int           item,    // X, Y, Z, Q, L
+                    const int           sign,    // either LEQ or GEQ
+                    const int           mode);   // true => element hidden
+
+        void update();
+
+    protected:
+
+        float slice_thresh[5]; // X Y Z Q L
+        int   slice_sign  [5]; // either LEQ or GEQ
+        int   slice_mode;      // either AND or OR
+
+        Mesh *m_ptr;
+};
+
 }
-Vert_std_data;
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifndef  CINO_STATIC_LIB
+#include "mesh_slicer.cpp"
+#endif
 
-typedef struct
-{}
-Edge_std_data;
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-typedef struct
-{
-    vec3d  normal   = vec3d(0,0,0);
-    float  color[3] = { 1, 1, 1 };
-    int    label    = -1;
-    bool   visible  = true;
-    float  quality  = 0.0;
-}
-Face_std_data;
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-typedef struct
-{
-    float  color[3] = { 1, 1, 1 };
-    int    label    = -1;
-    bool   visible  = true;
-    float  quality  = 0.0;
-}
-Cell_std_data;
-
-}
-
-#endif // CINO_MESH_STD_DATA_H
+#endif // CINO_MESH_SLICER_H
