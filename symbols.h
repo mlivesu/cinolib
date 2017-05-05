@@ -27,16 +27,18 @@
 namespace cinolib
 {
 
-// List of GLOBAL symbols used throughout the library
+// List of GLOBAL symbols used throughout the library. This helps keeping a unique ID for each symbol.
+// Symbols that require specialized values (e.g. X=>0, Y=>1, Z=>2) are to be defined within the classes
+// that need them, and will therefore leave in a different namespace.
 
 enum
 {
-    EQ,
-    NEQ,
-    LEQ,
-    GEQ,
-    AND,
-    OR
+    EQ,   // ==
+    NEQ,  // !=
+    LEQ,  // <=
+    GEQ,  // >=
+    AND,  // &&
+    OR    // ||
 };
 
 }
