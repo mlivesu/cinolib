@@ -27,32 +27,43 @@
 namespace cinolib
 {
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-DrawablePolygonmesh<V_data,E_data,F_data>::DrawablePolygonmesh() : Polygonmesh<V_data,E_data,F_data>()
+DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh() : Polygonmesh<V,E,F>()
 {
     init_drawable_stuff();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-DrawablePolygonmesh<V_data,E_data,F_data>::DrawablePolygonmesh(const std::vector<double>            & coords,
-                                                               const std::vector<std::vector<uint>> & faces)
-    : Polygonmesh<V_data,E_data,F_data>(coords,faces)
+DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh(const std::vector<vec3d>             & verts,
+                                                  const std::vector<std::vector<uint>> & faces)
+    : Polygonmesh<M,V,E,F>(verts,faces)
 {
     init_drawable_stuff();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawablePolygonmesh<V_data,E_data,F_data>::init_drawable_stuff()
+DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh(const std::vector<double>            & coords,
+                                                  const std::vector<std::vector<uint>> & faces)
+    : Polygonmesh<M,V,E,F>(coords,faces)
+{
+    init_drawable_stuff();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::init_drawable_stuff()
 {
     type   = POLYGONMESH;
-    slicer = MeshSlicer<Polygonmesh<V_data,E_data,F_data>>(this);
+    slicer = MeshSlicer<Polygonmesh<M,V,E,F>>(this);
 
     drawlist.draw_mode    = DRAW_MESH | DRAW_FLAT | DRAW_FACECOLOR | DRAW_BORDER;
     drawlist.seg_width    = 1;
@@ -66,18 +77,18 @@ void DrawablePolygonmesh<V_data,E_data,F_data>::init_drawable_stuff()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawablePolygonmesh<V_data,E_data,F_data>::draw(const float) const
+void DrawablePolygonmesh<M,V,E,F>::draw(const float) const
 {
     render(drawlist);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawablePolygonmesh<V_data,E_data,F_data>::update_drawlist()
+void DrawablePolygonmesh<M,V,E,F>::update_drawlist()
 {
     drawlist.tri_coords.clear();
     drawlist.tris.clear();
@@ -187,12 +198,12 @@ void DrawablePolygonmesh<V_data,E_data,F_data>::update_drawlist()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawablePolygonmesh<V_data,E_data,F_data>::slice(const float thresh, // thresh on centroids or quality
-                                                      const int   item,   // X, Y, Z, L, Q
-                                                      const int   sign,   // either LEQ or GEQ
-                                                      const int   mode)   // either AND or OR
+void DrawablePolygonmesh<M,V,E,F>::slice(const float thresh, // thresh on centroids or quality
+                                         const int   item,   // X, Y, Z, L, Q
+                                         const int   sign,   // either LEQ or GEQ
+                                         const int   mode)   // either AND or OR
 {
     slicer.update(thresh, item, sign, mode); // update per element visibility flags
     update_drawlist();

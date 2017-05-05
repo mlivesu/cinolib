@@ -29,10 +29,22 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-Polygonmesh<V_data,E_data,F_data>::Polygonmesh(const std::vector<double>            & coords,
-                                               const std::vector<std::vector<uint>> & faces)
+Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<vec3d>             & verts,
+                                  const std::vector<std::vector<uint>> & faces)
+: verts(verts)
+, faces(faces)
+{
+    init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<double>            & coords,
+                                  const std::vector<std::vector<uint>> & faces)
 : faces(faces)
 {
     uint nv = coords.size()/3;
@@ -44,17 +56,18 @@ Polygonmesh<V_data,E_data,F_data>::Polygonmesh(const std::vector<double>        
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<V_data,E_data,F_data>::clear()
+void Polygonmesh<M,V,E,F>::clear()
 {
     bb.reset();
-    filename.clear();
     //
     verts.clear();
     edges.clear();
     faces.clear();
     //
+    M std_M_data;
+    m_data = std_M_data;
     v_data.clear();
     e_data.clear();
     f_data.clear();
@@ -69,9 +82,9 @@ void Polygonmesh<V_data,E_data,F_data>::clear()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<V_data,E_data,F_data>::init()
+void Polygonmesh<M,V,E,F>::init()
 {
     update_adjacency();
     update_bbox();
@@ -85,9 +98,9 @@ void Polygonmesh<V_data,E_data,F_data>::init()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<V_data,E_data,F_data>::update_adjacency()
+void Polygonmesh<M,V,E,F>::update_adjacency()
 {
     timer_start("Build adjacency");
 
@@ -165,9 +178,9 @@ void Polygonmesh<V_data,E_data,F_data>::update_adjacency()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<V_data,E_data,F_data>::update_bbox()
+void Polygonmesh<M,V,E,F>::update_bbox()
 {
     bb.reset();
     for(uint vid=0; vid<num_verts(); ++vid)
@@ -180,9 +193,9 @@ void Polygonmesh<V_data,E_data,F_data>::update_bbox()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<V_data,E_data,F_data>::update_f_normals()
+void Polygonmesh<M,V,E,F>::update_f_normals()
 {
     for(uint fid=0; fid<num_faces(); ++fid) // TODO: make it more accurate!
     {
@@ -197,9 +210,9 @@ void Polygonmesh<V_data,E_data,F_data>::update_f_normals()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<V_data,E_data,F_data>::update_v_normals()
+void Polygonmesh<M,V,E,F>::update_v_normals()
 {
     for(uint vid=0; vid<num_verts(); ++vid)
     {
@@ -215,9 +228,9 @@ void Polygonmesh<V_data,E_data,F_data>::update_v_normals()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<V_data,E_data,F_data>::update_normals()
+void Polygonmesh<M,V,E,F>::update_normals()
 {
     update_f_normals();
     update_v_normals();
@@ -225,27 +238,27 @@ void Polygonmesh<V_data,E_data,F_data>::update_normals()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-uint Polygonmesh<V_data,E_data,F_data>::face_vert_id(const uint fid, const uint offset) const
+uint Polygonmesh<M,V,E,F>::face_vert_id(const uint fid, const uint offset) const
 {
     return faces.at(fid).at(offset);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d Polygonmesh<V_data,E_data,F_data>::face_vert(const uint fid, const uint offset) const
+vec3d Polygonmesh<M,V,E,F>::face_vert(const uint fid, const uint offset) const
 {
     return vert(faces.at(fid).at(offset));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d Polygonmesh<V_data,E_data,F_data>::face_centroid(const uint fid) const
+vec3d Polygonmesh<M,V,E,F>::face_centroid(const uint fid) const
 {
     vec3d c(0,0,0);
     for(uint vid : faces.at(fid)) c += vert(vid);
@@ -255,18 +268,18 @@ vec3d Polygonmesh<V_data,E_data,F_data>::face_centroid(const uint fid) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d Polygonmesh<V_data,E_data,F_data>::elem_centroid(const uint fid) const
+vec3d Polygonmesh<M,V,E,F>::elem_centroid(const uint fid) const
 {
     return face_centroid(fid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-uint Polygonmesh<V_data,E_data,F_data>::edge_vert_id(const uint eid, const uint offset) const
+uint Polygonmesh<M,V,E,F>::edge_vert_id(const uint eid, const uint offset) const
 {
     uint   eid_ptr = eid * 2;
     return edges.at(eid_ptr + offset);
@@ -274,9 +287,9 @@ uint Polygonmesh<V_data,E_data,F_data>::edge_vert_id(const uint eid, const uint 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d Polygonmesh<V_data,E_data,F_data>::edge_vert(const uint eid, const uint offset) const
+vec3d Polygonmesh<M,V,E,F>::edge_vert(const uint eid, const uint offset) const
 {
     uint eid_ptr = eid * 2;
     uint vid     = edges.at(eid_ptr + offset);
@@ -285,9 +298,9 @@ vec3d Polygonmesh<V_data,E_data,F_data>::edge_vert(const uint eid, const uint of
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class V_data, class E_data, class F_data>
+template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<V_data,E_data,F_data>::elem_show_all()
+void Polygonmesh<M,V,E,F>::elem_show_all()
 {
     for(uint fid=0; fid<num_faces(); ++fid)
     {

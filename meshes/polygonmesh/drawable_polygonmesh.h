@@ -41,14 +41,18 @@
 namespace cinolib
 {
 
-template<class V_data = Vert_std_data, // default template arguments
-         class E_data = Edge_std_data,
-         class F_data = Face_std_data>
-class DrawablePolygonmesh : public Polygonmesh<V_data,E_data,F_data>, public DrawableObject
+template<class M = Mesh_std_data, // default template arguments
+         class V = Vert_std_data,
+         class E = Edge_std_data,
+         class F = Face_std_data>
+class DrawablePolygonmesh : public Polygonmesh<M,V,E,F>, public DrawableObject
 {
     public:
 
         DrawablePolygonmesh();
+
+        DrawablePolygonmesh(const std::vector<vec3d>             & verts,
+                            const std::vector<std::vector<uint>> & faces);
 
         DrawablePolygonmesh(const std::vector<double>            & coords,
                             const std::vector<std::vector<uint>> & faces);
@@ -56,7 +60,7 @@ class DrawablePolygonmesh : public Polygonmesh<V_data,E_data,F_data>, public Dra
     protected:
 
         RenderData drawlist;
-        MeshSlicer<Polygonmesh<V_data,E_data,F_data>> slicer;
+        MeshSlicer<Polygonmesh<M,V,E,F>> slicer;
 
     public:
 

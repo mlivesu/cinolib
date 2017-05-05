@@ -33,36 +33,36 @@
 namespace cinolib
 {
 
-template<class V_data = Vert_std_data, // default template arguments
-         class E_data = Edge_std_data,
-         class F_data = Face_std_data>
+template<class M = Mesh_std_data, // default template arguments
+         class V = Vert_std_data,
+         class E = Edge_std_data,
+         class F = Face_std_data>
 class Polygonmesh
 {
     public:
 
         Polygonmesh(){}
 
+        Polygonmesh(const std::vector<vec3d>             & verts,
+                    const std::vector<std::vector<uint>> & faces);
+
         Polygonmesh(const std::vector<double>            & coords,
                     const std::vector<std::vector<uint>> & faces);
 
     protected:
 
-        // global properties
-        //
-        std::string filename;
-        Bbox        bb;
+        Bbox bb;
 
-        // mesh elements
-        //
         std::vector<vec3d>             verts;
         std::vector<uint>              edges;
         std::vector<std::vector<uint>> faces;
 
         // attributes
         //
-        std::vector<V_data> v_data;
-        std::vector<E_data> e_data;
-        std::vector<F_data> f_data;
+        M              m_data;
+        std::vector<V> v_data;
+        std::vector<E> e_data;
+        std::vector<F> f_data;
 
         // adjacencies -- Yes, I have lots of memory ;)
         //
@@ -110,14 +110,16 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const V_data & vert_data(const uint vid) const { return v_data.at(vid); }
-              V_data & vert_data(const uint vid)       { return v_data.at(vid); }
-        const E_data & edge_data(const uint eid) const { return e_data.at(eid); }
-              E_data & edge_data(const uint eid)       { return e_data.at(eid); }
-        const F_data & face_data(const uint fid) const { return f_data.at(fid); }
-              F_data & face_data(const uint fid)       { return f_data.at(fid); }
-        const F_data & elem_data(const uint fid) const { return f_data.at(fid); } // elem == face!!
-              F_data & elem_data(const uint fid)       { return f_data.at(fid); }
+        const M & mesh_data()               const { return m_data;         }
+              M & mesh_data()                     { return m_data;         }
+        const V & vert_data(const uint vid) const { return v_data.at(vid); }
+              V & vert_data(const uint vid)       { return v_data.at(vid); }
+        const E & edge_data(const uint eid) const { return e_data.at(eid); }
+              E & edge_data(const uint eid)       { return e_data.at(eid); }
+        const F & face_data(const uint fid) const { return f_data.at(fid); }
+              F & face_data(const uint fid)       { return f_data.at(fid); }
+        const F & elem_data(const uint fid) const { return f_data.at(fid); } // elem == face!!
+              F & elem_data(const uint fid)       { return f_data.at(fid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -138,9 +140,9 @@ class Polygonmesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // These are all wraps for the "face_ methods". They are useful for generic
-        // programming, because "elem_" will wrap face_ for surface meshes and "cell_"
-        // for volumetric meshes, allowing the use of templated algorithms that work
-        // with both types of meshes without requiring specialzed code
+        // programming, because "elem_" will wrap face_ for surface meshes and wrap
+        // "cell_" for volumetric meshes, allowing the use of templated algorithms
+        // that work with both types of meshes without requiring specialzed code
 
         vec3d elem_centroid(const uint fid) const;
         void  elem_show_all();

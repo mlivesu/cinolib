@@ -47,12 +47,22 @@ namespace cinolib
  * Otherwise, if more attributes are necessary, you can always
  * extend the current structures, and use explicit templates:
  *
- * Trimesh<Vdata,Edata,Fdata>     my_trimesh;
- * Quadmesh<Vdata,Edata,Fdata>    my_quadmesh;
- * Polygonmesh<Vdata,Edata,Fdata> my_polymesh;
- * Tetmesh<Vdata,Edata,Cdata>     my_tetmesh;
- * Hexmesh<Vdata,Edata,Cdata>     my_hexmesh;
+ * Trimesh<Mdata,Vdata,Edata,Fdata>     my_trimesh;
+ * Quadmesh<Mdata,Vdata,Edata,Fdata>    my_quadmesh;
+ * Polygonmesh<Mdata,Vdata,Edata,Fdata> my_polymesh;
+ * Tetmesh<Mdata,Vdata,Edata,Cdata>     my_tetmesh;
+ * Hexmesh<Mdata,Vdata,Edata,Cdata>     my_hexmesh;
 */
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+typedef struct
+{
+    std::string filename;
+}
+Mesh_std_data;
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 typedef struct
 {
