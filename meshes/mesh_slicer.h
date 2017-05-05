@@ -39,6 +39,12 @@ class MeshSlicer
 {
     public:
 
+        MeshSlicer() : m_ptr(NULL) {}
+
+        MeshSlicer(Mesh *m);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         enum
         {
             X   = 0, // filter w.r.t. element centroid X coord
@@ -52,14 +58,12 @@ class MeshSlicer
             GEQ = 8  // use >= to evaluate X Y Z Q
         };
 
-        MeshSlicer(){ m_ptr = NULL; }
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        MeshSlicer(Mesh *m);
-
-        void update(const float         thresh,  // thresh on centroid
-                    const int           item,    // X, Y, Z, Q, L
-                    const int           sign,    // either LEQ or GEQ (used for X Y Z Q)
-                    const int           mode);   // either AND or OR
+        void update(const float thresh,  // thresh on centroid
+                    const int   item,    // X, Y, Z, Q, L
+                    const int   sign,    // either LEQ or GEQ (used for X Y Z Q)
+                    const int   mode);   // either AND or OR
 
         void update();
 

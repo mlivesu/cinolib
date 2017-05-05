@@ -33,9 +33,12 @@ template<class V_data, class E_data, class F_data>
 CINO_INLINE
 Polygonmesh<V_data,E_data,F_data>::Polygonmesh(const std::vector<double>            & coords,
                                                const std::vector<std::vector<uint>> & faces)
-: coords(coords)
-, faces(faces)
+: faces(faces)
 {
+    uint nv = coords.size()/3;
+    verts.reserve(nv);
+    for(uint vid=0; vid<nv; ++vid) verts.push_back(vec3d(coords[3*vid+0], coords[3*vid+1], coords[3*vid+2]));
+
     init();
 }
 
@@ -48,7 +51,7 @@ void Polygonmesh<V_data,E_data,F_data>::clear()
     bb.reset();
     filename.clear();
     //
-    coords.clear();
+    verts.clear();
     edges.clear();
     faces.clear();
     //
@@ -224,16 +227,6 @@ void Polygonmesh<V_data,E_data,F_data>::update_normals()
 
 template<class V_data, class E_data, class F_data>
 CINO_INLINE
-vec3d Polygonmesh<V_data,E_data,F_data>::vert(const uint vid) const
-{
-    uint vid_ptr = vid * 3;
-    return vec3d(coords.at(vid_ptr+0), coords.at(vid_ptr+1), coords.at(vid_ptr+2));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class V_data, class E_data, class F_data>
-CINO_INLINE
 uint Polygonmesh<V_data,E_data,F_data>::face_vert_id(const uint fid, const uint offset) const
 {
     return faces.at(fid).at(offset);
@@ -287,8 +280,7 @@ vec3d Polygonmesh<V_data,E_data,F_data>::edge_vert(const uint eid, const uint of
 {
     uint eid_ptr = eid * 2;
     uint vid     = edges.at(eid_ptr + offset);
-    uint vid_ptr = vid * 3;
-    return vec3d(coords.at(vid_ptr + 0), coords.at(vid_ptr + 1), coords.at(vid_ptr + 2));
+    return vert(vid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

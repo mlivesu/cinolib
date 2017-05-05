@@ -25,6 +25,7 @@
 #define CINO_MESH_STD_DATA_H
 
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/color.h>
 
 namespace cinolib
 {
@@ -55,9 +56,9 @@ namespace cinolib
 
 typedef struct
 {
-    vec3d  normal   = vec3d(0,0,0);
-    float  color[3] = { 1, 1, 1 };
-    float  uvw[3]   = { 0, 0, 0 };
+    vec3d  normal = vec3d(0,0,0);
+    Color  color  = Color::WHITE();
+    float  uvw[3] = { 0, 0, 0 };
 }
 Vert_std_data;
 
@@ -71,11 +72,11 @@ Edge_std_data;
 
 typedef struct
 {
-    vec3d  normal   = vec3d(0,0,0);
-    float  color[3] = { 1, 1, 1 };
-    int    label    = -1;
-    bool   visible  = true;
-    float  quality  = 0.0;
+    vec3d  normal  = vec3d(0,0,0);
+    Color  color   = Color::WHITE();
+    int    label   = -1;
+    bool   visible = true;
+    float  quality = 0.0;
 }
 Face_std_data;
 
@@ -83,10 +84,10 @@ Face_std_data;
 
 typedef struct
 {
-    float  color[3] = { 1, 1, 1 };
-    int    label    = -1;
-    bool   visible  = true;
-    float  quality  = 0.0;
+    Color  color   = Color::WHITE();
+    int    label   = -1;
+    bool   visible = true;
+    float  quality = 0.0;
 }
 Cell_std_data;
 

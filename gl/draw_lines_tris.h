@@ -5,7 +5,7 @@
 *                                                                           *
 * Author: Marco Livesu (marco.livesu@gmail.com)                             *
 *                                                                           *
-* Copyright(C) 2017                                                         *
+* Copyright(C) 2016                                                         *
 * All rights reserved.                                                      *
 *                                                                           *
 * This file is part of CinoLib                                              *
@@ -21,66 +21,64 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef CINO_DRAWABLE_POLYGONMESH_H
-#define CINO_DRAWABLE_POLYGONMESH_H
+#ifndef CINO_DRAW_LINES_TRIS_H
+#define CINO_DRAW_LINES_TRIS_H
 
-#ifdef CINOLIB_USES_OPENGL
+#include <cinolib/cinolib.h>
 
 #ifdef __APPLE__
 #include <gl.h>
+#include <glu.h>
 #else
 #include <GL/gl.h>
+#include <GL/glu.h>
 #endif
 
-#include <cinolib/cinolib.h>
-#include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_lines_tris.h>
-#include <cinolib/meshes/polygonmesh/polygonmesh.h>
-#include <cinolib/meshes/mesh_slicer.h>
+#include <sys/types.h>
+#include <cmath>
 
 namespace cinolib
 {
 
-template<class V_data = Vert_std_data, // default template arguments
-         class E_data = Edge_std_data,
-         class F_data = Face_std_data>
-class DrawablePolygonmesh : public Polygonmesh<V_data,E_data,F_data>, public DrawableObject
+//typedef enum
+//{
+//    DRAW_MESH        = 0x00000001,
+//    DRAW_POINTS      = 0x00000002,
+//    DRAW_FLAT        = 0x00000004,
+//    DRAW_SMOOTH      = 0x00000008,
+//    DRAW_WIREFRAME   = 0x00000010,
+//    DRAW_FACECOLOR   = 0x00000020,
+//    DRAW_VERTEXCOLOR = 0x00000040,
+//    DRAW_TEXTURE1D   = 0x00000080,
+//    DRAW_BORDER      = 0x00000100,
+//}
+//DrawMode;
+
+typedef struct
 {
-    public:
+    int                 draw_mode;
+    //
+    std::vector<uint>   tris;
+    std::vector<double> tri_coords;
+    std::vector<double> tri_v_norms;
+    std::vector<float>  tri_v_colors; // rgba
+    std::vector<float>  tri_text1D;
+    GLuint              tri_text1D_id;
+    //
+    std::vector<uint>   segs;
+    std::vector<double> seg_coords;
+    float               seg_color[4];
+    int                 seg_width;
+}
+RenderData;
 
-        DrawablePolygonmesh();
 
-        DrawablePolygonmesh(const std::vector<double>            & coords,
-                            const std::vector<std::vector<uint>> & faces);
-
-    protected:
-
-        RenderData drawlist;
-        MeshSlicer<Polygonmesh<V_data,E_data,F_data>> slicer;
-
-    public:
-
-        void  draw(const float scene_size=1) const;
-        vec3d scene_center() const { return this->bb.center(); }
-        float scene_radius() const { return this->bb.diag();   }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void init_drawable_stuff();
-        void update_drawlist();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void slice(const float thresh, const int item, const int sign, const int mode);
-
-};
-
+CINO_INLINE
+void render(const RenderData & data);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "drawable_polygonmesh.cpp"
+#include "draw_lines_tris.cpp"
 #endif
 
-#endif // #ifdef CINOLIB_USES_OPENGL
-
-#endif // CINO_DRAWABLE_POLYGONMESH_H
+#endif // CINO_DRAW_LINES_TRIS_H

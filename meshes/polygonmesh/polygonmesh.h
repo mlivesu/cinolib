@@ -52,13 +52,13 @@ class Polygonmesh
         std::string filename;
         Bbox        bb;
 
-        // serialized xyz coordinates, edges and faces
+        // mesh elements
         //
-        std::vector<double>            coords;
+        std::vector<vec3d>             verts;
         std::vector<uint>              edges;
         std::vector<std::vector<uint>> faces;
 
-        // data arrays (attributes)
+        // attributes
         //
         std::vector<V_data> v_data;
         std::vector<E_data> e_data;
@@ -88,16 +88,16 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint num_verts() const { return static_cast<uint>(coords.size())/3; }
-        uint num_edges() const { return static_cast<uint>(edges.size())/2;  }
-        uint num_faces() const { return static_cast<uint>(faces.size());    }
-        uint num_elems() const { return static_cast<uint>(faces.size());    } // elem == face!!
+        uint num_verts() const { return static_cast<uint>(verts.size());   }
+        uint num_edges() const { return static_cast<uint>(edges.size())/2; }
+        uint num_faces() const { return static_cast<uint>(faces.size());   }
+        uint num_elems() const { return static_cast<uint>(faces.size());   } // elem == face!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const Bbox                & bbox()          const { return bb;     }
-        const std::vector<double> & vector_coords() const { return coords; }
-        const std::vector<uint>   & vector_edges()  const { return edges;  }
+        const Bbox               & bbox()         const { return bb;    }
+        const std::vector<vec3d> & vector_verts() const { return verts; }
+        const std::vector<uint>  & vector_edges() const { return edges; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -121,7 +121,8 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d vert(const uint vid) const;
+        const vec3d vert(const uint vid) const { return verts.at(vid); }
+              vec3d vert(const uint vid)       { return verts.at(vid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -136,8 +137,13 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void  elem_show_all();
+        // These are all wraps for the "face_ methods". They are useful for generic
+        // programming, because "elem_" will wrap face_ for surface meshes and "cell_"
+        // for volumetric meshes, allowing the use of templated algorithms that work
+        // with both types of meshes without requiring specialzed code
+
         vec3d elem_centroid(const uint fid) const;
+        void  elem_show_all();
 };
 
 }

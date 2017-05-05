@@ -21,66 +21,7 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef CINO_DRAWABLE_POLYGONMESH_H
-#define CINO_DRAWABLE_POLYGONMESH_H
-
-#ifdef CINOLIB_USES_OPENGL
-
-#ifdef __APPLE__
-#include <gl.h>
-#else
-#include <GL/gl.h>
-#endif
-
-#include <cinolib/cinolib.h>
-#include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_lines_tris.h>
-#include <cinolib/meshes/polygonmesh/polygonmesh.h>
-#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
-
-template<class V_data = Vert_std_data, // default template arguments
-         class E_data = Edge_std_data,
-         class F_data = Face_std_data>
-class DrawablePolygonmesh : public Polygonmesh<V_data,E_data,F_data>, public DrawableObject
-{
-    public:
-
-        DrawablePolygonmesh();
-
-        DrawablePolygonmesh(const std::vector<double>            & coords,
-                            const std::vector<std::vector<uint>> & faces);
-
-    protected:
-
-        RenderData drawlist;
-        MeshSlicer<Polygonmesh<V_data,E_data,F_data>> slicer;
-
-    public:
-
-        void  draw(const float scene_size=1) const;
-        vec3d scene_center() const { return this->bb.center(); }
-        float scene_radius() const { return this->bb.diag();   }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void init_drawable_stuff();
-        void update_drawlist();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void slice(const float thresh, const int item, const int sign, const int mode);
-
-};
-
 }
-
-#ifndef  CINO_STATIC_LIB
-#include "drawable_polygonmesh.cpp"
-#endif
-
-#endif // #ifdef CINOLIB_USES_OPENGL
-
-#endif // CINO_DRAWABLE_POLYGONMESH_H

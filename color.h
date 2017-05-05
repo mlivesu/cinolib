@@ -21,66 +21,48 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef CINO_DRAWABLE_POLYGONMESH_H
-#define CINO_DRAWABLE_POLYGONMESH_H
-
-#ifdef CINOLIB_USES_OPENGL
-
-#ifdef __APPLE__
-#include <gl.h>
-#else
-#include <GL/gl.h>
-#endif
+#ifndef CINO_COLOR_H
+#define CINO_COLOR_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_lines_tris.h>
-#include <cinolib/meshes/polygonmesh/polygonmesh.h>
-#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
 
-template<class V_data = Vert_std_data, // default template arguments
-         class E_data = Edge_std_data,
-         class F_data = Face_std_data>
-class DrawablePolygonmesh : public Polygonmesh<V_data,E_data,F_data>, public DrawableObject
+class Color
 {
     public:
 
-        DrawablePolygonmesh();
+        Color(const float r=1.0,
+              const float g=1.0,
+              const float b=1.0,
+              const float a=1.0)
+        : r(r), g(g), b(b), a(a)
+        {}
 
-        DrawablePolygonmesh(const std::vector<double>            & coords,
-                            const std::vector<std::vector<uint>> & faces);
+        static Color RED()     { return Color(1,0,0); }
+        static Color GREEN()   { return Color(0,1,0); }
+        static Color BLUE()    { return Color(0,0,1); }
+        static Color YELLOW()  { return Color(1,1,0); }
+        static Color MAGENTA() { return Color(1,0,1); }
+        static Color CYAN()    { return Color(0,1,1); }
+        static Color BLACK()   { return Color(0,0,0); }
+        static Color WHITE()   { return Color(1,1,1); }
 
-    protected:
-
-        RenderData drawlist;
-        MeshSlicer<Polygonmesh<V_data,E_data,F_data>> slicer;
-
-    public:
-
-        void  draw(const float scene_size=1) const;
-        vec3d scene_center() const { return this->bb.center(); }
-        float scene_radius() const { return this->bb.diag();   }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void init_drawable_stuff();
-        void update_drawlist();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void slice(const float thresh, const int item, const int sign, const int mode);
-
+        union
+        {
+            struct
+            {
+                float r, g, b, a;
+            };
+            float rgba[4];
+        };
 };
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "drawable_polygonmesh.cpp"
+#include "color.cpp"
 #endif
 
-#endif // #ifdef CINOLIB_USES_OPENGL
-
-#endif // CINO_DRAWABLE_POLYGONMESH_H
+#endif // CINO_COLOR_H
