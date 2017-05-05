@@ -5,7 +5,7 @@
 *                                                                           *
 * Author: Marco Livesu (marco.livesu@gmail.com)                             *
 *                                                                           *
-* Copyright(C) 2016                                                         *
+* Copyright(C) 2017                                                         *
 * All rights reserved.                                                      *
 *                                                                           *
 * This file is part of CinoLib                                              *
@@ -21,21 +21,25 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef CINO_LIB_H
-#define CINO_LIB_H
-
-#include <cinolib/cino_inline.h>
-#include <cinolib/common.h>
-#include <cinolib/symbols.h>
-#include <cinolib/logger.h>
+#ifndef CINO_SYMBOLS_H
+#define CINO_SYMBOLS_H
 
 namespace cinolib
 {
-    static Logger logger;
 
-    /*** OPTIONS ***/
-    static bool support_non_manifold_edges = true;
-    static bool print_non_manifold_edges   = false;
+// List of GLOBAL symbols used throughout the library
+
+enum
+{
+    EQ,
+    NEQ,
+    LEQ,
+    GEQ,
+    AND,
+    OR
+};
+
 }
 
-#endif // CINO_LIB_H
+
+#endif // CINO_SYMBOLS_H
