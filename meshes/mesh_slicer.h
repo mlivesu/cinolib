@@ -47,15 +47,11 @@ class MeshSlicer
 
         enum
         {
-            X   = 0, // filter w.r.t. element centroid X coord
-            Y   = 1, // filter w.r.t. element centroid Y coord
-            Z   = 2, // filter w.r.t. element centroid Z coord
-            Q   = 3, // filter w.r.t. element quality
-            L   = 4, // filter w.r.t. element label
-            AND = 5, // put multiple slice constraints in AND
-            OR  = 6, // put multiple slice constraints in OR
-            LEQ = 7, // use <= to evaluate X Y Z Q
-            GEQ = 8  // use >= to evaluate X Y Z Q
+            X = 0, // filter w.r.t. element centroid X coord
+            Y = 1, // filter w.r.t. element centroid Y coord
+            Z = 2, // filter w.r.t. element centroid Z coord
+            Q = 3, // filter w.r.t. element quality
+            L = 4, // filter w.r.t. element label
         };
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
