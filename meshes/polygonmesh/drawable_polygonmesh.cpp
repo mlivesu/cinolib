@@ -72,7 +72,7 @@ void DrawablePolygonmesh<M,V,E,F>::init_drawable_stuff()
     drawlist.seg_color[2] = 0.1;
     drawlist.seg_color[3] = 1.0;
 
-    update_drawlist();
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -88,7 +88,7 @@ void DrawablePolygonmesh<M,V,E,F>::draw(const float) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::update_drawlist()
+void DrawablePolygonmesh<M,V,E,F>::updateGL()
 {
     drawlist.tri_coords.clear();
     drawlist.tris.clear();
@@ -206,7 +206,7 @@ void DrawablePolygonmesh<M,V,E,F>::slice(const float thresh, // thresh on centro
                                          const int   mode)   // either AND or OR
 {
     slicer.update(*this, thresh, item, sign, mode); // update per element visibility flags
-    update_drawlist();
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

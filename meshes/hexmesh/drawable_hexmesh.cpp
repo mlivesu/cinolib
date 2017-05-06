@@ -95,7 +95,7 @@ void DrawableHexmesh<M,V,E,F,C>::init_drawable_stuff()
     drawlist_out.seg_color[2] = 0.1;
     drawlist_out.seg_color[3] = 1.0;
 
-    update_drawlist();
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -112,17 +112,17 @@ void DrawableHexmesh<M,V,E,F,C>::draw(const float) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::update_drawlist()
+void DrawableHexmesh<M,V,E,F,C>::updateGL()
 {
-    update_drawlist_out();
-    update_drawlist_in();
+    updateGL_out();
+    updateGL_in();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::update_drawlist_out()
+void DrawableHexmesh<M,V,E,F,C>::updateGL_out()
 {
     drawlist_out.tri_coords.clear();
     drawlist_out.tris.clear();
@@ -245,7 +245,7 @@ void DrawableHexmesh<M,V,E,F,C>::update_drawlist_out()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::update_drawlist_in()
+void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
 {
     drawlist_in.tri_coords.clear();
     drawlist_in.tris.clear();
@@ -389,7 +389,7 @@ void DrawableHexmesh<M,V,E,F,C>::slice(const float thresh, // thresh on centroid
                                        const int   mode)   // either AND or OR
 {
     slicer.update(*this, thresh, item, sign, mode); // update per element visibility flags
-    update_drawlist();
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

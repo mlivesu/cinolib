@@ -76,9 +76,9 @@ class DrawableHexmesh : public Hexmesh<M,V,E,F,C>, public DrawableObject
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void init_drawable_stuff();
-        void update_drawlist();
-        void update_drawlist_in();
-        void update_drawlist_out();
+        void updateGL();
+        void updateGL_in();
+        void updateGL_out();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

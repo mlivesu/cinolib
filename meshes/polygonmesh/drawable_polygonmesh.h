@@ -71,7 +71,7 @@ class DrawablePolygonmesh : public Polygonmesh<M,V,E,F>, public DrawableObject
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void init_drawable_stuff();
-        void update_drawlist();
+        void updateGL();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
