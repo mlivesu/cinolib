@@ -29,7 +29,7 @@ namespace cinolib
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh() : Polygonmesh<V,E,F>()
+DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh() : Polygonmesh<M,V,E,F>()
 {
     init_drawable_stuff();
 }
@@ -63,7 +63,7 @@ CINO_INLINE
 void DrawablePolygonmesh<M,V,E,F>::init_drawable_stuff()
 {
     type   = POLYGONMESH;
-    slicer = MeshSlicer<Polygonmesh<M,V,E,F>>(this);
+    slicer = MeshSlicer<Polygonmesh<M,V,E,F>>(*this);
 
     drawlist.draw_mode    = DRAW_MESH | DRAW_FLAT | DRAW_FACECOLOR | DRAW_BORDER;
     drawlist.seg_width    = 1;
@@ -205,7 +205,7 @@ void DrawablePolygonmesh<M,V,E,F>::slice(const float thresh, // thresh on centro
                                          const int   sign,   // either LEQ or GEQ
                                          const int   mode)   // either AND or OR
 {
-    slicer.update(thresh, item, sign, mode); // update per element visibility flags
+    slicer.update(*this, thresh, item, sign, mode); // update per element visibility flags
     update_drawlist();
 }
 

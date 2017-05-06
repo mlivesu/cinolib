@@ -88,10 +88,10 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint num_verts() const { return static_cast<uint>(verts.size());   }
-        uint num_edges() const { return static_cast<uint>(edges.size())/2; }
-        uint num_faces() const { return static_cast<uint>(faces.size());   }
-        uint num_elems() const { return static_cast<uint>(faces.size());   } // elem == face!!
+        uint num_verts() const { return verts.size();   }
+        uint num_edges() const { return edges.size()/2; }
+        uint num_faces() const { return faces.size();   }
+        uint num_elems() const { return faces.size();   } // elem == face!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

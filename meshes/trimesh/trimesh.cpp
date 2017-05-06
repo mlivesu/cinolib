@@ -783,7 +783,7 @@ std::vector<int> Trimesh::get_boundary_vertices() const
 }
 
 CINO_INLINE
-std::vector<std::pair<int,int> > Trimesh::get_boundary_edges() const
+std::vector<std::pair<uint,uint>> Trimesh::get_boundary_edges() const
 {    
     std::vector<ipair> border;
     for(int eid=0; eid<num_edges(); ++eid)

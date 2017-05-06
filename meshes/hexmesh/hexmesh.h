@@ -32,11 +32,10 @@
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/quadmesh/quadmesh.h>
 #include <cinolib/meshes/hexmesh/hexmesh_split_schemas.h>
-//#include "quality.h"
+#include <cinolib/meshes/mesh_std_data.h>
 
 namespace cinolib
 {
-
 
 static int HEXA_FACES[6][4] =
 {
@@ -64,187 +63,159 @@ static int HEXA_EDGES[12][2] =
     { 3, 7 }  // 11
 };
 
+
+template<class M = Mesh_std_data, // default template arguments
+         class V = Vert_std_data,
+         class E = Edge_std_data,
+         class F = Face_std_data,
+         class C = Cell_std_data>
 class Hexmesh
 {
     public:
 
         Hexmesh(){}
+
         Hexmesh(const char * filename);
+
         Hexmesh(const std::vector<double> & coords,
-                const std::vector<u_int>  & hexa);
+                const std::vector<u_int>  & cells);
 
-        std::string filename;
-
-        // bounding box
-        //
-        Bbox bb;
-
-        static const int verts_per_element = 8;
-        static const int edges_per_element = 12;
+        Hexmesh(const std::vector<vec3d>  & verts,
+                const std::vector<u_int>  & cells);
 
     protected:
 
-        // serialized xyz coordinates, hexa and edges
-        //
-        std::vector<double> coords;
-        std::vector<u_int>  hexa;
-        std::vector<u_int>  edges;
-        std::vector<u_int>  quads;    // exterior surface
-        std::vector<bool>   v_on_srf;  // true if a vertex is on the surface, false otherwise
-        std::vector<bool>   e_on_srf;  // true if a vertex is on the surface, false otherwise
+        Bbox bb;
 
-        // per vertex/quad surface normals
-        //
-        std::vector<double> q_norm;
+        std::vector<vec3d> verts;
+        std::vector<uint>  edges;
+        std::vector<uint>  faces;     // boundary only!
+        std::vector<uint>  cells;
+        std::vector<bool>  v_on_srf;  // true if a vertex is on the surface, false otherwise
+        std::vector<bool>  e_on_srf;  // true if a vertex is on the surface, false otherwise
 
-        // general purpose float and int scalars
+        // attributes
         //
-        std::vector<float> u_text;    // 1d texture per vertex
-        std::vector<int>   t_label;   // per tet
+        M              m_data;
+        std::vector<V> v_data;
+        std::vector<E> e_data;
+        std::vector<F> f_data;
+        std::vector<C> c_data;
 
-        // adjacencies
+        // adjacencies -- Yes, I have lots of memory ;)
         //
-        std::vector< std::vector<int> > vtx2vtx;
-        std::vector< std::vector<int> > vtx2edg;
-        std::vector< std::vector<int> > vtx2hexa;
-        std::vector< std::vector<int> > vtx2quad;
-        std::vector< std::vector<int> > edg2hexa;
-        std::vector< std::vector<int> > edg2quad;
-        std::vector< std::vector<int> > hexa2edg;
-        std::vector< std::vector<int> > hexa2hexa;
-        std::vector< std::vector<int> > hexa2quad;
-        std::vector< std::vector<int> > quad2quad;
-        std::vector< std::vector<int> > quad2edg;
-        std::vector< int >              quad2hexa;
-
+        std::vector<std::vector<uint>> v2v; // vert to vert adjacency
+        std::vector<std::vector<uint>> v2e; // vert to edge adjacency
+        std::vector<std::vector<uint>> v2f; // vert to face adjacency
+        std::vector<std::vector<uint>> v2c; // vert to cell adjacency
+        std::vector<std::vector<uint>> e2f; // edge to face adjacency
+        std::vector<std::vector<uint>> e2c; // edge to cell adjacency
+        std::vector<std::vector<uint>> f2e; // face to edge adjacency
+        std::vector<std::vector<uint>> f2f; // face to face adjacency
+        std::vector<uint>              f2c; // face to cell adjacency
+        std::vector<std::vector<uint>> c2e; // cell to edge adjacency
+        std::vector<std::vector<uint>> c2f; // cell to face adjacency
+        std::vector<std::vector<uint>> c2c; // cell to cell adjacency
 
     public:
 
-        const std::vector<double> & vector_coords()         const;
-        const std::vector<uint>   & vector_quads()          const;
-        const std::vector<float>  & vector_v_float_scalar() const;
-        const std::vector<int>    & vector_h_int_scalar()   const;
-
-
-        std::string loaded_file() const;
-
-        Quadmesh export_surface() const;
-        Quadmesh export_surface(std::map<int,int> & hexa2quad_map, std::map<int,int> & quad2hex_map) const;
-
-        virtual void operator+=(const Hexmesh & m);
-
-        void init();
         void clear();
+        void init();
         void load(const char * filename);
         void save(const char * filename) const;
 
-        void normalize_volume();
-
-        bool empty() const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void update_bbox();
-        void center_bbox();
         void update_interior_adjacency();
         void update_surface_adjacency();
         void update_q_normals();
 
-        int num_vertices()      const;
-        int num_hexahedra()    const;
-        int num_elements()      const;
-        int num_edges()         const;
-        int num_srf_quads() const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const std::vector<int> & adj_vtx2vtx(const int vid) const;
-        const std::vector<int> & adj_vtx2edg(const int vid) const;
-        const std::vector<int> & adj_vtx2quad(const int vid) const;
-        const std::vector<int> & adj_vtx2hexa(const int vid) const;
-        const std::vector<int> & adj_edg2hexa(const int eid) const;
-        const std::vector<int> & adj_edg2quad(const int eid) const;
-        const std::vector<int> & adj_hexa2edg(const int hid) const;
-        const std::vector<int> & adj_hexa2hexa(const int hid) const;
-        const std::vector<int> & adj_hexa2quad(const int hid) const;
-        const std::vector<int> & adj_quad2quad(const int hid) const;
-        const std::vector<int> & adj_quad2edg(const int hid) const;
-        const int              & adj_quad2hexa(const int hid) const;
+        uint num_verts() const { return verts.size();   }
+        uint num_edges() const { return edges.size()/2; }
+        uint num_faces() const { return faces.size()/4; }
+        uint num_cells() const { return cells.size()/8; }
+        uint num_elems() const { return cells.size()/8; } // elem == cell!!
 
-        vec3d vertex(const int vid) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void set_vertex_u_text(const int vid, const float val);
+        const Bbox               & bbox()         const { return bb;    }
+        const std::vector<vec3d> & vector_verts() const { return verts; }
+        const std::vector<uint>  & vector_edges() const { return edges; }
+        const std::vector<uint>  & vector_faces() const { return faces; }
+        const std::vector<uint>  & vector_cells() const { return cells; }
 
-        void set_hex_label(const int tid, const int label);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int hex_label(const int hid) const;
+        Quadmesh export_surface() const;
+        Quadmesh export_surface(std::map<uint,uint> & c2f_map,
+                                std::map<uint,uint> & f2c_map) const;
 
-        float vertex_u_text(const int vid) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        float min_u_text() const;
+        const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
+        const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
+        const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
+        const std::vector<uint> & adj_v2c(const uint vid) const { return v2c.at(vid); }
+        const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
+        const std::vector<uint> & adj_e2c(const uint eid) const { return e2c.at(eid); }
+        const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
+        const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
+              uint                adj_f2c(const uint fid) const { return f2c.at(fid); }
+        const std::vector<uint> & adj_c2e(const uint cid) const { return c2e.at(cid); }
+        const std::vector<uint> & adj_c2f(const uint cid) const { return c2f.at(cid); }
+        const std::vector<uint> & adj_c2c(const uint cid) const { return c2c.at(cid); }
 
-        float max_u_text() const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int max_t_label() const;
+        const M & mesh_data()               const { return m_data;         }
+              M & mesh_data()                     { return m_data;         }
+        const V & vert_data(const uint vid) const { return v_data.at(vid); }
+              V & vert_data(const uint vid)       { return v_data.at(vid); }
+        const E & edge_data(const uint eid) const { return e_data.at(eid); }
+              E & edge_data(const uint eid)       { return e_data.at(eid); }
+        const F & face_data(const uint fid) const { return f_data.at(fid); }
+              F & face_data(const uint fid)       { return f_data.at(fid); }
+        const C & cell_data(const uint cid) const { return c_data.at(cid); }
+              C & cell_data(const uint cid)       { return c_data.at(cid); }
+        const C & elem_data(const uint cid) const { return c_data.at(cid); } // elem == cell!!
+              C & elem_data(const uint cid)       { return c_data.at(cid); }
 
-        void set_vertex(const int vid, const vec3d & pos);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool is_surface_vertex(const int vid) const;
+        const vec3d vert(const uint vid) const { return verts.at(vid); }
+              vec3d vert(const uint vid)       { return verts.at(vid); }
 
-        bool is_surface_edge(const int eid) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d quad_normal(const int hid) const;
+        vec3d edge_vert   (const uint eid, const uint offset) const;
+        uint  edge_vert_id(const uint eid, const uint offset) const;
 
-        vec3d hex_centroid(const int hid) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int hex_vertex_id(const int tid, const int offset) const;
+        vec3d face_vert    (const uint fid, const uint offset) const;
+        uint  face_vert_id (const uint fid, const uint offset) const;
+        vec3d face_centroid(const uint fid)                    const;
 
-        vec3d hex_vertex(const int tid, const int offset) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int quad_vertex_id(const int tid, const int offset) const;
+        vec3d cell_vert         (const uint cid, const uint off)   const;
+        uint  cell_vert_id      (const uint cid, const uint off)   const;
+        vec3d cell_centroid     (const uint cid)                   const;
+        uint  cell_shared_face  (const uint cid0, const uint cid1) const;
+        bool  cell_contains_vert(const uint cid, const uint vid)   const;
 
-        vec3d quad_vertex(const int tid, const int offset) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool hex_contains_vertex(const int tid, const std::set<int> & vids) const;
+        // These are all wraps for the "cell_ methods". They are useful for generic
+        // programming, because "elem_" will wrap face_ for surface meshes and wrap
+        // "cell_" for volumetric meshes, allowing the use of templated algorithms
+        // that work with both types of meshes without requiring specialzed code
 
-        bool hex_contains_vertex(const int tid, const int vid) const;
-
-        bool hex_contains_edge(const int tid, const int eid) const;
-
-        vec3d element_barycenter(const int hid) const;
-
-        double avg_edge_length() const;
-        double edge_length(const int eid) const;
-
-        vec3d edge_vertex(const int eid, const int offset) const;
-
-        double hex_quality(const int hid) const;
-
-        bool hex_is_adjacent_to(const int tid, const int nbr) const;
-
-        double vertex_quality(const int vid) const;
-
-        int vertex_inverted_elements(const int vid) const;
-
-        double hex_volume(const int hid) const;
-
-        int edge_vertex_id(const int eid, const int offset) const;
-
-        int adjacent_hex_through_facet(const int tid, const int facet);
-
-        int shared_facet(const int hid0, const int hid1) const;
-
-        double vertex_mass(const int vid) const;
-
-        vec3d hex_face_normal(const int tid, const int fid) const;
-
-        int hex_face_opposite_to(const int tid, const int vid) const;
-
-        int hex_vertex_opposite_to(const int tid, const int facet) const;
-
-        int hex_edge_opposite_to(const int tid, const int vid0, const int vid1) const;
-
-        double hex_edge_length(const int tid, const int eid) const;
-
-        double minimum_SJ() const;
-        double average_SJ() const;
-        void print_quality_statistics(bool list_folded_elements = false) const;
+        vec3d elem_centroid(const uint cid) const;
+        void  elem_show_all();
 };
 
 }

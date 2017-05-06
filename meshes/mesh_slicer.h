@@ -39,9 +39,9 @@ class MeshSlicer
 {
     public:
 
-        MeshSlicer() : m_ptr(NULL) {}
+        MeshSlicer() {}
 
-        MeshSlicer(Mesh *m);
+        MeshSlicer(Mesh & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -56,20 +56,20 @@ class MeshSlicer
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update(const float thresh,  // thresh on centroid
-                    const int   item,    // X, Y, Z, Q, L
-                    const int   sign,    // either LEQ or GEQ (used for X Y Z Q)
-                    const int   mode);   // either AND or OR
+        void update(      Mesh  & m,
+                    const float   thresh,  // thresh on centroid
+                    const int     item,    // X, Y, Z, Q, L
+                    const int     sign,    // either LEQ or GEQ (used for X Y Z Q)
+                    const int     mode);   // either AND or OR
 
-        void update();
+        void update(Mesh & m);
 
     protected:
+
 
         float slice_thresh[5]; // X Y Z Q L
         int   slice_sign  [4]; // either LEQ or GEQ (used for X Y Z Q)
         int   slice_mode;      // either AND or OR
-
-        Mesh *m_ptr;
 };
 
 }

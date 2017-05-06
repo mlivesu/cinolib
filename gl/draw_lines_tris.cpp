@@ -29,6 +29,21 @@ namespace cinolib
 CINO_INLINE
 void render_pvt(const RenderData & data)
 {
+    typedef enum
+    {
+        DRAW_MESH        = 0x00000001,
+        DRAW_POINTS      = 0x00000002,
+        DRAW_FLAT        = 0x00000004,
+        DRAW_SMOOTH      = 0x00000008,
+        DRAW_WIREFRAME   = 0x00000010,
+        DRAW_FACECOLOR   = 0x00000020,
+        DRAW_VERTEXCOLOR = 0x00000040,
+        DRAW_TEXTURE1D   = 0x00000080,
+        DRAW_BORDER      = 0x00000100,
+    }
+    DrawMode;
+
+
     if (data.draw_mode & DRAW_POINTS)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -84,6 +99,20 @@ void render_pvt(const RenderData & data)
 CINO_INLINE
 void render(const RenderData & data)
 {
+    typedef enum
+    {
+        DRAW_MESH        = 0x00000001,
+        DRAW_POINTS      = 0x00000002,
+        DRAW_FLAT        = 0x00000004,
+        DRAW_SMOOTH      = 0x00000008,
+        DRAW_WIREFRAME   = 0x00000010,
+        DRAW_FACECOLOR   = 0x00000020,
+        DRAW_VERTEXCOLOR = 0x00000040,
+        DRAW_TEXTURE1D   = 0x00000080,
+        DRAW_BORDER      = 0x00000100,
+    }
+    DrawMode;
+
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glDisable(GL_CULL_FACE);
 

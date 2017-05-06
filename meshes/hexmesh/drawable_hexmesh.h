@@ -24,6 +24,8 @@
 #ifndef CINO_DRAWABLE_HEXMESH_H
 #define CINO_DRAWABLE_HEXMESH_H
 
+#ifdef CINOLIB_USES_OPENGL
+
 #ifdef __APPLE__
 #include <gl.h>
 #else
@@ -32,119 +34,55 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_tris_quads.h>
+#include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/meshes/hexmesh/hexmesh.h>
+#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
 
-class DrawableHexmesh : public Hexmesh, public DrawableObject
+template<class M = Mesh_std_data, // default template arguments
+         class V = Vert_std_data,
+         class E = Edge_std_data,
+         class F = Face_std_data,
+         class C = Cell_std_data>
+class DrawableHexmesh : public Hexmesh<M,V,E,F,C>, public DrawableObject
 {
 
     public:
 
-        enum
-        {
-            TEXTURE_ISOLINES                = 0,
-            TEXTURE_QUALITY_RAMP            = 1,
-            TEXTURE_QUALITY_RAMP_W_ISOLINES = 2
-        };
-
-        // X : slice w.r.t. tet centroid X coord
-        // Y : slice w.r.t. tet centroid Y coord
-        // Z : slice w.r.t. tet centroid Z coord
-        // Q : slice w.r.t. tet quality (MSJ)
-        // L : slice w.r.t. tet label
-        //
-        enum { X, Y, Z, Q, L };
-
         DrawableHexmesh();
-        DrawableHexmesh(const char *filename);
+
+        DrawableHexmesh(const char * filename);
+
+        DrawableHexmesh(const std::vector<vec3d> & verts,
+                        const std::vector<uint>  & cells);
+
         DrawableHexmesh(const std::vector<double> & coords,
-                        const std::vector<u_int>  & hexa);
-
-        void init();
-
-        void operator+=(const DrawableHexmesh & m);
-
-        // Implementation of the
-        // DrawableObject interface
-        //
-        void  draw(const float scene_size=1)         const;
-        vec3d scene_center() const;
-        float scene_radius() const;
-
-        void  draw_out() const;
-        void  draw_in()  const;
-
-        void set_draw_mesh(bool b);
-        void set_flat_shading();
-        void set_smooth_shading();
-        void set_points_shading();
-        void set_h_out_color(const float r, const float g, const float b);
-        void set_h_in_color(const float r, const float g, const float b);
-        void set_enable_out_face_color();
-        void set_enable_out_quality_color();
-        void set_enable_out_texture1D(int texture);
-        void set_out_wireframe(bool b);
-        void set_out_wireframe_color(float r, float g, float b);
-        void set_out_wireframe_width(float width);
-        void set_out_wireframe_transparency(float alpha);
-        void set_in_wireframe(bool b);
-        void set_in_wireframe_color(float r, float g, float b);
-        void set_in_wireframe_width(float width);
-        void set_in_wireframe_transparency(float alpha);
-        void set_draw_slice(bool b);
-        void set_slice_parameters(const float thresh, const int item, const bool dir, const bool mode);
-        void update_slice(const bool mode = true);
-        void set_enable_in_quality_color();
-        void set_enable_in_face_color();
-        void set_enable_in_texture1D(int texture);
-        void color_wrt_hex_scalar();
-
+                        const std::vector<uint>   & cells);
 
     protected:
 
-        void render_pass_out() const;
-        void render_pass_in()  const;
+        RenderData drawlist_in;
+        RenderData drawlist_out;
+        MeshSlicer<DrawableHexmesh<M,V,E,F,C>> slicer;
 
-        int    draw_mode_in;
-        int    draw_mode_out;
-        int    wireframe_out_width;
-        float  wireframe_out_color[4];
-        GLuint texture_out_id;
+    public:
 
-        int    wireframe_in_width;
-        float  wireframe_in_color[4];
-        GLuint texture_in_id;
+        void  draw(const float scene_size=1) const;
+        vec3d scene_center() const { return this->bb.center(); }
+        float scene_radius() const { return this->bb.diag();   }
 
-        void color_tets_wrt_quality(const bool in, const bool out);
-        void update_outer_visible_mesh();
-        void update_inner_slice();
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<bool> slice_mask;
-        float slice_thresh[5];
-        bool  slice_dir[5];
+        void init_drawable_stuff();
+        void update_drawlist();
+        void update_drawlist_in();
+        void update_drawlist_out();
 
-        std::vector<float> h_out_colors;
-        std::vector<float> h_in_colors;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        // sub-portion of the EXTERIOR of the hexmesh to be rendered
-        // (it depends on the slicing - if slicing is disabled the whole outer surface will be rendered)
-        //
-        std::vector<double> outer_visible_coords;
-        std::vector<u_int>  outer_visible_quads;
-        std::vector<double> outer_visible_v_norms;
-        std::vector<float>  outer_visible_f_values;
-        std::vector<float>  outer_visible_h_colors;
-
-        // sub-portion of the INTERIOR of the hexmesh to be rendered
-        //
-        std::vector<double> inner_slice_coords;
-        std::vector<u_int>  inner_slice_quads;
-        std::vector<double> inner_slice_v_norms;
-        std::vector<float>  inner_slice_f_values;
-        std::vector<float>  inner_slice_h_colors;
+        void slice(const float thresh, const int item, const int sign, const int mode);
 };
 
 }
@@ -152,5 +90,7 @@ class DrawableHexmesh : public Hexmesh, public DrawableObject
 #ifndef  CINO_STATIC_LIB
 #include "drawable_hexmesh.cpp"
 #endif
+
+#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_DRAWABLE_HEXMESH_H

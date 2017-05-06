@@ -30,11 +30,11 @@ namespace cinolib
 
 template<class Mesh>
 CINO_INLINE
-MeshSlicer<Mesh>::MeshSlicer(Mesh * m) : m_ptr(m)
+MeshSlicer<Mesh>::MeshSlicer(Mesh & m)
 {
-    slice_thresh[ X ] = m_ptr->bbox().max.x();
-    slice_thresh[ Y ] = m_ptr->bbox().max.y();
-    slice_thresh[ Z ] = m_ptr->bbox().max.z();
+    slice_thresh[ X ] = m.bbox().max.x();
+    slice_thresh[ Y ] = m.bbox().max.y();
+    slice_thresh[ Z ] = m.bbox().max.z();
     slice_thresh[ Q ] = 0.0;
     slice_thresh[ L ] = -1;
     slice_sign  [ X ] = LEQ;
@@ -43,47 +43,44 @@ MeshSlicer<Mesh>::MeshSlicer(Mesh * m) : m_ptr(m)
     slice_sign  [ Q ] = LEQ;
     slice_mode        = AND;
 
-    m_ptr->elem_show_all();
+    m.elem_show_all();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
-void MeshSlicer<Mesh>::update(const float thresh,  // thresh on centroids or quality
-                              const int   item,    // X, Y, Z, L, Q
-                              const int   sign,    // either LEQ or GEQ
-                              const int   mode)    // either AND or OR
+void MeshSlicer<Mesh>::update(      Mesh  & m,
+                              const float   thresh,  // thresh on centroids or quality
+                              const int     item,    // X, Y, Z, L, Q
+                              const int     sign,    // either LEQ or GEQ
+                              const int     mode)    // either AND or OR
 {
-    assert(m_ptr != NULL);
-
     switch (item)
     {
         case X:
         case Y:
-        case Z: slice_thresh[item] = m_ptr->bbox().min[item] + m_ptr->bbox().delta()[item] * thresh; break;
+        case Z: slice_thresh[item] = m.bbox().min[item] + m.bbox().delta()[item] * thresh; break;
         case L: slice_thresh[item] = thresh; break;
         default: assert(false);
     }
     slice_sign[item] = sign; assert(sign == LEQ || sign == GEQ);
     slice_mode       = mode; assert(mode == AND || mode == OR);
 
-    update();
+    update(m);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
-void MeshSlicer<Mesh>::update()
+void MeshSlicer<Mesh>::update(Mesh & m)
 {
-    assert(m_ptr != NULL);
-
-    for(uint eid=0; eid<m_ptr->num_elems(); ++eid)
+    for(uint eid=0; eid<m.num_elems(); ++eid)
     {
-        vec3d  c = m_ptr->elem_centroid(eid);
-        float  q = m_ptr->elem_data(eid).quality;
-        int    l = m_ptr->elem_data(eid).label;
+        vec3d  c = m.elem_centroid(eid);
+        float  q = m.elem_data(eid).quality;
+        int    l = m.elem_data(eid).label;
 
         bool pass_X = (slice_sign[X] == LEQ) ? (c.x() <= slice_thresh[X]) : (c.x() >= slice_thresh[X]);
         bool pass_Y = (slice_sign[Y] == LEQ) ? (c.y() <= slice_thresh[Y]) : (c.y() >= slice_thresh[Y]);
@@ -94,7 +91,7 @@ void MeshSlicer<Mesh>::update()
         bool b = (slice_mode == AND) ? ( pass_X &&  pass_Y &&  pass_Z &&  pass_L &&  pass_Q)
                                      : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
 
-        m_ptr->elem_data(eid).visible = b;
+        m.elem_data(eid).visible = b;
     }
 }
 

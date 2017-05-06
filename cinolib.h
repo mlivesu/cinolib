@@ -25,7 +25,6 @@
 #define CINO_LIB_H
 
 #include <cinolib/cino_inline.h>
-#include <cinolib/common.h>
 #include <cinolib/symbols.h>
 #include <cinolib/logger.h>
 

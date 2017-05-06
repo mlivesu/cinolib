@@ -48,8 +48,8 @@ Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<double>            & coords,
 : faces(faces)
 {
     uint nv = coords.size()/3;
-    verts.reserve(nv);
-    for(uint vid=0; vid<nv; ++vid) verts.push_back(vec3d(coords[3*vid+0], coords[3*vid+1], coords[3*vid+2]));
+    verts.resize(nv);
+    for(uint vid=0; vid<nv; ++vid) verts.at(vid) = vec3d(coords[3*vid+0], coords[3*vid+1], coords[3*vid+2]);
 
     init();
 }
@@ -147,25 +147,25 @@ void Polygonmesh<M,V,E,F>::update_adjacency()
         v2e.at(vid1).push_back(eid);
 
         std::vector<uint> fids = e2f_it.second;
-        for(int fid : fids)
+        for(uint fid : fids)
         {
             f2e.at(fid).push_back(eid);
             e2f.at(eid).push_back(fid);
-            for(int adj_fid : fids) if (fid != adj_fid) f2f.at(fid).push_back(adj_fid);
+            for(uint adj_fid : fids) if (fid != adj_fid) f2f.at(fid).push_back(adj_fid);
         }
 
         // MANIFOLDNESS CHECKS
         //
         bool is_manifold = (fids.size() > 2 || fids.size() < 1);
-        if (!support_non_manifold_edges)
+        if (is_manifold && !support_non_manifold_edges)
         {
             std::cerr << "Non manifold edge found! To support non manifoldness,";
             std::cerr << "enable the 'support_non_manifold_edges' flag in cinolib.h" << endl;
             assert(false);
         }
-        if (print_non_manifold_edges)
+        if (is_manifold && print_non_manifold_edges)
         {
-            if (!is_manifold) std::cerr << "Non manifold edge! (" << vid0 << "," << vid1 << ")" << endl;
+            std::cerr << "Non manifold edge! (" << vid0 << "," << vid1 << ")" << endl;
         }
     }
 

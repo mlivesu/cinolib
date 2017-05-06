@@ -1,5 +1,4 @@
-- add CINOLIB_USES_OPENGL to bound all the parts that involve GL primitives
-- Put the mesh slicer in a separate class, and make it available also for surfaces
+- add segments color and condensate rendering in a single method rather than two
 - Transform timer in a profiler class with internal string to be printed at the end
   and summary of times spent in each function… (NOTE: it’s a tree!!!!!!)
 - Refactor PointInsideMeshCache, it should return ALL the elements containing the

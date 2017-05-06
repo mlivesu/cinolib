@@ -28,6 +28,7 @@
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/bbox.h>
 #include <cinolib/drawable_object.h>
+#include <cinolib/common.h>
 
 #include <vector>
 #include <queue>

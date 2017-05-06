@@ -66,9 +66,10 @@ Mesh_std_data;
 
 typedef struct
 {
-    vec3d  normal = vec3d(0,0,0);
-    Color  color  = Color::WHITE();
-    float  uvw[3] = { 0, 0, 0 };
+    vec3d  normal  = vec3d(0,0,0);
+    Color  color   = Color::WHITE();
+    float  uvw[3]  = { 0, 0, 0 };
+    float  quality = 0.0;
 }
 Vert_std_data;
 
