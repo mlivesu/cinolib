@@ -101,11 +101,8 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
     {
         if (!(this->face_data(fid).visible)) continue;
 
-        uint n_sides = this->faces.at(fid).size();
-        assert(n_sides>2);
-
         // trivial triangulation for convex polygons...
-        for (uint i=2; i<this->faces.at(fid).size(); ++i)
+        for (uint i=2; i<this->verts_per_face(fid); ++i)
         {
             int vid0 = this->faces.at(fid).at( 0 );
             int vid1 = this->faces.at(fid).at(i-1);

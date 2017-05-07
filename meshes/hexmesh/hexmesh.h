@@ -133,11 +133,18 @@ class Hexmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint num_verts() const { return verts.size();   }
-        uint num_edges() const { return edges.size()/2; }
-        uint num_faces() const { return faces.size()/4; }
-        uint num_cells() const { return cells.size()/8; }
-        uint num_elems() const { return cells.size()/8; } // elem == cell!!
+        uint verts_per_face() const { return  4; }
+        uint verts_per_cell() const { return  8; }
+        uint edges_per_cell() const { return 12; }
+        uint faces_per_cell() const { return  6; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        uint num_verts() const { return verts.size();                    }
+        uint num_edges() const { return edges.size() / 2;                }
+        uint num_faces() const { return faces.size() / verts_per_face(); }
+        uint num_cells() const { return cells.size() / verts_per_cell(); }
+        uint num_elems() const { return cells.size() / verts_per_cell(); } // elem == cell!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -204,7 +211,7 @@ class Hexmesh
         vec3d cell_vert         (const uint cid, const uint off)   const;
         uint  cell_vert_id      (const uint cid, const uint off)   const;
         vec3d cell_centroid     (const uint cid)                   const;
-        uint  cell_shared_face  (const uint cid0, const uint cid1) const;
+        int   cell_shared_face  (const uint cid0, const uint cid1) const;
         bool  cell_contains_vert(const uint cid, const uint vid)   const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

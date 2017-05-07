@@ -22,6 +22,7 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include <cinolib/meshes/polygonmesh/polygonmesh.h>
+#include <cinolib/common.h>
 #include <map>
 
 namespace cinolib
@@ -45,11 +46,9 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<double>            & coords,
                                   const std::vector<std::vector<uint>> & faces)
-: faces(faces)
 {
-    uint nv = coords.size()/3;
-    verts.resize(nv);
-    for(uint vid=0; vid<nv; ++vid) verts.at(vid) = vec3d(coords[3*vid+0], coords[3*vid+1], coords[3*vid+2]);
+    this->verts = vec3d_from_serialized_xyz(coords);
+    this->faces = faces;
 
     init();
 }
@@ -113,13 +112,10 @@ void Polygonmesh<M,V,E,F>::update_adjacency()
     std::map<ipair,std::vector<uint>> e2f_map;
     for(uint fid=0; fid<num_faces(); ++fid)
     {
-        uint n_sides = faces.at(fid).size();
-        assert(n_sides > 2);
-
-        for(uint i=0; i<n_sides; ++i)
+        for(uint i=0; i<verts_per_face(fid); ++i)
         {
             int  vid0 = faces.at(fid).at(i);
-            int  vid1 = faces.at(fid).at((i+1)%n_sides);
+            int  vid1 = faces.at(fid).at((i+1)%verts_per_face(fid));
             v2f.at(vid0).push_back(fid);
             e2f_map[unique_pair(vid0,vid1)].push_back(fid);
         }
@@ -261,8 +257,11 @@ CINO_INLINE
 vec3d Polygonmesh<M,V,E,F>::face_centroid(const uint fid) const
 {
     vec3d c(0,0,0);
-    for(uint vid : faces.at(fid)) c += vert(vid);
-    c /= static_cast<double>(faces.size());
+    for(uint vid : faces.at(fid))
+    {
+        c += vert(vid);
+    }
+    c /= static_cast<double>(verts_per_face(fid));
     return c;
 }
 

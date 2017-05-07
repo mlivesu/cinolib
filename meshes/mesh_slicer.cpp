@@ -67,7 +67,7 @@ void MeshSlicer<Mesh>::update(      Mesh  & m,
     slice_sign[item] = sign; assert(sign == LEQ || sign == GEQ);
     slice_mode       = mode; assert(mode == AND || mode == OR);
 
-    update(m);
+    update(m);       
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -92,7 +92,7 @@ void MeshSlicer<Mesh>::update(Mesh & m)
                                      : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
 
         m.elem_data(eid).visible = b;
-    }
+    }   
 }
 
 }

@@ -88,6 +88,10 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        uint verts_per_face(const uint fid) const { return faces.at(fid).size(); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         uint num_verts() const { return verts.size();   }
         uint num_edges() const { return edges.size()/2; }
         uint num_faces() const { return faces.size();   }

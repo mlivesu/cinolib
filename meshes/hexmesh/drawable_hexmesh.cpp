@@ -104,8 +104,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableHexmesh<M,V,E,F,C>::draw(const float) const
 {
-    render(drawlist_in );
     render(drawlist_out);
+    render(drawlist_in );
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -124,8 +124,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableHexmesh<M,V,E,F,C>::updateGL_out()
 {
-    drawlist_out.tri_coords.clear();
     drawlist_out.tris.clear();
+    drawlist_out.tri_coords.clear();
     drawlist_out.tri_v_norms.clear();
     drawlist_out.tri_v_colors.clear();
     drawlist_out.segs.clear();

@@ -114,8 +114,8 @@ void Hexmesh<M,V,E,F,C>::load(const char * filename)
 
     verts = vec3d_from_serialized_xyz(coords);
 
-    logger << cells.size()/8 << " hexahedra read" << endl;
-    logger << verts.size()   << " vertices  read" << endl;
+    logger << num_cells() << " hexahedra read" << endl;
+    logger << num_verts() << " vertices  read" << endl;
 
     this->mesh_data().filename = std::string(filename);
 
@@ -248,15 +248,15 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
     std::map<ipair,std::vector<uint>> e2c_map;
     for(uint cid=0; cid<num_cells(); ++cid)
     {
-        uint cid_ptr = 8*cid;
+        uint cid_ptr = cid * verts_per_cell();
         uint vids[8] = { cells.at(cid_ptr+0), cells.at(cid_ptr+1), cells.at(cid_ptr+2), cells.at(cid_ptr+3),
                          cells.at(cid_ptr+4), cells.at(cid_ptr+5), cells.at(cid_ptr+6), cells.at(cid_ptr+7) };
 
-        for(uint vid=0; vid<8; ++vid)
+        for(uint vid=0; vid<verts_per_cell(); ++vid)
         {
-            v2c[vids[vid]].push_back(cid);
+            v2c.at(vids[vid]).push_back(cid);
         }
-        for(int eid=0; eid<12; ++eid)
+        for(int eid=0; eid<edges_per_cell(); ++eid)
         {
             ipair e = unique_pair(vids[HEXA_EDGES[eid][0]], vids[HEXA_EDGES[eid][1]]);
             e2c_map[e].push_back(cid);
@@ -292,12 +292,12 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
             uint cid = cids.at(i);
 
             c2e.at(cid).push_back(eid);
-            e2c.at(cid).push_back(cid);
+            e2c.at(eid).push_back(cid);
 
-            for(uint j=j+1; j<cids.size(); ++j)
+            for(uint j=i+1; j<cids.size(); ++j)
             {
-                uint nbr = cells.at(j);
-                if (cell_shared_face(cid,nbr != -1))
+                uint nbr = cids.at(j);
+                if (cell_shared_face(cid,nbr) != -1)
                 {
                     ipair p = unique_pair(cid,nbr);
                     if (DOES_NOT_CONTAIN(cell_pairs, p))
@@ -305,8 +305,8 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
                         cell_pairs.insert(p);
                         c2c.at(cid).push_back(nbr);
                         c2c.at(nbr).push_back(cid);
-                        assert(c2c.at(cid).size() <= 6);
-                        assert(c2c.at(nbr).size() <= 6);
+                        assert(c2c.at(cid).size() <= faces_per_cell());
+                        assert(c2c.at(nbr).size() <= faces_per_cell());
                     }
                 }
             }
@@ -333,8 +333,8 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
 
     for(uint cid=0; cid<num_cells(); ++cid)
     {
-        uint cid_ptr = cid*8;
-        for(int fid=0; fid<6; ++fid)
+        uint cid_ptr = cid * verts_per_cell();
+        for(int fid=0; fid<faces_per_cell(); ++fid)
         {
             face f;
             f.push_back(cells.at(cid_ptr + HEXA_FACES[fid][0]));
@@ -362,7 +362,7 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
     {
         uint cid     = f2c_it.second.first;
         uint f       = f2c_it.second.second;
-        uint cid_ptr = cid*8;
+        uint cid_ptr = cid * verts_per_cell();
         uint vid0    = cells.at(cid_ptr + HEXA_FACES[f][0]);
         uint vid1    = cells.at(cid_ptr + HEXA_FACES[f][1]);
         uint vid2    = cells.at(cid_ptr + HEXA_FACES[f][2]);
@@ -378,7 +378,11 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
         v_on_srf.at(vid2) = true;
         v_on_srf.at(vid3) = true;
 
-        v2f.at(vid0).push_back(fresh_id); // this? why only vid0 - and repeated entries?
+        v2f.at(vid0).push_back(fresh_id);
+        v2f.at(vid1).push_back(fresh_id);
+        v2f.at(vid2).push_back(fresh_id);
+        v2f.at(vid3).push_back(fresh_id);
+
         c2f.at(cid).push_back(fresh_id);
         f2c.at(fresh_id) = cid;
 
@@ -394,6 +398,8 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
                 f2e.at(fresh_id).push_back(eid);
             }
         }
+
+        ++fresh_id;
     }
 
     f2f.clear(); f2f.resize(num_faces());
@@ -410,7 +416,7 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
 
     timer_stop("Build Surface");
 
-    logger << faces.size()/4 << " quads" << endl;
+    logger << faces.size()/verts_per_face() << " quads" << endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -437,9 +443,9 @@ void Hexmesh<M,V,E,F,C>::update_q_normals()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Hexmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
+int Hexmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
 {
-    for(int f=0; f<6; ++f)
+    for(int f=0; f<faces_per_cell(); ++f)
     {
         if (cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][0])) &&
             cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][1])) &&
@@ -458,7 +464,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 bool Hexmesh<M,V,E,F,C>::cell_contains_vert(const uint cid, const uint vid) const
 {
-    for(uint i=0; i<7; ++i)
+    for(uint i=0; i<verts_per_cell(); ++i)
     {
         if (cell_vert_id(cid,i) == vid) return true;
     }
@@ -472,11 +478,11 @@ CINO_INLINE
 vec3d Hexmesh<M,V,E,F,C>::cell_centroid(const uint cid) const
 {
     vec3d c(0,0,0);
-    for(uint off=0; off<8; ++off)
+    for(uint off=0; off<verts_per_cell(); ++off)
     {
         c += cell_vert(cid,off);
     }
-    c /= 8.0;
+    c /= static_cast<double>(verts_per_cell());
     return c;
 }
 
@@ -495,7 +501,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 uint Hexmesh<M,V,E,F,C>::cell_vert_id(const uint cid, const uint off) const
 {
-    uint cid_ptr = 8*cid;
+    uint cid_ptr = cid * verts_per_cell();
     return cells.at(cid_ptr + off);
 }
 
@@ -515,8 +521,8 @@ CINO_INLINE
 vec3d Hexmesh<M,V,E,F,C>::face_centroid(const uint fid) const
 {
     vec3d c(0,0,0);
-    for(uint off=0; off<4; ++off) c += face_vert(fid,off);
-    c /= 4.0;
+    for(uint off=0; off<verts_per_face(); ++off) c += face_vert(fid,off);
+    c /= static_cast<double>(verts_per_face());
     return c;
 }
 
@@ -526,7 +532,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 uint Hexmesh<M,V,E,F,C>::face_vert_id(const uint fid, const uint off) const
 {
-    uint fid_ptr = 4*fid;
+    uint fid_ptr = fid * verts_per_face();
     return faces.at(fid_ptr + off);
 }
 
