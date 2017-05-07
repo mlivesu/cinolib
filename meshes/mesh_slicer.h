@@ -45,17 +45,6 @@ class MeshSlicer
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        enum
-        {
-            X = 0, // filter w.r.t. element centroid X coord
-            Y = 1, // filter w.r.t. element centroid Y coord
-            Z = 2, // filter w.r.t. element centroid Z coord
-            Q = 3, // filter w.r.t. element quality
-            L = 4, // filter w.r.t. element label
-        };
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void update(      Mesh  & m,
                     const float   thresh,  // thresh on centroid
                     const int     item,    // X, Y, Z, Q, L

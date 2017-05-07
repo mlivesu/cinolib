@@ -81,7 +81,7 @@ void DrawableHexmesh<M,V,E,F,C>::init_drawable_stuff()
     type   = HEXMESH;
     slicer = MeshSlicer<DrawableHexmesh<M,V,E,F,C>>(*this);
 
-    drawlist_in.draw_mode    = DRAW_FLAT | DRAW_FACECOLOR | DRAW_BORDER;
+    drawlist_in.draw_mode    = DRAW_MESH | DRAW_FLAT | DRAW_FACECOLOR | DRAW_BORDER;
     drawlist_in.seg_width    = 1;
     drawlist_in.seg_color[0] = 0.1;
     drawlist_in.seg_color[1] = 0.1;
@@ -104,8 +104,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableHexmesh<M,V,E,F,C>::draw(const float) const
 {
-    render(drawlist_out);
     render(drawlist_in );
+    render(drawlist_out);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -262,7 +262,7 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
         {
             if (!(this->cell_data(nbr).visible))
             {
-                uint f = this->cell_shared_face(cid,nbr);
+                int f = this->cell_shared_face(cid,nbr);
                 assert(f!=-1);
 
                 uint vid0 = this->cell_vert_id(cid, HEXA_FACES[f][0]);

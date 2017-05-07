@@ -33,6 +33,11 @@ namespace cinolib
 
 enum
 {
+    X,
+    Y,
+    Z,
+    Q,    // Quality
+    L,    // Label
     EQ,   // ==
     NEQ,  // !=
     LEQ,  // <=

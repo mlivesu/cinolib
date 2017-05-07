@@ -32,16 +32,16 @@ template<class Mesh>
 CINO_INLINE
 MeshSlicer<Mesh>::MeshSlicer(Mesh & m)
 {
-    slice_thresh[ X ] = m.bbox().max.x();
-    slice_thresh[ Y ] = m.bbox().max.y();
-    slice_thresh[ Z ] = m.bbox().max.z();
-    slice_thresh[ Q ] = 0.0;
-    slice_thresh[ L ] = -1;
-    slice_sign  [ X ] = LEQ;
-    slice_sign  [ Y ] = LEQ;
-    slice_sign  [ Z ] = LEQ;
-    slice_sign  [ Q ] = LEQ;
-    slice_mode        = AND;
+    slice_thresh[0] = m.bbox().max.x();
+    slice_thresh[1] = m.bbox().max.y();
+    slice_thresh[2] = m.bbox().max.z();
+    slice_thresh[3] = 0.0;
+    slice_thresh[4] = -1;
+    slice_sign  [0] = LEQ;
+    slice_sign  [1] = LEQ;
+    slice_sign  [2] = LEQ;
+    slice_sign  [3] = LEQ;
+    slice_mode      = AND;
 
     m.elem_show_all();
 }
@@ -56,17 +56,28 @@ void MeshSlicer<Mesh>::update(      Mesh  & m,
                               const int     sign,    // either LEQ or GEQ
                               const int     mode)    // either AND or OR
 {
+    assert(sign == LEQ || sign == GEQ);
+    assert(mode == AND || mode == OR);
+
+    slice_mode = mode;
+
     switch (item)
     {
-        case X:
-        case Y:
-        case Z: slice_thresh[item] = m.bbox().min[item] + m.bbox().delta()[item] * thresh; break;
-        case L: slice_thresh[item] = thresh; break;
+        case X: slice_thresh[0] = m.bbox().min[0] + m.bbox().delta()[0] * thresh;
+                slice_sign[0]   = sign;
+                break;
+        case Y: slice_thresh[1] = m.bbox().min[1] + m.bbox().delta()[1] * thresh;
+                slice_sign[1]   = sign;
+                break;
+        case Z: slice_thresh[2] = m.bbox().min[2] + m.bbox().delta()[2] * thresh;
+                slice_sign[2]   = sign;
+                break;
+        case Q: slice_thresh[3] = thresh;
+                slice_sign[3]   = sign;
+                break;
+        case L: slice_thresh[4] = thresh; break;
         default: assert(false);
     }
-    slice_sign[item] = sign; assert(sign == LEQ || sign == GEQ);
-    slice_mode       = mode; assert(mode == AND || mode == OR);
-
     update(m);       
 }
 
@@ -82,11 +93,11 @@ void MeshSlicer<Mesh>::update(Mesh & m)
         float  q = m.elem_data(eid).quality;
         int    l = m.elem_data(eid).label;
 
-        bool pass_X = (slice_sign[X] == LEQ) ? (c.x() <= slice_thresh[X]) : (c.x() >= slice_thresh[X]);
-        bool pass_Y = (slice_sign[Y] == LEQ) ? (c.y() <= slice_thresh[Y]) : (c.y() >= slice_thresh[Y]);
-        bool pass_Z = (slice_sign[Z] == LEQ) ? (c.z() <= slice_thresh[Z]) : (c.z() >= slice_thresh[Z]);
-        bool pass_Q = (slice_sign[Q] == LEQ) ? (q     <= slice_thresh[Q]) : (q     >= slice_thresh[Q]);
-        bool pass_L = (l == -1 ||  l != static_cast<int>(slice_thresh[L]));
+        bool pass_X = (slice_sign[0] == LEQ) ? (c.x() <= slice_thresh[0]) : (c.x() >= slice_thresh[0]);
+        bool pass_Y = (slice_sign[1] == LEQ) ? (c.y() <= slice_thresh[1]) : (c.y() >= slice_thresh[1]);
+        bool pass_Z = (slice_sign[2] == LEQ) ? (c.z() <= slice_thresh[2]) : (c.z() >= slice_thresh[2]);
+        bool pass_Q = (slice_sign[3] == LEQ) ? (q     <= slice_thresh[3]) : (q     >= slice_thresh[3]);
+        bool pass_L = (l == -1 ||  l != static_cast<int>(slice_thresh[4]));
 
         bool b = (slice_mode == AND) ? ( pass_X &&  pass_Y &&  pass_Z &&  pass_L &&  pass_Q)
                                      : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
