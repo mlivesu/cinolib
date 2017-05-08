@@ -64,7 +64,7 @@ class DrawableHexmesh : public Hexmesh<M,V,E,F,C>, public DrawableObject
     protected:
 
         RenderData drawlist_in;
-        RenderData drawlist_out;
+        RenderData drawlist_out;        
         MeshSlicer<DrawableHexmesh<M,V,E,F,C>> slicer;
 
     public:
@@ -72,6 +72,18 @@ class DrawableHexmesh : public Hexmesh<M,V,E,F,C>, public DrawableObject
         void  draw(const float scene_size=1) const;
         vec3d scene_center() const { return this->bb.center(); }
         float scene_radius() const { return this->bb.diag();   }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void vert_set_color(const Color & c) { Hexmesh<M,V,E,F,C>::vert_set_color(c); updateGL(); }
+        void edge_set_color(const Color & c) { Hexmesh<M,V,E,F,C>::edge_set_color(c); updateGL(); }
+        void face_set_color(const Color & c) { Hexmesh<M,V,E,F,C>::face_set_color(c); updateGL(); }
+        void cell_set_color(const Color & c) { Hexmesh<M,V,E,F,C>::cell_set_color(c); updateGL(); }
+
+        void vert_set_alpha(const float a) { Hexmesh<M,V,E,F,C>::vert_set_alpha(a); updateGL(); }
+        void edge_set_alpha(const float a) { Hexmesh<M,V,E,F,C>::edge_set_alpha(a); updateGL(); }
+        void face_set_alpha(const float a) { Hexmesh<M,V,E,F,C>::face_set_alpha(a); updateGL(); }
+        void cell_set_alpha(const float a) { Hexmesh<M,V,E,F,C>::cell_set_alpha(a); updateGL(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -83,6 +95,27 @@ class DrawableHexmesh : public Hexmesh<M,V,E,F,C>, public DrawableObject
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void slice(const float thresh, const int item, const int sign, const int mode);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void show_mesh(const bool b);
+        void show_mesh_flat();
+        void show_mesh_smooth();
+        void show_mesh_points();
+        void show_face_color();
+        void show_face_quality();
+        void show_face_texture1D(const GLint texture);
+        void show_face_wireframe(const bool b);
+        void show_face_wireframe_color(const Color & c);
+        void show_face_wireframe_width(const float width);
+        void show_face_wireframe_transparency(const float alpha);
+        void show_cell_color();
+        void show_cell_quality();
+        void show_cell_texture1D(const GLint texture);
+        void show_cell_wireframe(const bool b);
+        void show_cell_wireframe_color(const Color & c);
+        void show_cell_wireframe_width(const float width);
+        void show_cell_wireframe_transparency(const float alpha);
 };
 
 }

@@ -39,7 +39,7 @@ namespace cinolib
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
 Hexmesh<M,V,E,F,C>::Hexmesh(const std::vector<vec3d> & verts,
-                            const std::vector<u_int> & cells)
+                            const std::vector<uint>  & cells)
 : verts(verts)
 , cells(cells)
 {
@@ -51,7 +51,7 @@ Hexmesh<M,V,E,F,C>::Hexmesh(const std::vector<vec3d> & verts,
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
 Hexmesh<M,V,E,F,C>::Hexmesh(const std::vector<double> & coords,
-                            const std::vector<u_int>  & cells)
+                            const std::vector<uint>   & cells)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
     this->cells = cells;
@@ -214,6 +214,8 @@ void Hexmesh<M,V,E,F,C>::init()
     f_data.resize(num_faces());
 
     update_q_normals();
+
+    set_uvw_from_xyz(UVW_param);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -509,6 +511,23 @@ uint Hexmesh<M,V,E,F,C>::cell_vert_id(const uint cid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+uint Hexmesh<M,V,E,F,C>::cell_edge_id(const uint cid, const uint vid0, const uint vid1) const
+{
+    assert(cell_contains_vert(cid,vid0));
+    assert(cell_contains_vert(cid,vid1));
+
+    ipair query = unique_pair(vid0,vid1);
+    for(uint eid : adj_c2e(cid))
+    {
+        if (unique_pair(edge_vert_id(eid,0), edge_vert_id(eid,1)) == query) return eid;
+    }
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 vec3d Hexmesh<M,V,E,F,C>::cell_vert(const uint cid, const uint off) const
 {
     return verts.at(cell_vert_id(cid,off));
@@ -549,6 +568,36 @@ vec3d Hexmesh<M,V,E,F,C>::face_vert(const uint fid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+uint Hexmesh<M,V,E,F,C>::face_edge_id(const uint fid, const uint vid0, const uint vid1) const
+{
+    assert(face_contains_vert(fid,vid0));
+    assert(face_contains_vert(fid,vid1));
+
+    ipair query = unique_pair(vid0,vid1);
+    for(uint eid : adj_f2e(fid))
+    {
+        if (unique_pair(edge_vert_id(eid,0), edge_vert_id(eid,1)) == query) return eid;
+    }
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool Hexmesh<M,V,E,F,C>::face_contains_vert(const uint fid, const uint vid) const
+{
+    for(uint i=0; i<verts_per_face(); ++i)
+    {
+        if (face_vert_id(fid,i) == vid) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 uint Hexmesh<M,V,E,F,C>::edge_vert_id(const uint eid, const uint off) const
 {
     uint eid_ptr = 2*eid;
@@ -580,11 +629,71 @@ void Hexmesh<M,V,E,F,C>::elem_show_all()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+void Hexmesh<M,V,E,F,C>::vert_set_color(const Color & c)
+{
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        vert_data(vid).color = c;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Hexmesh<M,V,E,F,C>::vert_set_alpha(const float alpha)
+{
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        vert_data(vid).color.a = alpha;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Hexmesh<M,V,E,F,C>::edge_set_color(const Color & c)
+{
+    for(uint eid=0; eid<num_edges(); ++eid)
+    {
+        edge_data(eid).color = c;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Hexmesh<M,V,E,F,C>::edge_set_alpha(const float alpha)
+{
+    for(uint eid=0; eid<num_edges(); ++eid)
+    {
+        edge_data(eid).color.a = alpha;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 void Hexmesh<M,V,E,F,C>::face_set_color(const Color & c)
 {
     for(uint fid=0; fid<num_faces(); ++fid)
     {
         face_data(fid).color = c;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Hexmesh<M,V,E,F,C>::face_set_alpha(const float alpha)
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        face_data(fid).color.a = alpha;
     }
 }
 
@@ -598,6 +707,99 @@ void Hexmesh<M,V,E,F,C>::cell_set_color(const Color & c)
     {
         cell_data(cid).color = c;
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Hexmesh<M,V,E,F,C>::cell_set_alpha(const float alpha)
+{
+    for(uint cid=0; cid<num_cells(); ++cid)
+    {
+        cell_data(cid).color.a = alpha;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool Hexmesh<M,V,E,F,C>::edge_is_on_srf(const uint eid) const
+{
+    return e_on_srf.at(eid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+std::vector<float> Hexmesh<M,V,E,F,C>::export_uvw_param(const int mode) const
+{
+    std::vector<float> uvw;
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        switch (mode)
+        {
+            case U_param  : uvw.push_back(vert_data(vid).uvw[0]); break;
+            case V_param  : uvw.push_back(vert_data(vid).uvw[1]); break;
+            case W_param  : uvw.push_back(vert_data(vid).uvw[2]); break;
+            case UV_param : uvw.push_back(vert_data(vid).uvw[0]);
+                            uvw.push_back(vert_data(vid).uvw[1]); break;
+            case UW_param : uvw.push_back(vert_data(vid).uvw[0]);
+                            uvw.push_back(vert_data(vid).uvw[2]); break;
+            case VW_param : uvw.push_back(vert_data(vid).uvw[1]);
+                            uvw.push_back(vert_data(vid).uvw[2]); break;
+            case UVW_param: uvw.push_back(vert_data(vid).uvw[0]);
+                            uvw.push_back(vert_data(vid).uvw[1]);
+                            uvw.push_back(vert_data(vid).uvw[2]); break;
+            default: assert(false);
+        }
+    }
+    return uvw;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Hexmesh<M,V,E,F,C>::set_uvw_from_xyz(const int mode)
+{
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        switch (mode)
+        {
+            case U_param  : vert_data(vid).uvw[0] = static_cast<float>(vert(vid).x()); break;
+            case V_param  : vert_data(vid).uvw[1] = static_cast<float>(vert(vid).y()); break;
+            case W_param  : vert_data(vid).uvw[2] = static_cast<float>(vert(vid).z()); break;
+            case UV_param : vert_data(vid).uvw[0] = static_cast<float>(vert(vid).x());
+                            vert_data(vid).uvw[1] = static_cast<float>(vert(vid).y()); break;
+            case UW_param : vert_data(vid).uvw[0] = static_cast<float>(vert(vid).x());
+                            vert_data(vid).uvw[2] = static_cast<float>(vert(vid).z()); break;
+            case VW_param : vert_data(vid).uvw[1] = static_cast<float>(vert(vid).y());
+                            vert_data(vid).uvw[2] = static_cast<float>(vert(vid).z()); break;
+            case UVW_param: vert_data(vid).uvw[0] = static_cast<float>(vert(vid).z());
+                            vert_data(vid).uvw[1] = static_cast<float>(vert(vid).y());
+                            vert_data(vid).uvw[2] = static_cast<float>(vert(vid).z()); break;
+            default: assert(false);
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+std::vector<double> Hexmesh<M,V,E,F,C>::vector_coords() const
+{
+    std::vector<double> coords;
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        coords.push_back(vert(vid).x());
+        coords.push_back(vert(vid).y());
+        coords.push_back(vert(vid).z());
+    }
+    return coords;
 }
 
 }

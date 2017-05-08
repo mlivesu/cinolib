@@ -42,16 +42,16 @@ namespace cinolib
 
 enum
 {
-    DRAW_TRIS            = 0x00000001,
-    DRAW_TRI_POINTS      = 0x00000002,
-    DRAW_TRI_FLAT        = 0x00000004,
-    DRAW_TRI_SMOOTH      = 0x00000008,
-    DRAW_TRI_FACECOLOR   = 0x00000020,
-    DRAW_TRI_VERTEXCOLOR = 0x00000040,
-    DRAW_TRI_TEXTURE1D   = 0x00000080,
-    DRAW_SEGS            = 0x00000100,
-    DRAW_SEG_SEGCOLOR    = 0x00000200,
-    DRAW_SEG_VERTCOLOR   = 0x00000400,
+    DRAW_TRIS          = 0x00000001,
+    DRAW_TRI_POINTS    = 0x00000002,
+    DRAW_TRI_FLAT      = 0x00000004,
+    DRAW_TRI_SMOOTH    = 0x00000008,
+    DRAW_TRI_FACECOLOR = 0x00000020,
+    DRAW_TRI_VERTCOLOR = 0x00000040,
+    DRAW_TRI_TEXTURE1D = 0x00000080,
+    DRAW_SEGS          = 0x00000100,
+    DRAW_SEG_SEGCOLOR  = 0x00000200,
+    DRAW_SEG_VERTCOLOR = 0x00000400,
 };
 
 typedef struct
@@ -67,8 +67,8 @@ typedef struct
     //
     std::vector<uint>   segs;
     std::vector<double> seg_coords;
-    float               seg_color[4];
-    int                 seg_width;
+    std::vector<float>  seg_colors;
+    GLfloat             seg_width;
 }
 RenderData;
 

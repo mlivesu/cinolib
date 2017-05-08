@@ -1,4 +1,4 @@
-- add segments color and condensate rendering in a single method rather than two
+- add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
 - Transform timer in a profiler class with internal string to be printed at the end
   and summary of times spent in each function… (NOTE: it’s a tree!!!!!!)
 - Refactor PointInsideMeshCache, it should return ALL the elements containing the

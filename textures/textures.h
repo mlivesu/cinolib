@@ -21,43 +21,18 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef CINO_SYMBOLS_H
-#define CINO_SYMBOLS_H
+#ifndef CINO_TEXTURES_H
+#define CINO_TEXTURES_H
 
-namespace cinolib
-{
-
-// List of GLOBAL symbols used throughout the library. This helps keeping a unique ID for each symbol.
-// Symbols that require specialized values (e.g. X=>0, Y=>1, Z=>2) are to be defined within the classes
-// that need them, and will therefore leave in a different namespace.
+#include <cinolib/textures/isolines_texture.h>
+#include <cinolib/textures/quality_ramp_texture.h>
+#include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
 
 enum
 {
-    // XYZ coordinates
-    X,
-    Y,
-    Z,
-    // possible pairings of UVW parametric coordinates
-    U_param,
-    V_param,
-    W_param,
-    UV_param,
-    UW_param,
-    VW_param,
-    UVW_param,
-    //
-    Q,    // Quality
-    L,    // Label
-    //
-    EQ,   // ==
-    NEQ,  // !=
-    LEQ,  // <=
-    GEQ,  // >=
-    AND,  // &&
-    OR    // ||
+    TEXTURE_ISOLINES,
+    TEXTURE_QUALITY_RAMP,
+    TEXTURE_QUALITY_RAMP_W_ISOLINES
 };
 
-}
-
-
-#endif // CINO_SYMBOLS_H
+#endif // CINO_TEXTURES_H

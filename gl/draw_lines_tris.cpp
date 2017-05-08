@@ -35,7 +35,6 @@ void render_pvt(const RenderData & data)
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_DOUBLE, 0, data.tri_coords.data());
         glPointSize(data.seg_width);
-        glColor4fv(data.seg_color);
         glDrawArrays(GL_POINTS, 0, data.tri_coords.size()/3);
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
@@ -46,7 +45,7 @@ void render_pvt(const RenderData & data)
         glVertexPointer(3, GL_DOUBLE, 0, data.tri_coords.data());
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_DOUBLE, 0, data.tri_v_norms.data());
-        if (data.draw_mode & DRAW_TRI_VERTEXCOLOR || data.draw_mode & DRAW_TRI_FACECOLOR)
+        if (data.draw_mode & DRAW_TRI_VERTCOLOR || data.draw_mode & DRAW_TRI_FACECOLOR)
         {
             glEnableClientState(GL_COLOR_ARRAY);
             glColorPointer(4, GL_FLOAT, 0, data.tri_v_colors.data());
@@ -58,15 +57,16 @@ void render_pvt(const RenderData & data)
             glColor3f(1.0,1.0,1.0);
         }
         glDrawElements(GL_TRIANGLES, data.tris.size(), GL_UNSIGNED_INT, data.tris.data());
-        if (data.draw_mode & DRAW_TRI_VERTEXCOLOR) glDisableClientState(GL_COLOR_ARRAY);   else
-        if (data.draw_mode & DRAW_TRI_FACECOLOR)   glDisableClientState(GL_COLOR_ARRAY);   else
-        if (data.draw_mode & DRAW_TRI_TEXTURE1D)   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        if (data.draw_mode & DRAW_TRI_VERTCOLOR) glDisableClientState(GL_COLOR_ARRAY);   else
+        if (data.draw_mode & DRAW_TRI_FACECOLOR) glDisableClientState(GL_COLOR_ARRAY);   else
+        if (data.draw_mode & DRAW_TRI_TEXTURE1D) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
     }
 
     if (data.draw_mode & DRAW_SEGS)
     {
+        glDisable(GL_LIGHTING);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
         glDepthRange(0.0, 1.0);
@@ -74,10 +74,17 @@ void render_pvt(const RenderData & data)
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_DOUBLE, 0, data.seg_coords.data());
         glLineWidth(data.seg_width);
-        glColor4fv(data.seg_color);
+        if (data.draw_mode & DRAW_SEG_SEGCOLOR || data.draw_mode & DRAW_SEG_VERTCOLOR)
+        {
+            glEnableClientState(GL_COLOR_ARRAY);
+            glColorPointer(4, GL_FLOAT, 0, data.seg_colors.data());
+        }
         glDrawElements(GL_LINES, data.segs.size(), GL_UNSIGNED_INT, data.segs.data());
+        if (data.draw_mode & DRAW_SEG_VERTCOLOR) glDisableClientState(GL_COLOR_ARRAY); else
+        if (data.draw_mode & DRAW_SEG_SEGCOLOR)  glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
         glDepthFunc(GL_LESS);
+        glEnable(GL_LIGHTING);
     }
 }
 

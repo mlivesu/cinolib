@@ -63,7 +63,6 @@ static int HEXA_EDGES[12][2] =
     { 3, 7 }  // 11
 };
 
-
 template<class M = Mesh_std_data, // default template arguments
          class V = Vert_std_data,
          class E = Edge_std_data,
@@ -78,10 +77,10 @@ class Hexmesh
         Hexmesh(const char * filename);
 
         Hexmesh(const std::vector<double> & coords,
-                const std::vector<u_int>  & cells);
+                const std::vector<uint>   & cells);
 
-        Hexmesh(const std::vector<vec3d>  & verts,
-                const std::vector<u_int>  & cells);
+        Hexmesh(const std::vector<vec3d> & verts,
+                const std::vector<uint>  & cells);
 
     protected:
 
@@ -148,11 +147,17 @@ class Hexmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const Bbox               & bbox()         const { return bb;    }
-        const std::vector<vec3d> & vector_verts() const { return verts; }
-        const std::vector<uint>  & vector_edges() const { return edges; }
-        const std::vector<uint>  & vector_faces() const { return faces; }
-        const std::vector<uint>  & vector_cells() const { return cells; }
+        const Bbox                & bbox()          const { return bb;    }
+              std::vector<double>   vector_coords() const;
+        const std::vector<vec3d>  & vector_verts()  const { return verts; }
+        const std::vector<uint>   & vector_edges()  const { return edges; }
+        const std::vector<uint>   & vector_faces()  const { return faces; }
+        const std::vector<uint>   & vector_cells()  const { return cells; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        std::vector<float> export_uvw_param(const int mode) const;
+        void               set_uvw_from_xyz(const int mode);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -192,29 +197,39 @@ class Hexmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const vec3d vert(const uint vid) const { return verts.at(vid); }
-              vec3d vert(const uint vid)       { return verts.at(vid); }
+        const vec3d & vert          (const uint vid) const { return verts.at(vid); }
+              vec3d   vert          (const uint vid)       { return verts.at(vid); }
+virtual       void    vert_set_color(const Color & c);
+virtual       void    vert_set_alpha(const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d edge_vert   (const uint eid, const uint offset) const;
-        uint  edge_vert_id(const uint eid, const uint offset) const;
+        vec3d edge_vert     (const uint eid, const uint offset) const;
+        uint  edge_vert_id  (const uint eid, const uint offset) const;
+        bool  edge_is_on_srf(const uint eid) const;
+virtual void  edge_set_color(const Color & c);
+virtual void  edge_set_alpha(const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d face_vert     (const uint fid, const uint offset) const;
-        uint  face_vert_id  (const uint fid, const uint offset) const;
-        vec3d face_centroid (const uint fid)                    const;
-        void  face_set_color(const Color & c);
+        vec3d face_vert         (const uint fid, const uint offset) const;
+        uint  face_vert_id      (const uint fid, const uint offset) const;
+        uint  face_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
+        vec3d face_centroid     (const uint fid) const;
+        bool  face_contains_vert(const uint fid, const uint vid) const;
+virtual void  face_set_color    (const Color & c);
+virtual void  face_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         vec3d cell_vert         (const uint cid, const uint off)   const;
         uint  cell_vert_id      (const uint cid, const uint off)   const;
+        uint  cell_edge_id      (const uint cid, const uint vid0, const uint vid1) const;
         vec3d cell_centroid     (const uint cid)                   const;
         int   cell_shared_face  (const uint cid0, const uint cid1) const;
         bool  cell_contains_vert(const uint cid, const uint vid)   const;
-        void  cell_set_color    (const Color & c);
+virtual void  cell_set_color    (const Color & c);
+virtual void  cell_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -234,3 +249,48 @@ class Hexmesh
 #endif
 
 #endif // CINO_HEXMESH_H
+
+
+/*  TO BE INCLUDED IN THE DATA STRUCTURE TO HANDLE ELEMENT SPLITTING
+// finds average point (adding it if needed)
+// the second parameters contains the already added vertices
+// as they should never be added twice
+int _find_avg(vector<int> &points, map<vector<int>, int> &new_vertices)
+{
+    if (points.size() == 1) return points[0];
+
+    sort(points.begin(), points.end());
+
+    if (new_vertices.count(points)) return new_vertices[points];
+
+    // add new point as the average of existing points
+    vec3<real> new_point(0, 0, 0);
+    for (int p: points)
+    {
+        new_point += vertex(p);
+    }
+    new_point /= points.size();
+    add_vertex(new_point);
+    int vertex_index = m_coords.size()/3 - 1;
+    new_vertices[points] = vertex_index;
+    return vertex_index;
+}
+
+void _apply_split_scheme(const vector<vector<vector<int>>> & split_scheme,
+                         const vector<int> & old_hexes, // linearized input hexa (8 entries per element)
+                         const int base_addr,           // 8 * hexa ID
+                         map<vector<int>,int> & new_vertices)
+{
+    for (auto &hex: split_scheme)
+    for (auto &hex_point: hex)
+    {
+        std::vector<int> points;  // points to be averaged
+        for (int j: hex_point)
+        {
+            points.push_back(old_hexes[base_addr+j]);
+        }
+        m_hexes.push_back(_find_avg(points, new_vertices));
+    }
+}
+
+*/

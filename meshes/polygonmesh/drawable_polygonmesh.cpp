@@ -67,10 +67,6 @@ void DrawablePolygonmesh<M,V,E,F>::init_drawable_stuff()
 
     drawlist.draw_mode    = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist.seg_width    = 1;
-    drawlist.seg_color[0] = 0.1;
-    drawlist.seg_color[1] = 0.1;
-    drawlist.seg_color[2] = 0.1;
-    drawlist.seg_color[3] = 1.0;
 
     updateGL();
 }
@@ -149,7 +145,7 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
                 drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
                 drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
             }
-            else if (drawlist.draw_mode & DRAW_TRI_VERTEXCOLOR)
+            else if (drawlist.draw_mode & DRAW_TRI_VERTCOLOR)
             {
                 drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.r);
                 drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.g);
@@ -190,6 +186,18 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
         drawlist.seg_coords.push_back(vid1.x());
         drawlist.seg_coords.push_back(vid1.y());
         drawlist.seg_coords.push_back(vid1.z());
+
+        if (drawlist.draw_mode & DRAW_SEG_SEGCOLOR)
+        {
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
+        }
     }
 }
 
