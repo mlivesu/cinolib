@@ -256,7 +256,7 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
         {
             v2c.at(vids[vid]).push_back(cid);
         }
-        for(int eid=0; eid<edges_per_cell(); ++eid)
+        for(uint eid=0; eid<edges_per_cell(); ++eid)
         {
             ipair e = unique_pair(vids[HEXA_EDGES[eid][0]], vids[HEXA_EDGES[eid][1]]);
             e2c_map[e].push_back(cid);
@@ -334,7 +334,7 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
     for(uint cid=0; cid<num_cells(); ++cid)
     {
         uint cid_ptr = cid * verts_per_cell();
-        for(int fid=0; fid<faces_per_cell(); ++fid)
+        for(uint fid=0; fid<faces_per_cell(); ++fid)
         {
             face f;
             f.push_back(cells.at(cid_ptr + HEXA_FACES[fid][0]));
@@ -445,7 +445,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 int Hexmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
 {
-    for(int f=0; f<faces_per_cell(); ++f)
+    for(uint f=0; f<faces_per_cell(); ++f)
     {
         if (cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][0])) &&
             cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][1])) &&
@@ -573,6 +573,30 @@ void Hexmesh<M,V,E,F,C>::elem_show_all()
     for(uint cid=0; cid<num_cells(); ++cid)
     {
         cell_data(cid).visible = true;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Hexmesh<M,V,E,F,C>::face_set_color(const Color & c)
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        face_data(fid).color = c;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Hexmesh<M,V,E,F,C>::cell_set_color(const Color & c)
+{
+    for(uint cid=0; cid<num_cells(); ++cid)
+    {
+        cell_data(cid).color = c;
     }
 }
 

@@ -81,19 +81,22 @@ void DrawableHexmesh<M,V,E,F,C>::init_drawable_stuff()
     type   = HEXMESH;
     slicer = MeshSlicer<DrawableHexmesh<M,V,E,F,C>>(*this);
 
-    drawlist_in.draw_mode    = DRAW_MESH | DRAW_FLAT | DRAW_FACECOLOR | DRAW_BORDER;
+    drawlist_in.draw_mode    = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_in.seg_width    = 1;
     drawlist_in.seg_color[0] = 0.1;
     drawlist_in.seg_color[1] = 0.1;
     drawlist_in.seg_color[2] = 0.1;
     drawlist_in.seg_color[3] = 1.0;
 
-    drawlist_out.draw_mode    = DRAW_MESH | DRAW_FLAT | DRAW_FACECOLOR | DRAW_BORDER;
+    drawlist_out.draw_mode    = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_out.seg_width    = 1;
     drawlist_out.seg_color[0] = 0.1;
     drawlist_out.seg_color[1] = 0.1;
     drawlist_out.seg_color[2] = 0.1;
     drawlist_out.seg_color[3] = 1.0;
+
+    this->face_set_color(Color::YELLOW());
+    this->cell_set_color(Color::WHITE());
 
     updateGL();
 }
@@ -175,7 +178,7 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_out()
         drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.y());
         drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.z());
 
-        if (drawlist_out.draw_mode & DRAW_FACECOLOR) // replicate f color on each vertex
+        if (drawlist_out.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
         {
             drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.r);
             drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.g);
@@ -194,7 +197,7 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_out()
             drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.b);
             drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.a);
         }
-        else if (drawlist_out.draw_mode & DRAW_VERTEXCOLOR)
+        else if (drawlist_out.draw_mode & DRAW_TRI_VERTEXCOLOR)
         {
             drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.r);
             drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.g);
@@ -311,7 +314,7 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
                 drawlist_in.tri_v_norms.push_back(n.y());
                 drawlist_in.tri_v_norms.push_back(n.z());
 
-                if (drawlist_in.draw_mode & DRAW_FACECOLOR) // replicate f color on each vertex
+                if (drawlist_in.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
                 {
                     drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.r);
                     drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.g);
@@ -330,7 +333,7 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
                     drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.b);
                     drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.a);
                 }
-                else if (drawlist_in.draw_mode & DRAW_VERTEXCOLOR)
+                else if (drawlist_in.draw_mode & DRAW_TRI_VERTEXCOLOR)
                 {
                     drawlist_in.tri_v_colors.push_back(this->vert_data(vid0).color.r);
                     drawlist_in.tri_v_colors.push_back(this->vert_data(vid0).color.g);

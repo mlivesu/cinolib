@@ -65,7 +65,7 @@ void DrawablePolygonmesh<M,V,E,F>::init_drawable_stuff()
     type   = POLYGONMESH;
     slicer = MeshSlicer<Polygonmesh<M,V,E,F>>(*this);
 
-    drawlist.draw_mode    = DRAW_MESH | DRAW_FLAT | DRAW_FACECOLOR | DRAW_BORDER;
+    drawlist.draw_mode    = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist.seg_width    = 1;
     drawlist.seg_color[0] = 0.1;
     drawlist.seg_color[1] = 0.1;
@@ -134,7 +134,7 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
             drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.y());
             drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.z());
 
-            if (drawlist.draw_mode & DRAW_FACECOLOR) // replicate f color on each vertex
+            if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
             {
                 drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
                 drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
@@ -149,7 +149,7 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
                 drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
                 drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
             }
-            else if (drawlist.draw_mode & DRAW_VERTEXCOLOR)
+            else if (drawlist.draw_mode & DRAW_TRI_VERTEXCOLOR)
             {
                 drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.r);
                 drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.g);

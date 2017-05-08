@@ -29,22 +29,8 @@ namespace cinolib
 CINO_INLINE
 void render_pvt(const RenderData & data)
 {
-    typedef enum
-    {
-        DRAW_MESH        = 0x00000001,
-        DRAW_POINTS      = 0x00000002,
-        DRAW_FLAT        = 0x00000004,
-        DRAW_SMOOTH      = 0x00000008,
-        DRAW_WIREFRAME   = 0x00000010,
-        DRAW_FACECOLOR   = 0x00000020,
-        DRAW_VERTEXCOLOR = 0x00000040,
-        DRAW_TEXTURE1D   = 0x00000080,
-        DRAW_BORDER      = 0x00000100,
-    }
-    DrawMode;
 
-
-    if (data.draw_mode & DRAW_POINTS)
+    if (data.draw_mode & DRAW_TRI_POINTS)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_DOUBLE, 0, data.tri_coords.data());
@@ -54,32 +40,32 @@ void render_pvt(const RenderData & data)
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
     }
-    else if (data.draw_mode & DRAW_SMOOTH || data.draw_mode & DRAW_FLAT)
+    else if (data.draw_mode & DRAW_TRI_SMOOTH || data.draw_mode & DRAW_TRI_FLAT)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_DOUBLE, 0, data.tri_coords.data());
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_DOUBLE, 0, data.tri_v_norms.data());
-        if (data.draw_mode & DRAW_VERTEXCOLOR || data.draw_mode & DRAW_FACECOLOR)
+        if (data.draw_mode & DRAW_TRI_VERTEXCOLOR || data.draw_mode & DRAW_TRI_FACECOLOR)
         {
             glEnableClientState(GL_COLOR_ARRAY);
             glColorPointer(4, GL_FLOAT, 0, data.tri_v_colors.data());
         }
-        else if (data.draw_mode & DRAW_TEXTURE1D)
+        else if (data.draw_mode & DRAW_TRI_TEXTURE1D)
         {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(1, GL_FLOAT, 0, data.tri_text1D.data());
             glColor3f(1.0,1.0,1.0);
         }
         glDrawElements(GL_TRIANGLES, data.tris.size(), GL_UNSIGNED_INT, data.tris.data());
-        if (data.draw_mode & DRAW_VERTEXCOLOR) glDisableClientState(GL_COLOR_ARRAY);   else
-        if (data.draw_mode & DRAW_FACECOLOR)   glDisableClientState(GL_COLOR_ARRAY);   else
-        if (data.draw_mode & DRAW_TEXTURE1D)   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        if (data.draw_mode & DRAW_TRI_VERTEXCOLOR) glDisableClientState(GL_COLOR_ARRAY);   else
+        if (data.draw_mode & DRAW_TRI_FACECOLOR)   glDisableClientState(GL_COLOR_ARRAY);   else
+        if (data.draw_mode & DRAW_TRI_TEXTURE1D)   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
     }
 
-    if (data.draw_mode & DRAW_BORDER)
+    if (data.draw_mode & DRAW_SEGS)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
@@ -99,38 +85,24 @@ void render_pvt(const RenderData & data)
 CINO_INLINE
 void render(const RenderData & data)
 {
-    typedef enum
-    {
-        DRAW_MESH        = 0x00000001,
-        DRAW_POINTS      = 0x00000002,
-        DRAW_FLAT        = 0x00000004,
-        DRAW_SMOOTH      = 0x00000008,
-        DRAW_WIREFRAME   = 0x00000010,
-        DRAW_FACECOLOR   = 0x00000020,
-        DRAW_VERTEXCOLOR = 0x00000040,
-        DRAW_TEXTURE1D   = 0x00000080,
-        DRAW_BORDER      = 0x00000100,
-    }
-    DrawMode;
-
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glDisable(GL_CULL_FACE);
 
-    if (data.draw_mode & DRAW_MESH)
+    if (data.draw_mode & DRAW_TRIS)
     {
-        if (data.draw_mode & DRAW_POINTS)
+        if (data.draw_mode & DRAW_TRI_POINTS)
         {
             glDisable(GL_LIGHTING);
             render_pvt(data);
         }
-        else if (data.draw_mode & DRAW_FLAT)
+        else if (data.draw_mode & DRAW_TRI_FLAT)
         {
             glEnable(GL_LIGHTING);
             glShadeModel(GL_FLAT);
             glDepthRange(0.01, 1.0);
             render_pvt(data);
         }
-        else if (data.draw_mode & DRAW_SMOOTH)
+        else if (data.draw_mode & DRAW_TRI_SMOOTH)
         {
             glEnable(GL_LIGHTING);
             glShadeModel(GL_SMOOTH);

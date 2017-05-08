@@ -202,9 +202,10 @@ class Hexmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d face_vert    (const uint fid, const uint offset) const;
-        uint  face_vert_id (const uint fid, const uint offset) const;
-        vec3d face_centroid(const uint fid)                    const;
+        vec3d face_vert     (const uint fid, const uint offset) const;
+        uint  face_vert_id  (const uint fid, const uint offset) const;
+        vec3d face_centroid (const uint fid)                    const;
+        void  face_set_color(const Color & c);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -213,6 +214,7 @@ class Hexmesh
         vec3d cell_centroid     (const uint cid)                   const;
         int   cell_shared_face  (const uint cid0, const uint cid1) const;
         bool  cell_contains_vert(const uint cid, const uint vid)   const;
+        void  cell_set_color    (const Color & c);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
