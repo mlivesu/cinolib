@@ -23,10 +23,21 @@
 ****************************************************************************/
 #include <cinolib/meshes/polygonmesh/polygonmesh.h>
 #include <cinolib/common.h>
+#include <cinolib/io/read_write.h>
 #include <map>
 
 namespace cinolib
 {
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+Polygonmesh<M,V,E,F>::Polygonmesh(const char * filename)
+{
+    load(filename);
+    init();
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -51,6 +62,78 @@ Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<double>            & coords,
     this->faces = faces;
 
     init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Polygonmesh<M,V,E,F>::load(const char * filename)
+{
+    timer_start("Load Polygonmesh");
+
+    clear();
+    std::vector<double> coords;
+
+    std::string str(filename);
+    std::string filetype = str.substr(str.size()-4,4);
+
+    if (filetype.compare(".off") == 0 ||
+        filetype.compare(".OFF") == 0)
+    {
+        read_OFF(filename, coords, faces);
+    }
+    else if (filetype.compare(".obj") == 0 ||
+             filetype.compare(".OBJ") == 0)
+    {
+        read_OBJ(filename, coords, faces);
+    }
+    else
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
+        exit(-1);
+    }
+
+    verts = vec3d_from_serialized_xyz(coords);
+
+    logger << num_faces() << " polygons read" << endl;
+    logger << num_verts() << " vertices read" << endl;
+
+    this->mesh_data().filename = std::string(filename);
+
+    timer_stop("Load Polygonmesh");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Polygonmesh<M,V,E,F>::save(const char * filename) const
+{
+    timer_start("Save Polygonmesh");
+
+    std::vector<double> coords = serialized_xyz_from_vec3d(verts);
+
+    std::string str(filename);
+    std::string filetype = str.substr(str.size()-3,3);
+
+    if (filetype.compare("off") == 0 ||
+        filetype.compare("OFF") == 0)
+    {
+        write_OFF(filename, coords, faces);
+    }
+    else if (filetype.compare(".obj") == 0 ||
+             filetype.compare(".OBJ") == 0)
+    {
+        write_OBJ(filename, coords, faces);
+    }
+    else
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
+        exit(-1);
+    }
+
+    timer_stop("Save Polygonmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -68,6 +68,42 @@ void write_OBJ(const char                * filename,
     fclose(fp);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void write_OBJ(const char                           * filename,
+               const std::vector<double>            & xyz,
+               const std::vector<std::vector<uint>> & poly)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    FILE *fp = fopen(filename, "w");
+
+    if(!fp)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << endl;
+        exit(-1);
+    }
+
+    for(uint i=0; i<xyz.size(); i+=3)
+    {
+        // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+        //
+        fprintf(fp, "v %.17g %.17g %.17g\n", xyz[i], xyz[i+1], xyz[i+2]);
+    }
+
+    for(auto p : poly)
+    {
+        fprintf(fp, "f ");
+        for(uint vid : p) fprintf(fp, "%d ", vid+1);
+        fprintf(fp, "\n");
+    }
+
+    fclose(fp);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void write_OBJ(const char                * filename,
                const std::vector<double> & xyz,

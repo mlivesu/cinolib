@@ -43,6 +43,8 @@ class Polygonmesh
 
         Polygonmesh(){}
 
+        Polygonmesh(const char * filename);
+
         Polygonmesh(const std::vector<vec3d>             & verts,
                     const std::vector<std::vector<uint>> & faces);
 
@@ -77,6 +79,8 @@ class Polygonmesh
 
         void clear();
         void init();
+        void load(const char * filename);
+        void save(const char * filename) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

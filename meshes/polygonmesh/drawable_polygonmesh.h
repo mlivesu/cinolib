@@ -51,6 +51,8 @@ class DrawablePolygonmesh : public Polygonmesh<M,V,E,F>, public DrawableObject
 
         DrawablePolygonmesh();
 
+        DrawablePolygonmesh(const char * filename);
+
         DrawablePolygonmesh(const std::vector<vec3d>             & verts,
                             const std::vector<std::vector<uint>> & faces);
 

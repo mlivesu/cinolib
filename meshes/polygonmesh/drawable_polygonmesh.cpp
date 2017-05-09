@@ -38,6 +38,15 @@ DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh() : Polygonmesh<M,V,E,F>()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh(const char * filename) : Polygonmesh<M,V,E,F>(filename)
+{
+    init_drawable_stuff();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh(const std::vector<vec3d>             & verts,
                                                   const std::vector<std::vector<uint>> & faces)
     : Polygonmesh<M,V,E,F>(verts,faces)
@@ -65,8 +74,8 @@ void DrawablePolygonmesh<M,V,E,F>::init_drawable_stuff()
     type   = POLYGONMESH;
     slicer = MeshSlicer<Polygonmesh<M,V,E,F>>(*this);
 
-    drawlist.draw_mode    = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
-    drawlist.seg_width    = 1;
+    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
+    drawlist.seg_width = 1;
 
     updateGL();
 }
@@ -92,6 +101,7 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
     drawlist.tri_v_colors.clear();
     drawlist.segs.clear();
     drawlist.seg_coords.clear();
+    drawlist.seg_colors.clear();
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {

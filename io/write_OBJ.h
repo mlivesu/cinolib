@@ -25,7 +25,6 @@
 #define CINO_WRITE_OBJ_H
 
 #include <cinolib/cinolib.h>
-
 #include <sys/types.h>
 #include <vector>
 
@@ -35,8 +34,17 @@ namespace cinolib
 CINO_INLINE
 void write_OBJ(const char                * filename,
                const std::vector<double> & xyz,
-               const std::vector<u_int>  & tri,
-               const std::vector<u_int>  & quad);
+               const std::vector<uint>   & tri,
+               const std::vector<uint>   & quad);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void write_OBJ(const char                           * filename,
+               const std::vector<double>            & xyz,
+               const std::vector<std::vector<uint>> & poly);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void write_OBJ(const char                * filename,

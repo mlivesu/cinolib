@@ -35,8 +35,15 @@ namespace cinolib
 CINO_INLINE
 void read_OBJ(const char          * filename,
               std::vector<double> & xyz,
-              std::vector<u_int>  & tri,
-              std::vector<u_int>  & quad);
+              std::vector<uint>   & tri,
+              std::vector<uint>   & quad);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_OBJ(const char                     * filename,
+              std::vector<double>            & xyz,
+              std::vector<std::vector<uint>> & poly);
 
 }
 

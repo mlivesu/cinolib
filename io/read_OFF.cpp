@@ -31,8 +31,8 @@ namespace cinolib
 CINO_INLINE
 void read_OFF(const char          * filename,
               std::vector<double> & xyz,
-              std::vector<u_int>  & tri,
-              std::vector<u_int>  & quad)
+              std::vector<uint>   & tri,
+              std::vector<uint>   & quad)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -86,8 +86,58 @@ void read_OFF(const char          * filename,
             assert("Unsupported polygon" && false);
         }
     }
-
     fclose(fp);
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_OFF(const char                     * filename,
+              std::vector<double>            & xyz,
+              std::vector<std::vector<uint>> & faces)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    FILE *fp = fopen(filename, "r");
+
+    if(!fp)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OFF() : couldn't open input file " << filename << endl;
+        exit(-1);
+    }
+
+    uint nv, nfaces, dummy;
+
+    fscanf(fp, "OFF\n");
+    fscanf(fp, "%d %d %d\n", &nv, &nfaces, &dummy);
+
+    for(uint i=0; i<nv; ++i)
+    {
+        // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+        //
+        double x, y, z;
+        fscanf(fp, "%lf %lf %lf\n", &x, &y, &z);
+        xyz.push_back(x);
+        xyz.push_back(y);
+        xyz.push_back(z);
+    }
+
+    for(uint i=0; i<nfaces; ++i)
+    {
+        uint n_corners;
+        fscanf(fp, "%d", &n_corners);
+
+        std::vector<uint> face;
+        for(uint j=0; j<n_corners; ++j)
+        {
+            uint vid;
+            fscanf(fp, "%d", &vid);
+            face.push_back(vid);
+        }
+        faces.push_back(face);
+    }
+    fclose(fp);
+}
+
 
 }
