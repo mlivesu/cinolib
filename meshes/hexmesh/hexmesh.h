@@ -128,7 +128,9 @@ class Hexmesh
         void update_bbox();
         void update_interior_adjacency();
         void update_surface_adjacency();
-        void update_q_normals();
+        void update_face_normals();
+        void update_cell_quality(const uint cid);
+        void update_cell_quality();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -222,14 +224,14 @@ virtual void  face_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d cell_vert         (const uint cid, const uint off)   const;
-        uint  cell_vert_id      (const uint cid, const uint off)   const;
-        uint  cell_edge_id      (const uint cid, const uint vid0, const uint vid1) const;
-        vec3d cell_centroid     (const uint cid)                   const;
-        int   cell_shared_face  (const uint cid0, const uint cid1) const;
-        bool  cell_contains_vert(const uint cid, const uint vid)   const;
-virtual void  cell_set_color    (const Color & c);
-virtual void  cell_set_alpha    (const float alpha);
+        vec3d  cell_vert          (const uint cid, const uint off)   const;
+        uint   cell_vert_id       (const uint cid, const uint off)   const;
+        uint   cell_edge_id       (const uint cid, const uint vid0, const uint vid1) const;
+        vec3d  cell_centroid      (const uint cid) const;
+        int    cell_shared_face   (const uint cid0, const uint cid1) const;
+        bool   cell_contains_vert (const uint cid, const uint vid)   const;
+virtual void   cell_set_color     (const Color & c);
+virtual void   cell_set_alpha     (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

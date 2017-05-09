@@ -21,7 +21,41 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
+#include "color.h"
 
 namespace cinolib
 {
+
+CINO_INLINE
+std::ostream & operator<<(std::ostream & in, const Color & c)
+{
+    in << "RGBA: " << c.r << " " << c.g << " " << c.b << " " << c.a << "\n";
+    return in;
+}
+
+
+CINO_INLINE
+Color Color::rgb_from_quality(float q)
+{
+    if (q < 0) return Color(1,0,0);
+
+    if (q <= 0.5)
+    {
+        q *= 2.0;
+        return Color(WHITE().r * q + RED().r * (1.0 - q),
+                     WHITE().g * q + RED().g * (1.0 - q),
+                     WHITE().b * q + RED().b * (1.0 - q));
+    }
+
+    if (q <= 1.0)
+    {
+        q = 2.0 * q - 1.0;
+        return Color(BLUE().r * q + WHITE().r * (1.0 - q),
+                     BLUE().g * q + WHITE().g * (1.0 - q),
+                     BLUE().b * q + WHITE().b * (1.0 - q));
+    }
+
+    assert(false);
+}
+
 }

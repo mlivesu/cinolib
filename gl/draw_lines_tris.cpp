@@ -45,7 +45,9 @@ void render_pvt(const RenderData & data)
         glVertexPointer(3, GL_DOUBLE, 0, data.tri_coords.data());
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_DOUBLE, 0, data.tri_v_norms.data());
-        if (data.draw_mode & DRAW_TRI_VERTCOLOR || data.draw_mode & DRAW_TRI_FACECOLOR)
+        if (data.draw_mode & DRAW_TRI_VERTCOLOR ||
+            data.draw_mode & DRAW_TRI_FACECOLOR ||
+            data.draw_mode & DRAW_TRI_QUALITY)
         {
             glEnableClientState(GL_COLOR_ARRAY);
             glColorPointer(4, GL_FLOAT, 0, data.tri_v_colors.data());
@@ -59,6 +61,7 @@ void render_pvt(const RenderData & data)
         glDrawElements(GL_TRIANGLES, data.tris.size(), GL_UNSIGNED_INT, data.tris.data());
         if (data.draw_mode & DRAW_TRI_VERTCOLOR) glDisableClientState(GL_COLOR_ARRAY);   else
         if (data.draw_mode & DRAW_TRI_FACECOLOR) glDisableClientState(GL_COLOR_ARRAY);   else
+        if (data.draw_mode & DRAW_TRI_QUALITY)   glDisableClientState(GL_COLOR_ARRAY);   else
         if (data.draw_mode & DRAW_TRI_TEXTURE1D) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);

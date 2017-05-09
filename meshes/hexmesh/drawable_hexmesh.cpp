@@ -194,6 +194,27 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_out()
             drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.b);
             drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.a);
         }
+        else if (drawlist_out.draw_mode & DRAW_TRI_QUALITY)
+        {
+            float q = this->cell_data(this->adj_f2c(fid)).quality;
+            Color c = Color::rgb_from_quality(q);
+            drawlist_out.tri_v_colors.push_back(c.r);
+            drawlist_out.tri_v_colors.push_back(c.g);
+            drawlist_out.tri_v_colors.push_back(c.b);
+            drawlist_out.tri_v_colors.push_back(c.a);
+            drawlist_out.tri_v_colors.push_back(c.r);
+            drawlist_out.tri_v_colors.push_back(c.g);
+            drawlist_out.tri_v_colors.push_back(c.b);
+            drawlist_out.tri_v_colors.push_back(c.a);
+            drawlist_out.tri_v_colors.push_back(c.r);
+            drawlist_out.tri_v_colors.push_back(c.g);
+            drawlist_out.tri_v_colors.push_back(c.b);
+            drawlist_out.tri_v_colors.push_back(c.a);
+            drawlist_out.tri_v_colors.push_back(c.r);
+            drawlist_out.tri_v_colors.push_back(c.g);
+            drawlist_out.tri_v_colors.push_back(c.b);
+            drawlist_out.tri_v_colors.push_back(c.a);
+        }
         else if (drawlist_out.draw_mode & DRAW_TRI_VERTCOLOR)
         {
             drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.r);
@@ -390,6 +411,27 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
                     drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.b);
                     drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.a);
                 }
+                else if (drawlist_in.draw_mode & DRAW_TRI_QUALITY)
+                {
+                    float q = this->cell_data(cid).quality;
+                    Color c = Color::rgb_from_quality(q);
+                    drawlist_in.tri_v_colors.push_back(c.r);
+                    drawlist_in.tri_v_colors.push_back(c.g);
+                    drawlist_in.tri_v_colors.push_back(c.b);
+                    drawlist_in.tri_v_colors.push_back(c.a);
+                    drawlist_in.tri_v_colors.push_back(c.r);
+                    drawlist_in.tri_v_colors.push_back(c.g);
+                    drawlist_in.tri_v_colors.push_back(c.b);
+                    drawlist_in.tri_v_colors.push_back(c.a);
+                    drawlist_in.tri_v_colors.push_back(c.r);
+                    drawlist_in.tri_v_colors.push_back(c.g);
+                    drawlist_in.tri_v_colors.push_back(c.b);
+                    drawlist_in.tri_v_colors.push_back(c.a);
+                    drawlist_in.tri_v_colors.push_back(c.r);
+                    drawlist_in.tri_v_colors.push_back(c.g);
+                    drawlist_in.tri_v_colors.push_back(c.b);
+                    drawlist_in.tri_v_colors.push_back(c.a);
+                }
                 else if (drawlist_in.draw_mode & DRAW_TRI_VERTCOLOR)
                 {
                     drawlist_in.tri_v_colors.push_back(this->vert_data(vid0).color.r);
@@ -573,6 +615,7 @@ void DrawableHexmesh<M,V,E,F,C>::show_face_color()
 {
     drawlist_out.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
     drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
     glDisable(GL_TEXTURE_1D);
     updateGL_out();
@@ -584,7 +627,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableHexmesh<M,V,E,F,C>::show_face_quality()
 {
-    drawlist_out.draw_mode |=  DRAW_TRI_FACECOLOR;
+    drawlist_out.draw_mode |=  DRAW_TRI_QUALITY;
+    drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
     glDisable(GL_TEXTURE_1D);
@@ -600,6 +644,7 @@ void DrawableHexmesh<M,V,E,F,C>::show_face_texture1D(const GLint texture)
     drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
 
     if (drawlist_in.tri_text1D_id > 0) glDeleteTextures(1, &drawlist_in.tri_text1D_id);
     glGenTextures(1, &drawlist_in.tri_text1D_id);
@@ -665,6 +710,7 @@ void DrawableHexmesh<M,V,E,F,C>::show_cell_color()
 {
     drawlist_in.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
     drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
     glDisable(GL_TEXTURE_1D);
     updateGL_in();
@@ -676,7 +722,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableHexmesh<M,V,E,F,C>::show_cell_quality()
 {
-    drawlist_in.draw_mode |=  DRAW_TRI_FACECOLOR;
+    drawlist_in.draw_mode |=  DRAW_TRI_QUALITY;
+    drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
     glDisable(GL_TEXTURE_1D);
@@ -692,6 +739,7 @@ void DrawableHexmesh<M,V,E,F,C>::show_cell_texture1D(const GLint texture)
     drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
 
     if (drawlist_in.tri_text1D_id > 0) glDeleteTextures(1, &drawlist_in.tri_text1D_id);
     glGenTextures(1, &drawlist_in.tri_text1D_id);
@@ -728,7 +776,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableHexmesh<M,V,E,F,C>::show_cell_wireframe_color(const Color & c)
 {
-    edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    edge_set_color(c); // NOTE: this will change color for ANY adge (both interior and boundary)
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -748,5 +796,7 @@ void DrawableHexmesh<M,V,E,F,C>::show_cell_wireframe_transparency(const float al
 {
     edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 }

@@ -213,7 +213,8 @@ void Hexmesh<M,V,E,F,C>::init()
     c_data.resize(num_cells());
     f_data.resize(num_faces());
 
-    update_q_normals();
+    update_face_normals();
+    update_cell_quality();
 
     set_uvw_from_xyz(UVW_param);
 }
@@ -425,7 +426,7 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::update_q_normals()
+void Hexmesh<M,V,E,F,C>::update_face_normals()
 {
     for(uint fid=0; fid<num_faces(); ++fid)
     {
@@ -800,6 +801,30 @@ std::vector<double> Hexmesh<M,V,E,F,C>::vector_coords() const
         coords.push_back(vert(vid).z());
     }
     return coords;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Hexmesh<M,V,E,F,C>::update_cell_quality(const uint cid)
+{
+    cell_data(cid).quality = hex_scaled_jacobian(cell_vert(cid,0), cell_vert(cid,1),
+                                                 cell_vert(cid,2), cell_vert(cid,3),
+                                                 cell_vert(cid,4), cell_vert(cid,5),
+                                                 cell_vert(cid,6), cell_vert(cid,7));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Hexmesh<M,V,E,F,C>::update_cell_quality()
+{
+    for(uint cid=0; cid<num_cells(); ++cid)
+    {
+        update_cell_quality(cid);
+    }
 }
 
 }

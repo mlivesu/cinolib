@@ -33,12 +33,7 @@ class Color
 {
     public:
 
-        Color(const float r=1.0,
-              const float g=1.0,
-              const float b=1.0,
-              const float a=1.0)
-        : r(r), g(g), b(b), a(a)
-        {}
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         static Color RED()     { return Color(1,0,0); }
         static Color GREEN()   { return Color(0,1,0); }
@@ -49,6 +44,20 @@ class Color
         static Color BLACK()   { return Color(0,0,0); }
         static Color WHITE()   { return Color(1,1,1); }
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        Color(const float r=1.0,
+              const float g=1.0,
+              const float b=1.0,
+              const float a=1.0)
+        : r(r), g(g), b(b), a(a) {}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        static Color rgb_from_quality(float q);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         union
         {
             struct
@@ -58,6 +67,8 @@ class Color
             float rgba[4];
         };
 };
+
+CINO_INLINE std::ostream & operator<<(std::ostream & in, const Color & c);
 
 }
 
