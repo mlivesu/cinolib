@@ -25,6 +25,7 @@
 #define CINO_VEC2_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec2.h>
 
 #include <cmath>
 #include <iostream>
@@ -49,6 +50,8 @@ template<typename real> class vec2
 
     public:
 
+        enum { DROP_X, DROP_Y, DROP_Z };
+
         vec2()
         {
             set( 0.0, 0.0 );
@@ -57,6 +60,17 @@ template<typename real> class vec2
         vec2(const real x, const real y=0.0)
         {
             set(x, y);
+        }
+
+        vec2(const vec3<real> & p, const int mode)
+        {
+            switch (mode)
+            {
+                case DROP_X : set(p.y(), p.z()); break;
+                case DROP_Y : set(p.x(), p.z()); break;
+                case DROP_Z : set(p.x(), p.y()); break;
+                default : assert(false);
+            }
         }
 
         inline const real *ptr() const
