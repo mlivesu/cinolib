@@ -75,6 +75,8 @@ double Plane::operator[](const vec3d & p) const
 }
 
 
+
+// http://mathworld.wolfram.com/HessianNormalForm.html
 // http://mathworld.wolfram.com/Point-PlaneDistance.html (eq. 13)
 //
 CINO_INLINE

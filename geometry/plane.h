@@ -32,7 +32,10 @@
 namespace cinolib
 {
 
-// represents a plane with equation : a*x + b*y + c*z = d
+// represents a plane with equation
+// a*x + b*y + c*z = d
+// or, using the Hessian Normal Form (https://en.wikipedia.org/wiki/Hesse_normal_form)
+// n dot (x,y,z) - d = 0
 //
 class Plane
 {
