@@ -25,7 +25,7 @@
 #define CINO_VEC2_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/geometry/vec2.h>
+#include <cinolib/geometry/vec3.h>
 
 #include <cmath>
 #include <iostream>
@@ -233,6 +233,20 @@ template<typename real> class vec2
         {
             return vec2<real>(std::max(x(), in.x()),
                               std::max(y(), in.y()));
+        }
+
+        double angle_rad(const vec2<real> &in) const
+        {
+            vec2<real> u = *this; u.normalize();
+            vec2<real> v = in;    v.normalize();
+            double angle = acos(u.dot(v));
+            assert(!std::isnan(angle));
+            return angle;
+        }
+
+        double angle_deg(const vec2<real> &in) const
+        {
+            return angle_rad(in)*180.0/M_PI;
         }
 };
 
