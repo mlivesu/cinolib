@@ -120,6 +120,7 @@ class Hexmesh
 
         void clear();
         void init();
+        void print_quality(const bool list_folded_elements = false);
         void load(const char * filename);
         void save(const char * filename) const;
 

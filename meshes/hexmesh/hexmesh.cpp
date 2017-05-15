@@ -78,6 +78,42 @@ Hexmesh<M,V,E,F,C>::Hexmesh(const char * filename)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+void Hexmesh<M,V,E,F,C>::print_quality(const bool list_folded_elements)
+{
+    if (list_folded_elements) logger << "Folded Hexa: ";
+
+    double asj = 0.0;
+    double msj = FLT_MAX;
+    uint    inv = 0;
+
+    for(uint cid=0; cid<num_cells(); ++cid)
+    {
+        double q = cell_data(cid).quality;
+
+        asj += q;
+        msj = std::min(msj, q);
+
+        if (q <= 0.0)
+        {
+            ++inv;
+            if (list_folded_elements) logger << cid << " - ";
+        }
+    }
+    asj /= static_cast<double>(num_cells());
+
+    if (list_folded_elements) logger << endl << endl;
+
+    logger << endl;
+    logger << "MIN SJ : " << msj << endl;
+    logger << "AVG SJ : " << asj << endl;
+    logger << "INV EL : " << inv << " (out of " << num_cells() << ")" << endl;
+    logger << endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 void Hexmesh<M,V,E,F,C>::load(const char * filename)
 {
     timer_start("Load Hexmesh");
@@ -215,6 +251,8 @@ void Hexmesh<M,V,E,F,C>::init()
 
     update_face_normals();
     update_cell_quality();
+
+    print_quality();
 
     set_uvw_from_xyz(UVW_param);
 }
