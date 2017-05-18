@@ -51,7 +51,7 @@ class Bbox
         inline double delta_z()   const { return (max.z() - min.z());  }
         inline vec3d  delta()     const { return (max     - min);      }
         inline double min_entry() const { return  std::min(min.min_entry(), max.min_entry()); }
-        inline double max_entry() const { return  std::max(max.max_entry(), max.max_entry()); }
+        inline double max_entry() const { return  std::max(min.max_entry(), max.max_entry()); }
 };
 
 CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb);

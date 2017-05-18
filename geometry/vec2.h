@@ -90,11 +90,11 @@ template<typename real> class vec2
                    m_y * in.m_y;
         }
 
-        inline vec2<real> cross(const vec2<real> & in) const
-        {
-            return vec2<real>( m_x * in.m_y,
-                              -m_y * in.m_x);
-        }
+        //inline vec2<real> cross(const vec2<real> & in) const
+        //{
+        //    return vec2<real>( m_x * in.m_y,
+        //                      -m_y * in.m_x);
+        //}
 
         inline real length_squared() const
         {
@@ -247,6 +247,11 @@ template<typename real> class vec2
         double angle_deg(const vec2<real> &in) const
         {
             return angle_rad(in)*180.0/M_PI;
+        }
+
+        double dist(const vec2<real> &in) const
+        {
+            return (*this - in).length();
         }
 };
 
