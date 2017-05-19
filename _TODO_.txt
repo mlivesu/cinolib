@@ -1,3 +1,4 @@
+- add Mesh,SurfaceMesh and VolumeMesh interfaces, and implement them with ALL the meshes available within the library
 - add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
 - Transform timer in a profiler class with internal string to be printed at the end
   and summary of times spent in each function… (NOTE: it’s a tree!!!!!!)
@@ -14,7 +15,5 @@
   (ref => https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html)
 - Improve on mesh rendering (shaders, VBOs ecc)
 - Add ambient occlusion (with/without floor)
-- delete double render pass e do everything in a single pass
 - Copy/paste points of view
 - Add text box with debug messages
-- Add perspective/orthographic camera option, with field of view control (libQGLViewer has everything necessary)
