@@ -26,6 +26,39 @@
 namespace cinolib
 {
 
+
+// floodfill (for general graphs - i.e. not meshes)
+//
+CINO_INLINE
+void bfs_exahustive(const std::vector<std::vector<uint>> & nodes_adjacency,
+                    const uint                             source,
+                          std::set<uint>                 & visited)
+{
+    assert(visited.empty());
+
+    std::set<uint> active_set;
+    active_set.insert(source);
+
+    uint vid;
+    while (!active_set.empty())
+    {
+        vid = *active_set.begin();
+        active_set.erase(active_set.begin());
+
+        visited.insert(vid);
+
+        for(uint nbr : nodes_adjacency.at(vid))
+        {
+            if (DOES_NOT_CONTAIN(visited,nbr))
+            {
+                active_set.insert(nbr);
+            }
+        }
+    }
+}
+
+
+
 template<class Mesh>
 CINO_INLINE
 void bfs_exahustive(const Mesh          & m,
