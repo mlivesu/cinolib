@@ -26,8 +26,6 @@
 
 #include <cinolib/cinolib.h>
 
-#ifdef CINOLIB_USES_OPENGL
-
 namespace cinolib
 {
 
@@ -48,5 +46,4 @@ CINO_INLINE void scattered_color(int n_colors, int pos, float * rgb);
 #include "colors.cpp"
 #endif
 
-#endif // CINOLIB_USES_OPENGL
 #endif // CINO_COLORS_H
