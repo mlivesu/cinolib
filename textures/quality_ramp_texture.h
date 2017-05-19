@@ -24,17 +24,12 @@
 #ifndef CINO_QUALITY_RAMP_TEXTURE_H
 #define CINO_QUALITY_RAMP_TEXTURE_H
 
-#ifdef __APPLE__
-#include <gl.h>
-#else
-#include <GL/gl.h>
-#endif
+#include <sys/types.h>
 
 namespace cinolib
 {
 
-
-static const GLubyte quality_ramp_texture1D[768] =
+static const u_char quality_ramp_texture1D[768] =
 {
     0, 0, 255,
     0, 4, 255,
@@ -294,8 +289,6 @@ static const GLubyte quality_ramp_texture1D[768] =
     255, 0, 0,
 };
 
-
 }
-
 
 #endif // CINO_QUALITY_RAMP_TEXTURE_H

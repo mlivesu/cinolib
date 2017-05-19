@@ -24,17 +24,12 @@
 #ifndef CINO_ISOLINES_TEXTURE_H
 #define CINO_ISOLINES_TEXTURE_H
 
-#ifdef __APPLE__
-#include <gl.h>
-#else
-#include <GL/gl.h>
-#endif
-
+#include <sys/types.h>
 
 namespace cinolib
 {
 
-static const GLubyte isolines_texture1D[768] =
+static const u_char isolines_texture1D[768] =
 {
     0,   0,   0,
     0,   0,   0,
