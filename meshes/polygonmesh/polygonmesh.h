@@ -24,6 +24,7 @@
 #ifndef CINO_POLYGONMESH_H
 #define CINO_POLYGONMESH_H
 
+#include <vector>
 #include <cinolib/cinolib.h>
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>

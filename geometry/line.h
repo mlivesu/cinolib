@@ -24,6 +24,7 @@
 #ifndef CINO_LINE_H
 #define CINO_LINE_H
 
+#include <vector>
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/geometry/plane.h>

@@ -24,6 +24,7 @@
 #include <cinolib/meshes/polygonmesh/polygonmesh.h>
 #include <cinolib/common.h>
 #include <cinolib/io/read_write.h>
+#include <cinolib/timer.h>
 #include <map>
 
 namespace cinolib
