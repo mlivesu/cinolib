@@ -124,6 +124,7 @@ class Trimesh
         const std::vector<int> &    adj_ele2edg(const int tid) const; // equal to adj_tri2edg - just for template compatibility
         const std::vector<int> &    adj_tri2tri(const int tid) const;
         std::vector<int>            adj_vtx2vtx_ordered(const int vid) const;
+        std::vector<uint>           adj_vtx2tri_ordered(const int vid) const;
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         const Bbox                & bbox()                  const;
         const std::vector<double> & vector_coords()         const;
@@ -206,6 +207,7 @@ class Trimesh
         bool                        vertex_is_local_minima(const int vid) const;
         bool                        vertex_is_local_maxima(const int vid) const;
         bool                        vertex_is_critical_point(const int vid) const;
+        std::vector<uint>           vertex_incident_boundary_edges(const int vid) const;
         std::vector<int>            get_boundary_vertices() const;
         virtual int                 add_vertex(const vec3d & v, const float scalar = 0.0);
         virtual void                vertex_switch_id(const int vid0, const int vid1);
