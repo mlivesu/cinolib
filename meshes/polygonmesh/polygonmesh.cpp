@@ -196,6 +196,7 @@ void Polygonmesh<M,V,E,F>::update_adjacency()
     std::map<ipair,std::vector<uint>> e2f_map;
     for(uint fid=0; fid<num_faces(); ++fid)
     {
+        assert(verts_per_face(fid)>2);
         for(uint i=0; i<verts_per_face(fid); ++i)
         {
             int  vid0 = faces.at(fid).at(i);
@@ -279,6 +280,7 @@ void Polygonmesh<M,V,E,F>::update_f_normals()
 {
     for(uint fid=0; fid<num_faces(); ++fid) // TODO: make it more accurate!
     {
+        assert(verts_per_face(fid)>2);
         vec3d v0 = face_vert(fid,0);
         vec3d v1 = face_vert(fid,1);
         vec3d v2 = face_vert(fid,2);
