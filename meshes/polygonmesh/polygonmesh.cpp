@@ -25,6 +25,7 @@
 #include <cinolib/common.h>
 #include <cinolib/io/read_write.h>
 #include <cinolib/timer.h>
+#include <cinolib/geometry/plane.h>
 #include <map>
 
 namespace cinolib
@@ -278,15 +279,23 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Polygonmesh<M,V,E,F>::update_f_normals()
 {
-    for(uint fid=0; fid<num_faces(); ++fid) // TODO: make it more accurate!
+    for(uint fid=0; fid<num_faces(); ++fid)
     {
         assert(verts_per_face(fid)>2);
+
+        // compute the best fitting plane
+        std::vector<vec3d> points;
+        for(uint off=0; off<verts_per_face(fid); ++off) points.push_back(face_vert(fid,off));
+        Plane best_fit(points);
+
+        // adjust orientation (n or -n?)
         vec3d v0 = face_vert(fid,0);
         vec3d v1 = face_vert(fid,1);
-        vec3d v2 = face_vert(fid,2);
-        vec3d n  = (v1-v0).cross(v2-v0);
-        n.normalize();
-        face_data(fid).normal = n;
+        uint  i=2;
+        vec3d ccw;
+        do { ccw = (v1-v0).cross(face_vert(fid,i)-v0); } while (ccw.length_squared()==0 && i<verts_per_face(fid));
+
+        face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
     }
 }
 
