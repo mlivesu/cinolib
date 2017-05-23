@@ -1700,22 +1700,28 @@ void Trimesh::remove_unreferenced_triangle(const int tid)
 
 
 CINO_INLINE
-std::vector<uint> Trimesh::adj_vtx2tri_ordered(const int vid) const
+void Trimesh::ordered_one_ring(const int vid,
+                               std::vector<uint> & v_star,       // sorted list of adjacent vertices
+                               std::vector<uint> & t_star,       // sorted list of adjacent triangles
+                               std::vector<uint> & e_star,       // sorted list of edges incident to vid
+                               std::vector<uint> & e_link) const // sorted list of edges opposite to vid
 {
-    std::vector<uint> v_star; // sorted list of adjacent vertices
-    std::vector<uint> t_star; // sorted list of adjacent triangles
-    std::vector<uint> e_star; // sorted list of edges opposite to (link_t, vid)
+    v_star.clear();
+    t_star.clear();
+    e_star.clear();
+    e_link.clear();
 
-    if (adj_vtx2tri(vid).empty()) return t_star;
+    if (adj_vtx2tri(vid).empty()) return;
 
     uint curr_t = adj_vtx2tri(vid).front();
 
-    // if there are boundary edges it is important to start from the right triangle (i.e. right-most)
+    // If there are boundary edges it is important to start from the right triangle (i.e. right-most),
     // otherwise it will be impossible to cover the entire umbrella
     std::vector<uint> b_edges = vertex_incident_boundary_edges(vid);
-    if (b_edges.size()  > 2) assert(false); // no way to cover the whole umbrella walking through adjacent triangles!!!
-    if (b_edges.size() == 2)
+    if (b_edges.size()  > 0)
     {
+        assert(b_edges.size() == 2); // otherwise there is no way to cover the whole umbrella walking through adjacent triangles!!!
+
         uint  eid    = b_edges.front();
               curr_t = adj_edg2tri(eid).front(); assert(adj_edg2tri(eid).size()==1);
         uint  v1     = vertex_opposite_to(curr_t,edge_vertex_id(eid,0), edge_vertex_id(eid,1));
@@ -1733,10 +1739,10 @@ std::vector<uint> Trimesh::adj_vtx2tri_ordered(const int vid) const
     uint curr_v  = edge_vertex_id(curr_e, 1);
 
     // impose CCW orientation...
-    vec3d u = vertex(first_v) - vertex(vid);
-    vec3d v = vertex(curr_v)  - vertex(vid);
-    vec3d n = vertex_normal(vid);
-    if (u.cross(v).dot(n) < 0) std::swap(first_v,curr_v);
+    if ((vertex(first_v)-vertex(vid)).cross(vertex(curr_v)-vertex(vid)).dot(vertex_normal(vid)) < 0)
+    {
+        std::swap(first_v,curr_v);
+    }
 
     v_star.push_back(first_v);
     e_star.push_back(edge_opposite_to(curr_t, curr_v));
@@ -1745,6 +1751,7 @@ std::vector<uint> Trimesh::adj_vtx2tri_ordered(const int vid) const
     {
         v_star.push_back(curr_v);
         t_star.push_back(curr_t);
+        e_link.push_back(edge_opposite_to(curr_t, vid));
 
         curr_t = triangle_adjacent_along(curr_t, vid, curr_v);
 
@@ -1754,50 +1761,52 @@ std::vector<uint> Trimesh::adj_vtx2tri_ordered(const int vid) const
             curr_v = edge_vertex_id(curr_e, 0) == curr_v ? edge_vertex_id(curr_e, 1) : edge_vertex_id(curr_e, 0);
             e_star.push_back(edge_opposite_to(curr_t, curr_v));
         }
-        else curr_v = first_v;
+        else
+        {
+            e_star.push_back(edge_opposite_to(t_star.back(),v_star.at(v_star.size()-2)));
+            first_v = curr_v; // force exit from while()
+        }
     }
 
-    if (curr_t != -1) t_star.push_back(curr_t);
-
-    return t_star;
+    if (curr_t != -1)
+    {
+        t_star.push_back(curr_t);
+        e_link.push_back(edge_opposite_to(curr_t, vid));
+    }
 }
 
 
 CINO_INLINE
-std::vector<int> Trimesh::adj_vtx2vtx_ordered(const int vid) const
+std::vector<uint> Trimesh::adj_vtx2edg_ordered(const int vid) const
 {
-    std::vector<int> ordered_onering;
+    std::vector<uint> v_star; // sorted list of adjacent vertices
+    std::vector<uint> t_star; // sorted list of adjacent triangles
+    std::vector<uint> e_star; // sorted list of edges incident to vid
+    std::vector<uint> e_link; // sorted list of edges opposite to vid
+    ordered_one_ring(vid, v_star, t_star, e_star, e_link);
+    return e_star;
+}
 
-    int curr_e  = adj_vtx2edg(vid).front();
-    int curr_v  = vertex_opposite_to(curr_e, vid);
-    int curr_t  = adj_edg2tri(curr_e).front();
-    int start_t = curr_t;
+CINO_INLINE
+std::vector<uint> Trimesh::adj_vtx2vtx_ordered(const int vid) const
+{
+    std::vector<uint> v_star; // sorted list of adjacent vertices
+    std::vector<uint> t_star; // sorted list of adjacent triangles
+    std::vector<uint> e_star; // sorted list of edges incident to vid
+    std::vector<uint> e_link; // sorted list of edges opposite to vid
+    ordered_one_ring(vid, v_star, t_star, e_star, e_link);
+    return v_star;
+}
 
-    logger << "curr_e " << curr_e << endl;
-    logger << "curr_v " << curr_v << endl;
-    logger << "curr_t " << curr_t << endl;
-
-    do
-    {
-        logger << "iter" << endl;
-        ordered_onering.push_back(curr_v);
-
-        std::vector<int> adj_tri = adj_edg2tri(curr_e);
-        assert(adj_tri.size() == 2);
-
-        curr_e = edge_opposite_to(curr_t, curr_v);
-        curr_t = (adj_tri[0] == curr_t) ? adj_tri[1] : adj_tri[0];
-        curr_v = vertex_opposite_to(curr_e, vid);
-
-        logger << "-------" << endl;
-        logger << "curr_e " << curr_e << endl;
-        logger << "curr_v " << curr_v << endl;
-        logger << "curr_t " << curr_t << endl;
-    }
-    while(curr_t != start_t);
-
-    assert(ordered_onering.size() == adj_vtx2vtx(vid).size());
-    return ordered_onering;
+CINO_INLINE
+std::vector<uint> Trimesh::adj_vtx2tri_ordered(const int vid) const
+{
+    std::vector<uint> v_star; // sorted list of adjacent vertices
+    std::vector<uint> t_star; // sorted list of adjacent triangles
+    std::vector<uint> e_star; // sorted list of edges incident to vid
+    std::vector<uint> e_link; // sorted list of edges opposite to vid
+    ordered_one_ring(vid, v_star, t_star, e_star, e_link);
+    return t_star;
 }
 
 CINO_INLINE

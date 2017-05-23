@@ -123,8 +123,15 @@ class Trimesh
         const std::vector<int> &    adj_tri2edg(const int tid) const;
         const std::vector<int> &    adj_ele2edg(const int tid) const; // equal to adj_tri2edg - just for template compatibility
         const std::vector<int> &    adj_tri2tri(const int tid) const;
-        std::vector<int>            adj_vtx2vtx_ordered(const int vid) const;
+        std::vector<uint>           adj_vtx2vtx_ordered(const int vid) const;
         std::vector<uint>           adj_vtx2tri_ordered(const int vid) const;
+        std::vector<uint>           adj_vtx2edg_ordered(const int vid) const;
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        void ordered_one_ring(const int vid,
+                              std::vector<uint> & v_star,        // sorted list of adjacent vertices
+                              std::vector<uint> & t_star,        // sorted list of adjacent triangles
+                              std::vector<uint> & e_star,        // sorted list of edges incident to vid
+                              std::vector<uint> & e_link) const; // sorted list of edges opposite to vid
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         const Bbox                & bbox()                  const;
         const std::vector<double> & vector_coords()         const;
