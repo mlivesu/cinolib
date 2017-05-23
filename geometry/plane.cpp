@@ -57,6 +57,57 @@ Plane::Plane(const vec3d & point, const vec3d & normal)
 }
 
 
+// http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
+CINO_INLINE
+Plane::Plane(const std::vector<vec3d> & samples)
+{
+    // centroid
+    vec3d c(0,0,0);
+    for(auto p : samples) c += p;
+    c /= static_cast<double>(samples.size());
+
+    // 3x3 covariance matrix
+    double xx = 0.0; double yy = 0.0;
+    double xy = 0.0; double yz = 0.0;
+    double xz = 0.0; double zz = 0.0;
+    //
+    for(auto p : samples)
+    {
+        vec3d pc = p - c;
+        xx += pc.x() * pc.x();
+        xy += pc.x() * pc.y();
+        xz += pc.x() * pc.z();
+        yy += pc.y() * pc.y();
+        yz += pc.y() * pc.z();
+        zz += pc.z() * pc.z();
+    }
+
+    double det_x   = yy*zz - yz*yz;
+    double det_y   = xx*zz - xz*xz;
+    double det_z   = xx*yy - xy*xy;
+    double det_max = std::max(det_x, std::max(det_y, det_z));
+
+    if (det_max == 0) std::cerr << "WARNING : the points don't span a plane!" << std::endl;
+
+    if (det_max == det_x)
+    {
+        vec3d n(1.0, (xz*yz - xy*zz) / det_x, (xy*yz - xz*yy) / det_x);
+        set_plane(c,n);
+    }
+    else if (det_max == det_y)
+    {
+        vec3d n((yz*xz - xy*zz) / det_y, 1.0, (xy*xz - yz*xx) / det_y);
+        set_plane(c,n);
+    }
+    else if (det_max == det_z)
+    {
+        vec3d n((yz*xy - xz*yy) / det_z, (xz*xy - yz*xx) / det_z, 1.0);
+        set_plane(c,n);
+    }
+    else assert(false);
+}
+
+
 CINO_INLINE
 void Plane::set_plane(const vec3d & point, const vec3d & normal)
 {

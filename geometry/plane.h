@@ -52,6 +52,8 @@ class Plane
         Plane(const vec3d & point,
               const vec3d & normal);
 
+        Plane(const std::vector<vec3d> & samples); // best fitting plane
+
         double a() const { return n.x(); }
         double b() const { return n.y(); }
         double c() const { return n.z(); }
