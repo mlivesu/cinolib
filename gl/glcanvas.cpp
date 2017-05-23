@@ -30,7 +30,7 @@ CINO_INLINE GLcanvas::GLcanvas(QWidget * parent)
 {
     setParent(parent);
 
-    clear_color = QColor(50, 50, 50);
+    clear_color = QColor(200, 200, 200);
 }
 
 CINO_INLINE void GLcanvas::init()
