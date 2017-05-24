@@ -5,7 +5,7 @@
 *                                                                           *
 * Author: Marco Livesu (marco.livesu@gmail.com)                             *
 *                                                                           *
-* Copyright(C) 2017                                                         *
+* Copyright(C) 2016                                                         *
 * All rights reserved.                                                      *
 *                                                                           *
 * This file is part of CinoLib                                              *
@@ -135,8 +135,8 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const vec3d vert(const uint vid) const { return verts.at(vid); }
-              vec3d vert(const uint vid)       { return verts.at(vid); }
+        const vec3d & vert(const uint vid) const { return verts.at(vid); }
+              vec3d & vert(const uint vid)       { return verts.at(vid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
