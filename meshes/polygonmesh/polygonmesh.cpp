@@ -5,7 +5,7 @@
 *                                                                           *
 * Author: Marco Livesu (marco.livesu@gmail.com)                             *
 *                                                                           *
-* Copyright(C) 2017                                                         *
+* Copyright(C) 2016                                                         *
 * All rights reserved.                                                      *
 *                                                                           *
 * This file is part of CinoLib                                              *
@@ -235,10 +235,10 @@ void Polygonmesh<M,V,E,F>::update_adjacency()
     for(uint fid=0; fid<num_faces(); ++fid)
     {
         assert(verts_per_face(fid)>2);
-        for(uint i=0; i<verts_per_face(fid); ++i)
+        for(uint off=0; off<verts_per_face(fid); ++off)
         {
-            int  vid0 = faces.at(fid).at(i);
-            int  vid1 = faces.at(fid).at((i+1)%verts_per_face(fid));
+            int  vid0 = faces.at(fid).at(off);
+            int  vid1 = faces.at(fid).at((off+1)%verts_per_face(fid));
             v2f.at(vid0).push_back(fid);
             e2f_map[unique_pair(vid0,vid1)].push_back(fid);
         }
@@ -395,7 +395,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 vec3d Polygonmesh<M,V,E,F>::face_vert(const uint fid, const uint offset) const
 {
-    return vert(faces.at(fid).at(offset));
+    return vert(face_vert_id(fid,offset));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -438,9 +438,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 vec3d Polygonmesh<M,V,E,F>::edge_vert(const uint eid, const uint offset) const
 {
-    uint eid_ptr = eid * 2;
-    uint vid     = edges.at(eid_ptr + offset);
-    return vert(vid);
+    return vert(edge_vert_id(eid,offset));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
