@@ -1,3 +1,4 @@
+- improve face tessellation strategy for polygonal meshes
 - add Mesh,SurfaceMesh and VolumeMesh interfaces, and implement them with ALL the meshes available within the library
 - add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
 - Transform timer in a profiler class with internal string to be printed at the end
