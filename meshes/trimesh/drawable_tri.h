@@ -72,6 +72,10 @@ class DrawableTri : public Tri<M,V,E,F>, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void operator+=(const DrawableTri & m);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void init_drawable_stuff();
         void updateGL();
 

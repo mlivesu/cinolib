@@ -220,6 +220,15 @@ void DrawableTri<M,V,E,F>::slice(const float thresh, // thresh on centroids or q
     updateGL();
 }
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableTri<M,V,E,F>::operator+=(const DrawableTri<M,V,E,F> & m)
+{
+    Tri<M,V,E,F>::operator +=(m);
+    updateGL();
+}
 
 }

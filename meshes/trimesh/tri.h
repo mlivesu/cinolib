@@ -87,16 +87,17 @@ class Tri
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_adjacency();
-        void update_bbox();
-        void update_f_normals();
-        void update_v_normals();
-        void update_normals();
+virtual void operator+=(const Tri & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void center_bbox();
-        void normalize_area();
+        void update_adjacency();
+        void update_bbox();
+        void update_f_normal(const uint fid);
+        void update_v_normal(const uint vid);
+        void update_f_normals();
+        void update_v_normals();
+        void update_normals();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -140,6 +141,17 @@ class Tri
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void               center_bbox();
+        void               normalize_area();
+        void               translate(const vec3d & delta);
+        void               rotate(const vec3d & axis, const double angle);
+        vec3d              barycenter() const;
+        uint               connected_components() const;
+        uint               connected_components(std::vector<std::set<uint>> & ccs) const;
+        std::vector<ipair> get_boundary_edges() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         const vec3d & vert          (const uint vid) const { return verts.at(vid); }
               vec3d & vert          (const uint vid)       { return verts.at(vid); }
 virtual       void    vert_set_color(const Color & c);
@@ -147,18 +159,32 @@ virtual       void    vert_set_alpha(const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d edge_vert     (const uint eid, const uint offset) const;
-        uint  edge_vert_id  (const uint eid, const uint offset) const;
-virtual void  edge_set_color(const Color & c);
-virtual void  edge_set_alpha(const float alpha);
+        vec3d  edge_vert               (const uint eid, const uint offset) const;
+        uint   edge_vert_id            (const uint eid, const uint offset) const;
+        int    edge_opposite_to        (const uint fid, const uint vid) const;
+        bool   edge_contains_vert      (const uint eid, const uint vid) const;
+        bool   edge_is_manifold        (const uint eid) const;
+        bool   edge_is_boundary        (const uint eid) const;
+        bool   edges_share_face        (const uint eid1, const uint eid2) const;
+        ipair  edge_shared             (const uint fid0, const uint fid1) const;
+        double edge_length             (const uint eid) const;
+        double edge_avg_length         () const;
+        double edge_max_length         () const;
+        double edge_min_length         () const;
+virtual bool   edge_collapse           (const uint eid);
+virtual void   edge_switch_id          (const uint eid0, const uint eid1);
+virtual void   edge_remove_unreferenced(const uint eid);
+virtual void   edge_set_color          (const Color & c);
+virtual void   edge_set_alpha          (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d face_vert     (const uint fid, const uint offset) const;
-        uint  face_vert_id  (const uint fid, const uint offset) const;
-        vec3d face_centroid (const uint fid)                    const;
-virtual void  face_set_color(const Color & c);
-virtual void  face_set_alpha(const float alpha);
+        vec3d face_vert         (const uint fid, const uint offset) const;
+        uint  face_vert_id      (const uint fid, const uint offset) const;
+        vec3d face_centroid     (const uint fid)                    const;
+        bool  face_contains_vert(const uint fid, const uint vid) const;
+virtual void  face_set_color    (const Color & c);
+virtual void  face_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
