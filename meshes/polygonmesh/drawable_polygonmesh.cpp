@@ -107,12 +107,11 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
     {
         if (!(this->face_data(fid).visible)) continue;
 
-        // trivial triangulation for convex polygons...
-        for (uint i=2; i<this->verts_per_face(fid); ++i)
+        for(uint i=0; i< this->tessellated_faces.at(fid).size()/3; ++i)
         {
-            int vid0 = this->faces.at(fid).at( 0 );
-            int vid1 = this->faces.at(fid).at(i-1);
-            int vid2 = this->faces.at(fid).at( i );
+            int vid0 = this->tessellated_faces.at(fid).at(3*i+0);
+            int vid1 = this->tessellated_faces.at(fid).at(3*i+1);
+            int vid2 = this->tessellated_faces.at(fid).at(3*i+2);
 
             int base_addr = drawlist.tri_coords.size()/3;
 

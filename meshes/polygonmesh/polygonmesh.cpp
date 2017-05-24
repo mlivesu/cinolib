@@ -170,6 +170,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Polygonmesh<M,V,E,F>::init()
 {
+    update_face_tessellation();
     update_adjacency();
     update_bbox();
 
@@ -178,6 +179,40 @@ void Polygonmesh<M,V,E,F>::init()
     f_data.resize(num_faces());
 
     update_normals();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Polygonmesh<M,V,E,F>::update_face_tessellation()
+{
+    tessellated_faces.resize(num_faces());
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        // TODO: improve triangulation strategy (this assumes convexity!)
+        std::vector<vec3d> n;
+        for (uint i=2; i<verts_per_face(fid); ++i)
+        {
+            uint vid0 = faces.at(fid).at( 0 );
+            uint vid1 = faces.at(fid).at(i-1);
+            uint vid2 = faces.at(fid).at( i );
+
+            tessellated_faces.at(fid).push_back(vid0);
+            tessellated_faces.at(fid).push_back(vid1);
+            tessellated_faces.at(fid).push_back(vid2);
+
+            n.push_back((vert(vid1)-vert(vid0)).cross(vert(vid2)-vert(vid0)));
+        }
+        // check for badly tessellated polygons...
+        for(uint i=0; i<n.size()-1; ++i)
+        {
+            if (n.at(i).dot(n.at(i+1))<0)
+            {
+                std::cerr << "WARNING : Bad tessellation occurred for non-convex polygon " << fid << std::endl;
+            }
+        }
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -271,6 +306,22 @@ void Polygonmesh<M,V,E,F>::update_bbox()
         bb.min = bb.min.min(v);
         bb.max = bb.max.max(v);
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<double> Polygonmesh<M,V,E,F>::vector_coords() const
+{
+    std::vector<double> coords;
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        coords.push_back(vert(vid).x());
+        coords.push_back(vert(vid).y());
+        coords.push_back(vert(vid).z());
+    }
+    return coords;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

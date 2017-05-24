@@ -59,7 +59,8 @@ class Polygonmesh
         std::vector<vec3d>             verts;
         std::vector<uint>              edges;
         std::vector<std::vector<uint>> faces;
-
+        std::vector<std::vector<uint>> tessellated_faces; // triangles covering each face.Useful for
+                                                          // robust normal estimation and rendering
         // attributes
         //
         M              m_data;
@@ -90,6 +91,7 @@ class Polygonmesh
         void update_f_normals();
         void update_v_normals();
         void update_normals();
+        void update_face_tessellation();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -104,9 +106,10 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const Bbox               & bbox()         const { return bb;    }
-        const std::vector<vec3d> & vector_verts() const { return verts; }
-        const std::vector<uint>  & vector_edges() const { return edges; }
+        const Bbox                & bbox()          const { return bb;    }
+        const std::vector<uint>   & vector_edges()  const { return edges; }
+        const std::vector<vec3d>  & vector_verts()  const { return verts; }
+              std::vector<double>   vector_coords() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
