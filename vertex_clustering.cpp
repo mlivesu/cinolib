@@ -5,7 +5,7 @@
 *                                                                           *
 * Author: Marco Livesu (marco.livesu@gmail.com)                             *
 *                                                                           *
-* Copyright(C) 2017                                                         *
+* Copyright(C) 2016                                                         *
 * All rights reserved.                                                      *
 *                                                                           *
 * This file is part of CinoLib                                              *
