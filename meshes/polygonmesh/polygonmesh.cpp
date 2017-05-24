@@ -188,6 +188,8 @@ CINO_INLINE
 void Polygonmesh<M,V,E,F>::update_face_tessellation()
 {
     tessellated_faces.resize(num_faces());
+    std::set<uint> bad_faces;
+
     for(uint fid=0; fid<num_faces(); ++fid)
     {
         // TODO: improve triangulation strategy (this assumes convexity!)
@@ -205,14 +207,14 @@ void Polygonmesh<M,V,E,F>::update_face_tessellation()
             n.push_back((vert(vid1)-vert(vid0)).cross(vert(vid2)-vert(vid0)));
         }
         // check for badly tessellated polygons...
-        for(uint i=0; i<n.size()-1; ++i)
-        {
-            if (n.at(i).dot(n.at(i+1))<0)
-            {
-                std::cerr << "WARNING : Bad tessellation occurred for non-convex polygon " << fid << std::endl;
-            }
-        }
+        for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_faces.insert(fid);
     }
+    //
+    for(uint fid : bad_faces)
+    {
+        std::cerr << "WARNING : Bad tessellation occurred for non-convex polygon " << fid << std::endl;
+    }
+
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
