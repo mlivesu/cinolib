@@ -397,7 +397,7 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
     for(size_t i=0; i<sample_list.size(); ++i)
     {
         const Sample & s = sample_list.at(i);
-        int off;
+        uint off;
         if (triangle_bary_is_edge(s.bary, off))
         {
             int   eid         = m.triangle_edge_local_to_global(s.tid, off);

@@ -146,7 +146,7 @@ bool triangle_point_is_inside(const vec3d  & A,
 
 CINO_INLINE
 bool triangle_bary_is_vertex(const std::vector<double> & bary,
-                             int                       & vid,
+                             uint                      & vid,
                              const double                tol)
 {
     assert(bary.size()==3);
@@ -159,8 +159,8 @@ bool triangle_bary_is_vertex(const std::vector<double> & bary,
 
 CINO_INLINE
 bool triangle_bary_is_edge(const std::vector<double> & bary,
-                             int                     & eid,
-                             const double              tol)
+                           uint                      & eid,
+                           const double                tol)
 {
     assert(bary.size()==3);
     if (bary[0]>tol && bary[1]>tol && bary[2]<=tol) { eid = 0; return true; }

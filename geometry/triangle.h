@@ -86,13 +86,13 @@ bool triangle_point_is_inside(const vec3d  & A,
 
 CINO_INLINE
 bool triangle_bary_is_vertex(const std::vector<double> & bary,
-                             int                       & vid, // 0,1,2
+                             uint                      & vid, // 0,1,2
                              const double                tol = 1e-5);
 
 CINO_INLINE
 bool triangle_bary_is_edge(const std::vector<double> & bary,
-                             int                     & eid, // 0,1,2 (see TRI_EDGES)
-                             const double              tol = 1e-5);
+                           uint                      & eid, // 0,1,2 (see TRI_EDGES)
+                           const double              tol = 1e-5);
 }
 
 #ifndef  CINO_STATIC_LIB

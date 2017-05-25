@@ -1334,7 +1334,7 @@ bool Trimesh::elem_bary_is_vertex(const int                   tid,
                                   int                       & vid,
                                   const double                tol) const
 {
-    int off;
+    uint off;
     if (triangle_bary_is_vertex(wgts, off, tol))
     {
         vid = triangle_vertex_id(tid, off);
@@ -1350,7 +1350,7 @@ bool Trimesh::elem_bary_is_edge(const int                   tid,
                                 int                       & eid,
                                 const double                tol) const
 {
-    int off;
+    uint off;
     if (triangle_bary_is_edge(wgts, off, tol))
     {
         eid = triangle_edge_local_to_global(tid, off);
