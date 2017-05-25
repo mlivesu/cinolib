@@ -27,6 +27,7 @@
 #include <vector>
 #include <cinolib/cinolib.h>
 #include <cinolib/common.h>
+#include <cinolib/symbols.h>
 #include <cinolib/color.h>
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
@@ -49,7 +50,7 @@ class Tri
         Tri(const char * filename);
 
         Tri(const std::vector<vec3d> & verts,
-            const std::vector<uint> & faces);
+            const std::vector<uint>  & faces);
 
         Tri(const std::vector<double> & coords,
             const std::vector<uint>   & faces);
@@ -145,17 +146,43 @@ virtual void operator+=(const Tri & m);
         void               normalize_area();
         void               translate(const vec3d & delta);
         void               rotate(const vec3d & axis, const double angle);
-        vec3d              barycenter() const;
+        vec3d              centroid() const;
         uint               connected_components() const;
         uint               connected_components(std::vector<std::set<uint>> & ccs) const;
+        std::vector<uint>  get_boundary_vertices() const;
         std::vector<ipair> get_boundary_edges() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const vec3d & vert          (const uint vid) const { return verts.at(vid); }
-              vec3d & vert          (const uint vid)       { return verts.at(vid); }
-virtual       void    vert_set_color(const Color & c);
-virtual       void    vert_set_alpha(const float alpha);
+  const vec3d           & vert                    (const uint vid) const { return verts.at(vid); }
+        vec3d           & vert                    (const uint vid)       { return verts.at(vid); }
+        void              vert_ordered_one_ring   (const uint vid,
+                                                   std::vector<uint> & v_ring,        // sorted list of adjacent vertices
+                                                   std::vector<uint> & f_ring,        // sorted list of adjacent triangles
+                                                   std::vector<uint> & e_ring,        // sorted list of edges incident to vid
+                                                   std::vector<uint> & e_link) const; // sorted list of edges opposite to vid
+        std::vector<uint> vert_ordered_vert_ring  (const uint vid) const;
+        std::vector<uint> vert_ordered_face_ring  (const uint vid) const;
+        std::vector<uint> vert_ordered_edge_ring  (const uint vid) const;
+        std::vector<uint> vert_ordered_edge_link  (const uint vid) const;
+        std::set<uint>    vert_n_ring             (const uint vid, const uint n) const;
+        double            vert_area               (const uint vid) const;
+        double            vert_mass               (const uint vid) const;
+        bool              vert_is_boundary        (const uint vid) const;
+        bool              verts_are_adjacent      (const uint vid0, const uint vid1) const;
+        bool              vert_is_local_min       (const uint vid, const int tex_coord = U_param) const;
+        bool              vert_is_local_max       (const uint vid, const int tex_coord = U_param) const;
+        bool              vert_is_critical_p      (const uint vid) const;
+        uint              vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;
+        uint              vert_opposite_to        (const uint eid, const uint vid) const;
+        uint              vert_valence            (const uint vid) const;
+        uint              vert_shared             (const uint eid0, const uint eid1) const;
+        std::vector<uint> vert_boundary_edges     (const uint vid) const;
+        void              vert_switch_id          (const uint vid0, const uint vid1);
+virtual void              vert_remove_unreferenced(const uint vid);
+virtual uint              vert_add                (const vec3d & pos, const V & data);
+virtual void              vert_set_color          (const Color & c);
+virtual void              vert_set_alpha          (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -171,20 +198,36 @@ virtual       void    vert_set_alpha(const float alpha);
         double edge_avg_length         () const;
         double edge_max_length         () const;
         double edge_min_length         () const;
+        void   edge_switch_id          (const uint eid0, const uint eid1);
 virtual bool   edge_collapse           (const uint eid);
-virtual void   edge_switch_id          (const uint eid0, const uint eid1);
 virtual void   edge_remove_unreferenced(const uint eid);
 virtual void   edge_set_color          (const Color & c);
 virtual void   edge_set_alpha          (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d face_vert         (const uint fid, const uint offset) const;
-        uint  face_vert_id      (const uint fid, const uint offset) const;
-        vec3d face_centroid     (const uint fid)                    const;
-        bool  face_contains_vert(const uint fid, const uint vid) const;
-virtual void  face_set_color    (const Color & c);
-virtual void  face_set_alpha    (const float alpha);
+        vec3d  face_vert               (const uint fid, const uint offset) const;
+        uint   face_vert_id            (const uint fid, const uint offset) const;
+        uint   face_edge_id            (const uint fid, const uint offset) const;
+        uint   face_vert_offset        (const uint fid, const uint vid) const;
+        uint   face_shared             (const uint eid0, const uint eid1) const;
+        vec3d  face_centroid           (const uint fid) const;
+        double face_mass               (const uint fid) const;
+        double face_area               (const uint fid) const;
+        double face_angle_at_vert      (const uint fid, const uint vid, const int unit = RAD) const;
+        bool   face_contains_vert      (const uint fid, const uint vid) const;
+        bool   face_is_cap             (const uint fid, const double angle_thresh_deg = 177.0) const;
+        bool   face_is_needle          (const uint fid, const double angle_thresh_deg = 3.0) const;
+        int    face_adjacent_along     (const uint fid, const uint vid0, const uint vid1) const;
+        bool   face_is_boundary        (const uint fid) const;
+        bool   face_bary_coords        (const uint fid, const vec3d & P, std::vector<double> & wgts) const;
+        bool   face_bary_is_vert       (const uint fid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
+        bool   face_bary_is_edge       (const uint fid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
+        void   face_switch_id          (const uint fid0, const uint fid1);
+virtual uint   face_add                (const uint vid0, const uint vid1, const uint vid2, const F & data);
+virtual void   face_remove_unreferenced(const uint fid);
+virtual void   face_set_color          (const Color & c);
+virtual void   face_set_alpha          (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -193,9 +236,11 @@ virtual void  face_set_alpha    (const float alpha);
         // "cell_" for volumetric meshes, allowing the use of templated algorithms
         // that work with both types of meshes without requiring specialzed code
 
-        vec3d  elem_centroid(const uint fid) const;
-        void   elem_show_all();
-        double elem_mass(const uint fid) const;
+        vec3d  elem_centroid    (const uint fid) const;
+        void   elem_show_all    ();
+        double elem_mass        (const uint fid) const;
+        bool   elem_bary_is_vert(const uint fid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
+        bool   elem_bary_is_edge(const uint fid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
 };
 
 }

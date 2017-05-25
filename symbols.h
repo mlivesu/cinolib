@@ -46,6 +46,9 @@ enum
     VW_param,
     UVW_param,
     //
+    DEG,
+    RAD,
+    //
     Q,    // Quality
     L,    // Label
     //

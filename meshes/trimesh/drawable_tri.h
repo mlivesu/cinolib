@@ -72,10 +72,6 @@ class DrawableTri : public Tri<M,V,E,F>, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void operator+=(const DrawableTri & m);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void init_drawable_stuff();
         void updateGL();
 
@@ -83,6 +79,36 @@ class DrawableTri : public Tri<M,V,E,F>, public DrawableObject
 
         void slice(const float thresh, const int item, const int sign, const int mode);
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void show_mesh(const bool b);
+        void show_mesh_flat();
+        void show_mesh_smooth();
+        void show_mesh_points();
+        void show_face_color();
+        void show_face_quality();
+        void show_face_texture1D(const GLint texture);
+        void show_face_wireframe(const bool b);
+        void show_face_wireframe_color(const Color & c);
+        void show_face_wireframe_width(const float width);
+        void show_face_wireframe_transparency(const float alpha);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        /* (Re)implementation of virtual methods (mainly to call updateGL())*/
+        void operator+=              (const DrawableTri & m);
+        void vert_set_color          (const Color & c);
+        void vert_set_alpha          (const float a);
+        void vert_remove_unreferenced(const uint vid);
+        uint vert_add                (const vec3d & pos, const V & data);
+        void edge_set_color          (const Color & c);
+        void edge_set_alpha          (const float a);
+        bool edge_collapse           (const uint eid);
+        void edge_remove_unreferenced(const uint eid);
+        void face_set_color          (const Color & c);
+        void face_set_alpha          (const float a);
+        uint face_add                (const uint vid0, const uint vid1, const uint vid2, const F & data);
+        void face_remove_unreferenced(const uint fid);
 };
 
 }
