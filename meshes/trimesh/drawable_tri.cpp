@@ -99,6 +99,7 @@ void DrawableTri<M,V,E,F>::updateGL()
     drawlist.tris.clear();
     drawlist.tri_v_norms.clear();
     drawlist.tri_v_colors.clear();
+    drawlist.tri_text1D.clear();
     drawlist.segs.clear();
     drawlist.seg_coords.clear();
     drawlist.seg_colors.clear();
@@ -136,6 +137,10 @@ void DrawableTri<M,V,E,F>::updateGL()
         drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.x());
         drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.y());
         drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.z());
+
+        drawlist.tri_text1D.push_back(this->vert_data(vid0).uvw[0]);
+        drawlist.tri_text1D.push_back(this->vert_data(vid1).uvw[0]);
+        drawlist.tri_text1D.push_back(this->vert_data(vid2).uvw[0]);
 
         if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
         {
@@ -272,6 +277,20 @@ void DrawableTri<M,V,E,F>::show_mesh_points()
     drawlist.draw_mode |=  DRAW_TRI_POINTS;
     drawlist.draw_mode &= ~DRAW_TRI_FLAT;
     drawlist.draw_mode &= ~DRAW_TRI_SMOOTH;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableTri<M,V,E,F>::show_vert_color()
+{
+    drawlist.draw_mode |=  DRAW_TRI_VERTCOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    glDisable(GL_TEXTURE_1D);
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

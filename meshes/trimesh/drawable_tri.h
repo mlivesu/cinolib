@@ -85,6 +85,7 @@ class DrawableTri : public Tri<M,V,E,F>, public DrawableObject
         void show_mesh_flat();
         void show_mesh_smooth();
         void show_mesh_points();
+        void show_vert_color();
         void show_face_color();
         void show_face_texture1D(const GLint texture);
         void show_face_wireframe(const bool b);
