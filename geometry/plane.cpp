@@ -87,7 +87,7 @@ Plane::Plane(const std::vector<vec3d> & samples)
     double det_z   = xx*yy - xy*xy;
     double det_max = std::max(det_x, std::max(det_y, det_z));
 
-    if (det_max == 0) std::cerr << "WARNING : the points don't span a plane!" << std::endl;
+    if (fabs(det_max) < 1e-5) std::cerr << "WARNING : the points don't span a plane!" << std::endl;
 
     if (det_max == det_x)
     {
