@@ -25,293 +25,72 @@
 #include <cinolib/bfs.h>
 #include <cinolib/timer.h>
 #include <cinolib/io/read_write.h>
+#include <cinolib/geometry/plane.h>
 
 #include <queue>
 
 namespace cinolib
 {
 
-CINO_INLINE
-Quadmesh::Quadmesh(const char * filename)
-{
-    timer_start("load");
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class F>
+CINO_INLINE
+Quadmesh<M,V,E,F>::Quadmesh(const char * filename)
+{
     load(filename);
     init();
-
-    timer_stop("load");
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-Quadmesh::Quadmesh(const std::vector<double> & coords,
-                   const std::vector<u_int>  & quads)
+Quadmesh<M,V,E,F>::Quadmesh(const std::vector<vec3d> & verts,
+                            const std::vector<uint>  & faces)
+: verts(verts)
+, faces(faces)
 {
-    clear();
-    this->coords = coords;
-    this->quads   = quads;
     init();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void Quadmesh::clear()
+Quadmesh<M,V,E,F>::Quadmesh(const std::vector<double> & coords,
+                            const std::vector<uint>   & faces)
 {
-    bb.reset();
-    coords.clear();
-    quads.clear();
-    edges.clear();
-    u_text.clear();
-    q_label.clear();
-    v_norm.clear();
-    q_norm.clear();
-    vtx2vtx.clear();
-    vtx2quad.clear();
-    vtx2edg.clear();
-    quad2quad.clear();
-    quad2edg.clear();
-    edg2quad.clear();
+    this->verts = vec3d_from_serialized_xyz(coords);
+    this->faces = faces;
+
+    init();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void Quadmesh::init()
-{
-    update_adjacency();
-    update_bbox();
-    update_normals();
-
-    u_text.resize(num_vertices(), 0.0);
-    if (q_label.empty()) q_label.resize(num_quads(), 0);
-}
-
-CINO_INLINE
-void Quadmesh::update_adjacency()
-{
-    timer_start("Build adjacency");
-
-    edges.clear();
-
-    vtx2vtx.clear();
-    vtx2edg.clear();
-    edg2quad.clear();
-    quad2quad.clear();
-    quad2edg.clear();
-    vtx2quad.clear();
-
-    vtx2quad.resize(num_vertices());
-
-    typedef std::map<ipair, std::vector<int> > mymap;
-    mymap edge_quad_map;
-
-    for(int qid=0; qid<num_quads(); ++qid)
-    {
-        int qid_ptr = qid * 4;
-
-        for(int i=0; i<4; ++i)
-        {
-            int  vid0 = quads[qid_ptr + i];
-            int  vid1 = quads[qid_ptr + (i+1)%4];
-
-            vtx2quad[vid0].push_back(qid);
-
-            ipair e = unique_pair(vid0, vid1);
-            edge_quad_map[e].push_back(qid);
-        }
-    }
-
-    edg2quad.resize(edge_quad_map.size());
-    quad2edg.resize(num_quads());
-    quad2quad.resize(num_quads());
-    vtx2vtx.resize(num_vertices());
-    vtx2edg.resize(num_vertices());
-
-    int fresh_id = 0;
-    for(mymap::iterator it=edge_quad_map.begin(); it!=edge_quad_map.end(); ++it)
-    {
-        ipair e   = it->first;
-        int  eid  = fresh_id++;
-        int  vid0 = e.first;
-        int  vid1 = e.second;
-
-        edges.push_back(vid0);
-        edges.push_back(vid1);
-
-        vtx2vtx[vid0].push_back(vid1);
-        vtx2vtx[vid1].push_back(vid0);
-
-        vtx2edg[vid0].push_back(eid);
-        vtx2edg[vid1].push_back(eid);
-
-        std::vector<int> qids = it->second;
-        //assert(qids.size() <= 2 && "Non manifold edge!");
-        //assert(qids.size() >= 1 && "Non manifold edge!");
-        //if (qids.size() > 2 || qids.size() < 1) cerr << "Non manifold edge! " << edge_vertex(eid, 0) << "\t" << edge_vertex(eid, 1) << endl;
-
-        for(int i=0; i<(int)qids.size(); ++i)
-        {
-            int qid = qids[i];
-
-            quad2edg[qid].push_back(eid);
-            edg2quad[eid].push_back(qid);
-        }
-        if (qids.size() == 2)
-        {
-            quad2quad[qids[0]].push_back(qids[1]);
-            quad2quad[qids[1]].push_back(qids[0]);
-            assert(quad2quad[qids[0]].size() <= 4);
-            assert(quad2quad[qids[1]].size() <= 4);
-        }
-    }
-
-    logger << num_vertices()  << "\tvertices"  << endl;
-    logger << num_quads()     << "\tquads"     << endl;
-    logger << num_edges()     << "\tedges"     << endl;
-
-    timer_stop("Build adjacency");
-}
-
-CINO_INLINE
-void Quadmesh::update_q_normals()
-{
-    // TO UPDATE!!!!!!
-
-    q_norm.clear();
-    q_norm.resize(num_quads()*3);
-
-    for(int qid=0; qid<num_quads(); ++qid)
-    {
-        int qid_vid_ptr = qid * 4;
-
-        vec3d v0 = vertex(quads[qid_vid_ptr+0]);
-        vec3d v1 = vertex(quads[qid_vid_ptr+1]);
-        vec3d v2 = vertex(quads[qid_vid_ptr+2]);
-
-        vec3d u = v1 - v0;    u.normalize();
-        vec3d v = v2 - v0;    v.normalize();
-        vec3d n = u.cross(v); n.normalize();
-
-        int qid_norm_ptr = qid * 3;
-        q_norm[qid_norm_ptr + 0] = n.x();
-        q_norm[qid_norm_ptr + 1] = n.y();
-        q_norm[qid_norm_ptr + 2] = n.z();
-    }
-}
-
-CINO_INLINE
-void Quadmesh::update_v_normals()
-{
-    v_norm.clear();
-    v_norm.resize(num_vertices()*3);
-
-    for(int vid=0; vid<num_vertices(); ++vid)
-    {
-        std::vector<int> nbrs = adj_vtx2quad(vid);
-
-        vec3d sum(0,0,0);
-        for(int i=0; i<(int)nbrs.size(); ++i)
-        {
-            sum += quad_normal(nbrs[i]);
-        }
-
-        //assert(nbrs.size() > 0);
-        sum /= nbrs.size();
-        sum.normalize();
-
-        int vid_ptr = vid * 3;
-        v_norm[vid_ptr + 0] = sum.x();
-        v_norm[vid_ptr + 1] = sum.y();
-        v_norm[vid_ptr + 2] = sum.z();
-    }
-}
-
-CINO_INLINE
-std::string Quadmesh::loaded_file() const
-{
-    return filename;
-}
-
-CINO_INLINE
-int Quadmesh::num_vertices() const
-{
-    return coords.size()/3;
-}
-
-CINO_INLINE
-int Quadmesh::num_quads() const
-{
-    return quads.size()/4;
-}
-
-CINO_INLINE
-int Quadmesh::num_elements() const
-{
-    return quads.size()/4;
-}
-
-CINO_INLINE
-int Quadmesh::num_edges() const
-{
-    return edges.size()/2;
-}
-
-CINO_INLINE
-const std::vector<int> &Quadmesh::adj_vtx2vtx(const int vid) const
-{
-    return vtx2vtx.at(vid);
-}
-
-CINO_INLINE
-const std::vector<int> &Quadmesh::adj_vtx2edg(const int vid) const
-{
-    return vtx2edg.at(vid);
-}
-
-CINO_INLINE
-const std::vector<int> &Quadmesh::adj_vtx2quad(const int vid) const
-{
-    return vtx2quad.at(vid);
-}
-
-CINO_INLINE
-const std::vector<int> &Quadmesh::adj_edg2quad(const int eid) const
-{
-    return edg2quad.at(eid);
-}
-
-CINO_INLINE
-const std::vector<int> &Quadmesh::adj_quad2edg(const int qid) const
-{
-    return quad2edg.at(qid);
-}
-
-
-
-CINO_INLINE
-const std::vector<int> &Quadmesh::adj_quad2quad(const int qid) const
-{
-    return quad2quad.at(qid);
-}
-
-CINO_INLINE
-void Quadmesh::load(const char * filename)
+void Quadmesh<M,V,E,F>::load(const char * filename)
 {
     timer_start("Load Quadmesh");
 
     clear();
+    std::vector<double> coords;
+    std::vector<uint>   tris; // unused
 
     std::string str(filename);
-    std::string filetype = str.substr(str.size()-3,3);
+    std::string filetype = str.substr(str.size()-4,4);
 
-    if (filetype.compare("off") == 0 ||
-        filetype.compare("OFF") == 0)
+    if (filetype.compare(".off") == 0 ||
+        filetype.compare(".OFF") == 0)
     {
-        std::vector<uint> tris; // ignored here
-        read_OFF(filename, coords, tris, quads);
+        read_OFF(filename, coords, tris, faces);
     }
-    else
-    if (filetype.compare("obj") == 0 ||
-        filetype.compare("OBJ") == 0)
+    else if (filetype.compare(".obj") == 0 ||
+             filetype.compare(".OBJ") == 0)
     {
-        std::vector<uint> tris; // ignored here
-        read_OBJ(filename, coords, tris, quads);
+        read_OBJ(filename, coords, tris, faces);
     }
     else
     {
@@ -319,18 +98,26 @@ void Quadmesh::load(const char * filename)
         exit(-1);
     }
 
-    logger << quads.size() / 4   << " quads read" << endl;
-    logger << coords.size() / 3  << " vertices  read" << endl;
+    verts = vec3d_from_serialized_xyz(coords);
 
-    this->filename = std::string(filename);
+    logger << num_faces() << " quads read" << endl;
+    logger << num_verts() << " verts read" << endl;
+
+    this->mesh_data().filename = std::string(filename);
 
     timer_stop("Load Quadmesh");
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void Quadmesh::save(const char * filename) const
+void Quadmesh<M,V,E,F>::save(const char * filename) const
 {
     timer_start("Save Quadmesh");
+
+    std::vector<double> coords = serialized_xyz_from_vec3d(verts);
+    std::vector<uint>   tris; // unused
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-3,3);
@@ -338,202 +125,449 @@ void Quadmesh::save(const char * filename) const
     if (filetype.compare("off") == 0 ||
         filetype.compare("OFF") == 0)
     {
-        std::vector<uint> tris; // ignored here
-        write_OFF(filename, coords, tris, quads);
+        write_OFF(filename, coords, tris, faces);
     }
-    else
-    if (filetype.compare("obj") == 0 ||
-        filetype.compare("OBJ") == 0)
+    else if (filetype.compare(".obj") == 0 ||
+             filetype.compare(".OBJ") == 0)
     {
-        std::vector<uint> tris; // ignored here
-        write_OBJ(filename, coords, tris, quads);
+        write_OBJ(filename, coords, tris, faces);
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save() : file format not supported yet " << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
         exit(-1);
     }
-
-    logger << quads.size() / 4   << " quads written" << endl;
-    logger << coords.size() / 3  << " vertices  written" << endl;
 
     timer_stop("Save Quadmesh");
 }
 
-CINO_INLINE
-int Quadmesh::edge_vertex_id(const int eid, const int offset) const
-{
-    int eid_ptr = eid * 2;
-    return edges.at(eid_ptr + offset);
-}
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class F>
 CINO_INLINE
-int Quadmesh::quad_vertex_id(const int qid, const int offset) const
-{
-    int qid_ptr = qid * 4;
-    return quads.at(qid_ptr + offset);
-}
-
-CINO_INLINE
-vec3d Quadmesh::quad_normal(const int qid) const
-{
-    int qid_ptr = qid * 3;
-    return vec3d(q_norm.at(qid_ptr + 0), q_norm.at(qid_ptr + 1), q_norm.at(qid_ptr + 2));
-}
-
-CINO_INLINE
-vec3d Quadmesh::vertex_normal(const int vid) const
-{
-    int vid_ptr = vid * 3;
-    return vec3d(v_norm.at(vid_ptr+0), v_norm.at(vid_ptr+1), v_norm.at(vid_ptr+2));
-}
-
-CINO_INLINE
-vec3d Quadmesh::vertex(const int vid) const
-{
-    int vid_ptr = vid * 3;
-    return vec3d(coords.at(vid_ptr+0), coords.at(vid_ptr+1), coords.at(vid_ptr+2));
-}
-
-CINO_INLINE
-void Quadmesh::set_vertex(const int vid, const vec3d &pos)
-{
-    int vid_ptr = vid * 3;
-    coords.at(vid_ptr + 0) = pos.x();
-    coords.at(vid_ptr + 1) = pos.y();
-    coords.at(vid_ptr + 2) = pos.z();
-}
-
-CINO_INLINE
-int Quadmesh::vertex_valence(const int vid) const
-{
-    return adj_vtx2vtx(vid).size();
-}
-
-CINO_INLINE
-float Quadmesh::vertex_u_text(const int vid) const
-{
-    return u_text.at(vid);
-}
-
-CINO_INLINE
-void Quadmesh::set_vertex_u_text(const int vid, const float s)
-{
-    u_text.at(vid) = s;
-}
-
-CINO_INLINE
-bool Quadmesh::vertex_is_singular(const int vid)
-{
-    return (adj_vtx2vtx(vid).size()!=4);
-}
-
-CINO_INLINE
-int Quadmesh::quad_label(const int qid) const
-{
-    return q_label.at(qid);
-}
-
-CINO_INLINE
-void Quadmesh::quad_set_label(const int qid, const int i)
-{
-    q_label.at(qid) = i;
-}
-
-CINO_INLINE
-void Quadmesh::update_normals()
-{
-    update_q_normals();
-    update_v_normals();
-}
-
-CINO_INLINE
-bool Quadmesh::quad_contains_vertex(const int qid, const int vid) const
-{
-    if (quad_vertex_id(qid, 0) == vid) return true;
-    if (quad_vertex_id(qid, 1) == vid) return true;
-    if (quad_vertex_id(qid, 2) == vid) return true;
-    if (quad_vertex_id(qid, 3) == vid) return true;
-    return false;
-}
-
-CINO_INLINE
-void Quadmesh::update_bbox()
+void Quadmesh<M,V,E,F>::clear()
 {
     bb.reset();
-    for(int vid=0; vid<num_vertices(); ++vid)
+    //
+    verts.clear();
+    edges.clear();
+    faces.clear();
+    //
+    M std_M_data;
+    m_data = std_M_data;
+    v_data.clear();
+    e_data.clear();
+    f_data.clear();
+    //
+    v2v.clear();
+    v2e.clear();
+    v2f.clear();
+    e2f.clear();
+    f2e.clear();
+    f2f.clear();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::init()
+{
+    update_face_tessellation();
+    update_adjacency();
+    update_bbox();
+
+    v_data.resize(num_verts());
+    e_data.resize(num_edges());
+    f_data.resize(num_faces());
+
+    update_normals();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::update_face_tessellation()
+{
+    tessellated_faces.resize(num_faces());
+
+    for(uint fid=0; fid<num_faces(); ++fid)
     {
-        vec3d v = vertex(vid);
+        uint vid0 = face_vert_id(fid,0);
+        uint vid1 = face_vert_id(fid,1);
+        uint vid2 = face_vert_id(fid,2);
+        uint vid3 = face_vert_id(fid,3);
+
+        vec3d n1 = (vert(vid1)-vert(vid0)).cross(vert(vid2)-vert(vid0));
+        vec3d n2 = (vert(vid2)-vert(vid0)).cross(vert(vid3)-vert(vid0));
+
+        bool flip = (n1.dot(n2) < 0); // flip diag: t(0,1,2) t(0,2,3) => t(0,1,3) t(1,2,3)
+
+        tessellated_faces.at(fid).push_back(vid0);
+        tessellated_faces.at(fid).push_back(vid1);
+        tessellated_faces.at(fid).push_back(flip ? vid3 : vid2);
+        tessellated_faces.at(fid).push_back(flip ? vid1 : vid0);
+        tessellated_faces.at(fid).push_back(vid2);
+        tessellated_faces.at(fid).push_back(vid3);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::update_adjacency()
+{
+    timer_start("Build adjacency");
+
+    v2v.clear(); v2v.resize(num_verts());
+    v2e.clear(); v2e.resize(num_verts());
+    v2f.clear(); v2f.resize(num_verts());
+    f2f.clear(); f2f.resize(num_faces());
+    f2e.clear(); f2e.resize(num_faces());
+
+    std::map<ipair,std::vector<uint>> e2f_map;
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        for(uint off=0; off<verts_per_face(); ++off)
+        {
+            uint vid0 = face_vert_id(fid,off);
+            uint vid1 = face_vert_id(fid,(off+1)%verts_per_face());
+            v2f.at(vid0).push_back(fid);
+            e2f_map[unique_pair(vid0,vid1)].push_back(fid);
+        }
+    }
+
+    edges.clear();
+    e2f.clear();
+    e2f.resize(e2f_map.size());
+
+    uint fresh_id = 0;
+    for(auto e2f_it : e2f_map)
+    {
+        ipair e    = e2f_it.first;
+        uint  eid  = fresh_id++;
+        uint  vid0 = e.first;
+        uint  vid1 = e.second;
+
+        edges.push_back(vid0);
+        edges.push_back(vid1);
+
+        v2v.at(vid0).push_back(vid1);
+        v2v.at(vid1).push_back(vid0);
+
+        v2e.at(vid0).push_back(eid);
+        v2e.at(vid1).push_back(eid);
+
+        std::vector<uint> fids = e2f_it.second;
+        for(uint fid : fids)
+        {
+            f2e.at(fid).push_back(eid);
+            e2f.at(eid).push_back(fid);
+            for(uint adj_fid : fids) if (fid != adj_fid) f2f.at(fid).push_back(adj_fid);
+        }
+
+        // MANIFOLDNESS CHECKS
+        //
+        bool is_manifold = (fids.size() > 2 || fids.size() < 1);
+        if (is_manifold && !support_non_manifold_edges)
+        {
+            std::cerr << "Non manifold edge found! To support non manifoldness,";
+            std::cerr << "enable the 'support_non_manifold_edges' flag in cinolib.h" << endl;
+            assert(false);
+        }
+        if (is_manifold && print_non_manifold_edges)
+        {
+            std::cerr << "Non manifold edge! (" << vid0 << "," << vid1 << ")" << endl;
+        }
+    }
+
+    logger << num_verts() << "\tverts" << endl;
+    logger << num_faces() << "\tfaces" << endl;
+    logger << num_edges() << "\tedges" << endl;
+
+    timer_stop("Build adjacency");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::update_bbox()
+{
+    bb.reset();
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        vec3d v = vert(vid);
         bb.min = bb.min.min(v);
         bb.max = bb.max.max(v);
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d Quadmesh::element_barycenter(const int qid) const
+std::vector<double> Quadmesh<M,V,E,F>::vector_coords() const
 {
-    vec3d b(0,0,0);
-    for(int i=0; i<4; ++i)
+    std::vector<double> coords;
+    for(uint vid=0; vid<num_verts(); ++vid)
     {
-        b += quad_vertex(qid,i);
+        coords.push_back(vert(vid).x());
+        coords.push_back(vert(vid).y());
+        coords.push_back(vert(vid).z());
     }
-    b /= 4.0;
-    return b;
-}
-
-CINO_INLINE
-vec3d Quadmesh::quad_vertex(const int qid, const int offset) const
-{
-    int qid_ptr = qid * 4;
-    int vid     = quads.at(qid_ptr + offset);
-    int vid_ptr = vid * 3;
-    return vec3d(coords.at(vid_ptr + 0), coords.at(vid_ptr + 1), coords.at(vid_ptr + 2));
-}
-
-CINO_INLINE
-vec3d Quadmesh::edge_vertex(const int eid, const int offset) const
-{
-    int eid_ptr = eid * 2;
-    int vid     = edges.at(eid_ptr + offset);
-    int vid_ptr = vid * 3;
-    return vec3d(coords.at(vid_ptr + 0), coords.at(vid_ptr + 1), coords.at(vid_ptr + 2));
-}
-
-CINO_INLINE
-const std::vector<double> &Quadmesh::vector_coords() const
-{
     return coords;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-const std::vector<u_int> &Quadmesh::vector_quads() const
+void Quadmesh<M,V,E,F>::update_f_normals()
 {
-    return quads;
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        // compute the best fitting plane
+        std::vector<vec3d> points;
+        for(uint off=0; off<verts_per_face(); ++off) points.push_back(face_vert(fid,off));
+        Plane best_fit(points);
+
+        // adjust orientation (n or -n?)
+        assert(tessellated_faces.at(fid).size()>2);
+        vec3d v0 = vert(tessellated_faces.at(fid).at(0));
+        vec3d v1 = vert(tessellated_faces.at(fid).at(1));
+        vec3d v2 = vert(tessellated_faces.at(fid).at(2));
+        vec3d n  = (v1-v0).cross(v2-v0);
+
+        face_data(fid).normal = (best_fit.n.dot(n) < 0) ? -best_fit.n : best_fit.n;
+    }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-const std::vector<u_int> &Quadmesh::vector_edges() const
+void Quadmesh<M,V,E,F>::update_v_normals()
 {
-    return edges;
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        vec3d n(0,0,0);
+        for(uint fid : adj_v2f(vid))
+        {
+            n += face_data(fid).normal;
+        }
+        n.normalize();
+        vert_data(vid).normal = n;
+    }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class F>
 CINO_INLINE
-const Bbox &Quadmesh::bbox() const
+void Quadmesh<M,V,E,F>::update_normals()
 {
-    return bb;
+    update_f_normals();
+    update_v_normals();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-const std::vector<float> &Quadmesh::vector_v_float_scalar() const
+uint Quadmesh<M,V,E,F>::face_vert_id(const uint fid, const uint offset) const
 {
-    return u_text;
+    uint fid_ptr = fid * verts_per_face();
+    return faces.at(fid_ptr + offset);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-const std::vector<int> &Quadmesh::vector_q_int_scalar() const
+vec3d Quadmesh<M,V,E,F>::face_vert(const uint fid, const uint offset) const
 {
-    return q_label;
+    return vert(face_vert_id(fid,offset));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+vec3d Quadmesh<M,V,E,F>::face_centroid(const uint fid) const
+{
+    vec3d c(0,0,0);
+    for(uint off=0; off<verts_per_face(); ++off)
+    {
+        c += face_vert(fid,off);
+    }
+    c /= static_cast<double>(verts_per_face());
+    return c;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+vec3d Quadmesh<M,V,E,F>::elem_centroid(const uint fid) const
+{
+    return face_centroid(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+uint Quadmesh<M,V,E,F>::edge_vert_id(const uint eid, const uint offset) const
+{
+    uint   eid_ptr = eid * 2;
+    return edges.at(eid_ptr + offset);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+vec3d Quadmesh<M,V,E,F>::edge_vert(const uint eid, const uint offset) const
+{
+    return vert(edge_vert_id(eid,offset));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::elem_show_all()
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        face_data(fid).visible = true;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool Quadmesh<M,V,E,F>::face_contains_vert(const uint fid, const uint vid) const
+{
+    for(uint off=0; off<verts_per_face(); ++off)
+    {
+        if (face_vert_id(fid,off) == vid) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool Quadmesh<M,V,E,F>::vert_is_singular(const uint vid) const
+{
+    return (adj_v2v(vid).size()!=4);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::vert_set_color(const Color & c)
+{
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        vert_data(vid).color = c;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::vert_set_alpha(const float alpha)
+{
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        vert_data(vid).color.a = alpha;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::edge_set_color(const Color & c)
+{
+    for(uint eid=0; eid<num_edges(); ++eid)
+    {
+        edge_data(eid).color = c;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::edge_set_alpha(const float alpha)
+{
+    for(uint eid=0; eid<num_edges(); ++eid)
+    {
+        edge_data(eid).color.a = alpha;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::face_set_color(const Color & c)
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        face_data(fid).color = c;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::face_set_alpha(const float alpha)
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        face_data(fid).color.a = alpha;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<float> Quadmesh<M,V,E,F>::export_uvw_param(const int mode) const
+{
+    std::vector<float> uvw;
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        switch (mode)
+        {
+            case U_param  : uvw.push_back(vert_data(vid).uvw[0]); break;
+            case V_param  : uvw.push_back(vert_data(vid).uvw[1]); break;
+            case W_param  : uvw.push_back(vert_data(vid).uvw[2]); break;
+            case UV_param : uvw.push_back(vert_data(vid).uvw[0]);
+                            uvw.push_back(vert_data(vid).uvw[1]); break;
+            case UW_param : uvw.push_back(vert_data(vid).uvw[0]);
+                            uvw.push_back(vert_data(vid).uvw[2]); break;
+            case VW_param : uvw.push_back(vert_data(vid).uvw[1]);
+                            uvw.push_back(vert_data(vid).uvw[2]); break;
+            case UVW_param: uvw.push_back(vert_data(vid).uvw[0]);
+                            uvw.push_back(vert_data(vid).uvw[1]);
+                            uvw.push_back(vert_data(vid).uvw[2]); break;
+            default: assert(false);
+        }
+    }
+    return uvw;
 }
 
 }

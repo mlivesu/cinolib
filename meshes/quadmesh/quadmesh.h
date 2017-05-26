@@ -27,6 +27,7 @@
 #include <cinolib/cinolib.h>
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/meshes/mesh_std_data.h>
 
 #include <assert.h>
 #include <float.h>
@@ -34,12 +35,12 @@
 #include <map>
 #include <set>
 #include <sys/types.h>
-
+#include <cinolib/meshes/quadmesh/quadmesh.h>
 
 namespace cinolib
 {
 
-static const int QUAD_EDGES[4][2] =
+static const uint QUAD_EDGES[4][2] =
 {
     { 0, 1 }, // 0
     { 1, 2 }, // 1
@@ -47,6 +48,10 @@ static const int QUAD_EDGES[4][2] =
     { 3, 0 }, // 3
 };
 
+template<class M = Mesh_std_data, // default template arguments
+         class V = Vert_std_data,
+         class E = Edge_std_data,
+         class F = Face_std_data>
 class Quadmesh
 {
     public:
@@ -55,98 +60,130 @@ class Quadmesh
 
         Quadmesh(const char * filename);
 
-        Quadmesh(const std::vector<double> & coords,
-                 const std::vector<u_int>  & quads);
+        Quadmesh(const std::vector<vec3d> & verts,
+                 const std::vector<uint>  & faces);
 
-        static const int verts_per_element = 4;
-        static const int edges_per_element = 4;
+        Quadmesh(const std::vector<double> & coords,
+                 const std::vector<uint>   & faces);
 
     protected:
 
-        std::string filename;
-
-        // bounding box
-        //
         Bbox bb;
 
-        // serialized xyz coordinates, quads and edges
+        std::vector<vec3d>             verts;
+        std::vector<uint>              edges;
+        std::vector<uint>              faces;
+        std::vector<std::vector<uint>> tessellated_faces; // triangles covering each quad. Useful for
+                                                          // robust normal estimation and rendering
+        // attributes
         //
-        std::vector<double> coords;
-        std::vector<u_int>  quads;
-        std::vector<u_int>  edges;
+        M              m_data;
+        std::vector<V> v_data;
+        std::vector<E> e_data;
+        std::vector<F> f_data;
 
-        // per vertex/triangle normals
+        // adjacencies -- Yes, I have lots of memory ;)
         //
-        std::vector<double> v_norm;
-        std::vector<double> q_norm;
-
-        // general purpose float and int scalars
-        //
-        std::vector<float> u_text;  // per vertex: 1D texturing
-        std::vector<int>   q_label; // per triangle
-
-        // adjacencies
-        //
-        std::vector< std::vector<int> > vtx2vtx;
-        std::vector< std::vector<int> > vtx2edg;
-        std::vector< std::vector<int> > vtx2quad;
-        std::vector< std::vector<int> > edg2quad;
-        std::vector< std::vector<int> > quad2edg;
-        std::vector< std::vector<int> > quad2quad;
-
-        void load(const char * filename);
-        void init();
+        std::vector<std::vector<uint>> v2v; // vert to vert adjacency
+        std::vector<std::vector<uint>> v2e; // vert to edge adjacency
+        std::vector<std::vector<uint>> v2f; // vert to face adjacency
+        std::vector<std::vector<uint>> e2f; // edge to face adjacency
+        std::vector<std::vector<uint>> f2e; // face to edge adjacency
+        std::vector<std::vector<uint>> f2f; // face to face adjacency
 
     public:
 
-        void                        clear();
-        void                        update_adjacency();
-        void                        update_normals();
-        void                        update_q_normals();
-        void                        update_v_normals();
-        void                        update_bbox();
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        std::string                 loaded_file() const;
-        void                        save(const char * filename) const;
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        int                         num_vertices()  const;
-        int                         num_quads()     const;
-        int                         num_elements()  const;
-        int                         num_edges()     const;
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        const std::vector<int> &    adj_vtx2vtx(const int vid) const;
-        const std::vector<int> &    adj_vtx2edg(const int vid) const;
-        const std::vector<int> &    adj_vtx2quad(const int vid) const;
-        const std::vector<int> &    adj_edg2quad(const int eid) const;
-        const std::vector<int> &    adj_quad2edg(const int qid) const;
-        const std::vector<int> &    adj_quad2quad(const int qid) const;
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        const Bbox                & bbox()                  const;
-        const std::vector<double> & vector_coords()         const;
-        const std::vector<u_int>  & vector_quads()          const;
-        const std::vector<u_int>  & vector_edges()          const;
-        const std::vector<float>  & vector_v_float_scalar() const;
-        const std::vector<int>    & vector_q_int_scalar()   const;
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        int                         edge_vertex_id(const int eid, const int offset) const;
-        vec3d                       edge_vertex(const int eid, const int offset) const;
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        int                         quad_vertex_id(const int qid, const int offset) const;
-        vec3d                       quad_vertex(const int qid, const int offset) const;
-        vec3d                       quad_normal(const int qid) const;
-        int                         quad_label(const int qid) const;
-        void                        quad_set_label(const int qid, const int i);
-        bool                        quad_contains_vertex(const int qid, const int vid) const;
-        vec3d                       element_barycenter(const int qid) const;
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        double                      vertex_mass (const int vid) const;
-        vec3d                       vertex_normal(const int vid) const;
-        vec3d                       vertex(const int vid) const;
-        void                        set_vertex(const int vid, const vec3d & pos);
-        int                         vertex_valence(const int vid) const;
-        float                       vertex_u_text(const int vid) const;
-        void                        set_vertex_u_text(const int vid, const float s);
-        bool                        vertex_is_singular(const int vid);
+        void clear();
+        void init();
+        void load(const char * filename);
+        void save(const char * filename) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void update_adjacency();
+        void update_bbox();
+        void update_f_normals();
+        void update_v_normals();
+        void update_normals();
+        void update_face_tessellation();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        uint verts_per_face() const { return 4; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        uint num_verts() const { return verts.size();                    }
+        uint num_edges() const { return edges.size() / 2;                }
+        uint num_faces() const { return faces.size() / verts_per_face(); }
+        uint num_elems() const { return faces.size() / verts_per_face(); } // elem == face!!
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const Bbox                & bbox()          const { return bb;    }
+        const std::vector<uint>   & vector_edges()  const { return edges; }
+        const std::vector<vec3d>  & vector_verts()  const { return verts; }
+              std::vector<double>   vector_coords() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        std::vector<float> export_uvw_param(const int mode) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
+        const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
+        const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
+        const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
+        const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
+        const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const M & mesh_data()               const { return m_data;         }
+              M & mesh_data()                     { return m_data;         }
+        const V & vert_data(const uint vid) const { return v_data.at(vid); }
+              V & vert_data(const uint vid)       { return v_data.at(vid); }
+        const E & edge_data(const uint eid) const { return e_data.at(eid); }
+              E & edge_data(const uint eid)       { return e_data.at(eid); }
+        const F & face_data(const uint fid) const { return f_data.at(fid); }
+              F & face_data(const uint fid)       { return f_data.at(fid); }
+        const F & elem_data(const uint fid) const { return f_data.at(fid); } // elem == face!!
+              F & elem_data(const uint fid)       { return f_data.at(fid); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+  const vec3d & vert            (const uint vid) const { return verts.at(vid); }
+        vec3d & vert            (const uint vid)       { return verts.at(vid); }
+        bool    vert_is_singular(const uint vid) const;
+virtual void    vert_set_color  (const Color & c);
+virtual void    vert_set_alpha  (const float alpha);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d edge_vert     (const uint eid, const uint offset) const;
+        uint  edge_vert_id  (const uint eid, const uint offset) const;
+virtual void  edge_set_color(const Color & c);
+virtual void  edge_set_alpha(const float alpha);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        uint  face_vert_id      (const uint fid, const uint offset) const;
+        vec3d face_vert         (const uint fid, const uint offset) const;
+        vec3d face_centroid     (const uint fid) const;
+        bool  face_contains_vert(const uint fid, const uint vid) const;
+virtual void  face_set_color    (const Color & c);
+virtual void  face_set_alpha    (const float alpha);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        // These are all wraps for the "face_ methods". They are useful for generic
+        // programming, because "elem_" will wrap face_ for surface meshes and wrap
+        // "cell_" for volumetric meshes, allowing the use of templated algorithms
+        // that work with both types of meshes without requiring specialzed code
+
+        vec3d elem_centroid(const uint fid) const;
+        void  elem_show_all();
 };
 
 }

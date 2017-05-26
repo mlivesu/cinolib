@@ -22,300 +22,408 @@
 * for more details.                                                         *
 ****************************************************************************/
 #include <cinolib/meshes/quadmesh/drawable_quadmesh.h>
-#include <cinolib/textures/quality_ramp_texture.h>
-#include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
-#include <cinolib/textures/isolines_texture.h>
-#include <cinolib/colors.h>
+#include <cinolib/textures/textures.h>
 
 namespace cinolib
 {
 
+template<class M, class V, class E, class F>
 CINO_INLINE
-DrawableQuadmesh::DrawableQuadmesh() : Quadmesh()
+DrawableQuadmesh<M,V,E,F>::DrawableQuadmesh() : Quadmesh<M,V,E,F>()
 {
-    init();
+    init_drawable_stuff();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-DrawableQuadmesh::DrawableQuadmesh(const char *filename) : Quadmesh(filename)
+DrawableQuadmesh<M,V,E,F>::DrawableQuadmesh(const char * filename) : Quadmesh<M,V,E,F>(filename)
 {
-    init();
+    init_drawable_stuff();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-DrawableQuadmesh::DrawableQuadmesh(const std::vector<double> &coords,
-                                   const std::vector<u_int>  &quads) : Quadmesh(coords, quads)
+DrawableQuadmesh<M,V,E,F>::DrawableQuadmesh(const std::vector<vec3d> & verts,
+                                            const std::vector<uint>  & faces)
+    : Quadmesh<M,V,E,F>(verts,faces)
 {
-    init();
+    init_drawable_stuff();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableQuadmesh::init()
+DrawableQuadmesh<M,V,E,F>::DrawableQuadmesh(const std::vector<double> & coords,
+                                            const std::vector<uint>   & faces)
+    : Quadmesh<M,V,E,F>(coords,faces)
 {
-    type               = QUADMESH;
-    draw_mode          = DRAW_MESH | DRAW_SMOOTH | DRAW_FACECOLOR;
-
-    texture_id         = 0;
-
-    wireframe_width    = 1;
-    wireframe_color[0] = 0.1;
-    wireframe_color[1] = 0.1;
-    wireframe_color[2] = 0.1;
-    wireframe_color[3] = 1.0;
-
-    border_width       = 4;
-    border_color[0]    = 0.1;
-    border_color[1]    = 0.1;
-    border_color[2]    = 0.1;
-    border_color[3]    = 1.0;
-
-    set_v_color(0.1, 0.8, 0.1);
-    set_q_color(0.1, 0.8, 0.1);
-    //color_wrt_quad_scalar();
+    init_drawable_stuff();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableQuadmesh::clear()
+void DrawableQuadmesh<M,V,E,F>::init_drawable_stuff()
 {
-    Quadmesh::clear();
-    v_colors.clear();
-    q_colors.clear();
+    type   = QUADMESH;
+    slicer = MeshSlicer<Quadmesh<M,V,E,F>>(*this);
+
+    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
+    drawlist.seg_width = 1;
+
+    updateGL();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d DrawableQuadmesh::scene_center() const
+void DrawableQuadmesh<M,V,E,F>::draw(const float) const
 {
-    return bb.center();
+    render(drawlist);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-float DrawableQuadmesh::scene_radius() const
+void DrawableQuadmesh<M,V,E,F>::updateGL()
 {
-    return bb.diag() * 0.5;
-}
+    drawlist.tri_coords.clear();
+    drawlist.tris.clear();
+    drawlist.tri_v_norms.clear();
+    drawlist.tri_v_colors.clear();
+    drawlist.tri_text1D.clear();
+    drawlist.segs.clear();
+    drawlist.seg_coords.clear();
+    drawlist.seg_colors.clear();
 
-CINO_INLINE
-void DrawableQuadmesh::draw(const float) const
-{
-    RenderFaceData data;
-    data.face_type       = GL_QUADS;
-    data.draw_mode       = draw_mode;
-    data.coords          = &coords;
-    data.faces           = &quads;
-    data.v_norms         = &v_norm;
-    data.v_colors        = &v_colors;
-    data.f_colors        = &q_colors;
-    data.text1D          = &u_text;
-    data.border_coords   = &border_coords;
-    data.border_segs     = &border_segs;
-    data.wireframe_color = wireframe_color;
-    data.wireframe_width = wireframe_width;
-    data.border_color    = border_color;
-    data.border_width    = border_width;
-
-    render_faces(data);
-}
-
-CINO_INLINE
-void DrawableQuadmesh::set_draw_mesh(bool b)
-{
-    if (b) draw_mode |=  DRAW_MESH;
-    else   draw_mode &= ~DRAW_MESH;
-}
-
-CINO_INLINE
-void DrawableQuadmesh::set_wireframe(bool b)
-{
-    if (b) draw_mode |=  DRAW_WIREFRAME;
-    else   draw_mode &= ~DRAW_WIREFRAME;
-}
-
-CINO_INLINE
-void DrawableQuadmesh::set_border(bool b)
-{
-    if (b) draw_mode |=  DRAW_BORDER;
-    else   draw_mode &= ~DRAW_BORDER;
-}
-
-CINO_INLINE
-void DrawableQuadmesh::set_flat_shading()
-{
-    draw_mode |=  DRAW_FLAT;
-    draw_mode &= ~DRAW_SMOOTH;
-    draw_mode &= ~DRAW_POINTS;
-}
-
-CINO_INLINE
-void DrawableQuadmesh::set_smooth_shading()
-{
-    draw_mode |=  DRAW_SMOOTH;
-    draw_mode &= ~DRAW_FLAT;
-    draw_mode &= ~DRAW_POINTS;
-}
-
-CINO_INLINE
-void DrawableQuadmesh::set_points_shading()
-{
-    draw_mode |=  DRAW_POINTS;
-    draw_mode &= ~DRAW_FLAT;
-    draw_mode &= ~DRAW_SMOOTH;    
-}
-
-CINO_INLINE
-void DrawableQuadmesh::set_enable_vertex_color()
-{
-    draw_mode |=  DRAW_VERTEXCOLOR;
-    draw_mode &= ~DRAW_FACECOLOR;
-    draw_mode &= ~DRAW_TEXTURE1D;
-    glDisable(GL_TEXTURE_1D);
-}
-
-CINO_INLINE
-void DrawableQuadmesh::set_enable_quad_color()
-{
-    draw_mode |=  DRAW_FACECOLOR;
-    draw_mode &= ~DRAW_VERTEXCOLOR;
-    draw_mode &= ~DRAW_TEXTURE1D;
-    glDisable(GL_TEXTURE_1D);
-}
-
-CINO_INLINE
-void DrawableQuadmesh::set_enable_texture1D(int texture)
-{
-    draw_mode |=  DRAW_TEXTURE1D;
-    draw_mode &= ~DRAW_VERTEXCOLOR;
-    draw_mode &= ~DRAW_FACECOLOR;
-
-    if (texture_id > 0)
+    for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        glDeleteTextures(1, &texture_id);
+        if (!(this->face_data(fid).visible)) continue;
+
+        for(uint i=0; i< this->tessellated_faces.at(fid).size()/3; ++i)
+        {
+            int vid0 = this->tessellated_faces.at(fid).at(3*i+0);
+            int vid1 = this->tessellated_faces.at(fid).at(3*i+1);
+            int vid2 = this->tessellated_faces.at(fid).at(3*i+2);
+
+            int base_addr = drawlist.tri_coords.size()/3;
+
+            drawlist.tris.push_back(base_addr    );
+            drawlist.tris.push_back(base_addr + 1);
+            drawlist.tris.push_back(base_addr + 2);
+
+            drawlist.tri_coords.push_back(this->vert(vid0).x());
+            drawlist.tri_coords.push_back(this->vert(vid0).y());
+            drawlist.tri_coords.push_back(this->vert(vid0).z());
+            drawlist.tri_coords.push_back(this->vert(vid1).x());
+            drawlist.tri_coords.push_back(this->vert(vid1).y());
+            drawlist.tri_coords.push_back(this->vert(vid1).z());
+            drawlist.tri_coords.push_back(this->vert(vid2).x());
+            drawlist.tri_coords.push_back(this->vert(vid2).y());
+            drawlist.tri_coords.push_back(this->vert(vid2).z());
+
+            drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.x());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.y());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.z());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.x());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.y());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.z());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.x());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.y());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.z());
+
+            drawlist.tri_text1D.push_back(this->vert_data(vid0).uvw[0]);
+            drawlist.tri_text1D.push_back(this->vert_data(vid1).uvw[0]);
+            drawlist.tri_text1D.push_back(this->vert_data(vid2).uvw[0]);
+
+            if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
+            {
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
+            }
+            else if (drawlist.draw_mode & DRAW_TRI_VERTCOLOR)
+            {
+                drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.r);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.g);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.b);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.a);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.r);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.g);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.b);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.a);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.r);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.g);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.b);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.a);
+            }
+        }
     }
 
-    glGenTextures(1, &texture_id);
-    glBindTexture(GL_TEXTURE_1D, texture_id);
+    // bake wireframe as border
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        bool masked = true;
+        for(uint fid : this->adj_e2f(eid))
+        {
+            if (this->face_data(fid).visible) masked = false;
+        }
+        if (masked) continue;
 
+        int base_addr = drawlist.seg_coords.size()/3;
+        drawlist.segs.push_back(base_addr    );
+        drawlist.segs.push_back(base_addr + 1);
+
+        vec3d vid0 = this->edge_vert(eid,0);
+        vec3d vid1 = this->edge_vert(eid,1);
+
+        drawlist.seg_coords.push_back(vid0.x());
+        drawlist.seg_coords.push_back(vid0.y());
+        drawlist.seg_coords.push_back(vid0.z());
+        drawlist.seg_coords.push_back(vid1.x());
+        drawlist.seg_coords.push_back(vid1.y());
+        drawlist.seg_coords.push_back(vid1.z());
+
+        if (drawlist.draw_mode & DRAW_SEG_SEGCOLOR)
+        {
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
+            drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableQuadmesh<M,V,E,F>::slice(const float thresh, // thresh on centroids or quality
+                                         const int   item,   // X, Y, Z, L, Q
+                                         const int   sign,   // either LEQ or GEQ
+                                         const int   mode)   // either AND or OR
+{
+    slicer.update(*this, thresh, item, sign, mode); // update per element visibility flags
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableQuadmesh<M,V,E,F>::show_mesh(const bool b)
+{
+    if (b) drawlist.draw_mode |=  DRAW_TRIS;
+    else   drawlist.draw_mode &= ~DRAW_TRIS;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableQuadmesh<M,V,E,F>::show_mesh_flat()
+{
+    drawlist.draw_mode |=  DRAW_TRI_FLAT;
+    drawlist.draw_mode &= ~DRAW_TRI_SMOOTH;
+    drawlist.draw_mode &= ~DRAW_TRI_POINTS;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableQuadmesh<M,V,E,F>::show_mesh_smooth()
+{
+    drawlist.draw_mode |=  DRAW_TRI_SMOOTH;
+    drawlist.draw_mode &= ~DRAW_TRI_FLAT;
+    drawlist.draw_mode &= ~DRAW_TRI_POINTS;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableQuadmesh<M,V,E,F>::show_mesh_points()
+{
+    drawlist.draw_mode |=  DRAW_TRI_POINTS;
+    drawlist.draw_mode &= ~DRAW_TRI_FLAT;
+    drawlist.draw_mode &= ~DRAW_TRI_SMOOTH;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableQuadmesh<M,V,E,F>::show_vert_color()
+{
+    drawlist.draw_mode |=  DRAW_TRI_VERTCOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    glDisable(GL_TEXTURE_1D);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableQuadmesh<M,V,E,F>::show_face_color()
+{
+    drawlist.draw_mode |=  DRAW_TRI_FACECOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    glDisable(GL_TEXTURE_1D);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableQuadmesh<M,V,E,F>::show_face_texture1D(const GLint texture)
+{
+    drawlist.draw_mode |=  DRAW_TRI_TEXTURE1D;
+    drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
+
+    if (drawlist.tri_text1D_id > 0) glDeleteTextures(1, &drawlist.tri_text1D_id);
+    glGenTextures(1, &drawlist.tri_text1D_id);
+    glBindTexture(GL_TEXTURE_1D, drawlist.tri_text1D_id);
     switch (texture)
     {
-        case TEXTURE_ISOLINES:
-        {
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D);
-            break;
-        }
-
-        case TEXTURE_QUALITY_RAMP:
-        {
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D);
-            break;
-        }
-
-        case TEXTURE_QUALITY_RAMP_W_ISOLINES:
-        {
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines);
-            break;
-        }
-
+        case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
+        case TEXTURE_QUALITY_RAMP           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D); break;
+        case TEXTURE_QUALITY_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
         default : assert("Unknown 1D Texture" && false);
     }
-
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable(GL_TEXTURE_1D);
+
+    updateGL();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableQuadmesh::set_wireframe_color(float r, float g, float b)
+void DrawableQuadmesh<M,V,E,F>::show_face_wireframe(const bool b)
 {
-    wireframe_color[0] = r;
-    wireframe_color[1] = g;
-    wireframe_color[2] = b;
+    if (b) drawlist.draw_mode |=  DRAW_SEGS;
+    else   drawlist.draw_mode &= ~DRAW_SEGS;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableQuadmesh::set_wireframe_width(float width)
+void DrawableQuadmesh<M,V,E,F>::show_face_wireframe_color(const Color & c)
 {
-    wireframe_width = width;
+    edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableQuadmesh::set_wireframe_transparency(float alpha)
+void DrawableQuadmesh<M,V,E,F>::show_face_wireframe_width(const float width)
 {
-    wireframe_color[3] = alpha;
+    drawlist.seg_width = width;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableQuadmesh::set_border_color(float r, float g, float b)
+void DrawableQuadmesh<M,V,E,F>::show_face_wireframe_transparency(const float alpha)
 {
-    border_color[0] = r;
-    border_color[1] = g;
-    border_color[2] = b;
+    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableQuadmesh::set_border_width(float width)
+void DrawableQuadmesh<M,V,E,F>::vert_set_color(const Color & c)
 {
-    border_width = width;
+    Quadmesh<M,V,E,F>::vert_set_color(c);
+    updateGL();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableQuadmesh::set_border_transparency(float alpha)
+void DrawableQuadmesh<M,V,E,F>::vert_set_alpha(const float a)
 {
-    border_color[3] = alpha;
+    Quadmesh<M,V,E,F>::vert_set_alpha(a);
+    updateGL();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableQuadmesh::set_v_color(float r, float g, float b)
+void DrawableQuadmesh<M,V,E,F>::edge_set_color(const Color & c)
 {
-    v_colors.resize(num_vertices()*3);
-    for(int i=0; i<(int)v_colors.size(); i+=3)
-    {
-        v_colors[i + 0] = r;
-        v_colors[i + 1] = g;
-        v_colors[i + 2] = b;
-    }
+    Quadmesh<M,V,E,F>::edge_set_color(c);
+    updateGL();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableQuadmesh::set_q_color(float r, float g, float b)
+void DrawableQuadmesh<M,V,E,F>::edge_set_alpha(const float a)
 {
-    q_colors.resize(num_quads()*3);
-    for(int i=0; i<(int)q_colors.size(); i+=3)
-    {
-        q_colors[i + 0] = r;
-        q_colors[i + 1] = g;
-        q_colors[i + 2] = b;
-    }
+    Quadmesh<M,V,E,F>::edge_set_alpha(a);
+    updateGL();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
 CINO_INLINE
-const float *DrawableQuadmesh::vertex_color(const int vid) const
+void DrawableQuadmesh<M,V,E,F>::face_set_color(const Color & c)
 {
-    return &(v_colors[vid*3]);
+    Quadmesh<M,V,E,F>::face_set_color(c);
+    updateGL();
 }
 
-CINO_INLINE
-const float *DrawableQuadmesh::quad_color(const int qid) const
-{
-    return &(q_colors[qid*3]);
-}
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableQuadmesh::set_vertex_color(const int vid, const float *color)
+void DrawableQuadmesh<M,V,E,F>::face_set_alpha(const float a)
 {
-    int vid_ptr = vid * 3;
-    v_colors.at(vid_ptr + 0) = color[0];
-    v_colors.at(vid_ptr + 1) = color[1];
-    v_colors.at(vid_ptr + 2) = color[2];
-}
-
-CINO_INLINE
-void DrawableQuadmesh::set_quad_color(const int qid, const float *color)
-{
-    int qid_ptr = qid * 3;
-    q_colors.at(qid_ptr + 0) = color[0];
-    q_colors.at(qid_ptr + 1) = color[1];
-    q_colors.at(qid_ptr + 2) = color[2];
+    Quadmesh<M,V,E,F>::face_set_alpha(a);
+    updateGL();
 }
 
 }
