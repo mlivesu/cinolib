@@ -401,9 +401,9 @@ CINO_INLINE
 vec3d Tri<M,V,E,F>::face_centroid(const uint fid) const
 {
     vec3d c(0,0,0);
-    for(uint offset=0; offset<verts_per_face(); ++offset)
+    for(uint off=0; off<verts_per_face(); ++off)
     {
-        c += face_vert(fid,offset);
+        c += face_vert(fid,off);
     }
     c /= static_cast<double>(verts_per_face());
     return c;
@@ -824,9 +824,10 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 bool Tri<M,V,E,F>::face_contains_vert(const uint fid, const uint vid) const
 {
-    if (face_vert_id(fid,0) == vid) return true;
-    if (face_vert_id(fid,1) == vid) return true;
-    if (face_vert_id(fid,2) == vid) return true;
+    for(uint off=0; off<verts_per_face(); ++off)
+    {
+        if (face_vert_id(fid,off) == vid) return true;
+    }
     return false;
 }
 
@@ -1828,6 +1829,34 @@ std::vector<uint> Tri<M,V,E,F>::vert_ordered_edge_link(const uint vid) const
     return e_link;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<float> Tri<M,V,E,F>::export_uvw_param(const int mode) const
+{
+    std::vector<float> uvw;
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        switch (mode)
+        {
+            case U_param  : uvw.push_back(vert_data(vid).uvw[0]); break;
+            case V_param  : uvw.push_back(vert_data(vid).uvw[1]); break;
+            case W_param  : uvw.push_back(vert_data(vid).uvw[2]); break;
+            case UV_param : uvw.push_back(vert_data(vid).uvw[0]);
+                            uvw.push_back(vert_data(vid).uvw[1]); break;
+            case UW_param : uvw.push_back(vert_data(vid).uvw[0]);
+                            uvw.push_back(vert_data(vid).uvw[2]); break;
+            case VW_param : uvw.push_back(vert_data(vid).uvw[1]);
+                            uvw.push_back(vert_data(vid).uvw[2]); break;
+            case UVW_param: uvw.push_back(vert_data(vid).uvw[0]);
+                            uvw.push_back(vert_data(vid).uvw[1]);
+                            uvw.push_back(vert_data(vid).uvw[2]); break;
+            default: assert(false);
+        }
+    }
+    return uvw;
+}
 
 
 }

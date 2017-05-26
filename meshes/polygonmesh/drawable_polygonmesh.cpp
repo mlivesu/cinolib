@@ -225,4 +225,186 @@ void DrawablePolygonmesh<M,V,E,F>::slice(const float thresh, // thresh on centro
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::show_mesh(const bool b)
+{
+    if (b) drawlist.draw_mode |=  DRAW_TRIS;
+    else   drawlist.draw_mode &= ~DRAW_TRIS;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::show_mesh_flat()
+{
+    drawlist.draw_mode |=  DRAW_TRI_FLAT;
+    drawlist.draw_mode &= ~DRAW_TRI_SMOOTH;
+    drawlist.draw_mode &= ~DRAW_TRI_POINTS;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::show_mesh_smooth()
+{
+    drawlist.draw_mode |=  DRAW_TRI_SMOOTH;
+    drawlist.draw_mode &= ~DRAW_TRI_FLAT;
+    drawlist.draw_mode &= ~DRAW_TRI_POINTS;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::show_mesh_points()
+{
+    drawlist.draw_mode |=  DRAW_TRI_POINTS;
+    drawlist.draw_mode &= ~DRAW_TRI_FLAT;
+    drawlist.draw_mode &= ~DRAW_TRI_SMOOTH;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::show_face_color()
+{
+    drawlist.draw_mode |=  DRAW_TRI_FACECOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    glDisable(GL_TEXTURE_1D);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::show_face_texture1D(const GLint texture)
+{
+    drawlist.draw_mode |=  DRAW_TRI_TEXTURE1D;
+    drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
+
+    if (drawlist.tri_text1D_id > 0) glDeleteTextures(1, &drawlist.tri_text1D_id);
+    glGenTextures(1, &drawlist.tri_text1D_id);
+    glBindTexture(GL_TEXTURE_1D, drawlist.tri_text1D_id);
+    switch (texture)
+    {
+        case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
+        case TEXTURE_QUALITY_RAMP           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D); break;
+        case TEXTURE_QUALITY_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
+        default : assert("Unknown 1D Texture" && false);
+    }
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glEnable(GL_TEXTURE_1D);
+
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe(const bool b)
+{
+    if (b) drawlist.draw_mode |=  DRAW_SEGS;
+    else   drawlist.draw_mode &= ~DRAW_SEGS;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe_color(const Color & c)
+{
+    edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe_width(const float width)
+{
+    drawlist.seg_width = width;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe_transparency(const float alpha)
+{
+    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::vert_set_color(const Color & c)
+{
+    Polygonmesh<M,V,E,F>::vert_set_color(c);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::vert_set_alpha(const float a)
+{
+    Polygonmesh<M,V,E,F>::vert_set_alpha(a);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::edge_set_color(const Color & c)
+{
+    Polygonmesh<M,V,E,F>::edge_set_color(c);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::edge_set_alpha(const float a)
+{
+    Polygonmesh<M,V,E,F>::edge_set_alpha(a);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::face_set_color(const Color & c)
+{
+    Polygonmesh<M,V,E,F>::face_set_color(c);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawablePolygonmesh<M,V,E,F>::face_set_alpha(const float a)
+{
+    Polygonmesh<M,V,E,F>::face_set_alpha(a);
+    updateGL();
+}
+
 }

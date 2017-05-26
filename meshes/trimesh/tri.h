@@ -106,10 +106,10 @@ virtual void operator+=(const Tri & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint num_verts() const { return verts.size();   }
-        uint num_edges() const { return edges.size()/2; }
-        uint num_faces() const { return faces.size()/3; }
-        uint num_elems() const { return faces.size()/3; } // elem == face!!
+        uint num_verts() const { return verts.size();                    }
+        uint num_edges() const { return edges.size() / 2;                }
+        uint num_faces() const { return faces.size() / verts_per_face(); }
+        uint num_elems() const { return faces.size() / verts_per_face(); } // elem == face!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -117,6 +117,10 @@ virtual void operator+=(const Tri & m);
         const std::vector<uint>   & vector_edges()  const { return edges; }
         const std::vector<vec3d>  & vector_verts()  const { return verts; }
               std::vector<double>   vector_coords() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        std::vector<float> export_uvw_param(const int mode) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

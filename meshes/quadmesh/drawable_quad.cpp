@@ -21,15 +21,14 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include <cinolib/meshes/trimesh/drawable_tri.h>
-
+#include <cinolib/meshes/quadmesh/drawable_quad.h>
 
 namespace cinolib
 {
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-DrawableTri<M,V,E,F>::DrawableTri() : Tri<M,V,E,F>()
+DrawableQuad<M,V,E,F>::DrawableQuad() : Quad<M,V,E,F>()
 {
     init_drawable_stuff();
 }
@@ -38,7 +37,7 @@ DrawableTri<M,V,E,F>::DrawableTri() : Tri<M,V,E,F>()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-DrawableTri<M,V,E,F>::DrawableTri(const char * filename) : Tri<M,V,E,F>(filename)
+DrawableQuad<M,V,E,F>::DrawableQuad(const char * filename) : Quad<M,V,E,F>(filename)
 {
     init_drawable_stuff();
 }
@@ -47,9 +46,9 @@ DrawableTri<M,V,E,F>::DrawableTri(const char * filename) : Tri<M,V,E,F>(filename
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-DrawableTri<M,V,E,F>::DrawableTri(const std::vector<vec3d> & verts,
-                                  const std::vector<uint>  & faces)
-    : Tri<M,V,E,F>(verts,faces)
+DrawableQuad<M,V,E,F>::DrawableQuad(const std::vector<vec3d> & verts,
+                                    const std::vector<uint>  & faces)
+    : Quad<M,V,E,F>(verts,faces)
 {
     init_drawable_stuff();
 }
@@ -58,9 +57,9 @@ DrawableTri<M,V,E,F>::DrawableTri(const std::vector<vec3d> & verts,
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-DrawableTri<M,V,E,F>::DrawableTri(const std::vector<double> & coords,
-                                  const std::vector<uint>   & faces)
-    : Tri<M,V,E,F>(coords,faces)
+DrawableQuad<M,V,E,F>::DrawableQuad(const std::vector<double> & coords,
+                                    const std::vector<uint>   & faces)
+    : Quad<M,V,E,F>(coords,faces)
 {
     init_drawable_stuff();
 }
@@ -69,12 +68,12 @@ DrawableTri<M,V,E,F>::DrawableTri(const std::vector<double> & coords,
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::init_drawable_stuff()
+void DrawableQuad<M,V,E,F>::init_drawable_stuff()
 {
-    type   = TRIMESH;
-    slicer = MeshSlicer<Tri<M,V,E,F>>(*this);
+    type   = QUADMESH;
+    slicer = MeshSlicer<Quad<M,V,E,F>>(*this);
 
-    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
+    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
     drawlist.seg_width = 1;
 
     updateGL();
@@ -84,7 +83,7 @@ void DrawableTri<M,V,E,F>::init_drawable_stuff()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::draw(const float) const
+void DrawableQuad<M,V,E,F>::draw(const float) const
 {
     render(drawlist);
 }
@@ -93,7 +92,7 @@ void DrawableTri<M,V,E,F>::draw(const float) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::updateGL()
+void DrawableQuad<M,V,E,F>::updateGL()
 {
     drawlist.tri_coords.clear();
     drawlist.tris.clear();
@@ -107,65 +106,68 @@ void DrawableTri<M,V,E,F>::updateGL()
     {
         if (!(this->face_data(fid).visible)) continue;
 
-        int vid0 = this->face_vert_id(fid,0);
-        int vid1 = this->face_vert_id(fid,1);
-        int vid2 = this->face_vert_id(fid,2);
-
-        int base_addr = drawlist.tri_coords.size()/3;
-
-        drawlist.tris.push_back(base_addr    );
-        drawlist.tris.push_back(base_addr + 1);
-        drawlist.tris.push_back(base_addr + 2);
-
-        drawlist.tri_coords.push_back(this->vert(vid0).x());
-        drawlist.tri_coords.push_back(this->vert(vid0).y());
-        drawlist.tri_coords.push_back(this->vert(vid0).z());
-        drawlist.tri_coords.push_back(this->vert(vid1).x());
-        drawlist.tri_coords.push_back(this->vert(vid1).y());
-        drawlist.tri_coords.push_back(this->vert(vid1).z());
-        drawlist.tri_coords.push_back(this->vert(vid2).x());
-        drawlist.tri_coords.push_back(this->vert(vid2).y());
-        drawlist.tri_coords.push_back(this->vert(vid2).z());
-
-        drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.x());
-        drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.y());
-        drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.z());
-        drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.x());
-        drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.y());
-        drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.z());
-        drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.x());
-        drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.y());
-        drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.z());
-
-        if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
+        for(uint i=0; i< this->tessellated_faces.at(fid).size()/3; ++i)
         {
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
-        }
-        else if (drawlist.draw_mode & DRAW_TRI_VERTCOLOR)
-        {
-            drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.r);
-            drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.g);
-            drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.b);
-            drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.a);
-            drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.r);
-            drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.g);
-            drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.b);
-            drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.a);
-            drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.r);
-            drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.g);
-            drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.b);
-            drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.a);
+            int vid0 = this->tessellated_faces.at(fid).at(3*i+0);
+            int vid1 = this->tessellated_faces.at(fid).at(3*i+1);
+            int vid2 = this->tessellated_faces.at(fid).at(3*i+2);
+
+            int base_addr = drawlist.tri_coords.size()/3;
+
+            drawlist.tris.push_back(base_addr    );
+            drawlist.tris.push_back(base_addr + 1);
+            drawlist.tris.push_back(base_addr + 2);
+
+            drawlist.tri_coords.push_back(this->vert(vid0).x());
+            drawlist.tri_coords.push_back(this->vert(vid0).y());
+            drawlist.tri_coords.push_back(this->vert(vid0).z());
+            drawlist.tri_coords.push_back(this->vert(vid1).x());
+            drawlist.tri_coords.push_back(this->vert(vid1).y());
+            drawlist.tri_coords.push_back(this->vert(vid1).z());
+            drawlist.tri_coords.push_back(this->vert(vid2).x());
+            drawlist.tri_coords.push_back(this->vert(vid2).y());
+            drawlist.tri_coords.push_back(this->vert(vid2).z());
+
+            drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.x());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.y());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.z());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.x());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.y());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.z());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.x());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.y());
+            drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.z());
+
+            if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
+            {
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
+                drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
+            }
+            else if (drawlist.draw_mode & DRAW_TRI_VERTCOLOR)
+            {
+                drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.r);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.g);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.b);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.a);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.r);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.g);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.b);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.a);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.r);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.g);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.b);
+                drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.a);
+            }
         }
     }
 
@@ -211,31 +213,20 @@ void DrawableTri<M,V,E,F>::updateGL()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::slice(const float thresh, // thresh on centroids or quality
-                                 const int   item,   // X, Y, Z, L, Q
-                                 const int   sign,   // either LEQ or GEQ
-                                 const int   mode)   // either AND or OR
+void DrawableQuad<M,V,E,F>::slice(const float thresh, // thresh on centroids or quality
+                                         const int   item,   // X, Y, Z, L, Q
+                                         const int   sign,   // either LEQ or GEQ
+                                         const int   mode)   // either AND or OR
 {
     slicer.update(*this, thresh, item, sign, mode); // update per element visibility flags
     updateGL();
 }
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::operator+=(const DrawableTri<M,V,E,F> & m)
-{
-    Tri<M,V,E,F>::operator +=(m);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTri<M,V,E,F>::show_mesh(const bool b)
+void DrawableQuad<M,V,E,F>::show_mesh(const bool b)
 {
     if (b) drawlist.draw_mode |=  DRAW_TRIS;
     else   drawlist.draw_mode &= ~DRAW_TRIS;
@@ -245,7 +236,7 @@ void DrawableTri<M,V,E,F>::show_mesh(const bool b)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::show_mesh_flat()
+void DrawableQuad<M,V,E,F>::show_mesh_flat()
 {
     drawlist.draw_mode |=  DRAW_TRI_FLAT;
     drawlist.draw_mode &= ~DRAW_TRI_SMOOTH;
@@ -256,7 +247,7 @@ void DrawableTri<M,V,E,F>::show_mesh_flat()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::show_mesh_smooth()
+void DrawableQuad<M,V,E,F>::show_mesh_smooth()
 {
     drawlist.draw_mode |=  DRAW_TRI_SMOOTH;
     drawlist.draw_mode &= ~DRAW_TRI_FLAT;
@@ -267,7 +258,7 @@ void DrawableTri<M,V,E,F>::show_mesh_smooth()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::show_mesh_points()
+void DrawableQuad<M,V,E,F>::show_mesh_points()
 {
     drawlist.draw_mode |=  DRAW_TRI_POINTS;
     drawlist.draw_mode &= ~DRAW_TRI_FLAT;
@@ -278,7 +269,7 @@ void DrawableTri<M,V,E,F>::show_mesh_points()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::show_face_color()
+void DrawableQuad<M,V,E,F>::show_face_color()
 {
     drawlist.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
@@ -292,7 +283,7 @@ void DrawableTri<M,V,E,F>::show_face_color()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::show_face_texture1D(const GLint texture)
+void DrawableQuad<M,V,E,F>::show_face_texture1D(const GLint texture)
 {
     drawlist.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
@@ -322,7 +313,7 @@ void DrawableTri<M,V,E,F>::show_face_texture1D(const GLint texture)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::show_face_wireframe(const bool b)
+void DrawableQuad<M,V,E,F>::show_face_wireframe(const bool b)
 {
     if (b) drawlist.draw_mode |=  DRAW_SEGS;
     else   drawlist.draw_mode &= ~DRAW_SEGS;
@@ -332,7 +323,7 @@ void DrawableTri<M,V,E,F>::show_face_wireframe(const bool b)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::show_face_wireframe_color(const Color & c)
+void DrawableQuad<M,V,E,F>::show_face_wireframe_color(const Color & c)
 {
     edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
 }
@@ -341,7 +332,7 @@ void DrawableTri<M,V,E,F>::show_face_wireframe_color(const Color & c)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::show_face_wireframe_width(const float width)
+void DrawableQuad<M,V,E,F>::show_face_wireframe_width(const float width)
 {
     drawlist.seg_width = width;
 }
@@ -350,7 +341,7 @@ void DrawableTri<M,V,E,F>::show_face_wireframe_width(const float width)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::show_face_wireframe_transparency(const float alpha)
+void DrawableQuad<M,V,E,F>::show_face_wireframe_transparency(const float alpha)
 {
     edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
 }
@@ -359,9 +350,9 @@ void DrawableTri<M,V,E,F>::show_face_wireframe_transparency(const float alpha)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::vert_set_color(const Color & c)
+void DrawableQuad<M,V,E,F>::vert_set_color(const Color & c)
 {
-    Tri<M,V,E,F>::vert_set_color(c);
+    Quad<M,V,E,F>::vert_set_color(c);
     updateGL();
 }
 
@@ -369,9 +360,9 @@ void DrawableTri<M,V,E,F>::vert_set_color(const Color & c)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::vert_set_alpha(const float a)
+void DrawableQuad<M,V,E,F>::vert_set_alpha(const float a)
 {
-    Tri<M,V,E,F>::vert_set_alpha(a);
+    Quad<M,V,E,F>::vert_set_alpha(a);
     updateGL();
 }
 
@@ -379,9 +370,9 @@ void DrawableTri<M,V,E,F>::vert_set_alpha(const float a)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::vert_remove_unreferenced(const uint vid)
+void DrawableQuad<M,V,E,F>::edge_set_color(const Color & c)
 {
-    Tri<M,V,E,F>::vert_remove_unreferenced(vid);
+    Quad<M,V,E,F>::edge_set_color(c);
     updateGL();
 }
 
@@ -389,20 +380,9 @@ void DrawableTri<M,V,E,F>::vert_remove_unreferenced(const uint vid)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-uint DrawableTri<M,V,E,F>::vert_add(const vec3d & pos, const V & data)
+void DrawableQuad<M,V,E,F>::edge_set_alpha(const float a)
 {
-    uint res = Tri<M,V,E,F>::vert_add(pos,data);
-    updateGL();
-    return res;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTri<M,V,E,F>::edge_set_color(const Color & c)
-{
-    Tri<M,V,E,F>::edge_set_color(c);
+    Quad<M,V,E,F>::edge_set_alpha(a);
     updateGL();
 }
 
@@ -410,9 +390,9 @@ void DrawableTri<M,V,E,F>::edge_set_color(const Color & c)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::edge_set_alpha(const float a)
+void DrawableQuad<M,V,E,F>::face_set_color(const Color & c)
 {
-    Tri<M,V,E,F>::edge_set_alpha(a);
+    Quad<M,V,E,F>::face_set_color(c);
     updateGL();
 }
 
@@ -420,61 +400,9 @@ void DrawableTri<M,V,E,F>::edge_set_alpha(const float a)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTri<M,V,E,F>::face_set_color(const Color & c)
+void DrawableQuad<M,V,E,F>::face_set_alpha(const float a)
 {
-    Tri<M,V,E,F>::face_set_color(c);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-bool DrawableTri<M,V,E,F>::edge_collapse(const uint eid)
-{
-    uint res = Tri<M,V,E,F>::edge_collapse(eid);
-    updateGL();
-    return res;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTri<M,V,E,F>::edge_remove_unreferenced(const uint eid)
-{
-    Tri<M,V,E,F>::edge_remove_unreferenced(eid);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTri<M,V,E,F>::face_set_alpha(const float a)
-{
-    Tri<M,V,E,F>::face_set_alpha(a);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-uint DrawableTri<M,V,E,F>::face_add(const uint vid0, const uint vid1, const uint vid2, const F & data)
-{
-    uint res = Tri<M,V,E,F>::face_add(vid0, vid1,vid2,data);
-    updateGL();
-    return res;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTri<M,V,E,F>::face_remove_unreferenced(const uint fid)
-{
-    Tri<M,V,E,F>::face_remove_unreferenced(fid);
+    Quad<M,V,E,F>::face_set_alpha(a);
     updateGL();
 }
 

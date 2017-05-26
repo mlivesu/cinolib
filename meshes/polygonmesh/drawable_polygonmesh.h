@@ -79,6 +79,28 @@ class DrawablePolygonmesh : public Polygonmesh<M,V,E,F>, public DrawableObject
 
         void slice(const float thresh, const int item, const int sign, const int mode);
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void show_mesh(const bool b);
+        void show_mesh_flat();
+        void show_mesh_smooth();
+        void show_mesh_points();
+        void show_face_color();
+        void show_face_texture1D(const GLint texture);
+        void show_face_wireframe(const bool b);
+        void show_face_wireframe_color(const Color & c);
+        void show_face_wireframe_width(const float width);
+        void show_face_wireframe_transparency(const float alpha);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        /* (Re)implementation of virtual methods (mainly to call updateGL())*/
+        void vert_set_color(const Color & c);
+        void vert_set_alpha(const float a);
+        void edge_set_color(const Color & c);
+        void edge_set_alpha(const float a);
+        void face_set_color(const Color & c);
+        void face_set_alpha(const float a);
 };
 
 }

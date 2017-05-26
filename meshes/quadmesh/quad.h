@@ -21,36 +21,50 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef CINO_POLYGONMESH_H
-#define CINO_POLYGONMESH_H
+#ifndef CINO_QUAD_H
+#define CINO_QUAD_H
 
-#include <vector>
 #include <cinolib/cinolib.h>
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/mesh_std_data.h>
 
+#include <assert.h>
+#include <float.h>
+#include <vector>
+#include <map>
+#include <set>
+#include <sys/types.h>
+#include <cinolib/meshes/quadmesh/quadmesh.h>
 
 namespace cinolib
 {
+
+//static const int QUAD_EDGES[4][2] =
+//{
+//    { 0, 1 }, // 0
+//    { 1, 2 }, // 1
+//    { 2, 3 }, // 2
+//    { 3, 0 }, // 3
+//};
 
 template<class M = Mesh_std_data, // default template arguments
          class V = Vert_std_data,
          class E = Edge_std_data,
          class F = Face_std_data>
-class Polygonmesh
+class Quad
 {
     public:
 
-        Polygonmesh(){}
+        Quad(){}
 
-        Polygonmesh(const char * filename);
+        Quad(const char * filename);
 
-        Polygonmesh(const std::vector<vec3d>             & verts,
-                    const std::vector<std::vector<uint>> & faces);
+        Quad(const std::vector<vec3d> & verts,
+             const std::vector<uint>  & faces);
 
-        Polygonmesh(const std::vector<double>            & coords,
-                    const std::vector<std::vector<uint>> & faces);
+        Quad(const std::vector<double> & coords,
+             const std::vector<uint>   & faces);
 
     protected:
 
@@ -58,8 +72,8 @@ class Polygonmesh
 
         std::vector<vec3d>             verts;
         std::vector<uint>              edges;
-        std::vector<std::vector<uint>> faces;
-        std::vector<std::vector<uint>> tessellated_faces; // triangles covering each face.Useful for
+        std::vector<uint>              faces;
+        std::vector<std::vector<uint>> tessellated_faces; // triangles covering each quad. Useful for
                                                           // robust normal estimation and rendering
         // attributes
         //
@@ -95,14 +109,14 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_face(const uint fid) const { return faces.at(fid).size(); }
+        uint verts_per_face() const { return 4; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint num_verts() const { return verts.size();   }
-        uint num_edges() const { return edges.size()/2; }
-        uint num_faces() const { return faces.size();   }
-        uint num_elems() const { return faces.size();   } // elem == face!!
+        uint num_verts() const { return verts.size();                    }
+        uint num_edges() const { return edges.size() / 2;                }
+        uint num_faces() const { return faces.size() / verts_per_face(); }
+        uint num_elems() const { return faces.size() / verts_per_face(); } // elem == face!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -139,10 +153,11 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-  const vec3d & vert          (const uint vid) const { return verts.at(vid); }
-        vec3d & vert          (const uint vid)       { return verts.at(vid); }
-virtual void    vert_set_color(const Color & c);
-virtual void    vert_set_alpha(const float alpha);
+  const vec3d & vert            (const uint vid) const { return verts.at(vid); }
+        vec3d & vert            (const uint vid)       { return verts.at(vid); }
+        bool    vert_is_singular(const uint vid) const;
+virtual void    vert_set_color  (const Color & c);
+virtual void    vert_set_alpha  (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -153,11 +168,12 @@ virtual void  edge_set_alpha(const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d face_vert     (const uint fid, const uint offset) const;
-        uint  face_vert_id  (const uint fid, const uint offset) const;
-        vec3d face_centroid (const uint fid) const;
-virtual void  face_set_color(const Color & c);
-virtual void  face_set_alpha(const float alpha);
+        uint  face_vert_id      (const uint fid, const uint offset) const;
+        vec3d face_vert         (const uint fid, const uint offset) const;
+        vec3d face_centroid     (const uint fid) const;
+        bool  face_contains_vert(const uint fid, const uint vid) const;
+virtual void  face_set_color    (const Color & c);
+virtual void  face_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -173,7 +189,7 @@ virtual void  face_set_alpha(const float alpha);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "polygonmesh.cpp"
+#include "quad.cpp"
 #endif
 
-#endif // CINO_POLYGONMESH_H
+#endif // CINO_QUAD_H

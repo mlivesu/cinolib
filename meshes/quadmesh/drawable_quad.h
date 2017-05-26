@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#ifndef CINO_DRAWABLE_TRI_H
-#define CINO_DRAWABLE_TRI_H
+#ifndef CINO_DRAWABLE_QUAD_H
+#define CINO_DRAWABLE_QUAD_H
 
 #ifdef CINOLIB_USES_OPENGL
 
@@ -35,7 +35,7 @@
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/gl/draw_lines_tris.h>
-#include <cinolib/meshes/trimesh/tri.h>
+#include <cinolib/meshes/quadmesh/quad.h>
 #include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
@@ -45,24 +45,24 @@ template<class M = Mesh_std_data, // default template arguments
          class V = Vert_std_data,
          class E = Edge_std_data,
          class F = Face_std_data>
-class DrawableTri : public Tri<M,V,E,F>, public DrawableObject
+class DrawableQuad : public Quad<M,V,E,F>, public DrawableObject
 {
     public:
 
-        DrawableTri();
+        DrawableQuad();
 
-        DrawableTri(const char * filename);
+        DrawableQuad(const char * filename);
 
-        DrawableTri(const std::vector<vec3d> & verts,
-                    const std::vector<uint>  & faces);
+        DrawableQuad(const std::vector<vec3d> & verts,
+                     const std::vector<uint>  & faces);
 
-        DrawableTri(const std::vector<double> & coords,
-                    const std::vector<uint>   & faces);
+        DrawableQuad(const std::vector<double> & coords,
+                     const std::vector<uint>   & faces);
 
     protected:
 
         RenderData drawlist;
-        MeshSlicer<Tri<M,V,E,F>> slicer;
+        MeshSlicer<Quad<M,V,E,F>> slicer;
 
     public:
 
@@ -95,27 +95,20 @@ class DrawableTri : public Tri<M,V,E,F>, public DrawableObject
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         /* (Re)implementation of virtual methods (mainly to call updateGL())*/
-        void operator+=              (const DrawableTri & m);
-        void vert_set_color          (const Color & c);
-        void vert_set_alpha          (const float a);
-        void vert_remove_unreferenced(const uint vid);
-        uint vert_add                (const vec3d & pos, const V & data);
-        void edge_set_color          (const Color & c);
-        void edge_set_alpha          (const float a);
-        bool edge_collapse           (const uint eid);
-        void edge_remove_unreferenced(const uint eid);
-        void face_set_color          (const Color & c);
-        void face_set_alpha          (const float a);
-        uint face_add                (const uint vid0, const uint vid1, const uint vid2, const F & data);
-        void face_remove_unreferenced(const uint fid);
+        void vert_set_color(const Color & c);
+        void vert_set_alpha(const float a);
+        void edge_set_color(const Color & c);
+        void edge_set_alpha(const float a);
+        void face_set_color(const Color & c);
+        void face_set_alpha(const float a);
 };
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "drawable_tri.cpp"
+#include "drawable_quad.cpp"
 #endif
 
 #endif // #ifdef CINOLIB_USES_OPENGL
 
-#endif // CINO_DRAWABLE_TRI_H
+#endif // CINO_DRAWABLE_QUAD_H

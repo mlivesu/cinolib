@@ -200,10 +200,10 @@ class Hexmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const vec3d & vert          (const uint vid) const { return verts.at(vid); }
-              vec3d & vert          (const uint vid)       { return verts.at(vid); }
-virtual       void    vert_set_color(const Color & c);
-virtual       void    vert_set_alpha(const float alpha);
+  const vec3d & vert          (const uint vid) const { return verts.at(vid); }
+        vec3d & vert          (const uint vid)       { return verts.at(vid); }
+virtual void    vert_set_color(const Color & c);
+virtual void    vert_set_alpha(const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

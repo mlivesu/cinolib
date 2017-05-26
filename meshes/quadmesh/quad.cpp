@@ -21,12 +21,13 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include <cinolib/meshes/polygonmesh/polygonmesh.h>
-#include <cinolib/common.h>
-#include <cinolib/io/read_write.h>
+#include <cinolib/meshes/quadmesh/quad.h>
+#include <cinolib/bfs.h>
 #include <cinolib/timer.h>
+#include <cinolib/io/read_write.h>
 #include <cinolib/geometry/plane.h>
-#include <map>
+
+#include <queue>
 
 namespace cinolib
 {
@@ -35,7 +36,7 @@ namespace cinolib
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-Polygonmesh<M,V,E,F>::Polygonmesh(const char * filename)
+Quad<M,V,E,F>::Quad(const char * filename)
 {
     load(filename);
     init();
@@ -45,8 +46,8 @@ Polygonmesh<M,V,E,F>::Polygonmesh(const char * filename)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<vec3d>             & verts,
-                                  const std::vector<std::vector<uint>> & faces)
+Quad<M,V,E,F>::Quad(const std::vector<vec3d> & verts,
+                    const std::vector<uint>  & faces)
 : verts(verts)
 , faces(faces)
 {
@@ -57,8 +58,8 @@ Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<vec3d>             & verts,
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<double>            & coords,
-                                  const std::vector<std::vector<uint>> & faces)
+Quad<M,V,E,F>::Quad(const std::vector<double> & coords,
+                    const std::vector<uint>   & faces)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
     this->faces = faces;
@@ -70,12 +71,13 @@ Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<double>            & coords,
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::load(const char * filename)
+void Quad<M,V,E,F>::load(const char * filename)
 {
-    timer_start("Load Polygonmesh");
+    timer_start("Load Quadmesh");
 
     clear();
     std::vector<double> coords;
+    std::vector<uint>   tris; // unused
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -83,12 +85,12 @@ void Polygonmesh<M,V,E,F>::load(const char * filename)
     if (filetype.compare(".off") == 0 ||
         filetype.compare(".OFF") == 0)
     {
-        read_OFF(filename, coords, faces);
+        read_OFF(filename, coords, tris, faces);
     }
     else if (filetype.compare(".obj") == 0 ||
              filetype.compare(".OBJ") == 0)
     {
-        read_OBJ(filename, coords, faces);
+        read_OBJ(filename, coords, tris, faces);
     }
     else
     {
@@ -98,23 +100,24 @@ void Polygonmesh<M,V,E,F>::load(const char * filename)
 
     verts = vec3d_from_serialized_xyz(coords);
 
-    logger << num_faces() << " polygons read" << endl;
-    logger << num_verts() << " vertices read" << endl;
+    logger << num_faces() << " quads read" << endl;
+    logger << num_verts() << " verts read" << endl;
 
     this->mesh_data().filename = std::string(filename);
 
-    timer_stop("Load Polygonmesh");
+    timer_stop("Load Quadmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::save(const char * filename) const
+void Quad<M,V,E,F>::save(const char * filename) const
 {
-    timer_start("Save Polygonmesh");
+    timer_start("Save Quadmesh");
 
     std::vector<double> coords = serialized_xyz_from_vec3d(verts);
+    std::vector<uint>   tris; // unused
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-3,3);
@@ -122,12 +125,12 @@ void Polygonmesh<M,V,E,F>::save(const char * filename) const
     if (filetype.compare("off") == 0 ||
         filetype.compare("OFF") == 0)
     {
-        write_OFF(filename, coords, faces);
+        write_OFF(filename, coords, tris, faces);
     }
     else if (filetype.compare(".obj") == 0 ||
              filetype.compare(".OBJ") == 0)
     {
-        write_OBJ(filename, coords, faces);
+        write_OBJ(filename, coords, tris, faces);
     }
     else
     {
@@ -135,14 +138,14 @@ void Polygonmesh<M,V,E,F>::save(const char * filename) const
         exit(-1);
     }
 
-    timer_stop("Save Polygonmesh");
+    timer_stop("Save Quadmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::clear()
+void Quad<M,V,E,F>::clear()
 {
     bb.reset();
     //
@@ -168,7 +171,7 @@ void Polygonmesh<M,V,E,F>::clear()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::init()
+void Quad<M,V,E,F>::init()
 {
     update_face_tessellation();
     update_adjacency();
@@ -185,43 +188,36 @@ void Polygonmesh<M,V,E,F>::init()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_face_tessellation()
+void Quad<M,V,E,F>::update_face_tessellation()
 {
     tessellated_faces.resize(num_faces());
-    std::set<uint> bad_faces;
 
     for(uint fid=0; fid<num_faces(); ++fid)
     {
-        // TODO: improve triangulation strategy (this assumes convexity!)
-        std::vector<vec3d> n;
-        for (uint i=2; i<verts_per_face(fid); ++i)
-        {
-            uint vid0 = faces.at(fid).at( 0 );
-            uint vid1 = faces.at(fid).at(i-1);
-            uint vid2 = faces.at(fid).at( i );
+        uint vid0 = face_vert_id(fid,0);
+        uint vid1 = face_vert_id(fid,1);
+        uint vid2 = face_vert_id(fid,2);
+        uint vid3 = face_vert_id(fid,3);
 
-            tessellated_faces.at(fid).push_back(vid0);
-            tessellated_faces.at(fid).push_back(vid1);
-            tessellated_faces.at(fid).push_back(vid2);
+        vec3d n1 = (vert(vid1)-vert(vid0)).cross(vert(vid2)-vert(vid0));
+        vec3d n2 = (vert(vid2)-vert(vid0)).cross(vert(vid3)-vert(vid0));
 
-            n.push_back((vert(vid1)-vert(vid0)).cross(vert(vid2)-vert(vid0)));
-        }
-        // check for badly tessellated polygons...
-        for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_faces.insert(fid);
+        bool flip = (n1.dot(n2) < 0); // flip diag: t(0,1,2) t(0,2,3) => t(0,1,3) t(1,2,3)
+
+        tessellated_faces.at(fid).push_back(vid0);
+        tessellated_faces.at(fid).push_back(vid1);
+        tessellated_faces.at(fid).push_back(flip ? vid3 : vid2);
+        tessellated_faces.at(fid).push_back(flip ? vid1 : vid0);
+        tessellated_faces.at(fid).push_back(vid2);
+        tessellated_faces.at(fid).push_back(vid3);
     }
-    //
-    for(uint fid : bad_faces)
-    {
-        std::cerr << "WARNING : Bad tessellation occurred for non-convex polygon " << fid << std::endl;
-    }
-
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_adjacency()
+void Quad<M,V,E,F>::update_adjacency()
 {
     timer_start("Build adjacency");
 
@@ -234,11 +230,10 @@ void Polygonmesh<M,V,E,F>::update_adjacency()
     std::map<ipair,std::vector<uint>> e2f_map;
     for(uint fid=0; fid<num_faces(); ++fid)
     {
-        assert(verts_per_face(fid)>2);
-        for(uint off=0; off<verts_per_face(fid); ++off)
+        for(uint off=0; off<verts_per_face(); ++off)
         {
-            uint vid0 = faces.at(fid).at(off);
-            uint vid1 = faces.at(fid).at((off+1)%verts_per_face(fid));
+            uint vid0 = face_vert_id(fid,off);
+            uint vid1 = face_vert_id(fid,(off+1)%verts_per_face());
             v2f.at(vid0).push_back(fid);
             e2f_map[unique_pair(vid0,vid1)].push_back(fid);
         }
@@ -299,7 +294,7 @@ void Polygonmesh<M,V,E,F>::update_adjacency()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_bbox()
+void Quad<M,V,E,F>::update_bbox()
 {
     bb.reset();
     for(uint vid=0; vid<num_verts(); ++vid)
@@ -314,7 +309,7 @@ void Polygonmesh<M,V,E,F>::update_bbox()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-std::vector<double> Polygonmesh<M,V,E,F>::vector_coords() const
+std::vector<double> Quad<M,V,E,F>::vector_coords() const
 {
     std::vector<double> coords;
     for(uint vid=0; vid<num_verts(); ++vid)
@@ -330,25 +325,23 @@ std::vector<double> Polygonmesh<M,V,E,F>::vector_coords() const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_f_normals()
+void Quad<M,V,E,F>::update_f_normals()
 {
     for(uint fid=0; fid<num_faces(); ++fid)
     {
-        assert(verts_per_face(fid)>2);
-
         // compute the best fitting plane
         std::vector<vec3d> points;
-        for(uint off=0; off<verts_per_face(fid); ++off) points.push_back(face_vert(fid,off));
+        for(uint off=0; off<verts_per_face(); ++off) points.push_back(face_vert(fid,off));
         Plane best_fit(points);
 
         // adjust orientation (n or -n?)
-        vec3d v0 = face_vert(fid,0);
-        vec3d v1 = face_vert(fid,1);
-        uint  i=2;
-        vec3d ccw;
-        do { ccw = (v1-v0).cross(face_vert(fid,i)-v0); } while (ccw.length_squared()==0 && i<verts_per_face(fid));
+        assert(tessellated_faces.at(fid).size()>2);
+        vec3d v0 = vert(tessellated_faces.at(fid).at(0));
+        vec3d v1 = vert(tessellated_faces.at(fid).at(1));
+        vec3d v2 = vert(tessellated_faces.at(fid).at(2));
+        vec3d n  = (v1-v0).cross(v2-v0);
 
-        face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
+        face_data(fid).normal = (best_fit.n.dot(n) < 0) ? -best_fit.n : best_fit.n;
     }
 }
 
@@ -356,7 +349,7 @@ void Polygonmesh<M,V,E,F>::update_f_normals()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_v_normals()
+void Quad<M,V,E,F>::update_v_normals()
 {
     for(uint vid=0; vid<num_verts(); ++vid)
     {
@@ -374,7 +367,7 @@ void Polygonmesh<M,V,E,F>::update_v_normals()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_normals()
+void Quad<M,V,E,F>::update_normals()
 {
     update_f_normals();
     update_v_normals();
@@ -384,16 +377,17 @@ void Polygonmesh<M,V,E,F>::update_normals()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-uint Polygonmesh<M,V,E,F>::face_vert_id(const uint fid, const uint offset) const
+uint Quad<M,V,E,F>::face_vert_id(const uint fid, const uint offset) const
 {
-    return faces.at(fid).at(offset);
+    uint fid_ptr = fid * verts_per_face();
+    return faces.at(fid_ptr + offset);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d Polygonmesh<M,V,E,F>::face_vert(const uint fid, const uint offset) const
+vec3d Quad<M,V,E,F>::face_vert(const uint fid, const uint offset) const
 {
     return vert(face_vert_id(fid,offset));
 }
@@ -402,14 +396,14 @@ vec3d Polygonmesh<M,V,E,F>::face_vert(const uint fid, const uint offset) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d Polygonmesh<M,V,E,F>::face_centroid(const uint fid) const
+vec3d Quad<M,V,E,F>::face_centroid(const uint fid) const
 {
     vec3d c(0,0,0);
-    for(uint vid : faces.at(fid))
+    for(uint off=0; off<verts_per_face(); ++off)
     {
-        c += vert(vid);
+        c += face_vert(fid,off);
     }
-    c /= static_cast<double>(verts_per_face(fid));
+    c /= static_cast<double>(verts_per_face());
     return c;
 }
 
@@ -417,7 +411,7 @@ vec3d Polygonmesh<M,V,E,F>::face_centroid(const uint fid) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d Polygonmesh<M,V,E,F>::elem_centroid(const uint fid) const
+vec3d Quad<M,V,E,F>::elem_centroid(const uint fid) const
 {
     return face_centroid(fid);
 }
@@ -426,7 +420,7 @@ vec3d Polygonmesh<M,V,E,F>::elem_centroid(const uint fid) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-uint Polygonmesh<M,V,E,F>::edge_vert_id(const uint eid, const uint offset) const
+uint Quad<M,V,E,F>::edge_vert_id(const uint eid, const uint offset) const
 {
     uint   eid_ptr = eid * 2;
     return edges.at(eid_ptr + offset);
@@ -436,7 +430,7 @@ uint Polygonmesh<M,V,E,F>::edge_vert_id(const uint eid, const uint offset) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d Polygonmesh<M,V,E,F>::edge_vert(const uint eid, const uint offset) const
+vec3d Quad<M,V,E,F>::edge_vert(const uint eid, const uint offset) const
 {
     return vert(edge_vert_id(eid,offset));
 }
@@ -445,7 +439,7 @@ vec3d Polygonmesh<M,V,E,F>::edge_vert(const uint eid, const uint offset) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::elem_show_all()
+void Quad<M,V,E,F>::elem_show_all()
 {
     for(uint fid=0; fid<num_faces(); ++fid)
     {
@@ -457,7 +451,29 @@ void Polygonmesh<M,V,E,F>::elem_show_all()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::vert_set_color(const Color & c)
+bool Quad<M,V,E,F>::face_contains_vert(const uint fid, const uint vid) const
+{
+    for(uint off=0; off<verts_per_face(); ++off)
+    {
+        if (face_vert_id(fid,off) == vid) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool Quad<M,V,E,F>::vert_is_singular(const uint vid) const
+{
+    return (adj_v2v(vid).size()!=4);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quad<M,V,E,F>::vert_set_color(const Color & c)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
     {
@@ -469,7 +485,7 @@ void Polygonmesh<M,V,E,F>::vert_set_color(const Color & c)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::vert_set_alpha(const float alpha)
+void Quad<M,V,E,F>::vert_set_alpha(const float alpha)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
     {
@@ -481,7 +497,7 @@ void Polygonmesh<M,V,E,F>::vert_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::edge_set_color(const Color & c)
+void Quad<M,V,E,F>::edge_set_color(const Color & c)
 {
     for(uint eid=0; eid<num_edges(); ++eid)
     {
@@ -493,7 +509,7 @@ void Polygonmesh<M,V,E,F>::edge_set_color(const Color & c)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::edge_set_alpha(const float alpha)
+void Quad<M,V,E,F>::edge_set_alpha(const float alpha)
 {
     for(uint eid=0; eid<num_edges(); ++eid)
     {
@@ -505,7 +521,7 @@ void Polygonmesh<M,V,E,F>::edge_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::face_set_color(const Color & c)
+void Quad<M,V,E,F>::face_set_color(const Color & c)
 {
     for(uint fid=0; fid<num_faces(); ++fid)
     {
@@ -517,7 +533,7 @@ void Polygonmesh<M,V,E,F>::face_set_color(const Color & c)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::face_set_alpha(const float alpha)
+void Quad<M,V,E,F>::face_set_alpha(const float alpha)
 {
     for(uint fid=0; fid<num_faces(); ++fid)
     {
@@ -529,7 +545,7 @@ void Polygonmesh<M,V,E,F>::face_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-std::vector<float> Polygonmesh<M,V,E,F>::export_uvw_param(const int mode) const
+std::vector<float> Quad<M,V,E,F>::export_uvw_param(const int mode) const
 {
     std::vector<float> uvw;
     for(uint vid=0; vid<num_verts(); ++vid)
@@ -553,5 +569,6 @@ std::vector<float> Polygonmesh<M,V,E,F>::export_uvw_param(const int mode) const
     }
     return uvw;
 }
+
 
 }
