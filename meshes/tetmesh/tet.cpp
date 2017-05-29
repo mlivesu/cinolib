@@ -21,8 +21,8 @@
 * GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
 * for more details.                                                         *
 ****************************************************************************/
-#include <cinolib/meshes/hexmesh/hexmesh.h>
-#include <cinolib/quality.h>
+#include <cinolib/meshes/tetmesh/tet.h>
+#include <cinolib/geometry/tetrahedron.h>
 #include <cinolib/timer.h>
 #include <cinolib/io/read_write.h>
 #include <cinolib/common.h>
@@ -38,8 +38,8 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-Hexmesh<M,V,E,F,C>::Hexmesh(const std::vector<vec3d> & verts,
-                            const std::vector<uint>  & cells)
+Tet<M,V,E,F,C>::Tet(const std::vector<vec3d> & verts,
+                    const std::vector<uint>  & cells)
 : verts(verts)
 , cells(cells)
 {
@@ -50,8 +50,8 @@ Hexmesh<M,V,E,F,C>::Hexmesh(const std::vector<vec3d> & verts,
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-Hexmesh<M,V,E,F,C>::Hexmesh(const std::vector<double> & coords,
-                            const std::vector<uint>   & cells)
+Tet<M,V,E,F,C>::Tet(const std::vector<double> & coords,
+                    const std::vector<uint>   & cells)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
     this->cells = cells;
@@ -62,65 +62,27 @@ Hexmesh<M,V,E,F,C>::Hexmesh(const std::vector<double> & coords,
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-Hexmesh<M,V,E,F,C>::Hexmesh(const char * filename)
+Tet<M,V,E,F,C>::Tet(const char * filename)
 {
-    timer_start("load hexmesh");
+    timer_start("load Tetmesh");
 
     load(filename);
     init();
 
-    //print_quality_statistics();
-
-    timer_stop("load hexmesh");
+    timer_stop("load Tetmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::print_quality(const bool list_folded_elements)
+void Tet<M,V,E,F,C>::load(const char * filename)
 {
-    if (list_folded_elements) logger << "Folded Hexa: ";
-
-    double asj = 0.0;
-    double msj = FLT_MAX;
-    uint    inv = 0;
-
-    for(uint cid=0; cid<num_cells(); ++cid)
-    {
-        double q = cell_data(cid).quality;
-
-        asj += q;
-        msj = std::min(msj, q);
-
-        if (q <= 0.0)
-        {
-            ++inv;
-            if (list_folded_elements) logger << cid << " - ";
-        }
-    }
-    asj /= static_cast<double>(num_cells());
-
-    if (list_folded_elements) logger << endl << endl;
-
-    logger << endl;
-    logger << "MIN SJ : " << msj << endl;
-    logger << "AVG SJ : " << asj << endl;
-    logger << "INV EL : " << inv << " (out of " << num_cells() << ")" << endl;
-    logger << endl;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Hexmesh<M,V,E,F,C>::load(const char * filename)
-{
-    timer_start("Load Hexmesh");
+    timer_start("Load Tetmesh");
 
     clear();
     std::vector<double> coords;
-    std::vector<uint>   tets; // not used here
+    std::vector<uint> hexa; // not used here
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -128,17 +90,17 @@ void Hexmesh<M,V,E,F,C>::load(const char * filename)
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        read_MESH(filename, coords, tets, cells);
+        read_MESH(filename, coords, cells, hexa);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        read_VTU(filename, coords, tets, cells);
+        read_VTU(filename, coords, cells, hexa);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        read_VTK(filename, coords, tets, cells);
+        read_VTK(filename, coords, cells, hexa);
     }
     else
     {
@@ -148,24 +110,24 @@ void Hexmesh<M,V,E,F,C>::load(const char * filename)
 
     verts = vec3d_from_serialized_xyz(coords);
 
-    logger << num_cells() << " hexahedra read" << endl;
-    logger << num_verts() << " vertices  read" << endl;
+    logger << num_cells() << " tetrahedra read" << endl;
+    logger << num_verts() << " vertices   read" << endl;
 
     this->mesh_data().filename = std::string(filename);
 
-    timer_stop("Load Hexmesh");
+    timer_stop("Load Tetmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::save(const char * filename) const
+void Tet<M,V,E,F,C>::save(const char * filename) const
 {
-    timer_start("Save Hexmesh");
+    timer_start("Save Tetmesh");
 
     std::vector<double> coords = serialized_xyz_from_vec3d(verts);
-    std::vector<uint>   tets; // not used here
+    std::vector<uint>   hexa; // not used here
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -173,17 +135,17 @@ void Hexmesh<M,V,E,F,C>::save(const char * filename) const
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        write_MESH(filename, coords, tets, cells);
+        write_MESH(filename, coords, cells, hexa);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        write_VTU(filename, coords, tets, cells);
+        write_VTU(filename, coords, cells, hexa);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        write_VTK(filename, coords, tets, cells);
+        write_VTK(filename, coords, cells, hexa);
     }
     else
     {
@@ -191,14 +153,14 @@ void Hexmesh<M,V,E,F,C>::save(const char * filename) const
         exit(-1);
     }
 
-    timer_stop("Save Hexmesh");
+    timer_stop("Save Tetmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::clear()
+void Tet<M,V,E,F,C>::clear()
 {
     bb.reset();
     //
@@ -234,7 +196,7 @@ void Hexmesh<M,V,E,F,C>::clear()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::init()
+void Tet<M,V,E,F,C>::init()
 {
     update_bbox();
     update_interior_adjacency();
@@ -246,9 +208,6 @@ void Hexmesh<M,V,E,F,C>::init()
     f_data.resize(num_faces());
 
     update_face_normals();
-    update_cell_quality();
-
-    print_quality();
 
     set_uvw_from_xyz(UVW_param);
 }
@@ -257,7 +216,7 @@ void Hexmesh<M,V,E,F,C>::init()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::update_bbox()
+void Tet<M,V,E,F,C>::update_bbox()
 {
     bb.reset();
     for(uint vid=0; vid<num_verts(); ++vid)
@@ -272,7 +231,7 @@ void Hexmesh<M,V,E,F,C>::update_bbox()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
+void Tet<M,V,E,F,C>::update_interior_adjacency()
 {
     timer_start("Build interior adjacency");
 
@@ -286,8 +245,7 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
     for(uint cid=0; cid<num_cells(); ++cid)
     {
         uint cid_ptr = cid * verts_per_cell();
-        uint vids[8] = { cells.at(cid_ptr+0), cells.at(cid_ptr+1), cells.at(cid_ptr+2), cells.at(cid_ptr+3),
-                         cells.at(cid_ptr+4), cells.at(cid_ptr+5), cells.at(cid_ptr+6), cells.at(cid_ptr+7) };
+        uint vids[4] = { cells.at(cid_ptr+0), cells.at(cid_ptr+1), cells.at(cid_ptr+2), cells.at(cid_ptr+3) };
 
         for(uint vid=0; vid<verts_per_cell(); ++vid)
         {
@@ -295,7 +253,7 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
         }
         for(uint eid=0; eid<edges_per_cell(); ++eid)
         {
-            ipair e = unique_pair(vids[HEXA_EDGES[eid][0]], vids[HEXA_EDGES[eid][1]]);
+            ipair e = unique_pair(vids[TET_EDGES[eid][0]], vids[TET_EDGES[eid][1]]);
             e2c_map[e].push_back(cid);
         }
     }
@@ -351,7 +309,7 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
     }
 
     logger << num_verts() << "\tvertices"  << endl;
-    logger << num_cells() << "\thexahedra" << endl;
+    logger << num_cells() << "\tetrahedra" << endl;
     logger << num_edges() << "\tedges"     << endl;
 
     timer_stop("Build interior adjacency");
@@ -361,7 +319,7 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
+void Tet<M,V,E,F,C>::update_surface_adjacency()
 {
     timer_start("Build Surface");
 
@@ -374,10 +332,9 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
         for(uint fid=0; fid<faces_per_cell(); ++fid)
         {
             face f;
-            f.push_back(cells.at(cid_ptr + HEXA_FACES[fid][0]));
-            f.push_back(cells.at(cid_ptr + HEXA_FACES[fid][1]));
-            f.push_back(cells.at(cid_ptr + HEXA_FACES[fid][2]));
-            f.push_back(cells.at(cid_ptr + HEXA_FACES[fid][3]));
+            f.push_back(cells.at(cid_ptr + TET_FACES[fid][0]));
+            f.push_back(cells.at(cid_ptr + TET_FACES[fid][1]));
+            f.push_back(cells.at(cid_ptr + TET_FACES[fid][2]));
             sort(f.begin(), f.end());
             if (CONTAINS(f2c_map,f)) f2c_map.erase(f);
             else                     f2c_map[f] = std::make_pair(cid,fid);
@@ -400,25 +357,21 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
         uint cid     = f2c_it.second.first;
         uint f       = f2c_it.second.second;
         uint cid_ptr = cid * verts_per_cell();
-        uint vid0    = cells.at(cid_ptr + HEXA_FACES[f][0]);
-        uint vid1    = cells.at(cid_ptr + HEXA_FACES[f][1]);
-        uint vid2    = cells.at(cid_ptr + HEXA_FACES[f][2]);
-        uint vid3    = cells.at(cid_ptr + HEXA_FACES[f][3]);
+        uint vid0    = cells.at(cid_ptr + TET_FACES[f][0]);
+        uint vid1    = cells.at(cid_ptr + TET_FACES[f][1]);
+        uint vid2    = cells.at(cid_ptr + TET_FACES[f][2]);
 
         faces.push_back(vid0);
         faces.push_back(vid1);
         faces.push_back(vid2);
-        faces.push_back(vid3);
 
         v_on_srf.at(vid0) = true;
         v_on_srf.at(vid1) = true;
         v_on_srf.at(vid2) = true;
-        v_on_srf.at(vid3) = true;
 
         v2f.at(vid0).push_back(fresh_id);
         v2f.at(vid1).push_back(fresh_id);
         v2f.at(vid2).push_back(fresh_id);
-        v2f.at(vid3).push_back(fresh_id);
 
         c2f.at(cid).push_back(fresh_id);
         f2c.at(fresh_id) = cid;
@@ -427,8 +380,8 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
         {
             uint eid0  = edge_vert_id(eid, 0);
             uint eid1  = edge_vert_id(eid, 1);
-            bool has_0 = (eid0 == vid0 || eid0 == vid1 || eid0 == vid2 || eid0 == vid3);
-            bool has_1 = (eid1 == vid0 || eid1 == vid1 || eid1 == vid2 || eid1 == vid3);
+            bool has_0 = (eid0 == vid0 || eid0 == vid1 || eid0 == vid2);
+            bool has_1 = (eid1 == vid0 || eid1 == vid1 || eid1 == vid2);
             if (has_0 && has_1)
             {
                 e2f.at(eid).push_back(fresh_id);
@@ -453,14 +406,14 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
 
     timer_stop("Build Surface");
 
-    logger << faces.size()/verts_per_face() << " quads" << endl;
+    logger << faces.size()/verts_per_face() << " tris" << endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::update_face_normals()
+void Tet<M,V,E,F,C>::update_face_normals()
 {
     for(uint fid=0; fid<num_faces(); ++fid)
     {
@@ -480,14 +433,13 @@ void Hexmesh<M,V,E,F,C>::update_face_normals()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-int Hexmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
+int Tet<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
 {
     for(uint f=0; f<faces_per_cell(); ++f)
     {
-        if (cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][0])) &&
-            cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][1])) &&
-            cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][2])) &&
-            cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][3])) )
+        if (cell_contains_vert(cid1, cell_vert_id(cid0, TET_FACES[f][0])) &&
+            cell_contains_vert(cid1, cell_vert_id(cid0, TET_FACES[f][1])) &&
+            cell_contains_vert(cid1, cell_vert_id(cid0, TET_FACES[f][2])))
         {
             return f;
         }
@@ -499,7 +451,7 @@ int Hexmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-bool Hexmesh<M,V,E,F,C>::cell_contains_vert(const uint cid, const uint vid) const
+bool Tet<M,V,E,F,C>::cell_contains_vert(const uint cid, const uint vid) const
 {
     for(uint i=0; i<verts_per_cell(); ++i)
     {
@@ -512,7 +464,7 @@ bool Hexmesh<M,V,E,F,C>::cell_contains_vert(const uint cid, const uint vid) cons
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Hexmesh<M,V,E,F,C>::cell_centroid(const uint cid) const
+vec3d Tet<M,V,E,F,C>::cell_centroid(const uint cid) const
 {
     vec3d c(0,0,0);
     for(uint off=0; off<verts_per_cell(); ++off)
@@ -527,7 +479,7 @@ vec3d Hexmesh<M,V,E,F,C>::cell_centroid(const uint cid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Hexmesh<M,V,E,F,C>::elem_centroid(const uint cid) const
+vec3d Tet<M,V,E,F,C>::elem_centroid(const uint cid) const
 {
     return cell_centroid(cid);
 }
@@ -536,7 +488,7 @@ vec3d Hexmesh<M,V,E,F,C>::elem_centroid(const uint cid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Hexmesh<M,V,E,F,C>::cell_vert_id(const uint cid, const uint off) const
+uint Tet<M,V,E,F,C>::cell_vert_id(const uint cid, const uint off) const
 {
     uint cid_ptr = cid * verts_per_cell();
     return cells.at(cid_ptr + off);
@@ -546,7 +498,7 @@ uint Hexmesh<M,V,E,F,C>::cell_vert_id(const uint cid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Hexmesh<M,V,E,F,C>::cell_edge_id(const uint cid, const uint vid0, const uint vid1) const
+uint Tet<M,V,E,F,C>::cell_edge_id(const uint cid, const uint vid0, const uint vid1) const
 {
     assert(cell_contains_vert(cid,vid0));
     assert(cell_contains_vert(cid,vid1));
@@ -563,7 +515,7 @@ uint Hexmesh<M,V,E,F,C>::cell_edge_id(const uint cid, const uint vid0, const uin
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Hexmesh<M,V,E,F,C>::cell_vert(const uint cid, const uint off) const
+vec3d Tet<M,V,E,F,C>::cell_vert(const uint cid, const uint off) const
 {
     return verts.at(cell_vert_id(cid,off));
 }
@@ -572,7 +524,7 @@ vec3d Hexmesh<M,V,E,F,C>::cell_vert(const uint cid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Hexmesh<M,V,E,F,C>::face_centroid(const uint fid) const
+vec3d Tet<M,V,E,F,C>::face_centroid(const uint fid) const
 {
     vec3d c(0,0,0);
     for(uint off=0; off<verts_per_face(); ++off) c += face_vert(fid,off);
@@ -584,7 +536,7 @@ vec3d Hexmesh<M,V,E,F,C>::face_centroid(const uint fid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Hexmesh<M,V,E,F,C>::face_vert_id(const uint fid, const uint off) const
+uint Tet<M,V,E,F,C>::face_vert_id(const uint fid, const uint off) const
 {
     uint fid_ptr = fid * verts_per_face();
     return faces.at(fid_ptr + off);
@@ -594,7 +546,7 @@ uint Hexmesh<M,V,E,F,C>::face_vert_id(const uint fid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Hexmesh<M,V,E,F,C>::face_vert(const uint fid, const uint off) const
+vec3d Tet<M,V,E,F,C>::face_vert(const uint fid, const uint off) const
 {
     return verts.at(face_vert_id(fid,off));
 }
@@ -603,7 +555,7 @@ vec3d Hexmesh<M,V,E,F,C>::face_vert(const uint fid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Hexmesh<M,V,E,F,C>::face_edge_id(const uint fid, const uint vid0, const uint vid1) const
+uint Tet<M,V,E,F,C>::face_edge_id(const uint fid, const uint vid0, const uint vid1) const
 {
     assert(face_contains_vert(fid,vid0));
     assert(face_contains_vert(fid,vid1));
@@ -620,7 +572,7 @@ uint Hexmesh<M,V,E,F,C>::face_edge_id(const uint fid, const uint vid0, const uin
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-bool Hexmesh<M,V,E,F,C>::face_contains_vert(const uint fid, const uint vid) const
+bool Tet<M,V,E,F,C>::face_contains_vert(const uint fid, const uint vid) const
 {
     for(uint i=0; i<verts_per_face(); ++i)
     {
@@ -633,7 +585,7 @@ bool Hexmesh<M,V,E,F,C>::face_contains_vert(const uint fid, const uint vid) cons
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Hexmesh<M,V,E,F,C>::edge_vert_id(const uint eid, const uint off) const
+uint Tet<M,V,E,F,C>::edge_vert_id(const uint eid, const uint off) const
 {
     uint eid_ptr = 2*eid;
     return edges.at(eid_ptr + off);
@@ -643,7 +595,7 @@ uint Hexmesh<M,V,E,F,C>::edge_vert_id(const uint eid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Hexmesh<M,V,E,F,C>::edge_vert(const uint eid, const uint off) const
+vec3d Tet<M,V,E,F,C>::edge_vert(const uint eid, const uint off) const
 {
     return verts.at(edge_vert_id(eid,off));
 }
@@ -652,7 +604,7 @@ vec3d Hexmesh<M,V,E,F,C>::edge_vert(const uint eid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::elem_show_all()
+void Tet<M,V,E,F,C>::elem_show_all()
 {
     for(uint cid=0; cid<num_cells(); ++cid)
     {
@@ -664,7 +616,7 @@ void Hexmesh<M,V,E,F,C>::elem_show_all()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::vert_set_color(const Color & c)
+void Tet<M,V,E,F,C>::vert_set_color(const Color & c)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
     {
@@ -676,7 +628,7 @@ void Hexmesh<M,V,E,F,C>::vert_set_color(const Color & c)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::vert_set_alpha(const float alpha)
+void Tet<M,V,E,F,C>::vert_set_alpha(const float alpha)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
     {
@@ -688,7 +640,7 @@ void Hexmesh<M,V,E,F,C>::vert_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::edge_set_color(const Color & c)
+void Tet<M,V,E,F,C>::edge_set_color(const Color & c)
 {
     for(uint eid=0; eid<num_edges(); ++eid)
     {
@@ -700,7 +652,7 @@ void Hexmesh<M,V,E,F,C>::edge_set_color(const Color & c)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::edge_set_alpha(const float alpha)
+void Tet<M,V,E,F,C>::edge_set_alpha(const float alpha)
 {
     for(uint eid=0; eid<num_edges(); ++eid)
     {
@@ -712,7 +664,7 @@ void Hexmesh<M,V,E,F,C>::edge_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::face_set_color(const Color & c)
+void Tet<M,V,E,F,C>::face_set_color(const Color & c)
 {
     for(uint fid=0; fid<num_faces(); ++fid)
     {
@@ -724,7 +676,7 @@ void Hexmesh<M,V,E,F,C>::face_set_color(const Color & c)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::face_set_alpha(const float alpha)
+void Tet<M,V,E,F,C>::face_set_alpha(const float alpha)
 {
     for(uint fid=0; fid<num_faces(); ++fid)
     {
@@ -736,7 +688,7 @@ void Hexmesh<M,V,E,F,C>::face_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::cell_set_color(const Color & c)
+void Tet<M,V,E,F,C>::cell_set_color(const Color & c)
 {
     for(uint cid=0; cid<num_cells(); ++cid)
     {
@@ -748,7 +700,7 @@ void Hexmesh<M,V,E,F,C>::cell_set_color(const Color & c)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::cell_set_alpha(const float alpha)
+void Tet<M,V,E,F,C>::cell_set_alpha(const float alpha)
 {
     for(uint cid=0; cid<num_cells(); ++cid)
     {
@@ -760,7 +712,7 @@ void Hexmesh<M,V,E,F,C>::cell_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-bool Hexmesh<M,V,E,F,C>::edge_is_on_srf(const uint eid) const
+bool Tet<M,V,E,F,C>::edge_is_on_srf(const uint eid) const
 {
     return e_on_srf.at(eid);
 }
@@ -769,7 +721,7 @@ bool Hexmesh<M,V,E,F,C>::edge_is_on_srf(const uint eid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-std::vector<float> Hexmesh<M,V,E,F,C>::export_uvw_param(const int mode) const
+std::vector<float> Tet<M,V,E,F,C>::export_uvw_param(const int mode) const
 {
     std::vector<float> uvw;
     for(uint vid=0; vid<num_verts(); ++vid)
@@ -798,7 +750,7 @@ std::vector<float> Hexmesh<M,V,E,F,C>::export_uvw_param(const int mode) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::set_uvw_from_xyz(const int mode)
+void Tet<M,V,E,F,C>::set_uvw_from_xyz(const int mode)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
     {
@@ -825,7 +777,7 @@ void Hexmesh<M,V,E,F,C>::set_uvw_from_xyz(const int mode)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-std::vector<double> Hexmesh<M,V,E,F,C>::vector_coords() const
+std::vector<double> Tet<M,V,E,F,C>::vector_coords() const
 {
     std::vector<double> coords;
     for(uint vid=0; vid<num_verts(); ++vid)
@@ -835,30 +787,6 @@ std::vector<double> Hexmesh<M,V,E,F,C>::vector_coords() const
         coords.push_back(vert(vid).z());
     }
     return coords;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Hexmesh<M,V,E,F,C>::update_cell_quality(const uint cid)
-{
-    cell_data(cid).quality = hex_scaled_jacobian(cell_vert(cid,0), cell_vert(cid,1),
-                                                 cell_vert(cid,2), cell_vert(cid,3),
-                                                 cell_vert(cid,4), cell_vert(cid,5),
-                                                 cell_vert(cid,6), cell_vert(cid,7));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Hexmesh<M,V,E,F,C>::update_cell_quality()
-{
-    for(uint cid=0; cid<num_cells(); ++cid)
-    {
-        update_cell_quality(cid);
-    }
 }
 
 }
