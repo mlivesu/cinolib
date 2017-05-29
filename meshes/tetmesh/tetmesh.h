@@ -30,248 +30,193 @@
 #include <cinolib/cinolib.h>
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
-#include <cinolib/geometry/tetrahedron.h>
 #include <cinolib/meshes/trimesh/trimesh.h>
-#include <cinolib/quality.h>
+#include <cinolib/meshes/mesh_std_data.h>
 
 namespace cinolib
 {
 
+template<class M = Mesh_std_data, // default template arguments
+         class V = Vert_std_data,
+         class E = Edge_std_data,
+         class F = Face_std_data,
+         class C = Cell_std_data>
 class Tetmesh
 {
     public:
 
         Tetmesh(){}
+
         Tetmesh(const char * filename);
+
         Tetmesh(const std::vector<double> & coords,
-                const std::vector<u_int>  & tets);
+                const std::vector<uint>   & cells);
 
-        std::string filename;
-
-        const Bbox & bbox() const;
-
-        static const int verts_per_element = 4;
-        static const int edges_per_element = 6;
+        Tetmesh(const std::vector<vec3d> & verts,
+                const std::vector<uint>  & cells);
 
     protected:
 
-        // bounding box
-        //
         Bbox bb;
 
-        // serialized xyz coordinates, tets and edges
-        //
-        std::vector<double> coords;
-        std::vector<u_int>  tets;
-        std::vector<u_int>  edges;
-        std::vector<u_int>  tris;    // exterior surface
-        std::vector<bool>   v_on_srf;  // true if a vertex is on the surface, false otherwise
-        std::vector<bool>   e_on_srf;  // true if a vertex is on the surface, false otherwise
+        std::vector<vec3d> verts;
+        std::vector<uint>  edges;
+        std::vector<uint>  faces;     // boundary only!
+        std::vector<uint>  cells;
+        std::vector<bool>  v_on_srf;  // true if a vertex is on the surface, false otherwise
+        std::vector<bool>  e_on_srf;  // true if a vertex is on the surface, false otherwise
 
-        // per vertex/triangle surface normals
+        // attributes
         //
-        std::vector<double> t_norm;
+        M              m_data;
+        std::vector<V> v_data;
+        std::vector<E> e_data;
+        std::vector<F> f_data;
+        std::vector<C> c_data;
 
-        // general purpose float and int scalars
+        // adjacencies -- Yes, I have lots of memory ;)
         //
-        std::vector<float> u_text;    // 1d texture per vertex
-        std::vector<int>   t_label;   // per tet
-
-        // adjacencies
-        //
-        std::vector< std::vector<int> > vtx2vtx;
-        std::vector< std::vector<int> > vtx2edg;
-        std::vector< std::vector<int> > vtx2tet;
-        std::vector< std::vector<int> > vtx2tri;
-        std::vector< std::vector<int> > edg2tet;
-        std::vector< std::vector<int> > edg2tri;
-        std::vector< std::vector<int> > tet2edg;
-        std::vector< std::vector<int> > tet2tet;
-        std::vector< std::vector<int> > tet2tri;
-        std::vector< std::vector<int> > tri2tri;
-        std::vector< std::vector<int> > tri2edg;
-        std::vector< int >              tri2tet;
-
+        std::vector<std::vector<uint>> v2v; // vert to vert adjacency
+        std::vector<std::vector<uint>> v2e; // vert to edge adjacency
+        std::vector<std::vector<uint>> v2f; // vert to face adjacency
+        std::vector<std::vector<uint>> v2c; // vert to cell adjacency
+        std::vector<std::vector<uint>> e2f; // edge to face adjacency
+        std::vector<std::vector<uint>> e2c; // edge to cell adjacency
+        std::vector<std::vector<uint>> f2e; // face to edge adjacency
+        std::vector<std::vector<uint>> f2f; // face to face adjacency
+        std::vector<uint>              f2c; // face to cell adjacency
+        std::vector<std::vector<uint>> c2e; // cell to edge adjacency
+        std::vector<std::vector<uint>> c2f; // cell to face adjacency
+        std::vector<std::vector<uint>> c2c; // cell to cell adjacency
 
     public:
 
-        const std::vector<double> & vector_coords()         const;
-        const std::vector<uint>   & vector_tets()           const;
-        const std::vector<uint>   & vector_tris()           const;
-        const std::vector<float>  & vector_v_float_scalar() const;
-        const std::vector<int>    & vector_t_int_scalar()   const;
-
-
-        std::string loaded_file() const;
-
-        Trimesh export_surface() const;
-        Trimesh export_surface(std::map<int,int> & tet2tri_map, std::map<int,int> & tri2tet_map) const;
-
-        virtual void operator+=(const Tetmesh & m);
-
-        void init();
         void clear();
+        void init();
         void load(const char * filename);
         void save(const char * filename) const;
 
-        void normalize_volume();
-
-        bool empty() const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void update_bbox();
-        void center_bbox();
         void update_interior_adjacency();
         void update_surface_adjacency();
-        void update_t_normals();
+        void update_face_normals();
+        void update_cell_quality(const uint cid);
+        void update_cell_quality();
 
-        int num_vertices()      const;
-        int num_tetrahedra()    const;
-        int num_elements()      const;
-        int num_edges()         const;
-        int num_srf_triangles() const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const std::vector<int> & adj_vtx2vtx(const int vid) const;
-        const std::vector<int> & adj_vtx2edg(const int vid) const;
-        const std::vector<int> & adj_vtx2tri(const int vid) const;
-        const std::vector<int> & adj_vtx2tet(const int vid) const;
-        const std::vector<int> & adj_vtx2ele(const int vid) const; // equal to adj_vtx2tet - just for template compatibility
-        const std::vector<int> & adj_edg2tet(const int eid) const;
-        const std::vector<int> & adj_edg2tri(const int eid) const;
-        const std::vector<int> & adj_tet2edg(const int tid) const;
-        const std::vector<int> & adj_ele2edg(const int eid) const; // equal to adj_tet2edg - just for template compatibility
-        const std::vector<int> & adj_tet2tet(const int tid) const;
-        const std::vector<int> & adj_tet2tri(const int tid) const;
-        const std::vector<int> & adj_tri2tri(const int tid) const;
-        const std::vector<int> & adj_tri2edg(const int tid) const;
-        const int              & adj_tri2tet(const int tid) const;
+        uint verts_per_face() const { return 3; }
+        uint verts_per_cell() const { return 4; }
+        uint edges_per_cell() const { return 6; }
+        uint faces_per_cell() const { return 4; }
 
-        vec3d vertex(const int vid) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void set_vertex_u_text(const int vid, const float val);
+        uint num_verts() const { return verts.size();                    }
+        uint num_edges() const { return edges.size() / 2;                }
+        uint num_faces() const { return faces.size() / verts_per_face(); }
+        uint num_cells() const { return cells.size() / verts_per_cell(); }
+        uint num_elems() const { return cells.size() / verts_per_cell(); } // elem == cell!!
 
-        void set_tet_label(const int tid, const int label);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int tet_label(const int tid) const;
-        int elem_label(const int tid) const;
+        const Bbox                & bbox()          const { return bb;    }
+              std::vector<double>   vector_coords() const;
+        const std::vector<vec3d>  & vector_verts()  const { return verts; }
+        const std::vector<uint>   & vector_edges()  const { return edges; }
+        const std::vector<uint>   & vector_faces()  const { return faces; }
+        const std::vector<uint>   & vector_cells()  const { return cells; }
 
-        float vertex_u_text(const int vid) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        float min_u_text() const;
+        std::vector<float> export_uvw_param(const int mode) const;
+        void               set_uvw_from_xyz(const int mode);
 
-        float max_u_text() const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int max_t_label() const;
+        Trimesh<> export_surface() const;
+        Trimesh<> export_surface(std::map<uint,uint> & c2f_map,
+                                 std::map<uint,uint> & f2c_map) const;
 
-        void set_vertex(const int vid, const vec3d & pos);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool is_surface_vertex(const int vid) const;
+        const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
+        const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
+        const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
+        const std::vector<uint> & adj_v2c(const uint vid) const { return v2c.at(vid); }
+        const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
+        const std::vector<uint> & adj_e2c(const uint eid) const { return e2c.at(eid); }
+        const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
+        const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
+              uint                adj_f2c(const uint fid) const { return f2c.at(fid); }
+        const std::vector<uint> & adj_c2e(const uint cid) const { return c2e.at(cid); }
+        const std::vector<uint> & adj_c2f(const uint cid) const { return c2f.at(cid); }
+        const std::vector<uint> & adj_c2c(const uint cid) const { return c2c.at(cid); }
 
-        bool is_surface_edge(const int eid) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d triangle_normal(const int tid) const;
+        const M & mesh_data()               const { return m_data;         }
+              M & mesh_data()                     { return m_data;         }
+        const V & vert_data(const uint vid) const { return v_data.at(vid); }
+              V & vert_data(const uint vid)       { return v_data.at(vid); }
+        const E & edge_data(const uint eid) const { return e_data.at(eid); }
+              E & edge_data(const uint eid)       { return e_data.at(eid); }
+        const F & face_data(const uint fid) const { return f_data.at(fid); }
+              F & face_data(const uint fid)       { return f_data.at(fid); }
+        const C & cell_data(const uint cid) const { return c_data.at(cid); }
+              C & cell_data(const uint cid)       { return c_data.at(cid); }
+        const C & elem_data(const uint cid) const { return c_data.at(cid); } // elem == cell!!
+              C & elem_data(const uint cid)       { return c_data.at(cid); }
 
-        vec3d tet_centroid(const int tid) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int tet_vertex_id(const int tid, const int offset) const;
-        int elem_vertex_id(const int eid, const int offset) const;
+  const vec3d & vert          (const uint vid) const { return verts.at(vid); }
+        vec3d & vert          (const uint vid)       { return verts.at(vid); }
+virtual void    vert_set_color(const Color & c);
+virtual void    vert_set_alpha(const float alpha);
 
-        int tet_vertex_offset(const int tid, const int vid) const;
-        int elem_vertex_offset(const int eid, const int vid) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d tet_vertex(const int tid, const int offset) const;
-        vec3d elem_vertex(const int eid, const int offset) const;
+        vec3d edge_vert     (const uint eid, const uint offset) const;
+        uint  edge_vert_id  (const uint eid, const uint offset) const;
+        bool  edge_is_on_srf(const uint eid) const;
+virtual void  edge_set_color(const Color & c);
+virtual void  edge_set_alpha(const float alpha);
 
-        int tri_vertex_id(const int tid, const int offset) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d tri_vertex(const int tid, const int offset) const;
+        vec3d face_vert         (const uint fid, const uint offset) const;
+        uint  face_vert_id      (const uint fid, const uint offset) const;
+        uint  face_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
+        vec3d face_centroid     (const uint fid) const;
+        bool  face_contains_vert(const uint fid, const uint vid) const;
+virtual void  face_set_color    (const Color & c);
+virtual void  face_set_alpha    (const float alpha);
 
-        bool tet_contains_vertex(const int tid, const std::set<int> & vids) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool tet_contains_vertex(const int tid, const int vid) const;
+        vec3d  cell_vert                 (const uint cid, const uint off)   const;
+        uint   cell_vert_id              (const uint cid, const uint off)   const;
+        uint   cell_edge_id              (const uint cid, const uint vid0, const uint vid1) const;
+        vec3d  cell_centroid             (const uint cid) const;
+        uint   cell_shared_face          (const uint cid0, const uint cid1) const;
+        int    cell_shared_vert          (const uint cid, const std::vector<uint> incident_edges) const;
+        int    cell_adjacent_through_face(const uint cid, const uint face) const;
+        bool   cell_contains_vert        (const uint cid, const uint vid)   const;
+virtual void   cell_set_color            (const Color & c);
+virtual void   cell_set_alpha            (const float alpha);
 
-        bool tet_contains_edge(const int tid, const int eid) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool edge_contains_vertex(const int eid, const int vid) const;
+        // These are all wraps for the "cell_ methods". They are useful for generic
+        // programming, because "elem_" will wrap face_ for surface meshes and wrap
+        // "cell_" for volumetric meshes, allowing the use of templated algorithms
+        // that work with both types of meshes without requiring specialzed code
 
-        vec3d element_barycenter(const int tid) const;
-
-        double avg_edge_length() const;
-        double edge_length(const int eid) const;
-
-        vec3d edge_vertex(const int eid, const int offset) const;
-
-        double tet_quality(const int tid) const;
-        double elem_quality(const int eid) const;
-
-        bool tet_is_adjacent_to(const int tid, const int nbr) const;
-
-        double vertex_quality(const int vid) const;
-
-        int vertex_inverted_elements(const int vid) const;
-
-        double tet_volume(const int tid) const;
-
-        int edge_vertex_id(const int eid, const int offset) const;
-
-        void print_quality_statistics(bool list_folded_elements = false) const;
-
-        int adjacent_tet_through_facet(const int tid, const int facet) const;
-
-        int shared_facet(const int tid0, const int tid1) const;
-
-        double vertex_mass(const int vid) const;
-
-        int vertex_valence(const int vid) const;
-
-        double tet_dihedral_angle(const int tid, const int fid0, const int fid1) const;
-
-        vec3d tet_face_normal(const int tid, const int fid) const;
-
-        int tet_face_opposite_to(const int tid, const int vid) const;
-
-        int tet_vertex_opposite_to(const int tid, const int facet) const;
-
-        int tet_edge_opposite_to(const int tid, const int vid0, const int vid1) const;
-
-        double tet_edge_length(const int tid, const int eid) const;
-
-        std::vector<int> tet_one_ring(const int tid) const;
-
-        std::vector<int> get_flipped_tets() const;
-
-        Tetmesh export_submesh_with_label(const int label) const;
-
-        int edge_vertex_opposite_to(const int eid, const int vid) const;
-
-        void export_submesh_with_label(const int             label,
-                                       std::vector<double> & sub_coords,
-                                       std::vector<u_int>  & sub_tets,
-                                       std::map<int,int>   & vid2sub_vid,
-                                       std::map<int,int>   & sub_vid2sub) const;
-
-
-        std::vector<int> edge_ordered_tet_ring(const int eid) const;
-
-        bool barycentric_coordinates(const int tid, const vec3d & P, std::vector<double> & wgts) const;
-
-        void translate(const vec3d & delta);
-        void rotate(const vec3d & axis, const double angle_rad);
-
-        double tet_face_area(const int tid, const int fid) const;
-
-        void scale(const double x_scale, const double y_scale, const double z_scale);
-
-        void normalize_u_text_field();
-
-        bool vertex_is_local_minima(const int vid) const;
-        bool vertex_is_local_maxima(const int vid) const;
-        bool vertex_is_critical_point(const int vid) const;
-        float tet_min_u_text(const int tid) const;
-        int tet_edge_id(const int tid, const int vid0, const int vid1) const;
-
-        int tet_shared_vertex(const int tid, const std::vector<int> & incident_edges) const;
-
-        int edge_incidtent_to(const int vid_0, const int vid_1) const;
+        vec3d elem_centroid(const uint cid) const;
+        void  elem_show_all();
 };
 
 }

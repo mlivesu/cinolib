@@ -33,94 +33,81 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_tris_quads.h>
+#include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/meshes/trimesh/trimesh.h>
-
+#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
 
-class DrawableTrimesh : public Trimesh , public DrawableObject
+template<class M = Mesh_std_data, // default template arguments
+         class V = Vert_std_data,
+         class E = Edge_std_data,
+         class F = Face_std_data>
+class DrawableTrimesh : public Trimesh<M,V,E,F>, public DrawableObject
 {
     public:
 
-        enum
-        {
-            TEXTURE_ISOLINES                = 0,
-            TEXTURE_QUALITY_RAMP            = 1,
-            TEXTURE_QUALITY_RAMP_W_ISOLINES = 2
-        };
-
         DrawableTrimesh();
-        DrawableTrimesh(const Trimesh & m);
-        DrawableTrimesh(const char *filename);
+
+        DrawableTrimesh(const char * filename);
+
+        DrawableTrimesh(const std::vector<vec3d> & verts,
+                        const std::vector<uint>  & faces);
+
         DrawableTrimesh(const std::vector<double> & coords,
-                        const std::vector<u_int>  & tris);
-
-        void init();
-        void clear();
-
-        // Implementation of the
-        // DrawableObject interface
-        //
-        void  draw(const float scene_size=1) const;
-        vec3d scene_center() const;
-        float scene_radius() const;
-
-        // rendering options
-        //
-        void set_draw_mesh(bool b);
-        void set_wireframe(bool b);
-        void set_border(bool b);
-        void set_flat_shading();
-        void set_smooth_shading();
-        void set_points_shading();
-        void set_wireframe_color(float r, float g, float b);
-        void set_wireframe_width(float width);
-        void set_wireframe_transparency(float alpha);
-        void set_border_color(float r, float g, float b);
-        void set_border_width(float width);
-        void set_border_transparency(float alpha);
-        void set_enable_vertex_color();
-        void set_enable_triangle_color();
-        void set_enable_texture1D(int texture);
-        void set_v_color(float r, float g, float b);
-        void set_t_color(float r, float g, float b);
-
-        const float * vertex_color  (const int vid) const;
-        const float * triangle_color(const int tid) const;
-
-        void set_vertex_color(const int vid, const float * color);
-        void set_triangle_color(const int tid, const float * color);
-
-        void color_wrt_triangle_scalar();
-        void unglue_face_colors();
-        void unglue_boundary_edges();
-
-        std::vector<int> get_border_vertices() const;
-
-        int add_vertex(const vec3d & v, const float scalar = 0.0);
-        int add_triangle(const int vid0, const int vid1, const int vid2, const int scalar = 0);
-
-        void operator+=(const DrawableTrimesh & m);
+                        const std::vector<uint>   & faces);
 
     protected:
 
-        void render_pass() const;
-        void update_border();
+        RenderData drawlist;
+        MeshSlicer<Trimesh<M,V,E,F>> slicer;
 
-        int    draw_mode;
-        int    wireframe_width;
-        int    border_width;
-        float  wireframe_color[4];
-        float  border_color[4];
-        GLuint texture_id;
+    public:
 
-        std::vector<int>    border_vertices;
-        std::vector<double> border_coords;
-        std::vector<u_int>  border_segs;
-        std::vector<float>  v_colors;
-        std::vector<float>  t_colors;
+        void  draw(const float scene_size=1) const;
+        vec3d scene_center() const { return this->bb.center(); }
+        float scene_radius() const { return this->bb.diag();   }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void init_drawable_stuff();
+        void updateGL();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void slice(const float thresh, const int item, const int sign, const int mode);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void show_mesh(const bool b);
+        void show_mesh_flat();
+        void show_mesh_smooth();
+        void show_mesh_points();
+        void show_vert_color();
+        void show_face_color();
+        void show_face_texture1D(const GLint texture);
+        void show_face_wireframe(const bool b);
+        void show_face_wireframe_color(const Color & c);
+        void show_face_wireframe_width(const float width);
+        void show_face_wireframe_transparency(const float alpha);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        /* (Re)implementation of virtual methods (mainly to call updateGL())*/
+        void operator+=              (const DrawableTrimesh & m);
+        void vert_set_color          (const Color & c);
+        void vert_set_alpha          (const float a);
+        void vert_remove_unreferenced(const uint vid);
+        uint vert_add                (const vec3d & pos, const V & data);
+        void edge_set_color          (const Color & c);
+        void edge_set_alpha          (const float a);
+        bool edge_collapse           (const uint eid);
+        void edge_remove_unreferenced(const uint eid);
+        void face_set_color          (const Color & c);
+        void face_set_alpha          (const float a);
+        uint face_add                (const uint vid0, const uint vid1, const uint vid2, const F & data);
+        void face_remove_unreferenced(const uint fid);
 };
 
 }

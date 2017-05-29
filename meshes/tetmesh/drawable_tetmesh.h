@@ -32,116 +32,87 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_tris_quads.h>
+#include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/meshes/tetmesh/tetmesh.h>
+#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
 
-class DrawableTetmesh : public Tetmesh, public DrawableObject
+template<class M = Mesh_std_data, // default template arguments
+         class V = Vert_std_data,
+         class E = Edge_std_data,
+         class F = Face_std_data,
+         class C = Cell_std_data>
+class DrawableTetmesh : public Tetmesh<M,V,E,F,C>, public DrawableObject
 {
 
     public:
 
-        enum
-        {
-            TEXTURE_ISOLINES                = 0,
-            TEXTURE_QUALITY_RAMP            = 1,
-            TEXTURE_QUALITY_RAMP_W_ISOLINES = 2
-        };
-
-        // X : slice w.r.t. tet centroid X coord
-        // Y : slice w.r.t. tet centroid Y coord
-        // Z : slice w.r.t. tet centroid Z coord
-        // Q : slice w.r.t. tet quality (MSJ)
-        // L : slice w.r.t. tet label
-        //
-        enum { X, Y, Z, Q, L };
-
         DrawableTetmesh();
-        DrawableTetmesh(const char *filename);
+
+        DrawableTetmesh(const char * filename);
+
+        DrawableTetmesh(const std::vector<vec3d> & verts,
+                        const std::vector<uint>  & cells);
+
         DrawableTetmesh(const std::vector<double> & coords,
-                        const std::vector<u_int>  & tets);
-
-        void init();
-
-        void operator+=(const DrawableTetmesh & m);
-
-        // Implementation of the
-        // DrawableObject interface
-        //
-        void  draw(const float scene_size=1) const;
-        vec3d scene_center() const;
-        float scene_radius() const;
-
-        void  draw_out() const;
-        void  draw_in()  const;
-
-        void set_draw_mesh(bool b);
-        void set_flat_shading();
-        void set_smooth_shading();
-        void set_points_shading();
-        void set_t_out_color(const float r, const float g, const float b);
-        void set_t_in_color(const float r, const float g, const float b);
-        void set_enable_out_face_color();
-        void set_enable_out_quality_color();
-        void set_enable_out_texture1D(int texture);
-        void set_out_wireframe(bool b);
-        void set_out_wireframe_color(float r, float g, float b);
-        void set_out_wireframe_width(float width);
-        void set_out_wireframe_transparency(float alpha);
-        void set_in_wireframe(bool b);
-        void set_in_wireframe_color(float r, float g, float b);
-        void set_in_wireframe_width(float width);
-        void set_in_wireframe_transparency(float alpha);
-        void set_draw_slice(bool b);
-        void set_slice_parameters(const float thresh, const int item, const bool dir, const bool mode);
-        void update_slice(const bool mode = true);
-        void set_enable_in_quality_color();
-        void set_enable_in_face_color();
-        void set_enable_in_texture1D(int texture);
-        void color_wrt_tet_scalar();
-
+                        const std::vector<uint>   & cells);
 
     protected:
 
-        int    draw_mode_in;
-        int    draw_mode_out;
-        int    wireframe_out_width;
-        float  wireframe_out_color[4];
-        GLuint texture_out_id;
+        RenderData drawlist_in;
+        RenderData drawlist_out;
+        MeshSlicer<Tetmesh<M,V,E,F,C>> slicer;
 
-        int    wireframe_in_width;
-        float  wireframe_in_color[4];
-        GLuint texture_in_id;
+    public:
 
-        void color_tets_wrt_quality(const bool in, const bool out);
-        void update_outer_visible_mesh();
-        void update_inner_slice();
+        void  draw(const float scene_size=1) const;
+        vec3d scene_center() const { return this->bb.center(); }
+        float scene_radius() const { return this->bb.diag();   }
 
-        std::vector<bool> slice_mask;
-        float slice_thresh[5];
-        bool  slice_dir[5];
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<float> t_out_colors;
-        std::vector<float> t_in_colors;
+        void vert_set_color(const Color & c) { Tetmesh<M,V,E,F,C>::vert_set_color(c); updateGL(); }
+        void edge_set_color(const Color & c) { Tetmesh<M,V,E,F,C>::edge_set_color(c); updateGL(); }
+        void face_set_color(const Color & c) { Tetmesh<M,V,E,F,C>::face_set_color(c); updateGL(); }
+        void cell_set_color(const Color & c) { Tetmesh<M,V,E,F,C>::cell_set_color(c); updateGL(); }
+        void vert_set_alpha(const float   a) { Tetmesh<M,V,E,F,C>::vert_set_alpha(a); updateGL(); }
+        void edge_set_alpha(const float   a) { Tetmesh<M,V,E,F,C>::edge_set_alpha(a); updateGL(); }
+        void face_set_alpha(const float   a) { Tetmesh<M,V,E,F,C>::face_set_alpha(a); updateGL(); }
+        void cell_set_alpha(const float   a) { Tetmesh<M,V,E,F,C>::cell_set_alpha(a); updateGL(); }
 
-        // sub-portion of the EXTERIOR of the tetmesh to be rendered
-        // (it depends on the slicing - if slicing is disabled the whole outer surface will be rendered)
-        //
-        std::vector<double> outer_visible_coords;
-        std::vector<u_int>  outer_visible_tris;
-        std::vector<double> outer_visible_v_norms;
-        std::vector<float>  outer_visible_f_values;
-        std::vector<float>  outer_visible_t_colors;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        // sub-portion of the INTERIOR of the tetmesh to be rendered
-        //
-        std::vector<double> inner_slice_coords;
-        std::vector<u_int>  inner_slice_tris;
-        std::vector<double> inner_slice_v_norms;
-        std::vector<float>  inner_slice_f_values;
-        std::vector<float>  inner_slice_t_colors;
+        void init_drawable_stuff();
+        void updateGL();
+        void updateGL_in();
+        void updateGL_out();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void slice(const float thresh, const int item, const int sign, const int mode);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void show_mesh(const bool b);
+        void show_mesh_flat();
+        void show_mesh_smooth();
+        void show_mesh_points();
+        void show_face_color();
+        void show_face_quality();
+        void show_face_texture1D(const GLint texture);
+        void show_face_wireframe(const bool b);
+        void show_face_wireframe_color(const Color & c);
+        void show_face_wireframe_width(const float width);
+        void show_face_wireframe_transparency(const float alpha);
+        void show_cell_color();
+        void show_cell_quality();
+        void show_cell_texture1D(const GLint texture);
+        void show_cell_wireframe(const bool b);
+        void show_cell_wireframe_color(const Color & c);
+        void show_cell_wireframe_width(const float width);
+        void show_cell_wireframe_transparency(const float alpha);
 };
 
 }

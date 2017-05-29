@@ -27,651 +27,698 @@
 #include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
 #include <cinolib/colors.h>
 
-
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-DrawableTetmesh::DrawableTetmesh() : Tetmesh()
+DrawableTetmesh<M,V,E,F,C>::DrawableTetmesh() : Tetmesh<M,V,E,F,C>()
 {
-    init();
+    init_drawable_stuff();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-DrawableTetmesh::DrawableTetmesh(const char *filename) : Tetmesh(filename)
+DrawableTetmesh<M,V,E,F,C>::DrawableTetmesh(const char *filename)
+    : Tetmesh<M,V,E,F,C>(filename)
 {
-    init();
+    init_drawable_stuff();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-DrawableTetmesh::DrawableTetmesh(const std::vector<double> & coords,
-                                 const std::vector<u_int>  & tets) : Tetmesh(coords, tets)
+DrawableTetmesh<M,V,E,F,C>::DrawableTetmesh(const std::vector<vec3d> & verts,
+                                            const std::vector<uint>  & cells)
+    : Tetmesh<M,V,E,F,C>(verts, cells)
 {
-    init();
+    init_drawable_stuff();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::init()
+DrawableTetmesh<M,V,E,F,C>::DrawableTetmesh(const std::vector<double> & coords,
+                                            const std::vector<uint>   & cells)
+    : Tetmesh<M,V,E,F,C>(coords, cells)
 {
-    type          = TETMESH;
-
-    draw_mode_out = DRAW_MESH | DRAW_FLAT | DRAW_FACECOLOR | DRAW_WIREFRAME;
-    draw_mode_in  =             DRAW_FLAT | DRAW_FACECOLOR | DRAW_WIREFRAME;
-
-    wireframe_out_width    = 1;
-    wireframe_out_color[0] = 0.1;
-    wireframe_out_color[1] = 0.1;
-    wireframe_out_color[2] = 0.1;
-    wireframe_out_color[3] = 1.0;
-
-    wireframe_in_width    = 1;
-    wireframe_in_color[0] = 0.1;
-    wireframe_in_color[1] = 0.1;
-    wireframe_in_color[2] = 0.1;
-    wireframe_in_color[3] = 1.0;
-
-    slice_mask = std::vector<bool>(num_tetrahedra(), false);
-
-    slice_thresh[ X ] =   bb.max.x();
-    slice_thresh[ Y ] =   bb.max.y();
-    slice_thresh[ Z ] =   bb.max.z();
-    slice_thresh[ Q ] =   1.0;
-    slice_thresh[ L ] =  -1.0;
-
-    slice_dir[ X ] = true;
-    slice_dir[ Y ] = true;
-    slice_dir[ Z ] = true;
-    slice_dir[ Q ] = true;
-    slice_dir[ L ] = true;
-
-    set_t_out_color(0.1, 0.8, 0.1);
-    set_t_in_color(1.0, 1.0, 1.0);
-
-    update_outer_visible_mesh();
+    init_drawable_stuff();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::operator+=(const DrawableTetmesh & m)
+void DrawableTetmesh<M,V,E,F,C>::init_drawable_stuff()
 {
-    Tetmesh::operator+=(m);
+    type   = TETMESH;
+    slicer = MeshSlicer<Tetmesh<M,V,E,F,C>>(*this);
 
-    slice_thresh[ X ] =  bb.max.x();
-    slice_thresh[ Y ] =  bb.max.y();
-    slice_thresh[ Z ] =  bb.max.z();
+    drawlist_in.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
+    drawlist_in.seg_width = 1;
 
-    slice_mask.resize(num_tetrahedra());
+    drawlist_out.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
+    drawlist_out.seg_width = 1;
 
-    for(int tid=0; tid<m.num_tetrahedra(); ++tid)
-    {        
-        t_out_colors.push_back(m.t_out_colors[3*tid + 0]);
-        t_out_colors.push_back(m.t_out_colors[3*tid + 1]);
-        t_out_colors.push_back(m.t_out_colors[3*tid + 2]);
-        t_in_colors.push_back(m.t_in_colors[3*tid + 0]);
-        t_in_colors.push_back(m.t_in_colors[3*tid + 1]);
-        t_in_colors.push_back(m.t_in_colors[3*tid + 2]);
-    }
+    Tetmesh<M,V,E,F,C>::face_set_color(Color::YELLOW());
+    Tetmesh<M,V,E,F,C>::cell_set_color(Color::WHITE());
 
-    update_outer_visible_mesh();
+    updateGL();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d DrawableTetmesh::scene_center() const
+void DrawableTetmesh<M,V,E,F,C>::draw(const float) const
 {
-    return bb.center();
+    render(drawlist_in );
+    render(drawlist_out);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-float DrawableTetmesh::scene_radius() const
+void DrawableTetmesh<M,V,E,F,C>::updateGL()
 {
-    return bb.diag() * 0.5;
+    updateGL_out();
+    updateGL_in();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::draw(const float) const
+void DrawableTetmesh<M,V,E,F,C>::updateGL_out()
 {
-    RenderFaceData data_out;
-    data_out.face_type       = GL_TRIANGLES;
-    data_out.draw_mode       = draw_mode_out;
-    data_out.coords          = &outer_visible_coords;
-    data_out.faces           = &outer_visible_tris;
-    data_out.v_norms         = &outer_visible_v_norms;
-    data_out.f_colors        = &outer_visible_t_colors;
-    data_out.text1D          = &outer_visible_f_values;
-    data_out.wireframe_color = wireframe_out_color;
-    data_out.wireframe_width = wireframe_out_width;
+    drawlist_out.tris.clear();
+    drawlist_out.tri_coords.clear();
+    drawlist_out.tri_v_norms.clear();
+    drawlist_out.tri_v_colors.clear();
+    drawlist_out.tri_text1D.clear();
+    drawlist_out.segs.clear();
+    drawlist_out.seg_coords.clear();
+    drawlist_out.seg_colors.clear();
 
-    render_faces(data_out);
-
-    if (draw_mode_in & DRAW_MESH)
+    for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        RenderFaceData data_in;
-        data_in.face_type       = GL_TRIANGLES;
-        data_in.draw_mode       = draw_mode_in;
-        data_in.coords          = &inner_slice_coords;
-        data_in.faces           = &inner_slice_tris;
-        data_in.v_norms         = &inner_slice_v_norms;
-        data_in.f_colors        = &inner_slice_t_colors;
-        data_in.text1D          = &inner_slice_f_values;
-        data_in.wireframe_color = wireframe_in_color;
-        data_in.wireframe_width = wireframe_in_width;
+        if (!(this->cell_data(this->adj_f2c(fid)).visible)) continue;
 
-        render_faces(data_in);
-    }
-}
+        uint vid0 = this->face_vert_id(fid,0);
+        uint vid1 = this->face_vert_id(fid,1);
+        uint vid2 = this->face_vert_id(fid,2);
 
+        uint base_addr = drawlist_out.tri_coords.size()/3;
 
-CINO_INLINE
-void DrawableTetmesh::set_t_out_color(const float r, const float g, const float b)
-{
-    t_out_colors.resize(num_tetrahedra()*3);
-    for(int tid=0; tid<num_tetrahedra(); ++tid)
-    {
-        int tid_ptr = tid * 3;
-        t_out_colors[tid_ptr + 0] = r;
-        t_out_colors[tid_ptr + 1] = g;
-        t_out_colors[tid_ptr + 2] = b;
-    }
-}
+        drawlist_out.tris.push_back(base_addr    );
+        drawlist_out.tris.push_back(base_addr + 1);
+        drawlist_out.tris.push_back(base_addr + 2);
 
-CINO_INLINE
-void DrawableTetmesh::set_t_in_color(const float r, const float g, const float b)
-{
-    t_in_colors.resize(num_tetrahedra()*3);
-    for(int tid=0; tid<num_tetrahedra(); ++tid)
-    {
-        int tid_ptr = tid * 3;
-        t_in_colors[tid_ptr + 0] = r;
-        t_in_colors[tid_ptr + 1] = g;
-        t_in_colors[tid_ptr + 2] = b;
-    }
-}
+        drawlist_out.tri_coords.push_back(this->vert(vid0).x());
+        drawlist_out.tri_coords.push_back(this->vert(vid0).y());
+        drawlist_out.tri_coords.push_back(this->vert(vid0).z());
+        drawlist_out.tri_coords.push_back(this->vert(vid1).x());
+        drawlist_out.tri_coords.push_back(this->vert(vid1).y());
+        drawlist_out.tri_coords.push_back(this->vert(vid1).z());
+        drawlist_out.tri_coords.push_back(this->vert(vid2).x());
+        drawlist_out.tri_coords.push_back(this->vert(vid2).y());
+        drawlist_out.tri_coords.push_back(this->vert(vid2).z());
 
-CINO_INLINE
-void DrawableTetmesh::set_slice_parameters(const float thresh, const int item, const bool dir, const bool mode)
-{
-    if (draw_mode_in & DRAW_MESH)
-    {
-        switch (item)
+        drawlist_out.tri_text1D.push_back(this->vert_data(vid0).uvw[0]);
+        drawlist_out.tri_text1D.push_back(this->vert_data(vid1).uvw[0]);
+        drawlist_out.tri_text1D.push_back(this->vert_data(vid2).uvw[0]);
+
+        drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.x()); // replicate f normal on each vertex
+        drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.y());
+        drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.z());
+        drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.x());
+        drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.y());
+        drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.z());
+        drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.x());
+        drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.y());
+        drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.z());
+
+        if (drawlist_out.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
         {
-            case X:
-            case Y:
-            case Z: slice_thresh[item] = bb.min[item] + bb.delta()[item] * thresh; break;
-            case Q: slice_thresh[item] = thresh; break;
-            case L: slice_thresh[item] = thresh; break;
-            default: assert(0);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.r);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.g);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.b);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.a);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.r);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.g);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.b);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.a);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.r);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.g);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.b);
+            drawlist_out.tri_v_colors.push_back(this->face_data(fid).color.a);
         }
-        slice_dir[item] = dir;
-        update_slice(mode);
-    }
-}
-
-CINO_INLINE
-void DrawableTetmesh::update_slice(const bool mode)
-{
-    for(int tid=0; tid<num_tetrahedra(); ++tid)
-    {
-        vec3d  c = tet_centroid(tid);
-        double q = tet_quality(tid);
-        int    l = static_cast<int>(slice_thresh[L]);
-
-        bool pass_x = (slice_dir[X]) ? (c.x() <= slice_thresh[X]) : (c.x() >= slice_thresh[X]);
-        bool pass_y = (slice_dir[Y]) ? (c.y() <= slice_thresh[Y]) : (c.y() >= slice_thresh[Y]);
-        bool pass_z = (slice_dir[Z]) ? (c.z() <= slice_thresh[Z]) : (c.z() >= slice_thresh[Z]);
-        bool pass_q = (slice_dir[Q]) ? (q     <= slice_thresh[Q]) : (q     >= slice_thresh[Q]);
-        bool pass_l = (l == -1 || t_label[tid] != l);
-
-        slice_mask[tid] = (mode) ? (pass_x && pass_y && pass_z && pass_q && pass_l) : (!pass_x || !pass_y || !pass_z || !pass_q || !pass_l);
-    }
-
-    update_outer_visible_mesh();
-    update_inner_slice();
-}
-
-CINO_INLINE
-void DrawableTetmesh::update_inner_slice()
-{
-    inner_slice_coords.clear();
-    inner_slice_tris.clear();
-    inner_slice_v_norms.clear();
-    inner_slice_f_values.clear();
-    inner_slice_t_colors.clear();
-
-    for(int tid=0; tid<num_tetrahedra(); ++tid)
-    {
-        if ((draw_mode_in & DRAW_MESH) && (slice_mask[tid])) continue;
-
-        for(auto nbr : adj_tet2tet(tid))
+        else if (drawlist_out.draw_mode & DRAW_TRI_QUALITY)
         {
-            if (slice_mask[nbr])
+            float q = this->cell_data(this->adj_f2c(fid)).quality;
+            Color c = Color::rgb_from_quality(q);
+            drawlist_out.tri_v_colors.push_back(c.r);
+            drawlist_out.tri_v_colors.push_back(c.g);
+            drawlist_out.tri_v_colors.push_back(c.b);
+            drawlist_out.tri_v_colors.push_back(c.a);
+            drawlist_out.tri_v_colors.push_back(c.r);
+            drawlist_out.tri_v_colors.push_back(c.g);
+            drawlist_out.tri_v_colors.push_back(c.b);
+            drawlist_out.tri_v_colors.push_back(c.a);
+            drawlist_out.tri_v_colors.push_back(c.r);
+            drawlist_out.tri_v_colors.push_back(c.g);
+            drawlist_out.tri_v_colors.push_back(c.b);
+            drawlist_out.tri_v_colors.push_back(c.a);
+        }
+        else if (drawlist_out.draw_mode & DRAW_TRI_VERTCOLOR)
+        {
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.r);
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.g);
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.b);
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.a);
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid1).color.r);
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid1).color.g);
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid1).color.b);
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid1).color.a);
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.r);
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.g);
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.b);
+            drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.a);
+        }
+
+        // bake wireframe
+        base_addr = drawlist_out.seg_coords.size()/3;
+        //
+        uint eid0 = this->face_edge_id(fid, vid0, vid1);
+        uint eid1 = this->face_edge_id(fid, vid1, vid2);
+        uint eid2 = this->face_edge_id(fid, vid2, vid0);
+        //
+        drawlist_in.segs.push_back(base_addr    ); // v0 v1
+        drawlist_in.segs.push_back(base_addr + 1);
+        drawlist_in.segs.push_back(base_addr + 2); // v1 v2
+        drawlist_in.segs.push_back(base_addr + 3);
+        drawlist_in.segs.push_back(base_addr + 4); // v2 v0
+        drawlist_in.segs.push_back(base_addr + 5);
+
+        drawlist_in.seg_coords.push_back(this->vert(vid0).x());
+        drawlist_in.seg_coords.push_back(this->vert(vid0).y());
+        drawlist_in.seg_coords.push_back(this->vert(vid0).z());
+        drawlist_in.seg_coords.push_back(this->vert(vid1).x());
+        drawlist_in.seg_coords.push_back(this->vert(vid1).y());
+        drawlist_in.seg_coords.push_back(this->vert(vid1).z());
+        drawlist_in.seg_coords.push_back(this->vert(vid1).x());
+        drawlist_in.seg_coords.push_back(this->vert(vid1).y());
+        drawlist_in.seg_coords.push_back(this->vert(vid1).z());
+        drawlist_in.seg_coords.push_back(this->vert(vid2).x());
+        drawlist_in.seg_coords.push_back(this->vert(vid2).y());
+        drawlist_in.seg_coords.push_back(this->vert(vid2).z());
+        drawlist_in.seg_coords.push_back(this->vert(vid2).x());
+        drawlist_in.seg_coords.push_back(this->vert(vid2).y());
+        drawlist_in.seg_coords.push_back(this->vert(vid2).z());
+        drawlist_in.seg_coords.push_back(this->vert(vid0).x());
+        drawlist_in.seg_coords.push_back(this->vert(vid0).y());
+        drawlist_in.seg_coords.push_back(this->vert(vid0).z());
+
+
+        if (drawlist_out.draw_mode & DRAW_SEG_SEGCOLOR)
+        {
+            drawlist_out.seg_colors.push_back(this->edge_data(eid0).color.r);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid0).color.g);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid0).color.b);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid0).color.a);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid0).color.r);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid0).color.g);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid0).color.b);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid0).color.a);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid1).color.r);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid1).color.g);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid1).color.b);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid1).color.a);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid1).color.r);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid1).color.g);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid1).color.b);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid1).color.a);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid2).color.r);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid2).color.g);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid2).color.b);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid2).color.a);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid2).color.r);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid2).color.g);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid2).color.b);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid2).color.a);
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void DrawableTetmesh<M,V,E,F,C>::updateGL_in()
+{
+    drawlist_in.tri_coords.clear();
+    drawlist_in.tris.clear();
+    drawlist_in.tri_v_norms.clear();
+    drawlist_in.tri_v_colors.clear();
+    drawlist_in.tri_text1D.clear();
+    drawlist_in.segs.clear();
+    drawlist_in.seg_coords.clear();
+    drawlist_in.seg_colors.clear();
+
+    for(uint cid=0; cid<this->num_cells(); ++cid)
+    {
+        if (!(this->cell_data(cid).visible)) continue;
+
+        for(uint nbr : this->adj_c2c(cid))
+        {
+            if (!(this->cell_data(nbr).visible))
             {
-                int shared_f = shared_facet(tid, nbr);
-                assert(shared_f > -1);
+                int f = this->cell_shared_face(cid,nbr);
+                assert(f!=-1);
 
-                int vid0     = tet_vertex_id(tid, TET_FACES[shared_f][0]);
-                int vid1     = tet_vertex_id(tid, TET_FACES[shared_f][1]);
-                int vid2     = tet_vertex_id(tid, TET_FACES[shared_f][2]);
-                int vid0_ptr = 3 * vid0;
-                int vid1_ptr = 3 * vid1;
-                int vid2_ptr = 3 * vid2;
+                uint vid0 = this->cell_vert_id(cid, TET_FACES[f][0]);
+                uint vid1 = this->cell_vert_id(cid, TET_FACES[f][1]);
+                uint vid2 = this->cell_vert_id(cid, TET_FACES[f][2]);
 
-                int base_addr = inner_slice_tris.size();
+                uint base_addr = drawlist_in.tri_coords.size()/3;
 
-                inner_slice_tris.push_back(base_addr);
-                inner_slice_tris.push_back(base_addr + 1);
-                inner_slice_tris.push_back(base_addr + 2);
+                drawlist_in.tris.push_back(base_addr    );
+                drawlist_in.tris.push_back(base_addr + 1);
+                drawlist_in.tris.push_back(base_addr + 2);
 
-                int tid_ptr = tid * 3;
-                inner_slice_t_colors.push_back(t_in_colors[tid_ptr + 0]);
-                inner_slice_t_colors.push_back(t_in_colors[tid_ptr + 1]);
-                inner_slice_t_colors.push_back(t_in_colors[tid_ptr + 2]);
+                drawlist_in.tri_coords.push_back(this->vert(vid0).x());
+                drawlist_in.tri_coords.push_back(this->vert(vid0).y());
+                drawlist_in.tri_coords.push_back(this->vert(vid0).z());
+                drawlist_in.tri_coords.push_back(this->vert(vid1).x());
+                drawlist_in.tri_coords.push_back(this->vert(vid1).y());
+                drawlist_in.tri_coords.push_back(this->vert(vid1).z());
+                drawlist_in.tri_coords.push_back(this->vert(vid2).x());
+                drawlist_in.tri_coords.push_back(this->vert(vid2).y());
+                drawlist_in.tri_coords.push_back(this->vert(vid2).z());
 
-                inner_slice_coords.push_back(coords[vid0_ptr + 0]);
-                inner_slice_coords.push_back(coords[vid0_ptr + 1]);
-                inner_slice_coords.push_back(coords[vid0_ptr + 2]);
-                inner_slice_coords.push_back(coords[vid1_ptr + 0]);
-                inner_slice_coords.push_back(coords[vid1_ptr + 1]);
-                inner_slice_coords.push_back(coords[vid1_ptr + 2]);
-                inner_slice_coords.push_back(coords[vid2_ptr + 0]);
-                inner_slice_coords.push_back(coords[vid2_ptr + 1]);
-                inner_slice_coords.push_back(coords[vid2_ptr + 2]);
+                drawlist_in.tri_text1D.push_back(this->vert_data(vid0).uvw[0]);
+                drawlist_in.tri_text1D.push_back(this->vert_data(vid1).uvw[0]);
+                drawlist_in.tri_text1D.push_back(this->vert_data(vid2).uvw[0]);
 
-                vec3d v0 = vertex(vid0);
-                vec3d v1 = vertex(vid1);
-                vec3d v2 = vertex(vid2);
-                vec3d u  = v1 - v0; u.normalize();
-                vec3d v  = v2 - v0; v.normalize();
-                vec3d n = u.cross(v);
+                vec3d v0 = this->vert(vid0);
+                vec3d v1 = this->vert(vid1);
+                vec3d v2 = this->vert(vid2);
+                vec3d n = (v1-v0).cross(v2-v0);
                 n.normalize();
 
-                inner_slice_v_norms.push_back(n.x());
-                inner_slice_v_norms.push_back(n.y());
-                inner_slice_v_norms.push_back(n.z());
-                inner_slice_v_norms.push_back(n.x());
-                inner_slice_v_norms.push_back(n.y());
-                inner_slice_v_norms.push_back(n.z());
-                inner_slice_v_norms.push_back(n.x());
-                inner_slice_v_norms.push_back(n.y());
-                inner_slice_v_norms.push_back(n.z());
+                drawlist_in.tri_v_norms.push_back(n.x()); // replicate f normal on each vertex
+                drawlist_in.tri_v_norms.push_back(n.y());
+                drawlist_in.tri_v_norms.push_back(n.z());
+                drawlist_in.tri_v_norms.push_back(n.x());
+                drawlist_in.tri_v_norms.push_back(n.y());
+                drawlist_in.tri_v_norms.push_back(n.z());
+                drawlist_in.tri_v_norms.push_back(n.x());
+                drawlist_in.tri_v_norms.push_back(n.y());
+                drawlist_in.tri_v_norms.push_back(n.z());
 
-                inner_slice_f_values.push_back(vertex_u_text(vid0));
-                inner_slice_f_values.push_back(vertex_u_text(vid1));
-                inner_slice_f_values.push_back(vertex_u_text(vid2));
+                if (drawlist_in.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
+                {
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.r);
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.g);
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.b);
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.a);
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.r);
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.g);
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.b);
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.a);
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.r);
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.g);
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.b);
+                    drawlist_in.tri_v_colors.push_back(this->cell_data(cid).color.a);
+                }
+                else if (drawlist_in.draw_mode & DRAW_TRI_QUALITY)
+                {
+                    float q = this->cell_data(cid).quality;
+                    Color c = Color::rgb_from_quality(q);
+                    drawlist_in.tri_v_colors.push_back(c.r);
+                    drawlist_in.tri_v_colors.push_back(c.g);
+                    drawlist_in.tri_v_colors.push_back(c.b);
+                    drawlist_in.tri_v_colors.push_back(c.a);
+                    drawlist_in.tri_v_colors.push_back(c.r);
+                    drawlist_in.tri_v_colors.push_back(c.g);
+                    drawlist_in.tri_v_colors.push_back(c.b);
+                    drawlist_in.tri_v_colors.push_back(c.a);
+                    drawlist_in.tri_v_colors.push_back(c.r);
+                    drawlist_in.tri_v_colors.push_back(c.g);
+                    drawlist_in.tri_v_colors.push_back(c.b);
+                    drawlist_in.tri_v_colors.push_back(c.a);
+                }
+                else if (drawlist_in.draw_mode & DRAW_TRI_VERTCOLOR)
+                {
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid0).color.r);
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid0).color.g);
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid0).color.b);
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid0).color.a);
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid1).color.r);
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid1).color.g);
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid1).color.b);
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid1).color.a);
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid2).color.r);
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid2).color.g);
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid2).color.b);
+                    drawlist_in.tri_v_colors.push_back(this->vert_data(vid2).color.a);
+                }
+
+                // bake wireframe
+                base_addr = drawlist_in.seg_coords.size()/3;
+                //
+                uint eid0 = this->cell_edge_id(cid, vid0, vid1);
+                uint eid1 = this->cell_edge_id(cid, vid1, vid2);
+                uint eid2 = this->cell_edge_id(cid, vid2, vid0);
+                //
+                drawlist_in.segs.push_back(base_addr    ); // v0 v1
+                drawlist_in.segs.push_back(base_addr + 1);
+                drawlist_in.segs.push_back(base_addr + 2); // v1 v2
+                drawlist_in.segs.push_back(base_addr + 3);
+                drawlist_in.segs.push_back(base_addr + 4); // v2 v0
+                drawlist_in.segs.push_back(base_addr + 5);
+
+                drawlist_in.seg_coords.push_back(this->vert(vid0).x());
+                drawlist_in.seg_coords.push_back(this->vert(vid0).y());
+                drawlist_in.seg_coords.push_back(this->vert(vid0).z());
+                drawlist_in.seg_coords.push_back(this->vert(vid1).x());
+                drawlist_in.seg_coords.push_back(this->vert(vid1).y());
+                drawlist_in.seg_coords.push_back(this->vert(vid1).z());
+                drawlist_in.seg_coords.push_back(this->vert(vid1).x());
+                drawlist_in.seg_coords.push_back(this->vert(vid1).y());
+                drawlist_in.seg_coords.push_back(this->vert(vid1).z());
+                drawlist_in.seg_coords.push_back(this->vert(vid2).x());
+                drawlist_in.seg_coords.push_back(this->vert(vid2).y());
+                drawlist_in.seg_coords.push_back(this->vert(vid2).z());
+                drawlist_in.seg_coords.push_back(this->vert(vid2).x());
+                drawlist_in.seg_coords.push_back(this->vert(vid2).y());
+                drawlist_in.seg_coords.push_back(this->vert(vid2).z());
+                drawlist_in.seg_coords.push_back(this->vert(vid0).x());
+                drawlist_in.seg_coords.push_back(this->vert(vid0).y());
+                drawlist_in.seg_coords.push_back(this->vert(vid0).z());
+
+                if (drawlist_in.draw_mode & DRAW_SEG_SEGCOLOR)
+                {
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid0).color.r);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid0).color.g);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid0).color.b);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid0).color.a);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid0).color.r);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid0).color.g);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid0).color.b);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid0).color.a);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid1).color.r);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid1).color.g);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid1).color.b);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid1).color.a);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid1).color.r);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid1).color.g);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid1).color.b);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid1).color.a);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid2).color.r);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid2).color.g);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid2).color.b);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid2).color.a);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid2).color.r);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid2).color.g);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid2).color.b);
+                    drawlist_in.seg_colors.push_back(this->edge_data(eid2).color.a);
+                }
             }
         }
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::update_outer_visible_mesh()
+void DrawableTetmesh<M,V,E,F,C>::slice(const float thresh, // thresh on centroids or quality
+                                       const int   item,   // X, Y, Z, L, Q
+                                       const int   sign,   // either LEQ or GEQ
+                                       const int   mode)   // either AND or OR
 {
-    outer_visible_coords.clear();
-    outer_visible_tris.clear();
-    outer_visible_v_norms.clear();
-    outer_visible_f_values.clear();
-    outer_visible_t_colors.clear();
-
-    for(int tid=0; tid<num_srf_triangles(); ++tid)
-    {
-        if ((draw_mode_in & DRAW_MESH) && (slice_mask[adj_tri2tet(tid)])) continue;
-
-        int tid_ptr  = 3 * tid;
-        int vid0     = tris[tid_ptr + 0];
-        int vid1     = tris[tid_ptr + 1];
-        int vid2     = tris[tid_ptr + 2];
-        int vid0_ptr = 3 * vid0;
-        int vid1_ptr = 3 * vid1;
-        int vid2_ptr = 3 * vid2;
-
-        int base_addr = outer_visible_tris.size();
-
-        outer_visible_tris.push_back(base_addr);
-        outer_visible_tris.push_back(base_addr + 1);
-        outer_visible_tris.push_back(base_addr + 2);
-
-        outer_visible_coords.push_back(coords[vid0_ptr + 0]);
-        outer_visible_coords.push_back(coords[vid0_ptr + 1]);
-        outer_visible_coords.push_back(coords[vid0_ptr + 2]);
-        outer_visible_coords.push_back(coords[vid1_ptr + 0]);
-        outer_visible_coords.push_back(coords[vid1_ptr + 1]);
-        outer_visible_coords.push_back(coords[vid1_ptr + 2]);
-        outer_visible_coords.push_back(coords[vid2_ptr + 0]);
-        outer_visible_coords.push_back(coords[vid2_ptr + 1]);
-        outer_visible_coords.push_back(coords[vid2_ptr + 2]);
-
-        outer_visible_v_norms.push_back(t_norm[tid_ptr + 0]);
-        outer_visible_v_norms.push_back(t_norm[tid_ptr + 1]);
-        outer_visible_v_norms.push_back(t_norm[tid_ptr + 2]);
-        outer_visible_v_norms.push_back(t_norm[tid_ptr + 0]);
-        outer_visible_v_norms.push_back(t_norm[tid_ptr + 1]);
-        outer_visible_v_norms.push_back(t_norm[tid_ptr + 2]);
-        outer_visible_v_norms.push_back(t_norm[tid_ptr + 0]);
-        outer_visible_v_norms.push_back(t_norm[tid_ptr + 1]);
-        outer_visible_v_norms.push_back(t_norm[tid_ptr + 2]);
-
-        outer_visible_f_values.push_back(vertex_u_text(vid0));
-        outer_visible_f_values.push_back(vertex_u_text(vid1));
-        outer_visible_f_values.push_back(vertex_u_text(vid2));
-
-        int tet_id_ptr = adj_tri2tet(tid) * 3;
-        outer_visible_t_colors.push_back(t_out_colors[tet_id_ptr + 0]);
-        outer_visible_t_colors.push_back(t_out_colors[tet_id_ptr + 1]);
-        outer_visible_t_colors.push_back(t_out_colors[tet_id_ptr + 2]);
-    }
+    slicer.update(*this, thresh, item, sign, mode); // update per element visibility flags
+    updateGL();
 }
 
-CINO_INLINE
-void DrawableTetmesh::set_out_wireframe_color(float r, float g, float b)
-{
-    wireframe_out_color[0] = r;
-    wireframe_out_color[1] = g;
-    wireframe_out_color[2] = b;
-}
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::set_in_wireframe_color(float r, float g, float b)
-{
-    wireframe_in_color[0] = r;
-    wireframe_in_color[1] = g;
-    wireframe_in_color[2] = b;
-}
-
-CINO_INLINE
-void DrawableTetmesh::set_out_wireframe_width(float width)
-{
-    wireframe_out_width = width;
-}
-
-CINO_INLINE
-void DrawableTetmesh::set_in_wireframe_width(float width)
-{
-    wireframe_in_width = width;
-}
-
-CINO_INLINE
-void DrawableTetmesh::set_out_wireframe_transparency(float alpha)
-{
-    wireframe_out_color[3] = alpha;
-}
-
-CINO_INLINE
-void DrawableTetmesh::set_in_wireframe_transparency(float alpha)
-{
-    wireframe_in_color[3] = alpha;
-}
-
-CINO_INLINE
-void DrawableTetmesh::set_draw_mesh(bool b)
+void DrawableTetmesh<M,V,E,F,C>::show_mesh(const bool b)
 {
     if (b)
     {
-        draw_mode_out |=  DRAW_MESH;
+        drawlist_in.draw_mode  |= DRAW_TRIS;
+        drawlist_out.draw_mode |= DRAW_TRIS;
     }
     else
     {
-        draw_mode_out &= ~DRAW_MESH;
-        draw_mode_in  &= ~DRAW_MESH;
+        drawlist_in.draw_mode  &= ~DRAW_TRIS;
+        drawlist_out.draw_mode &= ~DRAW_TRIS;
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::set_out_wireframe(bool b)
+void DrawableTetmesh<M,V,E,F,C>::show_mesh_flat()
 {
-    if (b) draw_mode_out |=  DRAW_WIREFRAME;
-    else   draw_mode_out &= ~DRAW_WIREFRAME;
+    drawlist_in.draw_mode  |=  DRAW_TRI_FLAT;
+    drawlist_in.draw_mode  &= ~DRAW_TRI_SMOOTH;
+    drawlist_in.draw_mode  &= ~DRAW_TRI_POINTS;
+    drawlist_out.draw_mode |=  DRAW_TRI_FLAT;
+    drawlist_out.draw_mode &= ~DRAW_TRI_SMOOTH;
+    drawlist_out.draw_mode &= ~DRAW_TRI_POINTS;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::set_in_wireframe(bool b)
+void DrawableTetmesh<M,V,E,F,C>::show_mesh_smooth()
 {
-    if (b) draw_mode_in |=  DRAW_WIREFRAME;
-    else   draw_mode_in &= ~DRAW_WIREFRAME;
+    drawlist_in.draw_mode  |=  DRAW_TRI_SMOOTH;
+    drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
+    drawlist_in.draw_mode  &= ~DRAW_TRI_POINTS;
+    drawlist_out.draw_mode |=  DRAW_TRI_SMOOTH;
+    drawlist_out.draw_mode &= ~DRAW_TRI_FLAT;
+    drawlist_out.draw_mode &= ~DRAW_TRI_POINTS;
 }
 
-CINO_INLINE
-void DrawableTetmesh::set_flat_shading()
-{
-    draw_mode_out |=  DRAW_FLAT;
-    draw_mode_out &= ~DRAW_SMOOTH;
-    draw_mode_out &= ~DRAW_POINTS;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    draw_mode_in  |=  DRAW_FLAT;
-    draw_mode_in  &= ~DRAW_SMOOTH;
-    draw_mode_in  &= ~DRAW_POINTS;
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void DrawableTetmesh<M,V,E,F,C>::show_mesh_points()
+{
+    drawlist_in.draw_mode  |=  DRAW_TRI_POINTS;
+    drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
+    drawlist_in.draw_mode  &= ~DRAW_TRI_SMOOTH;
+    drawlist_out.draw_mode |=  DRAW_TRI_POINTS;
+    drawlist_out.draw_mode &= ~DRAW_TRI_FLAT;
+    drawlist_out.draw_mode &= ~DRAW_TRI_SMOOTH;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::set_smooth_shading()
+void DrawableTetmesh<M,V,E,F,C>::show_face_color()
 {
-    draw_mode_out |=  DRAW_SMOOTH;
-    draw_mode_out &= ~DRAW_FLAT;
-    draw_mode_out &= ~DRAW_POINTS;
-
-    draw_mode_in  |=  DRAW_SMOOTH;
-    draw_mode_in  &= ~DRAW_FLAT;
-    draw_mode_in  &= ~DRAW_POINTS;
-}
-
-CINO_INLINE
-void DrawableTetmesh::set_points_shading()
-{
-    draw_mode_out |=  DRAW_POINTS;
-    draw_mode_out &= ~DRAW_FLAT;
-    draw_mode_out &= ~DRAW_SMOOTH;
-
-    draw_mode_in  |=  DRAW_POINTS;
-    draw_mode_in  &= ~DRAW_FLAT;
-    draw_mode_in  &= ~DRAW_SMOOTH;
-}
-
-CINO_INLINE
-void DrawableTetmesh::set_draw_slice(bool b)
-{
-    if (b) draw_mode_in |=  DRAW_MESH;
-    else   draw_mode_in &= ~DRAW_MESH;
-}
-
-CINO_INLINE
-void DrawableTetmesh::set_enable_out_face_color()
-{
-    draw_mode_out |=  DRAW_FACECOLOR;
-    draw_mode_out &= ~DRAW_VERTEXCOLOR;
-    draw_mode_out &= ~DRAW_TEXTURE1D;
+    drawlist_out.draw_mode |=  DRAW_TRI_FACECOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
+    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
     glDisable(GL_TEXTURE_1D);
+    updateGL_out();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::set_enable_in_face_color()
+void DrawableTetmesh<M,V,E,F,C>::show_face_quality()
 {
-    draw_mode_in |=  DRAW_FACECOLOR;
-    draw_mode_in &= ~DRAW_VERTEXCOLOR;
-    draw_mode_in &= ~DRAW_TEXTURE1D;
+    drawlist_out.draw_mode |=  DRAW_TRI_QUALITY;
+    drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
     glDisable(GL_TEXTURE_1D);
+    updateGL_out();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::set_enable_out_quality_color()
+void DrawableTetmesh<M,V,E,F,C>::show_face_texture1D(const GLint texture)
 {
-    draw_mode_out |=  DRAW_FACECOLOR;
-    draw_mode_out &= ~DRAW_VERTEXCOLOR;
-    draw_mode_out &= ~DRAW_TEXTURE1D;
-    glDisable(GL_TEXTURE_1D);
+    drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE1D;
+    drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    color_tets_wrt_quality(false, true);
-}
-
-CINO_INLINE
-void DrawableTetmesh::set_enable_in_quality_color()
-{
-    draw_mode_in |=  DRAW_FACECOLOR;
-    draw_mode_in &= ~DRAW_VERTEXCOLOR;
-    draw_mode_in &= ~DRAW_TEXTURE1D;
-    glDisable(GL_TEXTURE_1D);
-
-    color_tets_wrt_quality(true, false);
-}
-
-CINO_INLINE
-void DrawableTetmesh::set_enable_out_texture1D(int texture)
-{
-    draw_mode_out |=  DRAW_TEXTURE1D;
-    draw_mode_out &= ~DRAW_VERTEXCOLOR;
-    draw_mode_out &= ~DRAW_FACECOLOR;
-
-    if (texture_out_id > 0)
-    {
-        glDeleteTextures(1, &texture_out_id);
-    }
-
-    glGenTextures(1, &texture_out_id);
-    glBindTexture(GL_TEXTURE_1D, texture_out_id);
-
+    if (drawlist_in.tri_text1D_id > 0) glDeleteTextures(1, &drawlist_in.tri_text1D_id);
+    glGenTextures(1, &drawlist_in.tri_text1D_id);
+    glBindTexture(GL_TEXTURE_1D, drawlist_in.tri_text1D_id);
     switch (texture)
     {
-        case TEXTURE_ISOLINES:
-        {
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D);
-            break;
-        }
-
-        case TEXTURE_QUALITY_RAMP:
-        {
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D);
-            break;
-        }
-
-        case TEXTURE_QUALITY_RAMP_W_ISOLINES:
-        {
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines);
-            break;
-        }
-
+        case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
+        case TEXTURE_QUALITY_RAMP           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D); break;
+        case TEXTURE_QUALITY_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
         default : assert("Unknown 1D Texture" && false);
     }
-
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable(GL_TEXTURE_1D);
+
+    updateGL_out();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::set_enable_in_texture1D(int texture)
+void DrawableTetmesh<M,V,E,F,C>::show_face_wireframe(const bool b)
 {
-    draw_mode_in |=  DRAW_TEXTURE1D;
-    draw_mode_in &= ~DRAW_VERTEXCOLOR;
-    draw_mode_in &= ~DRAW_FACECOLOR;
+    if (b) drawlist_out.draw_mode |=  DRAW_SEGS;
+    else   drawlist_out.draw_mode &= ~DRAW_SEGS;
+}
 
-    if (texture_in_id > 0)
-    {
-        glDeleteTextures(1, &texture_in_id);
-    }
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    glGenTextures(1, &texture_in_id);
-    glBindTexture(GL_TEXTURE_1D, texture_in_id);
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void DrawableTetmesh<M,V,E,F,C>::show_face_wireframe_color(const Color & c)
+{
+    edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void DrawableTetmesh<M,V,E,F,C>::show_face_wireframe_width(const float width)
+{
+    drawlist_out.seg_width = width;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void DrawableTetmesh<M,V,E,F,C>::show_face_wireframe_transparency(const float alpha)
+{
+    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void DrawableTetmesh<M,V,E,F,C>::show_cell_color()
+{
+    drawlist_in.draw_mode |=  DRAW_TRI_FACECOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
+    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    glDisable(GL_TEXTURE_1D);
+    updateGL_in();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void DrawableTetmesh<M,V,E,F,C>::show_cell_quality()
+{
+    drawlist_in.draw_mode |=  DRAW_TRI_QUALITY;
+    drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    glDisable(GL_TEXTURE_1D);
+    updateGL_in();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void DrawableTetmesh<M,V,E,F,C>::show_cell_texture1D(const GLint texture)
+{
+    drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE1D;
+    drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
+
+    if (drawlist_in.tri_text1D_id > 0) glDeleteTextures(1, &drawlist_in.tri_text1D_id);
+    glGenTextures(1, &drawlist_in.tri_text1D_id);
+    glBindTexture(GL_TEXTURE_1D, drawlist_in.tri_text1D_id);
     switch (texture)
     {
-        case TEXTURE_ISOLINES:
-        {
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D);
-            break;
-        }
-
-        case TEXTURE_QUALITY_RAMP:
-        {
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D);
-            break;
-        }
-
-        case TEXTURE_QUALITY_RAMP_W_ISOLINES:
-        {
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines);
-            break;
-        }
-
+        case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
+        case TEXTURE_QUALITY_RAMP           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D); break;
+        case TEXTURE_QUALITY_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
         default : assert("Unknown 1D Texture" && false);
     }
-
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable(GL_TEXTURE_1D);
+
+    updateGL_in();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::color_wrt_tet_scalar()
+void DrawableTetmesh<M,V,E,F,C>::show_cell_wireframe(const bool b)
 {
-    t_out_colors.resize(num_tetrahedra()*3);
-
-    int n_colors = *max_element(t_label.begin(), t_label.end()) + 1;
-
-    for(int tid=0; tid<num_tetrahedra(); ++tid)
-    {
-        float rgb[3];
-        scattered_color(n_colors, tet_label(tid), rgb);
-
-        int tid_ptr = tid * 3;
-        t_out_colors[tid_ptr + 0] = rgb[0];
-        t_out_colors[tid_ptr + 1] = rgb[1];
-        t_out_colors[tid_ptr + 2] = rgb[2];
-
-        t_in_colors[tid_ptr + 0] = rgb[0];
-        t_in_colors[tid_ptr + 1] = rgb[1];
-        t_in_colors[tid_ptr + 2] = rgb[2];
-    }
-    update_slice();
+    if (b) drawlist_in.draw_mode |=  DRAW_SEGS;
+    else   drawlist_in.draw_mode &= ~DRAW_SEGS;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void DrawableTetmesh::color_tets_wrt_quality(const bool in, const bool out)
+void DrawableTetmesh<M,V,E,F,C>::show_cell_wireframe_color(const Color & c)
 {
-    if (out) t_out_colors.resize(num_tetrahedra()*3);
-    if (in)  t_in_colors.resize(num_tetrahedra()*3);
-
-    for(int tid=0; tid<num_tetrahedra(); ++tid)
-    {
-        float r,g,b;
-        double q = tet_quality(tid);
-
-        if (q < 0)
-        {
-            r = 1.0;
-            g = 0.0;
-            b = 0.0;
-        }
-        else if (q <= 0.5)
-        {
-            q *= 2.0;
-            r = WHITE[0] * q + RED[0] * (1.0 - q);
-            g = WHITE[1] * q + RED[1] * (1.0 - q);
-            b = WHITE[2] * q + RED[2] * (1.0 - q);
-        }
-        else
-        {
-            q = 2.0 * q - 1.0;
-            r = BLUE[0] * q + WHITE[0] * (1.0 - q);
-            g = BLUE[1] * q + WHITE[1] * (1.0 - q);
-            b = BLUE[2] * q + WHITE[2] * (1.0 - q);
-        }
-
-        if (out)
-        {
-            t_out_colors[3*tid+0] = r;
-            t_out_colors[3*tid+1] = g;
-            t_out_colors[3*tid+2] = b;
-        }
-
-        if (in)
-        {
-            t_in_colors[3*tid+0] = r;
-            t_in_colors[3*tid+1] = g;
-            t_in_colors[3*tid+2] = b;
-        }
-    }
+    edge_set_color(c); // NOTE: this will change color for ANY adge (both interior and boundary)
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void DrawableTetmesh<M,V,E,F,C>::show_cell_wireframe_width(const float width)
+{
+    drawlist_in.seg_width = width;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void DrawableTetmesh<M,V,E,F,C>::show_cell_wireframe_transparency(const float alpha)
+{
+    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 }
