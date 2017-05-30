@@ -35,12 +35,12 @@ MeshSlicer<Mesh>::MeshSlicer(Mesh & m)
     slice_thresh[0] = m.bbox().max.x();
     slice_thresh[1] = m.bbox().max.y();
     slice_thresh[2] = m.bbox().max.z();
-    slice_thresh[3] = 0.0;
-    slice_thresh[4] = -1;
-    slice_sign  [0] = LEQ;
-    slice_sign  [1] = LEQ;
-    slice_sign  [2] = LEQ;
-    slice_sign  [3] = LEQ;
+    slice_thresh[3] = -1;  // Q
+    slice_thresh[4] = -1;  // L
+    slice_sign  [0] = LEQ; // X
+    slice_sign  [1] = LEQ; // Y
+    slice_sign  [2] = LEQ; // Z
+    slice_sign  [3] = GEQ; // Q
     slice_mode      = AND;
 
     m.elem_show_all();
