@@ -40,7 +40,7 @@ typedef std::pair<uint,uint> ipair;
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-ipair unique_pair(int v0, int v1)
+ipair unique_pair(uint v0, uint v1)
 {
     ipair e;
     e.first  = std::min(v0,v1);
