@@ -435,7 +435,7 @@ void Tetmesh<M,V,E,F,C>::update_face_normals()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
+int Tetmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
 {
     for(uint f=0; f<faces_per_cell(); ++f)
     {
@@ -446,7 +446,7 @@ uint Tetmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) cons
             return f;
         }
     }
-    assert(false);
+    return -1;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -845,6 +845,49 @@ void Tetmesh<M,V,E,F,C>::update_cell_quality()
     {
         update_cell_quality(cid);
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+double Tetmesh<M,V,E,F,C>::edge_length(const uint eid) const
+{
+    return (edge_vert(eid,0) - edge_vert(eid,1)).length();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+double Tetmesh<M,V,E,F,C>::edge_avg_length() const
+{
+    double avg = 0;
+    for(uint eid=0; eid<num_edges(); ++eid) avg += edge_length(eid);
+    if (num_edges() > 0) avg/=static_cast<double>(num_edges());
+    return avg;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+double Tetmesh<M,V,E,F,C>::edge_max_length() const
+{
+    double max = 0;
+    for(uint eid=0; eid<num_edges(); ++eid) max = std::max(max, edge_length(eid));
+    return max;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+double Tetmesh<M,V,E,F,C>::edge_min_length() const
+{
+    double min = 0;
+    for(uint eid=0; eid<num_edges(); ++eid) min = std::min(min,edge_length(eid));
+    return min;
 }
 
 }

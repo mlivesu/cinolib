@@ -179,11 +179,15 @@ virtual void    vert_set_alpha(const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d edge_vert     (const uint eid, const uint offset) const;
-        uint  edge_vert_id  (const uint eid, const uint offset) const;
-        bool  edge_is_on_srf(const uint eid) const;
-virtual void  edge_set_color(const Color & c);
-virtual void  edge_set_alpha(const float alpha);
+        vec3d  edge_vert      (const uint eid, const uint offset) const;
+        uint   edge_vert_id   (const uint eid, const uint offset) const;
+        bool   edge_is_on_srf (const uint eid) const;
+        double edge_length    (const uint eid) const;
+        double edge_avg_length() const;
+        double edge_max_length() const;
+        double edge_min_length() const;
+virtual void   edge_set_color (const Color & c);
+virtual void   edge_set_alpha (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -201,7 +205,7 @@ virtual void  face_set_alpha    (const float alpha);
         uint   cell_vert_id              (const uint cid, const uint off)   const;
         uint   cell_edge_id              (const uint cid, const uint vid0, const uint vid1) const;
         vec3d  cell_centroid             (const uint cid) const;
-        uint   cell_shared_face          (const uint cid0, const uint cid1) const;
+        int    cell_shared_face          (const uint cid0, const uint cid1) const;
         int    cell_shared_vert          (const uint cid, const std::vector<uint> incident_edges) const;
         int    cell_adjacent_through_face(const uint cid, const uint face) const;
         bool   cell_contains_vert        (const uint cid, const uint vid)   const;

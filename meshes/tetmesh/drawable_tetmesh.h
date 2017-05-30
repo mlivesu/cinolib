@@ -63,7 +63,7 @@ class DrawableTetmesh : public Tetmesh<M,V,E,F,C>, public DrawableObject
 
         RenderData drawlist_in;
         RenderData drawlist_out;
-        MeshSlicer<Tetmesh<M,V,E,F,C>> slicer;
+        MeshSlicer<DrawableTetmesh<M,V,E,F,C>> slicer;
 
     public:
 

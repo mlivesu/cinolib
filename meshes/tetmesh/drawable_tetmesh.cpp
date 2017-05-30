@@ -78,7 +78,7 @@ CINO_INLINE
 void DrawableTetmesh<M,V,E,F,C>::init_drawable_stuff()
 {
     type   = TETMESH;
-    slicer = MeshSlicer<Tetmesh<M,V,E,F,C>>(*this);
+    slicer = MeshSlicer<DrawableTetmesh<M,V,E,F,C>>(*this);
 
     drawlist_in.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
     drawlist_in.seg_width = 1;
@@ -220,32 +220,31 @@ void DrawableTetmesh<M,V,E,F,C>::updateGL_out()
         uint eid1 = this->face_edge_id(fid, vid1, vid2);
         uint eid2 = this->face_edge_id(fid, vid2, vid0);
         //
-        drawlist_in.segs.push_back(base_addr    ); // v0 v1
-        drawlist_in.segs.push_back(base_addr + 1);
-        drawlist_in.segs.push_back(base_addr + 2); // v1 v2
-        drawlist_in.segs.push_back(base_addr + 3);
-        drawlist_in.segs.push_back(base_addr + 4); // v2 v0
-        drawlist_in.segs.push_back(base_addr + 5);
+        drawlist_out.segs.push_back(base_addr    ); // v0 v1
+        drawlist_out.segs.push_back(base_addr + 1);
+        drawlist_out.segs.push_back(base_addr + 2); // v1 v2
+        drawlist_out.segs.push_back(base_addr + 3);
+        drawlist_out.segs.push_back(base_addr + 4); // v2 v0
+        drawlist_out.segs.push_back(base_addr + 5);
 
-        drawlist_in.seg_coords.push_back(this->vert(vid0).x());
-        drawlist_in.seg_coords.push_back(this->vert(vid0).y());
-        drawlist_in.seg_coords.push_back(this->vert(vid0).z());
-        drawlist_in.seg_coords.push_back(this->vert(vid1).x());
-        drawlist_in.seg_coords.push_back(this->vert(vid1).y());
-        drawlist_in.seg_coords.push_back(this->vert(vid1).z());
-        drawlist_in.seg_coords.push_back(this->vert(vid1).x());
-        drawlist_in.seg_coords.push_back(this->vert(vid1).y());
-        drawlist_in.seg_coords.push_back(this->vert(vid1).z());
-        drawlist_in.seg_coords.push_back(this->vert(vid2).x());
-        drawlist_in.seg_coords.push_back(this->vert(vid2).y());
-        drawlist_in.seg_coords.push_back(this->vert(vid2).z());
-        drawlist_in.seg_coords.push_back(this->vert(vid2).x());
-        drawlist_in.seg_coords.push_back(this->vert(vid2).y());
-        drawlist_in.seg_coords.push_back(this->vert(vid2).z());
-        drawlist_in.seg_coords.push_back(this->vert(vid0).x());
-        drawlist_in.seg_coords.push_back(this->vert(vid0).y());
-        drawlist_in.seg_coords.push_back(this->vert(vid0).z());
-
+        drawlist_out.seg_coords.push_back(this->vert(vid0).x());
+        drawlist_out.seg_coords.push_back(this->vert(vid0).y());
+        drawlist_out.seg_coords.push_back(this->vert(vid0).z());
+        drawlist_out.seg_coords.push_back(this->vert(vid1).x());
+        drawlist_out.seg_coords.push_back(this->vert(vid1).y());
+        drawlist_out.seg_coords.push_back(this->vert(vid1).z());
+        drawlist_out.seg_coords.push_back(this->vert(vid1).x());
+        drawlist_out.seg_coords.push_back(this->vert(vid1).y());
+        drawlist_out.seg_coords.push_back(this->vert(vid1).z());
+        drawlist_out.seg_coords.push_back(this->vert(vid2).x());
+        drawlist_out.seg_coords.push_back(this->vert(vid2).y());
+        drawlist_out.seg_coords.push_back(this->vert(vid2).z());
+        drawlist_out.seg_coords.push_back(this->vert(vid2).x());
+        drawlist_out.seg_coords.push_back(this->vert(vid2).y());
+        drawlist_out.seg_coords.push_back(this->vert(vid2).z());
+        drawlist_out.seg_coords.push_back(this->vert(vid0).x());
+        drawlist_out.seg_coords.push_back(this->vert(vid0).y());
+        drawlist_out.seg_coords.push_back(this->vert(vid0).z());
 
         if (drawlist_out.draw_mode & DRAW_SEG_SEGCOLOR)
         {
@@ -568,9 +567,9 @@ void DrawableTetmesh<M,V,E,F,C>::show_face_texture1D(const GLint texture)
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    if (drawlist_in.tri_text1D_id > 0) glDeleteTextures(1, &drawlist_in.tri_text1D_id);
-    glGenTextures(1, &drawlist_in.tri_text1D_id);
-    glBindTexture(GL_TEXTURE_1D, drawlist_in.tri_text1D_id);
+    if (drawlist_out.tri_text1D_id > 0) glDeleteTextures(1, &drawlist_out.tri_text1D_id);
+    glGenTextures(1, &drawlist_out.tri_text1D_id);
+    glBindTexture(GL_TEXTURE_1D, drawlist_out.tri_text1D_id);
     switch (texture)
     {
         case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;

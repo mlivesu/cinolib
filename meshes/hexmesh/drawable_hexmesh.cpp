@@ -646,9 +646,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_face_texture1D(const GLint texture)
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    if (drawlist_in.tri_text1D_id > 0) glDeleteTextures(1, &drawlist_in.tri_text1D_id);
-    glGenTextures(1, &drawlist_in.tri_text1D_id);
-    glBindTexture(GL_TEXTURE_1D, drawlist_in.tri_text1D_id);
+    if (drawlist_out.tri_text1D_id > 0) glDeleteTextures(1, &drawlist_out.tri_text1D_id);
+    glGenTextures(1, &drawlist_out.tri_text1D_id);
+    glBindTexture(GL_TEXTURE_1D, drawlist_out.tri_text1D_id);
     switch (texture)
     {
         case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
