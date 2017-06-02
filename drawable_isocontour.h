@@ -37,7 +37,7 @@ class DrawableIsocontour : public Isocontour, public DrawableObject
     public:
 
         DrawableIsocontour();
-        DrawableIsocontour(Trimesh & m_ptr, float iso_value);
+        DrawableIsocontour(Trimesh<> & m_ptr, float iso_value);
 
         // Implement DrawableObject interface
         //

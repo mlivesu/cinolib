@@ -42,7 +42,7 @@ class DrawableVectorField : public VectorField, public DrawableObject
             type = VECTOR_FIELD;
         }
 
-        DrawableVectorField(const Mesh & m) : VectorField(m.num_elements())
+        DrawableVectorField(const Mesh & m) : VectorField(m.num_elems())
         {
             type     = VECTOR_FIELD;
             m_ptr    = &m;
@@ -58,9 +58,9 @@ class DrawableVectorField : public VectorField, public DrawableObject
         {
             if (m_ptr)
             {
-                for(int tid=0; tid<m_ptr->num_elements(); ++tid)
+                for(int tid=0; tid<m_ptr->num_elems(); ++tid)
                 {
-                    vec3d base = m_ptr->element_barycenter(tid);
+                    vec3d base = m_ptr->elem_centroid(tid);
                     vec3d tip  = base + arrow_length * vec_at(tid);
 
                     arrow<vec3d>(base, tip, arrow_thicknes, color);
@@ -82,7 +82,7 @@ class DrawableVectorField : public VectorField, public DrawableObject
         {
             if (m_ptr)
             {
-                arrow_length   = m_ptr->avg_edge_length() * s;
+                arrow_length   = m_ptr->edge_avg_length() * s;
                 arrow_thicknes = arrow_length * 0.1;
             }
         }

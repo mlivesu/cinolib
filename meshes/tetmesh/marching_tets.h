@@ -31,7 +31,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-void marching_tets(const Tetmesh          & m,
+void marching_tets(const Tetmesh<>        & m,
                    const double             isovalue,
                    std::vector<double>    & coords,
                    std::vector<u_int>     & tris,

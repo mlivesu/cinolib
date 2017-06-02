@@ -35,14 +35,14 @@ class Isocontour
     public:
 
         Isocontour();
-        Isocontour(Trimesh & m, float iso_value, bool discard_boundary_edges = false);
+        Isocontour(Trimesh<> & m, float iso_value, bool discard_boundary_edges = false);
 
         int num_curves() const;
 
         // split triangles and edit the mesh connectivity in such a way
         // that there will be a chain of edges corresponding to isocurve
         //
-        std::vector<int> tessellate(Trimesh & m) const;
+        std::vector<int> tessellate(Trimesh<> & m) const;
 
         // returns the centroid of the cc^th isocurve
         //
@@ -81,9 +81,9 @@ class Isocontour
         std::vector< std::vector<vec3d> > curves_vertices;
         std::vector< std::vector<int> >   curves_edges; // edge-id for each edge of each curve
 
-        Trimesh *m_ptr;
-        float    iso_value;
-        bool     discard_edges_incident_to_boundary;
+        Trimesh<> *m_ptr;
+        float      iso_value;
+        bool       discard_edges_incident_to_boundary;
 };
 
 }

@@ -36,7 +36,7 @@ DrawableIsocontour::DrawableIsocontour()
 }
 
 CINO_INLINE
-DrawableIsocontour::DrawableIsocontour(Trimesh & m, float value) : Isocontour(m, value)
+DrawableIsocontour::DrawableIsocontour(Trimesh<> & m, float value) : Isocontour(m, value)
 {
     type = CURVE;
 

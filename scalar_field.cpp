@@ -58,10 +58,10 @@ template<class Mesh>
 CINO_INLINE
 void ScalarField::copy_to_mesh(Mesh & m) const
 {
-    assert(rows() == m.num_vertices());
+    assert(rows() == m.num_verts());
     for(int vid=0; vid<rows(); ++vid)
     {
-        m.set_vertex_u_text(vid, (*this)[vid]);
+        m.vert_data(vid).uvw[0] = (*this)[vid];
     }
 }
 

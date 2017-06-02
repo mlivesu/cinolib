@@ -6,3 +6,7 @@ meshes/hexmesh/to_be_added/split_schemas.h
 meshes/hexmesh/drawable_hexmesh_backup.h
 
 meshes/hexmesh/drawable_hexmesh_backup.cpp
+
+geometry/polygon2d.h
+
+geometry/polygon2d.cpp

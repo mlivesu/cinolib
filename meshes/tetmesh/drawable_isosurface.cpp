@@ -34,7 +34,7 @@ DrawableIsosurface::DrawableIsosurface()
 }
 
 CINO_INLINE
-DrawableIsosurface::DrawableIsosurface(const Tetmesh & m, const float iso_value) : Isosurface(m, iso_value)
+DrawableIsosurface::DrawableIsosurface(const Tetmesh<> & m, const float iso_value) : Isosurface(m, iso_value)
 {
     type = ISOSURFACE;
 }

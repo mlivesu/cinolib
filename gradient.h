@@ -89,12 +89,12 @@ Eigen::SparseMatrix<double> gradient(const Mesh &)
 
 template <>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient<Trimesh>(const Trimesh & m);
+Eigen::SparseMatrix<double> gradient<Trimesh<>>(const Trimesh<> & m);
 
 
 template <>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient<Tetmesh>(const Tetmesh & m);
+Eigen::SparseMatrix<double> gradient<Tetmesh<>>(const Tetmesh<> & m);
 
 }
 
