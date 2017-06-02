@@ -1,31 +1,33 @@
-/*******************************************************************************
-*  Copyright(C) 2016, Marco Livesu                                             *
-*  All rights reserved.                                                        *
-*                                                                              *
-*  This file is part of CinoLib                                                *
-*                                                                              *
-*  CinoLib is free software; you can redistribute it and/or modify             *
-*  it under the terms of the GNU General Public License as published by        *
-*  the Free Software Foundation; either version 3 of the License, or           *
-*  (at your option) any later version.                                         *
-*                                                                              *
-*  This program is distributed in the hope that it will be useful,             *
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of              *
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               *
-*  GNU General Public License (http://www.gnu.org/licenses/gpl.txt)            *
-*  for more details.                                                           *
-*                                                                              *
-*  Contact:                                                                    *
-*     Marco Livesu                                                             *
-*     email:    marco.livesu@gmail.com                                         *
-*     homepage: http://pers.ge.imati.cnr.it/livesu/                            *
-*                                                                              *
-*     Italian National Research Council (CNR)                                  *
-*     Institute for Applied Mathematics and Information Technologies (IMATI)   *
-*     Via de Marini, 6                                                         *
-*     16149 Genoa,                                                             *
-*     Italy                                                                    *
-*******************************************************************************/
+/*********************************************************************************
+*  Copyright(C) 2016: Marco Livesu                                               *
+*  All rights reserved.                                                          *
+*                                                                                *
+*  This file is part of CinoLib                                                  *
+*                                                                                *
+*  CinoLib is dual-licensed:                                                     *
+*                                                                                *
+*   - For non-commercial use you can redistribute it and/or modify it under the  *
+*     terms of the GNU General Public License as published by the Free Software  *
+*     Foundation; either version 3 of the License, or (at your option) any later *
+*     version.                                                                   *
+*                                                                                *
+*   - If you wish to use it as part of a commercial software, a proper agreement *
+*     with the Author(s) must be reached, based on a proper licensing contract.  *
+*                                                                                *
+*  This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE       *
+*  WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.     *
+*                                                                                *
+*  Author(s):                                                                    *
+*                                                                                *
+*     Marco Livesu (marco.livesu@gmail.com)                                      *
+*     http://pers.ge.imati.cnr.it/livesu/                                        *
+*                                                                                *
+*     Italian National Research Council (CNR)                                    *
+*     Institute for Applied Mathematics and Information Technologies (IMATI)     *
+*     Via de Marini, 6                                                           *
+*     16149 Genoa,                                                               *
+*     Italy                                                                      *
+**********************************************************************************/
 #include <cinolib/meshes/polyhedralmesh/polyhedralmesh.h>
 #include <cinolib/timer.h>
 #include <cinolib/io/read_write.h>
@@ -45,7 +47,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 Polyhedralmesh<M,V,E,F,C>::Polyhedralmesh(const std::vector<vec3d>             & verts,
                                           const std::vector<std::vector<uint>> & faces,
-                                          const std::vector<std::vector<uint>> & cells)
+                                          const std::vector<std::vector<int>>  & cells)
 : verts(verts)
 , faces(faces)
 , cells(cells)
@@ -59,7 +61,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 Polyhedralmesh<M,V,E,F,C>::Polyhedralmesh(const std::vector<double>            & coords,
                                           const std::vector<std::vector<uint>> & faces,
-                                          const std::vector<std::vector<uint>> & cells)
+                                          const std::vector<std::vector<int>>  & cells)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
     this->faces = faces;
