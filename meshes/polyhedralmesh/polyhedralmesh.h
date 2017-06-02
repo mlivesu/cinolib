@@ -54,12 +54,6 @@ class Polyhedralmesh
 
         Polyhedralmesh(){}
 
-        Polyhedralmesh(const char * filename);
-
-        Polyhedralmesh(const std::vector<double>            & coords,
-                       const std::vector<std::vector<uint>> & faces,
-                       const std::vector<std::vector<int>>  & cells);
-
         Polyhedralmesh(const std::vector<vec3d>             & verts,
                        const std::vector<std::vector<uint>> & faces,
                        const std::vector<std::vector<int>>  & cells);
@@ -110,13 +104,12 @@ class Polyhedralmesh
 
         void update_bbox();
         void update_adjacency();
-        void update_face_normals();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_face(const uint fid) const { return faces.at(fid).size();   }
-        uint edges_per_cell(const uint cid) const { return adj_c2e.at(cid).size(); }
-        uint faces_per_cell(const uint cid) const { return cells.at(cid).size();   }
+        uint verts_per_face(const uint fid) const { return faces.at(fid).size(); }
+        uint edges_per_cell(const uint cid) const { return c2e.at(cid).size();   }
+        uint faces_per_cell(const uint cid) const { return cells.at(cid).size(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -134,17 +127,6 @@ class Polyhedralmesh
         const std::vector<uint>              & vector_edges()  const { return edges; }
         const std::vector<std::vector<uint>> & vector_faces()  const { return faces; }
         const std::vector<std::vector<uint>> & vector_cells()  const { return cells; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        std::vector<float> export_uvw_param(const int mode) const;
-        void               set_uvw_from_xyz(const int mode);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        Polygonmesh<> export_surface() const;
-        Polygonmesh<> export_surface(std::map<uint,uint> & c2f_map,
-                                     std::map<uint,uint> & f2c_map) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -180,45 +162,12 @@ class Polyhedralmesh
 
   const vec3d & vert          (const uint vid) const { return verts.at(vid); }
         vec3d & vert          (const uint vid)       { return verts.at(vid); }
-virtual void    vert_set_color(const Color & c);
-virtual void    vert_set_alpha(const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d edge_vert     (const uint eid, const uint offset) const;
-        uint  edge_vert_id  (const uint eid, const uint offset) const;
-        bool  edge_is_on_srf(const uint eid) const;
-virtual void  edge_set_color(const Color & c);
-virtual void  edge_set_alpha(const float alpha);
+        uint face_vert_id(const uint fid, const uint off) const { return faces.at(fid).at(off); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d face_vert         (const uint fid, const uint offset) const;
-        uint  face_vert_id      (const uint fid, const uint offset) const;
-        uint  face_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
-        vec3d face_centroid     (const uint fid) const;
-        bool  face_contains_vert(const uint fid, const uint vid) const;
-virtual void  face_set_color    (const Color & c);
-virtual void  face_set_alpha    (const float alpha);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        uint   cell_face_id       (const uint cid, const uint off) const;
-        vec3d  cell_centroid      (const uint cid) const;
-        int    cell_shared_face   (const uint cid0, const uint cid1) const;
-        bool   cell_contains_vert (const uint cid, const uint vid) const;
-virtual void   cell_set_color     (const Color & c);
-virtual void   cell_set_alpha     (const float alpha);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        // These are all wraps for the "cell_ methods". They are useful for generic
-        // programming, because "elem_" will wrap face_ for surface meshes and wrap
-        // "cell_" for volumetric meshes, allowing the use of templated algorithms
-        // that work with both types of meshes without requiring specialzed code
-
-        vec3d elem_centroid(const uint cid) const;
-        void  elem_show_all();
 };
 
 }
