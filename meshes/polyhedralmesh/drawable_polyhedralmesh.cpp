@@ -49,30 +49,10 @@ DrawablePolyhedralmesh<M,V,E,F,C>::DrawablePolyhedralmesh() : Polyhedralmesh<M,V
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-DrawablePolyhedralmesh<M,V,E,F,C>::DrawablePolyhedralmesh(const char *filename)
-    : Polyhedralmesh<M,V,E,F,C>(filename)
-{
-    init_drawable_stuff();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-DrawablePolyhedralmesh<M,V,E,F,C>::DrawablePolyhedralmesh(const std::vector<vec3d> & verts,
-                                                          const std::vector<uint>  & cells)
-    : Polyhedralmesh<M,V,E,F,C>(verts, cells)
-{
-    init_drawable_stuff();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-DrawablePolyhedralmesh<M,V,E,F,C>::DrawablePolyhedralmesh(const std::vector<double> & coords,
-                                                          const std::vector<uint>   & cells)
-    : Polyhedralmesh<M,V,E,F,C>(coords, cells)
+DrawablePolyhedralmesh<M,V,E,F,C>::DrawablePolyhedralmesh(const std::vector<vec3d>             & verts,
+                                                          const std::vector<std::vector<uint>> & faces,
+                                                          const std::vector<std::vector<int>>  & cells)
+    : Polyhedralmesh<M,V,E,F,C>(verts, faces, cells)
 {
     init_drawable_stuff();
 }
@@ -83,7 +63,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawablePolyhedralmesh<M,V,E,F,C>::init_drawable_stuff()
 {
-    type   = Polyhedralmesh;
+    type   = POLYHEDRALMESH;
     slicer = MeshSlicer<DrawablePolyhedralmesh<M,V,E,F,C>>(*this);
 
     drawlist_in.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
@@ -546,9 +526,9 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawablePolyhedralmesh<M,V,E,F,C>::slice(const float thresh, // thresh on centroids or quality
-                                       const int   item,   // X, Y, Z, L, Q
-                                       const int   sign,   // either LEQ or GEQ
-                                       const int   mode)   // either AND or OR
+                                              const int   item,   // X, Y, Z, L, Q
+                                              const int   sign,   // either LEQ or GEQ
+                                              const int   mode)   // either AND or OR
 {
     slicer.update(*this, thresh, item, sign, mode); // update per element visibility flags
     updateGL();

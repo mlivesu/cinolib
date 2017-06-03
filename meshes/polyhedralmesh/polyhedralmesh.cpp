@@ -99,8 +99,9 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Polyhedralmesh<M,V,E,F,C>::init()
 {
-    update_bbox();
+    update_face_tessellation();
     update_adjacency();
+    update_bbox();
 
     v_data.resize(num_verts());
     e_data.resize(num_edges());
@@ -252,6 +253,41 @@ void Polyhedralmesh<M,V,E,F,C>::update_adjacency()
     logger << num_cells() << "\tcells" << endl;
 
     timer_stop("Build adjacency");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Polyhedralmesh<M,V,E,F,C>::update_face_tessellation()
+{
+    tessellated_faces.resize(num_faces());
+    std::set<uint> bad_faces;
+
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        // TODO: improve triangulation strategy (this assumes convexity!)
+        std::vector<vec3d> n;
+        for (uint i=2; i<verts_per_face(fid); ++i)
+        {
+            uint vid0 = faces.at(fid).at( 0 );
+            uint vid1 = faces.at(fid).at(i-1);
+            uint vid2 = faces.at(fid).at( i );
+
+            tessellated_faces.at(fid).push_back(vid0);
+            tessellated_faces.at(fid).push_back(vid1);
+            tessellated_faces.at(fid).push_back(vid2);
+
+            n.push_back((vert(vid1)-vert(vid0)).cross(vert(vid2)-vert(vid0)));
+        }
+        // check for badly tessellated polygons...
+        for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_faces.insert(fid);
+    }
+    //
+    for(uint fid : bad_faces)
+    {
+        std::cerr << "WARNING : Bad tessellation occurred for non-convex polygon " << fid << std::endl;
+    }
 }
 
 }

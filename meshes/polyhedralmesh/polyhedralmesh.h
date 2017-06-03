@@ -64,11 +64,13 @@ class Polyhedralmesh
 
         std::vector<vec3d>             verts;
         std::vector<uint>              edges;
-        std::vector<std::vector<uint>> faces;    // list of vertices (assumed CCW)
-        std::vector<std::vector<int>>  cells;    // unordered list of faces (<fid> => CCW, -<fid> => CW)
-        std::vector<bool>              v_on_srf; // true if a vertex is on the surface
-        std::vector<bool>              e_on_srf; // true if an edge is on the surface
-        std::vector<bool>              f_on_srf; // true if a face is on the surface
+        std::vector<std::vector<uint>> faces;             // list of vertices (assumed CCW)
+        std::vector<std::vector<uint>> tessellated_faces; // triangles covering each face (e.g., for rendering)
+        std::vector<std::vector<int>>  cells;             // unordered list of faces (<fid> => CCW, -<fid> => CW)
+        std::vector<bool>              v_on_srf;          // true if a vertex is on the surface
+        std::vector<bool>              e_on_srf;          // true if an edge is on the surface
+        std::vector<bool>              f_on_srf;          // true if a face is on the surface
+
 
         // attributes
         //
@@ -104,6 +106,7 @@ class Polyhedralmesh
 
         void update_bbox();
         void update_adjacency();
+        void update_face_tessellation();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

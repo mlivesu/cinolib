@@ -41,10 +41,11 @@ typedef enum
 {
     ABSTRACT      ,
     TRIMESH       ,
-    POLYGONMESH   ,
     TETMESH       ,
     QUADMESH      ,
     HEXMESH       ,
+    POLYGONMESH   ,
+    POLYHEDRALMESH,
     SKELETON      ,
     CURVE         ,
     ISOSURFACE    ,
