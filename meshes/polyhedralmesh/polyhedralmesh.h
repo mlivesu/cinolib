@@ -107,10 +107,12 @@ class Polyhedralmesh
         void update_bbox();
         void update_adjacency();
         void update_face_tessellation();
+        void update_f_normals();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint verts_per_face(const uint fid) const { return faces.at(fid).size(); }
+        uint verts_per_cell(const uint cid) const { return c2v.at(cid).size();   }
         uint edges_per_cell(const uint cid) const { return c2e.at(cid).size();   }
         uint faces_per_cell(const uint cid) const { return cells.at(cid).size(); }
 
@@ -168,9 +170,34 @@ class Polyhedralmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint face_vert_id(const uint fid, const uint off) const { return faces.at(fid).at(off); }
+        vec3d edge_vert     (const uint eid, const uint off) const;
+        uint  edge_vert_id  (const uint eid, const uint off) const;
+        bool  edge_is_on_srf(const uint eid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d face_vert     (const uint fid, const uint off) const;
+        uint  face_vert_id  (const uint fid, const uint off) const;
+        bool  face_is_on_srf(const uint fid) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        bool  cell_is_on_surf (const uint cid) const;
+        uint  cell_face_id    (const uint cid, const uint off) const;
+        bool  cell_face_is_CCW(const uint cid, const uint off) const;
+        bool  cell_face_is_CW (const uint cid, const uint off) const;
+        uint  cell_face_offset(const uint cid, const uint fid) const;
+        vec3d cell_centroid   (const uint cid) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        // These are all wraps for the "cell_ methods". They are useful for generic
+        // programming, because "elem_" will wrap face_ for surface meshes and wrap
+        // "cell_" for volumetric meshes, allowing the use of templated algorithms
+        // that work with both types of meshes without requiring specialzed code
+
+        vec3d elem_centroid(const uint cid) const;
+        void  elem_show_all();
 };
 
 }

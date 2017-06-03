@@ -107,6 +107,8 @@ void Polyhedralmesh<M,V,E,F,C>::init()
     e_data.resize(num_edges());
     c_data.resize(num_cells());
     f_data.resize(num_faces());
+
+    update_f_normals();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -288,6 +290,170 @@ void Polyhedralmesh<M,V,E,F,C>::update_face_tessellation()
     {
         std::cerr << "WARNING : Bad tessellation occurred for non-convex polygon " << fid << std::endl;
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+uint Polyhedralmesh<M,V,E,F,C>::cell_face_id(const uint cid, const uint off) const
+{
+    return std::abs(cells.at(cid).at(off)); // abs because it may be < 0 if the face is CW and not CCW!
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+bool Polyhedralmesh<M,V,E,F,C>::cell_face_is_CW(const uint cid, const uint off) const
+{
+    return (cells.at(cid).at(off) < 0);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+bool Polyhedralmesh<M,V,E,F,C>::cell_face_is_CCW(const uint cid, const uint off) const
+{
+    return (cells.at(cid).at(off) >= 0);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+uint Polyhedralmesh<M,V,E,F,C>::cell_face_offset(const uint cid, const uint fid) const
+{
+    for(uint off=0; off<cells.at(cid).size(); ++off)
+    {
+        if (cell_face_id(cid,off) == fid) return off;
+    }
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool Polyhedralmesh<M,V,E,F,C>::cell_is_on_surf(const uint cid) const
+{
+    for(uint off=0; off<faces_per_cell(cid); ++off)
+    {
+        if (f_on_srf.at(cell_face_id(cid,off))) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+uint Polyhedralmesh<M,V,E,F,C>::edge_vert_id(const uint eid, const uint offset) const
+{
+    uint   eid_ptr = eid * 2;
+    return edges.at(eid_ptr + offset);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+vec3d Polyhedralmesh<M,V,E,F,C>::edge_vert(const uint eid, const uint offset) const
+{
+    return vert(edge_vert_id(eid,offset));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+vec3d Polyhedralmesh<M,V,E,F,C>::cell_centroid(const uint cid) const
+{
+    vec3d c(0,0,0);
+    for(uint vid : adj_c2v(cid)) c += vert(vid);
+    c /= static_cast<double>(verts_per_cell(cid));
+    return c;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+vec3d Polyhedralmesh<M,V,E,F,C>::elem_centroid(const uint cid) const
+{
+    return cell_centroid(cid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Polyhedralmesh<M,V,E,F,C>::elem_show_all()
+{
+    for(uint cid=0; cid<num_cells(); ++cid)
+    {
+        cell_data(cid).visible = true;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Polyhedralmesh<M,V,E,F,C>::update_f_normals()
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        assert(verts_per_face(fid)>2);
+
+        // compute the best fitting plane
+        std::vector<vec3d> points;
+        for(uint off=0; off<verts_per_face(fid); ++off) points.push_back(face_vert(fid,off));
+        Plane best_fit(points);
+
+        // adjust orientation (n or -n?)
+        vec3d v0 = face_vert(fid,0);
+        vec3d v1 = face_vert(fid,1);
+        uint  i=2;
+        vec3d ccw;
+        do { ccw = (v1-v0).cross(face_vert(fid,i)-v0); } while (ccw.length_squared()==0 && i<verts_per_face(fid));
+
+        face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+vec3d Polyhedralmesh<M,V,E,F,C>::face_vert(const uint fid, const uint off) const
+{
+    return vert(face_vert_id(fid,off));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+uint Polyhedralmesh<M,V,E,F,C>::face_vert_id(const uint fid, const uint off) const
+{
+    return faces.at(fid).at(off);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool Polyhedralmesh<M,V,E,F,C>::face_is_on_srf(const uint fid) const
+{
+    return f_on_srf.at(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool Polyhedralmesh<M,V,E,F,C>::edge_is_on_srf(const uint eid) const
+{
+    return e_on_srf.at(eid);
 }
 
 }
