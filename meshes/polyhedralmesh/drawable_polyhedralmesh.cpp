@@ -49,6 +49,15 @@ DrawablePolyhedralmesh<M,V,E,F,C>::DrawablePolyhedralmesh() : Polyhedralmesh<M,V
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+DrawablePolyhedralmesh<M,V,E,F,C>::DrawablePolyhedralmesh(const char * filename) : Polyhedralmesh<M,V,E,F,C>(filename)
+{
+    init_drawable_stuff();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 DrawablePolyhedralmesh<M,V,E,F,C>::DrawablePolyhedralmesh(const std::vector<vec3d>             & verts,
                                                           const std::vector<std::vector<uint>> & faces,
                                                           const std::vector<std::vector<int>>  & cells)
@@ -242,6 +251,8 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
     drawlist_in.seg_coords.clear();
     drawlist_in.seg_colors.clear();
 
+    std::set<uint> edges_to_render;
+
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
         if (this->face_is_on_srf(fid)) continue;
@@ -253,6 +264,8 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
             if (this->cell_data(cid).visible) visible_cells.push_back(cid);
         }
         if (visible_cells.size()!=1) continue;
+
+        for(uint eid : this->adj_f2e(fid)) edges_to_render.insert(eid);
 
         uint cid   = visible_cells.front();
         bool is_CW = this->cell_face_is_CW(cid,this->cell_face_offset(cid,fid));
@@ -325,16 +338,9 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
     }
 
     // bake wireframe as border
-    for(uint eid=0; eid<this->num_edges(); ++eid)
+    for(uint eid : edges_to_render)
     {
-        if (this->edge_is_on_srf(eid)) continue;
-
-        bool masked = true;
-        for(uint cid : this->adj_e2c(eid))
-        {
-            if (this->cell_data(cid).visible) masked = false;
-        }
-        if (masked) continue;
+        if (this->edge_is_on_srf(eid)) continue; // updateGL_out() will consider it
 
         int base_addr = drawlist_in.seg_coords.size()/3;
         drawlist_in.segs.push_back(base_addr    );

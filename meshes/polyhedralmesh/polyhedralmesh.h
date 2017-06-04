@@ -54,6 +54,8 @@ class Polyhedralmesh
 
         Polyhedralmesh(){}
 
+        Polyhedralmesh(const char * filename);
+
         Polyhedralmesh(const std::vector<vec3d>             & verts,
                        const std::vector<std::vector<uint>> & faces,
                        const std::vector<std::vector<int>>  & cells);

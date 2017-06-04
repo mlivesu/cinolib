@@ -46,6 +46,16 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+Polyhedralmesh<M,V,E,F,C>::Polyhedralmesh(const char * filename)
+{
+    load(filename);
+    init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 Polyhedralmesh<M,V,E,F,C>::Polyhedralmesh(const std::vector<vec3d>             & verts,
                                           const std::vector<std::vector<uint>> & faces,
                                           const std::vector<std::vector<int>>  & cells)
@@ -91,6 +101,42 @@ void Polyhedralmesh<M,V,E,F,C>::clear()
     c2v.clear();
     c2e.clear();
     c2c.clear();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Polyhedralmesh<M,V,E,F,C>::load(const char * filename)
+{
+    timer_start("Load Polyhedralmesh");
+
+    clear();
+    std::vector<double> coords;
+
+    std::string str(filename);
+    std::string filetype = str.substr(str.size()-7,7);
+
+    if (filetype.compare(".hybrid") == 0 ||
+        filetype.compare(".HYBRID") == 0)
+    {
+        read_HYBDRID(filename, coords, faces, cells);
+    }
+    else
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
+        exit(-1);
+    }
+
+    verts = vec3d_from_serialized_xyz(coords);
+
+    logger << num_verts() << " verts read" << endl;
+    logger << num_faces() << " faces read" << endl;
+    logger << num_cells() << " cells read" << endl;
+
+    this->mesh_data().filename = std::string(filename);
+
+    timer_stop("Load Polyhedralmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

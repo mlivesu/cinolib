@@ -60,6 +60,8 @@ class DrawablePolyhedralmesh : public Polyhedralmesh<M,V,E,F,C>, public Drawable
 
         DrawablePolyhedralmesh();
 
+        DrawablePolyhedralmesh(const char * filename);
+
         DrawablePolyhedralmesh(const std::vector<vec3d>             & verts,
                                const std::vector<std::vector<uint>> & faces,
                                const std::vector<std::vector<int>>  & cells);

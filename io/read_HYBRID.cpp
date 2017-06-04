@@ -28,65 +28,87 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_DRAW_TRIS_QUADS_H
-#define CINO_DRAW_TRIS_QUADS_H
-
-#include <cinolib/cinolib.h>
-
-#ifdef __APPLE__
-#include <gl.h>
-#include <glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
-#include <sys/types.h>
-#include <cmath>
+#include <cinolib/io/read_HYBRID.h>
+#include <iostream>
 
 namespace cinolib
 {
 
-typedef enum
-{
-    DRAW_MESH        = 0x00000001,
-    DRAW_POINTS      = 0x00000002,
-    DRAW_FLAT        = 0x00000004,
-    DRAW_SMOOTH      = 0x00000008,
-    DRAW_WIREFRAME   = 0x00000010,
-    DRAW_FACECOLOR   = 0x00000020,
-    DRAW_VERTEXCOLOR = 0x00000040,
-    DRAW_TEXTURE1D   = 0x00000080,
-    DRAW_BORDER      = 0x00000100,
-}
-DrawMode;
-
-typedef struct
-{
-          int                  draw_mode;
-          GLenum               face_type;
-    const std::vector<double> *coords           = NULL;
-    const std::vector<uint>   *faces            = NULL;
-    const std::vector<double> *v_norms          = NULL;
-    const std::vector<float>  *v_colors         = NULL;
-    const std::vector<float>  *f_colors         = NULL;
-    const std::vector<float>  *text1D           = NULL;
-    const std::vector<double> *border_coords    = NULL;
-    const std::vector<uint>   *border_segs      = NULL;
-    const float               *wireframe_color  = NULL;
-    const float               *border_color     = NULL;
-          int                  wireframe_width;
-          int                  border_width;
-}
-RenderFaceData;
-
-
 CINO_INLINE
-void render_faces(const RenderFaceData & data);
+void read_HYBDRID(const char                     * filename,
+                  std::vector<double>            & coords,
+                  std::vector<std::vector<uint>> & faces,
+                  std::vector<std::vector<int>>  & cells)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    coords.clear();
+    faces.clear();
+    cells.clear();
+
+    FILE *fp = fopen(filename, "r");
+
+    if(!fp)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_HYBRID() : couldn't open input file " << filename << endl;
+        exit(-1);
+    }
+
+    uint nv, nf, nc;
+    fscanf(fp, "%d %d %d", &nv, &nf, &nc);
+    nc /= 3; // hack, bug in files?
+
+    for(uint i=0; i<nv; ++i)
+    {
+        double x, y, z;
+        fscanf(fp, "%lf %lf %lf", &x, &y, &z);
+        coords.push_back(x);
+        coords.push_back(y);
+        coords.push_back(z);
+    }
+
+    for(uint i=0; i<nf; ++i)
+    {
+        uint n_verts;
+        fscanf(fp, "%d", &n_verts);
+
+        std::vector<uint> face;
+        for(uint j=0; j<n_verts; ++j)
+        {
+            uint vid;
+            fscanf(fp, "%d", &vid);
+            face.push_back(vid);
+        }
+        faces.push_back(face);
+    }
+
+    for(uint i=0; i<nc; ++i)
+    {
+        uint nf;
+        fscanf(fp, "%d", &nf);
+
+        std::vector<int> cell;
+        for(uint j=0; j<nf; ++j)
+        {
+            uint fid;
+            fscanf(fp, "%d", &fid);
+            cell.push_back(fid);
+        }
+        cells.push_back(cell);
+
+        uint dummy; fscanf(fp, "%d", &dummy);
+        for(uint j=0; j<nf; ++j)
+        {
+            uint winding;
+            fscanf(fp, "%d", &winding);
+            if (winding == 0)
+            {
+                cells.back().at(j) *= -1; // -fid to indicates that the face winding order is CW as seen from the current cell
+            }
+        }
+    }
+
+    fclose(fp);
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "draw_tris_quads.cpp"
-#endif
-
-#endif // CINO_DRAW_TRIS_QUADS_H
+}
