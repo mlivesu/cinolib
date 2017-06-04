@@ -257,17 +257,11 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
         uint cid   = visible_cells.front();
         bool is_CW = this->cell_face_is_CW(cid,this->cell_face_offset(cid,fid));
 
-        std::cout << "draw inner face " << fid
-                  << " visible from cell " << cid
-                  << " with offset " << this->cell_face_offset(cid,fid)
-                  << " CW: " << this->cell_face_is_CW(cid,this->cell_face_offset(cid,fid)) << std::endl;
-
         for(uint i=0; i<this->tessellated_faces.at(fid).size()/3; ++i)
         {
             uint vid0 = this->tessellated_faces.at(fid).at(3*i+0);
             uint vid1 = this->tessellated_faces.at(fid).at(3*i+1);
             uint vid2 = this->tessellated_faces.at(fid).at(3*i+2);
-
             if (is_CW) std::swap(vid1,vid2); // flip triangle orientation
 
             int base_addr = drawlist_in.tri_coords.size()/3;
@@ -286,7 +280,7 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
             drawlist_in.tri_coords.push_back(this->vert(vid2).y());
             drawlist_in.tri_coords.push_back(this->vert(vid2).z());
 
-            vec3d n = this->face_data(fid).normal;
+            vec3d n = (is_CW) ? -this->face_data(fid).normal : this->face_data(fid).normal;
             drawlist_in.tri_v_norms.push_back(n.x());
             drawlist_in.tri_v_norms.push_back(n.y());
             drawlist_in.tri_v_norms.push_back(n.z());
