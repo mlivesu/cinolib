@@ -93,7 +93,6 @@ Eigen::SparseMatrix<double> gradient(const Mesh &)
     assert(false);
 }
 
-
 template <>
 CINO_INLINE
 Eigen::SparseMatrix<double> gradient<Trimesh<>>(const Trimesh<> & m);

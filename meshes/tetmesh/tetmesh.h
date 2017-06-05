@@ -213,6 +213,8 @@ virtual void  face_set_alpha    (const float alpha);
         uint   cell_edge_id              (const uint cid, const uint vid0, const uint vid1) const;
         vec3d  cell_centroid             (const uint cid) const;
         vec3d  cell_face_normal          (const uint cid, const uint face_offset) const;
+        double cell_face_area            (const uint cid, const uint face_offset) const;
+        double cell_volume               (const uint cid) const;
         double cell_dihedral_angle       (const uint cid, const uint face_offset1, const uint face_offset2) const;
         uint   cell_vert_opposite_to     (const uint cid, const uint face_offset) const;
         uint   cell_edge_opposite_to     (const uint cid, const uint vid0, const uint vid1) const;

@@ -536,6 +536,30 @@ vec3d Tetmesh<M,V,E,F,C>::cell_face_normal(const uint cid, const uint face_offse
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+double Tetmesh<M,V,E,F,C>::cell_face_area(const uint cid, const uint face_offset) const
+{
+    vec3d v0 = cell_vert(cid, TET_FACES[face_offset][0]);
+    vec3d v1 = cell_vert(cid, TET_FACES[face_offset][1]);
+    vec3d v2 = cell_vert(cid, TET_FACES[face_offset][2]);
+    return (0.5 * (v1-v0).cross(v2-v0).length());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+double Tetmesh<M,V,E,F,C>::cell_volume(const uint cid) const
+{
+    return tet_unsigned_volume(cell_vert(cid,0),
+                               cell_vert(cid,1),
+                               cell_vert(cid,2),
+                               cell_vert(cid,3));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 double Tetmesh<M,V,E,F,C>::cell_dihedral_angle(const uint cid, const uint face_offset1, const uint face_offset2) const
 {
     vec3d   n0 = cell_face_normal(cid, face_offset1);

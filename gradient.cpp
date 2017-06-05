@@ -1,3 +1,33 @@
+/*********************************************************************************
+*  Copyright(C) 2016: Marco Livesu                                               *
+*  All rights reserved.                                                          *
+*                                                                                *
+*  This file is part of CinoLib                                                  *
+*                                                                                *
+*  CinoLib is dual-licensed:                                                     *
+*                                                                                *
+*   - For non-commercial use you can redistribute it and/or modify it under the  *
+*     terms of the GNU General Public License as published by the Free Software  *
+*     Foundation; either version 3 of the License, or (at your option) any later *
+*     version.                                                                   *
+*                                                                                *
+*   - If you wish to use it as part of a commercial software, a proper agreement *
+*     with the Author(s) must be reached, based on a proper licensing contract.  *
+*                                                                                *
+*  This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE       *
+*  WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.     *
+*                                                                                *
+*  Author(s):                                                                    *
+*                                                                                *
+*     Marco Livesu (marco.livesu@gmail.com)                                      *
+*     http://pers.ge.imati.cnr.it/livesu/                                        *
+*                                                                                *
+*     Italian National Research Council (CNR)                                    *
+*     Institute for Applied Mathematics and Information Technologies (IMATI)     *
+*     Via de Marini, 6                                                           *
+*     16149 Genoa,                                                               *
+*     Italy                                                                      *
+**********************************************************************************/
 #include <cinolib/gradient.h>
 #include <cinolib/timer.h>
 
@@ -9,38 +39,38 @@ typedef Eigen::Triplet<double> Entry;
 
 template <>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient<Trimesh>(const Trimesh & m)
+Eigen::SparseMatrix<double> gradient<Trimesh<>>(const Trimesh<> & m)
 {
     timer_start("Compute gradient matrix");
 
-    Eigen::SparseMatrix<double> G(m.num_triangles()*3, m.num_vertices());
+    Eigen::SparseMatrix<double> G(m.num_faces()*3, m.num_verts());
 
     std::vector<Entry> entries;
 
-    for(int tid=0; tid<m.num_triangles(); ++tid)
+    for(uint fid=0; fid<m.num_faces(); ++fid)
     {
-        int i = m.triangle_vertex_id(tid, 0);
-        int j = m.triangle_vertex_id(tid, 1);
-        int k = m.triangle_vertex_id(tid, 2);
+        uint i = m.face_vert_id(fid, 0);
+        uint j = m.face_vert_id(fid, 1);
+        uint k = m.face_vert_id(fid, 2);
 
-        vec3d vi = m.vertex(i);
-        vec3d vj = m.vertex(j);
-        vec3d vk = m.vertex(k);
+        vec3d vi = m.vert(i);
+        vec3d vj = m.vert(j);
+        vec3d vk = m.vert(k);
         vec3d ik = vi - vk;
         vec3d ji = vj - vi;
 
-        vec3d  axis  = m.triangle_normal(tid);
+        vec3d  axis  = m.face_data(fid).normal;
         double angle = M_PI * 0.5;
 
         rotate(ik, axis, angle);
         rotate(ji, axis, angle);
 
-        double dblA = m.element_mass(tid);
+        double dblA = m.elem_mass(fid);
 
         ik /= dblA;
         ji /= dblA;
 
-        int row = 3 * tid;
+        uint row = 3 * fid;
         entries.push_back(Entry(row, i, -(ik.x() + ji.x())));
         entries.push_back(Entry(row, j, ik.x()));
         entries.push_back(Entry(row, k, ji.x()));
@@ -66,29 +96,29 @@ Eigen::SparseMatrix<double> gradient<Trimesh>(const Trimesh & m)
 
 template<>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient<Tetmesh>(const Tetmesh & m)
+Eigen::SparseMatrix<double> gradient<Tetmesh<>>(const Tetmesh<> &m)
 {
     timer_start("Compute gradient matrix");
 
-    Eigen::SparseMatrix<double> G(m.num_tetrahedra()*3, m.num_vertices());
+    Eigen::SparseMatrix<double> G(m.num_cells()*3, m.num_verts());
 
     std::vector<Entry> entries;
 
-    for(int tid=0; tid<m.num_tetrahedra(); ++tid)
+    for(uint cid=0; cid<m.num_cells(); ++cid)
     {
-        int A = m.tet_vertex_id(tid, 0);
-        int B = m.tet_vertex_id(tid, 1);
-        int C = m.tet_vertex_id(tid, 2);
-        int D = m.tet_vertex_id(tid, 3);
+        int A = m.cell_vert_id(cid, 0);
+        int B = m.cell_vert_id(cid, 1);
+        int C = m.cell_vert_id(cid, 2);
+        int D = m.cell_vert_id(cid, 3);
 
-        double vol3 = std::max(m.tet_volume(tid), 1e-5) * 3.0;
+        double vol3 = std::max(m.cell_volume(cid), 1e-5) * 3.0;
 
-        vec3d n_ABC = m.tet_face_normal(tid, 0) * m.tet_face_area(tid, 0) / vol3;
-        vec3d n_ABD = m.tet_face_normal(tid, 1) * m.tet_face_area(tid, 1) / vol3;
-        vec3d n_ACD = m.tet_face_normal(tid, 2) * m.tet_face_area(tid, 2) / vol3;
-        vec3d n_BCD = m.tet_face_normal(tid, 3) * m.tet_face_area(tid, 3) / vol3;
+        vec3d n_ABC = m.cell_face_normal(cid,0) * m.cell_face_area(cid,0) / vol3;
+        vec3d n_ABD = m.cell_face_normal(cid,1) * m.cell_face_area(cid,1) / vol3;
+        vec3d n_ACD = m.cell_face_normal(cid,2) * m.cell_face_area(cid,2) / vol3;
+        vec3d n_BCD = m.cell_face_normal(cid,3) * m.cell_face_area(cid,3) / vol3;
 
-        int row = 3 * tid;
+        uint row = 3 * cid;
         entries.push_back(Entry(row, A, n_ABC.x() + n_ABD.x() + n_ACD.x()));
         entries.push_back(Entry(row, B, n_ABC.x() + n_ABD.x() + n_BCD.x()));
         entries.push_back(Entry(row, C, n_ABC.x() + n_ACD.x() + n_BCD.x()));
