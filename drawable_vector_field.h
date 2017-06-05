@@ -33,7 +33,7 @@
 
 #include <cinolib/vector_field.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/colors.h>
+#include <cinolib/color.h>
 #include <cinolib/gl/draw_arrow.h>
 
 namespace cinolib
@@ -51,12 +51,10 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
         DrawableVectorField(const Mesh & m) : VectorField(m.num_elems())
         {
-            type     = VECTOR_FIELD;
-            m_ptr    = &m;
-            color[0] = RED[0];
-            color[1] = RED[1];
-            color[2] = RED[2];
+            type        = VECTOR_FIELD;
+            m_ptr       = &m;
 
+            set_arrow_color(Color::RED());
             set_arrow_size(0.5);
         }
 
@@ -65,12 +63,12 @@ class DrawableVectorField : public VectorField, public DrawableObject
         {
             if (m_ptr)
             {
-                for(int tid=0; tid<m_ptr->num_elems(); ++tid)
+                for(uint eid=0; eid<m_ptr->num_elems(); ++eid)
                 {
-                    vec3d base = m_ptr->elem_centroid(tid);
-                    vec3d tip  = base + arrow_length * vec_at(tid);
+                    vec3d base = m_ptr->elem_centroid(eid);
+                    vec3d tip  = base + arrow_length * vec_at(eid);
 
-                    arrow<vec3d>(base, tip, arrow_thicknes, color);
+                    arrow<vec3d>(base, tip, arrow_thicknes, arrow_color.rgba);
                 }
             }
         }
@@ -78,12 +76,7 @@ class DrawableVectorField : public VectorField, public DrawableObject
         vec3d scene_center() const { return vec3d(); }
         float scene_radius() const { return 0.0;     }
 
-        inline void set_color(float r, float g, float b)
-        {
-            color[0] = r;
-            color[1] = g;
-            color[2] = b;
-        }
+        void set_arrow_color(const Color & c) { arrow_color = c; }
 
         void set_arrow_size(float s)
         {
@@ -117,7 +110,7 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
         float arrow_length;
         float arrow_thicknes;
-        float color[3];
+        Color arrow_color;
 };
 
 }
