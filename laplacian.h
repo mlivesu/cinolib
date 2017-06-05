@@ -49,15 +49,15 @@ enum
 template<typename Mesh>
 CINO_INLINE
 void uniform_weights(const Mesh          & m,
-                     const int             vid,
-                     std::vector<int>    & nbrs,
+                     const uint            vid,
+                     std::vector<uint>   & nbrs,
                      std::vector<double> & wgts)
 {
     assert(nbrs.empty());
     assert(wgts.empty());
-    nbrs = m.adj_vtx2vtx(vid);
+    nbrs = m.adj_v2v(vid);
     double w = 1.0; // / (double)nbrs.size(); // <= WARNING: makes the matrix non-symmetric!!!!!
-    for(int i=0; i<(int)nbrs.size(); ++i)
+    for(uint i=0; i<nbrs.size(); ++i)
     {
         wgts.push_back(w);
     }
@@ -70,9 +70,9 @@ std::vector< Eigen::Triplet<double> > laplacian_matrix_entries(const Mesh & m, c
 {
     std::vector<Entry> entries;
 
-    for(int vid=0; vid<m.num_vertices(); ++vid)
+    for(uint vid=0; vid<m.num_verts(); ++vid)
     {
-        std::vector<int>    nbrs;
+        std::vector<uint>   nbrs;
         std::vector<double> wgts;
 
         if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
@@ -80,7 +80,7 @@ std::vector< Eigen::Triplet<double> > laplacian_matrix_entries(const Mesh & m, c
         assert(false);
 
         double sum = 0.0;
-        for(int i=0; i<(int)nbrs.size(); ++i)
+        for(uint i=0; i<nbrs.size(); ++i)
         {
             entries.push_back(Entry(vid, nbrs[i], wgts[i]));
             sum -= wgts[i];
@@ -102,15 +102,15 @@ std::vector< Eigen::Triplet<double> > laplacian_matrix_entries_xyz(const Mesh & 
 {
     std::vector<Entry> entries;
 
-    int nv     = m.num_vertices();
-    int base_x = nv * 0;
-    int base_y = nv * 1;
-    int base_z = nv * 2;
+    uint nv     = m.num_verts();
+    uint base_x = nv * 0;
+    uint base_y = nv * 1;
+    uint base_z = nv * 2;
 
 
-    for(int vid=0; vid<m.num_vertices(); ++vid)
+    for(uint vid=0; vid<m.num_verts(); ++vid)
     {
-        std::vector<int>    nbrs;
+        std::vector<uint>   nbrs;
         std::vector<double> wgts;
 
         if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
@@ -118,7 +118,7 @@ std::vector< Eigen::Triplet<double> > laplacian_matrix_entries_xyz(const Mesh & 
         assert(false);
 
         double sum = 0.0;
-        for(int i=0; i<(int)nbrs.size(); ++i)
+        for(uint i=0; i<nbrs.size(); ++i)
         {
             entries.push_back(Entry(base_x + vid, base_x + nbrs[i], wgts[i]));
             entries.push_back(Entry(base_y + vid, base_y + nbrs[i], wgts[i]));
@@ -140,7 +140,7 @@ Eigen::SparseMatrix<double> laplacian(const Mesh & m, const int mode)
 {
     std::vector<Entry> entries = laplacian_matrix_entries<Mesh>(m, mode);
 
-    Eigen::SparseMatrix<double> L(m.num_vertices(), m.num_vertices());
+    Eigen::SparseMatrix<double> L(m.num_verts(), m.num_verts());
     L.setFromTriplets(entries.begin(), entries.end());
 
     return L;

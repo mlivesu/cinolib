@@ -1,26 +1,33 @@
-/****************************************************************************
-* Italian National Research Council                                         *
-* Institute for Applied Mathematics and Information Technologies, Genoa     *
-* IMATI-GE / CNR                                                            *
-*                                                                           *
-* Author: Marco Livesu (marco.livesu@gmail.com)                             *
-*                                                                           *
-* Copyright(C) 2016                                                         *
-* All rights reserved.                                                      *
-*                                                                           *
-* This file is part of CinoLib                                              *
-*                                                                           *
-* CinoLib is free software; you can redistribute it and/or modify           *
-* it under the terms of the GNU General Public License as published by      *
-* the Free Software Foundation; either version 3 of the License, or         *
-* (at your option) any later version.                                       *
-*                                                                           *
-* This program is distributed in the hope that it will be useful,           *
-* but WITHOUT ANY WARRANTY; without even the implied warranty of            *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
-* GNU General Public License (http://www.gnu.org/licenses/gpl.txt)          *
-* for more details.                                                         *
-****************************************************************************/
+/*********************************************************************************
+*  Copyright(C) 2016: Marco Livesu                                               *
+*  All rights reserved.                                                          *
+*                                                                                *
+*  This file is part of CinoLib                                                  *
+*                                                                                *
+*  CinoLib is dual-licensed:                                                     *
+*                                                                                *
+*   - For non-commercial use you can redistribute it and/or modify it under the  *
+*     terms of the GNU General Public License as published by the Free Software  *
+*     Foundation; either version 3 of the License, or (at your option) any later *
+*     version.                                                                   *
+*                                                                                *
+*   - If you wish to use it as part of a commercial software, a proper agreement *
+*     with the Author(s) must be reached, based on a proper licensing contract.  *
+*                                                                                *
+*  This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE       *
+*  WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.     *
+*                                                                                *
+*  Author(s):                                                                    *
+*                                                                                *
+*     Marco Livesu (marco.livesu@gmail.com)                                      *
+*     http://pers.ge.imati.cnr.it/livesu/                                        *
+*                                                                                *
+*     Italian National Research Council (CNR)                                    *
+*     Institute for Applied Mathematics and Information Technologies (IMATI)     *
+*     Via de Marini, 6                                                           *
+*     16149 Genoa,                                                               *
+*     Italy                                                                      *
+**********************************************************************************/
 #include <cinolib/cotangent.h>
 
 namespace cinolib
@@ -43,33 +50,33 @@ CINO_INLINE double cot(double x) { return tan(M_PI_2 - x); }
 
 template<>
 CINO_INLINE
-void cotangent_weights<Trimesh>(const Trimesh       & m,
-                                const int             vid,
-                                std::vector<int>    & nbrs,
-                                std::vector<double> & wgts)
+void cotangent_weights<Trimesh<>>(const Trimesh<>     & m,
+                                  const uint            vid,
+                                  std::vector<uint>   & nbrs,
+                                  std::vector<double> & wgts)
 {
     assert(nbrs.empty());
     assert(wgts.empty());
 
-    std::vector<int> edges = m.adj_vtx2edg(vid);
+    std::vector<uint> edges = m.adj_v2e(vid);
 
-    for(int i=0; i<(int)edges.size(); ++i)
+    for(uint i=0; i<edges.size(); ++i)
     {
-        int eid = edges[i];
-        int nbr = m.edge_vertex_id(eid,0);
-        if (nbr == vid) nbr = m.edge_vertex_id(eid,1);
+        uint eid = edges[i];
+        uint nbr = m.edge_vert_id(eid,0);
+        if (nbr == vid) nbr = m.edge_vert_id(eid,1);
         assert(nbr != vid);
 
-        std::vector<int> tris = m.adj_edg2tri(eid);
-        assert(tris.size() == 2 || tris.size() == 1);
+        std::vector<uint> faces = m.adj_e2f(eid);
+        assert(faces.size() == 2 || faces.size() == 1);
 
         double wgt = 0.0;
-        for(int j=0; j<(int)tris.size(); ++j)
+        for(uint j=0; j<faces.size(); ++j)
         {
-            double alpha = m.triangle_angle_at_vertex(tris[j], m.vertex_opposite_to(tris[j], vid, nbr));
+            double alpha = m.face_angle_at_vert(faces[j], m.vert_opposite_to(faces[j], vid, nbr));
             wgt += cot(alpha);
         }
-        wgt = (tris.size() == 2) ? wgt * 0.5 : wgt;
+        wgt = (faces.size() == 2) ? wgt * 0.5 : wgt;
 
         nbrs.push_back(nbr);
         wgts.push_back(wgt);
@@ -79,34 +86,33 @@ void cotangent_weights<Trimesh>(const Trimesh       & m,
 
 template<>
 CINO_INLINE
-void cotangent_weights<Tetmesh>(const Tetmesh       & m,
-                                const int             vid,
-                                std::vector<int>    & nbrs,
-                                std::vector<double> & wgts)
+void cotangent_weights<Tetmesh<>>(const Tetmesh<>     & m,
+                                  const uint            vid,
+                                  std::vector<uint>   & nbrs,
+                                  std::vector<double> & wgts)
 {
     assert(nbrs.empty());
     assert(wgts.empty());
 
-    std::vector<int> edges = m.adj_vtx2edg(vid);
+    std::vector<uint> edges = m.adj_v2e(vid);
 
-    for(int i=0; i<(int)edges.size(); ++i)
+    for(uint i=0; i<edges.size(); ++i)
     {
-        int eid = edges[i];
-        int nbr = m.edge_vertex_id(eid, 0);
-        if (nbr == vid) nbr = m.edge_vertex_id(eid, 1);
+        uint eid = edges[i];
+        uint nbr = m.edge_vert_id(eid, 0);
+        if (nbr == vid) nbr = m.edge_vert_id(eid, 1);
         assert(nbr != vid);
 
-        std::vector<int> tets = m.adj_edg2tet(eid);
+        std::vector<uint> cells = m.adj_e2c(eid);
 
         double wgt = 0.0;
-        for(int j=0; j<(int)tets.size(); ++j)
+        for(uint cid : cells)
         {
-            int    tid       = tets[j];
-            int    e_opp     = m.tet_edge_opposite_to(tid, vid, nbr);
-            int    f_opp_vid = m.tet_face_opposite_to(tid, vid);
-            int    f_opp_nbr = m.tet_face_opposite_to(tid, nbr);
-            double l_k       = m.tet_edge_length(tid, e_opp);
-            double teta_k    = m.tet_dihedral_angle(tid, f_opp_vid, f_opp_nbr);
+            uint   e_opp     = m.cell_edge_opposite_to(cid, vid, nbr);
+            uint   f_opp_vid = m.cell_face_opposite_to(cid, vid);
+            uint   f_opp_nbr = m.cell_face_opposite_to(cid, nbr);
+            double l_k       = m.cell_edge_length(cid, e_opp);
+            double teta_k    = m.cell_dihedral_angle(cid, f_opp_vid, f_opp_nbr);
 
             wgt += cot(teta_k) * l_k;
         }

@@ -102,7 +102,7 @@ CINO_INLINE
 void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
                                  const Eigen::VectorXd             & b,
                                        Eigen::VectorXd             & x,
-                                       std::map<int,double>        & bc, // Dirichlet boundary conditions
+                                       std::map<uint,double>       & bc, // Dirichlet boundary conditions
                                  int   solver)
 {
     char msg[1024];
@@ -111,8 +111,8 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
     timer_start(msg);
 
     std::vector<int> col_map(A.rows(), -1);
-    int fresh_id = 0;
-    for(int col=0; col<A.cols(); ++col)
+    uint fresh_id = 0;
+    for(uint col=0; col<A.cols(); ++col)
     {
         if (DOES_NOT_CONTAIN(bc, col))
         {
@@ -120,12 +120,12 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
         }
     }
 
-    int size = A.rows() - bc.size();
+    uint size = A.rows() - bc.size();
 
     std::vector<Entry> Aprime_entries;
     Eigen::VectorXd    bprime(size);
 
-    for(int row=0; row<A.rows(); ++row)
+    for(uint row=0; row<A.rows(); ++row)
     {
         if (col_map[row] >= 0)
         {
@@ -137,12 +137,12 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
     // iterate over the non-zero entries
     // of sparse matrix A
     //
-    for (int i=0; i<A.outerSize(); ++i)
+    for (uint i=0; i<A.outerSize(); ++i)
     {
         for (Eigen::SparseMatrix<double>::InnerIterator it(A,i); it; ++it)
         {
-            int    row = it.row();
-            int    col = it.col();
+            uint    row = it.row();
+            uint    col = it.col();
             double val = it.value();
 
             if (col_map[row] < 0) continue;
@@ -168,7 +168,7 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
     solve_square_system(Aprime, bprime, tmp_x, solver);
 
     x.resize(A.cols());
-    for(int col=0; col<A.cols(); ++col)
+    for(uint col=0; col<A.cols(); ++col)
     {
         if (col_map[col] >= 0)
         {

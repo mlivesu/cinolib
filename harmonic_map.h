@@ -63,11 +63,11 @@ namespace cinolib
 
 template <class Mesh>
 CINO_INLINE
-ScalarField harmonic_map(const Mesh           & m,
-                         std::map<int,double> & bc,
-                         const int              n = 1,
-                         const int              laplacian_mode = COTANGENT,
-                         const int              solver = SIMPLICIAL_LLT)
+ScalarField harmonic_map(const Mesh            & m,
+                         std::map<uint,double> & bc,
+                         const uint              n = 1,
+                         const int               laplacian_mode = COTANGENT,
+                         const int               solver = SIMPLICIAL_LLT)
 {
     assert(n > 0);
     assert(bc.size() > 0);
@@ -76,13 +76,13 @@ ScalarField harmonic_map(const Mesh           & m,
 
     timer_start("Compute Harmonic Map");
 
-    ScalarField f(m.num_vertices());
+    ScalarField f(m.num_verts());
 
     Eigen::SparseMatrix<double> L   = laplacian<Mesh>(m, laplacian_mode);
     Eigen::SparseMatrix<double> Ln = -L;
-    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_vertices());
+    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
 
-    for(int i=1; i<n; ++i) Ln  = Ln * L;
+    for(uint i=1; i<n; ++i) Ln  = Ln * L;
 
     solve_square_system_with_bc(Ln, rhs, f, bc, solver);
 

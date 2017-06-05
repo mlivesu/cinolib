@@ -40,7 +40,7 @@ namespace cinolib
 
 template<class Mesh>
 CINO_INLINE
-void cotangent_weights(const Mesh &, const int, std::vector<int> &, std::vector<double> &)
+void cotangent_weights(const Mesh &, const uint, std::vector<uint> &, std::vector<double> &)
 {
     std::cerr << "WARNING! - Cotangent weights are not available for this mesh type!" << endl;
     assert(false);

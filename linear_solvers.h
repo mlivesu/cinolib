@@ -79,7 +79,7 @@ CINO_INLINE
 void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
                                  const Eigen::VectorXd             & b,
                                        Eigen::VectorXd             & x,
-                                       std::map<int,double>        & bc, // Dirichlet boundary conditions
+                                       std::map<uint,double>       & bc, // Dirichlet boundary conditions
                                  int   solver = SIMPLICIAL_LLT);
 
 
