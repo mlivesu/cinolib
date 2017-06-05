@@ -143,9 +143,9 @@ class Tetmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Trimesh<> export_surface() const;
-        Trimesh<> export_surface(std::map<uint,uint> & c2f_map,
-                                 std::map<uint,uint> & f2c_map) const;
+        Trimesh<M,V,E,F> export_surface() const;
+        Trimesh<M,V,E,F> export_surface(std::map<uint,uint> & c2f_map,
+                                        std::map<uint,uint> & f2c_map) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

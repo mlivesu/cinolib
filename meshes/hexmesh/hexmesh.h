@@ -171,9 +171,9 @@ class Hexmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Quadmesh<> export_surface() const;
-        Quadmesh<> export_surface(std::map<uint,uint> & c2f_map,
-                                  std::map<uint,uint> & f2c_map) const;
+        Quadmesh<M,V,E,F> export_surface() const;
+        Quadmesh<M,V,E,F> export_surface(std::map<uint,uint> & c2f_map,
+                                         std::map<uint,uint> & f2c_map) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
