@@ -317,9 +317,9 @@ void Tetmesh<M,V,E,F,C>::update_interior_adjacency()
         }
     }
 
-    logger << num_verts() << "\tvertices"  << endl;
-    logger << num_cells() << "\tetrahedra" << endl;
-    logger << num_edges() << "\tedges"     << endl;
+    logger << num_verts() << "\tverts" << endl;
+    logger << num_cells() << "\tcells" << endl;
+    logger << num_edges() << "\tedges" << endl;
 
     timer_stop("Build interior adjacency");
 }
@@ -415,7 +415,7 @@ void Tetmesh<M,V,E,F,C>::update_surface_adjacency()
 
     timer_stop("Build Surface");
 
-    logger << faces.size()/verts_per_face() << " tris" << endl;
+    logger << faces.size()/verts_per_face() << " faces" << endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

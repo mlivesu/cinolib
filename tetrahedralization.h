@@ -53,7 +53,7 @@ namespace cinolib
  *   bot base       top base
 */
 CINO_INLINE
-void tetrahedralize_prism(int prism[], std::vector<uint> & tets);
+void tetrahedralize_prism(uint prism[], std::vector<uint> & tets);
 
 
 }

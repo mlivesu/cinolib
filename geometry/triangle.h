@@ -39,7 +39,7 @@
 namespace cinolib
 {
 
-static const int TRI_EDGES[3][2] =
+static const uint TRI_EDGES[3][2] =
 {
     { 0, 1 }, // 0
     { 1, 2 }, // 1

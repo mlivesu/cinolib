@@ -28,73 +28,71 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_TETRAHEDRON_H
-#define CINO_TETRAHEDRON_H
+#ifndef CINO_MESH_INTERFACES_H
+#define CINO_MESH_INTERFACES_H
 
-#include <cinolib/cinolib.h>
+#include <vector>
+
+#include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
 
-static uint TET_FACES[4][3] =
+class Mesh
 {
-    { 0, 2, 1 } ,
-    { 0, 1, 3 } ,
-    { 0, 3, 2 } ,
-    { 1, 2, 3 }
+    protected:
+
+        int  mesh_type;
+
+        Bbox bb;
+
+        std::vector<vec3d> verts;
+        std::vector<uint>  edges;
+
+        std::vector<std::vector<uint>> v2v; // vert to vert adjacency
+        std::vector<std::vector<uint>> v2e; // vert to edge adjacency
+        std::vector<std::vector<uint>> v2f; // vert to face adjacency
+        std::vector<std::vector<uint>> e2f; // edge to face adjacency
+        std::vector<std::vector<uint>> f2e; // face to edge adjacency
+        std::vector<std::vector<uint>> f2f; // face to face adjacency
+
+    public:
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+                uint num_verts() const { return verts.size();     }
+                uint num_edges() const { return edges.size() / 2; }
+        virtual uint num_faces() const = 0;
+        virtual uint num_elems() const = 0;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const Bbox                & bbox()          const { return bb;    }
+        const std::vector<uint>   & vector_edges()  const { return edges; }
+        const std::vector<vec3d>  & vector_verts()  const { return verts; }
+              std::vector<double>   vector_coords() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
+        const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
+        const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
+        const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
+        const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
+        const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const vec3d           & vert                    (const uint vid) const { return verts.at(vid); }
+              vec3d           & vert                    (const uint vid)       { return verts.at(vid); }
+              virtual void              vert_set_color          (const Color & c);
+              virtual void              vert_set_alpha          (const float alpha);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 };
 
-static uint TET_EDGES[6][2] =
-{
-    { 0, 2 }, // 0
-    { 2, 1 }, // 1
-    { 1, 0 }, // 2
-    { 1, 3 }, // 3
-    { 3, 0 }, // 4
-    { 3, 2 }  // 5
-};
-
-static uint TET_INCIDENT_EDEGES[4][3] =
-{
-    { 0, 2, 4 }, // edges incident to V0
-    { 1, 2, 3 }, // edges incident to V1
-    { 0, 1, 5 }, // edges incident to V2
-    { 3, 4, 5 }, // edges incident to V3
-};
-
-CINO_INLINE
-bool tet_barycentric_coords(const vec3d & A,
-                            const vec3d & B,
-                            const vec3d & C,
-                            const vec3d & D,
-                            const vec3d & P,
-                            std::vector<double> & wgts,
-                            const double  tol = 1e-5);
-
-
-CINO_INLINE
-void tet_closest_vertex(const vec3d  & A,
-                        const vec3d  & B,
-                        const vec3d  & C,
-                        const vec3d  & D,
-                        const vec3d  & query,
-                              int    & id,
-                              double & dist);
-
-
-CINO_INLINE
-void tet_closest_edge(const vec3d  & A,
-                      const vec3d  & B,
-                      const vec3d  & C,
-                      const vec3d  & D,
-                      const vec3d  & query,
-                            int    & id,
-                            double & dist);
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "tetrahedron.cpp"
-#endif
-
-#endif // CINO_TETRAHEDRON_H
+#endif // CINO_MESH_INTERFACES

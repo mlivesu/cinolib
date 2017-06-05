@@ -29,20 +29,21 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/tetrahedralization.h>
+#include <cinolib/common.h>
 #include <set>
 
 namespace cinolib
 {
 
 CINO_INLINE
-void tetrahedralize_prism(int prism[], std::vector<u_int> & tets)
+void tetrahedralize_prism(uint prism[], std::vector<u_int> & tets)
 {
     std::set<ipair> ordered_vids;
-    for(int i=0; i<6; ++i) ordered_vids.insert(ipair(prism[i],i));
+    for(uint i=0; i<6; ++i) ordered_vids.insert(ipair(prism[i],i));
 
     // see Table 2 in "How to Subdivide Pyramids, Prisms and Hexahedra into Tetrahedra"
     //
-    int ref_prism[6];
+    uint ref_prism[6];
     switch ((*ordered_vids.begin()).second)
     {
         case 0: ref_prism[0] = prism[0];

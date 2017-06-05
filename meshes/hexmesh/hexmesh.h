@@ -44,7 +44,7 @@
 namespace cinolib
 {
 
-static int HEXA_FACES[6][4] =
+static uint HEXA_FACES[6][4] =
 {
     { 0 , 3 , 2 , 1 } ,
     { 1 , 2 , 6 , 5 } ,
@@ -54,7 +54,7 @@ static int HEXA_FACES[6][4] =
     { 2 , 3 , 7 , 6 }
 };
 
-static int HEXA_EDGES[12][2] =
+static uint HEXA_EDGES[12][2] =
 {
     { 0, 1 }, // 0
     { 1, 2 }, // 1
