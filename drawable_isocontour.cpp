@@ -59,16 +59,16 @@ DrawableIsocontour::DrawableIsocontour(Trimesh<> & m, float value) : Isocontour(
 CINO_INLINE
 void DrawableIsocontour::draw(const float scene_size) const
 {
-    float sample_rad = /*m_ptr->bbox().diag()*/scene_size*0.004;
+    //float sample_rad = /*m_ptr->bbox().diag()*/scene_size*0.004;
     float cylind_rad = /*m_ptr->bbox().diag()*/scene_size*0.002;
 
-    for(int i=0; i<(int)curves_vertices.size(); ++i)
+    for(uint i=0; i<curves_vertices.size(); ++i)
     {
-        for(int j=0; j<(int)curves_vertices[i].size()-1; ++j)
+        for(uint j=0; j<curves_vertices[i].size()-1; ++j)
         {
             cylinder<vec3d>(curves_vertices[i][j], curves_vertices[i][j+1], cylind_rad, cylind_rad, cylind_rgb);
         }
-        sphere<vec3d>(curve_centroid(i), sample_rad, centre_rgb);
+        //sphere<vec3d>(curve_centroid(i), sample_rad, centre_rgb);
     }
 }
 

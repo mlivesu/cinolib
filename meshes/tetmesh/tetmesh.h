@@ -181,8 +181,8 @@ class Tetmesh
 
   const vec3d & vert          (const uint vid) const { return verts.at(vid); }
         vec3d & vert          (const uint vid)       { return verts.at(vid); }
-virtual void    vert_set_color(const Color & c);
-virtual void    vert_set_alpha(const float alpha);
+        void    vert_set_color(const Color & c);
+        void    vert_set_alpha(const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -193,8 +193,8 @@ virtual void    vert_set_alpha(const float alpha);
         double edge_avg_length() const;
         double edge_max_length() const;
         double edge_min_length() const;
-virtual void   edge_set_color (const Color & c);
-virtual void   edge_set_alpha (const float alpha);
+        void   edge_set_color (const Color & c);
+        void   edge_set_alpha (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -203,8 +203,8 @@ virtual void   edge_set_alpha (const float alpha);
         uint  face_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
         vec3d face_centroid     (const uint fid) const;
         bool  face_contains_vert(const uint fid, const uint vid) const;
-virtual void  face_set_color    (const Color & c);
-virtual void  face_set_alpha    (const float alpha);
+        void  face_set_color    (const Color & c);
+        void  face_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -224,8 +224,8 @@ virtual void  face_set_alpha    (const float alpha);
         int    cell_shared_vert          (const uint cid, const std::vector<uint> incident_edges) const;
         int    cell_adjacent_through_face(const uint cid, const uint face_offset) const;
         bool   cell_contains_vert        (const uint cid, const uint vid)   const;
-virtual void   cell_set_color            (const Color & c);
-virtual void   cell_set_alpha            (const float alpha);
+        void   cell_set_color            (const Color & c);
+        void   cell_set_alpha            (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -98,23 +98,6 @@ class DrawableTrimesh : public Trimesh<M,V,E,F>, public DrawableObject
         void show_face_wireframe_color(const Color & c);
         void show_face_wireframe_width(const float width);
         void show_face_wireframe_transparency(const float alpha);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        /* (Re)implementation of virtual methods (mainly to call updateGL())*/
-        void operator+=              (const DrawableTrimesh & m);
-        void vert_set_color          (const Color & c);
-        void vert_set_alpha          (const float a);
-        void vert_remove_unreferenced(const uint vid);
-        uint vert_add                (const vec3d & pos, const V & data);
-        void edge_set_color          (const Color & c);
-        void edge_set_alpha          (const float a);
-        bool edge_collapse           (const uint eid);
-        void edge_remove_unreferenced(const uint eid);
-        void face_set_color          (const Color & c);
-        void face_set_alpha          (const float a);
-        uint face_add                (const uint vid0, const uint vid1, const uint vid2, const F & data);
-        void face_remove_unreferenced(const uint fid);
 };
 
 }

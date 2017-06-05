@@ -232,17 +232,6 @@ void DrawableTrimesh<M,V,E,F>::slice(const float thresh, // thresh on centroids 
     updateGL();
 }
 
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::operator+=(const DrawableTrimesh<M,V,E,F> & m)
-{
-    Trimesh<M,V,E,F>::operator +=(m);
-    updateGL();
-}
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
@@ -360,7 +349,8 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void DrawableTrimesh<M,V,E,F>::show_face_wireframe_color(const Color & c)
 {
-    edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    this->edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -378,129 +368,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void DrawableTrimesh<M,V,E,F>::show_face_wireframe_transparency(const float alpha)
 {
-    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::vert_set_color(const Color & c)
-{
-    Trimesh<M,V,E,F>::vert_set_color(c);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::vert_set_alpha(const float a)
-{
-    Trimesh<M,V,E,F>::vert_set_alpha(a);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::vert_remove_unreferenced(const uint vid)
-{
-    Trimesh<M,V,E,F>::vert_remove_unreferenced(vid);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-uint DrawableTrimesh<M,V,E,F>::vert_add(const vec3d & pos, const V & data)
-{
-    uint res = Trimesh<M,V,E,F>::vert_add(pos,data);
-    updateGL();
-    return res;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::edge_set_color(const Color & c)
-{
-    Trimesh<M,V,E,F>::edge_set_color(c);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::edge_set_alpha(const float a)
-{
-    Trimesh<M,V,E,F>::edge_set_alpha(a);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::face_set_color(const Color & c)
-{
-    Trimesh<M,V,E,F>::face_set_color(c);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-bool DrawableTrimesh<M,V,E,F>::edge_collapse(const uint eid)
-{
-    uint res = Trimesh<M,V,E,F>::edge_collapse(eid);
-    updateGL();
-    return res;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::edge_remove_unreferenced(const uint eid)
-{
-    Trimesh<M,V,E,F>::edge_remove_unreferenced(eid);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::face_set_alpha(const float a)
-{
-    Trimesh<M,V,E,F>::face_set_alpha(a);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-uint DrawableTrimesh<M,V,E,F>::face_add(const uint vid0, const uint vid1, const uint vid2, const F & data)
-{
-    uint res = Trimesh<M,V,E,F>::face_add(vid0, vid1,vid2,data);
-    updateGL();
-    return res;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::face_remove_unreferenced(const uint fid)
-{
-    Trimesh<M,V,E,F>::face_remove_unreferenced(fid);
+    this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();
 }
 

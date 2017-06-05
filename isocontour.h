@@ -44,24 +44,24 @@ class Isocontour
         Isocontour();
         Isocontour(Trimesh<> & m, float iso_value, bool discard_boundary_edges = false);
 
-        int num_curves() const;
+        uint num_curves() const;
 
         // split triangles and edit the mesh connectivity in such a way
         // that there will be a chain of edges corresponding to isocurve
         //
-        std::vector<int> tessellate(Trimesh<> & m) const;
+        std::vector<uint> tessellate(Trimesh<> & m) const;
 
         // returns the centroid of the cc^th isocurve
         //
-        vec3d curve_centroid(int cid) const;
+        vec3d curve_centroid(uint cid) const;
 
         // returns true if the cid^th curve is closed
         //
-        bool curve_is_closed(int cid) const;
+        bool curve_is_closed(uint cid) const;
 
         // returns true if the cid^th isocurve has less than <size> points
         //
-        bool curve_is_shorter_than(int cid, int size) const;
+        bool curve_is_shorter_than(uint cid, uint size) const;
 
         // TRUE if at least one of its curves is not closed or it is very short (< 5 samples)
         // FALSE otherwise
@@ -70,8 +70,7 @@ class Isocontour
 
         // matches the curves of the current isoline with the curves of another isoline
         //
-        void match(Isocontour & contour, std::set< std::pair<int,int> > & curve_matches) const;
-
+        void match(Isocontour & contour, std::set<std::pair<uint,uint>> & curve_matches) const;
 
         inline float value() const { return iso_value; }
 
@@ -80,13 +79,13 @@ class Isocontour
         void compute_edges2samples_map();
         void make_iso_curve();
 
-        std::map<int,vec3d>::const_iterator next_edge(int eid, const std::set<int> & visited) const;
+        std::map<uint,vec3d>::const_iterator next_edge(uint eid, const std::set<uint> & visited) const;
 
-        std::map<int,vec3d> edges2samples;
-        std::map<int,int>   edges2curves;
+        std::map<uint,vec3d> edges2samples;
+        std::map<uint,uint>  edges2curves;
 
-        std::vector< std::vector<vec3d> > curves_vertices;
-        std::vector< std::vector<int> >   curves_edges; // edge-id for each edge of each curve
+        std::vector<std::vector<vec3d>> curves_vertices;
+        std::vector<std::vector<uint>>  curves_edges; // edge-id for each edge of each curve
 
         Trimesh<> *m_ptr;
         float      iso_value;

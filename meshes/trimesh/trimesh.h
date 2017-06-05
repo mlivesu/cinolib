@@ -95,7 +95,7 @@ class Trimesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-virtual void operator+=(const Trimesh & m);
+        void operator+=(const Trimesh & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -190,10 +190,10 @@ virtual void operator+=(const Trimesh & m);
         uint              vert_shared             (const uint eid0, const uint eid1) const;
         std::vector<uint> vert_boundary_edges     (const uint vid) const;
         void              vert_switch_id          (const uint vid0, const uint vid1);
-virtual void              vert_remove_unreferenced(const uint vid);
-virtual uint              vert_add                (const vec3d & pos, const V & data);
-virtual void              vert_set_color          (const Color & c);
-virtual void              vert_set_alpha          (const float alpha);
+        void              vert_remove_unreferenced(const uint vid);
+        uint              vert_add                (const vec3d & pos);
+        void              vert_set_color          (const Color & c);
+        void              vert_set_alpha          (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -210,10 +210,11 @@ virtual void              vert_set_alpha          (const float alpha);
         double edge_max_length         () const;
         double edge_min_length         () const;
         void   edge_switch_id          (const uint eid0, const uint eid1);
-virtual bool   edge_collapse           (const uint eid);
-virtual void   edge_remove_unreferenced(const uint eid);
-virtual void   edge_set_color          (const Color & c);
-virtual void   edge_set_alpha          (const float alpha);
+        bool   edge_collapse           (const uint eid);
+        uint   edge_add                (const uint vid0, const uint vid1);
+        void   edge_remove_unreferenced(const uint eid);
+        void   edge_set_color          (const Color & c);
+        void   edge_set_alpha          (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -235,10 +236,12 @@ virtual void   edge_set_alpha          (const float alpha);
         bool   face_bary_is_vert       (const uint fid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
         bool   face_bary_is_edge       (const uint fid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
         void   face_switch_id          (const uint fid0, const uint fid1);
-virtual uint   face_add                (const uint vid0, const uint vid1, const uint vid2, const F & data);
-virtual void   face_remove_unreferenced(const uint fid);
-virtual void   face_set_color          (const Color & c);
-virtual void   face_set_alpha          (const float alpha);
+        uint   face_add                (const uint vid0, const uint vid1, const uint vid2);
+        void   face_set                (const uint fid, const uint vid0, const uint vid1, const uint vid2);
+        void   face_remove_unreferenced(const uint fid);
+        void   face_set_color          (const Color & c);
+        void   face_set_alpha          (const float alpha);
+        void   face_flip_winding_order (const uint fid);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

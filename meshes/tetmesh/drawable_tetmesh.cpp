@@ -609,7 +609,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableTetmesh<M,V,E,F,C>::show_face_wireframe_color(const Color & c)
 {
-    edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    this->edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -627,7 +628,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableTetmesh<M,V,E,F,C>::show_face_wireframe_transparency(const float alpha)
 {
-    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -704,7 +706,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableTetmesh<M,V,E,F,C>::show_cell_wireframe_color(const Color & c)
 {
-    edge_set_color(c); // NOTE: this will change color for ANY adge (both interior and boundary)
+    this->edge_set_color(c); // NOTE: this will change color for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -722,7 +725,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableTetmesh<M,V,E,F,C>::show_cell_wireframe_transparency(const float alpha)
 {
-    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

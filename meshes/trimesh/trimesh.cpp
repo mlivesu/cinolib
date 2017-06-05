@@ -563,6 +563,21 @@ void Trimesh<M,V,E,F>::face_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+void Trimesh<M,V,E,F>::face_flip_winding_order(const uint fid)
+{
+    uint fid_ptr = 3 * fid;
+    std::swap(faces.at(fid_ptr+1), faces.at(fid_ptr+2));
+    //
+    update_f_normal(fid);
+    update_v_normal(face_vert_id(fid,0));
+    update_v_normal(face_vert_id(fid,1));
+    update_v_normal(face_vert_id(fid,2));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 void Trimesh<M,V,E,F>::operator+=(const Trimesh<M,V,E,F> & m)
 {
     uint nv = num_verts();
@@ -1120,6 +1135,28 @@ bool Trimesh<M,V,E,F>::edge_collapse(const uint eid)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+uint Trimesh<M,V,E,F>::edge_add(const uint vid0, const uint vid1)
+{
+    assert(vid0 < num_verts());
+    assert(vid1 < num_verts());
+    //
+    uint id = num_edges();
+    //
+    edges.push_back(vid0);
+    edges.push_back(vid1);
+    //
+    e2f.push_back(std::vector<uint>());
+    //
+    E data;
+    e_data.push_back(data);
+    //
+    return id;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 void Trimesh<M,V,E,F>::edge_switch_id(const uint eid0, const uint eid1)
 {
     for(uint off=0; off<2; ++off) std::swap(edges.at(2*eid0+off), edges.at(2*eid1+off));
@@ -1359,11 +1396,11 @@ bool Trimesh<M,V,E,F>::face_is_needle(const uint fid, const double angle_thresh_
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-uint Trimesh<M,V,E,F>::face_add(const uint vid0, const uint vid1, const uint vid2, const F & data)
+uint Trimesh<M,V,E,F>::face_add(const uint vid0, const uint vid1, const uint vid2)
 {
-    assert(vid0 >= 0 && vid0 < num_verts());
-    assert(vid1 >= 0 && vid1 < num_verts());
-    assert(vid2 >= 0 && vid2 < num_verts());
+    assert(vid0 < num_verts());
+    assert(vid1 < num_verts());
+    assert(vid2 < num_verts());
 
     uint fid = num_faces();
     //
@@ -1371,11 +1408,13 @@ uint Trimesh<M,V,E,F>::face_add(const uint vid0, const uint vid1, const uint vid
     faces.push_back(vid1);
     faces.push_back(vid2);
     //
+    F data;
     f_data.push_back(data);
     //
     f2e.push_back(std::vector<uint>());
     f2f.push_back(std::vector<uint>());
     //
+
     v2f.at(vid0).push_back(fid);
     v2f.at(vid1).push_back(fid);
     v2f.at(vid2).push_back(fid);
@@ -1392,10 +1431,7 @@ uint Trimesh<M,V,E,F>::face_add(const uint vid0, const uint vid1, const uint vid
     {
         if (new_eid[i] == -1)
         {
-            new_eid[i] = num_edges();
-            edges.push_back(new_e[i].first);
-            edges.push_back(new_e[i].second);
-            e2f.push_back(std::vector<uint>());
+            new_eid[i] = edge_add(new_e[i].first, new_e[i].second);
         }
         //
         for(uint nbr : e2f.at(new_eid[i]))
@@ -1413,6 +1449,28 @@ uint Trimesh<M,V,E,F>::face_add(const uint vid0, const uint vid1, const uint vid
     update_v_normal(vid2);
 
     return fid;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Trimesh<M,V,E,F>::face_set(const uint fid, const uint vid0, const uint vid1, const uint vid2)
+{
+    /* WARNING!!!! This completely screws up edge connectivity!!!!!! */
+
+    assert(vid0 < num_verts());
+    assert(vid1 < num_verts());
+    assert(vid2 < num_verts());
+
+    uint fid_ptr = fid * 3;
+
+    faces.at(fid_ptr+0) = vid0;
+    faces.at(fid_ptr+1) = vid1;
+    faces.at(fid_ptr+2) = vid2;
+
+    update_f_normal(fid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1645,16 +1703,22 @@ std::vector<uint> Trimesh<M,V,E,F>::vert_boundary_edges(const uint vid) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-uint Trimesh<M,V,E,F>::vert_add(const vec3d & pos, const V & data)
+uint Trimesh<M,V,E,F>::vert_add(const vec3d & pos)
 {
     uint vid = num_verts();
+    //
     verts.push_back(pos);
+    //
+    V data;
     v_data.push_back(data);
+    //
     v2v.push_back(std::vector<uint>());
     v2e.push_back(std::vector<uint>());
     v2f.push_back(std::vector<uint>());
+    //
     bb.min = bb.min.min(pos);
     bb.max = bb.max.max(pos);
+    //
     return vid;
 }
 

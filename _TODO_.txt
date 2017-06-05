@@ -1,3 +1,4 @@
+- transform any function containing inner Trimesh<> or Tetmesh<> into a templated function  with generic Mesh type
 - remove old colors handling
 - improve face tessellation strategy for polygonal meshes
 - add Mesh,SurfaceMesh and VolumeMesh interfaces, and implement them with ALL the meshes available within the library

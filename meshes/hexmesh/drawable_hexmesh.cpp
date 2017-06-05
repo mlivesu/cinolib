@@ -92,8 +92,8 @@ void DrawableHexmesh<M,V,E,F,C>::init_drawable_stuff()
     drawlist_out.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
     drawlist_out.seg_width = 1;
 
-    Hexmesh<M,V,E,F,C>::face_set_color(Color::YELLOW());
-    Hexmesh<M,V,E,F,C>::cell_set_color(Color::WHITE());
+    this->face_set_color(Color::YELLOW());
+    this->cell_set_color(Color::WHITE());
 
     updateGL();
 }
@@ -688,7 +688,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableHexmesh<M,V,E,F,C>::show_face_wireframe_color(const Color & c)
 {
-    edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    this->edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -706,7 +707,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableHexmesh<M,V,E,F,C>::show_face_wireframe_transparency(const float alpha)
 {
-    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -783,7 +785,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableHexmesh<M,V,E,F,C>::show_cell_wireframe_color(const Color & c)
 {
-    edge_set_color(c); // NOTE: this will change color for ANY adge (both interior and boundary)
+    this->edge_set_color(c); // NOTE: this will change color for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -801,7 +804,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableHexmesh<M,V,E,F,C>::show_cell_wireframe_transparency(const float alpha)
 {
-    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

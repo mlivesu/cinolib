@@ -333,7 +333,8 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe_color(const Color & c)
 {
-    edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    this->edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -351,66 +352,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe_transparency(const float alpha)
 {
-    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::vert_set_color(const Color & c)
-{
-    Polygonmesh<M,V,E,F>::vert_set_color(c);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::vert_set_alpha(const float a)
-{
-    Polygonmesh<M,V,E,F>::vert_set_alpha(a);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::edge_set_color(const Color & c)
-{
-    Polygonmesh<M,V,E,F>::edge_set_color(c);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::edge_set_alpha(const float a)
-{
-    Polygonmesh<M,V,E,F>::edge_set_alpha(a);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::face_set_color(const Color & c)
-{
-    Polygonmesh<M,V,E,F>::face_set_color(c);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::face_set_alpha(const float a)
-{
-    Polygonmesh<M,V,E,F>::face_set_alpha(a);
+    this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();
 }
 
