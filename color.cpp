@@ -29,9 +29,14 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include "color.h"
+#include <cinolib/textures/quality_ramp_texture.h>
+#include <algorithm>
+#include <cmath>
 
 namespace cinolib
 {
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const Color & c)
@@ -40,6 +45,7 @@ std::ostream & operator<<(std::ostream & in, const Color & c)
     return in;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 Color Color::rgb_from_quality(float q)
@@ -63,6 +69,25 @@ Color Color::rgb_from_quality(float q)
     }
 
     assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+Color Color::scatter(uint n_colors, uint pos)
+{
+    float fpos  = float(pos)/float(n_colors - 1) * 255.0;
+    float alpha = fpos - std::floor(fpos);
+    uint  prev  = std::floor(fpos);
+    uint  next  = std::min(prev+1, (uint)255); // just to avoid "index out of bounds" errors...
+
+    int r = (1.0 - alpha) * quality_ramp_texture1D[prev*3 + 0] + alpha * quality_ramp_texture1D[next*3 + 0];
+    int g = (1.0 - alpha) * quality_ramp_texture1D[prev*3 + 1] + alpha * quality_ramp_texture1D[next*3 + 1];
+    int b = (1.0 - alpha) * quality_ramp_texture1D[prev*3 + 2] + alpha * quality_ramp_texture1D[next*3 + 2];
+
+    return Color(float(r)/255.0,
+                 float(g)/255.0,
+                 float(b)/255.0);
 }
 
 }

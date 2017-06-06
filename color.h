@@ -62,6 +62,7 @@ class Color
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         static Color rgb_from_quality(float q);
+        static Color scatter(uint n_colors, uint pos); // TODO: steal Color::scatter from VCG!!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -1,5 +1,4 @@
 - transform any function containing inner Trimesh<> or Tetmesh<> into a templated function  with generic Mesh type
-- remove old colors handling
 - improve face tessellation strategy for polygonal meshes
 - add Mesh,SurfaceMesh and VolumeMesh interfaces, and implement them with ALL the meshes available within the library
 - add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point

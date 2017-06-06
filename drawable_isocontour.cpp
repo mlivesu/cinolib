@@ -29,7 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/drawable_isocontour.h>
-#include <cinolib/colors.h>
+#include <cinolib/color.h>
 #include <cinolib/gl/draw_sphere.h>
 #include <cinolib/gl/draw_cylinder.h>
 
@@ -45,14 +45,10 @@ DrawableIsocontour::DrawableIsocontour()
 CINO_INLINE
 DrawableIsocontour::DrawableIsocontour(Trimesh<> & m, float value) : Isocontour(m, value)
 {
-    type = CURVE;
-
-    for(int i=0; i<3; ++i)
-    {
-        cylind_rgb[i] = YELLOW[i];
-        centre_rgb[i] = BLUE[i];
-        sample_rgb[i] = RED[i];
-    }
+    type   = CURVE;
+    color_cylind = Color::YELLOW();
+    color_centre = Color::BLUE();
+    color_sample = Color::RED();
 }
 
 
@@ -66,7 +62,7 @@ void DrawableIsocontour::draw(const float scene_size) const
     {
         for(uint j=0; j<curves_vertices[i].size()-1; ++j)
         {
-            cylinder<vec3d>(curves_vertices[i][j], curves_vertices[i][j+1], cylind_rad, cylind_rad, cylind_rgb);
+            cylinder<vec3d>(curves_vertices[i][j], curves_vertices[i][j+1], cylind_rad, cylind_rad, color_cylind.rgba);
         }
         //sphere<vec3d>(curve_centroid(i), sample_rad, centre_rgb);
     }

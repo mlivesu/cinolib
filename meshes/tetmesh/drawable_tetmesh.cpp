@@ -32,7 +32,7 @@
 #include <cinolib/textures/isolines_texture.h>
 #include <cinolib/textures/quality_ramp_texture.h>
 #include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
-#include <cinolib/colors.h>
+#include <cinolib/color.h>
 
 namespace cinolib
 {

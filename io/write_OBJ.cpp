@@ -29,7 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/io/write_OBJ.h>
-#include <cinolib/colors.h>
+#include <cinolib/color.h>
 
 
 #include <iostream>
@@ -139,9 +139,8 @@ void write_OBJ(const char                * filename,
 
     for(int l=min; l<=max; ++l)
     {
-        float rgb[3];
-        scattered_color(delta, l, rgb);
-        fprintf(f_mtl, "newmtl label_%d\nKd %f %f %f\n", l, rgb[0], rgb[1], rgb[2]);
+        Color c = Color::scatter(delta, l);
+        fprintf(f_mtl, "newmtl label_%d\nKd %f %f %f\n", l, c.r, c.g, c.b);
     }
 
     fprintf(f_obj, "mtllib %s\n", mtl_filename.c_str());

@@ -30,7 +30,7 @@
 **********************************************************************************/
 #include <cinolib/meshes/polyhedralmesh/drawable_polyhedralmesh.h>
 #include <cinolib/textures/textures.h>
-#include <cinolib/colors.h>
+#include <cinolib/color.h>
 
 
 namespace cinolib

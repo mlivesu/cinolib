@@ -30,7 +30,7 @@
 **********************************************************************************/
 #include <cinolib/meshes/skel/drawable_skel.h>
 #include <cinolib/cinolib.h>
-#include <cinolib/colors.h>
+#include <cinolib/color.h>
 #include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/gl/draw_sphere.h>
 
@@ -268,9 +268,8 @@ void DrawableSkel::update_bone_colors()
     s_colors.resize(num_segments()*3);
     for(int sid=0; sid<num_segments(); ++sid)
     {
-        float rgb[3];
-        scattered_color(num_bones(), segment_bone_id(sid), rgb);
-        set_segment_color(sid, rgb);
+        Color c = Color::scatter(num_bones(), segment_bone_id(sid));
+        set_segment_color(sid, c.rgba);
     }
 
     v_colors.resize(num_vertices()*3);
@@ -278,9 +277,8 @@ void DrawableSkel::update_bone_colors()
     {
         if (vertex_is_feature(vid)) continue;
 
-        float rgb[3];
-        scattered_color(num_bones(), vertex_bone_id(vid), rgb);
-        set_vertex_color(vid, rgb);
+        Color c = Color::scatter(num_bones(), segment_bone_id(vid));
+        set_vertex_color(vid, c.rgba);
     }
 }
 

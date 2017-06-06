@@ -33,7 +33,6 @@
 #include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/gl/draw_arrow.h>
 #include <cinolib/gl/draw_sphere.h>
-#include <cinolib/colors.h>
 #include <cinolib/intersection.h>
 #include <cinolib/meshes/trimesh/drawable_trimesh.h>
 #include <cinolib/meshes/tetmesh/drawable_tetmesh.h>

@@ -54,9 +54,9 @@ class DrawableIsocontour : public Isocontour, public DrawableObject
 
     private:
 
-        float sample_rgb[3];
-        float centre_rgb[3];
-        float cylind_rgb[3];
+        Color color_sample;
+        Color color_centre;
+        Color color_cylind;
 };
 
 }

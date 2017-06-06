@@ -30,7 +30,7 @@
 **********************************************************************************/
 #include <cinolib/meshes/hexmesh/drawable_hexmesh.h>
 #include <cinolib/textures/textures.h>
-#include <cinolib/colors.h>
+#include <cinolib/color.h>
 
 
 namespace cinolib
