@@ -94,24 +94,15 @@ Plane::Plane(const std::vector<vec3d> & samples)
     double det_z   = xx*yy - xy*xy;
     double det_max = std::max(det_x, std::max(det_y, det_z));
 
-    if (fabs(det_max) < 1e-5) std::cerr << "WARNING : the points don't span a plane!" << std::endl;
+    if (fabs(det_max) == 1e-5) std::cerr << "WARNING : the samples don't span a plane!" << std::endl;
 
-    if (det_max == det_x)
-    {
-        vec3d n(1.0, (xz*yz - xy*zz) / det_x, (xy*yz - xz*yy) / det_x);
-        set_plane(c,n);
-    }
-    else if (det_max == det_y)
-    {
-        vec3d n((yz*xz - xy*zz) / det_y, 1.0, (xy*xz - yz*xx) / det_y);
-        set_plane(c,n);
-    }
-    else if (det_max == det_z)
-    {
-        vec3d n((yz*xy - xz*yy) / det_z, (xz*xy - yz*xx) / det_z, 1.0);
-        set_plane(c,n);
-    }
+    vec3d n;
+    if (det_max == det_x) n = vec3d(1.0, (xz*yz - xy*zz) / det_x, (xy*yz - xz*yy) / det_x); else
+    if (det_max == det_y) n = vec3d((yz*xz - xy*zz) / det_y, 1.0, (xy*xz - yz*xx) / det_y); else
+    if (det_max == det_z) n = vec3d((yz*xy - xz*yy) / det_z, (xz*xy - yz*xx) / det_z, 1.0);
     else assert(false);
+
+    set_plane(c,n);
 }
 
 
