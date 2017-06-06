@@ -46,12 +46,12 @@ class IntegralCurve : public DrawableCurve
 
         IntegralCurve(const Mesh                & m,
                       const VectorField         & grad,
-                      const int                   tid,
+                      const uint                  eid,
                       const std::vector<double> & bary);
 
         IntegralCurve(const Mesh        & m,
                       const VectorField & grad,
-                      const int           vid);
+                      const uint          vid);
 
         typedef enum
         {
@@ -80,23 +80,23 @@ class IntegralCurve : public DrawableCurve
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         Curve::Sample move_forward             (const Sample & s);
-        Curve::Sample move_forward_from_vertex (const int vid) ;
-        Curve::Sample move_forward_from_edge   (const int eid, const vec3d & p);
-        Curve::Sample move_forward_from_face   (const int tid, const vec3d & p);
-        Curve::Sample move_forward_from_face   (const int tid, const int fid, const vec3d & p);
-        Curve::Sample move_forward_from_cell   (const int cid, const vec3d & p);
+        Curve::Sample move_forward_from_vertex (const uint vid) ;
+        Curve::Sample move_forward_from_edge   (const uint eid, const vec3d & p);
+        Curve::Sample move_forward_from_face   (const uint tid, const vec3d & p);
+        Curve::Sample move_forward_from_face   (const uint tid, const uint fid, const vec3d & p);
+        Curve::Sample move_forward_from_cell   (const uint cid, const vec3d & p);
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool is_on_vertex (const Sample & s, int & vid, const double tol = 1e-7) const;
-        bool is_on_edge   (const Sample & s, int & eid, const double tol = 1e-7) const;
-        bool is_on_face   (const Sample & s, int & tid, const double tol = 1e-7) const;
-        bool is_on_face   (const Sample & s, int & tid, int & fid, const double tol = 1e-7) const;
-        bool is_on_cell   (const Sample & s, int & cid, const double tol = 1e-7) const;
+        bool is_on_vertex (const Sample & s, uint & vid, const double tol = 1e-7) const;
+        bool is_on_edge   (const Sample & s, uint & eid, const double tol = 1e-7) const;
+        bool is_on_face   (const Sample & s, uint & tid, const double tol = 1e-7) const;
+        bool is_on_face   (const Sample & s, uint & tid, uint & fid, const double tol = 1e-7) const;
+        bool is_on_cell   (const Sample & s, uint & cid, const double tol = 1e-7) const;
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Curve::Sample make_sample(const int vid) const;
+        Curve::Sample make_sample(const uint vid) const;
 };
 
 }

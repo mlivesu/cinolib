@@ -50,11 +50,11 @@ class Curve
 
             // OPTIONAL - Connection to a Mesh
             // Express the sample in terms of barycentric coordinates wrt to
-            // a mesh element (either triangle or tetrahedral). This can be
+            // a mesh element (e.g. a triangle or tetrahedron). This can be
             // important for some algorithm, for example to embed the curve
             // mesh tessellation..
             //
-            int                 tid  = -1;
+            int                 eid  = -1;
             std::vector<double> bary = std::vector<double>();            
         }
         Sample;
@@ -63,7 +63,7 @@ class Curve
 
         Curve();
         Curve(const std::vector<vec3d> & samples);
-        Curve(const Skel & skel, const int bone);
+        Curve(const Skel & skel, const uint bone);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -71,7 +71,7 @@ class Curve
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int                         size()    const;
+        uint                        size()    const;
         double                      length()  const;
         const std::vector<Sample> & samples() const;
               std::vector<Sample> & samples();
@@ -88,29 +88,29 @@ class Curve
 
         // Arc-length parameterization (t \in [0,1])
         //
-        void             update_arc_length_param(); // recomputes parameter t for each sample
-        int              last_sample_lower_equal_than(const float t) const; // reteurns index
-        int              sample_closest_to(const float t) const; // reteurns index
-        vec3d            sample_curve_at(const float t) const;
-        vec3d            sample_curve_at(const float t, const double tot_length) const;
-        void             resample_curve(const int n_samples);
-        std::vector<int> select_n_samples(const int n_samples) const;
+        void              update_arc_length_param(); // recomputes parameter t for each sample
+        uint              last_sample_lower_equal_than(const float t) const; // reteurns index
+        uint              sample_closest_to(const float t) const; // reteurns index
+        vec3d             sample_curve_at(const float t) const;
+        vec3d             sample_curve_at(const float t, const double tot_length) const;
+        void              resample_curve(const uint n_samples);
+        std::vector<uint> select_n_samples(const uint n_samples) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<int> tessellate(Trimesh & m) const;
-        void             tessellate(Trimesh & m, const std::vector<int> & split_list) const;
+        std::vector<uint> tessellate(Trimesh<> & m) const;
+        void              tessellate(Trimesh<> & m, const std::vector<uint> & split_list) const;
 
-        void split_in_2(const Trimesh            & m,
-                        const int                  tid,
-                        const std::pair<int,int> & edg,
-                              std::vector<int>   & split_list) const;
+        void split_in_2(const Trimesh<>          & m,
+                        const uint                 fid,
+                        const ipair              & edg,
+                              std::vector<uint>  & split_list) const;
 
-        void split_in_3(const Trimesh            & m,
-                        const int                  tid,
-                        const std::pair<int,int> & edg0,
-                        const std::pair<int,int> & edg1,
-                              std::vector<int>   & split_list) const;
+        void split_in_3(const Trimesh<>         & m,
+                        const uint                fid,
+                        const ipair             & edg0,
+                        const ipair             & edg1,
+                              std::vector<uint> & split_list) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -36,7 +36,7 @@ namespace cinolib
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const Curve::Sample & s)
 {
-    in << s.pos <<  " \t " << s.tid << " \t ";
+    in << s.pos <<  " \t " << s.eid << " \t ";
     for(double w : s.bary) in << w << "  ";
     in << std::endl;
     return in;
@@ -67,7 +67,7 @@ Curve::Curve(const std::vector<vec3d> & samples)
 }
 
 CINO_INLINE
-Curve::Curve(const Skel & skel, const int bone)
+Curve::Curve(const Skel & skel, const uint bone)
 {
     std::vector<vec3d> samples;
     for(int vid : skel.vertex_bone(bone))
@@ -104,7 +104,7 @@ CINO_INLINE
 std::vector<double> Curve::vector_coords() const
 {
     std::vector<double> coords;
-    for(size_t i=0; i<sample_list.size(); ++i)
+    for(uint i=0; i<sample_list.size(); ++i)
     {
         coords.push_back(sample_list.at(i).pos.x());
         coords.push_back(sample_list.at(i).pos.y());
@@ -119,7 +119,7 @@ CINO_INLINE
 std::vector<int> Curve::vector_segments() const
 {
     std::vector<int> segs;
-    for(size_t i=1; i<sample_list.size(); ++i)
+    for(uint i=1; i<sample_list.size(); ++i)
     {
         segs.push_back(i-1);
         segs.push_back( i );
@@ -163,7 +163,7 @@ std::vector<Curve::Sample> & Curve::samples()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-int Curve::size() const
+uint Curve::size() const
 {
     return sample_list.size();
 }
@@ -174,7 +174,7 @@ CINO_INLINE
 double Curve::length() const
 {
     double l = 0.0;
-    for(size_t i=1; i<sample_list.size(); ++i)
+    for(uint i=1; i<sample_list.size(); ++i)
     {
         l += sample_list.at(i).pos.dist(sample_list.at(i-1).pos);
     }
@@ -233,7 +233,7 @@ void Curve::update_arc_length_param() // recomputes parameter t for each sample
     double curr_l     = 0.0;
     double curr_t     = 0.0;
 
-    for(size_t i=1; i<sample_list.size()-1; ++i)
+    for(uint i=1; i<sample_list.size()-1; ++i)
     {
         double seg_l   = sample_list.at(i-1).pos.dist(sample_list.at(i).pos);
         double delta_t = seg_l / tot_length;
@@ -251,7 +251,7 @@ void Curve::update_arc_length_param() // recomputes parameter t for each sample
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-int Curve::last_sample_lower_equal_than(const float t) const
+uint Curve::last_sample_lower_equal_than(const float t) const
 {
     assert(t>=0);
     assert(t<=1);
@@ -267,15 +267,15 @@ int Curve::last_sample_lower_equal_than(const float t) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-int Curve::sample_closest_to(const float t) const
+uint Curve::sample_closest_to(const float t) const
 {
     assert(t>=0);
     assert(t<=1);
 
     float best_err = FLT_MAX;
-    int   best_sam = 0;
+    uint  best_sam = 0;
 
-    for(size_t pos=0; pos<sample_list.size()-1; ++pos)
+    for(uint pos=0; pos<sample_list.size()-1; ++pos)
     {
         float err = fabs(sample_list.at(pos).t - t);
         if (err < best_err)
@@ -309,7 +309,7 @@ vec3d Curve::sample_curve_at(const float t, const double tot_length) const
 
     double curr_l = 0.0;
     double curr_t = 0.0;
-    for(size_t i=1; i<sample_list.size(); ++i)
+    for(uint i=1; i<sample_list.size(); ++i)
     {
         double seg_l   = sample_list.at(i-1).pos.dist(sample_list.at(i).pos);
         double delta_t = seg_l / tot_length;
@@ -328,13 +328,12 @@ vec3d Curve::sample_curve_at(const float t, const double tot_length) const
         }
     }
     assert(false);
-    return vec3d();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Curve::resample_curve(const int n_samples)
+void Curve::resample_curve(const uint n_samples)
 {
     assert(n_samples >= 2);
 
@@ -346,7 +345,7 @@ void Curve::resample_curve(const int n_samples)
     if (length()<=0) return;
 
     std::vector<Sample> new_samples;
-    for(int i=0; i<n_samples; ++i)
+    for(uint i=0; i<n_samples; ++i)
     {
         Sample s;
         s.pos = sample_curve_at(t,tot_length);
@@ -355,29 +354,29 @@ void Curve::resample_curve(const int n_samples)
     }
     sample_list = new_samples;
 
-    assert((int)new_samples.size() == n_samples);
+    assert(new_samples.size() == n_samples);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<int> Curve::select_n_samples(const int n_samples) const
+std::vector<uint> Curve::select_n_samples(const uint n_samples) const
 {
     assert(size() >= n_samples);
 
     float i    = 0;
     float step = float(size()-1) / float(n_samples-1);
 
-    std::vector<int> list;
+    std::vector<uint> list;
 
     do
     {
-        int new_pos = std::ceil(i);
-        if (new_pos == (int)samples().size()) --new_pos; // this may happen due to roundoff errors...
+        uint new_pos = std::ceil(i);
+        if (new_pos == samples().size()) --new_pos; // this may happen due to roundoff errors...
         list.push_back(new_pos);
         i += step;
     }
-    while ((int)list.size() < n_samples);
+    while (list.size() < n_samples);
 
     return list;
 }
@@ -385,11 +384,11 @@ std::vector<int> Curve::select_n_samples(const int n_samples) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<int> Curve::tessellate(Trimesh & m) const
+std::vector<uint> Curve::tessellate(Trimesh<> & m) const
 {
     for(Sample s : sample_list)
     {
-        if (s.tid == -1 || s.bary.size() < m.verts_per_element)
+        if (s.eid == -1 || s.bary.size() < m.verts_per_elem())
         {
             std::cerr << "WARNING: no link between mesh and curve existing." << std::endl;
             assert(false && "Impossible to tessellate the curve");
@@ -398,41 +397,42 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
 
     // 1) Split all the edges crossed by the curve
     //
-    std::vector<int>  curve_vids;    // ordered list of mesh vertices belonging to the curve
-    std::map<int,int> new_vids_map;  // for each edge, vid of the new vertex created
-    std::set<int>     tris_to_split; // list of the triangles that will require splitting
-    for(size_t i=0; i<sample_list.size(); ++i)
+    std::vector<uint>   curve_vids;    // ordered list of mesh vertices belonging to the curve
+    std::map<uint,uint> new_vids_map;  // for each edge, vid of the new vertex created
+    std::set<uint>      faces_to_split; // list of the triangles that will require splitting
+    for(uint i=0; i<sample_list.size(); ++i)
     {
         const Sample & s = sample_list.at(i);
         uint off;
         if (triangle_bary_is_edge(s.bary, off))
         {
-            int   eid         = m.triangle_edge_local_to_global(s.tid, off);
-            int   vid0        = m.triangle_vertex_id(s.tid, TRI_EDGES[off][0]);
-            int   vid1        = m.triangle_vertex_id(s.tid, TRI_EDGES[off][1]);
-            float f0          = m.vertex_u_text(vid0);
-            float f1          = m.vertex_u_text(vid1);
+            uint  eid         = m.face_edge_id(s.eid, off);
+            uint  vid0        = m.face_vert_id(s.eid, TRI_EDGES[off][0]);
+            uint  vid1        = m.face_vert_id(s.eid, TRI_EDGES[off][1]);
+            float f0          = m.vert_data(vid0).uvw[0];
+            float f1          = m.vert_data(vid1).uvw[0];
             float f_new       = f0 * s.bary.at(TRI_EDGES[off][0]) + f1 * s.bary.at(TRI_EDGES[off][1]);
-            int fresh_id      = m.add_vertex(sample_list.at(i).pos, f_new);
+            uint fresh_id     = m.vert_add(sample_list.at(i).pos);
+            m.vert_data(fresh_id).uvw[0] = f_new;
             new_vids_map[eid] = fresh_id;
 
             curve_vids.push_back(fresh_id);
-            for(int tid : m.adj_edg2tri(eid)) tris_to_split.insert(tid);
+            for(uint fid : m.adj_e2f(eid)) faces_to_split.insert(fid);
         }
         else if (triangle_bary_is_vertex(s.bary, off))
         {
-            curve_vids.push_back(m.triangle_vertex_id(s.tid, off));
+            curve_vids.push_back(m.face_vert_id(s.eid, off));
         }
         else assert(false && "Inner samples are not supported for tessellation yet");
     }
 
     // 2) Subdivide triangles according to the number of incident edges being split
     //
-    std::vector<int> split_list;
-    for(int tid : tris_to_split)
+    std::vector<uint> split_list;
+    for(uint fid : faces_to_split)
     {
-        std::vector< std::pair<int,int> > split_edges;
-        for(int eid : m.adj_tri2edg(tid))
+        std::vector<ipair> split_edges;
+        for(int eid : m.adj_f2e(fid))
         {
             auto query = new_vids_map.find(eid);
             if (query != new_vids_map.end())
@@ -443,8 +443,8 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
 
         switch (split_edges.size())
         {
-            case 1 : split_in_2(m, tid, split_edges.front(), split_list); break;
-            case 2 : split_in_3(m, tid, split_edges.front(), split_edges.back(), split_list); break;
+            case 1 : split_in_2(m, fid, split_edges.front(), split_list); break;
+            case 2 : split_in_3(m, fid, split_edges.front(), split_edges.back(), split_list); break;
             default: assert(false && "Unsupported tessellation configuration! (to be added, probably)");
         }
     }
@@ -456,7 +456,7 @@ std::vector<int> Curve::tessellate(Trimesh & m) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Curve::tessellate(Trimesh & m, const std::vector<int> & split_list) const
+void Curve::tessellate(Trimesh<> &m, const std::vector<uint> & split_list) const
 {
     // Serialized triangle split. Structure:
     //
@@ -465,28 +465,28 @@ void Curve::tessellate(Trimesh & m, const std::vector<int> & split_list) const
     //      the first tri will be generated using the set_triangle() routine
     //      the next tris will be generated using the add_triangle() routine
     //
-    for(size_t i=0; i<split_list.size();)
+    for(uint i=0; i<split_list.size();)
     {
-        int tid     = split_list.at(i);
-        int subtris = split_list.at(i+1);
-        int v0      = split_list.at(i+2);
-        int v1      = split_list.at(i+3);
-        int v2      = split_list.at(i+4);
-        vec3d n_og  = m.triangle_normal(tid);
-        vec3d n     = triangle_normal(m.vertex(v0), m.vertex(v1), m.vertex(v2));
+        uint fid     = split_list.at(i);
+        uint subtris = split_list.at(i+1);
+        uint v0      = split_list.at(i+2);
+        uint v1      = split_list.at(i+3);
+        uint v2      = split_list.at(i+4);
+        vec3d n_og  = m.face_data(fid).normal;
+        vec3d n     = triangle_normal(m.vert(v0), m.vert(v1), m.vert(v2));
         bool flip   = (n_og.dot(n) < 0); // if the normal is opposite flip them all...
 
         if (flip) std::swap(v1,v2);
-        m.set_triangle(tid, v0, v1, v2);
+        m.face_set(fid, v0, v1, v2);
 
-        int base = i+5;
-        for(int j=0; j<subtris-1; ++j)
+        uint base = i+5;
+        for(uint j=0; j<subtris-1; ++j)
         {
             v0 = split_list.at(base+3*j);
             v1 = split_list.at(base+3*j+1);
             v2 = split_list.at(base+3*j+2);
             if (flip) std::swap(v1,v2);
-            m.add_triangle(v0, v1, v2);
+            m.face_add(v0, v1, v2);
         }
 
         i+=2+3*subtris;
@@ -501,41 +501,41 @@ void Curve::tessellate(Trimesh & m, const std::vector<int> & split_list) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Curve::split_in_2(const Trimesh            & m,
-                       const int                  tid,
-                       const std::pair<int,int> & edg,
-                             std::vector<int>   & split_list) const
+void Curve::split_in_2(const Trimesh<>         & m,
+                       const uint                fid,
+                       const ipair             & edg,
+                             std::vector<uint> & split_list) const
 {
-    int eid   = edg.first;
-    int newv  = edg.second;
-    int old0  = m.edge_vertex_id(eid,0);
-    int old1  = m.edge_vertex_id(eid,1);
-    int pivot = m.vertex_opposite_to(tid, old0, old1);
+    uint eid   = edg.first;
+    uint newv  = edg.second;
+    uint old0  = m.edge_vert_id(eid,0);
+    uint old1  = m.edge_vert_id(eid,1);
+    uint pivot = m.vert_opposite_to(fid, old0, old1);
 
-    split_list.push_back(tid);  // triangle to split
+    split_list.push_back(fid);  // triangle to split
     split_list.push_back(2);    // # of sub-triangles to create
     split_list.push_back(old0);  split_list.push_back(pivot); split_list.push_back(newv); // t0
-    split_list.push_back(old1);  split_list.push_back(newv); split_list.push_back(pivot); // t1
+    split_list.push_back(old1);  split_list.push_back(newv);  split_list.push_back(pivot); // t1
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Curve::split_in_3(const Trimesh            & m,
-                       const int                  tid,
-                       const std::pair<int,int> & edg0,
-                       const std::pair<int,int> & edg1,
-                             std::vector<int>   & split_list) const
+void Curve::split_in_3(const Trimesh<>         & m,
+                       const uint                fid,
+                       const ipair             & edg0,
+                       const ipair             & edg1,
+                             std::vector<uint> & split_list) const
 {
-    int eid0  = edg0.first;
-    int eid1  = edg1.first;
-    int newv0 = edg0.second;
-    int newv1 = edg1.second;
-    int pivot = m.shared_vertex(eid0, eid1);
-    int old0  = m.edge_vertex_id(eid0,0); if (old0==pivot) old0 = m.edge_vertex_id(eid0,1);
-    int old1  = m.edge_vertex_id(eid1,0); if (old1==pivot) old1 = m.edge_vertex_id(eid1,1);
+    uint eid0  = edg0.first;
+    uint eid1  = edg1.first;
+    uint newv0 = edg0.second;
+    uint newv1 = edg1.second;
+    uint pivot = m.vert_shared(eid0, eid1);
+    uint old0  = m.edge_vert_id(eid0,0); if (old0==pivot) old0 = m.edge_vert_id(eid0,1);
+    uint old1  = m.edge_vert_id(eid1,0); if (old1==pivot) old1 = m.edge_vert_id(eid1,1);
 
-    split_list.push_back(tid);  // triangle to split
+    split_list.push_back(fid);  // triangle to split
     split_list.push_back(3);    // # of sub-triangles to create
     split_list.push_back(newv0); split_list.push_back(newv1);  split_list.push_back(old0); // t0
     split_list.push_back(old0);  split_list.push_back(newv1);  split_list.push_back(old1); // t1

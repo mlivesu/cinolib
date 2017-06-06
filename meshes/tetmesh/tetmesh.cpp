@@ -660,6 +660,15 @@ uint Tetmesh<M,V,E,F,C>::cell_vert_id(const uint cid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+uint Tetmesh<M,V,E,F,C>::elem_vert_id(const uint cid, const uint off) const
+{
+    return cell_vert_id(cid,off);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 uint Tetmesh<M,V,E,F,C>::cell_edge_id(const uint cid, const uint vid0, const uint vid1) const
 {
     assert(cell_contains_vert(cid,vid0));
@@ -680,6 +689,15 @@ CINO_INLINE
 vec3d Tetmesh<M,V,E,F,C>::cell_vert(const uint cid, const uint off) const
 {
     return verts.at(cell_vert_id(cid,off));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+vec3d Tetmesh<M,V,E,F,C>::elem_vert(const uint cid, const uint off) const
+{
+    return cell_vert(cid,off);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -751,6 +769,17 @@ uint Tetmesh<M,V,E,F,C>::edge_vert_id(const uint eid, const uint off) const
 {
     uint eid_ptr = 2*eid;
     return edges.at(eid_ptr + off);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool Tetmesh<M,V,E,F,C>::edge_contains_vert(const uint eid, const uint vid) const
+{
+    if (edge_vert_id(eid,0) == vid) return true;
+    if (edge_vert_id(eid,1) == vid) return true;
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1014,6 +1043,54 @@ double Tetmesh<M,V,E,F,C>::edge_min_length() const
     double min = 0;
     for(uint eid=0; eid<num_edges(); ++eid) min = std::min(min,edge_length(eid));
     return min;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool Tetmesh<M,V,E,F,C>::vert_is_local_min(const uint vid, const int tex_coord) const
+{
+    for(uint nbr : adj_v2v(vid))
+    {
+        switch (tex_coord)
+        {
+            case U_param : if (vert_data(nbr).uvw[0] < vert_data(vid).uvw[0]) return false; break;
+            case V_param : if (vert_data(nbr).uvw[1] < vert_data(vid).uvw[1]) return false; break;
+            case W_param : if (vert_data(nbr).uvw[2] < vert_data(vid).uvw[2]) return false; break;
+            default: assert(false);
+        }
+    }
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool Tetmesh<M,V,E,F,C>::vert_is_local_max(const uint vid, const int tex_coord) const
+{
+    for(uint nbr : adj_v2v(vid))
+    {
+        switch (tex_coord)
+        {
+            case U_param : if (vert_data(nbr).uvw[0] > vert_data(vid).uvw[0]) return false; break;
+            case V_param : if (vert_data(nbr).uvw[1] > vert_data(vid).uvw[1]) return false; break;
+            case W_param : if (vert_data(nbr).uvw[2] > vert_data(vid).uvw[2]) return false; break;
+            default: assert(false);
+        }
+    }
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool Tetmesh<M,V,E,F,C>::vert_is_critical_p(const uint vid, const int tex_coord) const
+{
+    // WARNING: does not handle saddle points!
+    return (vert_is_local_max(vid, tex_coord) || vert_is_local_min(vid, tex_coord));
 }
 
 }

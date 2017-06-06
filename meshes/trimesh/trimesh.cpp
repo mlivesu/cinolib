@@ -396,9 +396,27 @@ uint Trimesh<M,V,E,F>::face_vert_id(const uint fid, const uint offset) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+uint Trimesh<M,V,E,F>::elem_vert_id(const uint fid, const uint offset) const
+{
+    return face_vert_id(fid,offset);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 vec3d Trimesh<M,V,E,F>::face_vert(const uint fid, const uint offset) const
 {
     return vert(face_vert_id(fid,offset));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+vec3d Trimesh<M,V,E,F>::elem_vert(const uint fid, const uint offset) const
+{
+    return face_vert(fid,offset);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1296,6 +1314,15 @@ uint Trimesh<M,V,E,F>::face_vert_offset(const uint fid, const uint vid) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+uint Trimesh<M,V,E,F>::elem_vert_offset(const uint fid, const uint vid) const
+{
+    return face_vert_offset(fid,vid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 int Trimesh<M,V,E,F>::face_shared(const uint eid0, const uint eid1) const
 {
     for(uint fid0 : adj_e2f(eid0))
@@ -1682,10 +1709,10 @@ bool Trimesh<M,V,E,F>::vert_is_local_max(const uint vid, const int tex_coord) co
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-bool Trimesh<M,V,E,F>::vert_is_critical_p(const uint vid) const
+bool Trimesh<M,V,E,F>::vert_is_critical_p(const uint vid, const int tex_coord) const
 {
     // WARNING: does not handle saddle points!
-    return (vert_is_local_max(vid) || vert_is_local_min(vid));
+    return (vert_is_local_max(vid,tex_coord) || vert_is_local_min(vid,tex_coord));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

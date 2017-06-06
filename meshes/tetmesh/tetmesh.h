@@ -164,6 +164,13 @@ class Tetmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        const std::vector<uint> & adj_vert2elem(const uint vid) const { return v2c.at(vid); }
+        const std::vector<uint> & adj_edge2elem(const uint eid) const { return e2c.at(eid); }
+        const std::vector<uint> & adj_elem2edge(const uint cid) const { return c2e.at(cid); }
+        const std::vector<uint> & adj_elem2elem(const uint cid) const { return c2c.at(cid); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         const M & mesh_data()               const { return m_data;         }
               M & mesh_data()                     { return m_data;         }
         const V & vert_data(const uint vid) const { return v_data.at(vid); }
@@ -179,22 +186,26 @@ class Tetmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-  const vec3d & vert          (const uint vid) const { return verts.at(vid); }
-        vec3d & vert          (const uint vid)       { return verts.at(vid); }
-        void    vert_set_color(const Color & c);
-        void    vert_set_alpha(const float alpha);
+  const vec3d & vert              (const uint vid) const { return verts.at(vid); }
+        vec3d & vert              (const uint vid)       { return verts.at(vid); }
+        void    vert_set_color    (const Color & c);
+        void    vert_set_alpha    (const float alpha);
+        bool    vert_is_local_min (const uint vid, const int tex_coord = U_param) const;
+        bool    vert_is_local_max (const uint vid, const int tex_coord = U_param) const;
+        bool    vert_is_critical_p(const uint vid, const int tex_coord = U_param) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d  edge_vert      (const uint eid, const uint offset) const;
-        uint   edge_vert_id   (const uint eid, const uint offset) const;
-        bool   edge_is_on_srf (const uint eid) const;
-        double edge_length    (const uint eid) const;
-        double edge_avg_length() const;
-        double edge_max_length() const;
-        double edge_min_length() const;
-        void   edge_set_color (const Color & c);
-        void   edge_set_alpha (const float alpha);
+        vec3d  edge_vert         (const uint eid, const uint offset) const;
+        uint   edge_vert_id      (const uint eid, const uint offset) const;
+        bool   edge_contains_vert(const uint eid, const uint vid) const;
+        bool   edge_is_on_srf    (const uint eid) const;
+        double edge_length       (const uint eid) const;
+        double edge_avg_length   () const;
+        double edge_max_length   () const;
+        double edge_min_length   () const;
+        void   edge_set_color    (const Color & c);
+        void   edge_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -234,8 +245,11 @@ class Tetmesh
         // "cell_" for volumetric meshes, allowing the use of templated algorithms
         // that work with both types of meshes without requiring specialzed code
 
-        vec3d elem_centroid(const uint cid) const;
-        void  elem_show_all();
+        vec3d  elem_centroid(const uint cid) const;
+        void   elem_show_all();
+        vec3d  elem_vert    (const uint cid, const uint off) const;
+        uint   elem_vert_id (const uint cid, const uint off) const;
+
 };
 
 }

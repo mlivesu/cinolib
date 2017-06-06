@@ -110,6 +110,7 @@ class Trimesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint verts_per_face() const { return 3; }
+        uint verts_per_elem() const { return 3; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -137,6 +138,13 @@ class Trimesh
         const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
         const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
         const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const std::vector<uint> & adj_vert2elem(const uint vid) const { return v2f.at(vid); }
+        const std::vector<uint> & adj_edge2elem(const uint eid) const { return e2f.at(eid); }
+        const std::vector<uint> & adj_elem2edge(const uint fid) const { return f2e.at(fid); }
+        const std::vector<uint> & adj_elem2elem(const uint fid) const { return f2f.at(fid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -183,7 +191,7 @@ class Trimesh
         bool              verts_are_adjacent      (const uint vid0, const uint vid1) const;
         bool              vert_is_local_min       (const uint vid, const int tex_coord = U_param) const;
         bool              vert_is_local_max       (const uint vid, const int tex_coord = U_param) const;
-        bool              vert_is_critical_p      (const uint vid) const;
+        bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
         uint              vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;
         uint              vert_opposite_to        (const uint eid, const uint vid) const;
         uint              vert_valence            (const uint vid) const;
@@ -250,6 +258,9 @@ class Trimesh
         // "cell_" for volumetric meshes, allowing the use of templated algorithms
         // that work with both types of meshes without requiring specialzed code
 
+        vec3d  elem_vert        (const uint fid, const uint offset) const;
+        uint   elem_vert_id     (const uint fid, const uint offset) const;
+        uint   elem_vert_offset (const uint fid, const uint vid) const;
         vec3d  elem_centroid    (const uint fid) const;
         void   elem_show_all    ();
         double elem_mass        (const uint fid) const;
