@@ -68,16 +68,16 @@ void bfs_exahustive(const std::vector<std::vector<uint>> & nodes_adjacency,
 
 template<class Mesh>
 CINO_INLINE
-void bfs_exahustive(const Mesh          & m,
-                    const int             source,
-                          std::set<int> & visited)
+void bfs_exahustive(const Mesh           & m,
+                    const uint             source,
+                          std::set<uint> & visited)
 {
     assert(visited.empty());
 
-    std::set<int> active_set;
+    std::set<uint> active_set;
     active_set.insert(source);
 
-    int vid;
+    uint vid;
     while (!active_set.empty())
     {
         vid = *active_set.begin();
@@ -85,7 +85,7 @@ void bfs_exahustive(const Mesh          & m,
 
         visited.insert(vid);
 
-        for(int nbr : m.adj_vtx2vtx(vid))
+        for(uint nbr : m.adj_v2v(vid))
         {
             if (DOES_NOT_CONTAIN(visited,nbr))
             {
@@ -102,24 +102,24 @@ void bfs_exahustive(const Mesh          & m,
 template<class Mesh>
 CINO_INLINE
 void bfs_exahustive_on_dual(const Mesh              & m,
-                            const int                 source,
+                            const uint                source,
                             const std::vector<bool> & mask,
-                                  std::set<int>     & visited)
+                                  std::set<uint>    & visited)
 {
     assert(visited.empty());
 
-    std::set<int> active_set;
+    std::set<uint> active_set;
     active_set.insert(source);
 
-    int tid;
+    uint cid;
     while (!active_set.empty())
     {
-        tid = *active_set.begin();
+        cid = *active_set.begin();
         active_set.erase(active_set.begin());
 
-        visited.insert(tid);
+        visited.insert(cid);
 
-        for(int nbr : m.adj_tri2tri(tid))
+        for(uint nbr : m.adj_elem2elem(cid))
         {
             if (mask.at(nbr)) continue;
             if (DOES_NOT_CONTAIN(visited,nbr))
@@ -137,21 +137,21 @@ void bfs_exahustive_on_dual(const Mesh              & m,
 //
 template<class Mesh>
 CINO_INLINE
-void bfs(const Mesh             & m,
-         const int                source,
-         const int                dest,
-               std::vector<int> & path)
+void bfs(const Mesh              & m,
+         const uint                source,
+         const uint                dest,
+               std::vector<uint> & path)
 
 {
     assert(path.empty());
 
-    int inf_dist = m.num_edges()+1;
-    std::vector<int> prev(m.num_vertices(), -1);
-    std::vector<int> dist(m.num_vertices(), inf_dist);
+    uint inf_dist = m.num_edges()+1;
+    std::vector<int> prev(m.num_verts(), -1);
+    std::vector<uint> dist(m.num_verts(), inf_dist);
     dist[source] = 0;
 
     std::set<ipair> active_set;
-    active_set.insert(std::make_pair(0, source));
+    active_set.insert(std::make_pair(0,source));
 
     int vid;
     while (!active_set.empty())
@@ -159,7 +159,7 @@ void bfs(const Mesh             & m,
         vid = active_set.begin()->second;
         active_set.erase(active_set.begin());
 
-        if (vid == dest)
+        if (vid == (int)dest)
         {
             do
             {
@@ -170,7 +170,7 @@ void bfs(const Mesh             & m,
             return;
         }
 
-        for(int nbr : m.adj_vtx2vtx(vid))
+        for(uint nbr : m.adj_v2v(vid))
         {
             float tmp = dist[vid] + 1;
 
@@ -178,7 +178,7 @@ void bfs(const Mesh             & m,
             {
                 if (dist[nbr] < inf_dist)
                 {
-                    auto it = active_set.find(std::make_pair(dist[nbr], nbr));
+                    auto it = active_set.find(std::make_pair(dist[nbr],nbr));
                     assert(it!=active_set.end());
                     active_set.erase(it);
                 }
@@ -198,21 +198,21 @@ void bfs(const Mesh             & m,
 template<class Mesh>
 CINO_INLINE
 void bfs(const Mesh              & m,
-         const int                 source,
-         const int                 dest,
+         const uint                source,
+         const uint                dest,
          const std::vector<bool> & mask,
-               std::vector<int>  & path)
+               std::vector<uint> & path)
 {
     assert(path.empty());
-    assert(mask.size() == m.num_vertices());
+    assert(mask.size() == m.num_verts());
 
-    int inf_dist = m.num_edges()+1;
-    std::vector<int> prev(m.num_vertices(), -1);
-    std::vector<int> dist(m.num_vertices(), inf_dist);
+    uint inf_dist = m.num_edges()+1;
+    std::vector<int>  prev(m.num_verts(), -1);
+    std::vector<uint> dist(m.num_verts(), inf_dist);
     dist[source] = 0;
 
     std::set<ipair> active_set;
-    active_set.insert(std::make_pair(0, source));
+    active_set.insert(std::make_pair(0,source));
 
     int vid;
     while (!active_set.empty())
@@ -220,7 +220,7 @@ void bfs(const Mesh              & m,
         vid = active_set.begin()->second;
         active_set.erase(active_set.begin());
 
-        if (dest == vid)
+        if ((int)dest == vid)
         {
             do
             {
@@ -231,7 +231,7 @@ void bfs(const Mesh              & m,
             return;
         }
 
-        for(int nbr : m.adj_vtx2vtx(vid))
+        for(uint nbr : m.adj_v2v(vid))
         {
             float tmp = dist[vid] + 1;
 
@@ -261,17 +261,17 @@ void bfs(const Mesh              & m,
 template<class Mesh>
 CINO_INLINE
 void bfs(const Mesh              & m,
-         const int                 source,
-         const std::set<int>     & dest,
+         const uint                source,
+         const std::set<uint>    & dest,
          const std::vector<bool> & mask,
-               std::vector<int>  & path)
+               std::vector<uint> & path)
 {
     assert(path.empty());
-    assert(mask.size() == (size_t)m.num_vertices());
+    assert(mask.size() == (size_t)m.num_verts());
 
-    int inf_dist = m.num_edges()+1;
-    std::vector<int> prev(m.num_vertices(), -1);
-    std::vector<int> dist(m.num_vertices(), inf_dist);
+    uint inf_dist = m.num_edges()+1;
+    std::vector<int>  prev(m.num_verts(), -1);
+    std::vector<uint> dist(m.num_verts(), inf_dist);
     dist[source] = 0;
 
     std::set<ipair> active_set;
@@ -294,7 +294,7 @@ void bfs(const Mesh              & m,
             return;
         }
 
-        for(int nbr : m.adj_vtx2vtx(vid))
+        for(uint nbr : m.adj_v2v(vid))
         {
             float tmp = dist[vid] + 1;
 

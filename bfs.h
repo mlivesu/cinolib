@@ -50,9 +50,9 @@ void bfs_exahustive(const std::vector<std::vector<uint>> & nodes_adjacency,
 //
 template<class Mesh>
 CINO_INLINE
-void bfs_exahustive(const Mesh          & m,
-                    const int             source,
-                          std::set<int> & visited);
+void bfs_exahustive(const Mesh           & m,
+                    const uint             source,
+                          std::set<uint> & visited);
 
 
 // floodfill (with barriers) on the dual mesh (faces instead of vertices)
@@ -61,19 +61,19 @@ void bfs_exahustive(const Mesh          & m,
 template<class Mesh>
 CINO_INLINE
 void bfs_exahustive_on_dual(const Mesh              & m,
-                            const int                 source,
+                            const uint                source,
                             const std::vector<bool> & mask,
-                                  std::set<int>     & visited);
+                                  std::set<uint>    & visited);
 
 
 // shortest path on unweighted graph, essentially dijkstra with constaint weights.
 //
 template<class Mesh>
 CINO_INLINE
-void bfs(const Mesh             & m,
-         const int                source,
-         const int                dest,
-               std::vector<int> & path);
+void bfs(const Mesh              & m,
+         const uint                source,
+         const uint                dest,
+               std::vector<uint> & path);
 
 
 // shortest path (with barriers) on unweighted graph.
@@ -82,10 +82,10 @@ void bfs(const Mesh             & m,
 template<class Mesh>
 CINO_INLINE
 void bfs(const Mesh              & m,
-         const int                 source,
-         const int                 dest,
+         const uint                source,
+         const uint                dest,
          const std::vector<bool> & mask,
-               std::vector<int>  & path);
+               std::vector<uint> & path);
 
 
 // shortest path (with barriers and multiple destinatins) on unweighted graph.
@@ -95,10 +95,10 @@ void bfs(const Mesh              & m,
 template<class Mesh>
 CINO_INLINE
 void bfs(const Mesh              & m,
-         const int                 source,
-         const std::set<int>     & dest,
+         const uint                source,
+         const std::set<uint>    & dest,
          const std::vector<bool> & mask,
-               std::vector<int>  & path);
+               std::vector<uint> & path);
 }
 
 

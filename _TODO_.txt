@@ -1,5 +1,5 @@
 - transform any function containing inner Trimesh<> or Tetmesh<> into a templated function  with generic Mesh type
-- improve face tessellation strategy for polygonal meshes
+- improve face tessellation strategy for polygonal meshes (flipped elements may currently arise for non convex polygons)
 - add Mesh,SurfaceMesh and VolumeMesh interfaces, and implement them with ALL the meshes available within the library
 - add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
 - Transform timer in a profiler class with internal string to be printed at the end
@@ -18,4 +18,5 @@
 - Improve on mesh rendering (shaders, VBOs ecc)
 - Add ambient occlusion (with/without floor)
 - Copy/paste points of view
+- remove dependency from libQGLViewer and use Qt3D instead
 - Add text box with debug messages
