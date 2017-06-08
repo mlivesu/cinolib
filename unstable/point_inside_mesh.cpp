@@ -37,21 +37,21 @@ namespace cinolib
 
 template<class Mesh>
 CINO_INLINE
-PointInsideMeshCache<Mesh>::PointInsideMeshCache(const Mesh & m, const int octree_depth) : m_ptr(&m)
+PointInsideMeshCache<Mesh>::PointInsideMeshCache(const Mesh & m, const uint octree_depth) : m_ptr(&m)
 {
-    octree = Octree<int>(m.bbox().min, m.bbox().max);
+    octree = Octree<uint>(m.bbox().min, m.bbox().max);
     octree.subdivide_n_levels(octree_depth);
 
-    for(int tid=0; tid<m.num_elements(); ++tid)
+    for(uint eid=0; eid<m.num_elems(); ++eid)
     {
-        vec3d min = m.elem_vertex(tid, 0);
+        vec3d min = m.elem_vert(eid, 0);
         vec3d max = min;
-        for(int i=1; i<m.verts_per_element; ++i)
+        for(int i=1; i<m.verts_per_elem(); ++i)
         {
-            min = min.min(m.elem_vertex(tid, i));
-            max = max.max(m.elem_vertex(tid, i));
+            min = min.min(m.elem_vert(eid, i));
+            max = max.max(m.elem_vert(eid, i));
         }
-        octree.add_item(tid, min, max);
+        octree.add_item(eid, min, max);
     }
 }
 
@@ -62,16 +62,16 @@ PointInsideMeshCache<Mesh>::PointInsideMeshCache(const Mesh & m, const int octre
 */
 template<class Mesh>
 CINO_INLINE
-void PointInsideMeshCache<Mesh>::locate(const vec3d p, int & tid, std::vector<double> & wgts) const
+void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & eid, std::vector<double> & wgts) const
 {
-    std::set<int> items;
+    std::set<uint> items;
     octree.get_items(p, items);
 
-    for(int tet : items)
+    for(uint id : items)
     {
-        if (m_ptr->barycentric_coordinates(tet, p, wgts)) // if is inside...
+        if (m_ptr->barycentric_coordinates(id, p, wgts)) // if is inside...
         {
-            tid = tet;
+            eid = id;
             return;
         }
     }
@@ -84,13 +84,13 @@ void PointInsideMeshCache<Mesh>::locate(const vec3d p, int & tid, std::vector<do
     std::cerr << "BBmin: " << m_ptr->bbox().min << std::endl;
     std::cerr << "BBmax: " << m_ptr->bbox().max << std::endl;
 
-    std::set< std::pair<double,int>,std::greater< std::pair<double,int> > > ordered_items;
+    std::set<std::pair<double,uint>,std::greater<std::pair<double,uint>>> ordered_items;
     for(int item : items)
     {
-        ordered_items.insert(std::make_pair(m_ptr->element_barycenter(item).dist(p),item));
+        ordered_items.insert(std::make_pair(m_ptr->elem_centroid(item).dist(p),item));
     }
-    tid = (*ordered_items.begin()).second;
-    wgts = std::vector<double>(m_ptr->verts_per_element, 1.0/double(m_ptr->verts_per_element)); // centroid
+    eid = (*ordered_items.begin()).second;
+    wgts = std::vector<double>(m_ptr->verts_per_elem(), 1.0/double(m_ptr->verts_per_elem())); // centroid
 }
 
 
@@ -102,14 +102,14 @@ template<class Mesh>
 CINO_INLINE
 vec3d PointInsideMeshCache<Mesh>::locate(const vec3d p, const Mesh & m) const
 {
-    int tid;
-    std::vector<double> wgts(m.verts_per_element);
-    locate(p, tid, wgts);
+    uint eid;
+    std::vector<double> wgts(m.verts_per_elem());
+    locate(p, eid, wgts);
 
     vec3d tmp(0,0,0);
-    for(int i=0; i<m.verts_per_element; ++i)
+    for(uint off=0; off<m.verts_per_elem(); ++off)
     {
-        tmp += wgts.at(i) * m.elem_vertex(tid,i);
+        tmp += wgts.at(off) * m.elem_vert(eid,off);
     }
     return tmp;
 }

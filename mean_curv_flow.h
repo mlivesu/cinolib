@@ -46,8 +46,8 @@ namespace cinolib
 */
 
 CINO_INLINE
-void MCF(Trimesh      & m,
-         const int      n_iters,
+void MCF(Trimesh<>    & m,
+         const uint     n_iters,
          const double   time = 1e-3,
          const bool     conformalized = true);
 

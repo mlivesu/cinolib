@@ -47,8 +47,8 @@ template<class Mesh>
 CINO_INLINE
 void smooth_taubin(Mesh                & m,
                    const int             mode,
-                   const std::set<int>   do_not_smooth,
-                   const int             n_iters,
+                   const std::set<uint>  do_not_smooth,
+                   const uint            n_iters,
                    const double          lambda,
                    const double          mu)
 {
@@ -56,15 +56,15 @@ void smooth_taubin(Mesh                & m,
     assert(lambda <  1 );
     assert(lambda < -mu);
 
-    for(int iter=0; iter<n_iters; ++iter)
+    for(uint iter=0; iter<n_iters; ++iter)
     {
         // shrink
         //
-        for(int vid=0; vid<m.num_vertices(); ++vid)
+        for(uint vid=0; vid<m.num_verts(); ++vid)
         {
             if (CONTAINS(do_not_smooth, vid)) continue;
 
-            std::vector<int>    nbrs;
+            std::vector<uint>   nbrs;
             std::vector<double> wgts;
             if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
             if (mode & COTANGENT) cotangent_weights<Mesh>(m, vid, nbrs, wgts); else
@@ -76,18 +76,17 @@ void smooth_taubin(Mesh                & m,
             for(double &w : wgts) w /= sum;
 
             vec3d delta(0,0,0);
-            for(size_t i=0; i<nbrs.size(); ++i) delta += (m.vertex(nbrs[i]) - m.vertex(vid)) * wgts[i];
-            m.set_vertex(vid, m.vertex(vid) + delta * lambda);
+            for(uint i=0; i<nbrs.size(); ++i) delta += (m.vert(nbrs[i]) - m.vert(vid)) * wgts[i];
+            m.vert(vid) = m.vert(vid) + delta * lambda;
         }
-
 
         // inflate
         //
-        for(int vid=0; vid<m.num_vertices(); ++vid)
+        for(uint vid=0; vid<m.num_verts(); ++vid)
         {
             if (CONTAINS(do_not_smooth, vid)) continue;
 
-            std::vector<int>    nbrs;
+            std::vector<uint>   nbrs;
             std::vector<double> wgts;
             if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
             if (mode & COTANGENT) cotangent_weights<Mesh>(m, vid, nbrs, wgts); else
@@ -99,8 +98,8 @@ void smooth_taubin(Mesh                & m,
             for(double &w : wgts) w /= sum;
 
             vec3d delta(0,0,0);
-            for(size_t i=0; i<nbrs.size(); ++i) delta += (m.vertex(nbrs[i]) - m.vertex(vid)) * wgts[i];
-            m.set_vertex(vid, m.vertex(vid) + delta * mu);
+            for(uint i=0; i<nbrs.size(); ++i) delta += (m.vert(nbrs[i]) - m.vert(vid)) * wgts[i];
+            m.vert(vid) = m.vert(vid) + delta * mu;
         }
    }
 }

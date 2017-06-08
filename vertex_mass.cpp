@@ -40,12 +40,12 @@ Eigen::SparseMatrix<double> mass_matrix(const Mesh & m)
     typedef Eigen::Triplet<double> Entry;
 
     std::vector<Entry>  entries;
-    for(int vid=0; vid<m.num_vertices(); ++vid)
+    for(uint vid=0; vid<m.num_verts(); ++vid)
     {
-        entries.push_back(Entry(vid, vid, m.vertex_mass(vid)));
+        entries.push_back(Entry(vid, vid, m.vert_mass(vid)));
     }
 
-    Eigen::SparseMatrix<double> M(m.num_vertices(), m.num_vertices());
+    Eigen::SparseMatrix<double> M(m.num_verts(), m.num_verts());
     M.setFromTriplets(entries.begin(), entries.end());
 
     return M;

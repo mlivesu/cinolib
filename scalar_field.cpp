@@ -42,14 +42,14 @@ CINO_INLINE
 ScalarField::ScalarField(const std::vector<float> & data)
 {
     resize(data.size());
-    for(int i=0; i<rows(); ++i)
+    for(uint i=0; i<rows(); ++i)
     {
         (*this)[i] = data[i];
     }
 }
 
 CINO_INLINE
-ScalarField::ScalarField(const int size)
+ScalarField::ScalarField(const uint size)
 {
     setZero(size);
 }
@@ -66,7 +66,7 @@ CINO_INLINE
 void ScalarField::copy_to_mesh(Mesh & m) const
 {
     assert(rows() == m.num_verts());
-    for(int vid=0; vid<rows(); ++vid)
+    for(uint vid=0; vid<rows(); ++vid)
     {
         m.vert_data(vid).uvw[0] = (*this)[vid];
     }
@@ -79,7 +79,7 @@ void ScalarField::normalize_in_01()
     double min =  FLT_MAX;
     double max = -FLT_MAX;
 
-    for(int i=0; i<this->rows(); ++i)
+    for(uint i=0; i<this->rows(); ++i)
     {
         min = std::min(min, (*this)[i]);
         max = std::max(max, (*this)[i]);
@@ -93,7 +93,7 @@ void ScalarField::normalize_in_01()
 
     double delta = max - min;
 
-    for(int i=0; i<rows(); ++i)
+    for(uint i=0; i<rows(); ++i)
     {
         (*this)[i] = ((*this)[i] - min) / delta;
     }
@@ -101,12 +101,12 @@ void ScalarField::normalize_in_01()
 
 
 CINO_INLINE
-int ScalarField::min_element_index() const
+uint ScalarField::min_element_index() const
 {
-    double min_val =  FLT_MAX;
-    int    min_el  = -1;
+    double min_val = (*this)[0];
+    uint   min_el  = 0;
 
-    for(int i=0; i<rows(); ++i)
+    for(uint i=1; i<rows(); ++i)
     {
         if (min_val > (*this)[i])
         {
@@ -114,7 +114,6 @@ int ScalarField::min_element_index() const
             min_el  = i;
         }
     }
-    assert(min_el > -1);
     return min_el;
 }
 
@@ -127,7 +126,7 @@ void ScalarField::serialize(const char *filename) const
     f.open(filename);
     assert(f.is_open());
     f << "SCALAR_FIELD " << size() << "\n";
-    for(int i=0; i<rows(); ++i)
+    for(uint i=0; i<rows(); ++i)
     {
         f << (*this)[i] << "\n";
     }
@@ -142,11 +141,11 @@ void ScalarField::deserialize(const char *filename)
     f.precision(std::numeric_limits<double>::digits10+1);
     f.open(filename);
     assert(f.is_open());
-    int size;
+    uint size;
     std::string dummy;
     f >> dummy >> size;
     resize(size);
-    for(int i=0; i<size; ++i) f >> (*this)[i];
+    for(uint i=0; i<size; ++i) f >> (*this)[i];
     f.close();
 }
 

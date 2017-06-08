@@ -968,6 +968,27 @@ void Tetmesh<M,V,E,F,C>::set_uvw_from_xyz(const int mode)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+double Tetmesh<M,V,E,F,C>::vert_mass(const uint vid) const
+{
+    return vert_volume(vid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+double Tetmesh<M,V,E,F,C>::vert_volume(const uint vid) const
+{
+    double vol = 0.0;
+    for(uint cid : adj_v2c(vid)) vol += cell_volume(cid);
+    vol /= static_cast<double>(verts_per_cell());
+    return vol;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 std::vector<double> Tetmesh<M,V,E,F,C>::vector_coords() const
 {
     std::vector<double> coords;

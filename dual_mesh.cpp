@@ -34,7 +34,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-void dual_mesh(const Trimesh       & primal,
+void dual_mesh(const Trimesh<>     & primal,
                      Polygonmesh<> & dual,
                const bool            with_clipped_cells)
 {
@@ -46,7 +46,7 @@ void dual_mesh(const Trimesh       & primal,
 
 
 CINO_INLINE
-void dual_mesh(const Trimesh                        & primal,
+void dual_mesh(const Trimesh<>                      & primal,
                      std::vector<vec3d>             & dual_verts,
                      std::vector<std::vector<uint>> & dual_faces,
                const bool                             with_clipped_cells)
@@ -55,45 +55,45 @@ void dual_mesh(const Trimesh                        & primal,
     dual_faces.clear();
 
     // Initialize vertices with face centroids
-    dual_verts.resize(primal.num_triangles());
-    for(uint tid=0; tid<primal.num_triangles(); ++tid)
+    dual_verts.resize(primal.num_elems());
+    for(uint eid=0; eid<primal.num_elems(); ++eid)
     {
-        dual_verts.at(tid) = primal.element_barycenter(tid);
+        dual_verts.at(eid) = primal.elem_centroid(eid);
     }
 
     // Add boundary vertices as well as boundary edges' midpoints
     std::map<uint,uint> e2verts;
     std::map<uint,uint> v2verts;
-    for(int vid=0; vid<primal.num_vertices(); ++vid)
+    for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
-        if (primal.vertex_is_boundary(vid))
+        if (primal.vert_is_boundary(vid))
         {
             v2verts[vid] = dual_verts.size();
-            dual_verts.push_back(primal.vertex(vid));
+            dual_verts.push_back(primal.vert(vid));
         }
     }
-    for(int eid=0; eid<primal.num_edges(); ++eid)
+    for(uint eid=0; eid<primal.num_edges(); ++eid)
     {
         if (primal.edge_is_boundary(eid))
         {
             e2verts[eid] = dual_verts.size();
-            dual_verts.push_back(0.5 * (primal.edge_vertex(eid,0) + primal.edge_vertex(eid,1)));
+            dual_verts.push_back(0.5 * (primal.edge_vert(eid,0) + primal.edge_vert(eid,1)));
         }
     }
 
     // Make polygons
-    for(int vid=0; vid<primal.num_vertices(); ++vid)
+    for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
-        bool clipped_cell = primal.vertex_is_boundary(vid);
+        bool clipped_cell = primal.vert_is_boundary(vid);
         if (clipped_cell && !with_clipped_cells) continue;
 
         std::vector<uint> f;
-        std::vector<uint> ring = primal.adj_vtx2tri_ordered(vid);
-        for(uint tid : ring) f.push_back(tid);
+        std::vector<uint> f_ring = primal.vert_ordered_face_ring(vid);
+        for(uint fid : f_ring) f.push_back(fid);
 
         if (clipped_cell) // add boundary portion (vertex vid + boundary edges' midpoints)
         {
-            std::vector<uint> e_star = primal.adj_vtx2edg_ordered(vid);
+            std::vector<uint> e_star = primal.vert_ordered_edge_ring(vid);
             f.push_back(e2verts.at(e_star.back()));
             f.push_back(v2verts.at(vid));
             f.push_back(e2verts.at(e_star.front()));

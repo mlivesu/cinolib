@@ -38,9 +38,9 @@
 namespace cinolib
 {
     CINO_INLINE
-    std::vector<float> sample_within_interval(const int min,
-                                              const int max,
-                                              const int n_samples);
+    std::vector<float> sample_within_interval(const int  min,
+                                              const int  max,
+                                              const uint n_samples);
 }
 
 #ifndef  CINO_STATIC_LIB

@@ -187,13 +187,15 @@ class Tetmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-  const vec3d & vert              (const uint vid) const { return verts.at(vid); }
-        vec3d & vert              (const uint vid)       { return verts.at(vid); }
-        void    vert_set_color    (const Color & c);
-        void    vert_set_alpha    (const float alpha);
-        bool    vert_is_local_min (const uint vid, const int tex_coord = U_param) const;
-        bool    vert_is_local_max (const uint vid, const int tex_coord = U_param) const;
-        bool    vert_is_critical_p(const uint vid, const int tex_coord = U_param) const;
+  const vec3d  & vert              (const uint vid) const { return verts.at(vid); }
+        vec3d  & vert              (const uint vid)       { return verts.at(vid); }
+        double   vert_mass         (const uint vid) const;
+        double   vert_volume       (const uint vid) const;
+        void     vert_set_color    (const Color & c);
+        void     vert_set_alpha    (const float alpha);
+        bool     vert_is_local_min (const uint vid, const int tex_coord = U_param) const;
+        bool     vert_is_local_max (const uint vid, const int tex_coord = U_param) const;
+        bool     vert_is_critical_p(const uint vid, const int tex_coord = U_param) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

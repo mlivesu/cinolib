@@ -52,7 +52,7 @@ void DrawableCurve::draw(const float scene_size) const
 {
     double cylind_rad = scene_size*0.001;
 
-    for(size_t i=1; i<samples().size(); ++i)
+    for(uint i=1; i<samples().size(); ++i)
     {
         cylinder<vec3d>(samples()[i-1].pos, samples()[i].pos, cylind_rad, cylind_rad, Color::RED().rgba);
     }

@@ -70,11 +70,11 @@ namespace cinolib
 
 template<class Mesh>
 CINO_INLINE
-void compute_geodesics(const Mesh             & m,
-                       const std::vector<int> & heat_charges,
-                             ScalarField      & geodesics,
-                       const int                laplacian_mode = COTANGENT,
-                       const float              time_scalar = 1.0)
+void compute_geodesics(const Mesh              & m,
+                       const std::vector<uint> & heat_charges,
+                             ScalarField       & geodesics,
+                       const int                 laplacian_mode = COTANGENT,
+                       const float               time_scalar = 1.0)
 {
     timer_start("Compute geodesics");
 
@@ -82,22 +82,19 @@ void compute_geodesics(const Mesh             & m,
     Mesh m_copy = m;
     m_copy.normalize_area();
     m_copy.center_bbox();
-    double time = m_copy.avg_edge_length();
+    double time = m_copy.edge_avg_length();
     time *= time;
     time *= time_scalar;
 
     Eigen::SparseMatrix<double> L   = laplacian<Mesh>(m_copy, laplacian_mode);
     Eigen::SparseMatrix<double> M   = mass_matrix<Mesh>(m_copy);
     Eigen::SparseMatrix<double> G   = gradient(m_copy);
-    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m_copy.num_vertices());
+    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m_copy.num_verts());
 
-    std::map<int,double> bc;
-    for(int i=0; i<(int)heat_charges.size(); ++i)
-    {
-        bc[heat_charges[i]] = 1.0;
-    }
+    std::map<uint,double> bc;
+    for(uint i=0; i<heat_charges.size(); ++i) bc[heat_charges[i]] = 1.0;
 
-    ScalarField heat(m_copy.num_vertices());
+    ScalarField heat(m_copy.num_verts());
     solve_square_system_with_bc(M - time * L, rhs, heat, bc);
 
     VectorField grad = G * heat;

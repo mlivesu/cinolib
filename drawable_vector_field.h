@@ -51,8 +51,8 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
         DrawableVectorField(const Mesh & m) : VectorField(m.num_elems())
         {
-            type        = VECTOR_FIELD;
-            m_ptr       = &m;
+            type  = VECTOR_FIELD;
+            m_ptr = &m;
 
             set_arrow_color(Color::RED());
             set_arrow_size(0.5);

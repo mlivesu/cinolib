@@ -87,7 +87,7 @@ template<typename item_type> class Octree
                                     vec3d(bb_avg[0], bb_max[1], bb_max[2]));
         }
 
-        void subdivide_n_levels(const int n)
+        void subdivide_n_levels(const uint n)
         {
             assert(children.empty());
 

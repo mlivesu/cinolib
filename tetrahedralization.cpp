@@ -36,7 +36,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-void tetrahedralize_prism(uint prism[], std::vector<u_int> & tets)
+void tetrahedralize_prism(uint prism[], std::vector<uint> & tets)
 {
     std::set<ipair> ordered_vids;
     for(uint i=0; i<6; ++i) ordered_vids.insert(ipair(prism[i],i));

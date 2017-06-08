@@ -38,10 +38,10 @@ namespace cinolib
 {
 
 CINO_INLINE
-void MCF(Trimesh      & m,
-         const int      n_iters,
-         const double   time,
-         const bool     conformalized)
+void MCF(Trimesh<>       & m,
+         const uint        n_iters,
+         const double      time,
+         const bool        conformalized)
 {
     char msg[1024];
     sprintf(msg, "Mean Curvature Flow - time step: %f - n_iters: %d - conformalized: %d", time, n_iters, conformalized);
@@ -51,7 +51,7 @@ void MCF(Trimesh      & m,
     Eigen::SparseMatrix<double> L = laplacian<Trimesh>(m, COTANGENT);
     Eigen::SparseMatrix<double> M = mass_matrix<Trimesh>(m);
 
-    for(int i=1; i<=n_iters; ++i)
+    for(uint i=1; i<=n_iters; ++i)
     {
         // this is for numerical precision: try to stay within
         // the denser part of the machine float representation
@@ -63,12 +63,12 @@ void MCF(Trimesh      & m,
         //
         Eigen::SimplicialLLT< Eigen::SparseMatrix<double> > solver(M - time * L);
 
-        int nv = m.num_vertices();
+        uint nv = m.num_verts();
         Eigen::VectorXd x(nv);
         Eigen::VectorXd y(nv);
         Eigen::VectorXd z(nv);
 
-        for(int vid=0; vid<nv; ++vid)
+        for(uint vid=0; vid<nv; ++vid)
         {
             vec3d pos = m.vertex(vid);
             x[vid] = pos.x();
@@ -81,11 +81,11 @@ void MCF(Trimesh      & m,
         z = solver.solve(M * z);
 
         double residual = 0.0;
-        for(int vid=0; vid<m.num_vertices(); ++vid)
+        for(uint vid=0; vid<m.num_verts(); ++vid)
         {
             vec3d new_pos(x[vid], y[vid], z[vid]);
-            residual += (m.vertex(vid) - new_pos).length();
-            m.set_vertex(vid, new_pos);
+            residual += (m.vert(vid) - new_pos).length();
+            m.vert(vid) = new_pos;
         }
 
         logger << "MCF iter: " << i << " residual: " << residual << endl;

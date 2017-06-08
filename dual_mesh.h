@@ -39,7 +39,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-void dual_mesh(const Trimesh                        & primal,
+void dual_mesh(const Trimesh<>                      & primal,
                      std::vector<vec3d>             & dual_verts,
                      std::vector<std::vector<uint>> & dual_faces,
                const bool                             with_clipped_cells); // consider/discard boundary vertices

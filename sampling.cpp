@@ -34,9 +34,9 @@ namespace cinolib
 {
 
 CINO_INLINE
-std::vector<float> sample_within_interval(const int min,
-                                          const int max,
-                                          const int n_samples)
+std::vector<float> sample_within_interval(const int  min,
+                                          const int  max,
+                                          const uint n_samples)
 {
     assert(n_samples >= 2);
     std::vector<float> samples;
@@ -48,7 +48,7 @@ std::vector<float> sample_within_interval(const int min,
         samples.push_back(s);
         s += step;
     }
-    while ((int)samples.size() < n_samples - 1);
+    while (samples.size() < n_samples - 1);
 
     samples.push_back(max); // avoid to miss the exact boundaries due to roundoff errors...
 
