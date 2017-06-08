@@ -210,7 +210,7 @@ template<typename real> class vec2
 
         inline bool operator<(const vec2<real> in) const
         {
-            for( int i=0; i<2; ++i)
+            for(uint i=0; i<2; ++i)
             {
                 if( this->operator[](i) < in[i] ) return true;
                 if( this->operator[](i) > in[i] ) return false;

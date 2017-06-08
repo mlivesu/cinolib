@@ -62,11 +62,11 @@ void read_MESH(const char          * filename,
         //
         if (line[0] == 'V')
         {
-            int    nverts;
+            uint   nverts;
             double x,y,z;
             fgets(line,1024,fp);
             sscanf(line, "%d", &nverts);
-            for(int i=0; i<nverts; ++i)
+            for(uint i=0; i<nverts; ++i)
             {
                 // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
                 //
@@ -82,10 +82,10 @@ void read_MESH(const char          * filename,
         //
         if (line[0] == 'T' && line[1] == 'e')
         {
-            int ntets, v0, v1, v2, v3;
+            uint ntets, v0, v1, v2, v3;
             fgets(line, 1024, fp);
             sscanf(line, "%d", &ntets);
-            for( int i=0; i<ntets; i++ )
+            for(uint i=0; i<ntets; i++ )
             {
                 fgets(line,1024,fp);
                 sscanf(line, "%d %d %d %d", &v0, &v1, &v2, &v3);
@@ -100,10 +100,10 @@ void read_MESH(const char          * filename,
         //
         if (line[0] == 'H' && line[1] == 'e')
         {
-            int nhexa, v0, v1, v2, v3, v4, v5, v6, v7;
+            uint nhexa, v0, v1, v2, v3, v4, v5, v6, v7;
             fgets(line, 1024, fp);
             sscanf(line, "%d", &nhexa);
-            for( int i=0; i<nhexa; i++ )
+            for(uint i=0; i<nhexa; i++ )
             {
                 fgets(line,1024,fp);
                 sscanf(line, "%d %d %d %d %d %d %d %d", &v0, &v1, &v2, &v3, &v4, &v5, &v6, &v7);

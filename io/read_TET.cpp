@@ -49,7 +49,7 @@ void read_TET(const char          * filename,
         exit(-1);
     }
 
-    int  nv, nt;
+    uint  nv, nt;
     char line[1024];
 
     fgets(line,1024,fp);
@@ -58,7 +58,7 @@ void read_TET(const char          * filename,
     fgets(line,1024,fp);
     sscanf(line, "%d tets", &nt);
 
-    for(int vid=0; vid<nv; ++vid)
+    for(uint vid=0; vid<nv; ++vid)
     {
         fgets(line, 1024, fp);
 
@@ -72,11 +72,11 @@ void read_TET(const char          * filename,
         xyz.push_back(z);
     }
 
-    for(int tid=0; tid<nt; ++tid)
+    for(uint tid=0; tid<nt; ++tid)
     {
         fgets(line, 1024, fp);
 
-        int v0, v1, v2, v3;
+        uint v0, v1, v2, v3;
         sscanf(line, "4 %d %d %d %d", &v0, &v1, &v2, &v3);
 
         tets.push_back(v0);

@@ -46,7 +46,7 @@ PointInsideMeshCache<Mesh>::PointInsideMeshCache(const Mesh & m, const uint octr
     {
         vec3d min = m.elem_vert(eid, 0);
         vec3d max = min;
-        for(int i=1; i<m.verts_per_elem(); ++i)
+        for(uint i=1; i<m.verts_per_elem(); ++i)
         {
             min = min.min(m.elem_vert(eid, i));
             max = max.max(m.elem_vert(eid, i));

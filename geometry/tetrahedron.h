@@ -79,7 +79,7 @@ void tet_closest_vertex(const vec3d  & A,
                         const vec3d  & C,
                         const vec3d  & D,
                         const vec3d  & query,
-                              int    & id,
+                              uint   & id,
                               double & dist);
 
 
@@ -89,7 +89,7 @@ void tet_closest_edge(const vec3d  & A,
                       const vec3d  & C,
                       const vec3d  & D,
                       const vec3d  & query,
-                            int    & id,
+                            uint   & id,
                             double & dist);
 }
 

@@ -51,12 +51,12 @@ void read_OFF(const char          * filename,
         exit(-1);
     }
 
-    int nv, npoly, dummy;
+    uint nv, npoly, dummy;
 
     fscanf(fp, "OFF\n");
     fscanf(fp, "%d %d %d\n", &nv, &npoly, &dummy);
 
-    for(int i=0; i<nv; ++i)
+    for(uint i=0; i<nv; ++i)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
@@ -67,9 +67,9 @@ void read_OFF(const char          * filename,
         xyz.push_back(z);
     }
 
-    for(int i=0; i<npoly; ++i)
+    for(uint i=0; i<npoly; ++i)
     {
-        int n_corners, v0, v1, v2, v3;
+        uint n_corners, v0, v1, v2, v3;
         fscanf(fp, "%d", &n_corners);
 
         if (n_corners == 3)

@@ -39,10 +39,10 @@ namespace cinolib
 {
 
 CINO_INLINE
-Trimesh n_sided_polygon(const vec3d  & center,
-                        const int      n_sides,
-                        const double   radius,
-                        const vec3d  & n = vec3d(0,1,0));
+Trimesh<> n_sided_polygon(const vec3d  & center,
+                          const uint     n_sides,
+                          const double   radius,
+                          const vec3d  & n = vec3d(0,1,0));
 
 }
 

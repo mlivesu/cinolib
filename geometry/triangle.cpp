@@ -55,7 +55,7 @@ void triangle_traverse_with_ray(const vec3d   tri[3],
                                 const vec3d   P,
                                 const vec3d   dir,
                                       vec3d & exit_pos,
-                                      int   & exit_edge)
+                                      uint   & exit_edge)
 {
     // 1) Find the exit edge
     //
@@ -63,12 +63,12 @@ void triangle_traverse_with_ray(const vec3d   tri[3],
     vec3d uvw[3] = { tri[0]-P, tri[1]-P, tri[2]-P };
 
     std::set< std::pair<double,int> > sorted_by_angle;
-    for(int i=0; i<3; ++i)
+    for(uint i=0; i<3; ++i)
     {
         sorted_by_angle.insert(std::make_pair(dir.angle_rad(uvw[i]),i));
     }
 
-    int   vert  = (*sorted_by_angle.begin()).second;
+    uint  vert  = (*sorted_by_angle.begin()).second;
     vec3d tn    = triangle_normal(tri[0], tri[1], tri[2]);
     vec3d cross = dir.cross(uvw[vert]);
 

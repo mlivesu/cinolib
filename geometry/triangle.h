@@ -64,7 +64,7 @@ void triangle_traverse_with_ray(const vec3d   tri[3],
                                 const vec3d   P,
                                 const vec3d   dir,
                                       vec3d & exit_pos,
-                                      int   & exit_edge);
+                                      uint  & exit_edge);
 
 
 // https://en.wikipedia.org/wiki/Law_of_sines

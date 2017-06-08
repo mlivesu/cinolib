@@ -36,10 +36,10 @@ namespace cinolib
 {
 
 CINO_INLINE
-void write_Livesu2012(const char                          * filename,
-                      const std::vector<double>             coords,
-                      const std::vector<double>             max_spheres,
-                      const std::vector< std::vector<int> > adj_vtx2vtx)
+void write_Livesu2012(const char                       * filename,
+                      const std::vector<double>           coords,
+                      const std::vector<double>           max_spheres,
+                      const std::vector<std::vector<int>> adj_vtx2vtx)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -51,11 +51,11 @@ void write_Livesu2012(const char                          * filename,
         exit(-1);
     }
 
-    int nv = adj_vtx2vtx.size();
+    uint nv = adj_vtx2vtx.size();
 
     fprintf( f, "ID Cx Cy Cz RADIUS #NEIGHBORS NEIGHBORS_LIST\n%d\n", nv);
 
-    for(int vid=0; vid<nv; ++vid)
+    for(uint vid=0; vid<nv; ++vid)
     {
         vec3d pos(coords[3*vid+0],
                   coords[3*vid+1],
@@ -72,7 +72,7 @@ void write_Livesu2012(const char                          * filename,
                 max_spheres.at(vid),
                 (int)nbrs.size());
 
-        for(int i=0; i<(int)nbrs.size(); ++i)
+        for(uint i=0; i<nbrs.size(); ++i)
         {
             fprintf(f, "%d ", nbrs[i]);
         }

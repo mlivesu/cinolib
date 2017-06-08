@@ -73,7 +73,7 @@ void VectorField::normalize()
      * Here I choose the former. Play with it if you
      * need something different...
     */
-    for(int i=0; i<rows(); i+=3)
+    for(uint i=0; i<rows(); i+=3)
     {
         vec3d tmp((*this)[i], (*this)[i+1], (*this)[i+2]);
         (*this)[i + 0] /= tmp.length();

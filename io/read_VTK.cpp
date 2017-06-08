@@ -67,7 +67,7 @@ void read_VTK(const char          * filename,
     reader->Update();
     vtkSmartPointer<vtkUnstructuredGrid> grid(reader->GetUnstructuredGridOutput());
 
-    for(int i=0; i<grid->GetNumberOfPoints(); ++i)
+    for(uint i=0; i<grid->GetNumberOfPoints(); ++i)
     {
         double pnt[3];
         grid->GetPoint(i, pnt);
@@ -77,14 +77,14 @@ void read_VTK(const char          * filename,
         xyz.push_back(pnt[2]);
     }
 
-    for(int i=0; i<grid->GetNumberOfCells(); ++i)
+    for(uint i=0; i<grid->GetNumberOfCells(); ++i)
     {
         vtkCell *c = grid->GetCell(i);
 
         switch (c->GetCellType())
         {
-            case VTK_TETRA:      for(int j=0; j<4; ++j) tets.push_back(c->GetPointId(j)); break;
-            case VTK_HEXAHEDRON: for(int j=0; j<8; ++j) hexa.push_back(c->GetPointId(j)); break;
+            case VTK_TETRA:      for(uint j=0; j<4; ++j) tets.push_back(c->GetPointId(j)); break;
+            case VTK_HEXAHEDRON: for(uint j=0; j<8; ++j) hexa.push_back(c->GetPointId(j)); break;
         }
     }
 

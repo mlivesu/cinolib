@@ -133,9 +133,9 @@ void write_OBJ(const char                * filename,
         exit(-1);
     }
 
-    int  min    = *std::min_element(labels.begin(), labels.end());
-    int  max    = *std::max_element(labels.begin(), labels.end());
-    int  delta  = max - min;
+    int min    = *std::min_element(labels.begin(), labels.end());
+    int max    = *std::max_element(labels.begin(), labels.end());
+    int delta  = max - min;
 
     for(int l=min; l<=max; ++l)
     {
@@ -145,20 +145,20 @@ void write_OBJ(const char                * filename,
 
     fprintf(f_obj, "mtllib %s\n", mtl_filename.c_str());
 
-    for(size_t i=0; i<xyz.size(); i+=3)
+    for(uint i=0; i<xyz.size(); i+=3)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         fprintf(f_obj, "v %.17g %.17g %.17g\n", xyz[i], xyz[i+1], xyz[i+2]);
     }
 
-    for(size_t i=0; i<tri.size(); i+=3)
+    for(uint i=0; i<tri.size(); i+=3)
     {
         fprintf(f_obj, "usemtl label_%d\n", labels.at(i/3));
         fprintf(f_obj, "f %d %d %d\n", tri[i] + 1, tri[i+1] + 1, tri[i+2] + 1);
     }
 
-    for(size_t i=0; i<quad.size(); i+=4)
+    for(uint i=0; i<quad.size(); i+=4)
     {
         fprintf(f_obj, "usemtl label_%d\n", labels.at(i/4));
         fprintf(f_obj, "f %d %d %d %d\n", quad[i] + 1, quad[i+1] + 1, quad[i+2] + 1, quad[i+3] + 1);

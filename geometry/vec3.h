@@ -221,7 +221,7 @@ template<typename real> class vec3
 
         bool operator<(const vec3<real> in) const
         {
-            for( int i=0; i<3; ++i)
+            for(uint i=0; i<3; ++i)
             {
                 if( this->operator[](i) < in[i] ) return true;
                 if( this->operator[](i) > in[i] ) return false;

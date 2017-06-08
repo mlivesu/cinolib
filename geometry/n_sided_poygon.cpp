@@ -34,10 +34,10 @@ namespace cinolib
 {
 
 CINO_INLINE
-Trimesh n_sided_polygon(const vec3d  & center,
-                        const int      n_sides,
-                        const double   radius,
-                        const vec3d  & n)
+Trimesh<> n_sided_polygon(const vec3d  & center,
+                          const uint     n_sides,
+                          const double   radius,
+                          const vec3d  & n)
 {
     std::vector<double> coords;
     std::vector<uint> tris;
@@ -49,13 +49,13 @@ Trimesh n_sided_polygon(const vec3d  & center,
 
     std::vector<vec3d> boundary(n_sides);
     boundary[0] = vec3d(radius,0,0);
-    for(int i=1; i<n_sides; ++i)
+    for(uint i=1; i<n_sides; ++i)
     {
         boundary[i] = boundary[i-1];
         rotate(boundary[i], vec3d(0,1,0), 2.0*M_PI/double(n_sides));
     }
 
-    for(int i=0; i<n_sides; ++i)
+    for(uint i=0; i<n_sides; ++i)
     {
         coords.push_back(boundary[i].x());
         coords.push_back(boundary[i].y());
@@ -67,7 +67,7 @@ Trimesh n_sided_polygon(const vec3d  & center,
     }
 
     logger.disable();
-    Trimesh m(coords, tris);
+    Trimesh<> m(coords, tris);
     logger.enable();
 
     m.translate(center);

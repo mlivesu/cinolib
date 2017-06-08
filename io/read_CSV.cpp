@@ -68,7 +68,7 @@ void read_CSV(const char          * filename,
 
     fclose(f);
 
-    for(int i=1; i<(int)coords.size()/3; ++i)
+    for(uint i=1; i<coords.size()/3; ++i)
     {
         arcs.push_back(i-1);
         arcs.push_back(i);

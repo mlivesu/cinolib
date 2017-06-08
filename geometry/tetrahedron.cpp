@@ -106,13 +106,13 @@ void tet_closest_vertex(const vec3d  & A,
                         const vec3d  & C,
                         const vec3d  & D,
                         const vec3d  & query,
-                              int    & id,
+                              uint   & id,
                               double & dist)
 {
     vec3d tet[4] = { A, B, C, D };
 
     std::set< std::pair<double,int> > sorted_verts;
-    for(int i=0; i<4; ++i)
+    for(uint i=0; i<4; ++i)
     {
         sorted_verts.insert(std::make_pair(tet[i].dist(query),i));
     }
@@ -128,13 +128,13 @@ void tet_closest_edge(const vec3d  & A,
                       const vec3d  & C,
                       const vec3d  & D,
                       const vec3d  & query,
-                            int    & id,
+                            uint   & id,
                             double & dist)
 {
     vec3d tet[4] = { A, B, C, D };
 
-    std::set< std::pair<double,int> > sorted_segs;
-    for(int i=0; i<6; ++i)
+    std::set< std::pair<double,uint>> sorted_segs;
+    for(uint i=0; i<6; ++i)
     {
         Segment s(tet[TET_EDGES[i][0]], tet[TET_EDGES[i][1]]);
         sorted_segs.insert(std::make_pair(s.dist_to_point(query),i));
