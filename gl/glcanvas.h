@@ -64,16 +64,17 @@ class GLcanvas : public QGLViewer
         void clear();
         void fit_scene();
         void set_clear_color(const QColor & color);
-
-        void push_obj(const DrawableObject * obj, bool refit_scene = true);
+        void push_obj(DrawableObject * obj, bool refit_scene = true);
 
         bool pop_first_occurrence_of(int type);
         bool pop_all_occurrences_of (int type);
 
+        void set_slice(float thresh, int item, int sign, int mode);
+
     private:
 
         QColor clear_color;
-        std::vector<const DrawableObject *> drawlist;
+        std::vector<DrawableObject*> drawlist;
 };
 
 

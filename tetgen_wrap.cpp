@@ -73,9 +73,9 @@ void tetgen_wrap(const std::vector<double> & coords_in,
     in.numberoffacets = tris_in.size() / 3;
     in.facetlist      = new tetgenio::facet[in.numberoffacets];
 
-    for(uint tid=0; tid<in.numberoffacets; ++tid)
+    for(int fid=0; fid<in.numberoffacets; ++fid)
     {
-        f = &in.facetlist[tid];
+        f = &in.facetlist[fid];
         f->numberofpolygons = 1;
         f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
         f->numberofholes = 0;
@@ -83,9 +83,9 @@ void tetgen_wrap(const std::vector<double> & coords_in,
         p = &f->polygonlist[0];
         p->numberofvertices = 3;
         p->vertexlist = new int[p->numberofvertices];
-        p->vertexlist[0] = tris_in[tid * 3];
-        p->vertexlist[1] = tris_in[tid * 3 + 1];
-        p->vertexlist[2] = tris_in[tid * 3 + 2];
+        p->vertexlist[0] = tris_in[fid * 3];
+        p->vertexlist[1] = tris_in[fid * 3 + 1];
+        p->vertexlist[2] = tris_in[fid * 3 + 2];
     }
 
     // edges
@@ -105,7 +105,7 @@ void tetgen_wrap(const std::vector<double> & coords_in,
 
     // generate tetmesh
     //
-    for(uint vid=0; vid<out.numberofpoints; ++vid)
+    for(int vid=0; vid<out.numberofpoints; ++vid)
     {
         int vid_ptr = 3 * vid;
         coords_out.push_back(static_cast<double>(out.pointlist[vid_ptr    ]));
@@ -113,7 +113,7 @@ void tetgen_wrap(const std::vector<double> & coords_in,
         coords_out.push_back(static_cast<double>(out.pointlist[vid_ptr + 2]));
     }
 
-    for(uint tid=0; tid<out.numberoftetrahedra; ++tid)
+    for(int tid=0; tid<out.numberoftetrahedra; ++tid)
     {
         int tid_ptr = 4 * tid;
         tets_out.push_back(out.tetrahedronlist[tid_ptr    ]);

@@ -33,24 +33,28 @@
 namespace cinolib
 {
 
-CINO_INLINE GLcanvas::GLcanvas(QWidget * parent)
+CINO_INLINE
+GLcanvas::GLcanvas(QWidget * parent)
 {
     setParent(parent);
 
     clear_color = QColor(200, 200, 200);
 }
 
-CINO_INLINE void GLcanvas::init()
+CINO_INLINE
+void GLcanvas::init()
 {
     setFPSIsDisplayed(true);
 }
 
-CINO_INLINE void GLcanvas::clear()
+CINO_INLINE
+void GLcanvas::clear()
 {
     drawlist.clear();
 }
 
-CINO_INLINE void GLcanvas::draw()
+CINO_INLINE
+void GLcanvas::draw()
 {
     setBackgroundColor(clear_color);
 
@@ -60,7 +64,8 @@ CINO_INLINE void GLcanvas::draw()
     }
 }
 
-CINO_INLINE void GLcanvas::push_obj(const DrawableObject * obj, bool refit_scene)
+CINO_INLINE
+void GLcanvas::push_obj(DrawableObject *obj, bool refit_scene)
 {
     drawlist.push_back(obj);
 
@@ -72,7 +77,8 @@ CINO_INLINE void GLcanvas::push_obj(const DrawableObject * obj, bool refit_scene
     updateGL();
 }
 
-CINO_INLINE void GLcanvas::fit_scene()
+CINO_INLINE
+void GLcanvas::fit_scene()
 {
     vec3d center(0,0,0);
     float radius = 0.0;
@@ -98,14 +104,16 @@ CINO_INLINE void GLcanvas::fit_scene()
     //cout << endl;
 }
 
-CINO_INLINE void GLcanvas::set_clear_color(const QColor &color)
+CINO_INLINE
+void GLcanvas::set_clear_color(const QColor &color)
 {
     clear_color = color;
     updateGL();
 }
 
 
-CINO_INLINE bool GLcanvas::pop_all_occurrences_of(int type)
+CINO_INLINE
+bool GLcanvas::pop_all_occurrences_of(int type)
 {
     bool found = false;
 
@@ -117,13 +125,21 @@ CINO_INLINE bool GLcanvas::pop_all_occurrences_of(int type)
     return found;
 }
 
-CINO_INLINE bool GLcanvas::pop_first_occurrence_of(int type)
+CINO_INLINE
+void GLcanvas::set_slice(float thresh, int item, int sign, int mode)
 {
-    for(std::vector<const DrawableObject *>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
-    {
-        const DrawableObject * obj = *it;
+    for(DrawableObject *obj : drawlist) obj->slice(thresh, item, sign, mode);
+    updateGL();
+}
 
-        if (obj->type == type)
+CINO_INLINE
+bool GLcanvas::pop_first_occurrence_of(int type)
+{
+    for(std::vector<DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
+    {
+        const DrawableObject *obj = *it;
+
+        if (obj->drawable_type == type)
         {
             drawlist.erase(it);
             return true;

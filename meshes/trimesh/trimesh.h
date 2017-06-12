@@ -122,13 +122,15 @@ class Trimesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         const Bbox                & bbox()          const { return bb;    }
-        const std::vector<uint>   & vector_edges()  const { return edges; }
         const std::vector<vec3d>  & vector_verts()  const { return verts; }
+        const std::vector<uint>   & vector_edges()  const { return edges; }
+        const std::vector<uint>   & vector_faces()  const { return faces; }
               std::vector<double>   vector_coords() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         std::vector<float> export_uvw_param(const int mode) const;
+        std::vector<int>   export_per_face_labels() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -78,7 +78,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void DrawableTrimesh<M,V,E,F>::init_drawable_stuff()
 {
-    type   = TRIMESH;
+    drawable_type   = DRAWABLE_TRIMESH;
     slicer = MeshSlicer<Trimesh<M,V,E,F>>(*this);
 
     drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
@@ -224,9 +224,9 @@ void DrawableTrimesh<M,V,E,F>::updateGL()
 template<class M, class V, class E, class F>
 CINO_INLINE
 void DrawableTrimesh<M,V,E,F>::slice(const float thresh, // thresh on centroids or quality
-                                 const int   item,   // X, Y, Z, L, Q
-                                 const int   sign,   // either LEQ or GEQ
-                                 const int   mode)   // either AND or OR
+                                    const int   item,   // X, Y, Z, L, Q
+                                    const int   sign,   // either LEQ or GEQ
+                                    const int   mode)   // either AND or OR
 {
     slicer.update(*this, thresh, item, sign, mode); // update per element visibility flags
     updateGL();

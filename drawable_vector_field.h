@@ -46,12 +46,12 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
         DrawableVectorField()
         {
-            type = VECTOR_FIELD;
+            drawable_type = DRAWABLE_VECTOR_FIELD;
         }
 
         DrawableVectorField(const Mesh & m) : VectorField(m.num_elems())
         {
-            type  = VECTOR_FIELD;
+            drawable_type  = DRAWABLE_VECTOR_FIELD;
             m_ptr = &m;
 
             set_arrow_color(Color::RED());
@@ -75,6 +75,7 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
         vec3d scene_center() const { return vec3d(); }
         float scene_radius() const { return 0.0;     }
+        void  slice(const float, const int, const int, const int) {}
 
         void set_arrow_color(const Color & c) { arrow_color = c; }
 

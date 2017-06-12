@@ -129,8 +129,8 @@ void Trimesh<M,V,E,F>::save(const char * filename) const
     {
         write_OFF(filename, coords, faces, quads);
     }
-    else if (filetype.compare(".obj") == 0 ||
-             filetype.compare(".OBJ") == 0)
+    else if (filetype.compare("obj") == 0 ||
+             filetype.compare("OBJ") == 0)
     {
         write_OBJ(filename, coords, faces, quads);
     }
@@ -1934,6 +1934,7 @@ CINO_INLINE
 std::vector<float> Trimesh<M,V,E,F>::export_uvw_param(const int mode) const
 {
     std::vector<float> uvw;
+    uvw.reserve(num_verts());
     for(uint vid=0; vid<num_verts(); ++vid)
     {
         switch (mode)
@@ -1956,5 +1957,19 @@ std::vector<float> Trimesh<M,V,E,F>::export_uvw_param(const int mode) const
     return uvw;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<int> Trimesh<M,V,E,F>::export_per_face_labels() const
+{
+    std::vector<int> labels;
+    labels.reserve(num_faces());
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        labels.push_back( face_data(fid).label );
+    }
+    return labels;
+}
 
 }

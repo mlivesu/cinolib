@@ -72,14 +72,14 @@ void triangle_wrap(const std::vector<double> & coords_in,   // serialized xy coo
 
     in.numberofpoints = coords_in.size()/2;
     in.pointlist      = (double*)calloc(coords_in.size(),sizeof(double));
-    for(uint vid=0; vid<in.numberofpoints; ++vid)
+    for(int vid=0; vid<in.numberofpoints; ++vid)
     {
         in.pointlist[vid*2  ] = coords_in[vid*2  ];
         in.pointlist[vid*2+1] = coords_in[vid*2+1];
     }
     in.numberofpointattributes = 0;
     in.pointmarkerlist         = (int*)calloc(in.numberofpoints,sizeof(int));
-    for(uint vid=0; vid<in.numberofpoints; ++vid)
+    for(int vid=0; vid<in.numberofpoints; ++vid)
     {
        in.pointmarkerlist[vid] = 1;
     }
@@ -100,7 +100,7 @@ void triangle_wrap(const std::vector<double> & coords_in,   // serialized xy coo
 
     in.numberofholes = holes_in.size()/2;
     in.holelist      = (double*)calloc(holes_in.size(),sizeof(double));
-    for(uint vid=0; vid<in.numberofholes; ++vid)
+    for(int vid=0; vid<in.numberofholes; ++vid)
     {
         in.holelist[vid*2  ] = holes_in[vid*2  ];
         in.holelist[vid*2+1] = holes_in[vid*2+1];
@@ -116,7 +116,7 @@ void triangle_wrap(const std::vector<double> & coords_in,   // serialized xy coo
     triangulate(const_cast<char*>(s.c_str()), &in, &out, NULL);
 
     coords_out.reserve(out.numberofpoints * 3);
-    for(uint vid=0; vid<out.numberofpoints; ++vid)
+    for(int vid=0; vid<out.numberofpoints; ++vid)
     {
         coords_out.push_back(out.pointlist[vid*2  ]);
         coords_out.push_back(out.pointlist[vid*2+1]);
@@ -124,7 +124,7 @@ void triangle_wrap(const std::vector<double> & coords_in,   // serialized xy coo
     }
 
     tris_out.reserve(out.numberoftriangles * 3);
-    for(uint tid=0; tid<out.numberoftriangles; ++tid)
+    for(int tid=0; tid<out.numberoftriangles; ++tid)
     {
         tris_out.push_back(out.trianglelist[tid*3  ]);
         tris_out.push_back(out.trianglelist[tid*3+1]);

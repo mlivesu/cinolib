@@ -83,7 +83,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableHexmesh<M,V,E,F,C>::init_drawable_stuff()
 {
-    type   = HEXMESH;
+    drawable_type   = DRAWABLE_HEXMESH;
     slicer = MeshSlicer<DrawableHexmesh<M,V,E,F,C>>(*this);
 
     drawlist_in.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;

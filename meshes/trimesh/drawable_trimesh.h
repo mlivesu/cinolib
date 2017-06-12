@@ -74,7 +74,7 @@ class DrawableTrimesh : public Trimesh<M,V,E,F>, public DrawableObject
 
         void  draw(const float scene_size=1) const;
         vec3d scene_center() const { return this->bb.center(); }
-        float scene_radius() const { return this->bb.diag();   }
+        float scene_radius() const { return this->bb.diag();   }        
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

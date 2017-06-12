@@ -39,31 +39,33 @@ namespace cinolib
 
 typedef enum
 {
-    ABSTRACT      ,
-    TRIMESH       ,
-    TETMESH       ,
-    QUADMESH      ,
-    HEXMESH       ,
-    POLYGONMESH   ,
-    POLYHEDRALMESH,
-    SKELETON      ,
-    CURVE         ,
-    ISOSURFACE    ,
-    VECTOR_FIELD
+    ABSTRACT               ,
+    DRAWABLE_TRIMESH       ,
+    DRAWABLE_TETMESH       ,
+    DRAWABLE_QUADMESH      ,
+    DRAWABLE_HEXMESH       ,
+    DRAWABLE_POLYGONMESH   ,
+    DRAWABLE_POLYHEDRALMESH,
+    DRAWABLE_SKELETON      ,
+    DRAWABLE_CURVE         ,
+    DRAWABLE_ISOSURFACE    ,
+    DRAWABLE_VECTOR_FIELD
 }
-ObjectType;
+DrawableObjectType;
 
 class DrawableObject
 {
     public :
 
-        ObjectType type;
+        DrawableObjectType drawable_type;
 
-        DrawableObject() { type = ABSTRACT; }
+        DrawableObject() { drawable_type = ABSTRACT; }
 
         virtual void  draw(const float scene_size = 1) const = 0;  // do rendering
         virtual vec3d scene_center() const = 0;  // get position in space
         virtual float scene_radius() const = 0;  // get size (approx. radius of the bounding sphere)
+
+        virtual void  slice(const float thresh, const int item, const int sign, const int mode) = 0;
 };
 
 }
