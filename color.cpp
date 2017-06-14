@@ -41,7 +41,7 @@ namespace cinolib
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const Color & c)
 {
-    in << "RGBA: " << c.r << " " << c.g << " " << c.b << " " << c.a << "\n";
+    in << "r:" << c.r << " g:" << c.g << " b:" << c.b << " a:" << c.a << " ";
     return in;
 }
 

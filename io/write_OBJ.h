@@ -32,6 +32,7 @@
 #define CINO_WRITE_OBJ_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/color.h>
 #include <sys/types.h>
 #include <vector>
 
@@ -56,8 +57,26 @@ void write_OBJ(const char                           * filename,
 CINO_INLINE
 void write_OBJ(const char                * filename,
                const std::vector<double> & xyz,
-               const std::vector<u_int>  & tri,
-               const std::vector<u_int>  & quad,
+               const std::vector<uint>   & tri,
+               const std::vector<uint>   & quad,
+               const std::vector<Color>  & colors);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void write_OBJ(const char                * filename,
+               const std::vector<double> & xyz,
+               const std::vector<uint>   & tri,
+               const std::vector<uint>   & quad,
+               const Color               & color);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void write_OBJ(const char                * filename,
+               const std::vector<double> & xyz,
+               const std::vector<uint>   & tri,
+               const std::vector<uint>   & quad,
                const std::vector<int>    & labels);
 
 
