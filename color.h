@@ -61,6 +61,12 @@ class Color
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+              bool    operator< (const Color & c) const;
+              float & operator[](const uint    i);
+        const float & operator[](const uint    i) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         static Color rgb_from_quality(float q);
         static Color scatter(uint n_colors, uint pos); // TODO: steal Color::scatter from VCG!!!
 

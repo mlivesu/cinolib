@@ -48,6 +48,35 @@ std::ostream & operator<<(std::ostream & in, const Color & c)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+const float & Color::operator[](const uint i) const
+{
+    return rgba[i];
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+float & Color::operator[](const uint i)
+{
+    return rgba[i];
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Color::operator<(const Color & c) const
+{
+    for(uint i=0; i<4; ++i)
+    {
+        if (this->operator[](i) < c[i]) return true;
+        if (this->operator[](i) > c[i]) return false;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 Color Color::rgb_from_quality(float q)
 {
     if (q < 0) return Color(1,0,0);
