@@ -131,6 +131,7 @@ class Trimesh
 
         std::vector<float> export_uvw_param(const int mode) const;
         std::vector<int>   export_per_face_labels() const;
+        std::vector<Color> export_per_face_colors() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

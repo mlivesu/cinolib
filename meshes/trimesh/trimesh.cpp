@@ -1972,4 +1972,19 @@ std::vector<int> Trimesh<M,V,E,F>::export_per_face_labels() const
     return labels;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<Color> Trimesh<M,V,E,F>::export_per_face_colors() const
+{
+    std::vector<Color> colors;
+    colors.reserve(num_faces());
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        colors.push_back( face_data(fid).color );
+    }
+    return colors;
+}
+
 }
