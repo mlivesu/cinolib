@@ -739,12 +739,31 @@ CINO_INLINE
 std::vector<uint> Quadmesh<M,V,E,F>::vert_loop(const uint start, const uint next) const
 {
     assert(verts_are_adjacent(start,next));
-    assert(vert_is_regular(start));
-    assert(vert_is_regular(next)); // if there is a singularity along there will be no loop!
+    assert(vert_is_regular(start)); // if there is a singularity along there will be no loop!
+
+    uint curr = next;
+    uint prev = start;
 
     std::vector<uint> loop;
-    loop.push_back(start);
-    loop.push_back(next);
+    loop.push_back(prev);
+
+    do
+    {
+        assert(vert_is_regular(curr));
+        loop.push_back(curr);
+
+        std::vector<uint> v_ring = vert_ordered_vert_ring(curr);
+        auto it  = std::find(v_ring.begin(), v_ring.end(), prev); assert(it != v_ring.end());
+        uint pos = std::distance(v_ring.begin(),it);
+
+        prev = curr;
+        curr = v_ring.at((pos+4)%v_ring.size());
+
+        assert(loop.size() < num_verts()); // sanity check for inifnite loops...
+    }
+    while(curr != start);
+
+    return loop;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -841,10 +860,11 @@ std::vector<float> Quadmesh<M,V,E,F>::export_uvw_param(const int mode) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-uint Quadmesh<M,V,E,F>::vert_opposite_to(const uint fid, const uint vid) const
+uint Quadmesh<M,V,E,F>::vert_opposite_to(const uint eid, const uint vid) const
 {
-    uint   off = face_vert_offset(fid,vid);
-    return face_vert_id(fid,(off+1)%verts_per_face());
+    assert(edge_contains_vert(eid, vid));
+    if (edge_vert_id(eid,0) != vid) return edge_vert_id(eid,0);
+    else                            return edge_vert_id(eid,1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -162,7 +162,7 @@ class Quadmesh
 
   const vec3d           & vert                 (const uint vid) const { return verts.at(vid); }
         vec3d           & vert                 (const uint vid)       { return verts.at(vid); }
-        uint              vert_opposite_to     (const uint fid, const uint vid) const;
+        uint              vert_opposite_to     (const uint eid, const uint vid) const;
         uint              vert_valence         (const uint vid) const;
         bool              verts_are_adjacent   (const uint vid0, const uint vid1) const;
         bool              verts_are_ordered_CCW(const uint fid, const uint curr, const uint prev) const;
