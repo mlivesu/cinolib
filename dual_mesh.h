@@ -46,7 +46,7 @@ void dual_mesh(const Trimesh<>                      & primal,
 
 
 CINO_INLINE
-void dual_mesh(const Trimesh       & primal,
+void dual_mesh(const Trimesh<>     & primal,
                      Polygonmesh<> & dual,
                const bool            with_clipped_cells); // consider/discard boundary vertices
 
