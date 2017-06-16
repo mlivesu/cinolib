@@ -189,6 +189,7 @@ class Tetmesh
 
   const vec3d  & vert              (const uint vid) const { return verts.at(vid); }
         vec3d  & vert              (const uint vid)       { return verts.at(vid); }
+        bool     vert_is_on_srf    (const uint vid) const;
         double   vert_mass         (const uint vid) const;
         double   vert_volume       (const uint vid) const;
         void     vert_set_color    (const Color & c);

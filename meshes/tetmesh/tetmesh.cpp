@@ -964,6 +964,16 @@ void Tetmesh<M,V,E,F,C>::set_uvw_from_xyz(const int mode)
     }
 }
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool Tetmesh<M,V,E,F,C>::vert_is_on_srf(const uint vid) const
+{
+    return v_on_srf.at(vid);
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class C>
