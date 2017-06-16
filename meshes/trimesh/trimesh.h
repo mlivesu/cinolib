@@ -190,6 +190,7 @@ class Trimesh
         std::set<uint>    vert_n_ring             (const uint vid, const uint n) const;
         double            vert_area               (const uint vid) const;
         double            vert_mass               (const uint vid) const;
+        bool              verts_are_ordered_CCW   (const uint fid, const uint curr, const uint prev) const;
         bool              vert_is_boundary        (const uint vid) const;
         bool              verts_are_adjacent      (const uint vid0, const uint vid1) const;
         bool              vert_is_local_min       (const uint vid, const int tex_coord = U_param) const;
@@ -232,6 +233,7 @@ class Trimesh
         vec3d  face_vert               (const uint fid, const uint offset) const;
         uint   face_vert_id            (const uint fid, const uint offset) const;
         uint   face_edge_id            (const uint fid, const uint offset) const;
+        uint   face_edge_id            (const uint fid, const uint vid0, const uint vid1) const;
         uint   face_vert_offset        (const uint fid, const uint vid) const;
         int    face_shared             (const uint eid0, const uint eid1) const;
         vec3d  face_centroid           (const uint fid) const;

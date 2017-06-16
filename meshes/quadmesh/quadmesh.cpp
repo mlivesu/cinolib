@@ -418,6 +418,23 @@ vec3d Quadmesh<M,V,E,F>::face_centroid(const uint fid) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+uint Quadmesh<M,V,E,F>::face_edge_id(const uint fid, const uint vid0, const uint vid1) const
+{
+    assert(face_contains_vert(fid,vid0));
+    assert(face_contains_vert(fid,vid1));
+
+    for(uint eid : adj_f2e(fid))
+    {
+        if (edge_contains_vert(eid,vid0) && edge_contains_vert(eid,vid1)) return eid;
+    }
+
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 vec3d Quadmesh<M,V,E,F>::elem_centroid(const uint fid) const
 {
     return face_centroid(fid);
@@ -437,9 +454,38 @@ uint Quadmesh<M,V,E,F>::edge_vert_id(const uint eid, const uint offset) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+bool Quadmesh<M,V,E,F>::edge_contains_vert(const uint eid, const uint vid) const
+{
+    if (edge_vert_id(eid,0) == vid) return true;
+    if (edge_vert_id(eid,1) == vid) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 vec3d Quadmesh<M,V,E,F>::edge_vert(const uint eid, const uint offset) const
 {
     return vert(edge_vert_id(eid,offset));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool Quadmesh<M,V,E,F>::edge_is_manifold(const uint eid) const
+{
+    return (adj_e2f(eid).size() <= 2);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool Quadmesh<M,V,E,F>::edge_is_boundary(const uint eid) const
+{
+    return (adj_e2f(eid).size() < 2);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -471,9 +517,47 @@ bool Quadmesh<M,V,E,F>::face_contains_vert(const uint fid, const uint vid) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+bool Quadmesh<M,V,E,F>::verts_are_adjacent(const uint vid0, const uint vid1) const
+{
+    for(uint nbr : adj_v2v(vid0)) if (nbr==vid1) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool Quadmesh<M,V,E,F>::vert_is_boundary(const uint vid) const
+{
+    for(uint eid : adj_v2e(vid)) if (edge_is_boundary(eid)) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+uint Quadmesh<M,V,E,F>::vert_valence(const uint vid) const
+{
+    return adj_v2v(vid).size();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 bool Quadmesh<M,V,E,F>::vert_is_singular(const uint vid) const
 {
-    return (adj_v2v(vid).size()!=4);
+    return (vert_valence(vid)!=4);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool Quadmesh<M,V,E,F>::vert_is_regular(const uint vid) const
+{
+    return (vert_valence(vid)==4);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -504,6 +588,169 @@ void Quadmesh<M,V,E,F>::vert_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+std::vector<uint> Quadmesh<M,V,E,F>::vert_boundary_edges(const uint vid) const
+{
+    std::vector<uint> b_edges;
+    for(uint eid : adj_v2e(vid)) if (edge_is_boundary(eid)) b_edges.push_back(eid);
+    return b_edges;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool Quadmesh<M,V,E,F>::verts_are_ordered_CCW(const uint fid, const uint curr, const uint prev) const
+{
+    uint prev_offset = face_vert_offset(fid, prev);
+    uint curr_offset = face_vert_offset(fid, curr);
+    if (curr_offset == (prev_offset+1)%verts_per_face()) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::vert_ordered_one_ring(const uint vid,
+                                              std::vector<uint> & v_ring,       // sorted list of adjacent vertices
+                                              std::vector<uint> & f_ring,       // sorted list of adjacent quads
+                                              std::vector<uint> & e_ring,       // sorted list of edges incident to vid
+                                              std::vector<uint> & e_link) const // sorted list of edges opposite to vid
+{
+    v_ring.clear();
+    f_ring.clear();
+    e_ring.clear();
+    e_link.clear();
+
+    if (adj_v2e(vid).empty()) return;
+    uint curr_e  = adj_v2e(vid).front(); assert(edge_is_manifold(curr_e));
+    uint curr_v  = vert_opposite_to(curr_e, vid);
+    uint curr_f  = adj_e2f(curr_e).front();
+    // impose CCW winding...
+    if (!verts_are_ordered_CCW(curr_f, curr_v, vid)) curr_f = adj_e2f(curr_e).back();
+
+    // If there are boundary edges it is important to start from the right triangle (i.e. right-most),
+    // otherwise it will be impossible to cover the entire umbrella
+    std::vector<uint> b_edges = vert_boundary_edges(vid);
+    if (b_edges.size()  > 0)
+    {
+        assert(b_edges.size() == 2); // otherwise there is no way to cover the whole umbrella walking through adjacent triangles!!!
+
+        uint e = b_edges.front();
+        uint f = adj_e2f(e).front();
+        uint v = vert_opposite_to(e, vid);
+
+        if (!verts_are_ordered_CCW(f, v, vid))
+        {
+            e = b_edges.back();
+            f = adj_e2f(e).front();
+            v = vert_opposite_to(e, vid);
+            assert(verts_are_ordered_CCW(f, v, vid));
+        }
+
+        curr_e = e;
+        curr_f = f;
+        curr_v = v;
+    }
+
+    do
+    {
+        e_ring.push_back(curr_e);
+        f_ring.push_back(curr_f);
+
+        uint off = face_vert_offset(curr_f, curr_v);
+        for(uint i=0; i<verts_per_face()-1; ++i)
+        {
+            curr_v = face_vert_id(curr_f,(off+i)%verts_per_face());
+            if (i>0) e_link.push_back( face_edge_id(curr_f, curr_v, v_ring.back()) );
+            v_ring.push_back(curr_v);
+        }
+
+        curr_e = face_edge_id(curr_f, vid, v_ring.back()); assert(edge_is_manifold(curr_e));
+        curr_f = (adj_e2f(curr_e).front() == curr_f) ? adj_e2f(curr_e).back() : adj_e2f(curr_e).front();
+
+        v_ring.pop_back();
+
+        if (edge_is_boundary(curr_e)) e_ring.push_back(curr_e);
+    }
+    while(e_ring.size() < adj_v2e(vid).size());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<uint> Quadmesh<M,V,E,F>::vert_ordered_vert_ring(const uint vid) const
+{
+    std::vector<uint> v_ring; // sorted list of adjacent vertices
+    std::vector<uint> f_ring; // sorted list of adjacent triangles
+    std::vector<uint> e_ring; // sorted list of edges incident to vid
+    std::vector<uint> e_link; // sorted list of edges opposite to vid
+    vert_ordered_one_ring(vid, v_ring, f_ring, e_ring, e_link);
+    return v_ring;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<uint> Quadmesh<M,V,E,F>::vert_ordered_face_ring(const uint vid) const
+{
+    std::vector<uint> v_ring; // sorted list of adjacent vertices
+    std::vector<uint> f_ring; // sorted list of adjacent triangles
+    std::vector<uint> e_ring; // sorted list of edges incident to vid
+    std::vector<uint> e_link; // sorted list of edges opposite to vid
+    vert_ordered_one_ring(vid, v_ring, f_ring, e_ring, e_link);
+    return f_ring;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<uint> Quadmesh<M,V,E,F>::vert_ordered_edge_ring(const uint vid) const
+{
+    std::vector<uint> v_ring; // sorted list of adjacent vertices
+    std::vector<uint> f_ring; // sorted list of adjacent triangles
+    std::vector<uint> e_ring; // sorted list of edges incident to vid
+    std::vector<uint> e_link; // sorted list of edges opposite to vid
+    vert_ordered_one_ring(vid, v_ring, f_ring, e_ring, e_link);
+    return e_ring;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<uint> Quadmesh<M,V,E,F>::vert_ordered_edge_link(const uint vid) const
+{
+    std::vector<uint> v_ring; // sorted list of adjacent vertices
+    std::vector<uint> f_ring; // sorted list of adjacent triangles
+    std::vector<uint> e_ring; // sorted list of edges incident to vid
+    std::vector<uint> e_link; // sorted list of edges opposite to vid
+    vert_ordered_one_ring(vid, v_ring, f_ring, e_ring, e_link);
+    return e_link;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<uint> Quadmesh<M,V,E,F>::vert_loop(const uint start, const uint next) const
+{
+    assert(verts_are_adjacent(start,next));
+    assert(vert_is_regular(start));
+    assert(vert_is_regular(next)); // if there is a singularity along there will be no loop!
+
+    std::vector<uint> loop;
+    loop.push_back(start);
+    loop.push_back(next);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 void Quadmesh<M,V,E,F>::edge_set_color(const Color & c)
 {
     for(uint eid=0; eid<num_edges(); ++eid)
@@ -522,6 +769,19 @@ void Quadmesh<M,V,E,F>::edge_set_alpha(const float alpha)
     {
         edge_data(eid).color.a = alpha;
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+uint Quadmesh<M,V,E,F>::face_vert_offset(const uint fid, const uint vid) const
+{
+    for(uint off=0; off<verts_per_face(); ++off)
+    {
+        if (face_vert_id(fid,off) == vid) return off;
+    }
+    assert(false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -576,5 +836,18 @@ std::vector<float> Quadmesh<M,V,E,F>::export_uvw_param(const int mode) const
     }
     return uvw;
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+uint Quadmesh<M,V,E,F>::vert_opposite_to(const uint fid, const uint vid) const
+{
+    uint   off = face_vert_offset(fid,vid);
+    return face_vert_id(fid,(off+1)%verts_per_face());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 
 }

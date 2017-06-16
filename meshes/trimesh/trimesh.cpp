@@ -1292,6 +1292,23 @@ uint Trimesh<M,V,E,F>::face_edge_id(const uint fid, const uint offset) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+uint Trimesh<M,V,E,F>::face_edge_id(const uint fid, const uint vid0, const uint vid1) const
+{
+    assert(face_contains_vert(fid,vid0));
+    assert(face_contains_vert(fid,vid1));
+
+    for(uint eid : adj_f2e(fid))
+    {
+        if (edge_contains_vert(eid,vid0) && edge_contains_vert(eid,vid1)) return eid;
+    }
+
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 bool Trimesh<M,V,E,F>::face_is_boundary(const uint fid) const
 {
     return (adj_f2f(fid).size() < 3);
@@ -1600,6 +1617,18 @@ double Trimesh<M,V,E,F>::vert_mass(const uint vid) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+bool Trimesh<M,V,E,F>::verts_are_ordered_CCW(const uint fid, const uint curr, const uint prev) const
+{
+    uint prev_offset = face_vert_offset(fid, prev);
+    uint curr_offset = face_vert_offset(fid, curr);
+    if (curr_offset == (prev_offset+1)%verts_per_face()) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 uint Trimesh<M,V,E,F>::vert_opposite_to(const uint fid, const uint vid0, const uint vid1) const
 {
     assert(face_contains_vert(fid, vid0));
@@ -1808,8 +1837,12 @@ void Trimesh<M,V,E,F>::vert_ordered_one_ring(const uint vid,
     e_ring.clear();
     e_link.clear();
 
-    if (adj_v2f(vid).empty()) return;
-    uint curr_f = adj_v2f(vid).front();
+    if (adj_v2e(vid).empty()) return;
+    uint curr_e  = adj_v2e(vid).front(); assert(edge_is_manifold(curr_e));
+    uint curr_v  = vert_opposite_to(curr_e, vid);
+    uint curr_f  = adj_e2f(curr_e).front();    
+    // impose CCW winding...
+    if (!verts_are_ordered_CCW(curr_f, curr_v, vid)) curr_f = adj_e2f(curr_e).back();
 
     // If there are boundary edges it is important to start from the right triangle (i.e. right-most),
     // otherwise it will be impossible to cover the entire umbrella
@@ -1818,57 +1851,44 @@ void Trimesh<M,V,E,F>::vert_ordered_one_ring(const uint vid,
     {
         assert(b_edges.size() == 2); // otherwise there is no way to cover the whole umbrella walking through adjacent triangles!!!
 
-        uint  eid    = b_edges.front();
-              curr_f = adj_e2f(eid).front(); assert(adj_e2f(eid).size()==1);
-        uint  v1     = vert_opposite_to(curr_f,edge_vert_id(eid,0), edge_vert_id(eid,1));
-        uint  tmp    = edge_opposite_to(curr_f, vid);
-        uint  v0     = (edge_vert_id(tmp,0)==v1) ? edge_vert_id(tmp,1) : edge_vert_id(tmp,0);
+        uint e = b_edges.front();
+        uint f = adj_e2f(e).front();
+        uint v = vert_opposite_to(e, vid);
 
-        vec3d u = vert(v0) - vert(vid);
-        vec3d v = vert(v1) - vert(vid);
-        vec3d n = vert_data(vid).normal;
-        if (u.cross(v).dot(n) < 0) curr_f = adj_e2f(b_edges.back()).front();
-    }
-
-    uint curr_e  = edge_opposite_to(curr_f, vid);
-    uint first_v = edge_vert_id(curr_e, 0);
-    uint curr_v  = edge_vert_id(curr_e, 1);
-
-    // impose CCW orientation...
-    if ((vert(first_v)-vert(vid)).cross(vert(curr_v)-vert(vid)).dot(vert_data(vid).normal) < 0)
-    {
-        std::swap(first_v,curr_v);
-    }
-
-    v_ring.push_back(first_v);
-    e_ring.push_back(edge_opposite_to(curr_f, curr_v));
-
-    while(curr_v != first_v)
-    {
-        v_ring.push_back(curr_v);
-        f_ring.push_back(curr_f);
-        e_link.push_back(edge_opposite_to(curr_f, vid));
-
-        curr_f = face_adjacent_along(curr_f, vid, curr_v);
-
-        if (curr_f != -1)
+        if (!verts_are_ordered_CCW(f, v, vid))
         {
-            curr_e = edge_opposite_to(curr_f, vid);
-            curr_v = edge_vert_id(curr_e, 0) == curr_v ? edge_vert_id(curr_e, 1) : edge_vert_id(curr_e, 0);
-            e_ring.push_back(edge_opposite_to(curr_f, curr_v));
+            e = b_edges.back();
+            f = adj_e2f(e).front();
+            v = vert_opposite_to(e, vid);
+            assert(verts_are_ordered_CCW(f, v, vid));
         }
-        else
-        {
-            e_ring.push_back(edge_opposite_to(f_ring.back(),v_ring.at(v_ring.size()-2)));
-            first_v = curr_v; // force exit from while()
-        }
+
+        curr_e = e;
+        curr_f = f;
+        curr_v = v;
     }
 
-    if (curr_f != -1)
+    do
     {
+        e_ring.push_back(curr_e);
         f_ring.push_back(curr_f);
-        e_link.push_back(edge_opposite_to(curr_f, vid));
+
+        uint off = face_vert_offset(curr_f, curr_v);
+        for(uint i=0; i<verts_per_face()-1; ++i)
+        {
+            curr_v = face_vert_id(curr_f,(off+i)%verts_per_face());
+            if (i>0) e_link.push_back( face_edge_id(curr_f, curr_v, v_ring.back()) );
+            v_ring.push_back(curr_v);
+        }
+
+        curr_e = face_edge_id(curr_f, vid, v_ring.back()); assert(edge_is_manifold(curr_e));
+        curr_f = (adj_e2f(curr_e).front() == curr_f) ? adj_e2f(curr_e).back() : adj_e2f(curr_e).front();
+
+        v_ring.pop_back();
+
+        if (edge_is_boundary(curr_e)) e_ring.push_back(curr_e);
     }
+    while(e_ring.size() < adj_v2e(vid).size());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

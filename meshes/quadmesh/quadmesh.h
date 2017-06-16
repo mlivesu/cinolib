@@ -160,24 +160,46 @@ class Quadmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-  const vec3d & vert            (const uint vid) const { return verts.at(vid); }
-        vec3d & vert            (const uint vid)       { return verts.at(vid); }
-        bool    vert_is_singular(const uint vid) const;
-        void    vert_set_color  (const Color & c);
-        void    vert_set_alpha  (const float alpha);
+  const vec3d           & vert                 (const uint vid) const { return verts.at(vid); }
+        vec3d           & vert                 (const uint vid)       { return verts.at(vid); }
+        uint              vert_opposite_to     (const uint fid, const uint vid) const;
+        uint              vert_valence         (const uint vid) const;
+        bool              verts_are_adjacent   (const uint vid0, const uint vid1) const;
+        bool              verts_are_ordered_CCW(const uint fid, const uint curr, const uint prev) const;
+        bool              vert_is_boundary     (const uint vid) const;
+        bool              vert_is_singular     (const uint vid) const;
+        bool              vert_is_regular      (const uint vid) const;        
+        void              vert_set_color       (const Color & c);
+        void              vert_set_alpha       (const float alpha);
+        std::vector<uint> vert_boundary_edges  (const uint vid) const;
+        std::vector<uint> vert_loop            (const uint start, const uint next) const;
+        void              vert_ordered_one_ring(const uint vid,
+                                                std::vector<uint> & v_ring,        // sorted list of adjacent vertices
+                                                std::vector<uint> & f_ring,        // sorted list of adjacent quads
+                                                std::vector<uint> & e_ring,        // sorted list of edges incident to vid
+                                                std::vector<uint> & e_link) const; // sorted list of edges opposite to vid
+        std::vector<uint> vert_ordered_vert_ring(const uint vid) const;
+        std::vector<uint> vert_ordered_face_ring(const uint vid) const;
+        std::vector<uint> vert_ordered_edge_ring(const uint vid) const;
+        std::vector<uint> vert_ordered_edge_link(const uint vid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d edge_vert     (const uint eid, const uint offset) const;
-        uint  edge_vert_id  (const uint eid, const uint offset) const;
-        void  edge_set_color(const Color & c);
-        void  edge_set_alpha(const float alpha);
+        vec3d edge_vert         (const uint eid, const uint offset) const;
+        uint  edge_vert_id      (const uint eid, const uint offset) const;
+        bool  edge_contains_vert(const uint eid, const uint vid) const;
+        bool  edge_is_manifold  (const uint eid) const;
+        bool  edge_is_boundary  (const uint eid) const;
+        void  edge_set_color    (const Color & c);
+        void  edge_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        uint  face_vert_offset  (const uint fid, const uint vid) const;
         uint  face_vert_id      (const uint fid, const uint offset) const;
         vec3d face_vert         (const uint fid, const uint offset) const;
         vec3d face_centroid     (const uint fid) const;
+        uint  face_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
         bool  face_contains_vert(const uint fid, const uint vid) const;
         void  face_set_color    (const Color & c);
         void  face_set_alpha    (const float alpha);
