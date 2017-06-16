@@ -110,6 +110,8 @@ void MeshSlicer<Mesh>::update(Mesh & m)
                                      : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
 
         m.elem_data(eid).visible = b;
+
+        //std::cout << pass_X << " " << pass_Y << " " << pass_Z << " " << pass_Q << " " << pass_L << std::endl;
     }   
 }
 
