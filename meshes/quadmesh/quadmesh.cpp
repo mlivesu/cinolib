@@ -607,11 +607,15 @@ bool Quadmesh<M,V,E,F>::vert_is_saddle(const uint vid, const int tex_coord) cons
     std::vector<bool> signs;
     for(uint nbr : vert_ordered_vert_ring(vid))
     {
+        // Discard == signs. For references, see:
+        // Decomposing Polygon Meshes by Means of Critical Points
+        // Yinan Zhou and Zhiyong Huang
+        //
         switch (tex_coord)
         {
-            case U_param : signs.push_back(vert_data(nbr).uvw[0] > vert_data(vid).uvw[0]); break;
-            case V_param : signs.push_back(vert_data(nbr).uvw[1] > vert_data(vid).uvw[1]); break;
-            case W_param : signs.push_back(vert_data(nbr).uvw[2] > vert_data(vid).uvw[2]); break;
+            case U_param : if (vert_data(nbr).uvw[0] != vert_data(vid).uvw[0]) signs.push_back(vert_data(nbr).uvw[0] > vert_data(vid).uvw[0]); break;
+            case V_param : if (vert_data(nbr).uvw[1] != vert_data(vid).uvw[1]) signs.push_back(vert_data(nbr).uvw[1] > vert_data(vid).uvw[1]); break;
+            case W_param : if (vert_data(nbr).uvw[2] != vert_data(vid).uvw[2]) signs.push_back(vert_data(nbr).uvw[2] > vert_data(vid).uvw[2]); break;
             default: assert(false);
         }
     }
