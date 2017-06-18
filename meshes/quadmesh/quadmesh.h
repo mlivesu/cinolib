@@ -169,6 +169,10 @@ class Quadmesh
         bool              vert_is_boundary     (const uint vid) const;
         bool              vert_is_singular     (const uint vid) const;
         bool              vert_is_regular      (const uint vid) const;        
+        bool              vert_is_local_min    (const uint vid, const int tex_coord = U_param) const;
+        bool              vert_is_local_max    (const uint vid, const int tex_coord = U_param) const;
+        bool              vert_is_saddle       (const uint vid, const int tex_coord = U_param) const;
+        bool              vert_is_critical_p   (const uint vid, const int tex_coord = U_param) const;
         void              vert_set_color       (const Color & c);
         void              vert_set_alpha       (const float alpha);
         std::vector<uint> vert_boundary_edges  (const uint vid) const;

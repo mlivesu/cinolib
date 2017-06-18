@@ -1738,10 +1738,39 @@ bool Trimesh<M,V,E,F>::vert_is_local_max(const uint vid, const int tex_coord) co
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+bool Trimesh<M,V,E,F>::vert_is_saddle(const uint vid, const int tex_coord) const
+{
+    std::vector<bool> signs;
+    for(uint nbr : vert_ordered_vert_ring(vid))
+    {
+        switch (tex_coord)
+        {
+            case U_param : signs.push_back(vert_data(nbr).uvw[0] > vert_data(vid).uvw[0]); break;
+            case V_param : signs.push_back(vert_data(nbr).uvw[1] > vert_data(vid).uvw[1]); break;
+            case W_param : signs.push_back(vert_data(nbr).uvw[2] > vert_data(vid).uvw[2]); break;
+            default: assert(false);
+        }
+    }
+
+    uint sign_switch = 0;
+    for(uint i=0; i<signs.size(); ++i)
+    {
+        if (signs.at(i) != signs.at((i+1)%signs.size())) ++sign_switch;
+    }
+
+    if (sign_switch > 2) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 bool Trimesh<M,V,E,F>::vert_is_critical_p(const uint vid, const int tex_coord) const
 {
-    // WARNING: does not handle saddle points!
-    return (vert_is_local_max(vid,tex_coord) || vert_is_local_min(vid,tex_coord));
+    return (vert_is_local_max(vid,tex_coord) ||
+            vert_is_local_min(vid,tex_coord) ||
+            vert_is_saddle   (vid, tex_coord));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

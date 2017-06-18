@@ -195,6 +195,7 @@ class Trimesh
         bool              verts_are_adjacent      (const uint vid0, const uint vid1) const;
         bool              vert_is_local_min       (const uint vid, const int tex_coord = U_param) const;
         bool              vert_is_local_max       (const uint vid, const int tex_coord = U_param) const;
+        bool              vert_is_saddle          (const uint vid, const int tex_coord = U_param) const;
         bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
         uint              vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;
         uint              vert_opposite_to        (const uint eid, const uint vid) const;
