@@ -424,6 +424,49 @@ vec3d Polygonmesh<M,V,E,F>::face_centroid(const uint fid) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+int Polygonmesh<M,V,E,F>::face_opposite_to(const uint eid, const uint fid) const
+{
+    assert(face_contains_edge(fid,eid));
+    assert(edge_is_manifold(eid));
+    assert(!adj_e2f(eid).empty());
+
+    if (edge_is_boundary(eid)) return -1;
+    if (adj_e2f(eid).front() != fid) return adj_e2f(eid).front();
+    return adj_e2f(eid).back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool Polygonmesh<M,V,E,F>::face_contains_edge(const uint fid, const uint eid) const
+{
+    for(uint e : adj_f2e(fid)) if (e == eid) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool Polygonmesh<M,V,E,F>::edge_is_manifold(const uint eid) const
+{
+    return (adj_e2f(eid).size() <= 2);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool Polygonmesh<M,V,E,F>::edge_is_boundary(const uint eid) const
+{
+    return (adj_e2f(eid).size() < 2);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 vec3d Polygonmesh<M,V,E,F>::elem_centroid(const uint fid) const
 {
     return face_centroid(fid);
@@ -559,6 +602,21 @@ std::vector<float> Polygonmesh<M,V,E,F>::export_uvw_param(const int mode) const
         }
     }
     return uvw;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<Color> Polygonmesh<M,V,E,F>::export_per_face_colors() const
+{
+    std::vector<Color> colors;
+    colors.reserve(num_faces());
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        colors.push_back( face_data(fid).color );
+    }
+    return colors;
 }
 
 }

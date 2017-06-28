@@ -113,14 +113,16 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const Bbox                & bbox()          const { return bb;    }
-        const std::vector<uint>   & vector_edges()  const { return edges; }
-        const std::vector<vec3d>  & vector_verts()  const { return verts; }
-              std::vector<double>   vector_coords() const;
+        const Bbox                           & bbox()          const { return bb;    }
+        const std::vector<uint>              & vector_edges()  const { return edges; }
+        const std::vector<vec3d>             & vector_verts()  const { return verts; }
+        const std::vector<std::vector<uint>> & vector_faces()  const { return faces; }
+              std::vector<double>              vector_coords() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         std::vector<float> export_uvw_param(const int mode) const;
+        std::vector<Color> export_per_face_colors() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -153,18 +155,22 @@ class Polygonmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d edge_vert     (const uint eid, const uint offset) const;
-        uint  edge_vert_id  (const uint eid, const uint offset) const;
-        void  edge_set_color(const Color & c);
-        void  edge_set_alpha(const float alpha);
+        vec3d edge_vert       (const uint eid, const uint offset) const;
+        uint  edge_vert_id    (const uint eid, const uint offset) const;
+        bool  edge_is_manifold(const uint eid) const;
+        bool  edge_is_boundary(const uint eid) const;
+        void  edge_set_color  (const Color & c);
+        void  edge_set_alpha  (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d face_vert     (const uint fid, const uint offset) const;
-        uint  face_vert_id  (const uint fid, const uint offset) const;
-        vec3d face_centroid (const uint fid) const;
-        void  face_set_color(const Color & c);
-        void  face_set_alpha(const float alpha);
+        vec3d face_vert         (const uint fid, const uint offset) const;
+        uint  face_vert_id      (const uint fid, const uint offset) const;
+        vec3d face_centroid     (const uint fid) const;
+        int   face_opposite_to  (const uint eid, const uint fid) const;
+        bool  face_contains_edge(const uint fid, const uint eid) const;
+        void  face_set_color    (const Color & c);
+        void  face_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

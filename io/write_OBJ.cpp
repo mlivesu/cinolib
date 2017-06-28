@@ -225,6 +225,64 @@ void write_OBJ(const char                * filename,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
+void write_OBJ(const char                           * filename,
+               const std::vector<double>            & xyz,
+               const std::vector<std::vector<uint>> & poly,
+               const std::vector<Color>             & colors)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    std::string mtl_filename(filename);
+    mtl_filename.resize(mtl_filename.size()-4);
+    mtl_filename.append(".mtu");
+
+    FILE *f_mtl = fopen(mtl_filename.c_str(), "w");
+    FILE *f_obj = fopen(filename, "w");
+
+    if(!f_obj || !f_mtl)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << endl;
+        exit(-1);
+    }
+
+    assert(colors.size() == poly.size());
+
+    std::map<Color,uint> color_map;
+
+    for(const Color & c : colors)
+    {
+        if (DOES_NOT_CONTAIN(color_map, c))
+        {
+            uint fresh_id = color_map.size();
+            color_map[c]  = fresh_id;
+            fprintf(f_mtl, "newmtl color_%d\nKd %f %f %f\n", fresh_id, c.r, c.g, c.b);
+        }
+    }
+
+    fprintf(f_obj, "mtllib %s\n", mtl_filename.c_str());
+
+    for(uint i=0; i<xyz.size(); i+=3)
+    {
+        // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+        //
+        fprintf(f_obj, "v %.17g %.17g %.17g\n", xyz[i], xyz[i+1], xyz[i+2]);
+    }
+
+    for(uint fid=0; fid<poly.size(); ++fid)
+    {
+        fprintf(f_obj, "usemtl color_%d\n", color_map.at(colors.at(fid)));
+        fprintf(f_obj, "f ");
+        for(uint vid : poly.at(fid)) fprintf(f_obj, "%d ", vid+1);
+        fprintf(f_obj, "\n");
+    }
+
+    fclose(f_obj);
+    fclose(f_mtl);
+}
+
+
+
 //CINO_INLINE
 //void write_OBJ(const char                * filename,
 //               const std::vector<double> & xyz,

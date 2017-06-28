@@ -72,12 +72,12 @@ void write_OBJ(const char                * filename,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//CINO_INLINE
-//void write_OBJ(const char                * filename,
-//               const std::vector<double> & xyz,
-//               const std::vector<uint>   & tri,
-//               const std::vector<uint>   & quad,
-//               const std::vector<int>    & labels);
+CINO_INLINE
+void write_OBJ(const char                           * filename,
+               const std::vector<double>            & xyz,
+               const std::vector<std::vector<uint>> & poly,
+               const std::vector<Color>             & colors);
+
 
 }
 
