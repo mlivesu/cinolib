@@ -353,7 +353,7 @@ void Polygonmesh<M,V,E,F>::update_f_normals()
         vec3d v1 = face_vert(fid,1);
         uint  i=2;
         vec3d ccw;
-        do { ccw = (v1-v0).cross(face_vert(fid,i)-v0); } while (ccw.length_squared()==0 && i<verts_per_face(fid));
+        do { ccw = (v1-v0).cross(face_vert(fid,i)-v0);  ++i; } while (ccw.length_squared()==0 && i<verts_per_face(fid));
 
         face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
     }
