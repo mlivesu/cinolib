@@ -32,7 +32,11 @@
 #define CINO_RBF_LIBRARY_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/geometry/vec3.h>
+#include <cmath>
+
+/*
+ * https://en.wikipedia.org/wiki/Radial_basis_function
+*/
 
 namespace cinolib
 {
@@ -43,10 +47,7 @@ template <class Point> class AbstractRBF
 };
 
 
-
-/* WARNING: notoriously unstable for small sigma values!!
- *
- * Reference:
+/* WARNING: notoriously unstable for small sigma values!! See:
  * Stable Evaluation of Gaussian Radial Basis Function Interpolants
  * SIAM Journal on Scientific Computing 34(2), 2012
  * GE Fasshauer, MJ McCourt
@@ -63,6 +64,51 @@ template <class Point> class GaussianRBF : public AbstractRBF<Point>
         {
             double d = center.dist(sample);
             return exp(-sigma*d*d);
+        }
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class Point> class CubicSplineRBF : public AbstractRBF<Point>
+{
+    public:
+
+        CubicSplineRBF() {}
+
+        double eval(const Point & center, const Point & sample) const
+        {
+            double d = center.dist(sample);
+            return d*d*d;
+        }
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class Point> class ThinPlateSplineRBF : public AbstractRBF<Point>
+{
+    public:
+
+        ThinPlateSplineRBF() {}
+
+        double eval(const Point & center, const Point & sample) const
+        {
+            double d = center.dist(sample);
+            return d*d*log(d);
+        }
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class Point> class MultiQuadraticRBF : public AbstractRBF<Point>
+{
+    public:
+
+        MultiQuadraticRBF() {}
+
+        double eval(const Point & center, const Point & sample) const
+        {
+            double d = center.dist(sample);
+            return sqrt(1+d*d);
         }
 };
 
