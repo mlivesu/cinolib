@@ -124,7 +124,7 @@ template <class Point> class Multi_Quadratic_RBF : public AbstractRBF<Point>
 
     public:
 
-        Multi_Quadratic_RBF(const double eps) : sigma(eps) {}
+        Multi_Quadratic_RBF(const double eps) : eps(eps) {}
 
         double eval(const Point & center, const Point & sample) const
         {
