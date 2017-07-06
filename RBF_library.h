@@ -52,13 +52,13 @@ template <class Point> class AbstractRBF
  * SIAM Journal on Scientific Computing 34(2), 2012
  * GE Fasshauer, MJ McCourt
 */
-template <class Point> class GaussianRBF : public AbstractRBF<Point>
+template <class Point> class Gaussian_RBF : public AbstractRBF<Point>
 {
     double sigma;
 
     public:
 
-        GaussianRBF(const double sigma) : sigma(sigma) {}
+        Gaussian_RBF(const double sigma) : sigma(sigma) {}
 
         double eval(const Point & center, const Point & sample) const
         {
@@ -69,11 +69,11 @@ template <class Point> class GaussianRBF : public AbstractRBF<Point>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template <class Point> class CubicSplineRBF : public AbstractRBF<Point>
+template <class Point> class Cubic_Spline_RBF : public AbstractRBF<Point>
 {
     public:
 
-        CubicSplineRBF() {}
+        Cubic_Spline_RBF() {}
 
         double eval(const Point & center, const Point & sample) const
         {
@@ -84,11 +84,11 @@ template <class Point> class CubicSplineRBF : public AbstractRBF<Point>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template <class Point> class ThinPlateSplineRBF : public AbstractRBF<Point>
+template <class Point> class Thin_Plate_Spline_RBF : public AbstractRBF<Point>
 {
     public:
 
-        ThinPlateSplineRBF() {}
+        Thin_Plate_Spline_RBF() {}
 
         double eval(const Point & center, const Point & sample) const
         {
@@ -99,16 +99,37 @@ template <class Point> class ThinPlateSplineRBF : public AbstractRBF<Point>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template <class Point> class MultiQuadraticRBF : public AbstractRBF<Point>
+template <class Point> class Polyharmonic_Spline_RBF : public AbstractRBF<Point>
 {
+    uint k;
+
     public:
 
-        MultiQuadraticRBF() {}
+        Polyharmonic_Spline_RBF(const uint k) : k(k) {}
 
         double eval(const Point & center, const Point & sample) const
         {
             double d = center.dist(sample);
-            return sqrt(1+d*d);
+            double f = std::pow(d,k);
+            if (k%2==1) f *= log(d);
+            return f;
+        }
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class Point> class Multi_Quadratic_RBF : public AbstractRBF<Point>
+{
+    double eps;
+
+    public:
+
+        Multi_Quadratic_RBF(const double eps) : sigma(eps) {}
+
+        double eval(const Point & center, const Point & sample) const
+        {
+            double d = center.dist(sample);
+            return sqrt(1+(eps*d)*(eps*d));
         }
 };
 
