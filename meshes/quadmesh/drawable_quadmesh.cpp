@@ -117,11 +117,11 @@ void DrawableQuadmesh<M,V,E,F>::updateGL()
 
         for(uint i=0; i< this->tessellated_faces.at(fid).size()/3; ++i)
         {
-            int vid0 = this->tessellated_faces.at(fid).at(3*i+0);
-            int vid1 = this->tessellated_faces.at(fid).at(3*i+1);
-            int vid2 = this->tessellated_faces.at(fid).at(3*i+2);
+            uint vid0 = this->tessellated_faces.at(fid).at(3*i+0);
+            uint vid1 = this->tessellated_faces.at(fid).at(3*i+1);
+            uint vid2 = this->tessellated_faces.at(fid).at(3*i+2);
 
-            int base_addr = drawlist.tri_coords.size()/3;
+            uint base_addr = drawlist.tri_coords.size()/3;
 
             drawlist.tris.push_back(base_addr    );
             drawlist.tris.push_back(base_addr + 1);

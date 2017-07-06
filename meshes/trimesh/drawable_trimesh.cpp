@@ -81,7 +81,7 @@ void DrawableTrimesh<M,V,E,F>::init_drawable_stuff()
     drawable_type   = DRAWABLE_TRIMESH;
     slicer = MeshSlicer<Trimesh<M,V,E,F>>(*this);
 
-    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
+    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
     drawlist.seg_width = 1;
 
     updateGL();
@@ -115,11 +115,11 @@ void DrawableTrimesh<M,V,E,F>::updateGL()
     {
         if (!(this->face_data(fid).visible)) continue;
 
-        int vid0 = this->face_vert_id(fid,0);
-        int vid1 = this->face_vert_id(fid,1);
-        int vid2 = this->face_vert_id(fid,2);
+        uint vid0 = this->face_vert_id(fid,0);
+        uint vid1 = this->face_vert_id(fid,1);
+        uint vid2 = this->face_vert_id(fid,2);
 
-        int base_addr = drawlist.tri_coords.size()/3;
+        uint base_addr = drawlist.tri_coords.size()/3;
 
         drawlist.tris.push_back(base_addr    );
         drawlist.tris.push_back(base_addr + 1);
