@@ -1224,6 +1224,15 @@ bool Trimesh<M,V,E,F>::face_bary_coords(const uint fid, const vec3d & P, std::ve
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+bool Trimesh<M,V,E,F>::elem_bary_coords(const uint fid, const vec3d & P, std::vector<double> & wgts) const
+{
+    return face_bary_coords(fid, P, wgts);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 bool Trimesh<M,V,E,F>::face_bary_is_vert(const uint fid, const std::vector<double> & wgts, uint & vid, const double tol) const
 {
     uint off;

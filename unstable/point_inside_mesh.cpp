@@ -69,7 +69,7 @@ void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & eid, std::vector<d
 
     for(uint id : items)
     {
-        if (m_ptr->barycentric_coordinates(id, p, wgts)) // if is inside...
+        if (m_ptr->elem_bary_coords(id, p, wgts)) // if is inside...
         {
             eid = id;
             return;
@@ -89,6 +89,7 @@ void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & eid, std::vector<d
     {
         ordered_items.insert(std::make_pair(m_ptr->elem_centroid(item).dist(p),item));
     }
+    assert(ordered_items.size()>0);
     eid = (*ordered_items.begin()).second;
     wgts = std::vector<double>(m_ptr->verts_per_elem(), 1.0/double(m_ptr->verts_per_elem())); // centroid
 }

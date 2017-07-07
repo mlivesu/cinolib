@@ -270,6 +270,7 @@ class Trimesh
         vec3d  elem_centroid    (const uint fid) const;
         void   elem_show_all    ();
         double elem_mass        (const uint fid) const;
+        bool   elem_bary_coords (const uint fid, const vec3d & P, std::vector<double> & wgts) const;
         bool   elem_bary_is_vert(const uint fid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
         bool   elem_bary_is_edge(const uint fid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
 };
