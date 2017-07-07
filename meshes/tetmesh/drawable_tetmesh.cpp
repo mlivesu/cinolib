@@ -134,6 +134,11 @@ void DrawableTetmesh<M,V,E,F,C>::updateGL_out()
     drawlist_out.seg_coords.clear();
     drawlist_out.seg_colors.clear();
 
+    float min   = this->vert_min_tex_coord();
+    float max   = this->vert_max_tex_coord();
+    float delta = max - min;
+    if (delta == 0) delta = 1.0;
+
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
         if (!(this->cell_data(this->adj_f2c(fid)).visible)) continue;
@@ -158,9 +163,9 @@ void DrawableTetmesh<M,V,E,F,C>::updateGL_out()
         drawlist_out.tri_coords.push_back(this->vert(vid2).y());
         drawlist_out.tri_coords.push_back(this->vert(vid2).z());
 
-        drawlist_out.tri_text1D.push_back(this->vert_data(vid0).uvw[0]);
-        drawlist_out.tri_text1D.push_back(this->vert_data(vid1).uvw[0]);
-        drawlist_out.tri_text1D.push_back(this->vert_data(vid2).uvw[0]);
+        drawlist_out.tri_text1D.push_back((this->vert_data(vid0).uvw[0] - min)/delta);
+        drawlist_out.tri_text1D.push_back((this->vert_data(vid1).uvw[0] - min)/delta);
+        drawlist_out.tri_text1D.push_back((this->vert_data(vid2).uvw[0] - min)/delta);
 
         drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.x()); // replicate f normal on each vertex
         drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.y());
@@ -298,6 +303,11 @@ void DrawableTetmesh<M,V,E,F,C>::updateGL_in()
     drawlist_in.seg_coords.clear();
     drawlist_in.seg_colors.clear();
 
+    float min   = this->vert_min_tex_coord();
+    float max   = this->vert_max_tex_coord();
+    float delta = max - min;
+    if (delta == 0) delta = 1.0;
+
     for(uint cid=0; cid<this->num_cells(); ++cid)
     {
         if (!(this->cell_data(cid).visible)) continue;
@@ -329,9 +339,9 @@ void DrawableTetmesh<M,V,E,F,C>::updateGL_in()
                 drawlist_in.tri_coords.push_back(this->vert(vid2).y());
                 drawlist_in.tri_coords.push_back(this->vert(vid2).z());
 
-                drawlist_in.tri_text1D.push_back(this->vert_data(vid0).uvw[0]);
-                drawlist_in.tri_text1D.push_back(this->vert_data(vid1).uvw[0]);
-                drawlist_in.tri_text1D.push_back(this->vert_data(vid2).uvw[0]);
+                drawlist_in.tri_text1D.push_back((this->vert_data(vid0).uvw[0] - min)/delta);
+                drawlist_in.tri_text1D.push_back((this->vert_data(vid1).uvw[0] - min)/delta);
+                drawlist_in.tri_text1D.push_back((this->vert_data(vid2).uvw[0] - min)/delta);
 
                 vec3d v0 = this->vert(vid0);
                 vec3d v1 = this->vert(vid1);

@@ -192,6 +192,8 @@ class Tetmesh
         bool     vert_is_on_srf    (const uint vid) const;
         double   vert_mass         (const uint vid) const;
         double   vert_volume       (const uint vid) const;
+        float    vert_min_tex_coord(const int tex_coord = U_param) const;
+        float    vert_max_tex_coord(const int tex_coord = U_param) const;
         void     vert_set_color    (const Color & c);
         void     vert_set_alpha    (const float alpha);
         bool     vert_is_local_min (const uint vid, const int tex_coord = U_param) const;

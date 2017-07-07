@@ -999,6 +999,46 @@ double Tetmesh<M,V,E,F,C>::vert_volume(const uint vid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+float Tetmesh<M,V,E,F,C>::vert_min_tex_coord(const int tex_coord) const
+{
+    float min = FLT_MAX;
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        switch (tex_coord)
+        {
+            case U_param : min = std::min(min, vert_data(vid).uvw[0]); break;
+            case V_param : min = std::min(min, vert_data(vid).uvw[1]); break;
+            case W_param : min = std::min(min, vert_data(vid).uvw[2]); break;
+            default: assert(false);
+        }
+    }
+    return min;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+float Tetmesh<M,V,E,F,C>::vert_max_tex_coord(const int tex_coord) const
+{
+    float max = -FLT_MAX;
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        switch (tex_coord)
+        {
+            case U_param : max = std::max(max, vert_data(vid).uvw[0]); break;
+            case V_param : max = std::max(max, vert_data(vid).uvw[1]); break;
+            case W_param : max = std::max(max, vert_data(vid).uvw[2]); break;
+            default: assert(false);
+        }
+    }
+    return max;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 std::vector<double> Tetmesh<M,V,E,F,C>::vector_coords() const
 {
     std::vector<double> coords;
