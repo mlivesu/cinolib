@@ -65,6 +65,12 @@ class DrawableTrimesh : public Trimesh<M,V,E,F>, public DrawableObject
         DrawableTrimesh(const std::vector<double> & coords,
                         const std::vector<uint>   & faces);
 
+        DrawableTrimesh(const std::vector<vec3d>             & coords,
+                        const std::vector<std::vector<uint>> & faces);
+
+        DrawableTrimesh(const std::vector<double>            & coords,
+                        const std::vector<std::vector<uint>> & faces);
+
     protected:
 
         RenderData drawlist;

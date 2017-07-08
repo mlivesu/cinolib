@@ -56,8 +56,9 @@ CINO_INLINE
 Quadmesh<M,V,E,F>::Quadmesh(const std::vector<vec3d> & verts,
                             const std::vector<uint>  & faces)
 : verts(verts)
-, faces(faces)
 {
+    this->faces = faces_from_serialized_vids(faces,4);
+
     init();
 }
 
@@ -67,6 +68,31 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 Quadmesh<M,V,E,F>::Quadmesh(const std::vector<double> & coords,
                             const std::vector<uint>   & faces)
+{
+    this->verts = vec3d_from_serialized_xyz(coords);
+    this->faces = faces_from_serialized_vids(faces,4);
+
+    init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+Quadmesh<M,V,E,F>::Quadmesh(const std::vector<vec3d>             & verts,
+                            const std::vector<std::vector<uint>> & faces)
+: verts(verts)
+, faces(faces)
+{
+    init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+Quadmesh<M,V,E,F>::Quadmesh(const std::vector<double>            & coords,
+                            const std::vector<std::vector<uint>> & faces)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
     this->faces = faces;
@@ -80,11 +106,10 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Quadmesh<M,V,E,F>::load(const char * filename)
 {
-    timer_start("Load Quadmesh");
+    timer_start("Load Mesh");
 
     clear();
     std::vector<double> coords;
-    std::vector<uint>   tris; // unused
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -92,12 +117,12 @@ void Quadmesh<M,V,E,F>::load(const char * filename)
     if (filetype.compare(".off") == 0 ||
         filetype.compare(".OFF") == 0)
     {
-        read_OFF(filename, coords, tris, faces);
+        read_OFF(filename, coords, faces);
     }
     else if (filetype.compare(".obj") == 0 ||
              filetype.compare(".OBJ") == 0)
     {
-        read_OBJ(filename, coords, tris, faces);
+        read_OBJ(filename, coords, faces);
     }
     else
     {
@@ -105,14 +130,13 @@ void Quadmesh<M,V,E,F>::load(const char * filename)
         exit(-1);
     }
 
+    for(const auto & f : faces) assert(f.size() == 4);
+
     verts = vec3d_from_serialized_xyz(coords);
 
-    logger << num_faces() << " quads read" << endl;
-    logger << num_verts() << " verts read" << endl;
+    mesh_data().filename = std::string(filename);
 
-    this->mesh_data().filename = std::string(filename);
-
-    timer_stop("Load Quadmesh");
+    timer_stop("Load Mesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -121,10 +145,9 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Quadmesh<M,V,E,F>::save(const char * filename) const
 {
-    timer_start("Save Quadmesh");
+    timer_start("Save Mesh");
 
     std::vector<double> coords = serialized_xyz_from_vec3d(verts);
-    std::vector<uint>   tris; // unused
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-3,3);
@@ -132,12 +155,12 @@ void Quadmesh<M,V,E,F>::save(const char * filename) const
     if (filetype.compare("off") == 0 ||
         filetype.compare("OFF") == 0)
     {
-        write_OFF(filename, coords, tris, faces);
+        write_OFF(filename, coords, faces);
     }
     else if (filetype.compare(".obj") == 0 ||
              filetype.compare(".OBJ") == 0)
     {
-        write_OBJ(filename, coords, tris, faces);
+        write_OBJ(filename, coords, faces);
     }
     else
     {
@@ -145,7 +168,7 @@ void Quadmesh<M,V,E,F>::save(const char * filename) const
         exit(-1);
     }
 
-    timer_stop("Save Quadmesh");
+    timer_stop("Save Mesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -237,10 +260,10 @@ void Quadmesh<M,V,E,F>::update_adjacency()
     std::map<ipair,std::vector<uint>> e2f_map;
     for(uint fid=0; fid<num_faces(); ++fid)
     {
-        for(uint off=0; off<verts_per_face(); ++off)
+        for(uint off=0; off<verts_per_face(fid); ++off)
         {
             uint vid0 = face_vert_id(fid,off);
-            uint vid1 = face_vert_id(fid,(off+1)%verts_per_face());
+            uint vid1 = face_vert_id(fid,(off+1)%verts_per_face(fid));
             v2f.at(vid0).push_back(fid);
             e2f_map[unique_pair(vid0,vid1)].push_back(fid);
         }
@@ -338,7 +361,7 @@ void Quadmesh<M,V,E,F>::update_f_normals()
     {
         // compute the best fitting plane
         std::vector<vec3d> points;
-        for(uint off=0; off<verts_per_face(); ++off) points.push_back(face_vert(fid,off));
+        for(uint off=0; off<verts_per_face(fid); ++off) points.push_back(face_vert(fid,off));
         Plane best_fit(points);
 
         // adjust orientation (n or -n?)
@@ -386,8 +409,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 uint Quadmesh<M,V,E,F>::face_vert_id(const uint fid, const uint offset) const
 {
-    uint fid_ptr = fid * verts_per_face();
-    return faces.at(fid_ptr + offset);
+    return faces.at(fid).at(offset);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -406,11 +428,11 @@ CINO_INLINE
 vec3d Quadmesh<M,V,E,F>::face_centroid(const uint fid) const
 {
     vec3d c(0,0,0);
-    for(uint off=0; off<verts_per_face(); ++off)
+    for(uint off=0; off<verts_per_face(fid); ++off)
     {
         c += face_vert(fid,off);
     }
-    c /= static_cast<double>(verts_per_face());
+    c /= static_cast<double>(verts_per_face(fid));
     return c;
 }
 

@@ -161,6 +161,20 @@ std::vector<double> serialized_xyz_from_vec3d(const std::vector<vec3d> & verts)
     return tmp;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<std::vector<uint>> faces_from_serialized_vids(const std::vector<uint> & vids, const uint vids_per_face)
+{
+    uint nf = vids.size()/vids_per_face;
+    std::vector<std::vector<uint>> tmp(nf);
+    for(uint fid=0; fid<nf; ++fid)
+    {
+        for(uint off=0; off<vids_per_face; ++off) tmp.at(fid).push_back(vids.at(fid*vids_per_face+off));
+    }
+    return tmp;
+}
+
 }
 
 #endif // CINO_COMMON_H

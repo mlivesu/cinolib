@@ -46,7 +46,7 @@ PointInsideMeshCache<Mesh>::PointInsideMeshCache(const Mesh & m, const uint octr
     {
         vec3d min = m.elem_vert(eid, 0);
         vec3d max = min;
-        for(uint i=1; i<m.verts_per_elem(); ++i)
+        for(uint i=1; i<m.verts_per_elem(eid); ++i)
         {
             min = min.min(m.elem_vert(eid, i));
             max = max.max(m.elem_vert(eid, i));
@@ -91,7 +91,7 @@ void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & eid, std::vector<d
     }
     assert(ordered_items.size()>0);
     eid = (*ordered_items.begin()).second;
-    wgts = std::vector<double>(m_ptr->verts_per_elem(), 1.0/double(m_ptr->verts_per_elem())); // centroid
+    wgts = std::vector<double>(m_ptr->verts_per_elem(eid), 1.0/double(m_ptr->verts_per_elem(eid))); // centroid
 }
 
 
@@ -103,12 +103,12 @@ template<class Mesh>
 CINO_INLINE
 vec3d PointInsideMeshCache<Mesh>::locate(const vec3d p, const Mesh & m) const
 {
-    uint eid;
-    std::vector<double> wgts(m.verts_per_elem());
+    uint eid = -1; // assign -1 just to kill the uninitialized variable warning...
+    std::vector<double> wgts(m.verts_per_elem(eid));
     locate(p, eid, wgts);
 
     vec3d tmp(0,0,0);
-    for(uint off=0; off<m.verts_per_elem(); ++off)
+    for(uint off=0; off<m.verts_per_elem(eid); ++off)
     {
         tmp += wgts.at(off) * m.elem_vert(eid,off);
     }

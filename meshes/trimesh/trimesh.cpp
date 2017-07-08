@@ -51,8 +51,8 @@ Trimesh<M,V,E,F>::Trimesh(const char * filename)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-Trimesh<M,V,E,F>::Trimesh(const std::vector<vec3d> & verts,
-                          const std::vector<uint>  & faces)
+Trimesh<M,V,E,F>::Trimesh(const std::vector<vec3d>              & verts,
+                          const std::vector<std::vector<uint>>  & faces)
 : verts(verts)
 , faces(faces)
 {
@@ -63,8 +63,8 @@ Trimesh<M,V,E,F>::Trimesh(const std::vector<vec3d> & verts,
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-Trimesh<M,V,E,F>::Trimesh(const std::vector<double> & coords,
-                          const std::vector<uint>   & faces)
+Trimesh<M,V,E,F>::Trimesh(const std::vector<double>             & coords,
+                          const std::vector<std::vector<uint>>  & faces)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
     this->faces = faces;
@@ -76,13 +76,38 @@ Trimesh<M,V,E,F>::Trimesh(const std::vector<double> & coords,
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+Trimesh<M,V,E,F>::Trimesh(const std::vector<vec3d> & verts,
+                          const std::vector<uint>  & faces)
+: verts(verts)
+{
+    this->faces = faces_from_serialized_vids(faces,3);
+
+    init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+Trimesh<M,V,E,F>::Trimesh(const std::vector<double> & coords,
+                          const std::vector<uint>   & faces)
+{
+    this->verts = vec3d_from_serialized_xyz(coords);
+    this->faces = faces_from_serialized_vids(faces,3);
+
+    init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 void Trimesh<M,V,E,F>::load(const char * filename)
 {
-    timer_start("Load Tri");
+    timer_start("Load Mesh");
 
     clear();
     std::vector<double> coords;
-    std::vector<uint>   quads; // unused
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -90,24 +115,25 @@ void Trimesh<M,V,E,F>::load(const char * filename)
     if (filetype.compare(".off") == 0 ||
         filetype.compare(".OFF") == 0)
     {
-        read_OFF(filename, coords, faces, quads);
+        read_OFF(filename, coords, faces);
     }
     else if (filetype.compare(".obj") == 0 ||
              filetype.compare(".OBJ") == 0)
     {
-        read_OBJ(filename, coords, faces, quads);
+        read_OBJ(filename, coords, faces);
     }
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
         exit(-1);
     }
+    for(const auto & f : faces) assert(f.size() == 3);
 
     verts = vec3d_from_serialized_xyz(coords);
 
-    this->mesh_data().filename = std::string(filename);
+    mesh_data().filename = std::string(filename);
 
-    timer_stop("Load Tri");
+    timer_stop("Load Mesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -116,10 +142,9 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Trimesh<M,V,E,F>::save(const char * filename) const
 {
-    timer_start("Save Tri");
+    timer_start("Save Mesh");
 
     std::vector<double> coords = serialized_xyz_from_vec3d(verts);
-    std::vector<uint>   quads; // unused
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-3,3);
@@ -127,12 +152,12 @@ void Trimesh<M,V,E,F>::save(const char * filename) const
     if (filetype.compare("off") == 0 ||
         filetype.compare("OFF") == 0)
     {
-        write_OFF(filename, coords, faces, quads);
+        write_OFF(filename, coords, faces);
     }
     else if (filetype.compare("obj") == 0 ||
              filetype.compare("OBJ") == 0)
     {
-        write_OBJ(filename, coords, faces, quads);
+        write_OBJ(filename, coords, faces);
     }
     else
     {
@@ -140,7 +165,7 @@ void Trimesh<M,V,E,F>::save(const char * filename) const
         exit(-1);
     }
 
-    timer_stop("Save Tri");
+    timer_stop("Save Mesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -202,10 +227,10 @@ void Trimesh<M,V,E,F>::update_adjacency()
     std::map<ipair,std::vector<uint>> e2f_map;
     for(uint fid=0; fid<num_faces(); ++fid)
     {
-        for(uint offset=0; offset<verts_per_face(); ++offset)
+        for(uint offset=0; offset<verts_per_face(fid); ++offset)
         {
             int  vid0 = face_vert_id(fid,offset);
-            int  vid1 = face_vert_id(fid,(offset+1)%verts_per_face());
+            int  vid1 = face_vert_id(fid,(offset+1)%verts_per_face(fid));
             v2f.at(vid0).push_back(fid);
             e2f_map[unique_pair(vid0,vid1)].push_back(fid);
         }
@@ -388,8 +413,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 uint Trimesh<M,V,E,F>::face_vert_id(const uint fid, const uint offset) const
 {
-    uint face_ptr = verts_per_face() * fid;
-    return faces.at(face_ptr+offset);
+    return faces.at(fid).at(offset);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -426,11 +450,11 @@ CINO_INLINE
 vec3d Trimesh<M,V,E,F>::face_centroid(const uint fid) const
 {
     vec3d c(0,0,0);
-    for(uint off=0; off<verts_per_face(); ++off)
+    for(uint off=0; off<verts_per_face(fid); ++off)
     {
         c += face_vert(fid,off);
     }
-    c /= static_cast<double>(verts_per_face());
+    c /= static_cast<double>(verts_per_face(fid));
     return c;
 }
 
@@ -864,7 +888,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 bool Trimesh<M,V,E,F>::face_contains_vert(const uint fid, const uint vid) const
 {
-    for(uint off=0; off<verts_per_face(); ++off)
+    for(uint off=0; off<verts_per_face(fid); ++off)
     {
         if (face_vert_id(fid,off) == vid) return true;
     }
@@ -1390,8 +1414,8 @@ double Trimesh<M,V,E,F>::face_angle_at_vert(const uint fid, const uint vid, cons
     else { assert(false); offset=0; } // offset=0 kills uninitialized warning message
 
     vec3d P = vert(vid);
-    vec3d u = face_vert(fid,(offset+1)%verts_per_face()) - P;
-    vec3d v = face_vert(fid,(offset+2)%verts_per_face()) - P;
+    vec3d u = face_vert(fid,(offset+1)%verts_per_face(fid)) - P;
+    vec3d v = face_vert(fid,(offset+2)%verts_per_face(fid)) - P;
 
     switch (unit)
     {
@@ -1457,9 +1481,11 @@ uint Trimesh<M,V,E,F>::face_add(const uint vid0, const uint vid1, const uint vid
 
     uint fid = num_faces();
     //
-    faces.push_back(vid0);
-    faces.push_back(vid1);
-    faces.push_back(vid2);
+    std::vector<uint> f;
+    f.push_back(vid0);
+    f.push_back(vid1);
+    f.push_back(vid2);
+    faces.push_back(f);
     //
     F data;
     f_data.push_back(data);
@@ -1517,11 +1543,10 @@ void Trimesh<M,V,E,F>::face_set(const uint fid, const uint vid0, const uint vid1
     assert(vid1 < num_verts());
     assert(vid2 < num_verts());
 
-    uint fid_ptr = fid * 3;
-
-    faces.at(fid_ptr+0) = vid0;
-    faces.at(fid_ptr+1) = vid1;
-    faces.at(fid_ptr+2) = vid2;
+    faces.at(fid).clear();
+    faces.at(fid).push_back(vid0);
+    faces.at(fid).push_back(vid1);
+    faces.at(fid).push_back(vid2);
 
     update_f_normal(fid);
 }

@@ -56,19 +56,24 @@ class Trimesh
 
         Trimesh(const char * filename);
 
-        Trimesh(const std::vector<vec3d> & verts,
+        Trimesh(const std::vector<vec3d>             & coords,
+                const std::vector<std::vector<uint>> & faces);
+
+        Trimesh(const std::vector<double>            & coords,
+                const std::vector<std::vector<uint>> & faces);
+
+        Trimesh(const std::vector<vec3d> & coords,
                 const std::vector<uint>  & faces);
 
         Trimesh(const std::vector<double> & coords,
                 const std::vector<uint>   & faces);
-
     protected:
 
         Bbox bb;
 
-        std::vector<vec3d> verts;
-        std::vector<uint>  edges;
-        std::vector<uint>  faces;
+        std::vector<vec3d>             verts;
+        std::vector<uint>              edges;
+        std::vector<std::vector<uint>> faces;
 
         // attributes
         //
@@ -109,23 +114,23 @@ class Trimesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_face() const { return 3; }
-        uint verts_per_elem() const { return 3; }
+        uint verts_per_face(const uint) const { return 3; }
+        uint verts_per_elem(const uint) const { return 3; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint num_verts() const { return verts.size();                    }
-        uint num_edges() const { return edges.size() / 2;                }
-        uint num_faces() const { return faces.size() / verts_per_face(); }
-        uint num_elems() const { return faces.size() / verts_per_face(); } // elem == face!!
+        uint num_verts() const { return verts.size();     }
+        uint num_edges() const { return edges.size() / 2; }
+        uint num_faces() const { return faces.size();     }
+        uint num_elems() const { return faces.size();     } // elem == face!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const Bbox                & bbox()          const { return bb;    }
-        const std::vector<vec3d>  & vector_verts()  const { return verts; }
-        const std::vector<uint>   & vector_edges()  const { return edges; }
-        const std::vector<uint>   & vector_faces()  const { return faces; }
-              std::vector<double>   vector_coords() const;
+        const Bbox                           & bbox()          const { return bb;    }
+        const std::vector<vec3d>             & vector_verts()  const { return verts; }
+        const std::vector<uint>              & vector_edges()  const { return edges; }
+        const std::vector<std::vector<uint>> & vector_faces()  const { return faces; }
+              std::vector<double>              vector_coords() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

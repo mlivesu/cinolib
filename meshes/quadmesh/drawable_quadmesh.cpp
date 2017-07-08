@@ -76,6 +76,28 @@ DrawableQuadmesh<M,V,E,F>::DrawableQuadmesh(const std::vector<double> & coords,
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+DrawableQuadmesh<M,V,E,F>::DrawableQuadmesh(const std::vector<vec3d>             & verts,
+                                            const std::vector<std::vector<uint>> & faces)
+    : Quadmesh<M,V,E,F>(verts,faces)
+{
+    init_drawable_stuff();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+DrawableQuadmesh<M,V,E,F>::DrawableQuadmesh(const std::vector<double>            & coords,
+                                            const std::vector<std::vector<uint>> & faces)
+    : Quadmesh<M,V,E,F>(coords,faces)
+{
+    init_drawable_stuff();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 void DrawableQuadmesh<M,V,E,F>::init_drawable_stuff()
 {
     drawable_type   = DRAWABLE_QUADMESH;

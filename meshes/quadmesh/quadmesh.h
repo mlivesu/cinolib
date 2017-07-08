@@ -73,13 +73,19 @@ class Quadmesh
         Quadmesh(const std::vector<double> & coords,
                  const std::vector<uint>   & faces);
 
+        Quadmesh(const std::vector<vec3d>             & verts,
+                 const std::vector<std::vector<uint>> & faces);
+
+        Quadmesh(const std::vector<double>            & coords,
+                 const std::vector<std::vector<uint>> & faces);
+
     protected:
 
         Bbox bb;
 
         std::vector<vec3d>             verts;
         std::vector<uint>              edges;
-        std::vector<uint>              faces;
+        std::vector<std::vector<uint>> faces;
         std::vector<std::vector<uint>> tessellated_faces; // triangles covering each quad. Useful for
                                                           // robust normal estimation and rendering
         // attributes
@@ -116,14 +122,15 @@ class Quadmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_face() const { return 4; }
+        uint verts_per_face(const uint) const { return 4; }
+        uint verts_per_elem(const uint) const { return 4; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint num_verts() const { return verts.size();                    }
-        uint num_edges() const { return edges.size() / 2;                }
-        uint num_faces() const { return faces.size() / verts_per_face(); }
-        uint num_elems() const { return faces.size() / verts_per_face(); } // elem == face!!
+        uint num_verts() const { return verts.size();     }
+        uint num_edges() const { return edges.size() / 2; }
+        uint num_faces() const { return faces.size();     }
+        uint num_elems() const { return faces.size();     } // elem == face!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

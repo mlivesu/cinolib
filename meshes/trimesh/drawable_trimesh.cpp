@@ -76,6 +76,28 @@ DrawableTrimesh<M,V,E,F>::DrawableTrimesh(const std::vector<double> & coords,
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+DrawableTrimesh<M,V,E,F>::DrawableTrimesh(const std::vector<vec3d>             & verts,
+                                          const std::vector<std::vector<uint>> & faces)
+    : Trimesh<M,V,E,F>(verts,faces)
+{
+    init_drawable_stuff();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+DrawableTrimesh<M,V,E,F>::DrawableTrimesh(const std::vector<double>            & coords,
+                                          const std::vector<std::vector<uint>> & faces)
+    : Trimesh<M,V,E,F>(coords,faces)
+{
+    init_drawable_stuff();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 void DrawableTrimesh<M,V,E,F>::init_drawable_stuff()
 {
     drawable_type   = DRAWABLE_TRIMESH;

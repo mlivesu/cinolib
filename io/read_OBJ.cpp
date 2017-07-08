@@ -160,7 +160,10 @@ void read_OBJ(const char                     * filename,
                 s = s.substr(1,s.size()-1); // discard the 'f' letter
                 std::istringstream ss(s);
                 std::vector<uint> face;
-                for(uint vid; ss >> vid;) face.push_back(vid-1);
+                for(std::string sub_str; ss >> sub_str;)
+                {
+                    face.push_back(read_point_id(strdup(sub_str.c_str())));
+                }
                 faces.push_back(face);
                 break;
         }
