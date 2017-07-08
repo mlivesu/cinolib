@@ -40,45 +40,40 @@ template<class M,
          class V,
          class E,
          class F>
-class AbstractSurfaceMesh : public virtual AbstractMesh<M,V,E,F>
+class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 {
-//    virtual void              vert_ordered_one_ring   (const uint vid,
-//                                               std::vector<uint> & v_ring,        // sorted list of adjacent vertices
-//                                               std::vector<uint> & f_ring,        // sorted list of adjacent triangles
-//                                               std::vector<uint> & e_ring,        // sorted list of edges incident to vid
-//                                               std::vector<uint> & e_link) const; // sorted list of edges opposite to vid
-//    virtual std::vector<uint> vert_ordered_vert_ring  (const uint vid) const;
-//    virtual std::vector<uint> vert_ordered_face_ring  (const uint vid) const;
-//    virtual std::vector<uint> vert_ordered_edge_ring  (const uint vid) const;
-//    virtual std::vector<uint> vert_ordered_edge_link  (const uint vid) const;
-//    virtual double            vert_area               (const uint vid) const;
-//    virtual bool              verts_are_ordered_CCW   (const uint fid, const uint curr, const uint prev) const;
-//    virtual bool              vert_is_boundary        (const uint vid) const;
-//    virtual bool              vert_is_saddle          (const uint vid, const int tex_coord = U_param) const;
-//    virtual bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
-//    virtual uint              vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;
-//    virtual uint              vert_opposite_to        (const uint eid, const uint vid) const;
-//    virtual std::vector<uint> vert_boundary_edges     (const uint vid) const;
-//    virtual void              vert_switch_id          (const uint vid0, const uint vid1);
+    public:
 
-//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        uint              vert_opposite_to      (const uint eid, const uint vid) const;
+        double            vert_area             (const uint vid) const;
+        double            vert_mass             (const uint vid) const;
+        bool              verts_are_ordered_CCW (const uint fid, const uint curr, const uint prev) const;
+        bool              vert_is_boundary      (const uint vid) const;
+        std::vector<uint> vert_boundary_edges   (const uint vid) const;
+        std::vector<uint> vert_ordered_vert_ring(const uint vid) const;
+        std::vector<uint> vert_ordered_face_ring(const uint vid) const;
+        std::vector<uint> vert_ordered_edge_ring(const uint vid) const;
+        std::vector<uint> vert_ordered_edge_link(const uint vid) const;
+        void              vert_ordered_one_ring (const uint          vid,
+                                                 std::vector<uint> & v_ring,        // sorted list of adjacent vertices
+                                                 std::vector<uint> & f_ring,        // sorted list of adjacent triangles
+                                                 std::vector<uint> & e_ring,        // sorted list of edges incident to vid
+                                                 std::vector<uint> & e_link) const; // sorted list of edges opposite to vid
 
-//    virtual int    edge_opposite_to        (const uint fid, const uint vid) const;
-//    virtual bool   edge_is_manifold        (const uint eid) const;
-//    virtual bool   edge_is_boundary        (const uint eid) const;
-//    virtual bool   edges_share_face        (const uint eid1, const uint eid2) const;
-//    virtual ipair  edge_shared             (const uint fid0, const uint fid1) const;
-//    virtual void   edge_switch_id          (const uint eid0, const uint eid1);
-//    virtual bool   edge_collapse           (const uint eid);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        bool  edge_is_manifold(const uint eid) const;
+        bool  edge_is_boundary(const uint eid) const;
+        bool  edges_share_face(const uint eid1, const uint eid2) const;
+        ipair edge_shared     (const uint fid0, const uint fid1) const;
 
-//    virtual int    face_shared             (const uint eid0, const uint eid1) const;
-//    virtual uint   face_edge_id            (const uint fid, const uint offset) const;
-//    virtual bool   face_is_boundary        (const uint fid) const;
-//    virtual void   face_switch_id          (const uint fid0, const uint fid1);
-//    virtual uint   face_add                (const uint vid0, const uint vid1, const uint vid2);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+virtual double face_area          (const uint fid) const = 0;
+        double face_mass          (const uint fid) const;
+        int    face_shared        (const uint eid0, const uint eid1) const;
+        int    face_adjacent_along(const uint fid, const uint vid0, const uint vid1) const;
+        bool   face_is_boundary   (const uint fid) const;
 };
 
 }

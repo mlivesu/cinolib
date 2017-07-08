@@ -44,7 +44,7 @@ template<class M = Mesh_std_data, // default template arguments
          class V = Vert_std_data,
          class E = Edge_std_data,
          class F = Face_std_data>
-class Trimesh : public virtual AbstractSurfaceMesh<M,V,E,F>
+class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
 {
     public:
 
@@ -116,22 +116,10 @@ class Trimesh : public virtual AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void              vert_ordered_one_ring   (const uint vid,
-                                                   std::vector<uint> & v_ring,        // sorted list of adjacent vertices
-                                                   std::vector<uint> & f_ring,        // sorted list of adjacent triangles
-                                                   std::vector<uint> & e_ring,        // sorted list of edges incident to vid
-                                                   std::vector<uint> & e_link) const; // sorted list of edges opposite to vid
-        std::vector<uint> vert_ordered_vert_ring  (const uint vid) const;
-        std::vector<uint> vert_ordered_face_ring  (const uint vid) const;
-        std::vector<uint> vert_ordered_edge_ring  (const uint vid) const;
-        std::vector<uint> vert_ordered_edge_link  (const uint vid) const;
-        double            vert_area               (const uint vid) const;
-        double            vert_mass               (const uint vid) const;
-        bool              vert_is_boundary        (const uint vid) const;
         bool              vert_is_saddle          (const uint vid, const int tex_coord = U_param) const;
         bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
         uint              vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;
-        uint              vert_opposite_to        (const uint eid, const uint vid) const;
+                          using AbstractSurfaceMesh<M,V,E,F>::vert_opposite_to; // avoid to hide the most general method
         std::vector<uint> vert_boundary_edges     (const uint vid) const;
         void              vert_switch_id          (const uint vid0, const uint vid1);
         void              vert_remove_unreferenced(const uint vid);
@@ -140,10 +128,6 @@ class Trimesh : public virtual AbstractSurfaceMesh<M,V,E,F>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         int    edge_opposite_to        (const uint fid, const uint vid) const;
-        bool   edge_is_manifold        (const uint eid) const;
-        bool   edge_is_boundary        (const uint eid) const;
-        bool   edges_share_face        (const uint eid1, const uint eid2) const;
-        ipair  edge_shared             (const uint fid0, const uint fid1) const;
         void   edge_switch_id          (const uint eid0, const uint eid1);
         bool   edge_collapse           (const uint eid);
         uint   edge_add                (const uint vid0, const uint vid1);
@@ -151,15 +135,10 @@ class Trimesh : public virtual AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        //using  AbstractSurfaceMesh<M,V,E,F>::face_edge_id; // tell the compiler we want both the get from Abstand ours
-        uint   face_edge_id            (const uint fid, const uint offset) const;
-        int    face_shared             (const uint eid0, const uint eid1) const;
-        double face_mass               (const uint fid) const;
         double face_area               (const uint fid) const;
+        uint   face_edge_id            (const uint fid, const uint offset) const;
         bool   face_is_cap             (const uint fid, const double angle_thresh_deg = 177.0) const;
         bool   face_is_needle          (const uint fid, const double angle_thresh_deg = 3.0) const;
-        int    face_adjacent_along     (const uint fid, const uint vid0, const uint vid1) const;
-        bool   face_is_boundary        (const uint fid) const;
         bool   face_bary_coords        (const uint fid, const vec3d & P, std::vector<double> & wgts) const;
         bool   face_bary_is_vert       (const uint fid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
         bool   face_bary_is_edge       (const uint fid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;

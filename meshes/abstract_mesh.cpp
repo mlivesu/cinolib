@@ -531,16 +531,4 @@ void AbstractMesh<M,V,E,F>::face_set_alpha(const float alpha)
     }
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-bool AbstractMesh<M,V,E,F>::verts_are_ordered_CCW(const uint fid, const uint curr, const uint prev) const
-{
-    uint prev_offset = face_vert_offset(fid, prev);
-    uint curr_offset = face_vert_offset(fid, curr);
-    if (curr_offset == (prev_offset+1)%verts_per_face(fid)) return true;
-    return false;
-}
-
 }

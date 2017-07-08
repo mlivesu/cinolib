@@ -161,7 +161,6 @@ class AbstractMesh
                 const vec3d          & vert                 (const uint vid) const { return verts.at(vid); }
                       vec3d          & vert                 (const uint vid)       { return verts.at(vid); }
                       std::set<uint>   vert_n_ring          (const uint vid, const uint n) const;
-                      bool             verts_are_ordered_CCW(const uint fid, const uint curr, const uint prev) const;
                       bool             verts_are_adjacent   (const uint vid0, const uint vid1) const;
                       bool             vert_is_local_min    (const uint vid, const int tex_coord = U_param) const;
                       bool             vert_is_local_max    (const uint vid, const int tex_coord = U_param) const;
