@@ -84,7 +84,6 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void DrawableTetmesh<M,V,E,F,C>::init_drawable_stuff()
 {
-    drawable_type   = DRAWABLE_TETMESH;
     slicer = MeshSlicer<DrawableTetmesh<M,V,E,F,C>>(*this);
 
     drawlist_in.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;

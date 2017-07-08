@@ -78,7 +78,6 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void DrawablePolygonmesh<M,V,E,F>::init_drawable_stuff()
 {
-    drawable_type   = DRAWABLE_POLYGONMESH;
     slicer = MeshSlicer<Polygonmesh<M,V,E,F>>(*this);
 
     drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;

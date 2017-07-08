@@ -100,7 +100,6 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void DrawableQuadmesh<M,V,E,F>::init_drawable_stuff()
 {
-    drawable_type   = DRAWABLE_QUADMESH;
     slicer = MeshSlicer<Quadmesh<M,V,E,F>>(*this);
 
     drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;

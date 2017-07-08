@@ -48,13 +48,14 @@ class DrawableIsosurface : public Isosurface, public DrawableObject
 {
     public:
 
-        DrawableIsosurface();
+        DrawableIsosurface() {}
         DrawableIsosurface(const Tetmesh<> & m, const float iso_value);
 
-        void   draw(const float scene_size=1) const;
-        vec3d scene_center() const;
-        float scene_radius() const;
-        void  slice(const float, const int, const int, const int) {}
+        void       draw(const float scene_size=1) const;
+        vec3d      scene_center() const;
+        float      scene_radius() const;
+        ObjectType object_type()  const { return DRAWABLE_ISOSURFACE; }
+        void       slice(const float, const int, const int, const int) {}
 };
 
 }

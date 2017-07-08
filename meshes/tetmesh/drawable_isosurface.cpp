@@ -33,18 +33,9 @@
 namespace cinolib
 {
 
-
-CINO_INLINE
-DrawableIsosurface::DrawableIsosurface()
-{
-    drawable_type = DRAWABLE_ISOSURFACE;
-}
-
 CINO_INLINE
 DrawableIsosurface::DrawableIsosurface(const Tetmesh<> & m, const float iso_value) : Isosurface(m, iso_value)
-{
-    drawable_type = DRAWABLE_ISOSURFACE;
-}
+{}
 
 CINO_INLINE
 void DrawableIsosurface::draw(const float) const

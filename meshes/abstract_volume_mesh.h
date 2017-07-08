@@ -28,44 +28,33 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_DRAWABLE_OBJECT_H
-#define CINO_DRAWABLE_OBJECT_H
+#ifndef CINO_ABSTRACT_VOLUME_MESH_H
+#define CINO_ABSTRACT_VOLUME_MESH_H
 
-#include <cinolib/geometry/vec3.h>
-#include <float.h>
+#include <cinolib/meshes/abstract_mesh.h>
 
 namespace cinolib
 {
 
-typedef enum
+template<class M,
+         class V,
+         class E,
+         class F,
+         class C>
+class AbstractVolumeMesh : public AbstractMesh<M,V,E,F>
 {
-    DRAWABLE_TRIMESH       ,
-    DRAWABLE_TETMESH       ,
-    DRAWABLE_QUADMESH      ,
-    DRAWABLE_HEXMESH       ,
-    DRAWABLE_POLYGONMESH   ,
-    DRAWABLE_POLYHEDRALMESH,
-    DRAWABLE_SKELETON      ,
-    DRAWABLE_CURVE         ,
-    DRAWABLE_ISOSURFACE    ,
-    DRAWABLE_VECTOR_FIELD
-}
-ObjectType;
+    std::vector<std::vector<uint>> cells;
 
-class DrawableObject
-{
-    public :
+    std::vector<bool> v_on_srf;
+    std::vector<bool> e_on_srf;
 
-        virtual ObjectType  object_type()                    const = 0;
-        virtual void        draw(const float scene_size = 1) const = 0;  // do rendering
-        virtual vec3d       scene_center()                   const = 0;  // get position in space
-        virtual float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
-        virtual void        slice(const float thresh,
-                                  const int   item,
-                                  const int   sign,
-                                  const int   mode) = 0;
+    std::vector<C> c_data;
 };
 
 }
 
-#endif // CINO_DRAWABLE_OBJECT_H
+#ifndef  CINO_STATIC_LIB
+#include "abstract_volume_mesh.cpp"
+#endif
+
+#endif // CINO_ABSTRACT_VOLUME_MESH_H

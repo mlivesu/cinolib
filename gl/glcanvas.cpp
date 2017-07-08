@@ -139,7 +139,7 @@ bool GLcanvas::pop_first_occurrence_of(int type)
     {
         const DrawableObject *obj = *it;
 
-        if (obj->drawable_type == type)
+        if (obj->object_type() == type)
         {
             drawlist.erase(it);
             return true;

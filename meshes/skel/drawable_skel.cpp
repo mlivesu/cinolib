@@ -73,7 +73,6 @@ DrawableSkel::DrawableSkel(const std::vector<double> & coords, const std::vector
 CINO_INLINE
 void DrawableSkel::init()
 {
-    drawable_type      = DRAWABLE_SKELETON;
     draw_mode = DRAW_SKEL | DRAW_BONES | DRAW_STD_COLOR | DRAW_FEATURE_POINTS;
 
     bone_thickness_modifier = 1.0;

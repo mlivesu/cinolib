@@ -44,20 +44,16 @@ class DrawableVectorField : public VectorField, public DrawableObject
 {
     public:
 
-        DrawableVectorField()
-        {
-            drawable_type = DRAWABLE_VECTOR_FIELD;
-        }
+        DrawableVectorField() {}
 
         DrawableVectorField(const Mesh & m) : VectorField(m.num_elems())
         {
-            drawable_type  = DRAWABLE_VECTOR_FIELD;
             m_ptr = &m;
-
             set_arrow_color(Color::RED());
             set_arrow_size(0.5);
         }
 
+        ObjectType object_type() const { return DRAWABLE_VECTOR_FIELD; }
 
         void draw(const float) const
         {

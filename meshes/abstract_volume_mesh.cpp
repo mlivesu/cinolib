@@ -28,44 +28,9 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_DRAWABLE_OBJECT_H
-#define CINO_DRAWABLE_OBJECT_H
-
-#include <cinolib/geometry/vec3.h>
-#include <float.h>
+#include <cinolib/meshes/abstract_volume_mesh.h>
 
 namespace cinolib
 {
 
-typedef enum
-{
-    DRAWABLE_TRIMESH       ,
-    DRAWABLE_TETMESH       ,
-    DRAWABLE_QUADMESH      ,
-    DRAWABLE_HEXMESH       ,
-    DRAWABLE_POLYGONMESH   ,
-    DRAWABLE_POLYHEDRALMESH,
-    DRAWABLE_SKELETON      ,
-    DRAWABLE_CURVE         ,
-    DRAWABLE_ISOSURFACE    ,
-    DRAWABLE_VECTOR_FIELD
 }
-ObjectType;
-
-class DrawableObject
-{
-    public :
-
-        virtual ObjectType  object_type()                    const = 0;
-        virtual void        draw(const float scene_size = 1) const = 0;  // do rendering
-        virtual vec3d       scene_center()                   const = 0;  // get position in space
-        virtual float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
-        virtual void        slice(const float thresh,
-                                  const int   item,
-                                  const int   sign,
-                                  const int   mode) = 0;
-};
-
-}
-
-#endif // CINO_DRAWABLE_OBJECT_H

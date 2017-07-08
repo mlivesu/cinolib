@@ -74,9 +74,10 @@ class DrawableTetmesh : public Tetmesh<M,V,E,F,C>, public DrawableObject
 
     public:
 
-        void  draw(const float scene_size=1) const;
-        vec3d scene_center() const { return this->bb.center(); }
-        float scene_radius() const { return this->bb.diag();   }
+        void       draw(const float scene_size=1) const;
+        vec3d      scene_center() const { return this->bb.center(); }
+        float      scene_radius() const { return this->bb.diag();   }
+        ObjectType object_type()  const { return DRAWABLE_TETMESH;  }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

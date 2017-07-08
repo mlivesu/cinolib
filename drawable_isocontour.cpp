@@ -37,15 +37,8 @@ namespace cinolib
 {
 
 CINO_INLINE
-DrawableIsocontour::DrawableIsocontour()
-{
-    drawable_type = DRAWABLE_CURVE;
-}
-
-CINO_INLINE
 DrawableIsocontour::DrawableIsocontour(Trimesh<> & m, float value) : Isocontour(m, value)
 {
-    drawable_type   = DRAWABLE_CURVE;
     color_cylind = Color::YELLOW();
     color_centre = Color::BLUE();
     color_sample = Color::RED();
