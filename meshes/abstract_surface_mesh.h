@@ -44,6 +44,17 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 {
     public:
 
+        void               normalize_area();
+        void               translate(const vec3d & delta);
+        void               rotate(const vec3d & axis, const double angle);
+        vec3d              centroid() const;
+        std::vector<uint>  get_boundary_vertices() const;
+        std::vector<ipair> get_boundary_edges() const;
+        uint               connected_components() const;
+        uint               connected_components(std::vector<std::set<uint>> & ccs) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         uint              vert_opposite_to      (const uint eid, const uint vid) const;
         double            vert_area             (const uint vid) const;
         double            vert_mass             (const uint vid) const;

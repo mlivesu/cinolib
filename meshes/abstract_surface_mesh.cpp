@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/abstract_surface_mesh.h>
+#include <cinolib/bfs.h>
 
 namespace cinolib
 {
@@ -327,6 +328,130 @@ double AbstractSurfaceMesh<M,V,E,F>::face_mass(const uint fid) const
     return face_area(fid);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::normalize_area()
+{
+    double area = 0.0;
+    for(uint fid=0; fid<this->num_faces(); ++fid) area += this->elem_mass(fid);
+    area = std::max(1e-4,area); // avoid creating degenerate faces...
+    double s = 1.0 / sqrt(area);
+    for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) *= s;
+    this->update_bbox();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+vec3d AbstractSurfaceMesh<M,V,E,F>::centroid() const
+{
+    vec3d bary(0,0,0);
+    for(auto p : this->verts) bary += p;
+    if (this->num_verts() > 0) bary/=static_cast<double>(this->num_verts());
+    return bary;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::translate(const vec3d & delta)
+{
+    for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) += delta;
+    this->update_bbox();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::rotate(const vec3d & axis, const double angle)
+{
+    double R[3][3];
+    bake_rotation_matrix(axis, angle, R);
+    //
+    vec3d c = centroid();
+    //
+    for(uint vid=0; vid<this->num_verts(); ++vid)
+    {
+        this->vert(vid) -= c;
+        transform(this->vert(vid), R);
+        this->vert(vid) += c;
+    }
+    //
+    this->update_bbox();
+    this->update_normals();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<ipair> AbstractSurfaceMesh<M,V,E,F>::get_boundary_edges() const
+{
+    std::vector<ipair> res;
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if (this->edge_is_boundary(eid))
+        {
+            ipair e;
+            e.first  = this->edge_vert_id(eid,0);
+            e.second = this->edge_vert_id(eid,1);
+            res.push_back(e);
+        }
+    }
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::get_boundary_vertices() const
+{
+    std::vector<uint> res;
+    for(uint vid=0; vid<this->num_verts(); ++vid) if (this->vert_is_boundary(vid)) res.push_back(vid);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+uint AbstractSurfaceMesh<M,V,E,F>::connected_components() const
+{
+    std::vector<std::set<uint>> ccs;
+    return connected_components(ccs);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+uint AbstractSurfaceMesh<M,V,E,F>::connected_components(std::vector<std::set<uint>> & ccs) const
+{
+    ccs.clear();
+    uint seed = 0;
+    std::vector<bool> visited(this->num_verts(), false);
+
+    do
+    {
+        std::set<uint> cc;
+        bfs_exahustive<AbstractSurfaceMesh<M,V,E,F>>(*this, seed, cc);
+
+        ccs.push_back(cc);
+        for(uint vid : cc) visited.at(vid) = true;
+
+        seed = 0;
+        while (seed < this->num_verts() && visited.at(seed)) ++seed;
+    }
+    while (seed < this->num_verts());
+
+    return ccs.size();
+}
 
 
 }

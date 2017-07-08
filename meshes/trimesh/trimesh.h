@@ -104,18 +104,6 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void               center_bbox();
-        void               normalize_area();
-        void               translate(const vec3d & delta);
-        void               rotate(const vec3d & axis, const double angle);
-        vec3d              centroid() const;
-        uint               connected_components() const;
-        uint               connected_components(std::vector<std::set<uint>> & ccs) const;
-        std::vector<uint>  get_boundary_vertices() const;
-        std::vector<ipair> get_boundary_edges() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         bool              vert_is_saddle          (const uint vid, const int tex_coord = U_param) const;
         bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
         uint              vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;

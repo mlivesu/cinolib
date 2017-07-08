@@ -93,6 +93,7 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+                void center_bbox();
                 void update_bbox();
         virtual void update_adjacency() = 0;
         virtual void update_f_normal(const uint fid) = 0;

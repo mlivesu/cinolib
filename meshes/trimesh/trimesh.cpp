@@ -29,7 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/trimesh/trimesh.h>
-#include <cinolib/bfs.h>
 #include <cinolib/timer.h>
 #include <cinolib/io/read_write.h>
 
@@ -302,32 +301,6 @@ void Trimesh<M,V,E,F>::update_f_normal(const uint fid)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Trimesh<M,V,E,F>::normalize_area()
-{
-    double area = 0.0;
-    for(uint fid=0; fid<this->num_faces(); ++fid) area += elem_mass(fid);
-    area = std::max(1e-4,area); // avoid creating degenerate faces...
-    double s = 1.0 / sqrt(area);
-    for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) *= s;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Trimesh<M,V,E,F>::center_bbox()
-{
-    this->update_bbox();
-    vec3d center = this->bb.center();
-    for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) -= center;
-    this->bb.min -= center;
-    this->bb.max -= center;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
 uint Trimesh<M,V,E,F>::elem_vert_id(const uint fid, const uint offset) const
 {
     return this->face_vert_id(fid,offset);
@@ -439,86 +412,6 @@ void Trimesh<M,V,E,F>::operator+=(const Trimesh<M,V,E,F> & m)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d Trimesh<M,V,E,F>::centroid() const
-{
-    vec3d bary(0,0,0);
-    for(auto p : this->verts) bary += p;
-    if (this->num_verts() > 0) bary/=static_cast<double>(this->num_verts());
-    return bary;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Trimesh<M,V,E,F>::translate(const vec3d & delta)
-{
-    for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) += delta;
-    this->update_bbox();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Trimesh<M,V,E,F>::rotate(const vec3d & axis, const double angle)
-{
-    double R[3][3];
-    bake_rotation_matrix(axis, angle, R);
-    //
-    vec3d c = centroid();
-    //
-    for(uint vid=0; vid<this->num_verts(); ++vid)
-    {
-        this->vert(vid) -= c;
-        transform(this->vert(vid), R);
-        this->vert(vid) += c;
-    }
-    //
-    this->update_bbox();
-    this->update_normals();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-uint Trimesh<M,V,E,F>::connected_components() const
-{
-    std::vector<std::set<uint>> ccs;
-    return connected_components(ccs);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-uint Trimesh<M,V,E,F>::connected_components(std::vector<std::set<uint>> &) const
-{
-//    ccs.clear();
-//    uint seed = 0;
-//    std::vector<bool> visited(num_verts(), false);
-
-//    do
-//    {
-//        std::set<uint> cc;
-//        bfs_exahustive<Trimesh<M,V,E,F>>(*this, seed, cc);
-
-//        ccs.push_back(cc);
-//        for(uint vid : cc) visited.at(vid) = true;
-
-//        seed = 0;
-//        while (seed < num_verts() && visited.at(seed)) ++seed;
-//    }
-//    while (seed < num_verts());
-
-//    return ccs.size();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
 int Trimesh<M,V,E,F>::edge_opposite_to(const uint fid, const uint vid) const
 {
     assert(this->face_contains_vert(fid, vid));
@@ -528,37 +421,6 @@ int Trimesh<M,V,E,F>::edge_opposite_to(const uint fid, const uint vid) const
             this->edge_vert_id(eid,1) != vid) return eid;
     }
     return -1;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-std::vector<ipair> Trimesh<M,V,E,F>::get_boundary_edges() const
-{
-    std::vector<ipair> res;
-    for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
-        if (this->edge_is_boundary(eid))
-        {
-            ipair e;
-            e.first  = this->edge_vert_id(eid,0);
-            e.second = this->edge_vert_id(eid,1);
-            res.push_back(e);
-        }
-    }
-    return res;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-std::vector<uint> Trimesh<M,V,E,F>::get_boundary_vertices() const
-{
-    std::vector<uint> res;
-    for(uint vid=0; vid<this->num_verts(); ++vid) if (this->vert_is_boundary(vid)) res.push_back(vid);
-    return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -531,4 +531,19 @@ void AbstractMesh<M,V,E,F>::face_set_alpha(const float alpha)
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractMesh<M,V,E,F>::center_bbox()
+{
+    vec3d center = bb.center();
+    for(uint vid=0; vid<num_verts(); ++vid) vert(vid) -= center;
+    bb.min -= center;
+    bb.max -= center;
+    update_bbox();
+}
+
+
+
 }
