@@ -33,10 +33,8 @@
 
 #include <vector>
 #include <cinolib/cinolib.h>
-#include <cinolib/bbox.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/meshes/abstract_surface_mesh.h>
 #include <cinolib/meshes/mesh_std_data.h>
-
 
 namespace cinolib
 {
@@ -45,8 +43,12 @@ template<class M = Mesh_std_data, // default template arguments
          class V = Vert_std_data,
          class E = Edge_std_data,
          class F = Face_std_data>
-class Polygonmesh
+class Polygonmesh : public AbstractSurfaceMesh<M,V,E,F>
 {
+    protected:
+
+        std::vector<std::vector<uint>> tessellated_faces; // triangles covering each face.Useful for
+                                                          // robust normal estimation and rendering
     public:
 
         Polygonmesh(){}
@@ -59,128 +61,52 @@ class Polygonmesh
         Polygonmesh(const std::vector<double>            & coords,
                     const std::vector<std::vector<uint>> & faces);
 
-    protected:
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Bbox bb;
-
-        std::vector<vec3d>             verts;
-        std::vector<uint>              edges;
-        std::vector<std::vector<uint>> faces;
-        std::vector<std::vector<uint>> tessellated_faces; // triangles covering each face.Useful for
-                                                          // robust normal estimation and rendering
-        // attributes
-        //
-        M              m_data;
-        std::vector<V> v_data;
-        std::vector<E> e_data;
-        std::vector<F> f_data;
-
-        // adjacencies -- Yes, I have lots of memory ;)
-        //
-        std::vector<std::vector<uint>> v2v; // vert to vert adjacency
-        std::vector<std::vector<uint>> v2e; // vert to edge adjacency
-        std::vector<std::vector<uint>> v2f; // vert to face adjacency
-        std::vector<std::vector<uint>> e2f; // edge to face adjacency
-        std::vector<std::vector<uint>> f2e; // face to edge adjacency
-        std::vector<std::vector<uint>> f2f; // face to face adjacency
-
-    public:
-
-        void clear();
-        void init();
-        void load(const char * filename);
-        void save(const char * filename) const;
+        MeshType mesh_type() const { return POLYGONMESH; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_adjacency();
-        void update_bbox();
-        void update_f_normals();
-        void update_v_normals();
-        void update_normals();
+        void clear();
+        void init();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void update_f_normal(const uint fid);
         void update_face_tessellation();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_face(const uint fid) const { return faces.at(fid).size(); }
+        uint verts_per_face(const uint fid) const { return this->faces.at(fid).size(); }
+        uint verts_per_elem(const uint fid) const { return this->faces.at(fid).size(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint num_verts() const { return verts.size();   }
-        uint num_edges() const { return edges.size()/2; }
-        uint num_faces() const { return faces.size();   }
-        uint num_elems() const { return faces.size();   } // elem == face!!
+        uint num_elems() const { return this->faces.size(); } // elem == face!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const Bbox                           & bbox()          const { return bb;    }
-        const std::vector<uint>              & vector_edges()  const { return edges; }
-        const std::vector<vec3d>             & vector_verts()  const { return verts; }
-        const std::vector<std::vector<uint>> & vector_faces()  const { return faces; }
-              std::vector<double>              vector_coords() const;
+        const std::vector<uint> & adj_elem2elem(const uint fid) const { return this->f2f.at(fid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<float> export_uvw_param(const int mode) const;
-        std::vector<Color> export_per_face_colors() const;
+        const F & elem_data(const uint fid) const { return this->f_data.at(fid); } // elem == face!!
+              F & elem_data(const uint fid)       { return this->f_data.at(fid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
-        const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
-        const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
-        const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
-        const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
-        const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
+        double face_area         (const uint fid) const;
+        int    face_opposite_to  (const uint eid, const uint fid) const;
+        bool   face_contains_edge(const uint fid, const uint eid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const M & mesh_data()               const { return m_data;         }
-              M & mesh_data()                     { return m_data;         }
-        const V & vert_data(const uint vid) const { return v_data.at(vid); }
-              V & vert_data(const uint vid)       { return v_data.at(vid); }
-        const E & edge_data(const uint eid) const { return e_data.at(eid); }
-              E & edge_data(const uint eid)       { return e_data.at(eid); }
-        const F & face_data(const uint fid) const { return f_data.at(fid); }
-              F & face_data(const uint fid)       { return f_data.at(fid); }
-        const F & elem_data(const uint fid) const { return f_data.at(fid); } // elem == face!!
-              F & elem_data(const uint fid)       { return f_data.at(fid); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-  const vec3d & vert          (const uint vid) const { return verts.at(vid); }
-        vec3d & vert          (const uint vid)       { return verts.at(vid); }
-        void    vert_set_color(const Color & c);
-        void    vert_set_alpha(const float alpha);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d edge_vert       (const uint eid, const uint offset) const;
-        uint  edge_vert_id    (const uint eid, const uint offset) const;
-        bool  edge_is_manifold(const uint eid) const;
-        bool  edge_is_boundary(const uint eid) const;
-        void  edge_set_color  (const Color & c);
-        void  edge_set_alpha  (const float alpha);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d face_vert         (const uint fid, const uint offset) const;
-        uint  face_vert_id      (const uint fid, const uint offset) const;
-        vec3d face_centroid     (const uint fid) const;
-        int   face_opposite_to  (const uint eid, const uint fid) const;
-        bool  face_contains_edge(const uint fid, const uint eid) const;
-        void  face_set_color    (const Color & c);
-        void  face_set_alpha    (const float alpha);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        // These are all wraps for the "face_ methods". They are useful for generic
-        // programming, because "elem_" will wrap face_ for surface meshes and wrap
-        // "cell_" for volumetric meshes, allowing the use of templated algorithms
-        // that work with both types of meshes without requiring specialzed code
-
-        vec3d elem_centroid(const uint fid) const;
-        void  elem_show_all();
+        vec3d  elem_centroid(const uint fid) const;
+        void   elem_show_all();
+        vec3d  elem_vert       (const uint eid, const uint offset) const;
+        uint   elem_vert_id    (const uint eid, const uint offset) const;
+        uint   elem_vert_offset(const uint eid, const uint vid) const;
+        double elem_mass       (const uint eid) const;
 };
 
 }

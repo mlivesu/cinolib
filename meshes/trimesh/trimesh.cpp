@@ -29,8 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/trimesh/trimesh.h>
-#include <cinolib/timer.h>
-#include <cinolib/io/read_write.h>
 
 namespace cinolib
 {
@@ -41,7 +39,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 Trimesh<M,V,E,F>::Trimesh(const char * filename)
 {
-    load(filename);
+    this->load(filename);
     init();
 }
 
@@ -98,76 +96,6 @@ Trimesh<M,V,E,F>::Trimesh(const std::vector<double> & coords,
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Trimesh<M,V,E,F>::load(const char * filename)
-{
-    timer_start("Load Mesh");
-
-    clear();
-    std::vector<double> coords;
-
-    std::string str(filename);
-    std::string filetype = str.substr(str.size()-4,4);
-
-    if (filetype.compare(".off") == 0 ||
-        filetype.compare(".OFF") == 0)
-    {
-        read_OFF(filename, coords, this->faces);
-    }
-    else if (filetype.compare(".obj") == 0 ||
-             filetype.compare(".OBJ") == 0)
-    {
-        read_OBJ(filename, coords, this->faces);
-    }
-    else
-    {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
-        exit(-1);
-    }
-    for(const auto & f : this->faces) assert(f.size() == 3);
-
-    this->verts = vec3d_from_serialized_xyz(coords);
-
-    this->mesh_data().filename = std::string(filename);
-
-    timer_stop("Load Mesh");
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Trimesh<M,V,E,F>::save(const char * filename) const
-{
-    timer_start("Save Mesh");
-
-    std::vector<double> coords = serialized_xyz_from_vec3d(this->verts);
-
-    std::string str(filename);
-    std::string filetype = str.substr(str.size()-3,3);
-
-    if (filetype.compare("off") == 0 ||
-        filetype.compare("OFF") == 0)
-    {
-        write_OFF(filename, coords, this->faces);
-    }
-    else if (filetype.compare("obj") == 0 ||
-             filetype.compare("OBJ") == 0)
-    {
-        write_OBJ(filename, coords, this->faces);
-    }
-    else
-    {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
-        exit(-1);
-    }
-
-    timer_stop("Save Mesh");
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
 void Trimesh<M,V,E,F>::clear()
 {
     this->bb.reset();
@@ -196,7 +124,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Trimesh<M,V,E,F>::init()
 {
-    update_adjacency();
+    this->update_adjacency();
     this->update_bbox();
 
     this->v_data.resize(this->num_verts());
@@ -204,83 +132,6 @@ void Trimesh<M,V,E,F>::init()
     this->f_data.resize(this->num_faces());
 
     this->update_normals();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Trimesh<M,V,E,F>::update_adjacency()
-{
-    timer_start("Build adjacency");
-
-    this->v2v.clear(); this->v2v.resize(this->num_verts());
-    this->v2e.clear(); this->v2e.resize(this->num_verts());
-    this->v2f.clear(); this->v2f.resize(this->num_verts());
-    this->f2f.clear(); this->f2f.resize(this->num_faces());
-    this->f2e.clear(); this->f2e.resize(this->num_faces());
-
-    std::map<ipair,std::vector<uint>> e2f_map;
-    for(uint fid=0; fid<this->num_faces(); ++fid)
-    {
-        for(uint offset=0; offset<this->verts_per_face(fid); ++offset)
-        {
-            uint vid0 = this->face_vert_id(fid,offset);
-            uint vid1 = this->face_vert_id(fid,(offset+1)%this->verts_per_face(fid));
-            this->v2f.at(vid0).push_back(fid);
-            e2f_map[unique_pair(vid0,vid1)].push_back(fid);
-        }
-    }
-
-    this->edges.clear();
-    this->e2f.clear();
-    this->e2f.resize(e2f_map.size());
-
-    uint fresh_id = 0;
-    for(auto e2f_it : e2f_map)
-    {
-        ipair e    = e2f_it.first;
-        uint  eid  = fresh_id++;
-        uint  vid0 = e.first;
-        uint  vid1 = e.second;
-
-        this->edges.push_back(vid0);
-        this->edges.push_back(vid1);
-
-        this->v2v.at(vid0).push_back(vid1);
-        this->v2v.at(vid1).push_back(vid0);
-
-        this->v2e.at(vid0).push_back(eid);
-        this->v2e.at(vid1).push_back(eid);
-
-        std::vector<uint> fids = e2f_it.second;
-        for(uint fid : fids)
-        {
-            this->f2e.at(fid).push_back(eid);
-            this->e2f.at(eid).push_back(fid);
-            for(uint adj_fid : fids) if (fid != adj_fid) this->f2f.at(fid).push_back(adj_fid);
-        }
-
-        // MANIFOLDNESS CHECKS
-        //
-        bool is_manifold = (fids.size() > 2 || fids.size() < 1);
-        if (is_manifold && !support_non_manifold_edges)
-        {
-            std::cerr << "Non manifold edge found! To support non manifoldness,";
-            std::cerr << "enable the 'support_non_manifold_edges' flag in cinolib.h" << endl;
-            assert(false);
-        }
-        if (is_manifold && print_non_manifold_edges)
-        {
-            std::cerr << "Non manifold edge! (" << vid0 << "," << vid1 << ")" << endl;
-        }
-    }
-
-    logger << this->num_verts() << "\tverts" << endl;
-    logger << this->num_faces() << "\tfaces" << endl;
-    logger << this->num_edges() << "\tedges" << endl;
-
-    timer_stop("Build adjacency");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

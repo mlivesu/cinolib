@@ -72,8 +72,6 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
 
         void clear();
         void init();
-        void load(const char * filename);
-        void save(const char * filename) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -81,7 +79,6 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_adjacency();
         void update_f_normal(const uint fid);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -136,11 +133,6 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
         void   face_remove_unreferenced(const uint fid);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        // These are all wraps for the "face_ methods". They are useful for generic
-        // programming, because "elem_" will wrap face_ for surface meshes and wrap
-        // "cell_" for volumetric meshes, allowing the use of templated algorithms
-        // that work with both types of meshes without requiring specialzed code
 
         vec3d  elem_vert        (const uint fid, const uint offset) const;
         uint   elem_vert_id     (const uint fid, const uint offset) const;

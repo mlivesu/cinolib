@@ -544,6 +544,4 @@ void AbstractMesh<M,V,E,F>::center_bbox()
     update_bbox();
 }
 
-
-
 }

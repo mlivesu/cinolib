@@ -44,6 +44,15 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 {
     public:
 
+        void load(const char * filename);
+        void save(const char * filename) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void update_adjacency();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void               normalize_area();
         void               translate(const vec3d & delta);
         void               rotate(const vec3d & axis, const double angle);

@@ -29,9 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/polygonmesh/polygonmesh.h>
-#include <cinolib/common.h>
-#include <cinolib/io/read_write.h>
-#include <cinolib/timer.h>
 #include <cinolib/geometry/plane.h>
 #include <map>
 
@@ -44,7 +41,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 Polygonmesh<M,V,E,F>::Polygonmesh(const char * filename)
 {
-    load(filename);
+    this->load(filename);
     init();
 }
 
@@ -54,9 +51,9 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<vec3d>             & verts,
                                   const std::vector<std::vector<uint>> & faces)
-: verts(verts)
-, faces(faces)
 {
+    this->verts = verts;
+    this->faces = faces;
     init();
 }
 
@@ -69,80 +66,7 @@ Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<double>            & coords,
 {
     this->verts = vec3d_from_serialized_xyz(coords);
     this->faces = faces;
-
     init();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Polygonmesh<M,V,E,F>::load(const char * filename)
-{
-    timer_start("Load Polygonmesh");
-
-    clear();
-    std::vector<double> coords;
-
-    std::string str(filename);
-    std::string filetype = str.substr(str.size()-4,4);
-
-    if (filetype.compare(".off") == 0 ||
-        filetype.compare(".OFF") == 0)
-    {
-        read_OFF(filename, coords, faces);
-    }
-    else if (filetype.compare(".obj") == 0 ||
-             filetype.compare(".OBJ") == 0)
-    {
-        read_OBJ(filename, coords, faces);
-    }
-    else
-    {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
-        exit(-1);
-    }
-
-    verts = vec3d_from_serialized_xyz(coords);
-
-    logger << num_faces() << " polygons read" << endl;
-    logger << num_verts() << " vertices read" << endl;
-
-    this->mesh_data().filename = std::string(filename);
-
-    timer_stop("Load Polygonmesh");
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Polygonmesh<M,V,E,F>::save(const char * filename) const
-{
-    timer_start("Save Polygonmesh");
-
-    std::vector<double> coords = serialized_xyz_from_vec3d(verts);
-
-    std::string str(filename);
-    std::string filetype = str.substr(str.size()-3,3);
-
-    if (filetype.compare("off") == 0 ||
-        filetype.compare("OFF") == 0)
-    {
-        write_OFF(filename, coords, faces);
-    }
-    else if (filetype.compare(".obj") == 0 ||
-             filetype.compare(".OBJ") == 0)
-    {
-        write_OBJ(filename, coords, faces);
-    }
-    else
-    {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
-        exit(-1);
-    }
-
-    timer_stop("Save Polygonmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -151,24 +75,24 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Polygonmesh<M,V,E,F>::clear()
 {
-    bb.reset();
+    this->bb.reset();
     //
-    verts.clear();
-    edges.clear();
-    faces.clear();
+    this->verts.clear();
+    this->edges.clear();
+    this->faces.clear();
     //
     M std_M_data;
-    m_data = std_M_data;
-    v_data.clear();
-    e_data.clear();
-    f_data.clear();
+    this->m_data = std_M_data;
+    this->v_data.clear();
+    this->e_data.clear();
+    this->f_data.clear();
     //
-    v2v.clear();
-    v2e.clear();
-    v2f.clear();
-    e2f.clear();
-    f2e.clear();
-    f2f.clear();
+    this->v2v.clear();
+    this->v2e.clear();
+    this->v2f.clear();
+    this->e2f.clear();
+    this->f2e.clear();
+    this->f2f.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -178,14 +102,15 @@ CINO_INLINE
 void Polygonmesh<M,V,E,F>::init()
 {
     update_face_tessellation();
-    update_adjacency();
-    update_bbox();
 
-    v_data.resize(num_verts());
-    e_data.resize(num_edges());
-    f_data.resize(num_faces());
+    this->update_adjacency();
+    this->update_bbox();
 
-    update_normals();
+    this->v_data.resize(this->num_verts());
+    this->e_data.resize(this->num_edges());
+    this->f_data.resize(this->num_faces());
+
+    this->update_normals();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -194,24 +119,24 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Polygonmesh<M,V,E,F>::update_face_tessellation()
 {
-    tessellated_faces.resize(num_faces());
+    tessellated_faces.resize(this->num_faces());
     std::set<uint> bad_faces;
 
-    for(uint fid=0; fid<num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_faces(); ++fid)
     {
         // TODO: improve triangulation strategy (this assumes convexity!)
         std::vector<vec3d> n;
-        for (uint i=2; i<verts_per_face(fid); ++i)
+        for (uint i=2; i<this->verts_per_face(fid); ++i)
         {
-            uint vid0 = faces.at(fid).at( 0 );
-            uint vid1 = faces.at(fid).at(i-1);
-            uint vid2 = faces.at(fid).at( i );
+            uint vid0 = this->faces.at(fid).at( 0 );
+            uint vid1 = this->faces.at(fid).at(i-1);
+            uint vid2 = this->faces.at(fid).at( i );
 
             tessellated_faces.at(fid).push_back(vid0);
             tessellated_faces.at(fid).push_back(vid1);
             tessellated_faces.at(fid).push_back(vid2);
 
-            n.push_back((vert(vid1)-vert(vid0)).cross(vert(vid2)-vert(vid0)));
+            n.push_back((this->vert(vid1)-this->vert(vid0)).cross(this->vert(vid2)-this->vert(vid0)));
         }
         // check for badly tessellated polygons...
         for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_faces.insert(fid);
@@ -228,196 +153,31 @@ void Polygonmesh<M,V,E,F>::update_face_tessellation()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_adjacency()
+double Polygonmesh<M,V,E,F>::face_area(const uint /*fid*/) const
 {
-    timer_start("Build adjacency");
-
-    v2v.clear(); v2v.resize(num_verts());
-    v2e.clear(); v2e.resize(num_verts());
-    v2f.clear(); v2f.resize(num_verts());
-    f2f.clear(); f2f.resize(num_faces());
-    f2e.clear(); f2e.resize(num_faces());
-
-    std::map<ipair,std::vector<uint>> e2f_map;
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        assert(verts_per_face(fid)>2);
-        for(uint off=0; off<verts_per_face(fid); ++off)
-        {
-            uint vid0 = faces.at(fid).at(off);
-            uint vid1 = faces.at(fid).at((off+1)%verts_per_face(fid));
-            v2f.at(vid0).push_back(fid);
-            e2f_map[unique_pair(vid0,vid1)].push_back(fid);
-        }
-    }
-
-    edges.clear();
-    e2f.clear();
-    e2f.resize(e2f_map.size());
-
-    uint fresh_id = 0;
-    for(auto e2f_it : e2f_map)
-    {
-        ipair e    = e2f_it.first;
-        uint  eid  = fresh_id++;
-        uint  vid0 = e.first;
-        uint  vid1 = e.second;
-
-        edges.push_back(vid0);
-        edges.push_back(vid1);
-
-        v2v.at(vid0).push_back(vid1);
-        v2v.at(vid1).push_back(vid0);
-
-        v2e.at(vid0).push_back(eid);
-        v2e.at(vid1).push_back(eid);
-
-        std::vector<uint> fids = e2f_it.second;
-        for(uint fid : fids)
-        {
-            f2e.at(fid).push_back(eid);
-            e2f.at(eid).push_back(fid);
-            for(uint adj_fid : fids) if (fid != adj_fid) f2f.at(fid).push_back(adj_fid);
-        }
-
-        // MANIFOLDNESS CHECKS
-        //
-        bool is_manifold = (fids.size() > 2 || fids.size() < 1);
-        if (is_manifold && !support_non_manifold_edges)
-        {
-            std::cerr << "Non manifold edge found! To support non manifoldness,";
-            std::cerr << "enable the 'support_non_manifold_edges' flag in cinolib.h" << endl;
-            assert(false);
-        }
-        if (is_manifold && print_non_manifold_edges)
-        {
-            std::cerr << "Non manifold edge! (" << vid0 << "," << vid1 << ")" << endl;
-        }
-    }
-
-    logger << num_verts() << "\tverts" << endl;
-    logger << num_faces() << "\tfaces" << endl;
-    logger << num_edges() << "\tedges" << endl;
-
-    timer_stop("Build adjacency");
+    assert(false); // TODO!
+    return -1.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_bbox()
+void Polygonmesh<M,V,E,F>::update_f_normal(const uint fid)
 {
-    bb.reset();
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        vec3d v = vert(vid);
-        bb.min = bb.min.min(v);
-        bb.max = bb.max.max(v);
-    }
-}
+    // compute the best fitting plane
+    std::vector<vec3d> points;
+    for(uint off=0; off<this->verts_per_face(fid); ++off) points.push_back(this->face_vert(fid,off));
+    Plane best_fit(points);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    // adjust orientation (n or -n?)
+    vec3d v0 = this->face_vert(fid,0);
+    vec3d v1 = this->face_vert(fid,1);
+    uint  i=2;
+    vec3d ccw;
+    do { ccw = (v1-v0).cross(this->face_vert(fid,i)-v0);  ++i; } while (ccw.length_squared()==0 && i<this->verts_per_face(fid));
 
-template<class M, class V, class E, class F>
-CINO_INLINE
-std::vector<double> Polygonmesh<M,V,E,F>::vector_coords() const
-{
-    std::vector<double> coords;
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        coords.push_back(vert(vid).x());
-        coords.push_back(vert(vid).y());
-        coords.push_back(vert(vid).z());
-    }
-    return coords;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_f_normals()
-{
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        assert(verts_per_face(fid)>2);
-
-        // compute the best fitting plane
-        std::vector<vec3d> points;
-        for(uint off=0; off<verts_per_face(fid); ++off) points.push_back(face_vert(fid,off));
-        Plane best_fit(points);
-
-        // adjust orientation (n or -n?)
-        vec3d v0 = face_vert(fid,0);
-        vec3d v1 = face_vert(fid,1);
-        uint  i=2;
-        vec3d ccw;
-        do { ccw = (v1-v0).cross(face_vert(fid,i)-v0);  ++i; } while (ccw.length_squared()==0 && i<verts_per_face(fid));
-
-        face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_v_normals()
-{
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        vec3d n(0,0,0);
-        for(uint fid : adj_v2f(vid))
-        {
-            n += face_data(fid).normal;
-        }
-        n.normalize();
-        vert_data(vid).normal = n;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_normals()
-{
-    update_f_normals();
-    update_v_normals();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-uint Polygonmesh<M,V,E,F>::face_vert_id(const uint fid, const uint offset) const
-{
-    return faces.at(fid).at(offset);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-vec3d Polygonmesh<M,V,E,F>::face_vert(const uint fid, const uint offset) const
-{
-    return vert(face_vert_id(fid,offset));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-vec3d Polygonmesh<M,V,E,F>::face_centroid(const uint fid) const
-{
-    vec3d c(0,0,0);
-    for(uint vid : faces.at(fid))
-    {
-        c += vert(vid);
-    }
-    c /= static_cast<double>(verts_per_face(fid));
-    return c;
+    this->face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -427,12 +187,12 @@ CINO_INLINE
 int Polygonmesh<M,V,E,F>::face_opposite_to(const uint eid, const uint fid) const
 {
     assert(face_contains_edge(fid,eid));
-    assert(edge_is_manifold(eid));
-    assert(!adj_e2f(eid).empty());
+    assert(this->edge_is_manifold(eid));
+    assert(!this->adj_e2f(eid).empty());
 
-    if (edge_is_boundary(eid)) return -1;
-    if (adj_e2f(eid).front() != fid) return adj_e2f(eid).front();
-    return adj_e2f(eid).back();
+    if (this->edge_is_boundary(eid)) return -1;
+    if (this->adj_e2f(eid).front() != fid) return this->adj_e2f(eid).front();
+    return this->adj_e2f(eid).back();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -441,26 +201,8 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 bool Polygonmesh<M,V,E,F>::face_contains_edge(const uint fid, const uint eid) const
 {
-    for(uint e : adj_f2e(fid)) if (e == eid) return true;
+    for(uint e : this->adj_f2e(fid)) if (e == eid) return true;
     return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-bool Polygonmesh<M,V,E,F>::edge_is_manifold(const uint eid) const
-{
-    return (adj_e2f(eid).size() <= 2);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-bool Polygonmesh<M,V,E,F>::edge_is_boundary(const uint eid) const
-{
-    return (adj_e2f(eid).size() < 2);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -469,26 +211,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 vec3d Polygonmesh<M,V,E,F>::elem_centroid(const uint fid) const
 {
-    return face_centroid(fid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-uint Polygonmesh<M,V,E,F>::edge_vert_id(const uint eid, const uint offset) const
-{
-    uint   eid_ptr = eid * 2;
-    return edges.at(eid_ptr + offset);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-vec3d Polygonmesh<M,V,E,F>::edge_vert(const uint eid, const uint offset) const
-{
-    return vert(edge_vert_id(eid,offset));
+    return this->face_centroid(fid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -497,9 +220,9 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Polygonmesh<M,V,E,F>::elem_show_all()
 {
-    for(uint fid=0; fid<num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        face_data(fid).visible = true;
+        this->face_data(fid).visible = true;
     }
 }
 
@@ -507,116 +230,36 @@ void Polygonmesh<M,V,E,F>::elem_show_all()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::vert_set_color(const Color & c)
+uint Polygonmesh<M,V,E,F>::elem_vert_id(const uint fid, const uint offset) const
 {
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        vert_data(vid).color = c;
-    }
+    return this->face_vert_id(fid,offset);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::vert_set_alpha(const float alpha)
+vec3d Polygonmesh<M,V,E,F>::elem_vert(const uint fid, const uint offset) const
 {
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        vert_data(vid).color.a = alpha;
-    }
+    return this->face_vert(fid,offset);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::edge_set_color(const Color & c)
+uint Polygonmesh<M,V,E,F>::elem_vert_offset(const uint fid, const uint vid) const
 {
-    for(uint eid=0; eid<num_edges(); ++eid)
-    {
-        edge_data(eid).color = c;
-    }
+    return this->face_vert_offset(fid,vid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::edge_set_alpha(const float alpha)
+double Polygonmesh<M,V,E,F>::elem_mass(const uint fid) const
 {
-    for(uint eid=0; eid<num_edges(); ++eid)
-    {
-        edge_data(eid).color.a = alpha;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Polygonmesh<M,V,E,F>::face_set_color(const Color & c)
-{
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        face_data(fid).color = c;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Polygonmesh<M,V,E,F>::face_set_alpha(const float alpha)
-{
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        face_data(fid).color.a = alpha;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-std::vector<float> Polygonmesh<M,V,E,F>::export_uvw_param(const int mode) const
-{
-    std::vector<float> uvw;
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        switch (mode)
-        {
-            case U_param  : uvw.push_back(vert_data(vid).uvw[0]); break;
-            case V_param  : uvw.push_back(vert_data(vid).uvw[1]); break;
-            case W_param  : uvw.push_back(vert_data(vid).uvw[2]); break;
-            case UV_param : uvw.push_back(vert_data(vid).uvw[0]);
-                            uvw.push_back(vert_data(vid).uvw[1]); break;
-            case UW_param : uvw.push_back(vert_data(vid).uvw[0]);
-                            uvw.push_back(vert_data(vid).uvw[2]); break;
-            case VW_param : uvw.push_back(vert_data(vid).uvw[1]);
-                            uvw.push_back(vert_data(vid).uvw[2]); break;
-            case UVW_param: uvw.push_back(vert_data(vid).uvw[0]);
-                            uvw.push_back(vert_data(vid).uvw[1]);
-                            uvw.push_back(vert_data(vid).uvw[2]); break;
-            default: assert(false);
-        }
-    }
-    return uvw;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-std::vector<Color> Polygonmesh<M,V,E,F>::export_per_face_colors() const
-{
-    std::vector<Color> colors;
-    colors.reserve(num_faces());
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        colors.push_back( face_data(fid).color );
-    }
-    return colors;
+    return this->face_area(fid);
 }
 
 }
