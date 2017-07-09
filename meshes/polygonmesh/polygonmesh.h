@@ -77,7 +77,7 @@ class Polygonmesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double face_area(const uint fid) const;
+        double face_area(const uint) const { assert(false); } // TODO!
 };
 
 }

@@ -86,29 +86,29 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void clear() = 0;
-        virtual void init() = 0;
+        virtual void clear();
+        virtual void init();
         virtual void load(const char * filename) = 0;
         virtual void save(const char * filename) const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                void center_bbox();
-                void update_bbox();
+        virtual void center_bbox();
+        virtual void update_bbox();
         virtual void update_adjacency() = 0;
         virtual void update_f_normal(const uint fid) = 0;
-                void update_v_normal(const uint vid);
-                void update_f_normals();
-                void update_v_normals();
-                void update_normals();
+        virtual void update_v_normal(const uint vid);
+        virtual void update_f_normals();
+        virtual void update_v_normals();
+        virtual void update_normals();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                void   translate(const vec3d & delta);
-                void   rotate(const vec3d & axis, const double angle);
-                vec3d  centroid() const;
-                uint   connected_components() const;
-                uint   connected_components(std::vector<std::set<uint>> & ccs) const;
+        virtual void  translate(const vec3d & delta);
+        virtual void  rotate(const vec3d & axis, const double angle);
+        virtual vec3d centroid() const;
+        virtual uint  connected_components() const;
+        virtual uint  connected_components(std::vector<std::set<uint>> & ccs) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -117,92 +117,92 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                uint num_verts() const { return verts.size();     }
-                uint num_edges() const { return edges.size() / 2; }
-                uint num_faces() const { return faces.size();     }
+        virtual uint num_verts() const { return verts.size();     }
+        virtual uint num_edges() const { return edges.size() / 2; }
+        virtual uint num_faces() const { return faces.size();     }
         virtual uint num_elems() const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                const Bbox                           & bbox()          const { return bb;    }
-                const std::vector<vec3d>             & vector_verts()  const { return verts; }
-                const std::vector<uint>              & vector_edges()  const { return edges; }
-                const std::vector<std::vector<uint>> & vector_faces()  const { return faces; }
-                      std::vector<double>              vector_coords() const ;
+        virtual const Bbox                           & bbox()          const { return bb;    }
+        virtual const std::vector<vec3d>             & vector_verts()  const { return verts; }
+        virtual const std::vector<uint>              & vector_edges()  const { return edges; }
+        virtual const std::vector<std::vector<uint>> & vector_faces()  const { return faces; }
+        virtual       std::vector<double>              vector_coords() const ;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                std::vector<float> export_uvw_param(const int mode) const;
-                std::vector<int>   export_per_face_labels() const;
-                std::vector<Color> export_per_face_colors() const;
+        virtual std::vector<float> export_uvw_param(const int mode) const;
+        virtual std::vector<int>   export_per_face_labels() const;
+        virtual std::vector<Color> export_per_face_colors() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
-                const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
-                const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
-                const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
-                const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
-                const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
+        virtual const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
+        virtual const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
+        virtual const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
+        virtual const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
+        virtual const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
+        virtual const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                const std::vector<uint> & adj_vert2elem(const uint vid) const { return v2f.at(vid); }
-                const std::vector<uint> & adj_edge2elem(const uint eid) const { return e2f.at(eid); }
-                const std::vector<uint> & adj_elem2edge(const uint fid) const { return f2e.at(fid); }
+        virtual const std::vector<uint> & adj_vert2elem(const uint vid) const { return v2f.at(vid); }
+        virtual const std::vector<uint> & adj_edge2elem(const uint eid) const { return e2f.at(eid); }
+        virtual const std::vector<uint> & adj_elem2edge(const uint fid) const { return f2e.at(fid); }
         virtual const std::vector<uint> & adj_elem2elem(const uint eid) const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                const M & mesh_data()               const { return m_data;         }
-                      M & mesh_data()                     { return m_data;         }
-                const V & vert_data(const uint vid) const { return v_data.at(vid); }
-                      V & vert_data(const uint vid)       { return v_data.at(vid); }
-                const E & edge_data(const uint eid) const { return e_data.at(eid); }
-                      E & edge_data(const uint eid)       { return e_data.at(eid); }
-                const F & face_data(const uint fid) const { return f_data.at(fid); }
-                      F & face_data(const uint fid)       { return f_data.at(fid); }
+        virtual const M & mesh_data()               const { return m_data;         }
+        virtual       M & mesh_data()                     { return m_data;         }
+        virtual const V & vert_data(const uint vid) const { return v_data.at(vid); }
+        virtual       V & vert_data(const uint vid)       { return v_data.at(vid); }
+        virtual const E & edge_data(const uint eid) const { return e_data.at(eid); }
+        virtual       E & edge_data(const uint eid)       { return e_data.at(eid); }
+        virtual const F & face_data(const uint fid) const { return f_data.at(fid); }
+        virtual       F & face_data(const uint fid)       { return f_data.at(fid); }
         virtual const F & elem_data(const uint eid) const = 0;
         virtual       F & elem_data(const uint eid)       = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                const vec3d          & vert                 (const uint vid) const { return verts.at(vid); }
-                      vec3d          & vert                 (const uint vid)       { return verts.at(vid); }
-                      std::set<uint>   vert_n_ring          (const uint vid, const uint n) const;
-                      bool             verts_are_adjacent   (const uint vid0, const uint vid1) const;
-                      bool             vert_is_local_min    (const uint vid, const int tex_coord = U_param) const;
-                      bool             vert_is_local_max    (const uint vid, const int tex_coord = U_param) const;
-                      uint             vert_valence         (const uint vid) const;
-                      uint             vert_shared          (const uint eid0, const uint eid1) const;
-                      void             vert_set_color       (const Color & c);
-                      void             vert_set_alpha       (const float alpha);
+        virtual const vec3d          & vert                 (const uint vid) const { return verts.at(vid); }
+        virtual       vec3d          & vert                 (const uint vid)       { return verts.at(vid); }
+        virtual       std::set<uint>   vert_n_ring          (const uint vid, const uint n) const;
+        virtual       bool             verts_are_adjacent   (const uint vid0, const uint vid1) const;
+        virtual       bool             vert_is_local_min    (const uint vid, const int tex_coord = U_param) const;
+        virtual       bool             vert_is_local_max    (const uint vid, const int tex_coord = U_param) const;
+        virtual       uint             vert_valence         (const uint vid) const;
+        virtual       uint             vert_shared          (const uint eid0, const uint eid1) const;
+        virtual       void             vert_set_color       (const Color & c);
+        virtual       void             vert_set_alpha       (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                      vec3d  edge_vert         (const uint eid, const uint offset) const;
-                      uint   edge_vert_id      (const uint eid, const uint offset) const;
-                      bool   edge_contains_vert(const uint eid, const uint vid) const;
-                      double edge_length       (const uint eid) const;
-                      double edge_avg_length   () const;
-                      double edge_max_length   () const;
-                      double edge_min_length   () const;
-                      void   edge_set_color    (const Color & c);
-                      void   edge_set_alpha    (const float alpha);
+        virtual       vec3d  edge_vert         (const uint eid, const uint offset) const;
+        virtual       uint   edge_vert_id      (const uint eid, const uint offset) const;
+        virtual       bool   edge_contains_vert(const uint eid, const uint vid) const;
+        virtual       double edge_length       (const uint eid) const;
+        virtual       double edge_avg_length   () const;
+        virtual       double edge_max_length   () const;
+        virtual       double edge_min_length   () const;
+        virtual       void   edge_set_color    (const Color & c);
+        virtual       void   edge_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                      vec3d  face_vert              (const uint fid, const uint offset) const;
-                      uint   face_vert_id           (const uint fid, const uint offset) const;
-                      uint   face_edge_id           (const uint fid, const uint vid0, const uint vid1) const;
-                      uint   face_vert_offset       (const uint fid, const uint vid) const;
-                      vec3d  face_centroid          (const uint fid) const;
-                      double face_angle_at_vert     (const uint fid, const uint vid, const int unit = RAD) const;
-                      bool   face_contains_vert     (const uint fid, const uint vid) const;
-                      bool   face_contains_edge     (const uint fid, const uint eid) const;
-                      void   face_flip_winding_order(const uint fid);
-                      void   face_set_color         (const Color & c);
-                      void   face_set_alpha         (const float alpha);
+        virtual       vec3d  face_vert              (const uint fid, const uint offset) const;
+        virtual       uint   face_vert_id           (const uint fid, const uint offset) const;
+        virtual       uint   face_edge_id           (const uint fid, const uint vid0, const uint vid1) const;
+        virtual       uint   face_vert_offset       (const uint fid, const uint vid) const;
+        virtual       vec3d  face_centroid          (const uint fid) const;
+        virtual       double face_angle_at_vert     (const uint fid, const uint vid, const int unit = RAD) const;
+        virtual       bool   face_contains_vert     (const uint fid, const uint vid) const;
+        virtual       bool   face_contains_edge     (const uint fid, const uint eid) const;
+        virtual       void   face_flip_winding_order(const uint fid);
+        virtual       void   face_set_color         (const Color & c);
+        virtual       void   face_set_alpha         (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -70,11 +70,6 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void clear();
-        void init();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void operator+=(const Trimesh & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -88,7 +83,7 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
         uint   vert_add                (const vec3d & pos);
         uint   vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;
 
-        using  AbstractSurfaceMesh<M,V,E,F>::vert_opposite_to; // avoid to hide the most general method
+        using  AbstractSurfaceMesh<M,V,E,F>::vert_opposite_to; // avoid hiding vert_opposite_to(eid,vid)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -101,7 +96,6 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double face_area               (const uint fid) const;
-        uint   face_edge_id            (const uint fid, const uint offset) const;
         bool   face_is_cap             (const uint fid, const double angle_thresh_deg = 177.0) const;
         bool   face_is_needle          (const uint fid, const double angle_thresh_deg = 3.0) const;
         bool   face_bary_coords        (const uint fid, const vec3d & P, std::vector<double> & wgts) const;
@@ -111,6 +105,9 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
         uint   face_add                (const uint vid0, const uint vid1, const uint vid2);
         void   face_set                (const uint fid, const uint vid0, const uint vid1, const uint vid2);
         void   face_remove_unreferenced(const uint fid);
+        uint   face_edge_id            (const uint fid, const uint offset) const;
+
+        using  AbstractMesh<M,V,E,F>::face_edge_id; // avoid hiding face_ege_id(fid,vid0,vid1)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

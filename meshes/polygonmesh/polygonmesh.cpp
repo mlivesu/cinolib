@@ -75,24 +75,8 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Polygonmesh<M,V,E,F>::clear()
 {
-    this->bb.reset();
-    //
-    this->verts.clear();
-    this->edges.clear();
-    this->faces.clear();
-    //
-    M std_M_data;
-    this->m_data = std_M_data;
-    this->v_data.clear();
-    this->e_data.clear();
-    this->f_data.clear();
-    //
-    this->v2v.clear();
-    this->v2e.clear();
-    this->v2f.clear();
-    this->e2f.clear();
-    this->f2e.clear();
-    this->f2f.clear();
+    AbstractMesh<M,V,E,F>::clear();
+    tessellated_faces.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -102,15 +86,7 @@ CINO_INLINE
 void Polygonmesh<M,V,E,F>::init()
 {
     update_face_tessellation();
-
-    this->update_adjacency();
-    this->update_bbox();
-
-    this->v_data.resize(this->num_verts());
-    this->e_data.resize(this->num_edges());
-    this->f_data.resize(this->num_faces());
-
-    this->update_normals();
+    AbstractMesh<M,V,E,F>::init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -153,16 +129,6 @@ void Polygonmesh<M,V,E,F>::update_face_tessellation()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-double Polygonmesh<M,V,E,F>::face_area(const uint /*fid*/) const
-{
-    assert(false); // TODO!
-    return -1.0;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
 void Polygonmesh<M,V,E,F>::update_f_normal(const uint fid)
 {
     // compute the best fitting plane
@@ -175,7 +141,7 @@ void Polygonmesh<M,V,E,F>::update_f_normal(const uint fid)
     vec3d v1 = this->face_vert(fid,1);
     uint  i=2;
     vec3d ccw;
-    do { ccw = (v1-v0).cross(this->face_vert(fid,i)-v0);  ++i; } while (ccw.length_squared()==0 && i<this->verts_per_face(fid));
+    do { ccw = (v1-v0).cross(this->face_vert(fid,i)-v0); ++i; } while (ccw.length_squared()==0 && i<this->verts_per_face(fid));
 
     this->face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
 }

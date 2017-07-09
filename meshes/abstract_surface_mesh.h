@@ -44,81 +44,81 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 {
     public:
 
-        void load(const char * filename);
-        void save(const char * filename) const;
+        virtual void load(const char * filename);
+        virtual void save(const char * filename) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_adjacency();
+        virtual void update_adjacency();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_face(const uint fid) const { return this->faces.at(fid).size(); }
-        uint verts_per_elem(const uint fid) const { return this->faces.at(fid).size(); }
+        virtual uint verts_per_face(const uint fid) const { return this->faces.at(fid).size(); }
+        virtual uint verts_per_elem(const uint fid) const { return this->faces.at(fid).size(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint num_elems() const { return this->faces.size(); } // elem == face!!
+        virtual uint num_elems() const { return this->faces.size(); } // elem == face!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const std::vector<uint> & adj_elem2elem(const uint fid) const { return this->f2f.at(fid); }
+        virtual const std::vector<uint> & adj_elem2elem(const uint fid) const { return this->f2f.at(fid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const F & elem_data(const uint fid) const { return this->f_data.at(fid); } // elem == face!!
-              F & elem_data(const uint fid)       { return this->f_data.at(fid); }
+        virtual const F & elem_data(const uint fid) const { return this->f_data.at(fid); } // elem == face!!
+        virtual       F & elem_data(const uint fid)       { return this->f_data.at(fid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void               normalize_area();
-        std::vector<uint>  get_boundary_vertices() const;
-        std::vector<ipair> get_boundary_edges() const;
+        virtual void               normalize_area();
+        virtual std::vector<uint>  get_boundary_vertices() const;
+        virtual std::vector<ipair> get_boundary_edges() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool              vert_is_saddle        (const uint vid, const int tex_coord = U_param) const;
-        bool              vert_is_critical_p    (const uint vid, const int tex_coord = U_param) const;
-        uint              vert_opposite_to      (const uint eid, const uint vid) const;
-        double            vert_area             (const uint vid) const;
-        double            vert_mass             (const uint vid) const;
-        bool              verts_are_ordered_CCW (const uint fid, const uint curr, const uint prev) const;
-        bool              vert_is_boundary      (const uint vid) const;
-        std::vector<uint> vert_boundary_edges   (const uint vid) const;
-        std::vector<uint> vert_ordered_vert_ring(const uint vid) const;
-        std::vector<uint> vert_ordered_face_ring(const uint vid) const;
-        std::vector<uint> vert_ordered_edge_ring(const uint vid) const;
-        std::vector<uint> vert_ordered_edge_link(const uint vid) const;
-        void              vert_ordered_one_ring (const uint          vid,
-                                                 std::vector<uint> & v_ring,        // sorted list of adjacent vertices
-                                                 std::vector<uint> & f_ring,        // sorted list of adjacent triangles
-                                                 std::vector<uint> & e_ring,        // sorted list of edges incident to vid
-                                                 std::vector<uint> & e_link) const; // sorted list of edges opposite to vid
+        virtual bool              vert_is_saddle        (const uint vid, const int tex_coord = U_param) const;
+        virtual bool              vert_is_critical_p    (const uint vid, const int tex_coord = U_param) const;
+        virtual uint              vert_opposite_to      (const uint eid, const uint vid) const;
+        virtual double            vert_area             (const uint vid) const;
+        virtual double            vert_mass             (const uint vid) const;
+        virtual bool              verts_are_ordered_CCW (const uint fid, const uint curr, const uint prev) const;
+        virtual bool              vert_is_boundary      (const uint vid) const;
+        virtual std::vector<uint> vert_boundary_edges   (const uint vid) const;
+        virtual std::vector<uint> vert_ordered_vert_ring(const uint vid) const;
+        virtual std::vector<uint> vert_ordered_face_ring(const uint vid) const;
+        virtual std::vector<uint> vert_ordered_edge_ring(const uint vid) const;
+        virtual std::vector<uint> vert_ordered_edge_link(const uint vid) const;
+        virtual void              vert_ordered_one_ring (const uint          vid,
+                                                         std::vector<uint> & v_ring,        // sorted list of adjacent vertices
+                                                         std::vector<uint> & f_ring,        // sorted list of adjacent triangles
+                                                         std::vector<uint> & e_ring,        // sorted list of edges incident to vid
+                                                         std::vector<uint> & e_link) const; // sorted list of edges opposite to vid
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool  edge_is_manifold(const uint eid) const;
-        bool  edge_is_boundary(const uint eid) const;
-        bool  edges_share_face(const uint eid1, const uint eid2) const;
-        ipair edge_shared     (const uint fid0, const uint fid1) const;
+        virtual bool  edge_is_manifold(const uint eid) const;
+        virtual bool  edge_is_boundary(const uint eid) const;
+        virtual bool  edges_share_face(const uint eid1, const uint eid2) const;
+        virtual ipair edge_shared     (const uint fid0, const uint fid1) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-virtual double face_area          (const uint fid) const = 0;
-        double face_mass          (const uint fid) const;
-        int    face_shared        (const uint eid0, const uint eid1) const;
-        int    face_adjacent_along(const uint fid, const uint vid0, const uint vid1) const;
-        bool   face_is_boundary   (const uint fid) const;
-        int    face_opposite_to   (const uint eid, const uint fid) const;
+        virtual double face_area          (const uint fid) const = 0;
+        virtual double face_mass          (const uint fid) const;
+        virtual int    face_shared        (const uint eid0, const uint eid1) const;
+        virtual int    face_adjacent_along(const uint fid, const uint vid0, const uint vid1) const;
+        virtual bool   face_is_boundary   (const uint fid) const;
+        virtual int    face_opposite_to   (const uint eid, const uint fid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d  elem_vert        (const uint fid, const uint offset) const;
-        uint   elem_vert_id     (const uint fid, const uint offset) const;
-        uint   elem_vert_offset (const uint fid, const uint vid) const;
-        vec3d  elem_centroid    (const uint fid) const;
-        void   elem_show_all    ();
-        double elem_mass        (const uint fid) const;
+        virtual vec3d  elem_vert        (const uint fid, const uint offset) const;
+        virtual uint   elem_vert_id     (const uint fid, const uint offset) const;
+        virtual uint   elem_vert_offset (const uint fid, const uint vid) const;
+        virtual vec3d  elem_centroid    (const uint fid) const;
+        virtual void   elem_show_all    ();
+        virtual double elem_mass        (const uint fid) const;
 };
 
 }

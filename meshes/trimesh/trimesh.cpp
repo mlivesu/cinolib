@@ -40,7 +40,7 @@ CINO_INLINE
 Trimesh<M,V,E,F>::Trimesh(const char * filename)
 {
     this->load(filename);
-    init();
+    this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -53,7 +53,7 @@ Trimesh<M,V,E,F>::Trimesh(const std::vector<vec3d>              & verts,
 {
     this->verts = verts;
     this->faces = faces;
-    init();
+    this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -65,7 +65,7 @@ Trimesh<M,V,E,F>::Trimesh(const std::vector<double>             & coords,
 {
     this->verts = vec3d_from_serialized_xyz(coords);
     this->faces = faces;
-    init();
+    this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -77,7 +77,7 @@ Trimesh<M,V,E,F>::Trimesh(const std::vector<vec3d> & verts,
 {
     this->verts = verts;
     this->faces = faces_from_serialized_vids(faces,3);
-    init();
+    this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -89,49 +89,7 @@ Trimesh<M,V,E,F>::Trimesh(const std::vector<double> & coords,
 {
     this->verts = vec3d_from_serialized_xyz(coords);
     this->faces = faces_from_serialized_vids(faces,3);
-    init();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Trimesh<M,V,E,F>::clear()
-{
-    this->bb.reset();
-    //
-    this->verts.clear();
-    this->edges.clear();
-    this->faces.clear();
-    //
-    M std_M_data;
-    this->m_data = std_M_data;
-    this->v_data.clear();
-    this->e_data.clear();
-    this->f_data.clear();
-    //
-    this->v2v.clear();
-    this->v2e.clear();
-    this->v2f.clear();
-    this->e2f.clear();
-    this->f2e.clear();
-    this->f2f.clear();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Trimesh<M,V,E,F>::init()
-{
-    this->update_adjacency();
-    this->update_bbox();
-
-    this->v_data.resize(this->num_verts());
-    this->e_data.resize(this->num_edges());
-    this->f_data.resize(this->num_faces());
-
-    this->update_normals();
+    this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

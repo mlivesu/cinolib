@@ -100,24 +100,8 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Quadmesh<M,V,E,F>::clear()
 {
-    this->bb.reset();
-    //
-    this->verts.clear();
-    this->edges.clear();
-    this->faces.clear();
-    //
-    M std_M_data;
-    this->m_data = std_M_data;
-    this->v_data.clear();
-    this->e_data.clear();
-    this->f_data.clear();
-    //
-    this->v2v.clear();
-    this->v2e.clear();
-    this->v2f.clear();
-    this->e2f.clear();
-    this->f2e.clear();
-    this->f2f.clear();
+    AbstractMesh<M,V,E,F>::clear();
+    tessellated_faces.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -127,15 +111,7 @@ CINO_INLINE
 void Quadmesh<M,V,E,F>::init()
 {
     update_face_tessellation();
-
-    this->update_adjacency();
-    this->update_bbox();
-
-    this->v_data.resize(this->num_verts());
-    this->e_data.resize(this->num_edges());
-    this->f_data.resize(this->num_faces());
-
-    this->update_normals();
+    AbstractMesh<M,V,E,F>::init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -238,16 +214,6 @@ std::vector<uint> Quadmesh<M,V,E,F>::vert_loop(const uint start, const uint next
     while(curr != start);
 
     return loop;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-double Quadmesh<M,V,E,F>::face_area(const uint /*fid*/) const
-{
-    assert(false); // TODO!
-    return -1.0;
 }
 
 }

@@ -38,6 +38,48 @@ namespace cinolib
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+void AbstractMesh<M,V,E,F>::clear()
+{
+    bb.reset();
+    //
+    verts.clear();
+    edges.clear();
+    faces.clear();
+    //
+    M std_M_data;
+    m_data = std_M_data;
+    v_data.clear();
+    e_data.clear();
+    f_data.clear();
+    //
+    v2v.clear();
+    v2e.clear();
+    v2f.clear();
+    e2f.clear();
+    f2e.clear();
+    f2f.clear();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractMesh<M,V,E,F>::init()
+{
+    update_adjacency();
+    update_bbox();
+
+    v_data.resize(num_verts());
+    e_data.resize(num_edges());
+    f_data.resize(num_faces());
+
+    update_normals();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 vec3d AbstractMesh<M,V,E,F>::centroid() const
 {
     vec3d bary(0,0,0);
