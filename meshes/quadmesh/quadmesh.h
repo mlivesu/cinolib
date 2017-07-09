@@ -94,42 +94,13 @@ class Quadmesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_face(const uint) const { return 4; }
-        uint verts_per_elem(const uint) const { return 4; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        uint num_elems() const { return this->faces.size();     } // elem == face!!
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        const std::vector<uint> & adj_elem2elem(const uint fid) const { return this->f2f.at(fid); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        const F & elem_data(const uint fid) const { return this->f_data.at(fid); } // elem == face!!
-              F & elem_data(const uint fid)       { return this->f_data.at(fid); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        bool              vert_is_singular     (const uint vid) const;
-        bool              vert_is_regular      (const uint vid) const;        
-        bool              vert_is_saddle       (const uint vid, const int tex_coord = U_param) const;
-        bool              vert_is_critical_p   (const uint vid, const int tex_coord = U_param) const;
-        std::vector<uint> vert_loop            (const uint start, const uint next) const;
+        bool              vert_is_singular(const uint vid) const;
+        bool              vert_is_regular (const uint vid) const;
+        std::vector<uint> vert_loop       (const uint start, const uint next) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double face_area (const uint fid) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d  elem_centroid(const uint fid) const;
-        void   elem_show_all();
-        vec3d  elem_vert       (const uint eid, const uint offset) const;
-        uint   elem_vert_id    (const uint eid, const uint offset) const;
-        uint   elem_vert_offset(const uint eid, const uint vid) const;
-        double elem_mass       (const uint eid) const;
 };
 
 }

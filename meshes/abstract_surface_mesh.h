@@ -53,17 +53,32 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void               normalize_area();
-        void               translate(const vec3d & delta);
-        void               rotate(const vec3d & axis, const double angle);
-        vec3d              centroid() const;
-        std::vector<uint>  get_boundary_vertices() const;
-        std::vector<ipair> get_boundary_edges() const;
-        uint               connected_components() const;
-        uint               connected_components(std::vector<std::set<uint>> & ccs) const;
+        uint verts_per_face(const uint fid) const { return this->faces.at(fid).size(); }
+        uint verts_per_elem(const uint fid) const { return this->faces.at(fid).size(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        uint num_elems() const { return this->faces.size(); } // elem == face!!
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const std::vector<uint> & adj_elem2elem(const uint fid) const { return this->f2f.at(fid); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const F & elem_data(const uint fid) const { return this->f_data.at(fid); } // elem == face!!
+              F & elem_data(const uint fid)       { return this->f_data.at(fid); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void               normalize_area();
+        std::vector<uint>  get_boundary_vertices() const;
+        std::vector<ipair> get_boundary_edges() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        bool              vert_is_saddle        (const uint vid, const int tex_coord = U_param) const;
+        bool              vert_is_critical_p    (const uint vid, const int tex_coord = U_param) const;
         uint              vert_opposite_to      (const uint eid, const uint vid) const;
         double            vert_area             (const uint vid) const;
         double            vert_mass             (const uint vid) const;
@@ -94,6 +109,15 @@ virtual double face_area          (const uint fid) const = 0;
         int    face_shared        (const uint eid0, const uint eid1) const;
         int    face_adjacent_along(const uint fid, const uint vid0, const uint vid1) const;
         bool   face_is_boundary   (const uint fid) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d  elem_vert        (const uint fid, const uint offset) const;
+        uint   elem_vert_id     (const uint fid, const uint offset) const;
+        uint   elem_vert_offset (const uint fid, const uint vid) const;
+        vec3d  elem_centroid    (const uint fid) const;
+        void   elem_show_all    ();
+        double elem_mass        (const uint fid) const;
 };
 
 }

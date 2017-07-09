@@ -29,7 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/abstract_surface_mesh.h>
-#include <cinolib/bfs.h>
 #include <cinolib/timer.h>
 #include <cinolib/io/read_write.h>
 
@@ -180,6 +179,49 @@ void AbstractSurfaceMesh<M,V,E,F>::update_adjacency()
     logger << this->num_edges() << "\tedges" << endl;
 
     timer_stop("Build adjacency");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool AbstractSurfaceMesh<M,V,E,F>::vert_is_saddle(const uint vid, const int tex_coord) const
+{
+    std::vector<bool> signs;
+    for(uint nbr : vert_ordered_vert_ring(vid))
+    {
+        // Discard == signs. For references, see:
+        // Decomposing Polygon Meshes by Means of Critical Points
+        // Yinan Zhou and Zhiyong Huang
+        //
+        switch (tex_coord)
+        {
+            case U_param : if (this->vert_data(nbr).uvw[0] != this->vert_data(vid).uvw[0]) signs.push_back(this->vert_data(nbr).uvw[0] > this->vert_data(vid).uvw[0]); break;
+            case V_param : if (this->vert_data(nbr).uvw[1] != this->vert_data(vid).uvw[1]) signs.push_back(this->vert_data(nbr).uvw[1] > this->vert_data(vid).uvw[1]); break;
+            case W_param : if (this->vert_data(nbr).uvw[2] != this->vert_data(vid).uvw[2]) signs.push_back(this->vert_data(nbr).uvw[2] > this->vert_data(vid).uvw[2]); break;
+            default: assert(false);
+        }
+    }
+
+    uint sign_switch = 0;
+    for(uint i=0; i<signs.size(); ++i)
+    {
+        if (signs.at(i) != signs.at((i+1)%signs.size())) ++sign_switch;
+    }
+
+    if (sign_switch > 2) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+bool AbstractSurfaceMesh<M,V,E,F>::vert_is_critical_p(const uint vid, const int tex_coord) const
+{
+    return (this->vert_is_local_max(vid,tex_coord) ||
+            this->vert_is_local_min(vid,tex_coord) ||
+            this->vert_is_saddle   (vid,tex_coord));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -496,50 +538,6 @@ void AbstractSurfaceMesh<M,V,E,F>::normalize_area()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d AbstractSurfaceMesh<M,V,E,F>::centroid() const
-{
-    vec3d bary(0,0,0);
-    for(auto p : this->verts) bary += p;
-    if (this->num_verts() > 0) bary/=static_cast<double>(this->num_verts());
-    return bary;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::translate(const vec3d & delta)
-{
-    for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) += delta;
-    this->update_bbox();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::rotate(const vec3d & axis, const double angle)
-{
-    double R[3][3];
-    bake_rotation_matrix(axis, angle, R);
-    //
-    vec3d c = centroid();
-    //
-    for(uint vid=0; vid<this->num_verts(); ++vid)
-    {
-        this->vert(vid) -= c;
-        transform(this->vert(vid), R);
-        this->vert(vid) += c;
-    }
-    //
-    this->update_bbox();
-    this->update_normals();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
 std::vector<ipair> AbstractSurfaceMesh<M,V,E,F>::get_boundary_edges() const
 {
     std::vector<ipair> res;
@@ -571,36 +569,57 @@ std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::get_boundary_vertices() const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-uint AbstractSurfaceMesh<M,V,E,F>::connected_components() const
+uint AbstractSurfaceMesh<M,V,E,F>::elem_vert_id(const uint fid, const uint offset) const
 {
-    std::vector<std::set<uint>> ccs;
-    return connected_components(ccs);
+    return this->face_vert_id(fid,offset);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-uint AbstractSurfaceMesh<M,V,E,F>::connected_components(std::vector<std::set<uint>> & ccs) const
+vec3d AbstractSurfaceMesh<M,V,E,F>::elem_vert(const uint fid, const uint offset) const
 {
-    ccs.clear();
-    uint seed = 0;
-    std::vector<bool> visited(this->num_verts(), false);
+    return this->face_vert(fid,offset);
+}
 
-    do
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+vec3d AbstractSurfaceMesh<M,V,E,F>::elem_centroid(const uint fid) const
+{
+    return this->face_centroid(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::elem_show_all()
+{
+    for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        std::set<uint> cc;
-        bfs_exahustive<AbstractSurfaceMesh<M,V,E,F>>(*this, seed, cc);
-
-        ccs.push_back(cc);
-        for(uint vid : cc) visited.at(vid) = true;
-
-        seed = 0;
-        while (seed < this->num_verts() && visited.at(seed)) ++seed;
+        this->face_data(fid).visible = true;
     }
-    while (seed < this->num_verts());
+}
 
-    return ccs.size();
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+double AbstractSurfaceMesh<M,V,E,F>::elem_mass(const uint fid) const
+{
+    return this->face_area(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+uint AbstractSurfaceMesh<M,V,E,F>::elem_vert_offset(const uint fid, const uint vid) const
+{
+    return this->face_vert_offset(fid,vid);
 }
 
 

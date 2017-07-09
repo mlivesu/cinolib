@@ -83,26 +83,6 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_face(const uint) const { return 3; }
-        uint verts_per_elem(const uint) const { return 3; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        uint num_elems() const { return this->faces.size(); } // elem == face!!
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        const std::vector<uint> & adj_elem2elem(const uint fid) const { return this->f2f.at(fid); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        const F & elem_data(const uint fid) const { return this->f_data.at(fid); } // elem == face!!
-              F & elem_data(const uint fid)       { return this->f_data.at(fid); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        bool              vert_is_saddle          (const uint vid, const int tex_coord = U_param) const;
-        bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
         uint              vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;
                           using AbstractSurfaceMesh<M,V,E,F>::vert_opposite_to; // avoid to hide the most general method
         std::vector<uint> vert_boundary_edges     (const uint vid) const;
@@ -134,12 +114,6 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d  elem_vert        (const uint fid, const uint offset) const;
-        uint   elem_vert_id     (const uint fid, const uint offset) const;
-        uint   elem_vert_offset (const uint fid, const uint vid) const;
-        vec3d  elem_centroid    (const uint fid) const;
-        void   elem_show_all    ();
-        double elem_mass        (const uint fid) const;
         bool   elem_bary_coords (const uint fid, const vec3d & P, std::vector<double> & wgts) const;
         bool   elem_bary_is_vert(const uint fid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
         bool   elem_bary_is_edge(const uint fid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;

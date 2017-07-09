@@ -104,6 +104,14 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+                void   translate(const vec3d & delta);
+                void   rotate(const vec3d & axis, const double angle);
+                vec3d  centroid() const;
+                uint   connected_components() const;
+                uint   connected_components(std::vector<std::set<uint>> & ccs) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         virtual uint verts_per_face(const uint fid) const = 0;
         virtual uint verts_per_elem(const uint eid) const = 0;
 

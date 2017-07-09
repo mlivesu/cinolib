@@ -77,36 +77,9 @@ class Polygonmesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_face(const uint fid) const { return this->faces.at(fid).size(); }
-        uint verts_per_elem(const uint fid) const { return this->faces.at(fid).size(); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        uint num_elems() const { return this->faces.size(); } // elem == face!!
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        const std::vector<uint> & adj_elem2elem(const uint fid) const { return this->f2f.at(fid); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        const F & elem_data(const uint fid) const { return this->f_data.at(fid); } // elem == face!!
-              F & elem_data(const uint fid)       { return this->f_data.at(fid); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         double face_area         (const uint fid) const;
         int    face_opposite_to  (const uint eid, const uint fid) const;
         bool   face_contains_edge(const uint fid, const uint eid) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d  elem_centroid(const uint fid) const;
-        void   elem_show_all();
-        vec3d  elem_vert       (const uint eid, const uint offset) const;
-        uint   elem_vert_id    (const uint eid, const uint offset) const;
-        uint   elem_vert_offset(const uint eid, const uint vid) const;
-        double elem_mass       (const uint eid) const;
 };
 
 }

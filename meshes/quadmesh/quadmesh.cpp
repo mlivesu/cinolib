@@ -192,27 +192,6 @@ void Quadmesh<M,V,E,F>::update_f_normal(const uint fid)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-vec3d Quadmesh<M,V,E,F>::elem_centroid(const uint fid) const
-{
-    return this->face_centroid(fid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void Quadmesh<M,V,E,F>::elem_show_all()
-{
-    for(uint fid=0; fid<this->num_faces(); ++fid)
-    {
-        this->face_data(fid).visible = true;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
 bool Quadmesh<M,V,E,F>::vert_is_singular(const uint vid) const
 {
     return (this->vert_valence(vid)!=4);
@@ -225,49 +204,6 @@ CINO_INLINE
 bool Quadmesh<M,V,E,F>::vert_is_regular(const uint vid) const
 {
     return (this->vert_valence(vid)==4);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-bool Quadmesh<M,V,E,F>::vert_is_saddle(const uint vid, const int tex_coord) const
-{
-    std::vector<bool> signs;
-    for(uint nbr : this->vert_ordered_vert_ring(vid))
-    {
-        // Discard == signs. For references, see:
-        // Decomposing Polygon Meshes by Means of Critical Points
-        // Yinan Zhou and Zhiyong Huang
-        //
-        switch (tex_coord)
-        {
-            case U_param : if (this->vert_data(nbr).uvw[0] != this->vert_data(vid).uvw[0]) signs.push_back(this->vert_data(nbr).uvw[0] > this->vert_data(vid).uvw[0]); break;
-            case V_param : if (this->vert_data(nbr).uvw[1] != this->vert_data(vid).uvw[1]) signs.push_back(this->vert_data(nbr).uvw[1] > this->vert_data(vid).uvw[1]); break;
-            case W_param : if (this->vert_data(nbr).uvw[2] != this->vert_data(vid).uvw[2]) signs.push_back(this->vert_data(nbr).uvw[2] > this->vert_data(vid).uvw[2]); break;
-            default: assert(false);
-        }
-    }
-
-    uint sign_switch = 0;
-    for(uint i=0; i<signs.size(); ++i)
-    {
-        if (signs.at(i) != signs.at((i+1)%signs.size())) ++sign_switch;
-    }
-
-    if (sign_switch > 2) return true;
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-bool Quadmesh<M,V,E,F>::vert_is_critical_p(const uint vid, const int tex_coord) const
-{
-    return (this->vert_is_local_max(vid,tex_coord) ||
-            this->vert_is_local_min(vid,tex_coord) ||
-                  vert_is_saddle   (vid, tex_coord));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -312,42 +248,6 @@ double Quadmesh<M,V,E,F>::face_area(const uint /*fid*/) const
 {
     assert(false); // TODO!
     return -1.0;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-uint Quadmesh<M,V,E,F>::elem_vert_id(const uint fid, const uint offset) const
-{
-    return this->face_vert_id(fid,offset);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-vec3d Quadmesh<M,V,E,F>::elem_vert(const uint fid, const uint offset) const
-{
-    return this->face_vert(fid,offset);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-uint Quadmesh<M,V,E,F>::elem_vert_offset(const uint fid, const uint vid) const
-{
-    return this->face_vert_offset(fid,vid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-double Quadmesh<M,V,E,F>::elem_mass(const uint fid) const
-{
-    return this->face_area(fid);
 }
 
 }
