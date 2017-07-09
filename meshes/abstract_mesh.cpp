@@ -582,6 +582,16 @@ bool AbstractMesh<M,V,E,F>::face_contains_vert(const uint fid, const uint vid) c
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+bool AbstractMesh<M,V,E,F>::face_contains_edge(const uint fid, const uint eid) const
+{
+    for(uint e : adj_f2e(fid)) if (e == eid) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 void AbstractMesh<M,V,E,F>::face_flip_winding_order(const uint fid)
 {
     std::reverse(faces.at(fid).begin(), faces.at(fid).end());

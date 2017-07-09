@@ -77,9 +77,7 @@ class Polygonmesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double face_area         (const uint fid) const;
-        int    face_opposite_to  (const uint eid, const uint fid) const;
-        bool   face_contains_edge(const uint fid, const uint eid) const;
+        double face_area(const uint fid) const;
 };
 
 }

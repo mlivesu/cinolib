@@ -83,12 +83,12 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint              vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;
-                          using AbstractSurfaceMesh<M,V,E,F>::vert_opposite_to; // avoid to hide the most general method
-        std::vector<uint> vert_boundary_edges     (const uint vid) const;
-        void              vert_switch_id          (const uint vid0, const uint vid1);
-        void              vert_remove_unreferenced(const uint vid);
-        uint              vert_add                (const vec3d & pos);
+        void   vert_switch_id          (const uint vid0, const uint vid1);
+        void   vert_remove_unreferenced(const uint vid);
+        uint   vert_add                (const vec3d & pos);
+        uint   vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;
+
+        using  AbstractSurfaceMesh<M,V,E,F>::vert_opposite_to; // avoid to hide the most general method
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

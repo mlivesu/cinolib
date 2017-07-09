@@ -506,6 +506,21 @@ int AbstractSurfaceMesh<M,V,E,F>::face_adjacent_along(const uint fid, const uint
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+int AbstractSurfaceMesh<M,V,E,F>::face_opposite_to(const uint eid, const uint fid) const
+{
+    assert(this->face_contains_edge(fid,eid));
+    assert(this->edge_is_manifold(eid));
+    assert(!this->adj_e2f(eid).empty());
+
+    if (this->edge_is_boundary(eid)) return -1;
+    if (this->adj_e2f(eid).front() != fid) return this->adj_e2f(eid).front();
+    return this->adj_e2f(eid).back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 bool AbstractSurfaceMesh<M,V,E,F>::face_is_boundary(const uint fid) const
 {
     return (this->adj_f2f(fid).size() < 3);

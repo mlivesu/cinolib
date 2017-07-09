@@ -109,6 +109,7 @@ virtual double face_area          (const uint fid) const = 0;
         int    face_shared        (const uint eid0, const uint eid1) const;
         int    face_adjacent_along(const uint fid, const uint vid0, const uint vid1) const;
         bool   face_is_boundary   (const uint fid) const;
+        int    face_opposite_to   (const uint eid, const uint fid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

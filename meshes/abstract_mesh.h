@@ -199,6 +199,7 @@ class AbstractMesh
                       vec3d  face_centroid          (const uint fid) const;
                       double face_angle_at_vert     (const uint fid, const uint vid, const int unit = RAD) const;
                       bool   face_contains_vert     (const uint fid, const uint vid) const;
+                      bool   face_contains_edge     (const uint fid, const uint eid) const;
                       void   face_flip_winding_order(const uint fid);
                       void   face_set_color         (const Color & c);
                       void   face_set_alpha         (const float alpha);

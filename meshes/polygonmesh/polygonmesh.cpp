@@ -180,29 +180,4 @@ void Polygonmesh<M,V,E,F>::update_f_normal(const uint fid)
     this->face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-int Polygonmesh<M,V,E,F>::face_opposite_to(const uint eid, const uint fid) const
-{
-    assert(face_contains_edge(fid,eid));
-    assert(this->edge_is_manifold(eid));
-    assert(!this->adj_e2f(eid).empty());
-
-    if (this->edge_is_boundary(eid)) return -1;
-    if (this->adj_e2f(eid).front() != fid) return this->adj_e2f(eid).front();
-    return this->adj_e2f(eid).back();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-bool Polygonmesh<M,V,E,F>::face_contains_edge(const uint fid, const uint eid) const
-{
-    for(uint e : this->adj_f2e(fid)) if (e == eid) return true;
-    return false;
-}
-
 }
