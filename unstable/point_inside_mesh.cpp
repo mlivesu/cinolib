@@ -103,8 +103,8 @@ template<class Mesh>
 CINO_INLINE
 vec3d PointInsideMeshCache<Mesh>::locate(const vec3d p, const Mesh & m) const
 {
-    uint eid = -1; // assign -1 just to kill the uninitialized variable warning...
-    std::vector<double> wgts(m.verts_per_elem(eid));
+    uint eid;
+    std::vector<double> wgts;
     locate(p, eid, wgts);
 
     vec3d tmp(0,0,0);
