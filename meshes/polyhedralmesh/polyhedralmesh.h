@@ -58,7 +58,8 @@ class Polyhedralmesh
 
         Polyhedralmesh(const std::vector<vec3d>             & verts,
                        const std::vector<std::vector<uint>> & faces,
-                       const std::vector<std::vector<int>>  & cells);
+                       const std::vector<std::vector<uint>> & cells,
+                       const std::vector<std::vector<bool>> & cells_face_winding);
 
     protected:
 
@@ -66,13 +67,15 @@ class Polyhedralmesh
 
         std::vector<vec3d>             verts;
         std::vector<uint>              edges;
-        std::vector<std::vector<uint>> faces;             // list of vertices (assumed CCW)
-        std::vector<std::vector<uint>> tessellated_faces; // triangles covering each face (e.g., for rendering)
-        std::vector<std::vector<int>>  cells;             // unordered list of faces (<fid> => CCW, -<fid> => CW)
-        std::vector<bool>              v_on_srf;          // true if a vertex is on the surface
-        std::vector<bool>              e_on_srf;          // true if an edge is on the surface
-        std::vector<bool>              f_on_srf;          // true if a face is on the surface
+        std::vector<std::vector<uint>> faces;              // list of vertices (assumed CCW)
+        std::vector<std::vector<uint>> tessellated_faces;  // triangles covering each face (e.g., for rendering)
+        std::vector<std::vector<uint>> cells;              // unordered list of faces (<fid> => CCW, -<fid> => CW)
+        std::vector<bool>              v_on_srf;           // true if a vertex is on the surface
+        std::vector<bool>              e_on_srf;           // true if an edge is on the surface
+        std::vector<bool>              f_on_srf;           // true if a face is on the surface
 
+        std::vector<std::vector<bool>> cells_face_winding; // true if the face is CCW, false if it is CW
+        // TODO!!
 
         // attributes
         //

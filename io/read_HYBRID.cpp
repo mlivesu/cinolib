@@ -38,7 +38,8 @@ CINO_INLINE
 void read_HYBDRID(const char                     * filename,
                   std::vector<double>            & coords,
                   std::vector<std::vector<uint>> & faces,
-                  std::vector<std::vector<int>>  & cells)
+                  std::vector<std::vector<uint>> & cells,
+                  std::vector<std::vector<bool>> & cells_face_winding)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -87,7 +88,8 @@ void read_HYBDRID(const char                     * filename,
         uint nf;
         fscanf(fp, "%d", &nf);
 
-        std::vector<int> cell;
+        std::vector<uint> cell;
+        std::vector<bool> cell_winding;
         for(uint j=0; j<nf; ++j)
         {
             uint fid;
@@ -101,11 +103,10 @@ void read_HYBDRID(const char                     * filename,
         {
             uint winding;
             fscanf(fp, "%d", &winding);
-            if (winding == 0)
-            {
-                cells.back().at(j) *= -1; // -fid to indicates that the face winding order is CW as seen from the current cell
-            }
+            assert(winding==0 || winding==1);
+            cell_winding.push_back(winding);
         }
+        cells_face_winding.push_back(cell_winding);
     }
 
     fclose(fp);

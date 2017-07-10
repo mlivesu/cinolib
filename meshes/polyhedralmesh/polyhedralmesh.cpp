@@ -58,10 +58,12 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 Polyhedralmesh<M,V,E,F,C>::Polyhedralmesh(const std::vector<vec3d>             & verts,
                                           const std::vector<std::vector<uint>> & faces,
-                                          const std::vector<std::vector<int>>  & cells)
+                                          const std::vector<std::vector<uint>> & cells,
+                                          const std::vector<std::vector<bool>> & cells_face_winding)
 : verts(verts)
 , faces(faces)
 , cells(cells)
+, cells_face_winding(cells_face_winding)
 {
     init();
 }
@@ -77,7 +79,9 @@ void Polyhedralmesh<M,V,E,F,C>::clear()
     verts.clear();
     edges.clear();
     faces.clear();
+    tessellated_faces.clear();
     cells.clear();
+    cells_face_winding.clear();
     v_on_srf.clear();
     e_on_srf.clear();
     f_on_srf.clear();
@@ -120,7 +124,7 @@ void Polyhedralmesh<M,V,E,F,C>::load(const char * filename)
     if (filetype.compare(".hybrid") == 0 ||
         filetype.compare(".HYBRID") == 0)
     {
-        read_HYBDRID(filename, coords, faces, cells);
+        read_HYBDRID(filename, coords, faces, cells, cells_face_winding);
     }
     else
     {
@@ -151,8 +155,8 @@ void Polyhedralmesh<M,V,E,F,C>::init()
 
     v_data.resize(num_verts());
     e_data.resize(num_edges());
-    c_data.resize(num_cells());
     f_data.resize(num_faces());
+    c_data.resize(num_cells());
 
     update_f_normals();
 }
@@ -344,7 +348,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 uint Polyhedralmesh<M,V,E,F,C>::cell_face_id(const uint cid, const uint off) const
 {
-    return std::abs(cells.at(cid).at(off)); // abs because it may be < 0 if the face is CW and not CCW!
+    return cells.at(cid).at(off);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -352,7 +356,7 @@ uint Polyhedralmesh<M,V,E,F,C>::cell_face_id(const uint cid, const uint off) con
 template<class M, class V, class E, class F, class C>
 bool Polyhedralmesh<M,V,E,F,C>::cell_face_is_CW(const uint cid, const uint off) const
 {
-    return (cells.at(cid).at(off) < 0);
+    return (cells_face_winding.at(cid).at(off) == true);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -360,7 +364,7 @@ bool Polyhedralmesh<M,V,E,F,C>::cell_face_is_CW(const uint cid, const uint off) 
 template<class M, class V, class E, class F, class C>
 bool Polyhedralmesh<M,V,E,F,C>::cell_face_is_CCW(const uint cid, const uint off) const
 {
-    return (cells.at(cid).at(off) >= 0);
+    return (cells_face_winding.at(cid).at(off) == false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

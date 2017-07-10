@@ -42,7 +42,8 @@ CINO_INLINE
 void read_HYBDRID(const char                     * filename,
                   std::vector<double>            & coords,
                   std::vector<std::vector<uint>> & faces,
-                  std::vector<std::vector<int>>  & cells);
+                  std::vector<std::vector<uint>> &cells,
+                  std::vector<std::vector<bool>> & cells_face_winding);
 }
 
 #ifndef  CINO_STATIC_LIB
