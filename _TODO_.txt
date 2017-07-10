@@ -1,4 +1,4 @@
-- add Mesh,SurfaceMesh and VolumeMesh interfaces, and implement them with ALL the meshes available within the library
+- add Additive Manufacturing stuff…
 - transform any function containing inner Trimesh<> or Tetmesh<> into a templated function  with generic Mesh type
 - improve face tessellation strategy for polygonal meshes (flipped elements may currently arise for non convex polygons)
 - add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
