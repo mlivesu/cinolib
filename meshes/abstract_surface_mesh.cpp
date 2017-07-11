@@ -428,7 +428,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 bool AbstractSurfaceMesh<M,V,E,F>::edge_is_boundary(const uint eid) const
 {
-    return (this->adj_e2f(eid).size() < 2);
+    return (this->adj_e2f(eid).size() == 1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
