@@ -108,6 +108,22 @@ void AbstractSurfaceMesh<M,V,E,F>::save(const char * filename) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::init()
+{
+    this->update_adjacency();
+    this->update_bbox();
+
+    this->v_data.resize(this->num_verts());
+    this->e_data.resize(this->num_edges());
+    this->x_data.resize(this->num_faces());
+
+    this->update_normals();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 void AbstractSurfaceMesh<M,V,E,F>::update_adjacency()
 {
     timer_start("Build adjacency");
@@ -179,6 +195,55 @@ void AbstractSurfaceMesh<M,V,E,F>::update_adjacency()
     logger << this->num_edges() << "\tedges" << endl;
 
     timer_stop("Build adjacency");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::update_v_normal(const uint vid)
+{
+    vec3d n(0,0,0);
+    for(uint fid : this->adj_v2f(vid))
+    {
+        n += face_data(fid).normal;
+    }
+    n.normalize();
+    this->vert_data(vid).normal = n;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::update_f_normals()
+{
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        update_f_normal(fid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::update_v_normals()
+{
+    for(uint vid=0; vid<this->num_verts(); ++vid)
+    {
+        update_v_normal(vid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::update_normals()
+{
+    this->update_f_normals();
+    this->update_v_normals();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -637,5 +702,68 @@ uint AbstractSurfaceMesh<M,V,E,F>::elem_vert_offset(const uint fid, const uint v
     return this->face_vert_offset(fid,vid);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<int> AbstractSurfaceMesh<M,V,E,F>::export_per_face_labels() const
+{
+    std::vector<int> labels(this->num_faces());
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        labels.at(this->face_data(fid).label);
+    }
+    return labels;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<Color> AbstractSurfaceMesh<M,V,E,F>::export_per_face_colors() const
+{
+    std::vector<Color> colors(this->num_faces());
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        colors.at(fid) = this->face_data(fid).color;
+    }
+    return colors;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::face_flip_winding_order(const uint fid)
+{
+    std::reverse(this->faces.at(fid).begin(), this->faces.at(fid).end());
+
+    update_f_normal(fid);
+    for(uint off=0; off<this->verts_per_face(fid); ++off) update_v_normal(this->face_vert_id(fid,off));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::face_set_color(const Color & c)
+{
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        face_data(fid).color = c;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::face_set_alpha(const float alpha)
+{
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        face_data(fid).color.a = alpha;
+    }
+}
 
 }

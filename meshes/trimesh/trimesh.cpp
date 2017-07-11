@@ -642,7 +642,7 @@ uint Trimesh<M,V,E,F>::face_add(const uint vid0, const uint vid1, const uint vid
     this->faces.push_back(f);
     //
     F data;
-    this->f_data.push_back(data);
+    this->x_data.push_back(data);
     //
     this->f2e.push_back(std::vector<uint>());
     this->f2f.push_back(std::vector<uint>());

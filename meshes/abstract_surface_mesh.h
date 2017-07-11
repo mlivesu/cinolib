@@ -44,17 +44,32 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 {
     public:
 
+                 AbstractSurfaceMesh() : AbstractMesh<M,V,E,F>() {}
+        virtual ~AbstractSurfaceMesh() {}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         virtual void load(const char * filename);
         virtual void save(const char * filename) const;
+        virtual void init();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual void update_adjacency();
+        virtual void update_f_normal(const uint fid) = 0;
+        virtual void update_v_normal(const uint vid);
+        virtual void update_f_normals();
+        virtual void update_v_normals();
+        virtual void update_normals();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual uint verts_per_face(const uint fid) const { return this->faces.at(fid).size(); }
         virtual uint verts_per_elem(const uint fid) const { return this->faces.at(fid).size(); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual std::vector<int>   export_per_face_labels() const;
+        virtual std::vector<Color> export_per_face_colors() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -66,8 +81,10 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual const F & elem_data(const uint fid) const { return this->f_data.at(fid); } // elem == face!!
-        virtual       F & elem_data(const uint fid)       { return this->f_data.at(fid); }
+        virtual const F & face_data(const uint fid) const { return this->x_data.at(fid); }
+        virtual       F & face_data(const uint fid)       { return this->x_data.at(fid); }
+        virtual const F & elem_data(const uint fid) const { return this->x_data.at(fid); } // elem == face!!
+        virtual       F & elem_data(const uint fid)       { return this->x_data.at(fid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -104,12 +121,15 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual double face_area          (const uint fid) const = 0;
-        virtual double face_mass          (const uint fid) const;
-        virtual int    face_shared        (const uint eid0, const uint eid1) const;
-        virtual int    face_adjacent_along(const uint fid, const uint vid0, const uint vid1) const;
-        virtual bool   face_is_boundary   (const uint fid) const;
-        virtual int    face_opposite_to   (const uint eid, const uint fid) const;
+        virtual double face_area              (const uint fid) const = 0;
+        virtual double face_mass              (const uint fid) const;
+        virtual int    face_shared            (const uint eid0, const uint eid1) const;
+        virtual int    face_adjacent_along    (const uint fid, const uint vid0, const uint vid1) const;
+        virtual void   face_flip_winding_order(const uint fid);
+        virtual bool   face_is_boundary       (const uint fid) const;
+        virtual int    face_opposite_to       (const uint eid, const uint fid) const;
+        virtual void   face_set_color         (const Color & c);
+        virtual void   face_set_alpha         (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

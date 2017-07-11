@@ -50,7 +50,7 @@ void AbstractMesh<M,V,E,F>::clear()
     m_data = std_M_data;
     v_data.clear();
     e_data.clear();
-    f_data.clear();
+    x_data.clear();
     //
     v2v.clear();
     v2e.clear();
@@ -58,22 +58,6 @@ void AbstractMesh<M,V,E,F>::clear()
     e2f.clear();
     f2e.clear();
     f2f.clear();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void AbstractMesh<M,V,E,F>::init()
-{
-    update_adjacency();
-    update_bbox();
-
-    v_data.resize(num_verts());
-    e_data.resize(num_edges());
-    f_data.resize(num_faces());
-
-    update_normals();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -175,55 +159,6 @@ void AbstractMesh<M,V,E,F>::update_bbox()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void AbstractMesh<M,V,E,F>::update_v_normal(const uint vid)
-{
-    vec3d n(0,0,0);
-    for(uint fid : adj_v2f(vid))
-    {
-        n += face_data(fid).normal;
-    }
-    n.normalize();
-    vert_data(vid).normal = n;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void AbstractMesh<M,V,E,F>::update_f_normals()
-{
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        update_f_normal(fid);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void AbstractMesh<M,V,E,F>::update_v_normals()
-{
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        update_v_normal(vid);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void AbstractMesh<M,V,E,F>::update_normals()
-{
-    update_f_normals();
-    update_v_normals();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
 std::vector<double> AbstractMesh<M,V,E,F>::vector_coords() const
 {
     std::vector<double> coords;
@@ -264,34 +199,6 @@ std::vector<float> AbstractMesh<M,V,E,F>::export_uvw_param(const int mode) const
         }
     }
     return uvw;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-std::vector<int> AbstractMesh<M,V,E,F>::export_per_face_labels() const
-{
-    std::vector<int> labels(num_faces());
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        labels.at(face_data(fid).label);
-    }
-    return labels;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-std::vector<Color> AbstractMesh<M,V,E,F>::export_per_face_colors() const
-{
-    std::vector<Color> colors(num_faces());
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        colors.at(fid) = face_data(fid).color;
-    }
-    return colors;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -628,42 +535,6 @@ bool AbstractMesh<M,V,E,F>::face_contains_edge(const uint fid, const uint eid) c
 {
     for(uint e : adj_f2e(fid)) if (e == eid) return true;
     return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void AbstractMesh<M,V,E,F>::face_flip_winding_order(const uint fid)
-{
-    std::reverse(faces.at(fid).begin(), faces.at(fid).end());
-
-    update_f_normal(fid);
-    for(uint off=0; off<verts_per_face(fid); ++off) update_v_normal(face_vert_id(fid,off));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void AbstractMesh<M,V,E,F>::face_set_color(const Color & c)
-{
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        face_data(fid).color = c;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void AbstractMesh<M,V,E,F>::face_set_alpha(const float alpha)
-{
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        face_data(fid).color.a = alpha;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

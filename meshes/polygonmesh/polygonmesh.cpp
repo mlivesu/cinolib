@@ -87,7 +87,7 @@ CINO_INLINE
 void Polygonmesh<M,V,E,F>::init()
 {
     update_face_tessellation();
-    AbstractMesh<M,V,E,F>::init();
+    AbstractSurfaceMesh<M,V,E,F>::init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

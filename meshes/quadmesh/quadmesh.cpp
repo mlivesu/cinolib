@@ -41,7 +41,7 @@ namespace cinolib
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-Quadmesh<M,V,E,F>::Quadmesh(const char * filename)
+Quadmesh<M,V,E,F>::Quadmesh(const char * filename) : AbstractSurfaceMesh<M,V,E,F>()
 {
     this->load(filename);
     init();
@@ -52,7 +52,7 @@ Quadmesh<M,V,E,F>::Quadmesh(const char * filename)
 template<class M, class V, class E, class F>
 CINO_INLINE
 Quadmesh<M,V,E,F>::Quadmesh(const std::vector<vec3d> & verts,
-                            const std::vector<uint>  & faces)
+                            const std::vector<uint>  & faces) : AbstractSurfaceMesh<M,V,E,F>()
 {
     this->verts = verts;
     this->faces = faces_from_serialized_vids(faces,4);
@@ -64,7 +64,7 @@ Quadmesh<M,V,E,F>::Quadmesh(const std::vector<vec3d> & verts,
 template<class M, class V, class E, class F>
 CINO_INLINE
 Quadmesh<M,V,E,F>::Quadmesh(const std::vector<double> & coords,
-                            const std::vector<uint>   & faces)
+                            const std::vector<uint>   & faces) : AbstractSurfaceMesh<M,V,E,F>()
 {
     this->verts = vec3d_from_serialized_xyz(coords);
     this->faces = faces_from_serialized_vids(faces,4);
@@ -76,7 +76,7 @@ Quadmesh<M,V,E,F>::Quadmesh(const std::vector<double> & coords,
 template<class M, class V, class E, class F>
 CINO_INLINE
 Quadmesh<M,V,E,F>::Quadmesh(const std::vector<vec3d>             & verts,
-                            const std::vector<std::vector<uint>> & faces)
+                            const std::vector<std::vector<uint>> & faces) : AbstractSurfaceMesh<M,V,E,F>()
 {
     this->verts = verts;
     this->faces = faces;
@@ -88,7 +88,7 @@ Quadmesh<M,V,E,F>::Quadmesh(const std::vector<vec3d>             & verts,
 template<class M, class V, class E, class F>
 CINO_INLINE
 Quadmesh<M,V,E,F>::Quadmesh(const std::vector<double>            & coords,
-                            const std::vector<std::vector<uint>> & faces)
+                            const std::vector<std::vector<uint>> & faces) : AbstractSurfaceMesh<M,V,E,F>()
 {
     this->verts = vec3d_from_serialized_xyz(coords);
     this->faces = faces;
@@ -112,7 +112,7 @@ CINO_INLINE
 void Quadmesh<M,V,E,F>::init()
 {
     update_face_tessellation();
-    AbstractMesh<M,V,E,F>::init();
+    AbstractSurfaceMesh<M,V,E,F>::init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -57,7 +57,7 @@ namespace cinolib
 template<class M,
          class V,
          class E,
-         class F>
+         class X> // <= element data struct (it'll be faces for surface meshes and cells for volume meshes)
 class AbstractMesh
 {
     protected:
@@ -71,7 +71,7 @@ class AbstractMesh
         M              m_data;
         std::vector<V> v_data;
         std::vector<E> e_data;
-        std::vector<F> f_data;
+        std::vector<X> x_data; // <= element data
 
         std::vector<std::vector<uint>> v2v;
         std::vector<std::vector<uint>> v2e;
@@ -82,12 +82,17 @@ class AbstractMesh
 
     public:
 
+                 AbstractMesh() {}
+        virtual ~AbstractMesh() {}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         virtual MeshType mesh_type() const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual void clear();
-        virtual void init();
+        virtual void init() = 0;
         virtual void load(const char * filename) = 0;
         virtual void save(const char * filename) const = 0;
 
@@ -96,11 +101,7 @@ class AbstractMesh
         virtual void center_bbox();
         virtual void update_bbox();
         virtual void update_adjacency() = 0;
-        virtual void update_f_normal(const uint fid) = 0;
-        virtual void update_v_normal(const uint vid);
-        virtual void update_f_normals();
-        virtual void update_v_normals();
-        virtual void update_normals();
+        virtual void update_normals() = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -112,7 +113,7 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual uint verts_per_face(const uint fid) const = 0;
+        virtual uint verts_per_face(const uint fid) const { return faces.at(fid).size(); }
         virtual uint verts_per_elem(const uint eid) const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -133,8 +134,6 @@ class AbstractMesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual std::vector<float> export_uvw_param(const int mode) const;
-        virtual std::vector<int>   export_per_face_labels() const;
-        virtual std::vector<Color> export_per_face_colors() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -160,10 +159,8 @@ class AbstractMesh
         virtual       V & vert_data(const uint vid)       { return v_data.at(vid); }
         virtual const E & edge_data(const uint eid) const { return e_data.at(eid); }
         virtual       E & edge_data(const uint eid)       { return e_data.at(eid); }
-        virtual const F & face_data(const uint fid) const { return f_data.at(fid); }
-        virtual       F & face_data(const uint fid)       { return f_data.at(fid); }
-        virtual const F & elem_data(const uint eid) const = 0;
-        virtual       F & elem_data(const uint eid)       = 0;
+        virtual const X & elem_data(const uint eid) const = 0;
+        virtual       X & elem_data(const uint eid)       = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -192,17 +189,16 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual       vec3d  face_vert              (const uint fid, const uint offset) const;
-        virtual       uint   face_vert_id           (const uint fid, const uint offset) const;
-        virtual       uint   face_edge_id           (const uint fid, const uint vid0, const uint vid1) const;
-        virtual       uint   face_vert_offset       (const uint fid, const uint vid) const;
-        virtual       vec3d  face_centroid          (const uint fid) const;
-        virtual       double face_angle_at_vert     (const uint fid, const uint vid, const int unit = RAD) const;
-        virtual       bool   face_contains_vert     (const uint fid, const uint vid) const;
-        virtual       bool   face_contains_edge     (const uint fid, const uint eid) const;
-        virtual       void   face_flip_winding_order(const uint fid);
-        virtual       void   face_set_color         (const Color & c);
-        virtual       void   face_set_alpha         (const float alpha);
+        virtual       vec3d  face_vert         (const uint fid, const uint offset) const;
+        virtual       uint   face_vert_id      (const uint fid, const uint offset) const;
+        virtual       uint   face_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
+        virtual       uint   face_vert_offset  (const uint fid, const uint vid) const;
+        virtual       vec3d  face_centroid     (const uint fid) const;
+        virtual       double face_angle_at_vert(const uint fid, const uint vid, const int unit = RAD) const;
+        virtual       bool   face_contains_vert(const uint fid, const uint vid) const;
+        virtual       bool   face_contains_edge(const uint fid, const uint eid) const;
+        virtual       void   face_set_color    (const Color & c) = 0;
+        virtual       void   face_set_alpha    (const float alpha) = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
