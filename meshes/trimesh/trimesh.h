@@ -78,6 +78,10 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        std::vector<uint> get_ordered_boundary_vertices() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void   vert_switch_id          (const uint vid0, const uint vid1);
         void   vert_remove_unreferenced(const uint vid);
         uint   vert_add                (const vec3d & pos);

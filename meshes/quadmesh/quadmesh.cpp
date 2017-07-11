@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/quadmesh/quadmesh.h>
+#include <cinolib/meshes/trimesh/trimesh.h>
 #include <cinolib/geometry/plane.h>
 
 #include <queue>
@@ -214,6 +215,46 @@ std::vector<uint> Quadmesh<M,V,E,F>::vert_loop(const uint start, const uint next
     while(curr != start);
 
     return loop;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<uint> Quadmesh<M,V,E,F>::get_ordered_boundary_vertices() const
+{
+    // NOTE: assumes the mesh contains exactly ONE simply connected boundary!
+
+    std::vector<double> coords = this->vector_coords();
+    std::vector<uint>   tris;
+
+    vec3d c   = this->centroid();
+    uint  cid = this->num_verts();
+    coords.push_back(c.x());
+    coords.push_back(c.y());
+    coords.push_back(c.z());
+
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if (this->edge_is_boundary(eid))
+        {
+            uint fid  = this->adj_e2f(eid).front();
+            uint vid0 = this->edge_vert_id(eid,0);
+            uint vid1 = this->edge_vert_id(eid,1);
+            if (this->face_vert_offset(fid,vid0) > this->face_vert_offset(fid,vid1))
+            {
+                std::swap(vid0,vid1);
+            }
+            tris.push_back(vid0);
+            tris.push_back(vid1);
+            tris.push_back(cid);
+        }
+    }
+
+    logger.disable();
+    Trimesh<> tmp(coords,tris);
+    logger.enable();
+    return tmp.vert_ordered_vert_ring(cid);
 }
 
 }

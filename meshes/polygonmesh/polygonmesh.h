@@ -77,6 +77,10 @@ class Polygonmesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        std::vector<uint> get_ordered_boundary_vertices() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         double face_area(const uint) const { assert(false); } // TODO!
 };
 

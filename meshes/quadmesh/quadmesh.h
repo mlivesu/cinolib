@@ -94,6 +94,10 @@ class Quadmesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        std::vector<uint> get_ordered_boundary_vertices() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         bool              vert_is_singular(const uint vid) const;
         bool              vert_is_regular (const uint vid) const;
         std::vector<uint> vert_loop       (const uint start, const uint next) const;
