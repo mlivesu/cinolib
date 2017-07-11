@@ -766,4 +766,67 @@ void AbstractSurfaceMesh<M,V,E,F>::face_set_alpha(const float alpha)
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::operator+=(const AbstractSurfaceMesh<M,V,E,F> & m)
+{
+    uint nv = this->num_verts();
+    uint nf = this->num_faces();
+    uint ne = this->num_edges();
+
+    std::vector<uint> tmp;
+    for(uint fid=0; fid<m.num_faces(); ++fid)
+    {
+        std::vector<uint> f;
+        for(uint off=0; off<m.verts_per_face(fid); ++off) f.push_back(nv + m.face_vert_id(fid,off));
+        this->faces.push_back(f);
+
+        this->x_data.push_back(m.face_data(fid));
+
+        tmp.clear();
+        for(uint eid : m.f2e.at(fid)) tmp.push_back(ne + eid);
+        this->f2e.push_back(tmp);
+
+        tmp.clear();
+        for(uint nbr : m.f2f.at(fid)) tmp.push_back(nf + nbr);
+        this->f2f.push_back(tmp);
+    }
+    for(uint eid=0; eid<m.num_edges(); ++eid)
+    {
+        this->edges.push_back(nv + m.edge_vert_id(eid,0));
+        this->edges.push_back(nv + m.edge_vert_id(eid,1));
+
+        this->e_data.push_back(m.edge_data(eid));
+
+        tmp.clear();
+        for(uint tid : m.e2f.at(eid)) tmp.push_back(nf + tid);
+        this->e2f.push_back(tmp);
+    }
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        this->verts.push_back(m.vert(vid));
+        this->v_data.push_back(m.vert_data(vid));
+
+        tmp.clear();
+        for(uint eid : m.v2e.at(vid)) tmp.push_back(ne + eid);
+        this->v2e.push_back(tmp);
+
+        tmp.clear();
+        for(uint tid : m.v2f.at(vid)) tmp.push_back(nf + tid);
+        this->v2f.push_back(tmp);
+
+        tmp.clear();
+        for(uint nbr : m.v2v.at(vid)) tmp.push_back(nv + nbr);
+        this->v2v.push_back(tmp);
+    }
+
+    this->update_bbox();
+
+    logger << "Appended " << m.mesh_data().filename << " to mesh " << this->mesh_data().filename << endl;
+    logger << this->num_faces() << " faces" << endl;
+    logger << this->num_verts() << " verts" << endl;
+}
+
 }

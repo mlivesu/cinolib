@@ -49,6 +49,10 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void operator+=(const AbstractSurfaceMesh<M,V,E,F> & m);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         virtual void load(const char * filename);
         virtual void save(const char * filename) const;
         virtual void init();
