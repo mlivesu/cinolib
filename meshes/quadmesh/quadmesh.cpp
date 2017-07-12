@@ -121,6 +121,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Quadmesh<M,V,E,F>::update_face_tessellation()
 {
+    tessellated_faces.clear();
     tessellated_faces.resize(this->num_faces());
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
@@ -255,6 +256,16 @@ std::vector<uint> Quadmesh<M,V,E,F>::get_ordered_boundary_vertices() const
     Trimesh<> tmp(coords,tris);
     logger.enable();
     return tmp.vert_ordered_vert_ring(cid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Quadmesh<M,V,E,F>::operator+=(const Quadmesh<M,V,E,F> & m)
+{
+    AbstractSurfaceMesh<M,V,E,F>::operator +=(m);
+    update_face_tessellation();
 }
 
 }

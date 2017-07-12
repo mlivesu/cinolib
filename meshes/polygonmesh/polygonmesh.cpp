@@ -187,5 +187,14 @@ std::vector<uint> Polygonmesh<M,V,E,F>::get_ordered_boundary_vertices() const
     return tmp.vert_ordered_vert_ring(cid);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void Polygonmesh<M,V,E,F>::operator+=(const Polygonmesh<M,V,E,F> & m)
+{
+    AbstractSurfaceMesh<M,V,E,F>::operator +=(m);
+    update_face_tessellation();
+}
 
 }

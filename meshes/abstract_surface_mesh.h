@@ -49,10 +49,6 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void operator+=(const AbstractSurfaceMesh<M,V,E,F> & m);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         virtual void load(const char * filename);
         virtual void save(const char * filename) const;
         virtual void init();
@@ -65,6 +61,10 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
         virtual void update_f_normals();
         virtual void update_v_normals();
         virtual void update_normals();
+
+         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+         void operator+=(const AbstractSurfaceMesh<M,V,E,F> & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

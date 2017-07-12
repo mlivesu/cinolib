@@ -72,6 +72,10 @@ class Polygonmesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void operator+=(const Polygonmesh<M,V,E,F> & m);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void update_f_normal(const uint fid);
         void update_face_tessellation();
 
