@@ -89,7 +89,7 @@ class Curve
         // Arc-length parameterization (t \in [0,1])
         //
         void              update_arc_length_param(); // recomputes parameter t for each sample
-        uint              last_sample_lower_equal_than(const float t) const; // reteurns index
+        uint              last_sample_lower_equal_than(const float t) const; // returns index
         uint              sample_closest_to(const float t) const; // reteurns index
         vec3d             sample_curve_at(const float t) const;
         vec3d             sample_curve_at(const float t, const double tot_length) const;
