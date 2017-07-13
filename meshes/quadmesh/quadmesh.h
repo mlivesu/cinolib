@@ -104,7 +104,13 @@ class Quadmesh : public AbstractSurfaceMesh<M,V,E,F>
 
         bool              vert_is_singular(const uint vid) const;
         bool              vert_is_regular (const uint vid) const;
-        std::vector<uint> vert_loop       (const uint start, const uint next) const;
+        std::vector<uint> vert_chain      (const uint start, const uint next) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        uint              edge_opposite_to(const uint fid, const uint eid) const;
+        std::vector<uint> edges_opposite_to(const uint eid) const;
+        std::vector<uint> edge_chain(const uint eid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

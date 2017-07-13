@@ -188,7 +188,7 @@ bool Quadmesh<M,V,E,F>::vert_is_regular(const uint vid) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-std::vector<uint> Quadmesh<M,V,E,F>::vert_loop(const uint start, const uint next) const
+std::vector<uint> Quadmesh<M,V,E,F>::vert_chain(const uint start, const uint next) const
 {
     assert(this->verts_are_adjacent(start,next));
     assert(this->vert_is_regular(start)); // if there is a singularity along there will be no loop!
@@ -216,6 +216,76 @@ std::vector<uint> Quadmesh<M,V,E,F>::vert_loop(const uint start, const uint next
     while(curr != start);
 
     return loop;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<uint> Quadmesh<M,V,E,F>::edges_opposite_to(const uint eid) const
+{
+    std::vector<uint> res;
+    for(uint fid : this->adj_e2f(eid))
+    {
+        res.push_back(edge_opposite_to(fid,eid));
+    }
+    return res;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+uint Quadmesh<M,V,E,F>::edge_opposite_to(const uint fid, const uint eid) const
+{
+    assert(this->face_contains_edge(fid,eid));
+
+    uint vid0 = this->edge_vert_id(eid,0);
+    uint vid1 = this->edge_vert_id(eid,1);
+
+    for(uint e : this->adj_f2e(fid))
+    {
+        if (!this->edge_contains_vert(e,vid0) &&
+            !this->edge_contains_vert(e,vid1))
+        {
+            return e;
+        }
+    }
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+std::vector<uint> Quadmesh<M,V,E,F>::edge_chain(const uint eid) const
+{
+    std::vector<uint> chain;
+    std::set<uint>    visited;
+    std::queue<uint>  q;
+    q.push(eid);
+    visited.insert(eid);
+
+    while(!q.empty())
+    {
+        uint curr = q.front();
+        q.pop();
+
+        chain.push_back(curr);
+
+        for(uint e : edges_opposite_to(curr))
+        {
+            if (DOES_NOT_CONTAIN(visited,e))
+            {
+                visited.insert(e);
+                q.push(e);
+            }
+        }
+    }
+    assert(visited.size() == chain.size());
+
+    return chain;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
