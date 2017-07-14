@@ -292,6 +292,27 @@ std::vector<uint> Quadmesh<M,V,E,F>::edge_chain(const uint eid) const
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+std::vector<std::vector<uint>> Quadmesh<M,V,E,F>::edge_chains() const
+{
+    std::set<uint> visited;
+    std::vector<std::vector<uint>> chains;
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if (DOES_NOT_CONTAIN(visited,eid))
+        {
+            std::vector<uint> chain = edge_chain(eid);
+            for(uint e : chain) visited.insert(e);
+            chains.push_back(chain);
+        }
+    }
+    assert(visited.size()==this->num_edges());
+    return chains;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 std::vector<uint> Quadmesh<M,V,E,F>::get_ordered_boundary_vertices() const
 {
     // NOTE: assumes the mesh contains exactly ONE simply connected boundary!

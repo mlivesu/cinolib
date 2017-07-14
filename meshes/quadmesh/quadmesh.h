@@ -108,9 +108,10 @@ class Quadmesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint              edge_opposite_to(const uint fid, const uint eid) const;
-        std::vector<uint> edges_opposite_to(const uint eid) const;
-        std::vector<uint> edge_chain(const uint eid) const;
+        uint                           edge_opposite_to(const uint fid, const uint eid) const;
+        std::vector<uint>              edges_opposite_to(const uint eid) const;
+        std::vector<uint>              edge_chain(const uint eid) const;
+        std::vector<std::vector<uint>> edge_chains() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
