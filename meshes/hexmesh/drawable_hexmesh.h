@@ -33,12 +33,6 @@
 
 #ifdef CINOLIB_USES_OPENGL
 
-#ifdef __APPLE__
-#include <gl.h>
-#else
-#include <GL/gl.h>
-#endif
-
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/gl/draw_lines_tris.h>

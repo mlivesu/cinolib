@@ -31,13 +31,6 @@
 #ifndef CINO_DRAWABLE_TRIMESH_H
 #define CINO_DRAWABLE_TRIMESH_H
 
-#include <vector>
-#ifdef __APPLE__
-#include <gl.h>
-#else
-#include <GL/gl.h>
-#endif
-
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/gl/draw_lines_tris.h>
