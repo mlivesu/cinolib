@@ -31,8 +31,6 @@
 #ifndef CINO_DRAW_LINES_TRIS_H
 #define CINO_DRAW_LINES_TRIS_H
 
-#include <cinolib/cinolib.h>
-
 #ifdef __APPLE__
 #include <gl.h>
 #include <glu.h>
@@ -41,6 +39,9 @@
 #include <GL/glu.h>
 #endif
 
+#include <cinolib/cinolib.h>
+
+#include <vector>
 #include <sys/types.h>
 #include <cmath>
 
