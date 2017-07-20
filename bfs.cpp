@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/bfs.h>
+#include <queue>
 
 namespace cinolib
 {
@@ -314,6 +315,36 @@ void bfs(const Mesh              & m,
         }
     }
     assert(false && "BFS did not converge!");
+}
+
+
+template<class Mesh>
+CINO_INLINE
+void bfs_exahustive_on_dual(const Mesh                & m,
+                            const uint                  source,
+                                  std::vector<double> & dist) // elem id + dist
+{
+    dist = std::vector<double>(m.num_elems(), FLT_MAX);
+    std::queue<uint> q;
+
+    q.push(source);
+    dist.at(source) = 0.0;
+
+    while(!q.empty())
+    {
+        uint fid = q.front();
+        q.pop();
+
+        for(const uint & nbr : m.adj_elem2elem(fid))
+        {
+            double c = dist.at(fid) + m.elem_centroid(fid).dist(m.elem_centroid(nbr));
+            if (dist.at(nbr) > c)
+            {
+                dist.at(nbr) = c;
+                q.push(nbr);
+            }
+        }
+    }
 }
 
 

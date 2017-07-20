@@ -53,6 +53,17 @@ class Color
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        static Color PASTEL_YELLOW()  { return Color(254.0/255.0, 229.0/255.0, 157.0/255.0); }
+        static Color PASTEL_MAGENTA() { return Color(252.0/255.0,  89.0/255.0, 148.0/255.0); }
+        static Color PASTEL_GREEN()   { return Color(198.0/255.0, 223.0/255.0, 182.0/255.0); }
+        static Color PASTEL_CYAN()    { return Color( 77.0/255.0, 193.0/255.0, 198.0/255.0); }
+        static Color PASTEL_VIOLET()  { return Color(124.0/255.0, 158.0/255.0, 251.0/255.0); }
+        static Color PASTEL_PINK()    { return Color(182.0/255.0, 200.0/255.0, 230.0/255.0); }
+        static Color PASTEL_RED()     { return Color(253.0/255.0, 104.0/255.0, 118.0/255.0); }
+        static Color PASTEL_ORANGE()  { return Color(253.0/255.0, 135.0/255.0,  86.0/255.0); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         Color(const float r=1.0,
               const float g=1.0,
               const float b=1.0,

@@ -1,3 +1,4 @@
+- check the correct positioning of CINOLIB_USES_OPENGL (it should be only on files where open gl is directly included!)
 - make cotangent weights robust against almost degenerate triangles
 - make the uvw a vec3d and implement a set of methods to switch between xyz and uvw (this will make extremely easy to move a mesh from parametric to object space)
 - add Additive Manufacturing stuff…
