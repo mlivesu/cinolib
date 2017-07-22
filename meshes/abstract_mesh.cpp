@@ -108,6 +108,19 @@ void AbstractMesh<M,V,E,F>::rotate(const vec3d & axis, const double angle)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+void AbstractMesh<M,V,E,F>::scale(const double scale_factor)
+{
+    vec3d c = centroid();
+    translate(-c);
+    for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) *= scale_factor;
+    translate(c);
+    this->update_bbox();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 uint AbstractMesh<M,V,E,F>::connected_components() const
 {
     std::vector<std::set<uint>> ccs;

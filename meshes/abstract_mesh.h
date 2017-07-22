@@ -107,6 +107,7 @@ class AbstractMesh
 
         virtual void  translate(const vec3d & delta);
         virtual void  rotate(const vec3d & axis, const double angle);
+        virtual void  scale(const double scale_factor);
         virtual vec3d centroid() const;
         virtual uint  connected_components() const;
         virtual uint  connected_components(std::vector<std::set<uint>> & ccs) const;
