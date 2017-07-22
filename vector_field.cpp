@@ -82,6 +82,39 @@ void VectorField::normalize()
     }
 }
 
+
+CINO_INLINE
+void VectorField::serialize(const char *filename) const
+{
+    std::ofstream f;
+    f.precision(std::numeric_limits<double>::digits10+1);
+    f.open(filename);
+    assert(f.is_open());
+    f << "VECTOR_FIELD " << size()/3 << "\n";
+    for(uint i=0; i<rows(); ++i)
+    {
+        f << (*this)[i] << "\n";
+    }
+    f.close();
+}
+
+
+CINO_INLINE
+void VectorField::deserialize(const char *filename)
+{
+    std::ifstream f;
+    f.precision(std::numeric_limits<double>::digits10+1);
+    f.open(filename);
+    assert(f.is_open());
+    uint size;
+    std::string dummy;
+    f >> dummy >> size;
+    resize(size*3);
+    for(uint i=0; i<3*size; ++i) f >> (*this)[i];
+    f.close();
+}
+
+
 // for more info, see:
 // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
 //

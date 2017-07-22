@@ -32,12 +32,13 @@
 #define CINO_VECTOR_FIELD_H
 
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/serializable.h>
 #include <eigen3/Eigen/Dense>
 
 namespace cinolib
 {
 
-class VectorField : public Eigen::VectorXd
+class VectorField : public Eigen::VectorXd, public Serializable
 {
     public:
 
@@ -49,6 +50,9 @@ class VectorField : public Eigen::VectorXd
         void set(const int pos, const vec3d & vec);
 
         void normalize();
+
+        void serialize  (const char *filename) const;
+        void deserialize(const char *filename);
 
         // for more info, see:
         // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
