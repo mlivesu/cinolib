@@ -74,6 +74,8 @@ class Isocontour
 
         inline float value() const { return iso_value; }
 
+        const std::vector<vec3d> & curve_vertices(const uint id) const { return curves_vertices.at(id); }
+
     protected:
 
         void compute_edges2samples_map();
