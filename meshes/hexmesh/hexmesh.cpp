@@ -695,6 +695,18 @@ void Hexmesh<M,V,E,F,C>::vert_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+vec3d Hexmesh<M,V,E,F,C>::verts_average(const std::vector<uint> &vids) const
+{
+    vec3d res(0,0,0);
+    for(uint vid: vids) res += vert(vid);
+    res /= static_cast<double>(vids.size());
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 void Hexmesh<M,V,E,F,C>::edge_set_color(const Color & c)
 {
     for(uint eid=0; eid<num_edges(); ++eid)
@@ -866,6 +878,47 @@ void Hexmesh<M,V,E,F,C>::update_cell_quality()
     {
         update_cell_quality(cid);
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void Hexmesh<M,V,E,F,C>::cells_subdivide(const std::vector<std::vector<std::vector<uint>>> & cell_split_scheme)
+{
+    std::vector<vec3d> new_verts;
+    std::vector<uint>  new_cells;
+    std::map<std::vector<uint>,uint> v_map;
+
+    for(uint cid=0; cid<this->num_cells(); ++cid)
+    {
+        for(const auto & sub_cell: cell_split_scheme)
+        {
+            assert(sub_cell.size() == 8);
+            for(uint off=0; off<8; ++off)
+            {
+                std::vector<uint> vids;
+                for(uint i : sub_cell.at(off)) vids.push_back(cell_vert_id(cid,i));
+                sort(vids.begin(), vids.end());
+
+                auto query = v_map.find(vids);
+                if (query != v_map.end())
+                {
+                    new_cells.push_back(query->second);
+                }
+                else
+                {
+                    uint fresh_id = new_verts.size();
+                    new_verts.push_back(verts_average(vids));
+                    v_map[vids] = fresh_id;
+                    new_cells.push_back(fresh_id);
+                }
+            }
+        }
+    }
+    std::vector<uint> dummy;
+    write_MESH("/Users/cino/Desktop/test.mesh", serialized_xyz_from_vec3d(new_verts), dummy, new_cells);
+    *this = Hexmesh<M,V,E,F,C>(new_verts,new_cells);
 }
 
 }
