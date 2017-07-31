@@ -1,7 +1,9 @@
+- steal color::scatter from vcg :P
+- extend the concept of subdivisions from hexmesh to any mesh
 - check the correct positioning of CINOLIB_USES_OPENGL (it should be only on files where open gl is directly included!)
 - make cotangent weights robust against almost degenerate triangles
 - make the uvw a vec3d and implement a set of methods to switch between xyz and uvw (this will make extremely easy to move a mesh from parametric to object space)
-- add Additive Manufacturing stuff…
+- add Additive Manufacturing stuff (load and process CLI files)…
 - transform any function containing inner Trimesh<> or Tetmesh<> into a templated function  with generic Mesh type
 - improve face tessellation strategy for polygonal meshes (flipped elements may currently arise for non convex polygons)
 - add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
@@ -21,5 +23,5 @@
 - Improve on mesh rendering (shaders, VBOs ecc)
 - Add ambient occlusion (with/without floor)
 - Copy/paste points of view
-- remove dependency from libQGLViewer and use Qt3D instead
+- remove dependency from libQGLViewer and use Qt3D instead(?)
 - Add text box with debug messages
