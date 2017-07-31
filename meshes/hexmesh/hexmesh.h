@@ -212,6 +212,7 @@ class Hexmesh
         void    vert_set_color(const Color & c);
         void    vert_set_alpha(const float alpha);
         vec3d   verts_average (const std::vector<uint> & vids) const;
+        bool    vert_is_on_srf(const uint vid) const { return v_on_srf.at(vid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
