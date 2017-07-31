@@ -175,6 +175,20 @@ std::vector<std::vector<uint>> faces_from_serialized_vids(const std::vector<uint
     return tmp;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<uint> serialized_vids_from_faces(const std::vector<std::vector<uint>> & faces)
+{
+    std::vector<uint> tmp;
+    for(const auto & f   : faces)
+    for(const auto & vid : f    )
+    {
+        tmp.push_back(vid);
+    }
+    return tmp;
+}
+
 }
 
 #endif // CINO_COMMON_H
