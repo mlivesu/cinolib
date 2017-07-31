@@ -117,6 +117,7 @@ class Tetmesh
         uint verts_per_face() const { return 3; }
         uint verts_per_cell() const { return 4; }
         uint verts_per_elem() const { return 4; }
+        uint verts_per_elem(const uint) const { return 4; }
         uint edges_per_cell() const { return 6; }
         uint faces_per_cell() const { return 4; }
 
@@ -144,7 +145,7 @@ class Tetmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Trimesh<M,V,E,F> export_surface() const;
+        Trimesh<M,V,E,F> export_surface() const { return Trimesh<M,V,E,F>(verts,faces); }
         Trimesh<M,V,E,F> export_surface(std::map<uint,uint> & c2f_map,
                                         std::map<uint,uint> & f2c_map) const;
 
@@ -241,6 +242,7 @@ class Tetmesh
         int    cell_shared_vert          (const uint cid, const std::vector<uint> incident_edges) const;
         int    cell_adjacent_through_face(const uint cid, const uint face_offset) const;
         bool   cell_contains_vert        (const uint cid, const uint vid)   const;
+        bool   cell_bary_coords          (const uint cid, const vec3d & P, std::vector<double> & wgts) const;
         void   cell_set_color            (const Color & c);
         void   cell_set_alpha            (const float alpha);
 
@@ -251,10 +253,11 @@ class Tetmesh
         // "cell_" for volumetric meshes, allowing the use of templated algorithms
         // that work with both types of meshes without requiring specialzed code
 
-        vec3d  elem_centroid(const uint cid) const;
-        void   elem_show_all();
-        vec3d  elem_vert    (const uint cid, const uint off) const;
-        uint   elem_vert_id (const uint cid, const uint off) const;
+        vec3d  elem_centroid   (const uint cid) const;
+        void   elem_show_all   ();
+        vec3d  elem_vert       (const uint cid, const uint off) const;
+        uint   elem_vert_id    (const uint cid, const uint off) const;
+        bool   elem_bary_coords(const uint cid, const vec3d & P, std::vector<double> & wgts) const;
 
 };
 

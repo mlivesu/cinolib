@@ -507,6 +507,19 @@ bool Tetmesh<M,V,E,F,C>::cell_contains_vert(const uint cid, const uint vid) cons
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+bool Tetmesh<M,V,E,F,C>::cell_bary_coords(const uint cid, const vec3d &P, std::vector<double> &wgts) const
+{
+    return tet_barycentric_coords(cell_vert(cid,0),
+                                  cell_vert(cid,1),
+                                  cell_vert(cid,2),
+                                  cell_vert(cid,3),
+                                  P, wgts);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 vec3d Tetmesh<M,V,E,F,C>::cell_centroid(const uint cid) const
 {
     vec3d c(0,0,0);
@@ -663,6 +676,15 @@ CINO_INLINE
 uint Tetmesh<M,V,E,F,C>::elem_vert_id(const uint cid, const uint off) const
 {
     return cell_vert_id(cid,off);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool Tetmesh<M,V,E,F,C>::elem_bary_coords(const uint cid, const vec3d & P, std::vector<double> & wgts) const
+{
+    return cell_bary_coords(cid, P, wgts);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
