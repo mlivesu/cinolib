@@ -69,6 +69,7 @@ static const std::vector<std::vector<std::vector<uint>>> subdivide_grid_2x2x2
     {{0,1,2,3,4,5,6,7}, {1,2,5,6}, {2,6}, {2,3,6,7}, {4,5,6,7}, {5,6}, {6}, {6,7}},
     {{0,3,4,7}, {0,1,2,3,4,5,6,7}, {2,3,6,7}, {3,7}, {4,7}, {4,5,6,7}, {6,7}, {7}}
 };
+// mmm  to be checked! 3x3x3 seems buggy
 static const std::vector<std::vector<std::vector<uint>>> subdivide_grid_3x3x3
 {
     {{0}, {0,0,1}, {0,0,2}, {0,0,3}, {0,0,4}, {0,0,5}, {0,0,2,0,0,2,4,4,6}, {0,0,7}},
