@@ -536,6 +536,21 @@ ipair AbstractSurfaceMesh<M,V,E,F>::edge_shared(const uint fid0, const uint fid1
 
 template<class M, class V, class E, class F>
 CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::edge_highlight_labeling_boundaries()
+{
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        std::set<int> unique_labels;
+        for(uint fid : this->adj_e2f(eid)) unique_labels.insert(face_data(fid).label);
+
+        if (unique_labels.size()<2) this->edge_data(eid).color.a = 0.0;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
 int AbstractSurfaceMesh<M,V,E,F>::face_shared(const uint eid0, const uint eid1) const
 {
     for(uint fid0 : this->adj_e2f(eid0))
@@ -763,6 +778,25 @@ void AbstractSurfaceMesh<M,V,E,F>::face_set_alpha(const float alpha)
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
         face_data(fid).color.a = alpha;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void AbstractSurfaceMesh<M,V,E,F>::face_color_wrt_label()
+{
+    std::map<int,uint> l_map;
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        int l = face_data(fid).label;
+        if (DOES_NOT_CONTAIN(l_map,l)) l_map[l] = l_map.size();
+    }
+    uint n_labels = l_map.size();
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        face_data(fid).color = Color::scatter(n_labels,l_map.at(face_data(fid).label));
     }
 }
 

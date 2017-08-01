@@ -1,4 +1,5 @@
-- steal color::scatter from vcg :P
+- add rendering of 2D textures 
+- What I am currently doing in AbstractSurfaceMesh::edge_highlight_labeling_boundaries is wrong and should disappear. The right thing to do is to have a flag for edges, and a separate rendering session for flagged edges (for whatever reason)
 - extend the concept of subdivisions from hexmesh to any mesh
 - check the correct positioning of CINOLIB_USES_OPENGL (it should be only on files where open gl is directly included!)
 - make cotangent weights robust against almost degenerate triangles

@@ -122,6 +122,7 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
         virtual bool  edge_is_boundary(const uint eid) const;
         virtual bool  edges_share_face(const uint eid1, const uint eid2) const;
         virtual ipair edge_shared     (const uint fid0, const uint fid1) const;
+        virtual void  edge_highlight_labeling_boundaries();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -134,6 +135,7 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
         virtual int    face_opposite_to       (const uint eid, const uint fid) const;
         virtual void   face_set_color         (const Color & c);
         virtual void   face_set_alpha         (const float alpha);
+        virtual void   face_color_wrt_label   ();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
