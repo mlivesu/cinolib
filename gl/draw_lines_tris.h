@@ -61,8 +61,9 @@ enum
     DRAW_TRI_VERTCOLOR        = 0x00000020,
     DRAW_TRI_QUALITY          = 0x00000040,
     DRAW_TRI_TEXTURE1D        = 0x00000080,
-    DRAW_SEGS                 = 0x00000100,
-    DRAW_MARKED_SEGS          = 0x00000200,
+    DRAW_TRI_TEXTURE2D        = 0x00000100,
+    DRAW_SEGS                 = 0x00000200,
+    DRAW_MARKED_SEGS          = 0x00000400,
 };
 
 typedef struct
