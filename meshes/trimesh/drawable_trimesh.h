@@ -98,6 +98,10 @@ class DrawableTrimesh : public Trimesh<M,V,E,F>, public DrawableObject
         void show_face_wireframe_color(const Color & c);
         void show_face_wireframe_width(const float width);
         void show_face_wireframe_transparency(const float alpha);
+        void show_edge_marked(const bool b);
+        void show_edge_marked_color(const Color & c);
+        void show_edge_marked_width(const float width);
+        void show_edge_marked_transparency(const float alpha);
 };
 
 }

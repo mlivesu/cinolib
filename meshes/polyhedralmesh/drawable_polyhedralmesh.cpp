@@ -74,10 +74,10 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::init_drawable_stuff()
 {
     slicer = MeshSlicer<DrawablePolyhedralmesh<M,V,E,F,C>>(*this);
 
-    drawlist_in.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
+    drawlist_in.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_in.seg_width = 1;
 
-    drawlist_out.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
+    drawlist_out.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_out.seg_width = 1;
 
 //    Polyhedralmesh<M,V,E,F,C>::face_set_color(Color::YELLOW());
@@ -221,17 +221,14 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_out()
         drawlist_out.seg_coords.push_back(vid1.y());
         drawlist_out.seg_coords.push_back(vid1.z());
 
-        if (drawlist_out.draw_mode & DRAW_SEG_SEGCOLOR)
-        {
-            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.r);
-            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.g);
-            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.b);
-            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.a);
-            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.r);
-            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.g);
-            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.b);
-            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.a);
-        }
+        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.r);
+        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.g);
+        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.b);
+        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.a);
+        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.r);
+        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.g);
+        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.b);
+        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.a);
     }
 }
 
@@ -355,17 +352,14 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
         drawlist_in.seg_coords.push_back(vid1.y());
         drawlist_in.seg_coords.push_back(vid1.z());
 
-        if (drawlist_in.draw_mode & DRAW_SEG_SEGCOLOR)
-        {
-            drawlist_in.seg_colors.push_back(this->edge_data(eid).color.r);
-            drawlist_in.seg_colors.push_back(this->edge_data(eid).color.g);
-            drawlist_in.seg_colors.push_back(this->edge_data(eid).color.b);
-            drawlist_in.seg_colors.push_back(this->edge_data(eid).color.a);
-            drawlist_in.seg_colors.push_back(this->edge_data(eid).color.r);
-            drawlist_in.seg_colors.push_back(this->edge_data(eid).color.g);
-            drawlist_in.seg_colors.push_back(this->edge_data(eid).color.b);
-            drawlist_in.seg_colors.push_back(this->edge_data(eid).color.a);
-        }
+        drawlist_in.seg_colors.push_back(this->edge_data(eid).color.r);
+        drawlist_in.seg_colors.push_back(this->edge_data(eid).color.g);
+        drawlist_in.seg_colors.push_back(this->edge_data(eid).color.b);
+        drawlist_in.seg_colors.push_back(this->edge_data(eid).color.a);
+        drawlist_in.seg_colors.push_back(this->edge_data(eid).color.r);
+        drawlist_in.seg_colors.push_back(this->edge_data(eid).color.g);
+        drawlist_in.seg_colors.push_back(this->edge_data(eid).color.b);
+        drawlist_in.seg_colors.push_back(this->edge_data(eid).color.a);
     }
 }
 

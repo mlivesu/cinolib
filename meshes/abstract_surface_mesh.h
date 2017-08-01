@@ -118,11 +118,11 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual bool  edge_is_manifold(const uint eid) const;
-        virtual bool  edge_is_boundary(const uint eid) const;
-        virtual bool  edges_share_face(const uint eid1, const uint eid2) const;
-        virtual ipair edge_shared     (const uint fid0, const uint fid1) const;
-        virtual void  edge_highlight_labeling_boundaries();
+        virtual bool  edge_is_manifold             (const uint eid) const;
+        virtual bool  edge_is_boundary             (const uint eid) const;
+        virtual bool  edges_share_face             (const uint eid1, const uint eid2) const;
+        virtual ipair edge_shared                  (const uint fid0, const uint fid1) const;
+        virtual void  edge_mark_labeling_boundaries();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

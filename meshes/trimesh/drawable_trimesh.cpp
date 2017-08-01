@@ -102,8 +102,10 @@ void DrawableTrimesh<M,V,E,F>::init_drawable_stuff()
 {
     slicer = MeshSlicer<Trimesh<M,V,E,F>>(*this);
 
-    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
+    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_MARKED_SEGS;
     drawlist.seg_width = 1;
+    drawlist.marked_seg_color = Color::RED();
+    drawlist.marked_seg_width = 3;
 
     updateGL();
 }
@@ -202,15 +204,14 @@ void DrawableTrimesh<M,V,E,F>::updateGL()
         }
     }
 
-    // bake wireframe as border
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        bool masked = true;
+        bool invisible = true;
         for(uint fid : this->adj_e2f(eid))
         {
-            if (this->face_data(fid).visible) masked = false;
+            if (this->face_data(fid).visible) invisible = false;
         }
-        if (masked) continue;
+        if (invisible) continue;
 
         int base_addr = drawlist.seg_coords.size()/3;
         drawlist.segs.push_back(base_addr    );
@@ -226,16 +227,27 @@ void DrawableTrimesh<M,V,E,F>::updateGL()
         drawlist.seg_coords.push_back(vid1.y());
         drawlist.seg_coords.push_back(vid1.z());
 
-        if (drawlist.draw_mode & DRAW_SEG_SEGCOLOR)
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
+
+        if (this->edge_data(eid).marked && drawlist.draw_mode & DRAW_MARKED_SEGS)
         {
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
+            int base_addr = drawlist.marked_seg_coords.size()/3;
+            drawlist.marked_segs.push_back(base_addr    );
+            drawlist.marked_segs.push_back(base_addr + 1);
+
+            drawlist.marked_seg_coords.push_back(vid0.x());
+            drawlist.marked_seg_coords.push_back(vid0.y());
+            drawlist.marked_seg_coords.push_back(vid0.z());
+            drawlist.marked_seg_coords.push_back(vid1.x());
+            drawlist.marked_seg_coords.push_back(vid1.y());
+            drawlist.marked_seg_coords.push_back(vid1.z());
         }
     }
 }
@@ -390,6 +402,45 @@ CINO_INLINE
 void DrawableTrimesh<M,V,E,F>::show_face_wireframe_transparency(const float alpha)
 {
     this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableTrimesh<M,V,E,F>::show_edge_marked(const bool b)
+{
+    if (b) drawlist.draw_mode |=  DRAW_MARKED_SEGS;
+    else   drawlist.draw_mode &= ~DRAW_MARKED_SEGS;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableTrimesh<M,V,E,F>::show_edge_marked_color(const Color & c)
+{
+    drawlist.marked_seg_color = c;
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableTrimesh<M,V,E,F>::show_edge_marked_width(const float width)
+{
+    drawlist.marked_seg_width = width;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableTrimesh<M,V,E,F>::show_edge_marked_transparency(const float alpha)
+{
+    drawlist.marked_seg_color.a = alpha;
     updateGL();
 }
 

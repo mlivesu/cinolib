@@ -1,5 +1,4 @@
 - add rendering of 2D textures 
-- What I am currently doing in AbstractSurfaceMesh::edge_highlight_labeling_boundaries is wrong and should disappear. The right thing to do is to have a flag for edges, and a separate rendering session for flagged edges (for whatever reason)
 - extend the concept of subdivisions from hexmesh to any mesh
 - make cotangent weights robust against almost degenerate triangles
 - add Additive Manufacturing stuff (load and process CLI files)…

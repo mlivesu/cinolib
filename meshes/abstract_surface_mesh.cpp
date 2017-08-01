@@ -536,14 +536,14 @@ ipair AbstractSurfaceMesh<M,V,E,F>::edge_shared(const uint fid0, const uint fid1
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::edge_highlight_labeling_boundaries()
+void AbstractSurfaceMesh<M,V,E,F>::edge_mark_labeling_boundaries()
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         std::set<int> unique_labels;
         for(uint fid : this->adj_e2f(eid)) unique_labels.insert(face_data(fid).label);
 
-        if (unique_labels.size()<2) this->edge_data(eid).color.a = 0.0;
+        this->edge_data(eid).marked = (unique_labels.size()>=2);
     }
 }
 

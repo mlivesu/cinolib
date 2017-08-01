@@ -42,6 +42,7 @@
 #endif
 
 #include <cinolib/cinolib.h>
+#include <cinolib/color.h>
 
 #include <vector>
 #include <sys/types.h>
@@ -52,34 +53,38 @@ namespace cinolib
 
 enum
 {
-    DRAW_TRIS          = 0x00000001,
-    DRAW_TRI_POINTS    = 0x00000002,
-    DRAW_TRI_FLAT      = 0x00000004,
-    DRAW_TRI_SMOOTH    = 0x00000008,
-    DRAW_TRI_FACECOLOR = 0x00000010,
-    DRAW_TRI_VERTCOLOR = 0x00000020,
-    DRAW_TRI_QUALITY   = 0x00000040,
-    DRAW_TRI_TEXTURE1D = 0x00000080,
-    DRAW_SEGS          = 0x00000100,
-    DRAW_SEG_SEGCOLOR  = 0x00000200,
-    DRAW_SEG_VERTCOLOR = 0x00000400,
+    DRAW_TRIS                 = 0x00000001,
+    DRAW_TRI_POINTS           = 0x00000002,
+    DRAW_TRI_FLAT             = 0x00000004,
+    DRAW_TRI_SMOOTH           = 0x00000008,
+    DRAW_TRI_FACECOLOR        = 0x00000010,
+    DRAW_TRI_VERTCOLOR        = 0x00000020,
+    DRAW_TRI_QUALITY          = 0x00000040,
+    DRAW_TRI_TEXTURE1D        = 0x00000080,
+    DRAW_SEGS                 = 0x00000100,
+    DRAW_MARKED_SEGS          = 0x00000200,
 };
 
 typedef struct
 {
-    int                 draw_mode;
+    int                draw_mode;
     //
-    std::vector<uint>   tris;
-    std::vector<double> tri_coords;
-    std::vector<double> tri_v_norms;
-    std::vector<float>  tri_v_colors; // rgba
-    std::vector<float>  tri_text1D;
-    GLuint              tri_text1D_id;
+    std::vector<uint>  tris;
+    std::vector<float> tri_coords;
+    std::vector<float> tri_v_norms;
+    std::vector<float> tri_v_colors; // rgba
+    std::vector<float> tri_text1D;
+    GLuint             tri_text1D_id;
     //
-    std::vector<uint>   segs;
-    std::vector<double> seg_coords;
-    std::vector<float>  seg_colors;
-    GLfloat             seg_width;
+    std::vector<uint>  segs;
+    std::vector<float> seg_coords;
+    std::vector<float> seg_colors;
+    GLfloat            seg_width;
+    //
+    std::vector<uint>  marked_segs;
+    std::vector<float> marked_seg_coords;
+    Color              marked_seg_color;
+    GLfloat            marked_seg_width;
 }
 RenderData;
 

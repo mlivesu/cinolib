@@ -102,7 +102,7 @@ void DrawableQuadmesh<M,V,E,F>::init_drawable_stuff()
 {
     slicer = MeshSlicer<Quadmesh<M,V,E,F>>(*this);
 
-    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_SEG_SEGCOLOR;
+    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist.seg_width = 1;
 
     updateGL();
@@ -229,17 +229,14 @@ void DrawableQuadmesh<M,V,E,F>::updateGL()
         drawlist.seg_coords.push_back(vid1.y());
         drawlist.seg_coords.push_back(vid1.z());
 
-        if (drawlist.draw_mode & DRAW_SEG_SEGCOLOR)
-        {
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
-            drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
-        }
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
+        drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
     }
 }
 
