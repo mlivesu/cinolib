@@ -194,7 +194,7 @@ void DrawableTetmesh<M,V,E,F,C>::updateGL_out()
         else if (drawlist_out.draw_mode & DRAW_TRI_QUALITY)
         {
             float q = this->cell_data(this->adj_f2c(fid)).quality;
-            Color c = Color::rgb_from_quality(q);
+            Color c = Color::quality2rgb(q);
             drawlist_out.tri_v_colors.push_back(c.r);
             drawlist_out.tri_v_colors.push_back(c.g);
             drawlist_out.tri_v_colors.push_back(c.b);
@@ -376,7 +376,7 @@ void DrawableTetmesh<M,V,E,F,C>::updateGL_in()
                 else if (drawlist_in.draw_mode & DRAW_TRI_QUALITY)
                 {
                     float q = this->cell_data(cid).quality;
-                    Color c = Color::rgb_from_quality(q);
+                    Color c = Color::quality2rgb(q);
                     drawlist_in.tri_v_colors.push_back(c.r);
                     drawlist_in.tri_v_colors.push_back(c.g);
                     drawlist_in.tri_v_colors.push_back(c.b);
