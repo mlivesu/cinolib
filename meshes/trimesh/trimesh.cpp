@@ -795,15 +795,11 @@ std::vector<uint> Trimesh<M,V,E,F>::get_ordered_boundary_vertices() const
 {
     // NOTE: assumes the mesh contains exactly ONE simply connected boundary!
 
-    std::vector<double> coords = this->vector_coords();
-    std::vector<uint>   tris;
+    std::vector<uint>  faces;
+    std::vector<vec3d> verts = this->vector_verts();
+    verts.push_back(this->centroid());
 
-    vec3d c   = this->centroid();
-    uint  cid = this->num_verts();
-    coords.push_back(c.x());
-    coords.push_back(c.y());
-    coords.push_back(c.z());
-
+    uint cid = this->num_verts();
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         if (this->edge_is_boundary(eid))
@@ -815,15 +811,13 @@ std::vector<uint> Trimesh<M,V,E,F>::get_ordered_boundary_vertices() const
             {
                 std::swap(vid0,vid1);
             }
-            tris.push_back(vid0);
-            tris.push_back(vid1);
-            tris.push_back(cid);
+            faces.push_back(vid0);
+            faces.push_back(vid1);
+            faces.push_back(cid);
         }
     }
 
-    logger.disable();
-    Trimesh<> tmp(coords,tris);
-    logger.enable();
+    Trimesh<> tmp(verts,faces);
     return tmp.vert_ordered_vert_ring(cid);
 }
 
