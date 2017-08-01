@@ -75,8 +75,9 @@ typedef struct
 {
     vec3d  normal  = vec3d(0,0,0);
     Color  color   = Color::WHITE();
-    float  uvw[3]  = { 0, 0, 0 };
+    vec3d  uvw     = vec3d(0,0,0);
     float  quality = 0.0;
+    bool   marked  = false;
 }
 Vert_std_data;
 
@@ -84,7 +85,8 @@ Vert_std_data;
 
 typedef struct
 {
-    Color color   = Color::BLACK();
+    Color color  = Color::BLACK();
+    bool  marked = false;
 }
 Edge_std_data;
 
@@ -97,6 +99,7 @@ typedef struct
     int    label   = -1;
     bool   visible = true;
     float  quality = 0.0;
+    bool   marked  = false;
 }
 Face_std_data;
 
@@ -108,6 +111,7 @@ typedef struct
     int    label   = -1;
     bool   visible = true;
     float  quality = 0.0;
+    bool   marked  = false;
 }
 Cell_std_data;
 

@@ -54,10 +54,10 @@ enum // Look-up Table
 };
 
 CINO_INLINE
-void make_triangle(const Tetmesh<>       & m,
-                   const double            isovalue,
-                   const uint              vids[],
-                   const float             func[],
+void make_triangle(const Tetmesh<>        & m,
+                   const double             isovalue,
+                   const uint               vids[],
+                   const double             func[],
                    const uint               e[],
                    std::map<ipair,uint>   & e2v_map,
                    std::map<ipair,double> & split_info,
@@ -80,7 +80,7 @@ void marching_tets(const Tetmesh<>        & m,
 
     for(uint cid=0; cid<m.num_cells(); ++cid)
     {
-        float func[] =
+        double func[] =
         {
             m.vert_data(m.cell_vert_id(cid,0)).uvw[0],
             m.vert_data(m.cell_vert_id(cid,1)).uvw[0],
@@ -119,7 +119,7 @@ void marching_tets(const Tetmesh<>        & m,
             m.cell_vert_id(cid,3)
         };
 
-        float func[] =
+        double func[] =
         {
             m.vert_data(vids[0]).uvw[0],
             m.vert_data(vids[1]).uvw[0],
@@ -204,7 +204,7 @@ CINO_INLINE
 void make_triangle(const Tetmesh<>       & m,
                    const double            isovalue,
                    const uint              vids[],
-                   const float             func[],
+                   const double            func[],
                    const uint               e[],
                    std::map<ipair,uint>   & e2v_map,
                    std::map<ipair,double> & split_info,
@@ -239,8 +239,8 @@ void make_triangle(const Tetmesh<>       & m,
         }
         else
         {
-            float f_a = func[TET_EDGES[e[i]][0]];
-            float f_b = func[TET_EDGES[e[i]][1]];
+            double f_a = func[TET_EDGES[e[i]][0]];
+            double f_b = func[TET_EDGES[e[i]][1]];
 
             if (f_a < f_b)
             {

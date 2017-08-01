@@ -1021,9 +1021,9 @@ double Tetmesh<M,V,E,F,C>::vert_volume(const uint vid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-float Tetmesh<M,V,E,F,C>::vert_min_tex_coord(const int tex_coord) const
+double Tetmesh<M,V,E,F,C>::vert_min_tex_coord(const int tex_coord) const
 {
-    float min = FLT_MAX;
+    double min = FLT_MAX;
     for(uint vid=0; vid<num_verts(); ++vid)
     {
         switch (tex_coord)
@@ -1041,9 +1041,9 @@ float Tetmesh<M,V,E,F,C>::vert_min_tex_coord(const int tex_coord) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-float Tetmesh<M,V,E,F,C>::vert_max_tex_coord(const int tex_coord) const
+double Tetmesh<M,V,E,F,C>::vert_max_tex_coord(const int tex_coord) const
 {
-    float max = -FLT_MAX;
+    double max = -FLT_MAX;
     for(uint vid=0; vid<num_verts(); ++vid)
     {
         switch (tex_coord)
