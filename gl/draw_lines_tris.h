@@ -31,6 +31,8 @@
 #ifndef CINO_DRAW_LINES_TRIS_H
 #define CINO_DRAW_LINES_TRIS_H
 
+#ifdef CINOLIB_USES_OPENGL
+
 #ifdef __APPLE__
 #include <gl.h>
 #include <glu.h>
@@ -89,5 +91,7 @@ void render(const RenderData & data);
 #ifndef  CINO_STATIC_LIB
 #include "draw_lines_tris.cpp"
 #endif
+
+#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_DRAW_LINES_TRIS_H

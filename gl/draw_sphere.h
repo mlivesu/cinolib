@@ -31,7 +31,7 @@
 #ifndef CINO_DRAW_SPHERE_H
 #define CINO_DRAW_SPHERE_H
 
-#include <cinolib/cinolib.h>
+#ifdef CINOLIB_USES_OPENGL
 
 #ifdef __APPLE__
 #include <gl.h>
@@ -40,6 +40,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
+
+#include <cinolib/cinolib.h>
 
 namespace cinolib
 {
@@ -63,5 +65,7 @@ static void sphere(const vec3  & center,
 }
 
 }
+
+#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_DRAW_SPHERE_H

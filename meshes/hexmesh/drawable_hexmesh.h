@@ -31,8 +31,6 @@
 #ifndef CINO_DRAWABLE_HEXMESH_H
 #define CINO_DRAWABLE_HEXMESH_H
 
-#ifdef CINOLIB_USES_OPENGL
-
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/gl/draw_lines_tris.h>
@@ -113,7 +111,5 @@ class DrawableHexmesh : public Hexmesh<M,V,E,F,C>, public DrawableObject
 #ifndef  CINO_STATIC_LIB
 #include "drawable_hexmesh.cpp"
 #endif
-
-#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_DRAWABLE_HEXMESH_H

@@ -28,13 +28,8 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/meshes/skel/drawable_skel.h>
-#include <cinolib/cinolib.h>
-#include <cinolib/color.h>
-#include <cinolib/gl/draw_cylinder.h>
-#include <cinolib/gl/draw_sphere.h>
 
-#include <cstdlib>
+#ifdef CINOLIB_USES_OPENGL
 
 #ifdef __APPLE__
 #include <gl.h>
@@ -42,6 +37,13 @@
 #include <GL/gl.h>
 #endif
 
+#include <cinolib/meshes/skel/drawable_skel.h>
+#include <cinolib/cinolib.h>
+#include <cinolib/color.h>
+#include <cinolib/gl/draw_cylinder.h>
+#include <cinolib/gl/draw_sphere.h>
+
+#include <cstdlib>
 
 namespace cinolib
 {
@@ -282,3 +284,5 @@ void DrawableSkel::update_bone_colors()
 }
 
 }
+
+#endif // #ifdef CINOLIB_USES_OPENGL

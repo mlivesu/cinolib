@@ -31,8 +31,6 @@
 #ifndef CINO_DRAWABLE_QUADMESH_H
 #define CINO_DRAWABLE_QUADMESH_H
 
-#ifdef CINOLIB_USES_OPENGL
-
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/gl/draw_lines_tris.h>
@@ -107,7 +105,5 @@ class DrawableQuadmesh : public Quadmesh<M,V,E,F>, public DrawableObject
 #ifndef  CINO_STATIC_LIB
 #include "drawable_quadmesh.cpp"
 #endif
-
-#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_DRAWABLE_QUADMESH_H

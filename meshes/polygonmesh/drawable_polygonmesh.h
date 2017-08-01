@@ -31,8 +31,6 @@
 #ifndef CINO_DRAWABLE_POLYGONMESH_H
 #define CINO_DRAWABLE_POLYGONMESH_H
 
-#ifdef CINOLIB_USES_OPENGL
-
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/gl/draw_lines_tris.h>
@@ -100,7 +98,5 @@ class DrawablePolygonmesh : public Polygonmesh<M,V,E,F>, public DrawableObject
 #ifndef  CINO_STATIC_LIB
 #include "drawable_polygonmesh.cpp"
 #endif
-
-#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_DRAWABLE_POLYGONMESH_H

@@ -31,23 +31,23 @@
 #ifndef CINO_GLCANVAS_H
 #define CINO_GLCANVAS_H
 
+#ifdef CINOLIB_USES_OPENGL
 #ifdef CINOLIB_USES_QGLVIEWER
 
 #include <QGLWidget>
 #include <vector>
-
-#include <cinolib/cinolib.h>
-#include <cinolib/bbox.h>
-#include <cinolib/drawable_object.h>
-
-
-#include <qglviewer.h>
 
 #ifdef __APPLE__
 #include <gl.h>
 #else
 #include <GL/gl.h>
 #endif
+
+#include <cinolib/cinolib.h>
+#include <cinolib/bbox.h>
+#include <cinolib/drawable_object.h>
+
+#include <qglviewer.h>
 
 namespace cinolib
 {
@@ -84,6 +84,7 @@ class GLcanvas : public QGLViewer
 #include "glcanvas.cpp"
 #endif
 
-#endif
+#endif // #ifdef CINOLIB_USES_QGLVIEWER
+#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_GLCANVAS_H
