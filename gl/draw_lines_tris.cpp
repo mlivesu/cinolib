@@ -48,10 +48,6 @@ void render_pvt(const RenderData & data)
     }
     else if (data.draw_mode & DRAW_TRI_SMOOTH || data.draw_mode & DRAW_TRI_FLAT)
     {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, data.tri_coords.data());
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, 0, data.tri_v_norms.data());
         if (data.draw_mode & DRAW_TRI_VERTCOLOR ||
             data.draw_mode & DRAW_TRI_FACECOLOR ||
             data.draw_mode & DRAW_TRI_QUALITY)
@@ -63,20 +59,36 @@ void render_pvt(const RenderData & data)
         {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(1, GL_FLOAT, 0, data.tri_text.data());
+            glColor3f(1,1,1);
+            glEnable(GL_TEXTURE_1D);
         }
         else if (data.draw_mode & DRAW_TRI_TEXTURE2D)
         {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(2, GL_FLOAT, 0, data.tri_text.data());
+            glColor3f(1,1,1);
+            glEnable(GL_TEXTURE_2D);
         }
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, data.tri_coords.data());
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, 0, data.tri_v_norms.data());
         glDrawElements(GL_TRIANGLES, data.tris.size(), GL_UNSIGNED_INT, data.tris.data());
-        if (data.draw_mode & DRAW_TRI_VERTCOLOR) glDisableClientState(GL_COLOR_ARRAY);         else
-        if (data.draw_mode & DRAW_TRI_FACECOLOR) glDisableClientState(GL_COLOR_ARRAY);         else
-        if (data.draw_mode & DRAW_TRI_QUALITY)   glDisableClientState(GL_COLOR_ARRAY);         else
-        if (data.draw_mode & DRAW_TRI_TEXTURE1D) glDisableClientState(GL_TEXTURE_COORD_ARRAY); else
-        if (data.draw_mode & DRAW_TRI_TEXTURE2D) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        if (data.draw_mode & DRAW_TRI_VERTCOLOR) glDisableClientState(GL_COLOR_ARRAY); else
+        if (data.draw_mode & DRAW_TRI_FACECOLOR) glDisableClientState(GL_COLOR_ARRAY); else
+        if (data.draw_mode & DRAW_TRI_QUALITY)   glDisableClientState(GL_COLOR_ARRAY); else
+        if (data.draw_mode & DRAW_TRI_TEXTURE1D)
+        {
+            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+            glDisable(GL_TEXTURE_1D);
+        }
+        else if (data.draw_mode & DRAW_TRI_TEXTURE2D)
+        {
+            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+            glDisable(GL_TEXTURE_2D);
+        }
     }
 
     if (data.draw_mode & DRAW_SEGS)
@@ -100,19 +112,19 @@ void render_pvt(const RenderData & data)
 
     if (data.draw_mode & DRAW_MARKED_SEGS)
     {
-//        glDisable(GL_LIGHTING);
-//        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//        glEnable(GL_BLEND);
-//        glDepthRange(0.0, 1.0);
-//        glDepthFunc(GL_LEQUAL);
-//        glEnableClientState(GL_VERTEX_ARRAY);
-//        glVertexPointer(3, GL_FLOAT, 0, data.marked_seg_coords.data());
-//        glLineWidth(data.marked_seg_width);
-//        //glColor4fv(data.marked_seg_color.rgba);
-//        glDrawElements(GL_LINES, data.marked_segs.size(), GL_UNSIGNED_INT, data.marked_segs.data());
-//        glDisableClientState(GL_VERTEX_ARRAY);
-//        glDepthFunc(GL_LESS);
-//        glEnable(GL_LIGHTING);
+        glDisable(GL_LIGHTING);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+        glDepthRange(0.0, 1.0);
+        glDepthFunc(GL_LEQUAL);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, data.marked_seg_coords.data());
+        glLineWidth(data.marked_seg_width);
+        glColor4fv(data.marked_seg_color.rgba);
+        glDrawElements(GL_LINES, data.marked_segs.size(), GL_UNSIGNED_INT, data.marked_segs.data());
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDepthFunc(GL_LESS);
+        glEnable(GL_LIGHTING);
     }
 }
 

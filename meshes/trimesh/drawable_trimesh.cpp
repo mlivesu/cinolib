@@ -332,8 +332,6 @@ void DrawableTrimesh<M,V,E,F>::show_vert_color()
     drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    glDisable(GL_TEXTURE_1D);
-    glDisable(GL_TEXTURE_2D);
     updateGL();
 }
 
@@ -348,8 +346,6 @@ void DrawableTrimesh<M,V,E,F>::show_face_color()
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE2D;
-    glDisable(GL_TEXTURE_1D);
-    glDisable(GL_TEXTURE_2D);
     updateGL();
 }
 
@@ -368,6 +364,7 @@ void DrawableTrimesh<M,V,E,F>::show_face_texture1D(const GLint texture)
     if (drawlist.tri_text_id > 0) glDeleteTextures(1, &drawlist.tri_text_id);
     glGenTextures(1, &drawlist.tri_text_id);
     glBindTexture(GL_TEXTURE_1D, drawlist.tri_text_id);
+
     switch (texture)
     {
         case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
@@ -378,8 +375,6 @@ void DrawableTrimesh<M,V,E,F>::show_face_texture1D(const GLint texture)
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
-    glEnable(GL_TEXTURE_1D);
-
     updateGL();
 }
 
@@ -418,13 +413,11 @@ void DrawableTrimesh<M,V,E,F>::show_face_texture2D(const int grid_size)
         }
     }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, grid_size, grid_size, 0, GL_RGB, GL_FLOAT, pixels);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
     glGenerateMipmap(GL_TEXTURE_2D);
-    glEnable(GL_TEXTURE_2D);
-
     updateGL();
 }
 
