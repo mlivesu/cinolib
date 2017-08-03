@@ -129,10 +129,12 @@ void DrawableTrimesh<M,V,E,F>::updateGL()
     drawlist.tris.clear();
     drawlist.tri_v_norms.clear();
     drawlist.tri_v_colors.clear();
-    drawlist.tri_text1D.clear();
+    drawlist.tri_text.clear();
     drawlist.segs.clear();
     drawlist.seg_coords.clear();
     drawlist.seg_colors.clear();
+    drawlist.marked_segs.clear();
+    drawlist.marked_seg_coords.clear();
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
@@ -168,9 +170,21 @@ void DrawableTrimesh<M,V,E,F>::updateGL()
         drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.y());
         drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.z());
 
-        drawlist.tri_text1D.push_back(this->vert_data(vid0).uvw[0]);
-        drawlist.tri_text1D.push_back(this->vert_data(vid1).uvw[0]);
-        drawlist.tri_text1D.push_back(this->vert_data(vid2).uvw[0]);
+        if (drawlist.draw_mode & DRAW_TRI_TEXTURE1D)
+        {
+            drawlist.tri_text.push_back(this->vert_data(vid0).uvw[0]);
+            drawlist.tri_text.push_back(this->vert_data(vid1).uvw[0]);
+            drawlist.tri_text.push_back(this->vert_data(vid2).uvw[0]);
+        }
+        else //if (drawlist.draw_mode & DRAW_TRI_TEXTURE2D)
+        {
+            drawlist.tri_text.push_back(this->vert_data(vid0).uvw[0]);
+            drawlist.tri_text.push_back(this->vert_data(vid0).uvw[1]);
+            drawlist.tri_text.push_back(this->vert_data(vid1).uvw[0]);
+            drawlist.tri_text.push_back(this->vert_data(vid1).uvw[1]);
+            drawlist.tri_text.push_back(this->vert_data(vid2).uvw[0]);
+            drawlist.tri_text.push_back(this->vert_data(vid2).uvw[1]);
+        }
 
         if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
         {
@@ -319,6 +333,7 @@ void DrawableTrimesh<M,V,E,F>::show_vert_color()
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
     glDisable(GL_TEXTURE_1D);
+    glDisable(GL_TEXTURE_2D);
     updateGL();
 }
 
@@ -332,7 +347,9 @@ void DrawableTrimesh<M,V,E,F>::show_face_color()
     drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     glDisable(GL_TEXTURE_1D);
+    glDisable(GL_TEXTURE_2D);
     updateGL();
 }
 
@@ -343,13 +360,14 @@ CINO_INLINE
 void DrawableTrimesh<M,V,E,F>::show_face_texture1D(const GLint texture)
 {
     drawlist.draw_mode |=  DRAW_TRI_TEXTURE1D;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    if (drawlist.tri_text1D_id > 0) glDeleteTextures(1, &drawlist.tri_text1D_id);
-    glGenTextures(1, &drawlist.tri_text1D_id);
-    glBindTexture(GL_TEXTURE_1D, drawlist.tri_text1D_id);
+    if (drawlist.tri_text_id > 0) glDeleteTextures(1, &drawlist.tri_text_id);
+    glGenTextures(1, &drawlist.tri_text_id);
+    glBindTexture(GL_TEXTURE_1D, drawlist.tri_text_id);
     switch (texture)
     {
         case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
@@ -357,11 +375,55 @@ void DrawableTrimesh<M,V,E,F>::show_face_texture1D(const GLint texture)
         case TEXTURE_QUALITY_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
         default : assert("Unknown 1D Texture" && false);
     }
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable(GL_TEXTURE_1D);
+
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F>
+CINO_INLINE
+void DrawableTrimesh<M,V,E,F>::show_face_texture2D(const int grid_size)
+{
+    drawlist.draw_mode |=  DRAW_TRI_TEXTURE2D;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
+
+    if (drawlist.tri_text_id > 0) glDeleteTextures(1, &drawlist.tri_text_id);
+    glGenTextures(1, &drawlist.tri_text_id);
+    glBindTexture(GL_TEXTURE_2D, drawlist.tri_text_id);
+
+    // Black/white checkerboard
+    float pixels[grid_size*grid_size*3];
+    for(int r=0; r<grid_size; ++r)
+    for(int c=0; c<grid_size; ++c)
+    {
+        if (r%2 == c%2)
+        {
+            pixels[3*grid_size*r+3*c  ] = 0.0;
+            pixels[3*grid_size*r+3*c+1] = 0.0;
+            pixels[3*grid_size*r+3*c+2] = 0.0;
+        }
+        else
+        {
+            pixels[3*grid_size*r+3*c  ] = 1.0;
+            pixels[3*grid_size*r+3*c+1] = 1.0;
+            pixels[3*grid_size*r+3*c+2] = 1.0;
+        }
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, grid_size, grid_size, 0, GL_RGB, GL_FLOAT, pixels);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
 
     updateGL();
 }

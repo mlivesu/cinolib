@@ -63,12 +63,18 @@ ScalarField::ScalarField(const char *filename)
 
 template<class Mesh>
 CINO_INLINE
-void ScalarField::copy_to_mesh(Mesh & m) const
+void ScalarField::copy_to_mesh(Mesh & m, const int tex_coord) const
 {
     assert(rows() == m.num_verts());
     for(uint vid=0; vid<rows(); ++vid)
     {
-        m.vert_data(vid).uvw[0] = (*this)[vid];
+        switch (tex_coord)
+        {
+            case U_param : m.vert_data(vid).uvw[0] = (*this)[vid]; break;
+            case V_param : m.vert_data(vid).uvw[1] = (*this)[vid]; break;
+            case W_param : m.vert_data(vid).uvw[2] = (*this)[vid]; break; break;
+            default: assert(false);
+        }
     }
 }
 

@@ -52,7 +52,7 @@ class ScalarField : public Eigen::VectorXd, public Serializable
         ScalarField(const char *filename);
 
         template<class Mesh>
-        void copy_to_mesh(Mesh & m) const;
+        void copy_to_mesh(Mesh & m, const int tex_coord = U_param) const;
 
         void normalize_in_01();
         uint min_element_index() const;

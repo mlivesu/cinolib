@@ -62,14 +62,19 @@ void render_pvt(const RenderData & data)
         else if (data.draw_mode & DRAW_TRI_TEXTURE1D)
         {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            glTexCoordPointer(1, GL_FLOAT, 0, data.tri_text1D.data());
-            glColor3f(1.0,1.0,1.0);
+            glTexCoordPointer(1, GL_FLOAT, 0, data.tri_text.data());
+        }
+        else if (data.draw_mode & DRAW_TRI_TEXTURE2D)
+        {
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            glTexCoordPointer(2, GL_FLOAT, 0, data.tri_text.data());
         }
         glDrawElements(GL_TRIANGLES, data.tris.size(), GL_UNSIGNED_INT, data.tris.data());
-        if (data.draw_mode & DRAW_TRI_VERTCOLOR) glDisableClientState(GL_COLOR_ARRAY);   else
-        if (data.draw_mode & DRAW_TRI_FACECOLOR) glDisableClientState(GL_COLOR_ARRAY);   else
-        if (data.draw_mode & DRAW_TRI_QUALITY)   glDisableClientState(GL_COLOR_ARRAY);   else
-        if (data.draw_mode & DRAW_TRI_TEXTURE1D) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        if (data.draw_mode & DRAW_TRI_VERTCOLOR) glDisableClientState(GL_COLOR_ARRAY);         else
+        if (data.draw_mode & DRAW_TRI_FACECOLOR) glDisableClientState(GL_COLOR_ARRAY);         else
+        if (data.draw_mode & DRAW_TRI_QUALITY)   glDisableClientState(GL_COLOR_ARRAY);         else
+        if (data.draw_mode & DRAW_TRI_TEXTURE1D) glDisableClientState(GL_TEXTURE_COORD_ARRAY); else
+        if (data.draw_mode & DRAW_TRI_TEXTURE2D) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
     }
@@ -95,19 +100,19 @@ void render_pvt(const RenderData & data)
 
     if (data.draw_mode & DRAW_MARKED_SEGS)
     {
-        glDisable(GL_LIGHTING);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-        glDepthRange(0.0, 1.0);
-        glDepthFunc(GL_LEQUAL);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, data.marked_seg_coords.data());
-        glLineWidth(data.marked_seg_width);
-        glColor4fv(data.marked_seg_color.rgba);
-        glDrawElements(GL_LINES, data.marked_segs.size(), GL_UNSIGNED_INT, data.marked_segs.data());
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDepthFunc(GL_LESS);
-        glEnable(GL_LIGHTING);
+//        glDisable(GL_LIGHTING);
+//        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//        glEnable(GL_BLEND);
+//        glDepthRange(0.0, 1.0);
+//        glDepthFunc(GL_LEQUAL);
+//        glEnableClientState(GL_VERTEX_ARRAY);
+//        glVertexPointer(3, GL_FLOAT, 0, data.marked_seg_coords.data());
+//        glLineWidth(data.marked_seg_width);
+//        //glColor4fv(data.marked_seg_color.rgba);
+//        glDrawElements(GL_LINES, data.marked_segs.size(), GL_UNSIGNED_INT, data.marked_segs.data());
+//        glDisableClientState(GL_VERTEX_ARRAY);
+//        glDepthFunc(GL_LESS);
+//        glEnable(GL_LIGHTING);
     }
 }
 

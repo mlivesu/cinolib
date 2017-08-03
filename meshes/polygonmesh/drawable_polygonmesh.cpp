@@ -294,9 +294,9 @@ void DrawablePolygonmesh<M,V,E,F>::show_face_texture1D(const GLint texture)
     drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    if (drawlist.tri_text1D_id > 0) glDeleteTextures(1, &drawlist.tri_text1D_id);
-    glGenTextures(1, &drawlist.tri_text1D_id);
-    glBindTexture(GL_TEXTURE_1D, drawlist.tri_text1D_id);
+    if (drawlist.tri_text_id > 0) glDeleteTextures(1, &drawlist.tri_text_id);
+    glGenTextures(1, &drawlist.tri_text_id);
+    glBindTexture(GL_TEXTURE_1D, drawlist.tri_text_id);
     switch (texture)
     {
         case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;

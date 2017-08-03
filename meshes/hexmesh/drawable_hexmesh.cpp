@@ -127,7 +127,7 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_out()
     drawlist_out.tri_coords.clear();
     drawlist_out.tri_v_norms.clear();
     drawlist_out.tri_v_colors.clear();
-    drawlist_out.tri_text1D.clear();
+    drawlist_out.tri_text.clear();
     drawlist_out.segs.clear();
     drawlist_out.seg_coords.clear();
     drawlist_out.seg_colors.clear();
@@ -163,10 +163,10 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_out()
         drawlist_out.tri_coords.push_back(this->vert(vid3).y());
         drawlist_out.tri_coords.push_back(this->vert(vid3).z());
 
-        drawlist_out.tri_text1D.push_back(this->vert_data(vid0).uvw[0]);
-        drawlist_out.tri_text1D.push_back(this->vert_data(vid1).uvw[0]);
-        drawlist_out.tri_text1D.push_back(this->vert_data(vid2).uvw[0]);
-        drawlist_out.tri_text1D.push_back(this->vert_data(vid3).uvw[0]);
+        drawlist_out.tri_text.push_back(this->vert_data(vid0).uvw[0]);
+        drawlist_out.tri_text.push_back(this->vert_data(vid1).uvw[0]);
+        drawlist_out.tri_text.push_back(this->vert_data(vid2).uvw[0]);
+        drawlist_out.tri_text.push_back(this->vert_data(vid3).uvw[0]);
 
         drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.x()); // replicate f normal on each vertex
         drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.y());
@@ -328,7 +328,7 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
     drawlist_in.tris.clear();
     drawlist_in.tri_v_norms.clear();
     drawlist_in.tri_v_colors.clear();
-    drawlist_in.tri_text1D.clear();
+    drawlist_in.tri_text.clear();
     drawlist_in.segs.clear();
     drawlist_in.seg_coords.clear();
     drawlist_in.seg_colors.clear();
@@ -371,10 +371,10 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
                 drawlist_in.tri_coords.push_back(this->vert(vid3).y());
                 drawlist_in.tri_coords.push_back(this->vert(vid3).z());
 
-                drawlist_in.tri_text1D.push_back(this->vert_data(vid0).uvw[0]);
-                drawlist_in.tri_text1D.push_back(this->vert_data(vid1).uvw[0]);
-                drawlist_in.tri_text1D.push_back(this->vert_data(vid2).uvw[0]);
-                drawlist_in.tri_text1D.push_back(this->vert_data(vid3).uvw[0]);
+                drawlist_in.tri_text.push_back(this->vert_data(vid0).uvw[0]);
+                drawlist_in.tri_text.push_back(this->vert_data(vid1).uvw[0]);
+                drawlist_in.tri_text.push_back(this->vert_data(vid2).uvw[0]);
+                drawlist_in.tri_text.push_back(this->vert_data(vid3).uvw[0]);
 
                 vec3d v0 = this->vert(vid0);
                 vec3d v1 = this->vert(vid1);
@@ -646,9 +646,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_face_texture1D(const GLint texture)
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    if (drawlist_out.tri_text1D_id > 0) glDeleteTextures(1, &drawlist_out.tri_text1D_id);
-    glGenTextures(1, &drawlist_out.tri_text1D_id);
-    glBindTexture(GL_TEXTURE_1D, drawlist_out.tri_text1D_id);
+    if (drawlist_out.tri_text_id > 0) glDeleteTextures(1, &drawlist_out.tri_text_id);
+    glGenTextures(1, &drawlist_out.tri_text_id);
+    glBindTexture(GL_TEXTURE_1D, drawlist_out.tri_text_id);
     switch (texture)
     {
         case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
@@ -743,9 +743,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_cell_texture1D(const GLint texture)
     drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    if (drawlist_in.tri_text1D_id > 0) glDeleteTextures(1, &drawlist_in.tri_text1D_id);
-    glGenTextures(1, &drawlist_in.tri_text1D_id);
-    glBindTexture(GL_TEXTURE_1D, drawlist_in.tri_text1D_id);
+    if (drawlist_in.tri_text_id > 0) glDeleteTextures(1, &drawlist_in.tri_text_id);
+    glGenTextures(1, &drawlist_in.tri_text_id);
+    glBindTexture(GL_TEXTURE_1D, drawlist_in.tri_text_id);
     switch (texture)
     {
         case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;

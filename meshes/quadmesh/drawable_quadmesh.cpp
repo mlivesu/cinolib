@@ -127,7 +127,7 @@ void DrawableQuadmesh<M,V,E,F>::updateGL()
     drawlist.tris.clear();
     drawlist.tri_v_norms.clear();
     drawlist.tri_v_colors.clear();
-    drawlist.tri_text1D.clear();
+    drawlist.tri_text.clear();
     drawlist.segs.clear();
     drawlist.seg_coords.clear();
     drawlist.seg_colors.clear();
@@ -168,9 +168,9 @@ void DrawableQuadmesh<M,V,E,F>::updateGL()
             drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.y());
             drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.z());
 
-            drawlist.tri_text1D.push_back(this->vert_data(vid0).uvw[0]);
-            drawlist.tri_text1D.push_back(this->vert_data(vid1).uvw[0]);
-            drawlist.tri_text1D.push_back(this->vert_data(vid2).uvw[0]);
+            drawlist.tri_text.push_back(this->vert_data(vid0).uvw[0]);
+            drawlist.tri_text.push_back(this->vert_data(vid1).uvw[0]);
+            drawlist.tri_text.push_back(this->vert_data(vid2).uvw[0]);
 
             if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
             {
@@ -335,9 +335,9 @@ void DrawableQuadmesh<M,V,E,F>::show_face_texture1D(const GLint texture)
     drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    if (drawlist.tri_text1D_id > 0) glDeleteTextures(1, &drawlist.tri_text1D_id);
-    glGenTextures(1, &drawlist.tri_text1D_id);
-    glBindTexture(GL_TEXTURE_1D, drawlist.tri_text1D_id);
+    if (drawlist.tri_text_id > 0) glDeleteTextures(1, &drawlist.tri_text_id);
+    glGenTextures(1, &drawlist.tri_text_id);
+    glBindTexture(GL_TEXTURE_1D, drawlist.tri_text_id);
     switch (texture)
     {
         case TEXTURE_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
