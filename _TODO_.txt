@@ -1,3 +1,4 @@
+- create a centralized texturing system to create/load 1d/2D textures
 - extend the concept of subdivisions from hexmesh to any mesh
 - make cotangent weights robust against almost degenerate triangles
 - add Additive Manufacturing stuff (load and process CLI files)…

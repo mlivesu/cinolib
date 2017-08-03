@@ -28,65 +28,72 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_TEXTURES_H
-#define CINO_TEXTURES_H
-
-#ifdef CINOLIB_USES_OPENGL
-
-#ifdef __APPLE__
-#include <gl.h>
-#include <glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
-#include <cinolib/cinolib.h>
-#include <cinolib/color.h>
-#include <cinolib/textures/isolines_texture.h>
-#include <cinolib/textures/quality_ramp_texture.h>
-#include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
+#include <cinolib/textures/textures.h>
 
 namespace cinolib
 {
 
-typedef enum
+CINO_INLINE
+void load_texture(GLuint & texture_id, const TextureType & type)
 {
-    TEXTURE_1D_ISOLINES,
-    TEXTURE_1D_HSV_RAMP,
-    TEXTURE_1D_HSV_RAMP_W_ISOLINES,
-    TEXTURE_2D_CHECKERBOARD,
-    TEXTURE_2D_ISOLINES
+    if (texture_id > 0) glDeleteTextures(1, &texture_id);
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
+    float pixels[3*8*8];
+    for(int r=0; r<8; ++r)
+    for(int c=0; c<8; ++c)
+    {
+        pixels[3*8*r+3*c  ] = 1.0;
+        pixels[3*8*r+3*c+1] = 1.0;
+        pixels[3*8*r+3*c+2] = 1.0;
+    }
+    for(int c=0; c<8; ++c)
+    {
+        pixels[3*c  ] = 1.0;
+        pixels[3*c+1] = 0.0;
+        pixels[3*c+2] = 0.0;
+
+        pixels[3*8*7+3*c  ] = 1.0;
+        pixels[3*8*7+3*c+1] = 0.0;
+        pixels[3*8*7+3*c+2] = 0.0;
+    }
+    for(int r=0; r<8; ++r)
+    {
+        pixels[3*8*r+0] = 0.0;
+        pixels[3*8*r+1] = 0.0;
+        pixels[3*8*r+2] = 1.0;
+
+        pixels[3*8*r+3*7  ] = 0.0;
+        pixels[3*8*r+3*7+1] = 0.0;
+        pixels[3*8*r+3*7+2] = 1.0;
+    }
+
+//    float pixels[grid_size*grid_size*3];
+//    for(int r=0; r<grid_size; ++r)
+//    for(int c=0; c<grid_size; ++c)
+//    {
+//        if (r%2 == c%2)
+//        {
+//            pixels[3*grid_size*r+3*c  ] = c0.r;
+//            pixels[3*grid_size*r+3*c+1] = c0.g;
+//            pixels[3*grid_size*r+3*c+2] = c0.b;
+//        }
+//        else
+//        {
+//            pixels[3*grid_size*r+3*c  ] = c1.r;
+//            pixels[3*grid_size*r+3*c+1] = c1.g;
+//            pixels[3*grid_size*r+3*c+2] = c1.b;
+//        }
+//    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 8, 8, 0, GL_RGB, GL_FLOAT, pixels);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glGenerateMipmap(GL_TEXTURE_2D);
 }
-TextureType;
 
-CINO_INLINE
-void load_texture(GLuint & texture_id, const TextureType & type);
-
-CINO_INLINE
-void make_texture_checkerboard(const Color & c0 = Color::BLACK(),
-                               const Color & c1 = Color::WHITE());
-
-CINO_INLINE
-void make_texture_isolines2D(const Color & u_iso = Color::BLUE(),
-                             const Color & v_iso = Color::RED(),
-                             const Color & backd = Color::WHITE());
-
-CINO_INLINE
-void make_texture_isolines1D(const Color & c0 = Color::BLACK(),
-                             const Color & c1 = Color::WHITE());
-
-CINO_INLINE
-void make_texture_HSV_ramp();
-
-CINO_INLINE
-void make_texture_HSV_ramp_with_isolines(const Color & iso = Color::WHITE());
 
 }
-
-#ifndef  CINO_STATIC_LIB
-#include "textures.cpp"
-#endif
-
-#endif // CINOLIB_USES_OPENGL
-#endif // CINO_TEXTURES_H

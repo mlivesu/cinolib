@@ -76,6 +76,7 @@ typedef struct
     std::vector<float> tri_v_colors; // rgba
     std::vector<float> tri_text;
     GLuint             tri_text_id;
+    double             tri_text_unit_scalar;
     //
     std::vector<uint>  segs;
     std::vector<float> seg_coords;
