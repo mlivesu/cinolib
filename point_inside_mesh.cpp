@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/unstable/point_inside_mesh.h>
+#include <cinolib/point_inside_mesh.h>
 #include <cinolib/meshes/tetmesh/tetmesh.h>
 #include <cinolib/geometry/tetrahedron.h>
 

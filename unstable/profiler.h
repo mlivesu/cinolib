@@ -28,80 +28,76 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/smoothing.h>
+#ifndef CINO_PROFILER_H
+#define CINO_PROFILER_H
+
+#include <cinolib/cinolib.h>
+#include <chrono>
+#include <stack>
+#include <map>
 
 namespace cinolib
 {
 
-/*
- * Implementation of Taubin Smoothing.
- *
- * Reference:
- * Curve and Surface Smoothing Without Shrinkage
- * Gabriel Taubin
- * Proceeedings of IEEE 5th International Conference on Computer Vision, 1995.
- *
-*/
+// http://www.cplusplus.com/reference/chrono/high_resolution_clock/now/
 
-template<class Mesh>
-CINO_INLINE
-void smooth_taubin(Mesh                & m,
-                   const int             mode,
-                   const std::set<uint>  do_not_smooth,
-                   const uint            n_iters,
-                   const double          lambda,
-                   const double          mu)
+typedef struct
 {
-    assert(lambda >  0 );
-    assert(lambda <  1 );
-    assert(lambda < -mu);
+    std::chrono::high_resolution_clock::time_point start, stop;
+    std::string func_prototype;
+}
+ProfilerEntry;
 
-    for(uint iter=0; iter<n_iters; ++iter)
-    {
-        // shrink
-        //
-        for(uint vid=0; vid<m.num_verts(); ++vid)
-        {
-            if (CONTAINS(do_not_smooth, vid)) continue;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            std::vector<uint>   nbrs;
-            std::vector<double> wgts;
-            if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
-            if (mode & COTANGENT) cotangent_weights<Mesh>(m, vid, nbrs, wgts); else
-            assert(false);
+class Profiler
+{
+    public:
 
-            // normalize weights...
-            double sum = 0;
-            for(double  w : wgts) sum += w;
-            for(double &w : wgts) w /= sum;
+        Profiler() {}
 
-            vec3d delta(0,0,0);
-            for(uint i=0; i<nbrs.size(); ++i) delta += (m.vert(nbrs[i]) - m.vert(vid)) * wgts[i];
-            m.vert(vid) = m.vert(vid) + delta * lambda;
-        }
+        void push(const std::string & func_prototype);
+        void pop();
 
-        // inflate
-        //
-        for(uint vid=0; vid<m.num_verts(); ++vid)
-        {
-            if (CONTAINS(do_not_smooth, vid)) continue;
+        std::string report()     const;
+        std::string call_stack() const;
 
-            std::vector<uint>   nbrs;
-            std::vector<double> wgts;
-            if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
-            if (mode & COTANGENT) cotangent_weights<Mesh>(m, vid, nbrs, wgts); else
-            assert(false);
+    private:
 
-            // normalize weights...
-            double sum = 0;
-            for(double  w : wgts) sum += w;
-            for(double &w : wgts) w /= sum;
+        std::vector<std::string>     str_calls;
+        std::map<std::string,double> report_times; // how much time was spent into each function
+        std::map<std::string,uint>   report_calls; // how many times a function was called
+        std::stack<ProfilerEntry>    stack; // THIS MAUST BE A N-ARY TREE!!!!!!!
+};
 
-            vec3d delta(0,0,0);
-            for(uint i=0; i<nbrs.size(); ++i) delta += (m.vert(nbrs[i]) - m.vert(vid)) * wgts[i];
-            m.vert(vid) = m.vert(vid) + delta * mu;
-        }
-   }
+//    Profiler p;
+//    p.push("cinolib::func1");
+//        p.push("cinolib::func2.1");
+//            p.push("cinolib::func3.1");
+//                p.push("cinolib::func4.1"); p.pop();
+//            p.pop();
+//            p.push("cinolib::func3.2"); p.pop();
+//        p.pop();
+//        p.push("cinolib::func2.2"); p.pop();
+//        p.push("cinolib::func2.3");
+//            p.push("cinolib::func3.3"); p.pop();
+//            p.push("cinolib::func3.4"); p.pop();
+//            p.push("cinolib::func3.5"); p.pop();
+//        p.pop();
+//        p.push("cinolib::func2.4");
+//            p.push("cinolib::func3.6"); p.pop();
+//        p.pop();
+//        p.push("cinolib::func2.5"); p.pop();
+//    p.pop();
+
+//    std::cout << p.call_stack() << std::endl;
+//    std::cout << p.report() << std::endl;
+
+
 }
 
-}
+#ifndef  CINO_STATIC_LIB
+#include "profiler.cpp"
+#endif
+
+#endif // CINO_PROFILER_H
