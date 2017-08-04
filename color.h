@@ -78,6 +78,13 @@ class Color
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        u_char r_uchar() const { return static_cast<u_char>(r*255.0); }
+        u_char g_uchar() const { return static_cast<u_char>(g*255.0); }
+        u_char b_uchar() const { return static_cast<u_char>(b*255.0); }
+        u_char a_uchar() const { return static_cast<u_char>(a*255.0); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         static Color scatter(uint range, uint value, float sat=.3f, float val=.9f);
         static Color quality2rgb(float q);
         static Color hsv2rgb(float h, float s, float v);

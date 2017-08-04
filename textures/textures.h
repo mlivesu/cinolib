@@ -43,56 +43,56 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/color.h>
-#include <cinolib/textures/isolines_texture.h>
-#include <cinolib/textures/quality_ramp_texture.h>
-#include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
 
 namespace cinolib
 {
 
-typedef enum
+enum
 {
     TEXTURE_1D_ISOLINES,
     TEXTURE_1D_HSV_RAMP,
     TEXTURE_1D_HSV_RAMP_W_ISOLINES,
     TEXTURE_2D_CHECKERBOARD,
     TEXTURE_2D_ISOLINES
-}
-TextureType;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void load_texture(GLuint & texture_id, const TextureType & type);
+void load_texture(GLuint & texture_id, const int & texture_type);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void make_texture_HSV_ramp();
+void texture_HSV_ramp(const GLuint texture_id);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void make_texture_HSV_ramp_with_isolines(const Color & iso = Color::WHITE());
+void texture_HSV_ramp_with_isolines(const GLuint texture_id);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void make_texture_isolines1D(const Color & c0 = Color::BLACK(),
-                             const Color & c1 = Color::WHITE());
+void texture_isolines1D(const GLuint   texture_id,
+                        const Color  & c0 = Color::BLACK(),
+                        const Color  & c1 = Color::WHITE(),
+                        const uint     n_bands = 32);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void make_texture_checkerboard(const Color & c0 = Color::BLACK(),
-                               const Color & c1 = Color::WHITE());
+void texture_checkerboard(const GLuint   texture_id,
+                          const Color  & c0 = Color::BLACK(),
+                          const Color  & c1 = Color::WHITE());
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void make_texture_isolines2D(const Color & u_isolines = Color::BLUE(),
-                             const Color & v_isolines = Color::RED(),
-                             const Color & background = Color::WHITE());
+void texture_isolines2D(const GLuint   texture_id,
+                        const Color  & u_isolines = Color::BLUE(),
+                        const Color  & v_isolines = Color::RED(),
+                        const Color  & background = Color::WHITE());
 }
 
 #ifndef  CINO_STATIC_LIB

@@ -176,7 +176,7 @@ void DrawableTrimesh<M,V,E,F>::updateGL()
             drawlist.tri_text.push_back(this->vert_data(vid1).uvw[0]);
             drawlist.tri_text.push_back(this->vert_data(vid2).uvw[0]);
         }
-        else //if (drawlist.draw_mode & DRAW_TRI_TEXTURE2D)
+        else if (drawlist.draw_mode & DRAW_TRI_TEXTURE2D)
         {
             drawlist.tri_text.push_back(this->vert_data(vid0).uvw[0]*drawlist.tri_text_unit_scalar);
             drawlist.tri_text.push_back(this->vert_data(vid0).uvw[1]*drawlist.tri_text_unit_scalar);
@@ -353,7 +353,7 @@ void DrawableTrimesh<M,V,E,F>::show_face_color()
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::show_face_texture1D(const GLint texture)
+void DrawableTrimesh<M,V,E,F>::show_face_texture1D(const int tex_type)
 {
     drawlist.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE2D;
@@ -361,20 +361,7 @@ void DrawableTrimesh<M,V,E,F>::show_face_texture1D(const GLint texture)
     drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    if (drawlist.tri_text_id > 0) glDeleteTextures(1, &drawlist.tri_text_id);
-    glGenTextures(1, &drawlist.tri_text_id);
-    glBindTexture(GL_TEXTURE_1D, drawlist.tri_text_id);
-
-    switch (texture)
-    {
-        case TEXTURE_1D_ISOLINES           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
-        case TEXTURE_1D_HSV_RAMP           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D); break;
-        case TEXTURE_1D_HSV_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
-        default : assert("Unknown 1D Texture" && false);
-    }
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
+    load_texture(drawlist.tri_text_id, tex_type);
     updateGL();
 }
 
@@ -391,7 +378,7 @@ void DrawableTrimesh<M,V,E,F>::show_face_texture2D(const double tex_unit_scalar)
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
 
     drawlist.tri_text_unit_scalar = tex_unit_scalar;
-    load_texture(drawlist.tri_text_id, TEXTURE_2D_CHECKERBOARD);
+    load_texture(drawlist.tri_text_id, TEXTURE_2D_ISOLINES);
     updateGL();
 }
 

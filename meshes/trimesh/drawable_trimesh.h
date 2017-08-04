@@ -93,7 +93,7 @@ class DrawableTrimesh : public Trimesh<M,V,E,F>, public DrawableObject
         void show_mesh_points();
         void show_vert_color();
         void show_face_color();
-        void show_face_texture1D(const GLint texture);
+        void show_face_texture1D(const int tex_type);
         void show_face_texture2D(const double tex_unit_scalar);
         void show_face_wireframe(const bool b);
         void show_face_wireframe_color(const Color & c);
