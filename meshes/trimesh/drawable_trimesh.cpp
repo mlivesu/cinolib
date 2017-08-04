@@ -369,7 +369,7 @@ void DrawableTrimesh<M,V,E,F>::show_face_texture1D(const int tex_type)
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void DrawableTrimesh<M,V,E,F>::show_face_texture2D(const double tex_unit_scalar)
+void DrawableTrimesh<M,V,E,F>::show_face_texture2D(const int tex_type, const double tex_unit_scalar)
 {
     drawlist.draw_mode |=  DRAW_TRI_TEXTURE2D;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
@@ -378,7 +378,7 @@ void DrawableTrimesh<M,V,E,F>::show_face_texture2D(const double tex_unit_scalar)
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
 
     drawlist.tri_text_unit_scalar = tex_unit_scalar;
-    load_texture(drawlist.tri_text_id, TEXTURE_2D_ISOLINES);
+    load_texture(drawlist.tri_text_id, tex_type);
     updateGL();
 }
 

@@ -52,8 +52,8 @@ enum
     TEXTURE_1D_ISOLINES,
     TEXTURE_1D_HSV_RAMP,
     TEXTURE_1D_HSV_RAMP_W_ISOLINES,
+    TEXTURE_2D_ISOLINES,
     TEXTURE_2D_CHECKERBOARD,
-    TEXTURE_2D_ISOLINES
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
