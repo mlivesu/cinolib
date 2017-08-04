@@ -85,3 +85,34 @@ class Profiler
 #endif
 
 #endif // CINO_PROFILER_H
+
+
+/* EXAMPLE
+        Profiler profiler;
+        profiler.push("cinolib::func1");
+            profiler.push("cinolib::func2.1");
+                profiler.push("cinolib::func3.1");
+                    profiler.push("cinolib::func4.1"); profiler.pop();
+                    profiler.push("cinolib::func4.1"); profiler.pop();
+                    profiler.push("cinolib::func4.1"); profiler.pop();
+                    profiler.push("cinolib::func4.1"); profiler.pop();
+                    profiler.push("cinolib::func4.1"); profiler.pop();
+                    profiler.push("cinolib::func4.1"); profiler.pop();
+                profiler.pop();
+                profiler.push("cinolib::func3.2"); profiler.pop();
+            profiler.pop();
+            profiler.push("cinolib::func2.2"); profiler.pop();
+            profiler.push("cinolib::func2.3");
+                profiler.push("cinolib::func3.3"); profiler.pop();
+                profiler.push("cinolib::func3.4"); profiler.pop();
+                profiler.push("cinolib::func3.5"); profiler.pop();
+            profiler.pop();
+            profiler.push("cinolib::func2.4");
+                profiler.push("cinolib::func3.6"); profiler.pop();
+            profiler.pop();
+            profiler.push("cinolib::func2.5"); profiler.pop();
+        profiler.pop();
+
+        profiler.call_stack();
+        profiler.report();
+*/
