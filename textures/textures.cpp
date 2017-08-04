@@ -29,9 +29,12 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/textures/textures.h>
+#include <cinolib/common.h>
 
 namespace cinolib
 {
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void load_texture(GLuint & texture_id, const TextureType & type)
@@ -40,60 +43,97 @@ void load_texture(GLuint & texture_id, const TextureType & type)
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    float pixels[3*8*8];
-    for(int r=0; r<8; ++r)
-    for(int c=0; c<8; ++c)
+    switch (type)
     {
-        pixels[3*8*r+3*c  ] = 1.0;
-        pixels[3*8*r+3*c+1] = 1.0;
-        pixels[3*8*r+3*c+2] = 1.0;
+        case TEXTURE_1D_ISOLINES :            break;
+        case TEXTURE_1D_HSV_RAMP :            break;
+        case TEXTURE_1D_HSV_RAMP_W_ISOLINES : break;
+        case TEXTURE_2D_CHECKERBOARD :        make_texture_checkerboard(); break;
+        case TEXTURE_2D_ISOLINES:             make_texture_isolines2D();   break;
+        default: assert("Unknown Texture!" && false);
     }
-    for(int c=0; c<8; ++c)
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void make_texture_isolines2D(const Color & u_isolines,
+                             const Color & v_isolines,
+                             const Color & background)
+{
+    uint size = 8;
+    float pixels[3*size*size];
+    for(uint r=0; r<size; ++r)
+    for(uint c=0; c<size; ++c)
     {
-        pixels[3*c  ] = 1.0;
-        pixels[3*c+1] = 0.0;
-        pixels[3*c+2] = 0.0;
-
-        pixels[3*8*7+3*c  ] = 1.0;
-        pixels[3*8*7+3*c+1] = 0.0;
-        pixels[3*8*7+3*c+2] = 0.0;
+        uint i = serialize_2D_index(r,c,size);
+        pixels[3*i  ] = background.r;
+        pixels[3*i+1] = background.g;
+        pixels[3*i+2] = background.b;
     }
-    for(int r=0; r<8; ++r)
+    for(uint c=0; c<size; ++c)
     {
-        pixels[3*8*r+0] = 0.0;
-        pixels[3*8*r+1] = 0.0;
-        pixels[3*8*r+2] = 1.0;
+        uint i = serialize_2D_index(0,c,size);
+        pixels[3*i  ] = u_isolines.r;
+        pixels[3*i+1] = u_isolines.g;
+        pixels[3*i+2] = u_isolines.b;
 
-        pixels[3*8*r+3*7  ] = 0.0;
-        pixels[3*8*r+3*7+1] = 0.0;
-        pixels[3*8*r+3*7+2] = 1.0;
+        i = serialize_2D_index(size-1,c,size);
+        pixels[3*i  ] = u_isolines.r;
+        pixels[3*i+1] = u_isolines.g;
+        pixels[3*i+2] = u_isolines.b;
     }
+    for(uint r=0; r<size; ++r)
+    {
+        uint i = serialize_2D_index(r,0,size);
+        pixels[3*i  ] = v_isolines.r;
+        pixels[3*i+1] = v_isolines.g;
+        pixels[3*i+2] = v_isolines.b;
 
-//    float pixels[grid_size*grid_size*3];
-//    for(int r=0; r<grid_size; ++r)
-//    for(int c=0; c<grid_size; ++c)
-//    {
-//        if (r%2 == c%2)
-//        {
-//            pixels[3*grid_size*r+3*c  ] = c0.r;
-//            pixels[3*grid_size*r+3*c+1] = c0.g;
-//            pixels[3*grid_size*r+3*c+2] = c0.b;
-//        }
-//        else
-//        {
-//            pixels[3*grid_size*r+3*c  ] = c1.r;
-//            pixels[3*grid_size*r+3*c+1] = c1.g;
-//            pixels[3*grid_size*r+3*c+2] = c1.b;
-//        }
-//    }
+        i = serialize_2D_index(r,size-1,size);
+        pixels[3*i  ] = v_isolines.r;
+        pixels[3*i+1] = v_isolines.g;
+        pixels[3*i+2] = v_isolines.b;
+    }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 8, 8, 0, GL_RGB, GL_FLOAT, pixels);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void make_texture_checkerboard(const Color & c0, const Color & c1)
+{
+    uint size = 8;
+    float pixels[size*size*3];
+    for(uint r=0; r<size; ++r)
+    for(uint c=0; c<size; ++c)
+    {
+        uint i = serialize_2D_index(r,c,size);
+        if (r%2 == c%2)
+        {
+            pixels[3*i  ] = c0.r;
+            pixels[3*i+1] = c0.g;
+            pixels[3*i+2] = c0.b;
+        }
+        else
+        {
+            pixels[3*i  ] = c1.r;
+            pixels[3*i+1] = c1.g;
+            pixels[3*i+2] = c1.b;
+        }
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 8, 8, 0, GL_RGB, GL_FLOAT, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 8, 8, 0, GL_RGB, GL_FLOAT, pixels);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
 
 }

@@ -60,28 +60,39 @@ typedef enum
 }
 TextureType;
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void load_texture(GLuint & texture_id, const TextureType & type);
 
-CINO_INLINE
-void make_texture_checkerboard(const Color & c0 = Color::BLACK(),
-                               const Color & c1 = Color::WHITE());
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void make_texture_isolines2D(const Color & u_iso = Color::BLUE(),
-                             const Color & v_iso = Color::RED(),
-                             const Color & backd = Color::WHITE());
+void make_texture_HSV_ramp();
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void make_texture_HSV_ramp_with_isolines(const Color & iso = Color::WHITE());
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void make_texture_isolines1D(const Color & c0 = Color::BLACK(),
                              const Color & c1 = Color::WHITE());
 
-CINO_INLINE
-void make_texture_HSV_ramp();
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void make_texture_HSV_ramp_with_isolines(const Color & iso = Color::WHITE());
+void make_texture_checkerboard(const Color & c0 = Color::BLACK(),
+                               const Color & c1 = Color::WHITE());
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void make_texture_isolines2D(const Color & u_isolines = Color::BLUE(),
+                             const Color & v_isolines = Color::RED(),
+                             const Color & background = Color::WHITE());
 }
 
 #ifndef  CINO_STATIC_LIB
