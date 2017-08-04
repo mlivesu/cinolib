@@ -29,7 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/tetmesh/drawable_tetmesh.h>
-#include <cinolib/textures/isolines_texture.h>
 #include <cinolib/textures/quality_ramp_texture.h>
 #include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
 #include <cinolib/color.h>
@@ -582,7 +581,7 @@ void DrawableTetmesh<M,V,E,F,C>::show_face_texture1D(const GLint texture)
     glBindTexture(GL_TEXTURE_1D, drawlist_out.tri_text_id);
     switch (texture)
     {
-        case TEXTURE_1D_ISOLINES           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
+        //case TEXTURE_1D_ISOLINES           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
         case TEXTURE_1D_HSV_RAMP           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D); break;
         case TEXTURE_1D_HSV_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
         default : assert("Unknown 1D Texture" && false);
@@ -679,7 +678,7 @@ void DrawableTetmesh<M,V,E,F,C>::show_cell_texture1D(const GLint texture)
     glBindTexture(GL_TEXTURE_1D, drawlist_in.tri_text_id);
     switch (texture)
     {
-        case TEXTURE_1D_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
+//        case TEXTURE_1D_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
         case TEXTURE_1D_HSV_RAMP           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D); break;
         case TEXTURE_1D_HSV_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
         default : assert("Unknown 1D Texture" && false);

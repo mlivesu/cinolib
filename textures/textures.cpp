@@ -29,7 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/textures/textures.h>
-#include <cinolib/textures/isolines_texture.h>
 #include <cinolib/textures/quality_ramp_texture.h>
 #include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
 #include <cinolib/common.h>

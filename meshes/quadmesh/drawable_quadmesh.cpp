@@ -340,7 +340,7 @@ void DrawableQuadmesh<M,V,E,F>::show_face_texture1D(const GLint texture)
     glBindTexture(GL_TEXTURE_1D, drawlist.tri_text_id);
     switch (texture)
     {
-        case TEXTURE_1D_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
+        //case TEXTURE_1D_ISOLINES           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
         case TEXTURE_1D_HSV_RAMP           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D); break;
         case TEXTURE_1D_HSV_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
         default : assert("Unknown 1D Texture" && false);
