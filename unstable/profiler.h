@@ -32,19 +32,19 @@
 #define CINO_PROFILER_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/unstable/tree.h>
 #include <chrono>
-#include <stack>
 #include <map>
 
 namespace cinolib
 {
 
-// http://www.cplusplus.com/reference/chrono/high_resolution_clock/now/
-
 typedef struct
 {
+    // http://www.cplusplus.com/reference/chrono/high_resolution_clock/now/
     std::chrono::high_resolution_clock::time_point start, stop;
-    std::string func_prototype;
+    std::string f_prototype;
+    std::string s;
 }
 ProfilerEntry;
 
@@ -54,45 +54,29 @@ class Profiler
 {
     public:
 
-        Profiler() {}
+        Profiler() { tree_ptr = 0; }
 
-        void push(const std::string & func_prototype);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void push(const std::string & f_prototype);
         void pop();
 
-        std::string report()     const;
-        std::string call_stack() const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    private:
+        void report()     const;
+        void call_stack() const;
 
-        std::vector<std::string>     str_calls;
-        std::map<std::string,double> report_times; // how much time was spent into each function
-        std::map<std::string,uint>   report_calls; // how many times a function was called
-        std::stack<ProfilerEntry>    stack; // THIS MAUST BE A N-ARY TREE!!!!!!!
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        double delta_s(const uint id) const;
+
+    protected:
+
+        std::map<std::string,double> log_times; // how much time was spent into each function
+        std::map<std::string,uint>   log_calls; // how many times a function was called
+        Tree<ProfilerEntry>          tree;
+        uint                         tree_ptr;
 };
-
-//    Profiler p;
-//    p.push("cinolib::func1");
-//        p.push("cinolib::func2.1");
-//            p.push("cinolib::func3.1");
-//                p.push("cinolib::func4.1"); p.pop();
-//            p.pop();
-//            p.push("cinolib::func3.2"); p.pop();
-//        p.pop();
-//        p.push("cinolib::func2.2"); p.pop();
-//        p.push("cinolib::func2.3");
-//            p.push("cinolib::func3.3"); p.pop();
-//            p.push("cinolib::func3.4"); p.pop();
-//            p.push("cinolib::func3.5"); p.pop();
-//        p.pop();
-//        p.push("cinolib::func2.4");
-//            p.push("cinolib::func3.6"); p.pop();
-//        p.pop();
-//        p.push("cinolib::func2.5"); p.pop();
-//    p.pop();
-
-//    std::cout << p.call_stack() << std::endl;
-//    std::cout << p.report() << std::endl;
-
 
 }
 

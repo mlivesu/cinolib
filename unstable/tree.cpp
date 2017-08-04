@@ -28,84 +28,50 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/unstable/profiler.h>
-#include <set>
+#include <cinolib/unstable/tree.h>
 
 namespace cinolib
 {
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class T>
 CINO_INLINE
-void Profiler::push(const std::string & f_prototype)
+Tree<T>::Tree()
 {
-    ProfilerEntry entry;
-    entry.f_prototype = f_prototype;
-    entry.start       = std::chrono::high_resolution_clock::now();
-    tree_ptr          = tree.add_children(entry, tree_ptr);
+    // add a fake root (to make sure that the graph has always a single root)
+    tree.push_back(TreeNode<T>());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class T>
 CINO_INLINE
-void Profiler::pop()
+uint Tree<T>::add_children(T item, uint father)
 {
-    using namespace std::chrono;
-    tree.node(tree_ptr).item.stop = high_resolution_clock::now();
-    double t = delta_s(tree_ptr);
+    assert(father >= 0 && father < tree.size());
 
-    log_times[tree.node(tree_ptr).item.f_prototype] += t;
-    log_calls[tree.node(tree_ptr).item.f_prototype] += 1;
+    uint fresh_id = tree.size();
+    node(father).children.push_back(fresh_id);
 
-    std::string s;
-    for(uint i=0; i<tree.node(tree_ptr).depth-1; ++i) s += "----";
-    s += tree.node(tree_ptr).item.f_prototype + " [" + std::to_string(t) + "s]";
-    tree.node(tree_ptr).item.s = s;
+    TreeNode<T> n;
+    n.item   = item;
+    n.father = father;
+    n.depth  = node(father).depth + 1;
 
-    tree_ptr = tree.node(tree_ptr).father;
+    tree.push_back(n);
+    return fresh_id;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class T>
 CINO_INLINE
-double Profiler::delta_s(const uint id) const
+void Tree<T>::depth_first_traverse(std::vector<T> & items, const uint id) const
 {
-    using namespace std::chrono;
-    duration<double> delta = duration_cast<duration<double>>(tree.node(id).item.stop - tree.node(id).item.start);
-    return delta.count();
-}
+    if (id > 0) items.push_back(node(id).item);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void Profiler::call_stack() const
-{
-    std::cout << "::::::::::::::: PROFILER CALL TREE :::::::::::::::" << std::endl;
-
-    std::vector<ProfilerEntry> items;
-    tree.depth_first_traverse(items);
-
-    for(const ProfilerEntry & obj : items) std::cout << obj.s << std::endl;
-
-    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::::::\n" << std::endl;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void Profiler::report() const
-{
-    std::set<std::pair<double,std::string>,std::greater<std::pair<double,std::string>>> ordered_items; // most time consuming first
-    for(auto obj : log_times) ordered_items.insert(std::make_pair(obj.second,obj.first));
-
-    std::cout << "::::::::::::::: PROFILER STATISTICS :::::::::::::::" << std::endl;
-
-    for(auto obj : ordered_items)
-    {
-        std::cout << obj.first << "\t" << obj.second << " (called " << log_calls.at(obj.second) << " times)" << std::endl;
-    }
-
-    std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::\n" << std::endl;
+    for(const uint c : node(id).children) depth_first_traverse(items, c);
 }
 
 }
