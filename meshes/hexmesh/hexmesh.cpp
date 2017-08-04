@@ -30,7 +30,6 @@
 **********************************************************************************/
 #include <cinolib/meshes/hexmesh/hexmesh.h>
 #include <cinolib/quality.h>
-#include <cinolib/timer.h>
 #include <cinolib/io/read_write.h>
 #include <cinolib/common.h>
 
@@ -71,14 +70,10 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 Hexmesh<M,V,E,F,C>::Hexmesh(const char * filename)
 {
-    timer_start("load hexmesh");
-
     load(filename);
     init();
 
     //print_quality_statistics();
-
-    timer_stop("load hexmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -123,8 +118,6 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Hexmesh<M,V,E,F,C>::load(const char * filename)
 {
-    timer_start("Load Hexmesh");
-
     clear();
     std::vector<double> coords;
     std::vector<uint>   tets; // not used here
@@ -159,8 +152,6 @@ void Hexmesh<M,V,E,F,C>::load(const char * filename)
     logger << num_verts() << " vertices  read" << endl;
 
     this->mesh_data().filename = std::string(filename);
-
-    timer_stop("Load Hexmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -169,8 +160,6 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Hexmesh<M,V,E,F,C>::save(const char * filename) const
 {
-    timer_start("Save Hexmesh");
-
     std::vector<double> coords = serialized_xyz_from_vec3d(verts);
     std::vector<uint>   tets; // not used here
 
@@ -197,8 +186,6 @@ void Hexmesh<M,V,E,F,C>::save(const char * filename) const
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
         exit(-1);
     }
-
-    timer_stop("Save Hexmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -281,8 +268,6 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
 {
-    timer_start("Build interior adjacency");
-
     v2v.clear(); v2v.resize(num_verts());
     v2e.clear(); v2e.resize(num_verts());
     v2c.clear(); v2c.resize(num_verts());
@@ -360,8 +345,6 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
     logger << num_verts() << "\tvertices"  << endl;
     logger << num_cells() << "\thexahedra" << endl;
     logger << num_edges() << "\tedges"     << endl;
-
-    timer_stop("Build interior adjacency");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -370,8 +353,6 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
 {
-    timer_start("Build Surface");
-
     typedef std::vector<uint> face;
     std::map<face,std::pair<uint,uint>> f2c_map;
 
@@ -457,8 +438,6 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
 
         if (!e2f.at(eid).empty()) e_on_srf.at(eid) = true;
     }
-
-    timer_stop("Build Surface");
 
     logger << faces.size()/verts_per_face() << " quads" << endl;
 }

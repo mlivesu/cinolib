@@ -36,7 +36,6 @@
 #include <cinolib/laplacian.h>
 #include <cinolib/vertex_mass.h>
 #include <cinolib/linear_solvers.h>
-#include <cinolib/timer.h>
 #include <eigen3/Eigen/Sparse>
 
 namespace cinolib
@@ -55,8 +54,6 @@ ScalarField heat_flow(const Mesh              & m,
 {
     assert(heat_charges.size() > 0);
 
-    timer_start("Compute Heat Flow");
-
     ScalarField heat(m.num_verts());
 
     Eigen::SparseMatrix<double> L   = laplacian<Mesh>(m, laplacian_mode);
@@ -67,8 +64,6 @@ ScalarField heat_flow(const Mesh              & m,
     for(uint i=0; i<heat_charges.size(); ++i) bc[heat_charges[i]] = 1.0;
 
     solve_square_system_with_bc(M - time * L, rhs, heat, bc);
-
-    timer_stop("Compute Heat Flow");
 
     return heat;
 }

@@ -29,7 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/abstract_surface_mesh.h>
-#include <cinolib/timer.h>
 #include <cinolib/io/read_write.h>
 
 namespace cinolib
@@ -41,8 +40,6 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void AbstractSurfaceMesh<M,V,E,F>::load(const char * filename)
 {
-    timer_start("Load Mesh");
-
     this->clear();
     std::vector<double> coords;
 
@@ -68,8 +65,6 @@ void AbstractSurfaceMesh<M,V,E,F>::load(const char * filename)
     this->verts = vec3d_from_serialized_xyz(coords);
 
     this->mesh_data().filename = std::string(filename);
-
-    timer_stop("Load Mesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -78,8 +73,6 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void AbstractSurfaceMesh<M,V,E,F>::save(const char * filename) const
 {
-    timer_start("Save Mesh");
-
     std::vector<double> coords = serialized_xyz_from_vec3d(this->verts);
 
     std::string str(filename);
@@ -100,8 +93,6 @@ void AbstractSurfaceMesh<M,V,E,F>::save(const char * filename) const
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
         exit(-1);
     }
-
-    timer_stop("Save Mesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -126,8 +117,6 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void AbstractSurfaceMesh<M,V,E,F>::update_adjacency()
 {
-    timer_start("Build adjacency");
-
     this->v2v.clear(); this->v2v.resize(this->num_verts());
     this->v2e.clear(); this->v2e.resize(this->num_verts());
     this->v2f.clear(); this->v2f.resize(this->num_verts());
@@ -193,8 +182,6 @@ void AbstractSurfaceMesh<M,V,E,F>::update_adjacency()
     logger << this->num_verts() << "\tverts" << endl;
     logger << this->num_faces() << "\tfaces" << endl;
     logger << this->num_edges() << "\tedges" << endl;
-
-    timer_stop("Build adjacency");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -29,8 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/linear_solvers.h>
-#include <cinolib/timer.h>
-#include <time.h>
 
 namespace cinolib
 {
@@ -45,11 +43,6 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
                          int   solver)
 {
     assert(A.rows() == A.cols());
-
-    char msg[1024];
-    sprintf(msg, "Linear solve - %ld x %ld Matrix - %s", A.rows(), A.cols(), txt[solver].c_str());
-
-    timer_start(msg);
 
     switch (solver)
     {
@@ -93,8 +86,6 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
 
         default: assert(false && "Unknown Solver");
     }
-
-    timer_stop(msg);
 }
 
 
@@ -105,11 +96,6 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
                                        std::map<uint,double>       & bc, // Dirichlet boundary conditions
                                  int   solver)
 {
-    char msg[1024];
-    sprintf(msg, "Linear solve with %d BCs - precomputation", (int)bc.size());
-
-    timer_start(msg);
-
     std::vector<int> col_map(A.rows(), -1);
     uint fresh_id = 0;
     for(uint col=0; col<A.cols(); ++col)
@@ -161,8 +147,6 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
     Eigen::SparseMatrix<double> Aprime(size, size);
     Aprime.setFromTriplets(Aprime_entries.begin(), Aprime_entries.end());
 
-    timer_stop(msg);
-
     Eigen::VectorXd tmp_x(size);
 
     solve_square_system(Aprime, bprime, tmp_x, solver);
@@ -188,18 +172,11 @@ void solve_least_squares(const Eigen::SparseMatrix<double> & A,
                                Eigen::VectorXd             & x,
                          int   solver)
 {
-    char msg[1024];
-    sprintf(msg, "Least Squares Solve - %ld x %ld Matrix - %s", A.rows(), A.cols(), txt[solver].c_str());
-
-    timer_start(msg);
-
     Eigen::SparseMatrix<double> At  = A.transpose();
     Eigen::SparseMatrix<double> AtA = At * A;
     Eigen::VectorXd             Atb = At * b;
 
     solve_square_system(AtA, Atb, x, solver);
-
-    timer_stop(msg);
 }
 
 }

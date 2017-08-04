@@ -29,8 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/gradient.h>
-#include <cinolib/timer.h>
-
 
 namespace cinolib
 {
@@ -41,8 +39,6 @@ template <>
 CINO_INLINE
 Eigen::SparseMatrix<double> gradient<Trimesh<>>(const Trimesh<> & m)
 {
-    timer_start("Compute gradient matrix");
-
     Eigen::SparseMatrix<double> G(m.num_faces()*3, m.num_verts());
 
     std::vector<Entry> entries;
@@ -88,8 +84,6 @@ Eigen::SparseMatrix<double> gradient<Trimesh<>>(const Trimesh<> & m)
 
     G.setFromTriplets(entries.begin(), entries.end());
 
-    timer_stop("Compute gradient matrix");
-
     return G;
 }
 
@@ -98,8 +92,6 @@ template<>
 CINO_INLINE
 Eigen::SparseMatrix<double> gradient<Tetmesh<>>(const Tetmesh<> &m)
 {
-    timer_start("Compute gradient matrix");
-
     Eigen::SparseMatrix<double> G(m.num_cells()*3, m.num_verts());
 
     std::vector<Entry> entries;
@@ -138,8 +130,6 @@ Eigen::SparseMatrix<double> gradient<Tetmesh<>>(const Tetmesh<> &m)
     }
 
     G.setFromTriplets(entries.begin(), entries.end());
-
-    timer_stop("Compute gradient matrix");
 
     return G;
 }

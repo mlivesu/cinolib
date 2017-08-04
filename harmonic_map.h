@@ -34,7 +34,6 @@
 #include <cinolib/scalar_field.h>
 #include <cinolib/laplacian.h>
 #include <cinolib/linear_solvers.h>
-#include <cinolib/timer.h>
 #include <eigen3/Eigen/Sparse>
 
 
@@ -74,8 +73,6 @@ ScalarField harmonic_map(const Mesh            & m,
     assert(laplacian_mode == COTANGENT || laplacian_mode == UNIFORM);
     assert(solver == SIMPLICIAL_LLT || solver == SIMPLICIAL_LDLT || solver == SparseLU || solver == BiCGSTAB);
 
-    timer_start("Compute Harmonic Map");
-
     ScalarField f(m.num_verts());
 
     Eigen::SparseMatrix<double> L   = laplacian<Mesh>(m, laplacian_mode);
@@ -85,8 +82,6 @@ ScalarField harmonic_map(const Mesh            & m,
     for(uint i=1; i<n; ++i) Ln  = Ln * L;
 
     solve_square_system_with_bc(Ln, rhs, f, bc, solver);
-
-    timer_stop("Compute Harmonic Map");
 
     return f;
 }

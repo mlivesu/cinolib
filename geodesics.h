@@ -40,7 +40,6 @@
 #include <cinolib/laplacian.h>
 #include <cinolib/vertex_mass.h>
 #include <cinolib/linear_solvers.h>
-#include <cinolib/timer.h>
 
 namespace cinolib
 {
@@ -75,8 +74,6 @@ ScalarField compute_geodesics(const Mesh              & m,
                               const int                 laplacian_mode = COTANGENT,
                               const float               time_scalar = 1.0)
 {
-    timer_start("Compute geodesics");
-
     // use h^2 as time step, as suggested in the original paper
     Mesh m_copy = m;
     m_copy.normalize_area();
@@ -101,8 +98,6 @@ ScalarField compute_geodesics(const Mesh              & m,
 
     ScalarField geodesics;
     solve_square_system_with_bc(-L, G.transpose() * grad, geodesics, bc);
-
-    timer_stop("Compute geodesics");
 
     geodesics.normalize_in_01();
     return geodesics;

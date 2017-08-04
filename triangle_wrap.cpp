@@ -30,7 +30,6 @@
 **********************************************************************************/
 #include <cinolib/triangle_wrap.h>
 #include <cinolib/geometry/vec3.h>
-#include <cinolib/timer.h>
 
 #ifdef CINOLIB_USES_TRIANGLE
     /*

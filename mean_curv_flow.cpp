@@ -32,7 +32,6 @@
 #include <cinolib/laplacian.h>
 #include <cinolib/linear_solvers.h>
 #include <cinolib/vertex_mass.h>
-#include <cinolib/timer.h>
 
 namespace cinolib
 {
@@ -43,11 +42,6 @@ void MCF(Trimesh<>       & m,
          const double      time,
          const bool        conformalized)
 {
-    char msg[1024];
-    sprintf(msg, "Mean Curvature Flow - time step: %f - n_iters: %d - conformalized: %d", time, n_iters, conformalized);
-
-    timer_start(msg);
-
     Eigen::SparseMatrix<double> L = laplacian<Trimesh>(m, COTANGENT);
     Eigen::SparseMatrix<double> M = mass_matrix<Trimesh>(m);
 
@@ -96,8 +90,6 @@ void MCF(Trimesh<>       & m,
             if (!conformalized) L = laplacian<Trimesh>(m, COTANGENT);
         }
     }
-
-    timer_stop(msg);
 }
 
 }

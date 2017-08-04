@@ -29,7 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/polyhedralmesh/polyhedralmesh.h>
-#include <cinolib/timer.h>
 #include <cinolib/io/read_write.h>
 #include <cinolib/common.h>
 
@@ -113,8 +112,6 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Polyhedralmesh<M,V,E,F,C>::load(const char * filename)
 {
-    timer_start("Load Polyhedralmesh");
-
     clear();
     std::vector<double> coords;
 
@@ -139,8 +136,6 @@ void Polyhedralmesh<M,V,E,F,C>::load(const char * filename)
     logger << num_cells() << " cells read" << endl;
 
     this->mesh_data().filename = std::string(filename);
-
-    timer_stop("Load Polyhedralmesh");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -182,8 +177,6 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Polyhedralmesh<M,V,E,F,C>::update_adjacency()
 {
-    timer_start("Build adjacency");
-
     v2v.clear(); v2v.resize(num_verts());
     v2e.clear(); v2e.resize(num_verts());
     v2f.clear(); v2f.resize(num_verts());
@@ -303,8 +296,6 @@ void Polyhedralmesh<M,V,E,F,C>::update_adjacency()
     logger << num_edges() << "\tedges" << endl;
     logger << num_faces() << "\tfaces" << endl;
     logger << num_cells() << "\tcells" << endl;
-
-    timer_stop("Build adjacency");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
