@@ -1,3 +1,4 @@
+- fix 1D texturing for all the meshes but triangles (and add 2D texturing as well)
 - refactor IsoCurve (exploiting the Curve class)
 - extend the concept of subdivisions from hexmesh to any mesh
 - make cotangent weights robust against almost degenerate triangles
