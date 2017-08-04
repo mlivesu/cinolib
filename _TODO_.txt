@@ -5,8 +5,6 @@
 - transform any function containing inner Trimesh<> or Tetmesh<> into a templated function  with generic Mesh type
 - improve face tessellation strategy for polygonal meshes (flipped elements may currently arise for non convex polygons)
 - add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
-- Transform timer in a profiler class with internal string to be printed at the end
-  and summary of times spent in each function… (NOTE: it’s a tree!!!!!!)
 - Refactor PointInsideMeshCache, it should return ALL the elements containing the
   query point and let the application choose the best one
 - make a DrawableOctree (and visually test the octree)
