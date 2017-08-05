@@ -31,7 +31,10 @@
 #ifndef CINO_TREE_H
 #define CINO_TREE_H
 
-#include <cinolib/cinolib.h>
+#include <sys/types.h>
+#include <vector>
+
+#include <cinolib/cino_inline.h>
 
 /*
  * This class implements a trivial n-ary tree. This is not supposed to be perfect,

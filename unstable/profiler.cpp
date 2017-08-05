@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/unstable/profiler.h>
 #include <set>
+#include <iostream>
 
 namespace cinolib
 {
@@ -39,10 +40,12 @@ namespace cinolib
 CINO_INLINE
 void Profiler::push(const std::string & f_prototype)
 {
+#ifdef CINOLIB_PROFILER_ENABLED
     ProfilerEntry entry;
     entry.f_prototype = f_prototype;
     entry.start       = std::chrono::high_resolution_clock::now();
     tree_ptr          = tree.add_children(entry, tree_ptr);
+#endif
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -50,6 +53,7 @@ void Profiler::push(const std::string & f_prototype)
 CINO_INLINE
 void Profiler::pop()
 {
+#ifdef CINOLIB_PROFILER_ENABLED
     using namespace std::chrono;
     tree.node(tree_ptr).item.stop = high_resolution_clock::now();
     double t = delta_s(tree_ptr);
@@ -63,16 +67,7 @@ void Profiler::pop()
     tree.node(tree_ptr).item.s = s;
 
     tree_ptr = tree.node(tree_ptr).father;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double Profiler::delta_s(const uint id) const
-{
-    using namespace std::chrono;
-    duration<double> delta = duration_cast<duration<double>>(tree.node(id).item.stop - tree.node(id).item.start);
-    return delta.count();
+#endif
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -80,6 +75,7 @@ double Profiler::delta_s(const uint id) const
 CINO_INLINE
 void Profiler::call_stack() const
 {
+#ifdef CINOLIB_PROFILER_ENABLED
     std::cout << "::::::::::::::: PROFILER CALL TREE :::::::::::::::" << std::endl;
 
     std::vector<ProfilerEntry> items;
@@ -88,6 +84,7 @@ void Profiler::call_stack() const
     for(const ProfilerEntry & obj : items) std::cout << obj.s << std::endl;
 
     std::cout << "::::::::::::::::::::::::::::::::::::::::::::::::::\n" << std::endl;
+#endif
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -95,6 +92,7 @@ void Profiler::call_stack() const
 CINO_INLINE
 void Profiler::report() const
 {
+#ifdef CINOLIB_PROFILER_ENABLED
     std::set<std::pair<double,std::string>,std::greater<std::pair<double,std::string>>> ordered_items; // most time consuming first
     for(auto obj : log_times) ordered_items.insert(std::make_pair(obj.second,obj.first));
 
@@ -106,6 +104,17 @@ void Profiler::report() const
     }
 
     std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::\n" << std::endl;
+#endif
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Profiler::delta_s(const uint id) const
+{
+    using namespace std::chrono;
+    duration<double> delta = duration_cast<duration<double>>(tree.node(id).item.stop - tree.node(id).item.start);
+    return delta.count();
 }
 
 }

@@ -31,10 +31,11 @@
 #ifndef CINO_PROFILER_H
 #define CINO_PROFILER_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/unstable/tree.h>
 #include <chrono>
 #include <map>
+#include <string>
 
 namespace cinolib
 {
@@ -68,9 +69,11 @@ class Profiler
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+    protected:
+
         double delta_s(const uint id) const;
 
-    protected:
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         std::map<std::string,double> log_times; // how much time was spent into each function
         std::map<std::string,uint>   log_calls; // how many times a function was called

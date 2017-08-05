@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/unstable/tree.h>
+#include <assert.h>
 
 namespace cinolib
 {
