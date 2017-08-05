@@ -104,18 +104,19 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void Polyhedralmesh<M,V,E,F,P>::save(const char *) const
+{
+    assert(false && "TODO!");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void Polyhedralmesh<M,V,E,F,P>::init()
 {
-    this->update_face_tessellation();
-    this->update_adjacency();
-    this->update_bbox();
-
-    this->v_data.resize(this->num_verts());
-    this->e_data.resize(this->num_edges());
-    this->f_data.resize(this->num_faces());
-    this->p_data.resize(this->num_polys());
-
-    this->update_f_normals();
+    update_face_tessellation();
+    AbstractPolyhedralMesh<M,V,E,F,P>::init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -157,7 +158,7 @@ void Polyhedralmesh<M,V,E,F,P>::update_face_tessellation()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,P>::update_f_normals()
+void Polyhedralmesh<M,V,E,F,P>::update_normals()
 {
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {

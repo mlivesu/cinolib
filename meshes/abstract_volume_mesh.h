@@ -70,7 +70,14 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual void clear();
+        virtual void init();
+        virtual void load(const char * filename) = 0;
+        virtual void save(const char * filename) const = 0;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         virtual void update_adjacency();
+        virtual void update_normals() = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -113,13 +120,15 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
          //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-         virtual bool  poly_contains_vert(const uint fid, const uint vid) const;
-         virtual bool  poly_is_on_surf   (const uint pid) const;
-         virtual uint  poly_face_id      (const uint pid, const uint off) const;
-         virtual bool  poly_face_is_CCW  (const uint pid, const uint off) const;
-         virtual bool  poly_face_is_CW   (const uint pid, const uint off) const;
-         virtual uint  poly_face_offset  (const uint pid, const uint fid) const;
-         virtual vec3d poly_centroid     (const uint pid) const;
+         virtual double poly_volume       (const uint pid) const = 0;
+         virtual double poly_mass         (const uint pid) const;
+         virtual bool   poly_contains_vert(const uint fid, const uint vid) const;
+         virtual bool   poly_is_on_surf   (const uint pid) const;
+         virtual uint   poly_face_id      (const uint pid, const uint off) const;
+         virtual bool   poly_face_is_CCW  (const uint pid, const uint off) const;
+         virtual bool   poly_face_is_CW   (const uint pid, const uint off) const;
+         virtual uint   poly_face_offset  (const uint pid, const uint fid) const;
+         virtual vec3d  poly_centroid     (const uint pid) const;
 };
 
 }

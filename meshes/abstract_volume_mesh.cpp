@@ -61,6 +61,23 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::clear()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::init()
+{
+    this->update_adjacency();
+    this->update_bbox();
+
+    this->v_data.resize(this->num_verts());
+    this->e_data.resize(this->num_edges());
+    this->f_data.resize(this->num_faces());
+    this->p_data.resize(this->num_polys());
+
+    this->update_normals();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::update_adjacency()
 {
     this->v2v.clear(); this->v2v.resize(this->num_verts());
@@ -237,9 +254,9 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_on_surf(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_contains_vert(const uint fid, const uint vid) const
+bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_contains_vert(const uint pid, const uint vid) const
 {
-    for(uint v : adj_p2v(fid)) if(v == vid) return true;
+    for(uint v : adj_p2v(pid)) if(v == vid) return true;
     return false;
 }
 
@@ -261,7 +278,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 vec3d AbstractPolyhedralMesh<M,V,E,F,P>::face_vert(const uint fid, const uint off) const
 {
-    return vert(face_vert_id(fid,off));
+    return this->vert(face_vert_id(fid,off));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -280,6 +297,15 @@ CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_on_srf(const uint fid) const
 {
     return f_on_srf.at(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double AbstractPolyhedralMesh<M,V,E,F,P>::poly_mass(const uint pid) const
+{
+    return poly_volume(pid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

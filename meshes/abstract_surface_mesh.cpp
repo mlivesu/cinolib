@@ -569,6 +569,19 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_vert_offset(const uint fid, const uint v
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+bool AbstractPolygonMesh<M,V,E,P>::poly_contains_vert(const uint pid, const uint vid) const
+{
+    for(uint off=0; off<this->verts_per_poly(pid); ++off)
+    {
+        if (this->poly_vert_id(pid,off) == vid) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 vec3d AbstractPolygonMesh<M,V,E,P>::poly_centroid(const uint fid) const
 {
     vec3d c(0,0,0);
@@ -762,30 +775,6 @@ void AbstractPolygonMesh<M,V,E,P>::poly_flip_winding_order(const uint pid)
 
     update_p_normal(pid);
     for(uint off=0; off<this->verts_per_poly(pid); ++off) update_v_normal(this->poly_vert_id(pid,off));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractPolygonMesh<M,V,E,P>::poly_set_color(const Color & c)
-{
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        this->poly_data(pid).color = c;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractPolygonMesh<M,V,E,P>::poly_set_alpha(const float alpha)
-{
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        this->poly_data(pid).color.a = alpha;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

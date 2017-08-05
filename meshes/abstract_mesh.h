@@ -181,14 +181,14 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual       uint   poly_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
-        virtual       bool   poly_contains_vert(const uint fid, const uint vid) const = 0;
-        virtual       bool   poly_contains_edge(const uint fid, const uint eid) const;
         virtual       vec3d  poly_centroid     (const uint fid) const = 0;
         virtual       double poly_mass         (const uint fid) const = 0;
+        virtual       bool   poly_contains_vert(const uint fid, const uint vid) const = 0;
+        virtual       uint   poly_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
+        virtual       bool   poly_contains_edge(const uint fid, const uint eid) const;
         virtual       void   poly_show_all     ();
-        virtual       void   poly_set_color    (const Color & c) = 0;
-        virtual       void   poly_set_alpha    (const float alpha) = 0;
+        virtual       void   poly_set_color    (const Color & c);
+        virtual       void   poly_set_alpha    (const float alpha);
 };
 
 }

@@ -75,7 +75,11 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void update_face_tessellation();
-        void update_f_normals();
+        void update_normals();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual double poly_volume (const uint) const { assert(false && "TODO!"); return 1.0; }
 };
 
 }
