@@ -62,7 +62,11 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
                        const std::vector<std::vector<uint>> & polys,
                        const std::vector<std::vector<bool>> & polys_face_winding);
 
-    public:
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        MeshType mesh_type() const { return POLYHEDRALMESH; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void init();
         void load(const char * filename);
@@ -70,29 +74,8 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_adjacency();
         void update_face_tessellation();
         void update_f_normals();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        bool  edge_is_on_srf(const uint eid) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d face_vert     (const uint fid, const uint off) const;
-        uint  face_vert_id  (const uint fid, const uint off) const;
-        bool  face_is_on_srf(const uint fid) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        bool  poly_is_on_surf (const uint pid) const;
-        uint  poly_face_id    (const uint pid, const uint off) const;
-        bool  poly_face_is_CCW(const uint pid, const uint off) const;
-        bool  poly_face_is_CW (const uint pid, const uint off) const;
-        uint  poly_face_offset(const uint pid, const uint fid) const;
-        vec3d poly_centroid   (const uint pid) const;
-        void  poly_show_all();
 };
 
 }

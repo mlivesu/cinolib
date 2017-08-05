@@ -70,11 +70,12 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual void clear();
+        virtual void update_adjacency();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual uint verts_per_face(const uint fid) const { return this->faces.at(fid).size(); }
         virtual uint verts_per_poly(const uint pid) const { return this->p2v.at(pid).size();   }
+        virtual uint verts_per_face(const uint fid) const { return this->faces.at(fid).size(); }
         virtual uint edges_per_poly(const uint pid) const { return this->p2e.at(pid).size();   }
         virtual uint faces_per_poly(const uint pid) const { return this->polys.at(pid).size(); }
 
@@ -99,6 +100,26 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         virtual const F & face_data(const uint fid) const { return f_data.at(fid); }
         virtual       F & face_data(const uint fid)       { return f_data.at(fid); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+         virtual bool  edge_is_on_srf(const uint eid) const;
+
+         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+         virtual vec3d face_vert     (const uint fid, const uint off) const;
+         virtual uint  face_vert_id  (const uint fid, const uint off) const;
+         virtual bool  face_is_on_srf(const uint fid) const;
+
+         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+         virtual bool  poly_contains_vert(const uint fid, const uint vid) const;
+         virtual bool  poly_is_on_surf   (const uint pid) const;
+         virtual uint  poly_face_id      (const uint pid, const uint off) const;
+         virtual bool  poly_face_is_CCW  (const uint pid, const uint off) const;
+         virtual bool  poly_face_is_CW   (const uint pid, const uint off) const;
+         virtual uint  poly_face_offset  (const uint pid, const uint fid) const;
+         virtual vec3d poly_centroid     (const uint pid) const;
 };
 
 }

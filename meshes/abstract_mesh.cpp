@@ -437,24 +437,6 @@ void AbstractMesh<M,V,E,P>::edge_set_alpha(const float alpha)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractMesh<M,V,E,P>::poly_vert_id(const uint fid, const uint offset) const
-{
-    return polys.at(fid).at(offset);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-vec3d AbstractMesh<M,V,E,P>::poly_vert(const uint fid, const uint offset) const
-{
-    return vert(poly_vert_id(fid,offset));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 uint AbstractMesh<M,V,E,P>::poly_edge_id(const uint fid, const uint vid0, const uint vid1) const
 {
     assert(poly_contains_vert(fid,vid0));
@@ -466,47 +448,6 @@ uint AbstractMesh<M,V,E,P>::poly_edge_id(const uint fid, const uint vid0, const 
     }
 
     assert(false);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-uint AbstractMesh<M,V,E,P>::poly_vert_offset(const uint fid, const uint vid) const
-{
-    for(uint offset=0; offset<verts_per_poly(fid); ++offset)
-    {
-        if (poly_vert_id(fid,offset) == vid) return offset;
-    }
-    assert(false && "Something is off here...");
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-vec3d AbstractMesh<M,V,E,P>::poly_centroid(const uint fid) const
-{
-    vec3d c(0,0,0);
-    for(uint off=0; off<verts_per_poly(fid); ++off)
-    {
-        c += poly_vert(fid,off);
-    }
-    c /= static_cast<double>(verts_per_poly(fid));
-    return c;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-bool AbstractMesh<M,V,E,P>::poly_contains_vert(const uint fid, const uint vid) const
-{
-    for(uint off=0; off<verts_per_poly(fid); ++off)
-    {
-        if (poly_vert_id(fid,off) == vid) return true;
-    }
-    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

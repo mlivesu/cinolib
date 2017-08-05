@@ -538,6 +538,52 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_labeling_boundaries()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+uint AbstractPolygonMesh<M,V,E,P>::poly_vert_id(const uint fid, const uint offset) const
+{
+    return this->polys.at(fid).at(offset);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+vec3d AbstractPolygonMesh<M,V,E,P>::poly_vert(const uint fid, const uint offset) const
+{
+    return this->vert(poly_vert_id(fid,offset));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint AbstractPolygonMesh<M,V,E,P>::poly_vert_offset(const uint fid, const uint vid) const
+{
+    for(uint offset=0; offset<verts_per_poly(fid); ++offset)
+    {
+        if (poly_vert_id(fid,offset) == vid) return offset;
+    }
+    assert(false && "Something is off here...");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+vec3d AbstractPolygonMesh<M,V,E,P>::poly_centroid(const uint fid) const
+{
+    vec3d c(0,0,0);
+    for(uint off=0; off<verts_per_poly(fid); ++off)
+    {
+        c += poly_vert(fid,off);
+    }
+    c /= static_cast<double>(verts_per_poly(fid));
+    return c;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 double AbstractPolygonMesh<M,V,E,P>::poly_angle_at_vert(const uint pid, const uint vid, const int unit) const
 {
     assert(this->poly_contains_vert(pid,vid));

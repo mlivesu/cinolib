@@ -64,7 +64,11 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
          //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-         void operator+=(const AbstractPolygonMesh<M,V,E,P> & m);
+        virtual uint verts_per_poly(const uint pid) const { return this->polys.at(pid).size(); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void operator+=(const AbstractPolygonMesh<M,V,E,P> & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -107,8 +111,13 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        virtual vec3d  poly_vert              (const uint fid, const uint offset) const;
+        virtual uint   poly_vert_id           (const uint fid, const uint offset) const;
+        virtual uint   poly_vert_offset       (const uint fid, const uint vid) const;
+        virtual bool   poly_contains_vert     (const uint fid, const uint vid) const;
         virtual double poly_angle_at_vert     (const uint pid, const uint vid, const int unit = RAD) const;
         virtual double poly_area              (const uint pid) const = 0;
+        virtual vec3d  poly_centroid          (const uint fid) const;
         virtual double poly_mass              (const uint pid) const;
         virtual int    poly_shared            (const uint eid0, const uint eid1) const;
         virtual int    poly_adjacent_along    (const uint pid, const uint vid0, const uint vid1) const;
