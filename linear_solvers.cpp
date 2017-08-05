@@ -42,6 +42,8 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
                                Eigen::VectorXd             & x,
                          int   solver)
 {
+    profiler.push("cinolib::solve_square_system");
+
     assert(A.rows() == A.cols());
 
     switch (solver)
@@ -86,6 +88,8 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
 
         default: assert(false && "Unknown Solver");
     }
+
+    profiler.pop();
 }
 
 
@@ -96,6 +100,8 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
                                        std::map<uint,double>       & bc, // Dirichlet boundary conditions
                                  int   solver)
 {
+    profiler.push("cinolib::solve_square_system_with_bc");
+
     std::vector<int> col_map(A.rows(), -1);
     uint fresh_id = 0;
     for(uint col=0; col<A.cols(); ++col)
@@ -163,6 +169,8 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
             x[col] = bc[col];
         }
     }
+
+    profiler.pop();
 }
 
 

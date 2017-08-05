@@ -68,6 +68,8 @@ ScalarField harmonic_map(const Mesh            & m,
                          const int               laplacian_mode = COTANGENT,
                          const int               solver = SIMPLICIAL_LLT)
 {
+    profiler.push("cinolib::harmonic_map");
+
     assert(n > 0);
     assert(bc.size() > 0);
     assert(laplacian_mode == COTANGENT || laplacian_mode == UNIFORM);
@@ -82,6 +84,8 @@ ScalarField harmonic_map(const Mesh            & m,
     for(uint i=1; i<n; ++i) Ln  = Ln * L;
 
     solve_square_system_with_bc(Ln, rhs, f, bc, solver);
+
+    profiler.pop();
 
     return f;
 }
