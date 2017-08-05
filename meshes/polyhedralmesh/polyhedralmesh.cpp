@@ -43,9 +43,9 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Polyhedralmesh<M,V,E,F,C>::Polyhedralmesh(const char * filename)
+Polyhedralmesh<M,V,E,F,P>::Polyhedralmesh(const char * filename)
 {
     load(filename);
     init();
@@ -53,34 +53,34 @@ Polyhedralmesh<M,V,E,F,C>::Polyhedralmesh(const char * filename)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Polyhedralmesh<M,V,E,F,C>::Polyhedralmesh(const std::vector<vec3d>             & verts,
+Polyhedralmesh<M,V,E,F,P>::Polyhedralmesh(const std::vector<vec3d>             & verts,
                                           const std::vector<std::vector<uint>> & faces,
-                                          const std::vector<std::vector<uint>> & cells,
-                                          const std::vector<std::vector<bool>> & cells_face_winding)
+                                          const std::vector<std::vector<uint>> & polys,
+                                          const std::vector<std::vector<bool>> & polys_face_winding)
 : verts(verts)
 , faces(faces)
-, cells(cells)
-, cells_face_winding(cells_face_winding)
+, polys(polys)
+, polys_face_winding(polys_face_winding)
 {
     init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,C>::clear()
+void Polyhedralmesh<M,V,E,F,P>::clear()
 {
     bb.reset();
     //
     verts.clear();
     edges.clear();
     faces.clear();
-    tessellated_faces.clear();
-    cells.clear();
-    cells_face_winding.clear();
+    triangulated_faces.clear();
+    polys.clear();
+    polys_face_winding.clear();
     v_on_srf.clear();
     e_on_srf.clear();
     f_on_srf.clear();
@@ -90,27 +90,27 @@ void Polyhedralmesh<M,V,E,F,C>::clear()
     v_data.clear();
     e_data.clear();
     f_data.clear();
-    c_data.clear();
+    p_data.clear();
     //
     v2v.clear();
     v2e.clear();
     v2f.clear();
-    v2c.clear();
+    v2p.clear();
     e2f.clear();
-    e2c.clear();
+    e2p.clear();
     f2e.clear();
     f2f.clear();
-    f2c.clear();
-    c2v.clear();
-    c2e.clear();
-    c2c.clear();
+    f2p.clear();
+    p2v.clear();
+    p2e.clear();
+    p2p.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,C>::load(const char * filename)
+void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
 {
     clear();
     std::vector<double> coords;
@@ -121,7 +121,7 @@ void Polyhedralmesh<M,V,E,F,C>::load(const char * filename)
     if (filetype.compare(".hybrid") == 0 ||
         filetype.compare(".HYBRID") == 0)
     {
-        read_HYBDRID(filename, coords, faces, cells, cells_face_winding);
+        read_HYBDRID(filename, coords, faces, polys, polys_face_winding);
     }
     else
     {
@@ -133,16 +133,16 @@ void Polyhedralmesh<M,V,E,F,C>::load(const char * filename)
 
     logger << num_verts() << " verts read" << endl;
     logger << num_faces() << " faces read" << endl;
-    logger << num_cells() << " cells read" << endl;
+    logger << num_polys() << " polys read" << endl;
 
     this->mesh_data().filename = std::string(filename);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,C>::init()
+void Polyhedralmesh<M,V,E,F,P>::init()
 {
     update_face_tessellation();
     update_adjacency();
@@ -151,16 +151,16 @@ void Polyhedralmesh<M,V,E,F,C>::init()
     v_data.resize(num_verts());
     e_data.resize(num_edges());
     f_data.resize(num_faces());
-    c_data.resize(num_cells());
+    p_data.resize(num_polys());
 
     update_f_normals();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,C>::update_bbox()
+void Polyhedralmesh<M,V,E,F,P>::update_bbox()
 {
     bb.reset();
     for(uint vid=0; vid<num_verts(); ++vid)
@@ -173,40 +173,40 @@ void Polyhedralmesh<M,V,E,F,C>::update_bbox()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,C>::update_adjacency()
+void Polyhedralmesh<M,V,E,F,P>::update_adjacency()
 {
     v2v.clear(); v2v.resize(num_verts());
     v2e.clear(); v2e.resize(num_verts());
     v2f.clear(); v2f.resize(num_verts());
-    v2c.clear(); v2c.resize(num_verts());
+    v2p.clear(); v2p.resize(num_verts());
     f2e.clear(); f2e.resize(num_faces());
     f2f.clear(); f2f.resize(num_faces());
-    f2c.clear(); f2c.resize(num_faces());
-    c2v.clear(); c2v.resize(num_cells());
-    c2e.clear(); c2e.resize(num_cells());
-    c2c.clear(); c2c.resize(num_cells());
+    f2p.clear(); f2p.resize(num_faces());
+    p2v.clear(); p2v.resize(num_polys());
+    p2e.clear(); p2e.resize(num_polys());
+    p2p.clear(); p2p.resize(num_polys());
 
     std::map<ipair,std::set<uint>> e2f_map;
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint pid=0; pid<num_polys(); ++pid)
     {
-        std::set<uint> cell_verts; //unique list
-        for(int signed_fid : cells.at(cid))
+        std::set<uint> poly_verts; //unique list
+        for(int signed_fid : polys.at(pid))
         {
             uint fid = (signed_fid > 0) ? signed_fid : -signed_fid;
-            f2c.at(fid).push_back(cid);
+            f2p.at(fid).push_back(pid);
             uint nv = verts_per_face(fid);
             for(uint off=0; off<nv; ++off)
             {
                 uint vid = face_vert_id(fid, off);
                 ipair e  = unique_pair(vid,face_vert_id(fid,(off+1)%nv));
                 e2f_map[e].insert(fid);
-                cell_verts.insert(vid);
+                poly_verts.insert(vid);
             }
         }
-        for(uint vid : cell_verts) v2c.at(vid).push_back(cid);
-        std::copy(cell_verts.begin(), cell_verts.end(), std::back_inserter(c2v.at(cid)));
+        for(uint vid : poly_verts) v2p.at(vid).push_back(pid);
+        std::copy(poly_verts.begin(), poly_verts.end(), std::back_inserter(p2v.at(pid)));
     }
 
     for(uint fid=0; fid<num_faces(); ++fid)
@@ -220,7 +220,7 @@ void Polyhedralmesh<M,V,E,F,C>::update_adjacency()
 
     edges.clear();
     e2f.clear(); e2f.resize(e2f_map.size());
-    e2c.clear(); e2c.resize(e2f_map.size());
+    e2p.clear(); e2p.resize(e2f_map.size());
 
     uint fresh_id = 0;
     for(auto e2f_it : e2f_map)
@@ -257,24 +257,24 @@ void Polyhedralmesh<M,V,E,F,C>::update_adjacency()
 
     for(uint eid=0; eid<num_edges(); ++eid)
     {
-        std::set<uint> edge_cells;
+        std::set<uint> edge_polys;
         for(uint fid : e2f.at(eid))
-        for(uint cid : f2c.at(fid))
+        for(uint pid : f2p.at(fid))
         {
-            edge_cells.insert(cid);
+            edge_polys.insert(pid);
         }
-        for(uint cid : edge_cells) c2e.at(cid).push_back(eid);
-        std::copy(edge_cells.begin(), edge_cells.end(), std::back_inserter(e2c.at(eid)));
+        for(uint pid : edge_polys) p2e.at(pid).push_back(eid);
+        std::copy(edge_polys.begin(), edge_polys.end(), std::back_inserter(e2p.at(eid)));
     }
 
     for(uint fid=0; fid<num_faces(); ++fid)
     {
-        assert(f2c.at(fid).size() < 3);
-        for(uint i=0;   i<f2c.at(fid).size()-1; ++i)
-        for(uint j=i+1; j<f2c.at(fid).size();   ++j)
+        assert(f2p.at(fid).size() < 3);
+        for(uint i=0;   i<f2p.at(fid).size()-1; ++i)
+        for(uint j=i+1; j<f2p.at(fid).size();   ++j)
         {
-            c2c.at(f2c.at(fid).at(i)).push_back(f2c.at(fid).at(j));
-            c2c.at(f2c.at(fid).at(j)).push_back(f2c.at(fid).at(i));
+            p2p.at(f2p.at(fid).at(i)).push_back(f2p.at(fid).at(j));
+            p2p.at(f2p.at(fid).at(j)).push_back(f2p.at(fid).at(i));
         }
     }
 
@@ -284,7 +284,7 @@ void Polyhedralmesh<M,V,E,F,C>::update_adjacency()
 
     for(uint fid=0; fid<num_faces(); ++fid)
     {
-        if (f2c.at(fid).size() == 1)
+        if (f2p.at(fid).size() == 1)
         {
             f_on_srf.at(fid) = true;
             for(uint eid : f2e.at(fid)) e_on_srf.at(eid) = true;
@@ -295,16 +295,16 @@ void Polyhedralmesh<M,V,E,F,C>::update_adjacency()
     logger << num_verts() << "\tverts" << endl;
     logger << num_edges() << "\tedges" << endl;
     logger << num_faces() << "\tfaces" << endl;
-    logger << num_cells() << "\tcells" << endl;
+    logger << num_polys() << "\tpolys" << endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,C>::update_face_tessellation()
+void Polyhedralmesh<M,V,E,F,P>::update_face_tessellation()
 {
-    tessellated_faces.resize(num_faces());
+    triangulated_faces.resize(num_faces());
     std::set<uint> bad_faces;
 
     for(uint fid=0; fid<num_faces(); ++fid)
@@ -317,9 +317,9 @@ void Polyhedralmesh<M,V,E,F,C>::update_face_tessellation()
             uint vid1 = faces.at(fid).at(i-1);
             uint vid2 = faces.at(fid).at( i );
 
-            tessellated_faces.at(fid).push_back(vid0);
-            tessellated_faces.at(fid).push_back(vid1);
-            tessellated_faces.at(fid).push_back(vid2);
+            triangulated_faces.at(fid).push_back(vid0);
+            triangulated_faces.at(fid).push_back(vid1);
+            triangulated_faces.at(fid).push_back(vid2);
 
             n.push_back((vert(vid1)-vert(vid0)).cross(vert(vid2)-vert(vid0)));
         }
@@ -335,59 +335,59 @@ void Polyhedralmesh<M,V,E,F,C>::update_face_tessellation()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Polyhedralmesh<M,V,E,F,C>::cell_face_id(const uint cid, const uint off) const
+uint Polyhedralmesh<M,V,E,F,P>::poly_face_id(const uint pid, const uint off) const
 {
-    return cells.at(cid).at(off);
+    return polys.at(pid).at(off);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
-bool Polyhedralmesh<M,V,E,F,C>::cell_face_is_CW(const uint cid, const uint off) const
+template<class M, class V, class E, class F, class P>
+bool Polyhedralmesh<M,V,E,F,P>::poly_face_is_CW(const uint pid, const uint off) const
 {
-    return (cells_face_winding.at(cid).at(off) == true);
+    return (polys_face_winding.at(pid).at(off) == true);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
-bool Polyhedralmesh<M,V,E,F,C>::cell_face_is_CCW(const uint cid, const uint off) const
+template<class M, class V, class E, class F, class P>
+bool Polyhedralmesh<M,V,E,F,P>::poly_face_is_CCW(const uint pid, const uint off) const
 {
-    return (cells_face_winding.at(cid).at(off) == false);
+    return (polys_face_winding.at(pid).at(off) == false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
-uint Polyhedralmesh<M,V,E,F,C>::cell_face_offset(const uint cid, const uint fid) const
+template<class M, class V, class E, class F, class P>
+uint Polyhedralmesh<M,V,E,F,P>::poly_face_offset(const uint pid, const uint fid) const
 {
-    for(uint off=0; off<cells.at(cid).size(); ++off)
+    for(uint off=0; off<polys.at(pid).size(); ++off)
     {
-        if (cell_face_id(cid,off) == fid) return off;
+        if (poly_face_id(pid,off) == fid) return off;
     }
     assert(false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Polyhedralmesh<M,V,E,F,C>::cell_is_on_surf(const uint cid) const
+bool Polyhedralmesh<M,V,E,F,P>::poly_is_on_surf(const uint pid) const
 {
-    for(uint off=0; off<faces_per_cell(cid); ++off)
+    for(uint off=0; off<faces_per_poly(pid); ++off)
     {
-        if (f_on_srf.at(cell_face_id(cid,off))) return true;
+        if (f_on_srf.at(poly_face_id(pid,off))) return true;
     }
     return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Polyhedralmesh<M,V,E,F,C>::edge_vert_id(const uint eid, const uint offset) const
+uint Polyhedralmesh<M,V,E,F,P>::edge_vert_id(const uint eid, const uint offset) const
 {
     uint   eid_ptr = eid * 2;
     return edges.at(eid_ptr + offset);
@@ -395,51 +395,42 @@ uint Polyhedralmesh<M,V,E,F,C>::edge_vert_id(const uint eid, const uint offset) 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-vec3d Polyhedralmesh<M,V,E,F,C>::edge_vert(const uint eid, const uint offset) const
+vec3d Polyhedralmesh<M,V,E,F,P>::edge_vert(const uint eid, const uint offset) const
 {
     return vert(edge_vert_id(eid,offset));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-vec3d Polyhedralmesh<M,V,E,F,C>::cell_centroid(const uint cid) const
+vec3d Polyhedralmesh<M,V,E,F,P>::poly_centroid(const uint pid) const
 {
     vec3d c(0,0,0);
-    for(uint vid : adj_c2v(cid)) c += vert(vid);
-    c /= static_cast<double>(verts_per_cell(cid));
+    for(uint vid : adj_p2v(pid)) c += vert(vid);
+    c /= static_cast<double>(verts_per_poly(pid));
     return c;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-vec3d Polyhedralmesh<M,V,E,F,C>::poly_centroid(const uint cid) const
+void Polyhedralmesh<M,V,E,F,P>::poly_show_all()
 {
-    return cell_centroid(cid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Polyhedralmesh<M,V,E,F,C>::poly_show_all()
-{
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint pid=0; pid<num_polys(); ++pid)
     {
-        cell_data(cid).visible = true;
+        poly_data(pid).visible = true;
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,C>::update_f_normals()
+void Polyhedralmesh<M,V,E,F,P>::update_f_normals()
 {
     for(uint fid=0; fid<num_faces(); ++fid)
     {
@@ -463,36 +454,36 @@ void Polyhedralmesh<M,V,E,F,C>::update_f_normals()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-vec3d Polyhedralmesh<M,V,E,F,C>::face_vert(const uint fid, const uint off) const
+vec3d Polyhedralmesh<M,V,E,F,P>::face_vert(const uint fid, const uint off) const
 {
     return vert(face_vert_id(fid,off));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Polyhedralmesh<M,V,E,F,C>::face_vert_id(const uint fid, const uint off) const
+uint Polyhedralmesh<M,V,E,F,P>::face_vert_id(const uint fid, const uint off) const
 {
     return faces.at(fid).at(off);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Polyhedralmesh<M,V,E,F,C>::face_is_on_srf(const uint fid) const
+bool Polyhedralmesh<M,V,E,F,P>::face_is_on_srf(const uint fid) const
 {
     return f_on_srf.at(fid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Polyhedralmesh<M,V,E,F,C>::edge_is_on_srf(const uint eid) const
+bool Polyhedralmesh<M,V,E,F,P>::edge_is_on_srf(const uint eid) const
 {
     return e_on_srf.at(eid);
 }

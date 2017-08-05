@@ -49,10 +49,10 @@ static const uint QUAD_EDGES[4][2] =
     { 3, 0 }, // 3
 };
 
-template<class M = Mesh_std_data, // default template arguments
-         class V = Vert_std_data,
-         class E = Edge_std_data,
-         class P = Face_std_data>
+template<class M = Mesh_min_attributes, // default template arguments
+         class V = Vert_min_attributes,
+         class E = Edge_min_attributes,
+         class P = Polygon_min_attributes>
 class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 {
     protected:

@@ -54,10 +54,10 @@ MeshType;
 namespace cinolib
 {
 
-template<class M,
-         class V,
-         class E,
-         class P> // <= POLYGON for surface meshes, POLYHEDRA for volume meshes
+template<class M, // mesh attributes
+         class V, // vert attributes
+         class E, // edge attributes
+         class P> // polygon attributes for surface meshes, polyhedra attributes for volume meshes
 class AbstractMesh
 {
     protected:
@@ -73,12 +73,12 @@ class AbstractMesh
         std::vector<E> e_data;
         std::vector<P> p_data;
 
-        std::vector<std::vector<uint>> v2v;
-        std::vector<std::vector<uint>> v2e;
-        std::vector<std::vector<uint>> v2p;
-        std::vector<std::vector<uint>> e2p;
-        std::vector<std::vector<uint>> p2e;
-        std::vector<std::vector<uint>> p2p;
+        std::vector<std::vector<uint>> v2v; // vert to vert adjacency
+        std::vector<std::vector<uint>> v2e; // vert to edge adjacency
+        std::vector<std::vector<uint>> v2p; // vert to poly adjacency
+        std::vector<std::vector<uint>> e2p; // edge to poly adjacency
+        std::vector<std::vector<uint>> p2e; // poly to edge adjacency
+        std::vector<std::vector<uint>> p2p; // poly to poly adjacency
 
     public:
 

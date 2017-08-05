@@ -36,19 +36,29 @@
 namespace cinolib
 {
 
-template<class M,
-         class V,
-         class E,
-         class F,
-         class C>
-class AbstractVolumeMesh : public AbstractMesh<M,V,E,F>
+template<class M, // mesh attributes
+         class V, // vert attributes
+         class E, // edge attributes
+         class F, // face attributes
+         class P> // polyhedron attributes
+class AbstractVolumeMesh : public AbstractMesh<M,V,E,P>
 {
-    std::vector<std::vector<uint>> cells;
+    protected:
 
-    std::vector<bool> v_on_srf;
-    std::vector<bool> e_on_srf;
+        std::vector<std::vector<uint>> faces;               // list of faces (assumed CCW)
+        std::vector<std::vector<uint>> triangulated_faces;  // triangles covering each face (e.g., for rendering)
+        std::vector<bool>              v_on_srf;            // true if a vertex is exposed on the surface
+        std::vector<bool>              e_on_srf;            // true if an edge is exposed on the surface
+        std::vector<bool>              f_on_srf;            // true if a face is exposed on the surface
 
-    std::vector<C> c_data;
+        std::vector<F> f_data;
+
+        std::vector<std::vector<uint>> v2f; // vert to face adjacency
+        std::vector<std::vector<uint>> e2f; // edge to face adjacency
+        std::vector<std::vector<uint>> f2e; // face to edge adjacency
+        std::vector<std::vector<uint>> f2f; // face to face adjacency (through edges)
+        std::vector<std::vector<uint>> f2p; // face to poly adjacency
+        std::vector<std::vector<uint>> p2v; // poly to edge adjacency
 };
 
 }

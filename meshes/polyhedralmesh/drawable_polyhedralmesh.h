@@ -40,11 +40,11 @@
 namespace cinolib
 {
 
-template<class M = Mesh_std_data, // default template arguments
-         class V = Vert_std_data,
-         class E = Edge_std_data,
-         class F = Face_std_data,
-         class C = Cell_std_data>
+template<class M = Mesh_min_attributes, // default template arguments
+         class V = Vert_min_attributes,
+         class E = Edge_min_attributes,
+         class F = Polygon_min_attributes,
+         class C = Polyhedron_min_attributes>
 class DrawablePolyhedralmesh : public Polyhedralmesh<M,V,E,F,C>, public DrawableObject
 {
 
@@ -56,7 +56,7 @@ class DrawablePolyhedralmesh : public Polyhedralmesh<M,V,E,F,C>, public Drawable
 
         DrawablePolyhedralmesh(const std::vector<vec3d>             & verts,
                                const std::vector<std::vector<uint>> & faces,
-                               const std::vector<std::vector<int>>  & cells);
+                               const std::vector<std::vector<int>>  & polys);
 
     protected:
 

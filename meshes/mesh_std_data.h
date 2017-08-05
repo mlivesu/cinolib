@@ -67,7 +67,7 @@ typedef struct
 {
     std::string filename;
 }
-Mesh_std_data;
+Mesh_min_attributes;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -79,7 +79,7 @@ typedef struct
     float  quality = 0.0;
     bool   marked  = false;
 }
-Vert_std_data;
+Vert_min_attributes;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -88,7 +88,7 @@ typedef struct
     Color color  = Color::BLACK();
     bool  marked = false;
 }
-Edge_std_data;
+Edge_min_attributes;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -101,7 +101,7 @@ typedef struct
     float  quality = 0.0;
     bool   marked  = false;
 }
-Face_std_data;
+Polygon_min_attributes;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -113,7 +113,7 @@ typedef struct
     float  quality = 0.0;
     bool   marked  = false;
 }
-Cell_std_data;
+Polyhedron_min_attributes;
 
 }
 

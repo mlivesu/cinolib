@@ -43,11 +43,11 @@
 namespace cinolib
 {
 
-template<class M = Mesh_std_data, // default template arguments
-         class V = Vert_std_data,
-         class E = Edge_std_data,
-         class F = Face_std_data,
-         class C = Cell_std_data>
+template<class M = Mesh_min_attributes, // default template arguments
+         class V = Vert_min_attributes,
+         class E = Edge_min_attributes,
+         class F = Polygon_min_attributes,
+         class P = Polyhedron_min_attributes>
 class Polyhedralmesh
 {
     public:
@@ -58,8 +58,8 @@ class Polyhedralmesh
 
         Polyhedralmesh(const std::vector<vec3d>             & verts,
                        const std::vector<std::vector<uint>> & faces,
-                       const std::vector<std::vector<uint>> & cells,
-                       const std::vector<std::vector<bool>> & cells_face_winding);
+                       const std::vector<std::vector<uint>> & polys,
+                       const std::vector<std::vector<bool>> & polys_face_winding);
 
     protected:
 
@@ -67,14 +67,14 @@ class Polyhedralmesh
 
         std::vector<vec3d>             verts;
         std::vector<uint>              edges;
-        std::vector<std::vector<uint>> faces;              // list of vertices (assumed CCW)
-        std::vector<std::vector<uint>> tessellated_faces;  // triangles covering each face (e.g., for rendering)
-        std::vector<std::vector<uint>> cells;              // unordered list of faces (<fid> => CCW, -<fid> => CW)
-        std::vector<bool>              v_on_srf;           // true if a vertex is on the surface
-        std::vector<bool>              e_on_srf;           // true if an edge is on the surface
-        std::vector<bool>              f_on_srf;           // true if a face is on the surface
+        std::vector<std::vector<uint>> faces;               // list of vertices (assumed CCW)
+        std::vector<std::vector<uint>> triangulated_faces;  // triangles covering each face (e.g., for rendering)
+        std::vector<std::vector<uint>> polys;               // unordered list of faces (<fid> => CCW, -<fid> => CW)
+        std::vector<bool>              v_on_srf;            // true if a vertex is on the surface
+        std::vector<bool>              e_on_srf;            // true if an edge is on the surface
+        std::vector<bool>              f_on_srf;            // true if a face is on the surface
 
-        std::vector<std::vector<bool>> cells_face_winding; // true if the face is CCW, false if it is CW
+        std::vector<std::vector<bool>> polys_face_winding; // true if the face is CCW, false if it is CW
         // TODO!!
 
         // attributes
@@ -83,22 +83,22 @@ class Polyhedralmesh
         std::vector<V> v_data;
         std::vector<E> e_data;
         std::vector<F> f_data;
-        std::vector<C> c_data;
+        std::vector<P> p_data;
 
         // adjacencies -- Yes, I have lots of memory ;)
         //
         std::vector<std::vector<uint>> v2v; // vert to vert adjacency
         std::vector<std::vector<uint>> v2e; // vert to edge adjacency
         std::vector<std::vector<uint>> v2f; // vert to face adjacency
-        std::vector<std::vector<uint>> v2c; // vert to cell adjacency
+        std::vector<std::vector<uint>> v2p; // vert to poly adjacency
         std::vector<std::vector<uint>> e2f; // edge to face adjacency
-        std::vector<std::vector<uint>> e2c; // edge to cell adjacency
+        std::vector<std::vector<uint>> e2p; // edge to poly adjacency
         std::vector<std::vector<uint>> f2e; // face to edge adjacency
         std::vector<std::vector<uint>> f2f; // face to face adjacency (through edges)
-        std::vector<std::vector<uint>> f2c; // face to cell adjacency
-        std::vector<std::vector<uint>> c2v; // cell to edge adjacency
-        std::vector<std::vector<uint>> c2e; // cell to edge adjacency
-        std::vector<std::vector<uint>> c2c; // cell to cell adjacency
+        std::vector<std::vector<uint>> f2p; // face to poly adjacency
+        std::vector<std::vector<uint>> p2v; // poly to edge adjacency
+        std::vector<std::vector<uint>> p2e; // poly to edge adjacency
+        std::vector<std::vector<uint>> p2p; // poly to poly adjacency
 
     public:
 
@@ -117,17 +117,16 @@ class Polyhedralmesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint verts_per_face(const uint fid) const { return faces.at(fid).size(); }
-        uint verts_per_cell(const uint cid) const { return c2v.at(cid).size();   }
-        uint edges_per_cell(const uint cid) const { return c2e.at(cid).size();   }
-        uint faces_per_cell(const uint cid) const { return cells.at(cid).size(); }
+        uint verts_per_poly(const uint pid) const { return p2v.at(pid).size();   }
+        uint edges_per_poly(const uint pid) const { return p2e.at(pid).size();   }
+        uint faces_per_poly(const uint pid) const { return polys.at(pid).size(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint num_verts() const { return verts.size();     }
         uint num_edges() const { return edges.size() / 2; }
         uint num_faces() const { return faces.size();     }
-        uint num_cells() const { return cells.size();     }
-        uint num_polys() const { return cells.size();     } // elem == cell!!
+        uint num_polys() const { return polys.size();     }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -136,22 +135,22 @@ class Polyhedralmesh
         const std::vector<vec3d>             & vector_verts()  const { return verts; }
         const std::vector<uint>              & vector_edges()  const { return edges; }
         const std::vector<std::vector<uint>> & vector_faces()  const { return faces; }
-        const std::vector<std::vector<uint>> & vector_cells()  const { return cells; }
+        const std::vector<std::vector<uint>> & vector_polys()  const { return polys; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
         const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
         const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
-        const std::vector<uint> & adj_v2c(const uint vid) const { return v2c.at(vid); }
+        const std::vector<uint> & adj_v2p(const uint vid) const { return v2p.at(vid); }
         const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
-        const std::vector<uint> & adj_e2c(const uint eid) const { return e2c.at(eid); }
+        const std::vector<uint> & adj_e2p(const uint eid) const { return e2p.at(eid); }
         const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
         const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
-        const std::vector<uint> & adj_f2c(const uint fid) const { return f2c.at(fid); }
-        const std::vector<uint> & adj_c2v(const uint cid) const { return c2v.at(cid); }
-        const std::vector<uint> & adj_c2e(const uint cid) const { return c2e.at(cid); }
-        const std::vector<uint> & adj_c2c(const uint cid) const { return c2c.at(cid); }
+        const std::vector<uint> & adj_f2p(const uint fid) const { return f2p.at(fid); }
+        const std::vector<uint> & adj_p2v(const uint pid) const { return p2v.at(pid); }
+        const std::vector<uint> & adj_p2e(const uint pid) const { return p2e.at(pid); }
+        const std::vector<uint> & adj_p2p(const uint pid) const { return p2p.at(pid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -163,10 +162,8 @@ class Polyhedralmesh
               E & edge_data(const uint eid)       { return e_data.at(eid); }
         const F & face_data(const uint fid) const { return f_data.at(fid); }
               F & face_data(const uint fid)       { return f_data.at(fid); }
-        const C & cell_data(const uint cid) const { return c_data.at(cid); }
-              C & cell_data(const uint cid)       { return c_data.at(cid); }
-        const C & poly_data(const uint cid) const { return c_data.at(cid); } // elem == cell!!
-              C & poly_data(const uint cid)       { return c_data.at(cid); }
+        const P & poly_data(const uint pid) const { return p_data.at(pid); }
+              P & poly_data(const uint pid)       { return p_data.at(pid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -187,21 +184,12 @@ class Polyhedralmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool  cell_is_on_surf (const uint cid) const;
-        uint  cell_face_id    (const uint cid, const uint off) const;
-        bool  cell_face_is_CCW(const uint cid, const uint off) const;
-        bool  cell_face_is_CW (const uint cid, const uint off) const;
-        uint  cell_face_offset(const uint cid, const uint fid) const;
-        vec3d cell_centroid   (const uint cid) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        // These are all wraps for the "cell_ methods". They are useful for generic
-        // programming, because "poly_" will wrap face_ for surface meshes and wrap
-        // "cell_" for volumetric meshes, allowing the use of templated algorithms
-        // that work with both types of meshes without requiring specialzed code
-
-        vec3d poly_centroid(const uint cid) const;
+        bool  poly_is_on_surf (const uint pid) const;
+        uint  poly_face_id    (const uint pid, const uint off) const;
+        bool  poly_face_is_CCW(const uint pid, const uint off) const;
+        bool  poly_face_is_CW (const uint pid, const uint off) const;
+        uint  poly_face_offset(const uint pid, const uint fid) const;
+        vec3d poly_centroid   (const uint pid) const;
         void  poly_show_all();
 };
 
