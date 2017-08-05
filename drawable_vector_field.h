@@ -46,7 +46,7 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
         DrawableVectorField() {}
 
-        DrawableVectorField(const Mesh & m) : VectorField(m.num_elems())
+        DrawableVectorField(const Mesh & m) : VectorField(m.num_polys())
         {
             m_ptr = &m;
             set_arrow_color(Color::RED());
@@ -59,9 +59,9 @@ class DrawableVectorField : public VectorField, public DrawableObject
         {
             if (m_ptr)
             {
-                for(uint eid=0; eid<m_ptr->num_elems(); ++eid)
+                for(uint eid=0; eid<m_ptr->num_polys(); ++eid)
                 {
-                    vec3d base = m_ptr->elem_centroid(eid);
+                    vec3d base = m_ptr->poly_centroid(eid);
                     vec3d tip  = base + arrow_length * vec_at(eid);
 
                     arrow<vec3d>(base, tip, arrow_thicknes, arrow_color.rgba);

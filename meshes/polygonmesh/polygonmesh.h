@@ -42,13 +42,13 @@ namespace cinolib
 template<class M = Mesh_std_data, // default template arguments
          class V = Vert_std_data,
          class E = Edge_std_data,
-         class F = Face_std_data>
-class Polygonmesh : public AbstractSurfaceMesh<M,V,E,F>
+         class P = Face_std_data>
+class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
 {
     protected:
 
-        std::vector<std::vector<uint>> tessellated_faces; // triangles covering each face.Useful for
-                                                          // robust normal estimation and rendering
+        std::vector<std::vector<uint>> triangulated_polys; // triangles covering each polygon. Useful for
+                                                           // robust normal estimation and rendering
     public:
 
         Polygonmesh(){}
@@ -56,10 +56,10 @@ class Polygonmesh : public AbstractSurfaceMesh<M,V,E,F>
         Polygonmesh(const char * filename);
 
         Polygonmesh(const std::vector<vec3d>             & verts,
-                    const std::vector<std::vector<uint>> & faces);
+                    const std::vector<std::vector<uint>> & polys);
 
         Polygonmesh(const std::vector<double>            & coords,
-                    const std::vector<std::vector<uint>> & faces);
+                    const std::vector<std::vector<uint>> & polys);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -72,12 +72,12 @@ class Polygonmesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void operator+=(const Polygonmesh<M,V,E,F> & m);
+        void operator+=(const Polygonmesh<M,V,E,P> & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_f_normal(const uint fid);
-        void update_face_tessellation();
+        void update_p_normal(const uint fid);
+        void update_poly_tessellation();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -85,7 +85,7 @@ class Polygonmesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double face_area(const uint) const { assert(false); } // TODO!
+        double poly_area(const uint) const { assert(false); } // TODO!
 };
 
 }

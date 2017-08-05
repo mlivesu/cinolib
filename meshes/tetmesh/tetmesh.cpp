@@ -633,7 +633,7 @@ double Tetmesh<M,V,E,F,C>::cell_edge_length(const uint cid, const uint edge_offs
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::elem_centroid(const uint cid) const
+vec3d Tetmesh<M,V,E,F,C>::poly_centroid(const uint cid) const
 {
     return cell_centroid(cid);
 }
@@ -652,7 +652,7 @@ uint Tetmesh<M,V,E,F,C>::cell_vert_id(const uint cid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::elem_vert_id(const uint cid, const uint off) const
+uint Tetmesh<M,V,E,F,C>::poly_vert_id(const uint cid, const uint off) const
 {
     return cell_vert_id(cid,off);
 }
@@ -661,7 +661,7 @@ uint Tetmesh<M,V,E,F,C>::elem_vert_id(const uint cid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::elem_bary_coords(const uint cid, const vec3d & P, std::vector<double> & wgts) const
+bool Tetmesh<M,V,E,F,C>::poly_bary_coords(const uint cid, const vec3d & P, std::vector<double> & wgts) const
 {
     return cell_bary_coords(cid, P, wgts);
 }
@@ -696,7 +696,7 @@ vec3d Tetmesh<M,V,E,F,C>::cell_vert(const uint cid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::elem_vert(const uint cid, const uint off) const
+vec3d Tetmesh<M,V,E,F,C>::poly_vert(const uint cid, const uint off) const
 {
     return cell_vert(cid,off);
 }
@@ -796,7 +796,7 @@ vec3d Tetmesh<M,V,E,F,C>::edge_vert(const uint eid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Tetmesh<M,V,E,F,C>::elem_show_all()
+void Tetmesh<M,V,E,F,C>::poly_show_all()
 {
     for(uint cid=0; cid<num_cells(); ++cid)
     {

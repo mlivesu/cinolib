@@ -67,13 +67,13 @@ void cotangent_weights<Trimesh<>>(const Trimesh<>     & m,
         if (nbr == vid) nbr = m.edge_vert_id(eid,1);
         assert(nbr != vid);
 
-        std::vector<uint> faces = m.adj_e2f(eid);
+        std::vector<uint> faces = m.adj_e2p(eid);
         assert(faces.size() == 2 || faces.size() == 1);
 
         double wgt = 0.0;
         for(uint j=0; j<faces.size(); ++j)
         {
-            double alpha = m.face_angle_at_vert(faces[j], m.vert_opposite_to(faces[j], vid, nbr));
+            double alpha = m.poly_angle_at_vert(faces[j], m.vert_opposite_to(faces[j], vid, nbr));
             wgt += cot(alpha);
         }
         wgt = (faces.size() == 2) ? wgt * 0.5 : wgt;

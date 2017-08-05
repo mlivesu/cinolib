@@ -109,15 +109,15 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
     drawlist.seg_coords.clear();
     drawlist.seg_colors.clear();
 
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
-        if (!(this->face_data(fid).visible)) continue;
+        if (!(this->poly_data(fid).visible)) continue;
 
-        for(uint i=0; i< this->tessellated_faces.at(fid).size()/3; ++i)
+        for(uint i=0; i< this->triangulated_polys.at(fid).size()/3; ++i)
         {
-            uint vid0 = this->tessellated_faces.at(fid).at(3*i+0);
-            uint vid1 = this->tessellated_faces.at(fid).at(3*i+1);
-            uint vid2 = this->tessellated_faces.at(fid).at(3*i+2);
+            uint vid0 = this->triangulated_polys.at(fid).at(3*i+0);
+            uint vid1 = this->triangulated_polys.at(fid).at(3*i+1);
+            uint vid2 = this->triangulated_polys.at(fid).at(3*i+2);
 
             int base_addr = drawlist.tri_coords.size()/3;
 
@@ -147,18 +147,18 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
 
             if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
             {
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
-                drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.r);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.g);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.b);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.a);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.r);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.g);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.b);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.a);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.r);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.g);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.b);
+                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.a);
             }
             else if (drawlist.draw_mode & DRAW_TRI_VERTCOLOR)
             {
@@ -182,9 +182,9 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         bool masked = true;
-        for(uint fid : this->adj_e2f(eid))
+        for(uint fid : this->adj_e2p(eid))
         {
-            if (this->face_data(fid).visible) masked = false;
+            if (this->poly_data(fid).visible) masked = false;
         }
         if (masked) continue;
 

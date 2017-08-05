@@ -35,9 +35,9 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-Trimesh<M,V,E,F>::Trimesh(const char * filename)
+Trimesh<M,V,E,P>::Trimesh(const char * filename)
 {
     this->load(filename);
     this->init();
@@ -45,75 +45,75 @@ Trimesh<M,V,E,F>::Trimesh(const char * filename)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-Trimesh<M,V,E,F>::Trimesh(const std::vector<vec3d>              & verts,
+Trimesh<M,V,E,P>::Trimesh(const std::vector<vec3d>              & verts,
                           const std::vector<std::vector<uint>>  & faces)
 
 {
     this->verts = verts;
-    this->faces = faces;
+    this->polys = faces;
     this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-Trimesh<M,V,E,F>::Trimesh(const std::vector<double>             & coords,
+Trimesh<M,V,E,P>::Trimesh(const std::vector<double>             & coords,
                           const std::vector<std::vector<uint>>  & faces)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    this->faces = faces;
+    this->polys = faces;
     this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-Trimesh<M,V,E,F>::Trimesh(const std::vector<vec3d> & verts,
+Trimesh<M,V,E,P>::Trimesh(const std::vector<vec3d> & verts,
                           const std::vector<uint>  & faces)
 {
     this->verts = verts;
-    this->faces = faces_from_serialized_vids(faces,3);
+    this->polys = faces_from_serialized_vids(faces,3);
     this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-Trimesh<M,V,E,F>::Trimesh(const std::vector<double> & coords,
+Trimesh<M,V,E,P>::Trimesh(const std::vector<double> & coords,
                           const std::vector<uint>   & faces)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    this->faces = faces_from_serialized_vids(faces,3);
+    this->polys = faces_from_serialized_vids(faces,3);
     this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Trimesh<M,V,E,F>::update_f_normal(const uint fid)
+void Trimesh<M,V,E,P>::update_p_normal(const uint pid)
 {
-    vec3d A = this->face_vert(fid,0);
-    vec3d B = this->face_vert(fid,1);
-    vec3d C = this->face_vert(fid,2);
+    vec3d A = this->poly_vert(pid,0);
+    vec3d B = this->poly_vert(pid,1);
+    vec3d C = this->poly_vert(pid,2);
     vec3d n = (B-A).cross(C-A);
     n.normalize();
-    this->face_data(fid).normal = n;
+    this->poly_data(pid).normal = n;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-int Trimesh<M,V,E,F>::edge_opposite_to(const uint fid, const uint vid) const
+int Trimesh<M,V,E,P>::edge_opposite_to(const uint pid, const uint vid) const
 {
-    assert(this->face_contains_vert(fid, vid));
-    for(uint eid : this->adj_f2e(fid))
+    assert(this->poly_contains_vert(pid, vid));
+    for(uint eid : this->adj_p2e(pid))
     {
         if (this->edge_vert_id(eid,0) != vid &&
             this->edge_vert_id(eid,1) != vid) return eid;
@@ -123,20 +123,20 @@ int Trimesh<M,V,E,F>::edge_opposite_to(const uint fid, const uint vid) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,F>::edge_collapse(const uint eid)
+bool Trimesh<M,V,E,P>::edge_collapse(const uint eid)
 {
     // define what to keep and what to remove
     //
     uint vid_keep   = this->edge_vert_id(eid,0);
     uint vid_remove = this->edge_vert_id(eid,1);
-    std::set<uint> fid_remove(this->adj_e2f(eid).begin(), this->adj_e2f(eid).end());
+    std::set<uint> pid_remove(this->adj_e2p(eid).begin(), this->adj_e2p(eid).end());
     std::set<uint> edg_keep, edg_remove;
-    for(uint fid: fid_remove)
+    for(uint pid: pid_remove)
     {
-        edg_keep.insert(edge_opposite_to(fid, vid_remove));
-        edg_remove.insert(edge_opposite_to(fid, vid_keep));
+        edg_keep.insert(edge_opposite_to(pid, vid_remove));
+        edg_remove.insert(edge_opposite_to(pid, vid_keep));
     }
     edg_remove.insert(eid);
 
@@ -172,14 +172,14 @@ bool Trimesh<M,V,E,F>::edge_collapse(const uint eid)
 
     // Pre-processing : check triangles
     //
-    for(uint fid : this->adj_v2f(vid_remove))
+    for(uint pid : this->adj_v2p(vid_remove))
     {
-        if (CONTAINS(fid_remove, fid)) continue;
+        if (CONTAINS(pid_remove, pid)) continue;
 
-        vec3d n_old = this->face_data(fid).normal;
-        uint vid0   = this->face_vert_id(fid,0);
-        uint vid1   = this->face_vert_id(fid,1);
-        uint vid2   = this->face_vert_id(fid,2);
+        vec3d n_old = this->poly_data(pid).normal;
+        uint vid0   = this->poly_vert_id(pid,0);
+        uint vid1   = this->poly_vert_id(pid,1);
+        uint vid2   = this->poly_vert_id(pid,2);
 
         if (vid0 == vid_remove) vid0 = vid_keep; else
         if (vid1 == vid_remove) vid1 = vid_keep; else
@@ -197,13 +197,13 @@ bool Trimesh<M,V,E,F>::edge_collapse(const uint eid)
 
         if (n.length() == 0)
         {
-            logger << "WARNING : triangle on colinear points " << fid << " : Impossible to perform edge collapse. " << endl;
+            logger << "WARNING : triangle on colinear points " << pid << " : Impossible to perform edge collapse. " << endl;
             return false;
         }
 
         if (n.dot(n_old) < 0 ) // triangle inversion
         {
-            logger << "WARNING : triangle inversion " << fid << " : Impossible to perform edge collapse. " << std::endl;
+            logger << "WARNING : triangle inversion " << pid << " : Impossible to perform edge collapse. " << std::endl;
             return false;
         }
     }
@@ -221,41 +221,41 @@ bool Trimesh<M,V,E,F>::edge_collapse(const uint eid)
         assert("Something is off here" && false);
     }
     //
-    for(uint fid : this->adj_v2f(vid_remove))
+    for(uint pid : this->adj_v2p(vid_remove))
     {
-        if (CONTAINS(fid_remove, fid)) continue;
+        if (CONTAINS(pid_remove, pid)) continue;
 
-        this->v2f.at(vid_keep).push_back(fid);
-        if (this->face_vert_id(fid,0) == vid_remove) this->faces.at(fid*3+0) = vid_keep; else
-        if (this->face_vert_id(fid,0) == vid_remove) this->faces.at(fid*3+1) = vid_keep; else
-        if (this->face_vert_id(fid,0) == vid_remove) this->faces.at(fid*3+2) = vid_keep; else
+        this->v2p.at(vid_keep).push_back(pid);
+        if (this->poly_vert_id(pid,0) == vid_remove) this->polys.at(pid*3+0) = vid_keep; else
+        if (this->poly_vert_id(pid,0) == vid_remove) this->polys.at(pid*3+1) = vid_keep; else
+        if (this->poly_vert_id(pid,0) == vid_remove) this->polys.at(pid*3+2) = vid_keep; else
         assert("Something is off here" && false);
 
-        update_f_normal(fid);
+        update_p_normal(pid);
     }
 
     // Migrate references from edge_remove to edge_keep
     //
-    for(uint fid : fid_remove)
+    for(uint pid : pid_remove)
     {
-        int e_take = edge_opposite_to(fid, vid_remove); assert(e_take >= 0);
-        int e_give = edge_opposite_to(fid, vid_keep);   assert(e_give >= 0);
+        int e_take = edge_opposite_to(pid, vid_remove); assert(e_take >= 0);
+        int e_give = edge_opposite_to(pid, vid_keep);   assert(e_give >= 0);
         assert(CONTAINS(edg_remove, e_give));
 
-        for(uint inc_f : this->adj_e2f(e_give))
+        for(uint inc_f : this->adj_e2p(e_give))
         {
-            if (CONTAINS(fid_remove, inc_f)) continue;
+            if (CONTAINS(pid_remove, inc_f)) continue;
 
-            for (uint adj_f : this->adj_e2f(e_take))
+            for (uint adj_f : this->adj_e2p(e_take))
             {
-                if (CONTAINS(fid_remove, adj_f)) continue;
+                if (CONTAINS(pid_remove, adj_f)) continue;
 
-                this->f2f.at(inc_f).push_back(adj_f);
-                this->f2f.at(adj_f).push_back(inc_f);
+                this->p2p.at(inc_f).push_back(adj_f);
+                this->p2p.at(adj_f).push_back(inc_f);
             }
 
-            this->e2f.at(e_take).push_back(inc_f);
-            this->f2e.at(inc_f).push_back(e_take);
+            this->e2p.at(e_take).push_back(inc_f);
+            this->p2e.at(inc_f).push_back(e_take);
         }
     }
 
@@ -283,12 +283,12 @@ bool Trimesh<M,V,E,F>::edge_collapse(const uint eid)
     {
         assert(edg_rem<this->num_edges());
 
-        for(uint fid : this->adj_e2f(edg_rem))
+        for(uint pid : this->adj_e2p(edg_rem))
         {
-            assert(fid<this->num_faces());
-            auto beg = this->f2e.at(fid).begin();
-            auto end = this->f2e.at(fid).end();
-            this->f2e.at(fid).erase(std::remove(beg, end, edg_rem), end); // Erase-Remove idiom
+            assert(pid<this->num_polys());
+            auto beg = this->p2e.at(pid).begin();
+            auto end = this->p2e.at(pid).end();
+            this->p2e.at(pid).erase(std::remove(beg, end, edg_rem), end); // Erase-Remove idiom
         }
 
         for(uint i=0; i<2; ++i)
@@ -302,51 +302,51 @@ bool Trimesh<M,V,E,F>::edge_collapse(const uint eid)
     //
     // remove references to any triangle in tri_remove.
     //
-    for(uint fid_rem : fid_remove)
+    for(uint pid_rem : pid_remove)
     {
         for(uint off=0; off<3; ++off)
         {
-            uint vid = this->face_vert_id(fid_rem,off);
-            auto beg = this->v2f.at(vid).begin();
-            auto end = this->v2f.at(vid).end();
-            this->v2f.at(vid).erase(std::remove(beg, end, fid_rem), end); // Erase-Remove idiom
+            uint vid = this->poly_vert_id(pid_rem,off);
+            auto beg = this->v2p.at(vid).begin();
+            auto end = this->v2p.at(vid).end();
+            this->v2p.at(vid).erase(std::remove(beg, end, pid_rem), end); // Erase-Remove idiom
             this->update_v_normal(vid);
         }
 
-        for(uint eid : this->adj_f2e(fid_rem))
+        for(uint eid : this->adj_p2e(pid_rem))
         {
-            auto beg = this->e2f.at(eid).begin();
-            auto end = this->e2f.at(eid).end();
-            this->e2f.at(eid).erase(std::remove(beg, end, fid_rem), end); // Erase-Remove idiom
+            auto beg = this->e2p.at(eid).begin();
+            auto end = this->e2p.at(eid).end();
+            this->e2p.at(eid).erase(std::remove(beg, end, pid_rem), end); // Erase-Remove idiom
         }
 
-        for(uint fid : this->adj_f2f(fid_rem))
+        for(uint pid : this->adj_p2p(pid_rem))
         {
-            auto beg = this->f2f.at(fid).begin();
-            auto end = this->f2f.at(fid).end();
-            this->f2f.at(fid).erase(std::remove(beg, end, fid_rem), end); // Erase-Remove idiom
+            auto beg = this->p2p.at(pid).begin();
+            auto end = this->p2p.at(pid).end();
+            this->p2p.at(pid).erase(std::remove(beg, end, pid_rem), end); // Erase-Remove idiom
         }
     }
 
     // clear
     this->v2v.at(vid_remove).clear();
     this->v2e.at(vid_remove).clear();
-    this->v2f.at(vid_remove).clear();
+    this->v2p.at(vid_remove).clear();
 
     for(uint eid : edg_remove)
     {
-        this->e2f.at(eid).clear();
+        this->e2p.at(eid).clear();
         this->edges.at(eid*2+0) = INT_MAX;
         this->edges.at(eid*2+1) = INT_MAX;
     }
 
-    for(uint fid : fid_remove)
+    for(uint pid : pid_remove)
     {
-        this->f2e.at(fid).clear();
-        this->f2f.at(fid).clear();
-        this->faces.at(fid*3+0) = INT_MAX;
-        this->faces.at(fid*3+1) = INT_MAX;
-        this->faces.at(fid*3+2) = INT_MAX;
+        this->p2e.at(pid).clear();
+        this->p2p.at(pid).clear();
+        this->polys.at(pid*3+0) = INT_MAX;
+        this->polys.at(pid*3+1) = INT_MAX;
+        this->polys.at(pid*3+2) = INT_MAX;
     }
 
     // Finalize
@@ -358,10 +358,10 @@ bool Trimesh<M,V,E,F>::edge_collapse(const uint eid)
     std::reverse(edg_remove_vec.begin(), edg_remove_vec.end());
     for(uint eid : edg_remove_vec) edge_remove_unreferenced(eid);
 
-    std::vector<uint> fid_remove_vec(fid_remove.begin(), fid_remove.end());
-    std::sort(fid_remove_vec.begin(), fid_remove_vec.end());
-    std::reverse(fid_remove_vec.begin(), fid_remove_vec.end());
-    for(uint tid : fid_remove_vec) face_remove_unreferenced(tid);
+    std::vector<uint> pid_remove_vec(pid_remove.begin(), pid_remove.end());
+    std::sort(pid_remove_vec.begin(), pid_remove_vec.end());
+    std::reverse(pid_remove_vec.begin(), pid_remove_vec.end());
+    for(uint tid : pid_remove_vec) poly_remove_unreferenced(tid);
 
     this->update_normals();
 
@@ -370,9 +370,9 @@ bool Trimesh<M,V,E,F>::edge_collapse(const uint eid)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint Trimesh<M,V,E,F>::edge_add(const uint vid0, const uint vid1)
+uint Trimesh<M,V,E,P>::edge_add(const uint vid0, const uint vid1)
 {
     assert(vid0 < this->num_verts());
     assert(vid1 < this->num_verts());
@@ -382,7 +382,7 @@ uint Trimesh<M,V,E,F>::edge_add(const uint vid0, const uint vid1)
     this->edges.push_back(vid0);
     this->edges.push_back(vid1);
     //
-    this->e2f.push_back(std::vector<uint>());
+    this->e2p.push_back(std::vector<uint>());
     //
     E data;
     this->e_data.push_back(data);
@@ -392,13 +392,13 @@ uint Trimesh<M,V,E,F>::edge_add(const uint vid0, const uint vid1)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Trimesh<M,V,E,F>::edge_switch_id(const uint eid0, const uint eid1)
+void Trimesh<M,V,E,P>::edge_switch_id(const uint eid0, const uint eid1)
 {
     for(uint off=0; off<2; ++off) std::swap(this->edges.at(2*eid0+off), this->edges.at(2*eid1+off));
 
-    std::swap(this->e2f.at(eid0), this->e2f.at(eid1));
+    std::swap(this->e2p.at(eid0), this->e2p.at(eid1));
 
     for(std::vector<uint> & nbrs : this->v2e)
     for(uint & curr : nbrs)
@@ -407,7 +407,7 @@ void Trimesh<M,V,E,F>::edge_switch_id(const uint eid0, const uint eid1)
         if (curr == eid1) curr = eid0;
     }
 
-    for(std::vector<uint> & nbrs : this->f2e)
+    for(std::vector<uint> & nbrs : this->p2e)
     for(uint & curr : nbrs)
     {
         if (curr == eid0) curr = eid1; else
@@ -417,47 +417,38 @@ void Trimesh<M,V,E,F>::edge_switch_id(const uint eid0, const uint eid1)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Trimesh<M,V,E,F>::edge_remove_unreferenced(const uint eid)
+void Trimesh<M,V,E,P>::edge_remove_unreferenced(const uint eid)
 {
     edge_switch_id(eid, this->num_edges()-1);
     this->edges.resize(this->edges.size()-2);
     this->e_data.pop_back();
-    this->e2f.pop_back();
+    this->e2p.pop_back();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,F>::face_bary_coords(const uint fid, const vec3d & P, std::vector<double> & wgts) const
+bool Trimesh<M,V,E,P>::poly_bary_coords(const uint pid, const vec3d & p, std::vector<double> & wgts) const
 {
-    return triangle_barycentric_coords(this->face_vert(fid,0),
-                                       this->face_vert(fid,1),
-                                       this->face_vert(fid,2),
-                                       P, wgts);
+    return triangle_barycentric_coords(this->poly_vert(pid,0),
+                                       this->poly_vert(pid,1),
+                                       this->poly_vert(pid,2),
+                                       p, wgts);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,F>::elem_bary_coords(const uint fid, const vec3d & P, std::vector<double> & wgts) const
-{
-    return face_bary_coords(fid, P, wgts);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-bool Trimesh<M,V,E,F>::face_bary_is_vert(const uint fid, const std::vector<double> & wgts, uint & vid, const double tol) const
+bool Trimesh<M,V,E,P>::poly_bary_is_vert(const uint pid, const std::vector<double> & wgts, uint & vid, const double tol) const
 {
     uint off;
     if (triangle_bary_is_vertex(wgts, off, tol))
     {
-        vid = this->face_vert_id(fid, off);
+        vid = this->poly_vert_id(pid, off);
         return true;
     }
     return false;
@@ -465,23 +456,14 @@ bool Trimesh<M,V,E,F>::face_bary_is_vert(const uint fid, const std::vector<doubl
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,F>::elem_bary_is_vert(const uint fid, const std::vector<double> & wgts, uint & vid, const double tol) const
-{
-    return face_bary_is_vert(fid, wgts, vid, tol);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-bool Trimesh<M,V,E,F>::face_bary_is_edge(const uint fid, const std::vector<double> & wgts, uint & eid, const double tol) const
+bool Trimesh<M,V,E,P>::poly_bary_is_edge(const uint pid, const std::vector<double> & wgts, uint & eid, const double tol) const
 {
     uint off;
     if (triangle_bary_is_edge(wgts, off, tol))
     {
-        eid = face_edge_id(fid, off);
+        eid = poly_edge_id(pid, off);
         return true;
     }
     return false;
@@ -489,23 +471,14 @@ bool Trimesh<M,V,E,F>::face_bary_is_edge(const uint fid, const std::vector<doubl
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,F>::elem_bary_is_edge(const uint fid, const std::vector<double> & wgts, uint & eid, const double tol) const
+uint Trimesh<M,V,E,P>::poly_edge_id(const uint pid, const uint offset) const
 {
-    return face_bary_is_edge(fid, wgts, eid, tol);
-}
+    uint vid0 = this->poly_vert_id(pid, TRI_EDGES[offset][0]);
+    uint vid1 = this->poly_vert_id(pid, TRI_EDGES[offset][1]);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-uint Trimesh<M,V,E,F>::face_edge_id(const uint fid, const uint offset) const
-{
-    uint vid0 = this->face_vert_id(fid, TRI_EDGES[offset][0]);
-    uint vid1 = this->face_vert_id(fid, TRI_EDGES[offset][1]);
-
-    for(uint eid : this->adj_f2e(fid))
+    for(uint eid : this->adj_p2e(pid))
     {
         if (this->edge_contains_vert(eid,vid0) &&
             this->edge_contains_vert(eid,vid1))
@@ -523,14 +496,14 @@ uint Trimesh<M,V,E,F>::face_edge_id(const uint fid, const uint offset) const
 // Mario Botsch, Leif P. Kobbelt
 // VMW 2001
 //
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,F>::face_is_cap(const uint fid, const double angle_thresh_deg) const
+bool Trimesh<M,V,E,P>::poly_is_cap(const uint pid, const double angle_thresh_deg) const
 {
-    for(uint offset=0; offset<this->verts_per_face(fid); ++offset)
+    for(uint offset=0; offset<this->verts_per_poly(pid); ++offset)
     {
-        uint vid = this->face_vert_id(fid,offset);
-        if (this->face_angle_at_vert(fid,vid,DEG) > angle_thresh_deg)
+        uint vid = this->poly_vert_id(pid,offset);
+        if (this->poly_angle_at_vert(pid,vid,DEG) > angle_thresh_deg)
         {
             return true;
         }
@@ -545,14 +518,14 @@ bool Trimesh<M,V,E,F>::face_is_cap(const uint fid, const double angle_thresh_deg
 // Mario Botsch, Leif P. Kobbelt
 // VMW 2001
 //
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,F>::face_is_needle(const uint fid, const double angle_thresh_deg) const
+bool Trimesh<M,V,E,P>::poly_is_needle(const uint pid, const double angle_thresh_deg) const
 {
-    for(uint offset=0; offset<this->verts_per_face(fid); ++offset)
+    for(uint offset=0; offset<this->verts_per_poly(pid); ++offset)
     {
-        uint vid = this->face_vert_id(fid,offset);
-        if (this->face_angle_at_vert(fid,vid,DEG) < angle_thresh_deg)
+        uint vid = this->poly_vert_id(pid,offset);
+        if (this->poly_angle_at_vert(pid,vid,DEG) < angle_thresh_deg)
         {
             return true;
         }
@@ -562,32 +535,32 @@ bool Trimesh<M,V,E,F>::face_is_needle(const uint fid, const double angle_thresh_
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint Trimesh<M,V,E,F>::face_add(const uint vid0, const uint vid1, const uint vid2)
+uint Trimesh<M,V,E,P>::poly_add(const uint vid0, const uint vid1, const uint vid2)
 {
     assert(vid0 < this->num_verts());
     assert(vid1 < this->num_verts());
     assert(vid2 < this->num_verts());
 
-    uint fid = this->num_faces();
+    uint pid = this->num_polys();
     //
     std::vector<uint> f;
     f.push_back(vid0);
     f.push_back(vid1);
     f.push_back(vid2);
-    this->faces.push_back(f);
+    this->polys.push_back(f);
     //
-    F data;
-    this->x_data.push_back(data);
+    P data;
+    this->p_data.push_back(data);
     //
-    this->f2e.push_back(std::vector<uint>());
-    this->f2f.push_back(std::vector<uint>());
+    this->p2e.push_back(std::vector<uint>());
+    this->p2p.push_back(std::vector<uint>());
     //
 
-    this->v2f.at(vid0).push_back(fid);
-    this->v2f.at(vid1).push_back(fid);
-    this->v2f.at(vid2).push_back(fid);
+    this->v2p.at(vid0).push_back(pid);
+    this->v2p.at(vid1).push_back(pid);
+    this->v2p.at(vid2).push_back(pid);
     //
     ipair new_e[3]   = { unique_pair(vid0, vid1), unique_pair(vid1, vid2), unique_pair(vid2, vid0) };
     int   new_eid[3] = { -1, -1, -1 };
@@ -604,29 +577,29 @@ uint Trimesh<M,V,E,F>::face_add(const uint vid0, const uint vid1, const uint vid
             new_eid[i] = edge_add(new_e[i].first, new_e[i].second);
         }
         //
-        for(uint nbr : this->e2f.at(new_eid[i]))
+        for(uint nbr : this->e2p.at(new_eid[i]))
         {
-            this->f2f.at(nbr).push_back(fid);
-            this->f2f.at(fid).push_back(nbr);
+            this->p2p.at(nbr).push_back(pid);
+            this->p2p.at(pid).push_back(nbr);
         }
-        this->e2f.at(new_eid[i]).push_back(fid);
-        this->f2e.at(fid).push_back(new_eid[i]);
+        this->e2p.at(new_eid[i]).push_back(pid);
+        this->p2e.at(pid).push_back(new_eid[i]);
     }
     //
-    this->update_f_normal(fid);
+    this->update_p_normal(pid);
     this->update_v_normal(vid0);
     this->update_v_normal(vid1);
     this->update_v_normal(vid2);
 
-    return fid;
+    return pid;
 }
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Trimesh<M,V,E,F>::face_set(const uint fid, const uint vid0, const uint vid1, const uint vid2)
+void Trimesh<M,V,E,P>::poly_set(const uint pid, const uint vid0, const uint vid1, const uint vid2)
 {
     /* WARNING!!!! This completely screws up edge connectivity!!!!!! */
 
@@ -634,87 +607,87 @@ void Trimesh<M,V,E,F>::face_set(const uint fid, const uint vid0, const uint vid1
     assert(vid1 < this->num_verts());
     assert(vid2 < this->num_verts());
 
-    this->faces.at(fid).clear();
-    this->faces.at(fid).push_back(vid0);
-    this->faces.at(fid).push_back(vid1);
-    this->faces.at(fid).push_back(vid2);
+    this->polys.at(pid).clear();
+    this->polys.at(pid).push_back(vid0);
+    this->polys.at(pid).push_back(vid1);
+    this->polys.at(pid).push_back(vid2);
 
-    this->update_f_normal(fid);
+    this->update_p_normal(pid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-double Trimesh<M,V,E,F>::face_area(const uint fid) const
+double Trimesh<M,V,E,P>::poly_area(const uint pid) const
 {
-    vec3d P = this->face_vert(fid,0);
-    vec3d u = this->face_vert(fid,1) - P;
-    vec3d v = this->face_vert(fid,2) - P;
+    vec3d p = this->poly_vert(pid,0);
+    vec3d u = this->poly_vert(pid,1) - p;
+    vec3d v = this->poly_vert(pid,2) - p;
     double area = 0.5 * u.cross(v).length();
     return area;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Trimesh<M,V,E,F>::face_switch_id(const uint fid0, const uint fid1)
+void Trimesh<M,V,E,P>::poly_switch_id(const uint pid0, const uint pid1)
 {
     for(uint offset=0; offset<3; ++offset)
     {
-        std::swap(this->faces.at(3*fid0+offset),this->faces.at(3*fid1+offset));
+        std::swap(this->polys.at(3*pid0+offset),this->polys.at(3*pid1+offset));
     }
-    std::swap(this->f_data.at(fid0), this->f_data.at(fid1));
-    std::swap(this->f2e.at(fid0),    this->f2e.at(fid1));
-    std::swap(this->f2f.at(fid0),    this->f2f.at(fid1));
+    std::swap(this->f_data.at(pid0), this->f_data.at(pid1));
+    std::swap(this->p2e.at(pid0),    this->p2e.at(pid1));
+    std::swap(this->p2p.at(pid0),    this->p2p.at(pid1));
 
-    for(auto & nbrs : this->v2f)
+    for(auto & nbrs : this->v2p)
     for(uint & curr : nbrs)
     {
-        if (curr == fid0) curr = fid1; else
-        if (curr == fid1) curr = fid0;
+        if (curr == pid0) curr = pid1; else
+        if (curr == pid1) curr = pid0;
     }
 
-    for(auto & nbrs : this->e2f)
+    for(auto & nbrs : this->e2p)
     for(uint & curr : nbrs)
     {
-        if (curr == fid0) curr = fid1; else
-        if (curr == fid1) curr = fid0;
+        if (curr == pid0) curr = pid1; else
+        if (curr == pid1) curr = pid0;
     }
 
-    for(auto & nbrs : this->f2f)
+    for(auto & nbrs : this->p2p)
     for(uint & curr : nbrs)
     {
-        if (curr == fid0) curr = fid1; else
-        if (curr == fid1) curr = fid0;
+        if (curr == pid0) curr = pid1; else
+        if (curr == pid1) curr = pid0;
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Trimesh<M,V,E,F>::face_remove_unreferenced(const uint fid)
+void Trimesh<M,V,E,P>::poly_remove_unreferenced(const uint pid)
 {
-    face_switch_id(fid, this->num_faces()-1);
-    this->faces.resize(this->faces.size()-3);
+    poly_switch_id(pid, this->num_polys()-1);
+    this->polys.resize(this->polys.size()-3);
     this->f_data.pop_back();
-    this->f2e.pop_back();
-    this->f2f.pop_back();
+    this->p2e.pop_back();
+    this->p2p.pop_back();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint Trimesh<M,V,E,F>::vert_opposite_to(const uint fid, const uint vid0, const uint vid1) const
+uint Trimesh<M,V,E,P>::vert_opposite_to(const uint pid, const uint vid0, const uint vid1) const
 {
-    assert(this->face_contains_vert(fid, vid0));
-    assert(this->face_contains_vert(fid, vid1));
-    for(uint off=0; off<this->verts_per_face(fid); ++off)
+    assert(this->poly_contains_vert(pid, vid0));
+    assert(this->poly_contains_vert(pid, vid1));
+    for(uint off=0; off<this->verts_per_poly(pid); ++off)
     {
-        uint vid = this->face_vert_id(fid,off);
+        uint vid = this->poly_vert_id(pid,off);
         if (vid != vid0 && vid != vid1) return vid;
     }
     assert(false);
@@ -722,9 +695,9 @@ uint Trimesh<M,V,E,F>::vert_opposite_to(const uint fid, const uint vid0, const u
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint Trimesh<M,V,E,F>::vert_add(const vec3d & pos)
+uint Trimesh<M,V,E,P>::vert_add(const vec3d & pos)
 {
     uint vid = this->num_verts();
     //
@@ -735,7 +708,7 @@ uint Trimesh<M,V,E,F>::vert_add(const vec3d & pos)
     //
     this->v2v.push_back(std::vector<uint>());
     this->v2e.push_back(std::vector<uint>());
-    this->v2f.push_back(std::vector<uint>());
+    this->v2p.push_back(std::vector<uint>());
     //
     this->bb.min = this->bb.min.min(pos);
     this->bb.max = this->bb.max.max(pos);
@@ -745,14 +718,14 @@ uint Trimesh<M,V,E,F>::vert_add(const vec3d & pos)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Trimesh<M,V,E,F>::vert_switch_id(const uint vid0, const uint vid1)
+void Trimesh<M,V,E,P>::vert_switch_id(const uint vid0, const uint vid1)
 {
     std::swap(this->verts.at(vid0),this->verts.at(vid1));
     std::swap(this->v2v.at(vid0),this->v2v.at(vid1));
     std::swap(this->v2e.at(vid0),this->v2e.at(vid1));
-    std::swap(this->v2f.at(vid0),this->v2f.at(vid1));
+    std::swap(this->v2p.at(vid0),this->v2p.at(vid1));
 
     for(uint & curr : this->edges)
     {
@@ -760,7 +733,7 @@ void Trimesh<M,V,E,F>::vert_switch_id(const uint vid0, const uint vid1)
         if (curr == vid1) curr = vid0;
     }
 
-    for(uint & curr : this->faces)
+    for(uint & curr : this->polys)
     {
         if (curr == vid0) curr = vid1; else
         if (curr == vid1) curr = vid0;
@@ -776,22 +749,22 @@ void Trimesh<M,V,E,F>::vert_switch_id(const uint vid0, const uint vid1)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Trimesh<M,V,E,F>::vert_remove_unreferenced(const uint vid)
+void Trimesh<M,V,E,P>::vert_remove_unreferenced(const uint vid)
 {
     vert_switch_id(vid, this->num_verts()-1);
     this->verts.pop_back();
     this->v2v.pop_back();
     this->v2e.pop_back();
-    this->v2f.pop_back();
+    this->v2p.pop_back();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> Trimesh<M,V,E,F>::get_ordered_boundary_vertices() const
+std::vector<uint> Trimesh<M,V,E,P>::get_ordered_boundary_vertices() const
 {
     // NOTE: assumes the mesh contains exactly ONE simply connected boundary!
 
@@ -804,10 +777,10 @@ std::vector<uint> Trimesh<M,V,E,F>::get_ordered_boundary_vertices() const
     {
         if (this->edge_is_boundary(eid))
         {
-            uint fid  = this->adj_e2f(eid).front();
+            uint pid  = this->adj_e2p(eid).front();
             uint vid0 = this->edge_vert_id(eid,0);
             uint vid1 = this->edge_vert_id(eid,1);
-            if (this->face_vert_offset(fid,vid0) > this->face_vert_offset(fid,vid1))
+            if (this->poly_vert_offset(pid,vid0) > this->poly_vert_offset(pid,vid1))
             {
                 std::swap(vid0,vid1);
             }

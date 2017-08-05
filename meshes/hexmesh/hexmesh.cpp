@@ -513,7 +513,7 @@ vec3d Hexmesh<M,V,E,F,C>::cell_centroid(const uint cid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Hexmesh<M,V,E,F,C>::elem_centroid(const uint cid) const
+vec3d Hexmesh<M,V,E,F,C>::poly_centroid(const uint cid) const
 {
     return cell_centroid(cid);
 }
@@ -638,7 +638,7 @@ vec3d Hexmesh<M,V,E,F,C>::edge_vert(const uint eid, const uint off) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::elem_show_all()
+void Hexmesh<M,V,E,F,C>::poly_show_all()
 {
     for(uint cid=0; cid<num_cells(); ++cid)
     {
