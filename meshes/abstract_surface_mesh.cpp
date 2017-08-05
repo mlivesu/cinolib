@@ -106,7 +106,7 @@ void AbstractPolygonMesh<M,V,E,P>::init()
 
     this->v_data.resize(this->num_verts());
     this->e_data.resize(this->num_edges());
-    this->p_data.resize(this->num_faces());
+    this->p_data.resize(this->num_polys());
 
     this->update_normals();
 }
@@ -120,16 +120,16 @@ void AbstractPolygonMesh<M,V,E,P>::update_adjacency()
     this->v2v.clear(); this->v2v.resize(this->num_verts());
     this->v2e.clear(); this->v2e.resize(this->num_verts());
     this->v2p.clear(); this->v2p.resize(this->num_verts());
-    this->p2p.clear(); this->p2p.resize(this->num_faces());
-    this->p2e.clear(); this->p2e.resize(this->num_faces());
+    this->p2p.clear(); this->p2p.resize(this->num_polys());
+    this->p2e.clear(); this->p2e.resize(this->num_polys());
 
     std::map<ipair,std::vector<uint>> e2f_map;
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
-        for(uint offset=0; offset<this->verts_per_face(fid); ++offset)
+        for(uint offset=0; offset<this->verts_per_poly(fid); ++offset)
         {
             uint vid0 = this->poly_vert_id(fid,offset);
-            uint vid1 = this->poly_vert_id(fid,(offset+1)%this->verts_per_face(fid));
+            uint vid1 = this->poly_vert_id(fid,(offset+1)%this->verts_per_poly(fid));
             this->v2p.at(vid0).push_back(fid);
             e2f_map[unique_pair(vid0,vid1)].push_back(fid);
         }
@@ -180,7 +180,7 @@ void AbstractPolygonMesh<M,V,E,P>::update_adjacency()
     }
 
     logger << this->num_verts() << "\tverts" << endl;
-    logger << this->num_faces() << "\tfaces" << endl;
+    logger << this->num_polys() << "\tfaces" << endl;
     logger << this->num_edges() << "\tedges" << endl;
 }
 
@@ -205,7 +205,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::update_f_normals()
 {
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         update_f_normal(fid);
     }
@@ -295,7 +295,7 @@ bool AbstractPolygonMesh<M,V,E,P>::verts_are_ordered_CCW(const uint fid, const u
 {
     uint prev_offset = this->poly_vert_offset(fid, prev);
     uint curr_offset = this->poly_vert_offset(fid, curr);
-    if (curr_offset == (prev_offset+1)%this->verts_per_face(fid)) return true;
+    if (curr_offset == (prev_offset+1)%this->verts_per_poly(fid)) return true;
     return false;
 }
 
@@ -351,9 +351,9 @@ void AbstractPolygonMesh<M,V,E,P>::vert_ordered_one_ring(const uint vid,
         f_ring.push_back(curr_f);
 
         uint off = this->poly_vert_offset(curr_f, curr_v);
-        for(uint i=0; i<this->verts_per_face(curr_f)-1; ++i)
+        for(uint i=0; i<this->verts_per_poly(curr_f)-1; ++i)
         {
-            curr_v = this->poly_vert_id(curr_f,(off+i)%this->verts_per_face(curr_f));
+            curr_v = this->poly_vert_id(curr_f,(off+i)%this->verts_per_poly(curr_f));
             if (i>0) e_link.push_back( this->poly_edge_id(curr_f, curr_v, v_ring.back()) );
             v_ring.push_back(curr_v);
         }
@@ -431,7 +431,7 @@ CINO_INLINE
 double AbstractPolygonMesh<M,V,E,P>::vert_area(const uint vid) const
 {
     double area = 0.0;
-    for(uint fid : this->adj_v2p(vid)) area += poly_area(fid)/static_cast<double>(this->verts_per_face(fid));
+    for(uint fid : this->adj_v2p(vid)) area += poly_area(fid)/static_cast<double>(this->verts_per_poly(fid));
     return area;
 }
 
@@ -543,7 +543,7 @@ double AbstractPolygonMesh<M,V,E,P>::poly_angle_at_vert(const uint fid, const ui
     assert(this->poly_contains_vert(fid,vid));
 
     uint offset = 0;
-    for(uint i=0; i<this->verts_per_face(fid); ++i) if (this->poly_vert_id(fid,i) == vid) offset = i;
+    for(uint i=0; i<this->verts_per_poly(fid); ++i) if (this->poly_vert_id(fid,i) == vid) offset = i;
     assert(this->poly_vert_id(fid,offset) == vid);
     //
     // the code above substitutes this one (which was specific for AbstractMeshes...)
@@ -554,8 +554,8 @@ double AbstractPolygonMesh<M,V,E,P>::poly_angle_at_vert(const uint fid, const ui
     //else { assert(false); offset=0; } // offset=0 kills uninitialized warning message
 
     vec3d p = this->vert(vid);
-    vec3d u = this->poly_vert(fid,(offset+1)%this->verts_per_face(fid)) - p;
-    vec3d v = this->poly_vert(fid,(offset+2)%this->verts_per_face(fid)) - p;
+    vec3d u = this->poly_vert(fid,(offset+1)%this->verts_per_poly(fid)) - p;
+    vec3d v = this->poly_vert(fid,(offset+2)%this->verts_per_poly(fid)) - p;
 
     switch (unit)
     {
@@ -631,7 +631,7 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::normalize_area()
 {
     double area = 0.0;
-    for(uint fid=0; fid<this->num_faces(); ++fid) area += this->poly_mass(fid);
+    for(uint fid=0; fid<this->num_polys(); ++fid) area += this->poly_mass(fid);
     area = std::max(1e-4,area); // avoid creating degenerate faces...
     double s = 1.0 / sqrt(area);
     for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) *= s;
@@ -675,7 +675,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::poly_show_all()
 {
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         this->poly_data(fid).visible = true;
     }
@@ -696,8 +696,8 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 std::vector<int> AbstractPolygonMesh<M,V,E,P>::export_per_poly_labels() const
 {
-    std::vector<int> labels(this->num_faces());
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    std::vector<int> labels(this->num_polys());
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         labels.at(this->poly_data(fid).label);
     }
@@ -710,8 +710,8 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 std::vector<Color> AbstractPolygonMesh<M,V,E,P>::export_per_poly_colors() const
 {
-    std::vector<Color> colors(this->num_faces());
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    std::vector<Color> colors(this->num_polys());
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         colors.at(fid) = this->poly_data(fid).color;
     }
@@ -727,7 +727,7 @@ void AbstractPolygonMesh<M,V,E,P>::poly_flip_winding_order(const uint fid)
     std::reverse(this->polys.at(fid).begin(), this->polys.at(fid).end());
 
     update_f_normal(fid);
-    for(uint off=0; off<this->verts_per_face(fid); ++off) update_v_normal(this->poly_vert_id(fid,off));
+    for(uint off=0; off<this->verts_per_poly(fid); ++off) update_v_normal(this->poly_vert_id(fid,off));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -736,7 +736,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::poly_set_color(const Color & c)
 {
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         this->poly_data(fid).color = c;
     }
@@ -748,7 +748,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::poly_set_alpha(const float alpha)
 {
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         this->poly_data(fid).color.a = alpha;
     }
@@ -761,13 +761,13 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::poly_color_wrt_label()
 {
     std::map<int,uint> l_map;
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         int l = this->poly_data(fid).label;
         if (DOES_NOT_CONTAIN(l_map,l)) l_map[l] = l_map.size();
     }
     uint n_labels = l_map.size();
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         this->poly_data(fid).color = Color::scatter(n_labels,l_map.at(this->poly_data(fid).label));
     }
@@ -780,14 +780,14 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P> & m)
 {
     uint nv = this->num_verts();
-    uint nf = this->num_faces();
+    uint nf = this->num_polys();
     uint ne = this->num_edges();
 
     std::vector<uint> tmp;
-    for(uint fid=0; fid<m.num_faces(); ++fid)
+    for(uint fid=0; fid<m.num_polys(); ++fid)
     {
         std::vector<uint> f;
-        for(uint off=0; off<m.verts_per_face(fid); ++off) f.push_back(nv + m.poly_vert_id(fid,off));
+        for(uint off=0; off<m.verts_per_poly(fid); ++off) f.push_back(nv + m.poly_vert_id(fid,off));
         this->polys.push_back(f);
 
         this->p_data.push_back(m.poly_data(fid));
@@ -832,7 +832,7 @@ void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P>
     this->update_bbox();
 
     logger << "Appended " << m.mesh_data().filename << " to mesh " << this->mesh_data().filename << endl;
-    logger << this->num_faces() << " faces" << endl;
+    logger << this->num_polys() << " faces" << endl;
     logger << this->num_verts() << " verts" << endl;
 }
 

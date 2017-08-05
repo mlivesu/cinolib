@@ -55,8 +55,8 @@ void dual_mesh(const Trimesh<>                      & primal,
     dual_faces.clear();
 
     // Initialize vertices with face centroids
-    dual_verts.resize(primal.num_elems());
-    for(uint eid=0; eid<primal.num_elems(); ++eid)
+    dual_verts.resize(primal.num_polys());
+    for(uint eid=0; eid<primal.num_polys(); ++eid)
     {
         dual_verts.at(eid) = primal.poly_centroid(eid);
     }

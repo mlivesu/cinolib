@@ -127,7 +127,7 @@ class Polyhedralmesh
         uint num_edges() const { return edges.size() / 2; }
         uint num_faces() const { return faces.size();     }
         uint num_cells() const { return cells.size();     }
-        uint num_elems() const { return cells.size();     } // elem == cell!!
+        uint num_polys() const { return cells.size();     } // elem == cell!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -122,9 +122,9 @@ CINO_INLINE
 void Quadmesh<M,V,E,F>::update_poly_tessellation()
 {
     tessellated_faces.clear();
-    tessellated_faces.resize(this->num_faces());
+    tessellated_faces.resize(this->num_polys());
 
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         uint vid0 = this->poly_vert_id(fid,0);
         uint vid1 = this->poly_vert_id(fid,1);
@@ -153,7 +153,7 @@ void Quadmesh<M,V,E,F>::update_f_normal(const uint fid)
 {
     // compute the best fitting plane
     std::vector<vec3d> points;
-    for(uint off=0; off<this->verts_per_face(fid); ++off) points.push_back(this->poly_vert(fid,off));
+    for(uint off=0; off<this->verts_per_poly(fid); ++off) points.push_back(this->poly_vert(fid,off));
     Plane best_fit(points);
 
     // adjust orientation (n or -n?)

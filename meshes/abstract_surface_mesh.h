@@ -77,14 +77,6 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual uint num_elems() const { return this->polys.size(); } // elem == face!!
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        virtual const std::vector<uint> & adj_poly2poly(const uint fid) const { return this->p2p.at(fid); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         virtual void               normalize_area();
         virtual std::vector<uint>  get_boundary_vertices() const;
         virtual std::vector<ipair> get_boundary_edges() const;

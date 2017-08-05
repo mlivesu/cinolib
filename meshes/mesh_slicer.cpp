@@ -94,7 +94,7 @@ template<class Mesh>
 CINO_INLINE
 void MeshSlicer<Mesh>::update(Mesh & m)
 {
-    for(uint eid=0; eid<m.num_elems(); ++eid)
+    for(uint eid=0; eid<m.num_polys(); ++eid)
     {
         vec3d  c = m.poly_centroid(eid);
         float  q = m.poly_data(eid).quality;

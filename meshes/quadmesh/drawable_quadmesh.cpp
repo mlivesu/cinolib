@@ -132,7 +132,7 @@ void DrawableQuadmesh<M,V,E,F>::updateGL()
     drawlist.seg_coords.clear();
     drawlist.seg_colors.clear();
 
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         if (!(this->poly_data(fid).visible)) continue;
 

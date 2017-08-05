@@ -42,7 +42,7 @@ PointInsideMeshCache<Mesh>::PointInsideMeshCache(const Mesh & m, const uint octr
     octree = Octree<uint>(m.bbox().min, m.bbox().max);
     octree.subdivide_n_levels(octree_depth);
 
-    for(uint eid=0; eid<m.num_elems(); ++eid)
+    for(uint eid=0; eid<m.num_polys(); ++eid)
     {
         vec3d min = m.poly_vert(eid, 0);
         vec3d max = min;

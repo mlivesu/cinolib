@@ -39,11 +39,11 @@ template <>
 CINO_INLINE
 Eigen::SparseMatrix<double> gradient<Trimesh<>>(const Trimesh<> & m)
 {
-    Eigen::SparseMatrix<double> G(m.num_faces()*3, m.num_verts());
+    Eigen::SparseMatrix<double> G(m.num_polys()*3, m.num_verts());
 
     std::vector<Entry> entries;
 
-    for(uint fid=0; fid<m.num_faces(); ++fid)
+    for(uint fid=0; fid<m.num_polys(); ++fid)
     {
         uint i = m.poly_vert_id(fid, 0);
         uint j = m.poly_vert_id(fid, 1);

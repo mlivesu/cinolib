@@ -136,7 +136,7 @@ void DrawableTrimesh<M,V,E,F>::updateGL()
     drawlist.marked_segs.clear();
     drawlist.marked_seg_coords.clear();
 
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         if (!(this->poly_data(fid).visible)) continue;
 

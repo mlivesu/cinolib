@@ -153,7 +153,7 @@ class Hexmesh
         uint num_edges() const { return edges.size() / 2;                }
         uint num_faces() const { return faces.size() / verts_per_face(); }
         uint num_cells() const { return cells.size() / verts_per_cell(); }
-        uint num_elems() const { return cells.size() / verts_per_cell(); } // elem == cell!!
+        uint num_polys() const { return cells.size() / verts_per_cell(); } // elem == cell!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

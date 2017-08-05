@@ -96,14 +96,14 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Polygonmesh<M,V,E,F>::update_poly_tessellation()
 {
-    tessellated_faces.resize(this->num_faces());
+    tessellated_faces.resize(this->num_polys());
     std::set<uint> bad_faces;
 
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    for(uint fid=0; fid<this->num_polys(); ++fid)
     {
         // TODO: improve triangulation strategy (this assumes convexity!)
         std::vector<vec3d> n;
-        for (uint i=2; i<this->verts_per_face(fid); ++i)
+        for (uint i=2; i<this->verts_per_poly(fid); ++i)
         {
             uint vid0 = this->polys.at(fid).at( 0 );
             uint vid1 = this->polys.at(fid).at(i-1);
@@ -134,7 +134,7 @@ void Polygonmesh<M,V,E,F>::update_f_normal(const uint fid)
 {
     // compute the best fitting plane
     std::vector<vec3d> points;
-    for(uint off=0; off<this->verts_per_face(fid); ++off) points.push_back(this->poly_vert(fid,off));
+    for(uint off=0; off<this->verts_per_poly(fid); ++off) points.push_back(this->poly_vert(fid,off));
     Plane best_fit(points);
 
     // adjust orientation (n or -n?)
@@ -142,7 +142,7 @@ void Polygonmesh<M,V,E,F>::update_f_normal(const uint fid)
     vec3d v1 = this->poly_vert(fid,1);
     uint  i=2;
     vec3d ccw;
-    do { ccw = (v1-v0).cross(this->poly_vert(fid,i)-v0); ++i; } while (ccw.length_squared()==0 && i<this->verts_per_face(fid));
+    do { ccw = (v1-v0).cross(this->poly_vert(fid,i)-v0); ++i; } while (ccw.length_squared()==0 && i<this->verts_per_poly(fid));
 
     this->poly_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
 }

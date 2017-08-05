@@ -285,7 +285,7 @@ bool Trimesh<M,V,E,F>::edge_collapse(const uint eid)
 
         for(uint fid : this->adj_e2p(edg_rem))
         {
-            assert(fid<this->num_faces());
+            assert(fid<this->num_polys());
             auto beg = this->p2e.at(fid).begin();
             auto end = this->p2e.at(fid).end();
             this->p2e.at(fid).erase(std::remove(beg, end, edg_rem), end); // Erase-Remove idiom
@@ -500,7 +500,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 bool Trimesh<M,V,E,F>::poly_is_cap(const uint fid, const double angle_thresh_deg) const
 {
-    for(uint offset=0; offset<this->verts_per_face(fid); ++offset)
+    for(uint offset=0; offset<this->verts_per_poly(fid); ++offset)
     {
         uint vid = this->poly_vert_id(fid,offset);
         if (this->poly_angle_at_vert(fid,vid,DEG) > angle_thresh_deg)
@@ -522,7 +522,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 bool Trimesh<M,V,E,F>::poly_is_needle(const uint fid, const double angle_thresh_deg) const
 {
-    for(uint offset=0; offset<this->verts_per_face(fid); ++offset)
+    for(uint offset=0; offset<this->verts_per_poly(fid); ++offset)
     {
         uint vid = this->poly_vert_id(fid,offset);
         if (this->poly_angle_at_vert(fid,vid,DEG) < angle_thresh_deg)
@@ -543,7 +543,7 @@ uint Trimesh<M,V,E,F>::poly_add(const uint vid0, const uint vid1, const uint vid
     assert(vid1 < this->num_verts());
     assert(vid2 < this->num_verts());
 
-    uint fid = this->num_faces();
+    uint fid = this->num_polys();
     //
     std::vector<uint> f;
     f.push_back(vid0);
@@ -670,7 +670,7 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Trimesh<M,V,E,F>::poly_remove_unreferenced(const uint fid)
 {
-    poly_switch_id(fid, this->num_faces()-1);
+    poly_switch_id(fid, this->num_polys()-1);
     this->polys.resize(this->polys.size()-3);
     this->f_data.pop_back();
     this->p2e.pop_back();
@@ -685,7 +685,7 @@ uint Trimesh<M,V,E,F>::vert_opposite_to(const uint fid, const uint vid0, const u
 {
     assert(this->poly_contains_vert(fid, vid0));
     assert(this->poly_contains_vert(fid, vid1));
-    for(uint off=0; off<this->verts_per_face(fid); ++off)
+    for(uint off=0; off<this->verts_per_poly(fid); ++off)
     {
         uint vid = this->poly_vert_id(fid,off);
         if (vid != vid0 && vid != vid1) return vid;

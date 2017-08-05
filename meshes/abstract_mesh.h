@@ -114,22 +114,21 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual uint verts_per_face(const uint fid) const { return polys.at(fid).size(); }
+        virtual uint verts_per_poly(const uint pid) const { return polys.at(pid).size(); }
         virtual uint verts_per_elem(const uint eid) const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual uint num_verts() const { return verts.size();     }
         virtual uint num_edges() const { return edges.size() / 2; }
-        virtual uint num_faces() const { return polys.size();     }
-        virtual uint num_elems() const = 0;
+        virtual uint num_polys() const { return polys.size();     }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual const Bbox                           & bbox()          const { return bb;    }
         virtual const std::vector<vec3d>             & vector_verts()  const { return verts; }
         virtual const std::vector<uint>              & vector_edges()  const { return edges; }
-        virtual const std::vector<std::vector<uint>> & vector_faces()  const { return polys; }
+        virtual const std::vector<std::vector<uint>> & vector_polys()  const { return polys; }
         virtual       std::vector<double>              vector_coords() const ;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

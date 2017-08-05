@@ -324,7 +324,7 @@ void bfs_exahustive_on_dual(const Mesh                & m,
                             const uint                  source,
                                   std::vector<double> & dist) // elem id + dist
 {
-    dist = std::vector<double>(m.num_elems(), FLT_MAX);
+    dist = std::vector<double>(m.num_polys(), FLT_MAX);
     std::queue<uint> q;
 
     q.push(source);
