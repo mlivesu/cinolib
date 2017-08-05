@@ -38,9 +38,9 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-Polygonmesh<M,V,E,F>::Polygonmesh(const char * filename)
+Polygonmesh<M,V,E,P>::Polygonmesh(const char * filename)
 {
     this->load(filename);
     init();
@@ -48,9 +48,9 @@ Polygonmesh<M,V,E,F>::Polygonmesh(const char * filename)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<vec3d>             & verts,
+Polygonmesh<M,V,E,P>::Polygonmesh(const std::vector<vec3d>             & verts,
                                   const std::vector<std::vector<uint>> & faces)
 {
     this->verts = verts;
@@ -60,9 +60,9 @@ Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<vec3d>             & verts,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<double>            & coords,
+Polygonmesh<M,V,E,P>::Polygonmesh(const std::vector<double>            & coords,
                                   const std::vector<std::vector<uint>> & faces)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
@@ -72,86 +72,86 @@ Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<double>            & coords,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::clear()
+void Polygonmesh<M,V,E,P>::clear()
 {
-    AbstractMesh<M,V,E,F>::clear();
-    tessellated_faces.clear();
+    AbstractMesh<M,V,E,P>::clear();
+    triangulated_polys.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::init()
+void Polygonmesh<M,V,E,P>::init()
 {
     update_poly_tessellation();
-    AbstractPolygonMesh<M,V,E,F>::init();
+    AbstractPolygonMesh<M,V,E,P>::init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_poly_tessellation()
+void Polygonmesh<M,V,E,P>::update_poly_tessellation()
 {
-    tessellated_faces.resize(this->num_polys());
+    triangulated_polys.resize(this->num_polys());
     std::set<uint> bad_faces;
 
-    for(uint fid=0; fid<this->num_polys(); ++fid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
         // TODO: improve triangulation strategy (this assumes convexity!)
         std::vector<vec3d> n;
-        for (uint i=2; i<this->verts_per_poly(fid); ++i)
+        for (uint i=2; i<this->verts_per_poly(pid); ++i)
         {
-            uint vid0 = this->polys.at(fid).at( 0 );
-            uint vid1 = this->polys.at(fid).at(i-1);
-            uint vid2 = this->polys.at(fid).at( i );
+            uint vid0 = this->polys.at(pid).at( 0 );
+            uint vid1 = this->polys.at(pid).at(i-1);
+            uint vid2 = this->polys.at(pid).at( i );
 
-            tessellated_faces.at(fid).push_back(vid0);
-            tessellated_faces.at(fid).push_back(vid1);
-            tessellated_faces.at(fid).push_back(vid2);
+            triangulated_polys.at(pid).push_back(vid0);
+            triangulated_polys.at(pid).push_back(vid1);
+            triangulated_polys.at(pid).push_back(vid2);
 
             n.push_back((this->vert(vid1)-this->vert(vid0)).cross(this->vert(vid2)-this->vert(vid0)));
         }
         // check for badly tessellated polygons...
-        for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_faces.insert(fid);
+        for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_faces.insert(pid);
     }
     //
-    for(uint fid : bad_faces)
+    for(uint pid : bad_faces)
     {
-        std::cerr << "WARNING : Bad tessellation occurred for non-convex polygon " << fid << std::endl;
+        std::cerr << "WARNING : Bad tessellation occurred for non-convex polygon " << pid << std::endl;
     }
 
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_f_normal(const uint fid)
+void Polygonmesh<M,V,E,P>::update_p_normal(const uint pid)
 {
     // compute the best fitting plane
     std::vector<vec3d> points;
-    for(uint off=0; off<this->verts_per_poly(fid); ++off) points.push_back(this->poly_vert(fid,off));
+    for(uint off=0; off<this->verts_per_poly(pid); ++off) points.push_back(this->poly_vert(pid,off));
     Plane best_fit(points);
 
     // adjust orientation (n or -n?)
-    vec3d v0 = this->poly_vert(fid,0);
-    vec3d v1 = this->poly_vert(fid,1);
+    vec3d v0 = this->poly_vert(pid,0);
+    vec3d v1 = this->poly_vert(pid,1);
     uint  i=2;
     vec3d ccw;
-    do { ccw = (v1-v0).cross(this->poly_vert(fid,i)-v0); ++i; } while (ccw.length_squared()==0 && i<this->verts_per_poly(fid));
+    do { ccw = (v1-v0).cross(this->poly_vert(pid,i)-v0); ++i; } while (ccw.length_squared()==0 && i<this->verts_per_poly(pid));
 
-    this->poly_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
+    this->poly_data(pid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> Polygonmesh<M,V,E,F>::get_ordered_boundary_vertices() const
+std::vector<uint> Polygonmesh<M,V,E,P>::get_ordered_boundary_vertices() const
 {
     // NOTE: assumes the mesh contains exactly ONE simply connected boundary!
 
@@ -168,10 +168,10 @@ std::vector<uint> Polygonmesh<M,V,E,F>::get_ordered_boundary_vertices() const
     {
         if (this->edge_is_boundary(eid))
         {
-            uint fid  = this->adj_e2p(eid).front();
+            uint pid  = this->adj_e2p(eid).front();
             uint vid0 = this->edge_vert_id(eid,0);
             uint vid1 = this->edge_vert_id(eid,1);
-            if (this->poly_vert_offset(fid,vid0) > this->poly_vert_offset(fid,vid1))
+            if (this->poly_vert_offset(pid,vid0) > this->poly_vert_offset(pid,vid1))
             {
                 std::swap(vid0,vid1);
             }
@@ -189,11 +189,11 @@ std::vector<uint> Polygonmesh<M,V,E,F>::get_ordered_boundary_vertices() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::operator+=(const Polygonmesh<M,V,E,F> & m)
+void Polygonmesh<M,V,E,P>::operator+=(const Polygonmesh<M,V,E,P> & m)
 {
-    AbstractPolygonMesh<M,V,E,F>::operator +=(m);
+    AbstractPolygonMesh<M,V,E,P>::operator +=(m);
     update_poly_tessellation();
 }
 

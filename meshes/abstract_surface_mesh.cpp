@@ -124,14 +124,14 @@ void AbstractPolygonMesh<M,V,E,P>::update_adjacency()
     this->p2e.clear(); this->p2e.resize(this->num_polys());
 
     std::map<ipair,std::vector<uint>> e2f_map;
-    for(uint fid=0; fid<this->num_polys(); ++fid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        for(uint offset=0; offset<this->verts_per_poly(fid); ++offset)
+        for(uint offset=0; offset<this->verts_per_poly(pid); ++offset)
         {
-            uint vid0 = this->poly_vert_id(fid,offset);
-            uint vid1 = this->poly_vert_id(fid,(offset+1)%this->verts_per_poly(fid));
-            this->v2p.at(vid0).push_back(fid);
-            e2f_map[unique_pair(vid0,vid1)].push_back(fid);
+            uint vid0 = this->poly_vert_id(pid,offset);
+            uint vid1 = this->poly_vert_id(pid,(offset+1)%this->verts_per_poly(pid));
+            this->v2p.at(vid0).push_back(pid);
+            e2f_map[unique_pair(vid0,vid1)].push_back(pid);
         }
     }
 
@@ -156,17 +156,17 @@ void AbstractPolygonMesh<M,V,E,P>::update_adjacency()
         this->v2e.at(vid0).push_back(eid);
         this->v2e.at(vid1).push_back(eid);
 
-        std::vector<uint> fids = e2f_it.second;
-        for(uint fid : fids)
+        std::vector<uint> pids = e2f_it.second;
+        for(uint pid : pids)
         {
-            this->p2e.at(fid).push_back(eid);
-            this->e2p.at(eid).push_back(fid);
-            for(uint adj_fid : fids) if (fid != adj_fid) this->p2p.at(fid).push_back(adj_fid);
+            this->p2e.at(pid).push_back(eid);
+            this->e2p.at(eid).push_back(pid);
+            for(uint adj_pid : pids) if (pid != adj_pid) this->p2p.at(pid).push_back(adj_pid);
         }
 
         // MANIFOLDNESS CHECKS
         //
-        bool is_manifold = (fids.size() > 2 || fids.size() < 1);
+        bool is_manifold = (pids.size() > 2 || pids.size() < 1);
         if (is_manifold && !support_non_manifold_edges)
         {
             std::cerr << "Non manifold edge found! To support non manifoldness,";
@@ -191,9 +191,9 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::update_v_normal(const uint vid)
 {
     vec3d n(0,0,0);
-    for(uint fid : this->adj_v2p(vid))
+    for(uint pid : this->adj_v2p(vid))
     {
-        n += this->poly_data(fid).normal;
+        n += this->poly_data(pid).normal;
     }
     n.normalize();
     this->vert_data(vid).normal = n;
@@ -203,11 +203,11 @@ void AbstractPolygonMesh<M,V,E,P>::update_v_normal(const uint vid)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractPolygonMesh<M,V,E,P>::update_f_normals()
+void AbstractPolygonMesh<M,V,E,P>::update_p_normals()
 {
-    for(uint fid=0; fid<this->num_polys(); ++fid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        update_f_normal(fid);
+        update_p_normal(pid);
     }
 }
 
@@ -229,7 +229,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::update_normals()
 {
-    this->update_f_normals();
+    this->update_p_normals();
     this->update_v_normals();
 }
 
@@ -291,11 +291,11 @@ uint AbstractPolygonMesh<M,V,E,P>::vert_opposite_to(const uint eid, const uint v
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractPolygonMesh<M,V,E,P>::verts_are_ordered_CCW(const uint fid, const uint curr, const uint prev) const
+bool AbstractPolygonMesh<M,V,E,P>::verts_are_ordered_CCW(const uint pid, const uint curr, const uint prev) const
 {
-    uint prev_offset = this->poly_vert_offset(fid, prev);
-    uint curr_offset = this->poly_vert_offset(fid, curr);
-    if (curr_offset == (prev_offset+1)%this->verts_per_poly(fid)) return true;
+    uint prev_offset = this->poly_vert_offset(pid, prev);
+    uint curr_offset = this->poly_vert_offset(pid, curr);
+    if (curr_offset == (prev_offset+1)%this->verts_per_poly(pid)) return true;
     return false;
 }
 
@@ -431,7 +431,7 @@ CINO_INLINE
 double AbstractPolygonMesh<M,V,E,P>::vert_area(const uint vid) const
 {
     double area = 0.0;
-    for(uint fid : this->adj_v2p(vid)) area += poly_area(fid)/static_cast<double>(this->verts_per_poly(fid));
+    for(uint pid : this->adj_v2p(vid)) area += poly_area(pid)/static_cast<double>(this->verts_per_poly(pid));
     return area;
 }
 
@@ -489,10 +489,10 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 bool AbstractPolygonMesh<M,V,E,P>::edges_share_face(const uint eid1, const uint eid2) const
 {
-    for(uint fid1 : this->adj_e2p(eid1))
-    for(uint fid2 : this->adj_e2p(eid2))
+    for(uint pid1 : this->adj_e2p(eid1))
+    for(uint pid2 : this->adj_e2p(eid2))
     {
-        if (fid1 == fid2) return true;
+        if (pid1 == pid2) return true;
     }
     return false;
 }
@@ -501,16 +501,16 @@ bool AbstractPolygonMesh<M,V,E,P>::edges_share_face(const uint eid1, const uint 
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-ipair AbstractPolygonMesh<M,V,E,P>::edge_shared(const uint fid0, const uint fid1) const
+ipair AbstractPolygonMesh<M,V,E,P>::edge_shared(const uint pid0, const uint pid1) const
 {
     std::vector<uint> shared_verts;
-    uint v0 = this->poly_vert_id(fid0,0);
-    uint v1 = this->poly_vert_id(fid0,1);
-    uint v2 = this->poly_vert_id(fid0,2);
+    uint v0 = this->poly_vert_id(pid0,0);
+    uint v1 = this->poly_vert_id(pid0,1);
+    uint v2 = this->poly_vert_id(pid0,2);
 
-    if (this->poly_contains_vert(fid1,v0)) shared_verts.push_back(v0);
-    if (this->poly_contains_vert(fid1,v1)) shared_verts.push_back(v1);
-    if (this->poly_contains_vert(fid1,v2)) shared_verts.push_back(v2);
+    if (this->poly_contains_vert(pid1,v0)) shared_verts.push_back(v0);
+    if (this->poly_contains_vert(pid1,v1)) shared_verts.push_back(v1);
+    if (this->poly_contains_vert(pid1,v2)) shared_verts.push_back(v2);
     assert(shared_verts.size() == 2);
 
     ipair e;
@@ -528,7 +528,7 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_labeling_boundaries()
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         std::set<int> unique_labels;
-        for(uint fid : this->adj_e2p(eid)) unique_labels.insert(this->poly_data(fid).label);
+        for(uint pid : this->adj_e2p(eid)) unique_labels.insert(this->poly_data(pid).label);
 
         this->edge_data(eid).marked = (unique_labels.size()>=2);
     }
@@ -538,24 +538,24 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_labeling_boundaries()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractPolygonMesh<M,V,E,P>::poly_angle_at_vert(const uint fid, const uint vid, const int unit) const
+double AbstractPolygonMesh<M,V,E,P>::poly_angle_at_vert(const uint pid, const uint vid, const int unit) const
 {
-    assert(this->poly_contains_vert(fid,vid));
+    assert(this->poly_contains_vert(pid,vid));
 
     uint offset = 0;
-    for(uint i=0; i<this->verts_per_poly(fid); ++i) if (this->poly_vert_id(fid,i) == vid) offset = i;
-    assert(this->poly_vert_id(fid,offset) == vid);
+    for(uint i=0; i<this->verts_per_poly(pid); ++i) if (this->poly_vert_id(pid,i) == vid) offset = i;
+    assert(this->poly_vert_id(pid,offset) == vid);
     //
     // the code above substitutes this one (which was specific for AbstractMeshes...)
     //
-    //     if (poly_vert_id(fid,0) == vid) offset = 0;
-    //else if (poly_vert_id(fid,1) == vid) offset = 1;
-    //else if (poly_vert_id(fid,2) == vid) offset = 2;
+    //     if (poly_vert_id(pid,0) == vid) offset = 0;
+    //else if (poly_vert_id(pid,1) == vid) offset = 1;
+    //else if (poly_vert_id(pid,2) == vid) offset = 2;
     //else { assert(false); offset=0; } // offset=0 kills uninitialized warning message
 
     vec3d p = this->vert(vid);
-    vec3d u = this->poly_vert(fid,(offset+1)%this->verts_per_poly(fid)) - p;
-    vec3d v = this->poly_vert(fid,(offset+2)%this->verts_per_poly(fid)) - p;
+    vec3d u = this->poly_vert(pid,(offset+1)%this->verts_per_poly(pid)) - p;
+    vec3d v = this->poly_vert(pid,(offset+2)%this->verts_per_poly(pid)) - p;
 
     switch (unit)
     {
@@ -571,10 +571,10 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 int AbstractPolygonMesh<M,V,E,P>::poly_shared(const uint eid0, const uint eid1) const
 {
-    for(uint fid0 : this->adj_e2p(eid0))
-    for(uint fid1 : this->adj_e2p(eid1))
+    for(uint pid0 : this->adj_e2p(eid0))
+    for(uint pid1 : this->adj_e2p(eid1))
     {
-        if (fid0 == fid1) return fid0;
+        if (pid0 == pid1) return pid0;
     }
     return -1;
 }
@@ -583,13 +583,13 @@ int AbstractPolygonMesh<M,V,E,P>::poly_shared(const uint eid0, const uint eid1) 
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int AbstractPolygonMesh<M,V,E,P>::poly_adjacent_along(const uint fid, const uint vid0, const uint vid1) const
+int AbstractPolygonMesh<M,V,E,P>::poly_adjacent_along(const uint pid, const uint vid0, const uint vid1) const
 {
     // WARNING : assume the edge vid0,vid1 is manifold!
-    uint eid = this->poly_edge_id(fid, vid0, vid1);
+    uint eid = this->poly_edge_id(pid, vid0, vid1);
     assert(edge_is_manifold(eid));
 
-    for(uint nbr : this->adj_p2p(fid))
+    for(uint nbr : this->adj_p2p(pid))
     {
         if (this->poly_contains_vert(nbr,vid0) &&
             this->poly_contains_vert(nbr,vid1))
@@ -604,14 +604,14 @@ int AbstractPolygonMesh<M,V,E,P>::poly_adjacent_along(const uint fid, const uint
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int AbstractPolygonMesh<M,V,E,P>::poly_opposite_to(const uint eid, const uint fid) const
+int AbstractPolygonMesh<M,V,E,P>::poly_opposite_to(const uint eid, const uint pid) const
 {
-    assert(this->poly_contains_edge(fid,eid));
+    assert(this->poly_contains_edge(pid,eid));
     assert(this->edge_is_manifold(eid));
     assert(!this->adj_e2p(eid).empty());
 
     if (this->edge_is_boundary(eid)) return -1;
-    if (this->adj_e2p(eid).front() != fid) return this->adj_e2p(eid).front();
+    if (this->adj_e2p(eid).front() != pid) return this->adj_e2p(eid).front();
     return this->adj_e2p(eid).back();
 }
 
@@ -619,9 +619,9 @@ int AbstractPolygonMesh<M,V,E,P>::poly_opposite_to(const uint eid, const uint fi
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractPolygonMesh<M,V,E,P>::poly_is_boundary(const uint fid) const
+bool AbstractPolygonMesh<M,V,E,P>::poly_is_boundary(const uint pid) const
 {
-    return (this->adj_p2p(fid).size() < 3);
+    return (this->adj_p2p(pid).size() < 3);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -631,7 +631,7 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::normalize_area()
 {
     double area = 0.0;
-    for(uint fid=0; fid<this->num_polys(); ++fid) area += this->poly_mass(fid);
+    for(uint pid=0; pid<this->num_polys(); ++pid) area += this->poly_mass(pid);
     area = std::max(1e-4,area); // avoid creating degenerate faces...
     double s = 1.0 / sqrt(area);
     for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) *= s;
@@ -675,9 +675,9 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::poly_show_all()
 {
-    for(uint fid=0; fid<this->num_polys(); ++fid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        this->poly_data(fid).visible = true;
+        this->poly_data(pid).visible = true;
     }
 }
 
@@ -685,9 +685,9 @@ void AbstractPolygonMesh<M,V,E,P>::poly_show_all()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractPolygonMesh<M,V,E,P>::poly_mass(const uint fid) const
+double AbstractPolygonMesh<M,V,E,P>::poly_mass(const uint pid) const
 {
-    return this->poly_area(fid);
+    return this->poly_area(pid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -697,9 +697,9 @@ CINO_INLINE
 std::vector<int> AbstractPolygonMesh<M,V,E,P>::export_per_poly_labels() const
 {
     std::vector<int> labels(this->num_polys());
-    for(uint fid=0; fid<this->num_polys(); ++fid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        labels.at(this->poly_data(fid).label);
+        labels.at(this->poly_data(pid).label);
     }
     return labels;
 }
@@ -711,9 +711,9 @@ CINO_INLINE
 std::vector<Color> AbstractPolygonMesh<M,V,E,P>::export_per_poly_colors() const
 {
     std::vector<Color> colors(this->num_polys());
-    for(uint fid=0; fid<this->num_polys(); ++fid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        colors.at(fid) = this->poly_data(fid).color;
+        colors.at(pid) = this->poly_data(pid).color;
     }
     return colors;
 }
@@ -722,12 +722,12 @@ std::vector<Color> AbstractPolygonMesh<M,V,E,P>::export_per_poly_colors() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractPolygonMesh<M,V,E,P>::poly_flip_winding_order(const uint fid)
+void AbstractPolygonMesh<M,V,E,P>::poly_flip_winding_order(const uint pid)
 {
-    std::reverse(this->polys.at(fid).begin(), this->polys.at(fid).end());
+    std::reverse(this->polys.at(pid).begin(), this->polys.at(pid).end());
 
-    update_f_normal(fid);
-    for(uint off=0; off<this->verts_per_poly(fid); ++off) update_v_normal(this->poly_vert_id(fid,off));
+    update_p_normal(pid);
+    for(uint off=0; off<this->verts_per_poly(pid); ++off) update_v_normal(this->poly_vert_id(pid,off));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -736,9 +736,9 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::poly_set_color(const Color & c)
 {
-    for(uint fid=0; fid<this->num_polys(); ++fid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        this->poly_data(fid).color = c;
+        this->poly_data(pid).color = c;
     }
 }
 
@@ -748,9 +748,9 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::poly_set_alpha(const float alpha)
 {
-    for(uint fid=0; fid<this->num_polys(); ++fid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        this->poly_data(fid).color.a = alpha;
+        this->poly_data(pid).color.a = alpha;
     }
 }
 
@@ -761,15 +761,15 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::poly_color_wrt_label()
 {
     std::map<int,uint> l_map;
-    for(uint fid=0; fid<this->num_polys(); ++fid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        int l = this->poly_data(fid).label;
+        int l = this->poly_data(pid).label;
         if (DOES_NOT_CONTAIN(l_map,l)) l_map[l] = l_map.size();
     }
     uint n_labels = l_map.size();
-    for(uint fid=0; fid<this->num_polys(); ++fid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        this->poly_data(fid).color = Color::scatter(n_labels,l_map.at(this->poly_data(fid).label));
+        this->poly_data(pid).color = Color::scatter(n_labels,l_map.at(this->poly_data(pid).label));
     }
 }
 
@@ -784,20 +784,20 @@ void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P>
     uint ne = this->num_edges();
 
     std::vector<uint> tmp;
-    for(uint fid=0; fid<m.num_polys(); ++fid)
+    for(uint pid=0; pid<m.num_polys(); ++pid)
     {
         std::vector<uint> f;
-        for(uint off=0; off<m.verts_per_poly(fid); ++off) f.push_back(nv + m.poly_vert_id(fid,off));
+        for(uint off=0; off<m.verts_per_poly(pid); ++off) f.push_back(nv + m.poly_vert_id(pid,off));
         this->polys.push_back(f);
 
-        this->p_data.push_back(m.poly_data(fid));
+        this->p_data.push_back(m.poly_data(pid));
 
         tmp.clear();
-        for(uint eid : m.p2e.at(fid)) tmp.push_back(ne + eid);
+        for(uint eid : m.p2e.at(pid)) tmp.push_back(ne + eid);
         this->p2e.push_back(tmp);
 
         tmp.clear();
-        for(uint nbr : m.p2p.at(fid)) tmp.push_back(nf + nbr);
+        for(uint nbr : m.p2p.at(pid)) tmp.push_back(nf + nbr);
         this->p2p.push_back(tmp);
     }
     for(uint eid=0; eid<m.num_edges(); ++eid)

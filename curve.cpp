@@ -388,7 +388,7 @@ std::vector<uint> Curve::tessellate(Trimesh<> & m) const
 {
     for(Sample s : sample_list)
     {
-        if (s.eid == -1 || s.bary.size() < m.verts_per_elem(s.eid))
+        if (s.eid == -1 || s.bary.size() < m.verts_per_poly(s.eid))
         {
             std::cerr << "WARNING: no link between mesh and curve existing." << std::endl;
             assert(false && "Impossible to tessellate the curve");

@@ -58,7 +58,7 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh                & m,
     Sample seed;
     seed.eid  = eid;
     seed.bary = bary;
-    for(uint off=0; off<m.verts_per_elem(); ++off) seed.pos += bary.at(off) * m.poly_vert(eid, off);
+    for(uint off=0; off<m.verts_per_poly(); ++off) seed.pos += bary.at(off) * m.poly_vert(eid, off);
 
     trace_curve(seed);
 }
@@ -77,10 +77,10 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
     uint eid = m.adj_vert2poly(vid).front();
 
     uint off = 0;
-    while(off<m.verts_per_elem() && m.poly_vert_id(eid,off)!=vid) ++off;
+    while(off<m.verts_per_poly() && m.poly_vert_id(eid,off)!=vid) ++off;
     assert(m.poly_vert_id(eid,off)==vid && "Cannot find incident element to begin with");
 
-    std::vector<double> bary = std::vector<double>(m.verts_per_elem(),0);
+    std::vector<double> bary = std::vector<double>(m.verts_per_poly(),0);
     bary[off] = 1.0;
 
     Sample seed;
@@ -173,7 +173,7 @@ Curve::Sample IntegralCurve<Mesh>::make_sample(const uint vid) const
     Sample s;
     s.pos  = m_ptr->vert(vid);
     s.eid  = eid;
-    s.bary = std::vector<double>(m_ptr->verts_per_elem(),0);
+    s.bary = std::vector<double>(m_ptr->verts_per_poly(),0);
     s.bary.at(off) = 1.0;
     return s;
 }

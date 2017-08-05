@@ -46,7 +46,7 @@ PointInsideMeshCache<Mesh>::PointInsideMeshCache(const Mesh & m, const uint octr
     {
         vec3d min = m.poly_vert(eid, 0);
         vec3d max = min;
-        for(uint i=1; i<m.verts_per_elem(eid); ++i)
+        for(uint i=1; i<m.verts_per_poly(eid); ++i)
         {
             min = min.min(m.poly_vert(eid, i));
             max = max.max(m.poly_vert(eid, i));
@@ -91,7 +91,7 @@ void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & eid, std::vector<d
     }
     assert(ordered_items.size()>0);
     eid = (*ordered_items.begin()).second;
-    wgts = std::vector<double>(m_ptr->verts_per_elem(eid), 1.0/double(m_ptr->verts_per_elem(eid))); // centroid
+    wgts = std::vector<double>(m_ptr->verts_per_poly(eid), 1.0/double(m_ptr->verts_per_poly(eid))); // centroid
 }
 
 
@@ -108,7 +108,7 @@ vec3d PointInsideMeshCache<Mesh>::locate(const vec3d p, const Mesh & m) const
     locate(p, eid, wgts);
 
     vec3d tmp(0,0,0);
-    for(uint off=0; off<m.verts_per_elem(eid); ++off)
+    for(uint off=0; off<m.verts_per_poly(eid); ++off)
     {
         tmp += wgts.at(off) * m.poly_vert(eid,off);
     }

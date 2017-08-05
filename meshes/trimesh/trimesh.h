@@ -43,8 +43,8 @@ namespace cinolib
 template<class M = Mesh_std_data, // default template arguments
          class V = Vert_std_data,
          class E = Edge_std_data,
-         class F = Face_std_data>
-class Trimesh : public AbstractPolygonMesh<M,V,E,F>
+         class P = Face_std_data>
+class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 {
     public:
 
@@ -70,7 +70,7 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_f_normal(const uint fid);
+        void update_p_normal(const uint pid);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -81,13 +81,13 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,F>
         void   vert_switch_id          (const uint vid0, const uint vid1);
         void   vert_remove_unreferenced(const uint vid);
         uint   vert_add                (const vec3d & pos);
-        uint   vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;
+        uint   vert_opposite_to        (const uint pid, const uint vid0, const uint vid1) const;
 
-        using  AbstractPolygonMesh<M,V,E,F>::vert_opposite_to; // avoid hiding vert_opposite_to(eid,vid)
+        using  AbstractPolygonMesh<M,V,E,P>::vert_opposite_to; // avoid hiding vert_opposite_to(eid,vid)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int    edge_opposite_to        (const uint fid, const uint vid) const;
+        int    edge_opposite_to        (const uint pid, const uint vid) const;
         void   edge_switch_id          (const uint eid0, const uint eid1);
         bool   edge_collapse           (const uint eid);
         uint   edge_add                (const uint vid0, const uint vid1);
@@ -95,19 +95,19 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double poly_area               (const uint fid) const;
-        bool   poly_is_cap             (const uint fid, const double angle_thresh_deg = 177.0) const;
-        bool   poly_is_needle          (const uint fid, const double angle_thresh_deg = 3.0) const;
-        bool   poly_bary_coords        (const uint fid, const vec3d & P, std::vector<double> & wgts) const;
-        bool   poly_bary_is_vert       (const uint fid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
-        bool   poly_bary_is_edge       (const uint fid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
-        void   poly_switch_id          (const uint fid0, const uint fid1);
+        double poly_area               (const uint pid) const;
+        bool   poly_is_cap             (const uint pid, const double angle_thresh_deg = 177.0) const;
+        bool   poly_is_needle          (const uint pid, const double angle_thresh_deg = 3.0) const;
+        bool   poly_bary_coords        (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
+        bool   poly_bary_is_vert       (const uint pid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
+        bool   poly_bary_is_edge       (const uint pid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
+        void   poly_switch_id          (const uint pid0, const uint pid1);
         uint   poly_add                (const uint vid0, const uint vid1, const uint vid2);
-        void   poly_set                (const uint fid, const uint vid0, const uint vid1, const uint vid2);
-        void   poly_remove_unreferenced(const uint fid);
-        uint   poly_edge_id            (const uint fid, const uint offset) const;
+        void   poly_set                (const uint pid, const uint vid0, const uint vid1, const uint vid2);
+        void   poly_remove_unreferenced(const uint pid);
+        uint   poly_edge_id            (const uint pid, const uint offset) const;
 
-        using  AbstractMesh<M,V,E,F>::poly_edge_id; // avoid hiding poly_ege_id(fid,vid0,vid1)
+        using  AbstractMesh<M,V,E,P>::poly_edge_id; // avoid hiding poly_ege_id(pid,vid0,vid1)
 };
 
 }

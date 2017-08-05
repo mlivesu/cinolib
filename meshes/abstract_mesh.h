@@ -115,7 +115,6 @@ class AbstractMesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual uint verts_per_poly(const uint pid) const { return polys.at(pid).size(); }
-        virtual uint verts_per_elem(const uint eid) const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

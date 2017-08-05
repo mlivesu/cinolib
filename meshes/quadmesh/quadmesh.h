@@ -52,8 +52,8 @@ static const uint QUAD_EDGES[4][2] =
 template<class M = Mesh_std_data, // default template arguments
          class V = Vert_std_data,
          class E = Edge_std_data,
-         class F = Face_std_data>
-class Quadmesh : public AbstractPolygonMesh<M,V,E,F>
+         class P = Face_std_data>
+class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 {
     protected:
 
@@ -89,12 +89,12 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_f_normal(const uint fid);
+        void update_p_normal(const uint pid);
         void update_poly_tessellation();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void operator+=(const Quadmesh<M,V,E,F> & m);
+        void operator+=(const Quadmesh<M,V,E,P> & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -108,7 +108,7 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint                           edge_opposite_to(const uint fid, const uint eid) const;
+        uint                           edge_opposite_to(const uint pid, const uint eid) const;
         std::vector<uint>              edges_opposite_to(const uint eid) const;
         std::vector<uint>              edge_chain(const uint eid) const;
         std::vector<std::vector<uint>> edge_chains() const;

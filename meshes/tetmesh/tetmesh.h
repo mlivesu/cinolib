@@ -116,8 +116,8 @@ class Tetmesh
 
         uint verts_per_face() const { return 3; }
         uint verts_per_cell() const { return 4; }
-        uint verts_per_elem() const { return 4; }
-        uint verts_per_elem(const uint) const { return 4; }
+        uint verts_per_poly() const { return 4; }
+        uint verts_per_poly(const uint) const { return 4; }
         uint edges_per_cell() const { return 6; }
         uint faces_per_cell() const { return 4; }
 
