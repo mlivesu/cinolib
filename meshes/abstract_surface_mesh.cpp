@@ -36,9 +36,9 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::load(const char * filename)
+void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
 {
     this->clear();
     std::vector<double> coords;
@@ -49,12 +49,12 @@ void AbstractSurfaceMesh<M,V,E,F>::load(const char * filename)
     if (filetype.compare(".off") == 0 ||
         filetype.compare(".OFF") == 0)
     {
-        read_OFF(filename, coords, this->faces);
+        read_OFF(filename, coords, this->polys);
     }
     else if (filetype.compare(".obj") == 0 ||
              filetype.compare(".OBJ") == 0)
     {
-        read_OBJ(filename, coords, this->faces);
+        read_OBJ(filename, coords, this->polys);
     }
     else
     {
@@ -69,9 +69,9 @@ void AbstractSurfaceMesh<M,V,E,F>::load(const char * filename)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::save(const char * filename) const
+void AbstractPolygonMesh<M,V,E,P>::save(const char * filename) const
 {
     std::vector<double> coords = serialized_xyz_from_vec3d(this->verts);
 
@@ -81,12 +81,12 @@ void AbstractSurfaceMesh<M,V,E,F>::save(const char * filename) const
     if (filetype.compare("off") == 0 ||
         filetype.compare("OFF") == 0)
     {
-        write_OFF(filename, coords, this->faces);
+        write_OFF(filename, coords, this->polys);
     }
     else if (filetype.compare("obj") == 0 ||
              filetype.compare("OBJ") == 0)
     {
-        write_OBJ(filename, coords, this->faces);
+        write_OBJ(filename, coords, this->polys);
     }
     else
     {
@@ -97,47 +97,47 @@ void AbstractSurfaceMesh<M,V,E,F>::save(const char * filename) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::init()
+void AbstractPolygonMesh<M,V,E,P>::init()
 {
     this->update_adjacency();
     this->update_bbox();
 
     this->v_data.resize(this->num_verts());
     this->e_data.resize(this->num_edges());
-    this->x_data.resize(this->num_faces());
+    this->p_data.resize(this->num_faces());
 
     this->update_normals();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::update_adjacency()
+void AbstractPolygonMesh<M,V,E,P>::update_adjacency()
 {
     this->v2v.clear(); this->v2v.resize(this->num_verts());
     this->v2e.clear(); this->v2e.resize(this->num_verts());
-    this->v2f.clear(); this->v2f.resize(this->num_verts());
-    this->f2f.clear(); this->f2f.resize(this->num_faces());
-    this->f2e.clear(); this->f2e.resize(this->num_faces());
+    this->v2p.clear(); this->v2p.resize(this->num_verts());
+    this->p2p.clear(); this->p2p.resize(this->num_faces());
+    this->p2e.clear(); this->p2e.resize(this->num_faces());
 
     std::map<ipair,std::vector<uint>> e2f_map;
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
         for(uint offset=0; offset<this->verts_per_face(fid); ++offset)
         {
-            uint vid0 = this->face_vert_id(fid,offset);
-            uint vid1 = this->face_vert_id(fid,(offset+1)%this->verts_per_face(fid));
-            this->v2f.at(vid0).push_back(fid);
+            uint vid0 = this->poly_vert_id(fid,offset);
+            uint vid1 = this->poly_vert_id(fid,(offset+1)%this->verts_per_face(fid));
+            this->v2p.at(vid0).push_back(fid);
             e2f_map[unique_pair(vid0,vid1)].push_back(fid);
         }
     }
 
     this->edges.clear();
-    this->e2f.clear();
-    this->e2f.resize(e2f_map.size());
+    this->e2p.clear();
+    this->e2p.resize(e2f_map.size());
 
     uint fresh_id = 0;
     for(auto e2f_it : e2f_map)
@@ -159,9 +159,9 @@ void AbstractSurfaceMesh<M,V,E,F>::update_adjacency()
         std::vector<uint> fids = e2f_it.second;
         for(uint fid : fids)
         {
-            this->f2e.at(fid).push_back(eid);
-            this->e2f.at(eid).push_back(fid);
-            for(uint adj_fid : fids) if (fid != adj_fid) this->f2f.at(fid).push_back(adj_fid);
+            this->p2e.at(fid).push_back(eid);
+            this->e2p.at(eid).push_back(fid);
+            for(uint adj_fid : fids) if (fid != adj_fid) this->p2p.at(fid).push_back(adj_fid);
         }
 
         // MANIFOLDNESS CHECKS
@@ -186,14 +186,14 @@ void AbstractSurfaceMesh<M,V,E,F>::update_adjacency()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::update_v_normal(const uint vid)
+void AbstractPolygonMesh<M,V,E,P>::update_v_normal(const uint vid)
 {
     vec3d n(0,0,0);
-    for(uint fid : this->adj_v2f(vid))
+    for(uint fid : this->adj_v2p(vid))
     {
-        n += face_data(fid).normal;
+        n += this->poly_data(fid).normal;
     }
     n.normalize();
     this->vert_data(vid).normal = n;
@@ -201,9 +201,9 @@ void AbstractSurfaceMesh<M,V,E,F>::update_v_normal(const uint vid)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::update_f_normals()
+void AbstractPolygonMesh<M,V,E,P>::update_f_normals()
 {
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
@@ -213,9 +213,9 @@ void AbstractSurfaceMesh<M,V,E,F>::update_f_normals()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::update_v_normals()
+void AbstractPolygonMesh<M,V,E,P>::update_v_normals()
 {
     for(uint vid=0; vid<this->num_verts(); ++vid)
     {
@@ -225,9 +225,9 @@ void AbstractSurfaceMesh<M,V,E,F>::update_v_normals()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::update_normals()
+void AbstractPolygonMesh<M,V,E,P>::update_normals()
 {
     this->update_f_normals();
     this->update_v_normals();
@@ -235,9 +235,9 @@ void AbstractSurfaceMesh<M,V,E,F>::update_normals()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractSurfaceMesh<M,V,E,F>::vert_is_saddle(const uint vid, const int tex_coord) const
+bool AbstractPolygonMesh<M,V,E,P>::vert_is_saddle(const uint vid, const int tex_coord) const
 {
     std::vector<bool> signs;
     for(uint nbr : vert_ordered_vert_ring(vid))
@@ -267,9 +267,9 @@ bool AbstractSurfaceMesh<M,V,E,F>::vert_is_saddle(const uint vid, const int tex_
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractSurfaceMesh<M,V,E,F>::vert_is_critical_p(const uint vid, const int tex_coord) const
+bool AbstractPolygonMesh<M,V,E,P>::vert_is_critical_p(const uint vid, const int tex_coord) const
 {
     return (this->vert_is_local_max(vid,tex_coord) ||
             this->vert_is_local_min(vid,tex_coord) ||
@@ -278,9 +278,9 @@ bool AbstractSurfaceMesh<M,V,E,F>::vert_is_critical_p(const uint vid, const int 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractSurfaceMesh<M,V,E,F>::vert_opposite_to(const uint eid, const uint vid) const
+uint AbstractPolygonMesh<M,V,E,P>::vert_opposite_to(const uint eid, const uint vid) const
 {
     assert(this->edge_contains_vert(eid, vid));
     if (this->edge_vert_id(eid,0) != vid) return this->edge_vert_id(eid,0);
@@ -289,21 +289,21 @@ uint AbstractSurfaceMesh<M,V,E,F>::vert_opposite_to(const uint eid, const uint v
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractSurfaceMesh<M,V,E,F>::verts_are_ordered_CCW(const uint fid, const uint curr, const uint prev) const
+bool AbstractPolygonMesh<M,V,E,P>::verts_are_ordered_CCW(const uint fid, const uint curr, const uint prev) const
 {
-    uint prev_offset = this->face_vert_offset(fid, prev);
-    uint curr_offset = this->face_vert_offset(fid, curr);
+    uint prev_offset = this->poly_vert_offset(fid, prev);
+    uint curr_offset = this->poly_vert_offset(fid, curr);
     if (curr_offset == (prev_offset+1)%this->verts_per_face(fid)) return true;
     return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::vert_ordered_one_ring(const uint vid,
+void AbstractPolygonMesh<M,V,E,P>::vert_ordered_one_ring(const uint vid,
                                                          std::vector<uint> & v_ring,       // sorted list of adjacent vertices
                                                          std::vector<uint> & f_ring,       // sorted list of adjacent triangles
                                                          std::vector<uint> & e_ring,       // sorted list of edges incident to vid
@@ -317,9 +317,9 @@ void AbstractSurfaceMesh<M,V,E,F>::vert_ordered_one_ring(const uint vid,
     if (this->adj_v2e(vid).empty()) return;
     uint curr_e  = this->adj_v2e(vid).front(); assert(edge_is_manifold(curr_e));
     uint curr_v  = this->vert_opposite_to(curr_e, vid);
-    uint curr_f  = this->adj_e2f(curr_e).front();
+    uint curr_f  = this->adj_e2p(curr_e).front();
     // impose CCW winding...
-    if (!this->verts_are_ordered_CCW(curr_f, curr_v, vid)) curr_f = this->adj_e2f(curr_e).back();
+    if (!this->verts_are_ordered_CCW(curr_f, curr_v, vid)) curr_f = this->adj_e2p(curr_e).back();
 
     // If there are boundary edges it is important to start from the right triangle (i.e. right-most),
     // otherwise it will be impossible to cover the entire umbrella
@@ -329,13 +329,13 @@ void AbstractSurfaceMesh<M,V,E,F>::vert_ordered_one_ring(const uint vid,
         assert(b_edges.size() == 2); // otherwise there is no way to cover the whole umbrella walking through adjacent triangles!!!
 
         uint e = b_edges.front();
-        uint f = this->adj_e2f(e).front();
+        uint f = this->adj_e2p(e).front();
         uint v = vert_opposite_to(e, vid);
 
         if (!this->verts_are_ordered_CCW(f, v, vid))
         {
             e = b_edges.back();
-            f = this->adj_e2f(e).front();
+            f = this->adj_e2p(e).front();
             v = vert_opposite_to(e, vid);
             assert(this->verts_are_ordered_CCW(f, v, vid));
         }
@@ -350,16 +350,16 @@ void AbstractSurfaceMesh<M,V,E,F>::vert_ordered_one_ring(const uint vid,
         e_ring.push_back(curr_e);
         f_ring.push_back(curr_f);
 
-        uint off = this->face_vert_offset(curr_f, curr_v);
+        uint off = this->poly_vert_offset(curr_f, curr_v);
         for(uint i=0; i<this->verts_per_face(curr_f)-1; ++i)
         {
-            curr_v = this->face_vert_id(curr_f,(off+i)%this->verts_per_face(curr_f));
-            if (i>0) e_link.push_back( this->face_edge_id(curr_f, curr_v, v_ring.back()) );
+            curr_v = this->poly_vert_id(curr_f,(off+i)%this->verts_per_face(curr_f));
+            if (i>0) e_link.push_back( this->poly_edge_id(curr_f, curr_v, v_ring.back()) );
             v_ring.push_back(curr_v);
         }
 
-        curr_e = this->face_edge_id(curr_f, vid, v_ring.back()); assert(edge_is_manifold(curr_e));
-        curr_f = (this->adj_e2f(curr_e).front() == curr_f) ? this->adj_e2f(curr_e).back() : this->adj_e2f(curr_e).front();
+        curr_e = this->poly_edge_id(curr_f, vid, v_ring.back()); assert(edge_is_manifold(curr_e));
+        curr_f = (this->adj_e2p(curr_e).front() == curr_f) ? this->adj_e2p(curr_e).back() : this->adj_e2p(curr_e).front();
 
         v_ring.pop_back();
 
@@ -370,9 +370,9 @@ void AbstractSurfaceMesh<M,V,E,F>::vert_ordered_one_ring(const uint vid,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::vert_ordered_vert_ring(const uint vid) const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_vert_ring(const uint vid) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent vertices
     std::vector<uint> f_ring; // sorted list of adjacent triangles
@@ -384,9 +384,9 @@ std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::vert_ordered_vert_ring(const uin
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::vert_ordered_face_ring(const uint vid) const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_poly_ring(const uint vid) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent vertices
     std::vector<uint> f_ring; // sorted list of adjacent triangles
@@ -398,9 +398,9 @@ std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::vert_ordered_face_ring(const uin
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::vert_ordered_edge_ring(const uint vid) const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_edge_ring(const uint vid) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent vertices
     std::vector<uint> f_ring; // sorted list of adjacent triangles
@@ -412,9 +412,9 @@ std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::vert_ordered_edge_ring(const uin
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::vert_ordered_edge_link(const uint vid) const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_edge_link(const uint vid) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent vertices
     std::vector<uint> f_ring; // sorted list of adjacent triangles
@@ -426,29 +426,29 @@ std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::vert_ordered_edge_link(const uin
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractSurfaceMesh<M,V,E,F>::vert_area(const uint vid) const
+double AbstractPolygonMesh<M,V,E,P>::vert_area(const uint vid) const
 {
     double area = 0.0;
-    for(uint fid : this->adj_v2f(vid)) area += face_area(fid)/static_cast<double>(this->verts_per_face(fid));
+    for(uint fid : this->adj_v2p(vid)) area += poly_area(fid)/static_cast<double>(this->verts_per_face(fid));
     return area;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractSurfaceMesh<M,V,E,F>::vert_mass(const uint vid) const
+double AbstractPolygonMesh<M,V,E,P>::vert_mass(const uint vid) const
 {
     return vert_area(vid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractSurfaceMesh<M,V,E,F>::vert_is_boundary(const uint vid) const
+bool AbstractPolygonMesh<M,V,E,P>::vert_is_boundary(const uint vid) const
 {
     for(uint eid : this->adj_v2e(vid)) if (edge_is_boundary(eid)) return true;
     return false;
@@ -456,9 +456,9 @@ bool AbstractSurfaceMesh<M,V,E,F>::vert_is_boundary(const uint vid) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::vert_boundary_edges(const uint vid) const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_boundary_edges(const uint vid) const
 {
     std::vector<uint> b_edges;
     for(uint eid : this->adj_v2e(vid)) if (edge_is_boundary(eid)) b_edges.push_back(eid);
@@ -467,30 +467,30 @@ std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::vert_boundary_edges(const uint v
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractSurfaceMesh<M,V,E,F>::edge_is_manifold(const uint eid) const
+bool AbstractPolygonMesh<M,V,E,P>::edge_is_manifold(const uint eid) const
 {
-    return (this->adj_e2f(eid).size() <= 2);
+    return (this->adj_e2p(eid).size() <= 2);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractSurfaceMesh<M,V,E,F>::edge_is_boundary(const uint eid) const
+bool AbstractPolygonMesh<M,V,E,P>::edge_is_boundary(const uint eid) const
 {
-    return (this->adj_e2f(eid).size() == 1);
+    return (this->adj_e2p(eid).size() == 1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractSurfaceMesh<M,V,E,F>::edges_share_face(const uint eid1, const uint eid2) const
+bool AbstractPolygonMesh<M,V,E,P>::edges_share_face(const uint eid1, const uint eid2) const
 {
-    for(uint fid1 : this->adj_e2f(eid1))
-    for(uint fid2 : this->adj_e2f(eid2))
+    for(uint fid1 : this->adj_e2p(eid1))
+    for(uint fid2 : this->adj_e2p(eid2))
     {
         if (fid1 == fid2) return true;
     }
@@ -499,18 +499,18 @@ bool AbstractSurfaceMesh<M,V,E,F>::edges_share_face(const uint eid1, const uint 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-ipair AbstractSurfaceMesh<M,V,E,F>::edge_shared(const uint fid0, const uint fid1) const
+ipair AbstractPolygonMesh<M,V,E,P>::edge_shared(const uint fid0, const uint fid1) const
 {
     std::vector<uint> shared_verts;
-    uint v0 = this->face_vert_id(fid0,0);
-    uint v1 = this->face_vert_id(fid0,1);
-    uint v2 = this->face_vert_id(fid0,2);
+    uint v0 = this->poly_vert_id(fid0,0);
+    uint v1 = this->poly_vert_id(fid0,1);
+    uint v2 = this->poly_vert_id(fid0,2);
 
-    if (this->face_contains_vert(fid1,v0)) shared_verts.push_back(v0);
-    if (this->face_contains_vert(fid1,v1)) shared_verts.push_back(v1);
-    if (this->face_contains_vert(fid1,v2)) shared_verts.push_back(v2);
+    if (this->poly_contains_vert(fid1,v0)) shared_verts.push_back(v0);
+    if (this->poly_contains_vert(fid1,v1)) shared_verts.push_back(v1);
+    if (this->poly_contains_vert(fid1,v2)) shared_verts.push_back(v2);
     assert(shared_verts.size() == 2);
 
     ipair e;
@@ -521,14 +521,14 @@ ipair AbstractSurfaceMesh<M,V,E,F>::edge_shared(const uint fid0, const uint fid1
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::edge_mark_labeling_boundaries()
+void AbstractPolygonMesh<M,V,E,P>::edge_mark_labeling_boundaries()
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         std::set<int> unique_labels;
-        for(uint fid : this->adj_e2f(eid)) unique_labels.insert(face_data(fid).label);
+        for(uint fid : this->adj_e2p(eid)) unique_labels.insert(this->poly_data(fid).label);
 
         this->edge_data(eid).marked = (unique_labels.size()>=2);
     }
@@ -536,12 +536,43 @@ void AbstractSurfaceMesh<M,V,E,F>::edge_mark_labeling_boundaries()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-int AbstractSurfaceMesh<M,V,E,F>::face_shared(const uint eid0, const uint eid1) const
+double AbstractPolygonMesh<M,V,E,P>::poly_angle_at_vert(const uint fid, const uint vid, const int unit) const
 {
-    for(uint fid0 : this->adj_e2f(eid0))
-    for(uint fid1 : this->adj_e2f(eid1))
+    assert(this->poly_contains_vert(fid,vid));
+
+    uint offset = 0;
+    for(uint i=0; i<this->verts_per_face(fid); ++i) if (this->poly_vert_id(fid,i) == vid) offset = i;
+    assert(this->poly_vert_id(fid,offset) == vid);
+    //
+    // the code above substitutes this one (which was specific for AbstractMeshes...)
+    //
+    //     if (poly_vert_id(fid,0) == vid) offset = 0;
+    //else if (poly_vert_id(fid,1) == vid) offset = 1;
+    //else if (poly_vert_id(fid,2) == vid) offset = 2;
+    //else { assert(false); offset=0; } // offset=0 kills uninitialized warning message
+
+    vec3d p = this->vert(vid);
+    vec3d u = this->poly_vert(fid,(offset+1)%this->verts_per_face(fid)) - p;
+    vec3d v = this->poly_vert(fid,(offset+2)%this->verts_per_face(fid)) - p;
+
+    switch (unit)
+    {
+        case RAD : return u.angle_rad(v);
+        case DEG : return u.angle_deg(v);
+        default  : assert(false);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+int AbstractPolygonMesh<M,V,E,P>::poly_shared(const uint eid0, const uint eid1) const
+{
+    for(uint fid0 : this->adj_e2p(eid0))
+    for(uint fid1 : this->adj_e2p(eid1))
     {
         if (fid0 == fid1) return fid0;
     }
@@ -550,18 +581,18 @@ int AbstractSurfaceMesh<M,V,E,F>::face_shared(const uint eid0, const uint eid1) 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-int AbstractSurfaceMesh<M,V,E,F>::face_adjacent_along(const uint fid, const uint vid0, const uint vid1) const
+int AbstractPolygonMesh<M,V,E,P>::poly_adjacent_along(const uint fid, const uint vid0, const uint vid1) const
 {
     // WARNING : assume the edge vid0,vid1 is manifold!
-    uint eid = this->face_edge_id(fid, vid0, vid1);
+    uint eid = this->poly_edge_id(fid, vid0, vid1);
     assert(edge_is_manifold(eid));
 
-    for(uint nbr : this->adj_f2f(fid))
+    for(uint nbr : this->adj_p2p(fid))
     {
-        if (this->face_contains_vert(nbr,vid0) &&
-            this->face_contains_vert(nbr,vid1))
+        if (this->poly_contains_vert(nbr,vid0) &&
+            this->poly_contains_vert(nbr,vid1))
         {
             return nbr;
         }
@@ -571,45 +602,36 @@ int AbstractSurfaceMesh<M,V,E,F>::face_adjacent_along(const uint fid, const uint
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-int AbstractSurfaceMesh<M,V,E,F>::face_opposite_to(const uint eid, const uint fid) const
+int AbstractPolygonMesh<M,V,E,P>::poly_opposite_to(const uint eid, const uint fid) const
 {
-    assert(this->face_contains_edge(fid,eid));
+    assert(this->poly_contains_edge(fid,eid));
     assert(this->edge_is_manifold(eid));
-    assert(!this->adj_e2f(eid).empty());
+    assert(!this->adj_e2p(eid).empty());
 
     if (this->edge_is_boundary(eid)) return -1;
-    if (this->adj_e2f(eid).front() != fid) return this->adj_e2f(eid).front();
-    return this->adj_e2f(eid).back();
+    if (this->adj_e2p(eid).front() != fid) return this->adj_e2p(eid).front();
+    return this->adj_e2p(eid).back();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractSurfaceMesh<M,V,E,F>::face_is_boundary(const uint fid) const
+bool AbstractPolygonMesh<M,V,E,P>::poly_is_boundary(const uint fid) const
 {
-    return (this->adj_f2f(fid).size() < 3);
+    return (this->adj_p2p(fid).size() < 3);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractSurfaceMesh<M,V,E,F>::face_mass(const uint fid) const
-{
-    return face_area(fid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::normalize_area()
+void AbstractPolygonMesh<M,V,E,P>::normalize_area()
 {
     double area = 0.0;
-    for(uint fid=0; fid<this->num_faces(); ++fid) area += this->elem_mass(fid);
+    for(uint fid=0; fid<this->num_faces(); ++fid) area += this->poly_mass(fid);
     area = std::max(1e-4,area); // avoid creating degenerate faces...
     double s = 1.0 / sqrt(area);
     for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) *= s;
@@ -618,9 +640,9 @@ void AbstractSurfaceMesh<M,V,E,F>::normalize_area()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<ipair> AbstractSurfaceMesh<M,V,E,F>::get_boundary_edges() const
+std::vector<ipair> AbstractPolygonMesh<M,V,E,P>::get_boundary_edges() const
 {
     std::vector<ipair> res;
     for(uint eid=0; eid<this->num_edges(); ++eid)
@@ -638,9 +660,9 @@ std::vector<ipair> AbstractSurfaceMesh<M,V,E,F>::get_boundary_edges() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::get_boundary_vertices() const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::get_boundary_vertices() const
 {
     std::vector<uint> res;
     for(uint vid=0; vid<this->num_verts(); ++vid) if (this->vert_is_boundary(vid)) res.push_back(vid);
@@ -649,149 +671,113 @@ std::vector<uint> AbstractSurfaceMesh<M,V,E,F>::get_boundary_vertices() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractSurfaceMesh<M,V,E,F>::elem_vert_id(const uint fid, const uint offset) const
-{
-    return this->face_vert_id(fid,offset);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-vec3d AbstractSurfaceMesh<M,V,E,F>::elem_vert(const uint fid, const uint offset) const
-{
-    return this->face_vert(fid,offset);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-vec3d AbstractSurfaceMesh<M,V,E,F>::elem_centroid(const uint fid) const
-{
-    return this->face_centroid(fid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::elem_show_all()
+void AbstractPolygonMesh<M,V,E,P>::poly_show_all()
 {
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        this->face_data(fid).visible = true;
+        this->poly_data(fid).visible = true;
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractSurfaceMesh<M,V,E,F>::elem_mass(const uint fid) const
+double AbstractPolygonMesh<M,V,E,P>::poly_mass(const uint fid) const
 {
-    return this->face_area(fid);
+    return this->poly_area(fid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractSurfaceMesh<M,V,E,F>::elem_vert_offset(const uint fid, const uint vid) const
-{
-    return this->face_vert_offset(fid,vid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-std::vector<int> AbstractSurfaceMesh<M,V,E,F>::export_per_face_labels() const
+std::vector<int> AbstractPolygonMesh<M,V,E,P>::export_per_poly_labels() const
 {
     std::vector<int> labels(this->num_faces());
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        labels.at(this->face_data(fid).label);
+        labels.at(this->poly_data(fid).label);
     }
     return labels;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<Color> AbstractSurfaceMesh<M,V,E,F>::export_per_face_colors() const
+std::vector<Color> AbstractPolygonMesh<M,V,E,P>::export_per_poly_colors() const
 {
     std::vector<Color> colors(this->num_faces());
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        colors.at(fid) = this->face_data(fid).color;
+        colors.at(fid) = this->poly_data(fid).color;
     }
     return colors;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::face_flip_winding_order(const uint fid)
+void AbstractPolygonMesh<M,V,E,P>::poly_flip_winding_order(const uint fid)
 {
-    std::reverse(this->faces.at(fid).begin(), this->faces.at(fid).end());
+    std::reverse(this->polys.at(fid).begin(), this->polys.at(fid).end());
 
     update_f_normal(fid);
-    for(uint off=0; off<this->verts_per_face(fid); ++off) update_v_normal(this->face_vert_id(fid,off));
+    for(uint off=0; off<this->verts_per_face(fid); ++off) update_v_normal(this->poly_vert_id(fid,off));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::face_set_color(const Color & c)
+void AbstractPolygonMesh<M,V,E,P>::poly_set_color(const Color & c)
 {
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        face_data(fid).color = c;
+        this->poly_data(fid).color = c;
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::face_set_alpha(const float alpha)
+void AbstractPolygonMesh<M,V,E,P>::poly_set_alpha(const float alpha)
 {
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        face_data(fid).color.a = alpha;
+        this->poly_data(fid).color.a = alpha;
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::face_color_wrt_label()
+void AbstractPolygonMesh<M,V,E,P>::poly_color_wrt_label()
 {
     std::map<int,uint> l_map;
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        int l = face_data(fid).label;
+        int l = this->poly_data(fid).label;
         if (DOES_NOT_CONTAIN(l_map,l)) l_map[l] = l_map.size();
     }
     uint n_labels = l_map.size();
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        face_data(fid).color = Color::scatter(n_labels,l_map.at(face_data(fid).label));
+        this->poly_data(fid).color = Color::scatter(n_labels,l_map.at(this->poly_data(fid).label));
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractSurfaceMesh<M,V,E,F>::operator+=(const AbstractSurfaceMesh<M,V,E,F> & m)
+void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P> & m)
 {
     uint nv = this->num_verts();
     uint nf = this->num_faces();
@@ -801,18 +787,18 @@ void AbstractSurfaceMesh<M,V,E,F>::operator+=(const AbstractSurfaceMesh<M,V,E,F>
     for(uint fid=0; fid<m.num_faces(); ++fid)
     {
         std::vector<uint> f;
-        for(uint off=0; off<m.verts_per_face(fid); ++off) f.push_back(nv + m.face_vert_id(fid,off));
-        this->faces.push_back(f);
+        for(uint off=0; off<m.verts_per_face(fid); ++off) f.push_back(nv + m.poly_vert_id(fid,off));
+        this->polys.push_back(f);
 
-        this->x_data.push_back(m.face_data(fid));
-
-        tmp.clear();
-        for(uint eid : m.f2e.at(fid)) tmp.push_back(ne + eid);
-        this->f2e.push_back(tmp);
+        this->p_data.push_back(m.poly_data(fid));
 
         tmp.clear();
-        for(uint nbr : m.f2f.at(fid)) tmp.push_back(nf + nbr);
-        this->f2f.push_back(tmp);
+        for(uint eid : m.p2e.at(fid)) tmp.push_back(ne + eid);
+        this->p2e.push_back(tmp);
+
+        tmp.clear();
+        for(uint nbr : m.p2p.at(fid)) tmp.push_back(nf + nbr);
+        this->p2p.push_back(tmp);
     }
     for(uint eid=0; eid<m.num_edges(); ++eid)
     {
@@ -822,8 +808,8 @@ void AbstractSurfaceMesh<M,V,E,F>::operator+=(const AbstractSurfaceMesh<M,V,E,F>
         this->e_data.push_back(m.edge_data(eid));
 
         tmp.clear();
-        for(uint tid : m.e2f.at(eid)) tmp.push_back(nf + tid);
-        this->e2f.push_back(tmp);
+        for(uint tid : m.e2p.at(eid)) tmp.push_back(nf + tid);
+        this->e2p.push_back(tmp);
     }
     for(uint vid=0; vid<m.num_verts(); ++vid)
     {
@@ -835,8 +821,8 @@ void AbstractSurfaceMesh<M,V,E,F>::operator+=(const AbstractSurfaceMesh<M,V,E,F>
         this->v2e.push_back(tmp);
 
         tmp.clear();
-        for(uint tid : m.v2f.at(vid)) tmp.push_back(nf + tid);
-        this->v2f.push_back(tmp);
+        for(uint tid : m.v2p.at(vid)) tmp.push_back(nf + tid);
+        this->v2p.push_back(tmp);
 
         tmp.clear();
         for(uint nbr : m.v2v.at(vid)) tmp.push_back(nv + nbr);

@@ -138,11 +138,11 @@ void DrawableTrimesh<M,V,E,F>::updateGL()
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        if (!(this->face_data(fid).visible)) continue;
+        if (!(this->poly_data(fid).visible)) continue;
 
-        uint vid0 = this->face_vert_id(fid,0);
-        uint vid1 = this->face_vert_id(fid,1);
-        uint vid2 = this->face_vert_id(fid,2);
+        uint vid0 = this->poly_vert_id(fid,0);
+        uint vid1 = this->poly_vert_id(fid,1);
+        uint vid2 = this->poly_vert_id(fid,2);
 
         uint base_addr = drawlist.tri_coords.size()/3;
 
@@ -188,18 +188,18 @@ void DrawableTrimesh<M,V,E,F>::updateGL()
 
         if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
         {
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.r);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.g);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.b);
-            drawlist.tri_v_colors.push_back(this->face_data(fid).color.a);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.r);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.g);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.b);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.a);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.r);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.g);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.b);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.a);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.r);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.g);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.b);
+            drawlist.tri_v_colors.push_back(this->poly_data(fid).color.a);
         }
         else if (drawlist.draw_mode & DRAW_TRI_VERTCOLOR)
         {
@@ -221,9 +221,9 @@ void DrawableTrimesh<M,V,E,F>::updateGL()
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         bool invisible = true;
-        for(uint fid : this->adj_e2f(eid))
+        for(uint fid : this->adj_e2p(eid))
         {
-            if (this->face_data(fid).visible) invisible = false;
+            if (this->poly_data(fid).visible) invisible = false;
         }
         if (invisible) continue;
 

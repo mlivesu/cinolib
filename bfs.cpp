@@ -120,7 +120,7 @@ void bfs_exahustive_on_dual(const Mesh              & m,
 
         visited.insert(cid);
 
-        for(uint nbr : m.adj_elem2elem(cid))
+        for(uint nbr : m.adj_poly2poly(cid))
         {
             if (mask.at(nbr)) continue;
             if (DOES_NOT_CONTAIN(visited,nbr))
@@ -335,9 +335,9 @@ void bfs_exahustive_on_dual(const Mesh                & m,
         uint fid = q.front();
         q.pop();
 
-        for(const uint & nbr : m.adj_elem2elem(fid))
+        for(const uint & nbr : m.adj_poly2poly(fid))
         {
-            double c = dist.at(fid) + m.elem_centroid(fid).dist(m.elem_centroid(nbr));
+            double c = dist.at(fid) + m.poly_centroid(fid).dist(m.poly_centroid(nbr));
             if (dist.at(nbr) > c)
             {
                 dist.at(nbr) = c;

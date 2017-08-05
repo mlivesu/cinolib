@@ -61,7 +61,7 @@ class DrawableVectorField : public VectorField, public DrawableObject
             {
                 for(uint eid=0; eid<m_ptr->num_elems(); ++eid)
                 {
-                    vec3d base = m_ptr->elem_centroid(eid);
+                    vec3d base = m_ptr->poly_centroid(eid);
                     vec3d tip  = base + arrow_length * vec_at(eid);
 
                     arrow<vec3d>(base, tip, arrow_thicknes, arrow_color.rgba);

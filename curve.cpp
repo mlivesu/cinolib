@@ -406,9 +406,9 @@ std::vector<uint> Curve::tessellate(Trimesh<> & m) const
         uint off;
         if (triangle_bary_is_edge(s.bary, off))
         {
-            uint  eid         = m.face_edge_id(s.eid, off);
-            uint  vid0        = m.face_vert_id(s.eid, TRI_EDGES[off][0]);
-            uint  vid1        = m.face_vert_id(s.eid, TRI_EDGES[off][1]);
+            uint  eid         = m.poly_edge_id(s.eid, off);
+            uint  vid0        = m.poly_vert_id(s.eid, TRI_EDGES[off][0]);
+            uint  vid1        = m.poly_vert_id(s.eid, TRI_EDGES[off][1]);
             float f0          = m.vert_data(vid0).uvw[0];
             float f1          = m.vert_data(vid1).uvw[0];
             float f_new       = f0 * s.bary.at(TRI_EDGES[off][0]) + f1 * s.bary.at(TRI_EDGES[off][1]);
@@ -417,11 +417,11 @@ std::vector<uint> Curve::tessellate(Trimesh<> & m) const
             new_vids_map[eid] = fresh_id;
 
             curve_vids.push_back(fresh_id);
-            for(uint fid : m.adj_e2f(eid)) faces_to_split.insert(fid);
+            for(uint fid : m.adj_e2p(eid)) faces_to_split.insert(fid);
         }
         else if (triangle_bary_is_vertex(s.bary, off))
         {
-            curve_vids.push_back(m.face_vert_id(s.eid, off));
+            curve_vids.push_back(m.poly_vert_id(s.eid, off));
         }
         else assert(false && "Inner samples are not supported for tessellation yet");
     }
@@ -432,7 +432,7 @@ std::vector<uint> Curve::tessellate(Trimesh<> & m) const
     for(uint fid : faces_to_split)
     {
         std::vector<ipair> split_edges;
-        for(int eid : m.adj_f2e(fid))
+        for(int eid : m.adj_p2e(fid))
         {
             auto query = new_vids_map.find(eid);
             if (query != new_vids_map.end())
@@ -472,12 +472,12 @@ void Curve::tessellate(Trimesh<> &m, const std::vector<uint> & split_list) const
         uint v0      = split_list.at(i+2);
         uint v1      = split_list.at(i+3);
         uint v2      = split_list.at(i+4);
-        vec3d n_og  = m.face_data(fid).normal;
+        vec3d n_og  = m.poly_data(fid).normal;
         vec3d n     = triangle_normal(m.vert(v0), m.vert(v1), m.vert(v2));
         bool flip   = (n_og.dot(n) < 0); // if the normal is opposite flip them all...
 
         if (flip) std::swap(v1,v2);
-        m.face_set(fid, v0, v1, v2);
+        m.poly_set(fid, v0, v1, v2);
 
         uint base = i+5;
         for(uint j=0; j<subtris-1; ++j)
@@ -486,7 +486,7 @@ void Curve::tessellate(Trimesh<> &m, const std::vector<uint> & split_list) const
             v1 = split_list.at(base+3*j+1);
             v2 = split_list.at(base+3*j+2);
             if (flip) std::swap(v1,v2);
-            m.face_add(v0, v1, v2);
+            m.poly_add(v0, v1, v2);
         }
 
         i+=2+3*subtris;

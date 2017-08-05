@@ -41,7 +41,7 @@ namespace cinolib
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-Quadmesh<M,V,E,F>::Quadmesh(const char * filename) : AbstractSurfaceMesh<M,V,E,F>()
+Quadmesh<M,V,E,F>::Quadmesh(const char * filename) : AbstractPolygonMesh<M,V,E,F>()
 {
     this->load(filename);
     init();
@@ -52,10 +52,10 @@ Quadmesh<M,V,E,F>::Quadmesh(const char * filename) : AbstractSurfaceMesh<M,V,E,F
 template<class M, class V, class E, class F>
 CINO_INLINE
 Quadmesh<M,V,E,F>::Quadmesh(const std::vector<vec3d> & verts,
-                            const std::vector<uint>  & faces) : AbstractSurfaceMesh<M,V,E,F>()
+                            const std::vector<uint>  & faces) : AbstractPolygonMesh<M,V,E,F>()
 {
     this->verts = verts;
-    this->faces = faces_from_serialized_vids(faces,4);
+    this->polys = faces_from_serialized_vids(faces,4);
     init();
 }
 
@@ -64,10 +64,10 @@ Quadmesh<M,V,E,F>::Quadmesh(const std::vector<vec3d> & verts,
 template<class M, class V, class E, class F>
 CINO_INLINE
 Quadmesh<M,V,E,F>::Quadmesh(const std::vector<double> & coords,
-                            const std::vector<uint>   & faces) : AbstractSurfaceMesh<M,V,E,F>()
+                            const std::vector<uint>   & faces) : AbstractPolygonMesh<M,V,E,F>()
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    this->faces = faces_from_serialized_vids(faces,4);
+    this->polys = faces_from_serialized_vids(faces,4);
     init();
 }
 
@@ -76,10 +76,10 @@ Quadmesh<M,V,E,F>::Quadmesh(const std::vector<double> & coords,
 template<class M, class V, class E, class F>
 CINO_INLINE
 Quadmesh<M,V,E,F>::Quadmesh(const std::vector<vec3d>             & verts,
-                            const std::vector<std::vector<uint>> & faces) : AbstractSurfaceMesh<M,V,E,F>()
+                            const std::vector<std::vector<uint>> & faces) : AbstractPolygonMesh<M,V,E,F>()
 {
     this->verts = verts;
-    this->faces = faces;
+    this->polys = faces;
     init();
 }
 
@@ -88,10 +88,10 @@ Quadmesh<M,V,E,F>::Quadmesh(const std::vector<vec3d>             & verts,
 template<class M, class V, class E, class F>
 CINO_INLINE
 Quadmesh<M,V,E,F>::Quadmesh(const std::vector<double>            & coords,
-                            const std::vector<std::vector<uint>> & faces) : AbstractSurfaceMesh<M,V,E,F>()
+                            const std::vector<std::vector<uint>> & faces) : AbstractPolygonMesh<M,V,E,F>()
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    this->faces = faces;
+    this->polys = faces;
     init();
 }
 
@@ -111,25 +111,25 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Quadmesh<M,V,E,F>::init()
 {
-    update_face_tessellation();
-    AbstractSurfaceMesh<M,V,E,F>::init();
+    update_poly_tessellation();
+    AbstractPolygonMesh<M,V,E,F>::init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Quadmesh<M,V,E,F>::update_face_tessellation()
+void Quadmesh<M,V,E,F>::update_poly_tessellation()
 {
     tessellated_faces.clear();
     tessellated_faces.resize(this->num_faces());
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        uint vid0 = this->face_vert_id(fid,0);
-        uint vid1 = this->face_vert_id(fid,1);
-        uint vid2 = this->face_vert_id(fid,2);
-        uint vid3 = this->face_vert_id(fid,3);
+        uint vid0 = this->poly_vert_id(fid,0);
+        uint vid1 = this->poly_vert_id(fid,1);
+        uint vid2 = this->poly_vert_id(fid,2);
+        uint vid3 = this->poly_vert_id(fid,3);
 
         vec3d n1 = (this->vert(vid1)-this->vert(vid0)).cross(this->vert(vid2)-this->vert(vid0));
         vec3d n2 = (this->vert(vid2)-this->vert(vid0)).cross(this->vert(vid3)-this->vert(vid0));
@@ -153,7 +153,7 @@ void Quadmesh<M,V,E,F>::update_f_normal(const uint fid)
 {
     // compute the best fitting plane
     std::vector<vec3d> points;
-    for(uint off=0; off<this->verts_per_face(fid); ++off) points.push_back(this->face_vert(fid,off));
+    for(uint off=0; off<this->verts_per_face(fid); ++off) points.push_back(this->poly_vert(fid,off));
     Plane best_fit(points);
 
     // adjust orientation (n or -n?)
@@ -163,7 +163,7 @@ void Quadmesh<M,V,E,F>::update_f_normal(const uint fid)
     vec3d v2 = this->vert(tessellated_faces.at(fid).at(2));
     vec3d n  = (v1-v0).cross(v2-v0);
 
-    this->face_data(fid).normal = (best_fit.n.dot(n) < 0) ? -best_fit.n : best_fit.n;
+    this->poly_data(fid).normal = (best_fit.n.dot(n) < 0) ? -best_fit.n : best_fit.n;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -225,7 +225,7 @@ CINO_INLINE
 std::vector<uint> Quadmesh<M,V,E,F>::edges_opposite_to(const uint eid) const
 {
     std::vector<uint> res;
-    for(uint fid : this->adj_e2f(eid))
+    for(uint fid : this->adj_e2p(eid))
     {
         res.push_back(edge_opposite_to(fid,eid));
     }
@@ -239,12 +239,12 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 uint Quadmesh<M,V,E,F>::edge_opposite_to(const uint fid, const uint eid) const
 {
-    assert(this->face_contains_edge(fid,eid));
+    assert(this->poly_contains_edge(fid,eid));
 
     uint vid0 = this->edge_vert_id(eid,0);
     uint vid1 = this->edge_vert_id(eid,1);
 
-    for(uint e : this->adj_f2e(fid))
+    for(uint e : this->adj_p2e(fid))
     {
         if (!this->edge_contains_vert(e,vid0) &&
             !this->edge_contains_vert(e,vid1))
@@ -330,10 +330,10 @@ std::vector<uint> Quadmesh<M,V,E,F>::get_ordered_boundary_vertices() const
     {
         if (this->edge_is_boundary(eid))
         {
-            uint fid  = this->adj_e2f(eid).front();
+            uint fid  = this->adj_e2p(eid).front();
             uint vid0 = this->edge_vert_id(eid,0);
             uint vid1 = this->edge_vert_id(eid,1);
-            if (this->face_vert_offset(fid,vid0) > this->face_vert_offset(fid,vid1))
+            if (this->poly_vert_offset(fid,vid0) > this->poly_vert_offset(fid,vid1))
             {
                 std::swap(vid0,vid1);
             }
@@ -355,8 +355,8 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Quadmesh<M,V,E,F>::operator+=(const Quadmesh<M,V,E,F> & m)
 {
-    AbstractSurfaceMesh<M,V,E,F>::operator +=(m);
-    update_face_tessellation();
+    AbstractPolygonMesh<M,V,E,F>::operator +=(m);
+    update_poly_tessellation();
 }
 
 }

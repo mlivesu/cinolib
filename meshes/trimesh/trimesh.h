@@ -44,7 +44,7 @@ template<class M = Mesh_std_data, // default template arguments
          class V = Vert_std_data,
          class E = Edge_std_data,
          class F = Face_std_data>
-class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
+class Trimesh : public AbstractPolygonMesh<M,V,E,F>
 {
     public:
 
@@ -53,16 +53,16 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
         Trimesh(const char * filename);
 
         Trimesh(const std::vector<vec3d>             & coords,
-                const std::vector<std::vector<uint>> & faces);
+                const std::vector<std::vector<uint>> & polys);
 
         Trimesh(const std::vector<double>            & coords,
-                const std::vector<std::vector<uint>> & faces);
+                const std::vector<std::vector<uint>> & polys);
 
         Trimesh(const std::vector<vec3d> & coords,
-                const std::vector<uint>  & faces);
+                const std::vector<uint>  & polys);
 
         Trimesh(const std::vector<double> & coords,
-                const std::vector<uint>   & faces);
+                const std::vector<uint>   & polys);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -83,7 +83,7 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
         uint   vert_add                (const vec3d & pos);
         uint   vert_opposite_to        (const uint fid, const uint vid0, const uint vid1) const;
 
-        using  AbstractSurfaceMesh<M,V,E,F>::vert_opposite_to; // avoid hiding vert_opposite_to(eid,vid)
+        using  AbstractPolygonMesh<M,V,E,F>::vert_opposite_to; // avoid hiding vert_opposite_to(eid,vid)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -95,25 +95,19 @@ class Trimesh : public AbstractSurfaceMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double face_area               (const uint fid) const;
-        bool   face_is_cap             (const uint fid, const double angle_thresh_deg = 177.0) const;
-        bool   face_is_needle          (const uint fid, const double angle_thresh_deg = 3.0) const;
-        bool   face_bary_coords        (const uint fid, const vec3d & P, std::vector<double> & wgts) const;
-        bool   face_bary_is_vert       (const uint fid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
-        bool   face_bary_is_edge       (const uint fid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
-        void   face_switch_id          (const uint fid0, const uint fid1);
-        uint   face_add                (const uint vid0, const uint vid1, const uint vid2);
-        void   face_set                (const uint fid, const uint vid0, const uint vid1, const uint vid2);
-        void   face_remove_unreferenced(const uint fid);
-        uint   face_edge_id            (const uint fid, const uint offset) const;
+        double poly_area               (const uint fid) const;
+        bool   poly_is_cap             (const uint fid, const double angle_thresh_deg = 177.0) const;
+        bool   poly_is_needle          (const uint fid, const double angle_thresh_deg = 3.0) const;
+        bool   poly_bary_coords        (const uint fid, const vec3d & P, std::vector<double> & wgts) const;
+        bool   poly_bary_is_vert       (const uint fid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
+        bool   poly_bary_is_edge       (const uint fid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
+        void   poly_switch_id          (const uint fid0, const uint fid1);
+        uint   poly_add                (const uint vid0, const uint vid1, const uint vid2);
+        void   poly_set                (const uint fid, const uint vid0, const uint vid1, const uint vid2);
+        void   poly_remove_unreferenced(const uint fid);
+        uint   poly_edge_id            (const uint fid, const uint offset) const;
 
-        using  AbstractMesh<M,V,E,F>::face_edge_id; // avoid hiding face_ege_id(fid,vid0,vid1)
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        bool   elem_bary_coords (const uint fid, const vec3d & P, std::vector<double> & wgts) const;
-        bool   elem_bary_is_vert(const uint fid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
-        bool   elem_bary_is_edge(const uint fid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
+        using  AbstractMesh<M,V,E,F>::poly_edge_id; // avoid hiding poly_ege_id(fid,vid0,vid1)
 };
 
 }

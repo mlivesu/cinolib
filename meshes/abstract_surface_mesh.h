@@ -39,13 +39,13 @@ namespace cinolib
 template<class M,
          class V,
          class E,
-         class F>
-class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
+         class P>
+class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 {
     public:
 
-                 AbstractSurfaceMesh() : AbstractMesh<M,V,E,F>() {}
-        virtual ~AbstractSurfaceMesh() {}
+                 AbstractPolygonMesh() : AbstractMesh<M,V,E,P>() {}
+        virtual ~AbstractPolygonMesh() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -64,31 +64,24 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 
          //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-         void operator+=(const AbstractSurfaceMesh<M,V,E,F> & m);
+         void operator+=(const AbstractPolygonMesh<M,V,E,P> & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual uint verts_per_elem(const uint fid) const { return this->faces.at(fid).size(); }
+        virtual uint verts_per_elem(const uint fid) const { return this->polys.at(fid).size(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual std::vector<int>   export_per_face_labels() const;
-        virtual std::vector<Color> export_per_face_colors() const;
+        virtual std::vector<int>   export_per_poly_labels() const;
+        virtual std::vector<Color> export_per_poly_colors() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual uint num_elems() const { return this->faces.size(); } // elem == face!!
+        virtual uint num_elems() const { return this->polys.size(); } // elem == face!!
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual const std::vector<uint> & adj_elem2elem(const uint fid) const { return this->f2f.at(fid); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        virtual const F & face_data(const uint fid) const { return this->x_data.at(fid); }
-        virtual       F & face_data(const uint fid)       { return this->x_data.at(fid); }
-        virtual const F & elem_data(const uint fid) const { return this->x_data.at(fid); } // elem == face!!
-        virtual       F & elem_data(const uint fid)       { return this->x_data.at(fid); }
+        virtual const std::vector<uint> & adj_poly2poly(const uint fid) const { return this->p2p.at(fid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -107,7 +100,7 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
         virtual bool              vert_is_boundary      (const uint vid) const;
         virtual std::vector<uint> vert_boundary_edges   (const uint vid) const;
         virtual std::vector<uint> vert_ordered_vert_ring(const uint vid) const;
-        virtual std::vector<uint> vert_ordered_face_ring(const uint vid) const;
+        virtual std::vector<uint> vert_ordered_poly_ring(const uint vid) const;
         virtual std::vector<uint> vert_ordered_edge_ring(const uint vid) const;
         virtual std::vector<uint> vert_ordered_edge_link(const uint vid) const;
         virtual void              vert_ordered_one_ring (const uint          vid,
@@ -126,25 +119,18 @@ class AbstractSurfaceMesh : public AbstractMesh<M,V,E,F>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual double face_area              (const uint fid) const = 0;
-        virtual double face_mass              (const uint fid) const;
-        virtual int    face_shared            (const uint eid0, const uint eid1) const;
-        virtual int    face_adjacent_along    (const uint fid, const uint vid0, const uint vid1) const;
-        virtual void   face_flip_winding_order(const uint fid);
-        virtual bool   face_is_boundary       (const uint fid) const;
-        virtual int    face_opposite_to       (const uint eid, const uint fid) const;
-        virtual void   face_set_color         (const Color & c);
-        virtual void   face_set_alpha         (const float alpha);
-        virtual void   face_color_wrt_label   ();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        virtual vec3d  elem_vert        (const uint fid, const uint offset) const;
-        virtual uint   elem_vert_id     (const uint fid, const uint offset) const;
-        virtual uint   elem_vert_offset (const uint fid, const uint vid) const;
-        virtual vec3d  elem_centroid    (const uint fid) const;
-        virtual void   elem_show_all    ();
-        virtual double elem_mass        (const uint fid) const;
+        virtual void   poly_show_all          ();
+        virtual double poly_angle_at_vert     (const uint fid, const uint vid, const int unit = RAD) const;
+        virtual double poly_area              (const uint fid) const = 0;
+        virtual double poly_mass              (const uint fid) const;
+        virtual int    poly_shared            (const uint eid0, const uint eid1) const;
+        virtual int    poly_adjacent_along    (const uint fid, const uint vid0, const uint vid1) const;
+        virtual void   poly_flip_winding_order(const uint fid);
+        virtual bool   poly_is_boundary       (const uint fid) const;
+        virtual int    poly_opposite_to       (const uint eid, const uint fid) const;
+        virtual void   poly_set_color         (const Color & c);
+        virtual void   poly_set_alpha         (const float alpha);
+        virtual void   poly_color_wrt_label   ();
 };
 
 }

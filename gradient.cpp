@@ -45,9 +45,9 @@ Eigen::SparseMatrix<double> gradient<Trimesh<>>(const Trimesh<> & m)
 
     for(uint fid=0; fid<m.num_faces(); ++fid)
     {
-        uint i = m.face_vert_id(fid, 0);
-        uint j = m.face_vert_id(fid, 1);
-        uint k = m.face_vert_id(fid, 2);
+        uint i = m.poly_vert_id(fid, 0);
+        uint j = m.poly_vert_id(fid, 1);
+        uint k = m.poly_vert_id(fid, 2);
 
         vec3d vi = m.vert(i);
         vec3d vj = m.vert(j);
@@ -55,13 +55,13 @@ Eigen::SparseMatrix<double> gradient<Trimesh<>>(const Trimesh<> & m)
         vec3d ik = vi - vk;
         vec3d ji = vj - vi;
 
-        vec3d  axis  = m.face_data(fid).normal;
+        vec3d  axis  = m.poly_data(fid).normal;
         double angle = M_PI * 0.5;
 
         rotate(ik, axis, angle);
         rotate(ji, axis, angle);
 
-        double dblA = m.elem_mass(fid);
+        double dblA = m.poly_mass(fid);
 
         ik /= dblA;
         ji /= dblA;

@@ -233,27 +233,27 @@ std::vector<uint> Isocontour::tessellate(Trimesh<> & m) const
             uint v0       = edgesplit2newvid.at(e0);
             uint v1       = edgesplit2newvid.at(e1);
             uint shared_v = m.vert_shared(e0,e1);
-            int  fid      = m.face_shared(e0,e1); assert(fid!=-1);
+            int  fid      = m.poly_shared(e0,e1); assert(fid!=-1);
             uint e0_opp   = m.vert_opposite_to(e0, shared_v);
             uint e1_opp   = m.vert_opposite_to(e1, shared_v);
 
             vec3d A = m.vert(shared_v);
             vec3d B = m.vert(v0);
             vec3d C = m.vert(v1);
-            vec3d n = m.face_data(fid).normal;
+            vec3d n = m.poly_data(fid).normal;
 
-                         m.face_set(fid, shared_v, v0, v1);
-            uint newf0 = m.face_add(v0, e0_opp, e1_opp);
-            uint newf1 = m.face_add(v0, e1_opp, v1);
+                         m.poly_set(fid, shared_v, v0, v1);
+            uint newf0 = m.poly_add(v0, e0_opp, e1_opp);
+            uint newf1 = m.poly_add(v0, e1_opp, v1);
 
-            m.face_data(newf0) = m.face_data(fid);
-            m.face_data(newf1) = m.face_data(fid);
+            m.poly_data(newf0) = m.poly_data(fid);
+            m.poly_data(newf1) = m.poly_data(fid);
 
             if (!orientation_check_passed(n, B-A, C-A))
             {
-                m.face_flip_winding_order(fid);
-                m.face_flip_winding_order(newf0);
-                m.face_flip_winding_order(newf1);
+                m.poly_flip_winding_order(fid);
+                m.poly_flip_winding_order(newf0);
+                m.poly_flip_winding_order(newf1);
             }
         }
     }

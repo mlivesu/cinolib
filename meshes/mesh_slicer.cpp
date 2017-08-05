@@ -50,7 +50,7 @@ MeshSlicer<Mesh>::MeshSlicer(Mesh & m)
     slice_sign  [3] = GEQ; // Q
     slice_mode      = AND;
 
-    m.elem_show_all();
+    m.poly_show_all();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -96,9 +96,9 @@ void MeshSlicer<Mesh>::update(Mesh & m)
 {
     for(uint eid=0; eid<m.num_elems(); ++eid)
     {
-        vec3d  c = m.elem_centroid(eid);
-        float  q = m.elem_data(eid).quality;
-        int    l = m.elem_data(eid).label;
+        vec3d  c = m.poly_centroid(eid);
+        float  q = m.poly_data(eid).quality;
+        int    l = m.poly_data(eid).label;
 
         bool pass_X = (slice_sign[0] == LEQ) ? (c.x() <= slice_thresh[0]) : (c.x() >= slice_thresh[0]);
         bool pass_Y = (slice_sign[1] == LEQ) ? (c.y() <= slice_thresh[1]) : (c.y() >= slice_thresh[1]);
@@ -109,7 +109,7 @@ void MeshSlicer<Mesh>::update(Mesh & m)
         bool b = (slice_mode == AND) ? ( pass_X &&  pass_Y &&  pass_Z &&  pass_L &&  pass_Q)
                                      : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
 
-        m.elem_data(eid).visible = b;
+        m.poly_data(eid).visible = b;
 
         //std::cout << pass_X << " " << pass_Y << " " << pass_Z << " " << pass_Q << " " << pass_L << std::endl;
     }   

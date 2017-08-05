@@ -53,16 +53,16 @@ class DrawableTrimesh : public Trimesh<M,V,E,F>, public DrawableObject
         DrawableTrimesh(const char * filename);
 
         DrawableTrimesh(const std::vector<vec3d> & verts,
-                        const std::vector<uint>  & faces);
+                        const std::vector<uint>  & polys);
 
         DrawableTrimesh(const std::vector<double> & coords,
-                        const std::vector<uint>   & faces);
+                        const std::vector<uint>   & polys);
 
         DrawableTrimesh(const std::vector<vec3d>             & coords,
-                        const std::vector<std::vector<uint>> & faces);
+                        const std::vector<std::vector<uint>> & polys);
 
         DrawableTrimesh(const std::vector<double>            & coords,
-                        const std::vector<std::vector<uint>> & faces);
+                        const std::vector<std::vector<uint>> & polys);
 
     protected:
 

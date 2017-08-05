@@ -36,35 +36,35 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,F>::clear()
+void AbstractMesh<M,V,E,P>::clear()
 {
     bb.reset();
     //
     verts.clear();
     edges.clear();
-    faces.clear();
+    polys.clear();
     //
     M std_M_data;
     m_data = std_M_data;
     v_data.clear();
     e_data.clear();
-    x_data.clear();
+    p_data.clear();
     //
     v2v.clear();
     v2e.clear();
-    v2f.clear();
-    e2f.clear();
-    f2e.clear();
-    f2f.clear();
+    v2p.clear();
+    e2p.clear();
+    p2e.clear();
+    p2p.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-vec3d AbstractMesh<M,V,E,F>::centroid() const
+vec3d AbstractMesh<M,V,E,P>::centroid() const
 {
     vec3d bary(0,0,0);
     for(auto p : this->verts) bary += p;
@@ -74,9 +74,9 @@ vec3d AbstractMesh<M,V,E,F>::centroid() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,F>::translate(const vec3d & delta)
+void AbstractMesh<M,V,E,P>::translate(const vec3d & delta)
 {
     for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) += delta;
     this->update_bbox();
@@ -84,9 +84,9 @@ void AbstractMesh<M,V,E,F>::translate(const vec3d & delta)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,F>::rotate(const vec3d & axis, const double angle)
+void AbstractMesh<M,V,E,P>::rotate(const vec3d & axis, const double angle)
 {
     double R[3][3];
     bake_rotation_matrix(axis, angle, R);
@@ -106,9 +106,9 @@ void AbstractMesh<M,V,E,F>::rotate(const vec3d & axis, const double angle)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,F>::scale(const double scale_factor)
+void AbstractMesh<M,V,E,P>::scale(const double scale_factor)
 {
     vec3d c = centroid();
     translate(-c);
@@ -119,9 +119,9 @@ void AbstractMesh<M,V,E,F>::scale(const double scale_factor)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractMesh<M,V,E,F>::connected_components() const
+uint AbstractMesh<M,V,E,P>::connected_components() const
 {
     std::vector<std::set<uint>> ccs;
     return connected_components(ccs);
@@ -129,9 +129,9 @@ uint AbstractMesh<M,V,E,F>::connected_components() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractMesh<M,V,E,F>::connected_components(std::vector<std::set<uint>> & ccs) const
+uint AbstractMesh<M,V,E,P>::connected_components(std::vector<std::set<uint>> & ccs) const
 {
     ccs.clear();
     uint seed = 0;
@@ -140,7 +140,7 @@ uint AbstractMesh<M,V,E,F>::connected_components(std::vector<std::set<uint>> & c
     do
     {
         std::set<uint> cc;
-        bfs_exahustive<AbstractMesh<M,V,E,F>>(*this, seed, cc);
+        bfs_exahustive<AbstractMesh<M,V,E,P>>(*this, seed, cc);
 
         ccs.push_back(cc);
         for(uint vid : cc) visited.at(vid) = true;
@@ -155,9 +155,9 @@ uint AbstractMesh<M,V,E,F>::connected_components(std::vector<std::set<uint>> & c
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,F>::update_bbox()
+void AbstractMesh<M,V,E,P>::update_bbox()
 {
     bb.reset();
     for(uint vid=0; vid<num_verts(); ++vid)
@@ -170,9 +170,9 @@ void AbstractMesh<M,V,E,F>::update_bbox()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<double> AbstractMesh<M,V,E,F>::vector_coords() const
+std::vector<double> AbstractMesh<M,V,E,P>::vector_coords() const
 {
     std::vector<double> coords;
     for(uint vid=0; vid<num_verts(); ++vid)
@@ -186,9 +186,9 @@ std::vector<double> AbstractMesh<M,V,E,F>::vector_coords() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<float> AbstractMesh<M,V,E,F>::export_uvw_param(const int mode) const
+std::vector<float> AbstractMesh<M,V,E,P>::export_uvw_param(const int mode) const
 {
     std::vector<float> uvw;
     uvw.reserve(num_verts());
@@ -216,9 +216,9 @@ std::vector<float> AbstractMesh<M,V,E,F>::export_uvw_param(const int mode) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-std::set<uint> AbstractMesh<M,V,E,F>::vert_n_ring(const uint vid, const uint n) const
+std::set<uint> AbstractMesh<M,V,E,P>::vert_n_ring(const uint vid, const uint n) const
 {
     std::set<uint> active_set;
     std::set<uint> ring;
@@ -242,9 +242,9 @@ std::set<uint> AbstractMesh<M,V,E,F>::vert_n_ring(const uint vid, const uint n) 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractMesh<M,V,E,F>::verts_are_adjacent(const uint vid0, const uint vid1) const
+bool AbstractMesh<M,V,E,P>::verts_are_adjacent(const uint vid0, const uint vid1) const
 {
     for(uint nbr : adj_v2v(vid0)) if (vid1==nbr) return true;
     return false;
@@ -252,9 +252,9 @@ bool AbstractMesh<M,V,E,F>::verts_are_adjacent(const uint vid0, const uint vid1)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractMesh<M,V,E,F>::vert_is_local_min(const uint vid, const int tex_coord) const
+bool AbstractMesh<M,V,E,P>::vert_is_local_min(const uint vid, const int tex_coord) const
 {
     for(uint nbr : adj_v2v(vid))
     {
@@ -271,9 +271,9 @@ bool AbstractMesh<M,V,E,F>::vert_is_local_min(const uint vid, const int tex_coor
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractMesh<M,V,E,F>::vert_is_local_max(const uint vid, const int tex_coord) const
+bool AbstractMesh<M,V,E,P>::vert_is_local_max(const uint vid, const int tex_coord) const
 {
     for(uint nbr : adj_v2v(vid))
     {
@@ -290,18 +290,18 @@ bool AbstractMesh<M,V,E,F>::vert_is_local_max(const uint vid, const int tex_coor
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractMesh<M,V,E,F>::vert_valence(const uint vid) const
+uint AbstractMesh<M,V,E,P>::vert_valence(const uint vid) const
 {
     return adj_v2v(vid).size();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractMesh<M,V,E,F>::vert_shared(const uint eid0, const uint eid1) const
+uint AbstractMesh<M,V,E,P>::vert_shared(const uint eid0, const uint eid1) const
 {
     uint e00 = edge_vert_id(eid0,0);
     uint e01 = edge_vert_id(eid0,1);
@@ -314,9 +314,9 @@ uint AbstractMesh<M,V,E,F>::vert_shared(const uint eid0, const uint eid1) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,F>::vert_set_color(const Color & c)
+void AbstractMesh<M,V,E,P>::vert_set_color(const Color & c)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
     {
@@ -326,9 +326,9 @@ void AbstractMesh<M,V,E,F>::vert_set_color(const Color & c)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,F>::vert_set_alpha(const float alpha)
+void AbstractMesh<M,V,E,P>::vert_set_alpha(const float alpha)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
     {
@@ -338,9 +338,9 @@ void AbstractMesh<M,V,E,F>::vert_set_alpha(const float alpha)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractMesh<M,V,E,F>::edge_vert_id(const uint eid, const uint offset) const
+uint AbstractMesh<M,V,E,P>::edge_vert_id(const uint eid, const uint offset) const
 {
     uint   eid_ptr = eid * 2;
     return edges.at(eid_ptr + offset);
@@ -348,18 +348,18 @@ uint AbstractMesh<M,V,E,F>::edge_vert_id(const uint eid, const uint offset) cons
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-vec3d AbstractMesh<M,V,E,F>::edge_vert(const uint eid, const uint offset) const
+vec3d AbstractMesh<M,V,E,P>::edge_vert(const uint eid, const uint offset) const
 {
     return vert(edge_vert_id(eid,offset));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractMesh<M,V,E,F>::edge_contains_vert(const uint eid, const uint vid) const
+bool AbstractMesh<M,V,E,P>::edge_contains_vert(const uint eid, const uint vid) const
 {
     if (edge_vert_id(eid,0) == vid) return true;
     if (edge_vert_id(eid,1) == vid) return true;
@@ -368,18 +368,18 @@ bool AbstractMesh<M,V,E,F>::edge_contains_vert(const uint eid, const uint vid) c
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractMesh<M,V,E,F>::edge_length(const uint eid) const
+double AbstractMesh<M,V,E,P>::edge_length(const uint eid) const
 {
     return (edge_vert(eid,0) - edge_vert(eid,1)).length();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractMesh<M,V,E,F>::edge_avg_length() const
+double AbstractMesh<M,V,E,P>::edge_avg_length() const
 {
     double avg = 0;
     for(uint eid=0; eid<num_edges(); ++eid) avg += edge_length(eid);
@@ -389,9 +389,9 @@ double AbstractMesh<M,V,E,F>::edge_avg_length() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractMesh<M,V,E,F>::edge_max_length() const
+double AbstractMesh<M,V,E,P>::edge_max_length() const
 {
     double max = 0;
     for(uint eid=0; eid<num_edges(); ++eid) max = std::max(max, edge_length(eid));
@@ -400,9 +400,9 @@ double AbstractMesh<M,V,E,F>::edge_max_length() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractMesh<M,V,E,F>::edge_min_length() const
+double AbstractMesh<M,V,E,P>::edge_min_length() const
 {
     double min = 0;
     for(uint eid=0; eid<num_edges(); ++eid) min = std::min(min,edge_length(eid));
@@ -411,9 +411,9 @@ double AbstractMesh<M,V,E,F>::edge_min_length() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,F>::edge_set_color(const Color & c)
+void AbstractMesh<M,V,E,P>::edge_set_color(const Color & c)
 {
     for(uint eid=0; eid<num_edges(); ++eid)
     {
@@ -423,9 +423,9 @@ void AbstractMesh<M,V,E,F>::edge_set_color(const Color & c)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,F>::edge_set_alpha(const float alpha)
+void AbstractMesh<M,V,E,P>::edge_set_alpha(const float alpha)
 {
     for(uint eid=0; eid<num_edges(); ++eid)
     {
@@ -435,32 +435,32 @@ void AbstractMesh<M,V,E,F>::edge_set_alpha(const float alpha)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractMesh<M,V,E,F>::face_vert_id(const uint fid, const uint offset) const
+uint AbstractMesh<M,V,E,P>::poly_vert_id(const uint fid, const uint offset) const
 {
-    return faces.at(fid).at(offset);
+    return polys.at(fid).at(offset);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-vec3d AbstractMesh<M,V,E,F>::face_vert(const uint fid, const uint offset) const
+vec3d AbstractMesh<M,V,E,P>::poly_vert(const uint fid, const uint offset) const
 {
-    return vert(face_vert_id(fid,offset));
+    return vert(poly_vert_id(fid,offset));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractMesh<M,V,E,F>::face_edge_id(const uint fid, const uint vid0, const uint vid1) const
+uint AbstractMesh<M,V,E,P>::poly_edge_id(const uint fid, const uint vid0, const uint vid1) const
 {
-    assert(face_contains_vert(fid,vid0));
-    assert(face_contains_vert(fid,vid1));
+    assert(poly_contains_vert(fid,vid0));
+    assert(poly_contains_vert(fid,vid1));
 
-    for(uint eid : adj_f2e(fid))
+    for(uint eid : adj_p2e(fid))
     {
         if (edge_contains_vert(eid,vid0) && edge_contains_vert(eid,vid1)) return eid;
     }
@@ -470,27 +470,27 @@ uint AbstractMesh<M,V,E,F>::face_edge_id(const uint fid, const uint vid0, const 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractMesh<M,V,E,F>::face_vert_offset(const uint fid, const uint vid) const
+uint AbstractMesh<M,V,E,P>::poly_vert_offset(const uint fid, const uint vid) const
 {
     for(uint offset=0; offset<verts_per_face(fid); ++offset)
     {
-        if (face_vert_id(fid,offset) == vid) return offset;
+        if (poly_vert_id(fid,offset) == vid) return offset;
     }
     assert(false && "Something is off here...");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-vec3d AbstractMesh<M,V,E,F>::face_centroid(const uint fid) const
+vec3d AbstractMesh<M,V,E,P>::poly_centroid(const uint fid) const
 {
     vec3d c(0,0,0);
     for(uint off=0; off<verts_per_face(fid); ++off)
     {
-        c += face_vert(fid,off);
+        c += poly_vert(fid,off);
     }
     c /= static_cast<double>(verts_per_face(fid));
     return c;
@@ -498,63 +498,32 @@ vec3d AbstractMesh<M,V,E,F>::face_centroid(const uint fid) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractMesh<M,V,E,F>::face_angle_at_vert(const uint fid, const uint vid, const int unit) const
-{
-    assert(face_contains_vert(fid,vid));
-
-    uint offset = 0;
-    for(uint i=0; i<verts_per_face(fid); ++i) if (face_vert_id(fid,i) == vid) offset = i;
-    assert(face_vert_id(fid,offset) == vid);
-    //
-    // the code above substitutes this one (which was specific for AbstractMeshes...)
-    //
-    //     if (face_vert_id(fid,0) == vid) offset = 0;
-    //else if (face_vert_id(fid,1) == vid) offset = 1;
-    //else if (face_vert_id(fid,2) == vid) offset = 2;
-    //else { assert(false); offset=0; } // offset=0 kills uninitialized warning message
-
-    vec3d P = vert(vid);
-    vec3d u = face_vert(fid,(offset+1)%verts_per_face(fid)) - P;
-    vec3d v = face_vert(fid,(offset+2)%verts_per_face(fid)) - P;
-
-    switch (unit)
-    {
-        case RAD : return u.angle_rad(v);
-        case DEG : return u.angle_deg(v);
-        default  : assert(false);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-bool AbstractMesh<M,V,E,F>::face_contains_vert(const uint fid, const uint vid) const
+bool AbstractMesh<M,V,E,P>::poly_contains_vert(const uint fid, const uint vid) const
 {
     for(uint off=0; off<verts_per_face(fid); ++off)
     {
-        if (face_vert_id(fid,off) == vid) return true;
+        if (poly_vert_id(fid,off) == vid) return true;
     }
     return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractMesh<M,V,E,F>::face_contains_edge(const uint fid, const uint eid) const
+bool AbstractMesh<M,V,E,P>::poly_contains_edge(const uint fid, const uint eid) const
 {
-    for(uint e : adj_f2e(fid)) if (e == eid) return true;
+    for(uint e : adj_p2e(fid)) if (e == eid) return true;
     return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,F>::center_bbox()
+void AbstractMesh<M,V,E,P>::center_bbox()
 {
     vec3d center = bb.center();
     for(uint vid=0; vid<num_verts(); ++vid) vert(vid) -= center;

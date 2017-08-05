@@ -166,10 +166,10 @@ class Tetmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const std::vector<uint> & adj_vert2elem(const uint vid) const { return v2c.at(vid); }
-        const std::vector<uint> & adj_edge2elem(const uint eid) const { return e2c.at(eid); }
-        const std::vector<uint> & adj_elem2edge(const uint cid) const { return c2e.at(cid); }
-        const std::vector<uint> & adj_elem2elem(const uint cid) const { return c2c.at(cid); }
+        const std::vector<uint> & adj_vert2poly(const uint vid) const { return v2c.at(vid); }
+        const std::vector<uint> & adj_edge2poly(const uint eid) const { return e2c.at(eid); }
+        const std::vector<uint> & adj_poly2edge(const uint cid) const { return c2e.at(cid); }
+        const std::vector<uint> & adj_poly2poly(const uint cid) const { return c2c.at(cid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -183,8 +183,8 @@ class Tetmesh
               F & face_data(const uint fid)       { return f_data.at(fid); }
         const C & cell_data(const uint cid) const { return c_data.at(cid); }
               C & cell_data(const uint cid)       { return c_data.at(cid); }
-        const C & elem_data(const uint cid) const { return c_data.at(cid); } // elem == cell!!
-              C & elem_data(const uint cid)       { return c_data.at(cid); }
+        const C & poly_data(const uint cid) const { return c_data.at(cid); } // elem == cell!!
+              C & poly_data(const uint cid)       { return c_data.at(cid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -249,15 +249,15 @@ class Tetmesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // These are all wraps for the "cell_ methods". They are useful for generic
-        // programming, because "elem_" will wrap face_ for surface meshes and wrap
+        // programming, because "poly_" will wrap face_ for surface meshes and wrap
         // "cell_" for volumetric meshes, allowing the use of templated algorithms
         // that work with both types of meshes without requiring specialzed code
 
-        vec3d  elem_centroid   (const uint cid) const;
-        void   elem_show_all   ();
-        vec3d  elem_vert       (const uint cid, const uint off) const;
-        uint   elem_vert_id    (const uint cid, const uint off) const;
-        bool   elem_bary_coords(const uint cid, const vec3d & P, std::vector<double> & wgts) const;
+        vec3d  poly_centroid   (const uint cid) const;
+        void   poly_show_all   ();
+        vec3d  poly_vert       (const uint cid, const uint off) const;
+        uint   poly_vert_id    (const uint cid, const uint off) const;
+        bool   poly_bary_coords(const uint cid, const vec3d & P, std::vector<double> & wgts) const;
 
 };
 

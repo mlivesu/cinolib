@@ -44,12 +44,12 @@ PointInsideMeshCache<Mesh>::PointInsideMeshCache(const Mesh & m, const uint octr
 
     for(uint eid=0; eid<m.num_elems(); ++eid)
     {
-        vec3d min = m.elem_vert(eid, 0);
+        vec3d min = m.poly_vert(eid, 0);
         vec3d max = min;
         for(uint i=1; i<m.verts_per_elem(eid); ++i)
         {
-            min = min.min(m.elem_vert(eid, i));
-            max = max.max(m.elem_vert(eid, i));
+            min = min.min(m.poly_vert(eid, i));
+            max = max.max(m.poly_vert(eid, i));
         }
         octree.add_item(eid, min, max);
     }
@@ -69,7 +69,7 @@ void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & eid, std::vector<d
 
     for(uint id : items)
     {
-        if (m_ptr->elem_bary_coords(id, p, wgts)) // if is inside...
+        if (m_ptr->poly_bary_coords(id, p, wgts)) // if is inside...
         {
             eid = id;
             return;
@@ -87,7 +87,7 @@ void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & eid, std::vector<d
     std::set<std::pair<double,uint>,std::greater<std::pair<double,uint>>> ordered_items;
     for(int item : items)
     {
-        ordered_items.insert(std::make_pair(m_ptr->elem_centroid(item).dist(p),item));
+        ordered_items.insert(std::make_pair(m_ptr->poly_centroid(item).dist(p),item));
     }
     assert(ordered_items.size()>0);
     eid = (*ordered_items.begin()).second;
@@ -110,7 +110,7 @@ vec3d PointInsideMeshCache<Mesh>::locate(const vec3d p, const Mesh & m) const
     vec3d tmp(0,0,0);
     for(uint off=0; off<m.verts_per_elem(eid); ++off)
     {
-        tmp += wgts.at(off) * m.elem_vert(eid,off);
+        tmp += wgts.at(off) * m.poly_vert(eid,off);
     }
     return tmp;
 }

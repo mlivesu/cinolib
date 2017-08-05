@@ -53,16 +53,16 @@ class DrawableQuadmesh : public Quadmesh<M,V,E,F>, public DrawableObject
         DrawableQuadmesh(const char * filename);
 
         DrawableQuadmesh(const std::vector<vec3d> & verts,
-                         const std::vector<uint>  & faces);
+                         const std::vector<uint>  & polys);
 
         DrawableQuadmesh(const std::vector<double> & coords,
-                         const std::vector<uint>   & faces);
+                         const std::vector<uint>   & polys);
 
         DrawableQuadmesh(const std::vector<vec3d>             & verts,
-                         const std::vector<std::vector<uint>> & faces);
+                         const std::vector<std::vector<uint>> & polys);
 
         DrawableQuadmesh(const std::vector<double>            & verts,
-                         const std::vector<std::vector<uint>> & faces);
+                         const std::vector<std::vector<uint>> & polys);
 
     protected:
 

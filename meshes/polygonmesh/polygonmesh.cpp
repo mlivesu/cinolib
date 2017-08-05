@@ -54,7 +54,7 @@ Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<vec3d>             & verts,
                                   const std::vector<std::vector<uint>> & faces)
 {
     this->verts = verts;
-    this->faces = faces;
+    this->polys = faces;
     init();
 }
 
@@ -66,7 +66,7 @@ Polygonmesh<M,V,E,F>::Polygonmesh(const std::vector<double>            & coords,
                                   const std::vector<std::vector<uint>> & faces)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    this->faces = faces;
+    this->polys = faces;
     init();
 }
 
@@ -86,15 +86,15 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Polygonmesh<M,V,E,F>::init()
 {
-    update_face_tessellation();
-    AbstractSurfaceMesh<M,V,E,F>::init();
+    update_poly_tessellation();
+    AbstractPolygonMesh<M,V,E,F>::init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F>
 CINO_INLINE
-void Polygonmesh<M,V,E,F>::update_face_tessellation()
+void Polygonmesh<M,V,E,F>::update_poly_tessellation()
 {
     tessellated_faces.resize(this->num_faces());
     std::set<uint> bad_faces;
@@ -105,9 +105,9 @@ void Polygonmesh<M,V,E,F>::update_face_tessellation()
         std::vector<vec3d> n;
         for (uint i=2; i<this->verts_per_face(fid); ++i)
         {
-            uint vid0 = this->faces.at(fid).at( 0 );
-            uint vid1 = this->faces.at(fid).at(i-1);
-            uint vid2 = this->faces.at(fid).at( i );
+            uint vid0 = this->polys.at(fid).at( 0 );
+            uint vid1 = this->polys.at(fid).at(i-1);
+            uint vid2 = this->polys.at(fid).at( i );
 
             tessellated_faces.at(fid).push_back(vid0);
             tessellated_faces.at(fid).push_back(vid1);
@@ -134,17 +134,17 @@ void Polygonmesh<M,V,E,F>::update_f_normal(const uint fid)
 {
     // compute the best fitting plane
     std::vector<vec3d> points;
-    for(uint off=0; off<this->verts_per_face(fid); ++off) points.push_back(this->face_vert(fid,off));
+    for(uint off=0; off<this->verts_per_face(fid); ++off) points.push_back(this->poly_vert(fid,off));
     Plane best_fit(points);
 
     // adjust orientation (n or -n?)
-    vec3d v0 = this->face_vert(fid,0);
-    vec3d v1 = this->face_vert(fid,1);
+    vec3d v0 = this->poly_vert(fid,0);
+    vec3d v1 = this->poly_vert(fid,1);
     uint  i=2;
     vec3d ccw;
-    do { ccw = (v1-v0).cross(this->face_vert(fid,i)-v0); ++i; } while (ccw.length_squared()==0 && i<this->verts_per_face(fid));
+    do { ccw = (v1-v0).cross(this->poly_vert(fid,i)-v0); ++i; } while (ccw.length_squared()==0 && i<this->verts_per_face(fid));
 
-    this->face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
+    this->poly_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -168,10 +168,10 @@ std::vector<uint> Polygonmesh<M,V,E,F>::get_ordered_boundary_vertices() const
     {
         if (this->edge_is_boundary(eid))
         {
-            uint fid  = this->adj_e2f(eid).front();
+            uint fid  = this->adj_e2p(eid).front();
             uint vid0 = this->edge_vert_id(eid,0);
             uint vid1 = this->edge_vert_id(eid,1);
-            if (this->face_vert_offset(fid,vid0) > this->face_vert_offset(fid,vid1))
+            if (this->poly_vert_offset(fid,vid0) > this->poly_vert_offset(fid,vid1))
             {
                 std::swap(vid0,vid1);
             }
@@ -193,8 +193,8 @@ template<class M, class V, class E, class F>
 CINO_INLINE
 void Polygonmesh<M,V,E,F>::operator+=(const Polygonmesh<M,V,E,F> & m)
 {
-    AbstractSurfaceMesh<M,V,E,F>::operator +=(m);
-    update_face_tessellation();
+    AbstractPolygonMesh<M,V,E,F>::operator +=(m);
+    update_poly_tessellation();
 }
 
 }

@@ -58,7 +58,7 @@ void dual_mesh(const Trimesh<>                      & primal,
     dual_verts.resize(primal.num_elems());
     for(uint eid=0; eid<primal.num_elems(); ++eid)
     {
-        dual_verts.at(eid) = primal.elem_centroid(eid);
+        dual_verts.at(eid) = primal.poly_centroid(eid);
     }
 
     // Add boundary vertices as well as boundary edges' midpoints
@@ -88,7 +88,7 @@ void dual_mesh(const Trimesh<>                      & primal,
         if (clipped_cell && !with_clipped_cells) continue;
 
         std::vector<uint> f;
-        std::vector<uint> f_ring = primal.vert_ordered_face_ring(vid);
+        std::vector<uint> f_ring = primal.vert_ordered_poly_ring(vid);
         for(uint fid : f_ring) f.push_back(fid);
 
         if (clipped_cell) // add boundary portion (vertex vid + boundary edges' midpoints)
