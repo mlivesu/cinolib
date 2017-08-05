@@ -523,6 +523,18 @@ bool AbstractMesh<M,V,E,P>::poly_contains_edge(const uint fid, const uint eid) c
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_show_all()
+{
+    for(uint pid=0; pid<num_polys(); ++pid)
+    {
+        poly_data(pid).visible = true;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractMesh<M,V,E,P>::center_bbox()
 {
     vec3d center = bb.center();

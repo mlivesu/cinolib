@@ -33,4 +33,28 @@
 namespace cinolib
 {
 
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::clear()
+{
+    AbstractMesh<M,V,E,P>::clear();
+    //
+    faces.clear();
+    triangulated_faces.clear();
+    polys_face_winding.clear();
+    //
+    v_on_srf.clear();
+    e_on_srf.clear();
+    f_on_srf.clear();
+    //
+    f_data.clear();
+    //
+    v2f.clear();
+    e2f.clear();
+    f2e.clear();
+    f2f.clear();
+    f2p.clear();
+    p2v.clear();
+}
+
 }

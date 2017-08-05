@@ -59,51 +59,13 @@ Polyhedralmesh<M,V,E,F,P>::Polyhedralmesh(const std::vector<vec3d>             &
                                           const std::vector<std::vector<uint>> & faces,
                                           const std::vector<std::vector<uint>> & polys,
                                           const std::vector<std::vector<bool>> & polys_face_winding)
-: verts(verts)
-, faces(faces)
-, polys(polys)
-, polys_face_winding(polys_face_winding)
 {
+    this->verts = verts;
+    this->faces = faces;
+    this->polys = polys;
+    this->polys_face_winding = polys_face_winding;
+
     init();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Polyhedralmesh<M,V,E,F,P>::clear()
-{
-    bb.reset();
-    //
-    verts.clear();
-    edges.clear();
-    faces.clear();
-    triangulated_faces.clear();
-    polys.clear();
-    polys_face_winding.clear();
-    v_on_srf.clear();
-    e_on_srf.clear();
-    f_on_srf.clear();
-    //
-    M tmp;
-    m_data = tmp;;
-    v_data.clear();
-    e_data.clear();
-    f_data.clear();
-    p_data.clear();
-    //
-    v2v.clear();
-    v2e.clear();
-    v2f.clear();
-    v2p.clear();
-    e2f.clear();
-    e2p.clear();
-    f2e.clear();
-    f2f.clear();
-    f2p.clear();
-    p2v.clear();
-    p2e.clear();
-    p2p.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -112,7 +74,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
 {
-    clear();
+    this->clear();
     std::vector<double> coords;
 
     std::string str(filename);
@@ -121,7 +83,7 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
     if (filetype.compare(".hybrid") == 0 ||
         filetype.compare(".HYBRID") == 0)
     {
-        read_HYBDRID(filename, coords, faces, polys, polys_face_winding);
+        read_HYBDRID(filename, coords, this->faces, this->polys, this->polys_face_winding);
     }
     else
     {
@@ -129,11 +91,11 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
         exit(-1);
     }
 
-    verts = vec3d_from_serialized_xyz(coords);
+    this->verts = vec3d_from_serialized_xyz(coords);
 
-    logger << num_verts() << " verts read" << endl;
-    logger << num_faces() << " faces read" << endl;
-    logger << num_polys() << " polys read" << endl;
+    logger << this->num_verts() << " verts read" << endl;
+    logger << this->num_faces() << " faces read" << endl;
+    logger << this->num_polys() << " polys read" << endl;
 
     this->mesh_data().filename = std::string(filename);
 }
@@ -144,31 +106,16 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Polyhedralmesh<M,V,E,F,P>::init()
 {
-    update_face_tessellation();
-    update_adjacency();
-    update_bbox();
+    this->update_face_tessellation();
+    this->update_adjacency();
+    this->update_bbox();
 
-    v_data.resize(num_verts());
-    e_data.resize(num_edges());
-    f_data.resize(num_faces());
-    p_data.resize(num_polys());
+    this->v_data.resize(this->num_verts());
+    this->e_data.resize(this->num_edges());
+    this->f_data.resize(this->num_faces());
+    this->p_data.resize(this->num_polys());
 
-    update_f_normals();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Polyhedralmesh<M,V,E,F,P>::update_bbox()
-{
-    bb.reset();
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        vec3d v = vert(vid);
-        bb.min = bb.min.min(v);
-        bb.max = bb.max.max(v);
-    }
+    this->update_f_normals();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -177,7 +124,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Polyhedralmesh<M,V,E,F,P>::update_adjacency()
 {
-    v2v.clear(); v2v.resize(num_verts());
+    this->v2v.clear(); v2v.resize(num_verts());
     v2e.clear(); v2e.resize(num_verts());
     v2f.clear(); v2f.resize(num_verts());
     v2p.clear(); v2p.resize(num_verts());
@@ -412,18 +359,6 @@ vec3d Polyhedralmesh<M,V,E,F,P>::poly_centroid(const uint pid) const
     for(uint vid : adj_p2v(pid)) c += vert(vid);
     c /= static_cast<double>(verts_per_poly(pid));
     return c;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Polyhedralmesh<M,V,E,F,P>::poly_show_all()
-{
-    for(uint pid=0; pid<num_polys(); ++pid)
-    {
-        poly_data(pid).visible = true;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -107,7 +107,6 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void   poly_show_all          ();
         virtual double poly_angle_at_vert     (const uint pid, const uint vid, const int unit = RAD) const;
         virtual double poly_area              (const uint pid) const = 0;
         virtual double poly_mass              (const uint pid) const;

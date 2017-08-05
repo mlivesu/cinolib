@@ -673,18 +673,6 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::get_boundary_vertices() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractPolygonMesh<M,V,E,P>::poly_show_all()
-{
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        this->poly_data(pid).visible = true;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 double AbstractPolygonMesh<M,V,E,P>::poly_mass(const uint pid) const
 {
     return this->poly_area(pid);

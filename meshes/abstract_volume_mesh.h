@@ -41,15 +41,17 @@ template<class M, // mesh attributes
          class E, // edge attributes
          class F, // face attributes
          class P> // polyhedron attributes
-class AbstractVolumeMesh : public AbstractMesh<M,V,E,P>
+class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 {
     protected:
 
-        std::vector<std::vector<uint>> faces;               // list of faces (assumed CCW)
-        std::vector<std::vector<uint>> triangulated_faces;  // triangles covering each face (e.g., for rendering)
-        std::vector<bool>              v_on_srf;            // true if a vertex is exposed on the surface
-        std::vector<bool>              e_on_srf;            // true if an edge is exposed on the surface
-        std::vector<bool>              f_on_srf;            // true if a face is exposed on the surface
+        std::vector<std::vector<uint>> faces;              // list of faces (assumed CCW)
+        std::vector<std::vector<uint>> triangulated_faces; // triangles covering each face (e.g., for rendering)
+        std::vector<std::vector<bool>> polys_face_winding; // true if the face is CCW, false if it is CW
+
+        std::vector<bool> v_on_srf;           // true if a vertex is exposed on the surface
+        std::vector<bool> e_on_srf;           // true if an edge is exposed on the surface
+        std::vector<bool> f_on_srf;           // true if a face is exposed on the surface
 
         std::vector<F> f_data;
 
@@ -59,6 +61,44 @@ class AbstractVolumeMesh : public AbstractMesh<M,V,E,P>
         std::vector<std::vector<uint>> f2f; // face to face adjacency (through edges)
         std::vector<std::vector<uint>> f2p; // face to poly adjacency
         std::vector<std::vector<uint>> p2v; // poly to edge adjacency
+
+    public:
+
+                 AbstractPolyhedralMesh() : AbstractMesh<M,V,E,P>() {}
+        virtual ~AbstractPolyhedralMesh() {}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual void clear();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual uint verts_per_face(const uint fid) const { return this->faces.at(fid).size(); }
+        virtual uint verts_per_poly(const uint pid) const { return this->p2v.at(pid).size();   }
+        virtual uint edges_per_poly(const uint pid) const { return this->p2e.at(pid).size();   }
+        virtual uint faces_per_poly(const uint pid) const { return this->polys.at(pid).size(); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual uint num_faces() const { return faces.size(); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual const std::vector<std::vector<uint>> & vector_faces() const { return faces; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
+        virtual const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
+        virtual const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
+        virtual const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
+        virtual const std::vector<uint> & adj_f2p(const uint fid) const { return f2p.at(fid); }
+        virtual const std::vector<uint> & adj_p2v(const uint pid) const { return p2v.at(pid); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual const F & face_data(const uint fid) const { return f_data.at(fid); }
+        virtual       F & face_data(const uint fid)       { return f_data.at(fid); }
 };
 
 }
