@@ -184,10 +184,58 @@ void Polyhedralmesh<M,V,E,F,P>::update_normals()
         vec3d v1 = this->face_vert(fid,1);
         uint  i=2;
         vec3d ccw;
-        do { ccw = (v1-v0).cross(this->face_vert(fid,i)-v0); } while (ccw.length_squared()==0 && i<this->verts_per_face(fid));
+        do { ccw = (v1-v0).cross(this->face_vert(fid,i)-v0); ++i; } while (ccw.length_squared()==0 && i<this->verts_per_face(fid));
 
         this->face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
     }
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Polyhedralmesh<M,V,E,F,P>::export_to_hexahedral_mesh(std::vector<vec3d> & verts,
+                                                          std::vector<uint>  & hexa) const
+{
+    verts = this->vector_verts();
+    hexa.clear();
+
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        assert(this->verts_per_poly(pid) == 8);
+        assert(this->faces_per_poly(pid) == 6);
+
+        uint off_f0 = 0;
+        uint off_f1 = 1;
+
+        // put the first four vertices CCW
+        uint fid0 = this->poly_face_id(pid,off_f0);
+        std::vector<uint> f0;
+        for(uint i=0; i<this->verts_per_face(fid0); ++i) f0.push_back(this->face_vert_id(fid0,i));
+        if (this->poly_face_is_CW(pid,off_f0)) std::reverse(f0.begin(),f0.end());
+        for(uint vid : f0) hexa.push_back(vid);
+
+        // find its opposite face and sort it CW
+        uint fid1 = this->poly_face_id(pid,off_f1);
+        while(!this->faces_are_disjoint(fid0,fid1) && off_f1<6)
+        {
+            fid1 = this->poly_face_id(pid,++off_f1);
+        }
+        if (off_f1 > 5) assert(false && "Not a hex!");
+        std::vector<uint> f1;
+        for(uint i=0; i<this->verts_per_face(fid1); ++i) f1.push_back(this->face_vert_id(fid1,i));
+        if (this->poly_face_is_CCW(pid,off_f1)) std::reverse(f1.begin(),f1.end());
+
+        // align the first vertices of f0 and f1 so that there exists
+        // an edge in the polyhedron directly connecting them
+        uint offset = 0;
+        while (!this->poly_contains_edge(pid,f0.front(),f1.at(offset)) && offset<4) ++offset;
+        assert(offset<4);
+
+        for(uint i=0; i<4; ++i) hexa.push_back(f1.at((offset+i)%4));
+    }
+    assert(hexa.size() == this->num_polys()*8);
 }
 
 }

@@ -464,6 +464,23 @@ bool AbstractMesh<M,V,E,P>::poly_contains_edge(const uint fid, const uint eid) c
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+bool AbstractMesh<M,V,E,P>::poly_contains_edge(const uint pid, const uint vid0, const uint vid1) const
+{
+    for(uint eid : this->adj_p2e(pid))
+    {
+        if (this->edge_contains_vert(eid, vid0) &&
+            this->edge_contains_vert(eid, vid1))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractMesh<M,V,E,P>::poly_show_all()
 {
     for(uint pid=0; pid<num_polys(); ++pid)

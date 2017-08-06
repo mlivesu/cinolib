@@ -1,3 +1,5 @@
+- add mex_depth to profiler
+- think about it: you don’t need a tree for the profiler: if you put all the ProfilerEntries into a list sorted by time of call you did it…
 - add wrap functions like adj_v2p in surfaces, for better generic programming capabilities
 - add function in abstractmeshes, tessellated_poly(pid)   tessellated_poly(pid,fid)
   and use it in the rendering pipeline, in order to have a unified rendering

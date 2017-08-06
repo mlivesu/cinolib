@@ -263,12 +263,39 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_contains_vert(const uint pid, const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_contains_face(const uint pid, const uint fid) const
+{
+    for(uint off=0; off<faces_per_poly(pid); ++off)
+    {
+        if(poly_face_id(pid,off) == fid) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 vec3d AbstractPolyhedralMesh<M,V,E,F,P>::poly_centroid(const uint pid) const
 {
     vec3d c(0,0,0);
     for(uint vid : adj_p2v(pid)) c += this->vert(vid);
     c /= static_cast<double>(this->verts_per_poly(pid));
     return c;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::faces_are_disjoint(const uint fid0, const uint fid1) const
+{
+    for(uint i=0; i<verts_per_face(fid0); ++i)
+    for(uint j=0; j<verts_per_face(fid1); ++j)
+    {
+        if (face_vert_id(fid0,i) == face_vert_id(fid1,j)) return false;
+    }
+    return true;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -296,6 +323,19 @@ CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_on_srf(const uint fid) const
 {
     return f_on_srf.at(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::face_contrains_vert(const uint fid, const uint vid) const
+{
+    for(uint off=0; off<verts_per_face(fid); ++off)
+    {
+        if (face_vert_id(fid,off) == vid) return true;
+    }
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

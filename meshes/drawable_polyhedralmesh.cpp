@@ -60,8 +60,9 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 DrawablePolyhedralmesh<M,V,E,F,C>::DrawablePolyhedralmesh(const std::vector<vec3d>             & verts,
                                                           const std::vector<std::vector<uint>> & faces,
-                                                          const std::vector<std::vector<int>>  & cells)
-    : Polyhedralmesh<M,V,E,F,C>(verts, faces, cells)
+                                                          const std::vector<std::vector<uint>> & polys,
+                                                          const std::vector<std::vector<bool>> & polys_face_winding)
+    : Polyhedralmesh<M,V,E,F,C>(verts, faces, polys, polys_face_winding)
 {
     init_drawable_stuff();
 }
