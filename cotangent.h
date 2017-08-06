@@ -32,8 +32,8 @@
 #define CINO_COTANGENT_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh/trimesh.h>
-#include <cinolib/meshes/tetmesh/tetmesh.h>
+#include <cinolib/meshes/trimesh.h>
+#include <cinolib/meshes/tetmesh.h>
 
 namespace cinolib
 {

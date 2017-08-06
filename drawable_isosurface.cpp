@@ -28,33 +28,52 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_MEAN_CURV_FLOW_H
-#define CINO_MEAN_CURV_FLOW_H
-
-#include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh.h>
+#include <cinolib/meshes/drawable_isosurface.h>
 
 namespace cinolib
 {
 
-/* For the differences between cassical mean curvature flow (MCF) and
- * conformalized mean curvature flow (cMCF), please refer to:
- *
- * Can Mean-Curvature Flow be Modified to be Non-singular?
- * Michael Kazhdan, Jake Solomon and Mirela Ben-Chen
- * Computer Graphics Forum, 31(5), 2012.
-*/
+CINO_INLINE
+DrawableIsosurface::DrawableIsosurface(const Tetmesh<> & m, const float iso_value) : Isosurface(m, iso_value)
+{}
 
 CINO_INLINE
-void MCF(Trimesh<>    & m,
-         const uint     n_iters,
-         const double   time = 1e-3,
-         const bool     conformalized = true);
+void DrawableIsosurface::draw(const float) const
+{
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_LIGHTING);
+    glShadeModel(GL_SMOOTH);
 
+    for(size_t i=0; i<tris.size(); i+=3)
+    {
+        int vid0     = tris[i+0];
+        int vid1     = tris[i+1];
+        int vid2     = tris[i+2];
+        int vid0_ptr = 3 * vid0;
+        int vid1_ptr = 3 * vid1;
+        int vid2_ptr = 3 * vid2;
+
+        glBegin(GL_TRIANGLES);
+        glColor3f(1.0,0.0,0.0);
+        glNormal3dv(&(t_norms[i]));
+        glVertex3dv(&(coords[vid0_ptr]));
+        glVertex3dv(&(coords[vid1_ptr]));
+        glVertex3dv(&(coords[vid2_ptr]));
+        glEnd();
+    }
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "mean_curv_flow.cpp"
-#endif
+CINO_INLINE
+vec3d DrawableIsosurface::scene_center() const
+{
+    return m_ptr->bbox().center();
+}
 
-#endif // CINO_MEAN_CURV_FLOW_H
+CINO_INLINE
+float DrawableIsosurface::scene_radius() const
+{
+    return m_ptr->bbox().diag();
+}
+
+}

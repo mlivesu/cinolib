@@ -28,43 +28,87 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_DRAWABLE_ISOCONTOUR_H
-#define CINO_DRAWABLE_ISOCONTOUR_H
+#ifndef CINO_DRAWABLE_TRIMESH_H
+#define CINO_DRAWABLE_TRIMESH_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
+#include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/meshes/trimesh.h>
-#include <cinolib/isocontour.h>
+#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
 
-class DrawableIsocontour : public Isocontour, public DrawableObject
+template<class M = Mesh_min_attributes, // default template arguments
+         class V = Vert_min_attributes,
+         class E = Edge_min_attributes,
+         class F = Polygon_min_attributes>
+class DrawableTrimesh : public Trimesh<M,V,E,F>, public DrawableObject
 {
     public:
 
-        DrawableIsocontour() {}
-        DrawableIsocontour(Trimesh<> & m_ptr, float iso_value);
+        DrawableTrimesh();
 
-        // Implement DrawableObject interface
-        //
+        DrawableTrimesh(const char * filename);
+
+        DrawableTrimesh(const std::vector<vec3d> & verts,
+                        const std::vector<uint>  & polys);
+
+        DrawableTrimesh(const std::vector<double> & coords,
+                        const std::vector<uint>   & polys);
+
+        DrawableTrimesh(const std::vector<vec3d>             & coords,
+                        const std::vector<std::vector<uint>> & polys);
+
+        DrawableTrimesh(const std::vector<double>            & coords,
+                        const std::vector<std::vector<uint>> & polys);
+
+    protected:
+
+        RenderData drawlist;
+        MeshSlicer<Trimesh<M,V,E,F>> slicer;
+
+    public:
+
         void       draw(const float scene_size=1) const;
-        vec3d      scene_center() const { return vec3d();        }
-        float      scene_radius() const { return 0.0;            }
-        ObjectType object_type()  const { return DRAWABLE_CURVE; }
-        void       slice(const float, const int, const int, const int) {}
+        vec3d      scene_center() const { return this->bb.center(); }
+        float      scene_radius() const { return this->bb.diag();   }
+        ObjectType object_type()  const { return DRAWABLE_TRIMESH;  }
 
-    private:
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Color color_sample;
-        Color color_centre;
-        Color color_cylind;
+        void init_drawable_stuff();
+        void updateGL();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void slice(const float thresh, const int item, const int sign, const int mode);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void show_mesh(const bool b);
+        void show_mesh_flat();
+        void show_mesh_smooth();
+        void show_mesh_points();
+        void show_vert_color();
+        void show_face_color();
+        void show_face_texture1D(const int tex_type);
+        void show_face_texture2D(const int tex_type, const double tex_unit_scalar);
+        void show_face_wireframe(const bool b);
+        void show_face_wireframe_color(const Color & c);
+        void show_face_wireframe_width(const float width);
+        void show_face_wireframe_transparency(const float alpha);
+        void show_edge_marked(const bool b);
+        void show_edge_marked_color(const Color & c);
+        void show_edge_marked_width(const float width);
+        void show_edge_marked_transparency(const float alpha);
 };
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "drawable_isocontour.cpp"
+#include "drawable_trimesh.cpp"
 #endif
 
-#endif // CINO_DRAWABLE_ISOCONTOUR_H
+#endif // CINO_DRAWABLE_TRIMESH_H

@@ -28,33 +28,32 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_MEAN_CURV_FLOW_H
-#define CINO_MEAN_CURV_FLOW_H
+#ifndef CINO_MARCHING_TETS_H
+#define CINO_MARCHING_TETS_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh.h>
+#include <cinolib/meshes/tetmesh.h>
 
 namespace cinolib
 {
 
-/* For the differences between cassical mean curvature flow (MCF) and
- * conformalized mean curvature flow (cMCF), please refer to:
- *
- * Can Mean-Curvature Flow be Modified to be Non-singular?
- * Michael Kazhdan, Jake Solomon and Mirela Ben-Chen
- * Computer Graphics Forum, 31(5), 2012.
-*/
-
 CINO_INLINE
-void MCF(Trimesh<>    & m,
-         const uint     n_iters,
-         const double   time = 1e-3,
-         const bool     conformalized = true);
+void marching_tets(const Tetmesh<>        & m,
+                   const double             isovalue,
+                   std::vector<double>    & coords,
+                   std::vector<uint>      & tris,
+                   std::vector<double>    & norm,
+                   std::map<ipair,double> & split_info); // (v0,v1) => lambda
+                                                         // meaning that the edge (v0,v1) should
+                                                         // be split at
+                                                         // lambda * v0 + (1 - lambda) * v1
 
 }
 
+
 #ifndef  CINO_STATIC_LIB
-#include "mean_curv_flow.cpp"
+#include "marching_tets.cpp"
 #endif
 
-#endif // CINO_MEAN_CURV_FLOW_H
+
+#endif // CINO_MARCHING_TETS_H

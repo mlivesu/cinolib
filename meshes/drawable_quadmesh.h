@@ -28,33 +28,82 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_MEAN_CURV_FLOW_H
-#define CINO_MEAN_CURV_FLOW_H
+#ifndef CINO_DRAWABLE_QUADMESH_H
+#define CINO_DRAWABLE_QUADMESH_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/gl/draw_lines_tris.h>
+#include <cinolib/meshes/quadmesh.h>
+#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
 
-/* For the differences between cassical mean curvature flow (MCF) and
- * conformalized mean curvature flow (cMCF), please refer to:
- *
- * Can Mean-Curvature Flow be Modified to be Non-singular?
- * Michael Kazhdan, Jake Solomon and Mirela Ben-Chen
- * Computer Graphics Forum, 31(5), 2012.
-*/
+template<class M = Mesh_min_attributes, // default template arguments
+         class V = Vert_min_attributes,
+         class E = Edge_min_attributes,
+         class F = Polygon_min_attributes>
+class DrawableQuadmesh : public Quadmesh<M,V,E,F>, public DrawableObject
+{
+    public:
 
-CINO_INLINE
-void MCF(Trimesh<>    & m,
-         const uint     n_iters,
-         const double   time = 1e-3,
-         const bool     conformalized = true);
+        DrawableQuadmesh();
+
+        DrawableQuadmesh(const char * filename);
+
+        DrawableQuadmesh(const std::vector<vec3d> & verts,
+                         const std::vector<uint>  & polys);
+
+        DrawableQuadmesh(const std::vector<double> & coords,
+                         const std::vector<uint>   & polys);
+
+        DrawableQuadmesh(const std::vector<vec3d>             & verts,
+                         const std::vector<std::vector<uint>> & polys);
+
+        DrawableQuadmesh(const std::vector<double>            & verts,
+                         const std::vector<std::vector<uint>> & polys);
+
+    protected:
+
+        RenderData drawlist;
+        MeshSlicer<Quadmesh<M,V,E,F>> slicer;
+
+    public:
+
+        void       draw(const float scene_size=1) const;
+        vec3d      scene_center() const { return this->bb.center(); }
+        float      scene_radius() const { return this->bb.diag();   }
+        ObjectType object_type()  const { return DRAWABLE_QUADMESH; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void init_drawable_stuff();
+        void updateGL();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void slice(const float thresh, const int item, const int sign, const int mode);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void show_mesh(const bool b);
+        void show_mesh_flat();
+        void show_mesh_smooth();
+        void show_mesh_points();
+        void show_vert_color();
+        void show_face_color();
+        void show_face_texture1D(const GLint texture);
+        void show_face_wireframe(const bool b);
+        void show_face_wireframe_color(const Color & c);
+        void show_face_wireframe_width(const float width);
+        void show_face_wireframe_transparency(const float alpha);
+};
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "mean_curv_flow.cpp"
+#include "drawable_quadmesh.cpp"
 #endif
 
-#endif // CINO_MEAN_CURV_FLOW_H
+#endif // CINO_DRAWABLE_QUADMESH_H

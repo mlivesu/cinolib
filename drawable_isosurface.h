@@ -28,33 +28,34 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_MEAN_CURV_FLOW_H
-#define CINO_MEAN_CURV_FLOW_H
+#ifndef CINO_DRAWABLE_ISOSURFACE_H
+#define CINO_DRAWABLE_ISOSURFACE_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/isosurface.h>
 
 namespace cinolib
 {
 
-/* For the differences between cassical mean curvature flow (MCF) and
- * conformalized mean curvature flow (cMCF), please refer to:
- *
- * Can Mean-Curvature Flow be Modified to be Non-singular?
- * Michael Kazhdan, Jake Solomon and Mirela Ben-Chen
- * Computer Graphics Forum, 31(5), 2012.
-*/
+class DrawableIsosurface : public Isosurface, public DrawableObject
+{
+    public:
 
-CINO_INLINE
-void MCF(Trimesh<>    & m,
-         const uint     n_iters,
-         const double   time = 1e-3,
-         const bool     conformalized = true);
+        DrawableIsosurface() {}
+        DrawableIsosurface(const Tetmesh<> & m, const float iso_value);
+
+        void       draw(const float scene_size=1) const;
+        vec3d      scene_center() const;
+        float      scene_radius() const;
+        ObjectType object_type()  const { return DRAWABLE_ISOSURFACE; }
+        void       slice(const float, const int, const int, const int) {}
+};
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "mean_curv_flow.cpp"
+#include "drawable_isosurface.cpp"
 #endif
 
-#endif // CINO_MEAN_CURV_FLOW_H
+#endif // CINO_DRAWABLE_ISOSURFACE_H

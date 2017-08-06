@@ -28,33 +28,69 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_MEAN_CURV_FLOW_H
-#define CINO_MEAN_CURV_FLOW_H
+#ifndef CINO_POLYHEDRALMESH_H
+#define CINO_POLYHEDRALMESH_H
+
+#include <sys/types.h>
+#include <vector>
 
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh.h>
+#include <cinolib/bbox.h>
+#include <cinolib/meshes/polygonmesh.h>
+#include <cinolib/geometry/vec3.h>
+#include <cinolib/meshes/mesh_attributes.h>
+#include <cinolib/meshes/abstract_volume_mesh.h>
 
 namespace cinolib
 {
 
-/* For the differences between cassical mean curvature flow (MCF) and
- * conformalized mean curvature flow (cMCF), please refer to:
- *
- * Can Mean-Curvature Flow be Modified to be Non-singular?
- * Michael Kazhdan, Jake Solomon and Mirela Ben-Chen
- * Computer Graphics Forum, 31(5), 2012.
-*/
+template<class M = Mesh_min_attributes, // default template arguments
+         class V = Vert_min_attributes,
+         class E = Edge_min_attributes,
+         class F = Polygon_min_attributes,
+         class P = Polyhedron_min_attributes>
+class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
+{
+    protected:
 
-CINO_INLINE
-void MCF(Trimesh<>    & m,
-         const uint     n_iters,
-         const double   time = 1e-3,
-         const bool     conformalized = true);
+        std::vector<std::vector<uint>> triangulated_faces; // triangles covering each face (e.g., for rendering)
+
+    public:
+
+        Polyhedralmesh(){}
+
+        Polyhedralmesh(const char * filename);
+
+        Polyhedralmesh(const std::vector<vec3d>             & verts,
+                       const std::vector<std::vector<uint>> & faces,
+                       const std::vector<std::vector<uint>> & polys,
+                       const std::vector<std::vector<bool>> & polys_face_winding);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        MeshType mesh_type() const { return POLYHEDRALMESH; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void init();
+        void clear();
+        void load(const char * filename);
+        void save(const char * filename) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void update_face_tessellation();
+        void update_normals();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual double poly_volume (const uint) const { assert(false && "TODO!"); return 1.0; }
+};
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "mean_curv_flow.cpp"
+#include "polyhedralmesh.cpp"
 #endif
 
-#endif // CINO_MEAN_CURV_FLOW_H
+#endif // CINO_POLYHEDRALMESH_H

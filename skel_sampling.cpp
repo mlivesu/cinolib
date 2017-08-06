@@ -28,33 +28,76 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_MEAN_CURV_FLOW_H
-#define CINO_MEAN_CURV_FLOW_H
-
-#include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh.h>
+#include <cinolib/meshes/skel_sampling.h>
+#include <set>
 
 namespace cinolib
 {
 
-/* For the differences between cassical mean curvature flow (MCF) and
- * conformalized mean curvature flow (cMCF), please refer to:
- *
- * Can Mean-Curvature Flow be Modified to be Non-singular?
- * Michael Kazhdan, Jake Solomon and Mirela Ben-Chen
- * Computer Graphics Forum, 31(5), 2012.
-*/
-
 CINO_INLINE
-void MCF(Trimesh<>    & m,
-         const uint     n_iters,
-         const double   time = 1e-3,
-         const bool     conformalized = true);
+void recursive_mid_sampling(Skel          & skel,
+                            int             bid,
+                            int             beg_vid,
+                            int             end_vid,
+                            float           beg_sample,
+                            float           end_sample,
+                            std::set<int> & samples)
+{
+    assert(beg_sample < end_sample);
 
+    float mid_sample = beg_sample + ((end_sample - beg_sample) * 0.5);
+    int   mid_vid    = skel.sample_bone_at(bid, mid_sample);
+
+    vec3d beg_pos = skel.vertex(beg_vid);
+    vec3d mid_pos = skel.vertex(mid_vid);
+    vec3d end_pos = skel.vertex(end_vid);
+
+    double beg_r = skel.max_sphere_radius(beg_vid);
+    double mid_r = skel.max_sphere_radius(mid_vid);
+    double end_r = skel.max_sphere_radius(end_vid);
+
+    if ((beg_pos - mid_pos).length() > beg_r + mid_r || // <= logic OR, remember that!
+        (mid_pos - end_pos).length() > mid_r + end_r)   //    note to myself ;)
+    {
+        samples.insert(mid_vid);
+
+        recursive_mid_sampling(skel, bid, beg_vid, mid_vid, beg_sample, mid_sample, samples);
+        recursive_mid_sampling(skel, bid, mid_vid, end_vid, mid_sample, end_sample, samples);
+    }
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "mean_curv_flow.cpp"
-#endif
+CINO_INLINE
+void radius_based_mid_sampling(Skel & skel)
+{
+    // compute the new per bone sampling
+    //
+    std::set<int> new_samples;
+    for(int bid=0; bid<skel.num_bones(); ++bid)
+    {
+        std::vector<int> bone = skel.vertex_bone(bid);
 
-#endif // CINO_MEAN_CURV_FLOW_H
+        new_samples.insert(bone.front());
+        new_samples.insert(bone.back());
+
+        recursive_mid_sampling(skel, bid, bone.front(), bone.back(), 0.0, 1.0, new_samples);
+    }
+
+    // remove old sampling
+    //
+    std::vector<int> to_remove;
+    for(int vid=0; vid<skel.num_vertices(); ++vid)
+    {
+        if (DOES_NOT_CONTAIN(new_samples, vid)) to_remove.push_back(vid);
+    }
+    skel.remove_vertices(to_remove);
+
+    // make sure that each bone has at least one subdivision
+    //
+    for(int bid=0; bid<skel.num_bones(); ++bid)
+    {
+        std::vector<int> bone = skel.vertex_bone(bid);
+        if (bone.size() == 2) skel.sample_bone_at(bid, 0.5);
+    }
+}
+
+}

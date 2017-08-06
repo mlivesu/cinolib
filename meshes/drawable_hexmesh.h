@@ -28,39 +28,88 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_DRAWABLE_CURVE_H
-#define CINO_DRAWABLE_CURVE_H
+#ifndef CINO_DRAWABLE_HEXMESH_H
+#define CINO_DRAWABLE_HEXMESH_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/curve.h>
-#include <cinolib/gl/draw_cylinder.h>
-#include <cinolib/meshes/skel.h>
+#include <cinolib/gl/draw_lines_tris.h>
+#include <cinolib/meshes/hexmesh.h>
+#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
 
-class DrawableCurve : public Curve, public DrawableObject
+template<class M = Mesh_min_attributes, // default template arguments
+         class V = Vert_min_attributes,
+         class E = Edge_min_attributes,
+         class F = Polygon_min_attributes,
+         class C = Polyhedron_min_attributes>
+class DrawableHexmesh : public Hexmesh<M,V,E,F,C>, public DrawableObject
 {
+
     public:
 
-        DrawableCurve();
-        DrawableCurve(const std::vector<vec3d> & samples);
-        DrawableCurve(const Skel & skel, const int bone);
+        DrawableHexmesh();
+
+        DrawableHexmesh(const char * filename);
+
+        DrawableHexmesh(const std::vector<vec3d> & verts,
+                        const std::vector<uint>  & cells);
+
+        DrawableHexmesh(const std::vector<double> & coords,
+                        const std::vector<uint>   & cells);
+
+    protected:
+
+        RenderData drawlist_in;
+        RenderData drawlist_out;        
+        MeshSlicer<DrawableHexmesh<M,V,E,F,C>> slicer;
+
+    public:
 
         void       draw(const float scene_size=1) const;
-        vec3d      scene_center() const;
-        float      scene_radius() const;
-        ObjectType object_type()  const { return DRAWABLE_CURVE; }
-        void        slice(const float, const int, const int, const int) {}
+        vec3d      scene_center() const { return this->bb.center(); }
+        float      scene_radius() const { return this->bb.diag();   }
+        ObjectType object_type()  const { return DRAWABLE_HEXMESH;  }
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void init_drawable_stuff();
+        void updateGL();
+        void updateGL_in();
+        void updateGL_out();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void slice(const float thresh, const int item, const int sign, const int mode);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void show_mesh(const bool b);
+        void show_mesh_flat();
+        void show_mesh_smooth();
+        void show_mesh_points();
+        void show_face_color();
+        void show_face_quality();
+        void show_face_texture1D(const GLint texture);
+        void show_face_wireframe(const bool b);
+        void show_face_wireframe_color(const Color & c);
+        void show_face_wireframe_width(const float width);
+        void show_face_wireframe_transparency(const float alpha);
+        void show_cell_color();
+        void show_cell_quality();
+        void show_cell_texture1D(const GLint texture);
+        void show_cell_wireframe(const bool b);
+        void show_cell_wireframe_color(const Color & c);
+        void show_cell_wireframe_width(const float width);
+        void show_cell_wireframe_transparency(const float alpha);
 };
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "drawable_curve.cpp"
+#include "drawable_hexmesh.cpp"
 #endif
 
-#endif // CINO_DRAWABLE_CURVE_H
+#endif // CINO_DRAWABLE_HEXMESH_H

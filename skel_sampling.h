@@ -28,33 +28,22 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_MEAN_CURV_FLOW_H
-#define CINO_MEAN_CURV_FLOW_H
+#ifndef CINO_SKEL_SAMPLING_H
+#define CINO_SKEL_SAMPLING_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh.h>
+#include <cinolib/meshes/skel.h>
 
 namespace cinolib
 {
 
-/* For the differences between cassical mean curvature flow (MCF) and
- * conformalized mean curvature flow (cMCF), please refer to:
- *
- * Can Mean-Curvature Flow be Modified to be Non-singular?
- * Michael Kazhdan, Jake Solomon and Mirela Ben-Chen
- * Computer Graphics Forum, 31(5), 2012.
-*/
-
 CINO_INLINE
-void MCF(Trimesh<>    & m,
-         const uint     n_iters,
-         const double   time = 1e-3,
-         const bool     conformalized = true);
+void radius_based_mid_sampling(Skel & skel);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "mean_curv_flow.cpp"
+#include "skel_sampling.cpp"
 #endif
 
-#endif // CINO_MEAN_CURV_FLOW_H
+#endif // CINO_SKEL_SAMPLING_H

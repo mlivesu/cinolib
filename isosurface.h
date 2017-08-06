@@ -28,33 +28,51 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_MEAN_CURV_FLOW_H
-#define CINO_MEAN_CURV_FLOW_H
+#ifndef CINO_ISOSURFACE_H
+#define CINO_ISOSURFACE_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh.h>
+#include <cinolib/meshes/tetmesh.h>
+
 
 namespace cinolib
 {
 
-/* For the differences between cassical mean curvature flow (MCF) and
- * conformalized mean curvature flow (cMCF), please refer to:
- *
- * Can Mean-Curvature Flow be Modified to be Non-singular?
- * Michael Kazhdan, Jake Solomon and Mirela Ben-Chen
- * Computer Graphics Forum, 31(5), 2012.
-*/
+class Isosurface
+{
+    public:
 
-CINO_INLINE
-void MCF(Trimesh<>    & m,
-         const uint     n_iters,
-         const double   time = 1e-3,
-         const bool     conformalized = true);
+        Isosurface(){}
+        Isosurface(const Tetmesh<> & m, const float iso_value);
+
+        Trimesh<> export_as_trimesh() const;
+
+        void tessellate(std::vector<double> & coords,
+                        std::vector<uint>   & new_cells,
+                        std::vector<float>  & new_field) const;
+
+        const std::map<ipair,double> & edges_split() const { return split_info; }
+
+    protected:
+
+        void fix_subtet_orientation(const uint                  cid,
+                                    const uint                  n_subtets,
+                                    const std::vector<double> & coords,
+                                          std::vector<uint>   & cells) const;
+
+        const Tetmesh<>       *m_ptr;
+        float                  iso_value;
+        std::vector<double>    coords;
+        std::vector<uint>      tris;
+        std::vector<double>    t_norms;
+        std::map<ipair,double> split_info;
+};
+
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "mean_curv_flow.cpp"
+#include "isosurface.cpp"
 #endif
 
-#endif // CINO_MEAN_CURV_FLOW_H
+#endif // CINO_ISOSURFACE_H

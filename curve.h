@@ -33,8 +33,8 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/bbox.h>
-#include <cinolib/meshes/skel/skel.h>
-#include <cinolib/meshes/trimesh/trimesh.h>
+#include <cinolib/meshes/skel.h>
+#include <cinolib/meshes/trimesh.h>
 
 namespace cinolib
 {
