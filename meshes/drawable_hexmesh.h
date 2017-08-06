@@ -55,10 +55,10 @@ class DrawableHexmesh : public Hexmesh<M,V,E,F,C>, public DrawableObject
         DrawableHexmesh(const char * filename);
 
         DrawableHexmesh(const std::vector<vec3d> & verts,
-                        const std::vector<uint>  & cells);
+                        const std::vector<uint>  & polys);
 
         DrawableHexmesh(const std::vector<double> & coords,
-                        const std::vector<uint>   & cells);
+                        const std::vector<uint>   & polys);
 
     protected:
 

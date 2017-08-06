@@ -47,7 +47,7 @@ CINO_INLINE
 Hexmesh<M,V,E,F,C>::Hexmesh(const std::vector<vec3d> & verts,
                             const std::vector<uint>  & cells)
 : verts(verts)
-, cells(cells)
+, polys(cells)
 {
     init();
 }
@@ -60,7 +60,7 @@ Hexmesh<M,V,E,F,C>::Hexmesh(const std::vector<double> & coords,
                             const std::vector<uint>   & cells)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    this->cells = cells;
+    this->polys = cells;
     init();
 }
 
@@ -88,9 +88,9 @@ void Hexmesh<M,V,E,F,C>::print_quality(const bool list_folded_elements)
     double msj = FLT_MAX;
     uint    inv = 0;
 
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
-        double q = cell_data(cid).quality;
+        double q = poly_data(cid).quality;
 
         asj += q;
         msj = std::min(msj, q);
@@ -101,14 +101,14 @@ void Hexmesh<M,V,E,F,C>::print_quality(const bool list_folded_elements)
             if (list_folded_elements) logger << cid << " - ";
         }
     }
-    asj /= static_cast<double>(num_cells());
+    asj /= static_cast<double>(num_polys());
 
     if (list_folded_elements) logger << endl << endl;
 
     logger << endl;
     logger << "MIN SJ : " << msj << endl;
     logger << "AVG SJ : " << asj << endl;
-    logger << "INV EL : " << inv << " (out of " << num_cells() << ")" << endl;
+    logger << "INV EL : " << inv << " (out of " << num_polys() << ")" << endl;
     logger << endl;
 }
 
@@ -128,17 +128,17 @@ void Hexmesh<M,V,E,F,C>::load(const char * filename)
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        read_MESH(filename, coords, tets, cells);
+        read_MESH(filename, coords, tets, polys);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        read_VTU(filename, coords, tets, cells);
+        read_VTU(filename, coords, tets, polys);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        read_VTK(filename, coords, tets, cells);
+        read_VTK(filename, coords, tets, polys);
     }
     else
     {
@@ -148,7 +148,7 @@ void Hexmesh<M,V,E,F,C>::load(const char * filename)
 
     verts = vec3d_from_serialized_xyz(coords);
 
-    logger << num_cells() << " hexahedra read" << endl;
+    logger << num_polys() << " hexahedra read" << endl;
     logger << num_verts() << " vertices  read" << endl;
 
     this->mesh_data().filename = std::string(filename);
@@ -169,17 +169,17 @@ void Hexmesh<M,V,E,F,C>::save(const char * filename) const
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        write_MESH(filename, coords, tets, cells);
+        write_MESH(filename, coords, tets, polys);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        write_VTU(filename, coords, tets, cells);
+        write_VTU(filename, coords, tets, polys);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        write_VTK(filename, coords, tets, cells);
+        write_VTK(filename, coords, tets, polys);
     }
     else
     {
@@ -199,7 +199,7 @@ void Hexmesh<M,V,E,F,C>::clear()
     verts.clear();
     edges.clear();
     faces.clear();
-    cells.clear();
+    polys.clear();
     v_on_srf.clear();
     e_on_srf.clear();
     //
@@ -208,20 +208,20 @@ void Hexmesh<M,V,E,F,C>::clear()
     v_data.clear();
     e_data.clear();
     f_data.clear();
-    c_data.clear();
+    p_data.clear();
     //
     v2v.clear();
     v2e.clear();
     v2f.clear();
-    v2c.clear();
+    v2p.clear();
     e2f.clear();
-    e2c.clear();
+    e2p.clear();
     f2e.clear();
     f2f.clear();
-    f2c.clear();
-    c2e.clear();
-    c2f.clear();
-    c2c.clear();
+    f2p.clear();
+    p2e.clear();
+    p2f.clear();
+    p2p.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -236,7 +236,7 @@ void Hexmesh<M,V,E,F,C>::init()
 
     v_data.resize(num_verts());
     e_data.resize(num_edges());
-    c_data.resize(num_cells());
+    p_data.resize(num_polys());
     f_data.resize(num_faces());
 
     update_face_normals();
@@ -270,22 +270,22 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
 {
     v2v.clear(); v2v.resize(num_verts());
     v2e.clear(); v2e.resize(num_verts());
-    v2c.clear(); v2c.resize(num_verts());
-    c2c.clear(); c2c.resize(num_cells());
-    c2e.clear(); c2e.resize(num_cells());
+    v2p.clear(); v2p.resize(num_verts());
+    p2p.clear(); p2p.resize(num_polys());
+    p2e.clear(); p2e.resize(num_polys());
 
     std::map<ipair,std::vector<uint>> e2c_map;
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
-        uint cid_ptr = cid * verts_per_cell();
-        uint vids[8] = { cells.at(cid_ptr+0), cells.at(cid_ptr+1), cells.at(cid_ptr+2), cells.at(cid_ptr+3),
-                         cells.at(cid_ptr+4), cells.at(cid_ptr+5), cells.at(cid_ptr+6), cells.at(cid_ptr+7) };
+        uint cid_ptr = cid * verts_per_poly();
+        uint vids[8] = { polys.at(cid_ptr+0), polys.at(cid_ptr+1), polys.at(cid_ptr+2), polys.at(cid_ptr+3),
+                         polys.at(cid_ptr+4), polys.at(cid_ptr+5), polys.at(cid_ptr+6), polys.at(cid_ptr+7) };
 
-        for(uint vid=0; vid<verts_per_cell(); ++vid)
+        for(uint vid=0; vid<verts_per_poly(); ++vid)
         {
-            v2c.at(vids[vid]).push_back(cid);
+            v2p.at(vids[vid]).push_back(cid);
         }
-        for(uint eid=0; eid<edges_per_cell(); ++eid)
+        for(uint eid=0; eid<edges_per_poly(); ++eid)
         {
             ipair e = unique_pair(vids[HEXA_EDGES[eid][0]], vids[HEXA_EDGES[eid][1]]);
             e2c_map[e].push_back(cid);
@@ -293,8 +293,8 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
     }
 
     edges.clear();
-    e2c.clear();
-    e2c.resize(e2c_map.size());
+    e2p.clear();
+    e2p.resize(e2c_map.size());
 
     std::set<ipair> cell_pairs;
 
@@ -320,22 +320,22 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
         {
             uint cid = cids.at(i);
 
-            c2e.at(cid).push_back(eid);
-            e2c.at(eid).push_back(cid);
+            p2e.at(cid).push_back(eid);
+            e2p.at(eid).push_back(cid);
 
             for(uint j=i+1; j<cids.size(); ++j)
             {
                 uint nbr = cids.at(j);
-                if (cell_shared_face(cid,nbr) != -1)
+                if (poly_shared_face(cid,nbr) != -1)
                 {
                     ipair p = unique_pair(cid,nbr);
                     if (DOES_NOT_CONTAIN(cell_pairs, p))
                     {
                         cell_pairs.insert(p);
-                        c2c.at(cid).push_back(nbr);
-                        c2c.at(nbr).push_back(cid);
-                        assert(c2c.at(cid).size() <= faces_per_cell());
-                        assert(c2c.at(nbr).size() <= faces_per_cell());
+                        p2p.at(cid).push_back(nbr);
+                        p2p.at(nbr).push_back(cid);
+                        assert(p2p.at(cid).size() <= faces_per_poly());
+                        assert(p2p.at(nbr).size() <= faces_per_poly());
                     }
                 }
             }
@@ -343,7 +343,7 @@ void Hexmesh<M,V,E,F,C>::update_interior_adjacency()
     }
 
     logger << num_verts() << "\tvertices"  << endl;
-    logger << num_cells() << "\thexahedra" << endl;
+    logger << num_polys() << "\thexahedra" << endl;
     logger << num_edges() << "\tedges"     << endl;
 }
 
@@ -356,16 +356,16 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
     typedef std::vector<uint> face;
     std::map<face,std::pair<uint,uint>> f2c_map;
 
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
-        uint cid_ptr = cid * verts_per_cell();
-        for(uint fid=0; fid<faces_per_cell(); ++fid)
+        uint cid_ptr = cid * verts_per_poly();
+        for(uint fid=0; fid<faces_per_poly(); ++fid)
         {
             face f;
-            f.push_back(cells.at(cid_ptr + HEXA_FACES[fid][0]));
-            f.push_back(cells.at(cid_ptr + HEXA_FACES[fid][1]));
-            f.push_back(cells.at(cid_ptr + HEXA_FACES[fid][2]));
-            f.push_back(cells.at(cid_ptr + HEXA_FACES[fid][3]));
+            f.push_back(polys.at(cid_ptr + HEXA_FACES[fid][0]));
+            f.push_back(polys.at(cid_ptr + HEXA_FACES[fid][1]));
+            f.push_back(polys.at(cid_ptr + HEXA_FACES[fid][2]));
+            f.push_back(polys.at(cid_ptr + HEXA_FACES[fid][3]));
             sort(f.begin(), f.end());
             if (CONTAINS(f2c_map,f)) f2c_map.erase(f);
             else                     f2c_map[f] = std::make_pair(cid,fid);
@@ -374,10 +374,10 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
 
     v2f.clear(); v2f.resize(num_verts());
     e2f.clear(); e2f.resize(num_edges());
-    c2f.clear(); c2f.resize(num_cells());
+    p2f.clear(); p2f.resize(num_polys());
 
     faces.clear();
-    f2c.clear(); f2c.resize(f2c_map.size());
+    f2p.clear(); f2p.resize(f2c_map.size());
     f2e.clear(); f2e.resize(f2c_map.size());
     v_on_srf.resize(num_verts(), false);
     e_on_srf.resize(num_edges(), false);
@@ -387,11 +387,11 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
     {
         uint cid     = f2c_it.second.first;
         uint f       = f2c_it.second.second;
-        uint cid_ptr = cid * verts_per_cell();
-        uint vid0    = cells.at(cid_ptr + HEXA_FACES[f][0]);
-        uint vid1    = cells.at(cid_ptr + HEXA_FACES[f][1]);
-        uint vid2    = cells.at(cid_ptr + HEXA_FACES[f][2]);
-        uint vid3    = cells.at(cid_ptr + HEXA_FACES[f][3]);
+        uint cid_ptr = cid * verts_per_poly();
+        uint vid0    = polys.at(cid_ptr + HEXA_FACES[f][0]);
+        uint vid1    = polys.at(cid_ptr + HEXA_FACES[f][1]);
+        uint vid2    = polys.at(cid_ptr + HEXA_FACES[f][2]);
+        uint vid3    = polys.at(cid_ptr + HEXA_FACES[f][3]);
 
         faces.push_back(vid0);
         faces.push_back(vid1);
@@ -408,10 +408,10 @@ void Hexmesh<M,V,E,F,C>::update_surface_adjacency()
         v2f.at(vid2).push_back(fresh_id);
         v2f.at(vid3).push_back(fresh_id);
 
-        c2f.at(cid).push_back(fresh_id);
-        f2c.at(fresh_id) = cid;
+        p2f.at(cid).push_back(fresh_id);
+        f2p.at(fresh_id) = cid;
 
-        for(uint eid : adj_c2e(cid))
+        for(uint eid : adj_p2e(cid))
         {
             uint eid0  = edge_vert_id(eid, 0);
             uint eid1  = edge_vert_id(eid, 1);
@@ -466,14 +466,14 @@ void Hexmesh<M,V,E,F,C>::update_face_normals()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-int Hexmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
+int Hexmesh<M,V,E,F,C>::poly_shared_face(const uint cid0, const uint cid1) const
 {
-    for(uint f=0; f<faces_per_cell(); ++f)
+    for(uint f=0; f<faces_per_poly(); ++f)
     {
-        if (cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][0])) &&
-            cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][1])) &&
-            cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][2])) &&
-            cell_contains_vert(cid1, cell_vert_id(cid0, HEXA_FACES[f][3])) )
+        if (poly_contains_vert(cid1, poly_vert_id(cid0, HEXA_FACES[f][0])) &&
+            poly_contains_vert(cid1, poly_vert_id(cid0, HEXA_FACES[f][1])) &&
+            poly_contains_vert(cid1, poly_vert_id(cid0, HEXA_FACES[f][2])) &&
+            poly_contains_vert(cid1, poly_vert_id(cid0, HEXA_FACES[f][3])) )
         {
             return f;
         }
@@ -485,11 +485,11 @@ int Hexmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-bool Hexmesh<M,V,E,F,C>::cell_contains_vert(const uint cid, const uint vid) const
+bool Hexmesh<M,V,E,F,C>::poly_contains_vert(const uint cid, const uint vid) const
 {
-    for(uint i=0; i<verts_per_cell(); ++i)
+    for(uint i=0; i<verts_per_poly(); ++i)
     {
-        if (cell_vert_id(cid,i) == vid) return true;
+        if (poly_vert_id(cid,i) == vid) return true;
     }
     return false;
 }
@@ -498,14 +498,14 @@ bool Hexmesh<M,V,E,F,C>::cell_contains_vert(const uint cid, const uint vid) cons
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Hexmesh<M,V,E,F,C>::cell_centroid(const uint cid) const
+vec3d Hexmesh<M,V,E,F,C>::poly_centroid(const uint cid) const
 {
     vec3d c(0,0,0);
-    for(uint off=0; off<verts_per_cell(); ++off)
+    for(uint off=0; off<verts_per_poly(); ++off)
     {
-        c += cell_vert(cid,off);
+        c += poly_vert(cid,off);
     }
-    c /= static_cast<double>(verts_per_cell());
+    c /= static_cast<double>(verts_per_poly());
     return c;
 }
 
@@ -513,32 +513,23 @@ vec3d Hexmesh<M,V,E,F,C>::cell_centroid(const uint cid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Hexmesh<M,V,E,F,C>::poly_centroid(const uint cid) const
+uint Hexmesh<M,V,E,F,C>::poly_vert_id(const uint cid, const uint off) const
 {
-    return cell_centroid(cid);
+    uint cid_ptr = cid * verts_per_poly();
+    return polys.at(cid_ptr + off);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Hexmesh<M,V,E,F,C>::cell_vert_id(const uint cid, const uint off) const
+uint Hexmesh<M,V,E,F,C>::poly_edge_id(const uint cid, const uint vid0, const uint vid1) const
 {
-    uint cid_ptr = cid * verts_per_cell();
-    return cells.at(cid_ptr + off);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-uint Hexmesh<M,V,E,F,C>::cell_edge_id(const uint cid, const uint vid0, const uint vid1) const
-{
-    assert(cell_contains_vert(cid,vid0));
-    assert(cell_contains_vert(cid,vid1));
+    assert(poly_contains_vert(cid,vid0));
+    assert(poly_contains_vert(cid,vid1));
 
     ipair query = unique_pair(vid0,vid1);
-    for(uint eid : adj_c2e(cid))
+    for(uint eid : adj_p2e(cid))
     {
         if (unique_pair(edge_vert_id(eid,0), edge_vert_id(eid,1)) == query) return eid;
     }
@@ -549,9 +540,9 @@ uint Hexmesh<M,V,E,F,C>::cell_edge_id(const uint cid, const uint vid0, const uin
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Hexmesh<M,V,E,F,C>::cell_vert(const uint cid, const uint off) const
+vec3d Hexmesh<M,V,E,F,C>::poly_vert(const uint cid, const uint off) const
 {
-    return verts.at(cell_vert_id(cid,off));
+    return verts.at(poly_vert_id(cid,off));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -640,9 +631,9 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Hexmesh<M,V,E,F,C>::poly_show_all()
 {
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
-        cell_data(cid).visible = true;
+        poly_data(cid).visible = true;
     }
 }
 
@@ -734,11 +725,11 @@ void Hexmesh<M,V,E,F,C>::face_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::cell_set_color(const Color & c)
+void Hexmesh<M,V,E,F,C>::poly_set_color(const Color & c)
 {
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
-        cell_data(cid).color = c;
+        poly_data(cid).color = c;
     }
 }
 
@@ -746,11 +737,11 @@ void Hexmesh<M,V,E,F,C>::cell_set_color(const Color & c)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::cell_set_alpha(const float alpha)
+void Hexmesh<M,V,E,F,C>::poly_set_alpha(const float alpha)
 {
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
-        cell_data(cid).color.a = alpha;
+        poly_data(cid).color.a = alpha;
     }
 }
 
@@ -841,10 +832,10 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Hexmesh<M,V,E,F,C>::update_cell_quality(const uint cid)
 {
-    cell_data(cid).quality = hex_scaled_jacobian(cell_vert(cid,0), cell_vert(cid,1),
-                                                 cell_vert(cid,2), cell_vert(cid,3),
-                                                 cell_vert(cid,4), cell_vert(cid,5),
-                                                 cell_vert(cid,6), cell_vert(cid,7));
+    poly_data(cid).quality = hex_scaled_jacobian(poly_vert(cid,0), poly_vert(cid,1),
+                                                 poly_vert(cid,2), poly_vert(cid,3),
+                                                 poly_vert(cid,4), poly_vert(cid,5),
+                                                 poly_vert(cid,6), poly_vert(cid,7));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -853,7 +844,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Hexmesh<M,V,E,F,C>::update_cell_quality()
 {
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
         update_cell_quality(cid);
     }
@@ -863,13 +854,13 @@ void Hexmesh<M,V,E,F,C>::update_cell_quality()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Hexmesh<M,V,E,F,C>::cells_subdivide(const std::vector<std::vector<std::vector<uint>>> & cell_split_scheme)
+void Hexmesh<M,V,E,F,C>::poly_subdivide(const std::vector<std::vector<std::vector<uint>>> & cell_split_scheme)
 {
     std::vector<vec3d> new_verts;
     std::vector<uint>  new_cells;
     std::map<std::vector<uint>,uint> v_map;
 
-    for(uint cid=0; cid<this->num_cells(); ++cid)
+    for(uint cid=0; cid<this->num_polys(); ++cid)
     {
         for(const auto & sub_cell: cell_split_scheme)
         {
@@ -877,7 +868,7 @@ void Hexmesh<M,V,E,F,C>::cells_subdivide(const std::vector<std::vector<std::vect
             for(uint off=0; off<8; ++off)
             {
                 std::vector<uint> vids;
-                for(uint i : sub_cell.at(off)) vids.push_back(cell_vert_id(cid,i));
+                for(uint i : sub_cell.at(off)) vids.push_back(poly_vert_id(cid,i));
                 sort(vids.begin(), vids.end());
 
                 auto query = v_map.find(vids);

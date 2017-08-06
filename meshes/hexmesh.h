@@ -38,8 +38,9 @@
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/quadmesh.h>
-#include <cinolib/hexmesh_split_schemas.h>
 #include <cinolib/meshes/mesh_attributes.h>
+#include <cinolib/meshes/abstract_volume_mesh.h>
+#include <cinolib/hexmesh_split_schemas.h>
 
 namespace cinolib
 {
@@ -84,10 +85,10 @@ class Hexmesh
         Hexmesh(const char * filename);
 
         Hexmesh(const std::vector<double> & coords,
-                const std::vector<uint>   & cells);
+                const std::vector<uint>   & polys);
 
         Hexmesh(const std::vector<vec3d> & verts,
-                const std::vector<uint>  & cells);
+                const std::vector<uint>  & polys);
 
     protected:
 
@@ -96,7 +97,7 @@ class Hexmesh
         std::vector<vec3d> verts;
         std::vector<uint>  edges;
         std::vector<uint>  faces;     // boundary only!
-        std::vector<uint>  cells;
+        std::vector<uint>  polys;
         std::vector<bool>  v_on_srf;  // true if a vertex is on the surface, false otherwise
         std::vector<bool>  e_on_srf;  // true if a vertex is on the surface, false otherwise
 
@@ -106,22 +107,22 @@ class Hexmesh
         std::vector<V> v_data;
         std::vector<E> e_data;
         std::vector<F> f_data;
-        std::vector<C> c_data;
+        std::vector<C> p_data;
 
         // adjacencies -- Yes, I have lots of memory ;)
         //
         std::vector<std::vector<uint>> v2v; // vert to vert adjacency
         std::vector<std::vector<uint>> v2e; // vert to edge adjacency
         std::vector<std::vector<uint>> v2f; // vert to face adjacency
-        std::vector<std::vector<uint>> v2c; // vert to cell adjacency
+        std::vector<std::vector<uint>> v2p; // vert to cell adjacency
         std::vector<std::vector<uint>> e2f; // edge to face adjacency
-        std::vector<std::vector<uint>> e2c; // edge to cell adjacency
+        std::vector<std::vector<uint>> e2p; // edge to cell adjacency
         std::vector<std::vector<uint>> f2e; // face to edge adjacency
         std::vector<std::vector<uint>> f2f; // face to face adjacency
-        std::vector<uint>              f2c; // face to cell adjacency
-        std::vector<std::vector<uint>> c2e; // cell to edge adjacency
-        std::vector<std::vector<uint>> c2f; // cell to face adjacency
-        std::vector<std::vector<uint>> c2c; // cell to cell adjacency
+        std::vector<uint>              f2p; // face to cell adjacency
+        std::vector<std::vector<uint>> p2e; // cell to edge adjacency
+        std::vector<std::vector<uint>> p2f; // cell to face adjacency
+        std::vector<std::vector<uint>> p2p; // cell to cell adjacency
 
     public:
 
@@ -143,17 +144,16 @@ class Hexmesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint verts_per_face() const { return  4; }
-        uint verts_per_cell() const { return  8; }
-        uint edges_per_cell() const { return 12; }
-        uint faces_per_cell() const { return  6; }
+        uint verts_per_poly() const { return  8; }
+        uint edges_per_poly() const { return 12; }
+        uint faces_per_poly() const { return  6; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint num_verts() const { return verts.size();                    }
         uint num_edges() const { return edges.size() / 2;                }
         uint num_faces() const { return faces.size() / verts_per_face(); }
-        uint num_cells() const { return cells.size() / verts_per_cell(); }
-        uint num_polys() const { return cells.size() / verts_per_cell(); } // elem == cell!!
+        uint num_polys() const { return polys.size() / verts_per_poly(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -162,7 +162,7 @@ class Hexmesh
         const std::vector<vec3d>  & vector_verts()  const { return verts; }
         const std::vector<uint>   & vector_edges()  const { return edges; }
         const std::vector<uint>   & vector_faces()  const { return faces; }
-        const std::vector<uint>   & vector_cells()  const { return cells; }
+        const std::vector<uint>   & vector_polys()  const { return polys; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -180,15 +180,15 @@ class Hexmesh
         const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
         const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
         const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
-        const std::vector<uint> & adj_v2c(const uint vid) const { return v2c.at(vid); }
+        const std::vector<uint> & adj_v2p(const uint vid) const { return v2p.at(vid); }
         const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
-        const std::vector<uint> & adj_e2c(const uint eid) const { return e2c.at(eid); }
+        const std::vector<uint> & adj_e2p(const uint eid) const { return e2p.at(eid); }
         const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
         const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
-              uint                adj_f2c(const uint fid) const { return f2c.at(fid); }
-        const std::vector<uint> & adj_c2e(const uint cid) const { return c2e.at(cid); }
-        const std::vector<uint> & adj_c2f(const uint cid) const { return c2f.at(cid); }
-        const std::vector<uint> & adj_c2c(const uint cid) const { return c2c.at(cid); }
+              uint                adj_f2p(const uint fid) const { return f2p.at(fid); }
+        const std::vector<uint> & adj_p2e(const uint cid) const { return p2e.at(cid); }
+        const std::vector<uint> & adj_p2f(const uint cid) const { return p2f.at(cid); }
+        const std::vector<uint> & adj_p2c(const uint cid) const { return p2p.at(cid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -200,10 +200,8 @@ class Hexmesh
               E & edge_data(const uint eid)       { return e_data.at(eid); }
         const F & face_data(const uint fid) const { return f_data.at(fid); }
               F & face_data(const uint fid)       { return f_data.at(fid); }
-        const C & cell_data(const uint cid) const { return c_data.at(cid); }
-              C & cell_data(const uint cid)       { return c_data.at(cid); }
-        const C & poly_data(const uint cid) const { return c_data.at(cid); } // elem == cell!!
-              C & poly_data(const uint cid)       { return c_data.at(cid); }
+        const C & poly_data(const uint cid) const { return p_data.at(cid); }
+              C & poly_data(const uint cid)       { return p_data.at(cid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -234,25 +232,16 @@ class Hexmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d  cell_vert         (const uint cid, const uint off)   const;
-        uint   cell_vert_id      (const uint cid, const uint off)   const;
-        uint   cell_edge_id      (const uint cid, const uint vid0, const uint vid1) const;
-        vec3d  cell_centroid     (const uint cid) const;
-        int    cell_shared_face  (const uint cid0, const uint cid1) const;
-        bool   cell_contains_vert(const uint cid, const uint vid)   const;
-        void   cell_set_color    (const Color & c);
-        void   cell_set_alpha    (const float alpha);
-        void   cells_subdivide   (const std::vector<std::vector<std::vector<uint>>> & split_scheme);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        // These are all wraps for the "cell_ methods". They are useful for generic
-        // programming, because "poly_" will wrap face_ for surface meshes and wrap
-        // "cell_" for volumetric meshes, allowing the use of templated algorithms
-        // that work with both types of meshes without requiring specialzed code
-
-        vec3d poly_centroid(const uint cid) const;
-        void  poly_show_all();
+        vec3d  poly_vert         (const uint cid, const uint off)   const;
+        uint   poly_vert_id      (const uint cid, const uint off)   const;
+        uint   poly_edge_id      (const uint cid, const uint vid0, const uint vid1) const;
+        vec3d  poly_centroid     (const uint cid) const;
+        int    poly_shared_face  (const uint cid0, const uint cid1) const;
+        bool   poly_contains_vert(const uint cid, const uint vid)   const;
+        void   poly_set_color    (const Color & c);
+        void   poly_set_alpha    (const float alpha);
+        void   poly_subdivide    (const std::vector<std::vector<std::vector<uint>>> & split_scheme);
+        void   poly_show_all();
 };
 
 }
