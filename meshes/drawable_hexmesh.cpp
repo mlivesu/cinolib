@@ -38,52 +38,52 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-DrawableHexmesh<M,V,E,F,C>::DrawableHexmesh() : Hexmesh<M,V,E,F,C>()
+DrawableHexmesh<M,V,E,F,P>::DrawableHexmesh() : Hexmesh<M,V,E,F,P>()
 {
     init_drawable_stuff();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-DrawableHexmesh<M,V,E,F,C>::DrawableHexmesh(const char *filename)
-    : Hexmesh<M,V,E,F,C>(filename)
+DrawableHexmesh<M,V,E,F,P>::DrawableHexmesh(const char *filename)
+    : Hexmesh<M,V,E,F,P>(filename)
 {
     init_drawable_stuff();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-DrawableHexmesh<M,V,E,F,C>::DrawableHexmesh(const std::vector<vec3d> & verts,
+DrawableHexmesh<M,V,E,F,P>::DrawableHexmesh(const std::vector<vec3d> & verts,
                                             const std::vector<uint>  & cells)
-    : Hexmesh<M,V,E,F,C>(verts, cells)
+    : Hexmesh<M,V,E,F,P>(verts, cells)
 {
     init_drawable_stuff();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-DrawableHexmesh<M,V,E,F,C>::DrawableHexmesh(const std::vector<double> & coords,
+DrawableHexmesh<M,V,E,F,P>::DrawableHexmesh(const std::vector<double> & coords,
                                             const std::vector<uint>   & cells)
-    : Hexmesh<M,V,E,F,C>(coords, cells)
+    : Hexmesh<M,V,E,F,P>(coords, cells)
 {
     init_drawable_stuff();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::init_drawable_stuff()
+void DrawableHexmesh<M,V,E,F,P>::init_drawable_stuff()
 {
-    slicer = MeshSlicer<DrawableHexmesh<M,V,E,F,C>>(*this);
+    slicer = MeshSlicer<DrawableHexmesh<M,V,E,F,P>>(*this);
 
     drawlist_in.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_in.seg_width = 1;
@@ -99,9 +99,9 @@ void DrawableHexmesh<M,V,E,F,C>::init_drawable_stuff()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::draw(const float) const
+void DrawableHexmesh<M,V,E,F,P>::draw(const float) const
 {
     render(drawlist_in );
     render(drawlist_out);
@@ -109,9 +109,9 @@ void DrawableHexmesh<M,V,E,F,C>::draw(const float) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::updateGL()
+void DrawableHexmesh<M,V,E,F,P>::updateGL()
 {
     updateGL_out();
     updateGL_in();
@@ -119,9 +119,9 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::updateGL_out()
+void DrawableHexmesh<M,V,E,F,P>::updateGL_out()
 {
     drawlist_out.tris.clear();
     drawlist_out.tri_coords.clear();
@@ -134,7 +134,12 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_out()
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        if (!(this->poly_data(this->adj_f2p(fid)).visible)) continue;
+        if (!this->face_is_on_srf(fid)) continue;
+
+        assert(this->adj_f2p(fid).size()==1);
+        uint pid = this->adj_f2p(fid).front();
+
+        if (!(this->poly_data(pid).visible)) continue;
 
         uint vid0 = this->face_vert_id(fid,0);
         uint vid1 = this->face_vert_id(fid,1);
@@ -202,7 +207,7 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_out()
         }
         else if (drawlist_out.draw_mode & DRAW_TRI_QUALITY)
         {
-            float q = this->poly_data(this->adj_f2p(fid)).quality;
+            float q = this->poly_data(pid).quality;
             Color c = Color::quality2rgb(q);
             drawlist_out.tri_v_colors.push_back(c.r);
             drawlist_out.tri_v_colors.push_back(c.g);
@@ -320,9 +325,9 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_out()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
+void DrawableHexmesh<M,V,E,F,P>::updateGL_in()
 {
     drawlist_in.tri_coords.clear();
     drawlist_in.tris.clear();
@@ -337,7 +342,7 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
     {
         if (!(this->poly_data(pid).visible)) continue;
 
-        for(uint nbr : this->adj_p2c(pid))
+        for(uint nbr : this->adj_p2p(pid))
         {
             if (!(this->poly_data(nbr).visible))
             {
@@ -536,9 +541,9 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::slice(const float thresh, // thresh on centroids or quality
+void DrawableHexmesh<M,V,E,F,P>::slice(const float thresh, // thresh on centroids or quality
                                        const int   item,   // X, Y, Z, L, Q
                                        const int   sign,   // either LEQ or GEQ
                                        const int   mode)   // either AND or OR
@@ -549,9 +554,9 @@ void DrawableHexmesh<M,V,E,F,C>::slice(const float thresh, // thresh on centroid
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_mesh(const bool b)
+void DrawableHexmesh<M,V,E,F,P>::show_mesh(const bool b)
 {
     if (b)
     {
@@ -567,9 +572,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_mesh(const bool b)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_mesh_flat()
+void DrawableHexmesh<M,V,E,F,P>::show_mesh_flat()
 {
     drawlist_in.draw_mode  |=  DRAW_TRI_FLAT;
     drawlist_in.draw_mode  &= ~DRAW_TRI_SMOOTH;
@@ -581,9 +586,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_mesh_flat()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_mesh_smooth()
+void DrawableHexmesh<M,V,E,F,P>::show_mesh_smooth()
 {
     drawlist_in.draw_mode  |=  DRAW_TRI_SMOOTH;
     drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
@@ -595,9 +600,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_mesh_smooth()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_mesh_points()
+void DrawableHexmesh<M,V,E,F,P>::show_mesh_points()
 {
     drawlist_in.draw_mode  |=  DRAW_TRI_POINTS;
     drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
@@ -609,9 +614,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_mesh_points()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_face_color()
+void DrawableHexmesh<M,V,E,F,P>::show_face_color()
 {
     drawlist_out.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
@@ -623,9 +628,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_face_color()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_face_quality()
+void DrawableHexmesh<M,V,E,F,P>::show_face_quality()
 {
     drawlist_out.draw_mode |=  DRAW_TRI_QUALITY;
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
@@ -637,9 +642,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_face_quality()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_face_texture1D(const GLint texture)
+void DrawableHexmesh<M,V,E,F,P>::show_face_texture1D(const GLint texture)
 {
     drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
@@ -667,9 +672,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_face_texture1D(const GLint texture)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_face_wireframe(const bool b)
+void DrawableHexmesh<M,V,E,F,P>::show_face_wireframe(const bool b)
 {
     if (b) drawlist_out.draw_mode |=  DRAW_SEGS;
     else   drawlist_out.draw_mode &= ~DRAW_SEGS;
@@ -677,9 +682,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_face_wireframe(const bool b)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_face_wireframe_color(const Color & c)
+void DrawableHexmesh<M,V,E,F,P>::show_face_wireframe_color(const Color & c)
 {
     this->edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();
@@ -687,18 +692,18 @@ void DrawableHexmesh<M,V,E,F,C>::show_face_wireframe_color(const Color & c)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_face_wireframe_width(const float width)
+void DrawableHexmesh<M,V,E,F,P>::show_face_wireframe_width(const float width)
 {
     drawlist_out.seg_width = width;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_face_wireframe_transparency(const float alpha)
+void DrawableHexmesh<M,V,E,F,P>::show_face_wireframe_transparency(const float alpha)
 {
     this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();
@@ -706,9 +711,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_face_wireframe_transparency(const float al
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_cell_color()
+void DrawableHexmesh<M,V,E,F,P>::show_cell_color()
 {
     drawlist_in.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
@@ -720,9 +725,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_cell_color()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_cell_quality()
+void DrawableHexmesh<M,V,E,F,P>::show_cell_quality()
 {
     drawlist_in.draw_mode |=  DRAW_TRI_QUALITY;
     drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
@@ -734,9 +739,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_cell_quality()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_cell_texture1D(const GLint texture)
+void DrawableHexmesh<M,V,E,F,P>::show_cell_texture1D(const GLint texture)
 {
     drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
@@ -764,9 +769,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_cell_texture1D(const GLint texture)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_cell_wireframe(const bool b)
+void DrawableHexmesh<M,V,E,F,P>::show_cell_wireframe(const bool b)
 {
     if (b) drawlist_in.draw_mode |=  DRAW_SEGS;
     else   drawlist_in.draw_mode &= ~DRAW_SEGS;
@@ -774,9 +779,9 @@ void DrawableHexmesh<M,V,E,F,C>::show_cell_wireframe(const bool b)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_cell_wireframe_color(const Color & c)
+void DrawableHexmesh<M,V,E,F,P>::show_cell_wireframe_color(const Color & c)
 {
     this->edge_set_color(c); // NOTE: this will change color for ANY adge (both interior and boundary)
     updateGL();
@@ -784,18 +789,18 @@ void DrawableHexmesh<M,V,E,F,C>::show_cell_wireframe_color(const Color & c)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_cell_wireframe_width(const float width)
+void DrawableHexmesh<M,V,E,F,P>::show_cell_wireframe_width(const float width)
 {
     drawlist_in.seg_width = width;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableHexmesh<M,V,E,F,C>::show_cell_wireframe_transparency(const float alpha)
+void DrawableHexmesh<M,V,E,F,P>::show_cell_wireframe_transparency(const float alpha)
 {
     this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();

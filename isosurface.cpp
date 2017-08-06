@@ -50,7 +50,7 @@ Trimesh<> Isosurface::export_as_trimesh() const
 CINO_INLINE
 void Isosurface::tessellate(std::vector<double> & new_coords,
                             std::vector<uint>   & new_cells,
-                            std::vector<float>  & new_field) const
+                            std::vector<double> & new_field) const
 {
     new_cells.clear();
     new_coords = m_ptr->vector_coords();

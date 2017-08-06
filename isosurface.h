@@ -49,7 +49,7 @@ class Isosurface
 
         void tessellate(std::vector<double> & coords,
                         std::vector<uint>   & new_cells,
-                        std::vector<float>  & new_field) const;
+                        std::vector<double> & new_field) const;
 
         const std::map<ipair,double> & edges_split() const { return split_info; }
 

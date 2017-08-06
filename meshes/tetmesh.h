@@ -140,7 +140,7 @@ class Tetmesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<float> serialize_uvw(const int mode) const;
+        std::vector<double> serialize_uvw(const int mode) const;
         void               copy_xyz_to_uvw(const int mode);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

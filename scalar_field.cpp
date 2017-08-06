@@ -39,7 +39,7 @@ ScalarField::ScalarField()
 {}
 
 CINO_INLINE
-ScalarField::ScalarField(const std::vector<float> & data)
+ScalarField::ScalarField(const std::vector<double> &data)
 {
     resize(data.size());
     for(uint i=0; i<rows(); ++i)

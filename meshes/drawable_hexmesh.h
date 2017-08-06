@@ -44,8 +44,8 @@ template<class M = Mesh_min_attributes, // default template arguments
          class V = Vert_min_attributes,
          class E = Edge_min_attributes,
          class F = Polygon_min_attributes,
-         class C = Polyhedron_min_attributes>
-class DrawableHexmesh : public Hexmesh<M,V,E,F,C>, public DrawableObject
+         class P = Polyhedron_min_attributes>
+class DrawableHexmesh : public Hexmesh<M,V,E,F,P>, public DrawableObject
 {
 
     public:
@@ -64,7 +64,7 @@ class DrawableHexmesh : public Hexmesh<M,V,E,F,C>, public DrawableObject
 
         RenderData drawlist_in;
         RenderData drawlist_out;        
-        MeshSlicer<DrawableHexmesh<M,V,E,F,C>> slicer;
+        MeshSlicer<DrawableHexmesh<M,V,E,F,P>> slicer;
 
     public:
 

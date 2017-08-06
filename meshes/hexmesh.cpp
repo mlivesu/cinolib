@@ -239,10 +239,15 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Hexmesh<M,V,E,F,P>::update_hex_quality(const uint cid)
 {
-    this->poly_data(cid).quality = hex_scaled_jacobian(this->poly_vert(cid,0), this->poly_vert(cid,1),
-                                                       this->poly_vert(cid,2), this->poly_vert(cid,3),
-                                                       this->poly_vert(cid,4), this->poly_vert(cid,5),
-                                                       this->poly_vert(cid,6), this->poly_vert(cid,7));
+    std::vector<uint> vids = this->poly_vlist_as_hexa(cid);
+    this->poly_data(cid).quality = hex_scaled_jacobian(this->vert(vids.at(0)),
+                                                       this->vert(vids.at(1)),
+                                                       this->vert(vids.at(2)),
+                                                       this->vert(vids.at(3)),
+                                                       this->vert(vids.at(4)),
+                                                       this->vert(vids.at(5)),
+                                                       this->vert(vids.at(6)),
+                                                       this->vert(vids.at(7)));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -267,15 +272,17 @@ void Hexmesh<M,V,E,F,P>::poly_subdivide(const std::vector<std::vector<std::vecto
     std::vector<uint>  new_cells;
     std::map<std::vector<uint>,uint> v_map;
 
-    for(uint cid=0; cid<this->num_polys(); ++cid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
+        std::vector<uint> vlist = this->poly_vlist_as_hexa(pid);
+
         for(const auto & sub_cell: cell_split_scheme)
         {
             assert(sub_cell.size() == 8);
             for(uint off=0; off<8; ++off)
             {
                 std::vector<uint> vids;
-                for(uint i : sub_cell.at(off)) vids.push_back(poly_vert_id(cid,i));
+                for(uint i : sub_cell.at(off)) vids.push_back(vlist.at(i));
                 sort(vids.begin(), vids.end());
 
                 auto query = v_map.find(vids);

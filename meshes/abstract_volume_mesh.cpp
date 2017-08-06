@@ -203,6 +203,30 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_adjacency()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::face_set_color(const Color & c)
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        face_data(fid).color = c;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::face_set_alpha(const float alpha)
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        face_data(fid).color.a = alpha;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_id(const uint pid, const uint off) const
 {
     return this->polys.at(pid).at(off);
@@ -288,6 +312,49 @@ vec3d AbstractPolyhedralMesh<M,V,E,F,P>::poly_centroid(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_vlist_as_hexa(const uint pid) const
+{
+    assert(this->verts_per_poly(pid) == 8);
+    assert(this->faces_per_poly(pid) == 6);
+
+    std::vector<uint> v_list;
+
+    uint off_f0 = 0;
+    uint off_f1 = 1;
+
+    // put the first four vertices CCW
+    uint fid0 = this->poly_face_id(pid,off_f0);
+    std::vector<uint> f0;
+    for(uint i=0; i<this->verts_per_face(fid0); ++i) f0.push_back(this->face_vert_id(fid0,i));
+    if (this->poly_face_is_CW(pid,off_f0)) std::reverse(f0.begin(),f0.end());
+    for(uint vid : f0) v_list.push_back(vid);
+
+    // find its opposite face and sort it CW
+    uint fid1 = this->poly_face_id(pid,off_f1);
+    while(!this->faces_are_disjoint(fid0,fid1) && off_f1<6)
+    {
+        fid1 = this->poly_face_id(pid,++off_f1);
+    }
+    if (off_f1 > 5) assert(false && "Not a hex!");
+    std::vector<uint> f1;
+    for(uint i=0; i<this->verts_per_face(fid1); ++i) f1.push_back(this->face_vert_id(fid1,i));
+    if (this->poly_face_is_CCW(pid,off_f1)) std::reverse(f1.begin(),f1.end());
+
+    // align the first vertices of f0 and f1 so that there exists
+    // an edge in the polyhedron directly connecting them
+    uint offset = 0;
+    while (!this->poly_contains_edge(pid,f0.front(),f1.at(offset)) && offset<4) ++offset;
+    assert(offset<4);
+
+    for(uint i=0; i<4; ++i) v_list.push_back(f1.at((offset+i)%4));
+
+    return v_list;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::faces_are_disjoint(const uint fid0, const uint fid1) const
 {
     for(uint i=0; i<verts_per_face(fid0); ++i)
@@ -332,6 +399,8 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_edge_id(const uint fid, const uint 
             return eid;
         }
     }
+    assert(false && "Something is off here");
+    return 0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

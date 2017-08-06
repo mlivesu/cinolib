@@ -913,9 +913,9 @@ bool Tetmesh<M,V,E,F,C>::edge_is_on_srf(const uint eid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-std::vector<float> Tetmesh<M,V,E,F,C>::serialize_uvw(const int mode) const
+std::vector<double> Tetmesh<M,V,E,F,C>::serialize_uvw(const int mode) const
 {
-    std::vector<float> uvw;
+    std::vector<double> uvw;
     for(uint vid=0; vid<num_verts(); ++vid)
     {
         switch (mode)

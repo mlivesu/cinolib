@@ -77,11 +77,11 @@ class DrawablePolyhedralmesh : public Polyhedralmesh<M,V,E,F,C>, public Drawable
         void vert_set_color(const Color & c) { Polyhedralmesh<M,V,E,F,C>::vert_set_color(c); updateGL(); }
         void edge_set_color(const Color & c) { Polyhedralmesh<M,V,E,F,C>::edge_set_color(c); updateGL(); }
         void face_set_color(const Color & c) { Polyhedralmesh<M,V,E,F,C>::face_set_color(c); updateGL(); }
-        void cell_set_color(const Color & c) { Polyhedralmesh<M,V,E,F,C>::cell_set_color(c); updateGL(); }
+        void poly_set_color(const Color & c) { Polyhedralmesh<M,V,E,F,C>::poly_set_color(c); updateGL(); }
         void vert_set_alpha(const float   a) { Polyhedralmesh<M,V,E,F,C>::vert_set_alpha(a); updateGL(); }
         void edge_set_alpha(const float   a) { Polyhedralmesh<M,V,E,F,C>::edge_set_alpha(a); updateGL(); }
         void face_set_alpha(const float   a) { Polyhedralmesh<M,V,E,F,C>::face_set_alpha(a); updateGL(); }
-        void cell_set_alpha(const float   a) { Polyhedralmesh<M,V,E,F,C>::cell_set_alpha(a); updateGL(); }
+        void poly_set_alpha(const float   a) { Polyhedralmesh<M,V,E,F,C>::poly_set_alpha(a); updateGL(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

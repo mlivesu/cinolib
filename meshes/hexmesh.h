@@ -106,11 +106,8 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint  face_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void   poly_subdivide    (const std::vector<std::vector<std::vector<uint>>> & split_scheme);
+        void   poly_subdivide(const std::vector<std::vector<std::vector<uint>>> & split_scheme);
+        double poly_volume   (const uint) const { assert(false && "TODO!"); return 1.0; }
 };
 
 }
