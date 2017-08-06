@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/meshes/skel_sampling.h>
+#include <cinolib/skel_sampling.h>
 #include <set>
 
 namespace cinolib

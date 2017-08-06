@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/meshes/marching_tets.h>
+#include <cinolib/marching_tets.h>
 
 namespace cinolib
 {

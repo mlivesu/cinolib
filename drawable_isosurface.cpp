@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/meshes/drawable_isosurface.h>
+#include <cinolib/drawable_isosurface.h>
 
 namespace cinolib
 {

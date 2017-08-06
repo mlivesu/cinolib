@@ -28,8 +28,8 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/meshes/isosurface.h>
-#include <cinolib/meshes/marching_tets.h>
+#include <cinolib/isosurface.h>
+#include <cinolib/marching_tets.h>
 #include <cinolib/tetrahedralization.h>
 
 namespace cinolib
