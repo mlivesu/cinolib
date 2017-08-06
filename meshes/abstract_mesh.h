@@ -57,7 +57,7 @@ namespace cinolib
 template<class M, // mesh attributes
          class V, // vert attributes
          class E, // edge attributes
-         class P> // polygon attributes for surface meshes, polyhedra attributes for volume meshes
+         class P> // cell attributes (i.e., polygons for surface meshes, polyhedra for volume meshes)
 class AbstractMesh
 {
     protected:
@@ -66,7 +66,7 @@ class AbstractMesh
 
         std::vector<vec3d>             verts;
         std::vector<uint>              edges;
-        std::vector<std::vector<uint>> polys;
+        std::vector<std::vector<uint>> polys; // either polygons or polyhedra
 
         M              m_data;
         std::vector<V> v_data;
@@ -132,7 +132,9 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual std::vector<float> export_uvw_param(const int mode) const;
+        virtual std::vector<double> serialize_uvw  (const int mode) const;
+        virtual void                copy_xyz_to_uvw(const int mode);
+        virtual void                copy_uvw_to_xyz(const int mode);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

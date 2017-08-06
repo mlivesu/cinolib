@@ -109,28 +109,35 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-         virtual bool  edge_is_on_srf(const uint eid) const;
+        virtual bool vert_is_on_srf(const uint vid) const;
 
-         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-         virtual vec3d face_vert          (const uint fid, const uint off) const;
-         virtual uint  face_vert_id       (const uint fid, const uint off) const;
-         virtual bool  face_is_on_srf     (const uint fid) const;
-         virtual bool  face_contrains_vert(const uint fid, const uint vid) const;
-         virtual bool  faces_are_disjoint (const uint fid0, const uint fid1) const;
+        virtual bool edge_is_on_srf(const uint eid) const;
 
-         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-         virtual double poly_volume       (const uint pid) const = 0;
-         virtual double poly_mass         (const uint pid) const;
-         virtual bool   poly_contains_vert(const uint fid, const uint vid) const;
-         virtual bool   poly_contains_face(const uint pid, const uint fid) const;
-         virtual bool   poly_is_on_surf   (const uint pid) const;
-         virtual uint   poly_face_id      (const uint pid, const uint off) const;
-         virtual bool   poly_face_is_CCW  (const uint pid, const uint off) const;
-         virtual bool   poly_face_is_CW   (const uint pid, const uint off) const;
-         virtual uint   poly_face_offset  (const uint pid, const uint fid) const;
-         virtual vec3d  poly_centroid     (const uint pid) const;
+        virtual vec3d face_vert          (const uint fid, const uint off) const;
+        virtual uint  face_vert_id       (const uint fid, const uint off) const;
+        virtual uint  face_edge_id       (const uint fid, const uint vid0, const uint vid1) const;
+        virtual bool  face_is_on_srf     (const uint fid) const;
+        virtual bool  face_contrains_vert(const uint fid, const uint vid) const;
+        virtual vec3d face_centroid      (const uint fid) const;
+        virtual bool  faces_are_disjoint (const uint fid0, const uint fid1) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual double poly_volume       (const uint pid) const = 0;
+        virtual double poly_mass         (const uint pid) const;
+        virtual bool   poly_contains_vert(const uint fid, const uint vid) const;
+        virtual bool   poly_contains_face(const uint pid, const uint fid) const;
+        virtual bool   poly_is_on_surf   (const uint pid) const;
+        virtual int    poly_shared_face  (const uint pid0, const uint pid1) const;
+        virtual uint   poly_face_id      (const uint pid, const uint off) const;
+        virtual bool   poly_face_is_CCW  (const uint pid, const uint off) const;
+        virtual bool   poly_face_is_CW   (const uint pid, const uint off) const;
+        virtual uint   poly_face_offset  (const uint pid, const uint fid) const;
+        virtual vec3d  poly_centroid     (const uint pid) const;
 
 };
 

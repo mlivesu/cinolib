@@ -32,6 +32,7 @@
 #define CINO_QUADMESH_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/standard_elements_tables.h>
 #include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/meshes/abstract_surface_mesh.h>
 
@@ -40,14 +41,6 @@
 
 namespace cinolib
 {
-
-static const uint QUAD_EDGES[4][2] =
-{
-    { 0, 1 }, // 0
-    { 1, 2 }, // 1
-    { 2, 3 }, // 2
-    { 3, 0 }, // 3
-};
 
 template<class M = Mesh_min_attributes, // default template arguments
          class V = Vert_min_attributes,

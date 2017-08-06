@@ -54,7 +54,7 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
 {
     new_cells.clear();
     new_coords = m_ptr->vector_coords();
-    new_field  = m_ptr->export_uvw_param(U_param);
+    new_field  = m_ptr->serialize_uvw(U_param);
 
     // add vertices at split points
     //

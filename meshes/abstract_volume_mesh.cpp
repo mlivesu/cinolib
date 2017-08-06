@@ -320,6 +320,24 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_vert_id(const uint fid, const uint 
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::face_edge_id(const uint fid, const uint vid0, const uint vid1) const
+{
+    assert(face_contrains_vert(fid,vid0));
+    assert(face_contrains_vert(fid,vid1));
+    for(uint eid : adj_f2e(fid))
+    {
+        if (this->edge_contains_vert(eid,vid0) &&
+            this->edge_contains_vert(eid,vid1))
+        {
+            return eid;
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_on_srf(const uint fid) const
 {
     return f_on_srf.at(fid);
@@ -342,9 +360,47 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_contrains_vert(const uint fid, cons
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+vec3d AbstractPolyhedralMesh<M,V,E,F,P>::face_centroid(const uint fid) const
+{
+    vec3d c(0,0,0);
+    for(uint off=0; off<verts_per_face(fid); ++off) c += face_vert(fid,off);
+    c /= static_cast<double>(verts_per_face(fid));
+    return c;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int AbstractPolyhedralMesh<M,V,E,F,P>::poly_shared_face(const uint pid0, const uint pid1) const
+{
+    for(uint i=0; i<this->faces_per_poly(pid0); ++i)
+    for(uint j=0; j<this->faces_per_poly(pid1); ++j)
+    {
+        if (poly_face_id(pid0,i) == poly_face_id(pid1,j))
+        {
+            return poly_face_id(pid0,i);
+        }
+    }
+    return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 double AbstractPolyhedralMesh<M,V,E,F,P>::poly_mass(const uint pid) const
 {
     return poly_volume(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::vert_is_on_srf(const uint vid) const
+{
+    return v_on_srf.at(vid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

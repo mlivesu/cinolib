@@ -188,9 +188,9 @@ std::vector<double> AbstractMesh<M,V,E,P>::vector_coords() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<float> AbstractMesh<M,V,E,P>::export_uvw_param(const int mode) const
+std::vector<double> AbstractMesh<M, V, E, P>::serialize_uvw(const int mode) const
 {
-    std::vector<float> uvw;
+    std::vector<double> uvw;
     uvw.reserve(num_verts());
     for(uint vid=0; vid<num_verts(); ++vid)
     {
@@ -212,6 +212,60 @@ std::vector<float> AbstractMesh<M,V,E,P>::export_uvw_param(const int mode) const
         }
     }
     return uvw;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::copy_xyz_to_uvw(const int mode)
+{
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        switch (mode)
+        {
+            case U_param  : vert_data(vid).uvw[0] = vert(vid).x(); break;
+            case V_param  : vert_data(vid).uvw[1] = vert(vid).y(); break;
+            case W_param  : vert_data(vid).uvw[2] = vert(vid).z(); break;
+            case UV_param : vert_data(vid).uvw[0] = vert(vid).x();
+                            vert_data(vid).uvw[1] = vert(vid).y(); break;
+            case UW_param : vert_data(vid).uvw[0] = vert(vid).x();
+                            vert_data(vid).uvw[2] = vert(vid).z(); break;
+            case VW_param : vert_data(vid).uvw[1] = vert(vid).y();
+                            vert_data(vid).uvw[2] = vert(vid).z(); break;
+            case UVW_param: vert_data(vid).uvw[0] = vert(vid).x();
+                            vert_data(vid).uvw[1] = vert(vid).y();
+                            vert_data(vid).uvw[2] = vert(vid).z(); break;
+            default: assert(false);
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::copy_uvw_to_xyz(const int mode)
+{
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        switch (mode)
+        {
+            case U_param  : vert(vid).x() = vert_data(vid).uvw[0]; break;
+            case V_param  : vert(vid).y() = vert_data(vid).uvw[1]; break;
+            case W_param  : vert(vid).z() = vert_data(vid).uvw[2]; break;
+            case UV_param : vert(vid).x() = vert_data(vid).uvw[0];
+                            vert(vid).y() = vert_data(vid).uvw[1]; break;
+            case UW_param : vert(vid).x() = vert_data(vid).uvw[0];
+                            vert(vid).z() = vert_data(vid).uvw[2]; break;
+            case VW_param : vert(vid).y() = vert_data(vid).uvw[1];
+                            vert(vid).z() = vert_data(vid).uvw[2]; break;
+            case UVW_param: vert(vid).x() = vert_data(vid).uvw[0];
+                            vert(vid).y() = vert_data(vid).uvw[1];
+                            vert(vid).z() = vert_data(vid).uvw[2]; break;
+            default: assert(false);
+        }
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

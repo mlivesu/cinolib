@@ -28,48 +28,81 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_TETRAHEDRON_H
-#define CINO_TETRAHEDRON_H
+#ifndef CINO_STANDARD_ELEMENTS_TABLES_H
+#define CINO_STANDARD_ELEMENTS_TABLES_H
 
-#include <cinolib/cinolib.h>
-#include <cinolib/standard_elements_tables.h>
-#include <cinolib/geometry/vec3.h>
+#include <sys/types.h>
 
 namespace cinolib
 {
 
-CINO_INLINE
-bool tet_barycentric_coords(const vec3d & A,
-                            const vec3d & B,
-                            const vec3d & C,
-                            const vec3d & D,
-                            const vec3d & P,
-                            std::vector<double> & wgts,
-                            const double  tol = 1e-5);
+static const uint TRI_EDGES[3][2] =
+{
+    { 0, 1 }, // e0
+    { 1, 2 }, // e1
+    { 2, 0 }, // e2
+};
 
+static const uint QUAD_EDGES[4][2] =
+{
+    { 0, 1 }, // e0
+    { 1, 2 }, // e1
+    { 2, 3 }, // e2
+    { 3, 0 }, // e3
+};
 
-CINO_INLINE
-void tet_closest_vertex(const vec3d  & A,
-                        const vec3d  & B,
-                        const vec3d  & C,
-                        const vec3d  & D,
-                        const vec3d  & query,
-                              uint   & id,
-                              double & dist);
+static const uint TET_FACES[4][3] =
+{
+    { 0, 2, 1 } , // f0
+    { 0, 1, 3 } , // f1
+    { 0, 3, 2 } , // f2
+    { 1, 2, 3 }   // f3
+};
 
+static const uint TET_EDGES[6][2] =
+{
+    { 0, 2 }, // e0
+    { 2, 1 }, // e1
+    { 1, 0 }, // e2
+    { 1, 3 }, // e3
+    { 3, 0 }, // e4
+    { 3, 2 }  // e5
+};
 
-CINO_INLINE
-void tet_closest_edge(const vec3d  & A,
-                      const vec3d  & B,
-                      const vec3d  & C,
-                      const vec3d  & D,
-                      const vec3d  & query,
-                            uint   & id,
-                            double & dist);
+static const uint TET_INCIDENT_EDEGES[4][3] =
+{
+    { 0, 2, 4 }, // edges incident to v0
+    { 1, 2, 3 }, // edges incident to v1
+    { 0, 1, 5 }, // edges incident to v2
+    { 3, 4, 5 }, // edges incident to v3
+};
+
+static const uint HEXA_FACES[6][4] =
+{
+    { 0 , 3 , 2 , 1 } , // f0
+    { 1 , 2 , 6 , 5 } , // f1
+    { 4 , 5 , 6 , 7 } , // f2
+    { 3 , 0 , 4 , 7 } , // f3
+    { 0 , 1 , 5 , 4 } , // f4
+    { 2 , 3 , 7 , 6 }   // f5
+};
+
+static const uint HEXA_EDGES[12][2] =
+{
+    { 0, 1 }, // e0
+    { 1, 2 }, // e1
+    { 2, 3 }, // e2
+    { 3, 0 }, // e3
+    { 4, 5 }, // e4
+    { 5, 6 }, // e5
+    { 6, 7 }, // e6
+    { 7, 4 }, // e7
+    { 0, 4 }, // e8
+    { 1, 5 }, // e9
+    { 2, 6 }, // e10
+    { 3, 7 }  // e11
+};
+
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "tetrahedron.cpp"
-#endif
-
-#endif // CINO_TETRAHEDRON_H
+#endif // CINO_STANDARD_ELEMENTS_TABLES_H

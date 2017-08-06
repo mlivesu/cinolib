@@ -205,7 +205,7 @@ void Tetmesh<M,V,E,F,C>::init()
     update_face_normals();
     update_cell_quality();
 
-    set_uvw_from_xyz(UVW_param);
+    copy_xyz_to_uvw(UVW_param);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -913,7 +913,7 @@ bool Tetmesh<M,V,E,F,C>::edge_is_on_srf(const uint eid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-std::vector<float> Tetmesh<M,V,E,F,C>::export_uvw_param(const int mode) const
+std::vector<float> Tetmesh<M,V,E,F,C>::serialize_uvw(const int mode) const
 {
     std::vector<float> uvw;
     for(uint vid=0; vid<num_verts(); ++vid)
@@ -942,7 +942,7 @@ std::vector<float> Tetmesh<M,V,E,F,C>::export_uvw_param(const int mode) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Tetmesh<M,V,E,F,C>::set_uvw_from_xyz(const int mode)
+void Tetmesh<M,V,E,F,C>::copy_xyz_to_uvw(const int mode)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
     {

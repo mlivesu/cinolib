@@ -333,21 +333,21 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
     drawlist_in.seg_coords.clear();
     drawlist_in.seg_colors.clear();
 
-    for(uint cid=0; cid<this->num_polys(); ++cid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        if (!(this->poly_data(cid).visible)) continue;
+        if (!(this->poly_data(pid).visible)) continue;
 
-        for(uint nbr : this->adj_p2c(cid))
+        for(uint nbr : this->adj_p2c(pid))
         {
             if (!(this->poly_data(nbr).visible))
             {
-                int f = this->poly_shared_face(cid,nbr);
+                int f = this->poly_shared_face(pid,nbr);
                 assert(f!=-1);
 
-                uint vid0 = this->poly_vert_id(cid, HEXA_FACES[f][0]);
-                uint vid1 = this->poly_vert_id(cid, HEXA_FACES[f][1]);
-                uint vid2 = this->poly_vert_id(cid, HEXA_FACES[f][2]);
-                uint vid3 = this->poly_vert_id(cid, HEXA_FACES[f][3]);
+                uint vid0 = this->face_vert_id(f,0);
+                uint vid1 = this->face_vert_id(f,1);
+                uint vid2 = this->face_vert_id(f,2);
+                uint vid3 = this->face_vert_id(f,3);
 
                 uint base_addr = drawlist_in.tri_coords.size()/3;
 
@@ -397,26 +397,26 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
 
                 if (drawlist_in.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
                 {
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.r);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.g);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.b);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.a);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.r);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.g);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.b);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.a);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.r);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.g);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.b);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.a);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.r);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.g);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.b);
-                    drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.a);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.a);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.a);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.a);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                    drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.a);
                 }
                 else if (drawlist_in.draw_mode & DRAW_TRI_QUALITY)
                 {
-                    float q = this->poly_data(cid).quality;
+                    float q = this->poly_data(pid).quality;
                     Color c = Color::quality2rgb(q);
                     drawlist_in.tri_v_colors.push_back(c.r);
                     drawlist_in.tri_v_colors.push_back(c.g);
@@ -458,10 +458,10 @@ void DrawableHexmesh<M,V,E,F,C>::updateGL_in()
                 // bake wireframe
                 base_addr = drawlist_in.seg_coords.size()/3;
                 //
-                uint eid0 = this->poly_edge_id(cid, vid0, vid1);
-                uint eid1 = this->poly_edge_id(cid, vid1, vid2);
-                uint eid2 = this->poly_edge_id(cid, vid2, vid3);
-                uint eid3 = this->poly_edge_id(cid, vid3, vid0);
+                uint eid0 = this->poly_edge_id(pid, vid0, vid1);
+                uint eid1 = this->poly_edge_id(pid, vid1, vid2);
+                uint eid2 = this->poly_edge_id(pid, vid2, vid3);
+                uint eid3 = this->poly_edge_id(pid, vid3, vid0);
                 //
                 drawlist_in.segs.push_back(base_addr    ); // v0 v1
                 drawlist_in.segs.push_back(base_addr + 1);
