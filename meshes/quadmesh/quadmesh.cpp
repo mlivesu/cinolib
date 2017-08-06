@@ -102,7 +102,7 @@ CINO_INLINE
 void Quadmesh<M,V,E,P>::clear()
 {
     AbstractMesh<M,V,E,P>::clear();
-    tessellated_faces.clear();
+    triangulated_polys.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -121,8 +121,8 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void Quadmesh<M,V,E,P>::update_poly_tessellation()
 {
-    tessellated_faces.clear();
-    tessellated_faces.resize(this->num_polys());
+    triangulated_polys.clear();
+    triangulated_polys.resize(this->num_polys());
 
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
@@ -136,12 +136,12 @@ void Quadmesh<M,V,E,P>::update_poly_tessellation()
 
         bool flip = (n1.dot(n2) < 0); // flip diag: t(0,1,2) t(0,2,3) => t(0,1,3) t(1,2,3)
 
-        tessellated_faces.at(pid).push_back(vid0);
-        tessellated_faces.at(pid).push_back(vid1);
-        tessellated_faces.at(pid).push_back(flip ? vid3 : vid2);
-        tessellated_faces.at(pid).push_back(flip ? vid1 : vid0);
-        tessellated_faces.at(pid).push_back(vid2);
-        tessellated_faces.at(pid).push_back(vid3);
+        triangulated_polys.at(pid).push_back(vid0);
+        triangulated_polys.at(pid).push_back(vid1);
+        triangulated_polys.at(pid).push_back(flip ? vid3 : vid2);
+        triangulated_polys.at(pid).push_back(flip ? vid1 : vid0);
+        triangulated_polys.at(pid).push_back(vid2);
+        triangulated_polys.at(pid).push_back(vid3);
     }
 }
 
@@ -157,10 +157,10 @@ void Quadmesh<M,V,E,P>::update_p_normal(const uint pid)
     Plane best_fit(points);
 
     // adjust orientation (n or -n?)
-    assert(tessellated_faces.at(pid).size()>2);
-    vec3d v0 = this->vert(tessellated_faces.at(pid).at(0));
-    vec3d v1 = this->vert(tessellated_faces.at(pid).at(1));
-    vec3d v2 = this->vert(tessellated_faces.at(pid).at(2));
+    assert(triangulated_polys.at(pid).size()>2);
+    vec3d v0 = this->vert(triangulated_polys.at(pid).at(0));
+    vec3d v1 = this->vert(triangulated_polys.at(pid).at(1));
+    vec3d v2 = this->vert(triangulated_polys.at(pid).at(2));
     vec3d n  = (v1-v0).cross(v2-v0);
 
     this->poly_data(pid).normal = (best_fit.n.dot(n) < 0) ? -best_fit.n : best_fit.n;

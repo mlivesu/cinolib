@@ -57,8 +57,8 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 {
     protected:
 
-        std::vector<std::vector<uint>> tessellated_faces; // triangles covering each quad. Useful for
-                                                          // robust normal estimation and rendering
+        std::vector<std::vector<uint>> triangulated_polys; // triangles covering each quad. Useful for
+                                                           // robust normal estimation and rendering
 
     public:
 
@@ -115,7 +115,7 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double poly_area(const uint) const { assert(false); } // TODO!
+        double poly_area(const uint) const { assert(false); return 1.0; } // TODO!
 };
 
 }

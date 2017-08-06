@@ -1,3 +1,6 @@
+- add wrap functions like adj_v2p in surfaces, for better generic programming capabilities
+- add function in abstractmeshes, tessellated_poly(pid)   tessellated_poly(pid,fid)
+  and use it in the rendering pipeline, in order to have a unified rendering
 - fix 1D texturing for all the meshes but triangles (and add 2D texturing as well)
 - refactor IsoCurve (exploiting the Curve class)
 - extend the concept of subdivisions from hexmesh to any mesh
