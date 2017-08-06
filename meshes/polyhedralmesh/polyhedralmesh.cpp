@@ -123,9 +123,19 @@ void Polyhedralmesh<M,V,E,F,P>::init()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void Polyhedralmesh<M,V,E,F,P>::clear()
+{
+    AbstractPolyhedralMesh<M,V,E,F,P>::clear();
+    triangulated_faces.clear();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void Polyhedralmesh<M,V,E,F,P>::update_face_tessellation()
 {
-    this->triangulated_faces.resize(this->num_faces());
+    triangulated_faces.resize(this->num_faces());
     std::set<uint> bad_faces;
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
@@ -138,9 +148,9 @@ void Polyhedralmesh<M,V,E,F,P>::update_face_tessellation()
             uint vid1 = this->faces.at(fid).at(i-1);
             uint vid2 = this->faces.at(fid).at( i );
 
-            this->triangulated_faces.at(fid).push_back(vid0);
-            this->triangulated_faces.at(fid).push_back(vid1);
-            this->triangulated_faces.at(fid).push_back(vid2);
+            triangulated_faces.at(fid).push_back(vid0);
+            triangulated_faces.at(fid).push_back(vid1);
+            triangulated_faces.at(fid).push_back(vid2);
 
             n.push_back((this->vert(vid1)-this->vert(vid0)).cross(this->vert(vid2)-this->vert(vid0)));
         }

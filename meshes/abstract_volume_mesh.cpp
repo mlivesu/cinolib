@@ -40,7 +40,6 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::clear()
     AbstractMesh<M,V,E,P>::clear();
     //
     faces.clear();
-    triangulated_faces.clear();
     polys_face_winding.clear();
     //
     v_on_srf.clear();

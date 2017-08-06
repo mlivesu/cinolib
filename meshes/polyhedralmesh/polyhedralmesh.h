@@ -51,6 +51,10 @@ template<class M = Mesh_min_attributes, // default template arguments
          class P = Polyhedron_min_attributes>
 class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 {
+    protected:
+
+        std::vector<std::vector<uint>> triangulated_faces; // triangles covering each face (e.g., for rendering)
+
     public:
 
         Polyhedralmesh(){}
@@ -69,6 +73,7 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void init();
+        void clear();
         void load(const char * filename);
         void save(const char * filename) const;
 
