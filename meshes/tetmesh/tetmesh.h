@@ -38,7 +38,7 @@
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/trimesh/trimesh.h>
-#include <cinolib/meshes/mesh_std_data.h>
+#include <cinolib/meshes/mesh_attributes.h>
 
 namespace cinolib
 {

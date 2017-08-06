@@ -38,7 +38,7 @@
 #include <cinolib/bbox.h>
 #include <cinolib/meshes/polygonmesh/polygonmesh.h>
 #include <cinolib/geometry/vec3.h>
-#include <cinolib/meshes/mesh_std_data.h>
+#include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/meshes/abstract_volume_mesh.h>
 
 namespace cinolib

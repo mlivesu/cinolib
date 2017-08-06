@@ -33,7 +33,7 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/symbols.h>
-#include <cinolib/meshes/mesh_std_data.h>
+#include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/meshes/abstract_surface_mesh.h>
 

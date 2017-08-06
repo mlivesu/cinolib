@@ -28,8 +28,8 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_MESH_STD_DATA_H
-#define CINO_MESH_STD_DATA_H
+#ifndef CINO_MESH_ATTRIBUTES_H
+#define CINO_MESH_ATTRIBUTES_H
 
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
@@ -45,20 +45,22 @@ namespace cinolib
  * within the library. Meshes can therefore be declared as
  * follows:
  *
- * Trimesh<>     my_trimesh;
- * Quadmesh<>    my_quadmesh;
- * Polygonmesh<> my_polymesh;
- * Tetmesh<>     my_tetmesh;
- * Hexmesh<>     my_hexmesh;
+ * Trimesh<>        my_trimesh;
+ * Quadmesh<>       my_quadmesh;
+ * Polygonmesh<>    my_polygonmesh;
+ * Tetmesh<>        my_tetmesh;
+ * Hexmesh<>        my_hexmesh;
+ * Polyhedralmesh<> my_polyhedralmesh;
  *
  * Otherwise, if more attributes are necessary, you can always
  * extend the current structures, and use explicit templates:
  *
- * Trimesh<Mdata,Vdata,Edata,Fdata>     my_trimesh;
- * Quadmesh<Mdata,Vdata,Edata,Fdata>    my_quadmesh;
- * Polygonmesh<Mdata,Vdata,Edata,Fdata> my_polymesh;
- * Tetmesh<Mdata,Vdata,Edata,Cdata>     my_tetmesh;
- * Hexmesh<Mdata,Vdata,Edata,Cdata>     my_hexmesh;
+ * Trimesh<M,V,E,P>          my_trimesh;
+ * Quadmesh<M,V,E,P>         my_quadmesh;
+ * Polygonmesh<M,V,E,P>      my_polygonmesh;
+ * Tetmesh<M,V,E,F,P>        my_tetmesh;
+ * Hexmesh<M,V,E,F,P>        my_hexmesh;
+ * Polyhedralmesh<M,V,E,F,P> my_hexmesh;
 */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -117,4 +119,4 @@ Polyhedron_min_attributes;
 
 }
 
-#endif // CINO_MESH_STD_DATA_H
+#endif // CINO_MESH_ATTRIBUTES_H
