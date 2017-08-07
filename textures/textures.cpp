@@ -59,9 +59,9 @@ void load_texture(GLuint & texture_id, const int & texture_type)
 
 CINO_INLINE
 void texture_isolines2D(const GLuint   texture_id,
-                             const Color  & u_isolines,
-                             const Color  & v_isolines,
-                             const Color  & background)
+                        const Color  & u_isolines,
+                        const Color  & v_isolines,
+                        const Color  & background)
 {
     uint size = 8;
     u_char texels[3*size*size];
@@ -100,8 +100,8 @@ void texture_isolines2D(const GLuint   texture_id,
 
 CINO_INLINE
 void texture_checkerboard(const GLuint   texture_id,
-                               const Color  & c0,
-                               const Color  & c1)
+                          const Color  & c0,
+                          const Color  & c1)
 {
     uint size = 8;
     u_char texels[size*size*3];
@@ -135,9 +135,9 @@ void texture_checkerboard(const GLuint   texture_id,
 
 CINO_INLINE
 void texture_isolines1D(const GLuint   texture_id,
-                             const Color  & c0,
-                             const Color  & c1,
-                             const uint     n_bands)
+                        const Color  & c0,
+                        const Color  & c1,
+                        const uint     n_bands)
 {
     u_char texels[3*n_bands];
     for(uint i=0; i<n_bands; ++i)
