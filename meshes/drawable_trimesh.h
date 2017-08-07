@@ -31,11 +31,8 @@
 #ifndef CINO_DRAWABLE_TRIMESH_H
 #define CINO_DRAWABLE_TRIMESH_H
 
-#include <cinolib/cinolib.h>
-#include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/meshes/trimesh.h>
-#include <cinolib/meshes/mesh_slicer.h>
+#include <cinolib/meshes/abstract_drawable_surface_mesh.h>
 
 namespace cinolib
 {
@@ -43,72 +40,67 @@ namespace cinolib
 template<class M = Mesh_min_attributes, // default template arguments
          class V = Vert_min_attributes,
          class E = Edge_min_attributes,
-         class F = Polygon_min_attributes>
-class DrawableTrimesh : public Trimesh<M,V,E,F>, public DrawableObject
+         class P = Polygon_min_attributes>
+class DrawableTrimesh : public AbstractDrawableSurfaceMesh<Trimesh<M,V,E,P>>
 {
     public:
 
-        DrawableTrimesh();
+        DrawableTrimesh(Trimesh<M,V,E,P>) : Trimesh<M,V,E,P>()
+        {}
 
-        DrawableTrimesh(const char * filename);
+        DrawableTrimesh() : Trimesh<M,V,E,P>()
+        {
+            this->init_drawable_stuff();
+        }
 
-        DrawableTrimesh(const std::vector<vec3d> & verts,
-                        const std::vector<uint>  & polys);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableTrimesh(const std::vector<double> & coords,
-                        const std::vector<uint>   & polys);
+        DrawableTrimesh(const char * filename) : Trimesh<M,V,E,P>(filename)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         DrawableTrimesh(const std::vector<vec3d>             & coords,
-                        const std::vector<std::vector<uint>> & polys);
+                        const std::vector<std::vector<uint>> & polys)
+          : Trimesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         DrawableTrimesh(const std::vector<double>            & coords,
-                        const std::vector<std::vector<uint>> & polys);
-
-    protected:
-
-        RenderData drawlist;
-        MeshSlicer<Trimesh<M,V,E,F>> slicer;
-
-    public:
-
-        void       draw(const float scene_size=1) const;
-        vec3d      scene_center() const { return this->bb.center(); }
-        float      scene_radius() const { return this->bb.diag();   }
-        ObjectType object_type()  const { return DRAWABLE_TRIMESH;  }
+                        const std::vector<std::vector<uint>> & polys)
+          : Trimesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void init_drawable_stuff();
-        void updateGL();
+        DrawableTrimesh(const std::vector<vec3d> & coords,
+                        const std::vector<uint>  & polys)
+          : Trimesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void slice(const float thresh, const int item, const int sign, const int mode);
+        DrawableTrimesh(const std::vector<double> & coords,
+                        const std::vector<uint>   & polys)
+          : Trimesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void show_mesh(const bool b);
-        void show_mesh_flat();
-        void show_mesh_smooth();
-        void show_mesh_points();
-        void show_vert_color();
-        void show_face_color();
-        void show_face_texture1D(const int tex_type);
-        void show_face_texture2D(const int tex_type, const double tex_unit_scalar);
-        void show_face_wireframe(const bool b);
-        void show_face_wireframe_color(const Color & c);
-        void show_face_wireframe_width(const float width);
-        void show_face_wireframe_transparency(const float alpha);
-        void show_edge_marked(const bool b);
-        void show_edge_marked_color(const Color & c);
-        void show_edge_marked_width(const float width);
-        void show_edge_marked_transparency(const float alpha);
+        ObjectType object_type() const { return DRAWABLE_TRIMESH; }
 };
 
 }
-
-#ifndef  CINO_STATIC_LIB
-#include "drawable_trimesh.cpp"
-#endif
 
 #endif // CINO_DRAWABLE_TRIMESH_H

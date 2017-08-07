@@ -83,7 +83,7 @@ void texture_isolines1D(const GLuint   texture_id,
 
 CINO_INLINE
 void texture_checkerboard(const GLuint   texture_id,
-                          const Color  & c0 = Color::BLACK(),
+                          const Color  & c0 = Color(.5,.5,.5),
                           const Color  & c1 = Color::WHITE());
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

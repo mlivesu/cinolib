@@ -31,11 +31,8 @@
 #ifndef CINO_DRAWABLE_HEXMESH_H
 #define CINO_DRAWABLE_HEXMESH_H
 
-#include <cinolib/cinolib.h>
-#include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/meshes/hexmesh.h>
-#include <cinolib/meshes/mesh_slicer.h>
+#include <cinolib/meshes/abstract_drawable_volume_mesh.h>
 
 namespace cinolib
 {
@@ -45,73 +42,56 @@ template<class M = Mesh_min_attributes, // default template arguments
          class E = Edge_min_attributes,
          class F = Polygon_min_attributes,
          class P = Polyhedron_min_attributes>
-class DrawableHexmesh : public Hexmesh<M,V,E,F,P>, public DrawableObject
+class DrawableHexmesh : public AbstractDrawableVolumeMesh<Hexmesh<M,V,E,F,P>>
 {
-
     public:
 
-        DrawableHexmesh();
+        DrawableHexmesh() : Hexmesh<M,V,E,F,P>()
+        {
+            this->init_drawable_stuff();
+        }
 
-        DrawableHexmesh(const char * filename);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        DrawableHexmesh(const char * filename) : Hexmesh<M,V,E,F,P>(filename)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        DrawableHexmesh(const std::vector<vec3d>             & verts,
+                        const std::vector<std::vector<uint>> & faces,
+                        const std::vector<std::vector<uint>> & polys,
+                        const std::vector<std::vector<bool>> & polys_face_winding)
+            : Hexmesh<M,V,E,F,P>(verts, faces, polys, polys_face_winding)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         DrawableHexmesh(const std::vector<vec3d> & verts,
-                        const std::vector<uint>  & polys);
+                        const std::vector<uint>  & polys)
+            : Hexmesh<M,V,E,F,P>(verts, polys)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         DrawableHexmesh(const std::vector<double> & coords,
-                        const std::vector<uint>   & polys);
-
-    protected:
-
-        RenderData drawlist_in;
-        RenderData drawlist_out;        
-        MeshSlicer<DrawableHexmesh<M,V,E,F,P>> slicer;
-
-    public:
-
-        void       draw(const float scene_size=1) const;
-        vec3d      scene_center() const { return this->bb.center(); }
-        float      scene_radius() const { return this->bb.diag();   }
-        ObjectType object_type()  const { return DRAWABLE_HEXMESH;  }
+                        const std::vector<uint>   & polys)
+            : Hexmesh<M,V,E,F,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void init_drawable_stuff();
-        void updateGL();
-        void updateGL_in();
-        void updateGL_out();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void slice(const float thresh, const int item, const int sign, const int mode);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void show_mesh(const bool b);
-        void show_mesh_flat();
-        void show_mesh_smooth();
-        void show_mesh_points();
-        void show_face_color();
-        void show_face_quality();
-        void show_face_texture1D(const GLint texture);
-        void show_face_texture2D(const GLint texture, const double tex_unit_scalar);
-        void show_face_wireframe(const bool b);
-        void show_face_wireframe_color(const Color & c);
-        void show_face_wireframe_width(const float width);
-        void show_face_wireframe_transparency(const float alpha);
-        void show_cell_color();
-        void show_cell_quality();
-        void show_cell_texture1D(const GLint texture);
-        void show_cell_texture2D(const GLint texture, const double tex_unit_scalar);
-        void show_cell_wireframe(const bool b);
-        void show_cell_wireframe_color(const Color & c);
-        void show_cell_wireframe_width(const float width);
-        void show_cell_wireframe_transparency(const float alpha);
+        ObjectType object_type() const { return DRAWABLE_HEXMESH; }
 };
 
 }
-
-#ifndef  CINO_STATIC_LIB
-#include "drawable_hexmesh.cpp"
-#endif
 
 #endif // CINO_DRAWABLE_HEXMESH_H

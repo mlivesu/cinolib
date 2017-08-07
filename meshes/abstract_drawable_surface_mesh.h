@@ -28,71 +28,69 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_POLYGONMESH_H
-#define CINO_POLYGONMESH_H
+#ifndef CINO_ABSTRACT_DRAWABLE_SURFACE_MESH_H
+#define CINO_ABSTRACT_DRAWABLE_SURFACE_MESH_H
 
-#include <vector>
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/abstract_surface_mesh.h>
-#include <cinolib/meshes/mesh_attributes.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/gl/draw_lines_tris.h>
+#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class P = Polygon_min_attributes>
-class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
+template<class Mesh>
+class AbstractDrawableSurfaceMesh : public virtual Mesh, public DrawableObject
 {
     protected:
 
-        std::vector<std::vector<uint>> triangulated_polys; // triangles covering each polygon. Useful for
-                                                           // robust normal estimation and rendering
+        RenderData       drawlist;
+        MeshSlicer<Mesh> slicer;
+
     public:
 
-        Polygonmesh(){}
-
-        Polygonmesh(const char * filename);
-
-        Polygonmesh(const std::vector<vec3d>             & verts,
-                    const std::vector<std::vector<uint>> & polys);
-
-        Polygonmesh(const std::vector<double>            & coords,
-                    const std::vector<std::vector<uint>> & polys);
+        AbstractDrawableSurfaceMesh() : Mesh() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        MeshType mesh_type() const { return POLYGONMESH; }
+        void       draw(const float scene_size=1) const;
+        vec3d      scene_center() const { return this->bb.center(); }
+        float      scene_radius() const { return this->bb.diag();   }
+        ObjectType object_type()  const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void clear();
-        void init();
+        void init_drawable_stuff();
+        void updateGL();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void operator+=(const Polygonmesh<M,V,E,P> & m);
+        void slice(const float thresh, const int item, const int sign, const int mode);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_p_normal(const uint fid);
-        void update_poly_tessellation();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        std::vector<uint> get_ordered_boundary_vertices() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        std::vector<uint> poly_tessellation       (const uint pid) const;
-        double            poly_area(const uint) const { assert(false); } // TODO!
+        void show_mesh(const bool b);
+        void show_mesh_flat();
+        void show_mesh_smooth();
+        void show_mesh_points();
+        void show_vert_color();
+        void show_face_color();
+        void show_face_texture1D(const int tex_type);
+        void show_face_texture2D(const int tex_type, const double tex_unit_scalar);
+        void show_face_wireframe(const bool b);
+        void show_face_wireframe_color(const Color & c);
+        void show_face_wireframe_width(const float width);
+        void show_face_wireframe_transparency(const float alpha);
+        void show_edge_marked(const bool b);
+        void show_edge_marked_color(const Color & c);
+        void show_edge_marked_width(const float width);
+        void show_edge_marked_transparency(const float alpha);
 };
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "polygonmesh.cpp"
+#include "abstract_drawable_surface_mesh.cpp"
 #endif
 
-#endif // CINO_POLYGONMESH_H
+#endif // CINO_ABSTRACT_DRAWABLE_SURFACE_MESH_H

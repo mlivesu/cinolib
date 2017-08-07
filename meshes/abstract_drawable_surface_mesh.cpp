@@ -28,98 +28,63 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/meshes/drawable_polygonmesh.h>
-
+#include <cinolib/meshes/abstract_drawable_surface_mesh.h>
+#include <cinolib/textures/textures.h>
+#include <cinolib/color.h>
 
 namespace cinolib
 {
 
-template<class M, class V, class E, class F>
-CINO_INLINE
-DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh() : Polygonmesh<M,V,E,F>()
-{
-    init_drawable_stuff();
-}
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh(const char * filename) : Polygonmesh<M,V,E,F>(filename)
+void AbstractDrawableSurfaceMesh<Mesh>::init_drawable_stuff()
 {
-    init_drawable_stuff();
-}
+    slicer = MeshSlicer<Mesh>(*this);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh(const std::vector<vec3d>             & verts,
-                                                  const std::vector<std::vector<uint>> & faces)
-    : Polygonmesh<M,V,E,F>(verts,faces)
-{
-    init_drawable_stuff();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-DrawablePolygonmesh<M,V,E,F>::DrawablePolygonmesh(const std::vector<double>            & coords,
-                                                  const std::vector<std::vector<uint>> & faces)
-    : Polygonmesh<M,V,E,F>(coords,faces)
-{
-    init_drawable_stuff();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F>
-CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::init_drawable_stuff()
-{
-    slicer = MeshSlicer<Polygonmesh<M,V,E,F>>(*this);
-
-    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
-    drawlist.seg_width = 1;
+    drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_MARKED_SEGS;
 
     updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::draw(const float) const
+void AbstractDrawableSurfaceMesh<Mesh>::draw(const float) const
 {
     render(drawlist);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::updateGL()
+void AbstractDrawableSurfaceMesh<Mesh>::updateGL()
 {
     drawlist.tri_coords.clear();
     drawlist.tris.clear();
     drawlist.tri_v_norms.clear();
     drawlist.tri_v_colors.clear();
+    drawlist.tri_text.clear();
     drawlist.segs.clear();
     drawlist.seg_coords.clear();
     drawlist.seg_colors.clear();
+    drawlist.marked_segs.clear();
+    drawlist.marked_seg_coords.clear();
 
-    for(uint fid=0; fid<this->num_polys(); ++fid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        if (!(this->poly_data(fid).visible)) continue;
+        if (!(this->poly_data(pid).visible)) continue;
 
-        for(uint i=0; i< this->triangulated_polys.at(fid).size()/3; ++i)
+        for(uint i=0; i<this->poly_tessellation(pid).size()/3; ++i)
         {
-            uint vid0 = this->triangulated_polys.at(fid).at(3*i+0);
-            uint vid1 = this->triangulated_polys.at(fid).at(3*i+1);
-            uint vid2 = this->triangulated_polys.at(fid).at(3*i+2);
+            uint vid0 = this->poly_tessellation(pid).at(3*i+0);
+            uint vid1 = this->poly_tessellation(pid).at(3*i+1);
+            uint vid2 = this->poly_tessellation(pid).at(3*i+2);
 
-            int base_addr = drawlist.tri_coords.size()/3;
+            uint base_addr = drawlist.tri_coords.size()/3;
 
             drawlist.tris.push_back(base_addr    );
             drawlist.tris.push_back(base_addr + 1);
@@ -145,20 +110,36 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
             drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.y());
             drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.z());
 
+            if (drawlist.draw_mode & DRAW_TRI_TEXTURE1D)
+            {
+                drawlist.tri_text.push_back(this->vert_data(vid0).uvw[0]);
+                drawlist.tri_text.push_back(this->vert_data(vid1).uvw[0]);
+                drawlist.tri_text.push_back(this->vert_data(vid2).uvw[0]);
+            }
+            else if (drawlist.draw_mode & DRAW_TRI_TEXTURE2D)
+            {
+                drawlist.tri_text.push_back(this->vert_data(vid0).uvw[0]*drawlist.tri_text_unit_scalar);
+                drawlist.tri_text.push_back(this->vert_data(vid0).uvw[1]*drawlist.tri_text_unit_scalar);
+                drawlist.tri_text.push_back(this->vert_data(vid1).uvw[0]*drawlist.tri_text_unit_scalar);
+                drawlist.tri_text.push_back(this->vert_data(vid1).uvw[1]*drawlist.tri_text_unit_scalar);
+                drawlist.tri_text.push_back(this->vert_data(vid2).uvw[0]*drawlist.tri_text_unit_scalar);
+                drawlist.tri_text.push_back(this->vert_data(vid2).uvw[1]*drawlist.tri_text_unit_scalar);
+            }
+
             if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
             {
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.r);
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.g);
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.b);
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.a);
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.r);
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.g);
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.b);
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.a);
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.r);
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.g);
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.b);
-                drawlist.tri_v_colors.push_back(this->poly_data(fid).color.a);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.a);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.a);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                drawlist.tri_v_colors.push_back(this->poly_data(pid).color.a);
             }
             else if (drawlist.draw_mode & DRAW_TRI_VERTCOLOR)
             {
@@ -175,18 +156,34 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
                 drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.b);
                 drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.a);
             }
+            else if (drawlist.draw_mode & DRAW_TRI_QUALITY)
+            {
+                float q = this->poly_data(pid).quality;
+                Color c = Color::quality2rgb(q);
+                drawlist.tri_v_colors.push_back(c.r);
+                drawlist.tri_v_colors.push_back(c.g);
+                drawlist.tri_v_colors.push_back(c.b);
+                drawlist.tri_v_colors.push_back(c.a);
+                drawlist.tri_v_colors.push_back(c.r);
+                drawlist.tri_v_colors.push_back(c.g);
+                drawlist.tri_v_colors.push_back(c.b);
+                drawlist.tri_v_colors.push_back(c.a);
+                drawlist.tri_v_colors.push_back(c.r);
+                drawlist.tri_v_colors.push_back(c.g);
+                drawlist.tri_v_colors.push_back(c.b);
+                drawlist.tri_v_colors.push_back(c.a);
+            }
         }
     }
 
-    // bake wireframe as border
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        bool masked = true;
+        bool invisible = true;
         for(uint fid : this->adj_e2p(eid))
         {
-            if (this->poly_data(fid).visible) masked = false;
+            if (this->poly_data(fid).visible) invisible = false;
         }
-        if (masked) continue;
+        if (invisible) continue;
 
         int base_addr = drawlist.seg_coords.size()/3;
         drawlist.segs.push_back(base_addr    );
@@ -210,17 +207,31 @@ void DrawablePolygonmesh<M,V,E,F>::updateGL()
         drawlist.seg_colors.push_back(this->edge_data(eid).color.g);
         drawlist.seg_colors.push_back(this->edge_data(eid).color.b);
         drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
+
+        if (this->edge_data(eid).marked && drawlist.draw_mode & DRAW_MARKED_SEGS)
+        {
+            int base_addr = drawlist.marked_seg_coords.size()/3;
+            drawlist.marked_segs.push_back(base_addr    );
+            drawlist.marked_segs.push_back(base_addr + 1);
+
+            drawlist.marked_seg_coords.push_back(vid0.x());
+            drawlist.marked_seg_coords.push_back(vid0.y());
+            drawlist.marked_seg_coords.push_back(vid0.z());
+            drawlist.marked_seg_coords.push_back(vid1.x());
+            drawlist.marked_seg_coords.push_back(vid1.y());
+            drawlist.marked_seg_coords.push_back(vid1.z());
+        }
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::slice(const float thresh, // thresh on centroids or quality
-                                         const int   item,   // X, Y, Z, L, Q
-                                         const int   sign,   // either LEQ or GEQ
-                                         const int   mode)   // either AND or OR
+void AbstractDrawableSurfaceMesh<Mesh>::slice(const float thresh, // thresh on centroids or quality
+                                     const int   item,   // X, Y, Z, L, Q
+                                     const int   sign,   // either LEQ or GEQ
+                                     const int   mode)   // either AND or OR
 {
     slicer.update(*this, thresh, item, sign, mode); // update per element visibility flags
     updateGL();
@@ -228,9 +239,9 @@ void DrawablePolygonmesh<M,V,E,F>::slice(const float thresh, // thresh on centro
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::show_mesh(const bool b)
+void AbstractDrawableSurfaceMesh<Mesh>::show_mesh(const bool b)
 {
     if (b) drawlist.draw_mode |=  DRAW_TRIS;
     else   drawlist.draw_mode &= ~DRAW_TRIS;
@@ -238,9 +249,9 @@ void DrawablePolygonmesh<M,V,E,F>::show_mesh(const bool b)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::show_mesh_flat()
+void AbstractDrawableSurfaceMesh<Mesh>::show_mesh_flat()
 {
     drawlist.draw_mode |=  DRAW_TRI_FLAT;
     drawlist.draw_mode &= ~DRAW_TRI_SMOOTH;
@@ -249,9 +260,9 @@ void DrawablePolygonmesh<M,V,E,F>::show_mesh_flat()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::show_mesh_smooth()
+void AbstractDrawableSurfaceMesh<Mesh>::show_mesh_smooth()
 {
     drawlist.draw_mode |=  DRAW_TRI_SMOOTH;
     drawlist.draw_mode &= ~DRAW_TRI_FLAT;
@@ -260,9 +271,9 @@ void DrawablePolygonmesh<M,V,E,F>::show_mesh_smooth()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::show_mesh_points()
+void AbstractDrawableSurfaceMesh<Mesh>::show_mesh_points()
 {
     drawlist.draw_mode |=  DRAW_TRI_POINTS;
     drawlist.draw_mode &= ~DRAW_TRI_FLAT;
@@ -271,53 +282,70 @@ void DrawablePolygonmesh<M,V,E,F>::show_mesh_points()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::show_face_color()
+void AbstractDrawableSurfaceMesh<Mesh>::show_vert_color()
+{
+    drawlist.draw_mode |=  DRAW_TRI_VERTCOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE2D;
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void AbstractDrawableSurfaceMesh<Mesh>::show_face_color()
 {
     drawlist.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    glDisable(GL_TEXTURE_1D);
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::show_face_texture1D(const GLint texture)
+void AbstractDrawableSurfaceMesh<Mesh>::show_face_texture1D(const int tex_type)
 {
     drawlist.draw_mode |=  DRAW_TRI_TEXTURE1D;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    if (drawlist.tri_text_id > 0) glDeleteTextures(1, &drawlist.tri_text_id);
-    glGenTextures(1, &drawlist.tri_text_id);
-    glBindTexture(GL_TEXTURE_1D, drawlist.tri_text_id);
-    switch (texture)
-    {
-//        case TEXTURE_1D_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
-        case TEXTURE_1D_HSV_RAMP           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D); break;
-        case TEXTURE_1D_HSV_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
-        default : assert("Unknown 1D Texture" && false);
-    }
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glEnable(GL_TEXTURE_1D);
-
+    load_texture(drawlist.tri_text_id, tex_type);
     updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe(const bool b)
+void AbstractDrawableSurfaceMesh<Mesh>::show_face_texture2D(const int tex_type, const double tex_unit_scalar)
+{
+    drawlist.draw_mode |=  DRAW_TRI_TEXTURE2D;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
+
+    drawlist.tri_text_unit_scalar = tex_unit_scalar;
+    load_texture(drawlist.tri_text_id, tex_type);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe(const bool b)
 {
     if (b) drawlist.draw_mode |=  DRAW_SEGS;
     else   drawlist.draw_mode &= ~DRAW_SEGS;
@@ -325,9 +353,9 @@ void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe(const bool b)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe_color(const Color & c)
+void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe_color(const Color & c)
 {
     this->edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();
@@ -335,20 +363,59 @@ void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe_color(const Color & c)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe_width(const float width)
+void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe_width(const float width)
 {
     drawlist.seg_width = width;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F>
+template<class Mesh>
 CINO_INLINE
-void DrawablePolygonmesh<M,V,E,F>::show_face_wireframe_transparency(const float alpha)
+void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe_transparency(const float alpha)
 {
     this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void AbstractDrawableSurfaceMesh<Mesh>::show_edge_marked(const bool b)
+{
+    if (b) drawlist.draw_mode |=  DRAW_MARKED_SEGS;
+    else   drawlist.draw_mode &= ~DRAW_MARKED_SEGS;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void AbstractDrawableSurfaceMesh<Mesh>::show_edge_marked_color(const Color & c)
+{
+    drawlist.marked_seg_color = c;
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void AbstractDrawableSurfaceMesh<Mesh>::show_edge_marked_width(const float width)
+{
+    drawlist.marked_seg_width = width;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void AbstractDrawableSurfaceMesh<Mesh>::show_edge_marked_transparency(const float alpha)
+{
+    drawlist.marked_seg_color.a = alpha;
     updateGL();
 }
 
