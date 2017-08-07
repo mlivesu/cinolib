@@ -72,7 +72,8 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void export_to_hexahedral_mesh(std::vector<vec3d> & verts, std::vector<uint> & hexa) const;
+        void export_to_hexahedral_mesh(std::vector<vec3d>             & verts,
+                                       std::vector<std::vector<uint>> & hexa) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

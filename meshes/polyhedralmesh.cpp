@@ -195,12 +195,12 @@ void Polyhedralmesh<M,V,E,F,P>::update_normals()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,P>::export_to_hexahedral_mesh(std::vector<vec3d> & verts,
-                                                          std::vector<uint>  & hexa) const
+void Polyhedralmesh<M,V,E,F,P>::export_to_hexahedral_mesh(std::vector<vec3d>             & verts,
+                                                          std::vector<std::vector<uint>> & hexa) const
 {
     assert(false);
-//    verts = this->vector_verts();
-//    hexa  = this->serialized_hex_connectivity();
+    verts = this->vector_verts();
+    hexa  = this->serialized_hex_connectivity();
 }
 
 }
