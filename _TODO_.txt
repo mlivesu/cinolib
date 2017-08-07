@@ -5,10 +5,6 @@
 - think about it: you don’t need a tree for the profiler: if you put all the ProfilerEntries into a list sorted by time of call you did it…
 - topology navigation should happen always through adj_x2y methods. explicitly stored
    connectivity should be invisible from the outside… 
-- add function in abstractmeshes, tessellated_poly(pid)   tessellated_poly(pid,fid)
-  and use it in the rendering pipeline, in order to have a unified rendering and less code
-  repetition
-- fix 1D texturing for all the meshes but triangles (and add 2D texturing as well)
 - refactor IsoCurve (exploiting the Curve class)
 - extend the concept of subdivisions from hexmesh to any mesh
 - make cotangent weights robust against almost degenerate triangles and boundary meshes

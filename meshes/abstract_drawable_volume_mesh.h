@@ -28,70 +28,85 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_DRAWABLE_HEXMESH_H
-#define CINO_DRAWABLE_HEXMESH_H
+#ifndef CINO_ABSTRACT_DRAWABLE_VOLUME_MESH_H
+#define CINO_ABSTRACT_DRAWABLE_VOLUME_MESH_H
 
-#include <cinolib/meshes/hexmesh.h>
-#include <cinolib/meshes/abstract_drawable_volume_mesh.h>
+#include <cinolib/cinolib.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/gl/draw_lines_tris.h>
+#include <cinolib/meshes/abstract_volume_mesh.h>
+#include <cinolib/meshes/mesh_slicer.h>
+#include <cinolib/meshes/mesh_attributes.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class F = Polygon_min_attributes,
-         class P = Polyhedron_min_attributes>
-class DrawableHexmesh : public DrawableVolumeMesh<Hexmesh<M,V,E,F,P>>
+template<class Mesh>
+class DrawableVolumeMesh : public virtual Mesh, public DrawableObject
 {
+    protected:
+
+        RenderData       drawlist_in;
+        RenderData       drawlist_out;
+        MeshSlicer<Mesh> slicer;
+
     public:
 
-        DrawableHexmesh() : Hexmesh<M,V,E,F,P>()
-        {
-            this->init_drawable_stuff();
-        }
+        void       draw(const float scene_size=1) const;
+        vec3d      scene_center() const { return this->bb.center(); }
+        float      scene_radius() const { return this->bb.diag();   }
+        ObjectType object_type()  const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableHexmesh(const char * filename) : Hexmesh<M,V,E,F,P>(filename)
-        {
-            this->init_drawable_stuff();
-        }
+        void vert_set_color(const Color & c) { Mesh::vert_set_color(c); updateGL(); }
+        void edge_set_color(const Color & c) { Mesh::edge_set_color(c); updateGL(); }
+        void face_set_color(const Color & c) { Mesh::face_set_color(c); updateGL(); }
+        void poly_set_color(const Color & c) { Mesh::poly_set_color(c); updateGL(); }
+        void vert_set_alpha(const float   a) { Mesh::vert_set_alpha(a); updateGL(); }
+        void edge_set_alpha(const float   a) { Mesh::edge_set_alpha(a); updateGL(); }
+        void face_set_alpha(const float   a) { Mesh::face_set_alpha(a); updateGL(); }
+        void poly_set_alpha(const float   a) { Mesh::poly_set_alpha(a); updateGL(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableHexmesh(const std::vector<vec3d>             & verts,
-                        const std::vector<std::vector<uint>> & faces,
-                        const std::vector<std::vector<uint>> & polys,
-                        const std::vector<std::vector<bool>> & polys_face_winding)
-            : Hexmesh<M,V,E,F,P>(verts, faces, polys, polys_face_winding)
-        {
-            this->init_drawable_stuff();
-        }
+        void init_drawable_stuff();
+        void updateGL();
+        void updateGL_in();
+        void updateGL_out();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableHexmesh(const std::vector<vec3d> & verts,
-                        const std::vector<uint>  & polys)
-            : Hexmesh<M,V,E,F,P>(verts, polys)
-        {
-            this->init_drawable_stuff();
-        }
+        void slice(const float thresh, const int item, const int sign, const int mode);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableHexmesh(const std::vector<double> & coords,
-                        const std::vector<uint>   & polys)
-            : Hexmesh<M,V,E,F,P>(coords, polys)
-        {
-            this->init_drawable_stuff();
-        }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        ObjectType object_type() const { return DRAWABLE_HEXMESH; }
+        void show_mesh(const bool b);
+        void show_mesh_flat();
+        void show_mesh_smooth();
+        void show_mesh_points();
+        void show_face_color();
+        void show_face_quality();
+        void show_face_texture1D(const GLint texture);
+        void show_face_texture2D(const GLint texture, const double tex_unit_scalar);
+        void show_face_wireframe(const bool b);
+        void show_face_wireframe_color(const Color & c);
+        void show_face_wireframe_width(const float width);
+        void show_face_wireframe_transparency(const float alpha);
+        void show_cell_color();
+        void show_cell_quality();
+        void show_cell_texture1D(const GLint texture);
+        void show_cell_texture2D(const GLint texture, const double tex_unit_scalar);
+        void show_cell_wireframe(const bool b);
+        void show_cell_wireframe_color(const Color & c);
+        void show_cell_wireframe_width(const float width);
+        void show_cell_wireframe_transparency(const float alpha);
 };
 
 }
 
-#endif // CINO_DRAWABLE_HEXMESH_H
+#ifndef  CINO_STATIC_LIB
+#include "abstract_drawable_volume_mesh.cpp"
+#endif
+
+#endif // CINO_ABSTRACT_DRAWABLE_VOLUME_MESH_H
