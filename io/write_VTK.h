@@ -32,6 +32,7 @@
 #define CINO_WRITE_VTK_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
 
 #include <sys/types.h>
 #include <vector>
@@ -42,8 +43,16 @@ namespace cinolib
 CINO_INLINE
 void write_VTK(const char                * filename,
                const std::vector<double> & xyz,
-               const std::vector<u_int>  & tets,
-               const std::vector<u_int>  & hexa);
+               const std::vector<uint>   & tets,
+               const std::vector<uint>   & hexa);
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void write_VTK(const char                           * filename,
+               const std::vector<vec3d>             & verts,
+               const std::vector<std::vector<uint>> & polys);
 
 }
 

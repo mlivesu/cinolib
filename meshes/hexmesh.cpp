@@ -177,7 +177,7 @@ void Hexmesh<M,V,E,F,P>::save(const char * filename) const
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-//        write_VTK(filename, this->verts, this->serialized_hex_connectivity());
+        write_VTK(filename, this->verts, this->serialized_hex_connectivity());
     }
     else
     {
