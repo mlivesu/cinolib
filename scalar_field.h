@@ -47,7 +47,7 @@ class ScalarField : public Eigen::VectorXd, public Serializable
     public:
 
         ScalarField();
-        ScalarField(const std::vector<float> & data);
+        ScalarField(const std::vector<double> & data);
         ScalarField(const uint size);
         ScalarField(const char *filename);
 

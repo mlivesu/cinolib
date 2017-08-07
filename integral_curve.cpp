@@ -34,8 +34,8 @@
 #include <cinolib/gl/draw_arrow.h>
 #include <cinolib/gl/draw_sphere.h>
 #include <cinolib/intersection.h>
-#include <cinolib/meshes/trimesh/drawable_trimesh.h>
-#include <cinolib/meshes/tetmesh/drawable_tetmesh.h>
+#include <cinolib/meshes/drawable_trimesh.h>
+#include <cinolib/meshes/drawable_tetmesh.h>
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/geometry/segment.h>
 #include <cinolib/geometry/ray.h>

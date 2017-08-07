@@ -29,7 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/point_inside_mesh.h>
-#include <cinolib/meshes/tetmesh/tetmesh.h>
+#include <cinolib/meshes/tetmesh.h>
 #include <cinolib/geometry/tetrahedron.h>
 
 namespace cinolib

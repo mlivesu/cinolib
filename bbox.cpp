@@ -35,7 +35,9 @@ namespace cinolib
 
 CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb)
 {
-    in << "\n[Bbox Info] MIN: " << bb.min << "\tMAX: " << bb.max << "\n";
+    in << "\n[Bbox Info] MIN: " << bb.min << "\tMAX: " << bb.max <<
+          "\nDiag: " << bb.diag() << "\tDeltaX: " << bb.delta_x() <<
+          "\tDeltaY: " << bb.delta_y() << "\tDeltaZ: " << bb.delta_z() << "\n";
     return in;
 }
 

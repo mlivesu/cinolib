@@ -33,19 +33,12 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/standard_elements_tables.h>
 
 #include <set>
 
 namespace cinolib
 {
-
-static const uint TRI_EDGES[3][2] =
-{
-    { 0, 1 }, // 0
-    { 1, 2 }, // 1
-    { 2, 0 }, // 2
-};
-
 
 CINO_INLINE
 vec3d triangle_normal(const vec3d A,

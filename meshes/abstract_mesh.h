@@ -54,10 +54,10 @@ MeshType;
 namespace cinolib
 {
 
-template<class M,
-         class V,
-         class E,
-         class P> // <= POLYGON for surface meshes, POLYHEDRA for volume meshes
+template<class M, // mesh attributes
+         class V, // vert attributes
+         class E, // edge attributes
+         class P> // cell attributes (i.e., polygons for surface meshes, polyhedra for volume meshes)
 class AbstractMesh
 {
     protected:
@@ -66,19 +66,19 @@ class AbstractMesh
 
         std::vector<vec3d>             verts;
         std::vector<uint>              edges;
-        std::vector<std::vector<uint>> polys;
+        std::vector<std::vector<uint>> polys; // either polygons or polyhedra
 
         M              m_data;
         std::vector<V> v_data;
         std::vector<E> e_data;
         std::vector<P> p_data;
 
-        std::vector<std::vector<uint>> v2v;
-        std::vector<std::vector<uint>> v2e;
-        std::vector<std::vector<uint>> v2p;
-        std::vector<std::vector<uint>> e2p;
-        std::vector<std::vector<uint>> p2e;
-        std::vector<std::vector<uint>> p2p;
+        std::vector<std::vector<uint>> v2v; // vert to vert adjacency
+        std::vector<std::vector<uint>> v2e; // vert to edge adjacency
+        std::vector<std::vector<uint>> v2p; // vert to poly adjacency
+        std::vector<std::vector<uint>> e2p; // edge to poly adjacency
+        std::vector<std::vector<uint>> p2e; // poly to edge adjacency
+        std::vector<std::vector<uint>> p2p; // poly to poly adjacency
 
     public:
 
@@ -114,7 +114,7 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual uint verts_per_poly(const uint pid) const { return polys.at(pid).size(); }
+        virtual uint verts_per_poly(const uint pid) const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -132,7 +132,9 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual std::vector<float> export_uvw_param(const int mode) const;
+        virtual std::vector<double> serialize_uvw  (const int mode) const;
+        virtual void                copy_xyz_to_uvw(const int mode);
+        virtual void                copy_uvw_to_xyz(const int mode);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -181,17 +183,15 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual       vec3d  poly_vert         (const uint fid, const uint offset) const;
-        virtual       uint   poly_vert_id      (const uint fid, const uint offset) const;
-        virtual       uint   poly_vert_offset  (const uint fid, const uint vid) const;
-        virtual       vec3d  poly_centroid     (const uint fid) const;
-        virtual       uint   poly_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
-        virtual       bool   poly_contains_vert(const uint fid, const uint vid) const;
-        virtual       bool   poly_contains_edge(const uint fid, const uint eid) const;
+        virtual       vec3d  poly_centroid     (const uint fid) const = 0;
         virtual       double poly_mass         (const uint fid) const = 0;
-        virtual       void   poly_show_all     () = 0;
-        virtual       void   poly_set_color    (const Color & c) = 0;
-        virtual       void   poly_set_alpha    (const float alpha) = 0;
+        virtual       bool   poly_contains_vert(const uint fid, const uint vid) const = 0;
+        virtual       uint   poly_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
+        virtual       bool   poly_contains_edge(const uint fid, const uint eid) const;
+        virtual       bool   poly_contains_edge(const uint fid, const uint vid0, const uint vid1) const;
+        virtual       void   poly_show_all     ();
+        virtual       void   poly_set_color    (const Color & c);
+        virtual       void   poly_set_alpha    (const float alpha);
 };
 
 }

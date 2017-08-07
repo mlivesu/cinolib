@@ -32,8 +32,8 @@
 #define CINO_DUAL_MESH
 
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh/trimesh.h>
-#include <cinolib/meshes/polygonmesh/polygonmesh.h>
+#include <cinolib/meshes/trimesh.h>
+#include <cinolib/meshes/polygonmesh.h>
 
 namespace cinolib
 {

@@ -188,9 +188,9 @@ std::vector<double> AbstractMesh<M,V,E,P>::vector_coords() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<float> AbstractMesh<M,V,E,P>::export_uvw_param(const int mode) const
+std::vector<double> AbstractMesh<M, V, E, P>::serialize_uvw(const int mode) const
 {
-    std::vector<float> uvw;
+    std::vector<double> uvw;
     uvw.reserve(num_verts());
     for(uint vid=0; vid<num_verts(); ++vid)
     {
@@ -212,6 +212,60 @@ std::vector<float> AbstractMesh<M,V,E,P>::export_uvw_param(const int mode) const
         }
     }
     return uvw;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::copy_xyz_to_uvw(const int mode)
+{
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        switch (mode)
+        {
+            case U_param  : vert_data(vid).uvw[0] = vert(vid).x(); break;
+            case V_param  : vert_data(vid).uvw[1] = vert(vid).y(); break;
+            case W_param  : vert_data(vid).uvw[2] = vert(vid).z(); break;
+            case UV_param : vert_data(vid).uvw[0] = vert(vid).x();
+                            vert_data(vid).uvw[1] = vert(vid).y(); break;
+            case UW_param : vert_data(vid).uvw[0] = vert(vid).x();
+                            vert_data(vid).uvw[2] = vert(vid).z(); break;
+            case VW_param : vert_data(vid).uvw[1] = vert(vid).y();
+                            vert_data(vid).uvw[2] = vert(vid).z(); break;
+            case UVW_param: vert_data(vid).uvw[0] = vert(vid).x();
+                            vert_data(vid).uvw[1] = vert(vid).y();
+                            vert_data(vid).uvw[2] = vert(vid).z(); break;
+            default: assert(false);
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::copy_uvw_to_xyz(const int mode)
+{
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        switch (mode)
+        {
+            case U_param  : vert(vid).x() = vert_data(vid).uvw[0]; break;
+            case V_param  : vert(vid).y() = vert_data(vid).uvw[1]; break;
+            case W_param  : vert(vid).z() = vert_data(vid).uvw[2]; break;
+            case UV_param : vert(vid).x() = vert_data(vid).uvw[0];
+                            vert(vid).y() = vert_data(vid).uvw[1]; break;
+            case UW_param : vert(vid).x() = vert_data(vid).uvw[0];
+                            vert(vid).z() = vert_data(vid).uvw[2]; break;
+            case VW_param : vert(vid).y() = vert_data(vid).uvw[1];
+                            vert(vid).z() = vert_data(vid).uvw[2]; break;
+            case UVW_param: vert(vid).x() = vert_data(vid).uvw[0];
+                            vert(vid).y() = vert_data(vid).uvw[1];
+                            vert(vid).z() = vert_data(vid).uvw[2]; break;
+            default: assert(false);
+        }
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -437,24 +491,6 @@ void AbstractMesh<M,V,E,P>::edge_set_alpha(const float alpha)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractMesh<M,V,E,P>::poly_vert_id(const uint fid, const uint offset) const
-{
-    return polys.at(fid).at(offset);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-vec3d AbstractMesh<M,V,E,P>::poly_vert(const uint fid, const uint offset) const
-{
-    return vert(poly_vert_id(fid,offset));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 uint AbstractMesh<M,V,E,P>::poly_edge_id(const uint fid, const uint vid0, const uint vid1) const
 {
     assert(poly_contains_vert(fid,vid0));
@@ -472,51 +508,39 @@ uint AbstractMesh<M,V,E,P>::poly_edge_id(const uint fid, const uint vid0, const 
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractMesh<M,V,E,P>::poly_vert_offset(const uint fid, const uint vid) const
-{
-    for(uint offset=0; offset<verts_per_poly(fid); ++offset)
-    {
-        if (poly_vert_id(fid,offset) == vid) return offset;
-    }
-    assert(false && "Something is off here...");
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-vec3d AbstractMesh<M,V,E,P>::poly_centroid(const uint fid) const
-{
-    vec3d c(0,0,0);
-    for(uint off=0; off<verts_per_poly(fid); ++off)
-    {
-        c += poly_vert(fid,off);
-    }
-    c /= static_cast<double>(verts_per_poly(fid));
-    return c;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-bool AbstractMesh<M,V,E,P>::poly_contains_vert(const uint fid, const uint vid) const
-{
-    for(uint off=0; off<verts_per_poly(fid); ++off)
-    {
-        if (poly_vert_id(fid,off) == vid) return true;
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 bool AbstractMesh<M,V,E,P>::poly_contains_edge(const uint fid, const uint eid) const
 {
     for(uint e : adj_p2e(fid)) if (e == eid) return true;
     return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool AbstractMesh<M,V,E,P>::poly_contains_edge(const uint pid, const uint vid0, const uint vid1) const
+{
+    for(uint eid : this->adj_p2e(pid))
+    {
+        if (this->edge_contains_vert(eid, vid0) &&
+            this->edge_contains_vert(eid, vid1))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_show_all()
+{
+    for(uint pid=0; pid<num_polys(); ++pid)
+    {
+        poly_data(pid).visible = true;
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -531,5 +555,30 @@ void AbstractMesh<M,V,E,P>::center_bbox()
     bb.max -= center;
     update_bbox();
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_set_color(const Color & c)
+{
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        this->poly_data(pid).color = c;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_set_alpha(const float alpha)
+{
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        this->poly_data(pid).color.a = alpha;
+    }
+}
+
 
 }

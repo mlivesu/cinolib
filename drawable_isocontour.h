@@ -33,7 +33,7 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/meshes/trimesh/trimesh.h>
+#include <cinolib/meshes/trimesh.h>
 #include <cinolib/isocontour.h>
 
 namespace cinolib
