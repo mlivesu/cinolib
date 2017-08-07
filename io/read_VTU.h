@@ -32,6 +32,7 @@
 #define CINO_READ_VTU_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
 
 #include <sys/types.h>
 #include <vector>
@@ -42,8 +43,23 @@ namespace cinolib
 CINO_INLINE
 void read_VTU(const char          * filename,
                std::vector<double> & xyz,
-               std::vector<u_int>  & tet,
-               std::vector<u_int>  & hexa);
+               std::vector<uint>   & tet,
+               std::vector<uint>   & hexa);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_VTU(const char                      * filename,
+               std::vector<double>            & xyz,
+               std::vector<std::vector<uint>> & poly);
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_VTU(const char                      * filename,
+               std::vector<vec3d>             & verts,
+               std::vector<std::vector<uint>> & poly);
 
 }
 

@@ -120,8 +120,8 @@ CINO_INLINE
 void Hexmesh<M,V,E,F,P>::load(const char * filename)
 {
     this->clear();
-    std::vector<double> coords;
-    std::vector<uint>   tets; // not used here
+
+    std::vector<std::vector<uint>> hexa;
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -129,17 +129,17 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-      //  read_MESH(filename, coords, tets, polys);
+        read_MESH(filename, this->verts, hexa);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-       // read_VTU(filename, coords, tets, polys);
+        read_VTU(filename, this->verts, hexa);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-       // read_VTK(filename, coords, tets, polys);
+        read_VTK(filename, this->verts, hexa);
     }
     else
     {
@@ -147,7 +147,7 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
         exit(-1);
     }
 
-    this->verts = vec3d_from_serialized_xyz(coords);
+    from_hexahedra_to_general_polyhedra(hexa, this->faces, this->polys, this->polys_face_winding);
 
     logger << this->num_polys() << " hexahedra read" << endl;
     logger << this->num_verts() << " vertices  read" << endl;

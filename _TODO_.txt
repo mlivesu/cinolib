@@ -1,3 +1,6 @@
+- refactor connectivity editing throughout  the library. Trimesh should have three methods
+  edge_collapse(), triangle_split(), edge_split(), and all the connectivity changes should
+  happen through these operators!
 - add mex_depth to profiler
 - think about it: you don’t need a tree for the profiler: if you put all the ProfilerEntries into a list sorted by time of call you did it…
 - add wrap functions like adj_v2p in surfaces, for better generic programming capabilities

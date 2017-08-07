@@ -40,19 +40,83 @@
 namespace cinolib
 {
 
-#ifndef CINOLIB_USES_VTK
+#ifdef CINOLIB_USES_VTK
 
 CINO_INLINE
-void read_VTK(const char          * ,
-               std::vector<double> &,
-               std::vector<u_int>  &,
-               std::vector<u_int>  &)
+void read_VTK(const char                      * filename,
+               std::vector<vec3d>             & verts,
+               std::vector<std::vector<uint>> & poly)
 {
-    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
-    exit(-1);
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    vtkSmartPointer<vtkGenericDataObjectReader> reader = vtkSmartPointer<vtkGenericDataObjectReader>::New();
+    reader->SetFileName(filename);
+    reader->Update();
+    vtkSmartPointer<vtkUnstructuredGrid> grid(reader->GetUnstructuredGridOutput());
+
+    for(uint i=0; i<grid->GetNumberOfPoints(); ++i)
+    {
+        double pnt[3];
+        grid->GetPoint(i, pnt);
+
+        verts.push_back(vec3d(pnt[0],pnt[1],pnt[2]));
+    }
+
+    for(uint i=0; i<grid->GetNumberOfCells(); ++i)
+    {
+        vtkCell *c = grid->GetCell(i);
+
+        std::vector<uint> polyhedron;
+        switch (c->GetCellType())
+        {
+            case VTK_TETRA:      for(uint j=0; j<4; ++j) polyhedron.push_back(c->GetPointId(j)); break;
+            case VTK_HEXAHEDRON: for(uint j=0; j<8; ++j) polyhedron.push_back(c->GetPointId(j)); break;
+        }
+
+        poly.push_back(polyhedron);
+    }
 }
 
-#else
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_VTK(const char                      * filename,
+               std::vector<double>            & xyz,
+               std::vector<std::vector<uint>> & poly)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    vtkSmartPointer<vtkGenericDataObjectReader> reader = vtkSmartPointer<vtkGenericDataObjectReader>::New();
+    reader->SetFileName(filename);
+    reader->Update();
+    vtkSmartPointer<vtkUnstructuredGrid> grid(reader->GetUnstructuredGridOutput());
+
+    for(uint i=0; i<grid->GetNumberOfPoints(); ++i)
+    {
+        double pnt[3];
+        grid->GetPoint(i, pnt);
+
+        xyz.push_back(pnt[0]);
+        xyz.push_back(pnt[1]);
+        xyz.push_back(pnt[2]);
+    }
+
+    for(uint i=0; i<grid->GetNumberOfCells(); ++i)
+    {
+        vtkCell *c = grid->GetCell(i);
+
+        std::vector<uint> polyhedron;
+        switch (c->GetCellType())
+        {
+            case VTK_TETRA:      for(uint j=0; j<4; ++j) polyhedron.push_back(c->GetPointId(j)); break;
+            case VTK_HEXAHEDRON: for(uint j=0; j<8; ++j) polyhedron.push_back(c->GetPointId(j)); break;
+        }
+
+        poly.push_back(polyhedron);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_VTK(const char          * filename,
@@ -89,6 +153,37 @@ void read_VTK(const char          * filename,
     }
 
 }
+
+#else
+
+CINO_INLINE
+void read_VTU(const char          *,
+               std::vector<double> &,
+               std::vector<uint>   &,
+               std::vector<uint>   &)
+{
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    exit(-1);
+}
+
+CINO_INLINE
+void read_VTU(const char                      *,
+               std::vector<double>            &,
+               std::vector<std::vector<uint>> &)
+{
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    exit(-1);
+}
+
+CINO_INLINE
+void read_VTU(const char                      *,
+               std::vector<vec3d>             &,
+               std::vector<std::vector<uint>> &)
+{
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    exit(-1);
+}
+
 #endif
 
 }

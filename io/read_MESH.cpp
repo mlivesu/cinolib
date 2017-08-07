@@ -36,10 +36,174 @@ namespace cinolib
 {
 
 CINO_INLINE
+void read_MESH(const char                     * filename,
+               std::vector<double>            & coords,
+               std::vector<std::vector<uint>> & poly)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    FILE *fp = fopen(filename, "r");
+
+    if(!fp)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_MESH() : couldn't open input file " << filename << endl;
+        exit(-1);
+    }
+
+    char line[1024];
+
+    fgets(line,1024,fp);
+    fgets(line,1024,fp);
+
+    while(fgets(line, 1024, fp))
+    {
+        // read vertices
+        //
+        if (line[0] == 'V')
+        {
+            uint   nverts;
+            double x,y,z;
+            fgets(line,1024,fp);
+            sscanf(line, "%d", &nverts);
+            for(uint i=0; i<nverts; ++i)
+            {
+                // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+                //
+                fgets(line, 1024, fp);
+                sscanf(line, "%lf %lf %lf", &x, &y, &z);
+                coords.push_back(x);
+                coords.push_back(y);
+                coords.push_back(z);
+            }
+        }
+
+        // read tetrahedra
+        //
+        if (line[0] == 'T' && line[1] == 'e')
+        {
+            uint ntets;
+            fgets(line, 1024, fp);
+            sscanf(line, "%d", &ntets);
+            for(uint i=0; i<ntets; ++i)
+            {
+                std::vector<uint> tet(4);
+                fgets(line,1024,fp);
+                sscanf(line, "%d %d %d %d", &tet[0], &tet[1], &tet[2], &tet[3]);
+                for(uint & vid : tet) vid -= 1;
+                poly.push_back(tet);
+            }
+        }
+
+        // read hexahedra
+        //
+        if (line[0] == 'H' && line[1] == 'e')
+        {
+            uint nhexa;
+            fgets(line, 1024, fp);
+            sscanf(line, "%d", &nhexa);
+            for(uint i=0; i<nhexa; ++i)
+            {
+                std::vector<uint> hex(8);
+                fgets(line,1024,fp);
+                sscanf(line, "%d %d %d %d %d %d %d %d", &hex[0], &hex[1], &hex[2], &hex[3],
+                                                        &hex[4], &hex[5], &hex[6], &hex[7]);
+                for(uint & vid : hex) vid -= 1;
+                poly.push_back(hex);
+            }
+        }
+    }
+
+    fclose(fp);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_MESH(const char                     * filename,
+               std::vector<vec3d>             & verts,
+               std::vector<std::vector<uint>> & poly)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    FILE *fp = fopen(filename, "r");
+
+    if(!fp)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_MESH() : couldn't open input file " << filename << endl;
+        exit(-1);
+    }
+
+    char line[1024];
+
+    fgets(line,1024,fp);
+    fgets(line,1024,fp);
+
+    while(fgets(line, 1024, fp))
+    {
+        // read vertices
+        //
+        if (line[0] == 'V')
+        {
+            uint   nverts;
+            double x,y,z;
+            fgets(line,1024,fp);
+            sscanf(line, "%d", &nverts);
+            for(uint i=0; i<nverts; ++i)
+            {
+                // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+                //
+                fgets(line, 1024, fp);
+                sscanf(line, "%lf %lf %lf", &x, &y, &z);
+                verts.push_back(vec3d(x,y,z));
+            }
+        }
+
+        // read tetrahedra
+        //
+        if (line[0] == 'T' && line[1] == 'e')
+        {
+            uint ntets;
+            fgets(line, 1024, fp);
+            sscanf(line, "%d", &ntets);
+            for(uint i=0; i<ntets; ++i)
+            {
+                std::vector<uint> tet(4);
+                fgets(line,1024,fp);
+                sscanf(line, "%d %d %d %d", &tet[0], &tet[1], &tet[2], &tet[3]);
+                for(uint & vid : tet) vid -= 1;
+                poly.push_back(tet);
+            }
+        }
+
+        // read hexahedra
+        //
+        if (line[0] == 'H' && line[1] == 'e')
+        {
+            uint nhexa;
+            fgets(line, 1024, fp);
+            sscanf(line, "%d", &nhexa);
+            for(uint i=0; i<nhexa; ++i)
+            {
+                std::vector<uint> hex(8);
+                fgets(line,1024,fp);
+                sscanf(line, "%d %d %d %d %d %d %d %d", &hex[0], &hex[1], &hex[2], &hex[3],
+                                                        &hex[4], &hex[5], &hex[6], &hex[7]);
+                for(uint & vid : hex) vid -= 1;
+                poly.push_back(hex);
+            }
+        }
+    }
+
+    fclose(fp);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void read_MESH(const char          * filename,
                std::vector<double> & xyz,
-               std::vector<u_int>  & tets,
-               std::vector<u_int>  & hexa)
+               std::vector<uint>   & tets,
+               std::vector<uint>   & hexa)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 

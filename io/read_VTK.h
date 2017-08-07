@@ -32,6 +32,7 @@
 #define CINO_READ_VTK_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
 
 #include <sys/types.h>
 #include <vector>
@@ -44,6 +45,21 @@ void read_VTK(const char          * filename,
                std::vector<double> & xyz,
                std::vector<u_int>  & tet,
                std::vector<u_int>  & hexa);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_VTK(const char                      * filename,
+               std::vector<double>            & xyz,
+               std::vector<std::vector<uint>> & poly);
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_VTK(const char                      * filename,
+               std::vector<vec3d>             & verts,
+               std::vector<std::vector<uint>> & poly);
 
 }
 
