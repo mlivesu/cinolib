@@ -85,7 +85,8 @@ class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double poly_area(const uint) const { assert(false); } // TODO!
+        std::vector<uint> poly_tessellation       (const uint pid) const;
+        double            poly_area(const uint) const { assert(false); } // TODO!
 };
 
 }

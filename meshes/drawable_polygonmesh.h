@@ -31,11 +31,8 @@
 #ifndef CINO_DRAWABLE_POLYGONMESH_H
 #define CINO_DRAWABLE_POLYGONMESH_H
 
-#include <cinolib/cinolib.h>
-#include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/meshes/polygonmesh.h>
-#include <cinolib/meshes/mesh_slicer.h>
+#include <cinolib/meshes/abstract_drawable_surface_mesh.h>
 
 namespace cinolib
 {
@@ -43,60 +40,67 @@ namespace cinolib
 template<class M = Mesh_min_attributes, // default template arguments
          class V = Vert_min_attributes,
          class E = Edge_min_attributes,
-         class F = Polygon_min_attributes>
-class DrawablePolygonmesh : public Polygonmesh<M,V,E,F>, public DrawableObject
+         class P = Polygon_min_attributes>
+class DrawablePolygonmesh : public AbstractDrawableSurfaceMesh<Polygonmesh<M,V,E,P>>
 {
     public:
 
-        DrawablePolygonmesh();
+        DrawablePolygonmesh(Polygonmesh<M,V,E,P>) : Polygonmesh<M,V,E,P>()
+        {}
 
-        DrawablePolygonmesh(const char * filename);
+        DrawablePolygonmesh() : Polygonmesh<M,V,E,P>()
+        {
+            this->init_drawable_stuff();
+        }
 
-        DrawablePolygonmesh(const std::vector<vec3d>             & verts,
-                            const std::vector<std::vector<uint>> & polys);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        DrawablePolygonmesh(const char * filename) : Polygonmesh<M,V,E,P>(filename)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        DrawablePolygonmesh(const std::vector<vec3d>             & coords,
+                        const std::vector<std::vector<uint>> & polys)
+          : Polygonmesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         DrawablePolygonmesh(const std::vector<double>            & coords,
-                            const std::vector<std::vector<uint>> & polys);
-
-    protected:
-
-        RenderData drawlist;
-        MeshSlicer<Polygonmesh<M,V,E,F>> slicer;
-
-    public:
-
-        void       draw(const float scene_size=1) const;
-        vec3d      scene_center() const { return this->bb.center();    }
-        float      scene_radius() const { return this->bb.diag();      }
-        ObjectType object_type()  const { return DRAWABLE_POLYGONMESH; }
+                        const std::vector<std::vector<uint>> & polys)
+          : Polygonmesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void init_drawable_stuff();
-        void updateGL();
+        DrawablePolygonmesh(const std::vector<vec3d> & coords,
+                        const std::vector<uint>  & polys)
+          : Polygonmesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void slice(const float thresh, const int item, const int sign, const int mode);
+        DrawablePolygonmesh(const std::vector<double> & coords,
+                        const std::vector<uint>   & polys)
+          : Polygonmesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void show_mesh(const bool b);
-        void show_mesh_flat();
-        void show_mesh_smooth();
-        void show_mesh_points();
-        void show_face_color();
-        void show_face_texture1D(const GLint texture);
-        void show_face_wireframe(const bool b);
-        void show_face_wireframe_color(const Color & c);
-        void show_face_wireframe_width(const float width);
-        void show_face_wireframe_transparency(const float alpha);
+        ObjectType object_type() const { return DRAWABLE_POLYGONMESH; }
 };
 
 }
-
-#ifndef  CINO_STATIC_LIB
-#include "drawable_polygonmesh.cpp"
-#endif
 
 #endif // CINO_DRAWABLE_POLYGONMESH_H

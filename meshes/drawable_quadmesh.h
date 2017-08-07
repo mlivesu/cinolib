@@ -31,11 +31,8 @@
 #ifndef CINO_DRAWABLE_QUADMESH_H
 #define CINO_DRAWABLE_QUADMESH_H
 
-#include <cinolib/cinolib.h>
-#include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/meshes/quadmesh.h>
-#include <cinolib/meshes/mesh_slicer.h>
+#include <cinolib/meshes/abstract_drawable_surface_mesh.h>
 
 namespace cinolib
 {
@@ -43,67 +40,67 @@ namespace cinolib
 template<class M = Mesh_min_attributes, // default template arguments
          class V = Vert_min_attributes,
          class E = Edge_min_attributes,
-         class F = Polygon_min_attributes>
-class DrawableQuadmesh : public Quadmesh<M,V,E,F>, public DrawableObject
+         class P = Polygon_min_attributes>
+class DrawableQuadmesh : public AbstractDrawableSurfaceMesh<Quadmesh<M,V,E,P>>
 {
     public:
 
-        DrawableQuadmesh();
+        DrawableQuadmesh(Quadmesh<M,V,E,P>) : Quadmesh<M,V,E,P>()
+        {}
 
-        DrawableQuadmesh(const char * filename);
+        DrawableQuadmesh() : Quadmesh<M,V,E,P>()
+        {
+            this->init_drawable_stuff();
+        }
 
-        DrawableQuadmesh(const std::vector<vec3d> & verts,
-                         const std::vector<uint>  & polys);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        DrawableQuadmesh(const char * filename) : Quadmesh<M,V,E,P>(filename)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        DrawableQuadmesh(const std::vector<vec3d>             & coords,
+                        const std::vector<std::vector<uint>> & polys)
+          : Quadmesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        DrawableQuadmesh(const std::vector<double>            & coords,
+                        const std::vector<std::vector<uint>> & polys)
+          : Quadmesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        DrawableQuadmesh(const std::vector<vec3d> & coords,
+                        const std::vector<uint>  & polys)
+          : Quadmesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         DrawableQuadmesh(const std::vector<double> & coords,
-                         const std::vector<uint>   & polys);
-
-        DrawableQuadmesh(const std::vector<vec3d>             & verts,
-                         const std::vector<std::vector<uint>> & polys);
-
-        DrawableQuadmesh(const std::vector<double>            & verts,
-                         const std::vector<std::vector<uint>> & polys);
-
-    protected:
-
-        RenderData drawlist;
-        MeshSlicer<Quadmesh<M,V,E,F>> slicer;
-
-    public:
-
-        void       draw(const float scene_size=1) const;
-        vec3d      scene_center() const { return this->bb.center(); }
-        float      scene_radius() const { return this->bb.diag();   }
-        ObjectType object_type()  const { return DRAWABLE_QUADMESH; }
+                        const std::vector<uint>   & polys)
+          : Quadmesh<M,V,E,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void init_drawable_stuff();
-        void updateGL();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void slice(const float thresh, const int item, const int sign, const int mode);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void show_mesh(const bool b);
-        void show_mesh_flat();
-        void show_mesh_smooth();
-        void show_mesh_points();
-        void show_vert_color();
-        void show_face_color();
-        void show_face_texture1D(const GLint texture);
-        void show_face_wireframe(const bool b);
-        void show_face_wireframe_color(const Color & c);
-        void show_face_wireframe_width(const float width);
-        void show_face_wireframe_transparency(const float alpha);
+        ObjectType object_type() const { return DRAWABLE_QUADMESH; }
 };
 
 }
-
-#ifndef  CINO_STATIC_LIB
-#include "drawable_quadmesh.cpp"
-#endif
 
 #endif // CINO_DRAWABLE_QUADMESH_H
