@@ -36,10 +36,82 @@ namespace cinolib
 {
 
 CINO_INLINE
+void write_MESH(const char                           * filename,
+                const std::vector<vec3d>             & verts,
+                const std::vector<std::vector<uint>> & polys)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    FILE *fp = fopen(filename, "w");
+
+    if(!fp)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_MESH() : couldn't write output file " << filename << endl;
+        exit(-1);
+    }
+
+    fprintf(fp, "MeshVersionFormatted 1\n" );
+    fprintf(fp, "Dimension 3\n" );
+
+    uint nv = verts.size();
+    uint nt = 0;
+    uint nh = 0;
+    for(auto p : polys)
+    {
+        if (p.size() == 4) ++nt; else
+        if (p.size() == 8) ++nh;
+    }
+
+    if (nv > 0)
+    {
+        fprintf(fp, "Vertices\n" );
+        fprintf(fp, "%d\n", nv);
+        for(uint vid=0; vid<nv; ++vid)
+        {
+            // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+            //
+            fprintf( fp, "%.17g %.17g %.17g 0\n", verts.at(vid).x(), verts.at(vid).y(), verts.at(vid).z());
+        }
+    }
+
+    if (nt > 0)
+    {
+        fprintf(fp, "Tetrahedra\n" );
+        fprintf(fp, "%d\n", nt );
+        for(auto tet : polys)
+        {
+            if (tet.size() == 4)
+            {
+                fprintf(fp, "%d %d %d %d 0\n", tet.at(0)+1, tet.at(1)+1, tet.at(2)+1, tet.at(3)+1);
+            }
+        }
+    }
+
+    if (nh > 0)
+    {
+        fprintf(fp, "Hexahedra\n" );
+        fprintf(fp, "%d\n", nh );
+        for(auto hex : polys)
+        {
+            if (hex.size() == 8)
+            {
+                fprintf(fp, "%d %d %d %d %d %d %d %d 0\n", hex.at(0)+1, hex.at(1)+1, hex.at(2)+1, hex.at(3)+1,
+                                                           hex.at(4)+1, hex.at(5)+1, hex.at(6)+1, hex.at(7)+1);
+            }
+        }
+    }
+
+    fprintf(fp, "End\n\n");
+    fclose(fp);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void write_MESH(const char                * filename,
                 const std::vector<double> & xyz,
-                const std::vector<u_int>  & tets,
-                const std::vector<u_int>  & hexa)
+                const std::vector<uint>   & tets,
+                const std::vector<uint>   & hexa)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 

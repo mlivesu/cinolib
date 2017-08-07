@@ -95,6 +95,11 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        virtual std::vector<std::vector<uint>> serialized_hex_connectivity() const;
+        virtual std::vector<std::vector<uint>> serialized_tet_connectivity() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         virtual const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
         virtual const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
         virtual const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
@@ -140,7 +145,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual bool              poly_face_is_CW   (const uint pid, const uint off) const;
         virtual uint              poly_face_offset  (const uint pid, const uint fid) const;
         virtual vec3d             poly_centroid     (const uint pid) const;
-        virtual std::vector<uint> poly_vlist_as_hexa(const uint pid) const;
+        virtual std::vector<uint> poly_as_hex_vlist (const uint pid) const;
+        virtual std::vector<uint> poly_as_tet_vlist (const uint pid) const;
 };
 
 }

@@ -42,27 +42,84 @@
 namespace cinolib
 {
 
-#ifndef CINOLIB_USES_VTK
+#ifdef CINOLIB_USES_VTK
 
 CINO_INLINE
-void write_VTU(const char                *,
-               const std::vector<double> &,
-               const std::vector<u_int>  &,
-               const std::vector<u_int>  &)
+void write_VTU(const char                           * filename,
+               const std::vector<vec3d>             & verts,
+               const std::vector<std::vector<uint>> & polys)
 {
-    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
-    exit(-1);
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+    vtkSmartPointer<vtkUnstructuredGrid>          grid   = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    vtkSmartPointer<vtkPoints>                    points = vtkSmartPointer<vtkPoints>::New();
+
+    // generate some arrays that allow each element type to be viewed alone by thresholding
+    //
+    vtkSmartPointer<vtkIntArray> tetselector = vtkSmartPointer<vtkIntArray>::New();
+    vtkSmartPointer<vtkIntArray> hexselector = vtkSmartPointer<vtkIntArray>::New();
+    tetselector->SetName("tet_selector");
+    hexselector->SetName("hex_selector");
+
+    for(const vec3d & v : verts)
+    {
+        points->InsertNextPoint(v.x(), v.y(), v.z());
+    }
+
+    bool has_tets = false;
+    bool has_hexa = false;
+
+    for(auto p : polys)
+    {
+        switch (p.size())
+        {
+            case 4:
+            {
+                vtkIdType pid[] = { p.at(0), p.at(1), p.at(2), p.at(3) };
+                grid->InsertNextCell(VTK_TETRA, 4, pid);
+                tetselector->InsertNextValue(1);
+                hexselector->InsertNextValue(0);
+                has_tets = true;
+                break;
+            }
+
+            case 8:
+            {
+                vtkIdType pid[] = { p.at(0), p.at(1), p.at(2), p.at(3),
+                                    p.at(4), p.at(5), p.at(6), p.at(7) };
+                grid->InsertNextCell(VTK_HEXAHEDRON, 8, pid);
+                tetselector->InsertNextValue(0);
+                hexselector->InsertNextValue(1);
+                has_hexa = true;
+                break;
+            }
+
+            default: assert(false && "Unsupported Polyhedron!");
+        }
+    }
+
+    grid->SetPoints(points);
+    if (has_tets) grid->GetCellData()->AddArray(tetselector);
+    if (has_hexa) grid->GetCellData()->AddArray(hexselector);
+
+#if VTK_MAJOR_VERSION < 6
+    writer->SetInput( grid );
+#else
+    writer->SetInputData(grid);
+#endif
+    writer->SetFileName(filename);
+    writer->Write();
 }
 
-#else
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void write_VTU(const char                * filename,
                const std::vector<double> & xyz,
-               const std::vector<u_int>  & tets,
-               const std::vector<u_int>  & hexa)
+               const std::vector<uint>   & tets,
+               const std::vector<uint>   & hexa)
 {
-
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
     vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
@@ -119,6 +176,29 @@ void write_VTU(const char                * filename,
     writer->SetFileName(filename);
     writer->Write();
 }
+
+#else
+
+CINO_INLINE
+void write_VTU(const char                *,
+               const std::vector<double> &,
+               const std::vector<uint>   &,
+               const std::vector<uint>   &)
+{
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    exit(-1);
+}
+
+CINO_INLINE
+void write_VTU(const char                           *,
+               const std::vector<vec3d>             &,
+               const std::vector<std::vector<uint>> &)
+{
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    exit(-1);
+}
+
+
 #endif
 
 }

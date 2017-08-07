@@ -161,26 +161,23 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Hexmesh<M,V,E,F,P>::save(const char * filename) const
 {
-    std::vector<double> coords = serialized_xyz_from_vec3d(this->verts);
-    std::vector<uint>   tets; // not used here
-
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
 
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-//        write_MESH(filename, coords, tets, polys);
+        write_MESH(filename, this->verts, this->serialized_hex_connectivity());
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-//        write_VTU(filename, coords, tets, polys);
+        write_VTU(filename, this->verts, this->serialized_hex_connectivity());
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-//        write_VTK(filename, coords, tets, polys);
+//        write_VTK(filename, this->verts, this->serialized_hex_connectivity());
     }
     else
     {
@@ -239,7 +236,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Hexmesh<M,V,E,F,P>::update_hex_quality(const uint cid)
 {
-    std::vector<uint> vids = this->poly_vlist_as_hexa(cid);
+    std::vector<uint> vids = this->poly_as_hex_vlist(cid);
     this->poly_data(cid).quality = hex_scaled_jacobian(this->vert(vids.at(0)),
                                                        this->vert(vids.at(1)),
                                                        this->vert(vids.at(2)),
@@ -274,7 +271,7 @@ void Hexmesh<M,V,E,F,P>::poly_subdivide(const std::vector<std::vector<std::vecto
 
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        std::vector<uint> vlist = this->poly_vlist_as_hexa(pid);
+        std::vector<uint> vlist = this->poly_as_hex_vlist(pid);
 
         for(const auto & sub_cell: cell_split_scheme)
         {

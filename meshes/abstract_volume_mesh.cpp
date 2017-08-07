@@ -199,6 +199,35 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_adjacency()
     logger << this->num_polys() << "\tpolys" << endl;
 }
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<std::vector<uint>> AbstractPolyhedralMesh<M,V,E,F,P>::serialized_hex_connectivity() const
+{
+    std::vector<std::vector<uint>> hexa;
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        hexa.push_back(this->poly_as_hex_vlist(pid));
+    }
+    return hexa;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<std::vector<uint>> AbstractPolyhedralMesh<M,V,E,F,P>::serialized_tet_connectivity() const
+{
+    std::vector<std::vector<uint>> tets;
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        tets.push_back(this->poly_as_tet_vlist(pid));
+    }
+    return tets;
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
@@ -312,7 +341,7 @@ vec3d AbstractPolyhedralMesh<M,V,E,F,P>::poly_centroid(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_vlist_as_hexa(const uint pid) const
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_as_hex_vlist(const uint pid) const
 {
     assert(this->verts_per_poly(pid) == 8);
     assert(this->faces_per_poly(pid) == 6);
@@ -348,6 +377,20 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_vlist_as_hexa(const ui
 
     for(uint i=0; i<4; ++i) v_list.push_back(f1.at((offset+i)%4));
 
+    return v_list;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_as_tet_vlist(const uint pid) const
+{
+    assert(this->verts_per_poly(pid) == 4);
+    assert(this->faces_per_poly(pid) == 4);
+
+    assert(false && "TODO");
+    std::vector<uint> v_list;
     return v_list;
 }
 

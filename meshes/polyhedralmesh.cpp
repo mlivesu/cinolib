@@ -198,15 +198,9 @@ CINO_INLINE
 void Polyhedralmesh<M,V,E,F,P>::export_to_hexahedral_mesh(std::vector<vec3d> & verts,
                                                           std::vector<uint>  & hexa) const
 {
-    verts = this->vector_verts();
-    hexa.clear();
-
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    for(uint vid : this->poly_vlist_as_hexa(pid))
-    {
-        hexa.push_back(vid);
-    }
-    assert(hexa.size() == this->num_polys()*8);
+    assert(false);
+//    verts = this->vector_verts();
+//    hexa  = this->serialized_hex_connectivity();
 }
 
 }
