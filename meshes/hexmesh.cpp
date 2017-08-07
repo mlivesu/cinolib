@@ -45,10 +45,10 @@ namespace cinolib
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d> & verts,
-                            const std::vector<uint>  & cells)
+                            const std::vector<uint>  & polys)
 {
     this->verts = verts;
-    from_hexahedra_to_general_polyhedra(cells, this->faces, this->polys, this->polys_face_winding);
+    from_hexahedra_to_general_polyhedra(polys, this->faces, this->polys, this->polys_face_winding);
 
     init();
 }
@@ -58,10 +58,38 @@ Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d> & verts,
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<double> & coords,
-                            const std::vector<uint>   & cells)
+                            const std::vector<uint>   & polys)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    this->polys = cells;
+    from_hexahedra_to_general_polyhedra(polys, this->faces, this->polys, this->polys_face_winding);
+    init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d>             & verts,
+                            const std::vector<std::vector<uint>> & polys)
+{
+    this->verts = verts;
+    from_hexahedra_to_general_polyhedra(polys, this->faces, this->polys, this->polys_face_winding);
+    init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d>             & verts,
+                            const std::vector<std::vector<uint>> & faces,
+                            const std::vector<std::vector<uint>> & polys,
+                            const std::vector<std::vector<bool>> & polys_face_winding)
+{
+    this->verts = verts;
+    this->faces = faces;
+    this->polys = polys;
+    this->polys_face_winding = polys_face_winding;
     init();
 }
 
@@ -73,8 +101,6 @@ Hexmesh<M,V,E,F,P>::Hexmesh(const char * filename)
 {
     load(filename);
     init();
-
-    //print_quality_statistics();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -66,6 +66,9 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
                 const std::vector<uint>  & polys);
 
         Hexmesh(const std::vector<vec3d>             & verts,
+                const std::vector<std::vector<uint>> & polys);
+
+        Hexmesh(const std::vector<vec3d>             & verts,
                 const std::vector<std::vector<uint>> & faces,
                 const std::vector<std::vector<uint>> & polys,
                 const std::vector<std::vector<bool>> & polys_face_winding);
@@ -102,7 +105,7 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d   verts_average (const std::vector<uint> & vids) const;
+        vec3d verts_average(const std::vector<uint> & vids) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
