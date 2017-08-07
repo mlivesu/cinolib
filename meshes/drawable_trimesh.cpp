@@ -103,9 +103,6 @@ void DrawableTrimesh<M,V,E,F>::init_drawable_stuff()
     slicer = MeshSlicer<Trimesh<M,V,E,F>>(*this);
 
     drawlist.draw_mode = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_MARKED_SEGS;
-    drawlist.seg_width = 1;
-    drawlist.marked_seg_color = Color::RED();
-    drawlist.marked_seg_width = 3;
 
     updateGL();
 }
@@ -332,6 +329,7 @@ void DrawableTrimesh<M,V,E,F>::show_vert_color()
     drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    drawlist.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     updateGL();
 }
 

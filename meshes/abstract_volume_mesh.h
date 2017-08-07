@@ -95,8 +95,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual std::vector<std::vector<uint>> serialized_hex_connectivity() const;
-        virtual std::vector<std::vector<uint>> serialized_tet_connectivity() const;
+        virtual std::vector<std::vector<uint>> export_hex_connectivity() const;
+        virtual std::vector<std::vector<uint>> export_tet_connectivity() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -122,15 +122,16 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual vec3d face_vert          (const uint fid, const uint off) const;
-        virtual uint  face_vert_id       (const uint fid, const uint off) const;
-        virtual uint  face_edge_id       (const uint fid, const uint vid0, const uint vid1) const;
-        virtual bool  face_is_on_srf     (const uint fid) const;
-        virtual bool  face_contrains_vert(const uint fid, const uint vid) const;
-        virtual vec3d face_centroid      (const uint fid) const;
-        virtual bool  faces_are_disjoint (const uint fid0, const uint fid1) const;
-        virtual void  face_set_color     (const Color & c);
-        virtual void  face_set_alpha     (const float alpha);
+        virtual vec3d             face_vert          (const uint fid, const uint off) const;
+        virtual uint              face_vert_id       (const uint fid, const uint off) const;
+        virtual uint              face_edge_id       (const uint fid, const uint vid0, const uint vid1) const;
+        virtual bool              face_is_on_srf     (const uint fid) const;
+        virtual bool              face_contrains_vert(const uint fid, const uint vid) const;
+        virtual vec3d             face_centroid      (const uint fid) const;
+        virtual bool              faces_are_disjoint (const uint fid0, const uint fid1) const;
+        virtual void              face_set_color     (const Color & c);
+        virtual void              face_set_alpha     (const float alpha);
+        virtual std::vector<uint> face_tessellation  (const uint fid) const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

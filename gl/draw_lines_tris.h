@@ -75,18 +75,18 @@ typedef struct
     std::vector<float> tri_v_norms;
     std::vector<float> tri_v_colors; // rgba
     std::vector<float> tri_text;
-    GLuint             tri_text_id;
-    double             tri_text_unit_scalar;
+    GLuint             tri_text_id = 0;
+    double             tri_text_unit_scalar = 1.0;
     //
     std::vector<uint>  segs;
     std::vector<float> seg_coords;
     std::vector<float> seg_colors;
-    GLfloat            seg_width;
+    GLfloat            seg_width = 1;
     //
     std::vector<uint>  marked_segs;
     std::vector<float> marked_seg_coords;
-    Color              marked_seg_color;
-    GLfloat            marked_seg_width;
+    Color              marked_seg_color = Color::RED();
+    GLfloat            marked_seg_width = 3;
 }
 RenderData;
 

@@ -103,6 +103,7 @@ class DrawablePolyhedralmesh : public Polyhedralmesh<M,V,E,F,C>, public Drawable
         void show_face_color();
         void show_face_quality();
         void show_face_texture1D(const GLint texture);
+        void show_face_texture2D(const GLint texture, const double tex_unit_scalar);
         void show_face_wireframe(const bool b);
         void show_face_wireframe_color(const Color & c);
         void show_face_wireframe_width(const float width);
@@ -110,6 +111,7 @@ class DrawablePolyhedralmesh : public Polyhedralmesh<M,V,E,F,C>, public Drawable
         void show_cell_color();
         void show_cell_quality();
         void show_cell_texture1D(const GLint texture);
+        void show_cell_texture2D(const GLint texture, const double tex_unit_scalar);
         void show_cell_wireframe(const bool b);
         void show_cell_wireframe_color(const Color & c);
         void show_cell_wireframe_width(const float width);

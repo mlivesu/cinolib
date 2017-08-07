@@ -69,29 +69,23 @@ DrawablePolyhedralmesh<M,V,E,F,C>::DrawablePolyhedralmesh(const std::vector<vec3
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::init_drawable_stuff()
+void DrawablePolyhedralmesh<M,V,E,F,P>::init_drawable_stuff()
 {
-    slicer = MeshSlicer<DrawablePolyhedralmesh<M,V,E,F,C>>(*this);
+    slicer = MeshSlicer<DrawablePolyhedralmesh<M,V,E,F,P>>(*this);
 
-    drawlist_in.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
-    drawlist_in.seg_width = 1;
-
-    drawlist_out.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
-    drawlist_out.seg_width = 1;
-
-//    Polyhedralmesh<M,V,E,F,C>::face_set_color(Color::YELLOW());
-//    Polyhedralmesh<M,V,E,F,C>::cell_set_color(Color::WHITE());
+    drawlist_in.draw_mode  = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_MARKED_SEGS;
+    drawlist_out.draw_mode = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS | DRAW_MARKED_SEGS;
 
     updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::draw(const float) const
+void DrawablePolyhedralmesh<M,V,E,F,P>::draw(const float) const
 {
     render(drawlist_in );
     render(drawlist_out);
@@ -99,9 +93,9 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::draw(const float) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL()
+void DrawablePolyhedralmesh<M,V,E,F,P>::updateGL()
 {
     updateGL_out();
     updateGL_in();
@@ -109,9 +103,9 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_out()
+void DrawablePolyhedralmesh<M,V,E,F,P>::updateGL_out()
 {
     drawlist_out.tris.clear();
     drawlist_out.tri_coords.clear();
@@ -121,21 +115,23 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_out()
     drawlist_out.segs.clear();
     drawlist_out.seg_coords.clear();
     drawlist_out.seg_colors.clear();
+    drawlist_out.marked_segs.clear();
+    drawlist_out.marked_seg_coords.clear();
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
         if (!this->face_is_on_srf(fid)) continue;
 
         assert(this->adj_f2p(fid).size()==1);
-        uint cid = this->adj_f2p(fid).front();
+        uint pid = this->adj_f2p(fid).front();
 
-        if (!(this->poly_data(cid).visible)) continue;
+        if (!(this->poly_data(pid).visible)) continue;
 
-        for(uint i=0; i<this->triangulated_faces.at(fid).size()/3; ++i)
+        for(uint i=0; i<this->face_tessellation(fid).size()/3; ++i)
         {
-            uint vid0 = this->triangulated_faces.at(fid).at(3*i+0);
-            uint vid1 = this->triangulated_faces.at(fid).at(3*i+1);
-            uint vid2 = this->triangulated_faces.at(fid).at(3*i+2);
+            uint vid0 = this->face_tessellation(fid).at(3*i+0);
+            uint vid1 = this->face_tessellation(fid).at(3*i+1);
+            uint vid2 = this->face_tessellation(fid).at(3*i+2);
 
             int base_addr = drawlist_out.tri_coords.size()/3;
 
@@ -163,20 +159,36 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_out()
             drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.y());
             drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.z());
 
+            if (drawlist_out.draw_mode & DRAW_TRI_TEXTURE1D)
+            {
+                drawlist_out.tri_text.push_back(this->vert_data(vid0).uvw[0]);
+                drawlist_out.tri_text.push_back(this->vert_data(vid1).uvw[0]);
+                drawlist_out.tri_text.push_back(this->vert_data(vid2).uvw[0]);
+            }
+            else if (drawlist_out.draw_mode & DRAW_TRI_TEXTURE2D)
+            {
+                drawlist_out.tri_text.push_back(this->vert_data(vid0).uvw[0]*drawlist_out.tri_text_unit_scalar);
+                drawlist_out.tri_text.push_back(this->vert_data(vid0).uvw[1]*drawlist_out.tri_text_unit_scalar);
+                drawlist_out.tri_text.push_back(this->vert_data(vid1).uvw[0]*drawlist_out.tri_text_unit_scalar);
+                drawlist_out.tri_text.push_back(this->vert_data(vid1).uvw[1]*drawlist_out.tri_text_unit_scalar);
+                drawlist_out.tri_text.push_back(this->vert_data(vid2).uvw[0]*drawlist_out.tri_text_unit_scalar);
+                drawlist_out.tri_text.push_back(this->vert_data(vid2).uvw[1]*drawlist_out.tri_text_unit_scalar);
+            }
+
             if (drawlist_out.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
             {
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.r);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.g);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.b);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.a);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.r);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.g);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.b);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.a);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.r);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.g);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.b);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(cid).color.a);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.a);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.a);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.a);
             }
             else if (drawlist_out.draw_mode & DRAW_TRI_VERTCOLOR)
             {
@@ -193,20 +205,36 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_out()
                 drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.b);
                 drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.a);
             }
+            else if (drawlist_out.draw_mode & DRAW_TRI_QUALITY)
+            {
+                float q = this->poly_data(pid).quality;
+                Color c = Color::quality2rgb(q);
+                drawlist_out.tri_v_colors.push_back(c.r);
+                drawlist_out.tri_v_colors.push_back(c.g);
+                drawlist_out.tri_v_colors.push_back(c.b);
+                drawlist_out.tri_v_colors.push_back(c.a);
+                drawlist_out.tri_v_colors.push_back(c.r);
+                drawlist_out.tri_v_colors.push_back(c.g);
+                drawlist_out.tri_v_colors.push_back(c.b);
+                drawlist_out.tri_v_colors.push_back(c.a);
+                drawlist_out.tri_v_colors.push_back(c.r);
+                drawlist_out.tri_v_colors.push_back(c.g);
+                drawlist_out.tri_v_colors.push_back(c.b);
+                drawlist_out.tri_v_colors.push_back(c.a);
+            }
         }
     }
 
-    // bake wireframe as border
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         if (!this->edge_is_on_srf(eid)) continue;
 
-        bool masked = true;
+        bool invisible = true;
         for(uint cid : this->adj_e2p(eid))
         {
-            if (this->poly_data(cid).visible) masked = false;
+            if (this->poly_data(cid).visible) invisible = false;
         }
-        if (masked) continue;
+        if (invisible) continue;
 
         int base_addr = drawlist_out.seg_coords.size()/3;
         drawlist_out.segs.push_back(base_addr    );
@@ -230,14 +258,28 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_out()
         drawlist_out.seg_colors.push_back(this->edge_data(eid).color.g);
         drawlist_out.seg_colors.push_back(this->edge_data(eid).color.b);
         drawlist_out.seg_colors.push_back(this->edge_data(eid).color.a);
+
+        if (this->edge_data(eid).marked && drawlist_out.draw_mode & DRAW_MARKED_SEGS)
+        {
+            int base_addr = drawlist_out.marked_seg_coords.size()/3;
+            drawlist_out.marked_segs.push_back(base_addr    );
+            drawlist_out.marked_segs.push_back(base_addr + 1);
+
+            drawlist_out.marked_seg_coords.push_back(vid0.x());
+            drawlist_out.marked_seg_coords.push_back(vid0.y());
+            drawlist_out.marked_seg_coords.push_back(vid0.z());
+            drawlist_out.marked_seg_coords.push_back(vid1.x());
+            drawlist_out.marked_seg_coords.push_back(vid1.y());
+            drawlist_out.marked_seg_coords.push_back(vid1.z());
+        }
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
+void DrawablePolyhedralmesh<M,V,E,F,P>::updateGL_in()
 {
     drawlist_in.tris.clear();
     drawlist_in.tri_coords.clear();
@@ -247,6 +289,8 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
     drawlist_in.segs.clear();
     drawlist_in.seg_coords.clear();
     drawlist_in.seg_colors.clear();
+    drawlist_in.marked_segs.clear();
+    drawlist_in.marked_seg_coords.clear();
 
     std::set<uint> edges_to_render;
 
@@ -255,23 +299,27 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
         if (this->face_is_on_srf(fid)) continue;
 
         assert(this->adj_f2p(fid).size()==2);
-        std::vector<uint> visible_cells;
-        for(uint cid : this->adj_f2p(fid))
+        std::vector<uint> visible_polys;
+        for(uint pid : this->adj_f2p(fid))
         {
-            if (this->poly_data(cid).visible) visible_cells.push_back(cid);
+            if (this->poly_data(pid).visible) visible_polys.push_back(pid);
         }
-        if (visible_cells.size()!=1) continue;
+        if (visible_polys.size()!=1) continue;
 
-        for(uint eid : this->adj_f2e(fid)) edges_to_render.insert(eid);
+        uint pid   = visible_polys.front();
+        bool is_CW = this->poly_face_is_CW(pid,this->poly_face_offset(pid,fid));
 
-        uint cid   = visible_cells.front();
-        bool is_CW = this->poly_face_is_CW(cid,this->poly_face_offset(cid,fid));
-
-        for(uint i=0; i<this->triangulated_faces.at(fid).size()/3; ++i)
+        for(uint eid : this->adj_f2e(fid))
         {
-            uint vid0 = this->triangulated_faces.at(fid).at(3*i+0);
-            uint vid1 = this->triangulated_faces.at(fid).at(3*i+1);
-            uint vid2 = this->triangulated_faces.at(fid).at(3*i+2);
+            if (this->edge_is_on_srf(eid)) continue; // updateGL_out() will consider it
+            edges_to_render.insert(eid);
+        }
+
+        for(uint i=0; i<this->face_tessellation(fid).size()/3; ++i)
+        {
+            uint vid0 = this->face_tessellation(fid).at(3*i+0);
+            uint vid1 = this->face_tessellation(fid).at(3*i+1);
+            uint vid2 = this->face_tessellation(fid).at(3*i+2);
             if (is_CW) std::swap(vid1,vid2); // flip triangle orientation
 
             int base_addr = drawlist_in.tri_coords.size()/3;
@@ -301,20 +349,36 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
             drawlist_in.tri_v_norms.push_back(n.y());
             drawlist_in.tri_v_norms.push_back(n.z());
 
+            if (drawlist_in.draw_mode & DRAW_TRI_TEXTURE1D)
+            {
+                drawlist_in.tri_text.push_back(this->vert_data(vid0).uvw[0]);
+                drawlist_in.tri_text.push_back(this->vert_data(vid1).uvw[0]);
+                drawlist_in.tri_text.push_back(this->vert_data(vid2).uvw[0]);
+            }
+            else if (drawlist_in.draw_mode & DRAW_TRI_TEXTURE2D)
+            {
+                drawlist_in.tri_text.push_back(this->vert_data(vid0).uvw[0]*drawlist_in.tri_text_unit_scalar);
+                drawlist_in.tri_text.push_back(this->vert_data(vid0).uvw[1]*drawlist_in.tri_text_unit_scalar);
+                drawlist_in.tri_text.push_back(this->vert_data(vid1).uvw[0]*drawlist_in.tri_text_unit_scalar);
+                drawlist_in.tri_text.push_back(this->vert_data(vid1).uvw[1]*drawlist_in.tri_text_unit_scalar);
+                drawlist_in.tri_text.push_back(this->vert_data(vid2).uvw[0]*drawlist_in.tri_text_unit_scalar);
+                drawlist_in.tri_text.push_back(this->vert_data(vid2).uvw[1]*drawlist_in.tri_text_unit_scalar);
+            }
+
             if (drawlist_in.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
             {
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.r);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.g);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.b);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.a);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.r);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.g);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.b);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.a);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.r);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.g);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.b);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(cid).color.a);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.a);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.a);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.r);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.g);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.b);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.a);
             }
             else if (drawlist_in.draw_mode & DRAW_TRI_VERTCOLOR)
             {
@@ -331,15 +395,29 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
                 drawlist_in.tri_v_colors.push_back(this->vert_data(vid2).color.b);
                 drawlist_in.tri_v_colors.push_back(this->vert_data(vid2).color.a);
             }
+            else if (drawlist_in.draw_mode & DRAW_TRI_QUALITY)
+            {
+                float q = this->poly_data(pid).quality;
+                Color c = Color::quality2rgb(q);
+                drawlist_in.tri_v_colors.push_back(c.r);
+                drawlist_in.tri_v_colors.push_back(c.g);
+                drawlist_in.tri_v_colors.push_back(c.b);
+                drawlist_in.tri_v_colors.push_back(c.a);
+                drawlist_in.tri_v_colors.push_back(c.r);
+                drawlist_in.tri_v_colors.push_back(c.g);
+                drawlist_in.tri_v_colors.push_back(c.b);
+                drawlist_in.tri_v_colors.push_back(c.a);
+                drawlist_in.tri_v_colors.push_back(c.r);
+                drawlist_in.tri_v_colors.push_back(c.g);
+                drawlist_in.tri_v_colors.push_back(c.b);
+                drawlist_in.tri_v_colors.push_back(c.a);
+            }
         }
     }
 
-    // bake wireframe as border
     for(uint eid : edges_to_render)
     {
-        if (this->edge_is_on_srf(eid)) continue; // updateGL_out() will consider it
-
-        int base_addr = drawlist_in.seg_coords.size()/3;
+        uint base_addr = drawlist_in.seg_coords.size()/3;
         drawlist_in.segs.push_back(base_addr    );
         drawlist_in.segs.push_back(base_addr + 1);
 
@@ -361,17 +439,31 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::updateGL_in()
         drawlist_in.seg_colors.push_back(this->edge_data(eid).color.g);
         drawlist_in.seg_colors.push_back(this->edge_data(eid).color.b);
         drawlist_in.seg_colors.push_back(this->edge_data(eid).color.a);
+
+        if (this->edge_data(eid).marked && drawlist_in.draw_mode & DRAW_MARKED_SEGS)
+        {
+            int base_addr = drawlist_in.marked_seg_coords.size()/3;
+            drawlist_in.marked_segs.push_back(base_addr    );
+            drawlist_in.marked_segs.push_back(base_addr + 1);
+
+            drawlist_in.marked_seg_coords.push_back(vid0.x());
+            drawlist_in.marked_seg_coords.push_back(vid0.y());
+            drawlist_in.marked_seg_coords.push_back(vid0.z());
+            drawlist_in.marked_seg_coords.push_back(vid1.x());
+            drawlist_in.marked_seg_coords.push_back(vid1.y());
+            drawlist_in.marked_seg_coords.push_back(vid1.z());
+        }
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::slice(const float thresh, // thresh on centroids or quality
-                                              const int   item,   // X, Y, Z, L, Q
-                                              const int   sign,   // either LEQ or GEQ
-                                              const int   mode)   // either AND or OR
+void DrawablePolyhedralmesh<M,V,E,F,P>::slice(const float thresh, // thresh on centroids or quality
+                                       const int   item,   // X, Y, Z, L, Q
+                                       const int   sign,   // either LEQ or GEQ
+                                       const int   mode)   // either AND or OR
 {
     slicer.update(*this, thresh, item, sign, mode); // update per element visibility flags
     updateGL();
@@ -379,9 +471,9 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::slice(const float thresh, // thresh on c
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_mesh(const bool b)
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_mesh(const bool b)
 {
     if (b)
     {
@@ -397,9 +489,9 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::show_mesh(const bool b)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_mesh_flat()
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_mesh_flat()
 {
     drawlist_in.draw_mode  |=  DRAW_TRI_FLAT;
     drawlist_in.draw_mode  &= ~DRAW_TRI_SMOOTH;
@@ -411,9 +503,9 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::show_mesh_flat()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_mesh_smooth()
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_mesh_smooth()
 {
     drawlist_in.draw_mode  |=  DRAW_TRI_SMOOTH;
     drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
@@ -425,9 +517,9 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::show_mesh_smooth()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_mesh_points()
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_mesh_points()
 {
     drawlist_in.draw_mode  |=  DRAW_TRI_POINTS;
     drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
@@ -439,67 +531,70 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::show_mesh_points()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_face_color()
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_face_color()
 {
     drawlist_out.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
     drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    glDisable(GL_TEXTURE_1D);
+    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     updateGL_out();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_face_quality()
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_face_quality()
 {
     drawlist_out.draw_mode |=  DRAW_TRI_QUALITY;
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    glDisable(GL_TEXTURE_1D);
+    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     updateGL_out();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_face_texture1D(const GLint texture)
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_face_texture1D(const GLint texture)
 {
     drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE1D;
+    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    if (drawlist_out.tri_text_id > 0) glDeleteTextures(1, &drawlist_out.tri_text_id);
-    glGenTextures(1, &drawlist_out.tri_text_id);
-    glBindTexture(GL_TEXTURE_1D, drawlist_out.tri_text_id);
-    switch (texture)
-    {
-//        case TEXTURE_1D_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
-        case TEXTURE_1D_HSV_RAMP           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D); break;
-        case TEXTURE_1D_HSV_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
-        default : assert("Unknown 1D Texture" && false);
-    }
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glEnable(GL_TEXTURE_1D);
-
+    load_texture(drawlist_out.tri_text_id, texture);
     updateGL_out();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_face_wireframe(const bool b)
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_face_texture2D(const GLint texture, const double tex_unit_scalar)
+{
+    drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE2D;
+    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
+
+    drawlist_out.tri_text_unit_scalar = tex_unit_scalar;
+    load_texture(drawlist_out.tri_text_id, texture);
+    updateGL_out();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_face_wireframe(const bool b)
 {
     if (b) drawlist_out.draw_mode |=  DRAW_SEGS;
     else   drawlist_out.draw_mode &= ~DRAW_SEGS;
@@ -507,94 +602,98 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::show_face_wireframe(const bool b)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_face_wireframe_color(const Color & c)
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_face_wireframe_color(const Color & c)
 {
-    edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    this->edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_face_wireframe_width(const float width)
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_face_wireframe_width(const float width)
 {
     drawlist_out.seg_width = width;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_face_wireframe_transparency(const float alpha)
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_face_wireframe_transparency(const float alpha)
 {
-    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_cell_color()
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_cell_color()
 {
     drawlist_in.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
     drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    glDisable(GL_TEXTURE_1D);
-    updateGL_in();
+    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_cell_quality()
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_cell_quality()
 {
     drawlist_in.draw_mode |=  DRAW_TRI_QUALITY;
     drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    glDisable(GL_TEXTURE_1D);
+    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     updateGL_in();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_cell_texture1D(const GLint texture)
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_cell_texture1D(const GLint texture)
 {
     drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE1D;
+    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    if (drawlist_in.tri_text_id > 0) glDeleteTextures(1, &drawlist_in.tri_text_id);
-    glGenTextures(1, &drawlist_in.tri_text_id);
-    glBindTexture(GL_TEXTURE_1D, drawlist_in.tri_text_id);
-    switch (texture)
-    {
-//        case TEXTURE_1D_ISOLINES               : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, isolines_texture1D); break;
-        case TEXTURE_1D_HSV_RAMP           : glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D); break;
-        case TEXTURE_1D_HSV_RAMP_W_ISOLINES: glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines); break;
-        default : assert("Unknown 1D Texture" && false);
-    }
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glEnable(GL_TEXTURE_1D);
-
+    load_texture(drawlist_in.tri_text_id, texture);
     updateGL_in();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_cell_wireframe(const bool b)
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_cell_texture2D(const GLint texture, const double tex_unit_scalar)
+{
+    drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE2D;
+    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
+
+    drawlist_in.tri_text_unit_scalar = tex_unit_scalar;
+    load_texture(drawlist_in.tri_text_id, texture);
+    updateGL_in();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_cell_wireframe(const bool b)
 {
     if (b) drawlist_in.draw_mode |=  DRAW_SEGS;
     else   drawlist_in.draw_mode &= ~DRAW_SEGS;
@@ -602,31 +701,31 @@ void DrawablePolyhedralmesh<M,V,E,F,C>::show_cell_wireframe(const bool b)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_cell_wireframe_color(const Color & c)
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_cell_wireframe_color(const Color & c)
 {
-    edge_set_color(c); // NOTE: this will change color for ANY adge (both interior and boundary)
+    this->edge_set_color(c); // NOTE: this will change color for ANY adge (both interior and boundary)
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_cell_wireframe_width(const float width)
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_cell_wireframe_width(const float width)
 {
     drawlist_in.seg_width = width;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawablePolyhedralmesh<M,V,E,F,C>::show_cell_wireframe_transparency(const float alpha)
+void DrawablePolyhedralmesh<M,V,E,F,P>::show_cell_wireframe_transparency(const float alpha)
 {
-    edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    updateGL();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 }

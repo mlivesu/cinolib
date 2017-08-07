@@ -204,7 +204,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_adjacency()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<std::vector<uint>> AbstractPolyhedralMesh<M,V,E,F,P>::serialized_hex_connectivity() const
+std::vector<std::vector<uint>> AbstractPolyhedralMesh<M,V,E,F,P>::export_hex_connectivity() const
 {
     std::vector<std::vector<uint>> hexa;
     for(uint pid=0; pid<this->num_polys(); ++pid)
@@ -218,7 +218,7 @@ std::vector<std::vector<uint>> AbstractPolyhedralMesh<M,V,E,F,P>::serialized_hex
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<std::vector<uint>> AbstractPolyhedralMesh<M,V,E,F,P>::serialized_tet_connectivity() const
+std::vector<std::vector<uint>> AbstractPolyhedralMesh<M,V,E,F,P>::export_tet_connectivity() const
 {
     std::vector<std::vector<uint>> tets;
     for(uint pid=0; pid<this->num_polys(); ++pid)

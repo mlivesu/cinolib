@@ -193,17 +193,17 @@ void Hexmesh<M,V,E,F,P>::save(const char * filename) const
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        write_MESH(filename, this->verts, this->serialized_hex_connectivity());
+        write_MESH(filename, this->verts, this->export_hex_connectivity());
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        write_VTU(filename, this->verts, this->serialized_hex_connectivity());
+        write_VTU(filename, this->verts, this->export_hex_connectivity());
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        write_VTK(filename, this->verts, this->serialized_hex_connectivity());
+        write_VTK(filename, this->verts, this->export_hex_connectivity());
     }
     else
     {
@@ -254,6 +254,24 @@ vec3d Hexmesh<M,V,E,F,P>::verts_average(const std::vector<uint> &vids) const
     for(uint vid: vids) res += this->vert(vid);
     res /= static_cast<double>(vids.size());
     return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> Hexmesh<M,V,E,F,P>::face_tessellation(const uint fid) const
+{
+    std::vector<uint> triangulation =
+    {
+        this->face_vert_id(fid,0),
+        this->face_vert_id(fid,1),
+        this->face_vert_id(fid,2),
+        this->face_vert_id(fid,0),
+        this->face_vert_id(fid,2),
+        this->face_vert_id(fid,3),
+    };
+    return triangulation;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

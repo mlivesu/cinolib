@@ -89,7 +89,11 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual double poly_volume (const uint) const { assert(false && "TODO!"); return 1.0; }
+        std::vector<uint> face_tessellation(const uint fid) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        double poly_volume(const uint) const { assert(false && "TODO!"); return 1.0; }
 };
 
 }

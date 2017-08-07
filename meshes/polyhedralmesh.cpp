@@ -190,6 +190,14 @@ void Polyhedralmesh<M,V,E,F,P>::update_normals()
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> Polyhedralmesh<M,V,E,F,P>::face_tessellation(const uint fid) const
+{
+    return triangulated_faces.at(fid);
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -200,7 +208,7 @@ void Polyhedralmesh<M,V,E,F,P>::export_to_hexahedral_mesh(std::vector<vec3d>    
 {
     assert(false);
     verts = this->vector_verts();
-    hexa  = this->serialized_hex_connectivity();
+    hexa  = this->export_hex_connectivity();
 }
 
 }
