@@ -39,7 +39,7 @@
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/quadmesh.h>
 #include <cinolib/meshes/mesh_attributes.h>
-#include <cinolib/meshes/abstract_volume_mesh.h>
+#include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/hexmesh_split_schemas.h>
 

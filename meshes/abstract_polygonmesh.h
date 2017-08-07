@@ -28,8 +28,8 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_ABSTRACT_SURFACE_MESH_H
-#define CINO_ABSTRACT_SURFACE_MESH_H
+#ifndef CINO_ABSTRACT_POLYGON_MESH_H
+#define CINO_ABSTRACT_POLYGON_MESH_H
 
 #include <cinolib/meshes/abstract_mesh.h>
 
@@ -131,7 +131,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "abstract_surface_mesh.cpp"
+#include "abstract_polygonmesh.cpp"
 #endif
 
-#endif //CINO_ABSTRACT_SURFACE_MESH_H
+#endif //CINO_ABSTRACT_POLYGON_MESH_H

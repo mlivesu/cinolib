@@ -35,7 +35,7 @@
 #include <cinolib/symbols.h>
 #include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/geometry/triangle.h>
-#include <cinolib/meshes/abstract_surface_mesh.h>
+#include <cinolib/meshes/abstract_polygonmesh.h>
 
 namespace cinolib
 {

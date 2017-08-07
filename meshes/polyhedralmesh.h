@@ -39,7 +39,7 @@
 #include <cinolib/meshes/polygonmesh.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/mesh_attributes.h>
-#include <cinolib/meshes/abstract_volume_mesh.h>
+#include <cinolib/meshes/abstract_polyhedralmesh.h>
 
 namespace cinolib
 {

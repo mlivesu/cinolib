@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/meshes/abstract_surface_mesh.h>
+#include <cinolib/meshes/abstract_polygonmesh.h>
 #include <cinolib/io/read_write.h>
 
 namespace cinolib

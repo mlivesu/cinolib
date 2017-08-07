@@ -33,7 +33,7 @@
 
 #include <vector>
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/abstract_surface_mesh.h>
+#include <cinolib/meshes/abstract_polygonmesh.h>
 #include <cinolib/meshes/mesh_attributes.h>
 
 namespace cinolib

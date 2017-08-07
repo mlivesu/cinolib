@@ -32,7 +32,7 @@
 #define CINO_DRAWABLE_POLYHEDRALMESH_H
 
 #include <cinolib/meshes/polyhedralmesh.h>
-#include <cinolib/meshes/abstract_drawable_volume_mesh.h>
+#include <cinolib/meshes/abstract_drawable_polyhedralmesh.h>
 
 namespace cinolib
 {
@@ -42,7 +42,7 @@ template<class M = Mesh_min_attributes, // default template arguments
          class E = Edge_min_attributes,
          class F = Polygon_min_attributes,
          class P = Polyhedron_min_attributes>
-class DrawablePolyhedralmesh : public AbstractDrawableVolumeMesh<Polyhedralmesh<M,V,E,F,P>>
+class DrawablePolyhedralmesh : public AbstractDrawablePolyhedralMesh<Polyhedralmesh<M,V,E,F,P>>
 {
     public:
 

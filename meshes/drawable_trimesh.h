@@ -32,7 +32,7 @@
 #define CINO_DRAWABLE_TRIMESH_H
 
 #include <cinolib/meshes/trimesh.h>
-#include <cinolib/meshes/abstract_drawable_surface_mesh.h>
+#include <cinolib/meshes/abstract_drawable_polygonmesh.h>
 
 namespace cinolib
 {
@@ -41,7 +41,7 @@ template<class M = Mesh_min_attributes, // default template arguments
          class V = Vert_min_attributes,
          class E = Edge_min_attributes,
          class P = Polygon_min_attributes>
-class DrawableTrimesh : public AbstractDrawableSurfaceMesh<Trimesh<M,V,E,P>>
+class DrawableTrimesh : public AbstractDrawablePolygonMesh<Trimesh<M,V,E,P>>
 {
     public:
 

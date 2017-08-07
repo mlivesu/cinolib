@@ -28,8 +28,8 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_ABSTRACT_DRAWABLE_VOLUME_MESH_H
-#define CINO_ABSTRACT_DRAWABLE_VOLUME_MESH_H
+#ifndef CINO_ABSTRACT_DRAWABLE_POLYHEDRAL_MESH_H
+#define CINO_ABSTRACT_DRAWABLE_POLYHEDRAL_MESH_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
@@ -40,7 +40,7 @@ namespace cinolib
 {
 
 template<class Mesh>
-class AbstractDrawableVolumeMesh : public virtual Mesh, public DrawableObject
+class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObject
 {
     protected:
 
@@ -104,7 +104,7 @@ class AbstractDrawableVolumeMesh : public virtual Mesh, public DrawableObject
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "abstract_drawable_volume_mesh.cpp"
+#include "abstract_drawable_polyhedralmesh.cpp"
 #endif
 
-#endif // CINO_ABSTRACT_DRAWABLE_VOLUME_MESH_H
+#endif // CINO_ABSTRACT_DRAWABLE_POLYHEDRAL_MESH_H

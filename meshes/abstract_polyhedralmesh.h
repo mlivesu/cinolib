@@ -28,8 +28,8 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_ABSTRACT_VOLUME_MESH_H
-#define CINO_ABSTRACT_VOLUME_MESH_H
+#ifndef CINO_ABSTRACT_POLYHEDRAL_MESH_H
+#define CINO_ABSTRACT_POLYHEDRAL_MESH_H
 
 #include <cinolib/meshes/abstract_mesh.h>
 
@@ -153,7 +153,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "abstract_volume_mesh.cpp"
+#include "abstract_polyhedralmesh.cpp"
 #endif
 
-#endif // CINO_ABSTRACT_VOLUME_MESH_H
+#endif // CINO_ABSTRACT_POLYHEDRAL_MESH_H

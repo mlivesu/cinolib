@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/meshes/abstract_volume_mesh.h>
+#include <cinolib/meshes/abstract_polyhedralmesh.h>
 
 namespace cinolib
 {

@@ -28,8 +28,8 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_ABSTRACT_DRAWABLE_SURFACE_MESH_H
-#define CINO_ABSTRACT_DRAWABLE_SURFACE_MESH_H
+#ifndef CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H
+#define CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H
 
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
@@ -40,7 +40,7 @@ namespace cinolib
 {
 
 template<class Mesh>
-class AbstractDrawableSurfaceMesh : public virtual Mesh, public DrawableObject
+class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 {
     protected:
 
@@ -49,7 +49,7 @@ class AbstractDrawableSurfaceMesh : public virtual Mesh, public DrawableObject
 
     public:
 
-        AbstractDrawableSurfaceMesh() : Mesh() {}
+        AbstractDrawablePolygonMesh() : Mesh() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -90,7 +90,7 @@ class AbstractDrawableSurfaceMesh : public virtual Mesh, public DrawableObject
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "abstract_drawable_surface_mesh.cpp"
+#include "abstract_drawable_polygonmesh.cpp"
 #endif
 
-#endif // CINO_ABSTRACT_DRAWABLE_SURFACE_MESH_H
+#endif // CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H
