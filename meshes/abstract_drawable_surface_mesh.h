@@ -28,52 +28,69 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_DRAWABLE_POLYHEDRALMESH_H
-#define CINO_DRAWABLE_POLYHEDRALMESH_H
+#ifndef CINO_ABSTRACT_DRAWABLE_SURFACE_MESH_H
+#define CINO_ABSTRACT_DRAWABLE_SURFACE_MESH_H
 
-#include <cinolib/meshes/polyhedralmesh.h>
-#include <cinolib/meshes/abstract_drawable_volume_mesh.h>
+#include <cinolib/cinolib.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/gl/draw_lines_tris.h>
+#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class F = Polygon_min_attributes,
-         class P = Polyhedron_min_attributes>
-class DrawablePolyhedralmesh : public AbstractDrawableVolumeMesh<Polyhedralmesh<M,V,E,F,P>>
+template<class Mesh>
+class AbstractDrawableSurfaceMesh : public virtual Mesh, public DrawableObject
 {
+    protected:
+
+        RenderData       drawlist;
+        MeshSlicer<Mesh> slicer;
+
     public:
 
-        DrawablePolyhedralmesh() : Polyhedralmesh<M,V,E,F,P>()
-        {
-            this->init_drawable_stuff();
-        }
+        AbstractDrawableSurfaceMesh() : Mesh() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawablePolyhedralmesh(const char * filename) : Polyhedralmesh<M,V,E,F,P>(filename)
-        {
-            this->init_drawable_stuff();
-        }
+        void       draw(const float scene_size=1) const;
+        vec3d      scene_center() const { return this->bb.center(); }
+        float      scene_radius() const { return this->bb.diag();   }
+        ObjectType object_type()  const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawablePolyhedralmesh(const std::vector<vec3d>             & verts,
-                               const std::vector<std::vector<uint>> & faces,
-                               const std::vector<std::vector<uint>> & polys,
-                               const std::vector<std::vector<bool>> & polys_face_winding)
-            : Polyhedralmesh<M,V,E,F,P>(verts, faces, polys, polys_face_winding)
-        {
-            this->init_drawable_stuff();
-        }
+        void init_drawable_stuff();
+        void updateGL();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        ObjectType object_type() const { return DRAWABLE_POLYHEDRALMESH; }
+        void slice(const float thresh, const int item, const int sign, const int mode);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void show_mesh(const bool b);
+        void show_mesh_flat();
+        void show_mesh_smooth();
+        void show_mesh_points();
+        void show_vert_color();
+        void show_face_color();
+        void show_face_texture1D(const int tex_type);
+        void show_face_texture2D(const int tex_type, const double tex_unit_scalar);
+        void show_face_wireframe(const bool b);
+        void show_face_wireframe_color(const Color & c);
+        void show_face_wireframe_width(const float width);
+        void show_face_wireframe_transparency(const float alpha);
+        void show_edge_marked(const bool b);
+        void show_edge_marked_color(const Color & c);
+        void show_edge_marked_width(const float width);
+        void show_edge_marked_transparency(const float alpha);
 };
 
 }
 
-#endif // CINO_DRAWABLE_POLYHEDRALMESH_H
+#ifndef  CINO_STATIC_LIB
+#include "abstract_drawable_surface_mesh.cpp"
+#endif
+
+#endif // CINO_ABSTRACT_DRAWABLE_SURFACE_MESH_H

@@ -34,15 +34,13 @@
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/gl/draw_lines_tris.h>
-#include <cinolib/meshes/abstract_volume_mesh.h>
 #include <cinolib/meshes/mesh_slicer.h>
-#include <cinolib/meshes/mesh_attributes.h>
 
 namespace cinolib
 {
 
 template<class Mesh>
-class DrawableVolumeMesh : public virtual Mesh, public DrawableObject
+class AbstractDrawableVolumeMesh : public virtual Mesh, public DrawableObject
 {
     protected:
 

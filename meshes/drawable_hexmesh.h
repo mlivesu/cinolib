@@ -42,7 +42,7 @@ template<class M = Mesh_min_attributes, // default template arguments
          class E = Edge_min_attributes,
          class F = Polygon_min_attributes,
          class P = Polyhedron_min_attributes>
-class DrawableHexmesh : public DrawableVolumeMesh<Hexmesh<M,V,E,F,P>>
+class DrawableHexmesh : public AbstractDrawableVolumeMesh<Hexmesh<M,V,E,F,P>>
 {
     public:
 
