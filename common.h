@@ -308,6 +308,46 @@ void from_tetrahedra_to_general_polyhedra(const std::vector<uint>              &
     faces.clear();
     polys.clear();
     polys_face_winding.clear();
+
+    uint n_tets = tets.size()/4;
+
+    std::map<std::vector<uint>,uint> f_map;
+    for(uint tid=0; tid<n_tets; ++tid)
+    {
+        std::vector<uint> p_faces;
+        std::vector<bool> p_winding;
+
+        for(uint i=0; i<4; ++i)
+        {
+            uint base = tid*4;
+            std::vector<uint> f =
+            {
+                tets.at(base + TET_FACES[i][0]),
+                tets.at(base + TET_FACES[i][1]),
+                tets.at(base + TET_FACES[i][2]),
+            };
+            std::vector<uint> sorted_f = f;
+            sort(sorted_f.begin(), sorted_f.end());
+            auto query = f_map.find(sorted_f);
+
+            if (query == f_map.end())
+            {
+                uint fresh_id = f_map.size();
+                f_map[sorted_f] = fresh_id;
+                faces.push_back(f);
+                p_faces.push_back(fresh_id);
+                p_winding.push_back(true);
+            }
+            else
+            {
+                p_faces.push_back(query->second);
+                p_winding.push_back(false);
+            }
+        }
+
+        polys.push_back(p_faces);
+        polys_face_winding.push_back(p_winding);
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -321,6 +361,45 @@ void from_tetrahedra_to_general_polyhedra(const std::vector<std::vector<uint>> &
     faces.clear();
     polys.clear();
     polys_face_winding.clear();
+
+    std::map<std::vector<uint>,uint> f_map;
+    for(uint tid=0; tid<tets.size(); ++tid)
+    {
+        assert(tets.at(tid).size() == 4);
+
+        std::vector<uint> p_faces;
+        std::vector<bool> p_winding;
+
+        for(uint i=0; i<4; ++i)
+        {
+            std::vector<uint> f =
+            {
+                tets.at(tid).at(TET_FACES[i][0]),
+                tets.at(tid).at(TET_FACES[i][1]),
+                tets.at(tid).at(TET_FACES[i][2]),
+            };
+            std::vector<uint> sorted_f = f;
+            sort(sorted_f.begin(), sorted_f.end());
+            auto query = f_map.find(sorted_f);
+
+            if (query == f_map.end())
+            {
+                uint fresh_id = f_map.size();
+                f_map[sorted_f] = fresh_id;
+                faces.push_back(f);
+                p_faces.push_back(fresh_id);
+                p_winding.push_back(true);
+            }
+            else
+            {
+                p_faces.push_back(query->second);
+                p_winding.push_back(false);
+            }
+        }
+
+        polys.push_back(p_faces);
+        polys_face_winding.push_back(p_winding);
+    }
 }
 
 }
