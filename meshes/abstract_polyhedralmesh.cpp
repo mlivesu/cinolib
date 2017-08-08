@@ -203,20 +203,6 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_adjacency()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<std::vector<uint>> AbstractPolyhedralMesh<M,V,E,F,P>::export_tet_connectivity() const
-{
-    std::vector<std::vector<uint>> tets;
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        tets.push_back(this->poly_as_tet_vlist(pid));
-    }
-    return tets;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::face_set_color(const Color & c)
 {
     for(uint fid=0; fid<num_faces(); ++fid)
@@ -308,20 +294,6 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_contains_face(const uint pid, const
         if(poly_face_id(pid,off) == fid) return true;
     }
     return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_as_tet_vlist(const uint pid) const
-{
-    assert(this->verts_per_poly(pid) == 4);
-    assert(this->faces_per_poly(pid) == 4);
-
-    assert(false && "TODO");
-    std::vector<uint> v_list;
-    return v_list;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

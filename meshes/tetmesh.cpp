@@ -259,17 +259,17 @@ void Tetmesh<M,V,E,F,P>::save(const char * filename) const
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        write_MESH(filename, this->verts, this->export_tet_connectivity());
+        write_MESH(filename, this->verts, this->p2v);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        write_VTU(filename, this->verts, this->export_tet_connectivity());
+        write_MESH(filename, this->verts, this->p2v);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        write_VTK(filename, this->verts, this->export_tet_connectivity());
+        write_MESH(filename, this->verts, this->p2v);
     }
     else
     {
@@ -285,7 +285,7 @@ CINO_INLINE
 void Tetmesh<M,V,E,F,P>::init()
 {
     AbstractPolyhedralMesh<M,V,E,F,P>::init();
-    reorder_p2v();
+    reorder_p2v(); // makes sure the p2v adjacency stores vertices in a way that uniquely defines per element connectivity
     update_tet_quality();
     this->copy_xyz_to_uvw(UVW_param);
 }
