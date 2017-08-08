@@ -37,11 +37,11 @@
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class F = Polygon_min_attributes,
-         class P = Polyhedron_min_attributes>
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class F = Polygon_std_attributes,
+         class P = Polyhedron_std_attributes>
 class DrawableHexmesh : public AbstractDrawablePolyhedralMesh<Hexmesh<M,V,E,F,P>>
 {
     public:

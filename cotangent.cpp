@@ -103,16 +103,16 @@ void cotangent_weights<Tetmesh<>>(const Tetmesh<>     & m,
         if (nbr == vid) nbr = m.edge_vert_id(eid, 1);
         assert(nbr != vid);
 
-        std::vector<uint> cells = m.adj_e2c(eid);
+        std::vector<uint> cells = m.adj_e2p(eid);
 
         double wgt = 0.0;
         for(uint cid : cells)
         {
-            uint   e_opp     = m.cell_edge_opposite_to(cid, vid, nbr);
-            uint   f_opp_vid = m.cell_face_opposite_to(cid, vid);
-            uint   f_opp_nbr = m.cell_face_opposite_to(cid, nbr);
-            double l_k       = m.cell_edge_length(cid, e_opp);
-            double teta_k    = m.cell_dihedral_angle(cid, f_opp_vid, f_opp_nbr);
+            uint   e_opp     = m.poly_edge_opposite_to(cid, vid, nbr);
+            uint   f_opp_vid = m.poly_face_opposite_to(cid, vid);
+            uint   f_opp_nbr = m.poly_face_opposite_to(cid, nbr);
+            double l_k       = m.poly_edge_length(cid, e_opp);
+            double teta_k    = m.poly_dihedral_angle(cid, f_opp_vid, f_opp_nbr);
 
             wgt += cot(teta_k) * l_k;
         }

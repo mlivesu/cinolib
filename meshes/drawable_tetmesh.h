@@ -40,11 +40,11 @@
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class F = Polygon_min_attributes,
-         class C = Polyhedron_min_attributes>
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class F = Polygon_std_attributes,
+         class C = Polyhedron_std_attributes>
 class DrawableTetmesh : public Tetmesh<M,V,E,F,C>, public DrawableObject
 {
 
@@ -55,10 +55,10 @@ class DrawableTetmesh : public Tetmesh<M,V,E,F,C>, public DrawableObject
         DrawableTetmesh(const char * filename);
 
         DrawableTetmesh(const std::vector<vec3d> & verts,
-                        const std::vector<uint>  & cells);
+                        const std::vector<uint>  & polys);
 
         DrawableTetmesh(const std::vector<double> & coords,
-                        const std::vector<uint>   & cells);
+                        const std::vector<uint>   & polys);
 
     protected:
 

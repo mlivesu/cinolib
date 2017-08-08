@@ -76,16 +76,16 @@ void marching_tets(const Tetmesh<>        & m,
 {
     assert(split_info.empty());
 
-    std::vector<u_char> c(m.num_cells(),0x0);
+    std::vector<u_char> c(m.num_polys(),0x0);
 
-    for(uint cid=0; cid<m.num_cells(); ++cid)
+    for(uint cid=0; cid<m.num_polys(); ++cid)
     {
         double func[] =
         {
-            m.vert_data(m.cell_vert_id(cid,0)).uvw[0],
-            m.vert_data(m.cell_vert_id(cid,1)).uvw[0],
-            m.vert_data(m.cell_vert_id(cid,2)).uvw[0],
-            m.vert_data(m.cell_vert_id(cid,3)).uvw[0]
+            m.vert_data(m.poly_vert_id(cid,0)).uvw[0],
+            m.vert_data(m.poly_vert_id(cid,1)).uvw[0],
+            m.vert_data(m.poly_vert_id(cid,2)).uvw[0],
+            m.vert_data(m.poly_vert_id(cid,3)).uvw[0]
         };
 
         if (isovalue >= func[0]) c.at(cid) |= C_1000;
@@ -109,14 +109,14 @@ void marching_tets(const Tetmesh<>        & m,
 
     std::map<ipair,uint> e2v_map;
 
-    for(uint cid=0; cid<m.num_cells(); ++cid)
+    for(uint cid=0; cid<m.num_polys(); ++cid)
     {
         uint vids[] =
         {
-            m.cell_vert_id(cid,0),
-            m.cell_vert_id(cid,1),
-            m.cell_vert_id(cid,2),
-            m.cell_vert_id(cid,3)
+            m.poly_vert_id(cid,0),
+            m.poly_vert_id(cid,1),
+            m.poly_vert_id(cid,2),
+            m.poly_vert_id(cid,3)
         };
 
         double func[] =
@@ -137,10 +137,10 @@ void marching_tets(const Tetmesh<>        & m,
 
         int adj_tet[] // not uint because it may be -1 if there is no adjacent tet!
         {
-            m.cell_adjacent_through_face(cid,0),
-            m.cell_adjacent_through_face(cid,1),
-            m.cell_adjacent_through_face(cid,2),
-            m.cell_adjacent_through_face(cid,3),
+            m.poly_adjacent_through_face(cid,0),
+            m.poly_adjacent_through_face(cid,1),
+            m.poly_adjacent_through_face(cid,2),
+            m.poly_adjacent_through_face(cid,3),
         };
 
         // Avoid triangle duplication and collapsed triangle generation when the iso-surface

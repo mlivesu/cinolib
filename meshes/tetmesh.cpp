@@ -48,7 +48,7 @@ CINO_INLINE
 Tetmesh<M,V,E,F,C>::Tetmesh(const std::vector<vec3d> & verts,
                             const std::vector<uint>  & cells)
 : verts(verts)
-, cells(cells)
+, polys(cells)
 {
     init();
 }
@@ -61,7 +61,7 @@ Tetmesh<M,V,E,F,C>::Tetmesh(const std::vector<double> & coords,
                             const std::vector<uint>   & cells)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    this->cells = cells;
+    this->polys = cells;
     init();
 }
 
@@ -91,17 +91,17 @@ void Tetmesh<M,V,E,F,C>::load(const char * filename)
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        read_MESH(filename, coords, cells, hexa);
+        read_MESH(filename, coords, polys, hexa);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        read_VTU(filename, coords, cells, hexa);
+        read_VTU(filename, coords, polys, hexa);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        read_VTK(filename, coords, cells, hexa);
+        read_VTK(filename, coords, polys, hexa);
     }
     else
     {
@@ -111,7 +111,7 @@ void Tetmesh<M,V,E,F,C>::load(const char * filename)
 
     verts = vec3d_from_serialized_xyz(coords);
 
-    logger << num_cells() << " tetrahedra read" << endl;
+    logger << num_polys() << " tetrahedra read" << endl;
     logger << num_verts() << " vertices   read" << endl;
 
     this->mesh_data().filename = std::string(filename);
@@ -132,17 +132,17 @@ void Tetmesh<M,V,E,F,C>::save(const char * filename) const
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        write_MESH(filename, coords, cells, hexa);
+        write_MESH(filename, coords, polys, hexa);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        write_VTU(filename, coords, cells, hexa);
+        write_VTU(filename, coords, polys, hexa);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        write_VTK(filename, coords, cells, hexa);
+        write_VTK(filename, coords, polys, hexa);
     }
     else
     {
@@ -162,7 +162,7 @@ void Tetmesh<M,V,E,F,C>::clear()
     verts.clear();
     edges.clear();
     faces.clear();
-    cells.clear();
+    polys.clear();
     v_on_srf.clear();
     e_on_srf.clear();
     //
@@ -171,20 +171,20 @@ void Tetmesh<M,V,E,F,C>::clear()
     v_data.clear();
     e_data.clear();
     f_data.clear();
-    c_data.clear();
+    p_data.clear();
     //
     v2v.clear();
     v2e.clear();
     v2f.clear();
-    v2c.clear();
+    v2p.clear();
     e2f.clear();
-    e2c.clear();
+    e2p.clear();
     f2e.clear();
     f2f.clear();
-    f2c.clear();
-    c2e.clear();
-    c2f.clear();
-    c2c.clear();
+    f2p.clear();
+    p2e.clear();
+    p2f.clear();
+    p2p.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -199,7 +199,7 @@ void Tetmesh<M,V,E,F,C>::init()
 
     v_data.resize(num_verts());
     e_data.resize(num_edges());
-    c_data.resize(num_cells());
+    p_data.resize(num_polys());
     f_data.resize(num_faces());
 
     update_face_normals();
@@ -231,21 +231,21 @@ void Tetmesh<M,V,E,F,C>::update_interior_adjacency()
 {
     v2v.clear(); v2v.resize(num_verts());
     v2e.clear(); v2e.resize(num_verts());
-    v2c.clear(); v2c.resize(num_verts());
-    c2c.clear(); c2c.resize(num_cells());
-    c2e.clear(); c2e.resize(num_cells());
+    v2p.clear(); v2p.resize(num_verts());
+    p2p.clear(); p2p.resize(num_polys());
+    p2e.clear(); p2e.resize(num_polys());
 
     std::map<ipair,std::vector<uint>> e2c_map;
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
-        uint cid_ptr = cid * verts_per_cell();
-        uint vids[4] = { cells.at(cid_ptr+0), cells.at(cid_ptr+1), cells.at(cid_ptr+2), cells.at(cid_ptr+3) };
+        uint cid_ptr = cid * verts_per_poly();
+        uint vids[4] = { polys.at(cid_ptr+0), polys.at(cid_ptr+1), polys.at(cid_ptr+2), polys.at(cid_ptr+3) };
 
-        for(uint vid=0; vid<verts_per_cell(); ++vid)
+        for(uint vid=0; vid<verts_per_poly(); ++vid)
         {
-            v2c.at(vids[vid]).push_back(cid);
+            v2p.at(vids[vid]).push_back(cid);
         }
-        for(uint eid=0; eid<edges_per_cell(); ++eid)
+        for(uint eid=0; eid<edges_per_poly(); ++eid)
         {
             ipair e = unique_pair(vids[TET_EDGES[eid][0]], vids[TET_EDGES[eid][1]]);
             e2c_map[e].push_back(cid);
@@ -253,8 +253,8 @@ void Tetmesh<M,V,E,F,C>::update_interior_adjacency()
     }
 
     edges.clear();
-    e2c.clear();
-    e2c.resize(e2c_map.size());
+    e2p.clear();
+    e2p.resize(e2c_map.size());
 
     std::set<ipair> cell_pairs;
 
@@ -280,22 +280,22 @@ void Tetmesh<M,V,E,F,C>::update_interior_adjacency()
         {
             uint cid = cids.at(i);
 
-            c2e.at(cid).push_back(eid);
-            e2c.at(eid).push_back(cid);
+            p2e.at(cid).push_back(eid);
+            e2p.at(eid).push_back(cid);
 
             for(uint j=i+1; j<cids.size(); ++j)
             {
                 uint nbr = cids.at(j);
-                if (cell_shared_face(cid,nbr) != -1)
+                if (poly_shared_face(cid,nbr) != -1)
                 {
                     ipair p = unique_pair(cid,nbr);
                     if (DOES_NOT_CONTAIN(cell_pairs, p))
                     {
                         cell_pairs.insert(p);
-                        c2c.at(cid).push_back(nbr);
-                        c2c.at(nbr).push_back(cid);
-                        assert(c2c.at(cid).size() <= faces_per_cell());
-                        assert(c2c.at(nbr).size() <= faces_per_cell());
+                        p2p.at(cid).push_back(nbr);
+                        p2p.at(nbr).push_back(cid);
+                        assert(p2p.at(cid).size() <= faces_per_poly());
+                        assert(p2p.at(nbr).size() <= faces_per_poly());
                     }
                 }
             }
@@ -303,7 +303,7 @@ void Tetmesh<M,V,E,F,C>::update_interior_adjacency()
     }
 
     logger << num_verts() << "\tverts" << endl;
-    logger << num_cells() << "\tcells" << endl;
+    logger << num_polys() << "\tcells" << endl;
     logger << num_edges() << "\tedges" << endl;
 }
 
@@ -316,15 +316,15 @@ void Tetmesh<M,V,E,F,C>::update_surface_adjacency()
     typedef std::vector<uint> face;
     std::map<face,std::pair<uint,uint>> f2c_map;
 
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
-        uint cid_ptr = cid * verts_per_cell();
-        for(uint fid=0; fid<faces_per_cell(); ++fid)
+        uint cid_ptr = cid * verts_per_poly();
+        for(uint fid=0; fid<faces_per_poly(); ++fid)
         {
             face f;
-            f.push_back(cells.at(cid_ptr + TET_FACES[fid][0]));
-            f.push_back(cells.at(cid_ptr + TET_FACES[fid][1]));
-            f.push_back(cells.at(cid_ptr + TET_FACES[fid][2]));
+            f.push_back(polys.at(cid_ptr + TET_FACES[fid][0]));
+            f.push_back(polys.at(cid_ptr + TET_FACES[fid][1]));
+            f.push_back(polys.at(cid_ptr + TET_FACES[fid][2]));
             sort(f.begin(), f.end());
             if (CONTAINS(f2c_map,f)) f2c_map.erase(f);
             else                     f2c_map[f] = std::make_pair(cid,fid);
@@ -333,10 +333,10 @@ void Tetmesh<M,V,E,F,C>::update_surface_adjacency()
 
     v2f.clear(); v2f.resize(num_verts());
     e2f.clear(); e2f.resize(num_edges());
-    c2f.clear(); c2f.resize(num_cells());
+    p2f.clear(); p2f.resize(num_polys());
 
     faces.clear();
-    f2c.clear(); f2c.resize(f2c_map.size());
+    f2p.clear(); f2p.resize(f2c_map.size());
     f2e.clear(); f2e.resize(f2c_map.size());
     v_on_srf.resize(num_verts(), false);
     e_on_srf.resize(num_edges(), false);
@@ -346,10 +346,10 @@ void Tetmesh<M,V,E,F,C>::update_surface_adjacency()
     {
         uint cid     = f2c_it.second.first;
         uint f       = f2c_it.second.second;
-        uint cid_ptr = cid * verts_per_cell();
-        uint vid0    = cells.at(cid_ptr + TET_FACES[f][0]);
-        uint vid1    = cells.at(cid_ptr + TET_FACES[f][1]);
-        uint vid2    = cells.at(cid_ptr + TET_FACES[f][2]);
+        uint cid_ptr = cid * verts_per_poly();
+        uint vid0    = polys.at(cid_ptr + TET_FACES[f][0]);
+        uint vid1    = polys.at(cid_ptr + TET_FACES[f][1]);
+        uint vid2    = polys.at(cid_ptr + TET_FACES[f][2]);
 
         faces.push_back(vid0);
         faces.push_back(vid1);
@@ -363,10 +363,10 @@ void Tetmesh<M,V,E,F,C>::update_surface_adjacency()
         v2f.at(vid1).push_back(fresh_id);
         v2f.at(vid2).push_back(fresh_id);
 
-        c2f.at(cid).push_back(fresh_id);
-        f2c.at(fresh_id) = cid;
+        p2f.at(cid).push_back(fresh_id);
+        f2p.at(fresh_id) = cid;
 
-        for(uint eid : adj_c2e(cid))
+        for(uint eid : adj_p2e(cid))
         {
             uint eid0  = edge_vert_id(eid, 0);
             uint eid1  = edge_vert_id(eid, 1);
@@ -421,13 +421,13 @@ void Tetmesh<M,V,E,F,C>::update_face_normals()
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-int Tetmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
+int Tetmesh<M,V,E,F,C>::poly_shared_face(const uint cid0, const uint cid1) const
 {
-    for(uint f=0; f<faces_per_cell(); ++f)
+    for(uint f=0; f<faces_per_poly(); ++f)
     {
-        if (cell_contains_vert(cid1, cell_vert_id(cid0, TET_FACES[f][0])) &&
-            cell_contains_vert(cid1, cell_vert_id(cid0, TET_FACES[f][1])) &&
-            cell_contains_vert(cid1, cell_vert_id(cid0, TET_FACES[f][2])))
+        if (poly_contains_vert(cid1, poly_vert_id(cid0, TET_FACES[f][0])) &&
+            poly_contains_vert(cid1, poly_vert_id(cid0, TET_FACES[f][1])) &&
+            poly_contains_vert(cid1, poly_vert_id(cid0, TET_FACES[f][2])))
         {
             return f;
         }
@@ -439,7 +439,7 @@ int Tetmesh<M,V,E,F,C>::cell_shared_face(const uint cid0, const uint cid1) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-int Tetmesh<M,V,E,F,C>::cell_shared_vert(const uint cid, const std::vector<uint> incident_edges) const
+int Tetmesh<M,V,E,F,C>::poly_shared_vert(const uint cid, const std::vector<uint> incident_edges) const
 {
     assert(incident_edges.size() > 1);
     assert(incident_edges.size() < 4);
@@ -451,7 +451,7 @@ int Tetmesh<M,V,E,F,C>::cell_shared_vert(const uint cid, const std::vector<uint>
     }
     for(uint i=0; i<4; ++i)
     {
-        if (v_count[i] == incident_edges.size()) return cell_vert_id(cid,i);
+        if (v_count[i] == incident_edges.size()) return poly_vert_id(cid,i);
     }
     return -1;
 }
@@ -460,11 +460,11 @@ int Tetmesh<M,V,E,F,C>::cell_shared_vert(const uint cid, const std::vector<uint>
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-int Tetmesh<M,V,E,F,C>::cell_adjacent_through_face(const uint cid, const uint face_offset) const
+int Tetmesh<M,V,E,F,C>::poly_adjacent_through_face(const uint cid, const uint face_offset) const
 {
-    for(uint nbr : adj_c2c(cid))
+    for(uint nbr : adj_p2p(cid))
     {
-        if (cell_shared_face(cid,nbr) == (int)face_offset) return nbr;
+        if (poly_shared_face(cid,nbr) == (int)face_offset) return nbr;
     }
     return -1;
 }
@@ -473,11 +473,11 @@ int Tetmesh<M,V,E,F,C>::cell_adjacent_through_face(const uint cid, const uint fa
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::cell_contains_vert(const uint cid, const uint vid) const
+bool Tetmesh<M,V,E,F,C>::poly_contains_vert(const uint cid, const uint vid) const
 {
-    for(uint i=0; i<verts_per_cell(); ++i)
+    for(uint i=0; i<verts_per_poly(); ++i)
     {
-        if (cell_vert_id(cid,i) == vid) return true;
+        if (poly_vert_id(cid,i) == vid) return true;
     }
     return false;
 }
@@ -486,12 +486,12 @@ bool Tetmesh<M,V,E,F,C>::cell_contains_vert(const uint cid, const uint vid) cons
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::cell_bary_coords(const uint cid, const vec3d &P, std::vector<double> &wgts) const
+bool Tetmesh<M,V,E,F,C>::poly_bary_coords(const uint cid, const vec3d &P, std::vector<double> &wgts) const
 {
-    return tet_barycentric_coords(cell_vert(cid,0),
-                                  cell_vert(cid,1),
-                                  cell_vert(cid,2),
-                                  cell_vert(cid,3),
+    return tet_barycentric_coords(poly_vert(cid,0),
+                                  poly_vert(cid,1),
+                                  poly_vert(cid,2),
+                                  poly_vert(cid,3),
                                   P, wgts);
 }
 
@@ -499,14 +499,14 @@ bool Tetmesh<M,V,E,F,C>::cell_bary_coords(const uint cid, const vec3d &P, std::v
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::cell_centroid(const uint cid) const
+vec3d Tetmesh<M,V,E,F,C>::poly_centroid(const uint cid) const
 {
     vec3d c(0,0,0);
-    for(uint off=0; off<verts_per_cell(); ++off)
+    for(uint off=0; off<verts_per_poly(); ++off)
     {
-        c += cell_vert(cid,off);
+        c += poly_vert(cid,off);
     }
-    c /= static_cast<double>(verts_per_cell());
+    c /= static_cast<double>(verts_per_poly());
     return c;
 }
 
@@ -514,11 +514,11 @@ vec3d Tetmesh<M,V,E,F,C>::cell_centroid(const uint cid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::cell_face_normal(const uint cid, const uint face_offset) const
+vec3d Tetmesh<M,V,E,F,C>::poly_face_normal(const uint cid, const uint face_offset) const
 {
-    vec3d v0 = cell_vert(cid, TET_FACES[face_offset][0]);
-    vec3d v1 = cell_vert(cid, TET_FACES[face_offset][1]);
-    vec3d v2 = cell_vert(cid, TET_FACES[face_offset][2]);
+    vec3d v0 = poly_vert(cid, TET_FACES[face_offset][0]);
+    vec3d v1 = poly_vert(cid, TET_FACES[face_offset][1]);
+    vec3d v2 = poly_vert(cid, TET_FACES[face_offset][2]);
     vec3d n = (v1-v0).cross(v2-v0);
     n.normalize();
     return n;
@@ -528,11 +528,11 @@ vec3d Tetmesh<M,V,E,F,C>::cell_face_normal(const uint cid, const uint face_offse
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-double Tetmesh<M,V,E,F,C>::cell_face_area(const uint cid, const uint face_offset) const
+double Tetmesh<M,V,E,F,C>::poly_face_area(const uint cid, const uint face_offset) const
 {
-    vec3d v0 = cell_vert(cid, TET_FACES[face_offset][0]);
-    vec3d v1 = cell_vert(cid, TET_FACES[face_offset][1]);
-    vec3d v2 = cell_vert(cid, TET_FACES[face_offset][2]);
+    vec3d v0 = poly_vert(cid, TET_FACES[face_offset][0]);
+    vec3d v1 = poly_vert(cid, TET_FACES[face_offset][1]);
+    vec3d v2 = poly_vert(cid, TET_FACES[face_offset][2]);
     return (0.5 * (v1-v0).cross(v2-v0).length());
 }
 
@@ -540,22 +540,22 @@ double Tetmesh<M,V,E,F,C>::cell_face_area(const uint cid, const uint face_offset
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-double Tetmesh<M,V,E,F,C>::cell_volume(const uint cid) const
+double Tetmesh<M,V,E,F,C>::poly_volume(const uint cid) const
 {
-    return tet_unsigned_volume(cell_vert(cid,0),
-                               cell_vert(cid,1),
-                               cell_vert(cid,2),
-                               cell_vert(cid,3));
+    return tet_unsigned_volume(poly_vert(cid,0),
+                               poly_vert(cid,1),
+                               poly_vert(cid,2),
+                               poly_vert(cid,3));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-double Tetmesh<M,V,E,F,C>::cell_dihedral_angle(const uint cid, const uint face_offset1, const uint face_offset2) const
+double Tetmesh<M,V,E,F,C>::poly_dihedral_angle(const uint cid, const uint face_offset1, const uint face_offset2) const
 {
-    vec3d   n0 = cell_face_normal(cid, face_offset1);
-    vec3d   n1 = cell_face_normal(cid, face_offset2);
+    vec3d   n0 = poly_face_normal(cid, face_offset1);
+    vec3d   n1 = poly_face_normal(cid, face_offset2);
     double  alpha = acos(n0.dot(-n1));
     assert(!std::isnan(alpha));
     return alpha;
@@ -565,15 +565,15 @@ double Tetmesh<M,V,E,F,C>::cell_dihedral_angle(const uint cid, const uint face_o
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::cell_vert_opposite_to(const uint cid, const uint face_offset) const
+uint Tetmesh<M,V,E,F,C>::poly_vert_opposite_to(const uint cid, const uint face_offset) const
 {
     for(uint vert_offset=0; vert_offset<4; ++vert_offset)
     {
-        uint vid = cell_vert_id(cid, vert_offset);
+        uint vid = poly_vert_id(cid, vert_offset);
 
-        if (cell_vert_id(cid, TET_FACES[face_offset][0]) != vid &&
-            cell_vert_id(cid, TET_FACES[face_offset][1]) != vid &&
-            cell_vert_id(cid, TET_FACES[face_offset][2]) != vid)
+        if (poly_vert_id(cid, TET_FACES[face_offset][0]) != vid &&
+            poly_vert_id(cid, TET_FACES[face_offset][1]) != vid &&
+            poly_vert_id(cid, TET_FACES[face_offset][2]) != vid)
         {
             return vid;
         }
@@ -585,15 +585,15 @@ uint Tetmesh<M,V,E,F,C>::cell_vert_opposite_to(const uint cid, const uint face_o
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::cell_edge_opposite_to(const uint cid, const uint vid0, const uint vid1) const
+uint Tetmesh<M,V,E,F,C>::poly_edge_opposite_to(const uint cid, const uint vid0, const uint vid1) const
 {
-    assert(cell_contains_vert(cid,vid0));
-    assert(cell_contains_vert(cid,vid1));
+    assert(poly_contains_vert(cid,vid0));
+    assert(poly_contains_vert(cid,vid1));
 
-    for(uint off=0; off<edges_per_cell(); ++off)
+    for(uint off=0; off<edges_per_poly(); ++off)
     {
-        uint e0 = cell_vert_id(cid, TET_EDGES[off][0]);
-        uint e1 = cell_vert_id(cid, TET_EDGES[off][1]);
+        uint e0 = poly_vert_id(cid, TET_EDGES[off][0]);
+        uint e1 = poly_vert_id(cid, TET_EDGES[off][1]);
         if ((e0!=vid0 && e1!=vid1)  || (e0!=vid1 && e1!=vid0)) return off;
     }
     assert(false);
@@ -603,14 +603,14 @@ uint Tetmesh<M,V,E,F,C>::cell_edge_opposite_to(const uint cid, const uint vid0, 
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::cell_face_opposite_to(const uint cid, const uint vid) const
+uint Tetmesh<M,V,E,F,C>::poly_face_opposite_to(const uint cid, const uint vid) const
 {
-    assert(cell_contains_vert(cid, vid));
-    for(uint f=0; f<faces_per_cell(); ++f)
+    assert(poly_contains_vert(cid, vid));
+    for(uint f=0; f<faces_per_poly(); ++f)
     {
-        if (cell_vert_id(cid, TET_FACES[f][0]) != vid &&
-            cell_vert_id(cid, TET_FACES[f][1]) != vid &&
-            cell_vert_id(cid, TET_FACES[f][2]) != vid)
+        if (poly_vert_id(cid, TET_FACES[f][0]) != vid &&
+            poly_vert_id(cid, TET_FACES[f][1]) != vid &&
+            poly_vert_id(cid, TET_FACES[f][2]) != vid)
         {
             return f;
         }
@@ -622,30 +622,11 @@ uint Tetmesh<M,V,E,F,C>::cell_face_opposite_to(const uint cid, const uint vid) c
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-double Tetmesh<M,V,E,F,C>::cell_edge_length(const uint cid, const uint edge_offset) const
+double Tetmesh<M,V,E,F,C>::poly_edge_length(const uint cid, const uint edge_offset) const
 {
-    vec3d A = cell_vert(cid, TET_EDGES[edge_offset][0]);
-    vec3d B = cell_vert(cid, TET_EDGES[edge_offset][1]);
+    vec3d A = poly_vert(cid, TET_EDGES[edge_offset][0]);
+    vec3d B = poly_vert(cid, TET_EDGES[edge_offset][1]);
     return (A-B).length();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::poly_centroid(const uint cid) const
-{
-    return cell_centroid(cid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::cell_vert_id(const uint cid, const uint off) const
-{
-    uint cid_ptr = cid * verts_per_cell();
-    return cells.at(cid_ptr + off);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -654,29 +635,21 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 uint Tetmesh<M,V,E,F,C>::poly_vert_id(const uint cid, const uint off) const
 {
-    return cell_vert_id(cid,off);
+    uint cid_ptr = cid * verts_per_poly();
+    return polys.at(cid_ptr + off);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::poly_bary_coords(const uint cid, const vec3d & P, std::vector<double> & wgts) const
+uint Tetmesh<M,V,E,F,C>::poly_edge_id(const uint cid, const uint vid0, const uint vid1) const
 {
-    return cell_bary_coords(cid, P, wgts);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::cell_edge_id(const uint cid, const uint vid0, const uint vid1) const
-{
-    assert(cell_contains_vert(cid,vid0));
-    assert(cell_contains_vert(cid,vid1));
+    assert(poly_contains_vert(cid,vid0));
+    assert(poly_contains_vert(cid,vid1));
 
     ipair query = unique_pair(vid0,vid1);
-    for(uint eid : adj_c2e(cid))
+    for(uint eid : adj_p2e(cid))
     {
         if (unique_pair(edge_vert_id(eid,0), edge_vert_id(eid,1)) == query) return eid;
     }
@@ -687,18 +660,9 @@ uint Tetmesh<M,V,E,F,C>::cell_edge_id(const uint cid, const uint vid0, const uin
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::cell_vert(const uint cid, const uint off) const
-{
-    return verts.at(cell_vert_id(cid,off));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
 vec3d Tetmesh<M,V,E,F,C>::poly_vert(const uint cid, const uint off) const
 {
-    return cell_vert(cid,off);
+    return verts.at(poly_vert_id(cid,off));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -798,9 +762,9 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Tetmesh<M,V,E,F,C>::poly_show_all()
 {
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
-        cell_data(cid).visible = true;
+        poly_data(cid).visible = true;
     }
 }
 
@@ -880,11 +844,11 @@ void Tetmesh<M,V,E,F,C>::face_set_alpha(const float alpha)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Tetmesh<M,V,E,F,C>::cell_set_color(const Color & c)
+void Tetmesh<M,V,E,F,C>::poly_set_color(const Color & c)
 {
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
-        cell_data(cid).color = c;
+        poly_data(cid).color = c;
     }
 }
 
@@ -892,11 +856,11 @@ void Tetmesh<M,V,E,F,C>::cell_set_color(const Color & c)
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void Tetmesh<M,V,E,F,C>::cell_set_alpha(const float alpha)
+void Tetmesh<M,V,E,F,C>::poly_set_alpha(const float alpha)
 {
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
-        cell_data(cid).color.a = alpha;
+        poly_data(cid).color.a = alpha;
     }
 }
 
@@ -991,8 +955,8 @@ CINO_INLINE
 double Tetmesh<M,V,E,F,C>::vert_volume(const uint vid) const
 {
     double vol = 0.0;
-    for(uint cid : adj_v2c(vid)) vol += cell_volume(cid);
-    vol /= static_cast<double>(verts_per_cell());
+    for(uint cid : adj_v2p(vid)) vol += poly_volume(cid);
+    vol /= static_cast<double>(verts_per_poly());
     return vol;
 }
 
@@ -1058,8 +1022,8 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Tetmesh<M,V,E,F,C>::update_cell_quality(const uint cid)
 {
-    cell_data(cid).quality = tet_scaled_jacobian(cell_vert(cid,0), cell_vert(cid,1),
-                                                 cell_vert(cid,2), cell_vert(cid,3));
+    poly_data(cid).quality = tet_scaled_jacobian(poly_vert(cid,0), poly_vert(cid,1),
+                                                 poly_vert(cid,2), poly_vert(cid,3));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1068,7 +1032,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 void Tetmesh<M,V,E,F,C>::update_cell_quality()
 {
-    for(uint cid=0; cid<num_cells(); ++cid)
+    for(uint cid=0; cid<num_polys(); ++cid)
     {
         update_cell_quality(cid);
     }
