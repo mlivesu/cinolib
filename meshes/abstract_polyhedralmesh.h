@@ -95,7 +95,6 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual std::vector<std::vector<uint>> export_hex_connectivity() const;
         virtual std::vector<std::vector<uint>> export_tet_connectivity() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -148,7 +147,6 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual bool              poly_face_is_CCW  (const uint pid, const uint off) const;
         virtual bool              poly_face_is_CW   (const uint pid, const uint off) const;
         virtual uint              poly_face_offset  (const uint pid, const uint fid) const;
-        virtual std::vector<uint> poly_as_hex_vlist (const uint pid) const;
         virtual std::vector<uint> poly_as_tet_vlist (const uint pid) const;
 };
 

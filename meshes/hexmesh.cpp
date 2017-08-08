@@ -209,6 +209,55 @@ void Hexmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::ve
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void Hexmesh<M,V,E,F,P>::reorder_p2v()
+{
+    for(uint pid=0; pid<this->num_polys(); ++pid) reorder_p2v(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Hexmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
+{
+    std::vector<uint> new_p2v;
+
+    uint off_f0 = 0;
+    uint off_f1 = 1;
+
+    // put the first four vertices CCW
+    uint fid0 = this->poly_face_id(pid,off_f0);
+    std::vector<uint> f0;
+    for(uint i=0; i<this->verts_per_face(fid0); ++i) f0.push_back(this->face_vert_id(fid0,i));
+    if (this->poly_face_is_CW(pid,off_f0)) std::reverse(f0.begin(),f0.end());
+    for(uint vid : f0) new_p2v.push_back(vid);
+
+    // find its opposite face and sort it CW
+    uint fid1 = this->poly_face_id(pid,off_f1);
+    while(!this->faces_are_disjoint(fid0,fid1) && off_f1<6)
+    {
+        fid1 = this->poly_face_id(pid,++off_f1);
+    }
+    assert(off_f1 < 6);
+    std::vector<uint> f1;
+    for(uint i=0; i<this->verts_per_face(fid1); ++i) f1.push_back(this->face_vert_id(fid1,i));
+    if (this->poly_face_is_CCW(pid,off_f1)) std::reverse(f1.begin(),f1.end());
+
+    // align the first vertices of f0 and f1 so that there exists
+    // an edge in the polyhedron directly connecting them
+    uint offset = 0;
+    while (!this->poly_contains_edge(pid,f0.front(),f1.at(offset)) && offset<4) ++offset;
+    assert(offset<4);
+
+    for(uint i=0; i<4; ++i) new_p2v.push_back(f1.at((offset+i)%4));
+
+    this->p2v.at(pid) = new_p2v;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void Hexmesh<M,V,E,F,P>::print_quality(const bool list_folded_elements)
 {
     if (list_folded_elements) logger << "Folded Hexa: ";
@@ -295,17 +344,17 @@ void Hexmesh<M,V,E,F,P>::save(const char * filename) const
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        write_MESH(filename, this->verts, this->export_hex_connectivity());
+        write_MESH(filename, this->verts, this->p2v);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        write_VTU(filename, this->verts, this->export_hex_connectivity());
+        write_VTU(filename, this->verts, this->p2v);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        write_VTK(filename, this->verts, this->export_hex_connectivity());
+        write_VTK(filename, this->verts, this->p2v);
     }
     else
     {
@@ -321,6 +370,7 @@ CINO_INLINE
 void Hexmesh<M,V,E,F,P>::init()
 {
     AbstractPolyhedralMesh<M,V,E,F,P>::init();
+    reorder_p2v(); // makes sure the p2v adjacency stores vertices in a way that uniquely defines per element connectivity
     update_hex_quality();
     print_quality();
     this->copy_xyz_to_uvw(UVW_param);
@@ -383,15 +433,14 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Hexmesh<M,V,E,F,P>::update_hex_quality(const uint pid)
 {
-    std::vector<uint> vids = this->poly_as_hex_vlist(pid);
-    this->poly_data(pid).quality = hex_scaled_jacobian(this->vert(vids.at(0)),
-                                                       this->vert(vids.at(1)),
-                                                       this->vert(vids.at(2)),
-                                                       this->vert(vids.at(3)),
-                                                       this->vert(vids.at(4)),
-                                                       this->vert(vids.at(5)),
-                                                       this->vert(vids.at(6)),
-                                                       this->vert(vids.at(7)));
+    this->poly_data(pid).quality = hex_scaled_jacobian(this->poly_vert(pid,0),
+                                                       this->poly_vert(pid,1),
+                                                       this->poly_vert(pid,2),
+                                                       this->poly_vert(pid,3),
+                                                       this->poly_vert(pid,4),
+                                                       this->poly_vert(pid,5),
+                                                       this->poly_vert(pid,6),
+                                                       this->poly_vert(pid,7));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

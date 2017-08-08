@@ -103,12 +103,6 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Quadmesh<M,V,E,F> export_surface() const;
-        Quadmesh<M,V,E,F> export_surface(std::map<uint,uint> & c2f_map,
-                                         std::map<uint,uint> & f2c_map) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         vec3d verts_average(const std::vector<uint> & vids) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -127,6 +121,18 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         void from_serialized_vids_to_general_polyhedra(const std::vector<uint>              & hexa);
         void from_serialized_vids_to_general_polyhedra(const std::vector<std::vector<uint>> & hexa);
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void reorder_p2v();
+        void reorder_p2v(const uint pid);
+
+        // reorder_p2v() makes sure the p2v adjacency stores vertices
+        // in a way that uniquely defines per element connectivity:
+        //
+        //   TOP         BOTTOM
+        //  7 -- 6       3 -- 2
+        //  |    |       |    |
+        //  4 -- 5       0 -- 1
 };
 
 }

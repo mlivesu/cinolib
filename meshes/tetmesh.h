@@ -100,12 +100,6 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Trimesh<M,V,E,F> export_surface() const { return Trimesh<M,V,E,F>(this->verts,this->faces); }
-        Trimesh<M,V,E,F> export_surface(std::map<uint,uint> & c2f_map,
-                                        std::map<uint,uint> & f2c_map) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         std::vector<uint> face_tessellation(const uint fid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -129,6 +123,17 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         void from_serialized_vids_to_general_polyhedra(const std::vector<uint>              & tets);
         void from_serialized_vids_to_general_polyhedra(const std::vector<std::vector<uint>> & tets);
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void reorder_p2v();
+        void reorder_p2v(const uint pid);
+
+        // reorder_p2v() makes sure the p2v adjacency stores vertices
+        // in a way that uniquely defines per element connectivity:
+        //
+        //  3 -- 2      with 0,1,2 CCW (i.e. outgoing normal)
+        //   \  /  \
+        //    0 --- 1
 };
 
 }

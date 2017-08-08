@@ -259,17 +259,17 @@ void Tetmesh<M,V,E,F,P>::save(const char * filename) const
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        write_MESH(filename, this->verts, this->export_hex_connectivity());
+        write_MESH(filename, this->verts, this->export_tet_connectivity());
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        write_VTU(filename, this->verts, this->export_hex_connectivity());
+        write_VTU(filename, this->verts, this->export_tet_connectivity());
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        write_VTK(filename, this->verts, this->export_hex_connectivity());
+        write_VTK(filename, this->verts, this->export_tet_connectivity());
     }
     else
     {
@@ -285,6 +285,7 @@ CINO_INLINE
 void Tetmesh<M,V,E,F,P>::init()
 {
     AbstractPolyhedralMesh<M,V,E,F,P>::init();
+    reorder_p2v();
     update_tet_quality();
     this->copy_xyz_to_uvw(UVW_param);
 }
@@ -307,6 +308,34 @@ void Tetmesh<M,V,E,F,P>::update_normals()
 
         this->face_data(fid).normal = n;
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::reorder_p2v()
+{
+    for(uint pid=0; pid<this->num_polys(); ++pid) reorder_p2v(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
+{
+    std::vector<uint> new_p2v;
+    uint f = this->poly_face_id(pid,0);
+    for(uint i=0; i<this->verts_per_face(f); ++i) new_p2v.push_back(this->face_vert_id(f,i));
+    if (this->poly_face_is_CW(pid,0)) std::reverse(new_p2v.begin(),new_p2v.end());
+    for(uint vid : this->adj_p2v(pid))
+    {
+        if (this->face_contains_vert(f,vid)) continue;
+        new_p2v.push_back(vid);
+    }
+    assert(new_p2v.size()==4);
+    this->p2v.at(pid) = new_p2v;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -502,11 +531,10 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Tetmesh<M,V,E,F,P>::update_tet_quality(const uint pid)
 {
-//    std::vector<uint> vids = this->poly_as_tet_vlist(pid);
-//    this->poly_data(pid).quality = tet_scaled_jacobian(this->vert(vids.at(0)),
-//                                                       this->vert(vids.at(1)),
-//                                                       this->vert(vids.at(2)),
-//                                                       this->vert(vids.at(3)));
+    this->poly_data(pid).quality = tet_scaled_jacobian(this->poly_vert(pid,0),
+                                                       this->poly_vert(pid,1),
+                                                       this->poly_vert(pid,2),
+                                                       this->poly_vert(pid,3));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
