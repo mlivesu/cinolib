@@ -331,6 +331,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_as_hex_vlist(const uint pid) const
 {
+    assert(false && "I want to kill this!");
     assert(this->verts_per_poly(pid) == 8);
     assert(this->faces_per_poly(pid) == 6);
 

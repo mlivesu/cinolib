@@ -48,8 +48,7 @@ Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d> & verts,
                             const std::vector<uint>  & polys)
 {
     this->verts = verts;
-    from_hexahedra_to_general_polyhedra(polys, this->faces, this->polys, this->polys_face_winding);
-
+    from_serialized_vids_to_general_polyhedra(polys);
     init();
 }
 
@@ -61,7 +60,7 @@ Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<double> & coords,
                             const std::vector<uint>   & polys)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    from_hexahedra_to_general_polyhedra(polys, this->faces, this->polys, this->polys_face_winding);
+    from_serialized_vids_to_general_polyhedra(polys);
     init();
 }
 
@@ -73,7 +72,7 @@ Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d>             & verts,
                             const std::vector<std::vector<uint>> & polys)
 {
     this->verts = verts;
-    from_hexahedra_to_general_polyhedra(polys, this->faces, this->polys, this->polys_face_winding);
+    from_serialized_vids_to_general_polyhedra(polys);
     init();
 }
 
@@ -101,6 +100,109 @@ Hexmesh<M,V,E,F,P>::Hexmesh(const char * filename)
 {
     load(filename);
     init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Hexmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::vector<uint> & hexa)
+{
+    this->faces.clear();
+    this->polys.clear();
+    this->polys_face_winding.clear();
+
+    uint n_hexa = hexa.size()/8;
+
+    std::map<std::vector<uint>,uint> f_map;
+    for(uint hid=0; hid<n_hexa; ++hid)
+    {
+        std::vector<uint> p_faces;
+        std::vector<bool> p_winding;
+
+        for(uint i=0; i<6; ++i)
+        {
+            uint base = hid*8;
+            std::vector<uint> f =
+            {
+                hexa.at(base + HEXA_FACES[i][0]),
+                hexa.at(base + HEXA_FACES[i][1]),
+                hexa.at(base + HEXA_FACES[i][2]),
+                hexa.at(base + HEXA_FACES[i][3]),
+            };
+            std::vector<uint> sorted_f = f;
+            sort(sorted_f.begin(), sorted_f.end());
+            auto query = f_map.find(sorted_f);
+
+            if (query == f_map.end())
+            {
+                uint fresh_id = f_map.size();
+                f_map[sorted_f] = fresh_id;
+                this->faces.push_back(f);
+                p_faces.push_back(fresh_id);
+                p_winding.push_back(true);
+            }
+            else
+            {
+                p_faces.push_back(query->second);
+                p_winding.push_back(false);
+            }
+        }
+
+        this->polys.push_back(p_faces);
+        this->polys_face_winding.push_back(p_winding);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Hexmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::vector<std::vector<uint>> & hexa)
+{
+    this->faces.clear();
+    this->polys.clear();
+    this->polys_face_winding.clear();
+
+    std::map<std::vector<uint>,uint> f_map;
+    for(uint hid=0; hid<hexa.size(); ++hid)
+    {
+        assert(hexa.at(hid).size() == 8);
+
+        std::vector<uint> p_faces;
+        std::vector<bool> p_winding;
+
+        for(uint i=0; i<6; ++i)
+        {
+            std::vector<uint> f =
+            {
+                hexa.at(hid).at(HEXA_FACES[i][0]),
+                hexa.at(hid).at(HEXA_FACES[i][1]),
+                hexa.at(hid).at(HEXA_FACES[i][2]),
+                hexa.at(hid).at(HEXA_FACES[i][3]),
+            };
+            std::vector<uint> sorted_f = f;
+            sort(sorted_f.begin(), sorted_f.end());
+            auto query = f_map.find(sorted_f);
+
+            if (query == f_map.end())
+            {
+                uint fresh_id = f_map.size();
+                f_map[sorted_f] = fresh_id;
+                this->faces.push_back(f);
+                p_faces.push_back(fresh_id);
+                p_winding.push_back(true);
+            }
+            else
+            {
+                p_faces.push_back(query->second);
+                p_winding.push_back(false);
+            }
+        }
+
+        this->polys.push_back(p_faces);
+        this->polys_face_winding.push_back(p_winding);
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -173,7 +275,7 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
         exit(-1);
     }
 
-    from_hexahedra_to_general_polyhedra(hexa, this->faces, this->polys, this->polys_face_winding);
+    from_serialized_vids_to_general_polyhedra(hexa);
 
     logger << this->num_polys() << " hexahedra read" << endl;
     logger << this->num_verts() << " vertices  read" << endl;

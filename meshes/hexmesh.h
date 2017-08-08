@@ -119,6 +119,14 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         void   poly_subdivide(const std::vector<std::vector<std::vector<uint>>> & split_scheme);
         double poly_volume   (const uint) const { assert(false && "TODO!"); return 1.0; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    protected:
+
+        void from_serialized_vids_to_general_polyhedra(const std::vector<uint>              & hexa);
+        void from_serialized_vids_to_general_polyhedra(const std::vector<std::vector<uint>> & hexa);
+
 };
 
 }

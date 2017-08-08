@@ -121,6 +121,14 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         int    poly_adjacent_through_face(const uint pid, const uint face_offset) const;
         bool   poly_bary_coords          (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
         double poly_volume               (const uint pid) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    protected:
+
+        void from_serialized_vids_to_general_polyhedra(const std::vector<uint>              & tets);
+        void from_serialized_vids_to_general_polyhedra(const std::vector<std::vector<uint>> & tets);
+
 };
 
 }
