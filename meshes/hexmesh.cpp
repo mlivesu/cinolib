@@ -230,6 +230,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Hexmesh<M,V,E,F,P>::update_normals()
 {
+    // STEAL BETTER NORMAL ESTIMATION FROM QUADMESH!
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
         vec3d v0 = this->face_vert(fid,0);
@@ -278,10 +279,10 @@ std::vector<uint> Hexmesh<M,V,E,F,P>::face_tessellation(const uint fid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Hexmesh<M,V,E,F,P>::update_hex_quality(const uint cid)
+void Hexmesh<M,V,E,F,P>::update_hex_quality(const uint pid)
 {
-    std::vector<uint> vids = this->poly_as_hex_vlist(cid);
-    this->poly_data(cid).quality = hex_scaled_jacobian(this->vert(vids.at(0)),
+    std::vector<uint> vids = this->poly_as_hex_vlist(pid);
+    this->poly_data(pid).quality = hex_scaled_jacobian(this->vert(vids.at(0)),
                                                        this->vert(vids.at(1)),
                                                        this->vert(vids.at(2)),
                                                        this->vert(vids.at(3)),
@@ -297,9 +298,9 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Hexmesh<M,V,E,F,P>::update_hex_quality()
 {
-    for(uint cid=0; cid<this->num_polys(); ++cid)
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        update_hex_quality(cid);
+        update_hex_quality(pid);
     }
 }
 

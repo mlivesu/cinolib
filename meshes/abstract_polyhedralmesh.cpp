@@ -329,18 +329,6 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_contains_face(const uint pid, const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-vec3d AbstractPolyhedralMesh<M,V,E,F,P>::poly_centroid(const uint pid) const
-{
-    vec3d c(0,0,0);
-    for(uint vid : adj_p2v(pid)) c += this->vert(vid);
-    c /= static_cast<double>(this->verts_per_poly(pid));
-    return c;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_as_hex_vlist(const uint pid) const
 {
     assert(this->verts_per_poly(pid) == 8);
@@ -432,8 +420,8 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::face_edge_id(const uint fid, const uint vid0, const uint vid1) const
 {
-    assert(face_contrains_vert(fid,vid0));
-    assert(face_contrains_vert(fid,vid1));
+    assert(face_contains_vert(fid,vid0));
+    assert(face_contains_vert(fid,vid1));
     for(uint eid : adj_f2e(fid))
     {
         if (this->edge_contains_vert(eid,vid0) &&
@@ -459,7 +447,7 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_on_srf(const uint fid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool AbstractPolyhedralMesh<M,V,E,F,P>::face_contrains_vert(const uint fid, const uint vid) const
+bool AbstractPolyhedralMesh<M,V,E,F,P>::face_contains_vert(const uint fid, const uint vid) const
 {
     for(uint off=0; off<verts_per_face(fid); ++off)
     {
@@ -513,6 +501,27 @@ CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::vert_is_on_srf(const uint vid) const
 {
     return v_on_srf.at(vid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+double AbstractPolyhedralMesh<M,V,E,F,C>::vert_mass(const uint vid) const
+{
+    return vert_volume(vid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+double AbstractPolyhedralMesh<M,V,E,F,C>::vert_volume(const uint vid) const
+{
+    double vol = 0.0;    
+    for(uint pid : this->adj_v2p(vid)) vol += this->poly_volume(pid);
+    vol /= static_cast<double>(this->adj_v2p(vid).size());
+    return vol;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

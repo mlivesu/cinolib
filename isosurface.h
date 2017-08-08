@@ -55,7 +55,7 @@ class Isosurface
 
     protected:
 
-        void fix_subtet_orientation(const uint                  cid,
+        void fix_subtet_orientation(const uint                  pid,
                                     const uint                  n_subtets,
                                     const std::vector<double> & coords,
                                           std::vector<uint>   & cells) const;

@@ -86,16 +86,20 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void update_normals();
-        void update_hex_quality(const uint cid);
+        void update_hex_quality(const uint pid);
         void update_hex_quality();
         void print_quality(const bool list_folded_elements = false);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint verts_per_poly(const uint) const { return  8; }
+        uint verts_per_poly()           const { return  8; }
         uint edges_per_poly(const uint) const { return 12; }
+        uint edges_per_poly()           const { return 12; }
         uint faces_per_poly(const uint) const { return  6; }
+        uint faces_per_poly()           const { return  6; }
         uint verts_per_face(const uint) const { return  4; }
+        uint verts_per_face()           const { return  4; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

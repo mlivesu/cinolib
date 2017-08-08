@@ -496,7 +496,7 @@ bool IntegralCurve<Tetmesh<>>::is_on_face(const Curve::Sample & s, uint & tid, u
 
 template<>
 CINO_INLINE
-bool IntegralCurve<Tetmesh<>>::is_on_cell(const Curve::Sample & s, uint & cid, const double tol) const
+bool IntegralCurve<Tetmesh<>>::is_on_cell(const Curve::Sample & s, uint & pid, const double tol) const
 {
     assert(s.eid!=-1);
 
@@ -508,7 +508,7 @@ bool IntegralCurve<Tetmesh<>>::is_on_cell(const Curve::Sample & s, uint & cid, c
 
     if (non_zero_coords.size() == 4)
     {
-        cid = s.eid;
+        pid = s.eid;
         return true;
     }
     return false;
@@ -522,26 +522,26 @@ Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_vertex(const uint vid)
 {
     vec3d p = m_ptr->vert(vid);
     vec3d grad(0,0,0);
-    for(uint cid : m_ptr->adj_v2c(vid)) grad += grad_ptr->vec_at(cid);
+    for(uint pid : m_ptr->adj_v2c(vid)) grad += grad_ptr->vec_at(pid);
     grad.normalize();
     assert(grad.length() > 0);
 
-    for(uint cid : m_ptr->adj_v2c(vid))
+    for(uint pid : m_ptr->adj_v2c(vid))
     {
-        uint  fid = m_ptr->cell_face_opposite_to(cid, vid);
-        vec3d v0  = m_ptr->cell_vert(cid, TET_FACES[fid][0]);
-        vec3d v1  = m_ptr->cell_vert(cid, TET_FACES[fid][1]);
-        vec3d v2  = m_ptr->cell_vert(cid, TET_FACES[fid][2]);
+        uint  fid = m_ptr->cell_face_opposite_to(pid, vid);
+        vec3d v0  = m_ptr->cell_vert(pid, TET_FACES[fid][0]);
+        vec3d v1  = m_ptr->cell_vert(pid, TET_FACES[fid][1]);
+        vec3d v2  = m_ptr->cell_vert(pid, TET_FACES[fid][2]);
         vec3d inters;
         if (ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
         {
             Sample sample;
             sample.pos = inters;
-            sample.eid = cid;
-            tet_barycentric_coords(m_ptr->cell_vert(cid, 0),
-                                   m_ptr->cell_vert(cid, 1),
-                                   m_ptr->cell_vert(cid, 2),
-                                   m_ptr->cell_vert(cid, 3),
+            sample.eid = pid;
+            tet_barycentric_coords(m_ptr->cell_vert(pid, 0),
+                                   m_ptr->cell_vert(pid, 1),
+                                   m_ptr->cell_vert(pid, 2),
+                                   m_ptr->cell_vert(pid, 3),
                                    inters, sample.bary);
             return sample;
         }
@@ -558,45 +558,45 @@ CINO_INLINE
 Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_edge(const uint eid, const vec3d & p)
 {
     vec3d grad(0,0,0);
-    for(uint cid : m_ptr->adj_e2c(eid)) grad += grad_ptr->vec_at(cid);
+    for(uint pid : m_ptr->adj_e2c(eid)) grad += grad_ptr->vec_at(pid);
     grad.normalize();
     assert(grad.length() > 0);
 
     uint v0 = m_ptr->edge_vert_id(eid, 0);
     uint v1 = m_ptr->edge_vert_id(eid, 1);
 
-    for(uint cid : m_ptr->adj_e2c(eid))
+    for(uint pid : m_ptr->adj_e2c(eid))
     {
         for(uint f=0; f<m_ptr->faces_per_cell(); ++f)
         {
             // skip faces containing the edge eid
-            if (m_ptr->cell_vert_id(cid, TET_FACES[f][0]) == v0 &&
-                m_ptr->cell_vert_id(cid, TET_FACES[f][1]) == v1) continue;
-            if (m_ptr->cell_vert_id(cid, TET_FACES[f][0]) == v1 &&
-                m_ptr->cell_vert_id(cid, TET_FACES[f][1]) == v0) continue;
-            if (m_ptr->cell_vert_id(cid, TET_FACES[f][1]) == v0 &&
-                m_ptr->cell_vert_id(cid, TET_FACES[f][2]) == v1) continue;
-            if (m_ptr->cell_vert_id(cid, TET_FACES[f][1]) == v1 &&
-                m_ptr->cell_vert_id(cid, TET_FACES[f][2]) == v0) continue;
-            if (m_ptr->cell_vert_id(cid, TET_FACES[f][2]) == v0 &&
-                m_ptr->cell_vert_id(cid, TET_FACES[f][0]) == v1) continue;
-            if (m_ptr->cell_vert_id(cid, TET_FACES[f][2]) == v1 &&
-                m_ptr->cell_vert_id(cid, TET_FACES[f][0]) == v0) continue;
+            if (m_ptr->cell_vert_id(pid, TET_FACES[f][0]) == v0 &&
+                m_ptr->cell_vert_id(pid, TET_FACES[f][1]) == v1) continue;
+            if (m_ptr->cell_vert_id(pid, TET_FACES[f][0]) == v1 &&
+                m_ptr->cell_vert_id(pid, TET_FACES[f][1]) == v0) continue;
+            if (m_ptr->cell_vert_id(pid, TET_FACES[f][1]) == v0 &&
+                m_ptr->cell_vert_id(pid, TET_FACES[f][2]) == v1) continue;
+            if (m_ptr->cell_vert_id(pid, TET_FACES[f][1]) == v1 &&
+                m_ptr->cell_vert_id(pid, TET_FACES[f][2]) == v0) continue;
+            if (m_ptr->cell_vert_id(pid, TET_FACES[f][2]) == v0 &&
+                m_ptr->cell_vert_id(pid, TET_FACES[f][0]) == v1) continue;
+            if (m_ptr->cell_vert_id(pid, TET_FACES[f][2]) == v1 &&
+                m_ptr->cell_vert_id(pid, TET_FACES[f][0]) == v0) continue;
 
-            vec3d v0 = m_ptr->cell_vert(cid, TET_FACES[f][0]);
-            vec3d v1 = m_ptr->cell_vert(cid, TET_FACES[f][1]);
-            vec3d v2 = m_ptr->cell_vert(cid, TET_FACES[f][2]);
+            vec3d v0 = m_ptr->cell_vert(pid, TET_FACES[f][0]);
+            vec3d v1 = m_ptr->cell_vert(pid, TET_FACES[f][1]);
+            vec3d v2 = m_ptr->cell_vert(pid, TET_FACES[f][2]);
 
             vec3d inters;
             if (ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
             {
                 Sample sample;
                 sample.pos = inters;
-                sample.eid = cid;
-                tet_barycentric_coords(m_ptr->cell_vert(cid, 0),
-                                       m_ptr->cell_vert(cid, 1),
-                                       m_ptr->cell_vert(cid, 2),
-                                       m_ptr->cell_vert(cid, 3),
+                sample.eid = pid;
+                tet_barycentric_coords(m_ptr->cell_vert(pid, 0),
+                                       m_ptr->cell_vert(pid, 1),
+                                       m_ptr->cell_vert(pid, 2),
+                                       m_ptr->cell_vert(pid, 3),
                                        inters, sample.bary);
                 return sample;
             }
@@ -611,13 +611,13 @@ Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_edge(const uint eid, c
 
 template<>
 CINO_INLINE
-Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_face(const uint cid, const uint fid, const vec3d & p)
+Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_face(const uint pid, const uint fid, const vec3d & p)
 {
     std::vector<uint> cells_to_process;
-    cells_to_process.push_back(cid);
-    vec3d grad = grad_ptr->vec_at(cid);
+    cells_to_process.push_back(pid);
+    vec3d grad = grad_ptr->vec_at(pid);
 
-    int nbr = m_ptr->cell_adjacent_through_face(cid, fid);
+    int nbr = m_ptr->cell_adjacent_through_face(pid, fid);
     if (nbr != -1)
     {
         cells_to_process.push_back(nbr);
@@ -631,9 +631,9 @@ Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_face(const uint cid, c
     }
 
     std::vector<uint> illegal_f;
-    illegal_f.push_back(m_ptr->cell_vert_id(cid, TET_FACES[fid][0]));
-    illegal_f.push_back(m_ptr->cell_vert_id(cid, TET_FACES[fid][1]));
-    illegal_f.push_back(m_ptr->cell_vert_id(cid, TET_FACES[fid][2]));
+    illegal_f.push_back(m_ptr->cell_vert_id(pid, TET_FACES[fid][0]));
+    illegal_f.push_back(m_ptr->cell_vert_id(pid, TET_FACES[fid][1]));
+    illegal_f.push_back(m_ptr->cell_vert_id(pid, TET_FACES[fid][2]));
     std::sort(illegal_f.begin(), illegal_f.end());
 
     for(uint curr_cell : cells_to_process)
@@ -677,26 +677,26 @@ Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_face(const uint cid, c
 
 template<>
 CINO_INLINE
-Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_cell(const uint cid, const vec3d & p)
+Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_cell(const uint pid, const vec3d & p)
 {
-    vec3d grad = grad_ptr->vec_at(cid);
+    vec3d grad = grad_ptr->vec_at(pid);
     grad.normalize();
 
     for(uint f=0; f<m_ptr->faces_per_cell(); ++f)
     {
-        vec3d v0 = m_ptr->cell_vert(cid, TET_FACES[f][0]);
-        vec3d v1 = m_ptr->cell_vert(cid, TET_FACES[f][1]);
-        vec3d v2 = m_ptr->cell_vert(cid, TET_FACES[f][2]);
+        vec3d v0 = m_ptr->cell_vert(pid, TET_FACES[f][0]);
+        vec3d v1 = m_ptr->cell_vert(pid, TET_FACES[f][1]);
+        vec3d v2 = m_ptr->cell_vert(pid, TET_FACES[f][2]);
         vec3d inters;
         if (ray_triangle_intersection(Ray(p,grad), v0, v1, v2, inters))
         {
             Sample sample;
             sample.pos = inters;
-            sample.eid = cid;
-            tet_barycentric_coords(m_ptr->cell_vert(cid,0),
-                                   m_ptr->cell_vert(cid,1),
-                                   m_ptr->cell_vert(cid,2),
-                                   m_ptr->cell_vert(cid,3),
+            sample.eid = pid;
+            tet_barycentric_coords(m_ptr->cell_vert(pid,0),
+                                   m_ptr->cell_vert(pid,1),
+                                   m_ptr->cell_vert(pid,2),
+                                   m_ptr->cell_vert(pid,3),
                                    inters, sample.bary);
             return sample;
         }

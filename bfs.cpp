@@ -112,15 +112,15 @@ void bfs_exahustive_on_dual(const Mesh              & m,
     std::set<uint> active_set;
     active_set.insert(source);
 
-    uint cid;
+    uint pid;
     while (!active_set.empty())
     {
-        cid = *active_set.begin();
+        pid = *active_set.begin();
         active_set.erase(active_set.begin());
 
-        visited.insert(cid);
+        visited.insert(pid);
 
-        for(uint nbr : m.adj_poly2poly(cid))
+        for(uint nbr : m.adj_poly2poly(pid))
         {
             if (mask.at(nbr)) continue;
             if (DOES_NOT_CONTAIN(visited,nbr))

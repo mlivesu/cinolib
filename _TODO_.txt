@@ -1,3 +1,4 @@
+- move vert_mass at the highest level of the hierarchy
 - refactor connectivity editing throughout  the library. Trimesh should have three methods
   edge_collapse(), triangle_split(), edge_split(), and all the connectivity changes should
   happen through these operators!

@@ -43,33 +43,62 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Tetmesh<M,V,E,F,C>::Tetmesh(const std::vector<vec3d> & verts,
-                            const std::vector<uint>  & cells)
-: verts(verts)
-, polys(cells)
+Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d> & verts,
+                            const std::vector<uint>  & polys)
 {
+    this->verts = verts;
+    from_tetrahedra_to_general_polyhedra(polys, this->faces, this->polys, this->polys_face_winding);
+
     init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Tetmesh<M,V,E,F,C>::Tetmesh(const std::vector<double> & coords,
-                            const std::vector<uint>   & cells)
+Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<double> & coords,
+                            const std::vector<uint>   & polys)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    this->polys = cells;
+    from_tetrahedra_to_general_polyhedra(polys, this->faces, this->polys, this->polys_face_winding);
     init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Tetmesh<M,V,E,F,C>::Tetmesh(const char * filename)
+Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d>             & verts,
+                            const std::vector<std::vector<uint>> & polys)
+{
+    this->verts = verts;
+    from_tetrahedra_to_general_polyhedra(polys, this->faces, this->polys, this->polys_face_winding);
+    init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d>             & verts,
+                            const std::vector<std::vector<uint>> & faces,
+                            const std::vector<std::vector<uint>> & polys,
+                            const std::vector<std::vector<bool>> & polys_face_winding)
+{
+    this->verts = verts;
+    this->faces = faces;
+    this->polys = polys;
+    this->polys_face_winding = polys_face_winding;
+    init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+Tetmesh<M,V,E,F,P>::Tetmesh(const char * filename)
 {
     load(filename);
     init();
@@ -77,13 +106,13 @@ Tetmesh<M,V,E,F,C>::Tetmesh(const char * filename)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,C>::load(const char * filename)
+void Tetmesh<M,V,E,F,P>::load(const char * filename)
 {
-    clear();
-    std::vector<double> coords;
-    std::vector<uint> hexa; // not used here
+    this->clear();
+
+    std::vector<std::vector<uint>> tets;
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -91,17 +120,17 @@ void Tetmesh<M,V,E,F,C>::load(const char * filename)
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        read_MESH(filename, coords, polys, hexa);
+        read_MESH(filename, this->verts, tets);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        read_VTU(filename, coords, polys, hexa);
+        read_VTU(filename, this->verts, tets);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        read_VTK(filename, coords, polys, hexa);
+        read_VTK(filename, this->verts, tets);
     }
     else
     {
@@ -109,40 +138,37 @@ void Tetmesh<M,V,E,F,C>::load(const char * filename)
         exit(-1);
     }
 
-    verts = vec3d_from_serialized_xyz(coords);
+    from_tetrahedra_to_general_polyhedra(tets, this->faces, this->polys, this->polys_face_winding);
 
-    logger << num_polys() << " tetrahedra read" << endl;
-    logger << num_verts() << " vertices   read" << endl;
+    logger << this->num_polys() << " tetrahedra read" << endl;
+    logger << this->num_verts() << " vertices   read" << endl;
 
     this->mesh_data().filename = std::string(filename);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,C>::save(const char * filename) const
+void Tetmesh<M,V,E,F,P>::save(const char * filename) const
 {
-    std::vector<double> coords = serialized_xyz_from_vec3d(verts);
-    std::vector<uint>   hexa; // not used here
-
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
 
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        write_MESH(filename, coords, polys, hexa);
+        write_MESH(filename, this->verts, this->export_hex_connectivity());
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        write_VTU(filename, coords, polys, hexa);
+        write_VTU(filename, this->verts, this->export_hex_connectivity());
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        write_VTK(filename, coords, polys, hexa);
+        write_VTK(filename, this->verts, this->export_hex_connectivity());
     }
     else
     {
@@ -153,429 +179,188 @@ void Tetmesh<M,V,E,F,C>::save(const char * filename) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,C>::clear()
+void Tetmesh<M,V,E,F,P>::init()
 {
-    bb.reset();
-    //
-    verts.clear();
-    edges.clear();
-    faces.clear();
-    polys.clear();
-    v_on_srf.clear();
-    e_on_srf.clear();
-    //
-    M tmp;
-    m_data = tmp;;
-    v_data.clear();
-    e_data.clear();
-    f_data.clear();
-    p_data.clear();
-    //
-    v2v.clear();
-    v2e.clear();
-    v2f.clear();
-    v2p.clear();
-    e2f.clear();
-    e2p.clear();
-    f2e.clear();
-    f2f.clear();
-    f2p.clear();
-    p2e.clear();
-    p2f.clear();
-    p2p.clear();
+    AbstractPolyhedralMesh<M,V,E,F,P>::init();
+    update_tet_quality();
+    this->copy_xyz_to_uvw(UVW_param);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,C>::init()
+void Tetmesh<M,V,E,F,P>::update_normals()
 {
-    update_bbox();
-    update_interior_adjacency();
-    update_surface_adjacency();
-
-    v_data.resize(num_verts());
-    e_data.resize(num_edges());
-    p_data.resize(num_polys());
-    f_data.resize(num_faces());
-
-    update_face_normals();
-    update_cell_quality();
-
-    copy_xyz_to_uvw(UVW_param);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::update_bbox()
-{
-    bb.reset();
-    for(uint vid=0; vid<num_verts(); ++vid)
+    for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        vec3d v = vert(vid);
-        bb.min = bb.min.min(v);
-        bb.max = bb.max.max(v);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::update_interior_adjacency()
-{
-    v2v.clear(); v2v.resize(num_verts());
-    v2e.clear(); v2e.resize(num_verts());
-    v2p.clear(); v2p.resize(num_verts());
-    p2p.clear(); p2p.resize(num_polys());
-    p2e.clear(); p2e.resize(num_polys());
-
-    std::map<ipair,std::vector<uint>> e2c_map;
-    for(uint cid=0; cid<num_polys(); ++cid)
-    {
-        uint cid_ptr = cid * verts_per_poly();
-        uint vids[4] = { polys.at(cid_ptr+0), polys.at(cid_ptr+1), polys.at(cid_ptr+2), polys.at(cid_ptr+3) };
-
-        for(uint vid=0; vid<verts_per_poly(); ++vid)
-        {
-            v2p.at(vids[vid]).push_back(cid);
-        }
-        for(uint eid=0; eid<edges_per_poly(); ++eid)
-        {
-            ipair e = unique_pair(vids[TET_EDGES[eid][0]], vids[TET_EDGES[eid][1]]);
-            e2c_map[e].push_back(cid);
-        }
-    }
-
-    edges.clear();
-    e2p.clear();
-    e2p.resize(e2c_map.size());
-
-    std::set<ipair> cell_pairs;
-
-    uint fresh_id = 0;
-    for(auto e2c_it : e2c_map)
-    {
-        ipair e    = e2c_it.first;
-        uint  eid  = fresh_id++;
-        uint  vid0 = e.first;
-        uint  vid1 = e.second;
-
-        edges.push_back(vid0);
-        edges.push_back(vid1);
-
-        v2v.at(vid0).push_back(vid1);
-        v2v.at(vid1).push_back(vid0);
-
-        v2e.at(vid0).push_back(eid);
-        v2e.at(vid1).push_back(eid);
-
-        std::vector<uint> cids = e2c_it.second;
-        for(uint i=0; i<cids.size(); ++i)
-        {
-            uint cid = cids.at(i);
-
-            p2e.at(cid).push_back(eid);
-            e2p.at(eid).push_back(cid);
-
-            for(uint j=i+1; j<cids.size(); ++j)
-            {
-                uint nbr = cids.at(j);
-                if (poly_shared_face(cid,nbr) != -1)
-                {
-                    ipair p = unique_pair(cid,nbr);
-                    if (DOES_NOT_CONTAIN(cell_pairs, p))
-                    {
-                        cell_pairs.insert(p);
-                        p2p.at(cid).push_back(nbr);
-                        p2p.at(nbr).push_back(cid);
-                        assert(p2p.at(cid).size() <= faces_per_poly());
-                        assert(p2p.at(nbr).size() <= faces_per_poly());
-                    }
-                }
-            }
-        }
-    }
-
-    logger << num_verts() << "\tverts" << endl;
-    logger << num_polys() << "\tcells" << endl;
-    logger << num_edges() << "\tedges" << endl;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::update_surface_adjacency()
-{
-    typedef std::vector<uint> face;
-    std::map<face,std::pair<uint,uint>> f2c_map;
-
-    for(uint cid=0; cid<num_polys(); ++cid)
-    {
-        uint cid_ptr = cid * verts_per_poly();
-        for(uint fid=0; fid<faces_per_poly(); ++fid)
-        {
-            face f;
-            f.push_back(polys.at(cid_ptr + TET_FACES[fid][0]));
-            f.push_back(polys.at(cid_ptr + TET_FACES[fid][1]));
-            f.push_back(polys.at(cid_ptr + TET_FACES[fid][2]));
-            sort(f.begin(), f.end());
-            if (CONTAINS(f2c_map,f)) f2c_map.erase(f);
-            else                     f2c_map[f] = std::make_pair(cid,fid);
-        }
-    }
-
-    v2f.clear(); v2f.resize(num_verts());
-    e2f.clear(); e2f.resize(num_edges());
-    p2f.clear(); p2f.resize(num_polys());
-
-    faces.clear();
-    f2p.clear(); f2p.resize(f2c_map.size());
-    f2e.clear(); f2e.resize(f2c_map.size());
-    v_on_srf.resize(num_verts(), false);
-    e_on_srf.resize(num_edges(), false);
-
-    uint fresh_id = 0;
-    for(auto f2c_it : f2c_map)
-    {
-        uint cid     = f2c_it.second.first;
-        uint f       = f2c_it.second.second;
-        uint cid_ptr = cid * verts_per_poly();
-        uint vid0    = polys.at(cid_ptr + TET_FACES[f][0]);
-        uint vid1    = polys.at(cid_ptr + TET_FACES[f][1]);
-        uint vid2    = polys.at(cid_ptr + TET_FACES[f][2]);
-
-        faces.push_back(vid0);
-        faces.push_back(vid1);
-        faces.push_back(vid2);
-
-        v_on_srf.at(vid0) = true;
-        v_on_srf.at(vid1) = true;
-        v_on_srf.at(vid2) = true;
-
-        v2f.at(vid0).push_back(fresh_id);
-        v2f.at(vid1).push_back(fresh_id);
-        v2f.at(vid2).push_back(fresh_id);
-
-        p2f.at(cid).push_back(fresh_id);
-        f2p.at(fresh_id) = cid;
-
-        for(uint eid : adj_p2e(cid))
-        {
-            uint eid0  = edge_vert_id(eid, 0);
-            uint eid1  = edge_vert_id(eid, 1);
-            bool has_0 = (eid0 == vid0 || eid0 == vid1 || eid0 == vid2);
-            bool has_1 = (eid1 == vid0 || eid1 == vid1 || eid1 == vid2);
-            if (has_0 && has_1)
-            {
-                e2f.at(eid).push_back(fresh_id);
-                f2e.at(fresh_id).push_back(eid);
-            }
-        }
-
-        ++fresh_id;
-    }
-
-    f2f.clear(); f2f.resize(num_faces());
-    for(uint eid=0; eid<num_edges(); ++eid)
-    {
-        for(uint fid1 : e2f.at(eid))
-        for(uint fid2 : e2f.at(eid))
-        {
-            if (fid1 != fid2) f2f.at(fid1).push_back(fid2);
-        }
-
-        if (!e2f.at(eid).empty()) e_on_srf.at(eid) = true;
-    }
-
-    logger << faces.size()/verts_per_face() << " faces" << endl;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::update_face_normals()
-{
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        vec3d v0 = face_vert(fid,0);
-        vec3d v1 = face_vert(fid,1);
-        vec3d v2 = face_vert(fid,2);
+        vec3d v0 = this->face_vert(fid,0);
+        vec3d v1 = this->face_vert(fid,1);
+        vec3d v2 = this->face_vert(fid,2);
 
         vec3d u = v1 - v0;    u.normalize();
         vec3d v = v2 - v0;    v.normalize();
         vec3d n = u.cross(v); n.normalize();
 
-        face_data(fid).normal = n;
+        this->face_data(fid).normal = n;
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-int Tetmesh<M,V,E,F,C>::poly_shared_face(const uint cid0, const uint cid1) const
+std::vector<uint> Tetmesh<M,V,E,F,P>::face_tessellation(const uint fid) const
 {
-    for(uint f=0; f<faces_per_poly(); ++f)
-    {
-        if (poly_contains_vert(cid1, poly_vert_id(cid0, TET_FACES[f][0])) &&
-            poly_contains_vert(cid1, poly_vert_id(cid0, TET_FACES[f][1])) &&
-            poly_contains_vert(cid1, poly_vert_id(cid0, TET_FACES[f][2])))
-        {
-            return f;
-        }
-    }
+    return this->faces.at(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int Tetmesh<M,V,E,F,P>::poly_shared_vert(const uint pid, const std::vector<uint> & incident_edges) const
+{
+    assert(false); // LOST AFTER REFACTORING!!!!
+//    assert(incident_edges.size() > 1);
+//    assert(incident_edges.size() < 4);
+//    uint v_count[4] = { 0, 0, 0, 0 };
+//    for(uint e : incident_edges)
+//    {
+//        ++v_count[TET_EDGES[e][0]];
+//        ++v_count[TET_EDGES[e][1]];
+//    }
+//    for(uint i=0; i<4; ++i)
+//    {
+//        if (v_count[i] == incident_edges.size()) return poly_vert_id(pid,i);
+//    }
     return -1;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-int Tetmesh<M,V,E,F,C>::poly_shared_vert(const uint cid, const std::vector<uint> incident_edges) const
+int Tetmesh<M,V,E,F,P>::poly_adjacent_through_face(const uint pid, const uint face_offset) const
 {
-    assert(incident_edges.size() > 1);
-    assert(incident_edges.size() < 4);
-    uint v_count[4] = { 0, 0, 0, 0 };
-    for(uint e : incident_edges)
-    {
-        ++v_count[TET_EDGES[e][0]];
-        ++v_count[TET_EDGES[e][1]];
-    }
-    for(uint i=0; i<4; ++i)
-    {
-        if (v_count[i] == incident_edges.size()) return poly_vert_id(cid,i);
-    }
+    assert(false); // LOST AFTER REFACTORING!!!!
+//    for(uint nbr : adj_p2p(pid))
+//    {
+//        if (poly_shared_face(pid,nbr) == (int)face_offset) return nbr;
+//    }
     return -1;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-int Tetmesh<M,V,E,F,C>::poly_adjacent_through_face(const uint cid, const uint face_offset) const
+bool Tetmesh<M,V,E,F,P>::poly_bary_coords(const uint pid, const vec3d & p, std::vector<double> & wgts) const
 {
-    for(uint nbr : adj_p2p(cid))
+    return tet_barycentric_coords(this->poly_vert(pid,0),
+                                  this->poly_vert(pid,1),
+                                  this->poly_vert(pid,2),
+                                  this->poly_vert(pid,3),
+                                  p, wgts);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+vec3d Tetmesh<M,V,E,F,P>::poly_face_normal(const uint pid, const uint face_offset) const
+{
+    assert(false); // LOST AFTER REFACTORING!!!!
+//    vec3d v0 = poly_vert(pid, TET_FACES[face_offset][0]);
+//    vec3d v1 = poly_vert(pid, TET_FACES[face_offset][1]);
+//    vec3d v2 = poly_vert(pid, TET_FACES[face_offset][2]);
+//    vec3d n = (v1-v0).cross(v2-v0);
+//    n.normalize();
+//    return n;
+    return vec3d();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double Tetmesh<M,V,E,F,P>::poly_face_area(const uint pid, const uint face_offset) const
+{
+    assert(false); // LOST AFTER REFACTORING!!!!
+//    vec3d v0 = poly_vert(pid, TET_FACES[face_offset][0]);
+//    vec3d v1 = poly_vert(pid, TET_FACES[face_offset][1]);
+//    vec3d v2 = poly_vert(pid, TET_FACES[face_offset][2]);
+//    return (0.5 * (v1-v0).cross(v2-v0).length());
+    return 0.0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double Tetmesh<M,V,E,F,P>::poly_volume(const uint pid) const
+{
+    return tet_unsigned_volume(this->poly_vert(pid,0),
+                               this->poly_vert(pid,1),
+                               this->poly_vert(pid,2),
+                               this->poly_vert(pid,3));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double Tetmesh<M,V,E,F,P>::poly_dihedral_angle(const uint pid, const uint face_offset1, const uint face_offset2) const
+{
+    assert(false); // LOST AFTER REFACTORING!!!!
+//    vec3d   n0 = poly_face_normal(pid, face_offset1);
+//    vec3d   n1 = poly_face_normal(pid, face_offset2);
+//    double  alpha = acos(n0.dot(-n1));
+//    assert(!std::isnan(alpha));
+//    return alpha;
+    return 0.0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint Tetmesh<M,V,E,F,P>::poly_vert_opposite_to(const uint pid, const uint face_offset) const
+{
+    assert(false); // LOST AFTER REFACTORING!!!!
+//    for(uint vert_offset=0; vert_offset<4; ++vert_offset)
+//    {
+//        uint vid = poly_vert_id(pid, vert_offset);
+
+//        if (poly_vert_id(pid, TET_FACES[face_offset][0]) != vid &&
+//            poly_vert_id(pid, TET_FACES[face_offset][1]) != vid &&
+//            poly_vert_id(pid, TET_FACES[face_offset][2]) != vid)
+//        {
+//            return vid;
+//        }
+//    }
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint Tetmesh<M,V,E,F,P>::poly_edge_opposite_to(const uint pid, const uint vid0, const uint vid1) const
+{
+    assert(false); // WARNING: before refactoring used to return the offset and not the actual eid!!!!
+
+    assert(this->poly_contains_vert(pid,vid0));
+    assert(this->poly_contains_vert(pid,vid1));
+
+    for(uint eid : this->adj_p2e(pid))
     {
-        if (poly_shared_face(cid,nbr) == (int)face_offset) return nbr;
-    }
-    return -1;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::poly_contains_vert(const uint cid, const uint vid) const
-{
-    for(uint i=0; i<verts_per_poly(); ++i)
-    {
-        if (poly_vert_id(cid,i) == vid) return true;
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::poly_bary_coords(const uint cid, const vec3d &P, std::vector<double> &wgts) const
-{
-    return tet_barycentric_coords(poly_vert(cid,0),
-                                  poly_vert(cid,1),
-                                  poly_vert(cid,2),
-                                  poly_vert(cid,3),
-                                  P, wgts);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::poly_centroid(const uint cid) const
-{
-    vec3d c(0,0,0);
-    for(uint off=0; off<verts_per_poly(); ++off)
-    {
-        c += poly_vert(cid,off);
-    }
-    c /= static_cast<double>(verts_per_poly());
-    return c;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::poly_face_normal(const uint cid, const uint face_offset) const
-{
-    vec3d v0 = poly_vert(cid, TET_FACES[face_offset][0]);
-    vec3d v1 = poly_vert(cid, TET_FACES[face_offset][1]);
-    vec3d v2 = poly_vert(cid, TET_FACES[face_offset][2]);
-    vec3d n = (v1-v0).cross(v2-v0);
-    n.normalize();
-    return n;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::poly_face_area(const uint cid, const uint face_offset) const
-{
-    vec3d v0 = poly_vert(cid, TET_FACES[face_offset][0]);
-    vec3d v1 = poly_vert(cid, TET_FACES[face_offset][1]);
-    vec3d v2 = poly_vert(cid, TET_FACES[face_offset][2]);
-    return (0.5 * (v1-v0).cross(v2-v0).length());
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::poly_volume(const uint cid) const
-{
-    return tet_unsigned_volume(poly_vert(cid,0),
-                               poly_vert(cid,1),
-                               poly_vert(cid,2),
-                               poly_vert(cid,3));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::poly_dihedral_angle(const uint cid, const uint face_offset1, const uint face_offset2) const
-{
-    vec3d   n0 = poly_face_normal(cid, face_offset1);
-    vec3d   n1 = poly_face_normal(cid, face_offset2);
-    double  alpha = acos(n0.dot(-n1));
-    assert(!std::isnan(alpha));
-    return alpha;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::poly_vert_opposite_to(const uint cid, const uint face_offset) const
-{
-    for(uint vert_offset=0; vert_offset<4; ++vert_offset)
-    {
-        uint vid = poly_vert_id(cid, vert_offset);
-
-        if (poly_vert_id(cid, TET_FACES[face_offset][0]) != vid &&
-            poly_vert_id(cid, TET_FACES[face_offset][1]) != vid &&
-            poly_vert_id(cid, TET_FACES[face_offset][2]) != vid)
+        if (this->edge_contains_vert(eid,vid0) &&
+            this->edge_contains_vert(eid,vid1))
         {
-            return vid;
+            return eid;
         }
     }
     assert(false);
@@ -583,550 +368,56 @@ uint Tetmesh<M,V,E,F,C>::poly_vert_opposite_to(const uint cid, const uint face_o
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::poly_edge_opposite_to(const uint cid, const uint vid0, const uint vid1) const
+uint Tetmesh<M,V,E,F,P>::poly_face_opposite_to(const uint pid, const uint vid) const
 {
-    assert(poly_contains_vert(cid,vid0));
-    assert(poly_contains_vert(cid,vid1));
+    assert(false); // WARNING: before refactoring used to return the offset and not the actual face id!!!!
 
-    for(uint off=0; off<edges_per_poly(); ++off)
+    assert(this->poly_contains_vert(pid, vid));
+    for(uint fid : this->adj_p2f(pid))
     {
-        uint e0 = poly_vert_id(cid, TET_EDGES[off][0]);
-        uint e1 = poly_vert_id(cid, TET_EDGES[off][1]);
-        if ((e0!=vid0 && e1!=vid1)  || (e0!=vid1 && e1!=vid0)) return off;
+        if (!this->face_contains_vert(fid,vid)) return fid;
     }
     assert(false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class C>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::poly_face_opposite_to(const uint cid, const uint vid) const
+double Tetmesh<M,V,E,F,P>::poly_edge_length(const uint pid, const uint edge_offset) const
 {
-    assert(poly_contains_vert(cid, vid));
-    for(uint f=0; f<faces_per_poly(); ++f)
+    assert(false); // LOST AFTER REFACTORING!!!!
+//    vec3d A = poly_vert(pid, TET_EDGES[edge_offset][0]);
+//    vec3d B = poly_vert(pid, TET_EDGES[edge_offset][1]);
+//    return (A-B).length();
+    return 0.0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::update_tet_quality(const uint pid)
+{
+    std::vector<uint> vids = this->poly_as_tet_vlist(pid);
+    this->poly_data(pid).quality = tet_scaled_jacobian(this->vert(vids.at(0)),
+                                                       this->vert(vids.at(1)),
+                                                       this->vert(vids.at(2)),
+                                                       this->vert(vids.at(3)));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::update_tet_quality()
+{
+    for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        if (poly_vert_id(cid, TET_FACES[f][0]) != vid &&
-            poly_vert_id(cid, TET_FACES[f][1]) != vid &&
-            poly_vert_id(cid, TET_FACES[f][2]) != vid)
-        {
-            return f;
-        }
+        update_tet_quality(pid);
     }
-    assert(false);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::poly_edge_length(const uint cid, const uint edge_offset) const
-{
-    vec3d A = poly_vert(cid, TET_EDGES[edge_offset][0]);
-    vec3d B = poly_vert(cid, TET_EDGES[edge_offset][1]);
-    return (A-B).length();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::poly_vert_id(const uint cid, const uint off) const
-{
-    uint cid_ptr = cid * verts_per_poly();
-    return polys.at(cid_ptr + off);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::poly_edge_id(const uint cid, const uint vid0, const uint vid1) const
-{
-    assert(poly_contains_vert(cid,vid0));
-    assert(poly_contains_vert(cid,vid1));
-
-    ipair query = unique_pair(vid0,vid1);
-    for(uint eid : adj_p2e(cid))
-    {
-        if (unique_pair(edge_vert_id(eid,0), edge_vert_id(eid,1)) == query) return eid;
-    }
-    assert(false);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::poly_vert(const uint cid, const uint off) const
-{
-    return verts.at(poly_vert_id(cid,off));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::face_centroid(const uint fid) const
-{
-    vec3d c(0,0,0);
-    for(uint off=0; off<verts_per_face(); ++off) c += face_vert(fid,off);
-    c /= static_cast<double>(verts_per_face());
-    return c;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::face_vert_id(const uint fid, const uint off) const
-{
-    uint fid_ptr = fid * verts_per_face();
-    return faces.at(fid_ptr + off);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::face_vert(const uint fid, const uint off) const
-{
-    return verts.at(face_vert_id(fid,off));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::face_edge_id(const uint fid, const uint vid0, const uint vid1) const
-{
-    assert(face_contains_vert(fid,vid0));
-    assert(face_contains_vert(fid,vid1));
-
-    ipair query = unique_pair(vid0,vid1);
-    for(uint eid : adj_f2e(fid))
-    {
-        if (unique_pair(edge_vert_id(eid,0), edge_vert_id(eid,1)) == query) return eid;
-    }
-    assert(false);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::face_contains_vert(const uint fid, const uint vid) const
-{
-    for(uint i=0; i<verts_per_face(); ++i)
-    {
-        if (face_vert_id(fid,i) == vid) return true;
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-uint Tetmesh<M,V,E,F,C>::edge_vert_id(const uint eid, const uint off) const
-{
-    uint eid_ptr = 2*eid;
-    return edges.at(eid_ptr + off);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::edge_contains_vert(const uint eid, const uint vid) const
-{
-    if (edge_vert_id(eid,0) == vid) return true;
-    if (edge_vert_id(eid,1) == vid) return true;
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-vec3d Tetmesh<M,V,E,F,C>::edge_vert(const uint eid, const uint off) const
-{
-    return verts.at(edge_vert_id(eid,off));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::poly_show_all()
-{
-    for(uint cid=0; cid<num_polys(); ++cid)
-    {
-        poly_data(cid).visible = true;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::vert_set_color(const Color & c)
-{
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        vert_data(vid).color = c;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::vert_set_alpha(const float alpha)
-{
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        vert_data(vid).color.a = alpha;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::edge_set_color(const Color & c)
-{
-    for(uint eid=0; eid<num_edges(); ++eid)
-    {
-        edge_data(eid).color = c;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::edge_set_alpha(const float alpha)
-{
-    for(uint eid=0; eid<num_edges(); ++eid)
-    {
-        edge_data(eid).color.a = alpha;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::face_set_color(const Color & c)
-{
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        face_data(fid).color = c;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::face_set_alpha(const float alpha)
-{
-    for(uint fid=0; fid<num_faces(); ++fid)
-    {
-        face_data(fid).color.a = alpha;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::poly_set_color(const Color & c)
-{
-    for(uint cid=0; cid<num_polys(); ++cid)
-    {
-        poly_data(cid).color = c;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::poly_set_alpha(const float alpha)
-{
-    for(uint cid=0; cid<num_polys(); ++cid)
-    {
-        poly_data(cid).color.a = alpha;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::edge_is_on_srf(const uint eid) const
-{
-    return e_on_srf.at(eid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-std::vector<double> Tetmesh<M,V,E,F,C>::serialize_uvw(const int mode) const
-{
-    std::vector<double> uvw;
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        switch (mode)
-        {
-            case U_param  : uvw.push_back(vert_data(vid).uvw[0]); break;
-            case V_param  : uvw.push_back(vert_data(vid).uvw[1]); break;
-            case W_param  : uvw.push_back(vert_data(vid).uvw[2]); break;
-            case UV_param : uvw.push_back(vert_data(vid).uvw[0]);
-                            uvw.push_back(vert_data(vid).uvw[1]); break;
-            case UW_param : uvw.push_back(vert_data(vid).uvw[0]);
-                            uvw.push_back(vert_data(vid).uvw[2]); break;
-            case VW_param : uvw.push_back(vert_data(vid).uvw[1]);
-                            uvw.push_back(vert_data(vid).uvw[2]); break;
-            case UVW_param: uvw.push_back(vert_data(vid).uvw[0]);
-                            uvw.push_back(vert_data(vid).uvw[1]);
-                            uvw.push_back(vert_data(vid).uvw[2]); break;
-            default: assert(false);
-        }
-    }
-    return uvw;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::copy_xyz_to_uvw(const int mode)
-{
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        switch (mode)
-        {
-            case U_param  : vert_data(vid).uvw[0] = static_cast<float>(vert(vid).x()); break;
-            case V_param  : vert_data(vid).uvw[1] = static_cast<float>(vert(vid).y()); break;
-            case W_param  : vert_data(vid).uvw[2] = static_cast<float>(vert(vid).z()); break;
-            case UV_param : vert_data(vid).uvw[0] = static_cast<float>(vert(vid).x());
-                            vert_data(vid).uvw[1] = static_cast<float>(vert(vid).y()); break;
-            case UW_param : vert_data(vid).uvw[0] = static_cast<float>(vert(vid).x());
-                            vert_data(vid).uvw[2] = static_cast<float>(vert(vid).z()); break;
-            case VW_param : vert_data(vid).uvw[1] = static_cast<float>(vert(vid).y());
-                            vert_data(vid).uvw[2] = static_cast<float>(vert(vid).z()); break;
-            case UVW_param: vert_data(vid).uvw[0] = static_cast<float>(vert(vid).z());
-                            vert_data(vid).uvw[1] = static_cast<float>(vert(vid).y());
-                            vert_data(vid).uvw[2] = static_cast<float>(vert(vid).z()); break;
-            default: assert(false);
-        }
-    }
-}
-
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::vert_is_on_srf(const uint vid) const
-{
-    return v_on_srf.at(vid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::vert_mass(const uint vid) const
-{
-    return vert_volume(vid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::vert_volume(const uint vid) const
-{
-    double vol = 0.0;
-    for(uint cid : adj_v2p(vid)) vol += poly_volume(cid);
-    vol /= static_cast<double>(verts_per_poly());
-    return vol;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::vert_min_tex_coord(const int tex_coord) const
-{
-    double min = FLT_MAX;
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        switch (tex_coord)
-        {
-            case U_param : min = std::min(min, vert_data(vid).uvw[0]); break;
-            case V_param : min = std::min(min, vert_data(vid).uvw[1]); break;
-            case W_param : min = std::min(min, vert_data(vid).uvw[2]); break;
-            default: assert(false);
-        }
-    }
-    return min;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::vert_max_tex_coord(const int tex_coord) const
-{
-    double max = -FLT_MAX;
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        switch (tex_coord)
-        {
-            case U_param : max = std::max(max, vert_data(vid).uvw[0]); break;
-            case V_param : max = std::max(max, vert_data(vid).uvw[1]); break;
-            case W_param : max = std::max(max, vert_data(vid).uvw[2]); break;
-            default: assert(false);
-        }
-    }
-    return max;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-std::vector<double> Tetmesh<M,V,E,F,C>::vector_coords() const
-{
-    std::vector<double> coords;
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        coords.push_back(vert(vid).x());
-        coords.push_back(vert(vid).y());
-        coords.push_back(vert(vid).z());
-    }
-    return coords;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::update_cell_quality(const uint cid)
-{
-    poly_data(cid).quality = tet_scaled_jacobian(poly_vert(cid,0), poly_vert(cid,1),
-                                                 poly_vert(cid,2), poly_vert(cid,3));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-void Tetmesh<M,V,E,F,C>::update_cell_quality()
-{
-    for(uint cid=0; cid<num_polys(); ++cid)
-    {
-        update_cell_quality(cid);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::edge_length(const uint eid) const
-{
-    return (edge_vert(eid,0) - edge_vert(eid,1)).length();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::edge_avg_length() const
-{
-    double avg = 0;
-    for(uint eid=0; eid<num_edges(); ++eid) avg += edge_length(eid);
-    if (num_edges() > 0) avg/=static_cast<double>(num_edges());
-    return avg;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::edge_max_length() const
-{
-    double max = 0;
-    for(uint eid=0; eid<num_edges(); ++eid) max = std::max(max, edge_length(eid));
-    return max;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-double Tetmesh<M,V,E,F,C>::edge_min_length() const
-{
-    double min = 0;
-    for(uint eid=0; eid<num_edges(); ++eid) min = std::min(min,edge_length(eid));
-    return min;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::vert_is_local_min(const uint vid, const int tex_coord) const
-{
-    for(uint nbr : adj_v2v(vid))
-    {
-        switch (tex_coord)
-        {
-            case U_param : if (vert_data(nbr).uvw[0] < vert_data(vid).uvw[0]) return false; break;
-            case V_param : if (vert_data(nbr).uvw[1] < vert_data(vid).uvw[1]) return false; break;
-            case W_param : if (vert_data(nbr).uvw[2] < vert_data(vid).uvw[2]) return false; break;
-            default: assert(false);
-        }
-    }
-    return true;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::vert_is_local_max(const uint vid, const int tex_coord) const
-{
-    for(uint nbr : adj_v2v(vid))
-    {
-        switch (tex_coord)
-        {
-            case U_param : if (vert_data(nbr).uvw[0] > vert_data(vid).uvw[0]) return false; break;
-            case V_param : if (vert_data(nbr).uvw[1] > vert_data(vid).uvw[1]) return false; break;
-            case W_param : if (vert_data(nbr).uvw[2] > vert_data(vid).uvw[2]) return false; break;
-            default: assert(false);
-        }
-    }
-    return true;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class C>
-CINO_INLINE
-bool Tetmesh<M,V,E,F,C>::vert_is_critical_p(const uint vid, const int tex_coord) const
-{
-    // WARNING: does not handle saddle points!
-    return (vert_is_local_max(vid, tex_coord) || vert_is_local_min(vid, tex_coord));
 }
 
 }

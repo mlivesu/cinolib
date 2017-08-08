@@ -772,7 +772,7 @@ std::vector<uint> Trimesh<M,V,E,P>::get_ordered_boundary_vertices() const
     std::vector<vec3d> verts = this->vector_verts();
     verts.push_back(this->centroid());
 
-    uint cid = this->num_verts();
+    uint pid = this->num_verts();
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         if (this->edge_is_boundary(eid))
@@ -786,12 +786,12 @@ std::vector<uint> Trimesh<M,V,E,P>::get_ordered_boundary_vertices() const
             }
             faces.push_back(vid0);
             faces.push_back(vid1);
-            faces.push_back(cid);
+            faces.push_back(pid);
         }
     }
 
     Trimesh<> tmp(verts,faces);
-    return tmp.vert_ordered_vert_ring(cid);
+    return tmp.vert_ordered_vert_ring(pid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

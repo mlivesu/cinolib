@@ -196,9 +196,9 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
         if (!this->edge_is_on_srf(eid)) continue;
 
         bool invisible = true;
-        for(uint cid : this->adj_e2p(eid))
+        for(uint pid : this->adj_e2p(eid))
         {
-            if (this->poly_data(cid).visible) invisible = false;
+            if (this->poly_data(pid).visible) invisible = false;
         }
         if (invisible) continue;
 

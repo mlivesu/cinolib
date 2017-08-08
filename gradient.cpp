@@ -96,21 +96,21 @@ Eigen::SparseMatrix<double> gradient<Tetmesh<>>(const Tetmesh<> &m)
 
     std::vector<Entry> entries;
 
-    for(uint cid=0; cid<m.num_polys(); ++cid)
+    for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        int A = m.poly_vert_id(cid, 0);
-        int B = m.poly_vert_id(cid, 1);
-        int C = m.poly_vert_id(cid, 2);
-        int D = m.poly_vert_id(cid, 3);
+        int A = m.poly_vert_id(pid, 0);
+        int B = m.poly_vert_id(pid, 1);
+        int C = m.poly_vert_id(pid, 2);
+        int D = m.poly_vert_id(pid, 3);
 
-        double vol3 = std::max(m.poly_volume(cid), 1e-5) * 3.0;
+        double vol3 = std::max(m.poly_volume(pid), 1e-5) * 3.0;
 
-        vec3d n_ABC = m.poly_face_normal(cid,0) * m.poly_face_area(cid,0) / vol3;
-        vec3d n_ABD = m.poly_face_normal(cid,1) * m.poly_face_area(cid,1) / vol3;
-        vec3d n_ACD = m.poly_face_normal(cid,2) * m.poly_face_area(cid,2) / vol3;
-        vec3d n_BCD = m.poly_face_normal(cid,3) * m.poly_face_area(cid,3) / vol3;
+        vec3d n_ABC = m.poly_face_normal(pid,0) * m.poly_face_area(pid,0) / vol3;
+        vec3d n_ABD = m.poly_face_normal(pid,1) * m.poly_face_area(pid,1) / vol3;
+        vec3d n_ACD = m.poly_face_normal(pid,2) * m.poly_face_area(pid,2) / vol3;
+        vec3d n_BCD = m.poly_face_normal(pid,3) * m.poly_face_area(pid,3) / vol3;
 
-        uint row = 3 * cid;
+        uint row = 3 * pid;
         entries.push_back(Entry(row, A, n_ABC.x() + n_ABD.x() + n_ACD.x()));
         entries.push_back(Entry(row, B, n_ABC.x() + n_ABD.x() + n_BCD.x()));
         entries.push_back(Entry(row, C, n_ABC.x() + n_ACD.x() + n_BCD.x()));

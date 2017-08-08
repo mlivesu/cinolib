@@ -297,6 +297,32 @@ void from_hexahedra_to_general_polyhedra(const std::vector<std::vector<uint>> & 
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void from_tetrahedra_to_general_polyhedra(const std::vector<uint>              & tets,
+                                                std::vector<std::vector<uint>> & faces,
+                                                std::vector<std::vector<uint>> & polys,
+                                                std::vector<std::vector<bool>> & polys_face_winding)
+{
+    faces.clear();
+    polys.clear();
+    polys_face_winding.clear();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void from_tetrahedra_to_general_polyhedra(const std::vector<std::vector<uint>> & tets,
+                                                std::vector<std::vector<uint>> & faces,
+                                                std::vector<std::vector<uint>> & polys,
+                                                std::vector<std::vector<bool>> & polys_face_winding)
+{
+    faces.clear();
+    polys.clear();
+    polys_face_winding.clear();
+}
+
 }
 
 #endif // CINO_COMMON_H

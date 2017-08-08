@@ -75,7 +75,7 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
         new_field.push_back(f);
     }
 
-    for(uint cid=0; cid<m_ptr->num_polys(); ++cid)
+    for(uint pid=0; pid<m_ptr->num_polys(); ++pid)
     {
         std::vector<uint>   edges_split;
         std::vector<uint>   edges_not_split;
@@ -83,8 +83,8 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
 
         for(uint e=0; e<m_ptr->edges_per_poly(); ++e)
         {
-            uint  v_a   = m_ptr->poly_vert_id(cid, TET_EDGES[e][0]);
-            uint  v_b   = m_ptr->poly_vert_id(cid, TET_EDGES[e][1]);
+            uint  v_a   = m_ptr->poly_vert_id(pid, TET_EDGES[e][0]);
+            uint  v_b   = m_ptr->poly_vert_id(pid, TET_EDGES[e][1]);
             ipair eid   = unique_pair(v_a,v_b);
             auto  query = v_map.find(eid);
 
@@ -100,10 +100,10 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
         {
             case 0 : // replicate the whole tet
             {
-                new_cells.push_back(m_ptr->poly_vert_id(cid, 0));
-                new_cells.push_back(m_ptr->poly_vert_id(cid, 1));
-                new_cells.push_back(m_ptr->poly_vert_id(cid, 2));
-                new_cells.push_back(m_ptr->poly_vert_id(cid, 3));
+                new_cells.push_back(m_ptr->poly_vert_id(pid, 0));
+                new_cells.push_back(m_ptr->poly_vert_id(pid, 1));
+                new_cells.push_back(m_ptr->poly_vert_id(pid, 2));
+                new_cells.push_back(m_ptr->poly_vert_id(pid, 3));
                 break;
             }
 
@@ -111,19 +111,19 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
             {
                 assert(edges_vids.size() == 3);
                 auto vids_it  = edges_vids.begin();
-                int  tet_tip  = m_ptr->poly_shared_vert(cid, edges_split); assert(tet_tip!=-1);
+                int  tet_tip  = m_ptr->poly_shared_vert(pid, edges_split); assert(tet_tip!=-1);
                 uint prism[6] =
                 {
-                    m_ptr->poly_vert_id(cid, TET_EDGES[edges_split[0]][0]),
-                    m_ptr->poly_vert_id(cid, TET_EDGES[edges_split[1]][0]),
-                    m_ptr->poly_vert_id(cid, TET_EDGES[edges_split[2]][0]),
+                    m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[0]][0]),
+                    m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[1]][0]),
+                    m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[2]][0]),
                     (  vids_it)->second,
                     (++vids_it)->second,
                     (++vids_it)->second,
                 };
-                if ((int)prism[0] == tet_tip) prism[0] = m_ptr->poly_vert_id(cid, TET_EDGES[edges_split[0]][1]);
-                if ((int)prism[1] == tet_tip) prism[1] = m_ptr->poly_vert_id(cid, TET_EDGES[edges_split[1]][1]);
-                if ((int)prism[2] == tet_tip) prism[2] = m_ptr->poly_vert_id(cid, TET_EDGES[edges_split[2]][1]);
+                if ((int)prism[0] == tet_tip) prism[0] = m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[0]][1]);
+                if ((int)prism[1] == tet_tip) prism[1] = m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[1]][1]);
+                if ((int)prism[2] == tet_tip) prism[2] = m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[2]][1]);
                 //
                 tetrahedralize_prism(prism, new_cells);
                 //
@@ -132,7 +132,7 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
                 new_cells.push_back(prism[4]);
                 new_cells.push_back(prism[5]);
                 //
-                fix_subtet_orientation(cid, 4, new_coords, new_cells);
+                fix_subtet_orientation(pid, 4, new_coords, new_cells);
                 break;
             }
 
@@ -156,28 +156,28 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
                     std::vector<uint> tmp;
                     tmp.push_back(split_edges_top.front());
                     tmp.push_back(split_edges_bot.front());
-                    if (m_ptr->poly_shared_vert(cid, tmp) == -1)
+                    if (m_ptr->poly_shared_vert(pid, tmp) == -1)
                     {
                         std::swap(split_edges_top[0], split_edges_top[1]);
                         tmp.clear();
                         tmp.push_back(split_edges_top.front());
                         tmp.push_back(split_edges_bot.front());
-                        assert(m_ptr->poly_shared_vert(cid, tmp) != -1);
+                        assert(m_ptr->poly_shared_vert(pid, tmp) != -1);
                     }
                     //
                     uint prism[6] =
                     {
-                        m_ptr->poly_vert_id(cid, top),
+                        m_ptr->poly_vert_id(pid, top),
                         edges_vids.at(split_edges_top[0]),
                         edges_vids.at(split_edges_top[1]),
-                        m_ptr->poly_vert_id(cid, bot),
+                        m_ptr->poly_vert_id(pid, bot),
                         edges_vids.at(split_edges_bot[0]),
                         edges_vids.at(split_edges_bot[1]),
                     };
                     //
                     tetrahedralize_prism(prism, new_cells);
                 }
-                fix_subtet_orientation(cid, 6, new_coords, new_cells);
+                fix_subtet_orientation(pid, 6, new_coords, new_cells);
                 break;
             }
 
@@ -191,12 +191,12 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
 }
 
 CINO_INLINE
-void Isosurface::fix_subtet_orientation(const uint                  cid,
+void Isosurface::fix_subtet_orientation(const uint                  pid,
                                         const uint                  n_subtets,
                                         const std::vector<double> & coords,
                                               std::vector<uint>   & cells) const
 {
-    bool og_tet_was_flipped = m_ptr->poly_data(cid).quality;
+    bool og_tet_was_flipped = m_ptr->poly_data(pid).quality;
 
     for(uint i=1; i<=n_subtets; ++i)
     {
