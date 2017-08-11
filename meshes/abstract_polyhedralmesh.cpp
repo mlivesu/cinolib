@@ -277,16 +277,6 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_on_surf(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_contains_vert(const uint pid, const uint vid) const
-{
-    for(uint v : adj_p2v(pid)) if(v == vid) return true;
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_contains_face(const uint pid, const uint fid) const
 {
     for(uint off=0; off<faces_per_poly(pid); ++off)

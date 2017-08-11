@@ -140,7 +140,7 @@ uint AbstractMesh<M,V,E,P>::connected_components(std::vector<std::set<uint>> & c
     do
     {
         std::set<uint> cc;
-        bfs_exahustive<AbstractMesh<M,V,E,P>>(*this, seed, cc);
+        bfs_exahustive(*this, seed, cc);
 
         ccs.push_back(cc);
         for(uint vid : cc) visited.at(vid) = true;
@@ -444,6 +444,15 @@ uint AbstractMesh<M,V,E,P>::edge_vert_id(const uint eid, const uint offset) cons
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+uint AbstractMesh<M,V,E,P>::edge_valence(const uint eid) const
+{
+    return this->adj_e2p(eid).size();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 vec3d AbstractMesh<M,V,E,P>::edge_vert(const uint eid, const uint offset) const
 {
     return vert(edge_vert_id(eid,offset));
@@ -649,6 +658,36 @@ void AbstractMesh<M,V,E,P>::poly_set_alpha(const float alpha)
         poly_data(pid).color.a = alpha;
     }
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_color_wrt_label()
+{
+    std::map<int,uint> l_map;
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        int l = this->poly_data(pid).label;
+        if (DOES_NOT_CONTAIN(l_map,l)) l_map[l] = l_map.size();
+    }
+    uint n_labels = l_map.size();
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        this->poly_data(pid).color = Color::scatter(n_labels,l_map.at(this->poly_data(pid).label));
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool AbstractMesh<M,V,E,P>::poly_contains_vert(const uint pid, const uint vid) const
+{
+    for(uint v : adj_p2v(pid)) if(v == vid) return true;
+    return false;
+}
+
 
 
 }

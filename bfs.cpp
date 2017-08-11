@@ -29,11 +29,11 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/bfs.h>
-#include <queue>
 
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // floodfill (for general graphs - i.e. not meshes)
 //
@@ -65,13 +65,13 @@ void bfs_exahustive(const std::vector<std::vector<uint>> & nodes_adjacency,
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs_exahustive(const Mesh           & m,
-                    const uint             source,
-                          std::set<uint> & visited)
+void bfs_exahustive(const AbstractMesh<M,V,E,P> & m,
+                    const uint                    source,
+                          std::set<uint>        & visited)
 {
     assert(visited.empty());
 
@@ -96,16 +96,17 @@ void bfs_exahustive(const Mesh           & m,
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // floodfill (with barriers) on the dual mesh (faces instead of vertices)
 // The path cannot pass through faces for which mask[f] = true
 //
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs_exahustive_on_dual(const Mesh              & m,
-                            const uint                source,
-                            const std::vector<bool> & mask,
-                                  std::set<uint>    & visited)
+void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
+                            const uint                    source,
+                            const std::vector<bool>     & mask,
+                                  std::set<uint>        & visited)
 {
     assert(visited.empty());
 
@@ -120,7 +121,7 @@ void bfs_exahustive_on_dual(const Mesh              & m,
 
         visited.insert(pid);
 
-        for(uint nbr : m.adj_poly2poly(pid))
+        for(uint nbr : m.adj_p2p(pid))
         {
             if (mask.at(nbr)) continue;
             if (DOES_NOT_CONTAIN(visited,nbr))
@@ -131,17 +132,16 @@ void bfs_exahustive_on_dual(const Mesh              & m,
     }
 }
 
-
-
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // shortest path on unweighted graph, essentially dijkstra with constaint weights.
 //
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs(const Mesh              & m,
-         const uint                source,
-         const uint                dest,
-               std::vector<uint> & path)
+void bfs(const AbstractMesh<M,V,E,P> & m,
+         const uint                    source,
+         const uint                    dest,
+               std::vector<uint>     & path)
 
 {
     assert(path.empty());
@@ -192,17 +192,18 @@ void bfs(const Mesh              & m,
     assert(false && "BFS did not converge!");
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // shortest path (with barriers) on unweighted graph.
 // The path cannot pass throuh vertices for which mask[v] = true
 //
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs(const Mesh              & m,
-         const uint                source,
-         const uint                dest,
-         const std::vector<bool> & mask,
-               std::vector<uint> & path)
+void bfs(const AbstractMesh<M,V,E,P> & m,
+         const uint                    source,
+         const uint                    dest,
+         const std::vector<bool>     & mask,
+               std::vector<uint>     & path)
 {
     assert(path.empty());
     assert(mask.size() == m.num_verts());
@@ -254,18 +255,19 @@ void bfs(const Mesh              & m,
     assert(false && "BFS did not converge!");
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // shortest path (with barriers and multiple destinatins) on unweighted graph.
 // The path cannot pass throuh vertices for which mask[v] = true
 // The algorithm stops as soon as it reaches of of the destinations
 //
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs(const Mesh              & m,
-         const uint                source,
-         const std::set<uint>    & dest,
-         const std::vector<bool> & mask,
-               std::vector<uint> & path)
+void bfs(const AbstractMesh<M,V,E,P> & m,
+         const uint                    source,
+         const std::set<uint>        & dest,
+         const std::vector<bool>     & mask,
+               std::vector<uint>     & path)
 {
     assert(path.empty());
     assert(mask.size() == (size_t)m.num_verts());
@@ -317,12 +319,13 @@ void bfs(const Mesh              & m,
     assert(false && "BFS did not converge!");
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs_exahustive_on_dual(const Mesh                & m,
-                            const uint                  source,
-                                  std::vector<double> & dist) // elem id + dist
+void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
+                            const uint                    source,
+                                  std::vector<double>   & dist) // elem id + dist
 {
     dist = std::vector<double>(m.num_polys(), FLT_MAX);
     std::queue<uint> q;
@@ -335,7 +338,7 @@ void bfs_exahustive_on_dual(const Mesh                & m,
         uint fid = q.front();
         q.pop();
 
-        for(const uint & nbr : m.adj_poly2poly(fid))
+        for(const uint & nbr : m.adj_p2p(fid))
         {
             double c = dist.at(fid) + m.poly_centroid(fid).dist(m.poly_centroid(nbr));
             if (dist.at(nbr) > c)
@@ -346,6 +349,5 @@ void bfs_exahustive_on_dual(const Mesh                & m,
         }
     }
 }
-
 
 }

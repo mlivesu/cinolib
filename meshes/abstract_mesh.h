@@ -166,6 +166,7 @@ class AbstractMesh
         virtual       bool             vert_is_local_min    (const uint vid, const int tex_coord = U_param) const;
         virtual       bool             vert_is_local_max    (const uint vid, const int tex_coord = U_param) const;
         virtual       uint             vert_valence         (const uint vid) const;
+        virtual       double           vert_mass            (const uint vid) const = 0;
         virtual       uint             vert_shared          (const uint eid0, const uint eid1) const;
         virtual       double           vert_min_uvw_value   (const int tex_coord = U_param) const;
         virtual       double           vert_max_uvw_value   (const int tex_coord = U_param) const;
@@ -176,6 +177,7 @@ class AbstractMesh
 
         virtual       vec3d  edge_vert         (const uint eid, const uint offset) const;
         virtual       uint   edge_vert_id      (const uint eid, const uint offset) const;
+        virtual       uint   edge_valence      (const uint eid) const;
         virtual       bool   edge_contains_vert(const uint eid, const uint vid) const;
         virtual       double edge_length       (const uint eid) const;
         virtual       double edge_avg_length   () const;
@@ -186,17 +188,18 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual       vec3d  poly_vert         (const uint pid, const uint offset) const;
-        virtual       uint   poly_vert_id      (const uint pid, const uint offset) const;
-        virtual       vec3d  poly_centroid     (const uint pid) const;
-        virtual       double poly_mass         (const uint pid) const = 0;
-        virtual       bool   poly_contains_vert(const uint pid, const uint vid) const = 0;
-        virtual       uint   poly_edge_id      (const uint pid, const uint vid0, const uint vid1) const;
-        virtual       bool   poly_contains_edge(const uint pid, const uint eid) const;
-        virtual       bool   poly_contains_edge(const uint pid, const uint vid0, const uint vid1) const;
-        virtual       void   poly_show_all     ();
-        virtual       void   poly_set_color    (const Color & c);
-        virtual       void   poly_set_alpha    (const float alpha);
+        virtual       vec3d  poly_vert           (const uint pid, const uint offset) const;
+        virtual       uint   poly_vert_id        (const uint pid, const uint offset) const;
+        virtual       vec3d  poly_centroid       (const uint pid) const;
+        virtual       double poly_mass           (const uint pid) const = 0;
+        virtual       uint   poly_edge_id        (const uint pid, const uint vid0, const uint vid1) const;
+        virtual       bool   poly_contains_vert  (const uint pid, const uint vid) const;
+        virtual       bool   poly_contains_edge  (const uint pid, const uint eid) const;
+        virtual       bool   poly_contains_edge  (const uint pid, const uint vid0, const uint vid1) const;
+        virtual       void   poly_show_all       ();
+        virtual       void   poly_color_wrt_label();
+        virtual       void   poly_set_color      (const Color & c);
+        virtual       void   poly_set_alpha      (const float alpha);
 };
 
 }

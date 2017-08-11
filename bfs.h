@@ -31,9 +31,12 @@
 #ifndef CINO_BFS_H
 #define CINO_BFS_H
 
+#include <set>
+#include <queue>
+
 #include <cinolib/cinolib.h>
 #include <cinolib/common.h>
-#include <set>
+#include <cinolib/meshes/abstract_mesh.h>
 
 namespace cinolib
 {
@@ -45,73 +48,77 @@ void bfs_exahustive(const std::vector<std::vector<uint>> & nodes_adjacency,
                     const uint                             source,
                           std::set<uint>                 & visited);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // floodfill
 //
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs_exahustive(const Mesh           & m,
-                    const uint             source,
-                          std::set<uint> & visited);
+void bfs_exahustive(const AbstractMesh<M,V,E,P> & m,
+                    const uint                    source,
+                          std::set<uint>        & visited);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // floodfill (with barriers) on the dual mesh (faces instead of vertices)
 // The path cannot pass through faces for which mask[f] = true
 //
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs_exahustive_on_dual(const Mesh              & m,
-                            const uint                source,
-                            const std::vector<bool> & mask,
-                                  std::set<uint>    & visited);
+void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
+                            const uint                    source,
+                            const std::vector<bool>     & mask,
+                                  std::set<uint>        & visited);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // floodfill (with barriers) on the dual mesh (faces instead of vertices)
 // The path cannot pass through faces for which mask[f] = true
 //
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs_exahustive_on_dual(const Mesh                & m,
-                            const uint                  source,
-                            const std::vector<double> & dist); // elem id + dist
+void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
+                            const uint                    source,
+                            const std::vector<double>   & dist); // elem id + dist
 
-
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // shortest path on unweighted graph, essentially dijkstra with constaint weights.
 //
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs(const Mesh              & m,
-         const uint                source,
-         const uint                dest,
-               std::vector<uint> & path);
+void bfs(const AbstractMesh<M,V,E,P> & m,
+         const uint                    source,
+         const uint                    dest,
+               std::vector<uint>     & path);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // shortest path (with barriers) on unweighted graph.
 // The path cannot pass throuh vertices for which mask[v] = true
 //
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs(const Mesh              & m,
-         const uint                source,
-         const uint                dest,
-         const std::vector<bool> & mask,
-               std::vector<uint> & path);
+void bfs(const AbstractMesh<M,V,E,P> & m,
+         const uint                    source,
+         const uint                    dest,
+         const std::vector<bool>     & mask,
+               std::vector<uint>     & path);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // shortest path (with barriers and multiple destinatins) on unweighted graph.
 // The path cannot pass throuh vertices for which mask[v] = true
 // The algorithm stops as soon as it reaches of of the destinations
 //
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs(const Mesh              & m,
-         const uint                source,
-         const std::set<uint>    & dest,
-         const std::vector<bool> & mask,
-               std::vector<uint> & path);
+void bfs(const AbstractMesh<M,V,E,P> & m,
+         const uint                    source,
+         const std::set<uint>        & dest,
+         const std::vector<bool>     & mask,
+               std::vector<uint>     & path);
 }
-
 
 #ifndef  CINO_STATIC_LIB
 #include "bfs.cpp"

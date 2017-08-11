@@ -103,7 +103,9 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d verts_average(const std::vector<uint> & vids) const;
+        bool  vert_is_singular(const uint vid) const;
+        bool  vert_is_regular (const uint vid) const;
+        vec3d verts_average   (const std::vector<uint> & vids) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

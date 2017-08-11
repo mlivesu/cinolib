@@ -401,6 +401,26 @@ void Hexmesh<M,V,E,F,P>::update_normals()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool Hexmesh<M,V,E,F,P>::vert_is_singular(const uint vid) const
+{
+    if (this->vert_is_on_srf(vid) && this->vert_valence(vid)!=4) return true;
+    if (this->vert_valence(vid)!=6) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool Hexmesh<M,V,E,F,P>::vert_is_regular(const uint vid) const
+{
+    return !this->vert_is_singular(vid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 vec3d Hexmesh<M,V,E,F,P>::verts_average(const std::vector<uint> &vids) const
 {
     vec3d res(0,0,0);

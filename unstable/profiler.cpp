@@ -38,13 +38,13 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Profiler::push(const std::string & f_prototype)
+void Profiler::push(const std::string & key)
 {
 #ifdef CINOLIB_PROFILER_ENABLED
     ProfilerEntry entry;
-    entry.f_prototype = f_prototype;
-    entry.start       = std::chrono::high_resolution_clock::now();
-    tree_ptr          = tree.add_children(entry, tree_ptr);
+    entry.key   = key;
+    entry.start = std::chrono::high_resolution_clock::now();
+    tree_ptr    = tree.add_children(entry, tree_ptr);
 #endif
 }
 
@@ -58,12 +58,12 @@ void Profiler::pop()
     tree.node(tree_ptr).item.stop = high_resolution_clock::now();
     double t = delta_s(tree_ptr);
 
-    log_times[tree.node(tree_ptr).item.f_prototype] += t;
-    log_calls[tree.node(tree_ptr).item.f_prototype] += 1;
+    log_times[tree.node(tree_ptr).item.key] += t;
+    log_calls[tree.node(tree_ptr).item.key] += 1;
 
     std::string s;
     for(uint i=0; i<tree.node(tree_ptr).depth-1; ++i) s += "----";
-    s += tree.node(tree_ptr).item.f_prototype + " [" + std::to_string(t) + "s]";
+    s += tree.node(tree_ptr).item.key + " [" + std::to_string(t) + "s]";
     tree.node(tree_ptr).item.s = s;
 
     tree_ptr = tree.node(tree_ptr).father;

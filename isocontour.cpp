@@ -139,7 +139,7 @@ void Isocontour::make_iso_curve()
         {
             // close the loop (if it is a loop)
             //
-            if (m_ptr->edges_share_face(first->first, last->first))
+            if (m_ptr->edges_share_poly(first->first, last->first))
             {
                 isocurve.push_back(first->second);
                 isocurve_edges.push_back(first->first);
@@ -181,7 +181,7 @@ std::map<uint,vec3d>::const_iterator Isocontour::next_edge(uint eid, const std::
                 // the creation of fake loops when more than two edges
                 // incident to the same vertex are crossed by the iso-curve
                 //
-                if (m_ptr->edges_share_face(eid, query->first))
+                if (m_ptr->edges_share_poly(eid, query->first))
                 {
                     return query;
                 }

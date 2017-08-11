@@ -1,3 +1,12 @@
+- check google well practices for C++ and apply them
+- make all constructors explicit?
+- use template<class M, class V, class E, class P> void f(const AbstractMesh<M,V,E,P> &)
+  for generic programming!
+- AbstractMesh::vert_weights (uniform, cotangent, mean value…)
+- boundary conditions shouldn’t be a map, but rather a vector of pairs
+- add a file cinolib/types with all the types
+- check meshes hierarchy - where offsets appear and if they need to stay or go!
+- add cpp files for hex_subdivisions, laplacian, gradient ecc ecc
 - move vert_mass at the highest level of the hierarchy
 - refactor connectivity editing throughout  the library. Trimesh should have three methods
   edge_collapse(), triangle_split(), edge_split(), and all the connectivity changes should
@@ -10,7 +19,6 @@
 - extend the concept of subdivisions from hexmesh to any mesh
 - make cotangent weights robust against almost degenerate triangles and boundary meshes
 - add Additive Manufacturing stuff (load and process CLI files)…
-- transform any function containing inner Trimesh<> or Tetmesh<> into a templated function  with generic Mesh type
 - Improve face tessellation strategy for polygonal meshes (flipped elements may currently arise for non convex polygons)
 - Add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
 - Refactor PointInsideMeshCache, it should return ALL the elements containing the

@@ -135,7 +135,6 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         virtual double            poly_volume       (const uint pid) const = 0;
         virtual double            poly_mass         (const uint pid) const;
-        virtual bool              poly_contains_vert(const uint fid, const uint vid) const;
         virtual bool              poly_contains_face(const uint pid, const uint fid) const;
         virtual bool              poly_is_on_surf   (const uint pid) const;
         virtual int               poly_shared_face  (const uint pid0, const uint pid1) const;

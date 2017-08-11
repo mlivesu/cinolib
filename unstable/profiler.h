@@ -44,7 +44,7 @@ typedef struct
 {
     // http://www.cplusplus.com/reference/chrono/high_resolution_clock/now/
     std::chrono::high_resolution_clock::time_point start, stop;
-    std::string f_prototype;
+    std::string key;
     std::string s;
 }
 ProfilerEntry;
@@ -59,7 +59,7 @@ class Profiler
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void push(const std::string & f_prototype);
+        void push(const std::string & key);
         void pop();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
