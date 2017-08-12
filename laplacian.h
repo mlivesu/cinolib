@@ -41,10 +41,7 @@ namespace cinolib
 
 typedef Eigen::Triplet<double> Entry;
 
-<<<<<<< HEAD
-=======
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
->>>>>>> debug
 
 template<class M, class V, class E, class P>
 CINO_INLINE
