@@ -72,6 +72,8 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init()
     this->p_data.resize(this->num_polys());
 
     this->update_normals();
+
+    this->copy_xyz_to_uvw(UVW_param);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

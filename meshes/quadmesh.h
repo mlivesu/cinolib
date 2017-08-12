@@ -109,7 +109,6 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         std::vector<uint> poly_tessellation(const uint pid) const;
-        double            poly_area        (const uint) const { assert(false); return 1.0; } // TODO!
 };
 
 }

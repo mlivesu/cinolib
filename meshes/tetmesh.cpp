@@ -120,9 +120,9 @@ void Tetmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::ve
         std::vector<uint> p_faces;
         std::vector<bool> p_winding;
 
-        for(uint i=0; i<4; ++i)
+        for(uint i=0; i<faces_per_poly(); ++i)
         {
-            uint base = tid*4;
+            uint base = tid*verts_per_poly();
             std::vector<uint> f =
             {
                 tets.at(base + TET_FACES[i][0]),
@@ -171,7 +171,7 @@ void Tetmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::ve
         std::vector<uint> p_faces;
         std::vector<bool> p_winding;
 
-        for(uint i=0; i<4; ++i)
+        for(uint i=0; i<faces_per_poly(); ++i)
         {
             std::vector<uint> f =
             {
@@ -285,7 +285,6 @@ void Tetmesh<M,V,E,F,P>::init()
     AbstractPolyhedralMesh<M,V,E,F,P>::init();
     reorder_p2v(); // makes sure the p2v adjacency stores vertices in a way that uniquely defines per element connectivity
     update_tet_quality();
-    this->copy_xyz_to_uvw(UVW_param);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

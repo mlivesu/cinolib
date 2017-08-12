@@ -145,6 +145,8 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F
 
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
+        double vol3 = std::max(m.poly_volume(pid), 1e-5) * 3.0;
+
         for(uint vid : m.adj_p2v(pid))
         {
             vec3d per_vert_sum_over_f_normals(0,0,0);
@@ -156,7 +158,7 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F
                     per_vert_sum_over_f_normals += n * m.face_area(fid);
                 }
             }
-            per_vert_sum_over_f_normals /= std::max(m.poly_volume(pid), 1e-5) * 3.0;
+            per_vert_sum_over_f_normals /= vol3;
             uint row = 3 * pid;
             entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.x())); ++row;
             entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.y())); ++row;
@@ -168,5 +170,42 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F
     return G;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> & m)
+{
+    Eigen::SparseMatrix<double> G(m.num_polys()*3, m.num_verts());
+    std::vector<Entry> entries;
+
+    for(uint pid=0; pid<m.num_polys(); ++pid)
+    {
+        double area = std::max(m.poly_area(pid), 1e-5);
+        vec3d n     = m.poly_data(pid).normal;
+
+        for(uint off=0; off<m.verts_per_poly(pid); ++off)
+        {
+            uint  prev = m.poly_vert_id(pid,off);
+            uint  curr = m.poly_vert_id(pid,(off+1)%m.verts_per_poly(pid));
+            uint  next = m.poly_vert_id(pid,(off+2)%m.verts_per_poly(pid));
+            vec3d u    = m.vert(next) - m.vert(curr);
+            vec3d v    = m.vert(curr) - m.vert(prev);
+            vec3d u_90 = u.cross(n); u_90.normalize();
+            vec3d v_90 = v.cross(n); v_90.normalize();
+
+            vec3d per_edge_normal = u_90 * u.length() + v_90 * v.length();
+            per_edge_normal /= area;
+
+            uint row = 3 * pid;
+            entries.push_back(Entry(row, curr, per_edge_normal.x())); ++row;
+            entries.push_back(Entry(row, curr, per_edge_normal.y())); ++row;
+            entries.push_back(Entry(row, curr, per_edge_normal.z()));
+        }
+    }
+
+    G.setFromTriplets(entries.begin(), entries.end());
+    return G;
+}
 
 }

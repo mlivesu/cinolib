@@ -120,9 +120,9 @@ void Hexmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::ve
         std::vector<uint> p_faces;
         std::vector<bool> p_winding;
 
-        for(uint i=0; i<6; ++i)
+        for(uint i=0; i<faces_per_poly(); ++i)
         {
-            uint base = hid*8;
+            uint base = hid*verts_per_poly();
             std::vector<uint> f =
             {
                 hexa.at(base + HEXA_FACES[i][0]),
@@ -172,7 +172,7 @@ void Hexmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::ve
         std::vector<uint> p_faces;
         std::vector<bool> p_winding;
 
-        for(uint i=0; i<6; ++i)
+        for(uint i=0; i<faces_per_poly(); ++i)
         {
             std::vector<uint> f =
             {
@@ -373,7 +373,6 @@ void Hexmesh<M,V,E,F,P>::init()
     reorder_p2v(); // makes sure the p2v adjacency stores vertices in a way that uniquely defines per element connectivity
     update_hex_quality();
     print_quality();
-    this->copy_xyz_to_uvw(UVW_param);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -109,6 +109,8 @@ void AbstractPolygonMesh<M,V,E,P>::init()
     this->p_data.resize(this->num_polys());
 
     this->update_normals();
+
+    this->copy_xyz_to_uvw(UVW_param);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -664,6 +666,23 @@ CINO_INLINE
 double AbstractPolygonMesh<M,V,E,P>::poly_mass(const uint pid) const
 {
     return this->poly_area(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double AbstractPolygonMesh<M,V,E,P>::poly_area(const uint pid) const
+{
+    double area = 0.0;
+    std::vector<uint> tris = poly_tessellation(pid);
+    for(uint i=0; i<tris.size()/3; ++i)
+    {
+        area += triangle_area(this->vert(tris.at(3*i+0)),
+                              this->vert(tris.at(3*i+1)),
+                              this->vert(tris.at(3*i+2)));
+    }
+    return area;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
