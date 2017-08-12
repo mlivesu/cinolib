@@ -4,7 +4,7 @@
   for generic programming!
 - AbstractMesh::vert_weights (uniform, cotangent, mean value…)
 - boundary conditions shouldn’t be a map, but rather a vector of pairs
-- add a file cinolib/types with all the types
+- fix tetmesh : wherever appears “TODO: move to global ids!!!!!!”
 - check meshes hierarchy - where offsets appear and if they need to stay or go!
 - add cpp files for hex_subdivisions, laplacian, gradient ecc ecc
 - move vert_mass at the highest level of the hierarchy
@@ -13,8 +13,6 @@
   happen through these operators!
 - add max_depth to Profiler to avoid lengthy reports
 - Think about it: you don’t need a tree for the profiler. If you put all the ProfilerEntries into a list sorted by time of call you did it…
-- topology navigation should happen always through adj_x2y methods. Explicitly stored
-   connectivity should be invisible from the outside… 
 - refactor IsoCurve (exploiting the Curve class)
 - extend the concept of subdivisions from hexmesh to any mesh
 - make cotangent weights robust against almost degenerate triangles and boundary meshes
