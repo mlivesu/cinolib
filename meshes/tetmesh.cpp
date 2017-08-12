@@ -31,6 +31,7 @@
 #include <cinolib/meshes/tetmesh.h>
 
 #include <cinolib/geometry/tetrahedron.h>
+#include <cinolib/geometry/triangle.h>
 #include <cinolib/io/read_write.h>
 #include <cinolib/quality.h>
 #include <cinolib/bbox.h>
@@ -325,7 +326,7 @@ void Tetmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
     std::vector<uint> new_p2v;
     uint f = this->poly_face_id(pid,0);
     for(uint i=0; i<this->verts_per_face(f); ++i) new_p2v.push_back(this->face_vert_id(f,i));
-    if (this->poly_face_is_CW(pid,0)) std::reverse(new_p2v.begin(),new_p2v.end());
+    if (this->poly_face_is_CCW(pid,f)) std::reverse(new_p2v.begin(),new_p2v.end());
     for(uint vid : this->adj_p2v(pid))
     {
         if (this->face_contains_vert(f,vid)) continue;
@@ -342,6 +343,17 @@ CINO_INLINE
 std::vector<uint> Tetmesh<M,V,E,F,P>::face_tessellation(const uint fid) const
 {
     return this->faces.at(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double Tetmesh<M,V,E,F,P>::face_area(const uint fid) const
+{
+    return triangle_area(this->face_vert(fid,0),
+                         this->face_vert(fid,1),
+                         this->face_vert(fid,2));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

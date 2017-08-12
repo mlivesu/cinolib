@@ -229,7 +229,7 @@ void Hexmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
     uint fid0 = this->poly_face_id(pid,off_f0);
     std::vector<uint> f0;
     for(uint i=0; i<this->verts_per_face(fid0); ++i) f0.push_back(this->face_vert_id(fid0,i));
-    if (this->poly_face_is_CW(pid,off_f0)) std::reverse(f0.begin(),f0.end());
+    if (this->poly_face_is_CCW(pid,fid0)) std::reverse(f0.begin(),f0.end());
     for(uint vid : f0) new_p2v.push_back(vid);
 
     // find its opposite face and sort it CW
@@ -241,7 +241,7 @@ void Hexmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
     assert(off_f1 < 6);
     std::vector<uint> f1;
     for(uint i=0; i<this->verts_per_face(fid1); ++i) f1.push_back(this->face_vert_id(fid1,i));
-    if (this->poly_face_is_CCW(pid,off_f1)) std::reverse(f1.begin(),f1.end());
+    if (this->poly_face_is_CW(pid,fid1)) std::reverse(f1.begin(),f1.end());
 
     // align the first vertices of f0 and f1 so that there exists
     // an edge in the polyhedron directly connecting them
@@ -514,6 +514,22 @@ void Hexmesh<M,V,E,F,P>::poly_subdivide(const std::vector<std::vector<std::vecto
         }
     }
     *this = Hexmesh<M,V,E,F,P>(new_verts,new_cells);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double Hexmesh<M,V,E,F,P>::poly_volume(const uint pid) const
+{
+    return hex_unsigned_volume(this->poly_vert(pid,0),
+                               this->poly_vert(pid,1),
+                               this->poly_vert(pid,2),
+                               this->poly_vert(pid,3),
+                               this->poly_vert(pid,4),
+                               this->poly_vert(pid,5),
+                               this->poly_vert(pid,6),
+                               this->poly_vert(pid,7));
 }
 
 }

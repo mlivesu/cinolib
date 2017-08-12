@@ -28,53 +28,39 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_VECTOR_FIELD_H
-#define CINO_VECTOR_FIELD_H
-
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/serializable.h>
-#include <eigen3/Eigen/Dense>
+#include <cinolib/harmonic_map.h>
 
 namespace cinolib
 {
 
-class VectorField : public Eigen::VectorXd, public Serializable
+template<class M, class V, class E, class P>
+CINO_INLINE
+ScalarField harmonic_map(const AbstractMesh<M,V,E,P> & m,
+                         std::map<uint,double>       & bc,
+                         const uint                    n,
+                         const int                     laplacian_mode,
+                         const int                     solver)
 {
-    public:
+    profiler.push("cinolib::harmonic_map");
 
-        VectorField();
-        VectorField(const int size);
-        VectorField(const std::vector<vec3d> & data);
+    assert(n > 0);
+    assert(bc.size() > 0);
+    assert(laplacian_mode == COTANGENT || laplacian_mode == UNIFORM);
+    assert(solver == SIMPLICIAL_LLT || solver == SIMPLICIAL_LDLT || solver == SparseLU || solver == BiCGSTAB);
 
-        vec3d vec_at(const int pos) const;
+    ScalarField f(m.num_verts());
 
-        void set(const int pos, const vec3d & vec);
+    Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
+    Eigen::SparseMatrix<double> Ln = -L;
+    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
 
-        void normalize();
+    for(uint i=1; i<n; ++i) Ln  = Ln * L;
 
-        void serialize  (const char *filename) const;
-        void deserialize(const char *filename);
+    solve_square_system_with_bc(Ln, rhs, f, bc, solver);
 
-        // for more info, see:
-        // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
-        //
-        // This method allows you to assign Eigen expressions to VectorField
-        //
-        template<typename OtherDerived>
-        VectorField & operator= (const Eigen::MatrixBase<OtherDerived>& other);
+    profiler.pop();
 
-        //
-        // This constructor allows you to construct VectorField from Eigen expressions
-        //
-        template<typename OtherDerived>
-        VectorField(const Eigen::MatrixBase<OtherDerived>& other);
-};
-
+    return f;
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "vector_field.cpp"
-#endif
-
-
-#endif // CINO_VECTOR_FIELD_H
+}

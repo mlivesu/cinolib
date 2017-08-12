@@ -126,6 +126,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual bool              face_is_on_srf    (const uint fid) const;
         virtual bool              face_contains_vert(const uint fid, const uint vid) const;
         virtual vec3d             face_centroid     (const uint fid) const;
+        virtual double            face_mass         (const uint fid) const;
+        virtual double            face_area         (const uint fid) const;
         virtual bool              faces_are_disjoint(const uint fid0, const uint fid1) const;
         virtual void              face_set_color    (const Color & c);
         virtual void              face_set_alpha    (const float alpha);
@@ -139,8 +141,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual bool              poly_is_on_surf   (const uint pid) const;
         virtual int               poly_shared_face  (const uint pid0, const uint pid1) const;
         virtual uint              poly_face_id      (const uint pid, const uint off) const;
-        virtual bool              poly_face_is_CCW  (const uint pid, const uint off) const;
-        virtual bool              poly_face_is_CW   (const uint pid, const uint off) const;
+        virtual bool              poly_face_is_CCW  (const uint pid, const uint fid) const;
+        virtual bool              poly_face_is_CW   (const uint pid, const uint fid) const;
         virtual uint              poly_face_offset  (const uint pid, const uint fid) const;
 };
 

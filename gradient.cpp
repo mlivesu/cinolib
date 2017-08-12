@@ -134,4 +134,39 @@ Eigen::SparseMatrix<double> gradient<Tetmesh<>>(const Tetmesh<> &m)
     return G;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F,P> & m)
+{
+    Eigen::SparseMatrix<double> G(m.num_polys()*3, m.num_verts());
+    std::vector<Entry> entries;
+
+    for(uint pid=0; pid<m.num_polys(); ++pid)
+    {
+        for(uint vid : m.adj_p2v(pid))
+        {
+            vec3d per_vert_sum_over_f_normals(0,0,0);
+            for(uint fid : m.adj_p2f(pid))
+            {
+                if (m.face_contains_vert(fid,vid))
+                {
+                    vec3d n = (m.poly_face_is_CCW(pid,fid)) ? m.face_data(fid).normal : -m.face_data(fid).normal;
+                    per_vert_sum_over_f_normals += n * m.face_area(fid);
+                }
+            }
+            per_vert_sum_over_f_normals /= std::max(m.poly_volume(pid), 1e-5) * 3.0;
+            uint row = 3 * pid;
+            entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.x())); ++row;
+            entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.y())); ++row;
+            entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.z()));
+        }
+    }
+
+    G.setFromTriplets(entries.begin(), entries.end());
+    return G;
+}
+
+
 }

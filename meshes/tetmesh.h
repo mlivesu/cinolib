@@ -110,6 +110,7 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         std::vector<uint> face_tessellation(const uint fid) const;
+        double            face_area        (const uint fid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -28,94 +28,32 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/cotangent.h>
+#include <cinolib/heat_flow.h>
 
 namespace cinolib
 {
 
-/* Template Specializations.
- *
- * As a reference for the tetmesh version of cotangent weights, see:
- *
- * Gradient field based inhomogeneous volumetric mesh deformation for maxillofacial surgery simulation
- * Sheng-hui Liao, Ruo-feng Tong, Jin-xiang Dong, Fu-dong Zhu
- * Computer & Graphics, 2009
-*/
-
-
-template<>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void cotangent_weights<Trimesh<>>(const Trimesh<>     & m,
-                                  const uint            vid,
-                                  std::vector<uint>   & nbrs,
-                                  std::vector<double> & wgts)
+ScalarField heat_flow(const AbstractMesh<M,V,E,P> & m,
+                      const std::vector<uint>     & heat_charges,
+                      const double                  time,
+                      const int                     laplacian_mode)
 {
-    assert(nbrs.empty());
-    assert(wgts.empty());
+    assert(heat_charges.size() > 0);
 
-    std::vector<uint> edges = m.adj_v2e(vid);
+    ScalarField heat(m.num_verts());
 
-    for(uint i=0; i<edges.size(); ++i)
-    {
-        uint eid = edges[i];
-        uint nbr = m.edge_vert_id(eid,0);
-        if (nbr == vid) nbr = m.edge_vert_id(eid,1);
-        assert(nbr != vid);
+    Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
+    Eigen::SparseMatrix<double> MM   = mass_matrix(m);
+    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
 
-        std::vector<uint> faces = m.adj_e2p(eid);
-        assert(faces.size() == 2 || faces.size() == 1);
+    std::map<uint,double> bc;
+    for(uint vid : heat_charges) bc[vid] = 1.0;
 
-        double wgt = 0.0;
-        for(uint j=0; j<faces.size(); ++j)
-        {
-            double alpha = m.poly_angle_at_vert(faces[j], m.vert_opposite_to(faces[j], vid, nbr));
-            wgt += cot(alpha);
-        }
-        wgt = (faces.size() == 2) ? wgt * 0.5 : wgt;
+    solve_square_system_with_bc(MM - time * L, rhs, heat, bc);
 
-        nbrs.push_back(nbr);
-        wgts.push_back(wgt);
-    }
-}
-
-
-template<>
-CINO_INLINE
-void cotangent_weights<Tetmesh<>>(const Tetmesh<>     & m,
-                                  const uint            vid,
-                                  std::vector<uint>   & nbrs,
-                                  std::vector<double> & wgts)
-{
-    assert(nbrs.empty());
-    assert(wgts.empty());
-
-    std::vector<uint> edges = m.adj_v2e(vid);
-
-    for(uint i=0; i<edges.size(); ++i)
-    {
-        uint eid = edges[i];
-        uint nbr = m.edge_vert_id(eid, 0);
-        if (nbr == vid) nbr = m.edge_vert_id(eid, 1);
-        assert(nbr != vid);
-
-        std::vector<uint> cells = m.adj_e2p(eid);
-
-        double wgt = 0.0;
-        for(uint pid : cells)
-        {
-            uint   e_opp     = m.poly_edge_opposite_to(pid, vid, nbr);
-            uint   f_opp_vid = m.poly_face_opposite_to(pid, vid);
-            uint   f_opp_nbr = m.poly_face_opposite_to(pid, nbr);
-            double l_k       = m.poly_edge_length(pid, e_opp);
-            double teta_k    = m.poly_dihedral_angle(pid, f_opp_vid, f_opp_nbr);
-
-            wgt += cot(teta_k) * l_k;
-        }
-        wgt /= 6.0;
-
-        nbrs.push_back(nbr);
-        wgts.push_back(wgt);
-    }
+    return heat;
 }
 
 }

@@ -45,29 +45,16 @@ namespace cinolib
  * subject to certain Dirichlet boundary conditions
 */
 
-template <class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-ScalarField heat_flow(const Mesh              & m,
-                      const std::vector<uint> & heat_charges,
-                      const double              time = 100.0,
-                      const int                 laplacian_mode = COTANGENT)
-{
-    assert(heat_charges.size() > 0);
-
-    ScalarField heat(m.num_verts());
-
-    Eigen::SparseMatrix<double> L   = laplacian<Mesh>(m, laplacian_mode);
-    Eigen::SparseMatrix<double> M   = mass_matrix<Mesh>(m);
-    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
-
-    std::map<uint,double> bc;
-    for(uint i=0; i<heat_charges.size(); ++i) bc[heat_charges[i]] = 1.0;
-
-    solve_square_system_with_bc(M - time * L, rhs, heat, bc);
-
-    return heat;
+ScalarField heat_flow(const AbstractMesh<M,V,E,P> & m,
+                      const std::vector<uint>     & heat_charges,
+                      const double                  time = 100.0,
+                      const int                     laplacian_mode = COTANGENT);
 }
 
-}
+#ifndef  CINO_STATIC_LIB
+#include "heat_flow.cpp"
+#endif
 
 #endif // CINO_HEAT_FLOW_H

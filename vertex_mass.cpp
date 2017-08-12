@@ -33,9 +33,9 @@
 namespace cinolib
 {
 
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> mass_matrix(const Mesh & m)
+Eigen::SparseMatrix<double> mass_matrix(const AbstractMesh<M,V,E,P> & m)
 {
     typedef Eigen::Triplet<double> Entry;
 
@@ -45,10 +45,10 @@ Eigen::SparseMatrix<double> mass_matrix(const Mesh & m)
         entries.push_back(Entry(vid, vid, m.vert_mass(vid)));
     }
 
-    Eigen::SparseMatrix<double> M(m.num_verts(), m.num_verts());
-    M.setFromTriplets(entries.begin(), entries.end());
+    Eigen::SparseMatrix<double> MM(m.num_verts(), m.num_verts());
+    MM.setFromTriplets(entries.begin(), entries.end());
 
-    return M;
+    return MM;
 }
 
 

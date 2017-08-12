@@ -273,7 +273,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
         if (visible_polys.size()!=1) continue;
 
         uint pid   = visible_polys.front();
-        bool is_CW = this->poly_face_is_CW(pid,this->poly_face_offset(pid,fid));
+        bool is_CW = this->poly_face_is_CW(pid,fid);
 
         for(uint eid : this->adj_f2e(fid))
         {

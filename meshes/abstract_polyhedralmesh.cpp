@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
+#include <cinolib/geometry/triangle.h>
 
 namespace cinolib
 {
@@ -235,17 +236,18 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_id(const uint pid, const uint 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
-bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_is_CW(const uint pid, const uint off) const
+bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_is_CW(const uint pid, const uint fid) const
 {
-    return (polys_face_winding.at(pid).at(off) == true);
+    uint off = poly_face_offset(pid, fid);
+    return (polys_face_winding.at(pid).at(off) == false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
-bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_is_CCW(const uint pid, const uint off) const
+bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_is_CCW(const uint pid, const uint fid) const
 {
-    return (polys_face_winding.at(pid).at(off) == false);
+    return !poly_face_is_CW(pid,fid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -253,6 +255,7 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_is_CCW(const uint pid, const u
 template<class M, class V, class E, class F, class P>
 uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_offset(const uint pid, const uint fid) const
 {
+    assert(poly_contains_face(pid,fid));
     for(uint off=0; off<this->polys.at(pid).size(); ++off)
     {
         if (poly_face_id(pid,off) == fid) return off;
@@ -372,6 +375,31 @@ vec3d AbstractPolyhedralMesh<M,V,E,F,P>::face_centroid(const uint fid) const
     return c;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double AbstractPolyhedralMesh<M,V,E,F,P>::face_mass(const uint fid) const
+{
+    return face_area(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double AbstractPolyhedralMesh<M,V,E,F,P>::face_area(const uint fid) const
+{
+    double area = 0.0;
+    std::vector<uint> tris = face_tessellation(fid);
+    for(uint i=0; i<tris.size()/3; ++i)
+    {
+        area += triangle_area(this->vert(tris.at(3*i+0)),
+                              this->vert(tris.at(3*i+1)),
+                              this->vert(tris.at(3*i+2)));
+    }
+    return area;
+}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>

@@ -630,20 +630,6 @@ bool AbstractPolygonMesh<M,V,E,P>::poly_is_boundary(const uint pid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractPolygonMesh<M,V,E,P>::normalize_area()
-{
-    double area = 0.0;
-    for(uint pid=0; pid<this->num_polys(); ++pid) area += this->poly_mass(pid);
-    area = std::max(1e-4,area); // avoid creating degenerate faces...
-    double s = 1.0 / sqrt(area);
-    for(uint vid=0; vid<this->num_verts(); ++vid) this->vert(vid) *= s;
-    this->update_bbox();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 std::vector<ipair> AbstractPolygonMesh<M,V,E,P>::get_boundary_edges() const
 {
     std::vector<ipair> res;

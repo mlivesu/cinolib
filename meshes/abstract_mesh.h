@@ -100,7 +100,6 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void center_bbox();
         virtual void update_bbox();
         virtual void update_adjacency() = 0;
         virtual void update_normals() = 0;
@@ -108,8 +107,10 @@ class AbstractMesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual void  translate(const vec3d & delta);
+        virtual void  center_bbox();
         virtual void  rotate(const vec3d & axis, const double angle);
         virtual void  scale(const double scale_factor);
+        virtual void  normalize_bbox();
         virtual vec3d centroid() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

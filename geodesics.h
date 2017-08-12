@@ -67,42 +67,16 @@ namespace cinolib
  * phy is the scalar field encoding the geodesic distances.
 */
 
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-ScalarField compute_geodesics(const Mesh              & m,
-                              const std::vector<uint> & heat_charges,
-                              const int                 laplacian_mode = COTANGENT,
-                              const float               time_scalar = 1.0)
-{
-    // use h^2 as time step, as suggested in the original paper
-    Mesh m_copy = m;
-    m_copy.normalize_area();
-    m_copy.center_bbox();
-    double time = m_copy.edge_avg_length();
-    time *= time;
-    time *= time_scalar;
-
-    Eigen::SparseMatrix<double> L   = laplacian<Mesh>(m_copy, laplacian_mode);
-    Eigen::SparseMatrix<double> M   = mass_matrix<Mesh>(m_copy);
-    Eigen::SparseMatrix<double> G   = gradient(m_copy);
-    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m_copy.num_verts());
-
-    std::map<uint,double> bc;
-    for(uint vid : heat_charges) bc[vid] = 1.0;
-
-    ScalarField heat(m_copy.num_verts());
-    solve_square_system_with_bc(M - time * L, rhs, heat, bc);
-
-    VectorField grad = G * heat;
-    grad.normalize();
-
-    ScalarField geodesics;
-    solve_square_system_with_bc(-L, G.transpose() * grad, geodesics, bc);
-
-    geodesics.normalize_in_01();
-    return geodesics;
+ScalarField compute_geodesics(      AbstractMesh<M,V,E,P> & m,
+                              const std::vector<uint>     & heat_charges,
+                              const int                     laplacian_mode = COTANGENT,
+                              const float                   time_scalar = 1.0);
 }
 
-}
+#ifndef  CINO_STATIC_LIB
+#include "geodesics.cpp"
+#endif
 
 #endif // CINO_GEODESICS_H

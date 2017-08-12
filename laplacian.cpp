@@ -40,8 +40,8 @@ std::vector<Eigen::Triplet<double>> laplacian_matrix_entries(const AbstractMesh<
     std::vector<Entry> entries;
     for(uint vid=0; vid<m.num_verts(); ++vid)
     {
-        std::vector<std::pair<uint,double>> v_wgts;
-        m.vert_weights(m, mode, v_wgts);
+        std::vector<std::pair<uint,double>> wgts;
+        m.vert_weights(vid, mode, wgts);
 
         double sum = 0.0;
         for(auto item : wgts)
@@ -75,8 +75,8 @@ std::vector<Eigen::Triplet<double>> laplacian_matrix_entries_xyz(const AbstractM
 
     for(uint vid=0; vid<m.num_verts(); ++vid)
     {
-        std::vector<std::pair<uint,double>> v_wgts;
-        m.vert_weights(m, mode, v_wgts);
+        std::vector<std::pair<uint,double>> wgts;
+        m.vert_weights(vid, mode, wgts);
         double sum = 0.0;
         for(auto item : wgts)
         {
@@ -104,7 +104,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 Eigen::SparseMatrix<double> laplacian(const AbstractMesh<M,V,E,P> & m, const int mode)
 {
-    std::vector<Entry> entries = laplacian_matrix_entries<Mesh>(m, mode);
+    std::vector<Entry> entries = laplacian_matrix_entries(m, mode);
 
     Eigen::SparseMatrix<double> L(m.num_verts(), m.num_verts());
     L.setFromTriplets(entries.begin(), entries.end());

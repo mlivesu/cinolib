@@ -43,14 +43,14 @@ namespace cinolib
  *
 */
 
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void smooth_taubin(Mesh                & m,
-                   const int             mode,
-                   const std::set<uint>  do_not_smooth,
-                   const uint            n_iters,
-                   const double          lambda,
-                   const double          mu)
+void smooth_taubin(AbstractMesh<M,V,E,P> & m,
+                   const int               mode,
+                   const std::set<uint>    do_not_smooth,
+                   const uint              n_iters,
+                   const double            lambda,
+                   const double            mu)
 {
     assert(lambda >  0 );
     assert(lambda <  1 );
@@ -64,19 +64,16 @@ void smooth_taubin(Mesh                & m,
         {
             if (CONTAINS(do_not_smooth, vid)) continue;
 
-            std::vector<uint>   nbrs;
-            std::vector<double> wgts;
-            if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
-            if (mode & COTANGENT) cotangent_weights<Mesh>(m, vid, nbrs, wgts); else
-            assert(false);
+            std::vector<std::pair<uint,double>> wgts;
+            m.vert_weights(vid, mode, wgts);
 
             // normalize weights...
             double sum = 0;
-            for(double  w : wgts) sum += w;
-            for(double &w : wgts) w /= sum;
+            for(auto  w : wgts) sum += w.second;
+            for(auto &w : wgts) w.second /= sum;
 
             vec3d delta(0,0,0);
-            for(uint i=0; i<nbrs.size(); ++i) delta += (m.vert(nbrs[i]) - m.vert(vid)) * wgts[i];
+            for(auto w : wgts) delta += (m.vert(w.first) - m.vert(vid)) * w.first;
             m.vert(vid) = m.vert(vid) + delta * lambda;
         }
 
@@ -86,19 +83,16 @@ void smooth_taubin(Mesh                & m,
         {
             if (CONTAINS(do_not_smooth, vid)) continue;
 
-            std::vector<uint>   nbrs;
-            std::vector<double> wgts;
-            if (mode & UNIFORM)   uniform_weights<Mesh>  (m, vid, nbrs, wgts); else
-            if (mode & COTANGENT) cotangent_weights<Mesh>(m, vid, nbrs, wgts); else
-            assert(false);
+            std::vector<std::pair<uint,double>> wgts;
+            m.vert_weights(vid, mode, wgts);
 
             // normalize weights...
             double sum = 0;
-            for(double  w : wgts) sum += w;
-            for(double &w : wgts) w /= sum;
+            for(auto  w : wgts) sum += w.second;
+            for(auto &w : wgts) w.second /= sum;
 
             vec3d delta(0,0,0);
-            for(uint i=0; i<nbrs.size(); ++i) delta += (m.vert(nbrs[i]) - m.vert(vid)) * wgts[i];
+            for(auto w : wgts) delta += (m.vert(w.first) - m.vert(vid)) * w.first;
             m.vert(vid) = m.vert(vid) + delta * mu;
         }
    }

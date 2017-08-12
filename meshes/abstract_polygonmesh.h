@@ -81,7 +81,6 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void               normalize_area();
         virtual std::vector<uint>  get_boundary_vertices() const;
         virtual std::vector<ipair> get_boundary_edges() const;
 

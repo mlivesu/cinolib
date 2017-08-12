@@ -28,30 +28,52 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_COTANGENT_H
-#define CINO_COTANGENT_H
-
-#include <cinolib/cinolib.h>
-#include <cinolib/common.h>
-#include <cinolib/meshes/trimesh.h>
-#include <cinolib/meshes/tetmesh.h>
+#include <cinolib/geodesics.h>
 
 namespace cinolib
 {
 
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void cotangent_weights(const Mesh &, const uint, std::vector<uint> &, std::vector<double> &)
+ScalarField compute_geodesics(      AbstractMesh<M,V,E,P> & m,
+                              const std::vector<uint>     & heat_charges,
+                              const int                     laplacian_mode,
+                              const float                   time_scalar)
 {
-    std::cerr << "WARNING! - Cotangent weights are not available for this mesh type!" << endl;
-    assert(false);
+    // optimize position and scale to get better numerical precision
+    double d = m.bbox().diag();
+    vec3d  c = m.bbox().center();
+    m.translate(-c);
+    m.scale(1.0/d);
+
+    // use h^2 as time step, as suggested in the original paper
+    double time = m.edge_avg_length();
+    time *= time;
+    time *= time_scalar;
+
+    Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
+    Eigen::SparseMatrix<double> MM  = mass_matrix(m);
+    Eigen::SparseMatrix<double> G   = gradient(m);
+    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
+
+    std::map<uint,double> bc;
+    for(uint vid : heat_charges) bc[vid] = 1.0;
+
+    ScalarField heat(m.num_verts());
+    solve_square_system_with_bc(MM - time * L, rhs, heat, bc);
+
+    VectorField grad = G * heat;
+    grad.normalize();
+
+    ScalarField geodesics(m.num_verts());
+    solve_square_system_with_bc(-L, G.transpose() * grad, geodesics, bc);
+    geodesics.normalize_in_01();
+
+    // restore original scale and position
+    m.scale(d);
+    m.translate(c);
+
+    return geodesics;
 }
 
 }
-
-#ifndef  CINO_STATIC_LIB
-#include "cotangent.cpp"
-#endif
-
-
-#endif // CINO_COTANGENT_H

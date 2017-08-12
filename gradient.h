@@ -84,6 +84,13 @@ namespace cinolib
  * IEEE Transactions on Visualization and Computer Graphics (2011)
 */
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F,P> & m);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -93,10 +100,13 @@ Eigen::SparseMatrix<double> gradient(const Mesh &)
     assert(false);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template <>
 CINO_INLINE
 Eigen::SparseMatrix<double> gradient<Trimesh<>>(const Trimesh<> & m);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template <>
 CINO_INLINE
