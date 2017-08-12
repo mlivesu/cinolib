@@ -98,10 +98,10 @@ Eigen::SparseMatrix<double> gradient<Tetmesh<>>(const Tetmesh<> &m)
 
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        int A = m.poly_vert_id(pid, 0);
-        int B = m.poly_vert_id(pid, 1);
-        int C = m.poly_vert_id(pid, 2);
-        int D = m.poly_vert_id(pid, 3);
+        uint A = m.poly_vert_id(pid, 0);
+        uint B = m.poly_vert_id(pid, 1);
+        uint C = m.poly_vert_id(pid, 2);
+        uint D = m.poly_vert_id(pid, 3);
 
         double vol3 = std::max(m.poly_volume(pid), 1e-5) * 3.0;
 
