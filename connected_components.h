@@ -28,30 +28,33 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_COTANGENT_H
-#define CINO_COTANGENT_H
+#ifndef CINO_SPHERE_COVERAGE_H
+#define CINO_SPHERE_COVERAGE_H
+
+#include <vector>
 
 #include <cinolib/cinolib.h>
-#include <cinolib/common.h>
-#include <cinolib/meshes/trimesh.h>
-#include <cinolib/meshes/tetmesh.h>
+#include <cinolib/meshes/abstract_mesh.h>
+#include <cinolib/bfs.h>
 
 namespace cinolib
 {
 
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void cotangent_weights(const Mesh &, const uint, std::vector<uint> &, std::vector<double> &)
-{
-    std::cerr << "WARNING! - Cotangent weights are not available for this mesh type!" << endl;
-    assert(false);
-}
+uint connected_components(const AbstractMesh<M,V,E,P> & m);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint connected_components(const AbstractMesh<M,V,E,P> & m,
+                          std::vector<std::set<uint>> & ccs);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "cotangent.cpp"
+#include "sphere_coverage.cpp"
 #endif
 
-
-#endif // CINO_COTANGENT_H
+#endif // CINO_SPHERE_COVERAGE_H

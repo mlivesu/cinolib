@@ -29,14 +29,11 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/tetmesh.h>
+
 #include <cinolib/geometry/tetrahedron.h>
 #include <cinolib/io/read_write.h>
-#include <cinolib/common.h>
 #include <cinolib/quality.h>
-
-#include <float.h>
-#include <map>
-#include <set>
+#include <cinolib/bbox.h>
 
 namespace cinolib
 {
@@ -345,6 +342,51 @@ CINO_INLINE
 std::vector<uint> Tetmesh<M,V,E,F,P>::face_tessellation(const uint fid) const
 {
     return this->faces.at(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::vert_weights(const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const
+{
+    switch (type)
+    {
+        case UNIFORM   : this->vert_weights_uniform(vid, wgts); return;
+        case COTANGENT : vert_weights_cotangent(vid, wgts); return;
+        default        : assert(false && "Vert weights not supported at this level of the hierarchy!");
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* As a reference for the tetmesh version of cotangent weights, see:
+ * Gradient field based inhomogeneous volumetric mesh deformation for maxillofacial surgery simulation
+ * Sheng-hui Liao, Ruo-feng Tong, Jin-xiang Dong, Fu-dong Zhu
+ * Computer & Graphics, 2009
+*/
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::vert_weights_cotangent(const uint vid, std::vector<std::pair<uint,double>> & wgts) const
+{
+    wgts.clear();
+    for(uint eid : this->adj_v2e(vid))
+    {
+        uint   nbr = this->vert_opposite_to(eid, vid);
+        double wgt = 0.0;
+        for(uint pid : this->adj_e2p(eid))
+        {
+            uint   e_opp     = poly_edge_opposite_to(pid, vid, nbr);
+            uint   f_opp_vid = poly_face_opposite_to(pid, vid);
+            uint   f_opp_nbr = poly_face_opposite_to(pid, nbr);
+            double l_k       = poly_edge_length(pid, e_opp);
+            double teta_k    = poly_dihedral_angle(pid, f_opp_vid, f_opp_nbr);
+
+            wgt += cot(teta_k) * l_k;
+        }
+        wgt /= 6.0;
+        wgts.push_back(std::make_pair(nbr,wgt));
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -29,7 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/abstract_mesh.h>
-#include <cinolib/bfs.h>
 
 namespace cinolib
 {
@@ -115,42 +114,6 @@ void AbstractMesh<M,V,E,P>::scale(const double scale_factor)
     for(uint vid=0; vid<num_verts(); ++vid) vert(vid) *= scale_factor;
     translate(c);
     update_bbox();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-uint AbstractMesh<M,V,E,P>::connected_components() const
-{
-    std::vector<std::set<uint>> ccs;
-    return connected_components(ccs);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-uint AbstractMesh<M,V,E,P>::connected_components(std::vector<std::set<uint>> & ccs) const
-{
-    ccs.clear();
-    uint seed = 0;
-    std::vector<bool> visited(num_verts(), false);
-
-    do
-    {
-        std::set<uint> cc;
-        bfs_exahustive(*this, seed, cc);
-
-        ccs.push_back(cc);
-        for(uint vid : cc) visited.at(vid) = true;
-
-        seed = 0;
-        while (seed < num_verts() && visited.at(seed)) ++seed;
-    }
-    while (seed < num_verts());
-
-    return ccs.size();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -302,6 +265,44 @@ bool AbstractMesh<M,V,E,P>::verts_are_adjacent(const uint vid0, const uint vid1)
 {
     for(uint nbr : adj_v2v(vid0)) if (vid1==nbr) return true;
     return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint AbstractMesh<M,V,E,P>::vert_opposite_to(const uint eid, const uint vid) const
+{
+    assert(this->edge_contains_vert(eid, vid));
+    if (this->edge_vert_id(eid,0) != vid) return this->edge_vert_id(eid,0);
+    else                                  return this->edge_vert_id(eid,1);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::vert_weights(const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const
+{
+    switch (type)
+    {
+        case UNIFORM : vert_weights_uniform(vid, wgts); return;
+        default      : assert(false && "Vert weights not supported at this level of the hierarchy!");
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::vert_weights_uniform(const uint vid, std::vector<std::pair<uint,double>> & wgts) const
+{
+    wgts.clear();
+    double w = 1.0; // / (double)nbrs.size(); // <= WARNING: makes the matrix non-symmetric!!!!!
+    for(uint nbr : adj_v2v(vid))
+    {
+        wgts.push_back(std::make_pair(nbr,w));
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

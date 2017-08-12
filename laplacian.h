@@ -40,11 +40,6 @@ namespace cinolib
 
 typedef Eigen::Triplet<double> Entry;
 
-enum
-{
-    COTANGENT = 0x00000001, // only for Triangle Meshes!
-    UNIFORM   = 0x00000002
-};
 
 template<typename Mesh>
 CINO_INLINE

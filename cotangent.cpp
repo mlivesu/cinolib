@@ -33,11 +33,6 @@
 namespace cinolib
 {
 
-// http://stackoverflow.com/questions/3738384/stable-cotangent
-//
-CINO_INLINE double cot(double x) { return tan(M_PI_2 - x); }
-
-
 /* Template Specializations.
  *
  * As a reference for the tetmesh version of cotangent weights, see:

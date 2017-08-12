@@ -33,13 +33,17 @@
 
 #include <sys/types.h>
 #include <vector>
+#include <float.h>
+#include <map>
+#include <set>
 
 #include <cinolib/cinolib.h>
-#include <cinolib/bbox.h>
+#include <cinolib/common.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
+
 
 namespace cinolib
 {
@@ -97,6 +101,11 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         uint faces_per_poly()           const { return  4; }
         uint verts_per_face(const uint) const { return  3; }
         uint verts_per_face()           const { return  3; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void vert_weights          (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
+        void vert_weights_cotangent(const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -280,17 +280,6 @@ bool AbstractPolygonMesh<M,V,E,P>::vert_is_critical_p(const uint vid, const int 
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractPolygonMesh<M,V,E,P>::vert_opposite_to(const uint eid, const uint vid) const
-{
-    assert(this->edge_contains_vert(eid, vid));
-    if (this->edge_vert_id(eid,0) != vid) return this->edge_vert_id(eid,0);
-    else                                  return this->edge_vert_id(eid,1);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 bool AbstractPolygonMesh<M,V,E,P>::poly_verts_are_CCW(const uint pid, const uint curr, const uint prev) const
 {
     uint prev_offset = this->poly_vert_offset(pid, prev);
@@ -330,13 +319,13 @@ void AbstractPolygonMesh<M,V,E,P>::vert_ordered_one_ring(const uint vid,
 
         uint e = b_edges.front();
         uint p = this->adj_e2p(e).front();
-        uint v = vert_opposite_to(e, vid);
+        uint v = this->vert_opposite_to(e, vid);
 
         if (!this->poly_verts_are_CCW(p, v, vid))
         {
             e = b_edges.back();
             p = this->adj_e2p(e).front();
-            v = vert_opposite_to(e, vid);
+            v = this->vert_opposite_to(e, vid);
             assert(this->poly_verts_are_CCW(p, v, vid));
         }
 

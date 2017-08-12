@@ -31,13 +31,15 @@
 #ifndef CINO_ABSTRACT_MESH_H
 #define CINO_ABSTRACT_MESH_H
 
+#include <set>
+#include <vector>
+#include <sys/types.h>
+
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
 #include <cinolib/common.h>
-
-#include <set>
-#include <vector>
+#include <cinolib/symbols.h>
 
 typedef enum
 {
@@ -109,8 +111,6 @@ class AbstractMesh
         virtual void  rotate(const vec3d & axis, const double angle);
         virtual void  scale(const double scale_factor);
         virtual vec3d centroid() const;
-        virtual uint  connected_components() const;
-        virtual uint  connected_components(std::vector<std::set<uint>> & ccs) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -161,7 +161,10 @@ class AbstractMesh
 
         virtual const vec3d          & vert                 (const uint vid) const { return verts.at(vid); }
         virtual       vec3d          & vert                 (const uint vid)       { return verts.at(vid); }
+        virtual       void             vert_weights         (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
+        virtual       void             vert_weights_uniform (const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
         virtual       std::set<uint>   vert_n_ring          (const uint vid, const uint n) const;
+        virtual       uint             vert_opposite_to     (const uint eid, const uint vid) const;
         virtual       bool             verts_are_adjacent   (const uint vid0, const uint vid1) const;
         virtual       bool             vert_is_local_min    (const uint vid, const int tex_coord = U_param) const;
         virtual       bool             vert_is_local_max    (const uint vid, const int tex_coord = U_param) const;

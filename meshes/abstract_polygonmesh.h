@@ -89,7 +89,6 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         virtual bool              vert_is_saddle        (const uint vid, const int tex_coord = U_param) const;
         virtual bool              vert_is_critical_p    (const uint vid, const int tex_coord = U_param) const;
-        virtual uint              vert_opposite_to      (const uint eid, const uint vid) const;
         virtual double            vert_area             (const uint vid) const;
         virtual double            vert_mass             (const uint vid) const;
         virtual bool              vert_is_boundary      (const uint vid) const;

@@ -28,30 +28,44 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_COTANGENT_H
-#define CINO_COTANGENT_H
-
-#include <cinolib/cinolib.h>
-#include <cinolib/common.h>
-#include <cinolib/meshes/trimesh.h>
-#include <cinolib/meshes/tetmesh.h>
+#include <cinolib/connected_components.h>
 
 namespace cinolib
 {
 
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void cotangent_weights(const Mesh &, const uint, std::vector<uint> &, std::vector<double> &)
+uint connected_components(const AbstractMesh<M,V,E,P> & m)
 {
-    std::cerr << "WARNING! - Cotangent weights are not available for this mesh type!" << endl;
-    assert(false);
+    std::vector<std::set<uint>> ccs;
+    return connected_components(m, ccs);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint connected_components(const AbstractMesh<M,V,E,P> & m,
+                          std::vector<std::set<uint>> & ccs)
+{
+    ccs.clear();
+    uint seed = 0;
+    std::vector<bool> visited(m.num_verts(), false);
+
+    do
+    {
+        std::set<uint> cc;
+        bfs_exahustive(m, seed, cc);
+
+        ccs.push_back(cc);
+        for(uint vid : cc) visited.at(vid) = true;
+
+        seed = 0;
+        while (seed < num_verts() && visited.at(seed)) ++seed;
+    }
+    while (seed < m.num_verts());
+
+    return ccs.size();
 }
 
 }
-
-#ifndef  CINO_STATIC_LIB
-#include "cotangent.cpp"
-#endif
-
-
-#endif // CINO_COTANGENT_H
