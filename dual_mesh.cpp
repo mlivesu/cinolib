@@ -33,20 +33,23 @@
 namespace cinolib
 {
 
+template<class M, class V, class E, class P>
 CINO_INLINE
-void dual_mesh(const Trimesh<>     & primal,
-                     Polygonmesh<> & dual,
-               const bool            with_clipped_cells)
+void dual_mesh(const AbstractPolygonMesh<M,V,E,P> & primal,
+                     Polygonmesh<M,V,E,P>         & dual,
+               const bool                           with_clipped_cells)
 {
     std::vector<vec3d>             dual_verts;
     std::vector<std::vector<uint>> dual_faces;
     dual_mesh(primal, dual_verts, dual_faces, with_clipped_cells);
-    dual = Polygonmesh<>(dual_verts,dual_faces);
+    dual = Polygonmesh<M,V,E,P>(dual_verts,dual_faces);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class P>
 CINO_INLINE
-void dual_mesh(const Trimesh<>                      & primal,
+void dual_mesh(const AbstractPolygonMesh<M,V,E,P>   & primal,
                      std::vector<vec3d>             & dual_verts,
                      std::vector<std::vector<uint>> & dual_faces,
                const bool                             with_clipped_cells)

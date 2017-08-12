@@ -38,17 +38,20 @@
 namespace cinolib
 {
 
+template<class M, class V, class E, class P>
 CINO_INLINE
-void dual_mesh(const Trimesh<>                      & primal,
+void dual_mesh(const AbstractPolygonMesh<M,V,E,P>   & primal,
                      std::vector<vec3d>             & dual_verts,
                      std::vector<std::vector<uint>> & dual_faces,
                const bool                             with_clipped_cells); // consider/discard boundary vertices
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class P>
 CINO_INLINE
-void dual_mesh(const Trimesh<>     & primal,
-                     Polygonmesh<> & dual,
-               const bool            with_clipped_cells); // consider/discard boundary vertices
+void dual_mesh(const AbstractPolygonMesh<M,V,E,P> & primal,
+                     Polygonmesh<M,V,E,P>         & dual,
+               const bool                           with_clipped_cells); // consider/discard boundary vertices
 
 }
 
