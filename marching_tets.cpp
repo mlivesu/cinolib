@@ -76,47 +76,47 @@ void marching_tets(const Tetmesh<>        & m,
 {
     assert(split_info.empty());
 
-    std::vector<u_char> c(m.num_cells(),0x0);
+    std::vector<u_char> c(m.num_polys(),0x0);
 
-    for(uint cid=0; cid<m.num_cells(); ++cid)
+    for(uint pid=0; pid<m.num_polys(); ++pid)
     {
         double func[] =
         {
-            m.vert_data(m.cell_vert_id(cid,0)).uvw[0],
-            m.vert_data(m.cell_vert_id(cid,1)).uvw[0],
-            m.vert_data(m.cell_vert_id(cid,2)).uvw[0],
-            m.vert_data(m.cell_vert_id(cid,3)).uvw[0]
+            m.vert_data(m.poly_vert_id(pid,0)).uvw[0],
+            m.vert_data(m.poly_vert_id(pid,1)).uvw[0],
+            m.vert_data(m.poly_vert_id(pid,2)).uvw[0],
+            m.vert_data(m.poly_vert_id(pid,3)).uvw[0]
         };
 
-        if (isovalue >= func[0]) c.at(cid) |= C_1000;
-        if (isovalue >= func[1]) c.at(cid) |= C_0100;
-        if (isovalue >= func[2]) c.at(cid) |= C_0010;
-        if (isovalue >= func[3]) c.at(cid) |= C_0001;
+        if (isovalue >= func[0]) c.at(pid) |= C_1000;
+        if (isovalue >= func[1]) c.at(pid) |= C_0100;
+        if (isovalue >= func[2]) c.at(pid) |= C_0010;
+        if (isovalue >= func[3]) c.at(pid) |= C_0001;
 
         // In some degenerate cases (i.e. iso-surface touching an edge/face
         // exposed on the surface) one may get C_1111 and it is necessary to
         // invert the test sign to get it right (28th April @ EG2017)
         //
-        if (c.at(cid) == C_1111)
+        if (c.at(pid) == C_1111)
         {
-            c.at(cid) = 0x0;
-            if (isovalue <= func[0]) c.at(cid) |= C_1000;
-            if (isovalue <= func[1]) c.at(cid) |= C_0100;
-            if (isovalue <= func[2]) c.at(cid) |= C_0010;
-            if (isovalue <= func[3]) c.at(cid) |= C_0001;
+            c.at(pid) = 0x0;
+            if (isovalue <= func[0]) c.at(pid) |= C_1000;
+            if (isovalue <= func[1]) c.at(pid) |= C_0100;
+            if (isovalue <= func[2]) c.at(pid) |= C_0010;
+            if (isovalue <= func[3]) c.at(pid) |= C_0001;
         }
     }
 
     std::map<ipair,uint> e2v_map;
 
-    for(uint cid=0; cid<m.num_cells(); ++cid)
+    for(uint pid=0; pid<m.num_polys(); ++pid)
     {
         uint vids[] =
         {
-            m.cell_vert_id(cid,0),
-            m.cell_vert_id(cid,1),
-            m.cell_vert_id(cid,2),
-            m.cell_vert_id(cid,3)
+            m.poly_vert_id(pid,0),
+            m.poly_vert_id(pid,1),
+            m.poly_vert_id(pid,2),
+            m.poly_vert_id(pid,3)
         };
 
         double func[] =
@@ -137,43 +137,43 @@ void marching_tets(const Tetmesh<>        & m,
 
         int adj_tet[] // not uint because it may be -1 if there is no adjacent tet!
         {
-            m.cell_adjacent_through_face(cid,0),
-            m.cell_adjacent_through_face(cid,1),
-            m.cell_adjacent_through_face(cid,2),
-            m.cell_adjacent_through_face(cid,3),
+            m.poly_adjacent_through_face(pid,0),
+            m.poly_adjacent_through_face(pid,1),
+            m.poly_adjacent_through_face(pid,2),
+            m.poly_adjacent_through_face(pid,3),
         };
 
         // Avoid triangle duplication and collapsed triangle generation when the iso-surface
         // passes EXACTLY on a vertex/edge/face shared between many tetrahedra.
         //
-        switch (c.at(cid))
+        switch (c.at(pid))
         {
             // iso-surface passes on a face : make sure only one tet (MUST BE the one with higher tid) triggers triangle generation...
             // Notice that if the adjacent tet is collapsed (C_1111), then it make sense to use the current one regardless the tid order
-            case C_1110 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[2] && (int)cid < adj_tet[0] && c.at(adj_tet[0]) != C_1111) c.at(cid) = C_0000; break;
-            case C_1101 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[3] && (int)cid < adj_tet[1] && c.at(adj_tet[1]) != C_1111) c.at(cid) = C_0000; break;
-            case C_1011 : if (v_on_iso[0] && v_on_iso[2] && v_on_iso[3] && (int)cid < adj_tet[2] && c.at(adj_tet[2]) != C_1111) c.at(cid) = C_0000; break;
-            case C_0111 : if (v_on_iso[1] && v_on_iso[2] && v_on_iso[3] && (int)cid < adj_tet[3] && c.at(adj_tet[3]) != C_1111) c.at(cid) = C_0000; break;
+            case C_1110 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[2] && (int)pid < adj_tet[0] && c.at(adj_tet[0]) != C_1111) c.at(pid) = C_0000; break;
+            case C_1101 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[3] && (int)pid < adj_tet[1] && c.at(adj_tet[1]) != C_1111) c.at(pid) = C_0000; break;
+            case C_1011 : if (v_on_iso[0] && v_on_iso[2] && v_on_iso[3] && (int)pid < adj_tet[2] && c.at(adj_tet[2]) != C_1111) c.at(pid) = C_0000; break;
+            case C_0111 : if (v_on_iso[1] && v_on_iso[2] && v_on_iso[3] && (int)pid < adj_tet[3] && c.at(adj_tet[3]) != C_1111) c.at(pid) = C_0000; break;
 
             // iso-surface passes on a edge : do nothing
-            case C_0101 : if (v_on_iso[1] && v_on_iso[3]) c.at(cid) = C_0000; break;
-            case C_1010 : if (v_on_iso[0] && v_on_iso[2]) c.at(cid) = C_0000; break;
-            case C_0011 : if (v_on_iso[2] && v_on_iso[3]) c.at(cid) = C_0000; break;
-            case C_1100 : if (v_on_iso[0] && v_on_iso[1]) c.at(cid) = C_0000; break;
-            case C_1001 : if (v_on_iso[0] && v_on_iso[3]) c.at(cid) = C_0000; break;
-            case C_0110 : if (v_on_iso[1] && v_on_iso[2]) c.at(cid) = C_0000; break;
+            case C_0101 : if (v_on_iso[1] && v_on_iso[3]) c.at(pid) = C_0000; break;
+            case C_1010 : if (v_on_iso[0] && v_on_iso[2]) c.at(pid) = C_0000; break;
+            case C_0011 : if (v_on_iso[2] && v_on_iso[3]) c.at(pid) = C_0000; break;
+            case C_1100 : if (v_on_iso[0] && v_on_iso[1]) c.at(pid) = C_0000; break;
+            case C_1001 : if (v_on_iso[0] && v_on_iso[3]) c.at(pid) = C_0000; break;
+            case C_0110 : if (v_on_iso[1] && v_on_iso[2]) c.at(pid) = C_0000; break;
 
             // iso-surface passes on a vertex : do nothing
-            case C_1000 : if (v_on_iso[0]) c.at(cid) = C_0000; break;
-            case C_0100 : if (v_on_iso[1]) c.at(cid) = C_0000; break;
-            case C_0010 : if (v_on_iso[2]) c.at(cid) = C_0000; break;
-            case C_0001 : if (v_on_iso[3]) c.at(cid) = C_0000; break;
+            case C_1000 : if (v_on_iso[0]) c.at(pid) = C_0000; break;
+            case C_0100 : if (v_on_iso[1]) c.at(pid) = C_0000; break;
+            case C_0010 : if (v_on_iso[2]) c.at(pid) = C_0000; break;
+            case C_0001 : if (v_on_iso[3]) c.at(pid) = C_0000; break;
 
             default : break;
         }
 
         // triangle generation
-        switch (c.at(cid))
+        switch (c.at(pid))
         {
             case C_1000 : { uint e [] = { 2, 0, 4 }; make_triangle(m, isovalue, vids, func, e , e2v_map, split_info, coords, tris, norm); break; }
             case C_0111 : { uint e [] = { 0, 2, 4 }; make_triangle(m, isovalue, vids, func, e , e2v_map, split_info, coords, tris, norm); break; }

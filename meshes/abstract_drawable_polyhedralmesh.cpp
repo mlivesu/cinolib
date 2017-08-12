@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/meshes/abstract_drawable_volume_mesh.h>
+#include <cinolib/meshes/abstract_drawable_polyhedralmesh.h>
 #include <cinolib/textures/textures.h>
 #include <cinolib/color.h>
 
@@ -37,7 +37,7 @@ namespace cinolib
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::init_drawable_stuff()
+void AbstractDrawablePolyhedralMesh<Mesh>::init_drawable_stuff()
 {
     slicer = MeshSlicer<Mesh>(*this);
 
@@ -51,7 +51,7 @@ void AbstractDrawableVolumeMesh<Mesh>::init_drawable_stuff()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::draw(const float) const
+void AbstractDrawablePolyhedralMesh<Mesh>::draw(const float) const
 {
     render(drawlist_in );
     render(drawlist_out);
@@ -61,7 +61,7 @@ void AbstractDrawableVolumeMesh<Mesh>::draw(const float) const
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::updateGL()
+void AbstractDrawablePolyhedralMesh<Mesh>::updateGL()
 {
     updateGL_out();
     updateGL_in();
@@ -71,7 +71,7 @@ void AbstractDrawableVolumeMesh<Mesh>::updateGL()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::updateGL_out()
+void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
 {
     drawlist_out.tris.clear();
     drawlist_out.tri_coords.clear();
@@ -196,9 +196,9 @@ void AbstractDrawableVolumeMesh<Mesh>::updateGL_out()
         if (!this->edge_is_on_srf(eid)) continue;
 
         bool invisible = true;
-        for(uint cid : this->adj_e2p(eid))
+        for(uint pid : this->adj_e2p(eid))
         {
-            if (this->poly_data(cid).visible) invisible = false;
+            if (this->poly_data(pid).visible) invisible = false;
         }
         if (invisible) continue;
 
@@ -245,7 +245,7 @@ void AbstractDrawableVolumeMesh<Mesh>::updateGL_out()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::updateGL_in()
+void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
 {
     drawlist_in.tris.clear();
     drawlist_in.tri_coords.clear();
@@ -273,7 +273,7 @@ void AbstractDrawableVolumeMesh<Mesh>::updateGL_in()
         if (visible_polys.size()!=1) continue;
 
         uint pid   = visible_polys.front();
-        bool is_CW = this->poly_face_is_CW(pid,this->poly_face_offset(pid,fid));
+        bool is_CW = this->poly_face_is_CW(pid,fid);
 
         for(uint eid : this->adj_f2e(fid))
         {
@@ -426,7 +426,7 @@ void AbstractDrawableVolumeMesh<Mesh>::updateGL_in()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::slice(const float thresh, // thresh on centroids or quality
+void AbstractDrawablePolyhedralMesh<Mesh>::slice(const float thresh, // thresh on centroids or quality
                                        const int   item,   // X, Y, Z, L, Q
                                        const int   sign,   // either LEQ or GEQ
                                        const int   mode)   // either AND or OR
@@ -439,7 +439,7 @@ void AbstractDrawableVolumeMesh<Mesh>::slice(const float thresh, // thresh on ce
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_mesh(const bool b)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh(const bool b)
 {
     if (b)
     {
@@ -457,7 +457,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_mesh(const bool b)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_mesh_flat()
+void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_flat()
 {
     drawlist_in.draw_mode  |=  DRAW_TRI_FLAT;
     drawlist_in.draw_mode  &= ~DRAW_TRI_SMOOTH;
@@ -471,7 +471,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_mesh_flat()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_mesh_smooth()
+void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_smooth()
 {
     drawlist_in.draw_mode  |=  DRAW_TRI_SMOOTH;
     drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
@@ -485,7 +485,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_mesh_smooth()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_mesh_points()
+void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_points()
 {
     drawlist_in.draw_mode  |=  DRAW_TRI_POINTS;
     drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
@@ -499,7 +499,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_mesh_points()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_face_color()
+void AbstractDrawablePolyhedralMesh<Mesh>::show_face_color()
 {
     drawlist_out.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
@@ -513,7 +513,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_face_color()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_face_quality()
+void AbstractDrawablePolyhedralMesh<Mesh>::show_face_quality()
 {
     drawlist_out.draw_mode |=  DRAW_TRI_QUALITY;
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
@@ -527,7 +527,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_face_quality()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_face_texture1D(const GLint texture)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_face_texture1D(const GLint texture)
 {
     drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
@@ -543,7 +543,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_face_texture1D(const GLint texture)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_face_texture2D(const GLint texture, const double tex_unit_scalar)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_face_texture2D(const GLint texture, const double tex_unit_scalar)
 {
     drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE2D;
     drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
@@ -560,7 +560,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_face_texture2D(const GLint texture, 
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_face_wireframe(const bool b)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe(const bool b)
 {
     if (b) drawlist_out.draw_mode |=  DRAW_SEGS;
     else   drawlist_out.draw_mode &= ~DRAW_SEGS;
@@ -570,7 +570,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_face_wireframe(const bool b)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_face_wireframe_color(const Color & c)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe_color(const Color & c)
 {
     this->edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();
@@ -580,7 +580,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_face_wireframe_color(const Color & c
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_face_wireframe_width(const float width)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe_width(const float width)
 {
     drawlist_out.seg_width = width;
 }
@@ -589,7 +589,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_face_wireframe_width(const float wid
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_face_wireframe_transparency(const float alpha)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe_transparency(const float alpha)
 {
     this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();
@@ -599,7 +599,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_face_wireframe_transparency(const fl
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_cell_color()
+void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_color()
 {
     drawlist_in.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
@@ -612,7 +612,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_cell_color()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_cell_quality()
+void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_quality()
 {
     drawlist_in.draw_mode |=  DRAW_TRI_QUALITY;
     drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
@@ -626,7 +626,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_cell_quality()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_cell_texture1D(const GLint texture)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_texture1D(const GLint texture)
 {
     drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
@@ -642,7 +642,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_cell_texture1D(const GLint texture)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_cell_texture2D(const GLint texture, const double tex_unit_scalar)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_texture2D(const GLint texture, const double tex_unit_scalar)
 {
     drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE2D;
     drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
@@ -659,7 +659,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_cell_texture2D(const GLint texture, 
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_cell_wireframe(const bool b)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_wireframe(const bool b)
 {
     if (b) drawlist_in.draw_mode |=  DRAW_SEGS;
     else   drawlist_in.draw_mode &= ~DRAW_SEGS;
@@ -669,7 +669,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_cell_wireframe(const bool b)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_cell_wireframe_color(const Color & c)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_wireframe_color(const Color & c)
 {
     this->edge_set_color(c); // NOTE: this will change color for ANY adge (both interior and boundary)
     updateGL();
@@ -679,7 +679,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_cell_wireframe_color(const Color & c
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_cell_wireframe_width(const float width)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_wireframe_width(const float width)
 {
     drawlist_in.seg_width = width;
 }
@@ -688,7 +688,7 @@ void AbstractDrawableVolumeMesh<Mesh>::show_cell_wireframe_width(const float wid
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableVolumeMesh<Mesh>::show_cell_wireframe_transparency(const float alpha)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_wireframe_transparency(const float alpha)
 {
     this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();

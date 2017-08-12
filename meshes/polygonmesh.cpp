@@ -159,7 +159,7 @@ std::vector<uint> Polygonmesh<M,V,E,P>::get_ordered_boundary_vertices() const
     std::vector<uint>   tris;
 
     vec3d c   = this->centroid();
-    uint  cid = this->num_verts();
+    uint  pid = this->num_verts();
     coords.push_back(c.x());
     coords.push_back(c.y());
     coords.push_back(c.z());
@@ -177,14 +177,14 @@ std::vector<uint> Polygonmesh<M,V,E,P>::get_ordered_boundary_vertices() const
             }
             tris.push_back(vid0);
             tris.push_back(vid1);
-            tris.push_back(cid);
+            tris.push_back(pid);
         }
     }
 
     logger.disable();
     Trimesh<> tmp(coords,tris);
     logger.enable();
-    return tmp.vert_ordered_vert_ring(cid);
+    return tmp.vert_ordered_vert_ring(pid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

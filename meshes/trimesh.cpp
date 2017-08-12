@@ -720,6 +720,42 @@ uint Trimesh<M,V,E,P>::vert_add(const vec3d & pos)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void Trimesh<M,V,E,P>::vert_weights(const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const
+{
+    switch (type)
+    {
+        case UNIFORM   : this->vert_weights_uniform(vid, wgts); return;
+        case COTANGENT : vert_weights_cotangent(vid, wgts); return;
+        default        : assert(false && "Vert weights not supported at this level of the hierarchy!");
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void Trimesh<M,V,E,P>::vert_weights_cotangent(const uint vid, std::vector<std::pair<uint,double>> & wgts) const
+{
+    wgts.clear();
+    for(uint eid : this->adj_v2e(vid))
+    {
+        assert(this->edge_is_manifold(eid));
+        uint   nbr = this->vert_opposite_to(eid, vid);
+        double wgt = 0.0;
+        for(uint pid : this->adj_e2p(eid))
+        {
+            double alpha = this->poly_angle_at_vert(pid, vert_opposite_to(pid, vid, nbr));
+            wgt += cot(alpha);
+        }
+        wgt = (this->adj_e2p(eid).size() == 2) ? wgt * 0.5 : wgt;
+        wgts.push_back(std::make_pair(nbr,wgt));
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void Trimesh<M,V,E,P>::vert_switch_id(const uint vid0, const uint vid1)
 {
     std::swap(this->verts.at(vid0),this->verts.at(vid1));
@@ -772,7 +808,7 @@ std::vector<uint> Trimesh<M,V,E,P>::get_ordered_boundary_vertices() const
     std::vector<vec3d> verts = this->vector_verts();
     verts.push_back(this->centroid());
 
-    uint cid = this->num_verts();
+    uint pid = this->num_verts();
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         if (this->edge_is_boundary(eid))
@@ -786,12 +822,12 @@ std::vector<uint> Trimesh<M,V,E,P>::get_ordered_boundary_vertices() const
             }
             faces.push_back(vid0);
             faces.push_back(vid1);
-            faces.push_back(cid);
+            faces.push_back(pid);
         }
     }
 
     Trimesh<> tmp(verts,faces);
-    return tmp.vert_ordered_vert_ring(cid);
+    return tmp.vert_ordered_vert_ring(pid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

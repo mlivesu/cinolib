@@ -84,7 +84,7 @@ class IntegralCurve : public DrawableCurve
         Curve::Sample move_forward_from_edge   (const uint eid, const vec3d & p);
         Curve::Sample move_forward_from_face   (const uint tid, const vec3d & p);
         Curve::Sample move_forward_from_face   (const uint tid, const uint fid, const vec3d & p);
-        Curve::Sample move_forward_from_cell   (const uint cid, const vec3d & p);
+        Curve::Sample move_forward_from_cell   (const uint pid, const vec3d & p);
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -92,7 +92,7 @@ class IntegralCurve : public DrawableCurve
         bool is_on_edge   (const Sample & s, uint & eid, const double tol = 1e-7) const;
         bool is_on_face   (const Sample & s, uint & tid, const double tol = 1e-7) const;
         bool is_on_face   (const Sample & s, uint & tid, uint & fid, const double tol = 1e-7) const;
-        bool is_on_cell   (const Sample & s, uint & cid, const double tol = 1e-7) const;
+        bool is_on_cell   (const Sample & s, uint & pid, const double tol = 1e-7) const;
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

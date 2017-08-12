@@ -42,7 +42,7 @@ void MCF(Trimesh<>       & m,
          const double      time,
          const bool        conformalized)
 {
-    Eigen::SparseMatrix<double> L = laplacian<Trimesh>(m, COTANGENT);
+    Eigen::SparseMatrix<double> L = laplacian(m, COTANGENT);
     Eigen::SparseMatrix<double> M = mass_matrix<Trimesh>(m);
 
     for(uint i=1; i<=n_iters; ++i)
@@ -50,12 +50,12 @@ void MCF(Trimesh<>       & m,
         // this is for numerical precision: try to stay within
         // the denser part of the machine float representation
         //
-        m.normalize_area();
+        m.normalize_bbox();
         m.center_bbox();
 
         // backward euler time integration of heat flow equation
         //
-        Eigen::SimplicialLLT< Eigen::SparseMatrix<double> > solver(M - time * L);
+        Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver(M - time * L);
 
         uint nv = m.num_verts();
         Eigen::VectorXd x(nv);
@@ -87,7 +87,7 @@ void MCF(Trimesh<>       & m,
         if (i<n_iters) // update matrices for the next iteration
         {
             M = mass_matrix<Trimesh>(m);
-            if (!conformalized) L = laplacian<Trimesh>(m, COTANGENT);
+            if (!conformalized) L = laplacian(m, COTANGENT);
         }
     }
 }

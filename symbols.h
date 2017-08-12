@@ -67,6 +67,12 @@ enum
     OR    // ||
 };
 
+enum
+{
+    COTANGENT = 0x00000001, // only for Triangle Meshes!
+    UNIFORM   = 0x00000002
+};
+
 }
 
 

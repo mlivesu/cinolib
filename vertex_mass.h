@@ -31,15 +31,15 @@
 #ifndef CINO_VERTEX_MASS_H
 #define CINO_VERTEX_MASS_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/meshes/abstract_mesh.h>
 #include <eigen3/Eigen/Sparse>
 
 namespace cinolib
 {
 
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> mass_matrix(const Mesh & m);
+Eigen::SparseMatrix<double> mass_matrix(const AbstractMesh<M,V,E,P> & m);
 
 }
 

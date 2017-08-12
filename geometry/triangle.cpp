@@ -43,6 +43,11 @@ vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C)
     return n;
 }
 
+CINO_INLINE
+double triangle_area(const vec3d A, const vec3d B, const vec3d C)
+{
+    return (0.5 * (B-A).cross(C-A).length());
+}
 
 
 // Given a triangle t(A,B,C) and a ray r(P,dir) compute both

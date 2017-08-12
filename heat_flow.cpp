@@ -28,29 +28,32 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_COTANGENT_H
-#define CINO_COTANGENT_H
-
-#include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh.h>
-#include <cinolib/meshes/tetmesh.h>
+#include <cinolib/heat_flow.h>
 
 namespace cinolib
 {
 
-template<class Mesh>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void cotangent_weights(const Mesh &, const uint, std::vector<uint> &, std::vector<double> &)
+ScalarField heat_flow(const AbstractMesh<M,V,E,P> & m,
+                      const std::vector<uint>     & heat_charges,
+                      const double                  time,
+                      const int                     laplacian_mode)
 {
-    std::cerr << "WARNING! - Cotangent weights are not available for this mesh type!" << endl;
-    assert(false);
+    assert(heat_charges.size() > 0);
+
+    ScalarField heat(m.num_verts());
+
+    Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
+    Eigen::SparseMatrix<double> MM   = mass_matrix(m);
+    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
+
+    std::map<uint,double> bc;
+    for(uint vid : heat_charges) bc[vid] = 1.0;
+
+    solve_square_system_with_bc(MM - time * L, rhs, heat, bc);
+
+    return heat;
 }
 
 }
-
-#ifndef  CINO_STATIC_LIB
-#include "cotangent.cpp"
-#endif
-
-
-#endif // CINO_COTANGENT_H

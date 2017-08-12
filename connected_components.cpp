@@ -28,53 +28,44 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_VECTOR_FIELD_H
-#define CINO_VECTOR_FIELD_H
-
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/serializable.h>
-#include <eigen3/Eigen/Dense>
+#include <cinolib/connected_components.h>
 
 namespace cinolib
 {
 
-class VectorField : public Eigen::VectorXd, public Serializable
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint connected_components(const AbstractMesh<M,V,E,P> & m)
 {
-    public:
-
-        VectorField();
-        VectorField(const int size);
-        VectorField(const std::vector<vec3d> & data);
-
-        vec3d vec_at(const int pos) const;
-
-        void set(const int pos, const vec3d & vec);
-
-        void normalize();
-
-        void serialize  (const char *filename) const;
-        void deserialize(const char *filename);
-
-        // for more info, see:
-        // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
-        //
-        // This method allows you to assign Eigen expressions to VectorField
-        //
-        template<typename OtherDerived>
-        VectorField & operator= (const Eigen::MatrixBase<OtherDerived>& other);
-
-        //
-        // This constructor allows you to construct VectorField from Eigen expressions
-        //
-        template<typename OtherDerived>
-        VectorField(const Eigen::MatrixBase<OtherDerived>& other);
-};
-
+    std::vector<std::set<uint>> ccs;
+    return connected_components(m, ccs);
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "vector_field.cpp"
-#endif
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint connected_components(const AbstractMesh<M,V,E,P> & m,
+                          std::vector<std::set<uint>> & ccs)
+{
+    ccs.clear();
+    uint seed = 0;
+    std::vector<bool> visited(m.num_verts(), false);
 
-#endif // CINO_VECTOR_FIELD_H
+    do
+    {
+        std::set<uint> cc;
+        bfs_exahustive(m, seed, cc);
+
+        ccs.push_back(cc);
+        for(uint vid : cc) visited.at(vid) = true;
+
+        seed = 0;
+        while (seed < num_verts() && visited.at(seed)) ++seed;
+    }
+    while (seed < m.num_verts());
+
+    return ccs.size();
+}
+
+}

@@ -1,21 +1,22 @@
+- check google well practices for C++ and apply them
+- make all constructors explicit?
+- AbstractMesh::vert_weights (uniform, cotangent, mean value…)
+- fix tetmesh : wherever appears “TODO: move to global ids!!!!!!”
+- check meshes hierarchy - where offsets appear and if they need to stay or go!
 - refactor connectivity editing throughout  the library. Trimesh should have three methods
   edge_collapse(), triangle_split(), edge_split(), and all the connectivity changes should
   happen through these operators!
-- add mex_depth to profiler
-- think about it: you don’t need a tree for the profiler: if you put all the ProfilerEntries into a list sorted by time of call you did it…
-- topology navigation should happen always through adj_x2y methods. explicitly stored
-   connectivity should be invisible from the outside… 
+- add max_depth to Profiler to avoid lengthy reports
+- Think about it: you don’t need a tree for the profiler. If you put all the ProfilerEntries into a list sorted by time of call you did it…
 - refactor IsoCurve (exploiting the Curve class)
 - extend the concept of subdivisions from hexmesh to any mesh
 - make cotangent weights robust against almost degenerate triangles and boundary meshes
 - add Additive Manufacturing stuff (load and process CLI files)…
-- transform any function containing inner Trimesh<> or Tetmesh<> into a templated function  with generic Mesh type
-- improve face tessellation strategy for polygonal meshes (flipped elements may currently arise for non convex polygons)
-- add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
+- Improve face tessellation strategy for polygonal meshes (flipped elements may currently arise for non convex polygons)
+- Add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
 - Refactor PointInsideMeshCache, it should return ALL the elements containing the
   query point and let the application choose the best one
 - make a DrawableOctree (and visually test the octree)
-- Add face IDs and vertex IDs!!!!! (like libigl)
 - Bake a CurveNetwork class and use it for skeletons, gestures, sharp features 
   and coarse layouts
 - Add cache for eigen solvers - avoid refactoring matrices multiple times
@@ -23,9 +24,9 @@
   (ref. => Lecture Notes on Geometric Robustness di Jonathan Richard Shewchuk)
 - Add cotan laplacian  normalization
   (ref => https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html)
-- Improve on mesh rendering (shaders, VBOs ecc)
 - Add ambient occlusion (with/without floor)
 - Copy/paste points of view
-- remove dependency from libQGLViewer and use Qt3D instead(?)
+- remove dependency from libQGLViewer and use GLFW instead
+- Improve on mesh rendering (shaders, VBOs)
 - Add text box with debug messages
 - Fix Logger (it does not flush the streaming buffer until the program is closed)

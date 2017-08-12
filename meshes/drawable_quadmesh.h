@@ -32,16 +32,16 @@
 #define CINO_DRAWABLE_QUADMESH_H
 
 #include <cinolib/meshes/quadmesh.h>
-#include <cinolib/meshes/abstract_drawable_surface_mesh.h>
+#include <cinolib/meshes/abstract_drawable_polygonmesh.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class P = Polygon_min_attributes>
-class DrawableQuadmesh : public AbstractDrawableSurfaceMesh<Quadmesh<M,V,E,P>>
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class P = Polygon_std_attributes>
+class DrawableQuadmesh : public AbstractDrawablePolygonMesh<Quadmesh<M,V,E,P>>
 {
     public:
 

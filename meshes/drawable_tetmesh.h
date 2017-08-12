@@ -31,85 +31,67 @@
 #ifndef CINO_DRAWABLE_TETMESH_H
 #define CINO_DRAWABLE_TETMESH_H
 
-#include <cinolib/cinolib.h>
-#include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/meshes/tetmesh.h>
-#include <cinolib/meshes/mesh_slicer.h>
+#include <cinolib/meshes/abstract_drawable_polyhedralmesh.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class F = Polygon_min_attributes,
-         class C = Polyhedron_min_attributes>
-class DrawableTetmesh : public Tetmesh<M,V,E,F,C>, public DrawableObject
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class F = Polygon_std_attributes,
+         class P = Polyhedron_std_attributes>
+class DrawableTetmesh : public AbstractDrawablePolyhedralMesh<Tetmesh<M,V,E,F,P>>
 {
-
     public:
 
-        DrawableTetmesh();
+        DrawableTetmesh() : Tetmesh<M,V,E,F,P>()
+        {
+            this->init_drawable_stuff();
+        }
 
-        DrawableTetmesh(const char * filename);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        DrawableTetmesh(const char * filename) : Tetmesh<M,V,E,F,P>(filename)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        DrawableTetmesh(const std::vector<vec3d>             & verts,
+                        const std::vector<std::vector<uint>> & faces,
+                        const std::vector<std::vector<uint>> & polys,
+                        const std::vector<std::vector<bool>> & polys_face_winding)
+            : Tetmesh<M,V,E,F,P>(verts, faces, polys, polys_face_winding)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         DrawableTetmesh(const std::vector<vec3d> & verts,
-                        const std::vector<uint>  & cells);
+                        const std::vector<uint>  & polys)
+            : Tetmesh<M,V,E,F,P>(verts, polys)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         DrawableTetmesh(const std::vector<double> & coords,
-                        const std::vector<uint>   & cells);
-
-    protected:
-
-        RenderData drawlist_in;
-        RenderData drawlist_out;
-        MeshSlicer<DrawableTetmesh<M,V,E,F,C>> slicer;
-
-    public:
-
-        void       draw(const float scene_size=1) const;
-        vec3d      scene_center() const { return this->bb.center(); }
-        float      scene_radius() const { return this->bb.diag();   }
-        ObjectType object_type()  const { return DRAWABLE_TETMESH;  }
+                        const std::vector<uint>   & polys)
+            : Tetmesh<M,V,E,F,P>(coords, polys)
+        {
+            this->init_drawable_stuff();
+        }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void init_drawable_stuff();
-        void updateGL();
-        void updateGL_in();
-        void updateGL_out();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void slice(const float thresh, const int item, const int sign, const int mode);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void show_mesh(const bool b);
-        void show_mesh_flat();
-        void show_mesh_smooth();
-        void show_mesh_points();
-        void show_face_color();
-        void show_face_quality();
-        void show_face_texture1D(const GLint texture);
-        void show_face_wireframe(const bool b);
-        void show_face_wireframe_color(const Color & c);
-        void show_face_wireframe_width(const float width);
-        void show_face_wireframe_transparency(const float alpha);
-        void show_cell_color();
-        void show_cell_quality();
-        void show_cell_texture1D(const GLint texture);
-        void show_cell_wireframe(const bool b);
-        void show_cell_wireframe_color(const Color & c);
-        void show_cell_wireframe_width(const float width);
-        void show_cell_wireframe_transparency(const float alpha);
+        ObjectType object_type() const { return DRAWABLE_TETMESH; }
 };
 
 }
-
-#ifndef  CINO_STATIC_LIB
-#include "drawable_tetmesh.cpp"
-#endif
 
 #endif // CINO_DRAWABLE_TETMESH_H

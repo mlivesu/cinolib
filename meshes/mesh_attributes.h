@@ -38,7 +38,7 @@ namespace cinolib
 {
 
 /* These are the MINIMAL attributes required by CinoLib.
- * If omitted, the library would not compile!!!!!!!!!!!
+ * If omitted, the library will not compile!!!!!!!!!!!
  *
  * NOTE: you do not need to specify them, they have been
  * set as default template arguments in any mesh available
@@ -69,7 +69,7 @@ typedef struct
 {
     std::string filename;
 }
-Mesh_min_attributes;
+Mesh_std_attributes;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -81,7 +81,7 @@ typedef struct
     float  quality = 0.0;
     bool   marked  = false;
 }
-Vert_min_attributes;
+Vert_std_attributes;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -90,7 +90,7 @@ typedef struct
     Color color  = Color::BLACK();
     bool  marked = false;
 }
-Edge_min_attributes;
+Edge_std_attributes;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -103,7 +103,7 @@ typedef struct
     float  quality = 0.0;
     bool   marked  = false;
 }
-Polygon_min_attributes;
+Polygon_std_attributes;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -115,7 +115,7 @@ typedef struct
     float  quality = 0.0;
     bool   marked  = false;
 }
-Polyhedron_min_attributes;
+Polyhedron_std_attributes;
 
 }
 

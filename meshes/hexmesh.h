@@ -39,18 +39,18 @@
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/quadmesh.h>
 #include <cinolib/meshes/mesh_attributes.h>
-#include <cinolib/meshes/abstract_volume_mesh.h>
+#include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/standard_elements_tables.h>
-#include <cinolib/hexmesh_split_schemas.h>
+#include <cinolib/subdivision_schemas.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class F = Polygon_min_attributes,
-         class P = Polyhedron_min_attributes>
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class F = Polygon_std_attributes,
+         class P = Polyhedron_std_attributes>
 class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 {
     public:
@@ -86,26 +86,26 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void update_normals();
-        void update_hex_quality(const uint cid);
+        void update_hex_quality(const uint pid);
         void update_hex_quality();
         void print_quality(const bool list_folded_elements = false);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint verts_per_poly(const uint) const { return  8; }
+        uint verts_per_poly()           const { return  8; }
         uint edges_per_poly(const uint) const { return 12; }
+        uint edges_per_poly()           const { return 12; }
         uint faces_per_poly(const uint) const { return  6; }
+        uint faces_per_poly()           const { return  6; }
         uint verts_per_face(const uint) const { return  4; }
+        uint verts_per_face()           const { return  4; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Quadmesh<M,V,E,F> export_surface() const;
-        Quadmesh<M,V,E,F> export_surface(std::map<uint,uint> & c2f_map,
-                                         std::map<uint,uint> & f2c_map) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d verts_average(const std::vector<uint> & vids) const;
+        bool  vert_is_singular(const uint vid) const;
+        bool  vert_is_regular (const uint vid) const;
+        vec3d verts_average   (const std::vector<uint> & vids) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -114,7 +114,27 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void   poly_subdivide(const std::vector<std::vector<std::vector<uint>>> & split_scheme);
-        double poly_volume   (const uint) const { assert(false && "TODO!"); return 1.0; }
+        double poly_volume   (const uint pid) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    protected:
+
+        void from_serialized_vids_to_general_polyhedra(const std::vector<uint>              & hexa);
+        void from_serialized_vids_to_general_polyhedra(const std::vector<std::vector<uint>> & hexa);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void reorder_p2v();
+        void reorder_p2v(const uint pid);
+
+        // reorder_p2v() makes sure the p2v adjacency stores vertices
+        // in a way that uniquely defines per element connectivity:
+        //
+        //   TOP         BOTTOM
+        //  7 -- 6       3 -- 2
+        //  |    |       |    |
+        //  4 -- 5       0 -- 1
 };
 
 }

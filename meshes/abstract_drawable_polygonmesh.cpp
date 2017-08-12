@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/meshes/abstract_drawable_surface_mesh.h>
+#include <cinolib/meshes/abstract_drawable_polygonmesh.h>
 #include <cinolib/textures/textures.h>
 #include <cinolib/color.h>
 
@@ -39,7 +39,7 @@ namespace cinolib
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::init_drawable_stuff()
+void AbstractDrawablePolygonMesh<Mesh>::init_drawable_stuff()
 {
     slicer = MeshSlicer<Mesh>(*this);
 
@@ -52,7 +52,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::init_drawable_stuff()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::draw(const float) const
+void AbstractDrawablePolygonMesh<Mesh>::draw(const float) const
 {
     render(drawlist);
 }
@@ -61,7 +61,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::draw(const float) const
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::updateGL()
+void AbstractDrawablePolygonMesh<Mesh>::updateGL()
 {
     drawlist.tri_coords.clear();
     drawlist.tris.clear();
@@ -228,7 +228,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::updateGL()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::slice(const float thresh, // thresh on centroids or quality
+void AbstractDrawablePolygonMesh<Mesh>::slice(const float thresh, // thresh on centroids or quality
                                      const int   item,   // X, Y, Z, L, Q
                                      const int   sign,   // either LEQ or GEQ
                                      const int   mode)   // either AND or OR
@@ -241,7 +241,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::slice(const float thresh, // thresh on c
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_mesh(const bool b)
+void AbstractDrawablePolygonMesh<Mesh>::show_mesh(const bool b)
 {
     if (b) drawlist.draw_mode |=  DRAW_TRIS;
     else   drawlist.draw_mode &= ~DRAW_TRIS;
@@ -251,7 +251,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_mesh(const bool b)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_mesh_flat()
+void AbstractDrawablePolygonMesh<Mesh>::show_mesh_flat()
 {
     drawlist.draw_mode |=  DRAW_TRI_FLAT;
     drawlist.draw_mode &= ~DRAW_TRI_SMOOTH;
@@ -262,7 +262,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_mesh_flat()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_mesh_smooth()
+void AbstractDrawablePolygonMesh<Mesh>::show_mesh_smooth()
 {
     drawlist.draw_mode |=  DRAW_TRI_SMOOTH;
     drawlist.draw_mode &= ~DRAW_TRI_FLAT;
@@ -273,7 +273,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_mesh_smooth()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_mesh_points()
+void AbstractDrawablePolygonMesh<Mesh>::show_mesh_points()
 {
     drawlist.draw_mode |=  DRAW_TRI_POINTS;
     drawlist.draw_mode &= ~DRAW_TRI_FLAT;
@@ -284,7 +284,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_mesh_points()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_vert_color()
+void AbstractDrawablePolygonMesh<Mesh>::show_vert_color()
 {
     drawlist.draw_mode |=  DRAW_TRI_VERTCOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
@@ -298,7 +298,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_vert_color()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_face_color()
+void AbstractDrawablePolygonMesh<Mesh>::show_face_color()
 {
     drawlist.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
@@ -312,7 +312,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_face_color()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_face_texture1D(const int tex_type)
+void AbstractDrawablePolygonMesh<Mesh>::show_face_texture1D(const int tex_type)
 {
     drawlist.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE2D;
@@ -328,7 +328,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_face_texture1D(const int tex_type)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_face_texture2D(const int tex_type, const double tex_unit_scalar)
+void AbstractDrawablePolygonMesh<Mesh>::show_face_texture2D(const int tex_type, const double tex_unit_scalar)
 {
     drawlist.draw_mode |=  DRAW_TRI_TEXTURE2D;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
@@ -345,7 +345,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_face_texture2D(const int tex_type, 
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe(const bool b)
+void AbstractDrawablePolygonMesh<Mesh>::show_face_wireframe(const bool b)
 {
     if (b) drawlist.draw_mode |=  DRAW_SEGS;
     else   drawlist.draw_mode &= ~DRAW_SEGS;
@@ -355,7 +355,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe(const bool b)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe_color(const Color & c)
+void AbstractDrawablePolygonMesh<Mesh>::show_face_wireframe_color(const Color & c)
 {
     this->edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();
@@ -365,7 +365,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe_color(const Color & 
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe_width(const float width)
+void AbstractDrawablePolygonMesh<Mesh>::show_face_wireframe_width(const float width)
 {
     drawlist.seg_width = width;
 }
@@ -374,7 +374,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe_width(const float wi
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe_transparency(const float alpha)
+void AbstractDrawablePolygonMesh<Mesh>::show_face_wireframe_transparency(const float alpha)
 {
     this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();
@@ -384,7 +384,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_face_wireframe_transparency(const f
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_edge_marked(const bool b)
+void AbstractDrawablePolygonMesh<Mesh>::show_edge_marked(const bool b)
 {
     if (b) drawlist.draw_mode |=  DRAW_MARKED_SEGS;
     else   drawlist.draw_mode &= ~DRAW_MARKED_SEGS;
@@ -394,7 +394,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_edge_marked(const bool b)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_edge_marked_color(const Color & c)
+void AbstractDrawablePolygonMesh<Mesh>::show_edge_marked_color(const Color & c)
 {
     drawlist.marked_seg_color = c;
     updateGL();
@@ -404,7 +404,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_edge_marked_color(const Color & c)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_edge_marked_width(const float width)
+void AbstractDrawablePolygonMesh<Mesh>::show_edge_marked_width(const float width)
 {
     drawlist.marked_seg_width = width;
 }
@@ -413,7 +413,7 @@ void AbstractDrawableSurfaceMesh<Mesh>::show_edge_marked_width(const float width
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawableSurfaceMesh<Mesh>::show_edge_marked_transparency(const float alpha)
+void AbstractDrawablePolygonMesh<Mesh>::show_edge_marked_transparency(const float alpha)
 {
     drawlist.marked_seg_color.a = alpha;
     updateGL();

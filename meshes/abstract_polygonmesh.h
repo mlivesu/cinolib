@@ -28,8 +28,8 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_ABSTRACT_SURFACE_MESH_H
-#define CINO_ABSTRACT_SURFACE_MESH_H
+#ifndef CINO_ABSTRACT_POLYGON_MESH_H
+#define CINO_ABSTRACT_POLYGON_MESH_H
 
 #include <cinolib/meshes/abstract_mesh.h>
 
@@ -68,6 +68,10 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        virtual const std::vector<uint> & adj_p2v(const uint pid) const { return this->polys.at(pid); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void operator+=(const AbstractPolygonMesh<M,V,E,P> & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -77,7 +81,6 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void               normalize_area();
         virtual std::vector<uint>  get_boundary_vertices() const;
         virtual std::vector<ipair> get_boundary_edges() const;
 
@@ -85,10 +88,8 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         virtual bool              vert_is_saddle        (const uint vid, const int tex_coord = U_param) const;
         virtual bool              vert_is_critical_p    (const uint vid, const int tex_coord = U_param) const;
-        virtual uint              vert_opposite_to      (const uint eid, const uint vid) const;
         virtual double            vert_area             (const uint vid) const;
         virtual double            vert_mass             (const uint vid) const;
-        virtual bool              verts_are_ordered_CCW (const uint fid, const uint curr, const uint prev) const;
         virtual bool              vert_is_boundary      (const uint vid) const;
         virtual std::vector<uint> vert_boundary_edges   (const uint vid) const;
         virtual std::vector<uint> vert_ordered_vert_ring(const uint vid) const;
@@ -105,33 +106,29 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         virtual bool  edge_is_manifold             (const uint eid) const;
         virtual bool  edge_is_boundary             (const uint eid) const;
-        virtual bool  edges_share_face             (const uint eid1, const uint eid2) const;
+        virtual bool  edges_share_poly             (const uint eid1, const uint eid2) const;
         virtual ipair edge_shared                  (const uint fid0, const uint fid1) const;
         virtual void  edge_mark_labeling_boundaries();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual vec3d             poly_vert              (const uint fid, const uint offset) const;
-        virtual uint              poly_vert_id           (const uint fid, const uint offset) const;
-        virtual uint              poly_vert_offset       (const uint fid, const uint vid) const;
-        virtual bool              poly_contains_vert     (const uint fid, const uint vid) const;
+        virtual uint              poly_vert_offset       (const uint pid, const uint vid) const;
         virtual double            poly_angle_at_vert     (const uint pid, const uint vid, const int unit = RAD) const;
-        virtual double            poly_area              (const uint pid) const = 0;
+        virtual double            poly_area              (const uint pid) const;
         virtual double            poly_mass              (const uint pid) const;
-        virtual vec3d             poly_centroid          (const uint fid) const;
         virtual int               poly_shared            (const uint eid0, const uint eid1) const;
         virtual int               poly_adjacent_along    (const uint pid, const uint vid0, const uint vid1) const;
         virtual void              poly_flip_winding_order(const uint pid);
         virtual bool              poly_is_boundary       (const uint pid) const;
         virtual int               poly_opposite_to       (const uint eid, const uint pid) const;
-        virtual void              poly_color_wrt_label   ();
-        virtual std::vector<uint> poly_tessellation      (const uint fid) const = 0;
+        virtual bool              poly_verts_are_CCW     (const uint pid, const uint curr, const uint prev) const;
+        virtual std::vector<uint> poly_tessellation      (const uint pid) const = 0;
 };
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "abstract_surface_mesh.cpp"
+#include "abstract_polygonmesh.cpp"
 #endif
 
-#endif //CINO_ABSTRACT_SURFACE_MESH_H
+#endif //CINO_ABSTRACT_POLYGON_MESH_H

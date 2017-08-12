@@ -39,16 +39,16 @@
 #include <cinolib/meshes/polygonmesh.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/mesh_attributes.h>
-#include <cinolib/meshes/abstract_volume_mesh.h>
+#include <cinolib/meshes/abstract_polyhedralmesh.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class F = Polygon_min_attributes,
-         class P = Polyhedron_min_attributes>
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class F = Polygon_std_attributes,
+         class P = Polyhedron_std_attributes>
 class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 {
     protected:
@@ -69,11 +69,6 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         MeshType mesh_type() const { return POLYHEDRALMESH; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void export_to_hexahedral_mesh(std::vector<vec3d>             & verts,
-                                       std::vector<std::vector<uint>> & hexa) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

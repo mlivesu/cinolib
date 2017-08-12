@@ -28,8 +28,8 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_ABSTRACT_VOLUME_MESH_H
-#define CINO_ABSTRACT_VOLUME_MESH_H
+#ifndef CINO_ABSTRACT_POLYHEDRAL_MESH_H
+#define CINO_ABSTRACT_POLYHEDRAL_MESH_H
 
 #include <cinolib/meshes/abstract_mesh.h>
 
@@ -95,17 +95,13 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual std::vector<std::vector<uint>> export_hex_connectivity() const;
-        virtual std::vector<std::vector<uint>> export_tet_connectivity() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        virtual const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid); }
-        virtual const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid); }
-        virtual const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid); }
-        virtual const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid); }
-        virtual const std::vector<uint> & adj_f2p(const uint fid) const { return f2p.at(fid); }
-        virtual const std::vector<uint> & adj_p2v(const uint pid) const { return p2v.at(pid); }
+        virtual const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid);         }
+        virtual const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid);         }
+        virtual const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid);         }
+        virtual const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid);         }
+        virtual const std::vector<uint> & adj_f2p(const uint fid) const { return f2p.at(fid);         }
+        virtual const std::vector<uint> & adj_p2f(const uint pid) const { return this->polys.at(pid); }
+        virtual const std::vector<uint> & adj_p2v(const uint pid) const { return p2v.at(pid);         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -114,7 +110,9 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual bool vert_is_on_srf(const uint vid) const;
+        virtual bool   vert_is_on_srf(const uint vid) const;
+        virtual double vert_mass     (const uint vid) const;
+        virtual double vert_volume   (const uint vid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -122,38 +120,36 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual vec3d             face_vert          (const uint fid, const uint off) const;
-        virtual uint              face_vert_id       (const uint fid, const uint off) const;
-        virtual uint              face_edge_id       (const uint fid, const uint vid0, const uint vid1) const;
-        virtual bool              face_is_on_srf     (const uint fid) const;
-        virtual bool              face_contrains_vert(const uint fid, const uint vid) const;
-        virtual vec3d             face_centroid      (const uint fid) const;
-        virtual bool              faces_are_disjoint (const uint fid0, const uint fid1) const;
-        virtual void              face_set_color     (const Color & c);
-        virtual void              face_set_alpha     (const float alpha);
-        virtual std::vector<uint> face_tessellation  (const uint fid) const = 0;
+        virtual vec3d             face_vert         (const uint fid, const uint off) const;
+        virtual uint              face_vert_id      (const uint fid, const uint off) const;
+        virtual uint              face_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
+        virtual bool              face_is_on_srf    (const uint fid) const;
+        virtual bool              face_contains_vert(const uint fid, const uint vid) const;
+        virtual vec3d             face_centroid     (const uint fid) const;
+        virtual double            face_mass         (const uint fid) const;
+        virtual double            face_area         (const uint fid) const;
+        virtual bool              faces_are_disjoint(const uint fid0, const uint fid1) const;
+        virtual void              face_set_color    (const Color & c);
+        virtual void              face_set_alpha    (const float alpha);
+        virtual std::vector<uint> face_tessellation (const uint fid) const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual double            poly_volume       (const uint pid) const = 0;
         virtual double            poly_mass         (const uint pid) const;
-        virtual bool              poly_contains_vert(const uint fid, const uint vid) const;
         virtual bool              poly_contains_face(const uint pid, const uint fid) const;
         virtual bool              poly_is_on_surf   (const uint pid) const;
         virtual int               poly_shared_face  (const uint pid0, const uint pid1) const;
         virtual uint              poly_face_id      (const uint pid, const uint off) const;
-        virtual bool              poly_face_is_CCW  (const uint pid, const uint off) const;
-        virtual bool              poly_face_is_CW   (const uint pid, const uint off) const;
+        virtual bool              poly_face_is_CCW  (const uint pid, const uint fid) const;
+        virtual bool              poly_face_is_CW   (const uint pid, const uint fid) const;
         virtual uint              poly_face_offset  (const uint pid, const uint fid) const;
-        virtual vec3d             poly_centroid     (const uint pid) const;
-        virtual std::vector<uint> poly_as_hex_vlist (const uint pid) const;
-        virtual std::vector<uint> poly_as_tet_vlist (const uint pid) const;
 };
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "abstract_volume_mesh.cpp"
+#include "abstract_polyhedralmesh.cpp"
 #endif
 
-#endif // CINO_ABSTRACT_VOLUME_MESH_H
+#endif // CINO_ABSTRACT_POLYHEDRAL_MESH_H

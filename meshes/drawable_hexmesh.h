@@ -32,17 +32,17 @@
 #define CINO_DRAWABLE_HEXMESH_H
 
 #include <cinolib/meshes/hexmesh.h>
-#include <cinolib/meshes/abstract_drawable_volume_mesh.h>
+#include <cinolib/meshes/abstract_drawable_polyhedralmesh.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class F = Polygon_min_attributes,
-         class P = Polyhedron_min_attributes>
-class DrawableHexmesh : public AbstractDrawableVolumeMesh<Hexmesh<M,V,E,F,P>>
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class F = Polygon_std_attributes,
+         class P = Polyhedron_std_attributes>
+class DrawableHexmesh : public AbstractDrawablePolyhedralMesh<Hexmesh<M,V,E,F,P>>
 {
     public:
 

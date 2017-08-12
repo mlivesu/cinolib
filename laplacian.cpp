@@ -28,93 +28,102 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/unstable/profiler.h>
-#include <set>
-#include <iostream>
+#include <cinolib/laplacian.h>
 
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+template<class M, class V, class E, class P>
 CINO_INLINE
-void Profiler::push(const std::string & key)
+std::vector<Eigen::Triplet<double>> laplacian_matrix_entries(const AbstractMesh<M,V,E,P> & m, const int mode)
 {
-#ifdef CINOLIB_PROFILER_ENABLED
-    ProfilerEntry entry;
-    entry.key   = key;
-    entry.start = std::chrono::high_resolution_clock::now();
-    tree_ptr    = tree.add_children(entry, tree_ptr);
-#endif
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void Profiler::pop()
-{
-#ifdef CINOLIB_PROFILER_ENABLED
-    using namespace std::chrono;
-    tree.node(tree_ptr).item.stop = high_resolution_clock::now();
-    double t = delta_s(tree_ptr);
-
-    log_times[tree.node(tree_ptr).item.key] += t;
-    log_calls[tree.node(tree_ptr).item.key] += 1;
-
-    std::string s;
-    for(uint i=0; i<tree.node(tree_ptr).depth-1; ++i) s += "----";
-    s += tree.node(tree_ptr).item.key + " [" + std::to_string(t) + "s]";
-    tree.node(tree_ptr).item.s = s;
-
-    tree_ptr = tree.node(tree_ptr).father;
-#endif
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void Profiler::call_stack() const
-{
-#ifdef CINOLIB_PROFILER_ENABLED
-    std::cout << "::::::::::::::: PROFILER CALL TREE :::::::::::::::" << std::endl;
-
-    std::vector<ProfilerEntry> items;
-    tree.depth_first_traverse(items);
-
-    for(const ProfilerEntry & obj : items) std::cout << obj.s << std::endl;
-
-    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::::::\n" << std::endl;
-#endif
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void Profiler::report() const
-{
-#ifdef CINOLIB_PROFILER_ENABLED
-    std::set<std::pair<double,std::string>,std::greater<std::pair<double,std::string>>> ordered_items; // most time consuming first
-    for(auto obj : log_times) ordered_items.insert(std::make_pair(obj.second,obj.first));
-
-    std::cout << "::::::::::::::: PROFILER STATISTICS :::::::::::::::" << std::endl;
-
-    for(auto obj : ordered_items)
+    std::vector<Entry> entries;
+    for(uint vid=0; vid<m.num_verts(); ++vid)
     {
-        std::cout << obj.first << "s\t" << obj.second << " (called " << log_calls.at(obj.second) << " times)" << std::endl;
+        std::vector<std::pair<uint,double>> wgts;
+        m.vert_weights(vid, mode, wgts);
+
+        double sum = 0.0;
+        for(auto item : wgts)
+        {
+            entries.push_back(Entry(vid, item.first, item.second));
+            sum -= item.second;
+        }
+        if (sum == 0.0)
+        {
+            std::cerr << "WARNING: null row in the matrix! (disconnected vertex? I put 1 in the diagonal)" << endl;
+            sum = 1.0;
+        }
+        entries.push_back(Entry(vid, vid, sum));
     }
 
-    std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::\n" << std::endl;
-#endif
+    return entries;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class P>
 CINO_INLINE
-double Profiler::delta_s(const uint id) const
+std::vector<Eigen::Triplet<double>> laplacian_matrix_entries_xyz(const AbstractMesh<M,V,E,P> & m, const int mode)
 {
-    using namespace std::chrono;
-    duration<double> delta = duration_cast<duration<double>>(tree.node(id).item.stop - tree.node(id).item.start);
-    return delta.count();
+    std::vector<Entry> entries;
+
+    uint nv     = m.num_verts();
+    uint base_x = nv * 0;
+    uint base_y = nv * 1;
+    uint base_z = nv * 2;
+
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        std::vector<std::pair<uint,double>> wgts;
+        m.vert_weights(vid, mode, wgts);
+        double sum = 0.0;
+        for(auto item : wgts)
+        {
+            entries.push_back(Entry(base_x + vid, base_x + item.first, item.second));
+            entries.push_back(Entry(base_y + vid, base_y + item.first, item.second));
+            entries.push_back(Entry(base_z + vid, base_z + item.first, item.second));
+            sum -= item.second;
+        }
+        if (sum == 0.0)
+        {
+            std::cerr << "WARNING: null row in the matrix! (disconnected vertex? I put 1 in the diagonal)" << endl;
+            sum = 1.0;
+        }
+        entries.push_back(Entry(base_x + vid, base_x + vid, sum));
+        entries.push_back(Entry(base_y + vid, base_y + vid, sum));
+        entries.push_back(Entry(base_z + vid, base_z + vid, sum));
+    }
+
+    return entries;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+Eigen::SparseMatrix<double> laplacian(const AbstractMesh<M,V,E,P> & m, const int mode)
+{
+    std::vector<Entry> entries = laplacian_matrix_entries(m, mode);
+
+    Eigen::SparseMatrix<double> L(m.num_verts(), m.num_verts());
+    L.setFromTriplets(entries.begin(), entries.end());
+
+    return L;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+Eigen::SparseMatrix<double> laplacian_xyz(const AbstractMesh<M,V,E,P> & m, const int mode)
+{
+    std::vector<Entry> entries = laplacian_matrix_entries_xyz(m, mode);
+
+    Eigen::SparseMatrix<double> L(m.num_vertices() * 3, m.num_vertices() * 3);
+    L.setFromTriplets(entries.begin(), entries.end());
+
+    return L;
 }
 
 }

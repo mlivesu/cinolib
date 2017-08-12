@@ -53,15 +53,15 @@ class Isocontour
 
         // returns the centroid of the cc^th isocurve
         //
-        vec3d curve_centroid(uint cid) const;
+        vec3d curve_centroid(uint pid) const;
 
         // returns true if the cid^th curve is closed
         //
-        bool curve_is_closed(uint cid) const;
+        bool curve_is_closed(uint pid) const;
 
         // returns true if the cid^th isocurve has less than <size> points
         //
-        bool curve_is_shorter_than(uint cid, uint size) const;
+        bool curve_is_shorter_than(uint pid, uint size) const;
 
         // TRUE if at least one of its curves is not closed or it is very short (< 5 samples)
         // FALSE otherwise

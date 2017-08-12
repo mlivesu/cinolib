@@ -34,7 +34,7 @@
 #include <cinolib/cinolib.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/meshes/mesh_attributes.h>
-#include <cinolib/meshes/abstract_surface_mesh.h>
+#include <cinolib/meshes/abstract_polygonmesh.h>
 
 #include <map>
 #include <set>
@@ -42,10 +42,10 @@
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class P = Polygon_min_attributes>
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class P = Polygon_std_attributes>
 class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 {
     protected:
@@ -109,7 +109,6 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         std::vector<uint> poly_tessellation(const uint pid) const;
-        double            poly_area        (const uint) const { assert(false); return 1.0; } // TODO!
 };
 
 }

@@ -139,7 +139,7 @@ void Isocontour::make_iso_curve()
         {
             // close the loop (if it is a loop)
             //
-            if (m_ptr->edges_share_face(first->first, last->first))
+            if (m_ptr->edges_share_poly(first->first, last->first))
             {
                 isocurve.push_back(first->second);
                 isocurve_edges.push_back(first->first);
@@ -148,10 +148,10 @@ void Isocontour::make_iso_curve()
             curves_vertices.push_back(isocurve);
             curves_edges.push_back(isocurve_edges);
 
-            uint cid = curves_edges.size() - 1;
+            uint pid = curves_edges.size() - 1;
             for(uint i=0; i<isocurve_edges.size(); ++i)
             {
-                edges2curves[isocurve_edges[i]] = cid;
+                edges2curves[isocurve_edges[i]] = pid;
             }
         }
     }
@@ -181,7 +181,7 @@ std::map<uint,vec3d>::const_iterator Isocontour::next_edge(uint eid, const std::
                 // the creation of fake loops when more than two edges
                 // incident to the same vertex are crossed by the iso-curve
                 //
-                if (m_ptr->edges_share_face(eid, query->first))
+                if (m_ptr->edges_share_poly(eid, query->first))
                 {
                     return query;
                 }
@@ -263,37 +263,37 @@ std::vector<uint> Isocontour::tessellate(Trimesh<> & m) const
 
 
 CINO_INLINE
-vec3d Isocontour::curve_centroid(uint cid) const
+vec3d Isocontour::curve_centroid(uint pid) const
 {
     vec3d c(0,0,0);
-    for(uint i=0; i<curves_vertices[cid].size(); ++i)
+    for(uint i=0; i<curves_vertices[pid].size(); ++i)
     {
-        c += curves_vertices[cid][i];
+        c += curves_vertices[pid][i];
     }
-    return c/= static_cast<double>(curves_vertices[cid].size());
+    return c/= static_cast<double>(curves_vertices[pid].size());
 }
 
 
 CINO_INLINE
-bool Isocontour::curve_is_closed(uint cid) const
+bool Isocontour::curve_is_closed(uint pid) const
 {
-    return (curves_edges[cid].front() == curves_edges[cid].back());
+    return (curves_edges[pid].front() == curves_edges[pid].back());
 }
 
 
 CINO_INLINE
-bool Isocontour::curve_is_shorter_than(uint cid, uint size) const
+bool Isocontour::curve_is_shorter_than(uint pid, uint size) const
 {
-    return (curves_edges[cid].size() < size);
+    return (curves_edges[pid].size() < size);
 }
 
 CINO_INLINE
 bool Isocontour::is_suspicious() const
 {
-    for(uint cid=0; cid<num_curves(); ++cid)
+    for(uint pid=0; pid<num_curves(); ++pid)
     {
-        if (curve_is_shorter_than(cid, 5)) return true;
-        if (!curve_is_closed(cid)) return true;
+        if (curve_is_shorter_than(pid, 5)) return true;
+        if (!curve_is_closed(pid)) return true;
     }
     return false;
 }
@@ -304,14 +304,14 @@ void Isocontour::match(Isocontour & contour, std::set<std::pair<uint,uint> > & c
     // make sure we are on the same page (i.e. contours belong to the same mesh!)
     assert(m_ptr == contour.m_ptr);
 
-    for(uint cid=0; cid<num_curves(); ++cid)
+    for(uint pid=0; pid<num_curves(); ++pid)
     {
         // start from each edge of each cc and flood the mesh, looking
         // for the first edge of the other isocontour
         //
-        for(uint i=0; i<curves_edges[cid].size(); ++i)
+        for(uint i=0; i<curves_edges[pid].size(); ++i)
         {
-            uint eid = curves_edges[cid][i];
+            uint eid = curves_edges[pid][i];
 
             // flood edges until you find an edge of the other isocurve
             //
@@ -330,7 +330,7 @@ void Isocontour::match(Isocontour & contour, std::set<std::pair<uint,uint> > & c
                 //
                 if (query != contour.edges2curves.end())
                 {
-                    curve_matches.insert(std::make_pair(cid, query->second));
+                    curve_matches.insert(std::make_pair(pid, query->second));
                 }
                 else // otherwise do flood filling on the correct side of the curve
                 {

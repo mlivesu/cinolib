@@ -31,13 +31,15 @@
 #ifndef CINO_ABSTRACT_MESH_H
 #define CINO_ABSTRACT_MESH_H
 
+#include <set>
+#include <vector>
+#include <sys/types.h>
+
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
 #include <cinolib/common.h>
-
-#include <set>
-#include <vector>
+#include <cinolib/symbols.h>
 
 typedef enum
 {
@@ -76,7 +78,7 @@ class AbstractMesh
         std::vector<std::vector<uint>> v2v; // vert to vert adjacency
         std::vector<std::vector<uint>> v2e; // vert to edge adjacency
         std::vector<std::vector<uint>> v2p; // vert to poly adjacency
-        std::vector<std::vector<uint>> e2p; // edge to poly adjacency
+        std::vector<std::vector<uint>> e2p; // edge to poly adjacency        
         std::vector<std::vector<uint>> p2e; // poly to edge adjacency
         std::vector<std::vector<uint>> p2p; // poly to poly adjacency
 
@@ -98,7 +100,6 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void center_bbox();
         virtual void update_bbox();
         virtual void update_adjacency() = 0;
         virtual void update_normals() = 0;
@@ -106,11 +107,11 @@ class AbstractMesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual void  translate(const vec3d & delta);
+        virtual void  center_bbox();
         virtual void  rotate(const vec3d & axis, const double angle);
         virtual void  scale(const double scale_factor);
+        virtual void  normalize_bbox();
         virtual vec3d centroid() const;
-        virtual uint  connected_components() const;
-        virtual uint  connected_components(std::vector<std::set<uint>> & ccs) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -144,6 +145,7 @@ class AbstractMesh
         virtual const std::vector<uint> & adj_e2p(const uint eid) const { return e2p.at(eid); }
         virtual const std::vector<uint> & adj_p2e(const uint pid) const { return p2e.at(pid); }
         virtual const std::vector<uint> & adj_p2p(const uint pid) const { return p2p.at(pid); }
+        virtual const std::vector<uint> & adj_p2v(const uint pid) const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -160,12 +162,18 @@ class AbstractMesh
 
         virtual const vec3d          & vert                 (const uint vid) const { return verts.at(vid); }
         virtual       vec3d          & vert                 (const uint vid)       { return verts.at(vid); }
+        virtual       void             vert_weights         (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
+        virtual       void             vert_weights_uniform (const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
         virtual       std::set<uint>   vert_n_ring          (const uint vid, const uint n) const;
+        virtual       uint             vert_opposite_to     (const uint eid, const uint vid) const;
         virtual       bool             verts_are_adjacent   (const uint vid0, const uint vid1) const;
         virtual       bool             vert_is_local_min    (const uint vid, const int tex_coord = U_param) const;
         virtual       bool             vert_is_local_max    (const uint vid, const int tex_coord = U_param) const;
         virtual       uint             vert_valence         (const uint vid) const;
+        virtual       double           vert_mass            (const uint vid) const = 0;
         virtual       uint             vert_shared          (const uint eid0, const uint eid1) const;
+        virtual       double           vert_min_uvw_value   (const int tex_coord = U_param) const;
+        virtual       double           vert_max_uvw_value   (const int tex_coord = U_param) const;
         virtual       void             vert_set_color       (const Color & c);
         virtual       void             vert_set_alpha       (const float alpha);
 
@@ -173,6 +181,7 @@ class AbstractMesh
 
         virtual       vec3d  edge_vert         (const uint eid, const uint offset) const;
         virtual       uint   edge_vert_id      (const uint eid, const uint offset) const;
+        virtual       uint   edge_valence      (const uint eid) const;
         virtual       bool   edge_contains_vert(const uint eid, const uint vid) const;
         virtual       double edge_length       (const uint eid) const;
         virtual       double edge_avg_length   () const;
@@ -183,15 +192,18 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual       vec3d  poly_centroid     (const uint fid) const = 0;
-        virtual       double poly_mass         (const uint fid) const = 0;
-        virtual       bool   poly_contains_vert(const uint fid, const uint vid) const = 0;
-        virtual       uint   poly_edge_id      (const uint fid, const uint vid0, const uint vid1) const;
-        virtual       bool   poly_contains_edge(const uint fid, const uint eid) const;
-        virtual       bool   poly_contains_edge(const uint fid, const uint vid0, const uint vid1) const;
-        virtual       void   poly_show_all     ();
-        virtual       void   poly_set_color    (const Color & c);
-        virtual       void   poly_set_alpha    (const float alpha);
+        virtual       vec3d  poly_vert           (const uint pid, const uint offset) const;
+        virtual       uint   poly_vert_id        (const uint pid, const uint offset) const;
+        virtual       vec3d  poly_centroid       (const uint pid) const;
+        virtual       double poly_mass           (const uint pid) const = 0;
+        virtual       uint   poly_edge_id        (const uint pid, const uint vid0, const uint vid1) const;
+        virtual       bool   poly_contains_vert  (const uint pid, const uint vid) const;
+        virtual       bool   poly_contains_edge  (const uint pid, const uint eid) const;
+        virtual       bool   poly_contains_edge  (const uint pid, const uint vid0, const uint vid1) const;
+        virtual       void   poly_show_all       ();
+        virtual       void   poly_color_wrt_label();
+        virtual       void   poly_set_color      (const Color & c);
+        virtual       void   poly_set_alpha      (const float alpha);
 };
 
 }

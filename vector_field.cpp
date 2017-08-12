@@ -43,6 +43,13 @@ VectorField::VectorField(const int size)
 }
 
 CINO_INLINE
+VectorField::VectorField(const std::vector<vec3d> & data)
+{
+    setZero(3 * data.size());
+    for(uint i=0; i<data.size(); ++i) set(i,data.at(i));
+}
+
+CINO_INLINE
 vec3d VectorField::vec_at(const int pos) const
 {
     int ptr = pos * 3;

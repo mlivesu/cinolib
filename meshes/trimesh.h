@@ -35,15 +35,15 @@
 #include <cinolib/symbols.h>
 #include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/geometry/triangle.h>
-#include <cinolib/meshes/abstract_surface_mesh.h>
+#include <cinolib/meshes/abstract_polygonmesh.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_min_attributes, // default template arguments
-         class V = Vert_min_attributes,
-         class E = Edge_min_attributes,
-         class P = Polygon_min_attributes>
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class P = Polygon_std_attributes>
 class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 {
     public:
@@ -78,12 +78,14 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void   vert_weights            (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
+        void   vert_weights_cotangent  (const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
         void   vert_switch_id          (const uint vid0, const uint vid1);
         void   vert_remove_unreferenced(const uint vid);
         uint   vert_add                (const vec3d & pos);
         uint   vert_opposite_to        (const uint pid, const uint vid0, const uint vid1) const;
 
-        using  AbstractPolygonMesh<M,V,E,P>::vert_opposite_to; // avoid hiding vert_opposite_to(eid,vid)
+        using  AbstractMesh<M,V,E,P>::vert_opposite_to; // avoid hiding vert_opposite_to(eid,vid)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

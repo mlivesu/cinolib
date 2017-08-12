@@ -28,51 +28,53 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_GEODESICS_H
-#define CINO_GEODESICS_H
-
-#include <vector>
-
-#include <cinolib/cinolib.h>
-#include <cinolib/scalar_field.h>
-#include <cinolib/vector_field.h>
-#include <cinolib/gradient.h>
-#include <cinolib/laplacian.h>
-#include <cinolib/vertex_mass.h>
-#include <cinolib/linear_solvers.h>
+#include <cinolib/geodesics.h>
 
 namespace cinolib
 {
-
-/* Compute approximated geodesics as explained in
- *
- * Geodesics in Heat: A New Approach to Computing Distance Based on Heat Flow
- * KEENAN CRANE, CLARISSE WEISCHEDEL and MAX WARDETZKY
- * ACM Transactions on Graphics, 2013
- *
- * First step: solve the heat flow problem with some boundary condition u0
- * (the point(s) from which you want to compute the geodesic distances)
- *
- *                  (M - t * L) u = u0
- *
- * Second step: solve a Poisson problem to determine the function phy whose
- * divergence coincides with the normalized gradient of the heat flow
- *
- *              L phy = div( grad(u)/|grad(u)| )
- *
- * which can also be written as
- *
- *              L phy = grad^T * ( grad(u)/|grad(u)| )
- *
- * phy is the scalar field encoding the geodesic distances.
-*/
 
 template<class M, class V, class E, class P>
 CINO_INLINE
 ScalarField compute_geodesics(      AbstractPolygonMesh<M,V,E,P> & m,
                               const std::vector<uint>            & heat_charges,
-                              const int                            laplacian_mode = COTANGENT,
-                              const float                          time_scalar = 1.0);
+                              const int                            laplacian_mode,
+                              const float                          time_scalar)
+{
+    // optimize position and scale to get better numerical precision
+    double d = m.bbox().diag();
+    vec3d  c = m.bbox().center();
+    m.translate(-c);
+    m.scale(1.0/d);
+
+    // use the squared avg edge length as time step, as suggested in the original paper
+    double time = m.edge_avg_length();
+    time *= time;
+    time *= time_scalar;
+
+    Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
+    Eigen::SparseMatrix<double> MM  = mass_matrix(m);
+    Eigen::SparseMatrix<double> G   = gradient_matrix_srf(m);
+    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
+
+    std::map<uint,double> bc;
+    for(uint vid : heat_charges) bc[vid] = 1.0;
+
+    ScalarField heat(m.num_verts());
+    solve_square_system_with_bc(MM - time * L, rhs, heat, bc);
+
+    VectorField grad = G * heat;
+    grad.normalize();
+
+    ScalarField geodesics(m.num_verts());
+    solve_square_system_with_bc(-L, G.transpose() * grad, geodesics, bc);
+    geodesics.normalize_in_01();
+
+    // restore original scale and position
+    m.scale(d);
+    m.translate(c);
+
+    return geodesics;
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -80,12 +82,43 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 ScalarField compute_geodesics(      AbstractPolyhedralMesh<M,V,E,F,P> & m,
                               const std::vector<uint>                 & heat_charges,
-                              const int                                 laplacian_mode = COTANGENT,
-                              const float                               time_scalar = 1.0);
+                              const int                                 laplacian_mode,
+                              const float                               time_scalar)
+{
+    // optimize position and scale to get better numerical precision
+    double d = m.bbox().diag();
+    vec3d  c = m.bbox().center();
+    m.translate(-c);
+    m.scale(1.0/d);
+
+    // use the squared avg edge length as time step, as suggested in the original paper
+    double time = m.edge_avg_length();
+    time *= time;
+    time *= time_scalar;
+
+    Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
+    Eigen::SparseMatrix<double> MM  = mass_matrix_vol(m);
+    Eigen::SparseMatrix<double> G   = gradient_matrix(m);
+    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
+
+    std::map<uint,double> bc;
+    for(uint vid : heat_charges) bc[vid] = 1.0;
+
+    ScalarField heat(m.num_verts());
+    solve_square_system_with_bc(MM - time * L, rhs, heat, bc);
+
+    VectorField grad = G * heat;
+    grad.normalize();
+
+    ScalarField geodesics(m.num_verts());
+    solve_square_system_with_bc(-L, G.transpose() * grad, geodesics, bc);
+    geodesics.normalize_in_01();
+
+    // restore original scale and position
+    m.scale(d);
+    m.translate(c);
+
+    return geodesics;
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "geodesics.cpp"
-#endif
-
-#endif // CINO_GEODESICS_H
+}
