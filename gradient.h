@@ -31,49 +31,16 @@
 #ifndef CINO_GRADIENT_H
 #define CINO_GRADIENT_H
 
-#include <cinolib/cinolib.h>
-#include <cinolib/scalar_field.h>
-#include <cinolib/vector_field.h>
-#include <cinolib/meshes/trimesh.h>
-#include <cinolib/meshes/tetmesh.h>
 #include <eigen3/Eigen/Sparse>
+#include <cinolib/cinolib.h>
+#include <cinolib/meshes/abstract_polyhedralmesh.h>
+#include <cinolib/meshes/abstract_polygonmesh.h>
 
 namespace cinolib
 {
 
 /* Compute the gradient of a mesh as a 3M x N matrix, where M is the
- * number of elements and N the number of vertices.
- *
- *
- * TRIANGLE MESHES
- *
- * Given a function f() defined on the vertices of the mesh, the gradient
- * at the triangle Tijk is defined as
- *
- *  grad(Tijk) = [ f(j) - f(i) ] * R90_(vi - vk) / 2A +
- *               [ f(k) - f(i) ] * R90_(vj - vi) / 2A
- *
- * with vi being the 3D position of vertex i and A the area of Tijk. R90 represents a
- * rotation of 90 degrees around the surface normal at Tijk.
- *
- *
- *
- * TETRAHEDRAL MESHES
- *
- * Given a function f() defined on the vertices of the mesh, the gradient
- * at the tetrahedron Tijkl is defined according to the Green-Gauss method:
- *
- * grad(Tijkl) = 1/V(T) * sum_{t=1}^{4} ( avg_f(t_i) * n_{t_i} )
- *
- * where t_i is the i-th triangular facet of Tijkl, n_{t_i} its normal
- * orientation and avg_f(t_i) the average f() at the vertices of t_i.
- *
- * NOTE: avg_f() can be measured in many different ways, and the accuracy
- * of the gradient estimation heavily depends on the chosen averaging system.
- * For ease of implementation we use the arithmetic average.
- *
- *
- * References:
+ * number of elements and N the number of vertices. References:
  *
  * Gradient Calculation Methods on Arbitrary Polyhedral Unstructured Meshes for Cell-Centered CFD Solvers
  * Emre Sozer, Christoph Brehm and Cetin C. Kiris
@@ -84,40 +51,15 @@ namespace cinolib
  * IEEE Transactions on Visualization and Computer Graphics (2011)
 */
 
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> & m);
+Eigen::SparseMatrix<double> gradient_matrix_srf(const AbstractPolygonMesh<M,V,E,P> & m);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F,P> & m);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class Mesh>
-CINO_INLINE
-Eigen::SparseMatrix<double> gradient(const Mesh &)
-{
-    std::cerr << "WARNING! - Gradient is not available for this mesh type yet!" << endl;
-    assert(false);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <>
-CINO_INLINE
-Eigen::SparseMatrix<double> gradient<Trimesh<>>(const Trimesh<> & m);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <>
-CINO_INLINE
-Eigen::SparseMatrix<double> gradient<Tetmesh<>>(const Tetmesh<> & m);
+Eigen::SparseMatrix<double> gradient_matrix_vol(const AbstractPolyhedralMesh<M,V,E,F,P> & m);
 
 }
 

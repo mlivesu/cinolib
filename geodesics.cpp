@@ -35,10 +35,10 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-ScalarField compute_geodesics(      AbstractMesh<M,V,E,P> & m,
-                              const std::vector<uint>     & heat_charges,
-                              const int                     laplacian_mode,
-                              const float                   time_scalar)
+ScalarField compute_geodesics(      AbstractPolygonMesh<M,V,E,P> & m,
+                              const std::vector<uint>            & heat_charges,
+                              const int                            laplacian_mode,
+                              const float                          time_scalar)
 {
     // optimize position and scale to get better numerical precision
     double d = m.bbox().diag();
@@ -46,14 +46,59 @@ ScalarField compute_geodesics(      AbstractMesh<M,V,E,P> & m,
     m.translate(-c);
     m.scale(1.0/d);
 
-    // use h^2 as time step, as suggested in the original paper
+    // use the squared avg edge length as time step, as suggested in the original paper
     double time = m.edge_avg_length();
     time *= time;
     time *= time_scalar;
 
     Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
     Eigen::SparseMatrix<double> MM  = mass_matrix(m);
-    Eigen::SparseMatrix<double> G   = gradient(m);
+    Eigen::SparseMatrix<double> G   = gradient_matrix_srf(m);
+    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
+
+    std::map<uint,double> bc;
+    for(uint vid : heat_charges) bc[vid] = 1.0;
+
+    ScalarField heat(m.num_verts());
+    solve_square_system_with_bc(MM - time * L, rhs, heat, bc);
+
+    VectorField grad = G * heat;
+    grad.normalize();
+
+    ScalarField geodesics(m.num_verts());
+    solve_square_system_with_bc(-L, G.transpose() * grad, geodesics, bc);
+    geodesics.normalize_in_01();
+
+    // restore original scale and position
+    m.scale(d);
+    m.translate(c);
+
+    return geodesics;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+ScalarField compute_geodesics(      AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                              const std::vector<uint>                 & heat_charges,
+                              const int                                 laplacian_mode,
+                              const float                               time_scalar)
+{
+    // optimize position and scale to get better numerical precision
+    double d = m.bbox().diag();
+    vec3d  c = m.bbox().center();
+    m.translate(-c);
+    m.scale(1.0/d);
+
+    // use the squared avg edge length as time step, as suggested in the original paper
+    double time = m.edge_avg_length();
+    time *= time;
+    time *= time_scalar;
+
+    Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
+    Eigen::SparseMatrix<double> MM  = mass_matrix_vol(m);
+    Eigen::SparseMatrix<double> G   = gradient_matrix(m);
     Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
 
     std::map<uint,double> bc;

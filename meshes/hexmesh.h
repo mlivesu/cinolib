@@ -41,7 +41,7 @@
 #include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/standard_elements_tables.h>
-#include <cinolib/hexmesh_split_schemas.h>
+#include <cinolib/subdivision_schemas.h>
 
 namespace cinolib
 {

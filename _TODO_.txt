@@ -1,13 +1,8 @@
 - check google well practices for C++ and apply them
 - make all constructors explicit?
-- use template<class M, class V, class E, class P> void f(const AbstractMesh<M,V,E,P> &)
-  for generic programming!
 - AbstractMesh::vert_weights (uniform, cotangent, mean value…)
-- boundary conditions shouldn’t be a map, but rather a vector of pairs
 - fix tetmesh : wherever appears “TODO: move to global ids!!!!!!”
 - check meshes hierarchy - where offsets appear and if they need to stay or go!
-- add cpp files for hex_subdivisions, laplacian, gradient ecc ecc
-- move vert_mass at the highest level of the hierarchy
 - refactor connectivity editing throughout  the library. Trimesh should have three methods
   edge_collapse(), triangle_split(), edge_split(), and all the connectivity changes should
   happen through these operators!

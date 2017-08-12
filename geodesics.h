@@ -69,10 +69,19 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-ScalarField compute_geodesics(      AbstractMesh<M,V,E,P> & m,
-                              const std::vector<uint>     & heat_charges,
-                              const int                     laplacian_mode = COTANGENT,
-                              const float                   time_scalar = 1.0);
+ScalarField compute_geodesics(      AbstractPolygonMesh<M,V,E,P> & m,
+                              const std::vector<uint>            & heat_charges,
+                              const int                            laplacian_mode = COTANGENT,
+                              const float                          time_scalar = 1.0);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+ScalarField compute_geodesics(      AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                              const std::vector<uint>                 & heat_charges,
+                              const int                                 laplacian_mode = COTANGENT,
+                              const float                               time_scalar = 1.0);
 }
 
 #ifndef  CINO_STATIC_LIB

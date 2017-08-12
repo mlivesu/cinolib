@@ -28,25 +28,19 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_HEXMESH_SPLIT_SCHEMAS_H
-#define CINO_HEXMESH_SPLIT_SCHEMAS_H
+#ifndef CINO_SUBDIVISION_SCHEMAS_H
+#define CINO_SUBDIVISION_SCHEMAS_H
 
 #include <vector>
 #include <sys/types.h>
 
-// points of the next hexa will be defined as a linear combination of the initial hexa
+// Points of the subdivided polygon/polyhedron will be defined as a linear combination of the
+// initial vertices, according to the following structure:
 //
-//  FRONT        BACK
-//
-//  7 -- 6       4 -- 5
-//  |    |       |    |
-//  3 -- 2       0 -- 1
-//
-// split_scheme structure:
-//
-// std::vector<                  => one element for each new hexa in the new splitted mesh
-//      std::vector<             => always 8 elements (one for each hexa vertex)
-//           std::vector<uint>>> => points of the input hexa that contribute to define an output vertex position.
+// std::vector<                  => one entry for each new polygon/polyhedron in the new subdivided mesh
+//      std::vector<             => one entry for each polygon/polyhedron vertex
+//           std::vector<uint>>> => points of the input polygon/polyhedron that contribute to define
+//                                  the vertex position (as a linear combination).
 //                                  (NOTE: each entry contributes with 1/#entries. If a vertex wants to
 //                                   contribute more, it'll appear multiple times. Say I want a new vertex
 //                                   be defined as 3/4*v0 + 1/4*v1, the vector will be like: {0,0,0,1})
@@ -54,11 +48,14 @@
 namespace cinolib
 {
 
-static const std::vector<std::vector<std::vector<uint>>> do_not_subdivide
+static const std::vector<std::vector<std::vector<uint>>> no_subdivision
 {
     {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}}
 };
-static const std::vector<std::vector<std::vector<uint>>> subdivide_grid_2x2x2
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const std::vector<std::vector<std::vector<uint>>> hex_to_grid_2x2x2
 {
     {{0}, {0,1}, {0,1,2,3}, {0,3}, {0,4}, {0,1,4,5}, {0,1,2,3,4,5,6,7}, {0,3,4,7}},
     {{0,1}, {1}, {1,2}, {0,1,2,3}, {0,1,4,5}, {1,5}, {1,2,5,6}, {0,1,2,3,4,5,6,7}},
@@ -69,8 +66,10 @@ static const std::vector<std::vector<std::vector<uint>>> subdivide_grid_2x2x2
     {{0,1,2,3,4,5,6,7}, {1,2,5,6}, {2,6}, {2,3,6,7}, {4,5,6,7}, {5,6}, {6}, {6,7}},
     {{0,3,4,7}, {0,1,2,3,4,5,6,7}, {2,3,6,7}, {3,7}, {4,7}, {4,5,6,7}, {6,7}, {7}}
 };
-// mmm  to be checked! 3x3x3 seems buggy
-static const std::vector<std::vector<std::vector<uint>>> subdivide_grid_3x3x3
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const std::vector<std::vector<std::vector<uint>>> hex_to_grid_3x3x3
 {
     {{0}, {0,0,1}, {0,0,2}, {0,0,3}, {0,0,4}, {0,0,5}, {0,0,2,0,0,2,4,4,6}, {0,0,7}},
     {{0,0,1}, {1,1,0}, {1,1,3}, {0,0,2}, {0,0,5}, {1,1,4}, {1,1,3,1,1,3,5,5,7}, {0,0,2,0,0,2,4,4,6}},
@@ -100,7 +99,10 @@ static const std::vector<std::vector<std::vector<uint>>> subdivide_grid_3x3x3
     {{3,3,1,7,7,5,7,7,5}, {2,2,0,6,6,4,6,6,4}, {6,6,3}, {7,7,2}, {7,7,5}, {6,6,4}, {6,6,7}, {7,7,6}},
     {{2,2,0,6,6,4,6,6,4}, {6,6,1}, {2,6,6}, {6,6,3}, {6,6,4}, {6,6,5}, {6}, {6,6,7}},
 };
-static const std::vector<std::vector<std::vector<uint>>> subdivide_grid_4x4x4
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const std::vector<std::vector<std::vector<uint>>> hex_to_grid_4x4x4
 {
     {{0}, {0,0,0,1}, {0,0,0,2}, {0,0,0,3}, {0,0,0,4}, {0,0,0,5}, {0,0,0,6}, {0,0,0,7}}, //0ok
     {{0,0,0,1}, {0,1}, {0,0,0,1,1,1,2,3}, {0,0,0,2}, {0,0,0,5}, {0,0,0,1,1,1,4,5}, {0,0,0,0,0,1,1,1,1,1,2,3,4,5,6,7}, {0,0,0,6}}, //1ok
@@ -167,7 +169,10 @@ static const std::vector<std::vector<std::vector<uint>>> subdivide_grid_4x4x4
     {{0,1,2,3,4,5,6,7,6,7,6,7,6,7,6,7}, {0,6,6,6}, {3,6,6,6}, {2,3,6,7,6,7,6,7}, {4,5,6,7,6,7,6,7}, {4,6,6,6}, {6,6,6,7}, {6,7}}, //62
     {{0,6,6,6}, {1,6,6,6}, {2,6,6,6}, {3,6,6,6}, {4,6,6,6}, {5,6,6,6}, {6}, {6,6,6,7}} //63
 };
-static const std::vector<std::vector<std::vector<uint>>> subdivide_grid_4x4x4_old
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const std::vector<std::vector<std::vector<uint>>> hex_to_grid_4x4x4_old
 {
     {{0}, {0,0,0,1}, {0,0,0,2}, {0,0,0,3}, {0,0,0,4}, {0,0,0,5}, {0,0,0,6}, {0,0,0,7}}, //0ok
     {{0,0,0,1}, {0,1}, {0,0,1,2}, {0,0,0,2}, {0,0,0,5}, {0,0,1,5}, {0,0,1,6}, {0,0,0,6}}, //1ok
@@ -234,7 +239,10 @@ static const std::vector<std::vector<std::vector<uint>>> subdivide_grid_4x4x4_ol
     {{1,6,7,7}, {0,6,6,6}, {3,6,6,6}, {2,6,7,7}, {5,6,7,7}, {4,6,6,6}, {6,6,6,7}, {6,7}}, //62
     {{0,6,6,6}, {1,6,6,6}, {2,6,6,6}, {3,6,6,6}, {4,6,6,6}, {5,6,6,6}, {6}, {6,6,6,7}} //63
 };
-static const std::vector<std::vector<std::vector<uint>>> subdivide_1x1_to_2x2
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const std::vector<std::vector<std::vector<uint>>> hex_to_cone_1x1_to_2x2
 {
     {{0,1}, {1}, {1,2}, {0,1,2,3}, {0,0,0,1,1,1,4,5}, {1,1,1,5}, {1,1,1,2,2,2,6,5}, {0,0,0,1,1,1,2,2,2,3,3,3,4,5,6,7}},
     {{0}, {0,1}, {0,1,2,3}, {0,3}, {0,4}, {0,0,0,1,1,1,4,5}, {0,0,0,1,1,1,2,2,2,3,3,3,4,5,6,7}, {0,3,4,7}},
@@ -246,7 +254,10 @@ static const std::vector<std::vector<std::vector<uint>>> subdivide_1x1_to_2x2
     {{0,3,4,7}, {1,2,5,6}, {6,2}, {7,3}, {4,4,4,7,7,7,0,3}, {5,5,5,6,6,6,1,2}, {6,6,6,2}, {7,7,7,3}},
     {{4,4,4,7,7,7,0,3}, {5,5,5,6,6,6,1,2}, {6,6,6,2}, {7,7,7,3}, {4}, {5}, {6}, {7}}
 };
-static const std::vector<std::vector<std::vector<uint>>> subdivide_1x1_to_3x3
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const std::vector<std::vector<std::vector<uint>>> hex_to_cone_1x1_to_3x3
 {
     {{0}, {0,0,1}, {0,0,2}, {0,0,3}, {0,4}, {0,0,1,0,0,1,0,0,1,4,4,5}, {0,0,2,0,0,2,0,0,2,4,4,6}, {0,0,3,4,4,7}},
     {{0,0,3}, {0,0,2}, {3,3,1}, {3,3,0}, {0,0,3,4,4,7}, {0,0,2,0,0,2,0,0,2,4,4,6}, {3,3,1,3,3,1,3,3,1,7,7,5}, {3,3,0,7,7,4}},
@@ -265,7 +276,10 @@ static const std::vector<std::vector<std::vector<uint>>> subdivide_1x1_to_3x3
     {{3,3,0,7,7,4}, {2,2,1,6,6,5}, {2,6}, {3,7}, {3,3,0,7,7,4,7,7,4,7,7,4}, {2,2,1,6,6,5,6,6,5,6,6,5}, {6}, {7}},
     {{0,0,3,4,4,7,4,4,7,4,4,7}, {1,1,2,5,5,6,5,5,6,5,5,6}, {2,2,1,6,6,5,6,6,5,6,6,5}, {3,3,0,7,7,4,7,7,4,7,7,4}, {4}, {5}, {6}, {7}}
 };
-static const std::vector<std::vector<std::vector<uint>>> subdivide_2x2_to_4x4
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const std::vector<std::vector<std::vector<uint>>> hex_to_cone_2x2_to_4x4
 {
     {{0}, {0,0,0,1}, {0,0,0,2}, {0,0,0,3}, {0,0,0,4}, {0,0,0,5}, {0,0,0,6}, {0,0,0,7}}, //0ok
     {{0,0,0,1}, {0,1}, {0,0,0,1,1,1,2,3}, {0,0,0,2}, {0,0,0,5}, {0,0,0,1,1,1,4,5}, {0,0,0,0,0,1,1,1,1,1,2,3,4,5,6,7}, {0,0,0,6}}, //1ok
@@ -310,7 +324,10 @@ static const std::vector<std::vector<std::vector<uint>>> subdivide_2x2_to_4x4
     {{4,7,4,7,0,3,4,7}, {4,7,4,7,4,7,4,7,0,1,2,3,4,5,6,7}, {2,7,7,7}, {3,7,7,7}, {4,7}, {4,5,6,7}, {6,7}, {7}}, //40
     {{0,1,2,3,4,5,6,7,5,6,5,6,5,6,5,6}, {1,2,5,6,5,6,5,6}, {2,6,6,6}, {3,6,6,6}, {4,5,6,7}, {5,6}, {6}, {6,7}}  //41
 };
-static const std::vector<std::vector<std::vector<uint>>> subdivide_2x2_to_4x4_old
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const std::vector<std::vector<std::vector<uint>>> hex_to_cone_2x2_to_4x4_old
 {
     {{0}, {0,0,0,1}, {0,0,0,2}, {0,0,0,3}, {0,0,0,4}, {0,0,0,5}, {0,0,0,6}, {0,0,0,7}}, //0ok
     {{0,0,0,1}, {0,1}, {0,0,1,2}, {0,0,0,2}, {0,0,0,5}, {0,0,1,5}, {0,0,1,6}, {0,0,0,6}}, //1
@@ -358,4 +375,4 @@ static const std::vector<std::vector<std::vector<uint>>> subdivide_2x2_to_4x4_ol
 
 }
 
-#endif // CINO_HEXMESH_SPLIT_SCHEMAS_H
+#endif // CINO_SUBDIVISION_SCHEMAS_H
