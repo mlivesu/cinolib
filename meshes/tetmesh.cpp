@@ -41,7 +41,7 @@ Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d> & verts,
                             const std::vector<uint>  & polys)
 {
     this->verts = verts;
-    from_serialized_vids_to_general_polyhedra(polys);
+    from_serialized_tets_to_general_polyhedra(polys);
 
     init();
 }
@@ -54,7 +54,7 @@ Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<double> & coords,
                             const std::vector<uint>   & polys)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    from_serialized_vids_to_general_polyhedra(polys);
+    from_serialized_tets_to_general_polyhedra(polys);
     init();
 }
 
@@ -66,7 +66,7 @@ Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d>             & verts,
                             const std::vector<std::vector<uint>> & polys)
 {
     this->verts = verts;
-    from_serialized_vids_to_general_polyhedra(polys);
+    from_serialized_tets_to_general_polyhedra(polys);
     init();
 }
 
@@ -100,7 +100,7 @@ Tetmesh<M,V,E,F,P>::Tetmesh(const char * filename)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::vector<uint> & tets)
+void Tetmesh<M,V,E,F,P>::from_serialized_tets_to_general_polyhedra(const std::vector<uint> & tets)
 {
     this->faces.clear();
     this->polys.clear();
@@ -151,7 +151,7 @@ void Tetmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::ve
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::vector<std::vector<uint>> & tets)
+void Tetmesh<M,V,E,F,P>::from_serialized_tets_to_general_polyhedra(const std::vector<std::vector<uint>> & tets)
 {
     this->faces.clear();
     this->polys.clear();
@@ -231,7 +231,7 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
         exit(-1);
     }
 
-    from_serialized_vids_to_general_polyhedra(tets);
+    from_serialized_tets_to_general_polyhedra(tets);
 
     logger << this->num_polys() << " tetrahedra read" << endl;
     logger << this->num_verts() << " vertices   read" << endl;

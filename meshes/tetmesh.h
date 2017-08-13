@@ -132,8 +132,8 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
     protected:
 
-        void from_serialized_vids_to_general_polyhedra(const std::vector<uint>              & tets);
-        void from_serialized_vids_to_general_polyhedra(const std::vector<std::vector<uint>> & tets);
+        void from_serialized_tets_to_general_polyhedra(const std::vector<uint>              & tets);
+        void from_serialized_tets_to_general_polyhedra(const std::vector<std::vector<uint>> & tets);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -145,7 +145,7 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //
         //  3 -- 2      with 0,1,2 CCW (i.e. outgoing normal)
         //   \  /  \
-        //    0 --- 1
+        //    0 --- 1        
 };
 
 }

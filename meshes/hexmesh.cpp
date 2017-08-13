@@ -48,7 +48,7 @@ Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d> & verts,
                             const std::vector<uint>  & polys)
 {
     this->verts = verts;
-    from_serialized_vids_to_general_polyhedra(polys);
+    from_serialized_hexa_to_general_polyhedra(polys);
     init();
 }
 
@@ -60,7 +60,7 @@ Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<double> & coords,
                             const std::vector<uint>   & polys)
 {
     this->verts = vec3d_from_serialized_xyz(coords);
-    from_serialized_vids_to_general_polyhedra(polys);
+    from_serialized_hexa_to_general_polyhedra(polys);
     init();
 }
 
@@ -72,7 +72,7 @@ Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d>             & verts,
                             const std::vector<std::vector<uint>> & polys)
 {
     this->verts = verts;
-    from_serialized_vids_to_general_polyhedra(polys);
+    from_serialized_hexa_to_general_polyhedra(polys);
     init();
 }
 
@@ -106,7 +106,7 @@ Hexmesh<M,V,E,F,P>::Hexmesh(const char * filename)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Hexmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::vector<uint> & hexa)
+void Hexmesh<M,V,E,F,P>::from_serialized_hexa_to_general_polyhedra(const std::vector<uint> & hexa)
 {
     this->faces.clear();
     this->polys.clear();
@@ -158,7 +158,7 @@ void Hexmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::ve
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Hexmesh<M,V,E,F,P>::from_serialized_vids_to_general_polyhedra(const std::vector<std::vector<uint>> & hexa)
+void Hexmesh<M,V,E,F,P>::from_serialized_hexa_to_general_polyhedra(const std::vector<std::vector<uint>> & hexa)
 {
     this->faces.clear();
     this->polys.clear();
@@ -324,7 +324,7 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
         exit(-1);
     }
 
-    from_serialized_vids_to_general_polyhedra(hexa);
+    from_serialized_hexa_to_general_polyhedra(hexa);
 
     logger << this->num_polys() << " hexahedra read" << endl;
     logger << this->num_verts() << " vertices  read" << endl;
