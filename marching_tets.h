@@ -37,23 +37,21 @@
 namespace cinolib
 {
 
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void marching_tets(const Tetmesh<>        & m,
-                   const double             isovalue,
-                   std::vector<double>    & coords,
-                   std::vector<uint>      & tris,
-                   std::vector<double>    & norm,
-                   std::map<ipair,double> & split_info); // (v0,v1) => lambda
-                                                         // meaning that the edge (v0,v1) should
-                                                         // be split at
-                                                         // lambda * v0 + (1 - lambda) * v1
-
+void marching_tets(const Tetmesh<M,V,E,F,P> & m,
+                   const double               isovalue,
+                   std::vector<double>      & coords,
+                   std::vector<uint>        & tris,
+                   std::vector<double>      & norm,
+                   std::map<ipair,double>   & split_info); // (v0,v1) => lambda
+                                                           // meaning that the edge (v0,v1) should
+                                                           // be split at
+                                                           // lambda * v0 + (1 - lambda) * v1
 }
-
 
 #ifndef  CINO_STATIC_LIB
 #include "marching_tets.cpp"
 #endif
-
 
 #endif // CINO_MARCHING_TETS_H

@@ -33,47 +33,58 @@
 namespace cinolib
 {
 
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-DrawableIsosurface::DrawableIsosurface(const Tetmesh<> & m, const float iso_value) : Isosurface(m, iso_value)
+DrawableIsosurface<M,V,E,F,P>::DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value)
+    : Isosurface<M,V,E,F,P>(m, iso_value)
 {}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void DrawableIsosurface::draw(const float) const
+void DrawableIsosurface<M,V,E,F,P>::draw(const float) const
 {
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glDisable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
     glShadeModel(GL_SMOOTH);
 
-    for(size_t i=0; i<tris.size(); i+=3)
+    for(uint i=0; i<this->tris.size(); i+=3)
     {
-        int vid0     = tris[i+0];
-        int vid1     = tris[i+1];
-        int vid2     = tris[i+2];
-        int vid0_ptr = 3 * vid0;
-        int vid1_ptr = 3 * vid1;
-        int vid2_ptr = 3 * vid2;
+        uint vid0     = this->tris[i+0];
+        uint vid1     = this->tris[i+1];
+        uint vid2     = this->tris[i+2];
+        uint vid0_ptr = 3 * vid0;
+        uint vid1_ptr = 3 * vid1;
+        uint vid2_ptr = 3 * vid2;
 
         glBegin(GL_TRIANGLES);
         glColor3f(1.0,0.0,0.0);
-        glNormal3dv(&(t_norms[i]));
-        glVertex3dv(&(coords[vid0_ptr]));
-        glVertex3dv(&(coords[vid1_ptr]));
-        glVertex3dv(&(coords[vid2_ptr]));
+        glNormal3dv(&(this->t_norms[i]));
+        glVertex3dv(&(this->coords[vid0_ptr]));
+        glVertex3dv(&(this->coords[vid1_ptr]));
+        glVertex3dv(&(this->coords[vid2_ptr]));
         glEnd();
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-vec3d DrawableIsosurface::scene_center() const
+vec3d DrawableIsosurface<M,V,E,F,P>::scene_center() const
 {
-    return m_ptr->bbox().center();
+    return this->m_ptr->bbox().center();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-float DrawableIsosurface::scene_radius() const
+float DrawableIsosurface<M,V,E,F,P>::scene_radius() const
 {
-    return m_ptr->bbox().diag();
+    return this->m_ptr->bbox().diag();
 }
 
 }

@@ -53,26 +53,31 @@ enum // Look-up Table
     C_0000 = 0x0
 };
 
-CINO_INLINE
-void make_triangle(const Tetmesh<>        & m,
-                   const double             isovalue,
-                   const uint               vids[],
-                   const double             func[],
-                   const uint               e[],
-                   std::map<ipair,uint>   & e2v_map,
-                   std::map<ipair,double> & split_info,
-                   std::vector<double>    & coords,
-                   std::vector<uint>      & tris,
-                   std::vector<double>    & norm);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void marching_tets(const Tetmesh<>        & m,
-                   const double             isovalue,
-                   std::vector<double>    & coords,
-                   std::vector<uint>      & tris,
-                   std::vector<double>    & norm,
-                   std::map<ipair,double> & split_info)
+void make_triangle(const Tetmesh<M,V,E,F,P> & m,
+                   const double               isovalue,
+                   const uint                 vids[],
+                   const double               func[],
+                   const uint                 e[],
+                   std::map<ipair,uint>     & e2v_map,
+                   std::map<ipair,double>   & split_info,
+                   std::vector<double>      & coords,
+                   std::vector<uint>        & tris,
+                   std::vector<double>      & norm);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marching_tets(const Tetmesh<M,V,E,F,P> & m,
+                   const double               isovalue,
+                   std::vector<double>      & coords,
+                   std::vector<uint>        & tris,
+                   std::vector<double>      & norm,
+                   std::map<ipair,double>   & split_info)
 {
     assert(split_info.empty());
 
@@ -136,19 +141,19 @@ void marching_tets(const Tetmesh<>        & m,
         };
 
         int adj_tet[] // not uint because it may be -1 if there is no adjacent tet!
-        {
-            m.poly_adjacent_through_face(pid,0),
-            m.poly_adjacent_through_face(pid,1),
-            m.poly_adjacent_through_face(pid,2),
-            m.poly_adjacent_through_face(pid,3),
+        {            
+            m.poly_adjacent_through_face(pid, m.poly_face_id(pid,0)),
+            m.poly_adjacent_through_face(pid, m.poly_face_id(pid,1)),
+            m.poly_adjacent_through_face(pid, m.poly_face_id(pid,2)),
+            m.poly_adjacent_through_face(pid, m.poly_face_id(pid,3)),
         };
 
         // Avoid triangle duplication and collapsed triangle generation when the iso-surface
-        // passes EXACTLY on a vertex/edge/face shared between many tetrahedra.
+        // passes EXACTLY through a vertex/edge/face shared between many tetrahedra.
         //
         switch (c.at(pid))
         {
-            // iso-surface passes on a face : make sure only one tet (MUST BE the one with higher tid) triggers triangle generation...
+            // iso-surface passes on a face : make sure only one tet (MUST BE the one with higher id) triggers triangle generation...
             // Notice that if the adjacent tet is collapsed (C_1111), then it make sense to use the current one regardless the tid order
             case C_1110 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[2] && (int)pid < adj_tet[0] && c.at(adj_tet[0]) != C_1111) c.at(pid) = C_0000; break;
             case C_1101 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[3] && (int)pid < adj_tet[1] && c.at(adj_tet[1]) != C_1111) c.at(pid) = C_0000; break;
@@ -200,17 +205,20 @@ void marching_tets(const Tetmesh<>        & m,
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void make_triangle(const Tetmesh<>       & m,
-                   const double            isovalue,
-                   const uint              vids[],
-                   const double            func[],
-                   const uint               e[],
-                   std::map<ipair,uint>   & e2v_map,
-                   std::map<ipair,double> & split_info,
-                   std::vector<double>    & coords,
-                   std::vector<uint>      & tris,
-                   std::vector<double>    & norm)
+void make_triangle(const Tetmesh<M,V,E,F,P> & m,
+                   const double               isovalue,
+                   const uint                 vids[],
+                   const double               func[],
+                   const uint                 e[],
+                   std::map<ipair,uint>     & e2v_map,
+                   std::map<ipair,double>   & split_info,
+                   std::vector<double>      & coords,
+                   std::vector<uint>        & tris,
+                   std::vector<double>      & norm)
 {
     assert(isovalue >= *std::min_element(func, func+4));
     assert(isovalue <= *std::max_element(func, func+4));

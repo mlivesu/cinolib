@@ -35,24 +35,32 @@
 namespace cinolib
 {
 
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Isosurface::Isosurface(const Tetmesh<> &m, const float iso_value) : m_ptr(&m), iso_value(iso_value)
+Isosurface<M,V,E,F,P>::Isosurface(const Tetmesh<M,V,E,F,P> &m, const float iso_value)
+    : m_ptr(&m), iso_value(iso_value)
 {
     marching_tets(m, iso_value, coords, tris, t_norms, split_info);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Trimesh<> Isosurface::export_as_trimesh() const
+Trimesh<M,V,E,F> Isosurface<M,V,E,F,P>::export_as_trimesh() const
 {
-    return Trimesh<>(coords, tris);
+    return Trimesh<M,V,E,F>(coords, tris);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Isosurface::tessellate(std::vector<double> & new_coords,
-                            std::vector<uint>   & new_cells,
-                            std::vector<double> & new_field) const
+void Isosurface<M,V,E,F,P>::tessellate(std::vector<double> & new_coords,
+                                       std::vector<uint>   & new_polys,
+                                       std::vector<double> & new_field) const
 {
-    new_cells.clear();
+    new_polys.clear();
     new_coords = m_ptr->vector_coords();
     new_field  = m_ptr->serialize_uvw(U_param);
 
@@ -100,10 +108,10 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
         {
             case 0 : // replicate the whole tet
             {
-                new_cells.push_back(m_ptr->poly_vert_id(pid, 0));
-                new_cells.push_back(m_ptr->poly_vert_id(pid, 1));
-                new_cells.push_back(m_ptr->poly_vert_id(pid, 2));
-                new_cells.push_back(m_ptr->poly_vert_id(pid, 3));
+                new_polys.push_back(m_ptr->poly_vert_id(pid, 0));
+                new_polys.push_back(m_ptr->poly_vert_id(pid, 1));
+                new_polys.push_back(m_ptr->poly_vert_id(pid, 2));
+                new_polys.push_back(m_ptr->poly_vert_id(pid, 3));
                 break;
             }
 
@@ -125,14 +133,14 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
                 if ((int)prism[1] == tet_tip) prism[1] = m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[1]][1]);
                 if ((int)prism[2] == tet_tip) prism[2] = m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[2]][1]);
                 //
-                tetrahedralize_prism(prism, new_cells);
+                tetrahedralize_prism(prism, new_polys);
                 //
-                new_cells.push_back(tet_tip);
-                new_cells.push_back(prism[3]);
-                new_cells.push_back(prism[4]);
-                new_cells.push_back(prism[5]);
+                new_polys.push_back(tet_tip);
+                new_polys.push_back(prism[3]);
+                new_polys.push_back(prism[4]);
+                new_polys.push_back(prism[5]);
                 //
-                fix_subtet_orientation(pid, 4, new_coords, new_cells);
+                fix_subtet_orientation(pid, 4, new_coords, new_polys);
                 break;
             }
 
@@ -175,9 +183,9 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
                         edges_vids.at(split_edges_bot[1]),
                     };
                     //
-                    tetrahedralize_prism(prism, new_cells);
+                    tetrahedralize_prism(prism, new_polys);
                 }
-                fix_subtet_orientation(pid, 6, new_coords, new_cells);
+                fix_subtet_orientation(pid, 6, new_coords, new_polys);
                 break;
             }
 
@@ -190,28 +198,31 @@ void Isosurface::tessellate(std::vector<double> & new_coords,
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Isosurface::fix_subtet_orientation(const uint                  pid,
-                                        const uint                  n_subtets,
-                                        const std::vector<double> & coords,
-                                              std::vector<uint>   & cells) const
+void Isosurface<M,V,E,F,P>::fix_subtet_orientation(const uint                  pid,
+                                                   const uint                  n_subtets,
+                                                   const std::vector<double> & coords,
+                                                         std::vector<uint>   & polys) const
 {
     bool og_tet_was_flipped = m_ptr->poly_data(pid).quality;
 
     for(uint i=1; i<=n_subtets; ++i)
     {
-        uint  base_ptr = cells.size() - (4*i);
-        uint  v0_ptr   = cells.at(base_ptr+0);
-        uint  v1_ptr   = cells.at(base_ptr+1);
-        uint  v2_ptr   = cells.at(base_ptr+2);
-        uint  v3_ptr   = cells.at(base_ptr+3);
+        uint  base_ptr = polys.size() - (4*i);
+        uint  v0_ptr   = polys.at(base_ptr+0);
+        uint  v1_ptr   = polys.at(base_ptr+1);
+        uint  v2_ptr   = polys.at(base_ptr+2);
+        uint  v3_ptr   = polys.at(base_ptr+3);
         vec3d v0(coords.at(3*v0_ptr+0), coords.at(3*v0_ptr+1), coords.at(3*v0_ptr+2));
         vec3d v1(coords.at(3*v1_ptr+0), coords.at(3*v1_ptr+1), coords.at(3*v1_ptr+2));
         vec3d v2(coords.at(3*v2_ptr+0), coords.at(3*v2_ptr+1), coords.at(3*v2_ptr+2));
         vec3d v3(coords.at(3*v3_ptr+0), coords.at(3*v3_ptr+1), coords.at(3*v3_ptr+2));
         if (tet_scaled_jacobian(v0,v1,v2,v3) < 0 && !og_tet_was_flipped)
         {
-            std::swap(cells.at(base_ptr+1),cells.at(base_ptr+3));
+            std::swap(polys.at(base_ptr+1),polys.at(base_ptr+3));
         }
     }
 }

@@ -135,16 +135,17 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual double            poly_volume       (const uint pid) const = 0;
-        virtual double            poly_mass         (const uint pid) const;
-        virtual bool              poly_contains_face(const uint pid, const uint fid) const;
-        virtual bool              poly_is_on_surf   (const uint pid) const;
-        virtual int               poly_shared_face  (const uint pid0, const uint pid1) const;
-        virtual uint              poly_face_id      (const uint pid, const uint off) const;
-        virtual bool              poly_face_is_CCW  (const uint pid, const uint fid) const;
-        virtual bool              poly_face_is_CW   (const uint pid, const uint fid) const;
-        virtual uint              poly_face_offset  (const uint pid, const uint fid) const;
-        virtual vec3d             poly_face_normal  (const uint pid, const uint fid) const;
+        virtual double            poly_volume               (const uint pid) const = 0;
+        virtual double            poly_mass                 (const uint pid) const;
+        virtual bool              poly_contains_face        (const uint pid, const uint fid) const;
+        virtual bool              poly_is_on_surf           (const uint pid) const;
+        virtual int               poly_shared_face          (const uint pid0, const uint pid1) const;
+        virtual uint              poly_face_id              (const uint pid, const uint off) const;
+        virtual bool              poly_face_is_CCW          (const uint pid, const uint fid) const;
+        virtual bool              poly_face_is_CW           (const uint pid, const uint fid) const;
+        virtual uint              poly_face_offset          (const uint pid, const uint fid) const;
+        virtual vec3d             poly_face_normal          (const uint pid, const uint fid) const;
+        virtual int               poly_adjacent_through_face(const uint pid, const uint fid) const;
 };
 
 }

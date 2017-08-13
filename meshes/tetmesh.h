@@ -124,7 +124,6 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         uint   poly_edge_opposite_to     (const uint pid, const uint vid0, const uint vid1) const;
         uint   poly_face_opposite_to     (const uint pid, const uint vid) const;
         int    poly_shared_vert          (const uint pid, const std::vector<uint> & incident_edges) const; // TODO: move to global ids!!!!!!
-        int    poly_adjacent_through_face(const uint pid, const uint face_offset) const; // TODO: move to global ids!!!!!!
         bool   poly_bary_coords          (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
         double poly_volume               (const uint pid) const;
 

@@ -283,6 +283,19 @@ vec3d AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_normal(const uint pid, const 
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+int AbstractPolyhedralMesh<M,V,E,F,P>::poly_adjacent_through_face(const uint pid, const uint fid) const
+{
+    for(uint nbr : this->adj_p2p(pid))
+    {
+        if (this->poly_shared_face(pid,nbr) == static_cast<int>(fid)) return nbr;
+    }
+    return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_on_surf(const uint pid) const
 {
     for(uint off=0; off<faces_per_poly(pid); ++off)
@@ -422,13 +435,10 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 int AbstractPolyhedralMesh<M,V,E,F,P>::poly_shared_face(const uint pid0, const uint pid1) const
 {
-    for(uint i=0; i<this->faces_per_poly(pid0); ++i)
-    for(uint j=0; j<this->faces_per_poly(pid1); ++j)
+    for(uint fid0 : adj_p2f(pid0))
+    for(uint fid1 : adj_p2f(pid1))
     {
-        if (poly_face_id(pid0,i) == poly_face_id(pid1,j))
-        {
-            return poly_face_id(pid0,i);
-        }
+        if (fid0==fid1) return fid0;
     }
     return -1;
 }

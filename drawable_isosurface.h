@@ -38,12 +38,17 @@
 namespace cinolib
 {
 
-class DrawableIsosurface : public Isosurface, public DrawableObject
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class F = Polygon_std_attributes,
+         class P = Polyhedron_std_attributes>
+class DrawableIsosurface : public Isosurface<M,V,E,F,P>, public DrawableObject
 {
     public:
 
         DrawableIsosurface() {}
-        DrawableIsosurface(const Tetmesh<> & m, const float iso_value);
+        DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value);
 
         void       draw(const float scene_size=1) const;
         vec3d      scene_center() const;

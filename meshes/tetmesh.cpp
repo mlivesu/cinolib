@@ -420,20 +420,6 @@ int Tetmesh<M,V,E,F,P>::poly_shared_vert(const uint pid, const std::vector<uint>
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-int Tetmesh<M,V,E,F,P>::poly_adjacent_through_face(const uint pid, const uint face_offset) const
-{
-    // TODO: move to global ids!!!!!!
-    for(uint nbr : this->adj_p2p(pid))
-    {
-        if (this->poly_shared_face(pid,nbr) == (int)face_offset) return nbr;
-    }
-    return -1;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 bool Tetmesh<M,V,E,F,P>::poly_bary_coords(const uint pid, const vec3d & p, std::vector<double> & wgts) const
 {
     return tet_barycentric_coords(this->poly_vert(pid,0),

@@ -38,18 +38,29 @@
 namespace cinolib
 {
 
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class F = Polygon_std_attributes,
+         class P = Polyhedron_std_attributes>
 class Isosurface
 {
     public:
 
         Isosurface(){}
-        Isosurface(const Tetmesh<> & m, const float iso_value);
+        Isosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value);
 
-        Trimesh<> export_as_trimesh() const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        Trimesh<M,V,E,F> export_as_trimesh() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void tessellate(std::vector<double> & coords,
                         std::vector<uint>   & new_cells,
                         std::vector<double> & new_field) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         const std::map<ipair,double> & edges_split() const { return split_info; }
 
@@ -60,12 +71,14 @@ class Isosurface
                                     const std::vector<double> & coords,
                                           std::vector<uint>   & cells) const;
 
-        const Tetmesh<>       *m_ptr;
-        float                  iso_value;
-        std::vector<double>    coords;
-        std::vector<uint>      tris;
-        std::vector<double>    t_norms;
-        std::map<ipair,double> split_info;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const Tetmesh<M,V,E,F,P> *m_ptr;
+        float                     iso_value;
+        std::vector<double>       coords;
+        std::vector<uint>         tris;
+        std::vector<double>       t_norms;
+        std::map<ipair,double>    split_info;
 };
 
 
