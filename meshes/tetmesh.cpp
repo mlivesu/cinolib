@@ -384,7 +384,7 @@ void Tetmesh<M,V,E,F,P>::vert_weights_cotangent(const uint vid, std::vector<std:
             uint   e_opp     = poly_edge_opposite_to(pid, vid, nbr);
             uint   f_opp_vid = poly_face_opposite_to(pid, vid);
             uint   f_opp_nbr = poly_face_opposite_to(pid, nbr);
-            double l_k       = poly_edge_length(pid, e_opp);
+            double l_k       = this->edge_length(e_opp);
             double teta_k    = poly_dihedral_angle(pid, f_opp_vid, f_opp_nbr);
 
             wgt += cot(teta_k) * l_k;
@@ -447,20 +447,6 @@ bool Tetmesh<M,V,E,F,P>::poly_bary_coords(const uint pid, const vec3d & p, std::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-double Tetmesh<M,V,E,F,P>::poly_face_area(const uint pid, const uint face_offset) const
-{
-    // TODO: move to global ids!!!!!!
-    vec3d v0 = this->poly_vert(pid, TET_FACES[face_offset][0]);
-    vec3d v1 = this->poly_vert(pid, TET_FACES[face_offset][1]);
-    vec3d v2 = this->poly_vert(pid, TET_FACES[face_offset][2]);
-    return (0.5 * (v1-v0).cross(v2-v0).length());
-    return 0.0;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 double Tetmesh<M,V,E,F,P>::poly_volume(const uint pid) const
 {
     return tet_unsigned_volume(this->poly_vert(pid,0),
@@ -473,34 +459,24 @@ double Tetmesh<M,V,E,F,P>::poly_volume(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-double Tetmesh<M,V,E,F,P>::poly_dihedral_angle(const uint pid, const uint face_offset1, const uint face_offset2) const
+double Tetmesh<M,V,E,F,P>::poly_dihedral_angle(const uint pid, const uint fid0, const uint fid1) const
 {
-    // TODO: move to global ids!!!!!!
-    vec3d   n0 = poly_face_normal(pid, face_offset1);
-    vec3d   n1 = poly_face_normal(pid, face_offset2);
-    double  alpha = acos(n0.dot(-n1));
+    double  alpha = acos(this->poly_face_normal(pid,fid0).dot(-this->poly_face_normal(pid,fid1)));
     assert(!std::isnan(alpha));
     return alpha;
-    return 0.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,P>::poly_vert_opposite_to(const uint pid, const uint face_offset) const
+uint Tetmesh<M,V,E,F,P>::poly_vert_opposite_to(const uint pid, const uint fid) const
 {
-    // TODO: move to global ids!!!!!!
-    for(uint vert_offset=0; vert_offset<4; ++vert_offset)
-    {
-        uint vid = this->poly_vert_id(pid, vert_offset);
+    assert(this->poly_contains_face(pid, fid));
 
-        if (this->poly_vert_id(pid, TET_FACES[face_offset][0]) != vid &&
-            this->poly_vert_id(pid, TET_FACES[face_offset][1]) != vid &&
-            this->poly_vert_id(pid, TET_FACES[face_offset][2]) != vid)
-        {
-            return vid;
-        }
+    for(uint vid : this->adj_p2v(pid))
+    {
+        if (!this->face_contains_vert(fid, vid)) return vid;
     }
     assert(false);
 }
@@ -509,26 +485,29 @@ uint Tetmesh<M,V,E,F,P>::poly_vert_opposite_to(const uint pid, const uint face_o
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+uint Tetmesh<M,V,E,F,P>::poly_edge_opposite_to(const uint pid, const uint eid) const
+{
+    assert(this->poly_contains_edge(pid,eid));
+    return poly_edge_opposite_to(pid, this->edge_vert_id(eid,0), this->edge_vert_id(eid,1));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::poly_edge_opposite_to(const uint pid, const uint vid0, const uint vid1) const
 {
-    // TODO: move to global ids!!!!!!
     assert(this->poly_contains_vert(pid,vid0));
     assert(this->poly_contains_vert(pid,vid1));
 
-    for(uint off=0; off<this->edges_per_poly(); ++off)
+    for(uint eid : this->adj_p2e(pid))
     {
-        uint e0 = this->poly_vert_id(pid, TET_EDGES[off][0]);
-        uint e1 = this->poly_vert_id(pid, TET_EDGES[off][1]);
-        if ((e0!=vid0 && e1!=vid1)  || (e0!=vid1 && e1!=vid0)) return off;
+        if (!this->edge_contains_vert(eid,vid0) &&
+            !this->edge_contains_vert(eid,vid1))
+        {
+            return eid;
+        }
     }
-//    for(uint eid : this->adj_p2e(pid))
-//    {
-//        if (this->edge_contains_vert(eid,vid0) &&
-//            this->edge_contains_vert(eid,vid1))
-//        {
-//            return eid;
-//        }
-//    }
     assert(false);
 }
 
@@ -538,38 +517,13 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::poly_face_opposite_to(const uint pid, const uint vid) const
 {
-    // TODO: move to global ids!!!!!!
     assert(this->poly_contains_vert(pid, vid));
-    for(uint f=0; f<this->faces_per_poly(); ++f)
+
+    for(uint fid : this->adj_p2f(pid))
     {
-        if (this->poly_vert_id(pid, TET_FACES[f][0]) != vid &&
-            this->poly_vert_id(pid, TET_FACES[f][1]) != vid &&
-            this->poly_vert_id(pid, TET_FACES[f][2]) != vid)
-        {
-            return f;
-        }
+        if (!this->face_contains_vert(fid,vid)) return fid;
     }
     assert(false);
-
-//    assert(this->poly_contains_vert(pid, vid));
-//    for(uint fid : this->adj_p2f(pid))
-//    {
-//        if (!this->face_contains_vert(fid,vid)) return fid;
-//    }
-//    assert(false);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-double Tetmesh<M,V,E,F,P>::poly_edge_length(const uint pid, const uint edge_offset) const
-{
-    // TODO: move to global ids!!!!!!
-    vec3d A = this->poly_vert(pid, TET_EDGES[edge_offset][0]);
-    vec3d B = this->poly_vert(pid, TET_EDGES[edge_offset][1]);
-    return (A-B).length();
-    return 0.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

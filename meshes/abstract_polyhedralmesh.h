@@ -144,6 +144,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual bool              poly_face_is_CCW  (const uint pid, const uint fid) const;
         virtual bool              poly_face_is_CW   (const uint pid, const uint fid) const;
         virtual uint              poly_face_offset  (const uint pid, const uint fid) const;
+        virtual vec3d             poly_face_normal  (const uint pid, const uint fid) const;
 };
 
 }

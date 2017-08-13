@@ -238,6 +238,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_id(const uint pid, const uint 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_is_CW(const uint pid, const uint fid) const
 {
     uint off = poly_face_offset(pid, fid);
@@ -247,6 +248,7 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_is_CW(const uint pid, const ui
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_is_CCW(const uint pid, const uint fid) const
 {
     return !poly_face_is_CW(pid,fid);
@@ -255,6 +257,7 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_is_CCW(const uint pid, const u
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_offset(const uint pid, const uint fid) const
 {
     assert(poly_contains_face(pid,fid));
@@ -263,6 +266,17 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_offset(const uint pid, const u
         if (poly_face_id(pid,off) == fid) return off;
     }
     assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+vec3d AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_normal(const uint pid, const uint fid) const
+{
+    assert(poly_contains_face(pid,fid));
+    if (poly_face_is_CCW(pid,fid)) return this->face_data(fid).normal;
+    return -this->face_data(fid).normal;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
