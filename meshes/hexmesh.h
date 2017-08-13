@@ -120,8 +120,8 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
     protected:
 
-        void from_serialized_vids_to_general_polyhedra(const std::vector<uint>              & hexa);
-        void from_serialized_vids_to_general_polyhedra(const std::vector<std::vector<uint>> & hexa);
+        void from_serialized_hexa_to_general_polyhedra(const std::vector<uint>              & hexa);
+        void from_serialized_hexa_to_general_polyhedra(const std::vector<std::vector<uint>> & hexa);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
