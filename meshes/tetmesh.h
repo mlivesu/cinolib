@@ -39,11 +39,15 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/common.h>
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/meshes/trimesh.h>
-#include <cinolib/meshes/mesh_attributes.h>
+#include <cinolib/bbox.h>
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
-
+#include <cinolib/meshes/mesh_attributes.h>
+#include <cinolib/meshes/trimesh.h>
+#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/triangle.h>
+#include <cinolib/geometry/tetrahedron.h>
+#include <cinolib/io/read_write.h>
+#include <cinolib/quality.h>
 
 namespace cinolib
 {
@@ -114,15 +118,14 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d  poly_face_normal          (const uint pid, const uint face_offset) const;
-        double poly_face_area            (const uint pid, const uint face_offset) const;
-        double poly_dihedral_angle       (const uint pid, const uint face_offset1, const uint face_offset2) const;
-        uint   poly_vert_opposite_to     (const uint pid, const uint face_offset) const;
-        uint   poly_edge_opposite_to     (const uint pid, const uint vid0, const uint vid1) const;
-        uint   poly_face_opposite_to     (const uint pid, const uint vid) const;
-        double poly_edge_length          (const uint pid, const uint edge_offset) const;
-        int    poly_shared_vert          (const uint pid, const std::vector<uint> & incident_edges) const;
-        int    poly_adjacent_through_face(const uint pid, const uint face_offset) const;
+        double poly_face_area            (const uint pid, const uint face_offset) const; // TODO: move to global ids!!!!!!
+        double poly_dihedral_angle       (const uint pid, const uint face_offset1, const uint face_offset2) const; // TODO: move to global ids!!!!!!
+        uint   poly_vert_opposite_to     (const uint pid, const uint face_offset) const; // TODO: move to global ids!!!!!!
+        uint   poly_edge_opposite_to     (const uint pid, const uint vid0, const uint vid1) const; // TODO: move to global ids!!!!!!
+        uint   poly_face_opposite_to     (const uint pid, const uint vid) const; // TODO: move to global ids!!!!!!
+        double poly_edge_length          (const uint pid, const uint edge_offset) const; // TODO: move to global ids!!!!!!
+        int    poly_shared_vert          (const uint pid, const std::vector<uint> & incident_edges) const; // TODO: move to global ids!!!!!!
+        int    poly_adjacent_through_face(const uint pid, const uint face_offset) const; // TODO: move to global ids!!!!!!
         bool   poly_bary_coords          (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
         double poly_volume               (const uint pid) const;
 

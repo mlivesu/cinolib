@@ -30,12 +30,6 @@
 **********************************************************************************/
 #include <cinolib/meshes/tetmesh.h>
 
-#include <cinolib/geometry/tetrahedron.h>
-#include <cinolib/geometry/triangle.h>
-#include <cinolib/io/read_write.h>
-#include <cinolib/quality.h>
-#include <cinolib/bbox.h>
-
 namespace cinolib
 {
 
@@ -447,22 +441,6 @@ bool Tetmesh<M,V,E,F,P>::poly_bary_coords(const uint pid, const vec3d & p, std::
                                   this->poly_vert(pid,2),
                                   this->poly_vert(pid,3),
                                   p, wgts);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-vec3d Tetmesh<M,V,E,F,P>::poly_face_normal(const uint pid, const uint face_offset) const
-{
-    // TODO: move to global ids!!!!!!
-    vec3d v0 = this->poly_vert(pid, TET_FACES[face_offset][0]);
-    vec3d v1 = this->poly_vert(pid, TET_FACES[face_offset][1]);
-    vec3d v2 = this->poly_vert(pid, TET_FACES[face_offset][2]);
-    vec3d n = (v1-v0).cross(v2-v0);
-    n.normalize();
-    return n;
-    return vec3d();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
