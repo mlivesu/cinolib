@@ -182,7 +182,7 @@ std::vector<uint> Polygonmesh<M,V,E,P>::get_ordered_boundary_vertices() const
     }
 
     logger.disable();
-    Trimesh<> tmp(coords,tris);
+    Trimesh<M,V,E,P> tmp(coords,tris);
     logger.enable();
     return tmp.vert_ordered_vert_ring(pid);
 }

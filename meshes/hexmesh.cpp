@@ -486,15 +486,13 @@ void Hexmesh<M,V,E,F,P>::poly_subdivide(const std::vector<std::vector<std::vecto
 
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        std::vector<uint> vlist = this->poly_as_hex_vlist(pid);
-
         for(const auto & sub_cell: cell_split_scheme)
         {
             assert(sub_cell.size() == 8);
             for(uint off=0; off<8; ++off)
             {
                 std::vector<uint> vids;
-                for(uint i : sub_cell.at(off)) vids.push_back(vlist.at(i));
+                for(uint i : sub_cell.at(off)) vids.push_back(this->poly_vert_id(pid,i));
                 sort(vids.begin(), vids.end());
 
                 auto query = v_map.find(vids);

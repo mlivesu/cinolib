@@ -32,11 +32,22 @@
 #define CINO_DUAL_MESH
 
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/trimesh.h>
 #include <cinolib/meshes/polygonmesh.h>
+#include <cinolib/meshes/polyhedralmesh.h>
 
 namespace cinolib
 {
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
+                     std::vector<vec3d>                & dual_verts,
+                     std::vector<std::vector<uint>>    & dual_faces,
+                     std::vector<std::vector<uint>>    & dual_polys,
+                     std::vector<std::vector<uint>>    & dual_polys_winding,
+               const bool                                with_clipped_cells); // consider/discard boundary vertices
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE

@@ -33,6 +33,41 @@
 namespace cinolib
 {
 
+//template<class M, class V, class E, class F, class P>
+//CINO_INLINE
+//void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
+//                     std::vector<vec3d>                & dual_verts,
+//                     std::vector<std::vector<uint>>    & dual_faces,
+//                     std::vector<std::vector<uint>>    & dual_polys,
+//                     std::vector<std::vector<uint>>    & dual_polys_winding,
+//               const bool                                with_clipped_cells)
+//{
+//    dual_verts.clear();
+//    dual_faces.clear();
+//    dual_polys.clear();
+//    dual_polys_winding.clear();
+
+//    // Initialize vertices with face centroids
+//    dual_verts.resize(primal.num_polys());
+//    for(uint pid=0; pid<primal.num_polys(); ++pid)
+//    {
+//        dual_verts.at(pid) = primal.poly_centroid(pid);
+//    }
+
+//    // Make polyhedra
+//    for(uint vid=0; vid<primal.num_verts(); ++vid)
+//    {
+//        bool clipped_cell = primal.vert_is_boundary(vid);
+//        if (clipped_cell && !with_clipped_cells) continue;
+
+//        std::vector<uint> f;
+//        std::vector<uint> f_ring = primal.edge_ordered_poly_ring(vid); // TODO!!!
+//        for(uint fid : f_ring) f.push_back(fid);
+//    }
+//}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class P>
 CINO_INLINE
 void dual_mesh(const AbstractPolygonMesh<M,V,E,P> & primal,
@@ -51,17 +86,17 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void dual_mesh(const AbstractPolygonMesh<M,V,E,P>   & primal,
                      std::vector<vec3d>             & dual_verts,
-                     std::vector<std::vector<uint>> & dual_faces,
+                     std::vector<std::vector<uint>> & dual_polys,
                const bool                             with_clipped_cells)
 {
     dual_verts.clear();
-    dual_faces.clear();
+    dual_polys.clear();
 
     // Initialize vertices with face centroids
     dual_verts.resize(primal.num_polys());
-    for(uint eid=0; eid<primal.num_polys(); ++eid)
+    for(uint pid=0; pid<primal.num_polys(); ++pid)
     {
-        dual_verts.at(eid) = primal.poly_centroid(eid);
+        dual_verts.at(pid) = primal.poly_centroid(pid);
     }
 
     // Add boundary vertices as well as boundary edges' midpoints
@@ -90,19 +125,17 @@ void dual_mesh(const AbstractPolygonMesh<M,V,E,P>   & primal,
         bool clipped_cell = primal.vert_is_boundary(vid);
         if (clipped_cell && !with_clipped_cells) continue;
 
-        std::vector<uint> f;
-        std::vector<uint> f_ring = primal.vert_ordered_poly_ring(vid);
-        for(uint fid : f_ring) f.push_back(fid);
+        std::vector<uint> poly = primal.vert_ordered_poly_ring(vid);
 
         if (clipped_cell) // add boundary portion (vertex vid + boundary edges' midpoints)
         {
             std::vector<uint> e_star = primal.vert_ordered_edge_ring(vid);
-            f.push_back(e2verts.at(e_star.back()));
-            f.push_back(v2verts.at(vid));
-            f.push_back(e2verts.at(e_star.front()));
+            poly.push_back(e2verts.at(e_star.back()));
+            poly.push_back(v2verts.at(vid));
+            poly.push_back(e2verts.at(e_star.front()));
         }
 
-        dual_faces.push_back(f);
+        dual_polys.push_back(poly);
     }
 }
 

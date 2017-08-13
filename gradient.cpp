@@ -39,7 +39,7 @@ typedef Eigen::Triplet<double> Entry;
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient_matrix_srf(const AbstractPolygonMesh<M,V,E,P> & m)
+Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> & m)
 {
     Eigen::SparseMatrix<double> G(m.num_polys()*3, m.num_verts());
     std::vector<Entry> entries;
@@ -77,7 +77,7 @@ Eigen::SparseMatrix<double> gradient_matrix_srf(const AbstractPolygonMesh<M,V,E,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient_matrix_vol(const AbstractPolyhedralMesh<M,V,E,F,P> & m)
+Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F,P> & m)
 {
     Eigen::SparseMatrix<double> G(m.num_polys()*3, m.num_verts());
     std::vector<Entry> entries;
