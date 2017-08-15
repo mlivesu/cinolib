@@ -78,12 +78,17 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
     std::vector<double> coords;
 
     std::string str(filename);
-    std::string filetype = str.substr(str.size()-7,7);
+    std::string filetype = str.substr(str.size()-6,6);
 
-    if (filetype.compare(".hybrid") == 0 ||
-        filetype.compare(".HYBRID") == 0)
+    if (filetype.compare("hybrid") == 0 ||
+        filetype.compare("HYBRID") == 0)
     {
         read_HYBDRID(filename, coords, this->faces, this->polys, this->polys_face_winding);
+    }
+    else if (filetype.compare(".hedra") == 0 ||
+             filetype.compare(".HEDRA") == 0)
+    {
+        read_HEDRA(filename, coords, this->faces, this->polys, this->polys_face_winding);
     }
     else
     {
@@ -104,9 +109,21 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,P>::save(const char *) const
+void Polyhedralmesh<M,V,E,F,P>::save(const char * filename) const
 {
-    assert(false && "TODO!");
+    std::string str(filename);
+    std::string filetype = str.substr(str.size()-6,6);
+
+    if (filetype.compare(".hedra") == 0 ||
+        filetype.compare(".HEDRA") == 0)
+    {
+        write_HEDRA(filename, this->verts, this->faces, this->polys, this->polys_face_winding);
+    }
+    else
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
+        exit(-1);
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

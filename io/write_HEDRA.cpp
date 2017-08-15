@@ -28,54 +28,58 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_DUAL_MESH
-#define CINO_DUAL_MESH
-
-#include <cinolib/cinolib.h>
-#include <cinolib/meshes/polygonmesh.h>
-#include <cinolib/meshes/polyhedralmesh.h>
+#include <cinolib/io/write_HEDRA.h>
 
 namespace cinolib
 {
 
-template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
-                     Polyhedralmesh<M,V,E,F,P>         & dual,
-               const bool                                with_clipped_cells); // consider/discard boundary vertices
+void write_HEDRA(const char                           * filename,
+                 const std::vector<vec3d>             & verts,
+                 const std::vector<std::vector<uint>> & faces,
+                 const std::vector<std::vector<uint>> & polys,
+                 const std::vector<std::vector<bool>> & polys_winding)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    FILE *fp = fopen(filename, "w");
 
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
-                     std::vector<vec3d>                & dual_verts,
-                     std::vector<std::vector<uint>>    & dual_faces,
-                     std::vector<std::vector<uint>>    & dual_polys,
-                     std::vector<std::vector<bool>>    & dual_polys_winding,
-               const bool                                with_clipped_cells); // consider/discard boundary vertices
+    if(!fp)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_HEDRA() : couldn't write output file " << filename << endl;
+        exit(-1);
+    }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    uint nv = verts.size();
+    uint nf = faces.size();
+    uint np = polys.size();
 
-template<class M, class V, class E, class P>
-CINO_INLINE
-void dual_mesh(const AbstractPolygonMesh<M,V,E,P>   & primal,
-                     std::vector<vec3d>             & dual_verts,
-                     std::vector<std::vector<uint>> & dual_faces,
-               const bool                             with_clipped_cells); // consider/discard boundary vertices
+    fprintf(fp, "%d %d %d\n", nv, nf, np);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+    //
+    for(const vec3d & v : verts) fprintf(fp, "%.17g %.17g %.17g\n", v.x(), v.y(), v.z());
 
-template<class M, class V, class E, class P>
-CINO_INLINE
-void dual_mesh(const AbstractPolygonMesh<M,V,E,P> & primal,
-                     Polygonmesh<M,V,E,P>         & dual,
-               const bool                           with_clipped_cells); // consider/discard boundary vertices
+    for(const std::vector<uint> & f : faces)
+    {
+        fprintf(fp, "%d ", static_cast<int>(f.size()));
+        for(uint vid : f) fprintf(fp, "%d ", vid+1);
+        fprintf(fp, "\n");
+    }
 
+    for(uint pid=0; pid<np; ++pid)
+    {
+        fprintf(fp, "%d ", static_cast<int>(polys.at(pid).size()));
+
+        for(uint off=0; off<polys.at(pid).size(); ++off)
+        {
+            if (polys_winding.at(pid).at(off)) fprintf(fp, "%d ",   polys.at(pid).at(off)+1);
+            else                               fprintf(fp, "%d ", -(polys.at(pid).at(off)+1));
+        }
+        fprintf(fp, "\n");
+    }
+
+    fclose(fp);
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "dual_mesh.cpp"
-#endif
-
-#endif // CINO_DUAL_MESH
+}

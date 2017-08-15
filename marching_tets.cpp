@@ -142,10 +142,10 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
 
         int adj_tet[] // not uint because it may be -1 if there is no adjacent tet!
         {            
-            m.poly_adjacent_through_face(pid, m.poly_face_id(pid,0)),
-            m.poly_adjacent_through_face(pid, m.poly_face_id(pid,1)),
-            m.poly_adjacent_through_face(pid, m.poly_face_id(pid,2)),
-            m.poly_adjacent_through_face(pid, m.poly_face_id(pid,3)),
+            m.poly_adj_through_face(pid, m.poly_face_id(pid,0)),
+            m.poly_adj_through_face(pid, m.poly_face_id(pid,1)),
+            m.poly_adj_through_face(pid, m.poly_face_id(pid,2)),
+            m.poly_adj_through_face(pid, m.poly_face_id(pid,3)),
         };
 
         // Avoid triangle duplication and collapsed triangle generation when the iso-surface

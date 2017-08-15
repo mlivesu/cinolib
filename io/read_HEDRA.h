@@ -28,54 +28,29 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_DUAL_MESH
-#define CINO_DUAL_MESH
+#ifndef CINO_READ_HEDRA_H
+#define CINO_READ_HEDRA_H
+
+#include <sys/types.h>
+#include <vector>
+#include <iostream>
 
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/polygonmesh.h>
-#include <cinolib/meshes/polyhedralmesh.h>
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
 
-template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
-                     Polyhedralmesh<M,V,E,F,P>         & dual,
-               const bool                                with_clipped_cells); // consider/discard boundary vertices
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
-                     std::vector<vec3d>                & dual_verts,
-                     std::vector<std::vector<uint>>    & dual_faces,
-                     std::vector<std::vector<uint>>    & dual_polys,
-                     std::vector<std::vector<bool>>    & dual_polys_winding,
-               const bool                                with_clipped_cells); // consider/discard boundary vertices
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void dual_mesh(const AbstractPolygonMesh<M,V,E,P>   & primal,
-                     std::vector<vec3d>             & dual_verts,
-                     std::vector<std::vector<uint>> & dual_faces,
-               const bool                             with_clipped_cells); // consider/discard boundary vertices
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void dual_mesh(const AbstractPolygonMesh<M,V,E,P> & primal,
-                     Polygonmesh<M,V,E,P>         & dual,
-               const bool                           with_clipped_cells); // consider/discard boundary vertices
-
+void read_HEDRA(const char                     * filename,
+                std::vector<double>            & coords,
+                std::vector<std::vector<uint>> & faces,
+                std::vector<std::vector<uint>> & polys,
+                std::vector<std::vector<bool>> & polys_winding);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "dual_mesh.cpp"
+#include "read_HEDRA.cpp"
 #endif
 
-#endif // CINO_DUAL_MESH
+#endif // CINO_READ_HEDRA_H

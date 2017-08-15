@@ -485,6 +485,15 @@ bool AbstractMesh<M,V,E,P>::edge_contains_vert(const uint eid, const uint vid) c
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+vec3d AbstractMesh<M,V,E,P>::edge_sample_at(const uint eid, const double lambda) const
+{
+    return ((1.0-lambda)*edge_vert(eid,0) + lambda*edge_vert(eid,1));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 double AbstractMesh<M,V,E,P>::edge_length(const uint eid) const
 {
     return (edge_vert(eid,0) - edge_vert(eid,1)).length();

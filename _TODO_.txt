@@ -1,7 +1,6 @@
+- think of some visual trick to spot normal inversion problems. with duplicated vertices I never see flipped normals!
 - check google well practices for C++ and apply them
 - make all constructors explicit?
-- AbstractMesh::vert_weights (uniform, cotangent, mean value…)
-- check meshes hierarchy - where offsets appear and if they need to stay or go!
 - refactor connectivity editing throughout  the library. Trimesh should have three methods
   edge_collapse(), triangle_split(), edge_split(), and all the connectivity changes should
   happen through these operators!

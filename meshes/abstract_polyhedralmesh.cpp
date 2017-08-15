@@ -283,13 +283,17 @@ vec3d AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_normal(const uint pid, const 
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-int AbstractPolyhedralMesh<M,V,E,F,P>::poly_adjacent_through_face(const uint pid, const uint fid) const
+int AbstractPolyhedralMesh<M,V,E,F,P>::poly_adj_through_face(const uint pid, const uint fid) const
 {
-    for(uint nbr : this->adj_p2p(pid))
+    assert(poly_contains_face(pid,fid));
+
+    if (face_is_on_srf(fid)) return -1;
+
+    for(uint nbr : this->adj_f2p(fid))
     {
-        if (this->poly_shared_face(pid,nbr) == static_cast<int>(fid)) return nbr;
+        if (nbr!=pid) return nbr;
     }
-    return -1;
+    assert(false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -374,6 +378,88 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_edge_id(const uint fid, const uint 
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::face_adj_through_edge(const uint fid, const uint eid, const uint pid) const
+{
+    assert(this->poly_contains_face(pid, fid));
+    assert(this->poly_contains_edge(pid, eid));
+    assert(this->face_contains_edge(fid, eid));
+
+    for(uint f : this->adj_e2f(eid))
+    {
+        if (f!=fid && poly_contains_face(pid,f)) return f;
+    }
+
+    return 0;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+ipair AbstractPolyhedralMesh<M,V,E,F,P>::face_edges_from_vert(const uint fid, const uint vid) const
+{
+    assert(face_contains_vert(fid,vid));
+
+    ipair e;
+    uint found = 0;
+    for(uint eid : this->adj_f2e(fid))
+    {
+        if (this->edge_contains_vert(eid,vid))
+        {
+            if (found == 0) e.first = eid;
+            else            e.second = eid;
+            ++found;
+        }
+    }
+    assert(found == 2);
+    return e;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::face_adj_srf_edge(const uint fid, const uint eid, const uint vid) const
+{
+    assert(this->face_contains_edge(fid,eid));
+    assert(this->face_contains_vert(fid,vid));
+
+    for(uint e : this->adj_f2e(fid))
+    {
+        if (e!=eid && edge_is_on_srf(e) && this->edge_contains_vert(e, vid))
+        {
+            return e;
+        }
+    }
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::face_opp_to_srf_edge(const uint fid, const uint eid) const
+{
+    assert(face_is_on_srf(fid));
+    assert(edge_is_on_srf(eid));
+    assert(face_contains_edge(fid,eid));
+
+    for(uint f : adj_f2f(fid))
+    {
+        if (face_is_on_srf(f) && face_contains_edge(f,eid))
+        {
+            return f;
+        }
+    }
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_on_srf(const uint fid) const
 {
     return f_on_srf.at(fid);
@@ -385,9 +471,22 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_contains_vert(const uint fid, const uint vid) const
 {
-    for(uint off=0; off<verts_per_face(fid); ++off)
+    for(uint v : this->adj_f2v(fid))
     {
-        if (face_vert_id(fid,off) == vid) return true;
+        if (v == vid) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::face_contains_edge(const uint fid, const uint eid) const
+{
+    for(uint e : this->adj_f2e(fid))
+    {
+        if (e == eid) return true;
     }
     return false;
 }
@@ -482,6 +581,92 @@ double AbstractPolyhedralMesh<M,V,E,F,C>::vert_volume(const uint vid) const
     return vol;
 }
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_srf_edges(const uint vid) const
+{
+    std::vector<uint> srf_e;
+    for(uint eid : this->adj_v2e(vid))
+    {
+        if (this->edge_is_on_srf(eid)) srf_e.push_back(eid);
+    }
+    return srf_e;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_vert_ring(const uint vid) const
+{
+    std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
+    std::vector<uint> e_ring; // sorted list of surface edges incident to vid
+    std::vector<uint> f_ring; // sorted list of adjacent surface faces
+    verd_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    return v_ring;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_edge_ring(const uint vid) const
+{
+    std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
+    std::vector<uint> e_ring; // sorted list of surface edges incident to vid
+    std::vector<uint> f_ring; // sorted list of adjacent surface faces
+    verd_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    return e_ring;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_face_ring(const uint vid) const
+{
+    std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
+    std::vector<uint> e_ring; // sorted list of surface edges incident to vid
+    std::vector<uint> f_ring; // sorted list of adjacent surface faces
+    verd_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    return f_ring;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,C>::verd_ordered_srf_one_ring(const uint          vid,
+                                                                  std::vector<uint> & v_ring,
+                                                                  std::vector<uint> & e_ring,
+                                                                  std::vector<uint> & f_ring) const
+{
+    assert(vert_is_on_srf(vid));
+
+    v_ring.clear();
+    e_ring.clear();
+    f_ring.clear();
+
+    uint curr_e = this->vert_adj_srf_edges(vid).front();
+    uint curr_f = this->edge_adj_srf_faces(curr_e).front();
+    uint curr_v = this->vert_opposite_to(curr_e, vid);
+
+    do
+    {
+        v_ring.push_back(curr_v);
+        e_ring.push_back(curr_e);
+        f_ring.push_back(curr_f);
+
+        curr_e = face_adj_srf_edge(curr_f, curr_e, vid);
+        curr_f = face_opp_to_srf_edge(curr_f, curr_e);
+        curr_v = this->vert_opposite_to(curr_e, vid);
+    }
+    while(e_ring.size() < this->vert_adj_srf_edges(vid).size());
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
@@ -490,5 +675,55 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::edge_is_on_srf(const uint eid) const
 {
     return e_on_srf.at(eid);
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::edge_ordered_poly_ring(const uint eid) const
+{
+    std::vector<uint> plist;
+    if (this->adj_e2p(eid).empty()) return plist;
+
+    uint curr_f = this->adj_e2f(eid).front();
+    uint curr_p = this->adj_f2p(curr_f).front();
+
+    if (this->edge_is_on_srf(eid)) // make sure to start from a face exposed on the surface,
+    {                              // otherwise it'll be impossible to cover the whole umbrella
+        curr_f = this->edge_adj_srf_faces(eid).front();
+        curr_p = this->adj_f2p(curr_f).front();
+    }    
+
+    plist.push_back(curr_p);
+
+    do
+    {
+        curr_f = face_adj_through_edge(curr_f, eid, curr_p);
+        int tmp = poly_adj_through_face(curr_p, curr_f);
+        if (tmp >= 0)
+        {
+            curr_p = static_cast<uint>(tmp);
+            plist.push_back(curr_p);
+        }
+    }
+    while (plist.size() < this->adj_e2p(eid).size());
+
+    return plist;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::edge_adj_srf_faces(const uint eid) const
+{
+    std::vector<uint> srf_f;
+    for(uint fid : adj_e2f(eid))
+    {
+        if (face_is_on_srf(fid)) srf_f.push_back(fid);
+    }
+    return srf_f;
+}
+
 
 }
