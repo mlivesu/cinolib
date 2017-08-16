@@ -167,7 +167,7 @@ void read_VTU(const char          *,
 }
 
 CINO_INLINE
-void read_VTU(const char                      *,
+void read_VTK(const char                      *,
                std::vector<double>            &,
                std::vector<std::vector<uint>> &)
 {
@@ -176,7 +176,7 @@ void read_VTU(const char                      *,
 }
 
 CINO_INLINE
-void read_VTU(const char                      *,
+void read_VTK(const char                      *,
                std::vector<vec3d>             &,
                std::vector<std::vector<uint>> &)
 {
