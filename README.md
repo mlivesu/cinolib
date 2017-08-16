@@ -4,8 +4,8 @@ A generic programming C++ library for processing polygonal and polyhedral meshes
 (info on how to install/use it coming soon!)
 
 
-## Attribution
-If you use cinolib in your academic projects, please cite the library using this
+## Acknowldegment
+If you use cinolib in your academic projects, please cite the library using the following 
 BibTeX entry:
 
 ```bibtex
