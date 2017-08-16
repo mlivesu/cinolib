@@ -1,5 +1,5 @@
 # cinolib
-A generic programming C++ library for processing polygonal and polyhedral meshes.
+A generic programming header only C++ library for processing polygonal and polyhedral meshes.
 
 (info on how to install/use it coming soon!)
 
