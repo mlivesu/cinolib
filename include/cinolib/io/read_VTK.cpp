@@ -157,7 +157,7 @@ void read_VTK(const char          * filename,
 #else
 
 CINO_INLINE
-void read_VTU(const char          *,
+void read_VTK(const char          *,
                std::vector<double> &,
                std::vector<uint>   &,
                std::vector<uint>   &)
