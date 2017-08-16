@@ -46,7 +46,7 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> &
 
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        double area = std::max(m.poly_area(pid), 1e-5);
+        double area = std::max(m.poly_area(pid), 1e-5) * 2.0; // (2 is the average term : two verts for each edge)
         vec3d n     = m.poly_data(pid).normal;
 
         for(uint off=0; off<m.verts_per_poly(pid); ++off)
@@ -59,13 +59,13 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> &
             vec3d u_90 = u.cross(n); u_90.normalize();
             vec3d v_90 = v.cross(n); v_90.normalize();
 
-            vec3d per_edge_normal = u_90 * u.length() + v_90 * v.length();
-            per_edge_normal /= area;
+            vec3d per_vert_sum_over_edge_normals = u_90 * u.length() + v_90 * v.length();
+            per_vert_sum_over_edge_normals /= area;
 
             uint row = 3 * pid;
-            entries.push_back(Entry(row, curr, per_edge_normal.x())); ++row;
-            entries.push_back(Entry(row, curr, per_edge_normal.y())); ++row;
-            entries.push_back(Entry(row, curr, per_edge_normal.z()));
+            entries.push_back(Entry(row, curr, per_vert_sum_over_edge_normals.x())); ++row;
+            entries.push_back(Entry(row, curr, per_vert_sum_over_edge_normals.y())); ++row;
+            entries.push_back(Entry(row, curr, per_vert_sum_over_edge_normals.z()));
         }
     }
 
@@ -84,7 +84,7 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F
 
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        double vol3 = std::max(m.poly_volume(pid), 1e-5) * 3.0;
+        double vol = std::max(m.poly_volume(pid), 1e-5);
 
         for(uint vid : m.adj_p2v(pid))
         {
@@ -93,11 +93,13 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F
             {
                 if (m.face_contains_vert(fid,vid))
                 {
-                    vec3d n = (m.poly_face_is_CCW(pid,fid)) ? m.face_data(fid).normal : -m.face_data(fid).normal;
-                    per_vert_sum_over_f_normals += n * m.face_area(fid);
+                    vec3d  n   = m.poly_face_normal(pid,fid);
+                    double a   = m.face_area(fid);
+                    double avg = static_cast<double>(m.verts_per_face(fid));
+                    per_vert_sum_over_f_normals += (n*a)/avg;
                 }
             }
-            per_vert_sum_over_f_normals /= vol3;
+            per_vert_sum_over_f_normals /= vol;
             uint row = 3 * pid;
             entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.x())); ++row;
             entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.y())); ++row;
