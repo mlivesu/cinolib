@@ -36,6 +36,7 @@
 
 #include <QGLWidget>
 #include <vector>
+#include <string>
 
 #ifdef __APPLE__
 #include <gl.h>
@@ -52,31 +53,40 @@
 namespace cinolib
 {
 
-
 class GLcanvas : public QGLViewer
 {
     public:
 
         GLcanvas(QWidget * parent = 0);
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void init();
         void draw();
         void clear();
-        void fit_scene();
         void set_clear_color(const QColor & color);
-        void push_obj(DrawableObject * obj, bool refit_scene = true);
+        void fit_scene();
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void push_obj(DrawableObject * obj, bool refit_scene = true);
         bool pop_first_occurrence_of(int type);
         bool pop_all_occurrences_of (int type);
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void set_slice(float thresh, int item, int sign, int mode);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        std::string serialize_camera() const;
+        void        deserialize_camera(const std::string & s);
 
     private:
 
         QColor clear_color;
         std::vector<DrawableObject*> drawlist;
 };
-
 
 }
 

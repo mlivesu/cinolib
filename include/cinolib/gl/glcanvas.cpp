@@ -30,6 +30,11 @@
 **********************************************************************************/
 #include <cinolib/gl/glcanvas.h>
 
+#include <sstream>
+#include <QApplication>
+#include <QShortcut>
+#include <QMimeData>
+
 namespace cinolib
 {
 
@@ -39,7 +44,22 @@ GLcanvas::GLcanvas(QWidget * parent)
     setParent(parent);
 
     clear_color = QColor(200, 200, 200);
+
+    // enable cut/paste points of view for fast reproduction of paper images/comparisons
+    //
+    connect(new QShortcut(QKeySequence::Copy, this), &QShortcut::activated, [&](){
+        QApplication::clipboard()->setText(serialize_camera().data());
+    });
+    //
+    connect(new QShortcut(QKeySequence::Paste, this), &QShortcut::activated, [&](){
+        if (QApplication::clipboard()->mimeData()->hasText())
+        {
+            deserialize_camera(QApplication::clipboard()->mimeData()->text().toStdString());
+        }
+    });
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void GLcanvas::init()
@@ -47,11 +67,15 @@ void GLcanvas::init()
     setFPSIsDisplayed(true);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void GLcanvas::clear()
 {
     drawlist.clear();
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void GLcanvas::draw()
@@ -63,6 +87,8 @@ void GLcanvas::draw()
         obj->draw( sceneRadius() );
     }
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void GLcanvas::push_obj(DrawableObject *obj, bool refit_scene)
@@ -76,6 +102,8 @@ void GLcanvas::push_obj(DrawableObject *obj, bool refit_scene)
 
     updateGL();
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void GLcanvas::fit_scene()
@@ -104,6 +132,8 @@ void GLcanvas::fit_scene()
     //cout << endl;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void GLcanvas::set_clear_color(const QColor &color)
 {
@@ -111,6 +141,7 @@ void GLcanvas::set_clear_color(const QColor &color)
     updateGL();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool GLcanvas::pop_all_occurrences_of(int type)
@@ -125,12 +156,58 @@ bool GLcanvas::pop_all_occurrences_of(int type)
     return found;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::string GLcanvas::serialize_camera() const
+{
+    std::stringstream ss;
+    ss << this->camera()->position().x      << " "
+       << this->camera()->position().y      << " "
+       << this->camera()->position().z      << " "
+       << this->camera()->orientation()[0]  << " "
+       << this->camera()->orientation()[1]  << " "
+       << this->camera()->orientation()[2]  << " "
+       << this->camera()->orientation()[3]  << " "
+       << this->camera()->upVector().x      << " "
+       << this->camera()->upVector().y      << " "
+       << this->camera()->upVector().z      << " "
+       << this->camera()->viewDirection().x << " "
+       << this->camera()->viewDirection().y << " "
+       << this->camera()->viewDirection().z;
+    return ss.str();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::deserialize_camera(const std::string & s)
+{
+    double pos_x, pos_y, pos_z, or_i, or_j, or_k, or_l, up_x, up_y, up_z, dir_x, dir_y, dir_z;
+
+    std::stringstream ss(s);
+    ss >> pos_x >> pos_y >> pos_z
+       >> or_i  >> or_j  >> or_k >> or_l
+       >> up_x  >> up_y  >> up_z
+       >> dir_x >> dir_y >> dir_z;
+
+    this->camera()->setPosition     (qglviewer::Vec(pos_x, pos_y, pos_z));
+    this->camera()->setUpVector     (qglviewer::Vec(up_x,up_y,up_z));
+    this->camera()->setViewDirection(qglviewer::Vec(dir_x,dir_y,dir_z));
+    this->camera()->setOrientation  (qglviewer::Quaternion(or_i,or_j,or_k,or_l));
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void GLcanvas::set_slice(float thresh, int item, int sign, int mode)
 {
     for(DrawableObject *obj : drawlist) obj->slice(thresh, item, sign, mode);
     updateGL();
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool GLcanvas::pop_first_occurrence_of(int type)

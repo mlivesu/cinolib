@@ -5,7 +5,6 @@
 - consider avoiding to use a tree into the profiler. Sorting entries w.r.t. call time should do the job…
 - refactor IsoCurve (exploiting the Curve class)
 - extend the concept of subdivisions from hexmesh to any mesh
-- make cotangent weights robust against almost degenerate triangles and boundary meshes
 - add Additive Manufacturing stuff (load and process CLI files)…
 - Improve face tessellation strategy for polygonal meshes (flipped elements may currently arise for non convex polygons)
 - Add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
@@ -13,13 +12,11 @@
   query point and let the application choose the best one
 - make a DrawableOctree (and visually test the octree)
 - Add cache for eigen solvers - avoid refactoring matrices multiple times
+- make cotangent weights robust against almost degenerate triangles and boundary meshes
 - Use robust geometric computations (volumes, dihedral angles ecc.) 
   (ref. => Lecture Notes on Geometric Robustness di Jonathan Richard Shewchuk)
 - Add cotan laplacian  normalization
   (ref => https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html)
-- Add ambient occlusion (with/without floor)
-- Copy/paste points of view
-- remove dependency from libQGLViewer and use GLFW instead
 - Improve on mesh rendering (shaders, VBOs)
 - Add text box with debug messages
 - Fix Logger (it does not flush the streaming buffer until the program is closed)
