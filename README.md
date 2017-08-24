@@ -1,7 +1,7 @@
 # cinolib
 A generic programming header only C++ library for processing polygonal and polyhedral meshes.
 
-![](cinolib_rep_image.png)
+<p align="center"><img src="cinolib_rep_image.png" width="500"></p>
 
 (info on how to install/use it coming soon!)
 
