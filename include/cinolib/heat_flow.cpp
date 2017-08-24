@@ -45,7 +45,7 @@ ScalarField heat_flow(const AbstractMesh<M,V,E,P> & m,
     ScalarField heat(m.num_verts());
 
     Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
-    Eigen::SparseMatrix<double> MM   = mass_matrix(m);
+    Eigen::SparseMatrix<double> MM  = mass_matrix(m);
     Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
 
     std::map<uint,double> bc;
