@@ -56,6 +56,17 @@ const float & Color::operator[](const uint i) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+Color & Color::operator*=(const double d)
+{
+    r*=d;
+    g*=d;
+    b*=d;
+    return *this;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 float & Color::operator[](const uint i)
 {
     return rgba[i];
