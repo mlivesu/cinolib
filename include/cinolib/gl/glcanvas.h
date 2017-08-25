@@ -79,6 +79,7 @@ class GLcanvas : public QGLViewer
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        std::string serialize_drawlist() const;
         std::string serialize_camera() const;
         void        deserialize_camera(const std::string & s);
 

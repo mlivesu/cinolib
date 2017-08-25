@@ -159,6 +159,32 @@ bool GLcanvas::pop_all_occurrences_of(int type)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+std::string GLcanvas::serialize_drawlist() const
+{
+    std::stringstream ss;
+    for(const DrawableObject *obj : drawlist)
+    {
+        switch (obj->object_type())
+        {
+            case DRAWABLE_TRIMESH        : ss << "Trimesh        "; break;
+            case DRAWABLE_QUADMESH       : ss << "Qaudmesh       "; break;
+            case DRAWABLE_POLYGONMESH    : ss << "Polygonmesh    "; break;
+            case DRAWABLE_TETMESH        : ss << "Tetmesh        "; break;
+            case DRAWABLE_HEXMESH        : ss << "Hexmesh        "; break;
+            case DRAWABLE_POLYHEDRALMESH : ss << "Polyhedralmesh "; break;
+            case DRAWABLE_CURVE          : ss << "Curve          "; break;
+            case DRAWABLE_SKELETON       : ss << "Skeleton       "; break;
+            case DRAWABLE_ISOSURFACE     : ss << "Isosurface     "; break;
+            case DRAWABLE_VECTOR_FIELD   : ss << "VectorField    "; break;
+            default                      : assert(false && "Unknown Drawable Object!");
+        }
+    }
+    return ss.str();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 std::string GLcanvas::serialize_camera() const
 {
     std::stringstream ss;
