@@ -18,5 +18,4 @@
 - Add cotan laplacian  normalization
   (ref => https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html)
 - Improve on mesh rendering (shaders, VBOs)
-- Add text box with debug messages
 - Fix Logger (it does not flush the streaming buffer until the program is closed)
