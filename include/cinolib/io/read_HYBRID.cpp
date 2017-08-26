@@ -38,14 +38,14 @@ CINO_INLINE
 void read_HYBDRID(const char                     * filename,
                   std::vector<double>            & coords,
                   std::vector<std::vector<uint>> & faces,
-                  std::vector<std::vector<uint>> & cells,
-                  std::vector<std::vector<bool>> & cells_face_winding)
+                  std::vector<std::vector<uint>> & polys,
+                  std::vector<std::vector<bool>> & polys_face_winding)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
     coords.clear();
     faces.clear();
-    cells.clear();
+    polys.clear();
 
     FILE *fp = fopen(filename, "r");
 
@@ -88,15 +88,15 @@ void read_HYBDRID(const char                     * filename,
         uint nf;
         fscanf(fp, "%d", &nf);
 
-        std::vector<uint> cell;
+        std::vector<uint> poly;
         std::vector<bool> cell_winding;
         for(uint j=0; j<nf; ++j)
         {
             uint fid;
             fscanf(fp, "%d", &fid);
-            cell.push_back(fid);
+            poly.push_back(fid);
         }
-        cells.push_back(cell);
+        polys.push_back(poly);
 
         uint dummy; fscanf(fp, "%d", &dummy);
         for(uint j=0; j<nf; ++j)
@@ -106,7 +106,7 @@ void read_HYBDRID(const char                     * filename,
             assert(winding==0 || winding==1);
             cell_winding.push_back(winding);
         }
-        cells_face_winding.push_back(cell_winding);
+        polys_face_winding.push_back(cell_winding);
     }
 
     fclose(fp);

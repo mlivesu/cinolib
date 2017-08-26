@@ -478,39 +478,39 @@ void Hexmesh<M,V,E,F,P>::update_hex_quality()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Hexmesh<M,V,E,F,P>::poly_subdivide(const std::vector<std::vector<std::vector<uint>>> & cell_split_scheme)
+void Hexmesh<M,V,E,F,P>::poly_subdivide(const std::vector<std::vector<std::vector<uint>>> & poly_split_scheme)
 {
     std::vector<vec3d> new_verts;
-    std::vector<uint>  new_cells;
+    std::vector<uint>  new_polys;
     std::map<std::vector<uint>,uint> v_map;
 
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        for(const auto & sub_cell: cell_split_scheme)
+        for(const auto & sub_poly: poly_split_scheme)
         {
-            assert(sub_cell.size() == 8);
+            assert(sub_poly.size() == 8);
             for(uint off=0; off<8; ++off)
             {
                 std::vector<uint> vids;
-                for(uint i : sub_cell.at(off)) vids.push_back(this->poly_vert_id(pid,i));
+                for(uint i : sub_poly.at(off)) vids.push_back(this->poly_vert_id(pid,i));
                 sort(vids.begin(), vids.end());
 
                 auto query = v_map.find(vids);
                 if (query != v_map.end())
                 {
-                    new_cells.push_back(query->second);
+                    new_polys.push_back(query->second);
                 }
                 else
                 {
                     uint fresh_id = new_verts.size();
                     new_verts.push_back(verts_average(vids));
                     v_map[vids] = fresh_id;
-                    new_cells.push_back(fresh_id);
+                    new_polys.push_back(fresh_id);
                 }
             }
         }
     }
-    *this = Hexmesh<M,V,E,F,P>(new_verts,new_cells);
+    *this = Hexmesh<M,V,E,F,P>(new_verts,new_polys);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

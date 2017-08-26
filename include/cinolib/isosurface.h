@@ -57,7 +57,7 @@ class Isosurface
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void tessellate(std::vector<double> & coords,
-                        std::vector<uint>   & new_cells,
+                        std::vector<uint>   & new_polys,
                         std::vector<double> & new_field) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
