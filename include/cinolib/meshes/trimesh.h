@@ -74,6 +74,13 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        uint verts_per_poly(const uint) const { return 3; }
+        uint verts_per_poly()           const { return 3; }
+        uint edges_per_poly(const uint) const { return 3; }
+        uint edges_per_poly()           const { return 3; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         std::vector<uint> get_ordered_boundary_vertices() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

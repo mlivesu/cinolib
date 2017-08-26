@@ -87,6 +87,13 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        uint verts_per_poly(const uint) const { return 4; }
+        uint verts_per_poly()           const { return 4; }
+        uint edges_per_poly(const uint) const { return 4; }
+        uint edges_per_poly()           const { return 4; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void operator+=(const Quadmesh<M,V,E,P> & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

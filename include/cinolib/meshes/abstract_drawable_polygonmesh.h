@@ -60,6 +60,15 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void vert_set_color(const Color & c) { Mesh::vert_set_color(c); updateGL(); }
+        void edge_set_color(const Color & c) { Mesh::edge_set_color(c); updateGL(); }
+        void poly_set_color(const Color & c) { Mesh::poly_set_color(c); updateGL(); }
+        void vert_set_alpha(const float   a) { Mesh::vert_set_alpha(a); updateGL(); }
+        void edge_set_alpha(const float   a) { Mesh::edge_set_alpha(a); updateGL(); }
+        void poly_set_alpha(const float   a) { Mesh::poly_set_alpha(a); updateGL(); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void init_drawable_stuff();
         void updateGL();
 
