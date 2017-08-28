@@ -368,4 +368,33 @@ std::vector<uint> Quadmesh<M,V,E,P>::poly_tessellation(const uint pid) const
     return triangulated_polys.at(pid);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void Quadmesh<M,V,E,P>::poly_switch_id(const uint pid0, const uint pid1)
+{
+    AbstractPolygonMesh<M,V,E,P>::poly_switch_id(pid0, pid1);    
+    std::swap(triangulated_polys.at(pid0), triangulated_polys.at(pid1));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void Quadmesh<M,V,E,P>::poly_remove(const uint pid)
+{
+    AbstractPolygonMesh<M,V,E,P>::poly_remove(pid);
+    update_poly_tessellation();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void Quadmesh<M,V,E,P>::poly_remove_unreferenced(const uint pid)
+{
+    AbstractPolygonMesh<M,V,E,P>::poly_remove_unreferenced(pid);
+    triangulated_polys.pop_back();
+}
 }
