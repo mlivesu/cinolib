@@ -125,306 +125,265 @@ int Trimesh<M,V,E,P>::edge_opposite_to(const uint pid, const uint vid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,P>::edge_collapse(const uint eid)
+bool Trimesh<M,V,E,P>::edge_is_collapsible(const uint) const
 {
-    // define what to keep and what to remove
+    return true;
+    // Pre-processing : check edges (AUG 26th : I DON'T UNDERSTAND THIS!)
     //
-    uint vid_keep   = this->edge_vert_id(eid,0);
-    uint vid_remove = this->edge_vert_id(eid,1);
-    std::set<uint> pid_remove(this->adj_e2p(eid).begin(), this->adj_e2p(eid).end());
-    std::set<uint> edg_keep, edg_remove;
-    for(uint pid: pid_remove)
-    {
-        edg_keep.insert(edge_opposite_to(pid, vid_remove));
-        edg_remove.insert(edge_opposite_to(pid, vid_keep));
-    }
-    edg_remove.insert(eid);
+    //for(uint eid : this->adj_v2e(vid_rem))
+    //{
+    //    if (CONTAINS(edge_rem,eid)) continue;
 
-    // Pre-processing : check edges
-    //
-    for(uint eid : this->adj_v2e(vid_remove))
-    {
-        if (CONTAINS(edg_remove,eid)) continue;
+    //    uint vid0 = this->edge_vert_id(eid,0);
+    //    uint vid1 = this->edge_vert_id(eid,1);
+    //    //
+    //    uint vid0_mod = vid0;
+    //    uint vid1_mod = vid1;
+    //    //
+    //    if (vid0 == vid_rem) vid0_mod = vid_keep; else
+    //    if (vid1 == vid_rem) vid1_mod = vid_keep; else
+    //    assert("Something is off here" && false);
 
-        uint vid0 = this->edge_vert_id(eid,0);
-        uint vid1 = this->edge_vert_id(eid,1);
-        //
-        uint vid0_mod = vid0;
-        uint vid1_mod = vid1;
-        //
-        if (vid0 == vid_remove) vid0_mod = vid_keep; else
-        if (vid1 == vid_remove) vid1_mod = vid_keep; else
-        assert("Something is off here" && false);
+    //    // check edge
+    //    for(uint eid2=0; eid2<this->num_edges(); ++eid2)
+    //    {
+    //        if (eid2==eid) continue;
 
-        // check edge
-        for(uint eid2=0; eid2<this->num_edges(); ++eid2)
-        {
-            if (eid2==eid) continue;
-
-            if ((vid0_mod == vid0 && vid1_mod == vid1) ||
-                (vid0_mod == vid1 && vid1_mod == vid0))
-            {
-                logger << "WARNING : duplicared edge " << eid << " : Impossible to perform edge collapse. " << endl;
-                return false;
-            }
-        }
-    }
+    //        if ((vid0_mod == vid0 && vid1_mod == vid1) ||
+    //            (vid0_mod == vid1 && vid1_mod == vid0))
+    //        {
+    //            logger << "WARNING : duplicared edge " << eid << " : Impossible to perform edge collapse. " << endl;
+    //            return false;
+    //        }
+    //    }
+    //}
 
     // Pre-processing : check triangles
     //
-    for(uint pid : this->adj_v2p(vid_remove))
+//    for(uint pid : this->adj_v2p(vid_rem))
+//    {
+//        if (CONTAINS(pid_remove, pid)) continue;
+
+//        uint vid0   = this->poly_vert_id(pid,0);
+//        uint vid1   = this->poly_vert_id(pid,1);
+//        uint vid2   = this->poly_vert_id(pid,2);
+
+//        if (vid0 == vid_rem) vid0 = vid_keep; else
+//        if (vid1 == vid_rem) vid1 = vid_keep; else
+//        if (vid2 == vid_rem) vid2 = vid_keep; else
+//        assert("Something is off here" && false);
+
+//        // check triangle flip
+//        vec3d n = triangle_normal(this->vert(vid0), this->vert(vid1), this->vert(vid2));
+
+//        if (n.length() < 1e-6)
+//        {
+//            logger << "WARNING : triangle on colinear points " << pid << " : Impossible to perform edge collapse. " << endl;
+//            return false;
+//        }
+
+//        if (n.dot(this->poly_data(pid).normal) < 0 ) // triangle inversion
+//        {
+//            logger << "WARNING : triangle inversion " << pid << " : Impossible to perform edge collapse. " << std::endl;
+//            return false;
+//        }
+//    }
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool Trimesh<M,V,E,P>::edge_collapse(const uint eid)
+{
+    /* how it should be:
+     * delete all the faces incident to eid
+     *      this may trigger deleting isolated edges
+     *      this may trigger deleting isolated vertices
+     *      (do it on abstract mesh, debug it, then move forward)
+     * merge edge extrema
+     * merge pairs of edges in order to close the void generated through face deletion
+    */
+
+    if (!edge_is_collapsible(eid))
     {
-        if (CONTAINS(pid_remove, pid)) continue;
-
-        vec3d n_old = this->poly_data(pid).normal;
-        uint vid0   = this->poly_vert_id(pid,0);
-        uint vid1   = this->poly_vert_id(pid,1);
-        uint vid2   = this->poly_vert_id(pid,2);
-
-        if (vid0 == vid_remove) vid0 = vid_keep; else
-        if (vid1 == vid_remove) vid1 = vid_keep; else
-        if (vid2 == vid_remove) vid2 = vid_keep; else
-        assert("Something is off here" && false);
-
-        // check triangle flip
-        vec3d v0 = this->vert(vid0);
-        vec3d v1 = this->vert(vid1);
-        vec3d v2 = this->vert(vid2);
-        //
-        vec3d u = v1 - v0;    u.normalize();
-        vec3d v = v2 - v0;    v.normalize();
-        vec3d n = u.cross(v); n.normalize();
-
-        if (n.length() == 0)
-        {
-            logger << "WARNING : triangle on colinear points " << pid << " : Impossible to perform edge collapse. " << endl;
-            return false;
-        }
-
-        if (n.dot(n_old) < 0 ) // triangle inversion
-        {
-            logger << "WARNING : triangle inversion " << pid << " : Impossible to perform edge collapse. " << std::endl;
-            return false;
-        }
+        std::cerr << "Impossible to collapse edge " << eid << std::endl;
+        return false;
     }
 
-    // Everything is ok
-    // The edge can be collapsed
-
-    for(uint eid : this->adj_v2e(vid_remove))
-    {
-        if (CONTAINS(edg_remove, eid)) continue;
-
-        this->v2e.at(vid_keep).push_back(eid);
-        if (this->edge_vert_id(eid,0) == vid_remove) this->edges.at(eid*2+0) = vid_keep; else
-        if (this->edge_vert_id(eid,1) == vid_remove) this->edges.at(eid*2+1) = vid_keep; else
-        assert("Something is off here" && false);
-    }
+    // 1) Define what to keep and what to remove
     //
-    for(uint pid : this->adj_v2p(vid_remove))
+    uint vid_keep = this->edge_vert_id(eid,0);
+    uint vid_rem  = this->edge_vert_id(eid,1);
+    std::set<uint> poly_rem(this->adj_e2p(eid).begin(), this->adj_e2p(eid).end());
+    std::set<uint> edge_keep, edge_rem;
+    edge_rem.insert(eid);
+    for(uint pid: poly_rem)
     {
-        if (CONTAINS(pid_remove, pid)) continue;
-
-        this->v2p.at(vid_keep).push_back(pid);
-        if (this->poly_vert_id(pid,0) == vid_remove) this->polys.at(pid*3+0) = vid_keep; else
-        if (this->poly_vert_id(pid,0) == vid_remove) this->polys.at(pid*3+1) = vid_keep; else
-        if (this->poly_vert_id(pid,0) == vid_remove) this->polys.at(pid*3+2) = vid_keep; else
-        assert("Something is off here" && false);
-
-        update_p_normal(pid);
+        edge_keep.insert (edge_opposite_to(pid, vid_keep));
+        edge_rem.insert(edge_opposite_to(pid, vid_rem));
     }
 
-    // Migrate references from edge_remove to edge_keep
+    // 2) Migrate references from vid_rem to vid_keep
     //
-    for(uint pid : pid_remove)
+    for(uint vid : this->adj_v2v(vid_rem))
     {
-        int e_take = edge_opposite_to(pid, vid_remove); assert(e_take >= 0);
-        int e_give = edge_opposite_to(pid, vid_keep);   assert(e_give >= 0);
-        assert(CONTAINS(edg_remove, e_give));
-
-        for(uint inc_f : this->adj_e2p(e_give))
-        {
-            if (CONTAINS(pid_remove, inc_f)) continue;
-
-            for (uint adj_f : this->adj_e2p(e_take))
-            {
-                if (CONTAINS(pid_remove, adj_f)) continue;
-
-                this->p2p.at(inc_f).push_back(adj_f);
-                this->p2p.at(adj_f).push_back(inc_f);
-            }
-
-            this->e2p.at(e_take).push_back(inc_f);
-            this->p2e.at(inc_f).push_back(e_take);
-        }
-    }
-
-    // remove references to vid_remove
-    //
-    for(uint vid : this->adj_v2v(vid_remove))
-    {
-        assert(vid!=vid_remove && vid<this->num_verts());
-
-        auto beg = this->v2v.at(vid).begin();
-        auto end = this->v2v.at(vid).end();
-        this->v2v.at(vid).erase(std::remove(beg, end, vid_remove), end); // Erase-Remove idiom
-
         if (vid == vid_keep) continue;
-        if (!this->verts_are_adjacent(vid_keep,vid))
+        if (!this->verts_are_adjacent(vid_keep, vid))
         {
             this->v2v.at(vid_keep).push_back(vid);
             this->v2v.at(vid).push_back(vid_keep);
         }
     }
     //
-    // remove references to any edge in edg_remove.
-    //
-    for(uint edg_rem : edg_remove)
+    for(uint eid : this->adj_v2e(vid_rem))
     {
-        assert(edg_rem<this->num_edges());
+        if (CONTAINS(edge_rem, eid)) continue;
 
-        for(uint pid : this->adj_e2p(edg_rem))
+        this->v2e.at(vid_keep).push_back(eid);
+        if (this->edge_vert_id(eid,0) == vid_rem) this->edges.at(eid*2+0) = vid_keep; else
+        if (this->edge_vert_id(eid,1) == vid_rem) this->edges.at(eid*2+1) = vid_keep; else
+        assert("Something is off here" && false);
+    }
+    //
+    for(uint pid : this->adj_v2p(vid_rem))
+    {
+        if (CONTAINS(poly_rem, pid)) continue;
+
+        this->v2p.at(vid_keep).push_back(pid);
+        if (this->poly_vert_id(pid,0) == vid_rem) this->polys.at(pid).at(0) = vid_keep; else
+        if (this->poly_vert_id(pid,1) == vid_rem) this->polys.at(pid).at(1) = vid_keep; else
+        if (this->poly_vert_id(pid,2) == vid_rem) this->polys.at(pid).at(2) = vid_keep; else
+        assert("Something is off here" && false);
+
+        update_p_normal(pid);
+    }
+
+    // 3) Migrate references from edge_rem to edge_keep
+    //
+    for(uint pid : poly_rem)
+    {
+        int e_keep = edge_opposite_to(pid, vid_rem);  assert(e_keep >= 0);
+        int e_rem  = edge_opposite_to(pid, vid_keep); assert(e_rem >= 0);
+        assert(CONTAINS(edge_rem, e_rem));
+
+        for(uint pid0 : this->adj_e2p(e_rem))
+        {
+            if (CONTAINS(poly_rem, pid0)) continue;
+
+            for (uint pid1 : this->adj_e2p(e_keep))
+            {
+                if (CONTAINS(poly_rem, pid1)) continue;
+
+                this->p2p.at(pid0).push_back(pid1);
+                this->p2p.at(pid1).push_back(pid0);
+            }
+
+            this->e2p.at(e_keep).push_back(pid0);
+            this->p2e.at(pid0).push_back(e_keep);
+        }
+    }
+
+    // 4) Remove any reference to vid_rem
+    //
+    for(uint vid : this->adj_v2v(vid_rem))
+    {
+        assert(vid!=vid_rem && vid<this->num_verts());
+
+        auto beg = this->v2v.at(vid).begin();
+        auto end = this->v2v.at(vid).end();
+        this->v2v.at(vid).erase(std::remove(beg, end, vid_rem), end); // Erase-Remove idiom
+    }
+    //
+    // 5) Remove any reference to any edge in edg_rem.
+    //
+    for(uint eid : edge_rem)
+    {
+        assert(eid<this->num_edges());
+
+        for(uint pid : this->adj_e2p(eid))
         {
             assert(pid<this->num_polys());
             auto beg = this->p2e.at(pid).begin();
             auto end = this->p2e.at(pid).end();
-            this->p2e.at(pid).erase(std::remove(beg, end, edg_rem), end); // Erase-Remove idiom
+            this->p2e.at(pid).erase(std::remove(beg, end, eid), end); // Erase-Remove idiom
         }
 
         for(uint i=0; i<2; ++i)
         {
-            uint vid = this->edge_vert_id(edg_rem, i);
+            uint vid = this->edge_vert_id(eid, i);
             auto beg = this->v2e.at(vid).begin();
             auto end = this->v2e.at(vid).end();
-            this->v2e.at(vid).erase(std::remove(beg, end, edg_rem), end); // Erase-Remove idiom
+            this->v2e.at(vid).erase(std::remove(beg, end, eid), end); // Erase-Remove idiom
         }
     }
     //
-    // remove references to any triangle in tri_remove.
+    // 6) Remove any reference to any triangle in poly_rem.
     //
-    for(uint pid_rem : pid_remove)
+    for(uint pid : poly_rem)
     {
         for(uint off=0; off<3; ++off)
         {
-            uint vid = this->poly_vert_id(pid_rem,off);
+            uint vid = this->poly_vert_id(pid,off);
             auto beg = this->v2p.at(vid).begin();
             auto end = this->v2p.at(vid).end();
-            this->v2p.at(vid).erase(std::remove(beg, end, pid_rem), end); // Erase-Remove idiom
-            this->update_v_normal(vid);
+            this->v2p.at(vid).erase(std::remove(beg, end, pid), end); // Erase-Remove idiom
         }
 
-        for(uint eid : this->adj_p2e(pid_rem))
+        for(uint eid : this->adj_p2e(pid))
         {
             auto beg = this->e2p.at(eid).begin();
             auto end = this->e2p.at(eid).end();
-            this->e2p.at(eid).erase(std::remove(beg, end, pid_rem), end); // Erase-Remove idiom
+            this->e2p.at(eid).erase(std::remove(beg, end, pid), end); // Erase-Remove idiom
         }
 
-        for(uint pid : this->adj_p2p(pid_rem))
+        for(uint pid : this->adj_p2p(pid))
         {
             auto beg = this->p2p.at(pid).begin();
             auto end = this->p2p.at(pid).end();
-            this->p2p.at(pid).erase(std::remove(beg, end, pid_rem), end); // Erase-Remove idiom
+            this->p2p.at(pid).erase(std::remove(beg, end, pid), end); // Erase-Remove idiom
         }
     }
 
     // clear
-    this->v2v.at(vid_remove).clear();
-    this->v2e.at(vid_remove).clear();
-    this->v2p.at(vid_remove).clear();
+    this->v2v.at(vid_rem).clear();
+    this->v2e.at(vid_rem).clear();
+    this->v2p.at(vid_rem).clear();
 
-    for(uint eid : edg_remove)
+    for(uint eid : edge_rem)
     {
         this->e2p.at(eid).clear();
         this->edges.at(eid*2+0) = INT_MAX;
         this->edges.at(eid*2+1) = INT_MAX;
     }
 
-    for(uint pid : pid_remove)
+    for(uint pid : poly_rem)
     {
         this->p2e.at(pid).clear();
         this->p2p.at(pid).clear();
-        this->polys.at(pid*3+0) = INT_MAX;
-        this->polys.at(pid*3+1) = INT_MAX;
-        this->polys.at(pid*3+2) = INT_MAX;
+        this->polys.at(pid).at(0) = INT_MAX;
+        this->polys.at(pid).at(1) = INT_MAX;
+        this->polys.at(pid).at(2) = INT_MAX;
     }
 
     // Finalize
 
-    vert_remove_unreferenced(vid_remove);
+    this->vert_remove_unreferenced(vid_rem);
 
-    std::vector<uint> edg_remove_vec(edg_remove.begin(), edg_remove.end());
+    std::vector<uint> edg_remove_vec(edge_rem.begin(), edge_rem.end());
     std::sort(edg_remove_vec.begin(), edg_remove_vec.end());
     std::reverse(edg_remove_vec.begin(), edg_remove_vec.end());
-    for(uint eid : edg_remove_vec) edge_remove_unreferenced(eid);
+    for(uint eid : edg_remove_vec) this->edge_remove_unreferenced(eid);
 
-    std::vector<uint> pid_remove_vec(pid_remove.begin(), pid_remove.end());
+    std::vector<uint> pid_remove_vec(poly_rem.begin(), poly_rem.end());
     std::sort(pid_remove_vec.begin(), pid_remove_vec.end());
     std::reverse(pid_remove_vec.begin(), pid_remove_vec.end());
-    for(uint tid : pid_remove_vec) poly_remove_unreferenced(tid);
+    for(uint pid : pid_remove_vec) this->poly_remove_unreferenced(pid);
 
     this->update_normals();
 
     return true;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-uint Trimesh<M,V,E,P>::edge_add(const uint vid0, const uint vid1)
-{
-    assert(vid0 < this->num_verts());
-    assert(vid1 < this->num_verts());
-    //
-    uint id = this->num_edges();
-    //
-    this->edges.push_back(vid0);
-    this->edges.push_back(vid1);
-    //
-    this->e2p.push_back(std::vector<uint>());
-    //
-    E data;
-    this->e_data.push_back(data);
-    //
-    return id;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Trimesh<M,V,E,P>::edge_switch_id(const uint eid0, const uint eid1)
-{
-    for(uint off=0; off<2; ++off) std::swap(this->edges.at(2*eid0+off), this->edges.at(2*eid1+off));
-
-    std::swap(this->e2p.at(eid0), this->e2p.at(eid1));
-
-    for(std::vector<uint> & nbrs : this->v2e)
-    for(uint & curr : nbrs)
-    {
-        if (curr == eid0) curr = eid1; else
-        if (curr == eid1) curr = eid0;
-    }
-
-    for(std::vector<uint> & nbrs : this->p2e)
-    for(uint & curr : nbrs)
-    {
-        if (curr == eid0) curr = eid1; else
-        if (curr == eid1) curr = eid0;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Trimesh<M,V,E,P>::edge_remove_unreferenced(const uint eid)
-{
-    edge_switch_id(eid, this->num_edges()-1);
-    this->edges.resize(this->edges.size()-2);
-    this->e_data.pop_back();
-    this->e2p.pop_back();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -574,7 +533,7 @@ uint Trimesh<M,V,E,P>::poly_add(const uint vid0, const uint vid1, const uint vid
     {
         if (new_eid[i] == -1)
         {
-            new_eid[i] = edge_add(new_e[i].first, new_e[i].second);
+            new_eid[i] = this->edge_add(new_e[i].first, new_e[i].second);
         }
         //
         for(uint nbr : this->e2p.at(new_eid[i]))
@@ -632,55 +591,6 @@ double Trimesh<M,V,E,P>::poly_area(const uint pid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void Trimesh<M,V,E,P>::poly_switch_id(const uint pid0, const uint pid1)
-{
-    for(uint offset=0; offset<3; ++offset)
-    {
-        std::swap(this->polys.at(3*pid0+offset),this->polys.at(3*pid1+offset));
-    }
-    std::swap(this->f_data.at(pid0), this->f_data.at(pid1));
-    std::swap(this->p2e.at(pid0),    this->p2e.at(pid1));
-    std::swap(this->p2p.at(pid0),    this->p2p.at(pid1));
-
-    for(auto & nbrs : this->v2p)
-    for(uint & curr : nbrs)
-    {
-        if (curr == pid0) curr = pid1; else
-        if (curr == pid1) curr = pid0;
-    }
-
-    for(auto & nbrs : this->e2p)
-    for(uint & curr : nbrs)
-    {
-        if (curr == pid0) curr = pid1; else
-        if (curr == pid1) curr = pid0;
-    }
-
-    for(auto & nbrs : this->p2p)
-    for(uint & curr : nbrs)
-    {
-        if (curr == pid0) curr = pid1; else
-        if (curr == pid1) curr = pid0;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Trimesh<M,V,E,P>::poly_remove_unreferenced(const uint pid)
-{
-    poly_switch_id(pid, this->num_polys()-1);
-    this->polys.resize(this->polys.size()-3);
-    this->f_data.pop_back();
-    this->p2e.pop_back();
-    this->p2p.pop_back();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 uint Trimesh<M,V,E,P>::vert_opposite_to(const uint pid, const uint vid0, const uint vid1) const
 {
     assert(this->poly_contains_vert(pid, vid0));
@@ -691,29 +601,6 @@ uint Trimesh<M,V,E,P>::vert_opposite_to(const uint pid, const uint vid0, const u
         if (vid != vid0 && vid != vid1) return vid;
     }
     assert(false);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-uint Trimesh<M,V,E,P>::vert_add(const vec3d & pos)
-{
-    uint vid = this->num_verts();
-    //
-    this->verts.push_back(pos);
-    //
-    V data;
-    this->v_data.push_back(data);
-    //
-    this->v2v.push_back(std::vector<uint>());
-    this->v2e.push_back(std::vector<uint>());
-    this->v2p.push_back(std::vector<uint>());
-    //
-    this->bb.min = this->bb.min.min(pos);
-    this->bb.max = this->bb.max.max(pos);
-    //
-    return vid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -750,50 +637,6 @@ void Trimesh<M,V,E,P>::vert_weights_cotangent(const uint vid, std::vector<std::p
         wgt = (this->adj_e2p(eid).size() == 2) ? wgt * 0.5 : wgt;
         wgts.push_back(std::make_pair(nbr,wgt));
     }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Trimesh<M,V,E,P>::vert_switch_id(const uint vid0, const uint vid1)
-{
-    std::swap(this->verts.at(vid0),this->verts.at(vid1));
-    std::swap(this->v2v.at(vid0),this->v2v.at(vid1));
-    std::swap(this->v2e.at(vid0),this->v2e.at(vid1));
-    std::swap(this->v2p.at(vid0),this->v2p.at(vid1));
-
-    for(uint & curr : this->edges)
-    {
-        if (curr == vid0) curr = vid1; else
-        if (curr == vid1) curr = vid0;
-    }
-
-    for(uint & curr : this->polys)
-    {
-        if (curr == vid0) curr = vid1; else
-        if (curr == vid1) curr = vid0;
-    }
-
-    for(auto & nbrs : this->v2v)
-    for(uint & curr : nbrs)
-    {
-        if (curr == vid0) curr = vid1; else
-        if (curr == vid1) curr = vid0;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Trimesh<M,V,E,P>::vert_remove_unreferenced(const uint vid)
-{
-    vert_switch_id(vid, this->num_verts()-1);
-    this->verts.pop_back();
-    this->v2v.pop_back();
-    this->v2e.pop_back();
-    this->v2p.pop_back();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -94,18 +94,51 @@ CINO_INLINE void CHECK_BOUNDS(const C &, int) {}
 
 template<typename C,typename E>
 CINO_INLINE
-bool DOES_NOT_CONTAIN(const C & container, const E & element)
+bool CONTAINS(const C & container, const E & element)
 {
-    return (container.find(element) == container.end());
+    return (container.find(element) != container.end());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<typename C,typename E>
 CINO_INLINE
-bool CONTAINS(const C & container, const E & element)
+bool DOES_NOT_CONTAIN(const C & container, const E & element)
 {
-    return (container.find(element) != container.end());
+    return !CONTAINS(container,element);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename C,typename E>
+CINO_INLINE
+bool CONTAINS_VEC(const C & container, const E & element)
+{
+    return (std::find(container.begin(), container.end(), element) != container.end());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename C,typename E>
+CINO_INLINE
+bool DOES_NOT_CONTAIN_VEC(const C & container, const E & element)
+{
+    return !CONTAINS_VEC(container,element);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void REMOVE_FROM_VEC(std::vector<T> & vec, const T & elem)
+{
+    // https://en.wikipedia.org/wiki/Erase–remove_idiom
+    //
+    // IMPORTANT: erase–remove can only be used with containers
+    // holding elements with full value semantics without incurring
+    // resource leaks.
+    //
+    vec.erase(std::remove(vec.begin(), vec.end(), elem), vec.end());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

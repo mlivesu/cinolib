@@ -87,9 +87,6 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         void   vert_weights            (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
         void   vert_weights_cotangent  (const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
-        void   vert_switch_id          (const uint vid0, const uint vid1);
-        void   vert_remove_unreferenced(const uint vid);
-        uint   vert_add                (const vec3d & pos);
         uint   vert_opposite_to        (const uint pid, const uint vid0, const uint vid1) const;
 
         using  AbstractMesh<M,V,E,P>::vert_opposite_to; // avoid hiding vert_opposite_to(eid,vid)
@@ -97,10 +94,8 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         int    edge_opposite_to        (const uint pid, const uint vid) const;
-        void   edge_switch_id          (const uint eid0, const uint eid1);
         bool   edge_collapse           (const uint eid);
-        uint   edge_add                (const uint vid0, const uint vid1);
-        void   edge_remove_unreferenced(const uint eid);
+        bool   edge_is_collapsible     (const uint eid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -110,10 +105,8 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         bool              poly_bary_coords        (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
         bool              poly_bary_is_vert       (const uint pid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
         bool              poly_bary_is_edge       (const uint pid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
-        void              poly_switch_id          (const uint pid0, const uint pid1);
         uint              poly_add                (const uint vid0, const uint vid1, const uint vid2);
         void              poly_set                (const uint pid, const uint vid0, const uint vid1, const uint vid2);
-        void              poly_remove_unreferenced(const uint pid);
         uint              poly_edge_id            (const uint pid, const uint offset) const;
         std::vector<uint> poly_tessellation       (const uint pid) const;
 

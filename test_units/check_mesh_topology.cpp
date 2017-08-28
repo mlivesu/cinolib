@@ -28,73 +28,72 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_POLYGONMESH_H
-#define CINO_POLYGONMESH_H
-
-#include <vector>
-#include <cinolib/cinolib.h>
 #include <cinolib/meshes/abstract_polygonmesh.h>
-#include <cinolib/meshes/mesh_attributes.h>
+#include <assert.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_std_attributes, // default template arguments
-         class V = Vert_std_attributes,
-         class E = Edge_std_attributes,
-         class P = Polygon_std_attributes>
-class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
+template<class M, class V, class E, class P>
+CINO_INLINE
+void check_topology(const AbstractPolygonMesh<M,V,E,P> & m)
 {
-    protected:
+    std::cout << "TOPOLOGY CHECK...";
 
-        std::vector<std::vector<uint>> triangulated_polys; // triangles covering each polygon. Useful for
-                                                           // robust normal estimation and rendering
-    public:
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        for(uint nbr : m.adj_v2v(vid))
+        {
+            assert(nbr < m.num_verts());
+            assert(CONTAINS_VEC(m.adj_v2v(nbr), vid));
+        }
+        for(uint eid : m.adj_v2e(vid))
+        {
+            assert(eid < m.num_edges());
+            assert(m.edge_contains_vert(eid,vid));
+        }
+        for(uint pid : m.adj_v2p(vid))
+        {
+            assert(pid < m.num_polys());
+            assert(CONTAINS_VEC(m.adj_p2v(pid), vid));
+        }
+    }
 
-        Polygonmesh(){}
+    for(uint eid=0; eid<m.num_edges(); ++eid)
+    {
+        uint vid0 = m.edge_vert_id(eid,0);
+        uint vid1 = m.edge_vert_id(eid,1);
 
-        Polygonmesh(const char * filename);
+        assert(vid0 < m.num_verts());
+        assert(vid1 < m.num_verts());
 
-        Polygonmesh(const std::vector<vec3d>             & verts,
-                    const std::vector<std::vector<uint>> & polys);
+        for(uint pid : m.adj_e2p(eid))
+        {
+            assert(pid < m.num_polys());
+            assert(CONTAINS_VEC(m.adj_p2e(pid), eid));
+        }
+    }
 
-        Polygonmesh(const std::vector<double>            & coords,
-                    const std::vector<std::vector<uint>> & polys);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        MeshType mesh_type() const { return POLYGONMESH; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void clear();
-        void init();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void operator+=(const Polygonmesh<M,V,E,P> & m);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void update_p_normal(const uint fid);
-        void update_poly_tessellation();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        std::vector<uint> get_ordered_boundary_vertices() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        std::vector<uint> poly_tessellation       (const uint pid) const;
-        void              poly_switch_id          (const uint pid0, const uint pid1);
-        void              poly_remove             (const uint pid);
-        void              poly_remove_unreferenced(const uint pid);
-};
-
+    for(uint pid=0; pid<m.num_polys(); ++pid)
+    {
+        for(uint vid : m.adj_p2v(pid))
+        {
+            assert(vid < m.num_verts());
+            assert(CONTAINS_VEC(m.adj_v2p(vid), pid));
+        }
+        for(uint eid : m.adj_p2e(pid))
+        {
+            assert(eid < m.num_edges());
+            assert(CONTAINS_VEC(m.adj_e2p(eid), pid));
+        }
+        for(uint nbr : m.adj_p2p(pid))
+        {
+            assert(nbr < m.num_polys());
+            assert(CONTAINS_VEC(m.adj_p2p(nbr), pid));
+        }
+    }
+    std::cout << "passed!" << std::endl;
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "polygonmesh.cpp"
-#endif
 
-#endif // CINO_POLYGONMESH_H
+}

@@ -460,6 +460,89 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_boundary_edges(const uint v
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+uint AbstractPolygonMesh<M,V,E,P>::vert_add(const vec3d & pos)
+{
+    uint vid = this->num_verts();
+    //
+    this->verts.push_back(pos);
+    //
+    V data;
+    this->v_data.push_back(data);
+    //
+    this->v2v.push_back(std::vector<uint>());
+    this->v2e.push_back(std::vector<uint>());
+    this->v2p.push_back(std::vector<uint>());
+    //
+    this->bb.min = this->bb.min.min(pos);
+    this->bb.max = this->bb.max.max(pos);
+    //
+    return vid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::vert_switch_id(const uint vid0, const uint vid1)
+{
+    // [28 Aug 2017] Tested on 10K random id switches : PASSED
+
+    if (vid0 == vid1) return;
+
+    std::swap(this->verts.at(vid0),  this->verts.at(vid1));
+    std::swap(this->v_data.at(vid0), this->v_data.at(vid1));
+    std::swap(this->v2v.at(vid0),    this->v2v.at(vid1));
+    std::swap(this->v2e.at(vid0),    this->v2e.at(vid1));
+    std::swap(this->v2p.at(vid0),    this->v2p.at(vid1));
+
+    for(uint & vid : this->edges)
+    {
+        if (vid == vid0) vid = vid1; else
+        if (vid == vid1) vid = vid0;
+    }
+
+    for(auto & poly : this->polys)
+    for(uint & vid  : poly)
+    {
+        if (vid == vid0) vid = vid1; else
+        if (vid == vid1) vid = vid0;
+    }
+
+    for(auto & nbrs : this->v2v)
+    for(uint & vid  : nbrs)
+    {
+        if (vid == vid0) vid = vid1; else
+        if (vid == vid1) vid = vid0;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::vert_remove(const uint vid)
+{
+    polys_remove(this->adj_v2p(vid));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::vert_remove_unreferenced(const uint vid)
+{
+    vert_switch_id(vid, this->num_verts()-1);
+    this->verts.pop_back();
+    this->v_data.pop_back();
+    this->v2v.pop_back();
+    this->v2e.pop_back();
+    this->v2p.pop_back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 bool AbstractPolygonMesh<M,V,E,P>::edge_is_manifold(const uint eid) const
 {
     return (this->edge_valence(eid) <= 2);
@@ -514,6 +597,79 @@ ipair AbstractPolygonMesh<M,V,E,P>::edge_shared(const uint pid0, const uint pid1
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+uint AbstractPolygonMesh<M,V,E,P>::edge_add(const uint vid0, const uint vid1)
+{
+    assert(vid0 < this->num_verts());
+    assert(vid1 < this->num_verts());
+    //
+    uint id = this->num_edges();
+    //
+    this->edges.push_back(vid0);
+    this->edges.push_back(vid1);
+    //
+    this->e2p.push_back(std::vector<uint>());
+    //
+    E data;
+    this->e_data.push_back(data);
+    //
+    return id;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::edge_switch_id(const uint eid0, const uint eid1)
+{
+    // [28 Aug 2017] Tested on 10K random id switches : PASSED
+
+    if (eid0 == eid1) return;
+
+    for(uint off=0; off<2; ++off) std::swap(this->edges.at(2*eid0+off), this->edges.at(2*eid1+off));
+
+    std::swap(this->e2p.at(eid0),    this->e2p.at(eid1));
+    std::swap(this->e_data.at(eid0), this->e_data.at(eid1));
+
+    for(auto & nbrs : this->v2e)
+    for(uint & eid  : nbrs)
+    {
+        if (eid == eid0) eid = eid1; else
+        if (eid == eid1) eid = eid0;
+    }
+
+    for(auto & nbrs : this->p2e)
+    for(uint & eid  : nbrs)
+    {
+        if (eid == eid0) eid = eid1; else
+        if (eid == eid1) eid = eid0;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::edge_remove(const uint eid)
+{
+    polys_remove(this->adj_e2p(eid));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::edge_remove_unreferenced(const uint eid)
+{
+    edge_switch_id(eid, this->num_edges()-1);
+    this->edges.resize(this->edges.size()-2);
+    this->e_data.pop_back();
+    this->e2p.pop_back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::edge_mark_labeling_boundaries()
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
@@ -522,6 +678,18 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_labeling_boundaries()
         for(uint pid : this->adj_e2p(eid)) unique_labels.insert(this->poly_data(pid).label);
 
         this->edge_data(eid).marked = (unique_labels.size()>=2);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::edge_mark_boundaries()
+{
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        this->edge_data(eid).marked = edge_is_boundary(eid);
     }
 }
 
@@ -626,6 +794,121 @@ CINO_INLINE
 bool AbstractPolygonMesh<M,V,E,P>::poly_is_boundary(const uint pid) const
 {
     return (this->adj_p2p(pid).size() < 3);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::poly_switch_id(const uint pid0, const uint pid1)
+{
+    // [28 Aug 2017] Tested on 10K random id switches : PASSED
+
+    if (pid0 == pid1) return;
+
+    std::swap(this->polys.at(pid0),  this->polys.at(pid1));
+    std::swap(this->p_data.at(pid0), this->p_data.at(pid1));
+    std::swap(this->p2e.at(pid0),    this->p2e.at(pid1));
+    std::swap(this->p2p.at(pid0),    this->p2p.at(pid1));
+
+    for(auto & nbrs : this->v2p)
+    for(uint & pid  : nbrs)
+    {
+        if (pid == pid0) pid = pid1; else
+        if (pid == pid1) pid = pid0;
+    }
+
+    for(auto & nbrs : this->e2p)
+    for(uint & pid  : nbrs)
+    {
+        if (pid == pid0) pid = pid1; else
+        if (pid == pid1) pid = pid0;
+    }
+
+    for(auto & nbrs : this->p2p)
+    for(uint & pid  : nbrs)
+    {
+        if (pid == pid0) pid = pid1; else
+        if (pid == pid1) pid = pid0;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::polys_remove(const std::vector<uint> & pids)
+{
+    // in order to avoid id conflicts remove all the
+    // polys starting from the one with highest id
+    //
+    std::vector<uint> tmp = pids;
+    std::sort(tmp.begin(), tmp.end());
+    std::reverse(tmp.begin(), tmp.end());
+    for(uint pid : tmp) poly_remove(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::poly_remove(const uint pid)
+{
+    // [28 Aug 2017] Tested on progressive random removal until almost no polys are left: PASSED
+
+    std::set<uint,std::greater<uint>> dangling_verts; // higher ids first
+    std::set<uint,std::greater<uint>> dangling_edges; // higher ids first
+
+    // disconnect from vertices
+    for(uint vid : this->adj_p2v(pid))
+    {
+        REMOVE_FROM_VEC(this->v2p.at(vid), pid);
+        if (this->v2p.at(vid).empty()) dangling_verts.insert(vid);
+    }
+
+    // disconnect from edges
+    for(uint eid : this->adj_p2e(pid))
+    {
+        REMOVE_FROM_VEC(this->e2p.at(eid), pid);
+        if (this->e2p.at(eid).empty()) dangling_edges.insert(eid);
+    }
+
+    // disconnect from other polygons
+    for(uint nbr : this->adj_p2p(pid)) REMOVE_FROM_VEC(this->p2p.at(nbr), pid);
+
+    // delete dangling edges
+    for(uint eid : dangling_edges)
+    {
+        uint vid0 = this->edge_vert_id(eid,0);
+        uint vid1 = this->edge_vert_id(eid,1);
+        if (vid1 > vid0) std::swap(vid0,vid1); // make sure the highest id is processed first
+        REMOVE_FROM_VEC(this->v2e.at(vid0), eid);
+        REMOVE_FROM_VEC(this->v2e.at(vid1), eid);
+        edge_remove_unreferenced(eid);
+    }
+
+    // delete dangling vertices
+    for(uint vid : dangling_verts)
+    {
+        assert(this->adj_v2e(vid).empty());
+        for(uint nbr : this->adj_v2v(vid)) REMOVE_FROM_VEC(this->v2v.at(nbr), vid);
+        vert_remove_unreferenced(vid);
+    }
+
+    poly_remove_unreferenced(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::poly_remove_unreferenced(const uint pid)
+{
+    poly_switch_id(pid, this->num_polys()-1);
+    this->polys.pop_back();
+    this->p_data.pop_back();
+    this->p2e.pop_back();
+    this->p2p.pop_back();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

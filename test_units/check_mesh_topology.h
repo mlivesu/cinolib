@@ -28,73 +28,22 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_POLYGONMESH_H
-#define CINO_POLYGONMESH_H
+#ifndef CINO_CHECK_MESH_TOPOLOGY_H
+#define CINO_CHECK_MESH_TOPOLOGY_H
 
-#include <vector>
-#include <cinolib/cinolib.h>
 #include <cinolib/meshes/abstract_polygonmesh.h>
-#include <cinolib/meshes/mesh_attributes.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_std_attributes, // default template arguments
-         class V = Vert_std_attributes,
-         class E = Edge_std_attributes,
-         class P = Polygon_std_attributes>
-class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
-{
-    protected:
-
-        std::vector<std::vector<uint>> triangulated_polys; // triangles covering each polygon. Useful for
-                                                           // robust normal estimation and rendering
-    public:
-
-        Polygonmesh(){}
-
-        Polygonmesh(const char * filename);
-
-        Polygonmesh(const std::vector<vec3d>             & verts,
-                    const std::vector<std::vector<uint>> & polys);
-
-        Polygonmesh(const std::vector<double>            & coords,
-                    const std::vector<std::vector<uint>> & polys);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        MeshType mesh_type() const { return POLYGONMESH; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void clear();
-        void init();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void operator+=(const Polygonmesh<M,V,E,P> & m);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void update_p_normal(const uint fid);
-        void update_poly_tessellation();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        std::vector<uint> get_ordered_boundary_vertices() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        std::vector<uint> poly_tessellation       (const uint pid) const;
-        void              poly_switch_id          (const uint pid0, const uint pid1);
-        void              poly_remove             (const uint pid);
-        void              poly_remove_unreferenced(const uint pid);
-};
+template<class M, class V, class E, class P>
+CINO_INLINE
+void check_topology(const AbstractPolygonMesh<M,V,E,P> & m);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "polygonmesh.cpp"
+#include "check_mesh_topology.cpp"
 #endif
 
-#endif // CINO_POLYGONMESH_H
+#endif //CINO_CHECK_MESH_TOPOLOGY_H
