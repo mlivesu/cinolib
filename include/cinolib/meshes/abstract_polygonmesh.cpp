@@ -31,6 +31,8 @@
 #include <cinolib/meshes/abstract_polygonmesh.h>
 #include <cinolib/io/read_write.h>
 
+#include <unordered_set>
+
 namespace cinolib
 {
 
@@ -495,24 +497,44 @@ void AbstractPolygonMesh<M,V,E,P>::vert_switch_id(const uint vid0, const uint vi
     std::swap(this->v2e.at(vid0),    this->v2e.at(vid1));
     std::swap(this->v2p.at(vid0),    this->v2p.at(vid1));
 
-    for(uint & vid : this->edges)
+    std::unordered_set<uint> verts_to_update;
+    verts_to_update.insert(this->adj_v2v(vid0).begin(), this->adj_v2v(vid0).end());
+    verts_to_update.insert(this->adj_v2v(vid1).begin(), this->adj_v2v(vid1).end());
+
+    std::unordered_set<uint> edges_to_update;
+    edges_to_update.insert(this->adj_v2e(vid0).begin(), this->adj_v2e(vid0).end());
+    edges_to_update.insert(this->adj_v2e(vid1).begin(), this->adj_v2e(vid1).end());
+
+    std::unordered_set<uint> polys_to_update;
+    polys_to_update.insert(this->adj_v2p(vid0).begin(), this->adj_v2p(vid0).end());
+    polys_to_update.insert(this->adj_v2p(vid1).begin(), this->adj_v2p(vid1).end());
+
+    for(uint nbr : verts_to_update)
     {
-        if (vid == vid0) vid = vid1; else
-        if (vid == vid1) vid = vid0;
+        for(uint & vid : this->v2v.at(nbr))
+        {
+            if (vid == vid0) vid = vid1; else
+            if (vid == vid1) vid = vid0;
+        }
     }
 
-    for(auto & poly : this->polys)
-    for(uint & vid  : poly)
+    for(uint eid : edges_to_update)
     {
-        if (vid == vid0) vid = vid1; else
-        if (vid == vid1) vid = vid0;
+        for(uint i=0; i<2; ++i)
+        {
+            uint & vid = this->edges.at(2*eid+i);
+            if (vid == vid0) vid = vid1; else
+            if (vid == vid1) vid = vid0;
+        }
     }
 
-    for(auto & nbrs : this->v2v)
-    for(uint & vid  : nbrs)
+    for(uint pid : polys_to_update)
     {
-        if (vid == vid0) vid = vid1; else
-        if (vid == vid1) vid = vid0;
+        for(uint & vid : this->polys.at(pid))
+        {
+            if (vid == vid0) vid = vid1; else
+            if (vid == vid1) vid = vid0;
+        }
     }
 }
 
@@ -531,6 +553,9 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::vert_remove_unreferenced(const uint vid)
 {
+    this->v2v.at(vid).clear();
+    this->v2e.at(vid).clear();
+    this->v2p.at(vid).clear();
     vert_switch_id(vid, this->num_verts()-1);
     this->verts.pop_back();
     this->v_data.pop_back();
@@ -630,18 +655,32 @@ void AbstractPolygonMesh<M,V,E,P>::edge_switch_id(const uint eid0, const uint ei
     std::swap(this->e2p.at(eid0),    this->e2p.at(eid1));
     std::swap(this->e_data.at(eid0), this->e_data.at(eid1));
 
-    for(auto & nbrs : this->v2e)
-    for(uint & eid  : nbrs)
+    std::unordered_set<uint> verts_to_update;
+    verts_to_update.insert(this->edge_vert_id(eid0,0));
+    verts_to_update.insert(this->edge_vert_id(eid0,1));
+    verts_to_update.insert(this->edge_vert_id(eid1,0));
+    verts_to_update.insert(this->edge_vert_id(eid1,1));
+
+    std::unordered_set<uint> polys_to_update;
+    polys_to_update.insert(this->adj_e2p(eid0).begin(), this->adj_e2p(eid0).end());
+    polys_to_update.insert(this->adj_e2p(eid1).begin(), this->adj_e2p(eid1).end());
+
+    for(uint vid : verts_to_update)
     {
-        if (eid == eid0) eid = eid1; else
-        if (eid == eid1) eid = eid0;
+        for(uint & eid : this->v2e.at(vid))
+        {
+            if (eid == eid0) eid = eid1; else
+            if (eid == eid1) eid = eid0;
+        }
     }
 
-    for(auto & nbrs : this->p2e)
-    for(uint & eid  : nbrs)
+    for(uint pid : polys_to_update)
     {
-        if (eid == eid0) eid = eid1; else
-        if (eid == eid1) eid = eid0;
+        for(uint & eid : this->p2e.at(pid))
+        {
+            if (eid == eid0) eid = eid1; else
+            if (eid == eid1) eid = eid0;
+        }
     }
 }
 
@@ -660,6 +699,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::edge_remove_unreferenced(const uint eid)
 {
+    this->e2p.at(eid).clear();
     edge_switch_id(eid, this->num_edges()-1);
     this->edges.resize(this->edges.size()-2);
     this->e_data.pop_back();
@@ -811,25 +851,43 @@ void AbstractPolygonMesh<M,V,E,P>::poly_switch_id(const uint pid0, const uint pi
     std::swap(this->p2e.at(pid0),    this->p2e.at(pid1));
     std::swap(this->p2p.at(pid0),    this->p2p.at(pid1));
 
-    for(auto & nbrs : this->v2p)
-    for(uint & pid  : nbrs)
+    std::unordered_set<uint> verts_to_update;
+    verts_to_update.insert(this->adj_p2v(pid0).begin(), this->adj_p2v(pid0).end());
+    verts_to_update.insert(this->adj_p2v(pid1).begin(), this->adj_p2v(pid1).end());
+
+    std::unordered_set<uint> edges_to_update;
+    edges_to_update.insert(this->adj_p2e(pid0).begin(), this->adj_p2e(pid0).end());
+    edges_to_update.insert(this->adj_p2e(pid1).begin(), this->adj_p2e(pid1).end());
+
+    std::unordered_set<uint> polys_to_update;
+    polys_to_update.insert(this->adj_p2p(pid0).begin(), this->adj_p2p(pid0).end());
+    polys_to_update.insert(this->adj_p2p(pid1).begin(), this->adj_p2p(pid1).end());
+
+    for(uint vid : verts_to_update)
     {
-        if (pid == pid0) pid = pid1; else
-        if (pid == pid1) pid = pid0;
+        for(uint & pid : this->v2p.at(vid))
+        {
+            if (pid == pid0) pid = pid1; else
+            if (pid == pid1) pid = pid0;
+        }
     }
 
-    for(auto & nbrs : this->e2p)
-    for(uint & pid  : nbrs)
+    for(uint eid : edges_to_update)
     {
-        if (pid == pid0) pid = pid1; else
-        if (pid == pid1) pid = pid0;
+        for(uint & pid : this->e2p.at(eid))
+        {
+            if (pid == pid0) pid = pid1; else
+            if (pid == pid1) pid = pid0;
+        }
     }
 
-    for(auto & nbrs : this->p2p)
-    for(uint & pid  : nbrs)
+    for(uint nbr : polys_to_update)
     {
-        if (pid == pid0) pid = pid1; else
-        if (pid == pid1) pid = pid0;
+        for(uint & pid : this->p2p.at(nbr))
+        {
+            if (pid == pid0) pid = pid1; else
+            if (pid == pid1) pid = pid0;
+        }
     }
 }
 
@@ -904,6 +962,9 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::poly_remove_unreferenced(const uint pid)
 {
+    this->polys.at(pid).clear();
+    this->p2e.at(pid).clear();
+    this->p2p.at(pid).clear();
     poly_switch_id(pid, this->num_polys()-1);
     this->polys.pop_back();
     this->p_data.pop_back();
