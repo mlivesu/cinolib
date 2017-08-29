@@ -102,6 +102,7 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void              vert_switch_id  (const uint vid0, const uint vid1);
         bool              vert_is_singular(const uint vid) const;
         bool              vert_is_regular (const uint vid) const;
         std::vector<uint> vert_chain      (const uint start, const uint next) const;
@@ -117,7 +118,6 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 
         std::vector<uint> poly_tessellation       (const uint pid) const;
         void              poly_switch_id          (const uint pid0, const uint pid1);
-        void              poly_remove             (const uint pid);
         void              poly_remove_unreferenced(const uint pid);
 };
 
