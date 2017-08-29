@@ -85,9 +85,12 @@ class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void vert_switch_id(const uint vid0, const uint vid1);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         std::vector<uint> poly_tessellation       (const uint pid) const;
         void              poly_switch_id          (const uint pid0, const uint pid1);
-        void              poly_remove             (const uint pid);
         void              poly_remove_unreferenced(const uint pid);
 };
 

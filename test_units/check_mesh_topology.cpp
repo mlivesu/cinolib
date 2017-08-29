@@ -91,6 +91,12 @@ void check_topology(const AbstractPolygonMesh<M,V,E,P> & m)
             assert(nbr < m.num_polys());
             assert(CONTAINS_VEC(m.adj_p2p(nbr), pid));
         }
+        for(uint vid : m.poly_tessellation(pid))
+        {
+            assert(vid < m.num_verts());
+            assert(CONTAINS_VEC(m.adj_v2p(vid), pid));
+            assert(CONTAINS_VEC(m.adj_p2v(pid), vid));
+        }
     }
     std::cout << "passed!" << std::endl;
 }

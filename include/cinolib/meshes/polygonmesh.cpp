@@ -192,6 +192,28 @@ std::vector<uint> Polygonmesh<M,V,E,P>::get_ordered_boundary_vertices() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void Polygonmesh<M,V,E,P>::vert_switch_id(const uint vid0, const uint vid1)
+{
+    AbstractPolygonMesh<M,V,E,P>::vert_switch_id(vid0, vid1);
+
+    std::unordered_set<uint> polys_to_update;
+    polys_to_update.insert(this->adj_v2p(vid0).begin(), this->adj_v2p(vid0).end());
+    polys_to_update.insert(this->adj_v2p(vid1).begin(), this->adj_v2p(vid1).end());
+
+    for(uint pid : polys_to_update)
+    {
+        for(uint & vid : this->triangulated_polys.at(pid))
+        {
+            if (vid == vid0) vid = vid1; else
+            if (vid == vid1) vid = vid0;
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void Polygonmesh<M,V,E,P>::operator+=(const Polygonmesh<M,V,E,P> & m)
 {
     AbstractPolygonMesh<M,V,E,P>::operator +=(m);
@@ -215,16 +237,6 @@ void Polygonmesh<M,V,E,P>::poly_switch_id(const uint pid0, const uint pid1)
 {
     AbstractPolygonMesh<M,V,E,P>::poly_switch_id(pid0, pid1);
     std::swap(triangulated_polys.at(pid0), triangulated_polys.at(pid1));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Polygonmesh<M,V,E,P>::poly_remove(const uint pid)
-{
-    AbstractPolygonMesh<M,V,E,P>::poly_remove(pid);
-    update_poly_tessellation();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
