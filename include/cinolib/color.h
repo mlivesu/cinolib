@@ -64,11 +64,10 @@ class Color
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Color(const float r=1.0,
-              const float g=1.0,
-              const float b=1.0,
-              const float a=1.0)
-        : r(r), g(g), b(b), a(a) {}
+        explicit Color(const float r=1.0,
+                       const float g=1.0,
+                       const float b=1.0,
+                       const float a=1.0) : r(r), g(g), b(b), a(a) {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

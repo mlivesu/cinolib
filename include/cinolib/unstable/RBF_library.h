@@ -58,7 +58,7 @@ template <class Point> class Gaussian_RBF : public AbstractRBF<Point>
 
     public:
 
-        Gaussian_RBF(const double sigma) : sigma(sigma) {}
+        explicit Gaussian_RBF(const double sigma) : sigma(sigma) {}
 
         double eval(const Point & center, const Point & sample) const
         {
@@ -73,7 +73,7 @@ template <class Point> class Cubic_Spline_RBF : public AbstractRBF<Point>
 {
     public:
 
-        Cubic_Spline_RBF() {}
+        explicit Cubic_Spline_RBF() {}
 
         double eval(const Point & center, const Point & sample) const
         {
@@ -88,7 +88,7 @@ template <class Point> class Thin_Plate_Spline_RBF : public AbstractRBF<Point>
 {
     public:
 
-        Thin_Plate_Spline_RBF() {}
+        explicit Thin_Plate_Spline_RBF() {}
 
         double eval(const Point & center, const Point & sample) const
         {
@@ -105,7 +105,7 @@ template <class Point> class Polyharmonic_Spline_RBF : public AbstractRBF<Point>
 
     public:
 
-        Polyharmonic_Spline_RBF(const uint k) : k(k) {}
+        explicit Polyharmonic_Spline_RBF(const uint k) : k(k) {}
 
         double eval(const Point & center, const Point & sample) const
         {
@@ -124,7 +124,7 @@ template <class Point> class Multi_Quadratic_RBF : public AbstractRBF<Point>
 
     public:
 
-        Multi_Quadratic_RBF(const double eps) : eps(eps) {}
+        explicit Multi_Quadratic_RBF(const double eps) : eps(eps) {}
 
         double eval(const Point & center, const Point & sample) const
         {

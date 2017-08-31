@@ -59,17 +59,17 @@ template<typename real> class vec2
 
         enum { DROP_X, DROP_Y, DROP_Z };
 
-        vec2()
+        explicit vec2()
         {
             set( 0.0, 0.0 );
         }
 
-        vec2(const real x, const real y=0.0)
+        explicit vec2(const real x, const real y=0.0)
         {
             set(x, y);
         }
 
-        vec2(const vec3<real> & p, const int mode)
+        explicit vec2(const vec3<real> & p, const int mode)
         {
             switch (mode)
             {

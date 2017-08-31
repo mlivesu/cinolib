@@ -45,53 +45,53 @@ class DrawablePolygonmesh : public AbstractDrawablePolygonMesh<Polygonmesh<M,V,E
 {
     public:
 
-        DrawablePolygonmesh(Polygonmesh<M,V,E,P>) : Polygonmesh<M,V,E,P>()
+        explicit DrawablePolygonmesh(Polygonmesh<M,V,E,P>) : Polygonmesh<M,V,E,P>()
         {}
 
-        DrawablePolygonmesh() : Polygonmesh<M,V,E,P>()
+        explicit DrawablePolygonmesh() : Polygonmesh<M,V,E,P>()
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawablePolygonmesh(const char * filename) : Polygonmesh<M,V,E,P>(filename)
+        explicit DrawablePolygonmesh(const char * filename) : Polygonmesh<M,V,E,P>(filename)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawablePolygonmesh(const std::vector<vec3d>             & coords,
-                        const std::vector<std::vector<uint>> & polys)
-          : Polygonmesh<M,V,E,P>(coords, polys)
+        explicit DrawablePolygonmesh(const std::vector<vec3d>             & coords,
+                                     const std::vector<std::vector<uint>> & polys)
+        : Polygonmesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawablePolygonmesh(const std::vector<double>            & coords,
-                        const std::vector<std::vector<uint>> & polys)
-          : Polygonmesh<M,V,E,P>(coords, polys)
+        explicit DrawablePolygonmesh(const std::vector<double>            & coords,
+                                     const std::vector<std::vector<uint>> & polys)
+        : Polygonmesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawablePolygonmesh(const std::vector<vec3d> & coords,
-                        const std::vector<uint>  & polys)
-          : Polygonmesh<M,V,E,P>(coords, polys)
+        explicit DrawablePolygonmesh(const std::vector<vec3d> & coords,
+                                     const std::vector<uint>  & polys)
+        : Polygonmesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawablePolygonmesh(const std::vector<double> & coords,
-                        const std::vector<uint>   & polys)
-          : Polygonmesh<M,V,E,P>(coords, polys)
+        explicit DrawablePolygonmesh(const std::vector<double> & coords,
+                                     const std::vector<uint>   & polys)
+        : Polygonmesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }

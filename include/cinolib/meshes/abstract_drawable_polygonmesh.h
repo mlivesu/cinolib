@@ -49,7 +49,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 
     public:
 
-        AbstractDrawablePolygonMesh() : Mesh() {}
+        explicit AbstractDrawablePolygonMesh() : Mesh() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

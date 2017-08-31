@@ -42,7 +42,7 @@ class Ray
 {
     public:
 
-        Ray(const vec3d & start, const vec3d & dir);
+        explicit Ray(const vec3d & start, const vec3d & dir);
 
         std::vector<Plane> to_planes() const;
 

@@ -45,9 +45,9 @@ class MeshSlicer
 {
     public:
 
-        MeshSlicer() {}
+        explicit MeshSlicer() {}
 
-        MeshSlicer(Mesh & m);
+        explicit MeshSlicer(Mesh & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

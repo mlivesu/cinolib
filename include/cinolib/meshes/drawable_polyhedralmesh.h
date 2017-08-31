@@ -46,25 +46,25 @@ class DrawablePolyhedralmesh : public AbstractDrawablePolyhedralMesh<Polyhedralm
 {
     public:
 
-        DrawablePolyhedralmesh() : Polyhedralmesh<M,V,E,F,P>()
+        explicit DrawablePolyhedralmesh() : Polyhedralmesh<M,V,E,F,P>()
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawablePolyhedralmesh(const char * filename) : Polyhedralmesh<M,V,E,F,P>(filename)
+        explicit DrawablePolyhedralmesh(const char * filename) : Polyhedralmesh<M,V,E,F,P>(filename)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawablePolyhedralmesh(const std::vector<vec3d>             & verts,
-                               const std::vector<std::vector<uint>> & faces,
-                               const std::vector<std::vector<uint>> & polys,
-                               const std::vector<std::vector<bool>> & polys_face_winding)
-            : Polyhedralmesh<M,V,E,F,P>(verts, faces, polys, polys_face_winding)
+        explicit DrawablePolyhedralmesh(const std::vector<vec3d>             & verts,
+                                        const std::vector<std::vector<uint>> & faces,
+                                        const std::vector<std::vector<uint>> & polys,
+                                        const std::vector<std::vector<bool>> & polys_face_winding)
+        : Polyhedralmesh<M,V,E,F,P>(verts, faces, polys, polys_face_winding)
         {
             this->init_drawable_stuff();
         }

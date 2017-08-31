@@ -45,53 +45,53 @@ class DrawableTrimesh : public AbstractDrawablePolygonMesh<Trimesh<M,V,E,P>>
 {
     public:
 
-        DrawableTrimesh(Trimesh<M,V,E,P>) : Trimesh<M,V,E,P>()
+        explicit DrawableTrimesh(Trimesh<M,V,E,P>) : Trimesh<M,V,E,P>()
         {}
 
-        DrawableTrimesh() : Trimesh<M,V,E,P>()
+        explicit DrawableTrimesh() : Trimesh<M,V,E,P>()
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableTrimesh(const char * filename) : Trimesh<M,V,E,P>(filename)
+        explicit DrawableTrimesh(const char * filename) : Trimesh<M,V,E,P>(filename)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableTrimesh(const std::vector<vec3d>             & coords,
-                        const std::vector<std::vector<uint>> & polys)
-          : Trimesh<M,V,E,P>(coords, polys)
+        explicit DrawableTrimesh(const std::vector<vec3d>             & coords,
+                                 const std::vector<std::vector<uint>> & polys)
+        : Trimesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableTrimesh(const std::vector<double>            & coords,
-                        const std::vector<std::vector<uint>> & polys)
-          : Trimesh<M,V,E,P>(coords, polys)
+        explicit DrawableTrimesh(const std::vector<double>            & coords,
+                                 const std::vector<std::vector<uint>> & polys)
+        : Trimesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableTrimesh(const std::vector<vec3d> & coords,
-                        const std::vector<uint>  & polys)
-          : Trimesh<M,V,E,P>(coords, polys)
+        explicit DrawableTrimesh(const std::vector<vec3d> & coords,
+                                 const std::vector<uint>  & polys)
+        : Trimesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableTrimesh(const std::vector<double> & coords,
-                        const std::vector<uint>   & polys)
-          : Trimesh<M,V,E,P>(coords, polys)
+        explicit DrawableTrimesh(const std::vector<double> & coords,
+                                 const std::vector<uint>   & polys)
+        : Trimesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }

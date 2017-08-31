@@ -84,7 +84,7 @@ class AbstractMesh
 
     public:
 
-                 AbstractMesh() {}
+        explicit AbstractMesh() {}
         virtual ~AbstractMesh() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

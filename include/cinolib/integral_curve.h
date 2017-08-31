@@ -44,14 +44,14 @@ class IntegralCurve : public DrawableCurve
 
     public:
 
-        IntegralCurve(const Mesh                & m,
-                      const VectorField         & grad,
-                      const uint                  eid,
-                      const std::vector<double> & bary);
+        explicit IntegralCurve(const Mesh                & m,
+                               const VectorField         & grad,
+                               const uint                  eid,
+                               const std::vector<double> & bary);
 
-        IntegralCurve(const Mesh        & m,
-                      const VectorField & grad,
-                      const uint          vid);
+        explicit IntegralCurve(const Mesh        & m,
+                               const VectorField & grad,
+                               const uint          vid);
 
         typedef enum
         {

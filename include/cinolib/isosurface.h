@@ -47,8 +47,8 @@ class Isosurface
 {
     public:
 
-        Isosurface(){}
-        Isosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value);
+        explicit Isosurface(){}
+        explicit Isosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

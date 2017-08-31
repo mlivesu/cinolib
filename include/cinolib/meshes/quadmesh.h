@@ -55,21 +55,21 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 
     public:
 
-        Quadmesh(){}
+        explicit Quadmesh(){}
 
-        Quadmesh(const char * filename);
+        explicit Quadmesh(const char * filename);
 
-        Quadmesh(const std::vector<vec3d> & verts,
-                 const std::vector<uint>  & polys);
+        explicit Quadmesh(const std::vector<vec3d> & verts,
+                          const std::vector<uint>  & polys);
 
-        Quadmesh(const std::vector<double> & coords,
-                 const std::vector<uint>   & polys);
+        explicit Quadmesh(const std::vector<double> & coords,
+                          const std::vector<uint>   & polys);
 
-        Quadmesh(const std::vector<vec3d>             & verts,
-                 const std::vector<std::vector<uint>> & polys);
+        explicit Quadmesh(const std::vector<vec3d>             & verts,
+                          const std::vector<std::vector<uint>> & polys);
 
-        Quadmesh(const std::vector<double>            & coords,
-                 const std::vector<std::vector<uint>> & polys);
+        explicit Quadmesh(const std::vector<double>            & coords,
+                          const std::vector<std::vector<uint>> & polys);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

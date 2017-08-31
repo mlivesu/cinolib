@@ -46,43 +46,43 @@ class DrawableHexmesh : public AbstractDrawablePolyhedralMesh<Hexmesh<M,V,E,F,P>
 {
     public:
 
-        DrawableHexmesh() : Hexmesh<M,V,E,F,P>()
+        explicit DrawableHexmesh() : Hexmesh<M,V,E,F,P>()
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableHexmesh(const char * filename) : Hexmesh<M,V,E,F,P>(filename)
+        explicit DrawableHexmesh(const char * filename) : Hexmesh<M,V,E,F,P>(filename)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableHexmesh(const std::vector<vec3d>             & verts,
-                        const std::vector<std::vector<uint>> & faces,
-                        const std::vector<std::vector<uint>> & polys,
-                        const std::vector<std::vector<bool>> & polys_face_winding)
-            : Hexmesh<M,V,E,F,P>(verts, faces, polys, polys_face_winding)
+        explicit DrawableHexmesh(const std::vector<vec3d>             & verts,
+                                 const std::vector<std::vector<uint>> & faces,
+                                 const std::vector<std::vector<uint>> & polys,
+                                 const std::vector<std::vector<bool>> & polys_face_winding)
+        : Hexmesh<M,V,E,F,P>(verts, faces, polys, polys_face_winding)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableHexmesh(const std::vector<vec3d> & verts,
-                        const std::vector<uint>  & polys)
-            : Hexmesh<M,V,E,F,P>(verts, polys)
+        explicit DrawableHexmesh(const std::vector<vec3d> & verts,
+                                 const std::vector<uint>  & polys)
+        : Hexmesh<M,V,E,F,P>(verts, polys)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableHexmesh(const std::vector<double> & coords,
-                        const std::vector<uint>   & polys)
-            : Hexmesh<M,V,E,F,P>(coords, polys)
+        explicit DrawableHexmesh(const std::vector<double> & coords,
+                                 const std::vector<uint>   & polys)
+        : Hexmesh<M,V,E,F,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }

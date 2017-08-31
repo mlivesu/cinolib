@@ -42,7 +42,7 @@ class Bbox
 {
     public:
 
-        Bbox() { reset(); }
+        explicit Bbox() { reset(); }
 
         void reset()
         {

@@ -44,9 +44,9 @@ class DrawableCurve : public Curve, public DrawableObject
 {
     public:
 
-        DrawableCurve();
-        DrawableCurve(const std::vector<vec3d> & samples);
-        DrawableCurve(const Skel & skel, const int bone);
+        explicit DrawableCurve();
+        explicit DrawableCurve(const std::vector<vec3d> & samples);
+        explicit DrawableCurve(const Skel & skel, const int bone);
 
         void       draw(const float scene_size=1) const;
         vec3d      scene_center() const;

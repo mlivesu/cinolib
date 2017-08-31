@@ -45,53 +45,53 @@ class DrawableQuadmesh : public AbstractDrawablePolygonMesh<Quadmesh<M,V,E,P>>
 {
     public:
 
-        DrawableQuadmesh(Quadmesh<M,V,E,P>) : Quadmesh<M,V,E,P>()
+        explicit DrawableQuadmesh(Quadmesh<M,V,E,P>) : Quadmesh<M,V,E,P>()
         {}
 
-        DrawableQuadmesh() : Quadmesh<M,V,E,P>()
+        explicit DrawableQuadmesh() : Quadmesh<M,V,E,P>()
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableQuadmesh(const char * filename) : Quadmesh<M,V,E,P>(filename)
+        explicit DrawableQuadmesh(const char * filename) : Quadmesh<M,V,E,P>(filename)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableQuadmesh(const std::vector<vec3d>             & coords,
-                        const std::vector<std::vector<uint>> & polys)
-          : Quadmesh<M,V,E,P>(coords, polys)
+        explicit DrawableQuadmesh(const std::vector<vec3d>             & coords,
+                                  const std::vector<std::vector<uint>> & polys)
+        : Quadmesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableQuadmesh(const std::vector<double>            & coords,
-                        const std::vector<std::vector<uint>> & polys)
-          : Quadmesh<M,V,E,P>(coords, polys)
+        explicit DrawableQuadmesh(const std::vector<double>            & coords,
+                                  const std::vector<std::vector<uint>> & polys)
+        : Quadmesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableQuadmesh(const std::vector<vec3d> & coords,
-                        const std::vector<uint>  & polys)
-          : Quadmesh<M,V,E,P>(coords, polys)
+        explicit DrawableQuadmesh(const std::vector<vec3d> & coords,
+                                  const std::vector<uint>  & polys)
+        : Quadmesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        DrawableQuadmesh(const std::vector<double> & coords,
-                        const std::vector<uint>   & polys)
-          : Quadmesh<M,V,E,P>(coords, polys)
+        explicit DrawableQuadmesh(const std::vector<double> & coords,
+                                  const std::vector<uint>   & polys)
+        : Quadmesh<M,V,E,P>(coords, polys)
         {
             this->init_drawable_stuff();
         }

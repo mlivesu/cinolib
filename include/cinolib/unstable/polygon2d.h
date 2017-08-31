@@ -53,14 +53,14 @@ class Polygon2D
 {
     public:
 
-        Polygon2D();
+        explicit Polygon2D();
 
-        Polygon2D(const BoostPolygon & p);
+        explicit Polygon2D(const BoostPolygon & p);
 
-        Polygon2D(const std::vector<double> & ring);
+        explicit Polygon2D(const std::vector<double> & ring);
 
-        Polygon2D(const std::vector<double>              & outer_ring,
-                  const std::vector<std::vector<double>> & inner_rings);
+        explicit Polygon2D(const std::vector<double>              & outer_ring,
+                           const std::vector<std::vector<double>> & inner_rings);
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

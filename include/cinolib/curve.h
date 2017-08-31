@@ -61,9 +61,9 @@ class Curve
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Curve();
-        Curve(const std::vector<vec3d> & samples);
-        Curve(const Skel & skel, const uint bone);
+        explicit Curve();
+        explicit Curve(const std::vector<vec3d> & samples);
+        explicit Curve(const Skel & skel, const uint bone);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

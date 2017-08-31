@@ -57,7 +57,7 @@ class GLcanvas : public QGLViewer
 {
     public:
 
-        GLcanvas(QWidget * parent = 0);
+        explicit GLcanvas(QWidget * parent = 0);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

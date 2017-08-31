@@ -42,9 +42,9 @@ class VectorField : public Eigen::VectorXd, public Serializable
 {
     public:
 
-        VectorField();
-        VectorField(const int size);
-        VectorField(const std::vector<vec3d> & data);
+        explicit VectorField();
+        explicit VectorField(const int size);
+        explicit VectorField(const std::vector<vec3d> & data);
 
         vec3d vec_at(const int pos) const;
 

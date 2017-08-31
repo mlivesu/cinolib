@@ -43,7 +43,7 @@ class Segment : public std::pair<vec3d,vec3d>
 {
     public:
 
-        Segment(const vec3d & P0, const vec3d & P1);
+        explicit Segment(const vec3d & P0, const vec3d & P1);
 
         std::vector<Plane> to_planes() const;
 

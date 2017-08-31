@@ -47,8 +47,8 @@ class DrawableIsosurface : public Isosurface<M,V,E,F,P>, public DrawableObject
 {
     public:
 
-        DrawableIsosurface() {}
-        DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value);
+        explicit DrawableIsosurface() {}
+        explicit DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value);
 
         void       draw(const float scene_size=1) const;
         vec3d      scene_center() const;

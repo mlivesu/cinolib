@@ -51,15 +51,15 @@ class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
                                                            // robust normal estimation and rendering
     public:
 
-        Polygonmesh(){}
+        explicit Polygonmesh(){}
 
-        Polygonmesh(const char * filename);
+        explicit Polygonmesh(const char * filename);
 
-        Polygonmesh(const std::vector<vec3d>             & verts,
-                    const std::vector<std::vector<uint>> & polys);
+        explicit Polygonmesh(const std::vector<vec3d>             & verts,
+                             const std::vector<std::vector<uint>> & polys);
 
-        Polygonmesh(const std::vector<double>            & coords,
-                    const std::vector<std::vector<uint>> & polys);
+        explicit Polygonmesh(const std::vector<double>            & coords,
+                             const std::vector<std::vector<uint>> & polys);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

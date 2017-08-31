@@ -52,14 +52,14 @@ class Plane
         double d; // d coefficient of the plane equation
         vec3d  p; // any point on the plane (useful for point_plane_dist)
 
-        Plane(const vec3d & p0,
-              const vec3d & p1,
-              const vec3d & p2);
+        explicit Plane(const vec3d & p0,
+                       const vec3d & p1,
+                       const vec3d & p2);
 
-        Plane(const vec3d & point,
-              const vec3d & normal);
+        explicit Plane(const vec3d & point,
+                       const vec3d & normal);
 
-        Plane(const std::vector<vec3d> & samples); // best fitting plane
+        explicit Plane(const std::vector<vec3d> & samples); // best fitting plane
 
         double a() const { return n.x(); }
         double b() const { return n.y(); }

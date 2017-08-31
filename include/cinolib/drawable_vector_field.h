@@ -44,8 +44,9 @@ class DrawableVectorField : public VectorField, public DrawableObject
 {
     public:
 
-        DrawableVectorField() {}
+        explicit DrawableVectorField() {}
 
+        explicit
         DrawableVectorField(const Mesh & m) : VectorField(m.num_polys())
         {
             m_ptr = &m;

@@ -51,9 +51,9 @@ class Skel
 
         typedef std::pair<int,int> seg;
 
-        Skel(){}
-        Skel(const char * filename) { load(filename); }
-        Skel(const std::vector<double> & coords, const std::vector<int> & segs);
+        explicit Skel(){}
+        explicit Skel(const char * filename) { load(filename); }
+        explicit Skel(const std::vector<double> & coords, const std::vector<int> & segs);
 
     protected:
 

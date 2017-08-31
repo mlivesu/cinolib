@@ -57,14 +57,14 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
     public:
 
-        Polyhedralmesh(){}
+        explicit Polyhedralmesh(){}
 
-        Polyhedralmesh(const char * filename);
+        explicit Polyhedralmesh(const char * filename);
 
-        Polyhedralmesh(const std::vector<vec3d>             & verts,
-                       const std::vector<std::vector<uint>> & faces,
-                       const std::vector<std::vector<uint>> & polys,
-                       const std::vector<std::vector<bool>> & polys_face_winding);
+        explicit Polyhedralmesh(const std::vector<vec3d>             & verts,
+                                const std::vector<std::vector<uint>> & faces,
+                                const std::vector<std::vector<uint>> & polys,
+                                const std::vector<std::vector<bool>> & polys_face_winding);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -43,8 +43,8 @@ class DrawableIsocontour : public Isocontour, public DrawableObject
 {
     public:
 
-        DrawableIsocontour() {}
-        DrawableIsocontour(Trimesh<> & m_ptr, float iso_value);
+        explicit DrawableIsocontour() {}
+        explicit DrawableIsocontour(Trimesh<> & m_ptr, float iso_value);
 
         // Implement DrawableObject interface
         //

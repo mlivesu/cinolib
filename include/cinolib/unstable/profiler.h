@@ -55,7 +55,7 @@ class Profiler
 {
     public:
 
-        Profiler() { tree_ptr = 0; }
+        explicit Profiler() { tree_ptr = 0; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

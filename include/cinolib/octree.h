@@ -49,9 +49,9 @@ template<typename item_type> class Octree
 
     public:
 
-        Octree() {}
+        explicit Octree() {}
 
-        Octree(const vec3d & minim, const vec3d & maxim)
+        explicit Octree(const vec3d & minim, const vec3d & maxim)
         {
             set_extents(minim, maxim);
         }

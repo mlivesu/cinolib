@@ -63,7 +63,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
     public:
 
-                 AbstractPolyhedralMesh() : AbstractMesh<M,V,E,P>() {}
+        explicit AbstractPolyhedralMesh() : AbstractMesh<M,V,E,P>() {}
         virtual ~AbstractPolyhedralMesh() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

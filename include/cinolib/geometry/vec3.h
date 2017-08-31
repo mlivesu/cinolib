@@ -57,12 +57,12 @@ template<typename real> class vec3
 
     public:
 
-        vec3()
+        explicit vec3()
         {
             set( 0.0, 0.0, 0.0 );
         }
 
-        vec3(const real x, const real y=0.0, const real z=0.0 )
+        explicit vec3(const real x, const real y=0.0, const real z=0.0 )
         {
             set(x, y, z);
         }

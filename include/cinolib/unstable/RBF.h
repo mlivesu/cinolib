@@ -54,9 +54,9 @@ class RBF_interpolation
 {
     public:
 
-        RBF_interpolation(const AbstractRBF<vec3d>  * phi,
-                          const std::vector<Point>  & centers,
-                          const std::vector<double> & samples);
+        explicit RBF_interpolation(const AbstractRBF<vec3d>  * phi,
+                                   const std::vector<Point>  & centers,
+                                   const std::vector<double> & samples);
 
         double eval(const Point & p) const;
 

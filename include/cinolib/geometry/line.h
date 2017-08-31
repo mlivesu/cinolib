@@ -43,7 +43,7 @@ class Line
 {
     public:
 
-        Line(const vec3d & p0, const vec3d & p1);
+        explicit Line(const vec3d & p0, const vec3d & p1);
 
         std::vector<Plane> to_planes() const;
 

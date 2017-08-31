@@ -55,23 +55,23 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 {
     public:
 
-        Hexmesh(){}
+        explicit Hexmesh(){}
 
-        Hexmesh(const char * filename);
+        explicit Hexmesh(const char * filename);
 
-        Hexmesh(const std::vector<double> & coords,
-                const std::vector<uint>   & polys);
+        explicit Hexmesh(const std::vector<double> & coords,
+                         const std::vector<uint>   & polys);
 
-        Hexmesh(const std::vector<vec3d> & verts,
-                const std::vector<uint>  & polys);
+        explicit Hexmesh(const std::vector<vec3d> & verts,
+                         const std::vector<uint>  & polys);
 
-        Hexmesh(const std::vector<vec3d>             & verts,
-                const std::vector<std::vector<uint>> & polys);
+        explicit Hexmesh(const std::vector<vec3d>             & verts,
+                         const std::vector<std::vector<uint>> & polys);
 
-        Hexmesh(const std::vector<vec3d>             & verts,
-                const std::vector<std::vector<uint>> & faces,
-                const std::vector<std::vector<uint>> & polys,
-                const std::vector<std::vector<bool>> & polys_face_winding);
+        explicit Hexmesh(const std::vector<vec3d>             & verts,
+                         const std::vector<std::vector<uint>> & faces,
+                         const std::vector<std::vector<uint>> & polys,
+                         const std::vector<std::vector<bool>> & polys_face_winding);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

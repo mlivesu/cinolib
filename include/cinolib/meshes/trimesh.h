@@ -48,21 +48,21 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 {
     public:
 
-        Trimesh(){}
+        explicit Trimesh(){}
 
-        Trimesh(const char * filename);
+        explicit Trimesh(const char * filename);
 
-        Trimesh(const std::vector<vec3d>             & coords,
-                const std::vector<std::vector<uint>> & polys);
+        explicit Trimesh(const std::vector<vec3d>             & coords,
+                         const std::vector<std::vector<uint>> & polys);
 
-        Trimesh(const std::vector<double>            & coords,
-                const std::vector<std::vector<uint>> & polys);
+        explicit Trimesh(const std::vector<double>            & coords,
+                         const std::vector<std::vector<uint>> & polys);
 
-        Trimesh(const std::vector<vec3d> & coords,
-                const std::vector<uint>  & polys);
+        explicit Trimesh(const std::vector<vec3d> & coords,
+                         const std::vector<uint>  & polys);
 
-        Trimesh(const std::vector<double> & coords,
-                const std::vector<uint>   & polys);
+        explicit Trimesh(const std::vector<double> & coords,
+                         const std::vector<uint>   & polys);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

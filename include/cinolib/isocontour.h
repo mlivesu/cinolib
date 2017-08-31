@@ -41,8 +41,8 @@ class Isocontour
 {
     public:
 
-        Isocontour();
-        Isocontour(Trimesh<> & m, float iso_value, bool discard_boundary_edges = false);
+        explicit Isocontour();
+        explicit Isocontour(Trimesh<> & m, float iso_value, bool discard_boundary_edges = false);
 
         uint num_curves() const;
 

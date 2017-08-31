@@ -46,10 +46,10 @@ class ScalarField : public Eigen::VectorXd, public Serializable
 {
     public:
 
-        ScalarField();
-        ScalarField(const std::vector<double> & data);
-        ScalarField(const uint size);
-        ScalarField(const char *filename);
+        explicit ScalarField();
+        explicit ScalarField(const std::vector<double> & data);
+        explicit ScalarField(const uint size);
+        explicit ScalarField(const char *filename);
 
         template<class Mesh>
         void copy_to_mesh(Mesh & m, const int tex_coord = U_param) const;
