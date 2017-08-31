@@ -1,6 +1,4 @@
-- Fix performances of poly_remove on quad/polygon meshes (it is not necessary to re-triangulate!)
 - Gradients on hexmeshes are buggy. hint: check per face normals!
-- make all constructors explicit
 - add max_depth to Profiler to avoid lengthy reports
 - consider avoiding to use a tree into the profiler. Sorting entries w.r.t. call time should do the job…
 - refactor IsoCurve (exploiting the Curve class)
