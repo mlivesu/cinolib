@@ -141,7 +141,7 @@ bool Trimesh<M,V,E,P>::edge_is_collapsible(const uint eid, const double lambda) 
     }
 
     if (!edge_is_topologically_collapsible(eid)) return false;
-    //if (!edge_is_geometrycally_collapsible(eid, lambda)) return false;
+    if (!edge_is_geometrically_collapsible(eid, lambda)) return false;
     return true;
 }
 
