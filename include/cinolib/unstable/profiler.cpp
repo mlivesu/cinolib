@@ -37,16 +37,19 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#ifdef CINOLIB_PROFILER_ENABLED
 CINO_INLINE
 void Profiler::push(const std::string & key)
 {
-#ifdef CINOLIB_PROFILER_ENABLED
     ProfilerEntry entry;
     entry.key   = key;
     entry.start = std::chrono::high_resolution_clock::now();
     tree_ptr    = tree.add_children(entry, tree_ptr);
-#endif
 }
+#else
+CINO_INLINE
+void Profiler::push(const std::string &){}
+#endif
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

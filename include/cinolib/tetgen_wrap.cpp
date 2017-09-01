@@ -50,8 +50,8 @@ void tetgen_wrap(const std::vector<double> & coords_in,
 
     assert(!coords_in.empty());
     assert(!tris_in.empty());
-    assert(coords_out.empty());
-    assert(tets_out.empty());
+    coords_out.clear();
+    tets_out.clear();
 
     tetgenio           in, out;
     tetgenio::facet   *f;

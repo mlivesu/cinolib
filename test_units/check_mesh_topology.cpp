@@ -46,7 +46,7 @@ void check_topology(const AbstractPolygonMesh<M,V,E,P> & m)
         {
             assert(nbr < m.num_verts());
             assert(CONTAINS_VEC(m.adj_v2v(nbr), vid));
-            assert(m.edge_id(vid, nbr) >= 0); // there exist an edge (vid, nbr)
+            assert(m.edge_id(vid, nbr) >= 0); // there exists an edge (vid, nbr)
             assert(std::count(m.adj_v2v(vid).begin(), m.adj_v2v(vid).end(), nbr) == 1);
         }
         for(uint eid : m.adj_v2e(vid))
