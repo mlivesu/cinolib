@@ -297,7 +297,7 @@ Curve::Sample IntegralCurve<Trimesh<>>::move_forward_from_edge(const uint eid, c
         else               return make_sample(m_ptr->edge_vert_id(eid,1));
     }
 
-    // otherwise go for the stanrdard way: compute the average gradient between the
+    // otherwise go for the standard way: compute the average gradient between the
     // triangles incident to the edge and step into the triangle pointed by the arrow
 
     vec3d grad = g0 + g1;
