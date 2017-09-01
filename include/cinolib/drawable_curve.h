@@ -36,6 +36,7 @@
 #include <cinolib/curve.h>
 #include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/meshes/skel.h>
+#include <cinolib/color.h>
 
 namespace cinolib
 {
@@ -48,13 +49,29 @@ class DrawableCurve : public Curve, public DrawableObject
         explicit DrawableCurve(const std::vector<vec3d> & samples);
         explicit DrawableCurve(const Skel & skel, const int bone);
 
-        void       draw(const float scene_size=1) const;
-        vec3d      scene_center() const;
-        float      scene_radius() const;
-        ObjectType object_type()  const { return DRAWABLE_CURVE; }
-        void        slice(const float, const int, const int, const int) {}
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void  draw(const float scene_size=1) const;
+        vec3d scene_center() const;
+        float scene_radius() const;
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        ObjectType object_type() const { return DRAWABLE_CURVE; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void set_color(const Color & c);
+        void set_thickness(float t);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void slice(const float, const int, const int, const int) {}
+
+    private:
+
+        Color color;
+        float thickness;
 };
 
 }

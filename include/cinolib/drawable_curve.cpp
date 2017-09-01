@@ -36,28 +36,43 @@ namespace cinolib
 
 CINO_INLINE
 DrawableCurve::DrawableCurve() : Curve()
-{}
+{
+    thickness = 1.0;
+    color = Color::RED();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 DrawableCurve::DrawableCurve(const std::vector<vec3d> & samples) : Curve(samples)
-{}
+{
+    thickness = 1.0;
+    color = Color::RED();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 DrawableCurve::DrawableCurve(const Skel & skel, const int bone) : Curve(skel, bone)
-{}
+{
+    thickness = 1.0;
+    color = Color::RED();
+}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void DrawableCurve::draw(const float scene_size) const
 {
-    double cylind_rad = scene_size*0.001;
+    double cylind_rad = scene_size * 0.001 * thickness;
 
     for(uint i=1; i<samples().size(); ++i)
     {
-        cylinder<vec3d>(samples()[i-1].pos, samples()[i].pos, cylind_rad, cylind_rad, Color::RED().rgba);
+        cylinder<vec3d>(samples()[i-1].pos, samples()[i].pos, cylind_rad, cylind_rad, color.rgba);
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 vec3d DrawableCurve::scene_center() const
@@ -65,6 +80,7 @@ vec3d DrawableCurve::scene_center() const
     return bbox().center();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 float DrawableCurve::scene_radius() const
@@ -72,6 +88,20 @@ float DrawableCurve::scene_radius() const
     return bbox().diag();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
+void DrawableCurve::set_color(const Color & c)
+{
+    color = c;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableCurve::set_thickness(float t)
+{
+    thickness = t;
+}
 
 }
