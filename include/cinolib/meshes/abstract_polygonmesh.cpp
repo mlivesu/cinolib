@@ -1027,6 +1027,8 @@ void AbstractPolygonMesh<M,V,E,P>::poly_remove(const uint pid)
         if (vid1 > vid0) std::swap(vid0,vid1); // make sure the highest id is processed first
         REMOVE_FROM_VEC(this->v2e.at(vid0), eid);
         REMOVE_FROM_VEC(this->v2e.at(vid1), eid);
+        REMOVE_FROM_VEC(this->v2v.at(vid0), vid1);
+        REMOVE_FROM_VEC(this->v2v.at(vid1), vid0);
         edge_remove_unreferenced(eid);
     }
 
