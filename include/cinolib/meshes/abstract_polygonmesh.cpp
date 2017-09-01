@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/meshes/abstract_polygonmesh.h>
 #include <cinolib/io/read_write.h>
+#include <cinolib/quality.h>
 
 #include <unordered_set>
 
@@ -235,6 +236,37 @@ void AbstractPolygonMesh<M,V,E,P>::update_normals()
 {
     this->update_p_normals();
     this->update_v_normals();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double AbstractPolygonMesh<M,V,E,P>::mesh_volume() const
+{
+    // EFFICIENT FEATURE EXTRACTION FOR 2D/3D OBJECTS IN MESH REPRESENTATION
+    // Cha Zhang and Tsuhan Chen
+    // Proceedings of the International Conference on Image Processing, 2001
+
+    double vol = 0.0;
+    vec3d O(0,0,0);
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        for(uint i=0; i<this->poly_tessellation(pid).size()/3; ++i)
+        {
+            vec3d A    = this->vert(this->poly_tessellation(pid).at(3*i+0));
+            vec3d B    = this->vert(this->poly_tessellation(pid).at(3*i+1));
+            vec3d C    = this->vert(this->poly_tessellation(pid).at(3*i+2));
+
+            vec3d OA   = A - O;
+            vec3d n    = this->poly_data(pid).normal;
+
+            vol += (n.dot(OA) > 0) ?  tet_unsigned_volume(A,B,C,O)
+                                   : -tet_unsigned_volume(A,B,C,O);
+        }
+    }
+    assert(vol >= 0);
+    return vol;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

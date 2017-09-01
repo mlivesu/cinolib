@@ -86,6 +86,10 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        virtual double mesh_volume() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         virtual bool              vert_is_saddle          (const uint vid, const int tex_coord = U_param) const;
         virtual bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
         virtual double            vert_area               (const uint vid) const;
