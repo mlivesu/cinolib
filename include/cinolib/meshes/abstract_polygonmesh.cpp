@@ -805,26 +805,24 @@ int AbstractPolygonMesh<M,V,E,P>::poly_shared(const uint eid0, const uint eid1) 
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int AbstractPolygonMesh<M,V,E,P>::poly_adjacent_along(const uint pid, const uint eid) const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::polys_adjacent_along(const uint pid, const uint eid) const
 {
-    // WARNING : assume the edge vid0,vid1 is manifold!
-    assert(edge_is_manifold(eid));
+    std::vector<uint> polys;
     for(uint nbr : this->adj_p2p(pid))
     {
-        if (this->poly_contains_edge(nbr,eid)) return nbr;
+        if (this->poly_contains_edge(nbr,eid)) polys.push_back(nbr);
     }
-    return -1;
+    return polys;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int AbstractPolygonMesh<M,V,E,P>::poly_adjacent_along(const uint pid, const uint vid0, const uint vid1) const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::polys_adjacent_along(const uint pid, const uint vid0, const uint vid1) const
 {
     uint eid = this->poly_edge_id(pid, vid0, vid1);
-
-    return poly_adjacent_along(pid, eid);
+    return polys_adjacent_along(pid, eid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -840,6 +838,20 @@ int AbstractPolygonMesh<M,V,E,P>::poly_opposite_to(const uint eid, const uint pi
     if (this->edge_is_boundary(eid)) return -1;
     if (this->adj_e2p(eid).front() != pid) return this->adj_e2p(eid).front();
     return this->adj_e2p(eid).back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool AbstractPolygonMesh<M,V,E,P>::polys_are_adjacent(const uint pid0, const uint pid1) const
+{
+    for(uint eid : this->adj_p2e(pid0))
+    for(uint pid : this->polys_adjacent_along(pid0, eid))
+    {
+        if (pid == pid1) return true;
+    }
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -949,8 +961,7 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & p)
         for(uint nbr : this->e2p.at(eid))
         {
             assert(nbr!=pid);
-            assert(DOES_NOT_CONTAIN_VEC(this->p2p.at(nbr),pid)); // this may become an "if" for polygonal meshes...
-            assert(DOES_NOT_CONTAIN_VEC(this->p2p.at(pid),nbr));
+            if (this->polys_are_adjacent(pid,nbr)) continue;
             this->p2p.at(nbr).push_back(pid);
             this->p2p.at(pid).push_back(nbr);
         }

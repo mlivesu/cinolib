@@ -209,41 +209,31 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 bool Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda)
 {
-    if (!edge_is_collapsible(eid, lambda))
+    if (!edge_is_collapsible(eid, lambda)) return false;
+
+    uint vert_to_keep   = this->edge_vert_id(eid,0);
+    uint vert_to_remove = this->edge_vert_id(eid,1);
+    if (vert_to_remove < vert_to_keep) std::swap(vert_to_keep, vert_to_remove); // remove vert with highest ID
+
+    this->vert(vert_to_keep) = this->edge_sample_at(eid, lambda); // reposition vertex
+
+    for(uint pid : this->adj_v2p(vert_to_remove))
     {
-        //std::cerr << "Edge " << eid << " is non-collapsible" << std::endl;
-        return false;
-    }
+        if (this->poly_contains_edge(pid, eid)) continue; // no need to update. will collapse
 
-    uint vid0    = this->edge_vert_id(eid,0);
-    uint vid1    = this->edge_vert_id(eid,1);
-    uint new_vid = this->vert_add(this->edge_sample_at(eid, lambda));
-
-    std::unordered_set<uint> polys_to_update;
-    for(uint pid : this->adj_v2p(vid0)) if (!this->poly_contains_edge(pid, eid)) polys_to_update.insert(pid);
-    for(uint pid : this->adj_v2p(vid1)) if (!this->poly_contains_edge(pid, eid)) polys_to_update.insert(pid);
-
-    for(uint pid : polys_to_update)
-    {
-        int e_opp = -1;
-        if (this->poly_contains_vert(pid, vid0)) e_opp = this->edge_opposite_to(pid, vid0); else
-        if (this->poly_contains_vert(pid, vid1)) e_opp = this->edge_opposite_to(pid, vid1); else
-        assert(false);
-
-        uint A = this->edge_vert_id(e_opp,0);
-        uint B = this->edge_vert_id(e_opp,1);
+        int  e_opp = this->edge_opposite_to(pid, vert_to_remove);
+        uint A     = this->edge_vert_id(e_opp,0);
+        uint B     = this->edge_vert_id(e_opp,1);
 
         if (this->poly_verts_are_CCW(pid,A,B)) std::swap(A, B);
-        uint new_pid = this->poly_add(A, B, new_vid);
+        uint new_pid = this->poly_add(A, B, vert_to_keep);
 
         this->poly_data(new_pid) = this->poly_data(pid);
         this->update_p_normal(new_pid);
     }
-    this->update_v_normal(new_vid);
+    this->update_v_normal(vert_to_keep);
 
-    this->vert_remove(std::max(vid0,vid1));
-    this->vert_remove(std::min(vid0,vid1));
-
+    this->vert_remove(vert_to_remove);
     return true;
 }
 
