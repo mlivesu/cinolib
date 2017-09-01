@@ -181,6 +181,7 @@ class AbstractMesh
 
         virtual       vec3d  edge_vert         (const uint eid, const uint offset) const;
         virtual       uint   edge_vert_id      (const uint eid, const uint offset) const;
+        virtual       int    edge_id           (const uint vid0, const uint vid1) const;
         virtual       vec3d  edge_sample_at    (const uint eid, double lambda) const; // arc-length param
         virtual       uint   edge_valence      (const uint eid) const;
         virtual       bool   edge_contains_vert(const uint eid, const uint vid) const;

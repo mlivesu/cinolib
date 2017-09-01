@@ -126,10 +126,13 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         virtual double            poly_area               (const uint pid) const;
         virtual double            poly_mass               (const uint pid) const;
         virtual int               poly_shared             (const uint eid0, const uint eid1) const;
-        virtual int               poly_adjacent_along     (const uint pid, const uint vid0, const uint vid1) const;
+        virtual bool              polys_are_adjacent      (const uint pid0, const uint pid1) const;
+        virtual std::vector<uint> polys_adjacent_along    (const uint pid, const uint vid0, const uint vid1) const;
+        virtual std::vector<uint> polys_adjacent_along    (const uint pid, const uint eid) const;
         virtual void              poly_flip_winding_order (const uint pid);
         virtual void              poly_switch_id          (const uint pid0, const uint pid1);
         virtual bool              poly_is_boundary        (const uint pid) const;
+        virtual uint              poly_add                (const std::vector<uint> & p);
         virtual void              poly_remove_unreferenced(const uint pid);
         virtual void              poly_remove             (const uint pid);
         virtual void              polys_remove            (const std::vector<uint> & pids);

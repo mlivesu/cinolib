@@ -118,6 +118,7 @@ int Trimesh<M,V,E,P>::edge_opposite_to(const uint pid, const uint vid) const
         if (this->edge_vert_id(eid,0) != vid &&
             this->edge_vert_id(eid,1) != vid) return eid;
     }
+    assert(false && "This is not supposed to happen!");
     return -1;
 }
 
@@ -125,20 +126,114 @@ int Trimesh<M,V,E,P>::edge_opposite_to(const uint pid, const uint vid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,P>::edge_is_collapsible(const uint) const
+bool Trimesh<M,V,E,P>::edge_is_collapsible(const uint eid, const double lambda) const
 {
-    assert(false && "TODO");
+    // HYPER-CONSERVATIVE CHECKS THAT SHOULD BE RELAXED SOMEDAY...
+    {
+        if (!this->edge_is_manifold(eid)) return false;
+
+        uint vid0 = this->edge_vert_id(eid,0);
+        uint vid1 = this->edge_vert_id(eid,1);
+        if (this->vert_is_boundary(vid0)) return false;
+        if (this->vert_is_boundary(vid1)) return false;
+        for(uint nbr : this->adj_v2v(vid0)) if (this->vert_is_boundary(nbr)) return false;
+        for(uint nbr : this->adj_v2v(vid1)) if (this->vert_is_boundary(nbr)) return false;
+    }
+
+    if (!edge_is_topologically_collapsible(eid)) return false;
+    if (!edge_is_geometrically_collapsible(eid, lambda)) return false;
     return true;
 }
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,P>::edge_collapse(const uint)
+bool Trimesh<M,V,E,P>::edge_is_topologically_collapsible(const uint eid) const
 {
-    assert(false && "TODO");
+    // https://stackoverflow.com/questions/27049163/mesh-simplification-edge-collapse-conditions
+
+    uint vid0 = this->edge_vert_id(eid,0);
+    uint vid1 = this->edge_vert_id(eid,1);
+
+    std::set<uint> v0_ring(this->adj_v2v(vid0).begin(), this->adj_v2v(vid0).end());
+    std::set<uint> v1_ring(this->adj_v2v(vid1).begin(), this->adj_v2v(vid1).end());
+
+    // http://en.cppreference.com/w/cpp/algorithm/set_intersection
+    std::vector<uint> shared_verts;
+    std::set_intersection(v0_ring.begin(), v0_ring.end(),
+                          v1_ring.begin(), v1_ring.end(),
+                          std::back_inserter(shared_verts));
+
+    if ( this->edge_is_boundary(eid) && shared_verts.size() > 1) return false;
+    if (!this->edge_is_boundary(eid) && shared_verts.size() > 2) return false;
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool Trimesh<M,V,E,P>::edge_is_geometrically_collapsible(const uint eid, const double lambda) const
+{
+    // GEOMETRIC CONDITIONS: no triangle should flip
+    //
+    vec3d new_vert = this->edge_sample_at(eid, lambda);
+    uint  vid0     = this->edge_vert_id(eid,0);
+    uint  vid1     = this->edge_vert_id(eid,1);
+
+    std::unordered_set<uint> polys_to_test;
+    for(uint pid : this->adj_v2p(vid0)) if (!this->poly_contains_edge(pid, eid)) polys_to_test.insert(pid);
+    for(uint pid : this->adj_v2p(vid1)) if (!this->poly_contains_edge(pid, eid)) polys_to_test.insert(pid);
+
+    for(uint pid : polys_to_test)
+    {
+        int e_opp = -1;
+        if (this->poly_contains_vert(pid, vid0)) e_opp = this->edge_opposite_to(pid, vid0); else
+        if (this->poly_contains_vert(pid, vid1)) e_opp = this->edge_opposite_to(pid, vid1); else
+        assert(false);
+
+        uint A = this->edge_vert_id(e_opp,0);
+        uint B = this->edge_vert_id(e_opp,1);
+        if (this->poly_verts_are_CCW(pid,A,B)) std::swap(A, B);
+        vec3d new_n = triangle_normal(this->vert(A), this->vert(B), new_vert);
+
+        if (this->poly_data(pid).normal.dot(new_n) < 0) return false;
+    }
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda)
+{
+    if (!edge_is_collapsible(eid, lambda)) return false;
+
+    uint vert_to_keep   = this->edge_vert_id(eid,0);
+    uint vert_to_remove = this->edge_vert_id(eid,1);
+    if (vert_to_remove < vert_to_keep) std::swap(vert_to_keep, vert_to_remove); // remove vert with highest ID
+
+    this->vert(vert_to_keep) = this->edge_sample_at(eid, lambda); // reposition vertex
+
+    for(uint pid : this->adj_v2p(vert_to_remove))
+    {
+        if (this->poly_contains_edge(pid, eid)) continue; // no need to update. will collapse
+
+        int  e_opp = this->edge_opposite_to(pid, vert_to_remove);
+        uint A     = this->edge_vert_id(e_opp,0);
+        uint B     = this->edge_vert_id(e_opp,1);
+
+        if (this->poly_verts_are_CCW(pid,A,B)) std::swap(A, B);
+        uint new_pid = this->poly_add(A, B, vert_to_keep);
+
+        this->poly_data(new_pid) = this->poly_data(pid);
+        this->update_p_normal(new_pid);
+    }
+    this->update_v_normal(vert_to_keep);
+
+    this->vert_remove(vert_to_remove);
     return true;
 }
 
@@ -254,61 +349,9 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint Trimesh<M,V,E,P>::poly_add(const uint vid0, const uint vid1, const uint vid2)
 {
-    assert(vid0 < this->num_verts());
-    assert(vid1 < this->num_verts());
-    assert(vid2 < this->num_verts());
-
-    uint pid = this->num_polys();
-    //
-    std::vector<uint> f;
-    f.push_back(vid0);
-    f.push_back(vid1);
-    f.push_back(vid2);
-    this->polys.push_back(f);
-    //
-    P data;
-    this->p_data.push_back(data);
-    //
-    this->p2e.push_back(std::vector<uint>());
-    this->p2p.push_back(std::vector<uint>());
-    //
-
-    this->v2p.at(vid0).push_back(pid);
-    this->v2p.at(vid1).push_back(pid);
-    this->v2p.at(vid2).push_back(pid);
-    //
-    ipair new_e[3]   = { unique_pair(vid0, vid1), unique_pair(vid1, vid2), unique_pair(vid2, vid0) };
-    int   new_eid[3] = { -1, -1, -1 };
-    for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
-        ipair e = unique_pair(this->edge_vert_id(eid,0), this->edge_vert_id(eid,1));
-        for(uint i=0; i<3; ++i) if (e == new_e[i]) new_eid[i] = eid;
-    }
-    //
-    for(uint i=0; i<3; ++i)
-    {
-        if (new_eid[i] == -1)
-        {
-            new_eid[i] = this->edge_add(new_e[i].first, new_e[i].second);
-        }
-        //
-        for(uint nbr : this->e2p.at(new_eid[i]))
-        {
-            this->p2p.at(nbr).push_back(pid);
-            this->p2p.at(pid).push_back(nbr);
-        }
-        this->e2p.at(new_eid[i]).push_back(pid);
-        this->p2e.at(pid).push_back(new_eid[i]);
-    }
-    //
-    this->update_p_normal(pid);
-    this->update_v_normal(vid0);
-    this->update_v_normal(vid1);
-    this->update_v_normal(vid2);
-
-    return pid;
+    std::vector<uint> p = { vid0, vid1, vid2 };
+    return this->poly_add(p);
 }
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
