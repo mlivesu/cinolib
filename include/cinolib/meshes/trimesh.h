@@ -93,9 +93,11 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int    edge_opposite_to        (const uint pid, const uint vid) const;
-        bool   edge_collapse           (const uint eid);
-        bool   edge_is_collapsible     (const uint eid) const;
+        int    edge_opposite_to                 (const uint pid, const uint vid) const;
+        bool   edge_collapse                    (const uint eid, const double lambda = 0.5);
+        bool   edge_is_collapsible              (const uint eid, const double lambda) const;
+        bool   edge_is_geometrically_collapsible(const uint eid, const double lambda) const;
+        bool   edge_is_topologically_collapsible(const uint eid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -110,7 +112,8 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         uint              poly_edge_id            (const uint pid, const uint offset) const;
         std::vector<uint> poly_tessellation       (const uint pid) const;
 
-        using  AbstractMesh<M,V,E,P>::poly_edge_id; // avoid hiding poly_ege_id(pid,vid0,vid1)
+        using  AbstractMesh<M,V,E,P>::poly_edge_id;    // avoid hiding poly_ege_id(pid,vid0,vid1)
+        using  AbstractPolygonMesh<M,V,E,P>::poly_add; // avoid hiding poly_add(p)
 };
 
 }

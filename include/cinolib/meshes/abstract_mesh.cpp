@@ -456,6 +456,22 @@ uint AbstractMesh<M,V,E,P>::edge_vert_id(const uint eid, const uint offset) cons
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+int AbstractMesh<M,V,E,P>::edge_id(const uint vid0, const uint vid1) const
+{
+    for(uint eid : adj_v2e(vid0))
+    {
+        if (edge_contains_vert(eid, vid0) && edge_contains_vert(eid, vid1))
+        {
+            return eid;
+        }
+    }
+    return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 uint AbstractMesh<M,V,E,P>::edge_valence(const uint eid) const
 {
     return this->adj_e2p(eid).size();

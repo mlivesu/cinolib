@@ -626,8 +626,10 @@ uint AbstractPolygonMesh<M,V,E,P>::edge_add(const uint vid0, const uint vid1)
 {
     assert(vid0 < this->num_verts());
     assert(vid1 < this->num_verts());
+    assert(!this->verts_are_adjacent(vid0, vid1));
+    assert(this->edge_id(vid0, vid1) == -1);
     //
-    uint id = this->num_edges();
+    uint eid = this->num_edges();
     //
     this->edges.push_back(vid0);
     this->edges.push_back(vid1);
@@ -637,7 +639,7 @@ uint AbstractPolygonMesh<M,V,E,P>::edge_add(const uint vid0, const uint vid1)
     E data;
     this->e_data.push_back(data);
     //
-    return id;
+    return eid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -795,21 +797,26 @@ int AbstractPolygonMesh<M,V,E,P>::poly_shared(const uint eid0, const uint eid1) 
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int AbstractPolygonMesh<M,V,E,P>::poly_adjacent_along(const uint pid, const uint vid0, const uint vid1) const
+int AbstractPolygonMesh<M,V,E,P>::poly_adjacent_along(const uint pid, const uint eid) const
 {
     // WARNING : assume the edge vid0,vid1 is manifold!
-    uint eid = this->poly_edge_id(pid, vid0, vid1);
     assert(edge_is_manifold(eid));
-
     for(uint nbr : this->adj_p2p(pid))
     {
-        if (this->poly_contains_vert(nbr,vid0) &&
-            this->poly_contains_vert(nbr,vid1))
-        {
-            return nbr;
-        }
+        if (this->poly_contains_edge(nbr,eid)) return nbr;
     }
     return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+int AbstractPolygonMesh<M,V,E,P>::poly_adjacent_along(const uint pid, const uint vid0, const uint vid1) const
+{
+    uint eid = this->poly_edge_id(pid, vid0, vid1);
+
+    return poly_adjacent_along(pid, eid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -889,6 +896,76 @@ void AbstractPolygonMesh<M,V,E,P>::poly_switch_id(const uint pid0, const uint pi
             if (pid == pid1) pid = pid0;
         }
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & p)
+{
+    for(uint vid : p) assert(vid < this->num_verts());
+
+    uint pid = this->num_polys();
+    this->polys.push_back(p);
+
+    P data;
+    this->p_data.push_back(data);
+
+    this->p2e.push_back(std::vector<uint>());
+    this->p2p.push_back(std::vector<uint>());
+
+    // add missing edges
+    for(uint i=0; i<p.size(); ++i)
+    {
+        uint vid0 = p.at(i);
+        uint vid1 = p.at((i+1)%p.size());
+        int  eid = this->edge_id(vid0, vid1);
+
+        if (eid == -1)
+        {
+            eid = this->edge_add(vid0, vid1);
+
+            assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid0), vid1));
+            assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid1), vid0));
+            this->v2v.at(vid1).push_back(vid0);
+            this->v2v.at(vid0).push_back(vid1);
+
+            this->v2e.at(vid0).push_back(eid);
+            this->v2e.at(vid1).push_back(eid);
+        }
+    }
+
+    // update connectivity
+    for(uint vid : p)
+    {
+        this->v2p.at(vid).push_back(pid);
+    }
+    //
+    for(uint i=0; i<p.size(); ++i)
+    {
+        uint vid0 = p.at(i);
+        uint vid1 = p.at((i+1)%p.size());
+        int  eid = this->edge_id(vid0, vid1);
+        assert(eid >= 0);
+
+        for(uint nbr : this->e2p.at(eid))
+        {
+            assert(nbr!=pid);
+            assert(DOES_NOT_CONTAIN_VEC(this->p2p.at(nbr),pid));
+            assert(DOES_NOT_CONTAIN_VEC(this->p2p.at(pid),nbr));
+            this->p2p.at(nbr).push_back(pid);
+            this->p2p.at(pid).push_back(nbr);
+        }
+
+        this->e2p.at(eid).push_back(pid);
+        this->p2e.at(pid).push_back(eid);
+    }
+
+    this->update_p_normal(pid);
+    for(uint vid : p) this->update_v_normal(vid);
+
+    return pid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
