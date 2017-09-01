@@ -627,6 +627,8 @@ uint AbstractPolygonMesh<M,V,E,P>::edge_add(const uint vid0, const uint vid1)
     assert(vid0 < this->num_verts());
     assert(vid1 < this->num_verts());
     assert(!this->verts_are_adjacent(vid0, vid1));
+    assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid0), vid1));
+    assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid1), vid0));
     assert(this->edge_id(vid0, vid1) == -1);
     //
     uint eid = this->num_edges();
@@ -638,6 +640,12 @@ uint AbstractPolygonMesh<M,V,E,P>::edge_add(const uint vid0, const uint vid1)
     //
     E data;
     this->e_data.push_back(data);
+    //
+    this->v2v.at(vid1).push_back(vid0);
+    this->v2v.at(vid0).push_back(vid1);
+    //
+    this->v2e.at(vid0).push_back(eid);
+    this->v2e.at(vid1).push_back(eid);
     //
     return eid;
 }
@@ -922,18 +930,7 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & p)
         uint vid1 = p.at((i+1)%p.size());
         int  eid = this->edge_id(vid0, vid1);
 
-        if (eid == -1)
-        {
-            eid = this->edge_add(vid0, vid1);
-
-            assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid0), vid1));
-            assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid1), vid0));
-            this->v2v.at(vid1).push_back(vid0);
-            this->v2v.at(vid0).push_back(vid1);
-
-            this->v2e.at(vid0).push_back(eid);
-            this->v2e.at(vid1).push_back(eid);
-        }
+        if (eid == -1) eid = this->edge_add(vid0, vid1);
     }
 
     // update connectivity
@@ -952,7 +949,7 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & p)
         for(uint nbr : this->e2p.at(eid))
         {
             assert(nbr!=pid);
-            assert(DOES_NOT_CONTAIN_VEC(this->p2p.at(nbr),pid));
+            assert(DOES_NOT_CONTAIN_VEC(this->p2p.at(nbr),pid)); // this may become an "if" for polygonal meshes...
             assert(DOES_NOT_CONTAIN_VEC(this->p2p.at(pid),nbr));
             this->p2p.at(nbr).push_back(pid);
             this->p2p.at(pid).push_back(nbr);
