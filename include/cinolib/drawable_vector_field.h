@@ -72,7 +72,6 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
         vec3d scene_center() const { return vec3d(); }
         float scene_radius() const { return 0.0;     }
-        void  slice(const float, const int, const int, const int) {}
 
         void set_arrow_color(const Color & c) { arrow_color = c; }
 

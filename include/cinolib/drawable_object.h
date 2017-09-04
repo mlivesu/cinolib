@@ -60,10 +60,10 @@ class DrawableObject
         virtual void        draw(const float scene_size = 1) const = 0;  // do rendering
         virtual vec3d       scene_center()                   const = 0;  // get position in space
         virtual float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
-        virtual void        slice(const float thresh,
-                                  const int   item,
-                                  const int   sign,
-                                  const int   mode) = 0;
+        virtual void        slice(const float,   // thresh,
+                                  const int  ,   // item = { X, Y, Z, L, Q }
+                                  const int  ,   // sign = { LEQ, GEQ }
+                                  const int  ){} // mode = { AND , OR }
 };
 
 }

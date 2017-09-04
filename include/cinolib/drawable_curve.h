@@ -64,10 +64,6 @@ class DrawableCurve : public Curve, public DrawableObject
         void set_color(const Color & c);
         void set_thickness(float t);
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void slice(const float, const int, const int, const int) {}
-
     private:
 
         Color color;
