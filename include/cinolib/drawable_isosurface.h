@@ -54,7 +54,6 @@ class DrawableIsosurface : public Isosurface<M,V,E,F,P>, public DrawableObject
         vec3d      scene_center() const;
         float      scene_radius() const;
         ObjectType object_type()  const { return DRAWABLE_ISOSURFACE; }
-        void       slice(const float, const int, const int, const int) {}
 };
 
 }

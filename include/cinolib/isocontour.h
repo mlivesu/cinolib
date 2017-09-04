@@ -37,61 +37,27 @@
 namespace cinolib
 {
 
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class P = Polygon_std_attributes>
 class Isocontour
 {
     public:
 
         explicit Isocontour();
-        explicit Isocontour(Trimesh<> & m, float iso_value, bool discard_boundary_edges = false);
+        explicit Isocontour(AbstractPolygonMesh<M,V,E,P> & m, double iso_value);
 
-        uint num_curves() const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        // split triangles and edit the mesh connectivity in such a way
-        // that there will be a chain of edges corresponding to isocurve
-        //
-        std::vector<uint> tessellate(Trimesh<> & m) const;
+        std::vector<uint> tessellate(Trimesh<M,V,E,P> & m) const;
 
-        // returns the centroid of the cc^th isocurve
-        //
-        vec3d curve_centroid(uint pid) const;
-
-        // returns true if the cid^th curve is closed
-        //
-        bool curve_is_closed(uint pid) const;
-
-        // returns true if the cid^th isocurve has less than <size> points
-        //
-        bool curve_is_shorter_than(uint pid, uint size) const;
-
-        // TRUE if at least one of its curves is not closed or it is very short (< 5 samples)
-        // FALSE otherwise
-        //
-        bool is_suspicious() const;
-
-        // matches the curves of the current isoline with the curves of another isoline
-        //
-        void match(Isocontour & contour, std::set<std::pair<uint,uint>> & curve_matches) const;
-
-        inline float value() const { return iso_value; }
-
-        const std::vector<vec3d> & curve_vertices(const uint id) const { return curves_vertices.at(id); }
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     protected:
 
-        void compute_edges2samples_map();
-        void make_iso_curve();
-
-        std::map<uint,vec3d>::const_iterator next_edge(uint eid, const std::set<uint> & visited) const;
-
-        std::map<uint,vec3d> edges2samples;
-        std::map<uint,uint>  edges2curves;
-
-        std::vector<std::vector<vec3d>> curves_vertices;
-        std::vector<std::vector<uint>>  curves_edges; // edge-id for each edge of each curve
-
-        Trimesh<> *m_ptr;
-        float      iso_value;
-        bool       discard_edges_incident_to_boundary;
+        double             iso_value;
+        std::vector<vec3d> segs;
 };
 
 }

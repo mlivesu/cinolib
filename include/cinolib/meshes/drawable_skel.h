@@ -62,7 +62,6 @@ class DrawableSkel : public Skel, public DrawableObject
         vec3d      scene_center() const { return bb.center();       }
         float      scene_radius() const { return bb.diag() * 0.5;   }
         ObjectType object_type()  const { return DRAWABLE_SKELETON; }
-        void       slice(const float, const int, const int, const int) {}
 
         void init();
 

@@ -33,32 +33,44 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/meshes/trimesh.h>
 #include <cinolib/isocontour.h>
 
 namespace cinolib
 {
 
-class DrawableIsocontour : public Isocontour, public DrawableObject
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class P = Polygon_std_attributes>
+class DrawableIsocontour : public Isocontour<M,V,E,P>, public DrawableObject
 {
     public:
 
         explicit DrawableIsocontour() {}
-        explicit DrawableIsocontour(Trimesh<> & m_ptr, float iso_value);
+        explicit DrawableIsocontour(AbstractPolygonMesh<M,V,E,P> & m, double iso_value);
 
-        // Implement DrawableObject interface
-        //
-        void       draw(const float scene_size=1) const;
-        vec3d      scene_center() const { return vec3d();        }
-        float      scene_radius() const { return 0.0;            }
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void  draw(const float scene_size=1) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d scene_center() const { return vec3d(); }
+        float scene_radius() const { return 0.0;     }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         ObjectType object_type()  const { return DRAWABLE_CURVE; }
-        void       slice(const float, const int, const int, const int) {}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void set_color(const Color & c);
+        void set_thickness(float t);
 
     private:
 
-        Color color_sample;
-        Color color_centre;
-        Color color_cylind;
+        Color color;
+        float thickness;
 };
 
 }
