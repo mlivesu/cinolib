@@ -1,7 +1,6 @@
 - Gradients on hexmeshes are buggy. hint: check per face normals!
 - add max_depth to Profiler to avoid lengthy reports
 - consider avoiding to use a tree into the profiler. Sorting entries w.r.t. call time should do the job…
-- refactor IsoCurve (exploiting the Curve class)
 - extend the concept of subdivisions from hexmesh to any mesh
 - add Additive Manufacturing stuff (load and process CLI files)…
 - Improve face tessellation strategy for polygonal meshes (flipped elements may currently arise for non convex polygons)
