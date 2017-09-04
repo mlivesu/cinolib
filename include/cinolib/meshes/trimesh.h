@@ -98,10 +98,13 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         bool   edge_is_collapsible              (const uint eid, const double lambda) const;
         bool   edge_is_geometrically_collapsible(const uint eid, const double lambda) const;
         bool   edge_is_topologically_collapsible(const uint eid) const;
+        uint   edge_split                       (const uint eid, const double lambda = 0.5);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double            poly_area               (const uint pid) const;
+//        bool              poly_split              (const uint pid, std::vector<double> & wgts);
+//        bool              poly_split              (const uint pid, const vec3d & p);
         bool              poly_is_cap             (const uint pid, const double angle_thresh_deg = 177.0) const;
         bool              poly_is_needle          (const uint pid, const double angle_thresh_deg = 3.0) const;
         bool              poly_bary_coords        (const uint pid, const vec3d & p, std::vector<double> & wgts) const;

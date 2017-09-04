@@ -241,6 +241,28 @@ bool Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+uint Trimesh<M,V,E,P>::edge_split(const uint eid, const double lambda)
+{
+    uint new_vid = this->vert_add(this->edge_sample_at(eid,lambda));
+    uint vid0    = this->edge_vert_id(eid,0);
+    uint vid1    = this->edge_vert_id(eid,1);
+
+    for(uint pid : this->adj_e2p(eid))
+    {
+        uint v_opp = this->vert_opposite_to(pid, vid0, vid1);
+        if (this->poly_verts_are_CCW(pid, vid0, vid1)) std::swap(vid0, vid1);
+        this->poly_add(v_opp, vid0, new_vid);
+        this->poly_add(v_opp, new_vid, vid1);
+    }
+    this->polys_remove(this->adj_e2p(eid));
+
+    return new_vid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 bool Trimesh<M,V,E,P>::poly_bary_coords(const uint pid, const vec3d & p, std::vector<double> & wgts) const
 {
     return triangle_barycentric_coords(this->poly_vert(pid,0),
