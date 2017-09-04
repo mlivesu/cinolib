@@ -36,29 +36,47 @@
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
 CINO_INLINE
-DrawableIsocontour::DrawableIsocontour(Trimesh<> & m, float value) : Isocontour(m, value)
+DrawableIsocontour<M,V,E,P>::DrawableIsocontour(AbstractPolygonMesh<M,V,E,P> & m, double iso_value)
+: Isocontour<M,V,E,P>(m, iso_value)
 {
-    color_cylind = Color::YELLOW();
-    color_centre = Color::BLUE();
-    color_sample = Color::RED();
+    color     = Color::RED();
+    thickness = 1.0;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class P>
 CINO_INLINE
-void DrawableIsocontour::draw(const float scene_size) const
+void DrawableIsocontour<M,V,E,P>::draw(const float scene_size) const
 {
-    //float sample_rad = /*m_ptr->bbox().diag()*/scene_size*0.004;
-    float cylind_rad = /*m_ptr->bbox().diag()*/scene_size*0.002;
+    float cylind_rad = scene_size * 0.002 * thickness;
 
-    for(uint i=0; i<curves_vertices.size(); ++i)
+    for(uint i=0; i<this->segs.size()/2; ++i)
     {
-        for(uint j=0; j<curves_vertices[i].size()-1; ++j)
-        {
-            cylinder<vec3d>(curves_vertices[i][j], curves_vertices[i][j+1], cylind_rad, cylind_rad, color_cylind.rgba);
-        }
-        //sphere<vec3d>(curve_centroid(i), sample_rad, centre_rgb);
+        cylinder<vec3d>(this->segs.at(2*i+0), this->segs.at(2*i+1), cylind_rad, cylind_rad, color.rgba);
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void DrawableIsocontour<M,V,E,P>::set_color(const Color & c)
+{
+    color = c;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void DrawableIsocontour<M,V,E,P>::set_thickness(float t)
+{
+    thickness = t;
 }
 
 }
