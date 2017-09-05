@@ -77,43 +77,43 @@ Isocontour<M,V,E,P>::Isocontour(AbstractPolygonMesh<M,V,E,P> & m, double iso_val
         // 6) the curve enters from (v1,v2) and exits from (v2,v0)
         // 7) the does not pass fromm here
 
-        bool is_v0 = (iso_value == f0);
-        bool is_v1 = (iso_value == f1);
-        bool is_v2 = (iso_value == f2);
+        bool through_v0    = (iso_value == f0);
+        bool through_v1    = (iso_value == f1);
+        bool through_v2    = (iso_value == f2);
         bool crosses_v0_v1 = is_into_interval(iso_value, f0, f1);
         bool crosses_v1_v2 = is_into_interval(iso_value, f1, f2);
         bool crosses_v2_v0 = is_into_interval(iso_value, f2, f0);
 
-        if (is_v0 && is_v1)
+        if (through_v0 && through_v1) // case 1) the curve coincides with (v0,v1)
         {
             segs.push_back(m.vert(vid0));
             segs.push_back(m.vert(vid1));
         }
-        else if (is_v1 && is_v2)
+        else if (through_v1 && through_v2) // case 2) the curve coincides with (v1,v2)
         {
             segs.push_back(m.vert(vid1));
             segs.push_back(m.vert(vid2));
         }
-        else if (is_v2 && is_v0)
+        else if (through_v2 && through_v0) // 3) the curve coincides with (v2,v0)
         {
             segs.push_back(m.vert(vid2));
             segs.push_back(m.vert(vid0));
         }
-        else if (crosses_v0_v1 && crosses_v1_v2)
+        else if (crosses_v0_v1 && crosses_v1_v2) // case 4) the curve enters from (v0,v1) and exits from (v0,v2)
         {
             double alpha0 = std::fabs(iso_value - f0)/fabs(f1 - f0);
             double alpha1 = std::fabs(iso_value - f1)/fabs(f2 - f1);
             segs.push_back((1.0-alpha0)*m.vert(vid0) + alpha0*m.vert(vid1));
             segs.push_back((1.0-alpha1)*m.vert(vid1) + alpha1*m.vert(vid2));
         }
-        else if (crosses_v0_v1 && crosses_v2_v0)
+        else if (crosses_v0_v1 && crosses_v2_v0) // case 5) the curve enters from (v0,v1) and exits from (v1,v2)
         {
             double alpha0 = std::fabs(iso_value - f0)/fabs(f1 - f0);
             double alpha1 = std::fabs(iso_value - f2)/fabs(f0 - f2);
             segs.push_back((1.0-alpha0)*m.vert(vid0) + alpha0*m.vert(vid1));
             segs.push_back((1.0-alpha1)*m.vert(vid2) + alpha1*m.vert(vid0));
         }
-        else if (crosses_v1_v2 && crosses_v2_v0)
+        else if (crosses_v1_v2 && crosses_v2_v0) // 6) the curve enters from (v1,v2) and exits from (v2,v0)
         {
             double alpha0 = std::fabs(iso_value - f1)/fabs(f2 - f1);
             double alpha1 = std::fabs(iso_value - f2)/fabs(f0 - f2);
