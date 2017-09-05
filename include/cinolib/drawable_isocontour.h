@@ -52,11 +52,8 @@ class DrawableIsocontour : public Isocontour<M,V,E,P>, public DrawableObject
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void  draw(const float scene_size=1) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d scene_center() const { return vec3d(); }
-        float scene_radius() const { return 0.0;     }
+        vec3d scene_center() const;
+        float scene_radius() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
