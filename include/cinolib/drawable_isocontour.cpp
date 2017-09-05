@@ -67,6 +67,24 @@ void DrawableIsocontour<M,V,E,P>::draw(const float scene_size) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+vec3d DrawableIsocontour<M,V,E,P>::scene_center() const
+{
+    return vec3d();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+float DrawableIsocontour<M,V,E,P>::scene_radius() const
+{
+    return 0.0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void DrawableIsocontour<M,V,E,P>::set_color(const Color & c)
 {
     color = c;
