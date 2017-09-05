@@ -129,7 +129,8 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 std::vector<uint> Isocontour<M,V,E,P>::tessellate(Trimesh<M,V,E,P> & m) const
 {
-    std::set<std::pair<uint,double>, std::greater<std::pair<uint,double>>> edges_to_split; // from highest to lowest id
+    typedef std::pair<uint,double> split_data;
+    std::set<split_data,std::greater<split_data>> edges_to_split; // from highest to lowest id
 
     for(uint eid=0; eid<m.num_edges(); ++eid)
     {
