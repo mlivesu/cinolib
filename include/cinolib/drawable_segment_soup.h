@@ -32,6 +32,7 @@
 #define CINO_DRAWABLE_SEGMENT_SOUP_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/color.h>
 #include <cinolib/drawable_object.h>
 
 #include <vector>
@@ -57,11 +58,11 @@ class DrawableSegmentSoup: public std::vector<vec3d>, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void  draw(const float scene_size=1) const;
+        void draw(const float scene_size=1) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d scene_center() const { return vec3d(); }
+        vec3d scene_center() const { return vec3d(); } // TODO
         float scene_radius() const { return 0.0;     }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

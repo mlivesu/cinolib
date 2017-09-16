@@ -29,7 +29,6 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/drawable_segment_soup.h>
-#include <cinolib/color.h>
 #include <cinolib/gl/draw_sphere.h>
 #include <cinolib/gl/draw_cylinder.h>
 
@@ -47,6 +46,7 @@ DrawableSegmentSoup::DrawableSegmentSoup()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 void DrawableSegmentSoup::draw(const float scene_size) const
 {
     float cylind_rad = scene_size * 0.002 * thickness;
