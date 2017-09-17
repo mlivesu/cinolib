@@ -62,6 +62,10 @@ class DrawableSegmentSoup: public std::vector<vec3d>, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void set_cheap_rendering(const bool b);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         vec3d scene_center() const { return vec3d(); } // TODO
         float scene_radius() const { return 0.0;     }
 
@@ -76,6 +80,7 @@ class DrawableSegmentSoup: public std::vector<vec3d>, public DrawableObject
 
     private:
 
+        bool  use_gl_lines; // to speedup rendering (when lots of segments are to be rendered)
         Color color;
         float thickness;
 };

@@ -40,8 +40,9 @@ namespace cinolib
 CINO_INLINE
 DrawableSegmentSoup::DrawableSegmentSoup()
 {
-    color     = Color::RED();
-    thickness = 1.0;
+    color        = Color::RED();
+    thickness    = 1.0;
+    use_gl_lines = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -49,14 +50,38 @@ DrawableSegmentSoup::DrawableSegmentSoup()
 CINO_INLINE
 void DrawableSegmentSoup::draw(const float scene_size) const
 {
-    float cylind_rad = scene_size * 0.002 * thickness;
-
-    for(vec3d p : *this) sphere<vec3d>(p, cylind_rad, color.rgba);
-
-    for(uint i=0; i<size()/2; ++i)
+    if (!use_gl_lines)
     {
-        cylinder<vec3d>(at(2*i+0), at(2*i+1), cylind_rad, cylind_rad, color.rgba);
+        float cylind_rad = scene_size * 0.002 * thickness;
+
+        for(vec3d p : *this) sphere<vec3d>(p, cylind_rad, color.rgba);
+
+        for(uint i=0; i<size()/2; ++i)
+        {
+            cylinder<vec3d>(at(2*i+0), at(2*i+1), cylind_rad, cylind_rad, color.rgba);
+        }
     }
+    else
+    {
+        glColor3fv(color.rgba);
+        for(uint i=0; i<size()/2; ++i)
+        {
+            vec3d a = at(2*i+0);
+            vec3d b = at(2*i+1);
+            glBegin(GL_LINES);
+                glVertex3d(a.x(), a.y(), a.z());
+                glVertex3d(b.x(), b.y(), b.z());
+            glEnd();
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableSegmentSoup::set_cheap_rendering(const bool b)
+{
+    use_gl_lines = b;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
