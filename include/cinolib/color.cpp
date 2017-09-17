@@ -166,4 +166,20 @@ Color Color::scatter(uint n_colors, uint pos, float sat, float val)
     return hsv2rgb(float(b)/float(n_colors), sat, val);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+Color Color::hsv_ramp(uint n_colors, uint pos)
+{
+    assert(pos>=0 && pos<n_colors);
+
+    uint i = std::round(255 * static_cast<float>(pos)/static_cast<float>(n_colors));
+
+    float r = quality_ramp_texture1D[3*i+0]/255.0;
+    float g = quality_ramp_texture1D[3*i+1]/255.0;
+    float b = quality_ramp_texture1D[3*i+2]/255.0;
+
+    return Color(r,g,b);
+}
+
 }
