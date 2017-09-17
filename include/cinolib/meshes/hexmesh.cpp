@@ -379,21 +379,18 @@ void Hexmesh<M,V,E,F,P>::init()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Hexmesh<M,V,E,F,P>::update_normals()
+void Hexmesh<M,V,E,F,P>::update_f_normal(const uint fid)
 {
     // STEAL BETTER NORMAL ESTIMATION FROM QUADMESH!
-    for(uint fid=0; fid<this->num_faces(); ++fid)
-    {
-        vec3d v0 = this->face_vert(fid,0);
-        vec3d v1 = this->face_vert(fid,1);
-        vec3d v2 = this->face_vert(fid,2);
+    vec3d v0 = this->face_vert(fid,0);
+    vec3d v1 = this->face_vert(fid,1);
+    vec3d v2 = this->face_vert(fid,2);
 
-        vec3d u = v1 - v0;    u.normalize();
-        vec3d v = v2 - v0;    v.normalize();
-        vec3d n = u.cross(v); n.normalize();
+    vec3d u = v1 - v0;    u.normalize();
+    vec3d v = v2 - v0;    v.normalize();
+    vec3d n = u.cross(v); n.normalize();
 
-        this->face_data(fid).normal = n;
-    }
+    this->face_data(fid).normal = n;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

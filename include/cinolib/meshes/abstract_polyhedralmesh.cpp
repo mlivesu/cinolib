@@ -206,6 +206,55 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_adjacency()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::update_normals()
+{
+    update_f_normals();
+    update_v_normals();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::update_f_normals()
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        update_f_normal(fid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::update_v_normals()
+{
+    for(uint vid=0; vid<this->num_verts(); ++vid)
+    {
+        if(vert_is_on_srf(vid)) update_v_normal(vid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::update_v_normal(const uint vid)
+{
+    vec3d n(0,0,0);
+    for(uint fid : adj_v2f(vid))
+    {
+        if (face_is_on_srf(fid)) n += face_data(fid).normal;
+    }
+    n.normalize();
+    this->vert_data(vid).normal = n;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::face_set_color(const Color & c)
 {
     for(uint fid=0; fid<num_faces(); ++fid)

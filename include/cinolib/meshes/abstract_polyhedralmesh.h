@@ -76,7 +76,11 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual void update_adjacency();
-        virtual void update_normals() = 0;
+        virtual void update_normals();
+        virtual void update_f_normals();
+        virtual void update_f_normal(const uint fid) = 0;
+        virtual void update_v_normals();
+        virtual void update_v_normal(const uint vid);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

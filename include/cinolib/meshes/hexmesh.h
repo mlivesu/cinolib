@@ -85,7 +85,7 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_normals();
+        void update_f_normal(const uint fid);
         void update_hex_quality(const uint pid);
         void update_hex_quality();
         void print_quality(const bool list_folded_elements = false);

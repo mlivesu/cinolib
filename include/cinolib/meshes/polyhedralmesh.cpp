@@ -185,26 +185,23 @@ void Polyhedralmesh<M,V,E,F,P>::update_face_tessellation()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,P>::update_normals()
+void Polyhedralmesh<M,V,E,F,P>::update_f_normal(const uint fid)
 {
-    for(uint fid=0; fid<this->num_faces(); ++fid)
-    {
-        assert(this->verts_per_face(fid)>2);
+    assert(this->verts_per_face(fid)>2);
 
-        // compute the best fitting plane
-        std::vector<vec3d> points;
-        for(uint off=0; off<this->verts_per_face(fid); ++off) points.push_back(this->face_vert(fid,off));
-        Plane best_fit(points);
+    // compute the best fitting plane
+    std::vector<vec3d> points;
+    for(uint off=0; off<this->verts_per_face(fid); ++off) points.push_back(this->face_vert(fid,off));
+    Plane best_fit(points);
 
-        // adjust orientation (n or -n?)
-        vec3d v0 = this->face_vert(fid,0);
-        vec3d v1 = this->face_vert(fid,1);
-        uint  i=2;
-        vec3d ccw;
-        do { ccw = (v1-v0).cross(this->face_vert(fid,i)-v0); ++i; } while (ccw.length_squared()==0 && i<this->verts_per_face(fid));
+    // adjust orientation (n or -n?)
+    vec3d v0 = this->face_vert(fid,0);
+    vec3d v1 = this->face_vert(fid,1);
+    uint  i=2;
+    vec3d ccw;
+    do { ccw = (v1-v0).cross(this->face_vert(fid,i)-v0); ++i; } while (ccw.length_squared()==0 && i<this->verts_per_face(fid));
 
-        this->face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
-    }
+    this->face_data(fid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

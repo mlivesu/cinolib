@@ -80,7 +80,7 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void update_face_tessellation();
-        void update_normals();
+        void update_f_normal(const uint fid);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
