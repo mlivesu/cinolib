@@ -335,12 +335,46 @@ void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
 
     while(!q.empty())
     {
-        uint fid = q.front();
+        uint pid = q.front();
         q.pop();
 
-        for(const uint & nbr : m.adj_p2p(fid))
+        for(const uint & nbr : m.adj_p2p(pid))
         {
-            double c = dist.at(fid) + m.poly_centroid(fid).dist(m.poly_centroid(nbr));
+            double c = dist.at(pid) + m.poly_centroid(pid).dist(m.poly_centroid(nbr));
+            if (dist.at(nbr) > c)
+            {
+                dist.at(nbr) = c;
+                q.push(nbr);
+            }
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
+                            const std::vector<uint>     & sources,
+                                  std::vector<double>   & dist) // elem id + dist
+{
+    dist = std::vector<double>(m.num_polys(), FLT_MAX);
+    std::queue<uint> q;
+
+    for(uint pid : sources)
+    {
+        q.push(pid);
+        dist.at(pid) = 0.0;
+    }
+
+    while(!q.empty())
+    {
+        uint pid = q.front();
+        q.pop();
+
+        for(const uint & nbr : m.adj_p2p(pid))
+        {
+            double c = dist.at(pid) + m.poly_centroid(pid).dist(m.poly_centroid(nbr));
             if (dist.at(nbr) > c)
             {
                 dist.at(nbr) = c;
