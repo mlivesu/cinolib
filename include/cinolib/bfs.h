@@ -83,6 +83,14 @@ void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class P>
+CINO_INLINE
+void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
+                            const std::vector<uint>     & sources,
+                                  std::vector<double>   & dist); // elem id + dist
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // shortest path on unweighted graph, essentially dijkstra with constaint weights.
 //
 template<class M, class V, class E, class P>
