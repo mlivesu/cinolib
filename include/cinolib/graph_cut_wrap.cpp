@@ -107,7 +107,7 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
         }
 
         // set data terms
-        assert(feasible_region.size() == n_labels);
+        assert(feasible_region.size() == (size_t)n_labels);
         for(int label=0; label<n_labels; ++label)
         {
             uint count = 0;
