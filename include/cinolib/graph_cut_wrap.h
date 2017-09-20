@@ -62,6 +62,28 @@ std::vector<int> graph_cut_wrap(const  AbstractMesh<M,V,E,P>             & m,
                                 const std::vector<double>               & data_term,
                                       GCoptimization::SmoothCostFnExtra   smooth_term,
                                       void                              * smooth_data = NULL);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* Constrained version (some sites can receive only a subset of the available labels).
+ *
+ * - feasible_region is a vector containing one entry for each label. Each entry is a vector
+ *   of node ids, containing all the nodes that can receive that label.
+ *
+ * - data_term is similar to feasible_region, but instead of the node ids, contains the costs
+ *   of each node to receive that label
+ *
+*/
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
+                                const int                                 n_labels,
+                                const std::vector<std::vector<uint>>    & feasible_region,
+                                const std::vector<std::vector<double>>  & data_term,
+                                      GCoptimization::SmoothCostFnExtra   smooth_term,
+                                      void                              * smooth_data = NULL);
+
 }
 
 #ifndef  CINO_STATIC_LIB
