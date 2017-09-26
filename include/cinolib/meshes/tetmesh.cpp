@@ -225,6 +225,11 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
     {
         read_VTK(filename, this->verts, tets);
     }
+    else if (filetype.compare(".tet") == 0 ||
+             filetype.compare(".TET") == 0)
+    {
+        read_TET(filename, this->verts, tets);
+    }
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;

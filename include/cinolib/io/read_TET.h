@@ -32,6 +32,7 @@
 #define CINO_READ_TET_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
 
 #include <sys/types.h>
 #include <vector>
@@ -43,6 +44,13 @@ CINO_INLINE
 void read_TET(const char          * filename,
               std::vector<double> & xyz,
               std::vector<u_int>  & tet);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_TET(const char                     * filename,
+              std::vector<vec3d>             & verts,
+              std::vector<std::vector<uint>> & polys);
 
 }
 
