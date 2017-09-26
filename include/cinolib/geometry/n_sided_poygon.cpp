@@ -29,23 +29,56 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include "n_sided_poygon.h"
+#include <numeric>
 
 namespace cinolib
 {
 
 CINO_INLINE
-Trimesh<> n_sided_polygon(const vec3d  & center,
-                          const uint     n_sides,
-                          const double   radius,
-                          const vec3d  & n)
+std::vector<vec3d> n_sided_polygon(const vec3d & center,
+                                   const uint    n_sides,
+                                   const double  radius)
 {
-    std::vector<double> coords;
+    std::vector<vec3d> verts(n_sides);
+    verts[0] = vec3d(radius,0,0);
+    for(uint i=1; i<n_sides; ++i)
+    {
+        verts[i] = verts[i-1];
+        rotate(verts[i], vec3d(0,1,0), 2.0*M_PI/double(n_sides));
+    }
+    for(vec3d & v : verts) v += center;
+    return verts;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+Polygonmesh<M,V,E,P> n_sided_polygon(const vec3d & center,
+                                     const uint    n_sides,
+                                     const double  radius)
+{
+    std::vector<vec3d> verts = n_sided_polygon(center, n_sides, radius);
+    std::vector<std::vector<uint>> faces(1);
+    faces.front().resize(n_sides);
+    std::iota(faces.front().begin(), faces.front().end(), 0);
+    return Polygonmesh<M,V,E,P>(verts, faces);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+Trimesh<M,V,E,P> n_sided_polygon(const vec3d  & center,
+                                 const uint     n_sides,
+                                 const double   radius,
+                                 const vec3d  & n)
+{
+    std::vector<vec3d> verts;
     std::vector<uint> tris;
 
     // center
-    coords.push_back(0);
-    coords.push_back(0);
-    coords.push_back(0);
+    verts.push_back(vec3d(0,0,0));
 
     std::vector<vec3d> boundary(n_sides);
     boundary[0] = vec3d(radius,0,0);
@@ -56,10 +89,8 @@ Trimesh<> n_sided_polygon(const vec3d  & center,
     }
 
     for(uint i=0; i<n_sides; ++i)
-    {
-        coords.push_back(boundary[i].x());
-        coords.push_back(boundary[i].y());
-        coords.push_back(boundary[i].z());
+    {        
+        verts.push_back(boundary[i]);
 
         tris.push_back(0);
         tris.push_back(1+i);
@@ -67,7 +98,7 @@ Trimesh<> n_sided_polygon(const vec3d  & center,
     }
 
     logger.disable();
-    Trimesh<> m(coords, tris);
+    Trimesh<> m(verts, tris);
     logger.enable();
 
     m.translate(center);
