@@ -509,6 +509,19 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_opp_to_srf_edge(const uint fid, con
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::face_shared_edge(const uint fid0, const uint fid1) const
+{
+    for(uint eid : this->adj_f2e(fid0))
+    {
+        if (this->face_contains_edge(fid1, eid)) return eid;
+    }
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_on_srf(const uint fid) const
 {
     return f_on_srf.at(fid);

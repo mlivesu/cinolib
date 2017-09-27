@@ -145,6 +145,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual ipair             face_edges_from_vert (const uint fid, const uint vid) const;
         virtual uint              face_adj_srf_edge    (const uint fid, const uint eid, const uint vid) const;
         virtual uint              face_opp_to_srf_edge (const uint fid, const uint eid) const;
+        virtual uint              face_shared_edge     (const uint fid0, const uint fid1) const;
         virtual vec3d             face_centroid        (const uint fid) const;
         virtual double            face_mass            (const uint fid) const;
         virtual double            face_area            (const uint fid) const;
