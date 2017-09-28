@@ -69,7 +69,7 @@ template<typename real> class vec2
             set(x, y);
         }
 
-        explicit vec2(const vec3<real> & p, const int mode)
+        explicit vec2(const vec3<real> & p, const int mode = DROP_Z)
         {
             switch (mode)
             {
