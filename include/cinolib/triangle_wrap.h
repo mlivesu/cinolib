@@ -32,6 +32,7 @@
 #define CINO_TRIANGLE_WRAP_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec2.h>
 
 #include <vector>
 #include <sys/types.h>
@@ -40,14 +41,32 @@ namespace cinolib
 {
 
 CINO_INLINE
-void triangle_wrap(const std::vector<double> & coords_in,   // serialized xy coordinates
-                   const std::vector<uint>   & segs_in,     // serialized segment endpoint ids
-                   const std::vector<double> & holes_in,    // serialized xy holes innerpoints
-                   const double                z_coord,     // z coord for coords_out
-                   const std::string         & flags,       // options
-                         std::vector<double> & coords_out,  // serialized xyz's (z = z_coord)
-                         std::vector<uint>   & tris_out);   // serialized triangle vertex ids
+void triangle_wrap(const std::vector<double> & verts_in,  // serialized input xy coordinates
+                   const std::vector<uint>   & segs_in,   // serialized segments
+                   const std::vector<double> & holes_in,  // serialized xy holes
+                   const std::string         & flags,     // https://www.cs.cmu.edu/~quake/triangle.switch.html
+                         std::vector<double> & verts_out, // serialized output xy coordinates
+                         std::vector<uint>   & tris_out); // serialized tris
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void triangle_wrap(const std::vector<vec2d>             & verts_in,
+                   const std::vector<uint>              & segs_in,
+                   const std::vector<vec2d>             & holes_in,
+                   const std::string                    & flags,
+                         std::vector<vec2d>             & verts_out,
+                         std::vector<std::vector<uint>> & tris_out);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void triangle_wrap(const std::vector<vec3d>             & verts_in,  // automatically ignores the third component (z)
+                   const std::vector<uint>              & segs_in,
+                   const std::vector<vec3d>             & holes_in,  // automatically ignores the third component (z)
+                   const std::string                    & flags,
+                         std::vector<vec3d>             & verts_out, // automatically sets the third component (z) to zero
+                         std::vector<std::vector<uint>> & tris_out);
 }
 
 #ifndef  CINO_STATIC_LIB
