@@ -59,6 +59,20 @@ class ScalarField : public Eigen::VectorXd, public Serializable
 
         void serialize  (const char *filename) const;
         void deserialize(const char *filename);
+
+        // for more info, see:
+        // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
+        //
+        // This method allows you to assign Eigen expressions to ScalarField
+        //
+        template<typename OtherDerived>
+        ScalarField & operator= (const Eigen::MatrixBase<OtherDerived>& other);
+
+        //
+        // This constructor allows you to construct ScalarField from Eigen expressions
+        //
+        template<typename OtherDerived>
+        ScalarField(const Eigen::MatrixBase<OtherDerived>& other);
 };
 
 }

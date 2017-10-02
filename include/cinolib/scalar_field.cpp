@@ -155,4 +155,24 @@ void ScalarField::deserialize(const char *filename)
     f.close();
 }
 
+
+// for more info, see:
+// http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
+//
+// This method allows you to assign Eigen expressions to ScalarField
+//
+template<typename OtherDerived>
+CINO_INLINE
+ScalarField & ScalarField::operator= (const Eigen::MatrixBase<OtherDerived>& other)
+{
+    this->Eigen::VectorXd::operator=(other);
+    return *this;
+}
+//
+// This constructor allows you to construct ScalarField from Eigen expressions
+//
+template<typename OtherDerived>
+CINO_INLINE
+ScalarField::ScalarField(const Eigen::MatrixBase<OtherDerived>& other) : Eigen::VectorXd(other) {}
+
 }
