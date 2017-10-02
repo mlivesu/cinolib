@@ -262,7 +262,10 @@ template<typename real> class vec3
             vec3<real> u = *this; u.normalize();
             vec3<real> v = in;    v.normalize();
             double angle = acos(u.dot(v));
-            assert(!std::isnan(angle));
+            if (std::isnan(angle))
+            {
+                std::cerr << "WARNING: NaN!" << std::endl;
+            }
             return angle;
         }
 

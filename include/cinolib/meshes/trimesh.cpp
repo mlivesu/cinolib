@@ -448,14 +448,19 @@ void Trimesh<M,V,E,P>::vert_weights_cotangent(const uint vid, std::vector<std::p
     for(uint eid : this->adj_v2e(vid))
     {
         assert(this->edge_is_manifold(eid));
-        uint   nbr = this->vert_opposite_to(eid, vid);
-        double wgt = 0.0;
+        uint   nbr   = this->vert_opposite_to(eid, vid);
+        double wgt   = 0.0;
+        uint   count = 0;
         for(uint pid : this->adj_e2p(eid))
         {
             double alpha = this->poly_angle_at_vert(pid, vert_opposite_to(pid, vid, nbr));
-            wgt += cot(alpha);
+            if (!std::isnan(alpha))
+            {
+                wgt += cot(alpha);
+                ++count;
+            }
         }
-        wgt = (this->adj_e2p(eid).size() == 2) ? wgt * 0.5 : wgt;
+        wgt = (count > 0) ? wgt/static_cast<double>(count) : 0.0;
         wgts.push_back(std::make_pair(nbr,wgt));
     }
 }
