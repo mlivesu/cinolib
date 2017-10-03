@@ -28,40 +28,33 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_READ_WRITE_H
-#define CINO_READ_WRITE_H
+#ifndef CINO_WRITE_NODE_ELE_H
+#define CINO_WRITE_NODE_ELE_H
 
-// SURFACE READERS
-#include <cinolib/io/read_OBJ.h>
-#include <cinolib/io/read_OFF.h>
-#include <cinolib/io/read_IV.h>
-// SURFACE WRITERS
-#include <cinolib/io/write_OBJ.h>
-#include <cinolib/io/write_OFF.h>
-#include <cinolib/io/write_NODE_ELE.h>
+#include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
+#include <sys/types.h>
+#include <vector>
 
+namespace cinolib
+{
 
-// VOLUME READERS
-#include <cinolib/io/read_HEDRA.h>
-#include <cinolib/io/read_HYBRID.h>
-#include <cinolib/io/read_MESH.h>
-#include <cinolib/io/read_TET.h>
-#include <cinolib/io/read_VTU.h>
-#include <cinolib/io/read_VTK.h>
-// VOLUME WRITERS
-#include <cinolib/io/write_HEDRA.h>
-#include <cinolib/io/write_MESH.h>
-#include <cinolib/io/write_TET.h>
-#include <cinolib/io/write_VTU.h>
-#include <cinolib/io/write_VTK.h>
+CINO_INLINE
+void write_NODE_ELE(const char                           * basename,
+                    const std::vector<vec3d>             & verts,
+                    const std::vector<std::vector<uint>> & poly);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// SKELETON READERS
-#include <cinolib/io/read_LIVESU2012.h>
-#include <cinolib/io/read_TAGLIASACCHI2012.h>
-#include <cinolib/io/read_DEYSUN2006.h>
-#include <cinolib/io/read_CSV.h>
-// SKELETON WRITERS
-#include <cinolib/io/write_LIVESU2012.h>
+CINO_INLINE
+void write_NODE_ELE_2D(const char                           * basename,
+                       const std::vector<vec3d>             & verts, // z will be discarded
+                       const std::vector<std::vector<uint>> & poly);
 
-#endif // CINO_READ_WRITE
+}
+
+#ifndef  CINO_STATIC_LIB
+#include "write_NODE_ELE.cpp"
+#endif
+
+#endif // CINO_WRITE_NODE_ELE_H
