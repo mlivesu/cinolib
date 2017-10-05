@@ -37,31 +37,31 @@
 namespace cinolib
 {
 
-double orient2d    (double const * pa, double const * pb, double const * pc);
-double orient2d    (const  vec2d & pa, const  vec2d & pb, const  vec2d & pc);
-double orient2dfast(double const * pa, double const * pb, double const * pc);
-double orient2dfast(const  vec2d & pa, const  vec2d & pb, const  vec2d & pc);
+CINO_INLINE double orient2d    (double const * pa, double const * pb, double const * pc);
+CINO_INLINE double orient2d    (const  vec2d & pa, const  vec2d & pb, const  vec2d & pc);
+CINO_INLINE double orient2dfast(double const * pa, double const * pb, double const * pc);
+CINO_INLINE double orient2dfast(const  vec2d & pa, const  vec2d & pb, const  vec2d & pc);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-double orient3d    (double const * pa, double const * pb, double const * pc, double const * pd);
-double orient3d    (const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd);
-double orient3dfast(double const * pa, double const * pb, double const * pc, double const * pd);
-double orient3dfast(const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd);
+CINO_INLINE double orient3d    (double const * pa, double const * pb, double const * pc, double const * pd);
+CINO_INLINE double orient3d    (const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd);
+CINO_INLINE double orient3dfast(double const * pa, double const * pb, double const * pc, double const * pd);
+CINO_INLINE double orient3dfast(const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-double incircle    (double const * pa, double const * pb, double const * pc, double const * pd);
-double incircle    (const  vec2d & pa, const  vec2d & pb, const  vec2d & pc, const  vec2d & pd);
-double incirclefast(double const * pa, double const * pb, double const * pc, double const * pd);
-double incirclefast(const  vec2d & pa, const  vec2d & pb, const  vec2d & pc, const  vec2d & pd);
+CINO_INLINE double incircle    (double const * pa, double const * pb, double const * pc, double const * pd);
+CINO_INLINE double incircle    (const  vec2d & pa, const  vec2d & pb, const  vec2d & pc, const  vec2d & pd);
+CINO_INLINE double incirclefast(double const * pa, double const * pb, double const * pc, double const * pd);
+CINO_INLINE double incirclefast(const  vec2d & pa, const  vec2d & pb, const  vec2d & pc, const  vec2d & pd);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-double insphere    (double const * pa, double const * pb, double const * pc, double const * pd, double const * pe);
-double insphere    (const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd, const  vec3d & pe);
-double inspherefast(double const * pa, double const * pb, double const * pc, double const * pd, double const * pe);
-double inspherefast(const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd, const  vec3d & pe);
+CINO_INLINE double insphere    (double const * pa, double const * pb, double const * pc, double const * pd, double const * pe);
+CINO_INLINE double insphere    (const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd, const  vec3d & pe);
+CINO_INLINE double inspherefast(double const * pa, double const * pb, double const * pc, double const * pd, double const * pe);
+CINO_INLINE double inspherefast(const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd, const  vec3d & pe);
 
 }
 

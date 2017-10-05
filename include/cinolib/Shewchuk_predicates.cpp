@@ -365,14 +365,19 @@ namespace cinolib
   Square(a1, _j, _1); \
   Two_Two_Sum(_j, _1, _l, _2, x5, x4, x3, x2)
 
-REAL splitter;     /* = 2^ceiling(p / 2) + 1.  Used to split floats in half. */
-REAL epsilon;                /* = 2^(-p).  Used to estimate roundoff errors. */
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/* Cino edit: I am making everythng static to make it compile with header only CINOLIB */
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+static REAL splitter;     /* = 2^ceiling(p / 2) + 1.  Used to split floats in half. */
+static REAL epsilon;                /* = 2^(-p).  Used to estimate roundoff errors. */
 /* A set of coefficients used to calculate maximum roundoff errors.          */
-REAL resulterrbound;
-REAL ccwerrboundA, ccwerrboundB, ccwerrboundC;
-REAL o3derrboundA, o3derrboundB, o3derrboundC;
-REAL iccerrboundA, iccerrboundB, iccerrboundC;
-REAL isperrboundA, isperrboundB, isperrboundC;
+static REAL resulterrbound;
+static REAL ccwerrboundA, ccwerrboundB, ccwerrboundC;
+static REAL o3derrboundA, o3derrboundB, o3derrboundC;
+static REAL iccerrboundA, iccerrboundB, iccerrboundC;
+static REAL isperrboundA, isperrboundB, isperrboundC;
 
 /*****************************************************************************/
 /*                                                                           */
@@ -500,6 +505,7 @@ REAL *e;
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 double doublerand()
 {
   double result;
@@ -526,6 +532,7 @@ double doublerand()
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 double narrowdoublerand()
 {
   double result;
@@ -551,6 +558,7 @@ double narrowdoublerand()
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 double uniformdoublerand()
 {
   double result;
@@ -569,6 +577,7 @@ double uniformdoublerand()
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 float floatrand()
 {
   float result;
@@ -594,6 +603,7 @@ float floatrand()
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 float narrowfloatrand()
 {
   float result;
@@ -618,6 +628,7 @@ float narrowfloatrand()
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 float uniformfloatrand()
 {
   float result;
@@ -647,6 +658,7 @@ float uniformfloatrand()
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 void exactinit(void)
 {
   REAL half;
@@ -702,6 +714,7 @@ void exactinit(void)
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int grow_expansion(int elen, REAL *e, REAL b, REAL *h)                /* e and h can be the same. */
 {
   REAL Q;
@@ -735,6 +748,7 @@ int grow_expansion(int elen, REAL *e, REAL b, REAL *h)                /* e and h
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int grow_expansion_zeroelim(int elen, REAL *e, REAL b, REAL *h)       /* e and h can be the same. */
 {
   REAL Q, hh;
@@ -773,6 +787,7 @@ int grow_expansion_zeroelim(int elen, REAL *e, REAL b, REAL *h)       /* e and h
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /* e and h can be the same, but f and h cannot. */
 {
@@ -817,6 +832,7 @@ int expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int expansion_sum_zeroelim1(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /* e and h can be the same, but f and h cannot. */
 {
@@ -872,6 +888,7 @@ int expansion_sum_zeroelim1(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int expansion_sum_zeroelim2(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /* e and h can be the same, but f and h cannot. */
 {
@@ -924,6 +941,7 @@ int expansion_sum_zeroelim2(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int fast_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)           /* h cannot be e or f. */
 {
   REAL Q;
@@ -996,6 +1014,7 @@ int fast_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)           
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int fast_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)  /* h cannot be e or f. */
 {
   REAL Q;
@@ -1076,6 +1095,7 @@ int fast_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)  
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int linear_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)         /* h cannot be e or f. */
 {
   REAL Q, q;
@@ -1135,6 +1155,7 @@ int linear_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)         
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int linear_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)/* h cannot be e or f. */
 {
   REAL Q, q, hh;
@@ -1204,6 +1225,7 @@ int linear_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int scale_expansion(int elen, REAL *e, REAL b, REAL *h)            /* e and h cannot be the same. */
 {
   INEXACT REAL Q;
@@ -1249,6 +1271,7 @@ int scale_expansion(int elen, REAL *e, REAL b, REAL *h)            /* e and h ca
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int scale_expansion_zeroelim(int elen, REAL *e, REAL b, REAL *h)   /* e and h cannot be the same. */
 {
   INEXACT REAL Q, sum;
@@ -1300,6 +1323,7 @@ int scale_expansion_zeroelim(int elen, REAL *e, REAL b, REAL *h)   /* e and h ca
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 int compress(int elen, REAL *e, REAL *h)                         /* e and h may be the same. */
 {
   REAL Q, q;
@@ -1342,6 +1366,7 @@ int compress(int elen, REAL *e, REAL *h)                         /* e and h may 
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 REAL estimate(int elen, REAL *e)
 {
   REAL Q;
@@ -1380,6 +1405,7 @@ REAL estimate(int elen, REAL *e)
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 REAL orient2dfast(REAL const* pa, REAL const* pb, REAL const* pc)
 {
   REAL acx, bcx, acy, bcy;
@@ -1391,6 +1417,7 @@ REAL orient2dfast(REAL const* pa, REAL const* pb, REAL const* pc)
   return acx * bcy - acy * bcx;
 }
 
+CINO_INLINE
 REAL orient2dexact(REAL const* pa, REAL const* pb, REAL const* pc)
 {
   INEXACT REAL axby1, axcy1, bxcy1, bxay1, cxay1, cxby1;
@@ -1433,6 +1460,7 @@ REAL orient2dexact(REAL const* pa, REAL const* pb, REAL const* pc)
   return w[wlength - 1];
 }
 
+CINO_INLINE
 REAL orient2dslow(REAL const* pa, REAL const* pb, REAL const* pc)
 {
   INEXACT REAL acx, acy, bcx, bcy;
@@ -1474,6 +1502,7 @@ REAL orient2dslow(REAL const* pa, REAL const* pb, REAL const* pc)
   return deter[deterlen - 1];
 }
 
+CINO_INLINE
 REAL orient2dadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL detsum)
 {
   INEXACT REAL acx, acy, bcx, bcy;
@@ -1554,6 +1583,7 @@ REAL orient2dadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL detsum)
   return(D[Dlength - 1]);
 }
 
+CINO_INLINE
 REAL orient2d(REAL const* pa, REAL const* pb, REAL const* pc)
 {
   REAL detleft, detright, det;
@@ -1616,6 +1646,7 @@ REAL orient2d(REAL const* pa, REAL const* pb, REAL const* pc)
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 REAL orient3dfast(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
 {
   REAL adx, bdx, cdx;
@@ -1637,6 +1668,7 @@ REAL orient3dfast(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd
        + cdx * (ady * bdz - adz * bdy);
 }
 
+CINO_INLINE
 REAL orient3dexact(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
 {
   INEXACT REAL axby1, bxcy1, cxdy1, dxay1, axcy1, bxdy1;
@@ -1714,6 +1746,7 @@ REAL orient3dexact(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* p
   return deter[deterlen - 1];
 }
 
+CINO_INLINE
 REAL orient3dslow(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
 {
   INEXACT REAL adx, ady, adz, bdx, bdy, bdz, cdx, cdy, cdz;
@@ -1806,6 +1839,7 @@ REAL orient3dslow(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd
   return deter[deterlen - 1];
 }
 
+CINO_INLINE
 REAL orient3dadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL permanent)
 {
   INEXACT REAL adx, bdx, cdx, ady, bdy, cdy, adz, bdz, cdz;
@@ -2206,6 +2240,7 @@ REAL orient3dadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* p
   return finnow[finlength - 1];
 }
 
+CINO_INLINE
 REAL orient3d(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
 {
   REAL adx, bdx, cdx, ady, bdy, cdy, adz, bdz, cdz;
@@ -2273,6 +2308,7 @@ REAL orient3d(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 REAL incirclefast(REAL const*pa, REAL const* pb, REAL const* pc, REAL const* pd)
 {
   REAL adx, ady, bdx, bdy, cdx, cdy;
@@ -2296,6 +2332,7 @@ REAL incirclefast(REAL const*pa, REAL const* pb, REAL const* pc, REAL const* pd)
   return alift * bcdet + blift * cadet + clift * abdet;
 }
 
+CINO_INLINE
 REAL incircleexact(REAL const*pa, REAL const*pb, REAL const*pc, REAL const*pd)
 {
   INEXACT REAL axby1, bxcy1, cxdy1, dxay1, axcy1, bxdy1;
@@ -2394,6 +2431,7 @@ REAL incircleexact(REAL const*pa, REAL const*pb, REAL const*pc, REAL const*pd)
   return deter[deterlen - 1];
 }
 
+CINO_INLINE
 REAL incircleslow(REAL const*pa, REAL const*pb, REAL const*pc, REAL const*pd)
 {
   INEXACT REAL adx, bdx, cdx, ady, bdy, cdy;
@@ -2550,6 +2588,7 @@ REAL incircleslow(REAL const*pa, REAL const*pb, REAL const*pc, REAL const*pd)
   return deter[deterlen - 1];
 }
 
+CINO_INLINE
 REAL incircleadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL permanent)
 {
   INEXACT REAL adx, bdx, cdx, ady, bdy, cdy;
@@ -3119,6 +3158,7 @@ REAL incircleadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* p
   return finnow[finlength - 1];
 }
 
+CINO_INLINE
 REAL incircle(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
 {
   REAL adx, bdx, cdx, ady, bdy, cdy;
@@ -3188,6 +3228,7 @@ REAL incircle(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
 /*                                                                           */
 /*****************************************************************************/
 
+CINO_INLINE
 REAL inspherefast(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL const* pe)
 {
   REAL aex, bex, cex, dex;
@@ -3231,6 +3272,7 @@ REAL inspherefast(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd
   return (dlift * abc - clift * dab) + (blift * cda - alift * bcd);
 }
 
+CINO_INLINE
 REAL insphereexact(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL const* pe)
 {
   INEXACT REAL axby1, bxcy1, cxdy1, dxey1, exay1;
@@ -3483,6 +3525,7 @@ REAL insphereexact(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* p
   return deter[deterlen - 1];
 }
 
+CINO_INLINE
 REAL insphereslow(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL const* pe)
 {
   INEXACT REAL aex, bex, cex, dex, aey, bey, cey, dey, aez, bez, cez, dez;
@@ -3812,6 +3855,7 @@ REAL insphereslow(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd
   return deter[deterlen - 1];
 }
 
+CINO_INLINE
 REAL insphereadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL const* pe, REAL permanent)
 {
   INEXACT REAL aex, bex, cex, dex, aey, bey, cey, dey, aez, bez, cez, dez;
@@ -4026,6 +4070,7 @@ REAL insphereadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* p
   return insphereexact(pa, pb, pc, pd, pe);
 }
 
+CINO_INLINE
 REAL insphere(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL const* pe)
 {
   REAL aex, bex, cex, dex;
@@ -4134,6 +4179,7 @@ REAL insphere(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, RE
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 double orient2d(const vec2d & pa, const vec2d & pb, const vec2d & pc)
 {
     return orient2d(pa.ptr(), pb.ptr(), pc.ptr());
@@ -4141,6 +4187,7 @@ double orient2d(const vec2d & pa, const vec2d & pb, const vec2d & pc)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 double orient2dfast(const vec2d & pa, const vec2d & pb, const vec2d & pc)
 {
     return orient2dfast(pa.ptr(), pb.ptr(), pc.ptr());
@@ -4148,6 +4195,7 @@ double orient2dfast(const vec2d & pa, const vec2d & pb, const vec2d & pc)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 double orient3d(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd)
 {
     return orient3d(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr());
@@ -4155,6 +4203,7 @@ double orient3d(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 double orient3dfast(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd)
 {
     return orient3dfast(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr());
@@ -4162,6 +4211,8 @@ double orient3dfast(const vec3d & pa, const vec3d & pb, const vec3d & pc, const 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+
+CINO_INLINE
 double incircle(const vec2d & pa, const vec2d & pb, const vec2d & pc, const vec2d & pd)
 {
     return incircle(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr());
@@ -4169,6 +4220,7 @@ double incircle(const vec2d & pa, const vec2d & pb, const vec2d & pc, const vec2
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 double incirclefast(const vec2d & pa, const vec2d & pb, const vec2d & pc, const vec2d & pd)
 {
     return incirclefast(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr());
@@ -4176,6 +4228,7 @@ double incirclefast(const vec2d & pa, const vec2d & pb, const vec2d & pc, const 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 double insphere(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd, const vec3d & pe)
 {
     return insphere(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr(), pe.ptr());
@@ -4183,6 +4236,7 @@ double insphere(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 double inspherefast(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd, const vec3d & pe)
 {
     return inspherefast(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr(), pe.ptr());
