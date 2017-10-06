@@ -31,6 +31,7 @@
 #include <cinolib/meshes/polygonmesh.h>
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/geometry/plane.h>
+#include <cinolib/geometry/polygon.h>
 #include <map>
 
 namespace cinolib
@@ -98,11 +99,13 @@ void Polygonmesh<M,V,E,P>::update_poly_tessellation()
 {
     triangulated_polys.clear();
     triangulated_polys.resize(this->num_polys());
-    std::set<uint> bad_faces;
 
+    std::set<uint> bad_polys;
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        // TODO: improve triangulation strategy (this assumes convexity!)
+        // Assume convexity and try trivial tessellation first. If something flips
+        // apply earcut algorithm to get a valid triangulation (bad_polys vector)
+
         std::vector<vec3d> n;
         for (uint i=2; i<this->verts_per_poly(pid); ++i)
         {
@@ -116,15 +119,28 @@ void Polygonmesh<M,V,E,P>::update_poly_tessellation()
 
             n.push_back((this->vert(vid1)-this->vert(vid0)).cross(this->vert(vid2)-this->vert(vid0)));
         }
-        // check for badly tessellated polygons...
-        for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_faces.insert(pid);
+        // check for badly tessellated polygons...(to be re-triangulated)
+        for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_polys.insert(pid);
     }
     //
-    for(uint pid : bad_faces)
+    for(uint pid : bad_polys)
     {
-        std::cerr << "WARNING : Bad tessellation occurred for non-convex polygon " << pid << std::endl;
-    }
+        // NOTE: the triangulation is constructed on a proxy polygon obtained
+        // projecting the actual polygon onto the best fitting plane. Bad things
+        // can still happen for highly non-planar polygons
 
+        std::vector<vec3d> vlist(this->verts_per_poly(pid));
+        for (uint i=0; i<this->verts_per_poly(pid); ++i)
+        {
+            vlist.at(i) = this->poly_vert(pid,i);
+        }
+        //
+        std::vector<uint> tris;
+        polygon_triangulate(vlist, tris);
+        //
+        triangulated_polys.at(pid).clear();
+        for(uint off : tris) triangulated_polys.at(pid).push_back(this->poly_vert_id(pid,off));
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -136,16 +152,7 @@ void Polygonmesh<M,V,E,P>::update_p_normal(const uint pid)
     // compute the best fitting plane
     std::vector<vec3d> points;
     for(uint off=0; off<this->verts_per_poly(pid); ++off) points.push_back(this->poly_vert(pid,off));
-    Plane best_fit(points);
-
-    // adjust orientation (n or -n?)
-    vec3d v0 = this->poly_vert(pid,0);
-    vec3d v1 = this->poly_vert(pid,1);
-    uint  i=2;
-    vec3d ccw;
-    do { ccw = (v1-v0).cross(this->poly_vert(pid,i)-v0); ++i; } while (ccw.length_squared()==0 && i<this->verts_per_poly(pid));
-
-    this->poly_data(pid).normal = (best_fit.n.dot(ccw) < 0) ? -best_fit.n : best_fit.n;
+    this->poly_data(pid).normal = polygon_normal(points);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

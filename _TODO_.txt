@@ -3,7 +3,6 @@
 - consider avoiding to use a tree into the profiler. Sorting entries w.r.t. call time should do the job…
 - extend the concept of subdivisions from hexmesh to any mesh
 - add Additive Manufacturing stuff (load and process CLI files)…
-- Improve face tessellation strategy for polygonal meshes (flipped elements may currently arise for non convex polygons)
 - Add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
 - Refactor PointInsideMeshCache, it should return ALL the elements containing the
   query point and let the application choose the best one
