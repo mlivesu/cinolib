@@ -851,6 +851,20 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::polys_adjacent_along(const uint 
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+std::vector<vec3d> AbstractPolygonMesh<M,V,E,P>::poly_vlist(const uint pid) const
+{
+    std::vector<vec3d> vlist(this->verts_per_poly(pid));
+    for (uint i=0; i<this->verts_per_poly(pid); ++i)
+    {
+        vlist.at(i) = this->poly_vert(pid,i);
+    }
+    return vlist;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolygonMesh<M,V,E,P>::polys_adjacent_along(const uint pid, const uint vid0, const uint vid1) const
 {
     uint eid = this->poly_edge_id(pid, vid0, vid1);
