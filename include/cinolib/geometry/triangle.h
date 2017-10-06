@@ -43,9 +43,13 @@ namespace cinolib
 CINO_INLINE
 vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C);
 
-CINO_INLINE
-double triangle_area(const vec3d A, const vec3d B, const vec3d C);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template <class vec>
+CINO_INLINE
+double triangle_area(const vec A, const vec B, const vec C);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // Given a triangle t(A,B,C) and a ray r(P,dir) compute both
 // the edge and position where r exits from t
@@ -59,6 +63,7 @@ void triangle_traverse_with_ray(const vec3d   tri[3],
                                       vec3d & exit_pos,
                                       uint  & exit_edge);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // https://en.wikipedia.org/wiki/Law_of_sines
 //
@@ -67,27 +72,35 @@ double triangle_law_of_sines(const double angle_0,
                              const double angle_1,
                              const double length_0); // returns length_1
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
+template <class vec>
 CINO_INLINE
-bool triangle_barycentric_coords(const vec3d  & A,
-                                 const vec3d  & B,
-                                 const vec3d  & C,
-                                 const vec3d  & P,
+bool triangle_barycentric_coords(const vec & A,
+                                 const vec & B,
+                                 const vec & C,
+                                 const vec & P,
                                  std::vector<double> & wgts,
                                  const double   tol = 1e-5);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class vec>
 CINO_INLINE
-bool triangle_point_is_inside(const vec3d  & A,
-                              const vec3d  & B,
-                              const vec3d  & C,
-                              const vec3d  & P,
+bool triangle_point_is_inside(const vec    & A,
+                              const vec    & B,
+                              const vec    & C,
+                              const vec    & P,
                               const double   tol = 0.0);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool triangle_bary_is_vertex(const std::vector<double> & bary,
                              uint                      & vid, // 0,1,2
                              const double                tol = 1e-5);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool triangle_bary_is_edge(const std::vector<double> & bary,
