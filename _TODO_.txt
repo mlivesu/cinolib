@@ -8,7 +8,6 @@
   query point and let the application choose the best one
 - make a DrawableOctree (and visually test the octree)
 - Add cache for eigen solvers - avoid refactoring matrices multiple times
-- make cotangent weights robust against almost degenerate triangles and boundary meshes
 - Use robust geometric computations (volumes, dihedral angles ecc.) 
   (ref. => Lecture Notes on Geometric Robustness di Jonathan Richard Shewchuk)
 - Add cotan laplacian  normalization
