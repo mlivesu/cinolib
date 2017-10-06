@@ -100,13 +100,26 @@ void Polygonmesh<M,V,E,P>::update_poly_tessellation()
     triangulated_polys.clear();
     triangulated_polys.resize(this->num_polys());
 
-    std::set<uint> bad_polys;
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        // Assume convexity and try trivial tessellation first. If something flips
-        // apply earcut algorithm to get a valid triangulation (bad_polys vector)
+        update_poly_tessellation(pid);
+    }
+}
 
-        std::vector<vec3d> n;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void Polygonmesh<M,V,E,P>::update_poly_tessellation(const uint pid)
+{
+    triangulated_polys.at(pid).clear();
+
+    std::vector<vec3d> poly3d = this->poly_vlist(pid);
+    std::vector<vec2d> poly2d;
+    polygon_flatten(poly3d, poly2d);
+
+    if (polygon_is_convex(poly2d))
+    {
         for (uint i=2; i<this->verts_per_poly(pid); ++i)
         {
             uint vid0 = this->polys.at(pid).at( 0 );
@@ -116,29 +129,18 @@ void Polygonmesh<M,V,E,P>::update_poly_tessellation()
             triangulated_polys.at(pid).push_back(vid0);
             triangulated_polys.at(pid).push_back(vid1);
             triangulated_polys.at(pid).push_back(vid2);
-
-            n.push_back((this->vert(vid1)-this->vert(vid0)).cross(this->vert(vid2)-this->vert(vid0)));
         }
-        // check for badly tessellated polygons...(to be re-triangulated)
-        for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_polys.insert(pid);
     }
-    //
-    for(uint pid : bad_polys)
+    else
     {
+        // Apply ear cut algorithm
+        //
         // NOTE: the triangulation is constructed on a proxy polygon obtained
         // projecting the actual polygon onto the best fitting plane. Bad things
         // can still happen for highly non-planar polygons
-
-        std::vector<vec3d> vlist(this->verts_per_poly(pid));
-        for (uint i=0; i<this->verts_per_poly(pid); ++i)
-        {
-            vlist.at(i) = this->poly_vert(pid,i);
-        }
         //
         std::vector<uint> tris;
-        polygon_triangulate(vlist, tris);
-        //
-        triangulated_polys.at(pid).clear();
+        polygon_triangulate(poly2d, tris);
         for(uint off : tris) triangulated_polys.at(pid).push_back(this->poly_vert_id(pid,off));
     }
 }
@@ -231,9 +233,21 @@ void Polygonmesh<M,V,E,P>::operator+=(const Polygonmesh<M,V,E,P> & m)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> Polygonmesh<M,V,E,P>::poly_tessellation(const uint pid) const
+const std::vector<uint> & Polygonmesh<M,V,E,P>::poly_tessellation(const uint pid) const
 {
     return triangulated_polys.at(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint Polygonmesh<M,V,E,P>::poly_add(const std::vector<uint> & p)
+{
+    uint new_id = AbstractPolygonMesh<M,V,E,P>::poly_add(p);
+    triangulated_polys.push_back(std::vector<uint>(0));
+    update_poly_tessellation(new_id);
+    return new_id;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

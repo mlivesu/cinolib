@@ -116,9 +116,9 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<uint> poly_tessellation       (const uint pid) const;
-        void              poly_switch_id          (const uint pid0, const uint pid1);
-        void              poly_remove_unreferenced(const uint pid);
+        const std::vector<uint> & poly_tessellation       (const uint pid) const;
+              void                poly_switch_id          (const uint pid0, const uint pid1);
+              void                poly_remove_unreferenced(const uint pid);
 };
 
 }

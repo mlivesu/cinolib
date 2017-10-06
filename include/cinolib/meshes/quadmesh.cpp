@@ -385,7 +385,7 @@ void Quadmesh<M,V,E,P>::operator+=(const Quadmesh<M,V,E,P> & m)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> Quadmesh<M,V,E,P>::poly_tessellation(const uint pid) const
+const std::vector<uint> & Quadmesh<M,V,E,P>::poly_tessellation(const uint pid) const
 {
     return triangulated_polys.at(pid);
 }

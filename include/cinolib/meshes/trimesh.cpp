@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/trimesh.h>
+#include <unordered_set>
 
 namespace cinolib
 {
@@ -503,7 +504,7 @@ std::vector<uint> Trimesh<M,V,E,P>::get_ordered_boundary_vertices() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> Trimesh<M,V,E,P>::poly_tessellation(const uint pid) const
+const std::vector<uint> & Trimesh<M,V,E,P>::poly_tessellation(const uint pid) const
 {
     return this->polys.at(pid);
 }

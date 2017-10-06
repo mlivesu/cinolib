@@ -102,18 +102,18 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double            poly_area               (const uint pid) const;
-//        bool              poly_split              (const uint pid, std::vector<double> & wgts);
-//        bool              poly_split              (const uint pid, const vec3d & p);
-        bool              poly_is_cap             (const uint pid, const double angle_thresh_deg = 177.0) const;
-        bool              poly_is_needle          (const uint pid, const double angle_thresh_deg = 3.0) const;
-        bool              poly_bary_coords        (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
-        bool              poly_bary_is_vert       (const uint pid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
-        bool              poly_bary_is_edge       (const uint pid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
-        uint              poly_add                (const uint vid0, const uint vid1, const uint vid2);
-        void              poly_set                (const uint pid, const uint vid0, const uint vid1, const uint vid2);
-        uint              poly_edge_id            (const uint pid, const uint offset) const;
-        std::vector<uint> poly_tessellation       (const uint pid) const;
+              double            poly_area          (const uint pid) const;
+            //bool              poly_split         (const uint pid, std::vector<double> & wgts);
+            //bool              poly_split         (const uint pid, const vec3d & p);
+              bool              poly_is_cap        (const uint pid, const double angle_thresh_deg = 177.0) const;
+              bool              poly_is_needle     (const uint pid, const double angle_thresh_deg = 3.0) const;
+              bool              poly_bary_coords   (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
+              bool              poly_bary_is_vert  (const uint pid, const std::vector<double> & wgts, uint & vid, const double tol = 1e-5) const;
+              bool              poly_bary_is_edge  (const uint pid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
+              uint              poly_add           (const uint vid0, const uint vid1, const uint vid2);
+              void              poly_set           (const uint pid, const uint vid0, const uint vid1, const uint vid2);
+              uint              poly_edge_id       (const uint pid, const uint offset) const;
+        const std::vector<uint> & poly_tessellation(const uint pid) const;
 
         using  AbstractMesh<M,V,E,P>::poly_edge_id;    // avoid hiding poly_ege_id(pid,vid0,vid1)
         using  AbstractPolygonMesh<M,V,E,P>::poly_add; // avoid hiding poly_add(p)
