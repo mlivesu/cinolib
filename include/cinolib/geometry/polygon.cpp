@@ -153,8 +153,16 @@ uint polygon_find_ear(const std::vector<vec2d> & poly)
 // Implementation of the ear-cut triangulation algorithm
 //
 CINO_INLINE
-void polygon_triangulate(const std::vector<vec2d> & poly, std::vector<uint> & tris)
+void polygon_triangulate(std::vector<vec2d> & poly,
+                         std::vector<uint>  & tris)
 {
+    // If the polygon is not CCW, flip it along X
+    //
+    if (!polygon_is_CCW(poly))
+    {
+        for(auto & p : poly) p.x() = -p.x();
+    }
+
     tris.clear();
 
     std::map<uint,uint> v_map;
@@ -188,20 +196,34 @@ void polygon_triangulate(const std::vector<vec2d> & poly, std::vector<uint> & tr
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void polygon_triangulate(const std::vector<vec3d> & poly, std::vector<uint> & tris)
+void polygon_triangulate(std::vector<vec3d> &poly,
+                         std::vector<uint> & tris)
 {
     std::vector<vec2d> poly2d;
     polygon_flatten(poly, poly2d);
-
-    // polygon_flatten does not preserve winding. If
-    // flattened polygon is not CCW, flip it along X
-    //
-    if (!polygon_is_CCW(poly2d))
-    {
-        for(auto & p : poly2d) p.x() = -p.x();
-    }
-
     polygon_triangulate(poly2d, tris);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double polygon_is_convex(const std::vector<vec2d> & poly)
+{
+    bool turn_left  = false;
+    bool turn_right = false;
+    for(uint curr=0; curr<poly.size(); ++curr)
+    {
+        uint prev = (curr>0) ? curr-1 : poly.size()-1;
+        uint next = (curr<poly.size()-1) ? curr+1 : 0;
+
+        double sign = orient2d(poly.at(prev), poly.at(curr), poly.at(next));
+
+        if (sign > 0) turn_left  = true; else
+        if (sign < 0) turn_right = true;
+
+        if (turn_left && turn_right) return false;
+    }
+    return true;
 }
 
 }

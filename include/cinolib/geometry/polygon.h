@@ -53,6 +53,11 @@ double polygon_is_CCW(const std::vector<vec2d> & poly);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+double polygon_is_convex(const std::vector<vec2d> & poly);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 vec3d polygon_normal(const std::vector<vec3d> & poly);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -71,12 +76,12 @@ void polygon_flatten(const std::vector<vec3d> & poly3d,
 // Implementation of the ear-cut triangulation algorithm
 //
 CINO_INLINE
-void polygon_triangulate(const std::vector<vec2d> & poly, std::vector<uint> & tris);
+void polygon_triangulate(std::vector<vec2d> & poly, std::vector<uint> & tris);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void polygon_triangulate(const std::vector<vec3d> & poly, std::vector<uint> & tris);
+void polygon_triangulate(std::vector<vec3d> & poly, std::vector<uint> & tris);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
