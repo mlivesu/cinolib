@@ -40,6 +40,17 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+DrawableIsocontour<M,V,E,P>::DrawableIsocontour()
+: Isocontour<M,V,E,P>()
+{
+    color     = Color::RED();
+    thickness = 1.0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 DrawableIsocontour<M,V,E,P>::DrawableIsocontour(AbstractPolygonMesh<M,V,E,P> & m, double iso_value)
 : Isocontour<M,V,E,P>(m, iso_value)
 {
@@ -79,24 +90,6 @@ CINO_INLINE
 float DrawableIsocontour<M,V,E,P>::scene_radius() const
 {
     return 0.0;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void DrawableIsocontour<M,V,E,P>::set_color(const Color & c)
-{
-    color = c;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void DrawableIsocontour<M,V,E,P>::set_thickness(float t)
-{
-    thickness = t;
 }
 
 }

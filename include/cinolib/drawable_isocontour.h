@@ -46,8 +46,9 @@ class DrawableIsocontour : public Isocontour<M,V,E,P>, public DrawableObject
 {
     public:
 
-        explicit DrawableIsocontour() {}
+        explicit DrawableIsocontour();
         explicit DrawableIsocontour(AbstractPolygonMesh<M,V,E,P> & m, double iso_value);
+        ~DrawableIsocontour() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -60,11 +61,6 @@ class DrawableIsocontour : public Isocontour<M,V,E,P>, public DrawableObject
         ObjectType object_type()  const { return DRAWABLE_CURVE; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void set_color(const Color & c);
-        void set_thickness(float t);
-
-    private:
 
         Color color;
         float thickness;
