@@ -84,6 +84,11 @@ class AbstractMesh
 
     public:
 
+        typedef M M_type;
+        typedef V V_type;
+        typedef E E_type;
+        typedef P P_type;
+
         explicit AbstractMesh() {}
         virtual ~AbstractMesh() {}
 
