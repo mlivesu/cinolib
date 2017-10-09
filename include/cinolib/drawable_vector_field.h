@@ -44,17 +44,24 @@ class DrawableVectorField : public VectorField, public DrawableObject
 {
     public:
 
-        explicit DrawableVectorField() {}
+        explicit DrawableVectorField()
+        {
+            arrow_color = Color::RED();
+            arrow_size  = 0.5;
+        }
 
-        explicit
-        DrawableVectorField(const Mesh & m) : VectorField(m.num_polys())
+        explicit DrawableVectorField(const Mesh & m) : VectorField(m.num_polys())
         {
             m_ptr = &m;
             set_arrow_color(Color::RED());
             set_arrow_size(0.5);
         }
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         ObjectType object_type() const { return DRAWABLE_VECTOR_FIELD; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void draw(const float) const
         {
@@ -70,19 +77,29 @@ class DrawableVectorField : public VectorField, public DrawableObject
             }
         }
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         vec3d scene_center() const { return vec3d(); }
         float scene_radius() const { return 0.0;     }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void set_arrow_color(const Color & c) { arrow_color = c; }
 
         void set_arrow_size(float s)
         {
             if (m_ptr)
-            {
+            {                
+                arrow_size     = s;
                 arrow_length   = m_ptr->edge_avg_length() * s;
                 arrow_thicknes = arrow_length * 0.1;
             }
         }
+
+        Color get_arrow_color() const { return arrow_color; }
+        float get_arrow_size()  const { return arrow_size;  }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // for more info, see:
         // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
@@ -105,6 +122,7 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
         const Mesh *m_ptr;
 
+        float arrow_size;
         float arrow_length;
         float arrow_thicknes;
         Color arrow_color;
