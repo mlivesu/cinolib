@@ -70,6 +70,7 @@ class GLcanvas : public QGLViewer
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void push_obj(DrawableObject * obj, bool refit_scene = true);
+        bool pop(DrawableObject * obj);
         bool pop_first_occurrence_of(int type);
         bool pop_all_occurrences_of (int type);
 

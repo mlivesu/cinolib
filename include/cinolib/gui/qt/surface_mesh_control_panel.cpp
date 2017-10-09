@@ -1,0 +1,592 @@
+/*********************************************************************************
+*  Copyright(C) 2016: Marco Livesu                                               *
+*  All rights reserved.                                                          *
+*                                                                                *
+*  This file is part of CinoLib                                                  *
+*                                                                                *
+*  CinoLib is dual-licensed:                                                     *
+*                                                                                *
+*   - For non-commercial use you can redistribute it and/or modify it under the  *
+*     terms of the GNU General Public License as published by the Free Software  *
+*     Foundation; either version 3 of the License, or (at your option) any later *
+*     version.                                                                   *
+*                                                                                *
+*   - If you wish to use it as part of a commercial software, a proper agreement *
+*     with the Author(s) must be reached, based on a proper licensing contract.  *
+*                                                                                *
+*  This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE       *
+*  WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.     *
+*                                                                                *
+*  Author(s):                                                                    *
+*                                                                                *
+*     Marco Livesu (marco.livesu@gmail.com)                                      *
+*     http://pers.ge.imati.cnr.it/livesu/                                        *
+*                                                                                *
+*     Italian National Research Council (CNR)                                    *
+*     Institute for Applied Mathematics and Information Technologies (IMATI)     *
+*     Via de Marini, 6                                                           *
+*     16149 Genoa,                                                               *
+*     Italy                                                                      *
+**********************************************************************************/
+#include <cinolib/gui/qt/surface_mesh_control_panel.h>
+
+
+namespace cinolib
+{
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m_ptr, GLcanvas *canvas, QWidget *parent)
+    : m(m_ptr)
+    , canvas(canvas)
+{
+    assert(canvas != NULL);
+
+    widget        = new QWidget(parent);
+    global_layout = new QGridLayout(widget);
+    global_font.setPointSize(8);
+    widget->setFont(global_font);
+
+    // LOAD/SAVE buttons and SHADING
+    {
+        but_load     = new QPushButton("Load");
+        but_save     = new QPushButton("Save");
+        cb_show_mesh = new QCheckBox("Show");
+        but_load->setFont(global_font);
+        but_save->setFont(global_font);
+        cb_show_mesh->setFont(global_font);
+        cb_show_mesh->setChecked(true);
+        QVBoxLayout *layout0 = new QVBoxLayout();
+        layout0->addWidget(but_load);
+        layout0->addWidget(but_save);
+        layout0->addWidget(cb_show_mesh);
+        //
+        QGroupBox *gbox   = new QGroupBox("Shading",widget);
+        rb_point_shading  = new QRadioButton("Point",  gbox);
+        rb_flat_shading   = new QRadioButton("Flat",   gbox);
+        rb_smooth_shading = new QRadioButton("Smooth", gbox);
+        gbox->setFont(global_font);
+        rb_point_shading->setFont(global_font);
+        rb_flat_shading->setFont(global_font);
+        rb_smooth_shading->setFont(global_font);
+        rb_smooth_shading->setChecked(true);
+        QVBoxLayout *layout1 = new QVBoxLayout();
+        layout1->addWidget(rb_point_shading);
+        layout1->addWidget(rb_flat_shading);
+        layout1->addWidget(rb_smooth_shading);
+        gbox->setLayout(layout1);
+        //
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addLayout(layout0);
+        layout->addWidget(gbox);
+        global_layout->addLayout(layout,0,0);
+    }
+
+    // COLORS / TEXTURES
+    {
+        QGroupBox *gbox       = new QGroupBox("Colors/Textures",widget);
+        rb_vert_color         = new QRadioButton("Vertex Color", gbox);
+        rb_face_color         = new QRadioButton("Face Color", gbox);
+        rb_tex1D              = new QRadioButton("Texture 1D", gbox);
+        rb_tex2D              = new QRadioButton("Texture 2D", gbox);
+        but_set_vert_color    = new QPushButton("Set");
+        but_set_face_color    = new QPushButton("Set");
+        cb_tex1D_type         = new QComboBox(gbox);
+        cb_tex2D_type         = new QComboBox(gbox);
+        but_serialize_field   = new QPushButton("Serialize");
+        but_deserialize_field = new QPushButton("Deserialize");
+        sl_tex2D_density      = new QSlider(Qt::Horizontal, gbox);
+        rb_face_color->setChecked(true);
+        cb_tex1D_type->insertItem(0,"ISO");
+        cb_tex1D_type->insertItem(1,"RAMP");
+        cb_tex1D_type->insertItem(2,"RAMP + ISO");
+        cb_tex2D_type->insertItem(0,"ISO");
+        cb_tex2D_type->insertItem(1,"CB");
+        sl_tex2D_density->setMinimum(1);
+        sl_tex2D_density->setMaximum(200);
+        sl_tex2D_density->setValue(10);
+        sl_tex2D_density->setSliderPosition(10);
+        gbox->setFont(global_font);
+        rb_vert_color->setFont(global_font);
+        rb_face_color->setFont(global_font);
+        rb_tex1D->setFont(global_font);
+        rb_tex2D->setFont(global_font);
+        but_set_vert_color->setFont(global_font);
+        but_set_face_color->setFont(global_font);
+        cb_tex1D_type->setFont(global_font);
+        cb_tex2D_type->setFont(global_font);
+        but_serialize_field->setFont(global_font);
+        but_deserialize_field->setFont(global_font);
+        QGridLayout *layout = new QGridLayout();
+        layout->addWidget(rb_vert_color,0,0);
+        layout->addWidget(rb_face_color,1,0);
+        layout->addWidget(rb_tex1D,2,0);
+        layout->addWidget(rb_tex2D,3,0);
+        layout->addWidget(but_set_vert_color,0,1);
+        layout->addWidget(but_set_face_color,1,1);
+        layout->addWidget(cb_tex1D_type,2,1);
+        layout->addWidget(cb_tex2D_type,3,1);
+        layout->addWidget(sl_tex2D_density, 4,1);
+        layout->addWidget(but_serialize_field,5,0);
+        layout->addWidget(but_deserialize_field,5,1);
+        gbox->setLayout(layout);
+        global_layout->addWidget(gbox,1,0,2,1);
+    }
+
+    // WIREFRAME
+    {
+        QGroupBox *gbox     = new QGroupBox(widget);
+        cb_wireframe        = new QCheckBox("Wireframe", gbox);
+        sl_wireframe_width  = new QSlider(Qt::Horizontal, gbox);
+        sl_wireframe_alpha  = new QSlider(Qt::Horizontal, gbox);
+        but_wireframe_color = new QPushButton("Color");
+        QLabel *l_width     = new QLabel("Width: ");
+        QLabel *l_alpha     = new QLabel("Transp:");
+        sl_wireframe_width->setMinimum(1);
+        sl_wireframe_width->setMaximum(4);
+        sl_wireframe_width->setTickPosition(QSlider::TicksBelow);
+        sl_wireframe_width->setTickInterval(1);
+        sl_wireframe_alpha->setMinimum(0);
+        sl_wireframe_alpha->setMaximum(99);
+        sl_wireframe_alpha->setValue(99);
+        gbox->setFont(global_font);
+        cb_wireframe->setFont(global_font);
+        sl_wireframe_width->setFont(global_font);
+        sl_wireframe_alpha->setFont(global_font);
+        but_wireframe_color->setFont(global_font);
+        l_width->setFont(global_font);
+        l_alpha->setFont(global_font);
+        QGridLayout *layout = new QGridLayout();
+        layout->addWidget(cb_wireframe,0,0);
+        layout->addWidget(l_width,1,0);
+        layout->addWidget(l_alpha,2,0);
+        layout->addWidget(sl_wireframe_width,1,1);
+        layout->addWidget(sl_wireframe_alpha,2,1);
+        layout->addWidget(but_wireframe_color,3,1);
+        gbox->setLayout(layout);
+        global_layout->addWidget(gbox,0,1);
+    }
+
+    // ISO-CURVES
+    {
+        QGroupBox *gbox    = new QGroupBox(widget);
+        cb_isocurve        = new QCheckBox("Isocurve", gbox);
+        sl_isovalue        = new QSlider(Qt::Horizontal, gbox);
+        sl_isocurve_width  = new QSlider(Qt::Horizontal, gbox);
+        but_isocurve_color = new QPushButton("Color");
+        QLabel *l_value    = new QLabel("Isoval: ");
+        QLabel *l_width    = new QLabel("Width:  ");
+        sl_isocurve_width->setMinimum(1);
+        sl_isocurve_width->setMaximum(10);
+        sl_isovalue->setMaximum(999);
+        sl_isovalue->setValue(499);
+        sl_isovalue->setSliderPosition(499);
+        gbox->setFont(global_font);
+        but_isocurve_color->setFont(global_font);
+        l_width->setFont(global_font);
+        l_value->setFont(global_font);
+        cb_isocurve->setFont(global_font);
+        QGridLayout *layout = new QGridLayout();
+        layout->addWidget(cb_isocurve,0,1);
+        layout->addWidget(l_value,1,0);
+        layout->addWidget(sl_isovalue,1,1);
+        layout->addWidget(l_width,2,0);
+        layout->addWidget(sl_isocurve_width,2,1);
+        layout->addWidget(but_isocurve_color,3,1);
+        gbox->setLayout(layout);
+        global_layout->addWidget(gbox,1,1);
+    }
+
+    // GRADIENT
+    {
+        QGroupBox *gbox          = new QGroupBox(widget);
+        cb_gradient              = new QCheckBox("Gradient", gbox);
+        sl_gradient_size         = new QSlider(Qt::Horizontal, gbox);
+        but_gradient_color       = new QPushButton("Color");
+        but_gradient_serialize   = new QPushButton("Serialize");
+        but_gradient_deserialize = new QPushButton("Deserialize");
+        sl_gradient_size->setMinimum(1);
+        sl_gradient_size->setMaximum(100);
+        sl_gradient_size->setValue(20);
+        gbox->setFont(global_font);
+        cb_gradient->setFont(global_font);
+        but_gradient_color->setFont(global_font);
+        but_gradient_serialize->setFont(global_font);
+        but_gradient_deserialize->setFont(global_font);
+        QGridLayout *layout = new QGridLayout();
+        layout->addWidget(cb_gradient,0,1);
+        layout->addWidget(sl_gradient_size,1,1,1,2);
+        layout->addWidget(but_gradient_color,2,1,1,2);
+        layout->addWidget(but_gradient_serialize,3,1);
+        layout->addWidget(but_gradient_deserialize,3,2);
+        gbox->setLayout(layout);
+        global_layout->addWidget(gbox,2,1);
+    }
+
+    set_title();
+    connect();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void SurfaceMeshControlPanel<Mesh>::show()
+{
+    widget->show();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void SurfaceMeshControlPanel<Mesh>::set_title()
+{
+    if (m != NULL)
+    {
+        std::string title = m->mesh_data().filename.c_str();
+        title = title.substr(title.find_last_of("/")+1, title.size());
+        widget->setWindowTitle(title.c_str());
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+void SurfaceMeshControlPanel<Mesh>::connect()
+{
+    QPushButton::connect(but_load, &QPushButton::clicked, [&]()
+    {
+        std::string filename = QFileDialog::getOpenFileName(NULL, "Load mesh", ".", "3D Meshes (*.off *.obj *.iv);; OBJ(*.obj);; OFF(*.off);; IV(*.iv)").toStdString();
+        if (!filename.empty())
+        {
+            if (m != NULL)
+            {
+                delete(m);
+                m = NULL;
+            }
+            m = new Mesh(filename.c_str());
+            canvas->push_obj(m);
+            set_title();
+        }
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_save, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        std::string filename = QFileDialog::getSaveFileName(NULL, "Save mesh", ".", "3D Meshes (*.off *.obj *.iv);; OBJ(*.obj);; OFF(*.off);; IV(*.iv)").toStdString();
+        if (!filename.empty()) m->save(filename.c_str());
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_show_mesh, &QCheckBox::stateChanged, [&]()
+    {
+        if (m == NULL) return;
+        m->show_mesh(cb_show_mesh->isChecked());
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_point_shading, &QPushButton::toggled, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_mesh_points();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_flat_shading, &QPushButton::toggled, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_mesh_flat();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_smooth_shading, &QPushButton::toggled, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_mesh_smooth();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_vert_color, &QPushButton::toggled, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_vert_color();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_face_color, &QPushButton::toggled, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_face_color();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_tex1D, &QPushButton::toggled, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_face_texture1D(cb_tex1D_type->currentIndex());
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_tex2D, &QPushButton::toggled, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        int    texID   = cb_tex2D_type->currentIndex() + 3; // first three are for tex1D
+        double density = (double)sl_tex2D_density->value()/10.0;
+        m->show_face_texture2D(texID, density);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QComboBox::connect(cb_tex1D_type, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated), [&](int index)
+    {
+        if (m == NULL || canvas == NULL) return;
+        rb_tex1D->setChecked(true);
+        m->show_face_texture1D(index);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QComboBox::connect(cb_tex2D_type, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated), [&](int index)
+    {
+        if (m == NULL || canvas == NULL) return;
+        rb_tex2D->setChecked(true);
+        int    texID   = index + 3; // first three are for tex1D
+        double density = (double)sl_tex2D_density->value()/10.0;
+        m->show_face_texture2D(texID, density);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_tex2D_density, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        rb_tex2D->setChecked(true);
+        int    texID   = cb_tex2D_type->currentIndex() + 3; // first three are for tex1D
+        double density = (double)sl_tex2D_density->value()/10.0;
+        m->show_face_texture2D(texID, density);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_set_vert_color, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        rb_vert_color->setChecked(true);
+        QColor c = QColorDialog::getColor(Qt::white, widget);
+        m->vert_set_color(Color(c.redF(), c.greenF(), c.blueF()));
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_set_face_color, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        rb_face_color->setChecked(true);
+        QColor c = QColorDialog::getColor(Qt::white, widget);
+        m->poly_set_color(Color(c.redF(), c.greenF(), c.blueF()));
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_serialize_field, &QPushButton::clicked, [&]()
+    {
+        std::string filename = QFileDialog::getSaveFileName(NULL, "Serialize field", ".", "").toStdString();
+        if (!filename.empty())
+        {
+            ScalarField sf(m->serialize_uvw(U_param));
+            sf.serialize(filename.c_str());
+        }
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_deserialize_field, &QPushButton::clicked, [&]()
+    {
+        std::string filename = QFileDialog::getOpenFileName(NULL, "Serialize field", ".", "").toStdString();
+        if (!filename.empty())
+        {
+            ScalarField sf(filename.c_str());
+            if (sf.size() == m->num_verts()) sf.copy_to_mesh(*m);
+            else std::cerr << "Could not load scalar field " << filename << " - array size mismatch!" << endl;
+        }
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_wireframe, &QCheckBox::stateChanged, [&]()
+    {
+        if (m == NULL) return;
+        m->show_face_wireframe(cb_wireframe->isChecked());
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_wireframe_width, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_face_wireframe_width(sl_wireframe_width->value());
+        cb_wireframe->setChecked(true);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_wireframe_alpha, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        float alpha = float(sl_wireframe_alpha->value()) / 99.0;
+        m->show_face_wireframe_transparency(alpha);
+        cb_wireframe->setChecked(true);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_wireframe_color, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        QColor c = QColorDialog::getColor(Qt::white, widget);
+        m->show_face_wireframe_color(Color(c.redF(), c.greenF(), c.blueF()));
+        cb_wireframe->setChecked(true);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_isocurve, &QCheckBox::stateChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        canvas->pop(&isocontour);
+        if (cb_isocurve->isChecked())
+        {
+            double isovalue      = static_cast<double>(sl_isovalue->value())/999.0;
+            int    thickness     = isocontour.thickness;
+            Color  color         = isocontour.color;
+            isocontour           = DrawableIsocontour<M,V,E,P>(*m, isovalue);
+            isocontour.thickness = thickness;
+            isocontour.color     = color;
+            canvas->push_obj(&isocontour,false);
+        }
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_isovalue, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        canvas->pop(&isocontour);
+        if (cb_isocurve->isChecked())
+        {
+            double isovalue      = static_cast<double>(sl_isovalue->value())/999.0;
+            int    thickness     = isocontour.thickness;
+            Color  color         = isocontour.color;
+            isocontour           = DrawableIsocontour<M,V,E,P>(*m, isovalue);
+            isocontour.thickness = thickness;
+            isocontour.color     = color;
+            canvas->push_obj(&isocontour,false);
+        }
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_isocurve_width, &QSlider::valueChanged, [&]()
+    {
+        isocontour.thickness = sl_isocurve_width->value();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_isocurve_color, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        QColor c = QColorDialog::getColor(Qt::white, widget);
+        isocontour.color = Color(c.redF(), c.greenF(), c.blueF());
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_gradient, &QCheckBox::stateChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        canvas->pop(&gradient);
+        if (cb_gradient->isChecked())
+        {
+            float  size    = gradient.get_arrow_size();
+            Color  color   = gradient.get_arrow_color();
+            gradient = DrawableVectorField<Mesh>(*m);
+            ScalarField f(m->serialize_uvw(U_param));
+            gradient = gradient_matrix(*m) * f;
+            gradient.normalize();
+            gradient.set_arrow_size(size);
+            gradient.set_arrow_color(color);
+            canvas->push_obj(&gradient,false);
+        }
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_gradient_color, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        QColor c = QColorDialog::getColor(Qt::white, widget);
+        gradient.set_arrow_color(Color(c.redF(), c.greenF(), c.blueF()));
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_gradient_size, &QSlider::valueChanged, [&]()
+    {
+        gradient.set_arrow_size(2.0 * static_cast<float>(sl_gradient_size->value())/100.0);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_gradient_serialize, &QPushButton::clicked, [&]()
+    {
+        std::string filename = QFileDialog::getSaveFileName(NULL, "Serialize gradient", ".", "").toStdString();
+        if (!filename.empty()) gradient.serialize(filename.c_str());
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_gradient_deserialize, &QPushButton::clicked, [&]()
+    {
+        std::string filename = QFileDialog::getOpenFileName(NULL, "Deserialize gradient", ".", "").toStdString();
+        if (!filename.empty()) gradient.deserialize(filename.c_str());
+    });
+}
+
+}

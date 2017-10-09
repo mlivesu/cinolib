@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/gl/glcanvas.h>
+#include <cinolib/gui/qt/glcanvas.h>
 
 #include <sstream>
 #include <QApplication>
@@ -243,6 +243,22 @@ bool GLcanvas::pop_first_occurrence_of(int type)
         const DrawableObject *obj = *it;
 
         if (obj->object_type() == type)
+        {
+            drawlist.erase(it);
+            return true;
+        }
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool GLcanvas::pop(DrawableObject *obj)
+{
+    for(std::vector<DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
+    {
+        if (obj == *it)
         {
             drawlist.erase(it);
             return true;
