@@ -50,9 +50,9 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m_ptr, GLcanvas *ca
 
     // LOAD/SAVE buttons and SHADING
     {
-        but_load     = new QPushButton("Load");
-        but_save     = new QPushButton("Save");
-        cb_show_mesh = new QCheckBox("Show");
+        but_load     = new QPushButton("Load", widget);
+        but_save     = new QPushButton("Save", widget);
+        cb_show_mesh = new QCheckBox("Show", widget);
         but_load->setFont(global_font);
         but_save->setFont(global_font);
         cb_show_mesh->setFont(global_font);
@@ -90,12 +90,12 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m_ptr, GLcanvas *ca
         rb_face_color         = new QRadioButton("Face Color", gbox);
         rb_tex1D              = new QRadioButton("Texture 1D", gbox);
         rb_tex2D              = new QRadioButton("Texture 2D", gbox);
-        but_set_vert_color    = new QPushButton("Set");
-        but_set_face_color    = new QPushButton("Set");
+        but_set_vert_color    = new QPushButton("Set", gbox);
+        but_set_face_color    = new QPushButton("Set", gbox);
         cb_tex1D_type         = new QComboBox(gbox);
         cb_tex2D_type         = new QComboBox(gbox);
-        but_serialize_field   = new QPushButton("Serialize");
-        but_deserialize_field = new QPushButton("Deserialize");
+        but_serialize_field   = new QPushButton("Serialize", gbox);
+        but_deserialize_field = new QPushButton("Deserialize", gbox);
         sl_tex2D_density      = new QSlider(Qt::Horizontal, gbox);
         rb_face_color->setChecked(true);
         cb_tex1D_type->insertItem(0,"ISO");
@@ -140,9 +140,9 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m_ptr, GLcanvas *ca
         cb_wireframe        = new QCheckBox("Wireframe", gbox);
         sl_wireframe_width  = new QSlider(Qt::Horizontal, gbox);
         sl_wireframe_alpha  = new QSlider(Qt::Horizontal, gbox);
-        but_wireframe_color = new QPushButton("Color");
-        QLabel *l_width     = new QLabel("Width: ");
-        QLabel *l_alpha     = new QLabel("Transp:");
+        but_wireframe_color = new QPushButton("Color", gbox);
+        QLabel *l_width     = new QLabel("Width: ", gbox);
+        QLabel *l_alpha     = new QLabel("Transp:", gbox);
         sl_wireframe_width->setMinimum(1);
         sl_wireframe_width->setMaximum(4);
         sl_wireframe_width->setTickPosition(QSlider::TicksBelow);
@@ -174,9 +174,9 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m_ptr, GLcanvas *ca
         cb_isocurve        = new QCheckBox("Isocurve", gbox);
         sl_isovalue        = new QSlider(Qt::Horizontal, gbox);
         sl_isocurve_width  = new QSlider(Qt::Horizontal, gbox);
-        but_isocurve_color = new QPushButton("Color");
-        QLabel *l_value    = new QLabel("Isoval: ");
-        QLabel *l_width    = new QLabel("Width:  ");
+        but_isocurve_color = new QPushButton("Color", gbox);
+        QLabel *l_value    = new QLabel("Isoval: ", gbox);
+        QLabel *l_width    = new QLabel("Width:  ", gbox);
         sl_isocurve_width->setMinimum(1);
         sl_isocurve_width->setMaximum(10);
         sl_isovalue->setMaximum(999);
@@ -203,9 +203,9 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m_ptr, GLcanvas *ca
         QGroupBox *gbox          = new QGroupBox(widget);
         cb_gradient              = new QCheckBox("Gradient", gbox);
         sl_gradient_size         = new QSlider(Qt::Horizontal, gbox);
-        but_gradient_color       = new QPushButton("Color");
-        but_gradient_serialize   = new QPushButton("Serialize");
-        but_gradient_deserialize = new QPushButton("Deserialize");
+        but_gradient_color       = new QPushButton("Color", gbox);
+        but_gradient_serialize   = new QPushButton("Serialize", gbox);
+        but_gradient_deserialize = new QPushButton("Deserialize", gbox);
         sl_gradient_size->setMinimum(1);
         sl_gradient_size->setMaximum(100);
         sl_gradient_size->setValue(20);
@@ -222,6 +222,99 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m_ptr, GLcanvas *ca
         layout->addWidget(but_gradient_deserialize,3,2);
         gbox->setLayout(layout);
         global_layout->addWidget(gbox,2,1);
+    }
+
+    // SLICING
+    {
+        QGroupBox *gbox = new QGroupBox("Slice" ,widget);
+        sl_slice_x      = new QSlider(Qt::Horizontal, gbox);
+        sl_slice_y      = new QSlider(Qt::Horizontal, gbox);
+        sl_slice_z      = new QSlider(Qt::Horizontal, gbox);
+        sl_slice_q      = new QSlider(Qt::Horizontal, gbox);
+        sl_slice_l      = new QSlider(Qt::Horizontal, gbox);
+        cb_slice_flip_x = new QCheckBox("flip", gbox);
+        cb_slice_flip_y = new QCheckBox("flip", gbox);
+        cb_slice_flip_z = new QCheckBox("flip", gbox);
+        cb_slice_flip_q = new QCheckBox("flip", gbox);
+        rb_slice_AND    = new QRadioButton("&&", gbox);
+        rb_slice_OR     = new QRadioButton("||",  gbox);
+        but_slice_reset = new QPushButton("Reset", gbox);
+        QLabel *l_x     = new QLabel("X");
+        QLabel *l_y     = new QLabel("Y");
+        QLabel *l_z     = new QLabel("Z");
+        QLabel *l_q     = new QLabel("Q");
+        QLabel *l_l     = new QLabel("L");
+        sl_slice_l->setMinimum(-1);
+        sl_slice_l->setMaximum(20);
+        sl_slice_l->setOrientation(Qt::Horizontal);
+        sl_slice_l->setTickPosition(QSlider::TicksBelow);
+        sl_slice_x->setValue(sl_slice_x->maximum());
+        sl_slice_y->setValue(sl_slice_y->maximum());
+        sl_slice_z->setValue(sl_slice_z->maximum());
+        sl_slice_q->setValue(sl_slice_q->maximum());
+        sl_slice_l->setValue(sl_slice_l->maximum());
+        rb_slice_AND->setChecked(true);
+        cb_slice_flip_x->setChecked(false);
+        cb_slice_flip_y->setChecked(false);
+        cb_slice_flip_z->setChecked(false);
+        cb_slice_flip_q->setChecked(false);
+        gbox->setFont(global_font);
+        cb_slice_flip_x->setFont(global_font);
+        cb_slice_flip_y->setFont(global_font);
+        cb_slice_flip_z->setFont(global_font);
+        cb_slice_flip_q->setFont(global_font);
+        rb_slice_AND->setFont(global_font);
+        rb_slice_OR->setFont(global_font);
+        but_slice_reset->setFont(global_font);
+        l_x->setFont(global_font);
+        l_y->setFont(global_font);
+        l_z->setFont(global_font);
+        l_q->setFont(global_font);
+        l_l->setFont(global_font);
+        QGridLayout *layout = new QGridLayout();
+        layout->addWidget(but_slice_reset, 0,1);
+        layout->addWidget(rb_slice_AND,0,2);
+        layout->addWidget(rb_slice_OR,0,3);
+        layout->addWidget(l_x,1,0);
+        layout->addWidget(l_y,2,0);
+        layout->addWidget(l_z,3,0);
+        layout->addWidget(l_q,4,0);
+        layout->addWidget(l_l,5,0);
+        layout->addWidget(sl_slice_x,1,1,1,3);
+        layout->addWidget(sl_slice_y,2,1,1,3);
+        layout->addWidget(sl_slice_z,3,1,1,3);
+        layout->addWidget(sl_slice_q,4,1,1,3);
+        layout->addWidget(sl_slice_l,5,1,1,3);
+        layout->addWidget(cb_slice_flip_x,1,4);
+        layout->addWidget(cb_slice_flip_y,2,4);
+        layout->addWidget(cb_slice_flip_z,3,4);
+        layout->addWidget(cb_slice_flip_q,4,4);
+        gbox->setLayout(layout);
+        global_layout->addWidget(gbox,3,1);
+    }
+
+    // MARKED EDGES
+    {
+        QGroupBox *gbox        = new QGroupBox(widget);
+        cb_marked_edges        = new QCheckBox("Marked Edges", gbox);
+        sl_marked_edges_width  = new QSlider(Qt::Horizontal, gbox);
+        but_marked_edges_color = new QPushButton("Color", gbox);
+        QLabel *l_width        = new QLabel("Width:  ", gbox);
+        sl_marked_edges_width->setMinimum(1);
+        sl_marked_edges_width->setMaximum(10);
+        sl_marked_edges_width->setTickPosition(QSlider::TicksBelow);
+        sl_marked_edges_width->setTickInterval(1);
+        gbox->setFont(global_font);
+        but_marked_edges_color->setFont(global_font);
+        l_width->setFont(global_font);
+        cb_marked_edges->setFont(global_font);
+        QGridLayout *layout = new QGridLayout();
+        layout->addWidget(cb_marked_edges,0,1);
+        layout->addWidget(l_width,2,0);
+        layout->addWidget(sl_marked_edges_width,2,1);
+        layout->addWidget(but_marked_edges_color,3,1);
+        gbox->setLayout(layout);
+        global_layout->addWidget(gbox,3,0);
     }
 
     set_title();
@@ -586,6 +679,114 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     {
         std::string filename = QFileDialog::getOpenFileName(NULL, "Deserialize gradient", ".", "").toStdString();
         if (!filename.empty()) gradient.deserialize(filename.c_str());
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_slice_x, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        float thresh = float(sl_slice_x->value()) / float(sl_slice_x->maximum());
+        int   flip   = cb_slice_flip_x->isChecked() ? GEQ : LEQ;
+        int   mode   = rb_slice_AND->isChecked()    ? AND : OR;
+        m->slice(thresh, X, flip, mode);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_slice_y, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        float thresh = float(sl_slice_y->value()) / float(sl_slice_y->maximum());
+        int   flip   = cb_slice_flip_y->isChecked() ? GEQ : LEQ;
+        int   mode   = rb_slice_AND->isChecked()    ? AND : OR;
+        m->slice(thresh, Y, flip, mode);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_slice_z, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        float thresh = float(sl_slice_z->value()) / float(sl_slice_z->maximum());
+        int   flip   = cb_slice_flip_z->isChecked() ? GEQ : LEQ;
+        int   mode   = rb_slice_AND->isChecked()    ? AND : OR;
+        m->slice(thresh, Z, flip, mode);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_slice_q, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        float thresh = float(sl_slice_q->value()) / float(sl_slice_q->maximum());
+        int   flip   = cb_slice_flip_q->isChecked() ? GEQ : LEQ;
+        int   mode   = rb_slice_AND->isChecked()    ? AND : OR;
+        m->slice(thresh, Q, flip, mode);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_slice_l, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        int label = float() / float(sl_slice_l->maximum());
+        int mode  = rb_slice_AND->isChecked()    ? AND : OR;
+        m->slice(label, L, LEQ, mode);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_slice_reset, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->slicer_reset();
+        canvas->updateGL();
+        sl_slice_x->setValue(sl_slice_x->maximum());
+        sl_slice_y->setValue(sl_slice_y->maximum());
+        sl_slice_z->setValue(sl_slice_z->maximum());
+        sl_slice_q->setValue(sl_slice_q->maximum());
+        sl_slice_l->setValue(sl_slice_l->maximum());
+        rb_slice_AND->setChecked(true);
+        cb_slice_flip_x->setChecked(false);
+        cb_slice_flip_y->setChecked(false);
+        cb_slice_flip_z->setChecked(false);
+        cb_slice_flip_q->setChecked(false);
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_marked_edges, &QCheckBox::stateChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_edge_marked(cb_marked_edges->isChecked());
+        m->updateGL();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_marked_edges_color, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        QColor c = QColorDialog::getColor(Qt::white, widget);
+        m->show_edge_marked_color(Color(c.redF(), c.greenF(), c.blueF()));
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_marked_edges_width, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_edge_marked_width(sl_marked_edges_width->value());
+        cb_marked_edges->setChecked(true);
+        canvas->updateGL();
     });
 }
 

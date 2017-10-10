@@ -44,6 +44,7 @@
 #include <QLabel>
 #include <QGroupBox>
 #include <QComboBox>
+#include <QSpinBox>
 #include <QSlider>
 #include <QCheckBox>
 #include <QRadioButton>
@@ -65,7 +66,7 @@ class SurfaceMeshControlPanel
     typedef typename Mesh::E_type E;
     typedef typename Mesh::P_type P;
 
-public:
+    public:
 
         SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas, QWidget *parent = NULL);
 
@@ -113,6 +114,25 @@ public:
         QPushButton                 *but_gradient_color;
         QPushButton                 *but_gradient_serialize;
         QPushButton                 *but_gradient_deserialize;
+        QSlider                     *sl_slice_x;
+        QSlider                     *sl_slice_y;
+        QSlider                     *sl_slice_z;
+        QSlider                     *sl_slice_l;
+        QSlider                     *sl_slice_q;
+        QCheckBox                   *cb_slice_flip_x;
+        QCheckBox                   *cb_slice_flip_y;
+        QCheckBox                   *cb_slice_flip_z;
+        QCheckBox                   *cb_slice_flip_q;
+        QRadioButton                *rb_slice_AND;
+        QRadioButton                *rb_slice_OR;
+        QPushButton                 *but_slice_reset;
+        QCheckBox                   *cb_marked_edges;
+        QPushButton                 *but_marked_edges_color;
+        QSlider                     *sl_marked_edges_width;
+        //QPushButton                 *but_mark_border_edges;
+        //QPushButton                 *but_mark_labeling_border;
+        //QPushButton                 *but_mark_sharp_creases;
+        //QSpinBox                    *but_sharp_crease_angle;
 };
 
 }
