@@ -39,6 +39,15 @@ template<class Mesh>
 CINO_INLINE
 MeshSlicer<Mesh>::MeshSlicer(Mesh & m)
 {
+    reset(m);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void MeshSlicer<Mesh>::reset(Mesh & m)
+{
     slice_thresh[0] = m.bbox().max.x();
     slice_thresh[1] = m.bbox().max.y();
     slice_thresh[2] = m.bbox().max.z();

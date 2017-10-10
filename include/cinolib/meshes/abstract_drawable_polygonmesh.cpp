@@ -241,6 +241,16 @@ void AbstractDrawablePolygonMesh<Mesh>::slice(const float thresh, // thresh on c
 
 template<class Mesh>
 CINO_INLINE
+void AbstractDrawablePolygonMesh<Mesh>::slicer_reset()   // either AND or OR
+{
+    slicer.reset(*this);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::show_mesh(const bool b)
 {
     if (b) drawlist.draw_mode |=  DRAW_TRIS;

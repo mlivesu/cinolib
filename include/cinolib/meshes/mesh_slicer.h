@@ -51,6 +51,10 @@ class MeshSlicer
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void reset(Mesh & m);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void update(      Mesh  & m,
                     const float   thresh,  // thresh on centroid
                     const int     item,    // X, Y, Z, Q, L
