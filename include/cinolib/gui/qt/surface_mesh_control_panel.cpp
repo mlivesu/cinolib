@@ -37,8 +37,8 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
-SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m_ptr, GLcanvas *canvas, QWidget *parent)
-    : m(m_ptr)
+SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas, QWidget *parent)
+    : m(m)
     , canvas(canvas)
 {
     assert(canvas != NULL);
@@ -354,12 +354,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
         std::string filename = QFileDialog::getOpenFileName(NULL, "Load mesh", ".", "3D Meshes (*.off *.obj *.iv);; OBJ(*.obj);; OFF(*.off);; IV(*.iv)").toStdString();
         if (!filename.empty())
         {
-            if (m != NULL)
-            {
-                delete(m);
-                m = NULL;
-            }
-            m = new Mesh(filename.c_str());
+            *m = Mesh(filename.c_str());
             canvas->push_obj(m);
             set_title();
         }
