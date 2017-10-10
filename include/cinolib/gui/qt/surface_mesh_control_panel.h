@@ -31,7 +31,7 @@
 #ifndef CINO_SURFACE_MESH_CONTROL_PANEL_H
 #define CINO_SURFACE_MESH_CONTROL_PANEL_H
 
-#ifdef CINOLIB_USES_QGLVIEWER
+#ifdef CINOLIB_USES_QT_AND_QGLVIEWER
 
 #include <cinolib/scalar_field.h>
 #include <cinolib/drawable_isocontour.h>
@@ -141,6 +141,6 @@ class SurfaceMeshControlPanel
 #include "surface_mesh_control_panel.cpp"
 #endif
 
-#endif // #ifdef CINOLIB_USES_QGLVIEWER
+#endif // #ifdef CINOLIB_USES_QT_AND_QGLVIEWER
 
 #endif // CINO_SURFACE_MESH_CONTROL_PANEL_H

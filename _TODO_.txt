@@ -1,3 +1,4 @@
+- make control panel for volume meshes and skeletons
 - Gradients on hexmeshes are buggy. hint: check per face normals!
 - add max_depth to Profiler to avoid lengthy reports
 - consider avoiding to use a tree into the profiler. Sorting entries w.r.t. call time should do the job…

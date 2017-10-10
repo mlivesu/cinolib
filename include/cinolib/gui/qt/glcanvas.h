@@ -32,7 +32,7 @@
 #define CINO_GLCANVAS_H
 
 #ifdef CINOLIB_USES_OPENGL
-#ifdef CINOLIB_USES_QGLVIEWER
+#ifdef CINOLIB_USES_QT_AND_QGLVIEWER
 
 #include <QGLWidget>
 #include <vector>
@@ -96,7 +96,7 @@ class GLcanvas : public QGLViewer
 #include "glcanvas.cpp"
 #endif
 
-#endif // #ifdef CINOLIB_USES_QGLVIEWER
+#endif // #ifdef CINOLIB_USES_QT_AND_QGLVIEWER
 #endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_GLCANVAS_H
