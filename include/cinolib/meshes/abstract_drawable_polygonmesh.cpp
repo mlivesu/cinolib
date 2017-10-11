@@ -338,7 +338,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_face_texture1D(const int tex_type)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::show_face_texture2D(const int tex_type, const double tex_unit_scalar)
+void AbstractDrawablePolygonMesh<Mesh>::show_face_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
 {
     drawlist.draw_mode |=  DRAW_TRI_TEXTURE2D;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
@@ -347,7 +347,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_face_texture2D(const int tex_type, 
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
 
     drawlist.tri_text_unit_scalar = tex_unit_scalar;
-    load_texture(drawlist.tri_text_id, tex_type);
+    load_texture(drawlist.tri_text_id, tex_type, bitmap);
     updateGL();
 }
 

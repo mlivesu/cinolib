@@ -33,13 +33,18 @@
 #include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
 #include <cinolib/common.h>
 
+#ifdef CINOLIB_USES_QT_AND_QGLVIEWER
+#include <QImage>
+#include <QGLWidget>
+#endif
+
 namespace cinolib
 {
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void load_texture(GLuint & texture_id, const int & texture_type)
+void load_texture(GLuint & texture_id, const int & texture_type, const char *bitmap)
 {
     if (texture_id > 0) glDeleteTextures(1, &texture_id);
     glGenTextures(1, &texture_id);
@@ -51,6 +56,7 @@ void load_texture(GLuint & texture_id, const int & texture_type)
         case TEXTURE_1D_HSV_RAMP_W_ISOLINES : texture_HSV_ramp_with_isolines(texture_id); break;
         case TEXTURE_2D_CHECKERBOARD :        texture_checkerboard(texture_id);           break;
         case TEXTURE_2D_ISOLINES:             texture_isolines2D(texture_id);             break;
+        case TEXTURE_2D_BITMAP:               texture_bitmap(texture_id, bitmap);         break;
         default: assert("Unknown Texture!" && false);
     }
 }
@@ -184,6 +190,26 @@ void texture_HSV_ramp_with_isolines(const GLuint texture_id)
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void texture_bitmap(const GLuint texture_id, const char *bitmap)
+{
+#ifdef CINOLIB_USES_QT_AND_QGLVIEWER
+    QImage img = QGLWidget::convertToGLFormat(QImage(bitmap));
+    //
+    // useful link: https://stackoverflow.com/questions/20245865/render-qimage-with-opengl
+    //
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.height(), img.width(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glGenerateMipmap(GL_TEXTURE_2D);
+#endif
 }
 
 }

@@ -70,12 +70,19 @@ class SurfaceMeshControlPanel
 
         SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas, QWidget *parent = NULL);
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void show();
 
     protected:
 
         void connect();
         void set_title();
+        void set_tex1d();
+        void set_tex2d();
+        void set_isocurve();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         Mesh                        *m;
         DrawableIsocontour<M,V,E,P>  isocontour;
@@ -96,6 +103,8 @@ class SurfaceMeshControlPanel
         QRadioButton                *rb_tex2D;
         QPushButton                 *but_set_vert_color;
         QPushButton                 *but_set_face_color;
+        QPushButton                 *but_load_tex2d;
+        std::string                  tex2d_filename;
         QComboBox                   *cb_tex1D_type;
         QComboBox                   *cb_tex2D_type;
         QSlider                     *sl_tex2D_density;

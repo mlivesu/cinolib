@@ -54,12 +54,13 @@ enum
     TEXTURE_1D_HSV_RAMP_W_ISOLINES,
     TEXTURE_2D_ISOLINES,
     TEXTURE_2D_CHECKERBOARD,
+    TEXTURE_2D_BITMAP
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void load_texture(GLuint & texture_id, const int & texture_type);
+void load_texture(GLuint & texture_id, const int & texture_type, const char *bitmap = NULL);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -93,6 +94,12 @@ void texture_isolines2D(const GLuint   texture_id,
                         const Color  & u_isolines = Color::BLUE(),
                         const Color  & v_isolines = Color::RED(),
                         const Color  & background = Color::WHITE());
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void texture_bitmap(const GLuint texture_id, const char *bitmap);
+
 }
 
 #ifndef  CINO_STATIC_LIB

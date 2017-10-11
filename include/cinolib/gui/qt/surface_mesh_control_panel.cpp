@@ -97,12 +97,15 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         but_serialize_field   = new QPushButton("Serialize", gbox);
         but_deserialize_field = new QPushButton("Deserialize", gbox);
         sl_tex2D_density      = new QSlider(Qt::Horizontal, gbox);
+        but_load_tex2d        = new QPushButton("Load Tex2D", gbox);
+        tex2d_filename        = "";
         rb_face_color->setChecked(true);
         cb_tex1D_type->insertItem(0,"ISO");
         cb_tex1D_type->insertItem(1,"RAMP");
         cb_tex1D_type->insertItem(2,"RAMP + ISO");
         cb_tex2D_type->insertItem(0,"ISO");
         cb_tex2D_type->insertItem(1,"CB");
+        cb_tex2D_type->insertItem(2,"IMG");
         sl_tex2D_density->setMinimum(1);
         sl_tex2D_density->setMaximum(200);
         sl_tex2D_density->setValue(10);
@@ -114,6 +117,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         rb_tex2D->setFont(global_font);
         but_set_vert_color->setFont(global_font);
         but_set_face_color->setFont(global_font);
+        but_load_tex2d->setFont(global_font);
         cb_tex1D_type->setFont(global_font);
         cb_tex2D_type->setFont(global_font);
         but_serialize_field->setFont(global_font);
@@ -127,6 +131,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         layout->addWidget(but_set_face_color,1,1);
         layout->addWidget(cb_tex1D_type,2,1);
         layout->addWidget(cb_tex2D_type,3,1);
+        layout->addWidget(but_load_tex2d, 4,0);
         layout->addWidget(sl_tex2D_density, 4,1);
         layout->addWidget(but_serialize_field,5,0);
         layout->addWidget(but_deserialize_field,5,1);
@@ -347,6 +352,57 @@ void SurfaceMeshControlPanel<Mesh>::set_title()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
+CINO_INLINE
+void SurfaceMeshControlPanel<Mesh>::set_tex1d()
+{
+    if (m == NULL || canvas == NULL) return;
+    rb_tex1D->setChecked(true);
+    m->show_face_texture1D(cb_tex1D_type->currentIndex());
+    canvas->updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void SurfaceMeshControlPanel<Mesh>::set_tex2d()
+{
+    if (m == NULL || canvas == NULL) return;
+    rb_tex2D->setChecked(true);
+    int    tex_type = cb_tex2D_type->currentIndex() + 3; // first three are for tex1D
+    double density  = (double)sl_tex2D_density->value()/10.0;
+    if (tex_type == TEXTURE_2D_BITMAP && tex2d_filename.empty())
+    {
+        tex2d_filename = QFileDialog::getOpenFileName(NULL, "Load 2D Texture", ".", "").toStdString();
+    }
+    m->show_face_texture2D(tex_type, density, tex2d_filename.c_str());
+    canvas->updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void SurfaceMeshControlPanel<Mesh>::set_isocurve()
+{
+    if (m == NULL || canvas == NULL) return;
+    canvas->pop(&isocontour);
+    if (cb_isocurve->isChecked())
+    {
+        double isovalue      = static_cast<double>(sl_isovalue->value())/999.0;
+        int    thickness     = isocontour.thickness;
+        Color  color         = isocontour.color;
+        isocontour           = DrawableIsocontour<M,V,E,P>(*m, isovalue);
+        isocontour.thickness = thickness;
+        isocontour.color     = color;
+        canvas->push_obj(&isocontour,false);
+    }
+    canvas->updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
 void SurfaceMeshControlPanel<Mesh>::connect()
 {
     QPushButton::connect(but_load, &QPushButton::clicked, [&]()
@@ -427,54 +483,44 @@ void SurfaceMeshControlPanel<Mesh>::connect()
 
     QRadioButton::connect(rb_tex1D, &QPushButton::toggled, [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        m->show_face_texture1D(cb_tex1D_type->currentIndex());
-        canvas->updateGL();
+        if (rb_tex1D->isChecked()) set_tex1d();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     QRadioButton::connect(rb_tex2D, &QPushButton::toggled, [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        int    texID   = cb_tex2D_type->currentIndex() + 3; // first three are for tex1D
-        double density = (double)sl_tex2D_density->value()/10.0;
-        m->show_face_texture2D(texID, density);
-        canvas->updateGL();
+        if (rb_tex2D->isChecked()) set_tex2d();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QComboBox::connect(cb_tex1D_type, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated), [&](int index)
+    QComboBox::connect(cb_tex1D_type, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated), [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        rb_tex1D->setChecked(true);
-        m->show_face_texture1D(index);
-        canvas->updateGL();
+        set_tex1d();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QComboBox::connect(cb_tex2D_type, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated), [&](int index)
+    QComboBox::connect(cb_tex2D_type, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated), [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        rb_tex2D->setChecked(true);
-        int    texID   = index + 3; // first three are for tex1D
-        double density = (double)sl_tex2D_density->value()/10.0;
-        m->show_face_texture2D(texID, density);
-        canvas->updateGL();
+        set_tex2d();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     QSlider::connect(sl_tex2D_density, &QSlider::valueChanged, [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        rb_tex2D->setChecked(true);
-        int    texID   = cb_tex2D_type->currentIndex() + 3; // first three are for tex1D
-        double density = (double)sl_tex2D_density->value()/10.0;
-        m->show_face_texture2D(texID, density);
-        canvas->updateGL();
+        if (rb_tex2D->isChecked()) set_tex2d();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_load_tex2d, &QPushButton::clicked, [&]()
+    {
+        tex2d_filename = QFileDialog::getOpenFileName(NULL, "Load 2D Texture", ".", "").toStdString();
+        cb_tex2D_type->setCurrentIndex(2);
+        set_tex2d();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -569,38 +615,14 @@ void SurfaceMeshControlPanel<Mesh>::connect()
 
     QCheckBox::connect(cb_isocurve, &QCheckBox::stateChanged, [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        canvas->pop(&isocontour);
-        if (cb_isocurve->isChecked())
-        {
-            double isovalue      = static_cast<double>(sl_isovalue->value())/999.0;
-            int    thickness     = isocontour.thickness;
-            Color  color         = isocontour.color;
-            isocontour           = DrawableIsocontour<M,V,E,P>(*m, isovalue);
-            isocontour.thickness = thickness;
-            isocontour.color     = color;
-            canvas->push_obj(&isocontour,false);
-        }
-        canvas->updateGL();
+        set_isocurve();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     QSlider::connect(sl_isovalue, &QSlider::valueChanged, [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        canvas->pop(&isocontour);
-        if (cb_isocurve->isChecked())
-        {
-            double isovalue      = static_cast<double>(sl_isovalue->value())/999.0;
-            int    thickness     = isocontour.thickness;
-            Color  color         = isocontour.color;
-            isocontour           = DrawableIsocontour<M,V,E,P>(*m, isovalue);
-            isocontour.thickness = thickness;
-            isocontour.color     = color;
-            canvas->push_obj(&isocontour,false);
-        }
-        canvas->updateGL();
+        set_isocurve();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

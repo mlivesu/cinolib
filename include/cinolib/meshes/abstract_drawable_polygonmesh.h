@@ -86,7 +86,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         void show_vert_color();
         void show_face_color();
         void show_face_texture1D(const int tex_type);
-        void show_face_texture2D(const int tex_type, const double tex_unit_scalar);
+        void show_face_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap = NULL);
         void show_face_wireframe(const bool b);
         void show_face_wireframe_color(const Color & c);
         void show_face_wireframe_width(const float width);
