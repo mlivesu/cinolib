@@ -28,8 +28,8 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_SPHERE_COVERAGE_H
-#define CINO_SPHERE_COVERAGE_H
+#ifndef CINO_CONNECTED_COMPONENTS_H
+#define CINO_CONNECTED_COMPONENTS_H
 
 #include <vector>
 
@@ -54,7 +54,7 @@ uint connected_components(const AbstractMesh<M,V,E,P> & m,
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "sphere_coverage.cpp"
+#include "connected_components.cpp"
 #endif
 
-#endif // CINO_SPHERE_COVERAGE_H
+#endif // CINO_CONNECTED_COMPONENTS_H
