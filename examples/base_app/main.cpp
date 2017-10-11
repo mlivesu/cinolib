@@ -3,7 +3,17 @@
  *
  * Different meshes could also be used. All you need to do is substitute DrawableTrimesh
  * with DrawableQuadmesh (if you are into quadmeshes), or with DrawablePolygonmesh
- * (if you are into general polygon meshes). Enjoy!
+ * (if you are into general polygon meshes).
+ *
+ * Similarly, we support volumetric meshes too! You can use DrawableTetmesh for tetrahedral
+ * meshes, DrawableHexmesh for hexahedral meshes, and DrawablePolyhedralmesh for general
+ * polyhedral meshes (e.g., Voronoi cells).
+ *
+ * In case you don't need a GUI, you can drop the "Drawable" prefix from the data types.
+ * What you will get is lighter yet fully operational mesh data structure, just without 
+ * the OpenGL code we use for rendering!
+ *
+ * Enjoy!
 */
 
 #include <QApplication>
