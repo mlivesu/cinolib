@@ -35,6 +35,7 @@
 #ifdef CINOLIB_USES_QT_AND_QGLVIEWER
 
 #include <QGLWidget>
+#include <QMenu>
 #include <vector>
 #include <string>
 
@@ -58,6 +59,11 @@ class GLcanvas : public QGLViewer
     public:
 
         explicit GLcanvas(QWidget * parent = 0);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void make_popup_menu();
+        void mousePressEvent(QMouseEvent *event);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -86,7 +92,8 @@ class GLcanvas : public QGLViewer
 
     private:
 
-        QColor clear_color;
+        QMenu  *popup;
+        QColor  clear_color;
         std::vector<DrawableObject*> drawlist;
 };
 

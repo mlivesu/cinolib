@@ -32,8 +32,10 @@
 
 #include <sstream>
 #include <QApplication>
+#include <QColorDialog>
 #include <QShortcut>
 #include <QMimeData>
+#include <QMenu>
 
 namespace cinolib
 {
@@ -57,6 +59,41 @@ GLcanvas::GLcanvas(QWidget * parent)
             deserialize_camera(QApplication::clipboard()->mimeData()->text().toStdString());
         }
     });
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::make_popup_menu()
+{
+    if (popup != NULL)
+    {
+        delete(popup);
+        popup = NULL;
+    }
+    popup = new QMenu(this);
+
+    QAction *background_color = new QAction("Brackground color", this);
+    connect(background_color, &QAction::triggered, [&]()
+    {
+        this->set_clear_color(QColorDialog::getColor(Qt::white, this));
+        updateGL();
+    });
+    popup->addAction(background_color);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button()==Qt::RightButton && event->buttons()==Qt::RightButton)
+    {
+        make_popup_menu();
+        popup->exec(QCursor::pos());
+        return;
+    }
+    QGLViewer::mousePressEvent(event);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -167,7 +204,7 @@ std::string GLcanvas::serialize_drawlist() const
         switch (obj->object_type())
         {
             case DRAWABLE_TRIMESH        : ss << "Trimesh        "; break;
-            case DRAWABLE_QUADMESH       : ss << "Qaudmesh       "; break;
+            case DRAWABLE_QUADMESH       : ss << "Quadmesh       "; break;
             case DRAWABLE_POLYGONMESH    : ss << "Polygonmesh    "; break;
             case DRAWABLE_TETMESH        : ss << "Tetmesh        "; break;
             case DRAWABLE_HEXMESH        : ss << "Hexmesh        "; break;
