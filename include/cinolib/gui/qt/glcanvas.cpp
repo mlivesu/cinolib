@@ -87,8 +87,11 @@ void GLcanvas::make_popup_menu()
 CINO_INLINE
 void GLcanvas::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button()==Qt::RightButton && event->buttons()==Qt::RightButton)
+    if (event->button()   == Qt::RightButton &&
+        event->buttons()  == Qt::RightButton &&
+        event->modifiers()== Qt::ShiftModifier)
     {
+        event->accept();
         make_popup_menu();
         popup->exec(QCursor::pos());
         return;
