@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/io/read_OBJ.h>
+#include <cinolib/cut_along_seams.h>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -37,92 +38,70 @@
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// https://stackoverflow.com/questions/9310327/sscanf-optional-column
+//
 CINO_INLINE
-uint read_point_id(char *s)
+void read_point_id(char * s, int & v, int & vt, int & vn)
 {
-    int pos = 0;
-    while(s[pos] != '\0')
+    v = vt = vn = -1;
+
+    if(sscanf(s, "%d/%d/%d", &v, &vt, &vn) == 3)
     {
-        if(s[pos] == '/')
-        {
-            s[pos] = ' ';
-        }
-        ++pos;
+        --v; --vt; --vn;
     }
-    sscanf(s, "%d", &pos);
-    return pos-1;
-}
-
-
-CINO_INLINE
-void read_OBJ(const char           * filename,
-              std::vector<double>  & xyz,
-              std::vector<u_int>   & tri,
-              std::vector<u_int>   & quad)
-{
-    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
-
-    FILE *fp = fopen(filename, "r");
-
-    if(!fp)
+    else if(sscanf(s, "%d/%d", &v, &vt) == 2)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OBJ() : couldn't open input file " << filename << endl;
-        exit(-1);
+        --v; --vt;
     }
-
-    char line[1024], s0[1024], s1[1024], s2[1024], s3[1024];
-
-    while(fgets(line, 1024, fp))
+    else if(sscanf(s, "%d//%d", &v, &vn) == 2)
     {
-        switch(line[0])
-        {
-            case 'v':
-
-                if(!isspace(line[1])) continue;
-                if(line[1] != 't' && line[1] != 'n' )
-                {
-                    // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
-                    //
-                    double x, y, z;
-                    sscanf( line, "%*c %lf %lf %lf", &x, &y, &z );
-                    xyz.push_back(x);
-                    xyz.push_back(y);
-                    xyz.push_back(z);
-                }
-                break;
-
-            case 'f':
-                int n_corners = sscanf(line, "%*c %s %s %s %s", s0, s1, s2, s3);
-                if (n_corners == 3)
-                {
-                    tri.push_back(read_point_id(s0));
-                    tri.push_back(read_point_id(s1));
-                    tri.push_back(read_point_id(s2));
-                }
-                else if (n_corners == 4)
-                {
-                    quad.push_back(read_point_id(s0));
-                    quad.push_back(read_point_id(s1));
-                    quad.push_back(read_point_id(s2));
-                    quad.push_back(read_point_id(s3));
-                }
-                else
-                {
-                    std::cerr << "read_OBJ: polygons with " << n_corners << " corners are not supported!" << std::endl;
-                    assert("Unsupported polygon" && false);
-                }
-                break;
-        }
+        --v; --vn;
     }
-    fclose(fp);
+    else if(sscanf(s, "%d", &v) == 1)
+    {
+        --v;
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_OBJ(const char                     * filename,
-              std::vector<double>            & xyz,
-              std::vector<std::vector<uint>> & faces)
+              std::vector<vec3d>             & verts,
+              std::vector<std::vector<uint>> & poly)
+{
+    std::vector<vec3d> tex, nor;
+    std::vector<std::vector<uint>> poly_tex, poly_nor;
+    read_OBJ(filename, verts, tex, nor, poly, poly_tex, poly_nor);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_OBJ(const char                     * filename,
+              std::vector<vec3d>             & xyz,
+              std::vector<vec3d>             & uvw,
+              std::vector<std::vector<uint>> & poly)
+{
+    std::vector<vec3d> pos, tex, nor;
+    std::vector<std::vector<uint>> poly_pos, poly_tex, poly_nor;
+    read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor);
+
+    cut_mesh_along_seams(pos, tex, poly_pos, poly_tex, xyz, uvw, poly);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_OBJ(const char                     * filename,
+              std::vector<vec3d>             & pos,
+              std::vector<vec3d>             & tex,
+              std::vector<vec3d>             & nor,
+              std::vector<std::vector<uint>> & poly_pos,
+              std::vector<std::vector<uint>> & poly_tex,
+              std::vector<std::vector<uint>> & poly_nor)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -141,31 +120,48 @@ void read_OBJ(const char                     * filename,
         switch(line[0])
         {
             case 'v':
-
-                if(!isspace(line[1])) continue;
-                if(line[1] != 't' && line[1] != 'n' )
+            {
+                // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+                //
+                double a, b, c;
+                if(sscanf(line, "v %lf %lf %lf", &a, &b, &c) == 3)
                 {
-                    // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
-                    //
-                    double x, y, z;
-                    sscanf( line, "%*c %lf %lf %lf", &x, &y, &z );
-                    xyz.push_back(x);
-                    xyz.push_back(y);
-                    xyz.push_back(z);
+                    pos.push_back(vec3d(a,b,c));
+                }
+                else if(sscanf(line, "vt %lf %lf %lf", &a, &b, &c) == 3)
+                {
+                    tex.push_back(vec3d(a,b,c));
+                }
+                else if(sscanf(line, "vt %lf %lf %lf", &a, &b, &c) == 2)
+                {
+                    tex.push_back(vec3d(a,b,0));
+                }
+                else if(sscanf(line, "vn %lf %lf %lf", &a, &b, &c) == 3)
+                {
+                    nor.push_back(vec3d(a,b,c));
                 }
                 break;
+            }
 
             case 'f':
+            {
                 std::string s(line);
                 s = s.substr(1,s.size()-1); // discard the 'f' letter
                 std::istringstream ss(s);
-                std::vector<uint> face;
+                std::vector<uint> p_pos, p_tex, p_nor;
                 for(std::string sub_str; ss >> sub_str;)
                 {
-                    face.push_back(read_point_id(strdup(sub_str.c_str())));
+                    int v_pos, v_tex, v_nor;
+                    read_point_id(strdup(sub_str.c_str()), v_pos, v_tex, v_nor);
+                    if (v_pos >= 0) p_pos.push_back(v_pos);
+                    if (v_tex >= 0) p_tex.push_back(v_tex);
+                    if (v_nor >= 0) p_nor.push_back(v_nor);
                 }
-                faces.push_back(face);
+                poly_pos.push_back(p_pos);
+                poly_tex.push_back(p_tex);
+                poly_nor.push_back(p_nor);
                 break;
+            }
         }
     }
     fclose(fp);

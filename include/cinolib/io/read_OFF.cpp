@@ -35,73 +35,12 @@
 namespace cinolib
 {
 
-CINO_INLINE
-void read_OFF(const char          * filename,
-              std::vector<double> & xyz,
-              std::vector<uint>   & tri,
-              std::vector<uint>   & quad)
-{
-    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
-
-    FILE *fp = fopen(filename, "r");
-
-    if(!fp)
-    {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OFF() : couldn't open input file " << filename << endl;
-        exit(-1);
-    }
-
-    uint nv, npoly, dummy;
-
-    fscanf(fp, "OFF\n");
-    fscanf(fp, "%d %d %d\n", &nv, &npoly, &dummy);
-
-    for(uint i=0; i<nv; ++i)
-    {
-        // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
-        //
-        double x, y, z;
-        fscanf(fp, "%lf %lf %lf\n", &x, &y, &z);
-        xyz.push_back(x);
-        xyz.push_back(y);
-        xyz.push_back(z);
-    }
-
-    for(uint i=0; i<npoly; ++i)
-    {
-        uint n_corners, v0, v1, v2, v3;
-        fscanf(fp, "%d", &n_corners);
-
-        if (n_corners == 3)
-        {
-            fscanf(fp, "%d %d %d\n", &v0, &v1, &v2);
-            tri.push_back(v0);
-            tri.push_back(v1);
-            tri.push_back(v2);
-        }
-        else if (n_corners == 4)
-        {
-            fscanf(fp, "%d %d %d %d\n", &v0, &v1, &v2, &v3);
-            quad.push_back(v0);
-            quad.push_back(v1);
-            quad.push_back(v2);
-            quad.push_back(v3);
-        }
-        else
-        {
-            std::cerr << "read_OFF: polygons with " << n_corners << " corners are not supported!" << std::endl;
-            assert("Unsupported polygon" && false);
-        }
-    }
-    fclose(fp);
-}
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_OFF(const char                     * filename,
-              std::vector<double>            & xyz,
-              std::vector<std::vector<uint>> & faces)
+              std::vector<vec3d>             & verts,
+              std::vector<std::vector<uint>> & polys)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -124,9 +63,7 @@ void read_OFF(const char                     * filename,
         //
         double x, y, z;
         fscanf(fp, "%lf %lf %lf\n", &x, &y, &z);
-        xyz.push_back(x);
-        xyz.push_back(y);
-        xyz.push_back(z);
+        verts.push_back(vec3d(x,y,z));
     }
 
     for(uint i=0; i<nfaces; ++i)
@@ -141,7 +78,7 @@ void read_OFF(const char                     * filename,
             fscanf(fp, "%d", &vid);
             face.push_back(vid);
         }
-        faces.push_back(face);
+        polys.push_back(face);
     }
     fclose(fp);
 }

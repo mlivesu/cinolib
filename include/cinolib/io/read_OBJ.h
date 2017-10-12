@@ -32,24 +32,37 @@
 #define CINO_READ_OBJ_H
 
 #include <cinolib/cinolib.h>
-
+#include <cinolib/geometry/vec3.h>
 #include <sys/types.h>
 #include <vector>
 
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
-void read_OBJ(const char          * filename,
-              std::vector<double> & xyz,
-              std::vector<uint>   & tri,
-              std::vector<uint>   & quad);
+void read_OBJ(const char                     * filename,
+              std::vector<vec3d>             & pos,         // vertex xyz positions
+              std::vector<vec3d>             & tex,         // vertex uv(w) texture coordinates
+              std::vector<vec3d>             & nor,         // vertex normals
+              std::vector<std::vector<uint>> & poly_pos,    // polygons with references to pos
+              std::vector<std::vector<uint>> & poly_tex,    // polygons with references to tex
+              std::vector<std::vector<uint>> & poly_nor);   // polygons with references to nor
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_OBJ(const char                     * filename,
-              std::vector<double>            & xyz,
+              std::vector<vec3d>             & verts,
+              std::vector<std::vector<uint>> & poly);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_OBJ(const char                     * filename,
+              std::vector<vec3d>             & xyz,
+              std::vector<vec3d>             & uvw,
               std::vector<std::vector<uint>> & poly);
 
 }

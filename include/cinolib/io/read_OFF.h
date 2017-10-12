@@ -32,7 +32,7 @@
 #define CINO_READ_OFF_H
 
 #include <cinolib/cinolib.h>
-
+#include <cinolib/geometry/vec3.h>
 #include <sys/types.h>
 #include <vector>
 
@@ -40,17 +40,9 @@ namespace cinolib
 {
 
 CINO_INLINE
-void read_OFF(const char          * filename,
-              std::vector<double> & xyz,
-              std::vector<uint>   & tri,
-              std::vector<uint>   & quad);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
 void read_OFF(const char                     * filename,
-              std::vector<double>            & xyz,
-              std::vector<std::vector<uint>> & faces);
+              std::vector<vec3d>             & verts,
+              std::vector<std::vector<uint>> & polys);
 
 }
 

@@ -44,7 +44,6 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
 {
     this->clear();
-    std::vector<double> coords;
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -52,20 +51,18 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
     if (filetype.compare(".off") == 0 ||
         filetype.compare(".OFF") == 0)
     {
-        read_OFF(filename, coords, this->polys);
+        read_OFF(filename, this->verts, this->polys);
     }
     else if (filetype.compare(".obj") == 0 ||
              filetype.compare(".OBJ") == 0)
     {
-        read_OBJ(filename, coords, this->polys);
+        read_OBJ(filename, this->verts, this->polys);
     }
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
         exit(-1);
     }
-
-    this->verts = vec3d_from_serialized_xyz(coords);
 
     this->mesh_data().filename = std::string(filename);
 }
