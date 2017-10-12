@@ -46,6 +46,11 @@ void cut_mesh_along_seams(const std::vector<vec3d>             & xyz,
 {
     assert(xyz_poly.size() == uvw_poly.size());
 
+    unified_xyz.clear();
+    unified_uvw.clear();
+    unified_poly.clear();
+    unified_poly.reserve(xyz_poly.size());
+
     typedef std::pair<uint,uint> v_vt_pair;
     std::map<v_vt_pair,uint> v_map;
 
