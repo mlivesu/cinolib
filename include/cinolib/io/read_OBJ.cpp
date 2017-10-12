@@ -96,12 +96,12 @@ void read_OBJ(const char                     * filename,
 
 CINO_INLINE
 void read_OBJ(const char                     * filename,
-              std::vector<vec3d>             & pos,
-              std::vector<vec3d>             & tex,
-              std::vector<vec3d>             & nor,
-              std::vector<std::vector<uint>> & poly_pos,
-              std::vector<std::vector<uint>> & poly_tex,
-              std::vector<std::vector<uint>> & poly_nor)
+              std::vector<vec3d>             & pos,         // vertex xyz positions
+              std::vector<vec3d>             & tex,         // vertex uv(w) texture coordinates
+              std::vector<vec3d>             & nor,         // vertex normals
+              std::vector<std::vector<uint>> & poly_pos,    // polygons with references to pos
+              std::vector<std::vector<uint>> & poly_tex,    // polygons with references to tex
+              std::vector<std::vector<uint>> & poly_nor)   // polygons with references to nor
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
