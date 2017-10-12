@@ -48,6 +48,10 @@ namespace cinolib
  * but often contain seams (vertices with multiple texture coordinates) that
  * allow to flatten it to a plane from a texturing point of view.
  *
+ * What it does is to create one unified vertex entity for each unique pair
+ * of xyz and uv(w) coordinates, updating the references in the polygon list
+ * accordingly.
+ *
  * https://stackoverflow.com/questions/29867926/why-does-the-number-of-vt-and-v-elements-in-a-blender-obj-file-differ
 */
 
