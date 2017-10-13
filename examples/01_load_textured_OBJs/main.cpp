@@ -1,7 +1,5 @@
 #include <QApplication>
-#include <QImage>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/cut_along_seams.h>
 #include <cinolib/gui/qt/glcanvas.h>
 #include <cinolib/gui/qt/surface_mesh_control_panel.h>
 
