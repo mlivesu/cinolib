@@ -120,7 +120,7 @@ Eigen::SparseMatrix<double> laplacian_xyz(const AbstractMesh<M,V,E,P> & m, const
 {
     std::vector<Entry> entries = laplacian_matrix_entries_xyz(m, mode);
 
-    Eigen::SparseMatrix<double> L(m.num_vertices() * 3, m.num_vertices() * 3);
+    Eigen::SparseMatrix<double> L(m.num_verts() * 3, m.num_verts() * 3);
     L.setFromTriplets(entries.begin(), entries.end());
 
     return L;
