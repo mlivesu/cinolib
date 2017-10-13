@@ -89,7 +89,7 @@ void GLcanvas::mousePressEvent(QMouseEvent *event)
 {
     if (event->button()   == Qt::RightButton &&
         event->buttons()  == Qt::RightButton &&
-        event->modifiers()== Qt::ShiftModifier)
+        event->modifiers()== Qt::ControlModifier)
     {
         event->accept();
         make_popup_menu();
