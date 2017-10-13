@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = cinolib_base_app
+TARGET          = base_app
 QT             += core opengl xml
 CONFIG         += c++11
 CONFIG         -= app_bundle
