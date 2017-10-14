@@ -46,23 +46,10 @@ CINO_INLINE
 void read_point_id(char * s, int & v, int & vt, int & vn)
 {
     v = vt = vn = -1;
-
-    if(sscanf(s, "%d/%d/%d", &v, &vt, &vn) == 3)
-    {
-        --v; --vt; --vn;
-    }
-    else if(sscanf(s, "%d/%d", &v, &vt) == 2)
-    {
-        --v; --vt;
-    }
-    else if(sscanf(s, "%d//%d", &v, &vn) == 2)
-    {
-        --v; --vn;
-    }
-    else if(sscanf(s, "%d", &v) == 1)
-    {
-        --v;
-    }
+         if(sscanf(s, "%d/%d/%d", &v, &vt, &vn) == 3) { --v; --vt; --vn; }
+    else if(sscanf(s, "%d/%d",    &v, &vt     ) == 2) { --v; --vt;       }
+    else if(sscanf(s, "%d//%d",   &v, &vn     ) == 2) { --v; --vn;       }
+    else if(sscanf(s, "%d",       &v          ) == 1) { --v;             }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -141,22 +128,10 @@ void read_OBJ(const char                     * filename,
                 // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
                 //
                 double a, b, c;
-                if(sscanf(line, "v %lf %lf %lf", &a, &b, &c) == 3)
-                {
-                    pos.push_back(vec3d(a,b,c));
-                }
-                else if(sscanf(line, "vt %lf %lf %lf", &a, &b, &c) == 3)
-                {
-                    tex.push_back(vec3d(a,b,c));
-                }
-                else if(sscanf(line, "vt %lf %lf %lf", &a, &b, &c) == 2)
-                {
-                    tex.push_back(vec3d(a,b,0));
-                }
-                else if(sscanf(line, "vn %lf %lf %lf", &a, &b, &c) == 3)
-                {
-                    nor.push_back(vec3d(a,b,c));
-                }
+                     if(sscanf(line, "v %lf %lf %lf",  &a, &b, &c) == 3) pos.push_back(vec3d(a,b,c));
+                else if(sscanf(line, "vt %lf %lf %lf", &a, &b, &c) == 3) tex.push_back(vec3d(a,b,c));
+                else if(sscanf(line, "vt %lf %lf %lf", &a, &b, &c) == 2) tex.push_back(vec3d(a,b,0));
+                else if(sscanf(line, "vn %lf %lf %lf", &a, &b, &c) == 3) nor.push_back(vec3d(a,b,c));
                 break;
             }
 
@@ -204,7 +179,6 @@ void read_OBJ(const char                     * filename,
                 char mtu_c[1024];
                 if (sscanf(line, "mtllib %s", mtu_c) == 1)
                 {
-                    has_per_face_color = true;
                     if (mtu_c[0] == '.')
                     {
                         std::string obj(filename); // path of the OBJ file in string format
@@ -213,14 +187,14 @@ void read_OBJ(const char                     * filename,
                         read_MTU(path.c_str(), color_map);
                     }
                     else read_MTU(mtu_c, color_map);
+                    has_per_face_color = true;
                 }
                 break;
             }
         }
     }
-
-    if (!has_per_face_color) poly_col.clear();
     fclose(f);
+    if (!has_per_face_color) poly_col.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
