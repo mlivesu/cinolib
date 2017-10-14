@@ -131,7 +131,6 @@ void read_OBJ(const char                     * filename,
     Color curr_color = Color::WHITE();     // set WHITE as default color
     bool has_per_face_color = false;       // true if a mtllib is found. If "has_per_face_color" stays
                                            // false the "poly_color" vector will be emptied before returning.
-
     char line[1024];    
     while(fgets(line, 1024, f))
     {
@@ -246,11 +245,7 @@ void read_MTU(const char                  * filename,
     {
         switch(line[0])
         {
-            case 'n':
-            {
-                sscanf(line, "newmtl %s", curr_material);
-                break;
-            }
+            case 'n': sscanf(line, "newmtl %s", curr_material); break;
 
             case 'K':
             {
