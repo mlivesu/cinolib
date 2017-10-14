@@ -128,7 +128,7 @@ void read_OBJ(const char                     * filename,
                 // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
                 //
                 double a, b, c;
-                     if(sscanf(line, "v %lf %lf %lf",  &a, &b, &c) == 3) pos.push_back(vec3d(a,b,c));
+                     if(sscanf(line, "v  %lf %lf %lf", &a, &b, &c) == 3) pos.push_back(vec3d(a,b,c));
                 else if(sscanf(line, "vt %lf %lf %lf", &a, &b, &c) == 3) tex.push_back(vec3d(a,b,c));
                 else if(sscanf(line, "vt %lf %lf %lf", &a, &b, &c) == 2) tex.push_back(vec3d(a,b,0));
                 else if(sscanf(line, "vn %lf %lf %lf", &a, &b, &c) == 3) nor.push_back(vec3d(a,b,c));
