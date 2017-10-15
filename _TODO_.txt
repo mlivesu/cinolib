@@ -1,7 +1,7 @@
 - avoid headers from serialized vector and scalar fields (it’s far more general)
 - edit slicer interface (receive the full state as parameter)
 - edit texturing interface (receive the full info as parameter)
-- make control panel for volume meshes and skeletons
+- update skeleton data structure (and make relative control panel)
 - Gradients on hexmeshes are buggy. hint: check per face normals!
 - add max_depth to Profiler to avoid lengthy reports
 - consider avoiding to use a tree into the profiler. Sorting entries w.r.t. call time should do the job…
@@ -20,6 +20,7 @@
 - Fix Logger (it does not flush the streaming buffer until the program is closed)
 
 - coding examples to add:
+   - customized mesh attributes
    - scalar field visualization
    - vector field visualization
    - polyharmonic functions
