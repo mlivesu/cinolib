@@ -1,3 +1,4 @@
+- avoid headers from serialized vector and scalar fields (it’s far more general)
 - edit slicer interface (receive the full state as parameter)
 - edit texturing interface (receive the full info as parameter)
 - make control panel for volume meshes and skeletons
