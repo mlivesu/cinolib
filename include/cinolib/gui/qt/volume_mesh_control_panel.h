@@ -85,6 +85,7 @@ class VolumeMeshControlPanel
 
         void connect();
         void set_title();
+        void set_isosurface();
         void set_tex1d(const int in_out);
         void set_tex2d(const int in_out);
 
@@ -145,28 +146,30 @@ class VolumeMeshControlPanel
         QSlider                       *sl_in_wireframe_width;
         QSlider                       *sl_in_wireframe_alpha;
         QPushButton                   *but_in_wireframe_color;
+        //        
+        QCheckBox                     *cb_isosurface;
+        QSlider                       *sl_isovalue;
+        QPushButton                   *but_isosurface_color;
         //
-//        QCheckBox                     *cb_isocurve;
-//        QPushButton                   *but_isocurve_color;
-//        QSlider                       *sl_isocurve_width;
-//        QSlider                       *sl_isovalue;
-//        QCheckBox                     *cb_gradient;
-//        QSlider                       *sl_gradient_size;
-//        QPushButton                   *but_gradient_color;
-//        QPushButton                   *but_gradient_serialize;
-//        QPushButton                   *but_gradient_deserialize;
-//        QSlider                       *sl_slice_x;
-//        QSlider                       *sl_slice_y;
-//        QSlider                       *sl_slice_z;
-//        QSlider                       *sl_slice_l;
-//        QSlider                       *sl_slice_q;
-//        QCheckBox                     *cb_slice_flip_x;
-//        QCheckBox                     *cb_slice_flip_y;
-//        QCheckBox                     *cb_slice_flip_z;
-//        QCheckBox                     *cb_slice_flip_q;
-//        QRadioButton                  *rb_slice_AND;
-//        QRadioButton                  *rb_slice_OR;
-//        QPushButton                   *but_slice_reset;
+        QCheckBox                     *cb_gradient;
+        QSlider                       *sl_gradient_size;
+        QPushButton                   *but_gradient_color;
+        QPushButton                   *but_gradient_serialize;
+        QPushButton                   *but_gradient_deserialize;
+        //
+        QSlider                       *sl_slice_x;
+        QSlider                       *sl_slice_y;
+        QSlider                       *sl_slice_z;
+        QSlider                       *sl_slice_l;
+        QSlider                       *sl_slice_q;
+        QCheckBox                     *cb_slice_flip_x;
+        QCheckBox                     *cb_slice_flip_y;
+        QCheckBox                     *cb_slice_flip_z;
+        QCheckBox                     *cb_slice_flip_q;
+        QRadioButton                  *rb_slice_AND;
+        QRadioButton                  *rb_slice_OR;
+        QPushButton                   *but_slice_reset;
+        //
 //        QCheckBox                     *cb_marked_edges;
 //        QPushButton                   *but_marked_edges_color;
 //        QSlider                       *sl_marked_edges_width;

@@ -51,8 +51,8 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
     public:
 
         void       draw(const float scene_size=1) const;
-        vec3d      scene_center() const { return this->bb.center(); }
-        float      scene_radius() const { return this->bb.diag();   }
+        vec3d      scene_center() const { return this->bb.center();     }
+        float      scene_radius() const { return this->bb.diag() * 0.5; }
         ObjectType object_type()  const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -76,6 +76,7 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void slice(const float thresh, const int item, const int sign, const int mode);
+        void slicer_reset();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -34,6 +34,7 @@
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/isosurface.h>
+#include <cinolib/color.h>
 
 namespace cinolib
 {
@@ -47,13 +48,14 @@ class DrawableIsosurface : public Isosurface<M,V,E,F,P>, public DrawableObject
 {
     public:
 
-        explicit DrawableIsosurface() {}
+        explicit DrawableIsosurface();
         explicit DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value);
 
         void       draw(const float scene_size=1) const;
         vec3d      scene_center() const;
         float      scene_radius() const;
         ObjectType object_type()  const { return DRAWABLE_ISOSURFACE; }
+        Color      color;
 };
 
 }

@@ -35,9 +35,20 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+DrawableIsosurface<M,V,E,F,P>::DrawableIsosurface() : Isosurface<M,V,E,F,P>()
+{
+    color = Color::RED();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 DrawableIsosurface<M,V,E,F,P>::DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value)
     : Isosurface<M,V,E,F,P>(m, iso_value)
-{}
+{
+    color = Color::RED();
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -60,7 +71,7 @@ void DrawableIsosurface<M,V,E,F,P>::draw(const float) const
         uint vid2_ptr = 3 * vid2;
 
         glBegin(GL_TRIANGLES);
-        glColor3f(1.0,0.0,0.0);
+        glColor3fv(color.rgba);
         glNormal3dv(&(this->t_norms[i]));
         glVertex3dv(&(this->coords[vid0_ptr]));
         glVertex3dv(&(this->coords[vid1_ptr]));

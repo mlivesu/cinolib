@@ -439,6 +439,16 @@ void AbstractDrawablePolyhedralMesh<Mesh>::slice(const float thresh, // thresh o
 
 template<class Mesh>
 CINO_INLINE
+void AbstractDrawablePolyhedralMesh<Mesh>::slicer_reset()   // either AND or OR
+{
+    slicer.reset(*this);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh(const bool b)
 {
     if (b)
