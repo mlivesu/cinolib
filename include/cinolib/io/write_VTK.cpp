@@ -175,6 +175,18 @@ void write_VTK(const char                *,
     exit(-1);
 }
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void write_VTK(const char                           *,
+               const std::vector<vec3d>             &,
+               const std::vector<std::vector<uint>> &)
+{
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    exit(-1);
+}
+
 #endif
 
 }

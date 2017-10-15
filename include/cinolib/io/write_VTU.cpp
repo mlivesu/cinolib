@@ -189,6 +189,8 @@ void write_VTU(const char                *,
     exit(-1);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void write_VTU(const char                           *,
                const std::vector<vec3d>             &,

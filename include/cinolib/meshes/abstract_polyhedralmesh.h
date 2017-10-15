@@ -59,7 +59,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         std::vector<std::vector<uint>> f2e; // face to edge adjacency
         std::vector<std::vector<uint>> f2f; // face to face adjacency (through edges)
         std::vector<std::vector<uint>> f2p; // face to poly adjacency
-        std::vector<std::vector<uint>> p2v; // poly to edge adjacency
+        std::vector<std::vector<uint>> p2v; // poly to vert adjacency
 
     public:
 

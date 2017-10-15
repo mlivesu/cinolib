@@ -261,12 +261,12 @@ void Tetmesh<M,V,E,F,P>::save(const char * filename) const
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        write_MESH(filename, this->verts, this->p2v);
+        write_VTU(filename, this->verts, this->p2v);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        write_MESH(filename, this->verts, this->p2v);
+        write_VTK(filename, this->verts, this->p2v);
     }
     else
     {
