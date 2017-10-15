@@ -439,7 +439,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QRadioButton::connect(rb_point_shading, &QPushButton::toggled, [&]()
     {
         if (m == NULL || canvas == NULL) return;
-        m->show_mesh_points();
+        if (rb_point_shading->isChecked()) m->show_mesh_points();
         canvas->updateGL();
     });
 
@@ -448,7 +448,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QRadioButton::connect(rb_flat_shading, &QPushButton::toggled, [&]()
     {
         if (m == NULL || canvas == NULL) return;
-        m->show_mesh_flat();
+        if (rb_flat_shading->isChecked()) m->show_mesh_flat();
         canvas->updateGL();
     });
 
@@ -457,7 +457,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QRadioButton::connect(rb_smooth_shading, &QPushButton::toggled, [&]()
     {
         if (m == NULL || canvas == NULL) return;
-        m->show_mesh_smooth();
+        if (rb_smooth_shading->isChecked()) m->show_mesh_smooth();
         canvas->updateGL();
     });
 
@@ -466,7 +466,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QRadioButton::connect(rb_vert_color, &QPushButton::toggled, [&]()
     {
         if (m == NULL || canvas == NULL) return;
-        m->show_vert_color();
+        if (rb_vert_color->isChecked()) m->show_vert_color();
         canvas->updateGL();
     });
 
@@ -475,7 +475,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QRadioButton::connect(rb_poly_color, &QPushButton::toggled, [&]()
     {
         if (m == NULL || canvas == NULL) return;
-        m->show_poly_color();
+        if (rb_poly_color->isChecked()) m->show_poly_color();
         canvas->updateGL();
     });
 
