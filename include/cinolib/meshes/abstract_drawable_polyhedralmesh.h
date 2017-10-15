@@ -83,22 +83,28 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         void show_mesh_flat();
         void show_mesh_smooth();
         void show_mesh_points();
-        void show_face_color();
-        void show_face_quality();
-        void show_face_texture1D(const GLint texture);
-        void show_face_texture2D(const GLint texture, const double tex_unit_scalar);
-        void show_face_wireframe(const bool b);
-        void show_face_wireframe_color(const Color & c);
-        void show_face_wireframe_width(const float width);
-        void show_face_wireframe_transparency(const float alpha);
-        void show_cell_color();
-        void show_cell_quality();
-        void show_cell_texture1D(const GLint texture);
-        void show_cell_texture2D(const GLint texture, const double tex_unit_scalar);
-        void show_cell_wireframe(const bool b);
-        void show_cell_wireframe_color(const Color & c);
-        void show_cell_wireframe_width(const float width);
-        void show_cell_wireframe_transparency(const float alpha);
+
+        void show_out_vert_color();
+        void show_out_face_color();
+        void show_out_poly_color();
+        void show_out_poly_quality();
+        void show_out_texture1D(const int tex_type);
+        void show_out_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap = NULL);
+        void show_out_wireframe(const bool b);
+        void show_out_wireframe_color(const Color & c);
+        void show_out_wireframe_width(const float width);
+        void show_out_wireframe_transparency(const float alpha);
+
+        void show_in_vert_color();
+        void show_in_face_color();
+        void show_in_poly_color();
+        void show_in_poly_quality();
+        void show_in_texture1D(const int tex_type);
+        void show_in_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap = NULL);
+        void show_in_wireframe(const bool b);
+        void show_in_wireframe_color(const Color & c);
+        void show_in_wireframe_width(const float width);
+        void show_in_wireframe_transparency(const float alpha);
 };
 
 }

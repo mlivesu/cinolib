@@ -462,6 +462,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_flat()
     drawlist_in.draw_mode  |=  DRAW_TRI_FLAT;
     drawlist_in.draw_mode  &= ~DRAW_TRI_SMOOTH;
     drawlist_in.draw_mode  &= ~DRAW_TRI_POINTS;
+
     drawlist_out.draw_mode |=  DRAW_TRI_FLAT;
     drawlist_out.draw_mode &= ~DRAW_TRI_SMOOTH;
     drawlist_out.draw_mode &= ~DRAW_TRI_POINTS;
@@ -476,6 +477,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_smooth()
     drawlist_in.draw_mode  |=  DRAW_TRI_SMOOTH;
     drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
     drawlist_in.draw_mode  &= ~DRAW_TRI_POINTS;
+
     drawlist_out.draw_mode |=  DRAW_TRI_SMOOTH;
     drawlist_out.draw_mode &= ~DRAW_TRI_FLAT;
     drawlist_out.draw_mode &= ~DRAW_TRI_POINTS;
@@ -490,6 +492,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_points()
     drawlist_in.draw_mode  |=  DRAW_TRI_POINTS;
     drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
     drawlist_in.draw_mode  &= ~DRAW_TRI_SMOOTH;
+
     drawlist_out.draw_mode |=  DRAW_TRI_POINTS;
     drawlist_out.draw_mode &= ~DRAW_TRI_FLAT;
     drawlist_out.draw_mode &= ~DRAW_TRI_SMOOTH;
@@ -499,7 +502,44 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_points()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_face_color()
+void AbstractDrawablePolyhedralMesh<Mesh>::show_out_vert_color()
+{
+    drawlist_out.draw_mode |=  DRAW_TRI_VERTCOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
+    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
+    updateGL_out();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void AbstractDrawablePolyhedralMesh<Mesh>::show_in_vert_color()
+{
+    drawlist_in.draw_mode |=  DRAW_TRI_VERTCOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
+    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
+    updateGL_in();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void AbstractDrawablePolyhedralMesh<Mesh>::show_out_face_color()
+{
+    assert(false && "Per face color visualization not implemented yet!");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void AbstractDrawablePolyhedralMesh<Mesh>::show_out_poly_color()
 {
     drawlist_out.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
@@ -513,7 +553,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_face_color()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_face_quality()
+void AbstractDrawablePolyhedralMesh<Mesh>::show_out_poly_quality()
 {
     drawlist_out.draw_mode |=  DRAW_TRI_QUALITY;
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
@@ -527,7 +567,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_face_quality()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_face_texture1D(const GLint texture)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture1D(const int tex_type)
 {
     drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
@@ -535,7 +575,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_face_texture1D(const GLint textu
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    load_texture(drawlist_out.tri_text_id, texture);
+    load_texture(drawlist_out.tri_text_id, tex_type);
     updateGL_out();
 }
 
@@ -543,7 +583,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_face_texture1D(const GLint textu
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_face_texture2D(const GLint texture, const double tex_unit_scalar)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
 {
     drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE2D;
     drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
@@ -552,7 +592,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_face_texture2D(const GLint textu
     drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
 
     drawlist_out.tri_text_unit_scalar = tex_unit_scalar;
-    load_texture(drawlist_out.tri_text_id, texture);
+    load_texture(drawlist_out.tri_text_id, tex_type, bitmap);
     updateGL_out();
 }
 
@@ -560,7 +600,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_face_texture2D(const GLint textu
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe(const bool b)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_out_wireframe(const bool b)
 {
     if (b) drawlist_out.draw_mode |=  DRAW_SEGS;
     else   drawlist_out.draw_mode &= ~DRAW_SEGS;
@@ -570,9 +610,12 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe(const bool b)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe_color(const Color & c)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_out_wireframe_color(const Color & c)
 {
-    this->edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if (this->edge_is_on_srf(eid)) this->edge_data(eid).color = c;
+    }
     updateGL();
 }
 
@@ -580,7 +623,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe_color(const Color
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe_width(const float width)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_out_wireframe_width(const float width)
 {
     drawlist_out.seg_width = width;
 }
@@ -589,9 +632,12 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe_width(const float
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe_transparency(const float alpha)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_out_wireframe_transparency(const float alpha)
 {
-    this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if (this->edge_is_on_srf(eid)) this->edge_data(eid).color.a = alpha;
+    }
     updateGL();
 }
 
@@ -599,20 +645,30 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_face_wireframe_transparency(cons
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_color()
+void AbstractDrawablePolyhedralMesh<Mesh>::show_in_face_color()
 {
-    drawlist_in.draw_mode |=  DRAW_TRI_FACECOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
-    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
+    assert(false && "Per face color visualization not implemented yet!");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_quality()
+void AbstractDrawablePolyhedralMesh<Mesh>::show_in_poly_color()
+{
+    drawlist_in.draw_mode |=  DRAW_TRI_FACECOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
+    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
+    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
+    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
+    updateGL_in();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void AbstractDrawablePolyhedralMesh<Mesh>::show_in_poly_quality()
 {
     drawlist_in.draw_mode |=  DRAW_TRI_QUALITY;
     drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
@@ -626,7 +682,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_quality()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_texture1D(const GLint texture)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture1D(const int tex_type)
 {
     drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
@@ -634,7 +690,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_texture1D(const GLint textu
     drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    load_texture(drawlist_in.tri_text_id, texture);
+    load_texture(drawlist_in.tri_text_id, tex_type);
     updateGL_in();
 }
 
@@ -642,7 +698,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_texture1D(const GLint textu
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_texture2D(const GLint texture, const double tex_unit_scalar)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
 {
     drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE2D;
     drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
@@ -651,7 +707,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_texture2D(const GLint textu
     drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
 
     drawlist_in.tri_text_unit_scalar = tex_unit_scalar;
-    load_texture(drawlist_in.tri_text_id, texture);
+    load_texture(drawlist_in.tri_text_id, tex_type, bitmap);
     updateGL_in();
 }
 
@@ -659,7 +715,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_texture2D(const GLint textu
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_wireframe(const bool b)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_in_wireframe(const bool b)
 {
     if (b) drawlist_in.draw_mode |=  DRAW_SEGS;
     else   drawlist_in.draw_mode &= ~DRAW_SEGS;
@@ -669,9 +725,12 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_wireframe(const bool b)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_wireframe_color(const Color & c)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_in_wireframe_color(const Color & c)
 {
-    this->edge_set_color(c); // NOTE: this will change color for ANY adge (both interior and boundary)
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if (!this->edge_is_on_srf(eid)) this->edge_data(eid).color = c;
+    }
     updateGL();
 }
 
@@ -679,7 +738,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_wireframe_color(const Color
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_wireframe_width(const float width)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_in_wireframe_width(const float width)
 {
     drawlist_in.seg_width = width;
 }
@@ -688,9 +747,12 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_wireframe_width(const float
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_cell_wireframe_transparency(const float alpha)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_in_wireframe_transparency(const float alpha)
 {
-    this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if (!this->edge_is_on_srf(eid)) this->edge_data(eid).color.a = alpha;
+    }
     updateGL();
 }
 
