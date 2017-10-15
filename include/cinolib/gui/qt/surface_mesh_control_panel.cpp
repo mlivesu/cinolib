@@ -86,10 +86,10 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
     // COLORS / TEXTURES
     {
         QGroupBox *gbox       = new QGroupBox("Colors/Textures",widget);
-        rb_vert_color         = new QRadioButton("Vertex Color", gbox);
+        rb_vert_color         = new QRadioButton("Vert Color", gbox);
         rb_poly_color         = new QRadioButton("Poly Color", gbox);
-        rb_tex1D              = new QRadioButton("Texture 1D", gbox);
-        rb_tex2D              = new QRadioButton("Texture 2D", gbox);
+        rb_tex1D              = new QRadioButton("Text 1D", gbox);
+        rb_tex2D              = new QRadioButton("Text 2D", gbox);
         but_set_vert_color    = new QPushButton("Set", gbox);
         but_set_poly_color    = new QPushButton("Set", gbox);
         cb_tex1D_type         = new QComboBox(gbox);
@@ -163,7 +163,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         l_width->setFont(global_font);
         l_alpha->setFont(global_font);
         QGridLayout *layout = new QGridLayout();
-        layout->addWidget(cb_wireframe,0,0);
+        layout->addWidget(cb_wireframe,0,1);
         layout->addWidget(l_width,1,0);
         layout->addWidget(l_alpha,2,0);
         layout->addWidget(sl_wireframe_width,1,1);
