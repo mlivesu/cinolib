@@ -98,11 +98,11 @@ class SurfaceMeshControlPanel
         QRadioButton                *rb_flat_shading;
         QRadioButton                *rb_smooth_shading;
         QRadioButton                *rb_vert_color;
-        QRadioButton                *rb_face_color;
+        QRadioButton                *rb_poly_color;
         QRadioButton                *rb_tex1D;
         QRadioButton                *rb_tex2D;
         QPushButton                 *but_set_vert_color;
-        QPushButton                 *but_set_face_color;
+        QPushButton                 *but_set_poly_color;
         QPushButton                 *but_load_tex2d;
         std::string                  tex2d_filename;
         QComboBox                   *cb_tex1D_type;

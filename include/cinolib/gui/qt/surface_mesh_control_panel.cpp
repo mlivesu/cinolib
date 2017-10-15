@@ -87,11 +87,11 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
     {
         QGroupBox *gbox       = new QGroupBox("Colors/Textures",widget);
         rb_vert_color         = new QRadioButton("Vertex Color", gbox);
-        rb_face_color         = new QRadioButton("Face Color", gbox);
+        rb_poly_color         = new QRadioButton("Poly Color", gbox);
         rb_tex1D              = new QRadioButton("Texture 1D", gbox);
         rb_tex2D              = new QRadioButton("Texture 2D", gbox);
         but_set_vert_color    = new QPushButton("Set", gbox);
-        but_set_face_color    = new QPushButton("Set", gbox);
+        but_set_poly_color    = new QPushButton("Set", gbox);
         cb_tex1D_type         = new QComboBox(gbox);
         cb_tex2D_type         = new QComboBox(gbox);
         but_serialize_field   = new QPushButton("Serialize", gbox);
@@ -99,7 +99,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         sl_tex2D_density      = new QSlider(Qt::Horizontal, gbox);
         but_load_tex2d        = new QPushButton("Load Tex2D", gbox);
         tex2d_filename        = "";
-        rb_face_color->setChecked(true);
+        rb_poly_color->setChecked(true);
         cb_tex1D_type->insertItem(0,"ISO");
         cb_tex1D_type->insertItem(1,"RAMP");
         cb_tex1D_type->insertItem(2,"RAMP + ISO");
@@ -112,11 +112,11 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         sl_tex2D_density->setSliderPosition(10);
         gbox->setFont(global_font);
         rb_vert_color->setFont(global_font);
-        rb_face_color->setFont(global_font);
+        rb_poly_color->setFont(global_font);
         rb_tex1D->setFont(global_font);
         rb_tex2D->setFont(global_font);
         but_set_vert_color->setFont(global_font);
-        but_set_face_color->setFont(global_font);
+        but_set_poly_color->setFont(global_font);
         but_load_tex2d->setFont(global_font);
         cb_tex1D_type->setFont(global_font);
         cb_tex2D_type->setFont(global_font);
@@ -124,11 +124,11 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         but_deserialize_field->setFont(global_font);
         QGridLayout *layout = new QGridLayout();
         layout->addWidget(rb_vert_color,0,0);
-        layout->addWidget(rb_face_color,1,0);
+        layout->addWidget(rb_poly_color,1,0);
         layout->addWidget(rb_tex1D,2,0);
         layout->addWidget(rb_tex2D,3,0);
         layout->addWidget(but_set_vert_color,0,1);
-        layout->addWidget(but_set_face_color,1,1);
+        layout->addWidget(but_set_poly_color,1,1);
         layout->addWidget(cb_tex1D_type,2,1);
         layout->addWidget(cb_tex2D_type,3,1);
         layout->addWidget(but_load_tex2d, 4,0);
@@ -357,7 +357,7 @@ void SurfaceMeshControlPanel<Mesh>::set_tex1d()
 {
     if (m == NULL || canvas == NULL) return;
     rb_tex1D->setChecked(true);
-    m->show_face_texture1D(cb_tex1D_type->currentIndex());
+    m->show_texture1D(cb_tex1D_type->currentIndex());
     canvas->updateGL();
 }
 
@@ -375,7 +375,7 @@ void SurfaceMeshControlPanel<Mesh>::set_tex2d()
     {
         tex2d_filename = QFileDialog::getOpenFileName(NULL, "Load 2D Texture", ".", "").toStdString();
     }
-    m->show_face_texture2D(tex_type, density, tex2d_filename.c_str());
+    m->show_texture2D(tex_type, density, tex2d_filename.c_str());
     canvas->updateGL();
 }
 
@@ -472,10 +472,10 @@ void SurfaceMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_face_color, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_poly_color, &QPushButton::toggled, [&]()
     {
         if (m == NULL || canvas == NULL) return;
-        m->show_face_color();
+        m->show_poly_color();
         canvas->updateGL();
     });
 
@@ -536,10 +536,10 @@ void SurfaceMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QPushButton::connect(but_set_face_color, &QPushButton::clicked, [&]()
+    QPushButton::connect(but_set_poly_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        rb_face_color->setChecked(true);
+        rb_poly_color->setChecked(true);
         QColor c = QColorDialog::getColor(Qt::white, widget);
         m->poly_set_color(Color(c.redF(), c.greenF(), c.blueF()));
         canvas->updateGL();
@@ -575,7 +575,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QCheckBox::connect(cb_wireframe, &QCheckBox::stateChanged, [&]()
     {
         if (m == NULL) return;
-        m->show_face_wireframe(cb_wireframe->isChecked());
+        m->show_wireframe(cb_wireframe->isChecked());
         canvas->updateGL();
     });
 
@@ -584,7 +584,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QSlider::connect(sl_wireframe_width, &QSlider::valueChanged, [&]()
     {
         if (m == NULL || canvas == NULL) return;
-        m->show_face_wireframe_width(sl_wireframe_width->value());
+        m->show_wireframe_width(sl_wireframe_width->value());
         cb_wireframe->setChecked(true);
         canvas->updateGL();
     });
@@ -595,7 +595,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     {
         if (m == NULL || canvas == NULL) return;
         float alpha = float(sl_wireframe_alpha->value()) / 99.0;
-        m->show_face_wireframe_transparency(alpha);
+        m->show_wireframe_transparency(alpha);
         cb_wireframe->setChecked(true);
         canvas->updateGL();
     });
@@ -606,7 +606,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     {
         if (m == NULL) return;
         QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->show_face_wireframe_color(Color(c.redF(), c.greenF(), c.blueF()));
+        m->show_wireframe_color(Color(c.redF(), c.greenF(), c.blueF()));
         cb_wireframe->setChecked(true);
         canvas->updateGL();
     });

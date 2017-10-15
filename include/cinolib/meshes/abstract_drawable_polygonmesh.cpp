@@ -308,7 +308,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_vert_color()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::show_face_color()
+void AbstractDrawablePolygonMesh<Mesh>::show_poly_color()
 {
     drawlist.draw_mode |=  DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_VERTCOLOR;
@@ -322,7 +322,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_face_color()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::show_face_texture1D(const int tex_type)
+void AbstractDrawablePolygonMesh<Mesh>::show_texture1D(const int tex_type)
 {
     drawlist.draw_mode |=  DRAW_TRI_TEXTURE1D;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE2D;
@@ -338,7 +338,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_face_texture1D(const int tex_type)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::show_face_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
+void AbstractDrawablePolygonMesh<Mesh>::show_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
 {
     drawlist.draw_mode |=  DRAW_TRI_TEXTURE2D;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;
@@ -355,7 +355,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_face_texture2D(const int tex_type, 
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::show_face_wireframe(const bool b)
+void AbstractDrawablePolygonMesh<Mesh>::show_wireframe(const bool b)
 {
     if (b) drawlist.draw_mode |=  DRAW_SEGS;
     else   drawlist.draw_mode &= ~DRAW_SEGS;
@@ -365,7 +365,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_face_wireframe(const bool b)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::show_face_wireframe_color(const Color & c)
+void AbstractDrawablePolygonMesh<Mesh>::show_wireframe_color(const Color & c)
 {
     this->edge_set_color(c); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();
@@ -375,7 +375,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_face_wireframe_color(const Color & 
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::show_face_wireframe_width(const float width)
+void AbstractDrawablePolygonMesh<Mesh>::show_wireframe_width(const float width)
 {
     drawlist.seg_width = width;
 }
@@ -384,7 +384,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_face_wireframe_width(const float wi
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::show_face_wireframe_transparency(const float alpha)
+void AbstractDrawablePolygonMesh<Mesh>::show_wireframe_transparency(const float alpha)
 {
     this->edge_set_alpha(alpha); // NOTE: this will change alpha for ANY adge (both interior and boundary)
     updateGL();
