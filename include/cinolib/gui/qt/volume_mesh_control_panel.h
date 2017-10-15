@@ -135,8 +135,6 @@ class VolumeMeshControlPanel
         QComboBox                     *cb_in_tex1D_type;
         QComboBox                     *cb_in_tex2D_type;
         QSlider                       *sl_in_tex2D_density;
-        //QPushButton                 *but_serialize_field;
-        //QPushButton                 *but_deserialize_field;
         //
         QCheckBox                     *cb_out_wireframe;
         QSlider                       *sl_out_wireframe_width;
@@ -150,6 +148,8 @@ class VolumeMeshControlPanel
         QCheckBox                     *cb_isosurface;
         QSlider                       *sl_isovalue;
         QPushButton                   *but_isosurface_color;
+        QPushButton                   *but_serialize_field;
+        QPushButton                   *but_deserialize_field;
         //
         QCheckBox                     *cb_gradient;
         QSlider                       *sl_gradient_size;
@@ -170,9 +170,9 @@ class VolumeMeshControlPanel
         QRadioButton                  *rb_slice_OR;
         QPushButton                   *but_slice_reset;
         //
-//        QCheckBox                     *cb_marked_edges;
-//        QPushButton                   *but_marked_edges_color;
-//        QSlider                       *sl_marked_edges_width;
+        //QCheckBox                     *cb_marked_edges;
+        //QPushButton                   *but_marked_edges_color;
+        //QSlider                       *sl_marked_edges_width;
 };
 
 }

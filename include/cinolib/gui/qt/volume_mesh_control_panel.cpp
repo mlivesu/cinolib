@@ -277,23 +277,29 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
 
     // ISO-SURFACES
     {
-        QGroupBox *gbox      = new QGroupBox(widget);
-        cb_isosurface        = new QCheckBox("Isosurface", gbox);
-        sl_isovalue          = new QSlider(Qt::Horizontal, gbox);
-        but_isosurface_color = new QPushButton("Color", gbox);
-        QLabel *l_value      = new QLabel("Isoval: ", gbox);
+        QGroupBox *gbox       = new QGroupBox(widget);
+        cb_isosurface         = new QCheckBox("Isosurface", gbox);
+        sl_isovalue           = new QSlider(Qt::Horizontal, gbox);
+        but_isosurface_color  = new QPushButton("Color", gbox);
+        but_serialize_field   = new QPushButton("Serialize", gbox);
+        but_deserialize_field = new QPushButton("Deserialize", gbox);
+        QLabel *l_value       = new QLabel("Isoval: ", gbox);
         sl_isovalue->setMaximum(999);
         sl_isovalue->setValue(499);
         sl_isovalue->setSliderPosition(499);
         gbox->setFont(global_font);
+        but_serialize_field->setFont(global_font);
+        but_deserialize_field->setFont(global_font);
         but_isosurface_color->setFont(global_font);
         l_value->setFont(global_font);
         cb_isosurface->setFont(global_font);
         QGridLayout *layout = new QGridLayout();
-        layout->addWidget(cb_isosurface,0,1);
+        layout->addWidget(cb_isosurface,0,1,1,2);
         layout->addWidget(l_value,1,0);
-        layout->addWidget(sl_isovalue,1,1);
-        layout->addWidget(but_isosurface_color,2,1);
+        layout->addWidget(sl_isovalue,1,1,1,2);
+        layout->addWidget(but_isosurface_color,2,1,1,2);
+        layout->addWidget(but_serialize_field,3,1);
+        layout->addWidget(but_deserialize_field,3,2);
         gbox->setLayout(layout);
         global_layout->addWidget(gbox,4,0);
     }
@@ -805,28 +811,28 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//    QPushButton::connect(but_serialize_field, &QPushButton::clicked, [&]()
-//    {
-//        std::string filename = QFileDialog::getSaveFileName(NULL, "Serialize field", ".", "").toStdString();
-//        if (!filename.empty())
-//        {
-//            ScalarField sf(m->serialize_uvw(U_param));
-//            sf.serialize(filename.c_str());
-//        }
-//    });
+    QPushButton::connect(but_serialize_field, &QPushButton::clicked, [&]()
+    {
+        std::string filename = QFileDialog::getSaveFileName(NULL, "Serialize field", ".", "").toStdString();
+        if (!filename.empty())
+        {
+            ScalarField sf(m->serialize_uvw(U_param));
+            sf.serialize(filename.c_str());
+        }
+    });
 
-//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//    QPushButton::connect(but_deserialize_field, &QPushButton::clicked, [&]()
-//    {
-//        std::string filename = QFileDialog::getOpenFileName(NULL, "Serialize field", ".", "").toStdString();
-//        if (!filename.empty())
-//        {
-//            ScalarField sf(filename.c_str());
-//            if (sf.size() == m->num_verts()) sf.copy_to_mesh(*m);
-//            else std::cerr << "Could not load scalar field " << filename << " - array size mismatch!" << endl;
-//        }
-//    });
+    QPushButton::connect(but_deserialize_field, &QPushButton::clicked, [&]()
+    {
+        std::string filename = QFileDialog::getOpenFileName(NULL, "Serialize field", ".", "").toStdString();
+        if (!filename.empty())
+        {
+            ScalarField sf(filename.c_str());
+            if (sf.size() == m->num_verts()) sf.copy_to_mesh(*m);
+            else std::cerr << "Could not load scalar field " << filename << " - array size mismatch!" << endl;
+        }
+    });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -1071,30 +1077,30 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
 //    QCheckBox::connect(cb_marked_edges, &QCheckBox::stateChanged, [&]()
 //    {
-////        if (m == NULL || canvas == NULL) return;
-////        m->show_edge_marked(cb_marked_edges->isChecked());
-////        m->updateGL();
-////        canvas->updateGL();
+//        if (m == NULL || canvas == NULL) return;
+//        m->show_edge_marked(cb_marked_edges->isChecked());
+//        m->updateGL();
+//        canvas->updateGL();
 //    });
 
 //    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //    QPushButton::connect(but_marked_edges_color, &QPushButton::clicked, [&]()
 //    {
-////        if (m == NULL) return;
-////        QColor c = QColorDialog::getColor(Qt::white, widget);
-////        m->show_edge_marked_color(Color(c.redF(), c.greenF(), c.blueF()));
-////        canvas->updateGL();
+//        if (m == NULL) return;
+//        QColor c = QColorDialog::getColor(Qt::white, widget);
+//        m->show_edge_marked_color(Color(c.redF(), c.greenF(), c.blueF()));
+//        canvas->updateGL();
 //    });
 
 //    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //    QSlider::connect(sl_marked_edges_width, &QSlider::valueChanged, [&]()
 //    {
-////        if (m == NULL || canvas == NULL) return;
-////        m->show_edge_marked_width(sl_marked_edges_width->value());
-////        cb_marked_edges->setChecked(true);
-////        canvas->updateGL();
+//        if (m == NULL || canvas == NULL) return;
+//        m->show_edge_marked_width(sl_marked_edges_width->value());
+//        cb_marked_edges->setChecked(true);
+//        canvas->updateGL();
 //    });
 }
 
