@@ -1,14 +1,13 @@
-This folder contains a number of sample programs that illustrate the functionalities of cinolib. 
+This folder contains a number of sample programs that illustrate the functionalities of CinoLib. 
 
-At the moment there are only two sample programs. Unfortunately maintaining a library alone is very time consuming, and the amount of time I can spend on cinolib is limited.
+At the moment there are only two sample programs. Unfortunately maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited.
 
-I am currently working on a wide number of code samples that exploit the core functionalities of cinolib. They should be available in the following weeks. All of these topics will be covered:
+I am currently working on a wide number of code samples that exploit the core functionalities of CinoLib. They should be available in the following weeks. All of these topics will be covered:
 
 * Customize data structures with user defined mesh/vertex/edge/polygon/polyhedron attributes
 * Generate, process and visualize scalar fields
 * Generate, process and visualize vector fields
-* Generate poly-harmonic functions for surfaces and volumes
-* Overview of the topology editing operators implemented in cinolib
+* Overview of the topology editing operators implemented in CinoLib
 * Computation of quality metrics and mapping distortions
 * Computation of conformal maps for surface meshes
 * Computation of heat based geodesics for surfaces and volumes
