@@ -1,4 +1,2 @@
-examples/00_base_app/*.user
-examples/00_base_app/build*
-examples/01_load_textured_OBJs/build*
-examples/01_load_textured_OBJs/*.user
+examples/*/build*
+examples/*/*.user

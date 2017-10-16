@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = load_textured_OBJ
+TARGET          = 01_load_textured_OBJ
 QT             += core opengl xml gui
 CONFIG         += c++11
 CONFIG         -= app_bundle

@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = base_app
+TARGET          = 02_polyharmonic_functions
 QT             += core opengl xml
 CONFIG         += c++11
 CONFIG         -= app_bundle
