@@ -95,6 +95,8 @@ class AbstractMesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual MeshType mesh_type() const = 0;
+                bool     mesh_is_surface() const;
+                bool     mesh_is_volumetric() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

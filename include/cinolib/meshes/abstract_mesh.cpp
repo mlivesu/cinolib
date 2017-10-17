@@ -37,6 +37,32 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+bool AbstractMesh<M,V,E,P>::mesh_is_surface() const
+{
+    switch (mesh_type())
+    {
+        case TRIMESH       : return true;
+        case QUADMESH      : return true;
+        case POLYGONMESH   : return true;
+        case TETMESH       : return false;
+        case HEXMESH       : return false;
+        case POLYHEDRALMESH: return false;
+        default : assert(false);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool AbstractMesh<M,V,E,P>::mesh_is_volumetric() const
+{
+    return !mesh_is_surface();
+}
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractMesh<M,V,E,P>::clear()
 {
     bb.reset();
