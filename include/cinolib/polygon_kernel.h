@@ -32,6 +32,7 @@
 #define CINO_POLYGON_KERNEL_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
 #include <cinolib/geometry/vec2.h>
 
 namespace cinolib
@@ -54,6 +55,12 @@ namespace cinolib
 CINO_INLINE
 double polygon_kernel(const std::vector<vec2d> & poly,
                             std::vector<vec2d> & kernel);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double polygon_kernel(const std::vector<vec3d> & poly,     // will discard z component
+                            std::vector<vec3d> & kernel);  // z component will be zero
 
 }
 

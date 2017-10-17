@@ -42,6 +42,26 @@ typedef boost::geometry::model::polygon<BoostPoint>  BoostPolygon;
 namespace cinolib
 {
 
+CINO_INLINE
+double polygon_kernel(const std::vector<vec3d> & poly,   // will discard z component
+                            std::vector<vec3d> & kernel) // z component will be zero
+{
+    std::vector<vec2d> poly_2d, kernel_2d;
+    for(auto p : poly) poly_2d.push_back(vec2d(p));
+
+    double area = polygon_kernel(poly_2d, kernel_2d);
+
+    if (area > 0)
+    {
+        kernel.clear();
+        for(auto p : kernel_2d) kernel.push_back(vec3d(p.x(), p.y(), 0));
+    }
+
+    return area;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 #ifdef CINOLIB_USES_BOOST
 
 CINO_INLINE
