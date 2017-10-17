@@ -114,7 +114,7 @@ double polygon_kernel(const std::vector<vec2d> & poly,
         std::vector<BoostPolygon> res;
         boost::geometry::intersection(kernel_boost, half_spaces.at(i), res);
         if (res.empty()) return 0; // no kernel
-        assert(res.size()==1);     // not sure the case "size > 1" can never happen...
+        assert(res.size()==1);     // this should always hold. I am intersecting convex polygons...
         kernel_boost = res.front();
     }
 
