@@ -29,7 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/gui/qt/surface_mesh_control_panel.h>
-
+#include <cinolib/textures/textures.h>
 
 namespace cinolib
 {
