@@ -12,6 +12,7 @@ I am currently working on a wide number of code samples that showcase the core f
 * Evaluation of mapping distortions (angle/areas distortion popular metrics)
 * Evaluation of quality metrics (polygon kernels, incircles, circumcircles)
 * Computation of conformal maps for surface meshes
+* Parameterization based hexahedral remeshing
 * Computation of heat based geodesics for surfaces and volumes
 * Surface and volumetric format converters
 * Triangulation of general planar domains using the [Triangle](https://www.cs.cmu.edu/~quake/triangle.html) wrapper
