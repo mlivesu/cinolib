@@ -51,7 +51,6 @@ namespace cinolib
  * (iterative)
  */
 
-
 enum
 {
     SIMPLICIAL_LLT, // default
@@ -59,6 +58,8 @@ enum
     SparseLU,
     BiCGSTAB,
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 static const std::string txt[4] =
 {
@@ -68,6 +69,7 @@ static const std::string txt[4] =
     "BiCGSTAB",
 };
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void solve_square_system(const Eigen::SparseMatrix<double> & A,
@@ -75,20 +77,21 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
                                Eigen::VectorXd             & x,
                          int   solver = SIMPLICIAL_LLT);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
                                  const Eigen::VectorXd             & b,
                                        Eigen::VectorXd             & x,
-                                       std::map<uint,double>       & bc, // Dirichlet boundary conditions
+                                 const std::map<uint,double>       & bc, // Dirichlet boundary conditions
                                  int   solver = SIMPLICIAL_LLT);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 void solve_least_squares(const Eigen::SparseMatrix<double> & A,
                          const Eigen::VectorXd             & b,
                                Eigen::VectorXd             & x,
                          int   solver = SIMPLICIAL_LLT);
-
-
 }
 
 #ifndef  CINO_STATIC_LIB

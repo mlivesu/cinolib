@@ -35,6 +35,7 @@ namespace cinolib
 
 typedef Eigen::Triplet<double> Entry;
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void solve_square_system(const Eigen::SparseMatrix<double> & A,
@@ -92,12 +93,13 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
     profiler.pop();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
                                  const Eigen::VectorXd             & b,
                                        Eigen::VectorXd             & x,
-                                       std::map<uint,double>       & bc, // Dirichlet boundary conditions
+                                 const std::map<uint,double>       & bc, // Dirichlet boundary conditions
                                  int   solver)
 {
     profiler.push("cinolib::solve_square_system_with_bc");
@@ -141,7 +143,7 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
 
             if (col_map[col] < 0)
             {
-                bprime[ col_map[row] ] -= bc[col] * val;
+                bprime[ col_map[row] ] -= bc.at(col) * val;
             }
             else
             {
@@ -166,13 +168,14 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
         }
         else
         {
-            x[col] = bc[col];
+            x[col] = bc.at(col);
         }
     }
 
     profiler.pop();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void solve_least_squares(const Eigen::SparseMatrix<double> & A,
