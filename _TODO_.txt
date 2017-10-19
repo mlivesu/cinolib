@@ -1,3 +1,6 @@
+- Add GUI controls: save Isosurface - load/read labeling
+- Turn gradient GUI control in vector field (gradient button to make a gradient)
+- Substitute all FLT_MAX with std::numeric_limits<double>::infinite
 - avoid headers from serialized vector and scalar fields (it’s far more general)
 - edit slicer interface (receive the full state as parameter)
 - edit texturing interface (receive the full info as parameter)
