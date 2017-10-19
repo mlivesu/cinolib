@@ -52,11 +52,7 @@ namespace cinolib
  *
  * WARNING: the matrix is guaranteed Positive Semi Definite only for n=1. If
  * higher values of n are chosen I suggest avoiding the SIMPLICIAL_LLT solver
- * and using something like BiCGSTAB instead.
- *
- * WARNING: COTANGENT weights usually provide better results but may fail if
- * the mesh contains degenerate elements. In such cases I suggest using UNIFORM
- * weights instead.
+ * and using something like SIMPLICIAL_LDLT instead.
 */
 
 template<class M, class V, class E, class P>
