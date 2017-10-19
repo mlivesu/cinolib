@@ -61,6 +61,7 @@ void Profiler::pop()
     tree.node(tree_ptr).item.stop = high_resolution_clock::now();
     double t = delta_s(tree_ptr);
 
+    tot_time += t;
     log_times[tree.node(tree_ptr).item.key] += t;
     log_calls[tree.node(tree_ptr).item.key] += 1;
 
@@ -70,6 +71,7 @@ void Profiler::pop()
     tree.node(tree_ptr).item.s = s;
 
     tree_ptr = tree.node(tree_ptr).father;
+
 #endif
 }
 
@@ -79,7 +81,7 @@ CINO_INLINE
 void Profiler::call_stack() const
 {
 #ifdef CINOLIB_PROFILER_ENABLED
-    std::cout << "::::::::::::::: PROFILER CALL TREE :::::::::::::::" << std::endl;
+    std::cout << "::::::::::::::: PROFILER CALL TREE (" << tot_time << "s) :::::::::::::::" << std::endl;
 
     std::vector<ProfilerEntry> items;
     tree.depth_first_traverse(items);
@@ -99,7 +101,7 @@ void Profiler::report() const
     std::set<std::pair<double,std::string>,std::greater<std::pair<double,std::string>>> ordered_items; // most time consuming first
     for(auto obj : log_times) ordered_items.insert(std::make_pair(obj.second,obj.first));
 
-    std::cout << "::::::::::::::: PROFILER STATISTICS :::::::::::::::" << std::endl;
+    std::cout << "::::::::::::::: PROFILER STATISTICS (" << tot_time << "s) :::::::::::::::" << std::endl;
 
     for(auto obj : ordered_items)
     {

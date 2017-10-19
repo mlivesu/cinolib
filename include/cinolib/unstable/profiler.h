@@ -55,7 +55,7 @@ class Profiler
 {
     public:
 
-        explicit Profiler() { tree_ptr = 0; }
+        explicit Profiler() { tree_ptr = 0; tot_time = 0; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -75,6 +75,7 @@ class Profiler
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        double                       tot_time;
         std::map<std::string,double> log_times; // how much time was spent into each function
         std::map<std::string,uint>   log_calls; // how many times a function was called
         Tree<ProfilerEntry>          tree;
