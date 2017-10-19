@@ -4,12 +4,15 @@ At the moment there are only two sample programs. Unfortunately maintaining a li
 
 I am currently working on a wide number of code samples that showcase the core functionalities of CinoLib. They should be available in the following weeks. All of these topics will be covered:
 
+* Copy/paste points of view from the GL canvas for accurate visual comparisons and fast snapshot reproduction
 * Customize data structures with user defined mesh/vertex/edge/polygon/polyhedron attributes
 * Generate, process and visualize scalar fields
 * Generate, process and visualize vector fields
 * Overview of the topology editing operators implemented in CinoLib
-* Computation of quality metrics and mapping distortions
+* Evaluation of mapping distortions (angle/areas distortion popular metrics)
+* Evaluation of quality metrics (polygon kernels, incircles, circumcircles)
 * Computation of conformal maps for surface meshes
+* Parameterization based hexahedral remeshing
 * Computation of heat based geodesics for surfaces and volumes
 * Surface and volumetric format converters
 * Triangulation of general planar domains using the [Triangle](https://www.cs.cmu.edu/~quake/triangle.html) wrapper
