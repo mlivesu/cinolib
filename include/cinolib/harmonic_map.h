@@ -62,10 +62,20 @@ namespace cinolib
 template<class M, class V, class E, class P>
 CINO_INLINE
 ScalarField harmonic_map(const AbstractMesh<M,V,E,P> & m,
-                         std::map<uint,double>       & bc,
+                         const std::map<uint,double> & bc,
                          const uint                    n = 1,
                          const int                     laplacian_mode = COTANGENT,
                          const int                     solver = SIMPLICIAL_LLT);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<vec3d> harmonic_map_3d(const AbstractMesh<M,V,E,P> & m,
+                                   const std::map<uint,vec3d>  & bc,
+                                   const uint                    n = 1,
+                                   const int                     laplacian_mode = COTANGENT,
+                                   const int                     solver = SIMPLICIAL_LLT);
 }
 
 #ifndef  CINO_STATIC_LIB
