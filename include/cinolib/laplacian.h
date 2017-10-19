@@ -56,13 +56,13 @@ std::vector<Eigen::Triplet<double>> laplacian_matrix_entries(const AbstractMesh<
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> laplacian_xyz(const AbstractMesh<M,V,E,P> & m, const int mode);
+Eigen::SparseMatrix<double> laplacian_3d(const AbstractMesh<M,V,E,P> & m, const int mode);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<Eigen::Triplet<double>> laplacian_matrix_entries_xyz(const AbstractMesh<M,V,E,P> & m, const int mode);
+std::vector<Eigen::Triplet<double>> laplacian_3d_matrix_entries(const AbstractMesh<M,V,E,P> & m, const int mode);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
