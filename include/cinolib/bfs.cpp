@@ -144,7 +144,7 @@ void bfs(const AbstractMesh<M,V,E,P> & m,
                std::vector<uint>     & path)
 
 {
-    assert(path.empty());
+    path.clear();
 
     uint inf_dist = m.num_edges()+1;
     std::vector<int> prev(m.num_verts(), -1);
@@ -205,7 +205,7 @@ void bfs(const AbstractMesh<M,V,E,P> & m,
          const std::vector<bool>     & mask,
                std::vector<uint>     & path)
 {
-    assert(path.empty());
+    path.clear();
     assert(mask.size() == m.num_verts());
 
     uint inf_dist = m.num_edges()+1;
@@ -269,8 +269,8 @@ void bfs(const AbstractMesh<M,V,E,P> & m,
          const std::vector<bool>     & mask,
                std::vector<uint>     & path)
 {
-    assert(path.empty());
-    assert(mask.size() == (size_t)m.num_verts());
+    path.clear();
+    assert(mask.size() == m.num_verts());
 
     uint inf_dist = m.num_edges()+1;
     std::vector<int>  prev(m.num_verts(), -1);
