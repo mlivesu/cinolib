@@ -32,6 +32,7 @@
 #define CINO_BBOX_H
 
 #include <cinolib/cinolib.h>
+#include <cinolib/common.h>
 #include <cinolib/geometry/vec3.h>
 #include <float.h>
 
@@ -46,8 +47,8 @@ class Bbox
 
         void reset()
         {
-            min = vec3d( FLT_MAX,  FLT_MAX,  FLT_MAX);
-            max = vec3d(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+            min = vec3d( inf,  inf,  inf);
+            max = vec3d(-inf, -inf, -inf);
         }
 
         vec3d  min, max;

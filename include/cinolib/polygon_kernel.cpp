@@ -71,10 +71,6 @@ double polygon_kernel(const std::vector<vec2d> & poly,
     kernel.clear();
     if (poly.empty()) return 0;
 
-    // https://stackoverflow.com/questions/20016600/negative-infinity
-    static_assert(std::numeric_limits<double>::is_iec559, "IEEE 754 required");
-    double inf = std::numeric_limits<double>::infinity();
-
     // define 2d axis aligned bbox
     vec2d min( inf,  inf);
     vec2d max(-inf, -inf);

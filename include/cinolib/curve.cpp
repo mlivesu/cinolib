@@ -272,7 +272,7 @@ uint Curve::sample_closest_to(const float t) const
     assert(t>=0);
     assert(t<=1);
 
-    float best_err = FLT_MAX;
+    float best_err = inf;
     uint  best_sam = 0;
 
     for(uint pos=0; pos<sample_list.size()-1; ++pos)

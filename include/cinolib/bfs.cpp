@@ -327,7 +327,7 @@ void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
                             const uint                    source,
                                   std::vector<double>   & dist) // elem id + dist
 {
-    dist = std::vector<double>(m.num_polys(), FLT_MAX);
+    dist = std::vector<double>(m.num_polys(), inf);
     std::queue<uint> q;
 
     q.push(source);
@@ -358,7 +358,7 @@ void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
                             const std::vector<uint>     & sources,
                                   std::vector<double>   & dist) // elem id + dist
 {
-    dist = std::vector<double>(m.num_polys(), FLT_MAX);
+    dist = std::vector<double>(m.num_polys(), inf);
     std::queue<uint> q;
 
     for(uint pid : sources)

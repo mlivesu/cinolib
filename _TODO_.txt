@@ -1,6 +1,6 @@
+- debug integral curves (they look suspicious after the last big refactor…)
 - Add GUI controls: save Isosurface - load/read labeling
 - Turn gradient GUI control in vector field (gradient button to make a gradient)
-- Substitute all FLT_MAX with std::numeric_limits<double>::infinite
 - avoid headers from serialized vector and scalar fields (it’s far more general)
 - edit slicer interface (receive the full state as parameter)
 - edit texturing interface (receive the full info as parameter)
@@ -21,23 +21,3 @@
   (ref => https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html)
 - Improve on mesh rendering (shaders, VBOs)
 - Fix Logger (it does not flush the streaming buffer until the program is closed)
-
-- coding examples to add:
-   - customized mesh attributes
-   - scalar field visualization
-   - vector field visualization
-   - polyharmonic functions
-   - topology editing operators
-   - quality metrics and distortions
-   - conformal maps
-   - heat based geodesics
-   - formats convertes
-   - triangle/tetgen/graphcuts wrap
-   - polygon mesh construction (via dualization)
-   - polyhedral mesh construction (via dualization)   
-   - conformalized heat flow
-   - integral curves (with tessellation)
-   - isocurves (with tessellation)
-   - isosurfaces (with tessellation)
-   - subdivision schemas
-   - spherical fibonacci sampling	

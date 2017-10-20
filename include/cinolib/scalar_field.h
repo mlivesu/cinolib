@@ -51,14 +51,22 @@ class ScalarField : public Eigen::VectorXd, public Serializable
         explicit ScalarField(const uint size);
         explicit ScalarField(const char *filename);
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         template<class Mesh>
         void copy_to_mesh(Mesh & m, const int tex_coord = U_param) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void normalize_in_01();
         uint min_element_index() const;
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void serialize  (const char *filename) const;
         void deserialize(const char *filename);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // for more info, see:
         // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html

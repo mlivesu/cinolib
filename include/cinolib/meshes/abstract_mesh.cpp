@@ -410,7 +410,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 double AbstractMesh<M,V,E,P>::vert_min_uvw_value(const int tex_coord) const
 {
-    double min = FLT_MAX;
+    double min = inf;
     for(uint vid=0; vid<num_verts(); ++vid)
     {
         switch (tex_coord)
@@ -430,7 +430,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 double AbstractMesh<M,V,E,P>::vert_max_uvw_value(const int tex_coord) const
 {
-    double max = -FLT_MAX;
+    double max = -inf;
     for(uint vid=0; vid<num_verts(); ++vid)
     {
         switch (tex_coord)

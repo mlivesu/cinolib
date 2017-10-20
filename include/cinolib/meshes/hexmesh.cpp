@@ -263,8 +263,8 @@ void Hexmesh<M,V,E,F,P>::print_quality(const bool list_folded_elements)
     if (list_folded_elements) logger << "Folded Hexa: ";
 
     double asj = 0.0;
-    double msj = FLT_MAX;
-    uint    inv = 0;
+    double msj = inf;
+    uint   inv = 0;
 
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {

@@ -29,7 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/scalar_field.h>
-
+#include <cinolib/common.h>
 
 namespace cinolib
 {
@@ -37,6 +37,8 @@ namespace cinolib
 CINO_INLINE
 ScalarField::ScalarField()
 {}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 ScalarField::ScalarField(const std::vector<double> &data)
@@ -48,11 +50,15 @@ ScalarField::ScalarField(const std::vector<double> &data)
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 ScalarField::ScalarField(const uint size)
 {
     setZero(size);
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 ScalarField::ScalarField(const char *filename)
@@ -60,6 +66,7 @@ ScalarField::ScalarField(const char *filename)
     deserialize(filename);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -78,12 +85,13 @@ void ScalarField::copy_to_mesh(Mesh & m, const int tex_coord) const
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void ScalarField::normalize_in_01()
 {
-    double min =  FLT_MAX;
-    double max = -FLT_MAX;
+    double min =  inf;
+    double max = -inf;
 
     for(uint i=0; i<this->rows(); ++i)
     {
@@ -105,6 +113,7 @@ void ScalarField::normalize_in_01()
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 uint ScalarField::min_element_index() const
@@ -123,6 +132,7 @@ uint ScalarField::min_element_index() const
     return min_el;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void ScalarField::serialize(const char *filename) const
@@ -139,6 +149,7 @@ void ScalarField::serialize(const char *filename) const
     f.close();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void ScalarField::deserialize(const char *filename)
@@ -155,6 +166,7 @@ void ScalarField::deserialize(const char *filename)
     f.close();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // for more info, see:
 // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
