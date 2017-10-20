@@ -54,5 +54,6 @@ int main(int argc, char **argv)
 
     n_harmonicity.valueChanged(1); // start with a 1-harmonic map
 
+    app.setActiveWindow(&gui);
     return a.exec();
 }
