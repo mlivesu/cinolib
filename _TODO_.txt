@@ -1,4 +1,6 @@
+- make sure 1D textures are always drawn covering full spectrum (RED to BLUE in HSV RAMP)
 - debug integral curves (they look suspicious after the last big refactor…)
+- implement topological operators (add/remove/collapse) also for volumetric meshes
 - Add GUI controls: save Isosurface - load/read labeling
 - Turn gradient GUI control in vector field (gradient button to make a gradient)
 - avoid headers from serialized vector and scalar fields (it’s far more general)
