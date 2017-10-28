@@ -112,8 +112,8 @@ template<typename real> class vec3
             real len = length();
             if (len == 0)
             {
-                len = 1e-7;
-                //std::cerr << "WARNING - a zero length vector cannot be normalized!" << std::endl;
+                len = 1e-10;
+                std::cerr << "WARNING: normalization of zero length vector!" << std::endl;
             }
             m_x /= len;
             m_y /= len;
