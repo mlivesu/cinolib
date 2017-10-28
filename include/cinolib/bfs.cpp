@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/bfs.h>
+#include <cinolib/common.h>
 
 namespace cinolib
 {

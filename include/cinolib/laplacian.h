@@ -32,8 +32,6 @@
 #define CINO_LAPLACIAN_H
 
 #include <cinolib/meshes/abstract_mesh.h>
-#include <cinolib/symbols.h>
-#include <eigen3/Eigen/Sparse>
 
 namespace cinolib
 {

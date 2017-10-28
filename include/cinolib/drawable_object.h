@@ -32,7 +32,6 @@
 #define CINO_DRAWABLE_OBJECT_H
 
 #include <cinolib/geometry/vec3.h>
-#include <float.h>
 
 namespace cinolib
 {

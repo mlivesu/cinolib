@@ -32,7 +32,6 @@
 #define CINO_QUADMESH_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/standard_elements_tables.h>
 #include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/meshes/abstract_polygonmesh.h>
 

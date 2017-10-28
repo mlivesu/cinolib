@@ -34,23 +34,18 @@
 #ifdef CINOLIB_USES_QT_AND_QGLVIEWER
 
 #include <cinolib/scalar_field.h>
-#include <cinolib/drawable_isosurface.h>
 #include <cinolib/drawable_vector_field.h>
+#include <cinolib/drawable_isosurface.h>
 #include <cinolib/gui/qt/glcanvas.h>
-#include <cinolib/gradient.h>
 
-#include <iostream>
 #include <QWidget>
 #include <QLabel>
 #include <QGroupBox>
 #include <QComboBox>
-#include <QSpinBox>
 #include <QSlider>
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QGridLayout>
 #include <QFileDialog>
 #include <QColorDialog>

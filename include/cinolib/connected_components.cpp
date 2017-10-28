@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/connected_components.h>
+#include <cinolib/bfs.h>
 
 namespace cinolib
 {

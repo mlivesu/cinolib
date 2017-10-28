@@ -33,9 +33,7 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
-#include <cinolib/meshes/polygonmesh.h>
-#include <cinolib/meshes/trimesh.h>
-#include <cinolib/meshes/quadmesh.h>
+#include <cinolib/meshes/abstract_polygonmesh.h>
 
 namespace cinolib
 {

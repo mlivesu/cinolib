@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/map_distortion.h>
+#include <cinolib/geometry/vec3.h>
 #include <eigen3/Eigen/Dense>
 
 namespace cinolib

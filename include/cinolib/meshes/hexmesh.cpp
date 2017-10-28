@@ -32,6 +32,8 @@
 #include <cinolib/quality.h>
 #include <cinolib/io/read_write.h>
 #include <cinolib/common.h>
+#include <cinolib/standard_elements_tables.h>
+#include <cinolib/subdivision_schemas.h>
 
 #include <float.h>
 #include <map>

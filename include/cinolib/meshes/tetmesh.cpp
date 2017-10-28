@@ -29,6 +29,11 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/tetmesh.h>
+#include <cinolib/common.h>
+#include <cinolib/geometry/triangle.h>
+#include <cinolib/geometry/tetrahedron.h>
+#include <cinolib/io/read_write.h>
+#include <cinolib/quality.h>
 
 namespace cinolib
 {

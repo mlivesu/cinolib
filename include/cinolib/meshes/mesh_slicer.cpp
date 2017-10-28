@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/mesh_slicer.h>
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {

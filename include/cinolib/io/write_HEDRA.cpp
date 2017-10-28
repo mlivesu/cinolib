@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/io/write_HEDRA.h>
+#include <iostream>
 
 namespace cinolib
 {

@@ -29,6 +29,9 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/export_surface.h>
+#include <cinolib/meshes/trimesh.h>
+#include <cinolib/meshes/quadmesh.h>
+#include <cinolib/meshes/polygonmesh.h>
 
 namespace cinolib
 {

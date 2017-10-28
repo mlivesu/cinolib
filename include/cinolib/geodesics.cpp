@@ -29,6 +29,11 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/geodesics.h>
+#include <cinolib/vector_field.h>
+#include <cinolib/gradient.h>
+#include <cinolib/laplacian.h>
+#include <cinolib/vertex_mass.h>
+#include <cinolib/linear_solvers.h>
 
 namespace cinolib
 {

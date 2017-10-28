@@ -35,7 +35,6 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/meshes/abstract_mesh.h>
-#include <cinolib/bfs.h>
 
 namespace cinolib
 {

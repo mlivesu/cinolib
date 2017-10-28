@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/geometry/tetrahedron.h>
+#include <cinolib/standard_elements_tables.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/geometry/segment.h>
 

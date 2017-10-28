@@ -32,7 +32,6 @@
 #define CINO_READ_HYBRID_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/geometry/vec3.h>
 #include <vector>
 
 namespace cinolib

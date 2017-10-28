@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/unstable/smoothing.h>
+#include <cinolib/laplacian.h>
 
 namespace cinolib
 {

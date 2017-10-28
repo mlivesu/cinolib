@@ -44,13 +44,10 @@
 #include <QLabel>
 #include <QGroupBox>
 #include <QComboBox>
-#include <QSpinBox>
 #include <QSlider>
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QGridLayout>
 #include <QFileDialog>
 #include <QColorDialog>

@@ -32,7 +32,6 @@
 #define CINO_CURVE_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/bbox.h>
 #include <cinolib/meshes/skel.h>
 #include <cinolib/meshes/trimesh.h>
 

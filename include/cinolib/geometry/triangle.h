@@ -33,9 +33,6 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>
-#include <cinolib/standard_elements_tables.h>
-
-#include <set>
 
 namespace cinolib
 {

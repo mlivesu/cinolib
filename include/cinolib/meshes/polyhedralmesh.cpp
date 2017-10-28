@@ -30,6 +30,8 @@
 **********************************************************************************/
 #include <cinolib/meshes/polyhedralmesh.h>
 #include <cinolib/io/read_write.h>
+#include <cinolib/bbox.h>
+#include <cinolib/geometry/vec3.h>
 #include <cinolib/common.h>
 
 #include <algorithm>

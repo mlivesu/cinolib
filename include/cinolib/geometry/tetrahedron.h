@@ -32,7 +32,6 @@
 #define CINO_TETRAHEDRON_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/standard_elements_tables.h>
 #include <cinolib/geometry/vec3.h>
 
 namespace cinolib

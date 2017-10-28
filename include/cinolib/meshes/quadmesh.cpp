@@ -31,6 +31,7 @@
 #include <cinolib/meshes/quadmesh.h>
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/geometry/plane.h>
+#include <cinolib/standard_elements_tables.h>
 
 #include <queue>
 

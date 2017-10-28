@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/harmonic_map.h>
+#include <cinolib/laplacian.h>
 
 namespace cinolib
 {

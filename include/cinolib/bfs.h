@@ -35,7 +35,6 @@
 #include <queue>
 
 #include <cinolib/cinolib.h>
-#include <cinolib/common.h>
 #include <cinolib/meshes/abstract_mesh.h>
 
 namespace cinolib

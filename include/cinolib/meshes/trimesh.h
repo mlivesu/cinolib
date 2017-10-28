@@ -32,9 +32,7 @@
 #define CINO_TRIMESH_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/symbols.h>
 #include <cinolib/meshes/mesh_attributes.h>
-#include <cinolib/geometry/triangle.h>
 #include <cinolib/meshes/abstract_polygonmesh.h>
 
 namespace cinolib

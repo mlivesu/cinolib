@@ -29,8 +29,10 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/geometry/triangle.h>
+#include <cinolib/standard_elements_tables.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/geometry/plane.h>
+#include <set>
 
 namespace cinolib
 {

@@ -33,7 +33,6 @@
 
 #include <sys/types.h>
 #include <vector>
-#include <iostream>
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>

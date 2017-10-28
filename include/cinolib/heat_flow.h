@@ -33,10 +33,7 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/scalar_field.h>
-#include <cinolib/laplacian.h>
-#include <cinolib/vertex_mass.h>
 #include <cinolib/linear_solvers.h>
-#include <eigen3/Eigen/Sparse>
 
 namespace cinolib
 {

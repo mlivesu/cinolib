@@ -32,7 +32,6 @@
 #define CINO_SMOOTHING_H
 
 #include <cinolib/cinolib.h>
-#include <cinolib/laplacian.h>
 
 namespace cinolib
 {

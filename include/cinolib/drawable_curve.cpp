@@ -29,7 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include "drawable_curve.h"
-#include <cinolib/color.h>
+#include <cinolib/gl/draw_cylinder.h>
 
 namespace cinolib
 {

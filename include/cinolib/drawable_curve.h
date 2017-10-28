@@ -34,7 +34,6 @@
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/curve.h>
-#include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/meshes/skel.h>
 #include <cinolib/color.h>
 

@@ -38,16 +38,10 @@
 #include <set>
 
 #include <cinolib/cinolib.h>
-#include <cinolib/common.h>
-#include <cinolib/bbox.h>
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/geometry/vec3.h>
-#include <cinolib/geometry/triangle.h>
-#include <cinolib/geometry/tetrahedron.h>
-#include <cinolib/io/read_write.h>
-#include <cinolib/quality.h>
 
 namespace cinolib
 {
