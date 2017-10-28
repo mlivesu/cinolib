@@ -239,6 +239,30 @@ void AbstractPolygonMesh<M,V,E,P>::update_normals()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+double AbstractPolygonMesh<M,V,E,P>::mesh_area() const
+{
+    double area = 0;
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        area += this->poly_area(pid);
+    }
+    return area;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::normalize_area()
+{
+    this->scale(1.0/sqrt(this->mesh_area()));
+    assert(std::fabs(this->mesh_area()-1)<1e-5);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 double AbstractPolygonMesh<M,V,E,P>::mesh_volume() const
 {
     // EFFICIENT FEATURE EXTRACTION FOR 2D/3D OBJECTS IN MESH REPRESENTATION
