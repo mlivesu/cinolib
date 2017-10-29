@@ -190,4 +190,20 @@ void solve_least_squares(const Eigen::SparseMatrix<double> & A,
     solve_square_system(AtA, Atb, x, solver);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+void solve_weighted_least_squares(const Eigen::SparseMatrix<double> & A,
+                                  const Eigen::VectorXd             & w,
+                                  const Eigen::VectorXd             & b,
+                                        Eigen::VectorXd             & x,
+                                  int   solver)
+{
+    Eigen::SparseMatrix<double> At  = A.transpose();
+    Eigen::SparseMatrix<double> AtWA = At * w.asDiagonal() * A;
+    Eigen::VectorXd             AtWb = At * w.asDiagonal() * b;
+
+    solve_square_system(AtWA, AtWb, x, solver);
+}
+
+
 }
