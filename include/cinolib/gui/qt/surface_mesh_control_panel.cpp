@@ -43,16 +43,24 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
 {
     assert(canvas != NULL);
 
-    widget        = new QWidget(parent);
-    global_layout = new QGridLayout(widget);
+    widget                 = new QWidget(parent);
+    global_layout          = new QHBoxLayout(widget);
+    QVBoxLayout *left_col  = new QVBoxLayout();
+    QVBoxLayout *right_col = new QVBoxLayout();
+    global_layout->addLayout(left_col);
+    global_layout->addLayout(right_col);
     global_font.setPointSize(8);
     widget->setFont(global_font);
+    widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     // LOAD/SAVE buttons and SHADING
     {
         but_load     = new QPushButton("Load", widget);
         but_save     = new QPushButton("Save", widget);
         cb_show_mesh = new QCheckBox("Show", widget);
+        but_load->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_save->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_show_mesh->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         but_load->setFont(global_font);
         but_save->setFont(global_font);
         cb_show_mesh->setFont(global_font);
@@ -66,6 +74,10 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         rb_point_shading  = new QRadioButton("Point",  gbox);
         rb_flat_shading   = new QRadioButton("Flat",   gbox);
         rb_smooth_shading = new QRadioButton("Smooth", gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_point_shading->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_flat_shading->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_smooth_shading->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         gbox->setFont(global_font);
         rb_point_shading->setFont(global_font);
         rb_flat_shading->setFont(global_font);
@@ -80,7 +92,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addLayout(layout0);
         layout->addWidget(gbox);
-        global_layout->addLayout(layout,0,0);
+        left_col->addLayout(layout);
     }
 
     // COLORS / TEXTURES
@@ -99,6 +111,19 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         sl_tex2D_density      = new QSlider(Qt::Horizontal, gbox);
         but_load_tex2d        = new QPushButton("Load Tex2D", gbox);
         tex2d_filename        = "";
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_vert_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_poly_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_tex1D->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_tex2D->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_set_vert_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_set_poly_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_tex1D_type->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_tex2D_type->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_serialize_field->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_deserialize_field->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_tex2D_density->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_load_tex2d->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         rb_poly_color->setChecked(true);
         cb_tex1D_type->insertItem(0,"ISO");
         cb_tex1D_type->insertItem(1,"RAMP");
@@ -136,7 +161,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         layout->addWidget(but_serialize_field,5,0);
         layout->addWidget(but_deserialize_field,5,1);
         gbox->setLayout(layout);
-        global_layout->addWidget(gbox,1,0,2,1);
+        right_col->addWidget(gbox);
     }
 
     // WIREFRAME
@@ -148,6 +173,13 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         but_wireframe_color = new QPushButton("Color", gbox);
         QLabel *l_width     = new QLabel("Width: ", gbox);
         QLabel *l_alpha     = new QLabel("Transp:", gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_wireframe->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_wireframe_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_wireframe_alpha->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_wireframe_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        l_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        l_alpha->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sl_wireframe_width->setMinimum(1);
         sl_wireframe_width->setMaximum(4);
         sl_wireframe_width->setTickPosition(QSlider::TicksBelow);
@@ -170,7 +202,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         layout->addWidget(sl_wireframe_alpha,2,1);
         layout->addWidget(but_wireframe_color,3,1);
         gbox->setLayout(layout);
-        global_layout->addWidget(gbox,0,1);
+        left_col->addWidget(gbox);
     }
 
     // ISO-CURVES
@@ -182,6 +214,13 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         but_isocurve_color = new QPushButton("Color", gbox);
         QLabel *l_value    = new QLabel("Isoval: ", gbox);
         QLabel *l_width    = new QLabel("Width:  ", gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_isocurve->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_isovalue->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_isocurve_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_isocurve_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        l_value->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        l_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sl_isocurve_width->setMinimum(1);
         sl_isocurve_width->setMaximum(10);
         sl_isovalue->setMaximum(999);
@@ -200,7 +239,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         layout->addWidget(sl_isocurve_width,2,1);
         layout->addWidget(but_isocurve_color,3,1);
         gbox->setLayout(layout);
-        global_layout->addWidget(gbox,1,1);
+        left_col->addWidget(gbox);
     }
 
     // GRADIENT
@@ -211,6 +250,12 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         but_gradient_color       = new QPushButton("Color", gbox);
         but_gradient_serialize   = new QPushButton("Serialize", gbox);
         but_gradient_deserialize = new QPushButton("Deserialize", gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_gradient->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_gradient_size->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_gradient_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_gradient_serialize->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_gradient_deserialize->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sl_gradient_size->setMinimum(1);
         sl_gradient_size->setMaximum(100);
         sl_gradient_size->setValue(20);
@@ -220,13 +265,13 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         but_gradient_serialize->setFont(global_font);
         but_gradient_deserialize->setFont(global_font);
         QGridLayout *layout = new QGridLayout();
-        layout->addWidget(cb_gradient,0,1);
-        layout->addWidget(sl_gradient_size,1,1,1,2);
-        layout->addWidget(but_gradient_color,2,1,1,2);
-        layout->addWidget(but_gradient_serialize,3,1);
-        layout->addWidget(but_gradient_deserialize,3,2);
+        layout->addWidget(cb_gradient,0,0);
+        layout->addWidget(sl_gradient_size,1,0,1,2);
+        layout->addWidget(but_gradient_color,2,0,1,2);
+        layout->addWidget(but_gradient_serialize,3,0);
+        layout->addWidget(but_gradient_deserialize,3,1);
         gbox->setLayout(layout);
-        global_layout->addWidget(gbox,2,1);
+        left_col->addWidget(gbox);
     }
 
     // SLICING
@@ -249,6 +294,24 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         QLabel *l_z     = new QLabel("Z");
         QLabel *l_q     = new QLabel("Q");
         QLabel *l_l     = new QLabel("L");
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_slice_x->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_slice_y->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_slice_z->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_slice_q->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_slice_l->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_slice_flip_x->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_slice_flip_y->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_slice_flip_z->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_slice_flip_q->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_slice_AND->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_slice_OR->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_slice_reset->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        l_x->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        l_y->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        l_z->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        l_q->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        l_l->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sl_slice_l->setMinimum(-1);
         sl_slice_l->setMaximum(20);
         sl_slice_l->setOrientation(Qt::Horizontal);
@@ -295,7 +358,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         layout->addWidget(cb_slice_flip_z,3,4);
         layout->addWidget(cb_slice_flip_q,4,4);
         gbox->setLayout(layout);
-        global_layout->addWidget(gbox,3,1);
+        right_col->addWidget(gbox);
     }
 
     // MARKED EDGES
@@ -305,6 +368,11 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         sl_marked_edges_width  = new QSlider(Qt::Horizontal, gbox);
         but_marked_edges_color = new QPushButton("Color", gbox);
         QLabel *l_width        = new QLabel("Width:  ", gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_marked_edges->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_marked_edges_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_marked_edges_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        l_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sl_marked_edges_width->setMinimum(1);
         sl_marked_edges_width->setMaximum(10);
         sl_marked_edges_width->setTickPosition(QSlider::TicksBelow);
@@ -319,9 +387,12 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         layout->addWidget(sl_marked_edges_width,2,1);
         layout->addWidget(but_marked_edges_color,3,1);
         gbox->setLayout(layout);
-        global_layout->addWidget(gbox,3,0);
+        right_col->addWidget(gbox);
     }
 
+    global_layout->addStretch();
+    left_col->addStretch();
+    right_col->addStretch();
     set_title();
     connect();
 }

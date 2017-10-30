@@ -46,7 +46,8 @@
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QPushButton>
-#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QFileDialog>
 #include <QColorDialog>
 
@@ -91,7 +92,7 @@ class VolumeMeshControlPanel
         DrawableVectorField<Mesh>      gradient;
         GLcanvas                      *canvas;
         QWidget                       *widget;
-        QGridLayout                   *global_layout;
+        QHBoxLayout                   *global_layout;
         QFont                          global_font;
         //
         QPushButton                   *but_load;
