@@ -175,8 +175,8 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         QLabel *l_alpha     = new QLabel("Transp:", gbox);
         gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         cb_wireframe->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sl_wireframe_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sl_wireframe_alpha->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_wireframe_width->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        sl_wireframe_alpha->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
         but_wireframe_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         l_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         l_alpha->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -195,7 +195,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         l_width->setFont(global_font);
         l_alpha->setFont(global_font);
         QGridLayout *layout = new QGridLayout();
-        layout->addWidget(cb_wireframe,0,1);
+        layout->addWidget(cb_wireframe,0,0,1,2);
         layout->addWidget(l_width,1,0);
         layout->addWidget(l_alpha,2,0);
         layout->addWidget(sl_wireframe_width,1,1);
@@ -216,8 +216,8 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         QLabel *l_width    = new QLabel("Width:  ", gbox);
         gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         cb_isocurve->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sl_isovalue->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sl_isocurve_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_isovalue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        sl_isocurve_width->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
         but_isocurve_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         l_value->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         l_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -232,7 +232,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         l_value->setFont(global_font);
         cb_isocurve->setFont(global_font);
         QGridLayout *layout = new QGridLayout();
-        layout->addWidget(cb_isocurve,0,1);
+        layout->addWidget(cb_isocurve,0,0,1,2);
         layout->addWidget(l_value,1,0);
         layout->addWidget(sl_isovalue,1,1);
         layout->addWidget(l_width,2,0);
@@ -370,7 +370,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         QLabel *l_width        = new QLabel("Width:  ", gbox);
         gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         cb_marked_edges->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sl_marked_edges_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_marked_edges_width->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
         but_marked_edges_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         l_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sl_marked_edges_width->setMinimum(1);
@@ -382,10 +382,10 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         l_width->setFont(global_font);
         cb_marked_edges->setFont(global_font);
         QGridLayout *layout = new QGridLayout();
-        layout->addWidget(cb_marked_edges,0,1);
-        layout->addWidget(l_width,2,0);
-        layout->addWidget(sl_marked_edges_width,2,1);
-        layout->addWidget(but_marked_edges_color,3,1);
+        layout->addWidget(cb_marked_edges,0,0,1,2);
+        layout->addWidget(l_width,1,0);
+        layout->addWidget(sl_marked_edges_width,1,1);
+        layout->addWidget(but_marked_edges_color,2,1);
         gbox->setLayout(layout);
         right_col->addWidget(gbox);
     }
