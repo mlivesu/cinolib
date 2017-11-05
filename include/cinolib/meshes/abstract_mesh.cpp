@@ -484,6 +484,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 int AbstractMesh<M,V,E,P>::edge_id(const uint vid0, const uint vid1) const
 {
+    assert(vid0 != vid1);
     for(uint eid : adj_v2e(vid0))
     {
         if (edge_contains_vert(eid, vid0) && edge_contains_vert(eid, vid1))
