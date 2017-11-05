@@ -127,6 +127,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         virtual void  edge_remove_unreferenced     (const uint eid);
         virtual void  edge_mark_labeling_boundaries();
         virtual void  edge_mark_boundaries();
+        virtual void  edge_unmark_all();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
