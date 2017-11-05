@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/unstable/profiler.h>
+#include <cinolib/profiler.h>
 #include <set>
 #include <iostream>
 

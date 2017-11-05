@@ -32,7 +32,7 @@
 #define CINO_PROFILER_H
 
 #include <cinolib/cino_inline.h>
-#include <cinolib/unstable/tree.h>
+#include <cinolib/tree.h>
 #include <chrono>
 #include <map>
 #include <string>

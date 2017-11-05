@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/unstable/tree.h>
+#include <cinolib/tree.h>
 #include <assert.h>
 
 namespace cinolib
