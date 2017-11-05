@@ -33,13 +33,11 @@
 
 #include <cinolib/cino_inline.h>
 #include <cinolib/symbols.h>
-#include <cinolib/unstable/profiler.h>
 #include <cinolib/logger.h>
 
 namespace cinolib
 {
     static Logger   logger;
-    static Profiler profiler;
 
     /*** OPTIONS ***/
     static bool support_non_manifold_edges = true;

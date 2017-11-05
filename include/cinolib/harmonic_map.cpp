@@ -42,8 +42,6 @@ ScalarField harmonic_map(const AbstractMesh<M,V,E,P> & m,
                          const int                     laplacian_mode,
                          const int                     solver)
 {
-    profiler.push("cinolib::harmonic_map");
-
     assert(n > 0);
     assert(bc.size() > 0);
     assert(laplacian_mode == COTANGENT || laplacian_mode == UNIFORM);
@@ -59,8 +57,6 @@ ScalarField harmonic_map(const AbstractMesh<M,V,E,P> & m,
 
     solve_square_system_with_bc(Ln, rhs, f, bc, solver);
 
-    profiler.pop();
-
     return f;
 }
 
@@ -75,8 +71,6 @@ std::vector<vec3d> harmonic_map_3d(const AbstractMesh<M,V,E,P> & m,
                                    const int                     laplacian_mode,
                                    const int                     solver)
 {
-    profiler.push("cinolib::harmonic_map_3d");
-
     assert(n > 0);
     assert(bc.size() > 0);
     assert(laplacian_mode == COTANGENT || laplacian_mode == UNIFORM);
@@ -109,8 +103,6 @@ std::vector<vec3d> harmonic_map_3d(const AbstractMesh<M,V,E,P> & m,
     {
         res.at(vid) = vec3d(f[vid], f[y_off+vid], f[z_off+vid]);
     }
-
-    profiler.pop();
 
     return res;
 }

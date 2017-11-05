@@ -37,7 +37,6 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-#ifdef CINOLIB_PROFILER_ENABLED
 CINO_INLINE
 void Profiler::push(const std::string & key)
 {
@@ -46,17 +45,12 @@ void Profiler::push(const std::string & key)
     entry.start = std::chrono::high_resolution_clock::now();
     tree_ptr    = tree.add_children(entry, tree_ptr);
 }
-#else
-CINO_INLINE
-void Profiler::push(const std::string &){}
-#endif
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void Profiler::pop()
 {
-#ifdef CINOLIB_PROFILER_ENABLED
     using namespace std::chrono;
     tree.node(tree_ptr).item.stop = high_resolution_clock::now();
     double t = delta_s(tree_ptr);
@@ -69,10 +63,9 @@ void Profiler::pop()
     for(uint i=0; i<tree.node(tree_ptr).depth-1; ++i) s += "----";
     s += tree.node(tree_ptr).item.key + " [" + std::to_string(t) + "s]";
     tree.node(tree_ptr).item.s = s;
+    std::cout << s << std::endl;
 
     tree_ptr = tree.node(tree_ptr).father;
-
-#endif
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -80,7 +73,6 @@ void Profiler::pop()
 CINO_INLINE
 void Profiler::call_stack() const
 {
-#ifdef CINOLIB_PROFILER_ENABLED
     std::cout << "::::::::::::::: PROFILER CALL TREE (" << tot_time << "s) :::::::::::::::" << std::endl;
 
     std::vector<ProfilerEntry> items;
@@ -89,7 +81,6 @@ void Profiler::call_stack() const
     for(const ProfilerEntry & obj : items) std::cout << obj.s << std::endl;
 
     std::cout << "::::::::::::::::::::::::::::::::::::::::::::::::::\n" << std::endl;
-#endif
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -97,7 +88,6 @@ void Profiler::call_stack() const
 CINO_INLINE
 void Profiler::report() const
 {
-#ifdef CINOLIB_PROFILER_ENABLED
     std::set<std::pair<double,std::string>,std::greater<std::pair<double,std::string>>> ordered_items; // most time consuming first
     for(auto obj : log_times) ordered_items.insert(std::make_pair(obj.second,obj.first));
 
@@ -109,7 +99,6 @@ void Profiler::report() const
     }
 
     std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::\n" << std::endl;
-#endif
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/abstract_mesh.h>
+#include <map>
 
 namespace cinolib
 {
