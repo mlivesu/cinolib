@@ -6,7 +6,6 @@ CONFIG         -= app_bundle
 INCLUDEPATH    += /usr/local/include
 INCLUDEPATH    += /Users/cino/Documents/research/devel/lib/CinoLib/include
 DEPENDPATH     += /Users/cino/Documents/research/devel/lib/CinoLib/include # force recompilation if cinolib changes
-DEFINES        += CINOLIB_PROFILER_ENABLED
 
 
 # ------------------------------------ #
