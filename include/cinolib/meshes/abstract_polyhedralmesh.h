@@ -140,6 +140,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual vec3d             face_vert            (const uint fid, const uint off) const;
         virtual uint              face_vert_id         (const uint fid, const uint off) const;
         virtual uint              face_edge_id         (const uint fid, const uint vid0, const uint vid1) const;
+        virtual uint              face_edge_id         (const uint fid, const uint off) const;
         virtual bool              face_is_on_srf       (const uint fid) const;
         virtual bool              face_contains_vert   (const uint fid, const uint vid) const;
         virtual bool              face_contains_edge   (const uint fid, const uint eid) const;

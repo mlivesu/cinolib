@@ -427,6 +427,19 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_edge_id(const uint fid, const uint 
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::face_edge_id(const uint fid, const off) const
+{
+    uint vid0 = this->face_vert_id(fid, off);
+    uint vid1 = this->face_vert_id(fid, (off+1)%this->verts_per_face(fid));
+    int  eid  = this->edge_id(vid0, vid1);
+    assert(eid>=0);
+    return eid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::face_adj_through_edge(const uint fid, const uint eid, const uint pid) const
 {
     assert(this->poly_contains_face(pid, fid));
