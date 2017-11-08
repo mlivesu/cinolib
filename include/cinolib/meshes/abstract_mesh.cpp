@@ -728,7 +728,7 @@ void AbstractMesh<M,V,E,P>::poly_set_alpha(const float alpha)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::poly_color_wrt_label()
+void AbstractMesh<M,V,E,P>::poly_color_wrt_label(const float s, const float v) // s => saturation, v => value in HSV color space
 {
     std::map<int,uint> l_map;
     for(uint pid=0; pid<this->num_polys(); ++pid)
@@ -739,7 +739,7 @@ void AbstractMesh<M,V,E,P>::poly_color_wrt_label()
     uint n_labels = l_map.size();
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        this->poly_data(pid).color = Color::scatter(n_labels,l_map.at(this->poly_data(pid).label));
+        this->poly_data(pid).color = Color::scatter(n_labels,l_map.at(this->poly_data(pid).label), s, v);
     }
 }
 
