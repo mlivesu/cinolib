@@ -653,7 +653,7 @@ bool AbstractPolygonMesh<M,V,E,P>::edges_share_poly(const uint eid1, const uint 
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-ipair AbstractPolygonMesh<M,V,E,P>::edge_shared(const uint pid0, const uint pid1) const
+uint AbstractPolygonMesh<M,V,E,P>::edge_shared(const uint pid0, const uint pid1) const
 {
     std::vector<uint> shared_verts;
     uint v0 = this->poly_vert_id(pid0,0);
@@ -665,10 +665,9 @@ ipair AbstractPolygonMesh<M,V,E,P>::edge_shared(const uint pid0, const uint pid1
     if (this->poly_contains_vert(pid1,v2)) shared_verts.push_back(v2);
     assert(shared_verts.size() == 2);
 
-    ipair e;
-    e.first  = shared_verts.front();
-    e.second = shared_verts.back();
-    return e;
+    int eid = this->edge_id(shared_verts.front(),shared_verts.back());
+    assert(eid>=0);
+    return eid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

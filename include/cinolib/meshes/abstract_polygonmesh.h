@@ -120,7 +120,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         virtual bool  edge_is_manifold             (const uint eid) const;
         virtual bool  edge_is_boundary             (const uint eid) const;
         virtual bool  edges_share_poly             (const uint eid1, const uint eid2) const;
-        virtual ipair edge_shared                  (const uint fid0, const uint fid1) const;
+        virtual uint  edge_shared                  (const uint pid0, const uint pid1) const;
         virtual void  edge_switch_id               (const uint eid0, const uint eid1);
         virtual uint  edge_add                     (const uint vid0, const uint vid1);
         virtual void  edge_remove                  (const uint eid);
