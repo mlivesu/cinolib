@@ -59,6 +59,44 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
+                         const uint                    source,
+                               std::vector<double>   & distances)
+{
+    distances = std::vector<double>(m.num_verts(), inf_double);
+    distances.at(source) = 0.0;
+
+    std::set<std::pair<double,uint>> active_set;
+    active_set.insert(std::make_pair(0.0,source));
+
+    while(!active_set.empty())
+    {
+        uint vid = active_set.begin()->second;
+        active_set.erase(active_set.begin());
+
+        for(uint nbr : m.adj_v2v(vid))
+        {
+            double new_dist = distances.at(vid) + m.vert(vid).dist(m.vert(nbr));
+
+            if (distances.at(nbr) > new_dist)
+            {
+                if (distances.at(nbr) < inf_double) // otherwise it won't be found
+                {
+                    auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
+                    assert(it!=active_set.end());
+                    active_set.erase(it);
+                }
+                distances.at(nbr) = new_dist;
+                active_set.insert(std::make_pair(new_dist,nbr));
+            }
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void dijkstra(const AbstractMesh<M,V,E,P> & m,
               const uint                    source,
               const uint                    dest,
@@ -227,6 +265,86 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
         }
     }
     assert(false && "Dijkstra did not converge!");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void dijkstra_exhaustive_on_dual(const AbstractMesh<M,V,E,P> & m,
+                                 const uint                    source,
+                                       std::vector<double>   & distances)
+{
+    distances = std::vector<double>(m.num_polys(), inf_double);
+    distances.at(source) = 0.0;
+
+    std::set<std::pair<double,uint>> active_set;
+    active_set.insert(std::make_pair(0.0,source));
+
+    while(!active_set.empty())
+    {
+        uint vid = active_set.begin()->second;
+        active_set.erase(active_set.begin());
+
+        for(uint nbr : m.adj_p2p(vid))
+        {
+            double new_dist = distances.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
+
+            if (distances.at(nbr) > new_dist)
+            {
+                if (distances.at(nbr) < inf_double) // otherwise it won't be found
+                {
+                    auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
+                    assert(it!=active_set.end());
+                    active_set.erase(it);
+                }
+                distances.at(nbr) = new_dist;
+                active_set.insert(std::make_pair(new_dist,nbr));
+            }
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void dijkstra_exhaustive_on_dual(const AbstractMesh<M,V,E,P> & m,
+                                 const std::vector<uint>     & sources,
+                                       std::vector<double>   & distances)
+{
+    distances = std::vector<double>(m.num_polys(), inf_double);
+
+    std::set<std::pair<double,uint>> active_set;
+
+    for(uint s : sources)
+    {
+        distances.at(s) = 0.0;
+        active_set.insert(std::make_pair(0.0,s));
+    }
+
+    while(!active_set.empty())
+    {
+        uint vid = active_set.begin()->second;
+        active_set.erase(active_set.begin());
+
+        for(uint nbr : m.adj_p2p(vid))
+        {
+            double new_dist = distances.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
+
+            if (distances.at(nbr) > new_dist)
+            {
+                if (distances.at(nbr) < inf_double) // otherwise it won't be found
+                {
+                    auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
+                    assert(it!=active_set.end());
+                    active_set.erase(it);
+                }
+                distances.at(nbr) = new_dist;
+                active_set.insert(std::make_pair(new_dist,nbr));
+            }
+        }
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

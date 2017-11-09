@@ -38,6 +38,18 @@
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//:::::::::::::::: DIJKSTRAs ON PRIMAL GRAPH (VERTICES) ::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
+                         const uint                    source,
+                               std::vector<double>   & distances);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra(const AbstractMesh<M,V,E,P> & m,
@@ -47,35 +59,44 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// Shortest path (with barriers). The path cannot
-// pass throuh vertices for which mask[v] = true
-//
 template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra(const AbstractMesh<M,V,E,P> & m,
               const uint                    source,
               const uint                    dest,
-              const std::vector<bool>     & mask,
+              const std::vector<bool>     & mask, // if mask[v] = true, path cannot pass through it
                     std::vector<uint>     & path);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// Shortest path (with barriers and multiple destinations). The path
-// cannot pass throuh vertices for which mask[v] = true. The algorithm
-// stops as soon as it reaches one of the destinations
-//
 template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra(const AbstractMesh<M,V,E,P> & m,
               const uint                    source,
               const std::set<uint>        & dest,
-              const std::vector<bool>     & mask,
+              const std::vector<bool>     & mask, // if mask[v] = true, path cannot pass through it
                     std::vector<uint>     & path);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::: DIJKSTRAs ON DUAL GRAPH (POLYGONS/POLYHEDRA) :::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// works on dual mesh: polygons/polyhedra rather then vertices
-//
+template<class M, class V, class E, class P>
+CINO_INLINE
+void dijkstra_exhaustive_on_dual(const AbstractMesh<M,V,E,P> & m,
+                                 const uint                    source,
+                                       std::vector<double>   & distances);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void dijkstra_exhaustive_on_dual(const AbstractMesh<M,V,E,P> & m,
+                                 const std::vector<uint>     & sources,
+                                       std::vector<double>   & distances);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
@@ -85,26 +106,22 @@ void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// works on dual mesh: polygons/polyhedra rather then vertices
-//
 template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
                       const uint                    source,
                       const uint                    dest,
-                      const std::vector<bool>     & mask,
+                      const std::vector<bool>     & mask, // if mask[p] = true, path cannot pass through it
                             std::vector<uint>     & path);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// works on dual mesh: polygons/polyhedra rather then vertices
-//
 template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
                       const uint                    source,
                       const std::set<uint>        & dest,
-                      const std::vector<bool>     & mask,
+                      const std::vector<bool>     & mask, // if mask[p] = true, path cannot pass through it
                             std::vector<uint>     & path);
 
 }
