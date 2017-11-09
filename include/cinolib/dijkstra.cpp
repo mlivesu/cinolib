@@ -43,7 +43,7 @@ namespace cinolib
 // update, which is supported by none of the STL containers. Options are:
 //
 //  1) remove an element and re-add it with updated priority. In this
-//     case std::set has the best look-up performances
+//     case std::set has the best remove performances
 //
 //  2) leave "dead" copies of an element in the container, and just add a
 //     new copy each time its priority needs an update. Regardless the waste
