@@ -90,8 +90,8 @@ void ScalarField::copy_to_mesh(Mesh & m, const int tex_coord) const
 CINO_INLINE
 void ScalarField::normalize_in_01()
 {
-    double min =  inf;
-    double max = -inf;
+    double min =  inf_double;
+    double max = -inf_double;
 
     for(uint i=0; i<this->rows(); ++i)
     {

@@ -46,8 +46,8 @@ class Bbox
 
         void reset()
         {
-            min = vec3d( inf,  inf,  inf);
-            max = vec3d(-inf, -inf, -inf);
+            min = vec3d( inf_double,  inf_double,  inf_double);
+            max = vec3d(-inf_double, -inf_double, -inf_double);
         }
 
         vec3d  min, max;

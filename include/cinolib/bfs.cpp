@@ -135,7 +135,7 @@ void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// shortest path on unweighted graph, essentially dijkstra with constaint weights.
+// shortest path on unweighted graph, essentially dijkstra with constant weights.
 //
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -260,7 +260,7 @@ void bfs(const AbstractMesh<M,V,E,P> & m,
 
 // shortest path (with barriers and multiple destinatins) on unweighted graph.
 // The path cannot pass throuh vertices for which mask[v] = true
-// The algorithm stops as soon as it reaches of of the destinations
+// The algorithm stops as soon as it reaches one of the destinations
 //
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -328,7 +328,7 @@ void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
                             const uint                    source,
                                   std::vector<double>   & dist) // elem id + dist
 {
-    dist = std::vector<double>(m.num_polys(), inf);
+    dist = std::vector<double>(m.num_polys(), inf_double);
     std::queue<uint> q;
 
     q.push(source);
@@ -359,7 +359,7 @@ void bfs_exahustive_on_dual(const AbstractMesh<M,V,E,P> & m,
                             const std::vector<uint>     & sources,
                                   std::vector<double>   & dist) // elem id + dist
 {
-    dist = std::vector<double>(m.num_polys(), inf);
+    dist = std::vector<double>(m.num_polys(), inf_double);
     std::queue<uint> q;
 
     for(uint pid : sources)

@@ -114,7 +114,7 @@ void bfs(const AbstractMesh<M,V,E,P> & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// shortest path (with barriers and multiple destinatins) on unweighted graph.
+// shortest path (with barriers and multiple destinations) on unweighted graph.
 // The path cannot pass throuh vertices for which mask[v] = true
 // The algorithm stops as soon as it reaches of of the destinations
 //
