@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/gui/qt/volume_mesh_control_panel.h>
+#include <cinolib/textures/textures.h>
 #include <cinolib/gradient.h>
 #include <iostream>
 
