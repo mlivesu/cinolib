@@ -189,7 +189,7 @@ std::vector<double> AbstractMesh<M,V,E,P>::vector_coords() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<double> AbstractMesh<M, V, E, P>::serialize_uvw(const int mode) const
+std::vector<double> AbstractMesh<M,V,E,P>::serialize_uvw(const int mode) const
 {
     std::vector<double> uvw;
     uvw.reserve(num_verts());
@@ -213,6 +213,19 @@ std::vector<double> AbstractMesh<M, V, E, P>::serialize_uvw(const int mode) cons
         }
     }
     return uvw;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::deserialize_uvw(const std::vector<vec3d> & uvw)
+{
+    assert(uvw.size()==num_verts());
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        vert_data(vid).uvw = uvw.at(vid);
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -267,6 +280,20 @@ void AbstractMesh<M,V,E,P>::copy_uvw_to_xyz(const int mode)
             default: assert(false);
         }
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::swap_xyz_uvw(const bool normals, const bool bbox)
+{
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        std::swap(vert(vid),vert_data(vid).uvw);
+    }
+    if (normals) update_normals();
+    if (bbox)    update_bbox();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

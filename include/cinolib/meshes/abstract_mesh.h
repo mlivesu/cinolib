@@ -141,8 +141,10 @@ class AbstractMesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual std::vector<double> serialize_uvw  (const int mode) const;
+        virtual void                deserialize_uvw(const std::vector<vec3d> & uvw);
         virtual void                copy_xyz_to_uvw(const int mode);
         virtual void                copy_uvw_to_xyz(const int mode);
+        virtual void                swap_xyz_uvw(const bool normals = true, const bool bbox = true);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
