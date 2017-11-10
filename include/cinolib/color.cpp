@@ -169,6 +169,8 @@ Color Color::scatter(uint n_colors, uint pos, float sat, float val)
 {
     assert(pos>=0 && pos<n_colors);
 
+    n_colors += 1; // for some reason I am getting duplicated colors without this... :(
+
     // Magic stolen from VCG :P
 
     uint b, k, m = n_colors;
