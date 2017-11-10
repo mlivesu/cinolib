@@ -31,9 +31,9 @@
 #ifndef CINO_BFS_H
 #define CINO_BFS_H
 
-#include <unordered_set>
+#include <cinolib/meshes/meshes.h>
 #include <cinolib/cinolib.h>
-#include <cinolib/meshes/abstract_mesh.h>
+#include <unordered_set>
 
 namespace cinolib
 {
@@ -57,14 +57,37 @@ void bfs(const AbstractMesh<M,V,E,P>    & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// floodfill (with barriers)
+//
+template<class M, class V, class E, class P>
+CINO_INLINE
+void bfs(const AbstractMesh<M,V,E,P>    & m,
+         const uint                       source,
+         const std::vector<bool>        & mask, // if mask[p] = true, bfs cannot visit polygon/polyhedron p
+               std::unordered_set<uint> & visited);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // floodfill (with barriers) on the dual mesh (polygons/polyhedra instead of vertices)
 //
 template<class M, class V, class E, class P>
 CINO_INLINE
 void bfs_on_dual(const AbstractMesh<M,V,E,P>    & m,
                  const uint                       source,
-                 const std::vector<bool>        & mask, // if mask[p] = true, path cannot pass through it
+                 const std::vector<bool>        & mask, // if mask[p] = true, bfs cannot visit polygon/polyhedron p
                        std::unordered_set<uint> & visited);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// floodfill (with barriers on edges) [just for surface meshes]
+//
+template<class M, class V, class E, class P>
+CINO_INLINE
+void bfs_on_dual_w_edge_barriers(const AbstractPolygonMesh<M,V,E,P> & m,
+                                 const uint                           source,
+                                 const std::vector<bool>            & mask_edges, // if mask[e] = true, bfs canno expand through edge e
+                                 std::unordered_set<uint>     & visited);
+
 }
 
 #ifndef  CINO_STATIC_LIB

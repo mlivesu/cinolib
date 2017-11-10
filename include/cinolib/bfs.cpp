@@ -73,6 +73,7 @@ void bfs(const AbstractMesh<M,V,E,P>    & m,
                std::unordered_set<uint> & visited)
 {
     visited.clear();
+    visited.insert(source);
 
     std::queue<uint> q;
     q.push(source);
@@ -82,12 +83,42 @@ void bfs(const AbstractMesh<M,V,E,P>    & m,
         uint vid = q.front();
         q.pop();
 
-        visited.insert(vid);
-
         for(uint nbr : m.adj_v2v(vid))
         {
             if (DOES_NOT_CONTAIN(visited,nbr))
             {
+                visited.insert(nbr);
+                q.push(nbr);
+            }
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void bfs(const AbstractMesh<M,V,E,P>    & m,
+         const uint                       source,
+         const std::vector<bool>        & mask, // if mask[p] = true, path cannot pass through it
+               std::unordered_set<uint> & visited)
+{
+    visited.clear();
+    visited.insert(source);
+
+    std::queue<uint> q;
+    q.push(source);
+
+    while(!q.empty())
+    {
+        uint vid = q.front();
+        q.pop();
+
+        for(uint nbr : m.adj_v2v(vid))
+        {
+            if (!mask.at(nbr) && DOES_NOT_CONTAIN(visited,nbr))
+            {
+                visited.insert(nbr);
                 q.push(nbr);
             }
         }
@@ -103,7 +134,8 @@ void bfs_on_dual(const AbstractMesh<M,V,E,P>    & m,
                  const std::vector<bool>        & mask, // if mask[p] = true, path cannot pass through it
                        std::unordered_set<uint> & visited)
 {
-    assert(visited.empty());
+    visited.clear();
+    visited.insert(source);
 
     std::queue<uint> q;
     q.push(source);
@@ -113,12 +145,45 @@ void bfs_on_dual(const AbstractMesh<M,V,E,P>    & m,
         uint pid = q.front();
         q.pop();
 
-        visited.insert(pid);
-
         for(uint nbr : m.adj_p2p(pid))
         {
             if (!mask.at(nbr) && DOES_NOT_CONTAIN(visited,nbr))
             {
+                visited.insert(nbr);
+                q.push(nbr);
+            }
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// floodfill (with barriers on edges) [just for surface meshes]
+//
+template<class M, class V, class E, class P>
+CINO_INLINE
+void bfs_on_dual_w_edge_barriers(const AbstractPolygonMesh<M,V,E,P> & m,
+                                 const uint                           source,
+                                 const std::vector<bool>            & mask_edges, // if mask[e] = true, bfs canno expand through edge e
+                                 std::unordered_set<uint>     & visited)
+{
+    visited.clear();
+    visited.insert(source);
+
+    std::queue<uint> q;
+    q.push(source);
+
+    while(!q.empty())
+    {
+        uint pid = q.front();
+        q.pop();
+
+        for(uint nbr : m.adj_p2p(pid))
+        {
+            uint eid = m.edge_shared(pid,nbr);
+            if (!mask_edges.at(eid) && DOES_NOT_CONTAIN(visited,nbr))
+            {
+                visited.insert(nbr);
                 q.push(nbr);
             }
         }
