@@ -210,7 +210,7 @@ class AbstractMesh
         virtual       bool   poly_contains_edge  (const uint pid, const uint eid) const;
         virtual       bool   poly_contains_edge  (const uint pid, const uint vid0, const uint vid1) const;
         virtual       void   poly_show_all       ();
-        virtual       void   poly_color_wrt_label(const float s=.3f, float v=.9f); // s => saturation, v => value in HSV color space
+        virtual       void   poly_color_wrt_label(const float s=.5f, float v=.85f); // s => saturation, v => value in HSV color space
         virtual       void   poly_set_color      (const Color & c);
         virtual       void   poly_set_alpha      (const float alpha);
 };
