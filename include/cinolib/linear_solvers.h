@@ -88,6 +88,7 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 void solve_least_squares(const Eigen::SparseMatrix<double> & A,
                          const Eigen::VectorXd             & b,
                                Eigen::VectorXd             & x,
@@ -95,6 +96,7 @@ void solve_least_squares(const Eigen::SparseMatrix<double> & A,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 void solve_weighted_least_squares(const Eigen::SparseMatrix<double> & A,
                                   const Eigen::VectorXd             & w,
                                   const Eigen::VectorXd             & b,
