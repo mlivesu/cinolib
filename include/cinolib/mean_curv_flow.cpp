@@ -36,26 +36,33 @@
 namespace cinolib
 {
 
+template<class M, class V, class E, class P>
 CINO_INLINE
-void MCF(Trimesh<>       & m,
-         const uint        n_iters,
-         const double      time,
-         const bool        conformalized)
+void MCF(AbstractPolygonMesh<M,V,E,P> & m,
+         const uint                     n_iters,
+         const double                   time_scalar,
+         const bool                     conformalized)
 {
-    Eigen::SparseMatrix<double> L = laplacian(m, COTANGENT);
-    Eigen::SparseMatrix<double> M = mass_matrix<Trimesh>(m);
+    // use the squared avg edge length as time step, as suggested in:
+    // Geodesics in Heat: A New Approach to Computing Distance Based on Heat Flow
+    // K.Crane, C.Weischedel, M.Wardetzky
+    // SIGGRAPH 2013
+    double time = m.edge_avg_length();
+    time *= time;
+    time *= time_scalar;
+
+    Eigen::SparseMatrix<double> L  = laplacian(m, COTANGENT);
+    Eigen::SparseMatrix<double> MM = mass_matrix(m);
 
     for(uint i=1; i<=n_iters; ++i)
     {
-        // this is for numerical precision: try to stay within
-        // the denser part of the machine float representation
-        //
+        // optimize position and scale to get better numerical precision
         m.normalize_bbox();
-        m.center_bbox();
+        m.center_bbox();        
 
         // backward euler time integration of heat flow equation
         //
-        Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver(M - time * L);
+        Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver(MM - time_scalar * L);
 
         uint nv = m.num_verts();
         Eigen::VectorXd x(nv);
@@ -64,15 +71,15 @@ void MCF(Trimesh<>       & m,
 
         for(uint vid=0; vid<nv; ++vid)
         {
-            vec3d pos = m.vertex(vid);
+            vec3d pos = m.vert(vid);
             x[vid] = pos.x();
             y[vid] = pos.y();
             z[vid] = pos.z();
         }
 
-        x = solver.solve(M * x);
-        y = solver.solve(M * y);
-        z = solver.solve(M * z);
+        x = solver.solve(MM * x);
+        y = solver.solve(MM * y);
+        z = solver.solve(MM * z);
 
         double residual = 0.0;
         for(uint vid=0; vid<m.num_verts(); ++vid)
@@ -86,7 +93,7 @@ void MCF(Trimesh<>       & m,
 
         if (i<n_iters) // update matrices for the next iteration
         {
-            M = mass_matrix<Trimesh>(m);
+            MM = mass_matrix(m);
             if (!conformalized) L = laplacian(m, COTANGENT);
         }
     }

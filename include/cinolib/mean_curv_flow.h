@@ -45,11 +45,12 @@ namespace cinolib
  * Computer Graphics Forum, 31(5), 2012.
 */
 
+template<class M, class V, class E, class P>
 CINO_INLINE
-void MCF(Trimesh<>    & m,
-         const uint     n_iters,
-         const double   time = 1e-3,
-         const bool     conformalized = true);
+void MCF(AbstractPolygonMesh<M,V,E,P> & m,
+         const uint                     n_iters,
+         const double                   time_scalar = 0.01, // I suggest very small steps for the conformalized version
+         const bool                     conformalized = true);
 
 }
 
