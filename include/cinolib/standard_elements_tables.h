@@ -103,6 +103,20 @@ static const uint HEXA_EDGES[12][2] =
     { 3, 7 }  // e11
 };
 
+static const uint HEXA_INCIDENT_EDGES[8][3] =
+{
+    { 0, 3,  8 }, // edges incident to v0
+    { 0, 1,  9 }, // edges incident to v1
+    { 1, 2, 10 }, // edges incident to v2
+    { 2, 3, 11 }, // edges incident to v3
+    { 4, 7,  8 }, // edges incident to v4
+    { 4, 5,  9 }, // edges incident to v5
+    { 5, 6, 10 }, // edges incident to v6
+    { 6, 7, 11 }, // edges incident to v7
+};
+
+
+
 }
 
 #endif // CINO_STANDARD_ELEMENTS_TABLES_H
