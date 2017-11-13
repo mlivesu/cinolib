@@ -61,8 +61,7 @@ void MCF(AbstractPolygonMesh<M,V,E,P> & m,
         m.center_bbox();        
 
         // backward euler time integration of heat flow equation
-        //
-        Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver(MM - time_scalar * L);
+        Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> LLT(MM - time_scalar * L);
 
         uint nv = m.num_verts();
         Eigen::VectorXd x(nv);
@@ -77,9 +76,9 @@ void MCF(AbstractPolygonMesh<M,V,E,P> & m,
             z[vid] = pos.z();
         }
 
-        x = solver.solve(MM * x);
-        y = solver.solve(MM * y);
-        z = solver.solve(MM * z);
+        x = LLT.solve(MM * x);
+        y = LLT.solve(MM * y);
+        z = LLT.solve(MM * z);
 
         double residual = 0.0;
         for(uint vid=0; vid<m.num_verts(); ++vid)
