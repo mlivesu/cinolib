@@ -46,7 +46,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 ScalarField heat_flow(const AbstractMesh<M,V,E,P> & m,
                       const std::vector<uint>     & heat_charges,
-                      const double                  time = 100.0,
+                      const double                  time = 1.0,
                       const int                     laplacian_mode = COTANGENT);
 }
 
