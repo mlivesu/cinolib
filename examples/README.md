@@ -19,7 +19,6 @@ I am currently working on a wide number of code samples that showcase the core f
 * Tetrahedralization of piece-wise linear complexes using the [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) wrapper
 * Solve multi-labeling problems on surfaces and volumes using the [GraphCuts](http://vision.csd.uwo.ca/code/) wrapper
 * Exploit dualization to generate general polygonal and polyhedral meshes
-* Use conformalized heat flow to map genus zero surfaces to a sphere
 * Integral curve computation (and tessellation)
 * Iso curve computation (and tessellation)
 * Subdivision schemas for hexahedral meshes
