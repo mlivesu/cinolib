@@ -257,6 +257,7 @@ void AbstractPolygonMesh<M,V,E,P>::normalize_area()
 {
     this->scale(1.0/sqrt(this->mesh_area()));
     assert(std::fabs(this->mesh_area()-1)<1e-5);
+    this->update_bbox();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
