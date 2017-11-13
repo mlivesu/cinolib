@@ -52,6 +52,14 @@ void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
+                         const std::vector<uint>     & sources,
+                               std::vector<double>   & distances);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void dijkstra(const AbstractMesh<M,V,E,P> & m,
               const uint                    source,
               const uint                    dest,

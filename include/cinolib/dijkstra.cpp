@@ -97,6 +97,44 @@ void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
+                         const std::vector<uint>     & sources,
+                               std::vector<double>   & distances)
+{
+    distances = std::vector<double>(m.num_verts(), inf_double);
+    for(uint vid : sources) distances.at(vid) = 0.0;
+
+    std::set<std::pair<double,uint>> active_set;
+    for(uint vid : sources) active_set.insert(std::make_pair(0.0,vid));
+
+    while(!active_set.empty())
+    {
+        uint vid = active_set.begin()->second;
+        active_set.erase(active_set.begin());
+
+        for(uint nbr : m.adj_v2v(vid))
+        {
+            double new_dist = distances.at(vid) + m.vert(vid).dist(m.vert(nbr));
+
+            if (distances.at(nbr) > new_dist)
+            {
+                if (distances.at(nbr) < inf_double) // otherwise it won't be found
+                {
+                    auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
+                    assert(it!=active_set.end());
+                    active_set.erase(it);
+                }
+                distances.at(nbr) = new_dist;
+                active_set.insert(std::make_pair(new_dist,nbr));
+            }
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void dijkstra(const AbstractMesh<M,V,E,P> & m,
               const uint                    source,
               const uint                    dest,
