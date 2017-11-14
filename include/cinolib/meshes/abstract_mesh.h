@@ -132,11 +132,13 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual const Bbox                           & bbox()          const { return bb;    }
-        virtual const std::vector<vec3d>             & vector_verts()  const { return verts; }
-        virtual const std::vector<uint>              & vector_edges()  const { return edges; }
-        virtual const std::vector<std::vector<uint>> & vector_polys()  const { return polys; }
-        virtual       std::vector<double>              vector_coords() const ;
+        const Bbox                           & bbox()          const { return bb;    }
+              std::vector<double>              vector_coords() const ;
+        const std::vector<vec3d>             & vector_verts()  const { return verts; }
+              std::vector<vec3d>             & vector_verts()        { return verts; }
+        const std::vector<uint>              & vector_edges()  const { return edges; }
+        const std::vector<std::vector<uint>> & vector_polys()  const { return polys; }
+              std::vector<std::vector<uint>> & vector_polys()        { return polys; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
