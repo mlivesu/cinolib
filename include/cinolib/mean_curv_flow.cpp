@@ -96,6 +96,8 @@ void MCF(AbstractPolygonMesh<M,V,E,P> & m,
             if (!conformalized) L = laplacian(m, COTANGENT);
         }
     }
+
+    m.update_bbox();
 }
 
 }
