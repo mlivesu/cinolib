@@ -36,9 +36,9 @@ namespace cinolib
 
 template<class Vertex>
 CINO_INLINE
-void vertex_clustering(const std::vector<Vertex>   & points,
-                       const double                  proximity_thresh,
-                       std::vector<std::set<uint>> & clusters)
+void vertex_clustering(const std::vector<Vertex>             & points,
+                       const double                            proximity_thresh,
+                       std::vector<std::unordered_set<uint>> & clusters)
 {
     // build v2v connectivity based on point proximity
     std::vector<std::vector<uint>> v2v(points.size());
@@ -59,8 +59,8 @@ void vertex_clustering(const std::vector<Vertex>   & points,
     std::vector<bool> visited(nv, false);
     do
     {
-        std::set<uint> cluster;
-        bfs_exahustive(v2v, seed, cluster);
+        std::unordered_set<uint> cluster;
+        bfs(v2v, seed, cluster);
 
         clusters.push_back(cluster);
         for(uint vid : cluster) visited.at(vid) = true;
