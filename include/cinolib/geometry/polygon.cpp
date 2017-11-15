@@ -51,6 +51,14 @@ double polygon_signed_area(const std::vector<vec2d> & poly)
     }
     return area * 0.5;
 }
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double polygon_unsigned_area(const std::vector<vec2d> & poly)
+{
+    return std::fabs(polygon_signed_area(poly));
+}
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -153,17 +161,23 @@ uint polygon_find_ear(const std::vector<vec2d> & poly)
 // Implementation of the ear-cut triangulation algorithm
 //
 CINO_INLINE
-void polygon_triangulate(std::vector<vec2d> & poly,
+bool polygon_triangulate(std::vector<vec2d> & poly,
                          std::vector<uint>  & tris)
 {
+    tris.clear();
+
+    if (polygon_unsigned_area(poly) < 1e-5)
+    {
+        std::cerr << "WARNING: degenerate polygon (area < 1e-5). No triangulation will be produced." << std::endl;
+        return false;
+    }
+
     // If the polygon is not CCW, flip it along X
     //
     if (!polygon_is_CCW(poly))
     {
         for(auto & p : poly) p.x() = -p.x();
     }
-
-    tris.clear();
 
     std::map<uint,uint> v_map;
     for(uint vid=0; vid<poly.size(); ++vid) v_map[vid] = vid;
@@ -191,17 +205,19 @@ void polygon_triangulate(std::vector<vec2d> & poly,
         sub_poly = tmp_poly;
         v_map    = tmp_v_map;
     }
+
+    return true;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void polygon_triangulate(std::vector<vec3d> &poly,
+bool polygon_triangulate(std::vector<vec3d> &poly,
                          std::vector<uint> & tris)
 {
     std::vector<vec2d> poly2d;
     polygon_flatten(poly, poly2d);
-    polygon_triangulate(poly2d, tris);
+    return polygon_triangulate(poly2d, tris);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
