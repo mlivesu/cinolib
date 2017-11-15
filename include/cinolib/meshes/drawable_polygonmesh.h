@@ -31,6 +31,8 @@
 #ifndef CINO_DRAWABLE_POLYGONMESH_H
 #define CINO_DRAWABLE_POLYGONMESH_H
 
+#ifdef CINOLIB_USES_OPENGL
+
 #include <cinolib/meshes/polygonmesh.h>
 #include <cinolib/meshes/abstract_drawable_polygonmesh.h>
 
@@ -86,5 +88,7 @@ class DrawablePolygonmesh : public AbstractDrawablePolygonMesh<Polygonmesh<M,V,E
 };
 
 }
+
+#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_DRAWABLE_POLYGONMESH_H

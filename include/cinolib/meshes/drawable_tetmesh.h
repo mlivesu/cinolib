@@ -31,6 +31,8 @@
 #ifndef CINO_DRAWABLE_TETMESH_H
 #define CINO_DRAWABLE_TETMESH_H
 
+#ifdef CINOLIB_USES_OPENGL
+
 #include <cinolib/meshes/tetmesh.h>
 #include <cinolib/meshes/abstract_drawable_polyhedralmesh.h>
 
@@ -93,5 +95,7 @@ class DrawableTetmesh : public AbstractDrawablePolyhedralMesh<Tetmesh<M,V,E,F,P>
 };
 
 }
+
+#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_DRAWABLE_TETMESH_H

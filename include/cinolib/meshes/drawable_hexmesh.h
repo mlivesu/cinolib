@@ -31,6 +31,8 @@
 #ifndef CINO_DRAWABLE_HEXMESH_H
 #define CINO_DRAWABLE_HEXMESH_H
 
+#ifdef CINOLIB_USES_OPENGL
+
 #include <cinolib/meshes/hexmesh.h>
 #include <cinolib/meshes/abstract_drawable_polyhedralmesh.h>
 
@@ -93,5 +95,7 @@ class DrawableHexmesh : public AbstractDrawablePolyhedralMesh<Hexmesh<M,V,E,F,P>
 };
 
 }
+
+#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_DRAWABLE_HEXMESH_H

@@ -31,6 +31,8 @@
 #ifndef CINO_DRAWABLE_QUADMESH_H
 #define CINO_DRAWABLE_QUADMESH_H
 
+#ifdef CINOLIB_USES_OPENGL
+
 #include <cinolib/meshes/quadmesh.h>
 #include <cinolib/meshes/abstract_drawable_polygonmesh.h>
 
@@ -102,5 +104,7 @@ class DrawableQuadmesh : public AbstractDrawablePolygonMesh<Quadmesh<M,V,E,P>>
 };
 
 }
+
+#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_DRAWABLE_QUADMESH_H

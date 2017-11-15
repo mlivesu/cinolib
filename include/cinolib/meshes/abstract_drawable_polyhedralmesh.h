@@ -31,6 +31,8 @@
 #ifndef CINO_ABSTRACT_DRAWABLE_POLYHEDRAL_MESH_H
 #define CINO_ABSTRACT_DRAWABLE_POLYHEDRAL_MESH_H
 
+#ifdef CINOLIB_USES_OPENGL
+
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/meshes/mesh_slicer.h>
@@ -112,5 +114,7 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
 #ifndef  CINO_STATIC_LIB
 #include "abstract_drawable_polyhedralmesh.cpp"
 #endif
+
+#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_ABSTRACT_DRAWABLE_POLYHEDRAL_MESH_H

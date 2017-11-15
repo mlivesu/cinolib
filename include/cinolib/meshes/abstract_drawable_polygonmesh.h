@@ -31,6 +31,8 @@
 #ifndef CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H
 #define CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H
 
+#ifdef CINOLIB_USES_OPENGL
+
 #include <cinolib/cinolib.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/gl/draw_lines_tris.h>
@@ -102,5 +104,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 #ifndef  CINO_STATIC_LIB
 #include "abstract_drawable_polygonmesh.cpp"
 #endif
+
+#endif // #ifdef CINOLIB_USES_OPENGL
 
 #endif // CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H
