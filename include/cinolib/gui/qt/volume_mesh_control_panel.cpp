@@ -602,14 +602,15 @@ template<class Mesh>
 CINO_INLINE
 void VolumeMeshControlPanel<Mesh>::set_isosurface()
 {
-    if (m == NULL || canvas == NULL) return;
+    if (m == NULL || canvas == NULL || m->mesh_type() != TETMESH) return;
     canvas->pop(&isosurface);
     if (cb_isosurface->isChecked())
     {
-        Color  color     = isosurface.color;
-        double isovalue  = static_cast<double>(sl_isovalue->value())/999.0;
-        isosurface       = DrawableIsosurface<M,V,E,F,P>(*m, isovalue);
-        isosurface.color = color;
+        Color  color            = isosurface.color;
+        double isovalue         = static_cast<double>(sl_isovalue->value())/999.0;
+        Tetmesh<M,V,E,F,P> *ptr = dynamic_cast<Tetmesh<M,V,E,F,P>*>(m);
+        isosurface              = DrawableIsosurface<M,V,E,F,P>(*ptr, isovalue);
+        isosurface.color        = color;
         canvas->push_obj(&isosurface,false);
     }
     canvas->updateGL();
