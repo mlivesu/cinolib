@@ -15,10 +15,7 @@ I am currently working on a wide number of code samples that showcase the core f
 * Parameterization based hexahedral remeshing
 * Computation of heat based geodesics for surfaces and volumes
 * Surface and volumetric format converters
-* Triangulation of general planar domains using the [Triangle](https://www.cs.cmu.edu/~quake/triangle.html) wrapper
-* Tetrahedralization of piece-wise linear complexes using the [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) wrapper
 * Solve multi-labeling problems on surfaces and volumes using the [GraphCuts](http://vision.csd.uwo.ca/code/) wrapper
-* Exploit dualization to generate general polygonal and polyhedral meshes
 * Integral curve computation (and tessellation)
 * Iso curve computation (and tessellation)
 * Subdivision schemas for hexahedral meshes
