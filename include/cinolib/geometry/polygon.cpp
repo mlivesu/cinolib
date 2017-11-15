@@ -123,7 +123,7 @@ void polygon_flatten(const std::vector<vec3d> & poly3d,
 // http://cgm.cs.mcgill.ca/~godfried/teaching/cg-projects/97/Ian/algorithm1.html
 //
 CINO_INLINE
-uint polygon_find_ear(const std::vector<vec2d> & poly)
+int polygon_find_ear(const std::vector<vec2d> & poly)
 {
     uint curr = 0;
     bool ear_not_found = true;
@@ -150,8 +150,8 @@ uint polygon_find_ear(const std::vector<vec2d> & poly)
             if (!contains_other_point) ear_not_found = false;
         }
 
-        if(ear_not_found) ++curr;
-        assert(curr < poly.size());
+        if (ear_not_found) ++curr;
+        if (curr >= poly.size()) return -1; // no ear could be found (usually means the polygon is degenerate)
     }
     return curr;
 }
@@ -166,12 +166,6 @@ bool polygon_triangulate(std::vector<vec2d> & poly,
 {
     tris.clear();
 
-    if (polygon_unsigned_area(poly) < 1e-5)
-    {
-        std::cerr << "WARNING: degenerate polygon (area < 1e-5). No triangulation will be produced." << std::endl;
-        return false;
-    }
-
     // If the polygon is not CCW, flip it along X
     //
     if (!polygon_is_CCW(poly))
@@ -185,7 +179,13 @@ bool polygon_triangulate(std::vector<vec2d> & poly,
     std::vector<vec2d> sub_poly = poly;
     while(sub_poly.size() >= 3)
     {
-        uint curr = polygon_find_ear(sub_poly);
+        int curr = polygon_find_ear(sub_poly);
+        if (curr<0)
+        {
+            std::cerr << "WARNING: ear cut algorithm failure (is the polygon degenerate?)" << std::endl;
+            tris.clear();
+            return false;
+        }
         uint prev = (curr+sub_poly.size()-1)%sub_poly.size();
         uint next = (curr+1)%sub_poly.size();
 
@@ -198,7 +198,7 @@ bool polygon_triangulate(std::vector<vec2d> & poly,
         std::vector<vec2d>  tmp_poly;
         for(uint vid=0; vid<sub_poly.size(); ++vid)
         {
-            if (vid==curr) continue;
+            if ((int)vid==curr) continue;
             tmp_poly.push_back(sub_poly.at(vid));
             tmp_v_map[tmp_poly.size()-1] = v_map.at(vid);
         }

@@ -94,7 +94,7 @@ bool polygon_triangulate(std::vector<vec3d> & poly, std::vector<uint> & tris);
 // http://cgm.cs.mcgill.ca/~godfried/teaching/cg-projects/97/Ian/algorithm1.html
 //
 CINO_INLINE
-uint polygon_find_ear(const std::vector<vec2d> & poly);
+int polygon_find_ear(const std::vector<vec2d> & poly);
 
 }
 

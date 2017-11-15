@@ -192,10 +192,11 @@ void Polyhedralmesh<M,V,E,F,P>::update_face_tessellation()
         }
         //
         std::vector<uint> tris;
-        polygon_triangulate(vlist, tris);
-        //
-        triangulated_faces.at(fid).clear();
-        for(uint off : tris) triangulated_faces.at(fid).push_back(this->face_vert_id(fid,off));
+        if (polygon_triangulate(vlist, tris))
+        {
+            triangulated_faces.at(fid).clear();
+            for(uint off : tris) triangulated_faces.at(fid).push_back(this->face_vert_id(fid,off));
+        }
     }
 }
 

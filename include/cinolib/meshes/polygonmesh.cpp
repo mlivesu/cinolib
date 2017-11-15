@@ -118,20 +118,7 @@ void Polygonmesh<M,V,E,P>::update_poly_tessellation(const uint pid)
     std::vector<vec2d> poly2d;
     polygon_flatten(poly3d, poly2d);
 
-    if (polygon_is_convex(poly2d))
-    {
-        for (uint i=2; i<this->verts_per_poly(pid); ++i)
-        {
-            uint vid0 = this->polys.at(pid).at( 0 );
-            uint vid1 = this->polys.at(pid).at(i-1);
-            uint vid2 = this->polys.at(pid).at( i );
-
-            triangulated_polys.at(pid).push_back(vid0);
-            triangulated_polys.at(pid).push_back(vid1);
-            triangulated_polys.at(pid).push_back(vid2);
-        }
-    }
-    else
+    if (!polygon_is_convex(poly2d))
     {
         // Apply ear cut algorithm
         //
@@ -140,8 +127,24 @@ void Polygonmesh<M,V,E,P>::update_poly_tessellation(const uint pid)
         // can still happen for highly non-planar polygons
         //
         std::vector<uint> tris;
-        polygon_triangulate(poly2d, tris);
-        for(uint off : tris) triangulated_polys.at(pid).push_back(this->poly_vert_id(pid,off));
+        if (polygon_triangulate(poly2d, tris))
+        {
+            for(uint off : tris) triangulated_polys.at(pid).push_back(this->poly_vert_id(pid,off));
+            return;
+        }
+    }
+
+    // iff polygon is convex (or ear cut failed), apply trivial triangulation
+    //
+    for (uint i=2; i<this->verts_per_poly(pid); ++i)
+    {
+        uint vid0 = this->polys.at(pid).at( 0 );
+        uint vid1 = this->polys.at(pid).at(i-1);
+        uint vid2 = this->polys.at(pid).at( i );
+
+        triangulated_polys.at(pid).push_back(vid0);
+        triangulated_polys.at(pid).push_back(vid1);
+        triangulated_polys.at(pid).push_back(vid2);
     }
 }
 
