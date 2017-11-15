@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     // make tetmesh
     std::vector<uint>   edges, tets;
     std::vector<double> verts;
-    double vol_thresh = 0.01 * m_in.bbox().diag(); // force triangles to be smaller than 5% of bbox diag
+    double vol_thresh = 0.01 * m_in.bbox().diag(); // force tets to be smaller than 5% of bbox diag
     char opt[100];
     sprintf(opt, "YQqa%f", vol_thresh);
     tetgen_wrap(m_in.vector_coords(), m_in.vector_serialized_polys(), edges, opt, verts, tets);
