@@ -189,6 +189,22 @@ std::vector<double> AbstractMesh<M,V,E,P>::vector_coords() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+std::vector<uint> AbstractMesh<M,V,E,P>::vector_serialized_polys() const
+{
+    std::vector<uint> serialized_polys;
+    serialized_polys.reserve(3*num_polys());
+    for(uint pid=0; pid<num_polys(); ++pid)
+    for(uint off=0; off<verts_per_poly(pid); ++off)
+    {
+        serialized_polys.push_back(poly_vert_id(pid,off));
+    }
+    return serialized_polys;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<double> AbstractMesh<M,V,E,P>::serialize_uvw(const int mode) const
 {
     std::vector<double> uvw;

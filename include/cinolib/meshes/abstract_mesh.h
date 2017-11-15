@@ -132,13 +132,14 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const Bbox                           & bbox()          const { return bb;    }
-              std::vector<double>              vector_coords() const ;
-        const std::vector<vec3d>             & vector_verts()  const { return verts; }
-              std::vector<vec3d>             & vector_verts()        { return verts; }
-        const std::vector<uint>              & vector_edges()  const { return edges; }
-        const std::vector<std::vector<uint>> & vector_polys()  const { return polys; }
-              std::vector<std::vector<uint>> & vector_polys()        { return polys; }
+        const Bbox                           & bbox()                    const { return bb;    }
+              std::vector<double>              vector_coords()           const ;
+        const std::vector<vec3d>             & vector_verts()            const { return verts; }
+              std::vector<vec3d>             & vector_verts()                  { return verts; }
+        const std::vector<uint>              & vector_edges()            const { return edges; }
+        const std::vector<std::vector<uint>> & vector_polys()            const { return polys; }
+              std::vector<std::vector<uint>> & vector_polys()                  { return polys; }
+              std::vector<uint>                vector_serialized_polys() const ;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
