@@ -1,11 +1,14 @@
 TEMPLATE        = app
 TARGET          = 00_base_app
 QT             += core opengl xml
-CONFIG         += c++11
+CONFIG         += c++11 release
 CONFIG         -= app_bundle
 INCLUDEPATH    += /usr/local/include
 INCLUDEPATH    += /Users/cino/Documents/research/devel/lib/CinoLib/include
 DEPENDPATH     += /Users/cino/Documents/research/devel/lib/CinoLib/include # force recompilation if cinolib changes
+
+DATA_PATH = \\\"$$PWD/../data/\\\"
+DEFINES  += DATA_PATH=$$DATA_PATH
 
 # ------------------------------------ #
 # --------- WARNINGS CONTROL --------- #

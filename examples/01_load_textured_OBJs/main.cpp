@@ -31,7 +31,8 @@ int main(int argc, char **argv)
 
     std::vector<vec3d> xyz, uvw;
     std::vector<std::vector<uint>> poly;
-    read_OBJ("../../data/blub_triangulated.obj", xyz, uvw, poly);
+    std::string s = std::string(DATA_PATH) + "/blub_triangulated.obj";
+    read_OBJ(s.c_str(), xyz, uvw, poly);
 
     DrawableTrimesh<> m_xyz(xyz, poly);
 
@@ -43,8 +44,9 @@ int main(int argc, char **argv)
     m_uvw.copy_uvw_to_xyz(UVW_param);
     m_uvw.update_normals();
 
-    m_xyz.show_texture2D(TEXTURE_2D_BITMAP, 1.0, "../../data/blub_texture.png");
-    m_uvw.show_texture2D(TEXTURE_2D_BITMAP, 1.0, "../../data/blub_texture.png");
+    s = std::string(DATA_PATH) + "/blub_texture.png";
+    m_xyz.show_texture2D(TEXTURE_2D_BITMAP, 1.0, s.c_str());
+    m_uvw.show_texture2D(TEXTURE_2D_BITMAP, 1.0, s.c_str());
 
     gui_xyz.push_obj(&m_xyz);
     gui_uvw.push_obj(&m_uvw);

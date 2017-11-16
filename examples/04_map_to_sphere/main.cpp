@@ -24,7 +24,8 @@ int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
 
-    cinolib::DrawableTrimesh<> m_xyz("../../data/bunny.obj");
+    std::string s = std::string(DATA_PATH) + "/bunny.obj";
+    cinolib::DrawableTrimesh<> m_xyz(s.c_str());
     cinolib::DrawableTrimesh<> m_uvw = m_xyz;
 
     QWidget  gui;

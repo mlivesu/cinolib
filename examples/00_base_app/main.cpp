@@ -28,8 +28,10 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    cinolib::DrawableTrimesh<> m_srf("../../data/circle.obj");
-    cinolib::DrawableTetmesh<> m_vol("../../data/sphere.mesh");
+    std::string s0 = std::string(DATA_PATH) + "/circle.obj";
+    std::string s1 = std::string(DATA_PATH) + "/sphere.mesh";
+    cinolib::DrawableTrimesh<> m_srf(s0.c_str());
+    cinolib::DrawableTetmesh<> m_vol(s1.c_str());
 
     cinolib::GLcanvas gui_srf;
     gui_srf.resize(400,300);

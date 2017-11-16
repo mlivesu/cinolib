@@ -22,7 +22,8 @@ int main(int argc, char **argv)
 
     QApplication app(argc, argv);
 
-    DrawablePolygonmesh<> m_in("../../data/E.obj");
+    std::string s = std::string(DATA_PATH) + "/E.obj";
+    DrawablePolygonmesh<> m_in(s.c_str());
 
     // make trimesh
     std::vector<std::vector<uint>> tris;
