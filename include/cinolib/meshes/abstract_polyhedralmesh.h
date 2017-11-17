@@ -153,6 +153,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual double            face_mass            (const uint fid) const;
         virtual double            face_area            (const uint fid) const;
         virtual bool              faces_are_disjoint   (const uint fid0, const uint fid1) const;
+        virtual void              face_unmark_all      ();
         virtual void              face_set_color       (const Color & c);
         virtual void              face_set_alpha       (const float alpha);
         virtual std::vector<uint> face_tessellation    (const uint fid) const = 0;

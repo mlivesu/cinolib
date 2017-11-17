@@ -636,6 +636,18 @@ void AbstractMesh<M,V,E,P>::edge_set_color(const Color & c)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractMesh<M,V,E,P>::edge_unmark_all()
+{
+    for(uint eid=0; eid<num_edges(); ++eid)
+    {
+        edge_data(eid).marked = false;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractMesh<M,V,E,P>::edge_set_alpha(const float alpha)
 {
     for(uint eid=0; eid<num_edges(); ++eid)

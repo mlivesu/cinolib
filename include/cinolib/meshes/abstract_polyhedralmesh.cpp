@@ -267,6 +267,18 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::face_set_color(const Color & c)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::face_unmark_all()
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        face_data(fid).marked = false;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::face_set_alpha(const float alpha)
 {
     for(uint fid=0; fid<num_faces(); ++fid)

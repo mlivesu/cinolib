@@ -203,6 +203,7 @@ class AbstractMesh
         virtual       double edge_min_length   () const;
         virtual       void   edge_set_color    (const Color & c);
         virtual       void   edge_set_alpha    (const float alpha);
+        virtual       void   edge_unmark_all   ();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

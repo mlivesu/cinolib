@@ -1,3 +1,5 @@
 examples/*/build*
 examples/*/*.user
 examples/build-*
+
+examples/build_all_examples.pro.user
