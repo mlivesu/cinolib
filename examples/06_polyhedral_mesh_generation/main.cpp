@@ -13,7 +13,6 @@
 #include <cinolib/dual_mesh.h>
 #include <cinolib/tetgen_wrap.h>
 #include <cinolib/gui/qt/glcanvas.h>
-#include <cinolib/gui/qt/volume_mesh_control_panel.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
