@@ -7,3 +7,4 @@ SUBDIRS += 03_polyharmonic_functions_vol
 SUBDIRS += 04_map_to_sphere
 SUBDIRS += 05_polygon_mesh_generation
 SUBDIRS += 06_polyhedral_mesh_generation
+SUBDIRS += 07_heat_based_geodesics

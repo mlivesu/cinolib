@@ -13,7 +13,6 @@ I am currently working on a wide number of code samples that showcase the core f
 * Evaluation of quality metrics (polygon kernels, incircles, circumcircles)
 * Computation of conformal maps for surface meshes
 * Parameterization based hexahedral remeshing
-* Computation of heat based geodesics for surfaces and volumes
 * Surface and volumetric format converters
 * Solve multi-labeling problems on surfaces and volumes using the [GraphCuts](http://vision.csd.uwo.ca/code/) wrapper
 * Integral curve computation (and tessellation)
