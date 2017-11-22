@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/gui/qt/volume_mesh_control_panel.h>
 #include <cinolib/textures/textures.h>
+#include <cinolib/meshes/mesh_slicer.h>
 #include <cinolib/gradient.h>
 #include <iostream>
 
@@ -413,6 +414,7 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         cb_slice_flip_y = new QCheckBox("flip", gbox);
         cb_slice_flip_z = new QCheckBox("flip", gbox);
         cb_slice_flip_q = new QCheckBox("flip", gbox);
+        cb_slice_flip_l = new QCheckBox("flip", gbox);
         rb_slice_AND    = new QRadioButton("&&", gbox);
         rb_slice_OR     = new QRadioButton("||",  gbox);
         but_slice_reset = new QPushButton("Reset", gbox);
@@ -431,6 +433,7 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         cb_slice_flip_y->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         cb_slice_flip_z->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         cb_slice_flip_q->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_slice_flip_l->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         rb_slice_AND->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         rb_slice_OR->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         but_slice_reset->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -447,7 +450,7 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         sl_slice_y->setValue(sl_slice_y->maximum());
         sl_slice_z->setValue(sl_slice_z->maximum());
         sl_slice_q->setValue(sl_slice_q->maximum());
-        sl_slice_l->setValue(sl_slice_l->maximum());
+        sl_slice_l->setValue(sl_slice_l->minimum());
         rb_slice_AND->setChecked(true);
         cb_slice_flip_x->setChecked(false);
         cb_slice_flip_y->setChecked(false);
@@ -458,6 +461,7 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         cb_slice_flip_y->setFont(global_font);
         cb_slice_flip_z->setFont(global_font);
         cb_slice_flip_q->setFont(global_font);
+        cb_slice_flip_l->setFont(global_font);
         rb_slice_AND->setFont(global_font);
         rb_slice_OR->setFont(global_font);
         but_slice_reset->setFont(global_font);
@@ -484,6 +488,7 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         layout->addWidget(cb_slice_flip_y,2,4);
         layout->addWidget(cb_slice_flip_z,3,4);
         layout->addWidget(cb_slice_flip_q,4,4);
+        layout->addWidget(cb_slice_flip_l,5,4);
         gbox->setLayout(layout);
         left_col->addWidget(gbox);
     }
@@ -593,6 +598,29 @@ void VolumeMeshControlPanel<Mesh>::set_tex2d(const int in_out)
         }
         m->show_in_texture2D(tex_type, density, in_tex2d_filename.c_str());
     }
+    canvas->updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void VolumeMeshControlPanel<Mesh>::set_slice()
+{
+    if (m == NULL || canvas == NULL) return;
+    SlicerState s;
+    s.X_thresh = float(sl_slice_x->value()) / float(sl_slice_x->maximum());
+    s.Y_thresh = float(sl_slice_y->value()) / float(sl_slice_y->maximum());
+    s.Z_thresh = float(sl_slice_z->value()) / float(sl_slice_z->maximum());
+    s.Q_thresh = float(sl_slice_q->value()) / float(sl_slice_q->maximum());
+    s.L_filter = sl_slice_l->value();
+    s.X_sign   = cb_slice_flip_x->isChecked() ? GEQ : LEQ;
+    s.Y_sign   = cb_slice_flip_y->isChecked() ? GEQ : LEQ;
+    s.Z_sign   = cb_slice_flip_z->isChecked() ? GEQ : LEQ;
+    s.Q_sign   = cb_slice_flip_q->isChecked() ? GEQ : LEQ;
+    s.L_mode   = cb_slice_flip_l->isChecked() ? IS  : IS_NOT;
+    s.mode     = rb_slice_AND->isChecked()    ? AND : OR;
+    m->slice(s);
     canvas->updateGL();
 }
 
@@ -1093,59 +1121,70 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     QSlider::connect(sl_slice_x, &QSlider::valueChanged, [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        float thresh = float(sl_slice_x->value()) / float(sl_slice_x->maximum());
-        int   flip   = cb_slice_flip_x->isChecked() ? GEQ : LEQ;
-        int   mode   = rb_slice_AND->isChecked()    ? AND : OR;
-        m->slice(thresh, X, flip, mode);
-        canvas->updateGL();
+        set_slice();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     QSlider::connect(sl_slice_y, &QSlider::valueChanged, [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        float thresh = float(sl_slice_y->value()) / float(sl_slice_y->maximum());
-        int   flip   = cb_slice_flip_y->isChecked() ? GEQ : LEQ;
-        int   mode   = rb_slice_AND->isChecked()    ? AND : OR;
-        m->slice(thresh, Y, flip, mode);
-        canvas->updateGL();
+        set_slice();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     QSlider::connect(sl_slice_z, &QSlider::valueChanged, [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        float thresh = float(sl_slice_z->value()) / float(sl_slice_z->maximum());
-        int   flip   = cb_slice_flip_z->isChecked() ? GEQ : LEQ;
-        int   mode   = rb_slice_AND->isChecked()    ? AND : OR;
-        m->slice(thresh, Z, flip, mode);
-        canvas->updateGL();
+        set_slice();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     QSlider::connect(sl_slice_q, &QSlider::valueChanged, [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        float thresh = float(sl_slice_q->value()) / float(sl_slice_q->maximum());
-        int   flip   = cb_slice_flip_q->isChecked() ? GEQ : LEQ;
-        int   mode   = rb_slice_AND->isChecked()    ? AND : OR;
-        m->slice(thresh, Q, flip, mode);
-        canvas->updateGL();
+        set_slice();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     QSlider::connect(sl_slice_l, &QSlider::valueChanged, [&]()
     {
-        if (m == NULL || canvas == NULL) return;
-        int label = float() / float(sl_slice_l->maximum());
-        int mode  = rb_slice_AND->isChecked()    ? AND : OR;
-        m->slice(label, L, LEQ, mode);
-        canvas->updateGL();
+        set_slice();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_slice_flip_x, &QCheckBox::toggled, [&]()
+    {
+        set_slice();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_slice_flip_y, &QCheckBox::toggled, [&]()
+    {
+        set_slice();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_slice_flip_z, &QCheckBox::toggled, [&]()
+    {
+        set_slice();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_slice_flip_q, &QCheckBox::toggled, [&]()
+    {
+        set_slice();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_slice_flip_l, &QCheckBox::toggled, [&]()
+    {
+        set_slice();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1159,7 +1198,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
         sl_slice_y->setValue(sl_slice_y->maximum());
         sl_slice_z->setValue(sl_slice_z->maximum());
         sl_slice_q->setValue(sl_slice_q->maximum());
-        sl_slice_l->setValue(sl_slice_l->maximum());
+        sl_slice_l->setValue(sl_slice_l->minimum());
         rb_slice_AND->setChecked(true);
         cb_slice_flip_x->setChecked(false);
         cb_slice_flip_y->setChecked(false);

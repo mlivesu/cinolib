@@ -267,15 +267,6 @@ void GLcanvas::deserialize_camera(const std::string & s)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::set_slice(float thresh, int item, int sign, int mode)
-{
-    for(DrawableObject *obj : drawlist) obj->slice(thresh, item, sign, mode);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
 bool GLcanvas::pop_first_occurrence_of(int type)
 {
     for(std::vector<DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)

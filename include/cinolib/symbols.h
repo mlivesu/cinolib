@@ -59,12 +59,15 @@ enum
     Q,    // Quality
     L,    // Label
     //
-    EQ,   // ==
-    NEQ,  // !=
-    LEQ,  // <=
-    GEQ,  // >=
-    AND,  // &&
-    OR    // ||
+    IS,     // for labels
+    IS_NOT, // for labels
+    //
+    EQ,     // ==
+    NEQ,    // !=
+    LEQ,    // <=
+    GEQ,    // >=
+    AND,    // &&
+    OR      // ||
 };
 
 enum

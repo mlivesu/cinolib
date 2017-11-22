@@ -76,7 +76,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void slice(const float thresh, const int item, const int sign, const int mode);
+        void slice(const SlicerState & s);
         void slicer_reset();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

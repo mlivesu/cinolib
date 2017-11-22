@@ -228,12 +228,9 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::slice(const float thresh, // thresh on centroids or quality
-                                     const int   item,   // X, Y, Z, L, Q
-                                     const int   sign,   // either LEQ or GEQ
-                                     const int   mode)   // either AND or OR
+void AbstractDrawablePolygonMesh<Mesh>::slice(const SlicerState & s)
 {
-    slicer.update(*this, thresh, item, sign, mode); // update per element visibility flags
+    slicer.update(*this, s); // update per element visibility flags
     updateGL();
 }
 
@@ -241,7 +238,7 @@ void AbstractDrawablePolygonMesh<Mesh>::slice(const float thresh, // thresh on c
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::slicer_reset()   // either AND or OR
+void AbstractDrawablePolygonMesh<Mesh>::slicer_reset()
 {
     slicer.reset(*this);
     updateGL();

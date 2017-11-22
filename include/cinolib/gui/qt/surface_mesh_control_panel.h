@@ -79,6 +79,7 @@ class SurfaceMeshControlPanel
         void set_tex1d();
         void set_tex2d();
         void set_isocurve();
+        void set_slice();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -130,6 +131,7 @@ class SurfaceMeshControlPanel
         QCheckBox                   *cb_slice_flip_y;
         QCheckBox                   *cb_slice_flip_z;
         QCheckBox                   *cb_slice_flip_q;
+        QCheckBox                   *cb_slice_flip_l;
         QRadioButton                *rb_slice_AND;
         QRadioButton                *rb_slice_OR;
         QPushButton                 *but_slice_reset;

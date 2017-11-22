@@ -56,9 +56,11 @@ int main(int argc, char **argv)
     m_in.show_wireframe(true);
 
     // show interior
-    m_in.slice(0.6, Z, LEQ, AND);
-    tetmesh.slice(0.6, Z, LEQ, AND);
-    polymesh.slice(0.6, Z, LEQ, AND);
+    SlicerState slice_params;
+    slice_params.Z_thresh = 0.6;
+    m_in.slice(slice_params);
+    tetmesh.slice(slice_params);
+    polymesh.slice(slice_params);
 
     return app.exec();
 }

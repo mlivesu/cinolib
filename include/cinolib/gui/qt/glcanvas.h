@@ -82,10 +82,6 @@ class GLcanvas : public QGLViewer
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void set_slice(float thresh, int item, int sign, int mode);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         std::string serialize_drawlist() const;
         std::string serialize_camera() const;
         void        deserialize_camera(const std::string & s);

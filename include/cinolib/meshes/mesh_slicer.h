@@ -35,6 +35,25 @@
 
 namespace cinolib
 {
+
+typedef struct
+{
+    float X_thresh =  1;  // X coord \in [0,1] ( relative w.r.t. bbox delta x)
+    float Y_thresh =  1;  // Y coord \in [0,1] ( relative w.r.t. bbox delta y)
+    float Z_thresh =  1;  // Z coord \in [0,1] ( relative w.r.t. bbox delta z)
+    float Q_thresh =  1;  // Quality \in [0,1] ( assumes quality metric is in [0,1] too)
+    int   L_filter = -1;  // Label (-1 : show all labels)
+    int   X_sign   = LEQ; // { LEQ, GEQ   }
+    int   Y_sign   = LEQ; // { LEQ, GEQ   }
+    int   Z_sign   = LEQ; // { LEQ, GEQ   }
+    int   Q_sign   = LEQ; // { LEQ, GEQ   }
+    int   L_mode   = IS;  // { IS, IS_NOT }
+    int   mode     = AND; // { AND, OR    }
+}
+SlicerState;
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 /* Filter mesh elements according to a number of different criteria.
  * Useful to inspect the interior of volume meshes, or to isolate
  * interesting portions of a complex surface mesh.
@@ -54,20 +73,7 @@ class MeshSlicer
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update(      Mesh  & m,
-                    const float   thresh,  // thresh on centroid
-                    const int     item,    // X, Y, Z, Q, L
-                    const int     sign,    // either LEQ or GEQ (used for X Y Z Q)
-                    const int     mode);   // either AND or OR
-
-        void update(Mesh & m);
-
-    protected:
-
-
-        float slice_thresh[5]; // X Y Z Q L
-        int   slice_sign  [4]; // either LEQ or GEQ (used for X Y Z Q)
-        int   slice_mode;      // either AND or OR
+        void update(Mesh & m, const SlicerState & s);
 };
 
 }

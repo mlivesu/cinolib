@@ -84,6 +84,7 @@ class VolumeMeshControlPanel
         void set_isosurface();
         void set_tex1d(const int in_out);
         void set_tex2d(const int in_out);
+        void set_slice();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -162,6 +163,7 @@ class VolumeMeshControlPanel
         QCheckBox                     *cb_slice_flip_y;
         QCheckBox                     *cb_slice_flip_z;
         QCheckBox                     *cb_slice_flip_q;
+        QCheckBox                     *cb_slice_flip_l;
         QRadioButton                  *rb_slice_AND;
         QRadioButton                  *rb_slice_OR;
         QPushButton                   *but_slice_reset;
