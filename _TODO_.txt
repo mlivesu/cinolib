@@ -1,10 +1,16 @@
+- add inverse and transpose operators for 2x2 matrices
+- add instructions to compile examples on README (via bash and via QtCreator)
+- add Profiler to all examples
+- remove virtual from mesh hierarchy whenever possible
+- try making connectivity just by using poly_add and vert_add
+- fix includes to <eigen3\Eigen\...> => they should be <Eigen\...>
+- read vectors of meshes rather than meshes in GUI control panel
 - make sure 1D textures are always drawn covering full spectrum (RED to BLUE in HSV RAMP)
-- debug integral curves (they look suspicious after the last big refactor…)
+- refactor ray/line/plane intersections and integral curve tracing (check Robust Polylines Tracing for N-Symmetry Direction Field on Triangulated Surfaces)
 - implement topological operators (add/remove/collapse) also for volumetric meshes
-- Add GUI controls: save Isosurface - load/read labeling
+- Add GUI controls: save Isosurface - load/save labeling
 - Turn gradient GUI control in vector field (gradient button to make a gradient)
 - avoid headers from serialized vector and scalar fields (it’s far more general)
-- edit slicer interface (receive the full state as parameter)
 - edit texturing interface (receive the full info as parameter)
 - update skeleton data structure (and make relative control panel)
 - Gradients on hexmeshes are buggy. hint: check per face normals!
