@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/gui/qt/surface_mesh_control_panel.h>
 #include <cinolib/textures/textures.h>
+#include <cinolib/meshes/mesh_slicer.h>
 
 namespace cinolib
 {
