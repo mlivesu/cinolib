@@ -870,6 +870,20 @@ void SurfaceMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+    QRadioButton::connect(rb_slice_AND, &QPushButton::toggled, [&]()
+    {
+        set_slice();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_slice_OR, &QPushButton::toggled, [&]()
+    {
+        set_slice();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     QPushButton::connect(but_slice_reset, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
