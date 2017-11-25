@@ -47,7 +47,7 @@ GLcanvas::GLcanvas(QWidget * parent)
 
     clear_color = QColor(200, 200, 200);
 
-    // enable cut/paste points of view for fast reproduction of paper images/comparisons
+    // enable cut/paste shortcuts to copy/paste points of view for fast reproduction of paper images/comparisons
     //
     connect(new QShortcut(QKeySequence::Copy, this), &QShortcut::activated, [&](){
         QApplication::clipboard()->setText(serialize_camera().data());
@@ -80,6 +80,23 @@ void GLcanvas::make_popup_menu()
         updateGL();
     });
     popup->addAction(background_color);
+
+    QAction *copy_POV = new QAction("Copy POV", this);
+    connect(copy_POV, &QAction::triggered, [&]()
+    {
+        QApplication::clipboard()->setText(serialize_camera().data());
+    });
+    popup->addAction(copy_POV);
+
+    QAction *paste_POV = new QAction("Paste POV", this);
+    connect(paste_POV, &QAction::triggered, [&]()
+    {
+        if (QApplication::clipboard()->mimeData()->hasText())
+        {
+            deserialize_camera(QApplication::clipboard()->mimeData()->text().toStdString());
+        }
+    });
+    popup->addAction(paste_POV);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
