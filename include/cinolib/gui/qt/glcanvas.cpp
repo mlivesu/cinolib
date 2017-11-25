@@ -44,6 +44,7 @@ CINO_INLINE
 GLcanvas::GLcanvas(QWidget * parent)
 {
     setParent(parent);
+    make_popup_menu();
 
     clear_color = QColor(200, 200, 200);
 
@@ -66,31 +67,23 @@ GLcanvas::GLcanvas(QWidget * parent)
 CINO_INLINE
 void GLcanvas::make_popup_menu()
 {
-    if (popup != NULL)
-    {
-        delete(popup);
-        popup = NULL;
-    }
     popup = new QMenu(this);
 
     QAction *background_color = new QAction("Brackground color", this);
-    connect(background_color, &QAction::triggered, [&]()
-    {
+    connect(background_color, &QAction::triggered, [&]() {
         this->set_clear_color(QColorDialog::getColor(Qt::white, this));
         updateGL();
     });
     popup->addAction(background_color);
 
     QAction *copy_POV = new QAction("Copy POV", this);
-    connect(copy_POV, &QAction::triggered, [&]()
-    {
+    connect(copy_POV, &QAction::triggered, [&]() {
         QApplication::clipboard()->setText(serialize_camera().data());
     });
     popup->addAction(copy_POV);
 
     QAction *paste_POV = new QAction("Paste POV", this);
-    connect(paste_POV, &QAction::triggered, [&]()
-    {
+    connect(paste_POV, &QAction::triggered, [&]() {
         if (QApplication::clipboard()->mimeData()->hasText())
         {
             deserialize_camera(QApplication::clipboard()->mimeData()->text().toStdString());
@@ -109,7 +102,6 @@ void GLcanvas::mousePressEvent(QMouseEvent *event)
         event->modifiers()== Qt::ControlModifier)
     {
         event->accept();
-        make_popup_menu();
         popup->exec(QCursor::pos());
         return;
     }

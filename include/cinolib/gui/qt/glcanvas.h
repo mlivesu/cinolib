@@ -88,8 +88,8 @@ class GLcanvas : public QGLViewer
 
     private:
 
-        QMenu  *popup;
-        QColor  clear_color;
+        QMenu   *popup;
+        QColor   clear_color;
         std::vector<DrawableObject*> drawlist;
 };
 
