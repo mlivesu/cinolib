@@ -1,11 +1,11 @@
 TEMPLATE        = app
-TARGET          = 01_load_textured_OBJ
+TARGET          = load_textured_OBJ
 QT             += core opengl xml gui
 CONFIG         += c++11 release
 CONFIG         -= app_bundle
 INCLUDEPATH    += /usr/local/include
-INCLUDEPATH    += /Users/cino/Documents/research/devel/lib/CinoLib/include
-DEPENDPATH     += /Users/cino/Documents/research/devel/lib/CinoLib/include # force recompilation if cinolib changes
+INCLUDEPATH    += $$PWD/../../include
+DEPENDPATH     += $$PWD/../../include
 
 DATA_PATH = \\\"$$PWD/../data/\\\"
 DEFINES  += DATA_PATH=$$DATA_PATH

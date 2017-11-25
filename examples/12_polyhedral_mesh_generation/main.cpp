@@ -38,7 +38,6 @@ int main(int argc, char **argv)
     DrawablePolyhedralmesh<> polymesh;
     dual_mesh(tetmesh, polymesh, true);
     polymesh.updateGL();
-    polymesh.slicer_reset();
 
     QWidget  gui;
     QHBoxLayout layout;

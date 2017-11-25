@@ -1,11 +1,11 @@
 TEMPLATE        = app
-TARGET          = 06_polyhedral_mesh_generation
+TARGET          = map_to_sphere
 QT             += core opengl xml
 CONFIG         += c++11 release
 CONFIG         -= app_bundle
 INCLUDEPATH    += /usr/local/include
-INCLUDEPATH    += /Users/cino/Documents/research/devel/lib/CinoLib/include
-DEPENDPATH     += /Users/cino/Documents/research/devel/lib/CinoLib/include # force recompilation if cinolib changes
+INCLUDEPATH    += $$PWD/../../include
+DEPENDPATH     += $$PWD/../../include
 
 DATA_PATH = \\\"$$PWD/../data/\\\"
 DEFINES  += DATA_PATH=$$DATA_PATH
@@ -26,11 +26,6 @@ DEFINES      += CINOLIB_USES_QT_AND_QGLVIEWER
 INCLUDEPATH  += /Library/Frameworks/QGLViewer.framework/Versions/2/Headers
 QMAKE_LFLAGS *= -F/Library/Frameworks
 LIBS         += -framework QGLViewer
-
-# enable Tetgen
-DEFINES += CINOLIB_USES_TETGEN
-DEFINES += TETLIBRARY # this is to link tetgen in "library mode"
-LIBS    += -ltet
 
 # ------------------------------------ #
 # -------------- SOURCES ------------- #

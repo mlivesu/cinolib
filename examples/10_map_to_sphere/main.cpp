@@ -40,12 +40,12 @@ int main(int argc, char **argv)
     t.setMinimum(0.0000001);
     t.setMaximum(100);
     t.setDecimals(7);
-    t.setValue(0.001);
+    t.setValue(0.005);
     QLabel l_iter("#iters:");
     QSpinBox iters;
     iters.setMinimum(1);
     iters.setMaximum(100);
-    iters.setValue(5);
+    iters.setValue(10);
     QCheckBox conformalized("Conformalized", &gui);
     conformalized.setChecked(true);
     QPushButton but("MCF", &gui);

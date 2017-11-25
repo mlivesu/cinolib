@@ -1,11 +1,11 @@
 TEMPLATE        = app
-TARGET          = 05_polygon_mesh_generation
+TARGET          = base_app_polyhedralmesh
 QT             += core opengl xml
 CONFIG         += c++11 release
 CONFIG         -= app_bundle
 INCLUDEPATH    += /usr/local/include
-INCLUDEPATH    += /Users/cino/Documents/research/devel/lib/CinoLib/include
-DEPENDPATH     += /Users/cino/Documents/research/devel/lib/CinoLib/include # force recompilation if cinolib changes
+INCLUDEPATH    += $$PWD/../../include
+DEPENDPATH     += $$PWD/../../include
 
 DATA_PATH = \\\"$$PWD/../data/\\\"
 DEFINES  += DATA_PATH=$$DATA_PATH
@@ -26,10 +26,6 @@ DEFINES      += CINOLIB_USES_QT_AND_QGLVIEWER
 INCLUDEPATH  += /Library/Frameworks/QGLViewer.framework/Versions/2/Headers
 QMAKE_LFLAGS *= -F/Library/Frameworks
 LIBS         += -framework QGLViewer
-
-# enable Triangle ()
-DEFINES += CINOLIB_USES_TRIANGLE
-LIBS    += -ltriangle
 
 # ------------------------------------ #
 # -------------- SOURCES ------------- #
