@@ -372,6 +372,7 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         cb_isosurface         = new QCheckBox("Isosurface", gbox);
         sl_isovalue           = new QSlider(Qt::Horizontal, gbox);
         but_isosurface_color  = new QPushButton("Color", gbox);
+        but_isosurface_save   = new QPushButton("Save", gbox);
         but_serialize_field   = new QPushButton("Serialize", gbox);
         but_deserialize_field = new QPushButton("Deserialize", gbox);
         QLabel *l_value       = new QLabel("Isoval: ", gbox);
@@ -379,6 +380,7 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         cb_isosurface->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sl_isovalue->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         but_isosurface_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_isosurface_save->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         but_serialize_field->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         but_deserialize_field->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         l_value->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -389,13 +391,15 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         but_serialize_field->setFont(global_font);
         but_deserialize_field->setFont(global_font);
         but_isosurface_color->setFont(global_font);
+        but_isosurface_save->setFont(global_font);
         l_value->setFont(global_font);
         cb_isosurface->setFont(global_font);
         QGridLayout *layout = new QGridLayout();
         layout->addWidget(cb_isosurface,0,1,1,2);
         layout->addWidget(l_value,1,0);
         layout->addWidget(sl_isovalue,1,1,1,2);
-        layout->addWidget(but_isosurface_color,2,1,1,2);
+        layout->addWidget(but_isosurface_color,2,1);
+        layout->addWidget(but_isosurface_save,2,2);
         layout->addWidget(but_serialize_field,3,1);
         layout->addWidget(but_deserialize_field,3,2);
         gbox->setLayout(layout);
@@ -1060,6 +1064,14 @@ void VolumeMeshControlPanel<Mesh>::connect()
         QColor c = QColorDialog::getColor(Qt::white, widget);
         isosurface.color = Color(c.redF(), c.greenF(), c.blueF());
         canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_isosurface_save, &QPushButton::clicked, [&]()
+    {
+        std::string filename = QFileDialog::getSaveFileName(NULL, "Save Isosurface", ".", "").toStdString();
+        if (!filename.empty()) isosurface.export_as_trimesh().save(filename.c_str());
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

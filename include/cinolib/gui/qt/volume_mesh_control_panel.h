@@ -145,6 +145,7 @@ class VolumeMeshControlPanel
         QCheckBox                     *cb_isosurface;
         QSlider                       *sl_isovalue;
         QPushButton                   *but_isosurface_color;
+        QPushButton                   *but_isosurface_save;
         QPushButton                   *but_serialize_field;
         QPushButton                   *but_deserialize_field;
         //
