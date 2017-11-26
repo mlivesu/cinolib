@@ -34,6 +34,7 @@
 #include <QApplication>
 #include <QColorDialog>
 #include <QShortcut>
+#include <QMouseEvent>
 #include <QMimeData>
 #include <QMenu>
 
