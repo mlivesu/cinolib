@@ -34,7 +34,7 @@
 #include <assert.h>
 #include <cmath>
 #include <vector>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec3.h>

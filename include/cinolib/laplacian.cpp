@@ -30,7 +30,7 @@
 **********************************************************************************/
 #include <cinolib/laplacian.h>
 #include <cinolib/symbols.h>
-#include <eigen3/Eigen/Sparse>
+#include <Eigen/Sparse>
 
 namespace cinolib
 {

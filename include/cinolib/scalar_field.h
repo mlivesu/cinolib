@@ -37,7 +37,7 @@
 #include <iostream>
 #include <float.h>
 #include <vector>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
 namespace cinolib
 {

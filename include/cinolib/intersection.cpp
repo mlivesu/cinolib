@@ -35,7 +35,7 @@
 #include <boost/geometry/geometries/segment.hpp>
 #include <boost/geometry/algorithms/intersection.hpp>
 
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
 namespace cinolib
 {

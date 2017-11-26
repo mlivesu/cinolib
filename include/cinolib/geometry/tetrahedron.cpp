@@ -33,7 +33,7 @@
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/geometry/segment.h>
 
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <set>
 
 namespace cinolib

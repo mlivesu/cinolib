@@ -29,7 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/simplicial_map.h>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
 namespace cinolib
 {

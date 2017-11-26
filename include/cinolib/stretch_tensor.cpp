@@ -31,7 +31,7 @@
 #include <cinolib/stretch_tensor.h>
 #include <cinolib/tangent_space.h>
 #include <cinolib/matrix.h>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
 namespace cinolib
 {

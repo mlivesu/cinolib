@@ -33,7 +33,7 @@
 
 #include <cinolib/scalar_field.h>
 #include <cinolib/linear_solvers.h>
-#include <eigen3/Eigen/Sparse>
+#include <Eigen/Sparse>
 
 namespace cinolib
 {

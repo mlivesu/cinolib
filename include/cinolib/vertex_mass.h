@@ -32,7 +32,7 @@
 #define CINO_VERTEX_MASS_H
 
 #include <cinolib/meshes/abstract_mesh.h>
-#include <eigen3/Eigen/Sparse>
+#include <Eigen/Sparse>
 
 namespace cinolib
 {

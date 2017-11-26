@@ -4,6 +4,7 @@ QT             += core opengl xml gui
 CONFIG         += c++11 release
 CONFIG         -= app_bundle
 INCLUDEPATH    += /usr/local/include
+INCLUDEPATH    += /usr/local/include/eigen3
 INCLUDEPATH    += $$PWD/../../include
 DEPENDPATH     += $$PWD/../../include
 

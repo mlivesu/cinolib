@@ -13,6 +13,7 @@
 #include <cinolib/gui/qt/glcanvas.h>
 #include <cinolib/gui/qt/volume_mesh_control_panel.h>
 #include <cinolib/harmonic_map.h>
+#include <cinolib/profiler.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -44,12 +45,15 @@ int main(int argc, char **argv)
     VolumeMeshControlPanel<DrawableTetmesh<>> m_controls(&m, &gui);
     m_controls.show();
 
+    Profiler profiler;
+
     // use the spin box to increase the harmonicity index
     QSpinBox::connect(&n_harmonicity, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), [&]()
     {
-
         std::map<uint,double> bc = {{0,0.0}, {999,1.0}}; // Dirichlet boundary conditions
+        profiler.push("harmonic_map");
         harmonic_map(m, bc, n_harmonicity.value(), COTANGENT, SIMPLICIAL_LDLT).copy_to_mesh(m);
+        profiler.pop();
         m.updateGL();
         gui.updateGL();
     });

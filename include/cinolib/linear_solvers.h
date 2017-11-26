@@ -32,7 +32,7 @@
 #define CINO_LINEAR_SOLVERS_H
 
 #include <cinolib/cinolib.h>
-#include <eigen3/Eigen/Sparse>
+#include <Eigen/Sparse>
 #include <string>
 
 namespace cinolib
