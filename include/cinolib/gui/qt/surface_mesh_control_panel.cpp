@@ -135,7 +135,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         sl_tex2D_density->setMinimum(1);
         sl_tex2D_density->setMaximum(200);
         sl_tex2D_density->setValue(10);
-        sl_tex2D_density->setSliderPosition(10);
+        sl_tex2D_density->setSliderPosition(10);        
         gbox->setFont(global_font);
         rb_vert_color->setFont(global_font);
         rb_poly_color->setFont(global_font);
@@ -628,8 +628,8 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     {
         if (m == NULL) return;
         rb_vert_color->setChecked(true);
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->vert_set_color(Color(c.redF(), c.greenF(), c.blueF()));
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->vert_set_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
         canvas->updateGL();
     });
 
@@ -639,8 +639,8 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     {
         if (m == NULL) return;
         rb_poly_color->setChecked(true);
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->poly_set_color(Color(c.redF(), c.greenF(), c.blueF()));
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->poly_set_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
         canvas->updateGL();
     });
 
@@ -705,8 +705,8 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QPushButton::connect(but_wireframe_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->show_wireframe_color(Color(c.redF(), c.greenF(), c.blueF()));
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->show_wireframe_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
         cb_wireframe->setChecked(true);
         canvas->updateGL();
     });
@@ -738,8 +738,8 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QPushButton::connect(but_isocurve_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        isocontour.color = Color(c.redF(), c.greenF(), c.blueF());
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        isocontour.color = Color(c.redF(), c.greenF(), c.blueF(), c.alphaF());
         canvas->updateGL();
     });
 
@@ -769,8 +769,8 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QPushButton::connect(but_gradient_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        gradient.set_arrow_color(Color(c.redF(), c.greenF(), c.blueF()));
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        gradient.set_arrow_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
         canvas->updateGL();
     });
 
@@ -916,8 +916,8 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QPushButton::connect(but_marked_edges_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->show_edge_marked_color(Color(c.redF(), c.greenF(), c.blueF()));
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->show_edge_marked_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
         canvas->updateGL();
     });
 

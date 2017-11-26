@@ -795,8 +795,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
     {
         if (m == NULL) return;
         rb_out_vert_color->setChecked(true);
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->vert_set_color(Color(c.redF(), c.greenF(), c.blueF())); // both IN and OUT!
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->vert_set_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF())); // both IN and OUT!
         canvas->updateGL();
     });
 
@@ -806,8 +806,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
     {
         if (m == NULL) return;
         rb_out_face_color->setChecked(true);
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->face_set_color(Color(c.redF(), c.greenF(), c.blueF())); // both IN and OUT!
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->face_set_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF())); // both IN and OUT!
         canvas->updateGL();
     });
 
@@ -817,8 +817,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
     {
         if (m == NULL) return;
         rb_out_poly_color->setChecked(true);
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->poly_set_color(Color(c.redF(), c.greenF(), c.blueF())); // both IN and OUT!
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->poly_set_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF())); // both IN and OUT!
         canvas->updateGL();
     });
 
@@ -908,8 +908,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
     {
         if (m == NULL) return;
         rb_in_vert_color->setChecked(true);
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->vert_set_color(Color(c.redF(), c.greenF(), c.blueF())); // both IN and OUT!
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->vert_set_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF())); // both IN and OUT!
         canvas->updateGL();
     });
 
@@ -919,8 +919,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
     {
         if (m == NULL) return;
         rb_in_face_color->setChecked(true);
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->face_set_color(Color(c.redF(), c.greenF(), c.blueF())); // both IN and OUT!
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->face_set_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF())); // both IN and OUT!
         canvas->updateGL();
     });
 
@@ -930,8 +930,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
     {
         if (m == NULL) return;
         rb_in_poly_color->setChecked(true);
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->poly_set_color(Color(c.redF(), c.greenF(), c.blueF())); // both IN and OUT!
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->poly_set_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF())); // both IN and OUT!
         canvas->updateGL();
     });
 
@@ -995,8 +995,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
     QPushButton::connect(but_out_wireframe_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->show_out_wireframe_color(Color(c.redF(), c.greenF(), c.blueF()));
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->show_out_wireframe_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
         cb_out_wireframe->setChecked(true);
         canvas->updateGL();
     });
@@ -1036,8 +1036,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
     QPushButton::connect(but_in_wireframe_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        m->show_in_wireframe_color(Color(c.redF(), c.greenF(), c.blueF()));
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->show_in_wireframe_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
         cb_in_wireframe->setChecked(true);
         canvas->updateGL();
     });
@@ -1061,8 +1061,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
     QPushButton::connect(but_isosurface_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        isosurface.color = Color(c.redF(), c.greenF(), c.blueF());
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        isosurface.color = Color(c.redF(), c.greenF(), c.blueF(), c.alphaF());
         canvas->updateGL();
     });
 
@@ -1100,8 +1100,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
     QPushButton::connect(but_gradient_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        QColor c = QColorDialog::getColor(Qt::white, widget);
-        gradient.set_arrow_color(Color(c.redF(), c.greenF(), c.blueF()));
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        gradient.set_arrow_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
         canvas->updateGL();
     });
 
@@ -1247,8 +1247,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
 //    QPushButton::connect(but_marked_edges_color, &QPushButton::clicked, [&]()
 //    {
 //        if (m == NULL) return;
-//        QColor c = QColorDialog::getColor(Qt::white, widget);
-//        m->show_edge_marked_color(Color(c.redF(), c.greenF(), c.blueF()));
+//        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+//        m->show_edge_marked_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
 //        canvas->updateGL();
 //    });
 

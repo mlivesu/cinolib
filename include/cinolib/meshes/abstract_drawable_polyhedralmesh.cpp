@@ -194,37 +194,38 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
 
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        if (!this->edge_is_on_srf(eid)) continue;
-
-        bool invisible = true;
-        for(uint pid : this->adj_e2p(eid))
-        {
-            if (this->poly_data(pid).visible) invisible = false;
-        }
-        if (invisible) continue;
-
-        int base_addr = drawlist_out.seg_coords.size()/3;
-        drawlist_out.segs.push_back(base_addr    );
-        drawlist_out.segs.push_back(base_addr + 1);
-
         vec3d vid0 = this->edge_vert(eid,0);
         vec3d vid1 = this->edge_vert(eid,1);
 
-        drawlist_out.seg_coords.push_back(vid0.x());
-        drawlist_out.seg_coords.push_back(vid0.y());
-        drawlist_out.seg_coords.push_back(vid0.z());
-        drawlist_out.seg_coords.push_back(vid1.x());
-        drawlist_out.seg_coords.push_back(vid1.y());
-        drawlist_out.seg_coords.push_back(vid1.z());
+        if (this->edge_is_on_srf(eid))
+        {
+            bool invisible = true;
+            for(uint pid : this->adj_e2p(eid))
+            {
+                if (this->poly_data(pid).visible) invisible = false;
+            }
+            if (invisible) continue;
 
-        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.r);
-        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.g);
-        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.b);
-        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.a);
-        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.r);
-        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.g);
-        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.b);
-        drawlist_out.seg_colors.push_back(this->edge_data(eid).color.a);
+            int base_addr = drawlist_out.seg_coords.size()/3;
+            drawlist_out.segs.push_back(base_addr    );
+            drawlist_out.segs.push_back(base_addr + 1);
+
+            drawlist_out.seg_coords.push_back(vid0.x());
+            drawlist_out.seg_coords.push_back(vid0.y());
+            drawlist_out.seg_coords.push_back(vid0.z());
+            drawlist_out.seg_coords.push_back(vid1.x());
+            drawlist_out.seg_coords.push_back(vid1.y());
+            drawlist_out.seg_coords.push_back(vid1.z());
+
+            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.r);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.g);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.b);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.a);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.r);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.g);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.b);
+            drawlist_out.seg_colors.push_back(this->edge_data(eid).color.a);
+        }
 
         if (this->edge_data(eid).marked && drawlist_out.draw_mode & DRAW_MARKED_SEGS)
         {

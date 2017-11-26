@@ -8,7 +8,7 @@
 - make sure 1D textures are always drawn covering full spectrum (RED to BLUE in HSV RAMP)
 - refactor ray/line/plane intersections and integral curve tracing (check Robust Polylines Tracing for N-Symmetry Direction Field on Triangulated Surfaces)
 - implement topological operators (add/remove/collapse) also for volumetric meshes
-- Add GUI controls: load/save labeling, mesh transparency
+- Add GUI controls: load/save labeling
 - Turn gradient GUI control in vector field (gradient button to make a gradient)
 - avoid headers from serialized vector and scalar fields (it’s far more general)
 - edit texturing interface (receive the full info as parameter)
