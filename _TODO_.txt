@@ -1,9 +1,7 @@
 - add inverse and transpose operators for 2x2 matrices
 - add instructions to compile examples on README (via bash and via QtCreator)
-- add Profiler to all examples
 - remove virtual from mesh hierarchy whenever possible
 - try making connectivity just by using poly_add and vert_add
-- fix includes to <eigen3\Eigen\...> => they should be <Eigen\...>
 - read vectors of meshes rather than meshes in GUI control panel
 - make sure 1D textures are always drawn covering full spectrum (RED to BLUE in HSV RAMP)
 - refactor ray/line/plane intersections and integral curve tracing (check Robust Polylines Tracing for N-Symmetry Direction Field on Triangulated Surfaces)

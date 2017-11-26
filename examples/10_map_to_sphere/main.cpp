@@ -17,6 +17,7 @@
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/mean_curv_flow.h>
 #include <cinolib/gui/qt/glcanvas.h>
+#include <cinolib/profiler.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -67,9 +68,13 @@ int main(int argc, char **argv)
     m_xyz.show_wireframe(true);
     m_uvw.show_wireframe(true);
 
+    cinolib::Profiler profiler;
+
     QPushButton::connect(&but, &QPushButton::clicked, [&]()
     {
+        profiler.push("Compute MCF");
         cinolib::MCF(m_uvw, iters.value(), t.value(), conformalized.isChecked());
+        profiler.pop();
         m_uvw.updateGL();
         gui_uvw.fit_scene();
     });

@@ -13,6 +13,7 @@
 #include <cinolib/dual_mesh.h>
 #include <cinolib/triangle_wrap.h>
 #include <cinolib/gui/qt/glcanvas.h>
+#include <cinolib/profiler.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -34,9 +35,13 @@ int main(int argc, char **argv)
     triangle_wrap(m_in.vector_verts(), m_in.vector_edges(), holes, opt, verts, tris);
     DrawableTrimesh<> trimesh(verts, tris);
 
+    Profiler profiler;
+
     // make polygon mesh
     DrawablePolygonmesh<> polymesh;
+    profiler.push("Dualize mesh");
     dual_mesh(trimesh, polymesh, true);
+    profiler.pop();
     polymesh.updateGL();
 
     QWidget  gui;
