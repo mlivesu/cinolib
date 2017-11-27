@@ -497,29 +497,54 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         left_col->addWidget(gbox);
     }
 
-//    // MARKED EDGES
-//    {
-//        QGroupBox *gbox        = new QGroupBox(widget);
-//        cb_marked_edges        = new QCheckBox("Marked Edges", gbox);
-//        sl_marked_edges_width  = new QSlider(Qt::Horizontal, gbox);
-//        but_marked_edges_color = new QPushButton("Color", gbox);
-//        QLabel *l_width        = new QLabel("Width:  ", gbox);
-//        sl_marked_edges_width->setMinimum(1);
-//        sl_marked_edges_width->setMaximum(10);
-//        sl_marked_edges_width->setTickPosition(QSlider::TicksBelow);
-//        sl_marked_edges_width->setTickInterval(1);
-//        gbox->setFont(global_font);
-//        but_marked_edges_color->setFont(global_font);
-//        l_width->setFont(global_font);
-//        cb_marked_edges->setFont(global_font);
-//        QGridLayout *layout = new QGridLayout();
-//        layout->addWidget(cb_marked_edges,0,1);
-//        layout->addWidget(l_width,2,0);
-//        layout->addWidget(sl_marked_edges_width,2,1);
-//        layout->addWidget(but_marked_edges_color,3,1);
-//        gbox->setLayout(layout);
-//        global_layout->addWidget(gbox,3,0);
-//    }
+    // MARKED EDGES
+    {
+        QGroupBox *gbox        = new QGroupBox(widget);
+        cb_marked_edges        = new QCheckBox("Marked Edges", gbox);
+        sl_marked_edges_width  = new QSlider(Qt::Horizontal, gbox);
+        but_marked_edges_color = new QPushButton("Color", gbox);
+        QLabel *l_width        = new QLabel("Width:  ", gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_marked_edges->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_marked_edges_width->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        but_marked_edges_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        l_width->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_marked_edges->setChecked(true);
+        sl_marked_edges_width->setMinimum(1);
+        sl_marked_edges_width->setMaximum(10);
+        sl_marked_edges_width->setTickPosition(QSlider::TicksBelow);
+        sl_marked_edges_width->setTickInterval(1);
+        gbox->setFont(global_font);
+        but_marked_edges_color->setFont(global_font);
+        l_width->setFont(global_font);
+        cb_marked_edges->setFont(global_font);
+        QGridLayout *layout = new QGridLayout();
+        layout->addWidget(cb_marked_edges,0,0,1,2);
+        layout->addWidget(l_width,1,0);
+        layout->addWidget(sl_marked_edges_width,1,1);
+        layout->addWidget(but_marked_edges_color,2,1);
+        gbox->setLayout(layout);
+        left_col->addWidget(gbox);
+    }
+
+    // MARKED FACES
+    {
+        QGroupBox *gbox        = new QGroupBox(widget);
+        cb_marked_faces        = new QCheckBox("Marked Faces", gbox);
+        but_marked_faces_color = new QPushButton("Color", gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_marked_faces->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_marked_faces_color->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_marked_faces->setChecked(true);
+        gbox->setFont(global_font);
+        but_marked_faces_color->setFont(global_font);
+        cb_marked_faces->setFont(global_font);
+        QGridLayout *layout = new QGridLayout();
+        layout->addWidget(cb_marked_faces,0,0);
+        layout->addWidget(but_marked_faces_color,0,1);
+        gbox->setLayout(layout);
+        left_col->addWidget(gbox);
+    }
 
     global_layout->addStretch();
     left_col->addStretch();
@@ -1234,33 +1259,53 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//    QCheckBox::connect(cb_marked_edges, &QCheckBox::stateChanged, [&]()
-//    {
-//        if (m == NULL || canvas == NULL) return;
-//        m->show_edge_marked(cb_marked_edges->isChecked());
-//        m->updateGL();
-//        canvas->updateGL();
-//    });
+    QCheckBox::connect(cb_marked_edges, &QCheckBox::stateChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_marked_edge(cb_marked_edges->isChecked());
+        m->updateGL();
+        canvas->updateGL();
+    });
 
-//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//    QPushButton::connect(but_marked_edges_color, &QPushButton::clicked, [&]()
-//    {
-//        if (m == NULL) return;
-//        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
-//        m->show_edge_marked_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
-//        canvas->updateGL();
-//    });
+    QPushButton::connect(but_marked_edges_color, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->show_marked_edge_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
+        canvas->updateGL();
+    });
 
-//    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//    QSlider::connect(sl_marked_edges_width, &QSlider::valueChanged, [&]()
-//    {
-//        if (m == NULL || canvas == NULL) return;
-//        m->show_edge_marked_width(sl_marked_edges_width->value());
-//        cb_marked_edges->setChecked(true);
-//        canvas->updateGL();
-//    });
+    QSlider::connect(sl_marked_edges_width, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_marked_edge_width(sl_marked_edges_width->value());
+        cb_marked_edges->setChecked(true);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_marked_faces, &QCheckBox::stateChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        m->show_marked_face(cb_marked_faces->isChecked());
+        m->updateGL();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_marked_faces_color, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
+        m->show_marked_face_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
+        canvas->updateGL();
+    });
 }
 
 }

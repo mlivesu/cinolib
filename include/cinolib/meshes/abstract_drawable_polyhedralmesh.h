@@ -45,9 +45,12 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
 {
     protected:
 
+        MeshSlicer<Mesh> slicer;
         RenderData       drawlist_in;
         RenderData       drawlist_out;
-        MeshSlicer<Mesh> slicer;
+        RenderData       drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces/poly too)
+        Color            marked_edge_color;
+        Color            marked_face_color;
 
     public:
 
@@ -70,9 +73,13 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void init_drawable_stuff();
-        void updateGL();
-        void updateGL_in();
-        void updateGL_out();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void updateGL();         // regenerates rendering data for mesh inside/outside and marked elements
+        void updateGL_in();      // regenerates rendering data for mesh inside
+        void updateGL_out();     // regenerates rendering data for mesh outside
+        void updateGL_marked();  // regenerates rendering data for mesh marked elements
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -107,6 +114,15 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         void show_in_wireframe_color(const Color & c);
         void show_in_wireframe_width(const float width);
         void show_in_wireframe_transparency(const float alpha);
+
+        void show_marked_edge(const bool b);
+        void show_marked_edge_color(const Color & c);
+        void show_marked_edge_width(const float width);
+        void show_marked_edge_transparency(const float alpha);
+
+        void show_marked_face(const bool b);
+        void show_marked_face_color(const Color & c);
+        void show_marked_face_transparency(const float alpha);
 };
 
 }

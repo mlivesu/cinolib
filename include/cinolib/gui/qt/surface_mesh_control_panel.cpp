@@ -906,7 +906,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QCheckBox::connect(cb_marked_edges, &QCheckBox::stateChanged, [&]()
     {
         if (m == NULL || canvas == NULL) return;
-        m->show_edge_marked(cb_marked_edges->isChecked());
+        m->show_marked_edge(cb_marked_edges->isChecked());
         m->updateGL();
         canvas->updateGL();
     });
@@ -917,7 +917,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     {
         if (m == NULL) return;
         QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
-        m->show_edge_marked_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
+        m->show_marked_edge_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
         canvas->updateGL();
     });
 
@@ -926,7 +926,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QSlider::connect(sl_marked_edges_width, &QSlider::valueChanged, [&]()
     {
         if (m == NULL || canvas == NULL) return;
-        m->show_edge_marked_width(sl_marked_edges_width->value());
+        m->show_marked_edge_width(sl_marked_edges_width->value());
         cb_marked_edges->setChecked(true);
         canvas->updateGL();
     });

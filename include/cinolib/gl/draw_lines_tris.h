@@ -80,19 +80,15 @@ typedef struct
     //
     std::vector<uint>  segs;
     std::vector<float> seg_coords;
-    std::vector<float> seg_colors;
+    std::vector<float> seg_colors; // rgba
     GLfloat            seg_width = 1;
-    //
-    std::vector<uint>  marked_segs;
-    std::vector<float> marked_seg_coords;
-    Color              marked_seg_color = Color::RED();
-    GLfloat            marked_seg_width = 3;
 }
 RenderData;
 
 
 CINO_INLINE
 void render(const RenderData & data);
+
 }
 
 #ifndef  CINO_STATIC_LIB

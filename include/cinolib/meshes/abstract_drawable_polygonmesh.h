@@ -46,8 +46,10 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 {
     protected:
 
-        RenderData       drawlist;
         MeshSlicer<Mesh> slicer;
+        RenderData       drawlist;
+        RenderData       drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces too)
+        Color            marked_edge_color;
 
     public:
 
@@ -72,7 +74,12 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void init_drawable_stuff();
-        void updateGL();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void updateGL();        // regenerates rendering data for both mesh and marked elements
+        void updateGL_mesh();   // regenerates rendering data for mesh elements
+        void updateGL_marked(); // regenerates rendering data for marked mesh elements
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -93,10 +100,10 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         void show_wireframe_color(const Color & c);
         void show_wireframe_width(const float width);
         void show_wireframe_transparency(const float alpha);
-        void show_edge_marked(const bool b);
-        void show_edge_marked_color(const Color & c);
-        void show_edge_marked_width(const float width);
-        void show_edge_marked_transparency(const float alpha);
+        void show_marked_edge(const bool b);
+        void show_marked_edge_color(const Color & c);
+        void show_marked_edge_width(const float width);
+        void show_marked_edge_transparency(const float alpha);
 };
 
 }

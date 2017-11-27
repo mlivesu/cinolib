@@ -169,9 +169,12 @@ class VolumeMeshControlPanel
         QRadioButton                  *rb_slice_OR;
         QPushButton                   *but_slice_reset;
         //
-        //QCheckBox                     *cb_marked_edges;
-        //QPushButton                   *but_marked_edges_color;
-        //QSlider                       *sl_marked_edges_width;
+        QCheckBox                     *cb_marked_edges;
+        QPushButton                   *but_marked_edges_color;
+        QSlider                       *sl_marked_edges_width;
+        //
+        QCheckBox                     *cb_marked_faces;
+        QPushButton                   *but_marked_faces_color;
 };
 
 }

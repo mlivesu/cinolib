@@ -34,9 +34,8 @@ namespace cinolib
 {
 
 CINO_INLINE
-void render_pvt(const RenderData & data)
+void render_tris(const RenderData & data)
 {
-
     if (data.draw_mode & DRAW_TRI_POINTS)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -46,16 +45,9 @@ void render_pvt(const RenderData & data)
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
     }
-    else if (data.draw_mode & DRAW_TRI_SMOOTH || data.draw_mode & DRAW_TRI_FLAT)
+    else
     {
-        if (data.draw_mode & DRAW_TRI_VERTCOLOR ||
-            data.draw_mode & DRAW_TRI_FACECOLOR ||
-            data.draw_mode & DRAW_TRI_QUALITY)
-        {
-            glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(4, GL_FLOAT, 0, data.tri_v_colors.data());
-        }
-        else if (data.draw_mode & DRAW_TRI_TEXTURE1D)
+        if (data.draw_mode & DRAW_TRI_TEXTURE1D)
         {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(1, GL_FLOAT, 0, data.tri_text.data());
@@ -69,6 +61,11 @@ void render_pvt(const RenderData & data)
             glColor3f(1,1,1);
             glEnable(GL_TEXTURE_2D);
         }
+        else
+        {
+            glEnableClientState(GL_COLOR_ARRAY);
+            glColorPointer(4, GL_FLOAT, 0, data.tri_v_colors.data());
+        }
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, data.tri_coords.data());
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -76,9 +73,6 @@ void render_pvt(const RenderData & data)
         glDrawElements(GL_TRIANGLES, data.tris.size(), GL_UNSIGNED_INT, data.tris.data());
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
-        if (data.draw_mode & DRAW_TRI_VERTCOLOR) glDisableClientState(GL_COLOR_ARRAY); else
-        if (data.draw_mode & DRAW_TRI_FACECOLOR) glDisableClientState(GL_COLOR_ARRAY); else
-        if (data.draw_mode & DRAW_TRI_QUALITY)   glDisableClientState(GL_COLOR_ARRAY); else
         if (data.draw_mode & DRAW_TRI_TEXTURE1D)
         {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -89,8 +83,18 @@ void render_pvt(const RenderData & data)
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
             glDisable(GL_TEXTURE_2D);
         }
+        else
+        {
+            glDisableClientState(GL_COLOR_ARRAY);
+        }
     }
+}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void render_segs(const RenderData & data)
+{
     if (data.draw_mode & DRAW_SEGS)
     {
         glDisable(GL_LIGHTING);
@@ -109,25 +113,9 @@ void render_pvt(const RenderData & data)
         glDepthFunc(GL_LESS);
         glEnable(GL_LIGHTING);
     }
-
-    if (data.draw_mode & DRAW_MARKED_SEGS)
-    {
-        glDisable(GL_LIGHTING);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-        glDepthRange(0.0, 1.0);
-        glDepthFunc(GL_LEQUAL);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, data.marked_seg_coords.data());
-        glLineWidth(data.marked_seg_width);
-        glColor4fv(data.marked_seg_color.rgba);
-        glDrawElements(GL_LINES, data.marked_segs.size(), GL_UNSIGNED_INT, data.marked_segs.data());
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDepthFunc(GL_LESS);
-        glEnable(GL_LIGHTING);
-    }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void render(const RenderData & data)
@@ -140,22 +128,27 @@ void render(const RenderData & data)
         if (data.draw_mode & DRAW_TRI_POINTS)
         {
             glDisable(GL_LIGHTING);
-            render_pvt(data);
-        }
-        else if (data.draw_mode & DRAW_TRI_FLAT)
-        {
-            glEnable(GL_LIGHTING);
-            glShadeModel(GL_FLAT);
-            glDepthRange(0.01, 1.0);
-            render_pvt(data);
+            render_tris(data);
         }
         else if (data.draw_mode & DRAW_TRI_SMOOTH)
         {
             glEnable(GL_LIGHTING);
             glShadeModel(GL_SMOOTH);
             glDepthRange(0.01, 1.0);
-            render_pvt(data);
+            render_tris(data);
         }
+        else // default: FLAT shading
+        {
+            glEnable(GL_LIGHTING);
+            glShadeModel(GL_FLAT);
+            glDepthRange(0.01, 1.0);
+            render_tris(data);
+        }
+    }
+
+    if (data.draw_mode & DRAW_SEGS)
+    {
+        render_segs(data);
     }
 }
 
