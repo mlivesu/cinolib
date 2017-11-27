@@ -31,6 +31,7 @@
 #include <cinolib/meshes/quadmesh.h>
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/geometry/plane.h>
+#include <cinolib/geometry/polygon.h>
 #include <cinolib/standard_elements_tables.h>
 
 #include <queue>
@@ -155,16 +156,7 @@ void Quadmesh<M,V,E,P>::update_p_normal(const uint pid)
     // compute the best fitting plane
     std::vector<vec3d> points;
     for(uint off=0; off<this->verts_per_poly(pid); ++off) points.push_back(this->poly_vert(pid,off));
-    Plane best_fit(points);
-
-    // adjust orientation (n or -n?)
-    assert(triangulated_polys.at(pid).size()>2);
-    vec3d v0 = this->vert(triangulated_polys.at(pid).at(0));
-    vec3d v1 = this->vert(triangulated_polys.at(pid).at(1));
-    vec3d v2 = this->vert(triangulated_polys.at(pid).at(2));
-    vec3d n  = (v1-v0).cross(v2-v0);
-
-    this->poly_data(pid).normal = (best_fit.n.dot(n) < 0) ? -best_fit.n : best_fit.n;
+    this->poly_data(pid).normal = polygon_normal(points);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
