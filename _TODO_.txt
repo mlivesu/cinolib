@@ -25,5 +25,5 @@
   (ref. => Lecture Notes on Geometric Robustness di Jonathan Richard Shewchuk)
 - Add cotan laplacian  normalization
   (ref => https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html)
-- Improve on mesh rendering (shaders, VBOs)
+- Improve on mesh rendering (shaders, VBOs (https://www.khronos.org/opengl/wiki/VBO_-_just_examples))
 - Fix Logger (it does not flush the streaming buffer until the program is closed)

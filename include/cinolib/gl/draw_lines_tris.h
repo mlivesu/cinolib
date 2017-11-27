@@ -63,8 +63,9 @@ enum
     DRAW_TRI_TEXTURE1D        = 0x00000080,
     DRAW_TRI_TEXTURE2D        = 0x00000100,
     DRAW_SEGS                 = 0x00000200,
-    DRAW_MARKED_SEGS          = 0x00000400,
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 typedef struct
 {
@@ -85,6 +86,7 @@ typedef struct
 }
 RenderData;
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void render(const RenderData & data);
