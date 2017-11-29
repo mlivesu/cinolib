@@ -28,41 +28,70 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_READ_WRITE_H
-#define CINO_READ_WRITE_H
-
-// SURFACE READERS
-#include <cinolib/io/read_OBJ.h>
-#include <cinolib/io/read_OFF.h>
-#include <cinolib/io/read_IV.h>
-// SURFACE WRITERS
-#include <cinolib/io/write_OBJ.h>
-#include <cinolib/io/write_OFF.h>
-#include <cinolib/io/write_NODE_ELE.h>
-
-
-// VOLUME READERS
-#include <cinolib/io/read_HEDRA.h>
-#include <cinolib/io/read_HYBRID.h>
-#include <cinolib/io/read_MESH.h>
-#include <cinolib/io/read_TET.h>
-#include <cinolib/io/read_VTU.h>
-#include <cinolib/io/read_VTK.h>
 #include <cinolib/io/read_HEXEX.h>
-// VOLUME WRITERS
-#include <cinolib/io/write_HEDRA.h>
-#include <cinolib/io/write_MESH.h>
-#include <cinolib/io/write_TET.h>
-#include <cinolib/io/write_VTU.h>
-#include <cinolib/io/write_VTK.h>
+#include <sstream>
+#include <iostream>
+#include <assert.h>
 
+namespace cinolib
+{
 
-// SKELETON READERS
-#include <cinolib/io/read_LIVESU2012.h>
-#include <cinolib/io/read_TAGLIASACCHI2012.h>
-#include <cinolib/io/read_DEYSUN2006.h>
-#include <cinolib/io/read_CSV.h>
-// SKELETON WRITERS
-#include <cinolib/io/write_LIVESU2012.h>
+CINO_INLINE
+void read_HEXEX(const char         * filename,
+                std::vector<vec3d> & verts,
+                std::vector<uint>  & tets,        // serialized tets (4 vids per tet)
+                std::vector<vec3d> & tets_param) // tets param (4 points per tet)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
-#endif // CINO_READ_WRITE
+    verts.clear();
+    tets.clear();
+    tets_param.clear();
+
+    FILE *f = fopen(filename, "r");
+
+    if(!f)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_HEXEX() : couldn't open input file " << filename << endl;
+        exit(-1);
+    }
+
+    int nv;
+    fscanf(f,"%d\n", &nv);
+    verts = std::vector<vec3d>(nv);
+    for(int vid=0; vid<nv; ++vid)
+    {
+        fscanf(f,"%lf %lf %lf", &verts.at(vid).x(), &verts.at(vid).y(), &verts.at(vid).z());
+    }
+
+    int nt;
+    fscanf(f,"%d\n", &nt);
+    tets.reserve(4*nt);
+    tets_param = std::vector<vec3d>(4*nt);
+    for(int tid=0; tid<nt; ++tid)
+    {
+        uint v0,v1,v2,v3;
+        fscanf(f,"%d %d %d %d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+               &v0, &v1, &v2, &v3,
+               &tets_param.at(4*tid+0).x(),
+               &tets_param.at(4*tid+0).y(),
+               &tets_param.at(4*tid+0).z(),
+               &tets_param.at(4*tid+1).x(),
+               &tets_param.at(4*tid+1).y(),
+               &tets_param.at(4*tid+1).z(),
+               &tets_param.at(4*tid+2).x(),
+               &tets_param.at(4*tid+2).y(),
+               &tets_param.at(4*tid+2).z(),
+               &tets_param.at(4*tid+3).x(),
+               &tets_param.at(4*tid+3).y(),
+               &tets_param.at(4*tid+3).z());
+
+        tets.push_back(v0);
+        tets.push_back(v1);
+        tets.push_back(v2);
+        tets.push_back(v3);
+    }
+
+    fclose(f);
+}
+}

@@ -28,41 +28,36 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_READ_WRITE_H
-#define CINO_READ_WRITE_H
+#ifndef CINO_READ_HEXEX_H
+#define CINO_READ_HEXEX_H
 
-// SURFACE READERS
-#include <cinolib/io/read_OBJ.h>
-#include <cinolib/io/read_OFF.h>
-#include <cinolib/io/read_IV.h>
-// SURFACE WRITERS
-#include <cinolib/io/write_OBJ.h>
-#include <cinolib/io/write_OFF.h>
-#include <cinolib/io/write_NODE_ELE.h>
+#include <cinolib/cinolib.h>
+#include <cinolib/geometry/vec3.h>
+#include <sys/types.h>
+#include <vector>
 
+namespace cinolib
+{
 
-// VOLUME READERS
-#include <cinolib/io/read_HEDRA.h>
-#include <cinolib/io/read_HYBRID.h>
-#include <cinolib/io/read_MESH.h>
-#include <cinolib/io/read_TET.h>
-#include <cinolib/io/read_VTU.h>
-#include <cinolib/io/read_VTK.h>
-#include <cinolib/io/read_HEXEX.h>
-// VOLUME WRITERS
-#include <cinolib/io/write_HEDRA.h>
-#include <cinolib/io/write_MESH.h>
-#include <cinolib/io/write_TET.h>
-#include <cinolib/io/write_VTU.h>
-#include <cinolib/io/write_VTK.h>
+/* Read a tetrahedral mesh and an integer grid map associated to it in the
+ * libHexEx format (https://www.graphics.rwth-aachen.de/software/libHexEx).
+ * For further deails please refer to the original paper:
+ *
+ *     HexEx: Robust Hexahedral Mesh Extraction
+ *     M.Lyon, D.Bommes and L.Kobbelt
+ *     ACM TOG (SIGGRAPH 2016)
+*/
 
+CINO_INLINE
+void read_HEXEX(const char         * filename,
+                std::vector<vec3d> & verts,
+                std::vector<uint>  & tets,        // serialized tets (4 vids per tet)
+                std::vector<vec3d> & tets_param); // tets param (4 points per tet)
 
-// SKELETON READERS
-#include <cinolib/io/read_LIVESU2012.h>
-#include <cinolib/io/read_TAGLIASACCHI2012.h>
-#include <cinolib/io/read_DEYSUN2006.h>
-#include <cinolib/io/read_CSV.h>
-// SKELETON WRITERS
-#include <cinolib/io/write_LIVESU2012.h>
+}
 
-#endif // CINO_READ_WRITE
+#ifndef  CINO_STATIC_LIB
+#include "read_HEXEX.cpp"
+#endif
+
+#endif // CINO_READ_HEXEX
