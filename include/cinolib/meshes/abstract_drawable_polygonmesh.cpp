@@ -158,15 +158,30 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
             drawlist.tri_coords.push_back(this->vert(vid2).y());
             drawlist.tri_coords.push_back(this->vert(vid2).z());
 
-            drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.x());
-            drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.y());
-            drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.z());
-            drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.x());
-            drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.y());
-            drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.z());
-            drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.x());
-            drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.y());
-            drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.z());
+            if (drawlist.draw_mode & DRAW_TRI_SMOOTH)
+            {
+                drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.x());
+                drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.y());
+                drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.z());
+                drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.x());
+                drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.y());
+                drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.z());
+                drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.x());
+                drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.y());
+                drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.z());
+            }
+            else if (drawlist.draw_mode & DRAW_TRI_FLAT)
+            {
+                drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.x());
+                drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.y());
+                drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.z());
+                drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.x());
+                drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.y());
+                drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.z());
+                drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.x());
+                drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.y());
+                drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.z());
+            }
 
             if (drawlist.draw_mode & DRAW_TRI_TEXTURE1D)
             {
@@ -306,7 +321,8 @@ void AbstractDrawablePolygonMesh<Mesh>::show_mesh_flat()
 {
     drawlist.draw_mode |=  DRAW_TRI_FLAT;
     drawlist.draw_mode &= ~DRAW_TRI_SMOOTH;
-    drawlist.draw_mode &= ~DRAW_TRI_POINTS;
+    drawlist.draw_mode &= ~DRAW_TRI_POINTS;    
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -318,6 +334,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_mesh_smooth()
     drawlist.draw_mode |=  DRAW_TRI_SMOOTH;
     drawlist.draw_mode &= ~DRAW_TRI_FLAT;
     drawlist.draw_mode &= ~DRAW_TRI_POINTS;
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
