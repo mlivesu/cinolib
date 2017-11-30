@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 
     QApplication app(argc, argv);
 
-    std::string s = std::string(DATA_PATH) + "/E.obj";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/E.obj";
     DrawablePolygonmesh<> m_in(s.c_str());
 
     // make trimesh

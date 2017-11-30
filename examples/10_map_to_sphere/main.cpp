@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
 
-    std::string s = std::string(DATA_PATH) + "/bunny.obj";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.obj";
     cinolib::DrawableTrimesh<> m_xyz(s.c_str());
     cinolib::DrawableTrimesh<> m_uvw = m_xyz;
 

@@ -36,7 +36,7 @@ int main(int argc, char **argv)
     window.setLayout(&layout);
     window.show();
 
-    std::string s = std::string(DATA_PATH) + "/circle.obj";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/circle.obj";
     DrawableTrimesh<> m(s.c_str());
     m.show_texture1D(TEXTURE_1D_HSV_RAMP_W_ISOLINES);
     gui.push_obj(&m);

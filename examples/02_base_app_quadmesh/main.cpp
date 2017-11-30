@@ -20,11 +20,9 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    std::string filename;
-    if (argc == 2) filename = std::string(argv[1]);
-    else           filename = std::string(DATA_PATH) + "/cubespikes.obj";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cubespikes.obj";
 
-    cinolib::DrawableQuadmesh<> m(filename.c_str());
+    cinolib::DrawableQuadmesh<> m(s.c_str());
 
     cinolib::GLcanvas gui;
     gui.push_obj(&m);

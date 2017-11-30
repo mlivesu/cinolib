@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 
     QApplication app(argc, argv);
 
-    std::string s = std::string(DATA_PATH) + "/3holes.obj";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/3holes.obj";
     DrawableTrimesh<> m_in(s.c_str());
 
     // make tetmesh

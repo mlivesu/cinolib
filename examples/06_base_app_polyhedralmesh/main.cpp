@@ -20,11 +20,9 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    std::string filename;
-    if (argc == 2) filename = std::string(argv[1]);
-    else           filename = std::string(DATA_PATH) + "/eight_voronoi.HEDRA";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/eight_voronoi.HEDRA";
 
-    cinolib::DrawablePolyhedralmesh<> m(filename.c_str());
+    cinolib::DrawablePolyhedralmesh<> m(s.c_str());
 
     cinolib::GLcanvas gui;
     gui.push_obj(&m);
