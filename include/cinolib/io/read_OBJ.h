@@ -35,6 +35,7 @@
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
 #include <sys/types.h>
+#include <string>
 #include <vector>
 
 namespace cinolib

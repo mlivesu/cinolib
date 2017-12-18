@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/io/read_IV.h>
+#include <string>
 #include <iostream>
 
 namespace cinolib
