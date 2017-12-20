@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/polygon_kernel.h>
+#include <cinolib/common.h>
 
 #ifdef CINOLIB_USES_BOOST
 #include <boost/geometry/geometries/polygon.hpp>
@@ -72,8 +73,8 @@ double polygon_kernel(const std::vector<vec2d> & poly,
     if (poly.empty()) return 0;
 
     // define 2d axis aligned bbox
-    vec2d min( inf,  inf);
-    vec2d max(-inf, -inf);
+    vec2d min( inf_double,  inf_double);
+    vec2d max(-inf_double, -inf_double);
     for(const vec2d & p : poly)
     {
         min = min.min(p);
