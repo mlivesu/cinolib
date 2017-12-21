@@ -38,7 +38,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-void polygon_maximum_inscribed_circle(const std::vector<vec2d> & poly,
+void polygon_maximum_inscribed_circle(const std::vector<vec2d> & poly,  // ordered polygon vertex list
                                             vec2d              & center,
                                             double             & radius);
 
