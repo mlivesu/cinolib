@@ -38,7 +38,7 @@ namespace cinolib
 CINO_INLINE
 void write_TET(const char                * filename,
                const std::vector<double> & xyz,
-               const std::vector<u_int>  & tets)
+               const std::vector<uint>  & tets)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 

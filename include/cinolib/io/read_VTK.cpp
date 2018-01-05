@@ -121,8 +121,8 @@ void read_VTK(const char                      * filename,
 CINO_INLINE
 void read_VTK(const char          * filename,
                std::vector<double> & xyz,
-               std::vector<u_int>  & tets,
-               std::vector<u_int>  & hexa)
+               std::vector<uint>  & tets,
+               std::vector<uint>  & hexa)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 

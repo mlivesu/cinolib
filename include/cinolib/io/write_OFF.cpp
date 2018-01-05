@@ -38,8 +38,8 @@ namespace cinolib
 CINO_INLINE
 void write_OFF(const char                * filename,
               const std::vector<double> & xyz,
-              const std::vector<u_int>  & tri,
-              const std::vector<u_int>  & quad)
+              const std::vector<uint>  & tri,
+              const std::vector<uint>  & quad)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 

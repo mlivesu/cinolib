@@ -43,8 +43,8 @@ namespace cinolib
 CINO_INLINE
 void read_VTK(const char          * filename,
                std::vector<double> & xyz,
-               std::vector<u_int>  & tet,
-               std::vector<u_int>  & hexa);
+               std::vector<uint>  & tet,
+               std::vector<uint>  & hexa);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

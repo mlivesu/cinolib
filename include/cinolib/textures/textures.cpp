@@ -32,6 +32,7 @@
 #include <cinolib/textures/quality_ramp_texture.h>
 #include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
 #include <cinolib/common.h>
+#include <stdint.h>
 
 #ifdef CINOLIB_USES_QT_AND_QGLVIEWER
 #include <QImage>
@@ -70,7 +71,7 @@ void texture_isolines2D(const GLuint   texture_id,
                         const Color  & background)
 {
     uint size = 8;
-    u_char texels[3*size*size];
+    uint8_t texels[3*size*size];
     for(uint r=0; r<size; ++r)
     for(uint c=0; c<size; ++c)
     {
@@ -110,7 +111,7 @@ void texture_checkerboard(const GLuint   texture_id,
                           const Color  & c1)
 {
     uint size = 8;
-    u_char texels[size*size*3];
+    uint8_t texels[size*size*3];
     for(uint r=0; r<size; ++r)
     for(uint c=0; c<size; ++c)
     {
@@ -145,7 +146,7 @@ void texture_isolines1D(const GLuint   texture_id,
                         const Color  & c1,
                         const uint     n_bands)
 {
-    u_char texels[3*n_bands];
+    uint8_t texels[3*n_bands];
     for(uint i=0; i<n_bands; ++i)
     {
         if (i%2)

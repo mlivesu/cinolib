@@ -42,7 +42,7 @@ namespace cinolib
 CINO_INLINE
 void read_IV(const char          * filename,
              std::vector<double> & xyz,
-             std::vector<u_int>  & tri);
+             std::vector<uint>  & tri);
 
 }
 

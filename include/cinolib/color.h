@@ -32,6 +32,7 @@
 #define CINO_COLOR_H
 
 #include <cinolib/cinolib.h>
+#include <stdint.h>
 
 namespace cinolib
 {
@@ -80,10 +81,10 @@ class Color
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        u_char r_uchar() const { return static_cast<u_char>(r*255.0); }
-        u_char g_uchar() const { return static_cast<u_char>(g*255.0); }
-        u_char b_uchar() const { return static_cast<u_char>(b*255.0); }
-        u_char a_uchar() const { return static_cast<u_char>(a*255.0); }
+        uint8_t r_uchar() const { return static_cast<uint8_t>(r*255.0); }
+        uint8_t g_uchar() const { return static_cast<uint8_t>(g*255.0); }
+        uint8_t b_uchar() const { return static_cast<uint8_t>(b*255.0); }
+        uint8_t a_uchar() const { return static_cast<uint8_t>(a*255.0); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

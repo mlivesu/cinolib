@@ -31,12 +31,12 @@
 #ifndef CINO_QUALITY_RAMP_TEXTURE_H
 #define CINO_QUALITY_RAMP_TEXTURE_H
 
-#include <sys/types.h>
+#include <stdint.h>
 
 namespace cinolib
 {
 
-static const u_char quality_ramp_texture1D[768] =
+static const uint8_t quality_ramp_texture1D[768] =
 {
     0, 0, 255,
     0, 4, 255,
