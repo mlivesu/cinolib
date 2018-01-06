@@ -308,4 +308,17 @@ bool GLcanvas::pop(DrawableObject *obj)
     return false;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::updateGL()
+{
+    // http://libqglviewer.com/changeLog.html
+    #if QGLVIEWER_VERSION < 0x020700
+        QGLViewer::updateGL();
+    #else
+        QGLViewer::update();
+    #endif
+}
+
 }

@@ -67,6 +67,10 @@ class GLcanvas : public QGLViewer
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void updateGL();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void init();
         void draw();
         void clear();
@@ -88,8 +92,8 @@ class GLcanvas : public QGLViewer
 
     private:
 
-        QMenu   *popup;
-        QColor   clear_color;
+        QMenu                       *popup;
+        QColor                       clear_color;
         std::vector<DrawableObject*> drawlist;
 };
 
