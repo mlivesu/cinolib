@@ -127,8 +127,8 @@ std::pair<vec2d,double> Welzl_algorithm(const std::vector<vec2d> & points,
     }
     if (nR == 3) return make_disk(points, R.at(0), R.at(1), R.at(2));
 
-    std::pair<vec2d,double> c = Welzl_algorithm(points, P, nP-1, R, nR);
-    if (c.first.dist(points.at(P.at(nP-1))) < c.second) return c;
+    std::pair<vec2d,double> disk = Welzl_algorithm(points, P, nP-1, R, nR);
+    if (disk.first.dist(points.at(P.at(nP-1))) < disk.second) return disk;
     R.at(nR) = P.at(nP-1);
     return Welzl_algorithm(points, P, nP-1, R, nR+1);
 }
