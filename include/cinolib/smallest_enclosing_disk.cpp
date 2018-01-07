@@ -44,6 +44,7 @@ CINO_INLINE
 std::pair<vec2d,double> make_disk(const std::vector<vec2d> & points,
                                   const uint                 id)
 {
+    // (degenerate) disk passing through 1 point
     std::pair<vec2d,double> disk;
     disk.first  = points.at(id);
     disk.second = 0.0;
@@ -57,6 +58,7 @@ std::pair<vec2d,double> make_disk(const std::vector<vec2d> & points,
                                     const uint               id0,
                                     const uint               id1)
 {
+    // disk passing through 2 points
     std::pair<vec2d,double> disk;
     disk.first = (points.at(id0) + points.at(id1))*0.5;
     disk.second = disk.first.dist(points.at(id1));
@@ -71,6 +73,7 @@ std::pair<vec2d,double> make_disk(const std::vector<vec2d> & points,
                                     const uint               id1,
                                     const uint               id2)
 {
+    // disk passing through 3 points
     std::pair<vec2d,double> disk;
     double xd, yd, side_a, side_b, side_c, s;
     double term1, term2, term3, denom;
