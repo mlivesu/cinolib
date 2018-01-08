@@ -23,11 +23,13 @@ QMAKE_CXXFLAGS += -Wno-deprecated-declarations       # gluQuadric gluSphere and 
 # ------------------------------------ #
 
 # enable a OpenGL, QT and QGLViewer based GUI (used in cinolib/gui/qt/glcanvas.cpp)
-DEFINES      += CINOLIB_USES_OPENGL
-DEFINES      += CINOLIB_USES_QT_AND_QGLVIEWER
-INCLUDEPATH  += /Library/Frameworks/QGLViewer.framework/Versions/2/Headers
-QMAKE_LFLAGS *= -F/Library/Frameworks
-LIBS         += -framework QGLViewer
+# see http://libqglviewer.com/compilation.html for details
+        DEFINES += CINOLIB_USES_OPENGL
+        DEFINES += CINOLIB_USES_QT_AND_QGLVIEWER
+    INCLUDEPATH += /Library/Frameworks/QGLViewer.framework/Versions/2/Headers
+      macx:LIBS += -F/Library/Frameworks -framework QGLViewer
+unix:!macx:LIBS += -L. -lQGLViewer
+     win32:LIBS += -L. -lQGLViewer2
 
 # enable VTK readers (used in cinolib/io/read_write.h -- .vtu and .vtk file formats)
 DEFINES      += CINOLIB_USES_VTK
