@@ -690,6 +690,18 @@ vec3d AbstractMesh<M,V,E,P>::poly_vert(const uint pid, const uint offset) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+std::vector<vec3d> AbstractMesh<M,V,E,P>::poly_verts(const uint pid) const
+{
+    uint nv = this->verts_per_poly(pid);
+    std::vector<vec3d> p_list(nv);
+    for(uint off=0; off<nv; ++off) p_list.at(off) = this->poly_vert(pid,off);
+    return p_list;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 uint AbstractMesh<M,V,E,P>::poly_edge_id(const uint fid, const uint vid0, const uint vid1) const
 {
     assert(poly_contains_vert(fid,vid0));

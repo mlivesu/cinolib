@@ -207,18 +207,19 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual       vec3d  poly_vert           (const uint pid, const uint offset) const;
-        virtual       uint   poly_vert_id        (const uint pid, const uint offset) const;
-        virtual       vec3d  poly_centroid       (const uint pid) const;
-        virtual       double poly_mass           (const uint pid) const = 0;
-        virtual       uint   poly_edge_id        (const uint pid, const uint vid0, const uint vid1) const;
-        virtual       bool   poly_contains_vert  (const uint pid, const uint vid) const;
-        virtual       bool   poly_contains_edge  (const uint pid, const uint eid) const;
-        virtual       bool   poly_contains_edge  (const uint pid, const uint vid0, const uint vid1) const;
-        virtual       void   poly_show_all       ();
-        virtual       void   poly_color_wrt_label(const float s=.5f, float v=.85f); // s => saturation, v => value in HSV color space
-        virtual       void   poly_set_color      (const Color & c);
-        virtual       void   poly_set_alpha      (const float alpha);
+        virtual       vec3d              poly_vert           (const uint pid, const uint offset) const;
+        virtual       std::vector<vec3d> poly_verts          (const uint pid) const;
+        virtual       uint               poly_vert_id        (const uint pid, const uint offset) const;
+        virtual       vec3d              poly_centroid       (const uint pid) const;
+        virtual       double             poly_mass           (const uint pid) const = 0;
+        virtual       uint               poly_edge_id        (const uint pid, const uint vid0, const uint vid1) const;
+        virtual       bool               poly_contains_vert  (const uint pid, const uint vid) const;
+        virtual       bool               poly_contains_edge  (const uint pid, const uint eid) const;
+        virtual       bool               poly_contains_edge  (const uint pid, const uint vid0, const uint vid1) const;
+        virtual       void               poly_show_all       ();
+        virtual       void               poly_color_wrt_label(const float s=.5f, float v=.85f); // s => saturation, v => value in HSV color space
+        virtual       void               poly_set_color      (const Color & c);
+        virtual       void               poly_set_alpha      (const float alpha);
 };
 
 }
