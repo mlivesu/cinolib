@@ -61,17 +61,16 @@ ScalarField compute_geodesics(      Mesh              & m,
     Eigen::SparseMatrix<double> G   = gradient_matrix(m);
     Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
 
-    std::map<uint,double> bc;
-    for(uint vid : heat_charges) bc[vid] = 1.0;
+    for(uint vid : heat_charges) rhs[vid] = 1.0;
 
     ScalarField heat(m.num_verts());
-    solve_square_system_with_bc(MM - time * L, rhs, heat, bc);
+    solve_square_system(MM - time * L, rhs, heat);
 
     VectorField grad = G * heat;
     grad.normalize();
 
     ScalarField geodesics(m.num_verts());
-    solve_square_system_with_bc(-L, G.transpose() * grad, geodesics, bc);
+    solve_square_system(-L, G.transpose() * grad, geodesics, SIMPLICIAL_LDLT);
     geodesics.normalize_in_01();
 
     // restore original scale and position
