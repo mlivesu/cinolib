@@ -33,6 +33,7 @@
 
 #include <cinolib/cinolib.h>
 #include <cinolib/geometry/vec2.h>
+#include <cinolib/geometry/vec3.h>
 #include <vector>
 
 namespace cinolib
@@ -51,6 +52,14 @@ namespace cinolib
 CINO_INLINE
 void smallest_enclosing_disk(const std::vector<vec2d> & points,
                                    vec2d              & center,
+                                   double             & radius);
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void smallest_enclosing_disk(const std::vector<vec3d> & points,  // will drop z component
+                                   vec3d              & center,  // will have z=0
                                    double             & radius);
 }
 

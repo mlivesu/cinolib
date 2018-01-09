@@ -153,4 +153,19 @@ void smallest_enclosing_disk(const std::vector<vec2d> & points,
     radius = min_disk.second;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void smallest_enclosing_disk(const std::vector<vec3d> & points,  // will drop z component
+                                   vec3d              & center,  // will have z=0
+                                   double             & radius)
+{
+    std::vector<vec2d> points_2d;
+    for(auto p : points) points_2d.push_back(vec2d(p.x(), p.y()));
+
+    vec2d center_2d;
+    smallest_enclosing_disk(points_2d, center_2d, radius);
+    center = vec3d(center_2d.x(), center_2d.y(), 0);
+}
+
 }
