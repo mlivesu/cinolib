@@ -117,4 +117,16 @@ double determinant_2x2(const vec2d a0, const vec2d a1)
     return determinant_2x2(a0[0], a0[1], a1[0], a1[1]);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double determinant_3x3(const double a00, const double a01, const double a02,
+                       const double a10, const double a11, const double a12,
+                       const double a20, const double a21, const double a22)
+{
+    return a00 * determinant_2x2(a11, a12, a21, a22) -
+           a01 * determinant_2x2(a10, a12, a20, a22) +
+           a02 * determinant_2x2(a10, a11, a20, a21);
+}
+
 }

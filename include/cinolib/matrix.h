@@ -70,16 +70,20 @@ void eigenvectors_2x2(const double   a00,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double determinant_2x2(const double a00,
-                       const double a01,
-                       const double a10,
-                       const double a11);
+double determinant_2x2(const double a00, const double a01,
+                       const double a10, const double a11);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double determinant_2x2(const vec2d a0,
-                       const vec2d a1);
+double determinant_2x2(const vec2d a0, const vec2d a1);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double determinant_3x3(const double a00, const double a01, const double a02,
+                       const double a10, const double a11, const double a12,
+                       const double a20, const double a21, const double a22);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
