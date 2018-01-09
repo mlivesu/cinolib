@@ -1,11 +1,14 @@
+- allow matrix pre-factorization in eat based geodesics
+- put cotangents (tets/tris) on a separate .h/cpp file?
 - add inverse and transpose operators for 2x2 matrices
 - add instructions to compile examples on README (via bash and via QtCreator)
 - remove virtual from mesh hierarchy whenever possible
-- try making connectivity just by using poly_add and vert_add
 - read vectors of meshes rather than meshes in GUI control panel
 - make sure 1D textures are always drawn covering full spectrum (RED to BLUE in HSV RAMP)
 - refactor ray/line/plane intersections and integral curve tracing (check Robust Polylines Tracing for N-Symmetry Direction Field on Triangulated Surfaces)
-- implement topological operators (add/remove/collapse) also for volumetric meshes
+- add topological operators (add/remove/collapse) also for volumetric meshes
+     => then deprecate update_adjacency and make connectivity through poly_add and vert_add instead
+        (I already tested for surfaces. The code is much cleaner and loading becomes slightly faster!)
 - Add GUI controls: load/save labeling
 - Turn gradient GUI control in vector field (gradient button to make a gradient)
 - avoid headers from serialized vector and scalar fields (it’s far more general)
