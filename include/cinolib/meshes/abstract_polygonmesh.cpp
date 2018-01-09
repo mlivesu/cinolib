@@ -817,20 +817,12 @@ double AbstractPolygonMesh<M,V,E,P>::poly_angle_at_vert(const uint pid, const ui
 {
     assert(this->poly_contains_vert(pid,vid));
 
-    uint offset = 0;
-    for(uint i=0; i<this->verts_per_poly(pid); ++i) if (this->poly_vert_id(pid,i) == vid) offset = i;
-    assert(this->poly_vert_id(pid,offset) == vid);
-    //
-    // the code above substitutes this one (which was specific for AbstractMeshes...)
-    //
-    //     if (poly_vert_id(pid,0) == vid) offset = 0;
-    //else if (poly_vert_id(pid,1) == vid) offset = 1;
-    //else if (poly_vert_id(pid,2) == vid) offset = 2;
-    //else { assert(false); offset=0; } // offset=0 kills uninitialized warning message
-
-    vec3d p = this->vert(vid);
-    vec3d u = this->poly_vert(pid,(offset+1)%this->verts_per_poly(pid)) - p;
-    vec3d v = this->poly_vert(pid,(offset+2)%this->verts_per_poly(pid)) - p;
+    uint  curr = this->poly_vert_offset(pid, vid);
+    uint  next = (curr+1)%this->verts_per_poly(pid);
+    uint  prev = (curr+this->verts_per_poly(pid)-1)%this->verts_per_poly(pid);
+    vec3d p    = this->poly_vert(pid, curr);
+    vec3d u    = this->poly_vert(pid, prev) - p;
+    vec3d v    = this->poly_vert(pid, next) - p;
 
     switch (unit)
     {
@@ -1181,6 +1173,17 @@ double AbstractPolygonMesh<M,V,E,P>::poly_area(const uint pid) const
                               this->vert(tris.at(3*i+2)));
     }
     return area;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double AbstractPolygonMesh<M,V,E,P>::poly_perimeter(const uint pid) const
+{
+    double perimeter = 0.0;
+    for(uint eid : this->adj_p2e(pid)) perimeter += this->edge_length(eid);
+    return perimeter;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

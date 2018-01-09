@@ -133,6 +133,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         virtual       uint                 poly_vert_offset        (const uint pid, const uint vid) const;
         virtual       double               poly_angle_at_vert      (const uint pid, const uint vid, const int unit = RAD) const;
         virtual       double               poly_area               (const uint pid) const;
+        virtual       double               poly_perimeter          (const uint pid) const;
         virtual       double               poly_mass               (const uint pid) const;
         virtual       int                  poly_shared             (const uint eid0, const uint eid1) const;
         virtual       bool                 polys_are_adjacent      (const uint pid0, const uint pid1) const;
