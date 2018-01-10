@@ -428,6 +428,7 @@ uint Trimesh<M,V,E,P>::vert_opposite_to(const uint pid, const uint vid0, const u
         if (vid != vid0 && vid != vid1) return vid;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

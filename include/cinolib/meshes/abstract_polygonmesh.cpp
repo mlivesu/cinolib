@@ -807,6 +807,7 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_vert_offset(const uint pid, const uint v
         if (this->poly_vert_id(pid,offset) == vid) return offset;
     }
     assert(false && "Something is off here...");
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

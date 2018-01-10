@@ -446,6 +446,7 @@ uint AbstractMesh<M,V,E,P>::vert_shared(const uint eid0, const uint eid1) const
     if (e00 == e10 || e00 == e11) return e00;
     if (e01 == e10 || e01 == e11) return e01;
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -713,6 +714,7 @@ uint AbstractMesh<M,V,E,P>::poly_edge_id(const uint fid, const uint vid0, const 
     }
 
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

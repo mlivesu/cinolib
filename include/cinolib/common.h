@@ -49,9 +49,9 @@ typedef std::pair<uint,uint> ipair;
 // https://stackoverflow.com/questions/20016600/negative-infinity
 static_assert(std::numeric_limits<double>::is_iec559, "IEEE 754 required");
 static double inf_double = std::numeric_limits<double>::infinity();
-static float  inf_float  = std::numeric_limits<float>::infinity();
-static int    inf_int    = std::numeric_limits<int>::infinity();
 static uint   inf_uint   = std::numeric_limits<uint>::infinity();
+//static float  inf_float  = std::numeric_limits<float>::infinity();
+//static int    inf_int    = std::numeric_limits<int>::infinity();
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

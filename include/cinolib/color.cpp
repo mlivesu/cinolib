@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include "color.h"
 #include <cinolib/textures/quality_ramp_texture.h>
+#include <assert.h>
 #include <algorithm>
 #include <cmath>
 
@@ -133,6 +134,7 @@ Color Color::quality2rgb(float q)
     }
 
     assert(false);
+    return Color(); // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -160,6 +162,7 @@ Color Color::hsv2rgb(float h, float s, float v)
         case 5: return Color(v,p,q);
         default: assert(false);
     }
+    return Color(); // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -167,7 +170,7 @@ Color Color::hsv2rgb(float h, float s, float v)
 CINO_INLINE
 Color Color::scatter(uint n_colors, uint pos, float sat, float val)
 {
-    assert(pos>=0 && pos<n_colors);
+    assert(pos<n_colors);
 
     n_colors += 1; // for some reason I am getting duplicated colors without this... :(
 
@@ -197,7 +200,7 @@ Color Color::scatter(uint n_colors, uint pos, float sat, float val)
 CINO_INLINE
 Color Color::hsv_ramp(uint n_colors, uint pos)
 {
-    assert(pos>=0 && pos<n_colors);
+    assert(pos<n_colors);
 
     uint i = std::round(255 * static_cast<float>(pos)/static_cast<float>(n_colors));
 

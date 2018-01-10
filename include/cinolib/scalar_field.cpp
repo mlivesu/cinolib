@@ -44,7 +44,7 @@ CINO_INLINE
 ScalarField::ScalarField(const std::vector<double> &data)
 {
     resize(data.size());
-    for(uint i=0; i<rows(); ++i)
+    for(int i=0; i<rows(); ++i)
     {
         (*this)[i] = data[i];
     }
@@ -93,7 +93,7 @@ void ScalarField::normalize_in_01()
     double min =  inf_double;
     double max = -inf_double;
 
-    for(uint i=0; i<this->rows(); ++i)
+    for(int i=0; i<this->rows(); ++i)
     {
         min = std::min(min, (*this)[i]);
         max = std::max(max, (*this)[i]);
@@ -107,7 +107,7 @@ void ScalarField::normalize_in_01()
 
     double delta = max - min;
 
-    for(uint i=0; i<rows(); ++i)
+    for(int i=0; i<rows(); ++i)
     {
         (*this)[i] = ((*this)[i] - min) / delta;
     }
@@ -121,7 +121,7 @@ uint ScalarField::min_element_index() const
     double min_val = (*this)[0];
     uint   min_el  = 0;
 
-    for(uint i=1; i<rows(); ++i)
+    for(int i=1; i<rows(); ++i)
     {
         if (min_val > (*this)[i])
         {
@@ -142,7 +142,7 @@ void ScalarField::serialize(const char *filename) const
     f.open(filename);
     assert(f.is_open());
     f << "SCALAR_FIELD " << size() << "\n";
-    for(uint i=0; i<rows(); ++i)
+    for(int i=0; i<rows(); ++i)
     {
         f << (*this)[i] << "\n";
     }

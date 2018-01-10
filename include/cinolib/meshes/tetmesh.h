@@ -133,12 +133,13 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         void reorder_p2v();
         void reorder_p2v(const uint pid);
 
-        // reorder_p2v() makes sure the p2v adjacency stores vertices
-        // in a way that uniquely defines per element connectivity:
-        //
-        //  3 -- 2      with 0,1,2 CCW (i.e. outgoing normal)
-        //   \  /  \
-        //    0 --- 1        
+        /* reorder_p2v() makes sure the p2v adjacency stores vertices
+           in a way that uniquely defines per element connectivity:
+
+           3 -- 2      with 0,1,2 CCW (i.e. outgoing normal)
+            \  /  \
+             0 --- 1
+        */
 };
 
 }

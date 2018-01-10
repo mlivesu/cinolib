@@ -80,7 +80,7 @@ void VectorField::normalize()
      * Here I choose the former. Play with it if you
      * need something different...
     */
-    for(uint i=0; i<rows(); i+=3)
+    for(int i=0; i<rows(); i+=3)
     {
         vec3d tmp((*this)[i], (*this)[i+1], (*this)[i+2]);
         (*this)[i + 0] /= tmp.length();
@@ -98,7 +98,7 @@ void VectorField::serialize(const char *filename) const
     f.open(filename);
     assert(f.is_open());
     f << "VECTOR_FIELD " << size()/3 << "\n";
-    for(uint i=0; i<rows(); ++i)
+    for(int i=0; i<rows(); ++i)
     {
         f << (*this)[i] << "\n";
     }
