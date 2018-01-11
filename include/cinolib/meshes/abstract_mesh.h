@@ -40,6 +40,7 @@
 #include <cinolib/color.h>
 #include <cinolib/common.h>
 #include <cinolib/symbols.h>
+#include <cinolib/inf.h>
 
 typedef enum
 {

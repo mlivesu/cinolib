@@ -31,7 +31,7 @@
 #include <cinolib/meshes/hexmesh.h>
 #include <cinolib/quality.h>
 #include <cinolib/io/read_write.h>
-#include <cinolib/common.h>
+#include <cinolib/inf.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/subdivision_schemas.h>
 

@@ -29,7 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/dijkstra.h>
-#include <cinolib/common.h>
+#include <cinolib/inf.h>
 
 namespace cinolib
 {

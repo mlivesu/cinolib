@@ -28,44 +28,21 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_BBOX_H
-#define CINO_BBOX_H
+#ifndef CINO_INF
+#define CINO_INF
 
-#include <cinolib/inf.h>
-#include <cinolib/geometry/vec3.h>
+#include <sys/types.h>
+#include <limits>
 
 namespace cinolib
 {
+    // https://stackoverflow.com/questions/20016600/negative-infinity
+    static_assert(std::numeric_limits<double>::is_iec559, "IEEE 754 required");
 
-class Bbox
-{
-    public:
-
-        explicit Bbox() { reset(); }
-
-        void reset()
-        {
-            min = vec3d( inf_double,  inf_double,  inf_double);
-            max = vec3d(-inf_double, -inf_double, -inf_double);
-        }
-
-        vec3d  min, max;
-        inline vec3d  center()    const { return (min + max) * 0.5;    }
-        inline double diag()      const { return (min - max).length(); }
-        inline double delta_x()   const { return (max.x() - min.x());  }
-        inline double delta_y()   const { return (max.y() - min.y());  }
-        inline double delta_z()   const { return (max.z() - min.z());  }
-        inline vec3d  delta()     const { return (max     - min);      }
-        inline double min_entry() const { return  std::min(min.min_entry(), max.min_entry()); }
-        inline double max_entry() const { return  std::max(min.max_entry(), max.max_entry()); }
-};
-
-CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb);
-
+    const double inf_double = std::numeric_limits<double>::infinity();
+    const uint   inf_uint   = std::numeric_limits<uint>::infinity();
+    const float  inf_float  = std::numeric_limits<float>::infinity();
+    const int    inf_int    = std::numeric_limits<int>::infinity();
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "bbox.cpp"
-#endif
-
-#endif // CINO_BBOX_H
+#endif // CINO_INF
