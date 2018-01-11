@@ -32,6 +32,7 @@
 #define CINO_SMOOTHING_H
 
 #include <cinolib/cino_inline.h>
+#include <cinolib/symbols.h>
 
 namespace cinolib
 {

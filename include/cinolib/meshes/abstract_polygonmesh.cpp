@@ -33,7 +33,6 @@
 #include <cinolib/quality.h>
 #include <cinolib/stl_container_utilities.h>
 
-
 #include <unordered_set>
 
 namespace cinolib

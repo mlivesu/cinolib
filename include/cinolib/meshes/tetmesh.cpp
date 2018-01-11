@@ -35,8 +35,7 @@
 #include <cinolib/io/read_write.h>
 #include <cinolib/quality.h>
 #include <cinolib/cot.h>
-
-
+#include <cinolib/symbols.h>
 
 namespace cinolib
 {

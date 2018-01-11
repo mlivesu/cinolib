@@ -32,6 +32,7 @@
 #include <cinolib/laplacian.h>
 #include <cinolib/linear_solvers.h>
 #include <cinolib/vertex_mass.h>
+#include <cinolib/symbols.h>
 
 namespace cinolib
 {

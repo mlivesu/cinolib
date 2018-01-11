@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/isosurface.h>
 #include <cinolib/marching_tets.h>
+#include <cinolib/symbols.h>
 #include <cinolib/tetrahedralization.h>
 
 namespace cinolib

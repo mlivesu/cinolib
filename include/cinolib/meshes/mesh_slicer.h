@@ -32,6 +32,7 @@
 #define CINO_MESH_SLICER_H
 
 #include <cinolib/cino_inline.h>
+#include <cinolib/symbols.h>
 
 namespace cinolib
 {

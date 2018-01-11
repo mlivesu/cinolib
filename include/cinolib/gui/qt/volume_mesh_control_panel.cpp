@@ -32,6 +32,7 @@
 #include <cinolib/textures/textures.h>
 #include <cinolib/meshes/mesh_slicer.h>
 #include <cinolib/gradient.h>
+#include <cinolib/symbols.h>
 #include <iostream>
 
 namespace cinolib

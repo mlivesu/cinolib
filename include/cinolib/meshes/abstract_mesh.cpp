@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/meshes/abstract_mesh.h>
 #include <cinolib/stl_container_utilities.h>
+#include <cinolib/symbols.h>
 #include <map>
 
 namespace cinolib

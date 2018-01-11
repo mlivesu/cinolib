@@ -33,6 +33,7 @@
 
 #include <cinolib/meshes/abstract_mesh.h>
 #include <cinolib/ipair.h>
+#include <cinolib/symbols.h>
 
 namespace cinolib
 {

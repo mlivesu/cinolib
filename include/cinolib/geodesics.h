@@ -35,6 +35,7 @@
 
 #include <cinolib/cino_inline.h>
 #include <cinolib/scalar_field.h>
+#include <cinolib/symbols.h>
 
 namespace cinolib
 {

@@ -33,6 +33,7 @@
 
 #include <cinolib/cino_inline.h>
 #include <cinolib/serializable.h>
+#include <cinolib/symbols.h>
 
 #include <iostream>
 #include <float.h>
