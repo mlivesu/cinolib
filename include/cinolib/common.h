@@ -46,16 +46,6 @@ typedef std::pair<uint,uint> ipair;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// http://stackoverflow.com/questions/3738384/stable-cotangent
-//
-CINO_INLINE
-double cot(double x)
-{
-    return tan(M_PI_2 - x);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 ipair unique_pair(uint v0, uint v1)
 {

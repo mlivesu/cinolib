@@ -31,6 +31,7 @@
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/symbols.h>
+#include <cinolib/cot.h>
 #include <unordered_set>
 
 namespace cinolib
