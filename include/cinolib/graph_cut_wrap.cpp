@@ -66,7 +66,7 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
         gc->setSmoothCost(smooth_term, smooth_data);
         double energy = gc->swap(-1);
 
-        logger << "graph cut energy: " << energy << endl;
+        std::cout << "graph cut energy: " << energy << std::endl;
 
         for(uint pid=0; pid<m.num_polys(); ++pid)
         {
@@ -129,7 +129,7 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
         gc->setSmoothCost(smooth_term, smooth_data);
         double energy = gc->swap(-1);
 
-        logger << "graph cut energy: " << energy << endl;
+        std::cout << "graph cut energy: " << energy << std::endl;
 
         for(uint pid=0; pid<m.num_polys(); ++pid)
         {
@@ -155,7 +155,7 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             &,
                                       GCoptimization::SmoothCostFnExtra  ,
                                       void                              *)
 {
-    std::cerr << "ERROR : Graph Cut disabled. Recompile defining symbol CINOLIB_USES_GRAPH_CUT" << endl;
+    std::cerr << "ERROR : Graph Cut disabled. Recompile defining symbol CINOLIB_USES_GRAPH_CUT" << std::endl;
     exit(-1);
 }
 
@@ -170,7 +170,7 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             &,
                                       GCoptimization::SmoothCostFnExtra  ,
                                       void                              *)
 {
-    std::cerr << "ERROR : Graph Cut disabled. Recompile defining symbol CINOLIB_USES_GRAPH_CUT" << endl;
+    std::cerr << "ERROR : Graph Cut disabled. Recompile defining symbol CINOLIB_USES_GRAPH_CUT" << std::endl;
     exit(-1);
 }
 #endif

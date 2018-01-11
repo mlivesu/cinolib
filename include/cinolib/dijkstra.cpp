@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/dijkstra.h>
 #include <cinolib/inf.h>
+#include <cinolib/stl_container_utilities.h>
 
 namespace cinolib
 {

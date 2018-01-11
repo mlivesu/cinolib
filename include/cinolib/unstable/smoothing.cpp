@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/unstable/smoothing.h>
 #include <cinolib/laplacian.h>
+#include <cinolib/stl_container_utilities.h>
 
 namespace cinolib
 {

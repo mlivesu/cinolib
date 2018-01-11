@@ -31,7 +31,7 @@
 #ifndef CINO_DRAW_ARROW_H
 #define CINO_DRAW_ARROW_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/gl/draw_cylinder.h>
 
 namespace cinolib

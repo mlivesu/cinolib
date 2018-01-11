@@ -29,8 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/ssvd.h>
-
-#include <iostream>
+#include <cinolib/matrix.h>
 
 namespace cinolib
 {
@@ -72,15 +71,15 @@ void ssvd(const Eigen::Matrix3d                 & m,
     assert(u.determinant() > 0);
 
     //assert(m.determinant() * (u * s * v.transpose()).determinant() > 0);
-    //cout << "m :\n" << m << endl;
-    //cout << endl;
-    //cout << "m':\n" << u * s * v.transpose() << endl;
-    //cout << endl;
-    //cout << "m' - m:\n" << m - (u * s * v.transpose()) << endl;
-    //cout << endl;
-    //cout << "det m: " << m.determinant() << endl;
-    //cout << endl;
-    //cout << "det m': " << (u * s * v.transpose()).determinant() << endl;
+    //cout << "m :\n" << m << std::endl;
+    //cout << std::endl;
+    //cout << "m':\n" << u * s * v.transpose() << std::endl;
+    //cout << std::endl;
+    //cout << "m' - m:\n" << m - (u * s * v.transpose()) << std::endl;
+    //cout << std::endl;
+    //cout << "det m: " << m.determinant() << std::endl;
+    //cout << std::endl;
+    //cout << "det m': " << (u * s * v.transpose()).determinant() << std::endl;
 }
 
 
@@ -97,10 +96,10 @@ void closest_pos_det_matrix(double T[3][3])
 
     ssvd(t, u, s, v);
 
-    //cout << ":::::::::::::::::::::::::::::::::::::::::::" << endl;
-    //cout << T[0][0] << "\t" << T[0][1] << "\t" << T[0][2] << endl;
-    //cout << T[1][0] << "\t" << T[1][1] << "\t" << T[1][2] << endl;
-    //cout << T[2][0] << "\t" << T[2][1] << "\t" << T[2][2] << endl;
+    //cout << ":::::::::::::::::::::::::::::::::::::::::::" << std::endl;
+    //cout << T[0][0] << "\t" << T[0][1] << "\t" << T[0][2] << std::endl;
+    //cout << T[1][0] << "\t" << T[1][1] << "\t" << T[1][2] << std::endl;
+    //cout << T[2][0] << "\t" << T[2][1] << "\t" << T[2][2] << std::endl;
 
     assert(s.diagonal()[0] > 0.0);
     assert(s.diagonal()[1] > 0.0);

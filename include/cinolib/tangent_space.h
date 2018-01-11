@@ -31,7 +31,7 @@
 #ifndef CINO_TANGENT_SPACE_H
 #define CINO_TANGENT_SPACE_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>
 

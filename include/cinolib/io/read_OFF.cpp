@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/io/read_OFF.h>
 
+
 #include <iostream>
 
 namespace cinolib
@@ -48,7 +49,7 @@ void read_OFF(const char                     * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OFF() : couldn't open input file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OFF() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 

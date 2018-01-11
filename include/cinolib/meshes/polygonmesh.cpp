@@ -32,6 +32,8 @@
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/geometry/plane.h>
 #include <cinolib/geometry/polygon.h>
+#include <cinolib/vector_serialization.h>
+
 #include <map>
 
 namespace cinolib
@@ -194,9 +196,7 @@ std::vector<uint> Polygonmesh<M,V,E,P>::get_ordered_boundary_vertices() const
         }
     }
 
-    logger.disable();
     Trimesh<M,V,E,P> tmp(coords,tris);
-    logger.enable();
     return tmp.vert_ordered_vert_ring(pid);
 }
 

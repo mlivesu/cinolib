@@ -34,6 +34,8 @@
 #include <cinolib/inf.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/subdivision_schemas.h>
+#include <cinolib/vector_serialization.h>
+
 
 #include <float.h>
 #include <map>
@@ -262,7 +264,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Hexmesh<M,V,E,F,P>::print_quality(const bool list_folded_elements)
 {
-    if (list_folded_elements) logger << "Folded Hexa: ";
+    if (list_folded_elements) std::cout << "Folded Hexa: ";
 
     double asj = 0.0;
     double msj = inf_double;
@@ -278,18 +280,18 @@ void Hexmesh<M,V,E,F,P>::print_quality(const bool list_folded_elements)
         if (q <= 0.0)
         {
             ++inv;
-            if (list_folded_elements) logger << pid << " - ";
+            if (list_folded_elements) std::cout << pid << " - ";
         }
     }
     asj /= static_cast<double>(this->num_polys());
 
-    if (list_folded_elements) logger << endl << endl;
+    if (list_folded_elements) std::cout << std::endl << std::endl;
 
-    logger << endl;
-    logger << "MIN SJ : " << msj << endl;
-    logger << "AVG SJ : " << asj << endl;
-    logger << "INV EL : " << inv << " (out of " << this->num_polys() << ")" << endl;
-    logger << endl;
+    std::cout << std::endl;
+    std::cout << "MIN SJ : " << msj << std::endl;
+    std::cout << "AVG SJ : " << asj << std::endl;
+    std::cout << "INV EL : " << inv << " (out of " << this->num_polys() << ")" << std::endl;
+    std::cout << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -322,14 +324,14 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
         exit(-1);
     }
 
     from_serialized_hexa_to_general_polyhedra(hexa);
 
-    logger << this->num_polys() << " hexahedra read" << endl;
-    logger << this->num_verts() << " vertices  read" << endl;
+    std::cout << this->num_polys() << " hexahedra read" << std::endl;
+    std::cout << this->num_verts() << " vertices  read" << std::endl;
 
     this->mesh_data().filename = std::string(filename);
 }
@@ -360,7 +362,7 @@ void Hexmesh<M,V,E,F,P>::save(const char * filename) const
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
         exit(-1);
     }
 }

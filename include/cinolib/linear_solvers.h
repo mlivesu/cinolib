@@ -31,7 +31,7 @@
 #ifndef CINO_LINEAR_SOLVERS_H
 #define CINO_LINEAR_SOLVERS_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <Eigen/Sparse>
 #include <string>
 

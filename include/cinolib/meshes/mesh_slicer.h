@@ -31,7 +31,7 @@
 #ifndef CINO_MESH_SLICER_H
 #define CINO_MESH_SLICER_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {

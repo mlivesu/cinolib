@@ -33,7 +33,7 @@
 
 #include <vector>
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/meshes/abstract_mesh.h>
 
 namespace cinolib

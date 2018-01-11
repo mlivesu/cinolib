@@ -31,7 +31,7 @@
 #ifndef CINO_MEAN_CURV_FLOW_H
 #define CINO_MEAN_CURV_FLOW_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/meshes/trimesh.h>
 
 namespace cinolib

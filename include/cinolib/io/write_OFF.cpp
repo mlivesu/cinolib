@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/io/write_OFF.h>
 
+
 #include <iostream>
 
 namespace cinolib
@@ -47,7 +48,7 @@ void write_OFF(const char                * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OFF() : couldn't save file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OFF() : couldn't save file " << filename << std::endl;
         exit(-1);
     }
 
@@ -87,7 +88,7 @@ void write_OFF(const char                           * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OFF() : couldn't save file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OFF() : couldn't save file " << filename << std::endl;
         exit(-1);
     }
 

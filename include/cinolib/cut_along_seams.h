@@ -32,7 +32,7 @@
 #define CINO_CUT_ALONG_SEAMS_H
 
 #include <vector>
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 
 namespace cinolib

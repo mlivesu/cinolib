@@ -28,7 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/logger.h>
+
 #include <cinolib/cino_inline.h>
 
 namespace cinolib

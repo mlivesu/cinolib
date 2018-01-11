@@ -29,7 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/tetrahedralization.h>
-#include <cinolib/common.h>
+#include <cinolib/ipair.h>
 #include <set>
 
 namespace cinolib

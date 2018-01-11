@@ -31,7 +31,7 @@
 #ifndef CINO_WRITE_OBJ_H
 #define CINO_WRITE_OBJ_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
 #include <sys/types.h>
 #include <vector>

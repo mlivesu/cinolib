@@ -31,7 +31,7 @@
 #ifndef CINO_N_SIDED_POLYGON_H
 #define CINO_N_SIDED_POLYGON_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/meshes/polygonmesh.h>

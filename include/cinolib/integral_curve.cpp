@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include "integral_curve.h"
 
+#include <cinolib/ipair.h>
 #include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/gl/draw_arrow.h>
 #include <cinolib/gl/draw_sphere.h>

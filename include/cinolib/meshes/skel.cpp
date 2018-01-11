@@ -31,6 +31,7 @@
 #include <cinolib/meshes/skel.h>
 #include <cinolib/io/read_write.h>
 
+
 namespace cinolib
 {
 
@@ -130,7 +131,7 @@ void Skel::load(const char * filename)
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : not supported skeleton type" << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : not supported skeleton type" << std::endl;
         exit(-1);
     }
 
@@ -279,10 +280,10 @@ void Skel::build_bones()
             }
             seg_bones.push_back(s_bone);
 
-            logger << "New Bone\t" << v_bone.size() << " vertices\t" << s_bone.size() << " segments." << endl;
+            std::cout << "New Bone\t" << v_bone.size() << " vertices\t" << s_bone.size() << " segments." << std::endl;
         }
     }
-    logger << vtx_bones.size() << " bone(s) found!" << endl;
+    std::cout << vtx_bones.size() << " bone(s) found!" << std::endl;
 }
 
 CINO_INLINE

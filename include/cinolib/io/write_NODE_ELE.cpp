@@ -49,7 +49,7 @@ void write_NODE_ELE(const char                           * basename,
 
     if(!f_node || !f_ele)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write_NODE_ELE() : couldn't create output file(s)." << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write_NODE_ELE() : couldn't create output file(s)." << std::endl;
         exit(-1);
     }
 
@@ -91,7 +91,7 @@ void write_NODE_ELE_2D(const char                           * basename,
 
     if(!f_node || !f_ele)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write_NODE_ELE() : couldn't create output file(s)." << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write_NODE_ELE() : couldn't create output file(s)." << std::endl;
         exit(-1);
     }
 

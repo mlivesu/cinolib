@@ -31,6 +31,7 @@
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/geometry/triangle.h>
 
+
 namespace cinolib
 {
 
@@ -196,10 +197,10 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_adjacency()
         }
     }
 
-    logger << this->num_verts() << "\tverts" << endl;
-    logger << this->num_edges() << "\tedges" << endl;
-    logger << this->num_faces() << "\tfaces" << endl;
-    logger << this->num_polys() << "\tpolys" << endl;
+    std::cout << this->num_verts() << "\tverts" << std::endl;
+    std::cout << this->num_edges() << "\tedges" << std::endl;
+    std::cout << this->num_faces() << "\tfaces" << std::endl;
+    std::cout << this->num_polys() << "\tpolys" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

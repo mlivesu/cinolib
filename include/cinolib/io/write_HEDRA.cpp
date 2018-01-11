@@ -47,7 +47,7 @@ void write_HEDRA(const char                           * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_HEDRA() : couldn't write output file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_HEDRA() : couldn't write output file " << filename << std::endl;
         exit(-1);
     }
 

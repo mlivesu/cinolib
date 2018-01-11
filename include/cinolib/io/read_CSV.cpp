@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/io/read_CSV.h>
 
+
 namespace cinolib
 {
 
@@ -49,7 +50,7 @@ void read_CSV(const char          * filename,
 
     if (!f)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : error while reading file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : error while reading file " << filename << std::endl;
         exit(-1);
     }
 
@@ -74,9 +75,9 @@ void read_CSV(const char          * filename,
         arcs.push_back(i);
     }
 
-    logger << endl;
-    logger << "Gesture Loaded - " << coords.size()/3 << " points" << endl;
-    logger << endl;
+    std::cout << std::endl;
+    std::cout << "Gesture Loaded - " << coords.size()/3 << " points" << std::endl;
+    std::cout << std::endl;
 }
 
 }

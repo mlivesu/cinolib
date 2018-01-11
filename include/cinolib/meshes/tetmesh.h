@@ -37,7 +37,7 @@
 #include <map>
 #include <set>
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/meshes/trimesh.h>

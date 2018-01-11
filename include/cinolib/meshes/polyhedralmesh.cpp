@@ -32,7 +32,7 @@
 #include <cinolib/io/read_write.h>
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
-#include <cinolib/common.h>
+#include <cinolib/vector_serialization.h>
 
 #include <algorithm>
 #include <cmath>
@@ -94,15 +94,15 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
         exit(-1);
     }
 
     this->verts = vec3d_from_serialized_xyz(coords);
 
-    logger << this->num_verts() << " verts read" << endl;
-    logger << this->num_faces() << " faces read" << endl;
-    logger << this->num_polys() << " polys read" << endl;
+    std::cout << this->num_verts() << " verts read" << std::endl;
+    std::cout << this->num_faces() << " faces read" << std::endl;
+    std::cout << this->num_polys() << " polys read" << std::endl;
 
     this->mesh_data().filename = std::string(filename);
 }
@@ -123,7 +123,7 @@ void Polyhedralmesh<M,V,E,F,P>::save(const char * filename) const
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
         exit(-1);
     }
 }

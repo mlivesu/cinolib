@@ -51,7 +51,7 @@ void read_HEDRA(const char                     * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_HEDRA() : couldn't open input file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_HEDRA() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 

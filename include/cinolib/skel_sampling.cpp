@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/skel_sampling.h>
+#include <cinolib/stl_container_utilities.h>
 #include <set>
 
 namespace cinolib

@@ -31,7 +31,7 @@
 #ifndef CINO_VERTEX_CLUSTERING_H
 #define CINO_VERTEX_CLUSTERING_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <set>
 
 namespace cinolib

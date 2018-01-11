@@ -33,6 +33,8 @@
 #include <cinolib/geometry/plane.h>
 #include <cinolib/geometry/polygon.h>
 #include <cinolib/standard_elements_tables.h>
+#include <cinolib/stl_container_utilities.h>
+#include <cinolib/vector_serialization.h>
 
 #include <queue>
 
@@ -358,9 +360,7 @@ std::vector<uint> Quadmesh<M,V,E,P>::get_ordered_boundary_vertices() const
         }
     }
 
-    logger.disable();
     Trimesh<> tmp(coords,tris);
-    logger.enable();
     return tmp.vert_ordered_vert_ring(pid);
 }
 

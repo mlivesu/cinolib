@@ -31,7 +31,7 @@
 #ifndef CINO_SMALLEST_ENCLOSING_DISK_H
 #define CINO_SMALLEST_ENCLOSING_DISK_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>
 #include <vector>

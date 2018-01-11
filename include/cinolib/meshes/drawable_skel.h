@@ -33,6 +33,7 @@
 
 #include <cinolib/drawable_object.h>
 #include <cinolib/meshes/skel.h>
+#include <cinolib/stl_container_utilities.h>
 
 namespace cinolib
 {

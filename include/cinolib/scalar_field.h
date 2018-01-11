@@ -31,7 +31,7 @@
 #ifndef CINO_SCALAR_FIELD_V_H
 #define CINO_SCALAR_FIELD_V_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/serializable.h>
 
 #include <iostream>

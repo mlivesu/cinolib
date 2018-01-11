@@ -31,7 +31,7 @@
 #ifndef CINO_QUALITY
 #define CINO_QUALITY
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 #include <float.h>
 

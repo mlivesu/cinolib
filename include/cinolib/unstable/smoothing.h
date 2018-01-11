@@ -31,7 +31,7 @@
 #ifndef CINO_SMOOTHING_H
 #define CINO_SMOOTHING_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {

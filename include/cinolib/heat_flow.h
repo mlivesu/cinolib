@@ -31,7 +31,7 @@
 #ifndef CINO_HEAT_FLOW_H
 #define CINO_HEAT_FLOW_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/scalar_field.h>
 #include <cinolib/linear_solvers.h>
 

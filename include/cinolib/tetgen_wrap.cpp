@@ -123,7 +123,7 @@ void tetgen_wrap(const std::vector<double> & coords_in,
     }
 
 #else
-    std::cerr << "ERROR : Tetgen missing. Install Tetgen and recompile defining symbol CINOLIB_USES_TETGEN" << endl;
+    std::cerr << "ERROR : Tetgen missing. Install Tetgen and recompile defining symbol CINOLIB_USES_TETGEN" << std::endl;
     exit(-1);
 #endif
 }

@@ -31,7 +31,7 @@
 #ifndef CINO_TRIANGLE_WRAP_H
 #define CINO_TRIANGLE_WRAP_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec2.h>
 
 #include <vector>

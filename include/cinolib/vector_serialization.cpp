@@ -28,20 +28,64 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_LIB_H
-#define CINO_LIB_H
-
-#include <cinolib/cino_inline.h>
-#include <cinolib/symbols.h>
-#include <cinolib/logger.h>
+#include <cinolib/vector_serialization.h>
 
 namespace cinolib
 {
-    static Logger   logger;
 
-    /*** OPTIONS ***/
-    static bool support_non_manifold_edges = true;
-    static bool print_non_manifold_edges   = false;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<vec3d> vec3d_from_serialized_xyz(const std::vector<double> & coords)
+{
+    uint nv = coords.size()/3;
+    std::vector<vec3d> tmp(nv);
+    for(uint vid=0; vid<nv; ++vid) tmp.at(vid) = vec3d(coords[3*vid+0], coords[3*vid+1], coords[3*vid+2]);
+    return tmp;
 }
 
-#endif // CINO_LIB_H
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<double> serialized_xyz_from_vec3d(const std::vector<vec3d> & verts)
+{
+    uint nv = verts.size();
+    std::vector<double> tmp(3*nv);
+    for(uint vid=0; vid<nv; ++vid)
+    {
+        tmp.at(3*vid  ) = verts.at(vid).x();
+        tmp.at(3*vid+1) = verts.at(vid).y();
+        tmp.at(3*vid+2) = verts.at(vid).z();
+    }
+    return tmp;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<std::vector<uint>> faces_from_serialized_vids(const std::vector<uint> & vids, const uint vids_per_face)
+{
+    uint nf = vids.size()/vids_per_face;
+    std::vector<std::vector<uint>> tmp(nf);
+    for(uint fid=0; fid<nf; ++fid)
+    {
+        for(uint off=0; off<vids_per_face; ++off) tmp.at(fid).push_back(vids.at(fid*vids_per_face+off));
+    }
+    return tmp;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<uint> serialized_vids_from_faces(const std::vector<std::vector<uint>> & faces)
+{
+    std::vector<uint> tmp;
+    for(const auto & f   : faces)
+    for(const auto & vid : f    )
+    {
+        tmp.push_back(vid);
+    }
+    return tmp;
+}
+
+}

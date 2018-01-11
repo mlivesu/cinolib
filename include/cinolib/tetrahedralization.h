@@ -31,7 +31,7 @@
 #ifndef CINO_TETRAHEDRALIZATION_H
 #define CINO_TETRAHEDRALIZATION_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 
 /* The split schemes implemented here are largely based on:
  *

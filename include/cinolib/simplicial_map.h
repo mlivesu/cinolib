@@ -31,7 +31,7 @@
 #ifndef CINO_SIMPLICIAL_MAP_H
 #define CINO_SIMPLICIAL_MAP_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 
 namespace cinolib

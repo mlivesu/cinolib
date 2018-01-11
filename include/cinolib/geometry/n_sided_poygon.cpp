@@ -97,10 +97,7 @@ Trimesh<M,V,E,P> n_sided_polygon(const vec3d  & center,
         tris.push_back(1+(i+1)%n_sides);
     }
 
-    logger.disable();
     Trimesh<> m(verts, tris);
-    logger.enable();
-
     m.translate(center);
 
     vec3d  Y(0,1,0);

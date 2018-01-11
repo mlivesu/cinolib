@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/io/write_TET.h>
 
+
 #include <iostream>
 
 namespace cinolib
@@ -46,7 +47,7 @@ void write_TET(const char                * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_TET() : couldn't write output file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_TET() : couldn't write output file " << filename << std::endl;
         exit(-1);
     }
 

@@ -31,7 +31,7 @@
 #ifndef CINO_POLYGON_MAXIMUM_INSCRIBED_CIRCLE_H
 #define CINO_POLYGON_MAXIMUM_INSCRIBED_CIRCLE_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec2.h>
 
 namespace cinolib

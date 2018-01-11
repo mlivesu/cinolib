@@ -31,7 +31,7 @@
 #ifndef CINO_DRAWABLE_CURVE_H
 #define CINO_DRAWABLE_CURVE_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/curve.h>
 #include <cinolib/meshes/skel.h>

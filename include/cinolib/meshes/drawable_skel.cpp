@@ -38,7 +38,7 @@
 #endif
 
 #include <cinolib/meshes/drawable_skel.h>
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
 #include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/gl/draw_sphere.h>

@@ -273,7 +273,7 @@ void Polygon2D::triangulate(std::vector<double> & coords,
 //    if (tmp.n_vertices() != n_vertices())
 //    {
 //        cerr << "WARNING: " << n_vertices() - tmp.n_vertices()
-//             << " duplicated vertices were removed to perform triangulation" << endl;
+//             << " duplicated vertices were removed to perform triangulation" << std::endl;
 //    }
 
     std::vector<double> coords_in;  // serialized xy coordinates
@@ -366,28 +366,28 @@ void Polygon2D::triangulate(std::vector<double> & coords,
     //
     if (coords_in.size()/2 != coords.size()/3)
     {
-        cerr << "WARNING - Triangle: input and output vertices do not match. Discard polygon!" << endl;
+        cerr << "WARNING - Triangle: input and output vertices do not match. Discard polygon!" << std::endl;
 
         coords.clear();
         tris.clear();
 
         //cout.precision(17);
-        //cout << coords_in.size()/2 << "\t" << coords.size()/3 << endl;
-        //cout << *this << endl;
-        //cout << "coords in (xy)" << endl;
-        //for(auto c : coords_in) cout << c << endl;
-        //cout << endl;
-        //cout << "segs in" << endl;
-        //for(auto c : edges_in) cout << c << endl;
-        //cout << endl;
-        //cout << "holes in" << endl;
-        //for(auto c : holes_in) cout << c << endl;
-        //cout << endl;
-        //cout << "coords out (xyz)" << endl;
-        //for(auto c : coords) cout << c << endl;
-        //cout << endl;
-        //cout << "tris out" << endl;
-        //for(auto c : tris) cout << c << endl;
+        //cout << coords_in.size()/2 << "\t" << coords.size()/3 << std::endl;
+        //cout << *this << std::endl;
+        //cout << "coords in (xy)" << std::endl;
+        //for(auto c : coords_in) cout << c << std::endl;
+        //cout << std::endl;
+        //cout << "segs in" << std::endl;
+        //for(auto c : edges_in) cout << c << std::endl;
+        //cout << std::endl;
+        //cout << "holes in" << std::endl;
+        //for(auto c : holes_in) cout << c << std::endl;
+        //cout << std::endl;
+        //cout << "coords out (xyz)" << std::endl;
+        //for(auto c : coords) cout << c << std::endl;
+        //cout << std::endl;
+        //cout << "tris out" << std::endl;
+        //for(auto c : tris) cout << c << std::endl;
         //assert(coords_in.size()/2 == coords.size()/3);
     }
 }
@@ -637,7 +637,7 @@ void Polygon2D::merge_adjacent_nearby_vertices(const double eps)
         }
         else
         {
-            cerr << "WARNING: ring oversimplified! It contains less than 3 vertices, discarded." << endl;
+            cerr << "WARNING: ring oversimplified! It contains less than 3 vertices, discarded." << std::endl;
 
             if (r==0) // if it is the outer ring return an empty polygon
             {
@@ -650,7 +650,7 @@ void Polygon2D::merge_adjacent_nearby_vertices(const double eps)
     Polygon2D new_poly(new_rings);
     poly = new_poly.poly;
 
-    if (count) cout << count << " points were removed from the Polygon2D" << endl;
+    if (count) cout << count << " points were removed from the Polygon2D" << std::endl;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -703,7 +703,7 @@ void Polygon2D::merge_collinear_edges(const double angle_deg)
         }
         else
         {
-            cerr << "WARNING: ring oversimplified! It contains less than 3 vertices, discarded." << endl;
+            cerr << "WARNING: ring oversimplified! It contains less than 3 vertices, discarded." << std::endl;
 
             if (r==0) // if it is the outer ring return an empty polygon
             {
@@ -716,7 +716,7 @@ void Polygon2D::merge_collinear_edges(const double angle_deg)
     Polygon2D new_poly(new_rings);
     poly = new_poly.poly;
 
-    if (count) cout << count << " colinear edge pairs were merged" << endl;
+    if (count) cout << count << " colinear edge pairs were merged" << std::endl;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

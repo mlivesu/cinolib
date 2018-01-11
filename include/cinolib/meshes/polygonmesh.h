@@ -32,7 +32,7 @@
 #define CINO_POLYGONMESH_H
 
 #include <vector>
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/meshes/abstract_polygonmesh.h>
 #include <cinolib/meshes/mesh_attributes.h>
 

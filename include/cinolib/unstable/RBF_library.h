@@ -31,7 +31,7 @@
 #ifndef CINO_RBF_LIBRARY_H
 #define CINO_RBF_LIBRARY_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cmath>
 
 /*

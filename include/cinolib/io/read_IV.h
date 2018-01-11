@@ -31,7 +31,7 @@
 #ifndef CINO_READ_IV_H
 #define CINO_READ_IV_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 
 #include <sys/types.h>
 #include <vector>

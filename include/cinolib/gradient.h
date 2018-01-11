@@ -32,7 +32,7 @@
 #define CINO_GRADIENT_H
 
 #include <Eigen/Sparse>
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/meshes/abstract_polygonmesh.h>
 

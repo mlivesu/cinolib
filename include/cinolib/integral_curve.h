@@ -31,7 +31,7 @@
 #ifndef CINO_INTEGRAL_CURVE_H
 #define CINO_INTEGRAL_CURVE_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/vector_field.h>
 #include <cinolib/drawable_curve.h>
 

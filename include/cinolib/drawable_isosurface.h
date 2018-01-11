@@ -31,7 +31,7 @@
 #ifndef CINO_DRAWABLE_ISOSURFACE_H
 #define CINO_DRAWABLE_ISOSURFACE_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/isosurface.h>
 #include <cinolib/color.h>

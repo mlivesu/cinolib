@@ -144,7 +144,7 @@ void triangle_wrap(const std::vector<double> & verts_in,
     free(out.segmentlist);
 
 #else
-    std::cerr << "ERROR : Triangle missing. Install Triangle and recompile defining symbol CINOLIB_USES_TRIANGLE" << endl;
+    std::cerr << "ERROR : Triangle missing. Install Triangle and recompile defining symbol CINOLIB_USES_TRIANGLE" << std::endl;
     exit(-1);
 #endif
 }

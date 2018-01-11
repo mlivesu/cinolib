@@ -31,11 +31,11 @@
 #ifndef CINO_SKEL_H
 #define CINO_SKEL_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/bbox.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/common.h>
+//
 
 #include <vector>
 #include <queue>

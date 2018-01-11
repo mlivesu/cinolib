@@ -92,9 +92,7 @@ void Curve::reverse()
 CINO_INLINE
 Skel Curve::export_as_skeleton() const
 {
-    logger.disable();
     Skel s(vector_coords(), vector_segments());
-    logger.enable();
     return s;
 }
 
@@ -491,11 +489,7 @@ void Curve::tessellate(Trimesh<> &m, const std::vector<uint> & split_list) const
 
         i+=2+3*subtris;
     }
-
-    // sanitize edge connectivity...
-    logger.disable();
     m.update_adjacency();
-    logger.enable();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

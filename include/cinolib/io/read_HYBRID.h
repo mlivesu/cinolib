@@ -31,7 +31,7 @@
 #ifndef CINO_READ_HYBRID_H
 #define CINO_READ_HYBRID_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <vector>
 
 namespace cinolib

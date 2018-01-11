@@ -29,12 +29,14 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/tetmesh.h>
-#include <cinolib/common.h>
+#include <cinolib/vector_serialization.h>
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/geometry/tetrahedron.h>
 #include <cinolib/io/read_write.h>
 #include <cinolib/quality.h>
 #include <cinolib/cot.h>
+
+
 
 namespace cinolib
 {
@@ -238,14 +240,14 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
         exit(-1);
     }
 
     from_serialized_tets_to_general_polyhedra(tets);
 
-    logger << this->num_polys() << " tetrahedra read" << endl;
-    logger << this->num_verts() << " vertices   read" << endl;
+    std::cout << this->num_polys() << " tetrahedra read" << std::endl;
+    std::cout << this->num_verts() << " vertices   read" << std::endl;
 
     this->mesh_data().filename = std::string(filename);
 }
@@ -276,7 +278,7 @@ void Tetmesh<M,V,E,F,P>::save(const char * filename) const
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
         exit(-1);
     }
 }

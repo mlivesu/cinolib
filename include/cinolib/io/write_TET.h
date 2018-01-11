@@ -31,7 +31,7 @@
 #ifndef CINO_WRITE_TET_H
 #define CINO_WRITE_TET_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 
 #include <sys/types.h>
 #include <vector>

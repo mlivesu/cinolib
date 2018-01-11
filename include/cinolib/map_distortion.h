@@ -31,7 +31,7 @@
 #ifndef CINO_MAP_DISTORTION_H
 #define CINO_MAP_DISTORTION_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {

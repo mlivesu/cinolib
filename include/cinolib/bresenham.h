@@ -31,7 +31,7 @@
 #ifndef CINO_BRESENHAM_H
 #define CINO_BRESENHAM_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <vector>
 
 namespace cinolib

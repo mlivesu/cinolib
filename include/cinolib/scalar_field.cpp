@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/scalar_field.h>
 #include <cinolib/inf.h>
+#include <fstream>
 
 namespace cinolib
 {
@@ -99,11 +100,11 @@ void ScalarField::normalize_in_01()
         max = std::max(max, (*this)[i]);
     }
 
-    logger << endl;
-    logger << "Min value " << min << endl;
-    logger << "Max value " << max << endl;
-    logger << "Normalized in the range [0,1]" << endl;
-    logger << endl;
+    std::cout << std::endl;
+    std::cout << "Min value " << min << std::endl;
+    std::cout << "Max value " << max << std::endl;
+    std::cout << "Normalized in the range [0,1]" << std::endl;
+    std::cout << std::endl;
 
     double delta = max - min;
 

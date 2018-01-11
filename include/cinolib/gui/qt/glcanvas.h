@@ -45,7 +45,7 @@
 #include <GL/gl.h>
 #endif
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/bbox.h>
 #include <cinolib/drawable_object.h>
 

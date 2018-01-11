@@ -30,7 +30,7 @@
 **********************************************************************************/
 #include <cinolib/io/write_OBJ.h>
 #include <cinolib/color.h>
-#include <cinolib/common.h>
+#include <cinolib/stl_container_utilities.h>
 
 #include <iostream>
 #include <algorithm>
@@ -52,7 +52,7 @@ void write_OBJ(const char                * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 
@@ -89,7 +89,7 @@ void write_OBJ(const char                           * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 
@@ -130,7 +130,7 @@ void write_OBJ(const char                * filename,
 
     if(!f_obj || !f_mtl)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 
@@ -193,7 +193,7 @@ void write_OBJ(const char                * filename,
 
     if(!f_obj || !f_mtl)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 
@@ -242,7 +242,7 @@ void write_OBJ(const char                           * filename,
 
     if(!f_obj || !f_mtl)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 
@@ -301,7 +301,7 @@ void write_OBJ(const char                           * filename,
 
 //    if(!f_obj || !f_mtl)
 //    {
-//        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << endl;
+//        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << std::endl;
 //        exit(-1);
 //    }
 

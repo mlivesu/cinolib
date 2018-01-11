@@ -162,7 +162,7 @@ void read_VTU(const char          *,
                std::vector<uint>   &,
                std::vector<uint>   &)
 {
-    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << std::endl;
     exit(-1);
 }
 
@@ -171,7 +171,7 @@ void read_VTU(const char                      *,
                std::vector<double>            &,
                std::vector<std::vector<uint>> &)
 {
-    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << std::endl;
     exit(-1);
 }
 
@@ -180,7 +180,7 @@ void read_VTU(const char                      *,
                std::vector<vec3d>             &,
                std::vector<std::vector<uint>> &)
 {
-    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << endl;
+    std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << std::endl;
     exit(-1);
 }
 

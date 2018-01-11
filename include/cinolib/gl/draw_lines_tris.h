@@ -41,7 +41,7 @@
 #include <GL/glu.h>
 #endif
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
 
 #include <vector>

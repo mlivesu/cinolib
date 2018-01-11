@@ -31,8 +31,8 @@
 #ifndef CINO_BFS_H
 #define CINO_BFS_H
 
+#include <cinolib/cino_inline.h>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/cinolib.h>
 #include <unordered_set>
 
 namespace cinolib

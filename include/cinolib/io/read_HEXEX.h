@@ -31,7 +31,7 @@
 #ifndef CINO_READ_HEXEX_H
 #define CINO_READ_HEXEX_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 #include <sys/types.h>
 #include <vector>

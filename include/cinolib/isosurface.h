@@ -31,7 +31,8 @@
 #ifndef CINO_ISOSURFACE_H
 #define CINO_ISOSURFACE_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
+#include <cinolib/ipair.h>
 #include <cinolib/meshes/tetmesh.h>
 
 

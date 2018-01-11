@@ -88,7 +88,7 @@ void MCF(AbstractPolygonMesh<M,V,E,P> & m,
             m.vert(vid) = new_pos;
         }
 
-        logger << "MCF iter: " << i << " residual: " << residual << endl;
+        std::cout << "MCF iter: " << i << " residual: " << residual << std::endl;
 
         if (i<n_iters) // update matrices for the next iteration
         {

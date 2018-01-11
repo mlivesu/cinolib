@@ -31,7 +31,7 @@
 #ifndef POLYGON2D_H
 #define POLYGON2D_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 
 #include <vector>
 #include <ostream>

@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/vector_field.h>
+#include <fstream>
 
 namespace cinolib
 {

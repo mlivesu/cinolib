@@ -110,7 +110,7 @@ void read_OBJ(const char                     * filename,
 
     if(!f)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OBJ() : couldn't open input file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OBJ() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 
@@ -209,7 +209,7 @@ void read_MTU(const char                  * filename,
 
     if(!f)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_MTU() : couldn't open color file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_MTU() : couldn't open color file " << filename << std::endl;
         exit(-1);
     }
 

@@ -31,7 +31,7 @@
 #ifndef CINO_SAMPLING_H
 #define CINO_SAMPLING_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 
 #include <vector>
 

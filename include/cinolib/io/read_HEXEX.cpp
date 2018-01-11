@@ -52,7 +52,7 @@ void read_HEXEX(const char         * filename,
 
     if(!f)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_HEXEX() : couldn't open input file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_HEXEX() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 

@@ -31,8 +31,7 @@
 #ifndef CINO_READ_DEYSUN2006_H
 #define CINO_READ_DEYSUN2006_H
 
-#include <cinolib/cinolib.h>
-
+#include <cinolib/cino_inline.h>
 #include <vector>
 
 namespace cinolib

@@ -35,7 +35,7 @@
 #include <vector>
 #include <iostream>
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {

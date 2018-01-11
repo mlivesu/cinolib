@@ -981,7 +981,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
         {
             ScalarField sf(filename.c_str());
             if (sf.size() == m->num_verts()) sf.copy_to_mesh(*m);
-            else std::cerr << "Could not load scalar field " << filename << " - array size mismatch!" << endl;
+            else std::cerr << "Could not load scalar field " << filename << " - array size mismatch!" << std::endl;
         }
     });
 

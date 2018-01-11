@@ -31,7 +31,7 @@
 #ifndef CINO_COLOR_H
 #define CINO_COLOR_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <stdint.h>
 
 namespace cinolib

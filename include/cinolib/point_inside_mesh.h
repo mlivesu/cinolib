@@ -31,7 +31,7 @@
 #ifndef CINO_POINT_INSIDE_MESH_H
 #define CINO_POINT_INSIDE_MESH_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/octree.h>
 
 namespace cinolib

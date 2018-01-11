@@ -31,7 +31,7 @@
 #include <cinolib/textures/textures.h>
 #include <cinolib/textures/quality_ramp_texture.h>
 #include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
-#include <cinolib/common.h>
+#include <cinolib/serialize_2D.h>
 #include <stdint.h>
 
 #ifdef CINOLIB_USES_QT_AND_QGLVIEWER

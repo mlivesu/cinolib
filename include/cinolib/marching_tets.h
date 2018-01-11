@@ -31,7 +31,8 @@
 #ifndef CINO_MARCHING_TETS_H
 #define CINO_MARCHING_TETS_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
+#include <cinolib/ipair.h>
 #include <cinolib/meshes/tetmesh.h>
 
 namespace cinolib

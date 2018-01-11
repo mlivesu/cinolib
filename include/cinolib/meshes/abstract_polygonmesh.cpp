@@ -31,6 +31,8 @@
 #include <cinolib/meshes/abstract_polygonmesh.h>
 #include <cinolib/io/read_write.h>
 #include <cinolib/quality.h>
+#include <cinolib/stl_container_utilities.h>
+
 
 #include <unordered_set>
 
@@ -60,7 +62,7 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
         exit(-1);
     }
 
@@ -90,7 +92,7 @@ void AbstractPolygonMesh<M,V,E,P>::save(const char * filename) const
     }
     else
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
         exit(-1);
     }
 }
@@ -168,22 +170,22 @@ void AbstractPolygonMesh<M,V,E,P>::update_adjacency()
 
         // MANIFOLDNESS CHECKS
         //
-        bool is_manifold = (pids.size() > 2 || pids.size() < 1);
-        if (is_manifold && !support_non_manifold_edges)
-        {
-            std::cerr << "Non manifold edge found! To support non manifoldness,";
-            std::cerr << "enable the 'support_non_manifold_edges' flag in cinolib.h" << endl;
-            assert(false);
-        }
-        if (is_manifold && print_non_manifold_edges)
-        {
-            std::cerr << "Non manifold edge! (" << vid0 << "," << vid1 << ")" << endl;
-        }
+        //bool is_manifold = (pids.size() > 2 || pids.size() < 1);
+        //if (is_manifold && !support_non_manifold_edges)
+        //{
+        //    std::cerr << "Non manifold edge found! To support non manifoldness,";
+        //    std::cerr << "enable the 'support_non_manifold_edges' flag in cinolib.h" << std::endl;
+        //    assert(false);
+        //}
+        //if (is_manifold && print_non_manifold_edges)
+        //{
+        //    std::cerr << "Non manifold edge! (" << vid0 << "," << vid1 << ")" << std::endl;
+        //}
     }
 
-    logger << this->num_verts() << "\tverts" << endl;
-    logger << this->num_polys() << "\tfaces" << endl;
-    logger << this->num_edges() << "\tedges" << endl;
+    std::cout << this->num_verts() << "\tverts" << std::endl;
+    std::cout << this->num_polys() << "\tfaces" << std::endl;
+    std::cout << this->num_edges() << "\tedges" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1285,9 +1287,9 @@ void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P>
 
     this->update_bbox();
 
-    logger << "Appended " << m.mesh_data().filename << " to mesh " << this->mesh_data().filename << endl;
-    logger << this->num_polys() << " faces" << endl;
-    logger << this->num_verts() << " verts" << endl;
+    std::cout << "Appended " << m.mesh_data().filename << " to mesh " << this->mesh_data().filename << std::endl;
+    std::cout << this->num_polys() << " faces" << std::endl;
+    std::cout << this->num_verts() << " verts" << std::endl;
 }
 
 }

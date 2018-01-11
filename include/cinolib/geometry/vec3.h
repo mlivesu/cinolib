@@ -31,7 +31,7 @@
 #ifndef CINO_VEC3_H
 #define CINO_VEC3_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 
 #include <cmath>
 #include <iostream>

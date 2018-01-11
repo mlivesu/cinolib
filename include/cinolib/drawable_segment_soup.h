@@ -31,7 +31,7 @@
 #ifndef CINO_DRAWABLE_SEGMENT_SOUP_H
 #define CINO_DRAWABLE_SEGMENT_SOUP_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
 #include <cinolib/drawable_object.h>
 

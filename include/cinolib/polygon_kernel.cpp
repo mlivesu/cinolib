@@ -134,7 +134,7 @@ CINO_INLINE
 double polygon_kernel(const std::vector<vec2d> &,
                             std::vector<vec2d> &)
 {
-    std::cerr << "ERROR : Boost Polygon disabled. Recompile defining symbol CINOLIB_USES_BOOST" << endl;
+    std::cerr << "ERROR : Boost Polygon disabled. Recompile defining symbol CINOLIB_USES_BOOST" << std::endl;
     exit(-1);
 }
 

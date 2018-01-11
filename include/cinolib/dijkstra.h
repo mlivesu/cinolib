@@ -32,7 +32,7 @@
 #define CINO_DIJKSTRA_H
 
 #include <set>
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/meshes/abstract_mesh.h>
 
 namespace cinolib

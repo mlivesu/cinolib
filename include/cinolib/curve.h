@@ -31,7 +31,8 @@
 #ifndef CINO_CURVE_H
 #define CINO_CURVE_H
 
-#include <cinolib/cinolib.h>
+#include <cinolib/cino_inline.h>
+#include <cinolib/ipair.h>
 #include <cinolib/meshes/skel.h>
 #include <cinolib/meshes/trimesh.h>
 

@@ -57,7 +57,7 @@ void read_IV(const char          * filename,
 
     if(!fp)
     {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_IV() : couldn't open input file " << filename << endl;
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_IV() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 
