@@ -37,6 +37,7 @@
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/meshes/polygonmesh.h>
+#include <cinolib/symbols.h>
 
 namespace cinolib
 {
@@ -44,25 +45,8 @@ namespace cinolib
 CINO_INLINE
 std::vector<vec3d> n_sided_polygon(const vec3d & center,
                                    const uint    n_sides,
-                                   const double  radius);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-Polygonmesh<M,V,E,P> n_sided_polygon(const vec3d & center,
-                                     const uint    n_sides,
-                                     const double  radius);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-Trimesh<M,V,E,P> n_sided_polygon(const vec3d  & center,
-                                 const uint     n_sides,
-                                 const double   radius,
-                                 const vec3d  & n = vec3d(0,1,0));
-
+                                   const double  radius,
+                                   const int     axis = Z);
 }
 
 #ifndef  CINO_STATIC_LIB

@@ -28,8 +28,7 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include "n_sided_poygon.h"
-#include <numeric>
+#include <cinolib/geometry/n_sided_poygon.h>
 
 namespace cinolib
 {
@@ -37,78 +36,32 @@ namespace cinolib
 CINO_INLINE
 std::vector<vec3d> n_sided_polygon(const vec3d & center,
                                    const uint    n_sides,
-                                   const double  radius)
+                                   const double  radius,
+                                   const int     axis)
 {
     std::vector<vec3d> verts(n_sides);
-    verts[0] = vec3d(radius,0,0);
+
+    switch (axis)
+    {
+        case X : verts[0] = vec3d(0,0,radius); break;
+        case Y : verts[0] = vec3d(radius,0,0); break;
+        case Z : verts[0] = vec3d(radius,0,0); break;
+        default: assert(false);
+    }
+
     for(uint i=1; i<n_sides; ++i)
     {
         verts[i] = verts[i-1];
-        rotate(verts[i], vec3d(0,1,0), 2.0*M_PI/double(n_sides));
+        switch (axis)
+        {
+            case X : rotate(verts[i], vec3d(1,0,0), 2.0*M_PI/double(n_sides)); break;
+            case Y : rotate(verts[i], vec3d(0,1,0), 2.0*M_PI/double(n_sides)); break;
+            case Z : rotate(verts[i], vec3d(0,0,1), 2.0*M_PI/double(n_sides)); break;
+            default: assert(false);
+        }
     }
     for(vec3d & v : verts) v += center;
     return verts;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-Polygonmesh<M,V,E,P> n_sided_polygon(const vec3d & center,
-                                     const uint    n_sides,
-                                     const double  radius)
-{
-    std::vector<vec3d> verts = n_sided_polygon(center, n_sides, radius);
-    std::vector<std::vector<uint>> faces(1);
-    faces.front().resize(n_sides);
-    std::iota(faces.front().begin(), faces.front().end(), 0);
-    return Polygonmesh<M,V,E,P>(verts, faces);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-Trimesh<M,V,E,P> n_sided_polygon(const vec3d  & center,
-                                 const uint     n_sides,
-                                 const double   radius,
-                                 const vec3d  & n)
-{
-    std::vector<vec3d> verts;
-    std::vector<uint> tris;
-
-    // center
-    verts.push_back(vec3d(0,0,0));
-
-    std::vector<vec3d> boundary(n_sides);
-    boundary[0] = vec3d(radius,0,0);
-    for(uint i=1; i<n_sides; ++i)
-    {
-        boundary[i] = boundary[i-1];
-        rotate(boundary[i], vec3d(0,1,0), 2.0*M_PI/double(n_sides));
-    }
-
-    for(uint i=0; i<n_sides; ++i)
-    {        
-        verts.push_back(boundary[i]);
-
-        tris.push_back(0);
-        tris.push_back(1+i);
-        tris.push_back(1+(i+1)%n_sides);
-    }
-
-    Trimesh<> m(verts, tris);
-    m.translate(center);
-
-    vec3d  Y(0,1,0);
-    vec3d  axis  = Y.cross(n); axis.normalize();
-    double angle = acos(Y.dot(n));
-    if (!std::isnan(angle) && std::fabs(angle * 180.0/M_PI) > 1)
-    {
-        m.rotate(axis, angle);
-    }
-
-    return m;
 }
 
 }
