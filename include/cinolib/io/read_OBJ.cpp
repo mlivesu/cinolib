@@ -30,7 +30,6 @@
 **********************************************************************************/
 #include <cinolib/io/read_OBJ.h>
 #include <cinolib/cut_along_seams.h>
-#include <string>
 #include <sstream>
 #include <iostream>
 #include <assert.h>
