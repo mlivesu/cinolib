@@ -1,8 +1,8 @@
-/* This sample program computes the kernel, the maximally
- * inscribed circle and the smallest enclosing circle of
- * a general 2D polygon. The user can change the polygon
- * shape through a slider placed on the top part of the
- * canvas.
+/* This sample program computes the kernel (in red),
+ * the maximally inscribed circle (in blue) and the
+ * smallest enclosing circle (in red) of a general
+ * 2D polygon. The user can change the polygon shape
+ * through a slider placed on the top part of the canvas.
  *
  * Enjoy!
 */

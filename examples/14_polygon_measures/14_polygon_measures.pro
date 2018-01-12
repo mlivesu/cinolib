@@ -7,6 +7,7 @@ INCLUDEPATH    += /usr/local/include
 INCLUDEPATH    += /usr/local/include/eigen3
 INCLUDEPATH    += $$PWD/../../include
 DEPENDPATH     += $$PWD/../../include
+DEFINES        += CINOLIB_USES_BOOST # used to compute kernel and maximally inscribed circles
 
 DATA_PATH = \\\"$$PWD/../data/\\\"
 DEFINES  += DATA_PATH=$$DATA_PATH
