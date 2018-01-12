@@ -55,6 +55,8 @@ class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
 
         explicit Polygonmesh(const char * filename);
 
+        explicit Polygonmesh(const std::vector<vec3d> & verts);
+
         explicit Polygonmesh(const std::vector<vec3d>             & verts,
                              const std::vector<std::vector<uint>> & polys);
 

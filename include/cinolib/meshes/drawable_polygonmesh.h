@@ -66,6 +66,14 @@ class DrawablePolygonmesh : public AbstractDrawablePolygonMesh<Polygonmesh<M,V,E
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        explicit DrawablePolygonmesh(const std::vector<vec3d> & coords)
+        : Polygonmesh<M,V,E,P>(coords)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         explicit DrawablePolygonmesh(const std::vector<vec3d>             & coords,
                                      const std::vector<std::vector<uint>> & polys)
         : Polygonmesh<M,V,E,P>(coords, polys)

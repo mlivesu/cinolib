@@ -33,7 +33,7 @@
 #include <cinolib/geometry/plane.h>
 #include <cinolib/geometry/polygon.h>
 #include <cinolib/vector_serialization.h>
-
+#include <numeric>
 #include <map>
 
 namespace cinolib
@@ -46,6 +46,21 @@ CINO_INLINE
 Polygonmesh<M,V,E,P>::Polygonmesh(const char * filename)
 {
     this->load(filename);
+    init();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+Polygonmesh<M,V,E,P>::Polygonmesh(const std::vector<vec3d> & verts)
+{
+    this->verts = verts;
+
+    std::vector<uint> p(verts.size());
+    std::iota(p.begin(), p.end(), 0);
+    this->polys.push_back(p);
+
     init();
 }
 
