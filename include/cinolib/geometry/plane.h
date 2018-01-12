@@ -31,10 +31,9 @@
 #ifndef CINO_PLANE_H
 #define CINO_PLANE_H
 
-#include <cinolib/cino_inline.h>
+#include <iostream>
+#include <vector>
 #include <cinolib/geometry/vec3.h>
-
-#include <ostream>
 
 namespace cinolib
 {

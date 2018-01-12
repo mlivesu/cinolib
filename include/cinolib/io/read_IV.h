@@ -31,10 +31,9 @@
 #ifndef CINO_READ_IV_H
 #define CINO_READ_IV_H
 
-#include <cinolib/cino_inline.h>
-
 #include <sys/types.h>
 #include <vector>
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {

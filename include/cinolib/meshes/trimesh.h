@@ -31,7 +31,8 @@
 #ifndef CINO_TRIMESH_H
 #define CINO_TRIMESH_H
 
-#include <cinolib/cino_inline.h>
+#include <vector>
+#include <sys/types.h>
 #include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/meshes/abstract_polygonmesh.h>
 

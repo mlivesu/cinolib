@@ -31,10 +31,11 @@
 #ifndef CINO_SPHERE_COVERAGE_H
 #define CINO_SPHERE_COVERAGE_H
 
+#include <vector>
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 
-#include <vector>
 
 namespace cinolib
 {

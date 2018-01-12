@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/isosurface.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/marching_tets.h>
 #include <cinolib/symbols.h>
 #include <cinolib/tetrahedralization.h>

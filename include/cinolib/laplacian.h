@@ -33,6 +33,7 @@
 
 #include <cinolib/meshes/abstract_mesh.h>
 #include <Eigen/Sparse>
+#include <vector>
 
 namespace cinolib
 {

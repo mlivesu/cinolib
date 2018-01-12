@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/drawable_isosurface.h>
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {

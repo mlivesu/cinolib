@@ -32,7 +32,7 @@
 #define CINO_GEODESICS_H
 
 #include <vector>
-
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/scalar_field.h>
 #include <cinolib/symbols.h>

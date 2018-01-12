@@ -31,10 +31,13 @@
 #ifndef CINO_HARMONIC_MAP_H
 #define CINO_HARMONIC_MAP_H
 
+#include <sys/types.h>
+#include <vector>
+#include <map>
+#include <cinolib/cino_inline.h>
 #include <cinolib/scalar_field.h>
 #include <cinolib/linear_solvers.h>
 #include <cinolib/symbols.h>
-#include <Eigen/Sparse>
 
 namespace cinolib
 {

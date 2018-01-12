@@ -31,6 +31,7 @@
 #ifndef CINO_INTERSECTION_H
 #define CINO_INTERSECTION_H
 
+#include <vector>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>

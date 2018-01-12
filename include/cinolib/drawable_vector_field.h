@@ -33,6 +33,7 @@
 
 #include <cinolib/vector_field.h>
 #include <cinolib/drawable_object.h>
+#include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
 #include <cinolib/gl/draw_arrow.h>
 

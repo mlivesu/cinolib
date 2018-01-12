@@ -31,6 +31,7 @@
 #ifndef CINO_GRID_MESH_H
 #define CINO_GRID_MESH_H
 
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/meshes/quadmesh.h>
 

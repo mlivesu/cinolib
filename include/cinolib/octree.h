@@ -34,6 +34,7 @@
 #include <cinolib/geometry/vec3.h>
 #include <set>
 #include <vector>
+#include <assert.h>
 
 namespace cinolib
 {
@@ -64,7 +65,7 @@ template<typename item_type> class Octree
 
         void subdivide()
         {
-            assert (children.empty());
+            assert(children.empty());
 
             vec3d bb_avg = (bb_min + bb_max)/2.0;
 

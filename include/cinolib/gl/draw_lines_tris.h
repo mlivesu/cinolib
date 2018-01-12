@@ -41,12 +41,11 @@
 #include <GL/glu.h>
 #endif
 
+#include <vector>
+#include <cmath>
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
-
-#include <vector>
-#include <sys/types.h>
-#include <cmath>
 
 namespace cinolib
 {

@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/harmonic_map.h>
 #include <cinolib/laplacian.h>
+#include <Eigen/Sparse>
 
 namespace cinolib
 {

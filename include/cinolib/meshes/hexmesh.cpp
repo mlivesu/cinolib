@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/hexmesh.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/quality.h>
 #include <cinolib/io/read_write.h>
 #include <cinolib/inf.h>

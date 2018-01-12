@@ -31,12 +31,13 @@
 #ifndef CINO_READ_OBJ_H
 #define CINO_READ_OBJ_H
 
+#include <sys/types.h>
+#include <map>
+#include <string>
+#include <vector>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
-#include <sys/types.h>
-#include <string>
-#include <vector>
 
 namespace cinolib
 {

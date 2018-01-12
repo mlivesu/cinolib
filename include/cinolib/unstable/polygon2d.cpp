@@ -28,8 +28,9 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/geometry/polygon2d.h>
+#include <cinolib/unstable/polygon2d.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/inf.h>
 
 namespace cinolib
 {
@@ -200,7 +201,7 @@ void Polygon2D::set_coords(const uint ring, const uint pos, const double x, cons
 CINO_INLINE
 double Polygon2D::min_x() const
 {
-    double x = DBL_MAX;
+    double x = inf_double;
     for(uint vid=0; vid<poly.outer().size()-1; ++vid)
     {
         x = std::min(x, boost::geometry::get<0>(poly.outer()[vid]));
@@ -213,7 +214,7 @@ double Polygon2D::min_x() const
 CINO_INLINE
 double Polygon2D::min_y() const
 {
-    double y = DBL_MAX;
+    double y = inf_double;
     for(uint vid=0; vid<poly.outer().size()-1; ++vid)
     {
         y = std::min(y, boost::geometry::get<1>(poly.outer()[vid]));
@@ -226,7 +227,7 @@ double Polygon2D::min_y() const
 CINO_INLINE
 double Polygon2D::max_x() const
 {
-    double x = -DBL_MAX;
+    double x = -inf_double;
     for(uint vid=0; vid<poly.outer().size()-1; ++vid)
     {
         x = std::max(x, boost::geometry::get<0>(poly.outer()[vid]));
@@ -239,7 +240,7 @@ double Polygon2D::max_x() const
 CINO_INLINE
 double Polygon2D::max_y() const
 {
-    double y = -DBL_MAX;
+    double y = -inf_double;
     for(uint vid=0; vid<poly.outer().size()-1; ++vid)
     {
         y = std::max(y, boost::geometry::get<1>(poly.outer()[vid]));

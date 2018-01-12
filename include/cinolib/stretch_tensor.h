@@ -33,6 +33,7 @@
 
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec2.h>
 
 namespace cinolib
 {

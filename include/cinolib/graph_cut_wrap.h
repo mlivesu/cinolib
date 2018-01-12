@@ -31,6 +31,7 @@
 #ifndef CINO_GRAPH_CUT_WRAP_H
 #define CINO_GRAPH_CUT_WRAP_H
 
+#include <vector>
 #include <cinolib/cino_inline.h>
 #include <cinolib/meshes/abstract_mesh.h>
 

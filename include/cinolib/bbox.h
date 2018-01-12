@@ -33,6 +33,7 @@
 
 #include <cinolib/inf.h>
 #include <cinolib/geometry/vec3.h>
+#include <algorithm>
 
 namespace cinolib
 {

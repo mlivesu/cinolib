@@ -31,9 +31,10 @@
 #ifndef CINO_IPAIR
 #define CINO_IPAIR
 
-#include <cinolib/cino_inline.h>
 #include <sys/types.h>
-#include <iosfwd>
+#include <iostream>
+#include <utility>
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {

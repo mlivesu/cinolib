@@ -31,10 +31,10 @@
 #ifndef CINO_WRITE_OFF_H
 #define CINO_WRITE_OFF_H
 
-#include <cinolib/cino_inline.h>
-
 #include <sys/types.h>
 #include <vector>
+#include <cinolib/cino_inline.h>
+
 
 namespace cinolib
 {

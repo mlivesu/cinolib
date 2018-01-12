@@ -34,8 +34,6 @@
 #include <sys/types.h>
 #include <vector>
 
-#include <cinolib/cino_inline.h>
-
 /*
  * This class implements a trivial n-ary tree. This is not supposed to be perfect,
  * and there is a lot of stuff missing (e.g., node deletion). The only reason it

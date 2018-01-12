@@ -31,8 +31,9 @@
 #ifndef CINO_ISOCONTOUR_H
 #define CINO_ISOCONTOUR_H
 
-#include <cinolib/cino_inline.h>
+#include <vector>
 #include <cinolib/meshes/trimesh.h>
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {

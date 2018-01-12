@@ -31,12 +31,10 @@
 #ifndef CINO_VEC2_H
 #define CINO_VEC2_H
 
-#include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec3.h>
-
 #include <cmath>
 #include <iostream>
 #include <assert.h>
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {

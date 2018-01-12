@@ -31,6 +31,8 @@
 #ifndef CINO_LABELING_H
 #define CINO_LABELING_H
 
+#include <map>
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/meshes/tetmesh.h>
 

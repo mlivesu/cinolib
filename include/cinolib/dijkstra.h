@@ -32,6 +32,8 @@
 #define CINO_DIJKSTRA_H
 
 #include <set>
+#include <sys/types.h>
+#include <vector>
 #include <cinolib/cino_inline.h>
 #include <cinolib/meshes/abstract_mesh.h>
 

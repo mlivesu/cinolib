@@ -31,7 +31,10 @@
 #ifndef CINO_DUAL_MESH
 #define CINO_DUAL_MESH
 
+#include <vector>
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
+#include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/polygonmesh.h>
 #include <cinolib/meshes/polyhedralmesh.h>
 

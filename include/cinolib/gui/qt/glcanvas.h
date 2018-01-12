@@ -34,22 +34,21 @@
 #ifdef CINOLIB_USES_OPENGL
 #ifdef CINOLIB_USES_QT_AND_QGLVIEWER
 
-#include <QGLWidget>
-#include <QMenu>
-#include <vector>
-#include <string>
-
 #ifdef __APPLE__
 #include <gl.h>
 #else
 #include <GL/gl.h>
 #endif
 
-#include <cinolib/cino_inline.h>
-#include <cinolib/bbox.h>
-#include <cinolib/drawable_object.h>
-
+#include <vector>
+#include <string>
+#include <QGLWidget>
+#include <QColor>
+#include <QMenu>
 #include <qglviewer.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/bbox.h>
+
 
 namespace cinolib
 {

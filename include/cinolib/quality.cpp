@@ -29,6 +29,8 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/quality.h>
+#include <cinolib/inf.h>
+#include <algorithm>
 
 /*
  * Scaled Jacobian and Volume computations are all based on:
@@ -73,7 +75,7 @@ double tet_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2,
 
     double max = *std::max_element(lambda, lambda + 5);
 
-    if (max < DBL_MIN) return -1.0;
+    if (max < -inf_double) return -1.0;
     return  (J * sqrt_2 / max);
 }
 

@@ -31,10 +31,11 @@
 #ifndef CINO_TETGEN_WRAP_H
 #define CINO_TETGEN_WRAP_H
 
-#include <cinolib/cino_inline.h>
-
 #include <vector>
 #include <sys/types.h>
+#include <string>
+#include <cinolib/cino_inline.h>
+
 
 namespace cinolib
 {

@@ -29,7 +29,9 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/abstract_drawable_polygonmesh.h>
+#include <cinolib/cino_inline.h>
 #include <cinolib/textures/textures.h>
+#include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/color.h>
 
 namespace cinolib

@@ -32,7 +32,7 @@
 #define CINO_CONNECTED_COMPONENTS_H
 
 #include <vector>
-
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/meshes/abstract_mesh.h>
 

@@ -31,6 +31,7 @@
 #include <cinolib/heat_flow.h>
 #include <cinolib/laplacian.h>
 #include <cinolib/vertex_mass.h>
+#include <cinolib/linear_solvers.h>
 #include <Eigen/Sparse>
 
 namespace cinolib

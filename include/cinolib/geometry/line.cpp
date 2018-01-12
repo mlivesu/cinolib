@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include "cinolib/geometry/line.h"
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {

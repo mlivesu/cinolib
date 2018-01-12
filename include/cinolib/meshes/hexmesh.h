@@ -33,9 +33,6 @@
 
 #include <sys/types.h>
 #include <vector>
-
-#include <cinolib/cino_inline.h>
-#include <cinolib/bbox.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/quadmesh.h>
 #include <cinolib/meshes/mesh_attributes.h>

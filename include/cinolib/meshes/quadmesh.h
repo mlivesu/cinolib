@@ -31,12 +31,10 @@
 #ifndef CINO_QUADMESH_H
 #define CINO_QUADMESH_H
 
-#include <cinolib/cino_inline.h>
+#include <vector>
+#include <sys/types.h>
 #include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/meshes/abstract_polygonmesh.h>
-
-#include <map>
-#include <set>
 
 namespace cinolib
 {

@@ -31,9 +31,10 @@
 #ifndef CINO_VECTOR_SERIALIZATION
 #define CINO_VECTOR_SERIALIZATION
 
+#include <vector>
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
-#include <vector>
 
 namespace cinolib
 {

@@ -33,10 +33,9 @@
 
 #ifdef CINOLIB_USES_OPENGL
 
-#include <cinolib/cino_inline.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/meshes/mesh_slicer.h>
+#include <cinolib/gl/draw_lines_tris.h>
 
 namespace cinolib
 {

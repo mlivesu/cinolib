@@ -31,6 +31,7 @@
 #ifndef CINO_CUT_ALONG_SEAMS_H
 #define CINO_CUT_ALONG_SEAMS_H
 
+#include <sys/types.h>
 #include <vector>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>

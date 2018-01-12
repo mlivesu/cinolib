@@ -31,8 +31,8 @@
 #ifndef CINO_STL_CONTAINER_UTILITIES
 #define CINO_STL_CONTAINER_UTILITIES
 
-#include <cinolib/cino_inline.h>
 #include <vector>
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {

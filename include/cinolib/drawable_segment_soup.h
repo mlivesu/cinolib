@@ -31,11 +31,11 @@
 #ifndef CINO_DRAWABLE_SEGMENT_SOUP_H
 #define CINO_DRAWABLE_SEGMENT_SOUP_H
 
-#include <cinolib/cino_inline.h>
-#include <cinolib/color.h>
-#include <cinolib/drawable_object.h>
-
 #include <vector>
+#include <cinolib/geometry/vec3.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/color.h>
+
 
 namespace cinolib
 {

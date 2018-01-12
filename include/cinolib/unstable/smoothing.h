@@ -31,8 +31,11 @@
 #ifndef CINO_SMOOTHING_H
 #define CINO_SMOOTHING_H
 
+#include <set>
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/symbols.h>
+#include <cinolib/meshes/abstract_mesh.h>
 
 namespace cinolib
 {

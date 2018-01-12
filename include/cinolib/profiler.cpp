@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/profiler.h>
+#include <cinolib/cino_inline.h>
 #include <set>
 #include <iostream>
 

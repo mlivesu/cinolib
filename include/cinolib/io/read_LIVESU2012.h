@@ -31,8 +31,8 @@
 #ifndef CINO_READ_LIVESU2012_H
 #define CINO_READ_LIVESU2012_H
 
-#include <cinolib/cino_inline.h>
 #include <vector>
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {

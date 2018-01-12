@@ -31,6 +31,9 @@
 #ifndef CINO_MARCHING_TETS_H
 #define CINO_MARCHING_TETS_H
 
+#include <vector>
+#include <map>
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/ipair.h>
 #include <cinolib/meshes/tetmesh.h>

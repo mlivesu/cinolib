@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/isocontour.h>
+#include <cinolib/cino_inline.h>
 #include <queue>
 
 namespace cinolib

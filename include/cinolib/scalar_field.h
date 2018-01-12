@@ -31,14 +31,13 @@
 #ifndef CINO_SCALAR_FIELD_V_H
 #define CINO_SCALAR_FIELD_V_H
 
-#include <cinolib/cino_inline.h>
+#include <iostream>
+#include <vector>
+#include <sys/types.h>
+#include <Eigen/Dense>
 #include <cinolib/serializable.h>
 #include <cinolib/symbols.h>
 
-#include <iostream>
-#include <float.h>
-#include <vector>
-#include <Eigen/Dense>
 
 namespace cinolib
 {

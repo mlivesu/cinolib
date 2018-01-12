@@ -31,9 +31,11 @@
 #ifndef CINO_HEAT_FLOW_H
 #define CINO_HEAT_FLOW_H
 
+#include <vector>
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/scalar_field.h>
-#include <cinolib/linear_solvers.h>
+#include <cinolib/meshes/abstract_mesh.h>
 #include <cinolib/symbols.h>
 
 namespace cinolib

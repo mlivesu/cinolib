@@ -31,6 +31,7 @@
 #ifndef CINO_POLYGON_KERNEL_H
 #define CINO_POLYGON_KERNEL_H
 
+#include <vector>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/geometry/vec2.h>

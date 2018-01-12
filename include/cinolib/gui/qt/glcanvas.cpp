@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/gui/qt/glcanvas.h>
+#include <cinolib/cino_inline.h>
 
 #include <sstream>
 #include <QApplication>

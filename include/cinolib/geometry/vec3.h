@@ -32,7 +32,6 @@
 #define CINO_VEC3_H
 
 #include <cinolib/cino_inline.h>
-
 #include <cmath>
 #include <iostream>
 #include <assert.h>

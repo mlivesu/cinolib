@@ -31,16 +31,14 @@
 #ifndef CINO_SKEL_H
 #define CINO_SKEL_H
 
-#include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/bbox.h>
-#include <cinolib/drawable_object.h>
-//
-
 #include <vector>
-#include <queue>
 #include <set>
+#include <utility>
 #include <assert.h>
+#include <cinolib/cino_inline.h>
+#include <cinolib/bbox.h>
+#include <cinolib/geometry/vec3.h>
+#include <cinolib/stl_container_utilities.h>
 
 namespace cinolib
 {

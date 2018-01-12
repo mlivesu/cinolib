@@ -31,6 +31,8 @@
 #ifndef CINO_EXPORT_SURFACE_H
 #define CINO_EXPORT_SURFACE_H
 
+#include <map>
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/meshes/abstract_polygonmesh.h>

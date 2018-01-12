@@ -31,8 +31,8 @@
 #ifndef CINO_RBF_H
 #define CINO_RBF_H
 
-#include <cinolib/cino_inline.h>
-#include <cinolib/RBF_library.h>
+#include <vector>
+#include <cinolib/unstable/RBF_library.h>
 #include <cinolib/geometry/vec3.h>
 
 namespace cinolib

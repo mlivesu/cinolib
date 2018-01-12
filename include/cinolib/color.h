@@ -33,6 +33,7 @@
 
 #include <cinolib/cino_inline.h>
 #include <stdint.h>
+#include <iostream>
 
 namespace cinolib
 {

@@ -33,8 +33,6 @@
 
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
-#include <float.h>
-
 
 /*
  * Scaled Jacobian and Volume computations are all based on:

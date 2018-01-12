@@ -37,7 +37,6 @@
 #include <cinolib/drawable_isocontour.h>
 #include <cinolib/drawable_vector_field.h>
 #include <cinolib/gui/qt/glcanvas.h>
-#include <cinolib/gradient.h>
 
 #include <iostream>
 #include <QWidget>

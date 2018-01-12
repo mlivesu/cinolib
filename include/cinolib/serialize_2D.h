@@ -31,8 +31,8 @@
 #ifndef CINO_SERIALIZE_2D
 #define CINO_SERIALIZE_2D
 
-#include <cinolib/ipair.h>
 #include <cinolib/cino_inline.h>
+#include <cinolib/ipair.h>
 
 namespace cinolib
 {

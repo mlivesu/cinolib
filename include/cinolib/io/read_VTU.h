@@ -31,11 +31,11 @@
 #ifndef CINO_READ_VTU_H
 #define CINO_READ_VTU_H
 
+#include <sys/types.h>
+#include <vector>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 
-#include <sys/types.h>
-#include <vector>
 
 namespace cinolib
 {

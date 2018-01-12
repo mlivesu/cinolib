@@ -31,8 +31,10 @@
 #ifndef CINO_DRAWABLE_SKEL_H
 #define CINO_DRAWABLE_SKEL_H
 
+#include <vector>
 #include <cinolib/drawable_object.h>
 #include <cinolib/meshes/skel.h>
+#include <cinolib/geometry/vec3.h>
 #include <cinolib/stl_container_utilities.h>
 
 namespace cinolib

@@ -31,8 +31,9 @@
 #ifndef CINO_MEAN_CURV_FLOW_H
 #define CINO_MEAN_CURV_FLOW_H
 
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
-#include <cinolib/meshes/trimesh.h>
+#include <cinolib/meshes/abstract_polygonmesh.h>
 
 namespace cinolib
 {

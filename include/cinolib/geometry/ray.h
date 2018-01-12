@@ -31,7 +31,7 @@
 #ifndef CINO_RAY_H
 #define CINO_RAY_H
 
-#include <cinolib/cino_inline.h>
+#include <vector>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/geometry/plane.h>
 

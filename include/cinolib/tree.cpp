@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/tree.h>
+#include <cinolib/cino_inline.h>
 #include <assert.h>
 
 namespace cinolib

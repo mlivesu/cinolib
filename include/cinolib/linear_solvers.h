@@ -31,9 +31,11 @@
 #ifndef CINO_LINEAR_SOLVERS_H
 #define CINO_LINEAR_SOLVERS_H
 
+#include <string>
+#include <map>
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <Eigen/Sparse>
-#include <string>
 
 namespace cinolib
 {

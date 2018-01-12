@@ -31,9 +31,9 @@
 #ifndef CINO_DRAWABLE_ISOCONTOUR_H
 #define CINO_DRAWABLE_ISOCONTOUR_H
 
-#include <cinolib/cino_inline.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/isocontour.h>
+#include <cinolib/color.h>
 
 namespace cinolib
 {
