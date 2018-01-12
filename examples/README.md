@@ -10,7 +10,6 @@ I am currently working on a wide number of code samples that showcase the core f
 * Generate, process and visualize vector fields
 * Overview of the topology editing operators implemented in CinoLib
 * Evaluation of mapping distortions (angle/areas distortion popular metrics)
-* Evaluation of 2D polygon metrics (kernels, incircles, circumcircles...)
 * Computation of conformal maps for surface meshes
 * Parameterization based hexahedral remeshing
 * Surface and volumetric format converters
