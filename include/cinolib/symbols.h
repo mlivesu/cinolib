@@ -35,8 +35,8 @@ namespace cinolib
 {
 
 // List of GLOBAL symbols used throughout the library. This helps keeping a unique ID for each symbol.
-// Symbols that require specialized values (e.g. X=>0, Y=>1, Z=>2) are to be defined within the classes
-// that need them, and will therefore leave in a different namespace.
+// Symbols that require specialized values (e.g. when used for array lookup) are to be defined locally
+// (within the files that need them), and to avoid conflicts should live in a dedicated namespace
 
 enum
 {
@@ -44,7 +44,8 @@ enum
     X,
     Y,
     Z,
-    // possible pairings of UVW parametric coordinates
+
+    // UVW parametric coordinates (and all possible pairings of them - for serialization)
     U_param,
     V_param,
     W_param,
@@ -52,28 +53,29 @@ enum
     UW_param,
     VW_param,
     UVW_param,
-    //
-    DEG,
-    RAD,
-    //
-    Q,    // Quality
-    L,    // Label
-    //
-    IS,     // for labels
-    IS_NOT, // for labels
-    //
+
+    // Quality, Label (for slicer)
+    Q,
+    L,
+
+    // math/logical binary operators
     EQ,     // ==
     NEQ,    // !=
     LEQ,    // <=
     GEQ,    // >=
     AND,    // &&
-    OR      // ||
-};
+    OR,     // ||
 
-enum
-{
-    COTANGENT = 0x00000001, // only for Triangle Meshes!
-    UNIFORM   = 0x00000002
+    // angle units
+    DEG,
+    RAD,
+
+    // laplacians
+    COTANGENT,
+    UNIFORM,
+
+    IS,
+    IS_NOT,
 };
 
 }
