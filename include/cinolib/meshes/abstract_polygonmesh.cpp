@@ -830,8 +830,7 @@ double AbstractPolygonMesh<M,V,E,P>::poly_angle_at_vert(const uint pid, const ui
     {
         case RAD : return u.angle_rad(v);
         case DEG : return u.angle_deg(v);
-        default  : assert(false);
-                   return 0;
+        default  : assert(false); return 0; // warning killer
     }
 }
 
