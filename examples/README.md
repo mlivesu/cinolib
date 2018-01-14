@@ -35,4 +35,4 @@ make -j4
 ```
 
 ### Additional dependencies
-Notice that some of the projects may also depend from external libraries which are wrapped in CinoLib (e.g. Triangle, Tetgen or VTK). In this case, such libraries should be installed separately, and the configuration files updated with correct paths for compiler and linker. If you are not interested in these examples, you can safely comment them (adding `#` at the beginning of the corresponding lines in `build_all_examples.pro`, and they will be ignored by qmake).
+Notice that some of the projects may also depend from external libraries which are wrapped in CinoLib (e.g. [Triangle](https://www.cs.cmu.edu/~quake/triangle.html), [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) or [VTK](https://www.vtk.org)). In this case, such libraries should be installed separately, and the configuration files updated with correct paths for compiler and linker. If you are not interested in these examples, you can safely comment them (adding `#` at the beginning of the corresponding lines in `build_all_examples.pro`, and they will be ignored by qmake).
