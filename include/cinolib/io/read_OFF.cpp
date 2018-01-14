@@ -53,30 +53,32 @@ void read_OFF(const char                     * filename,
         exit(-1);
     }
 
+    int read_value;
+    (void) read_value;
     uint nv, nfaces, dummy;
 
-    fscanf(fp, "OFF\n");
-    fscanf(fp, "%d %d %d\n", &nv, &nfaces, &dummy);
+    read_value = fscanf(fp, "OFF\n");
+    read_value = fscanf(fp, "%d %d %d\n", &nv, &nfaces, &dummy);
 
     for(uint i=0; i<nv; ++i)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         double x, y, z;
-        fscanf(fp, "%lf %lf %lf\n", &x, &y, &z);
+        read_value = fscanf(fp, "%lf %lf %lf\n", &x, &y, &z);
         verts.push_back(vec3d(x,y,z));
     }
 
     for(uint i=0; i<nfaces; ++i)
     {
         uint n_corners;
-        fscanf(fp, "%d", &n_corners);
+        read_value = fscanf(fp, "%d", &n_corners);
 
         std::vector<uint> face;
         for(uint j=0; j<n_corners; ++j)
         {
             uint vid;
-            fscanf(fp, "%d", &vid);
+            read_value = fscanf(fp, "%d", &vid);
             face.push_back(vid);
         }
         polys.push_back(face);
