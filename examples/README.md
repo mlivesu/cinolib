@@ -76,5 +76,6 @@ Unfortunately maintaining a library alone is very time consuming, and the amount
 * Solve multi-labeling problems on surfaces and volumes using the [GraphCuts](http://vision.csd.uwo.ca/code/) wrapper
 * Integral curve computation (and tessellation)
 * Iso curve computation (and tessellation)
+* Iso surface computation (and tessellation)
 * Subdivision schemas for hexahedral meshes
 * Uniform sphere sampling using spherical Fibonacci
