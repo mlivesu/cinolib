@@ -248,7 +248,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_v_normal(const uint vid)
     {
         if (face_is_on_srf(fid)) n += face_data(fid).normal;
     }
-    n.normalize();
+    if (n.length()>0) n.normalize();
     this->vert_data(vid).normal = n;
 }
 
