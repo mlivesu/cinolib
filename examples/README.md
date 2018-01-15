@@ -61,6 +61,9 @@ Notice that some of the projects may also depend from external libraries which a
 #### 14 - Compute kernels, incircles and circumcircles for 2D polygons
 <p align="left"><img src="snapshots/14_polygon_measures.png" width="500"></p>
 
+#### 15 - Uniform sphere sampling using spherical Fibonacci
+<p align="left"><img src="snapshots/15_sphere_sampling.png" width="500"></p>
+
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
@@ -78,4 +81,3 @@ Maintaining a library alone is very time consuming, and the amount of time I can
 * Iso curve computation (and tessellation)
 * Iso surface computation (and tessellation)
 * Subdivision schemas for hexahedral meshes
-* Uniform sphere sampling using spherical Fibonacci
