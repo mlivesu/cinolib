@@ -38,12 +38,14 @@ void render_tris(const RenderData & data)
 {
     if (data.draw_mode & DRAW_TRI_POINTS)
     {
+        glEnableClientState(GL_COLOR_ARRAY);
+        glColorPointer(4, GL_FLOAT, 0, data.tri_v_colors.data());
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, data.tri_coords.data());
         glPointSize(data.seg_width);
         glDrawArrays(GL_POINTS, 0, data.tri_coords.size()/3);
-        glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
     }
     else
     {
