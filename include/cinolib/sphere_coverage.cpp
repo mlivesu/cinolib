@@ -29,6 +29,11 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/sphere_coverage.h>
+#include <stdlib.h> // rand()
+#include <math.h>   // sin(), cos(), sqrt(), pow()
+#include <time.h>   // time()
+#include <stddef.h> // NULL
+#include <assert.h> // assert()
 
 namespace cinolib
 {
