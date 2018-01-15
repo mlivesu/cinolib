@@ -14,3 +14,4 @@ SUBDIRS += 11_polygon_mesh_generation
 SUBDIRS += 12_polyhedral_mesh_generation
 SUBDIRS += 13_heat_based_geodesics
 SUBDIRS += 14_polygon_measures
+SUBDIRS += 15_sphere_sampling

@@ -46,7 +46,7 @@ namespace cinolib
 CINO_INLINE
 void sphere_coverage(const uint n_samples, std::vector<vec3d> & points)
 {
-    assert(points.empty());
+    points.clear();
 
     srand(time(NULL));
     double rnd      = rand() * n_samples;
