@@ -61,8 +61,8 @@ Notice that some of the projects may also depend from external libraries which a
 #### 14 - Compute kernels, incircles and circumcircles for 2D polygons
 <p align="left"><img src="snapshots/14_polygon_measures.png" width="500"></p>
 
-# Updates
-Unfortunately maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
+# Upcoming examples
+Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
 * Copy/paste points of view from the GL canvas for accurate visual comparisons and fast snapshot reproduction
 * Customize data structures with user defined mesh/vertex/edge/polygon/polyhedron attributes
