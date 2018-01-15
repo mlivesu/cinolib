@@ -17,6 +17,7 @@ make -j4
 ### Additional dependencies
 Notice that some of the projects may also depend from external libraries which are wrapped in CinoLib (e.g. [Triangle](https://www.cs.cmu.edu/~quake/triangle.html), [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) or [VTK](https://www.vtk.org)). In this case, such libraries should be installed separately, and the configuration files updated with correct paths for compiler and linker. If you are not interested in these examples, you can safely comment them (adding `#` at the beginning of the corresponding lines in `build_all_examples.pro`, and they will be ignored by qmake).
 
+# List of Examples
 
 #### 01 - Load and render a triangle mesh
 <p align="left"><img src="snapshots/01_base_app_trimesh.png" width="500"></p>
@@ -54,13 +55,13 @@ Notice that some of the projects may also depend from external libraries which a
 #### 12 - Generate tetrahedral and polyhedral tessellations of 3D domains
 <p align="left"><img src="snapshots/12_polyhedral_mesh_generation.png" width="500"></p>
 
-#### 13 - Compute geodesic distances using the heat flow
+#### 13 - Compute geodesic distances using the heat flow method
 <p align="left"><img src="snapshots/13_heat_based_geodesics.png" width="500"></p>
 
 #### 14 - Compute kernels, incircles and circumcircles for 2D polygons
 <p align="left"><img src="snapshots/14_polygon_measures.png" width="500"></p>
 
-
+# Updates
 Unfortunately maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
 * Copy/paste points of view from the GL canvas for accurate visual comparisons and fast snapshot reproduction
