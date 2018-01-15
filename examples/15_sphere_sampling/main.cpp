@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/sphere_coverage.h>
+#include <cinolib/profiler.h>
 #include <cinolib/gui/qt/glcanvas.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -47,9 +48,13 @@ int main(int argc, char **argv)
     m.show_mesh_points();
     gui.push_obj(&m);
 
+    Profiler profiler;
+
     QPushButton::connect(&but_compute_samples, &QPushButton::clicked, [&]()
     {
+        profiler.push("Sphere coverage");
         sphere_coverage(sb_num_samples.value(), samples);
+        profiler.pop();
         m = DrawableTrimesh<>(samples, no_polys);
         m.vert_set_color(Color::BLACK());
         m.show_wireframe_width(3);

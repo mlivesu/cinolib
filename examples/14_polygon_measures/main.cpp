@@ -13,6 +13,7 @@
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/gui/qt/glcanvas.h>
 #include <cinolib/polygon_kernel.h>
+#include <cinolib/profiler.h>
 #include <cinolib/polygon_maximum_inscribed_circle.h>
 #include <cinolib/smallest_enclosing_disk.h>
 #include <cinolib/geometry/n_sided_poygon.h>
@@ -67,6 +68,8 @@ int main(int argc, char **argv)
     window.setLayout(&layout);
     window.show();
 
+    Profiler profiler;
+
     QSlider::connect(&slider, &QSlider::valueChanged, [&]()
     {
         float t = static_cast<float>(slider.value()-slider.minimum())/static_cast<float>(slider.maximum()-slider.minimum());
@@ -76,12 +79,18 @@ int main(int argc, char **argv)
         m.update_poly_tessellation();
         m.updateGL();
 
+        profiler.push("Compute polygon kernel");
         double area = polygon_kernel(m.vector_verts(), kernel);
+        profiler.pop();
         k = DrawablePolygonmesh<>(kernel);
         k.poly_set_color(Color::PASTEL_RED());
 
+        profiler.push("Compute smallest enclosing circle");
         smallest_enclosing_disk(m.vector_verts(), sec_c, sec_r);
+        profiler.pop();
+        profiler.push("Compute maximum inscribed circle");
         polygon_maximum_inscribed_circle(m.vector_verts(), mic_c, mic_r);
+        profiler.pop();
         sec.vector_verts() = n_sided_polygon(sec_c, 50, sec_r, Z);
         mic.vector_verts() = n_sided_polygon(mic_c, 50, mic_r, Z);
         sec.updateGL();
