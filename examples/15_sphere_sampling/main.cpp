@@ -1,4 +1,4 @@
-/* This sample program computes a evenly distributed
+/* This sample program computes an evenly distributed
  * sphere sampling based on spherical Fibonacci.
  *
  * Enjoy!
