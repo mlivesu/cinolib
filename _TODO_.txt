@@ -1,4 +1,3 @@
-- allow matrix pre-factorization in eat based geodesics
 - put cotangents (tets/tris) on a separate .h/cpp file?
 - add inverse and transpose operators for 2x2 matrices
 - remove virtual from mesh hierarchy whenever possible
