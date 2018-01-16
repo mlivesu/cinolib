@@ -46,7 +46,7 @@ void grid_mesh(const uint                quads_per_row,
     for(uint r=0; r<=quads_per_row; ++r)
     for(uint c=0; c<=quads_per_col; ++c)
     {
-        points.push_back(vec3d(r,c,0));
+        points.push_back(vec3d(c, r,0));
 
         if (r<quads_per_row && c<quads_per_col)
         {
