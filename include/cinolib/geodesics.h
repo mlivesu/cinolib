@@ -36,6 +36,7 @@
 #include <cinolib/cino_inline.h>
 #include <cinolib/scalar_field.h>
 #include <cinolib/symbols.h>
+#include <Eigen/Sparse>
 
 namespace cinolib
 {
@@ -69,6 +70,26 @@ ScalarField compute_geodesics(      Mesh              & m,
                               const std::vector<uint> & heat_charges,
                               const int                 laplacian_mode = COTANGENT,
                               const float               time_scalar = 1.0);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+typedef struct
+{
+    Eigen::SimplicialLLT<Eigen::SparseMatrix<double>>  *heat_flow_cache   = NULL;
+    Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> *integration_cache = NULL;
+    Eigen::SparseMatrix<double>                         gradient_matrix;
+}
+GeodesicsCache;
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+ScalarField compute_geodesics_amortized(      Mesh              & m,
+                                              GeodesicsCache    & cache,
+                                        const std::vector<uint> & heat_charges,
+                                        const int                 laplacian_mode = COTANGENT,
+                                        const float               time_scalar = 1.0);
 }
 
 #ifndef  CINO_STATIC_LIB

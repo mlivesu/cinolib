@@ -1,6 +1,7 @@
 /* This sample program computes one-to-many and many-to-many
- * discrete geodesic distances on a given triangle mesh. For
- * details you may refer to the following article:
+ * discrete geodesic distances on a given triangle mesh.
+ * Matrix prefactorization is used to speed-up computation.
+ * For details you may refer to the following article:
  *
  *   Geodesics in Heat: A New Approach to Computing Distance Based on Heat Flow
  *   KEENAN CRANE, CLARISSE WEISCHEDEL and MAX WARDETZKY
@@ -50,6 +51,7 @@ int main(int argc, char **argv)
     m_controls.show();
 
     Profiler profiler;
+    GeodesicsCache prefactored_matrices;
 
     QPushButton::connect(&but_compute_geod, &QPushButton::clicked, [&]()
     {
@@ -61,7 +63,7 @@ int main(int argc, char **argv)
         if (!sources.empty())
         {
             profiler.push("compute_geodesics");
-            compute_geodesics(m, sources).copy_to_mesh(m);
+            compute_geodesics_amortized(m, prefactored_matrices, sources).copy_to_mesh(m);
             profiler.pop();
             m.updateGL();
             gui.updateGL();

@@ -80,4 +80,72 @@ ScalarField compute_geodesics(      Mesh              & m,
     return geodesics;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+ScalarField compute_geodesics_amortized(      Mesh              & m,
+                                              GeodesicsCache    & cache,
+                                        const std::vector<uint> & heat_charges,
+                                        const int                 laplacian_mode,
+                                        const float               time_scalar)
+{
+    // first call, heavy solve (matrix factorization + gradient matrix)
+    if (cache.heat_flow_cache == NULL)
+    {
+        // optimize position and scale to get better numerical precision
+        double d = m.bbox().diag();
+        vec3d  c = m.bbox().center();
+        m.translate(-c);
+        m.scale(1.0/d);
+
+        // use the squared avg edge length as time step, as suggested in the original paper
+        double time = m.edge_avg_length();
+        time *= time;
+        time *= time_scalar;
+
+        Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
+        Eigen::SparseMatrix<double> MM  = mass_matrix(m);
+        Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
+
+        for(uint vid : heat_charges) rhs[vid] = 1.0;
+
+        ScalarField heat(m.num_verts());
+        cache.heat_flow_cache = new Eigen::SimplicialLLT<Eigen::SparseMatrix<double>>(MM - time * L);
+        assert(cache.heat_flow_cache->info() == Eigen::Success);
+        heat = cache.heat_flow_cache->solve(rhs).eval();
+
+        cache.gradient_matrix = gradient_matrix(m);
+        VectorField grad = cache.gradient_matrix * heat;
+        grad.normalize();
+
+        ScalarField geodesics(m.num_verts());
+        cache.integration_cache = new Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>>(-L);
+        assert(cache.integration_cache->info() == Eigen::Success);
+        geodesics = cache.integration_cache->solve(cache.gradient_matrix.transpose() * grad).eval();
+        geodesics.normalize_in_01();
+
+        // restore original scale and position
+        m.scale(d);
+        m.translate(c);
+        return geodesics;
+    }
+    else // solve by back-substitution using pre-factored matrices
+    {
+        Eigen::VectorXd rhs = Eigen::VectorXd::Zero(m.num_verts());
+        for(uint vid : heat_charges) rhs[vid] = 1.0;
+        ScalarField heat = cache.heat_flow_cache->solve(rhs).eval();
+
+        VectorField grad = cache.gradient_matrix * heat;
+        grad.normalize();
+
+        ScalarField geodesics(m.num_verts());
+        geodesics = cache.integration_cache->solve(cache.gradient_matrix.transpose() * grad).eval();
+        geodesics.normalize_in_01();
+
+        return geodesics;
+    }
+
+}
+
 }
