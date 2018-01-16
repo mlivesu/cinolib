@@ -29,15 +29,20 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/grid_mesh.h>
+#include <cinolib/serialize_2D.h>
+#include <vector>
 
 namespace cinolib
 {
 
+template<class M, class V, class E, class P>
 CINO_INLINE
-Quadmesh<> grid_mesh(const uint quads_per_row, const uint quads_per_col)
+void grid_mesh(const uint                quads_per_row,
+               const uint                quads_per_col,
+                     Quadmesh<M,V,E,P> & m)
 {
     std::vector<vec3d> points;
-    std::vector<uint>  faces;
+    std::vector<uint>  polys;
     for(uint r=0; r<=quads_per_row; ++r)
     for(uint c=0; c<=quads_per_col; ++c)
     {
@@ -45,13 +50,13 @@ Quadmesh<> grid_mesh(const uint quads_per_row, const uint quads_per_col)
 
         if (r<quads_per_row && c<quads_per_col)
         {
-            faces.push_back(serialize_2D_index(r  , c,   quads_per_col+1));
-            faces.push_back(serialize_2D_index(r  , c+1, quads_per_col+1));
-            faces.push_back(serialize_2D_index(r+1, c+1, quads_per_col+1));
-            faces.push_back(serialize_2D_index(r+1, c,   quads_per_col+1));
+            polys.push_back(serialize_2D_index(r  , c,   quads_per_col+1));
+            polys.push_back(serialize_2D_index(r  , c+1, quads_per_col+1));
+            polys.push_back(serialize_2D_index(r+1, c+1, quads_per_col+1));
+            polys.push_back(serialize_2D_index(r+1, c,   quads_per_col+1));
         }
     }
-    return Quadmesh<>(points, faces);
+    m = Quadmesh<M,V,E,P>(points, polys);
 }
 
 }
