@@ -1,8 +1,8 @@
 # Examples
-This folder contains a number of sample programs that illustrate the functionalities of CinoLib. 
+This folder contains a number of sample programs that illustrate the core functionalities of CinoLib. 
 
 ### How to compile the example projects
-To compile the examples you'll need to download CinoLib and [Eigen](http://eigen.tuxfamily.org) on your machine, and to install [Qt](https://www.qt.io) and [libQGLViewer](http://libqglviewer.com/index.html) for the GUI. Each sample project comes with its own configuration file (.pro), in which details on the aforementioned libraries are specified. Alternatively, you can compile all the examples together by considering the file `build_all_examples.pro`. Configuration files require minimal editing prior compilation. Specifically, you need to:
+To compile the examples you must download CinoLib and [Eigen](http://eigen.tuxfamily.org) on your machine, and install [Qt](https://www.qt.io) and [libQGLViewer](http://libqglviewer.com/index.html) for the GUI. Each sample project comes with its own configuration file (.pro), in which links to the aforementioned libraries are specified. Alternatively, you can compile all the examples together by considering the file `build_all_examples.pro`. Configuration files require minimal editing prior compilation. Specifically, you need to:
 
 * change the path `/usr/local/include/eigen3` with the local path to your Eigen headers
 * change the path `/Library/Frameworks/QGLViewer.framework/Versions/2/Headers` with the local path to your QGLViewer headers
@@ -15,9 +15,10 @@ make -j4
 ```
 
 ### Additional dependencies
-Notice that some of the projects may also depend from external libraries which are wrapped in CinoLib (e.g. [Triangle](https://www.cs.cmu.edu/~quake/triangle.html), [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) or [VTK](https://www.vtk.org)). In this case, such libraries should be installed separately, and the configuration files updated with correct paths for compiler and linker. If you are not interested in these examples, you can safely comment them (adding `#` at the beginning of the corresponding lines in `build_all_examples.pro`, and they will be ignored by qmake).
+Notice that some of the projects also depend from external libraries which are wrapped in CinoLib (e.g. [Triangle](https://www.cs.cmu.edu/~quake/triangle.html), [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) or [VTK](https://www.vtk.org)). In this case, such libraries should be installed separately, and the configuration files updated with correct paths for compiler and linker. If you are not interested in these examples, you can safely comment them by adding `#` at the beginning of the corresponding lines in `build_all_examples.pro`, and they will be automatically ignored by qmake.
 
 # List of Examples
+Here is a list of the sample programs available in CinoLib.
 
 #### 01 - Load and render a triangle mesh
 <p align="left"><img src="snapshots/01_base_app_trimesh.png" width="500"></p>
@@ -58,13 +59,13 @@ Notice that some of the projects may also depend from external libraries which a
 #### 13 - Compute geodesic distances using the heat flow method
 <p align="left"><img src="snapshots/13_heat_based_geodesics.png" width="500"></p>
 
-#### 14 - Compute kernels, incircles and circumcircles for 2D polygons
+#### 14 - Compute kernels, incircles and circumcircles of 2D polygons
 <p align="left"><img src="snapshots/14_polygon_measures.png" width="500"></p>
 
-#### 15 - Uniform sphere sampling using spherical Fibonacci
+#### 15 - Use spherical Fibonacci to evenly sample th eunit sphere
 <p align="left"><img src="snapshots/15_sphere_sampling.png" width="500"></p>
 
-#### 16 - Extract ISO surfaces using marching cubes for tetrahedral grids
+#### 16 - Extract ISO surfaces using marching cubes for tetrahedral meshes
 <p align="left"><img src="snapshots/16_iso_surfaces.png" width="500"></p>
 
 # Upcoming examples
