@@ -64,6 +64,9 @@ Notice that some of the projects may also depend from external libraries which a
 #### 15 - Uniform sphere sampling using spherical Fibonacci
 <p align="left"><img src="snapshots/15_sphere_sampling.png" width="500"></p>
 
+#### 16 - Extract ISO surfaces using marching cubes for tetrahedral grids
+<p align="left"><img src="snapshots/16_iso_surfaces.png" width="500"></p>
+
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
@@ -79,5 +82,4 @@ Maintaining a library alone is very time consuming, and the amount of time I can
 * Solve multi-labeling problems on surfaces and volumes using the [GraphCuts](http://vision.csd.uwo.ca/code/) wrapper
 * Integral curve computation (and tessellation)
 * Iso curve computation (and tessellation)
-* Iso surface computation (and tessellation)
 * Subdivision schemas for hexahedral meshes
