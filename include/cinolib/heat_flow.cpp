@@ -52,10 +52,8 @@ ScalarField heat_flow(const AbstractMesh<M,V,E,P> & m,
     Eigen::SparseMatrix<double> MM  = mass_matrix(m);
     Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
 
-    std::map<uint,double> bc;
-    for(uint vid : heat_charges) bc[vid] = 1.0;
-
-    solve_square_system_with_bc(MM - time * L, rhs, heat, bc);
+    for(uint vid : heat_charges) rhs[vid] = 1.0;
+    solve_square_system(MM - time * L, rhs, heat);
 
     return heat;
 }
