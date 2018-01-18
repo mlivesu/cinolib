@@ -62,7 +62,7 @@ Here is a list of the sample programs available in CinoLib.
 #### 14 - Compute kernels, incircles and circumcircles of 2D polygons
 <p align="left"><img src="snapshots/14_polygon_measures.png" width="500"></p>
 
-#### 15 - Use spherical Fibonacci to evenly sample th eunit sphere
+#### 15 - Use spherical Fibonacci to evenly sample the unit sphere
 <p align="left"><img src="snapshots/15_sphere_sampling.png" width="500"></p>
 
 #### 16 - Extract ISO surfaces using marching cubes for tetrahedral meshes
