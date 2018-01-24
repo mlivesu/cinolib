@@ -23,7 +23,6 @@ int main(int argc, char **argv)
 
     QApplication a(argc, argv);
 
-    // read a mesh from file
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/Laurana.obj";
     DrawableTrimesh<> m(s.c_str());
 
@@ -33,14 +32,14 @@ int main(int argc, char **argv)
     // create parametric space (discrete unit circle with as many point as the boundary vertices)
     std::vector<vec3d> uv_boundary = n_sided_polygon(vec3d(0,0,0), boundary.size(), 1.0);
 
-    // set potitional constraints for boundary vertices (map its boundary to the discrete circle)
+    // set potitional constraints for boundary vertices (map mesh boundary to the unit circle)
     std::map<uint,vec3d> dirichlet_bcs;
     for(uint i=0; i<boundary.size(); ++i) dirichlet_bcs[boundary.at(i)] = uv_boundary.at(i);
 
     // solve for the interior vertices via harmonic map
     std::vector<vec3d> uv_map = harmonic_map_3d(m, dirichlet_bcs);
 
-    // create a mesh of the uv parametric space
+    // create a mesh of the uv parametric space (same connectivity, different embedding)
     DrawableTrimesh<> m_uv(uv_map, m.vector_polys());
 
     // copy uv coordinates to m (for texture visualization)
