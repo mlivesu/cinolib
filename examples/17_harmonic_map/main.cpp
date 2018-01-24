@@ -14,6 +14,7 @@
 #include <cinolib/harmonic_map.h>
 #include <cinolib/geometry/n_sided_poygon.h>
 #include <cinolib/textures/textures.h>
+#include <cinolib/profiler.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -37,7 +38,10 @@ int main(int argc, char **argv)
     for(uint i=0; i<boundary.size(); ++i) dirichlet_bcs[boundary.at(i)] = uv_boundary.at(i);
 
     // solve for the interior vertices via harmonic map
+    Profiler profiler;
+    profiler.push("3D Harmonic map");
     std::vector<vec3d> uv_map = harmonic_map_3d(m, dirichlet_bcs);
+    profiler.pop();
 
     // create a mesh of the uv parametric space (same connectivity, different embedding)
     DrawableTrimesh<> m_uv(uv_map, m.vector_polys());
