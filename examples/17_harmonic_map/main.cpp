@@ -1,3 +1,13 @@
+/* This sample program maps a disk-like triangulated surface
+ * into the 2D unit circle. The map is computed by solving
+ * the harmonic equation, fixing the boundary of the shape
+ * on the perimeter of the circle through Dirichelet boundary
+ * conditions. Alternative parametric domains could also be 
+ * considered (e.g. a square or other convex polygons)
+ *
+ * Enjoy!
+*/
+
 #include <QApplication>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/gui/qt/glcanvas.h>
