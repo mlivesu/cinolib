@@ -68,6 +68,9 @@ Here is a list of the sample programs available in CinoLib.
 #### 16 - Extract ISO surfaces using marching cubes for tetrahedral meshes
 <p align="left"><img src="snapshots/16_iso_surfaces.png" width="500"></p>
 
+#### 17 - Compute discrete harmonic maps
+<p align="left"><img src="snapshots/17_harmonic_map.png" width="500"></p>
+
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
@@ -77,7 +80,6 @@ Maintaining a library alone is very time consuming, and the amount of time I can
 * Generate, process and visualize vector fields
 * Overview of the topology editing operators implemented in CinoLib
 * Evaluation of mapping distortions (angle/areas distortion popular metrics)
-* Computation of conformal maps for surface meshes
 * Parameterization based hexahedral remeshing
 * Surface and volumetric format converters
 * Solve multi-labeling problems on surfaces and volumes using the [GraphCuts](http://vision.csd.uwo.ca/code/) wrapper
