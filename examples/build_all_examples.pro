@@ -16,3 +16,4 @@ SUBDIRS += 13_heat_based_geodesics
 SUBDIRS += 14_polygon_measures
 SUBDIRS += 15_sphere_sampling
 SUBDIRS += 16_iso_surfaces
+SUBDIRS += 17_harmonic_map
