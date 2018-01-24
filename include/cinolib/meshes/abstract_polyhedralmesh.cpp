@@ -197,10 +197,11 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_adjacency()
         }
     }
 
-    std::cout << this->num_verts() << "\tverts" << std::endl;
-    std::cout << this->num_edges() << "\tedges" << std::endl;
-    std::cout << this->num_faces() << "\tfaces" << std::endl;
-    std::cout << this->num_polys() << "\tpolys" << std::endl;
+    std::cout << "new mesh\t"      <<
+                 this->num_verts() << "V / " <<
+                 this->num_edges() << "E / " <<
+                 this->num_faces() << "F / " <<
+                 this->num_polys() << "P   " << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
