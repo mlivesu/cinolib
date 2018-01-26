@@ -32,7 +32,7 @@
 #define CINO_GLCANVAS2_H
 
 #ifdef CINOLIB_USES_OPENGL
-#ifdef CINOLIB_USES_QT_AND_QGLVIEWER
+#ifdef CINOLIB_USES_QT
 
 #ifdef __APPLE__
 #include <gl.h>
