@@ -51,20 +51,37 @@ void render_tris(const RenderData & data)
     {
         if (data.draw_mode & DRAW_TRI_TEXTURE1D)
         {
+            glBindTexture(GL_TEXTURE_1D, data.texture.id);
+            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, data.texture.size, 0, GL_RGB, GL_UNSIGNED_BYTE, data.texture.data);
+            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
+
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(1, GL_FLOAT, 0, data.tri_text.data());
             glColor3f(1,1,1);
+            glDisable(GL_COLOR_MATERIAL);
             glEnable(GL_TEXTURE_1D);
         }
         else if (data.draw_mode & DRAW_TRI_TEXTURE2D)
         {
+            glBindTexture(GL_TEXTURE_2D, data.texture.id);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data.texture.size, data.texture.size, 0, GL_RGB, GL_UNSIGNED_BYTE, data.texture.data);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+            glGenerateMipmap(GL_TEXTURE_2D);
+
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(2, GL_FLOAT, 0, data.tri_text.data());
             glColor3f(1,1,1);
+            glDisable(GL_COLOR_MATERIAL);
             glEnable(GL_TEXTURE_2D);
         }
         else
         {
+            glEnable(GL_COLOR_MATERIAL);
             glEnableClientState(GL_COLOR_ARRAY);
             glColorPointer(4, GL_FLOAT, 0, data.tri_v_colors.data());
         }
@@ -79,15 +96,18 @@ void render_tris(const RenderData & data)
         {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
             glDisable(GL_TEXTURE_1D);
+            glEnable(GL_COLOR_MATERIAL);
         }
         else if (data.draw_mode & DRAW_TRI_TEXTURE2D)
         {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
             glDisable(GL_TEXTURE_2D);
+            glEnable(GL_COLOR_MATERIAL);
         }
         else
         {
             glDisableClientState(GL_COLOR_ARRAY);
+            glDisable(GL_COLOR_MATERIAL);
         }
     }
 }
@@ -123,6 +143,7 @@ CINO_INLINE
 void render(const RenderData & data)
 {
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 
     if (data.draw_mode & DRAW_TRIS)

@@ -46,6 +46,7 @@
 #include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
+#include <cinolib/textures/textures.h>
 
 namespace cinolib
 {
@@ -75,13 +76,13 @@ typedef struct
     std::vector<float> tri_v_norms;
     std::vector<float> tri_v_colors; // rgba
     std::vector<float> tri_text;
-    GLuint             tri_text_id = 0;
-    double             tri_text_unit_scalar = 1.0;
+    Texture            texture;
     //
     std::vector<uint>  segs;
     std::vector<float> seg_coords;
     std::vector<float> seg_colors; // rgba
     GLfloat            seg_width = 1;
+    //
 }
 RenderData;
 

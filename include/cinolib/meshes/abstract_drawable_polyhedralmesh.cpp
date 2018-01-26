@@ -244,12 +244,12 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             }
             else if (drawlist_out.draw_mode & DRAW_TRI_TEXTURE2D)
             {
-                drawlist_out.tri_text.push_back(this->vert_data(vid0).uvw[0]*drawlist_out.tri_text_unit_scalar);
-                drawlist_out.tri_text.push_back(this->vert_data(vid0).uvw[1]*drawlist_out.tri_text_unit_scalar);
-                drawlist_out.tri_text.push_back(this->vert_data(vid1).uvw[0]*drawlist_out.tri_text_unit_scalar);
-                drawlist_out.tri_text.push_back(this->vert_data(vid1).uvw[1]*drawlist_out.tri_text_unit_scalar);
-                drawlist_out.tri_text.push_back(this->vert_data(vid2).uvw[0]*drawlist_out.tri_text_unit_scalar);
-                drawlist_out.tri_text.push_back(this->vert_data(vid2).uvw[1]*drawlist_out.tri_text_unit_scalar);
+                drawlist_out.tri_text.push_back(this->vert_data(vid0).uvw[0]*drawlist_out.texture.scaling_factor);
+                drawlist_out.tri_text.push_back(this->vert_data(vid0).uvw[1]*drawlist_out.texture.scaling_factor);
+                drawlist_out.tri_text.push_back(this->vert_data(vid1).uvw[0]*drawlist_out.texture.scaling_factor);
+                drawlist_out.tri_text.push_back(this->vert_data(vid1).uvw[1]*drawlist_out.texture.scaling_factor);
+                drawlist_out.tri_text.push_back(this->vert_data(vid2).uvw[0]*drawlist_out.texture.scaling_factor);
+                drawlist_out.tri_text.push_back(this->vert_data(vid2).uvw[1]*drawlist_out.texture.scaling_factor);
             }
 
             if (drawlist_out.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
@@ -442,12 +442,12 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
             }
             else if (drawlist_in.draw_mode & DRAW_TRI_TEXTURE2D)
             {
-                drawlist_in.tri_text.push_back(this->vert_data(vid0).uvw[0]*drawlist_in.tri_text_unit_scalar);
-                drawlist_in.tri_text.push_back(this->vert_data(vid0).uvw[1]*drawlist_in.tri_text_unit_scalar);
-                drawlist_in.tri_text.push_back(this->vert_data(vid1).uvw[0]*drawlist_in.tri_text_unit_scalar);
-                drawlist_in.tri_text.push_back(this->vert_data(vid1).uvw[1]*drawlist_in.tri_text_unit_scalar);
-                drawlist_in.tri_text.push_back(this->vert_data(vid2).uvw[0]*drawlist_in.tri_text_unit_scalar);
-                drawlist_in.tri_text.push_back(this->vert_data(vid2).uvw[1]*drawlist_in.tri_text_unit_scalar);
+                drawlist_in.tri_text.push_back(this->vert_data(vid0).uvw[0]*drawlist_in.texture.scaling_factor);
+                drawlist_in.tri_text.push_back(this->vert_data(vid0).uvw[1]*drawlist_in.texture.scaling_factor);
+                drawlist_in.tri_text.push_back(this->vert_data(vid1).uvw[0]*drawlist_in.texture.scaling_factor);
+                drawlist_in.tri_text.push_back(this->vert_data(vid1).uvw[1]*drawlist_in.texture.scaling_factor);
+                drawlist_in.tri_text.push_back(this->vert_data(vid2).uvw[0]*drawlist_in.texture.scaling_factor);
+                drawlist_in.tri_text.push_back(this->vert_data(vid2).uvw[1]*drawlist_in.texture.scaling_factor);
             }
 
             if (drawlist_in.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
@@ -701,7 +701,14 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture1D(const int tex_type
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    load_texture(drawlist_out.tri_text_id, tex_type);
+    drawlist_out.texture.type = tex_type;
+    switch (tex_type)
+    {
+        case TEXTURE_1D_ISOLINES :            texture_isolines1D(drawlist_out.texture);             break;
+        case TEXTURE_1D_HSV_RAMP :            texture_HSV_ramp(drawlist_out.texture);               break;
+        case TEXTURE_1D_HSV_RAMP_W_ISOLINES : texture_HSV_ramp_with_isolines(drawlist_out.texture); break;
+        default: assert("Unknown Texture!" && false);
+    }
     updateGL_out();
 }
 
@@ -717,8 +724,15 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture2D(const int tex_type
     drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    drawlist_out.tri_text_unit_scalar = tex_unit_scalar;
-    load_texture(drawlist_out.tri_text_id, tex_type, bitmap);
+    drawlist_out.texture.type           = tex_type;
+    drawlist_out.texture.scaling_factor = tex_unit_scalar;
+    switch (tex_type)
+    {
+        case TEXTURE_2D_CHECKERBOARD : texture_checkerboard(drawlist_out.texture);   break;
+        case TEXTURE_2D_ISOLINES:      texture_isolines2D(drawlist_out.texture);     break;
+        case TEXTURE_2D_BITMAP:        texture_bitmap(drawlist_out.texture, bitmap); break;
+        default: assert("Unknown Texture!" && false);
+    }
     updateGL_out();
 }
 
@@ -816,7 +830,14 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture1D(const int tex_type)
     drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    load_texture(drawlist_in.tri_text_id, tex_type);
+    drawlist_in.texture.type = tex_type;
+    switch (tex_type)
+    {
+        case TEXTURE_1D_ISOLINES :            texture_isolines1D(drawlist_in.texture);             break;
+        case TEXTURE_1D_HSV_RAMP :            texture_HSV_ramp(drawlist_in.texture);               break;
+        case TEXTURE_1D_HSV_RAMP_W_ISOLINES : texture_HSV_ramp_with_isolines(drawlist_in.texture); break;
+        default: assert("Unknown Texture!" && false);
+    }
     updateGL_in();
 }
 
@@ -832,8 +853,15 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture2D(const int tex_type,
     drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    drawlist_in.tri_text_unit_scalar = tex_unit_scalar;
-    load_texture(drawlist_in.tri_text_id, tex_type, bitmap);
+    drawlist_in.texture.type           = tex_type;
+    drawlist_in.texture.scaling_factor = tex_unit_scalar;
+    switch (tex_type)
+    {
+        case TEXTURE_2D_CHECKERBOARD : texture_checkerboard(drawlist_in.texture);   break;
+        case TEXTURE_2D_ISOLINES:      texture_isolines2D(drawlist_in.texture);     break;
+        case TEXTURE_2D_BITMAP:        texture_bitmap(drawlist_in.texture, bitmap); break;
+        default: assert("Unknown Texture!" && false);
+    }
     updateGL_in();
 }
 

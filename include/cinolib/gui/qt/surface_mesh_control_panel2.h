@@ -28,15 +28,15 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_SURFACE_MESH_CONTROL_PANEL_H
-#define CINO_SURFACE_MESH_CONTROL_PANEL_H
+#ifndef CINO_SURFACE_MESH_CONTROL_PANEL2_H
+#define CINO_SURFACE_MESH_CONTROL_PANEL2_H
 
 #ifdef CINOLIB_USES_QT
 
 #include <cinolib/scalar_field.h>
 #include <cinolib/drawable_isocontour.h>
 #include <cinolib/drawable_vector_field.h>
-#include <cinolib/gui/qt/glcanvas.h>
+#include <cinolib/gui/qt/glcanvas2.h>
 
 #include <iostream>
 #include <QWidget>
@@ -56,7 +56,7 @@ namespace cinolib
 {
 
 template<class Mesh>
-class SurfaceMeshControlPanel
+class SurfaceMeshControlPanel2
 {
     typedef typename Mesh::M_type M;
     typedef typename Mesh::V_type V;
@@ -65,7 +65,7 @@ class SurfaceMeshControlPanel
 
     public:
 
-        SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas, QWidget *parent = NULL);
+        SurfaceMeshControlPanel2(Mesh *m, GLcanvas2 *canvas, QWidget *parent = NULL);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -85,7 +85,7 @@ class SurfaceMeshControlPanel
         Mesh                        *m;
         DrawableIsocontour<M,V,E,P>  isocontour;
         DrawableVectorField<Mesh>    gradient;
-        GLcanvas                    *canvas;
+        GLcanvas2                   *canvas;
         QWidget                     *widget;
         QHBoxLayout                 *global_layout;
         QFont                        global_font;
@@ -154,9 +154,9 @@ class SurfaceMeshControlPanel
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "surface_mesh_control_panel.cpp"
+#include "surface_mesh_control_panel2.cpp"
 #endif
 
 #endif // #ifdef CINOLIB_USES_QT
 
-#endif // CINO_SURFACE_MESH_CONTROL_PANEL_H
+#endif // CINO_SURFACE_MESH_CONTROL_PANEL2_H

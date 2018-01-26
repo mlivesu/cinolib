@@ -30,8 +30,8 @@
 **********************************************************************************/
 #include <cinolib/meshes/abstract_drawable_polygonmesh.h>
 #include <cinolib/cino_inline.h>
-#include <cinolib/textures/textures.h>
 #include <cinolib/gl/draw_lines_tris.h>
+#include <cinolib/textures/textures.h>
 #include <cinolib/color.h>
 
 namespace cinolib
@@ -211,12 +211,12 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
                 }
                 else if (drawlist.draw_mode & DRAW_TRI_TEXTURE2D)
                 {
-                    drawlist.tri_text.push_back(this->vert_data(vid0).uvw[0]*drawlist.tri_text_unit_scalar);
-                    drawlist.tri_text.push_back(this->vert_data(vid0).uvw[1]*drawlist.tri_text_unit_scalar);
-                    drawlist.tri_text.push_back(this->vert_data(vid1).uvw[0]*drawlist.tri_text_unit_scalar);
-                    drawlist.tri_text.push_back(this->vert_data(vid1).uvw[1]*drawlist.tri_text_unit_scalar);
-                    drawlist.tri_text.push_back(this->vert_data(vid2).uvw[0]*drawlist.tri_text_unit_scalar);
-                    drawlist.tri_text.push_back(this->vert_data(vid2).uvw[1]*drawlist.tri_text_unit_scalar);
+                    drawlist.tri_text.push_back(this->vert_data(vid0).uvw[0]*drawlist.texture.scaling_factor);
+                    drawlist.tri_text.push_back(this->vert_data(vid0).uvw[1]*drawlist.texture.scaling_factor);
+                    drawlist.tri_text.push_back(this->vert_data(vid1).uvw[0]*drawlist.texture.scaling_factor);
+                    drawlist.tri_text.push_back(this->vert_data(vid1).uvw[1]*drawlist.texture.scaling_factor);
+                    drawlist.tri_text.push_back(this->vert_data(vid2).uvw[0]*drawlist.texture.scaling_factor);
+                    drawlist.tri_text.push_back(this->vert_data(vid2).uvw[1]*drawlist.texture.scaling_factor);
                 }
 
                 if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
@@ -409,7 +409,14 @@ void AbstractDrawablePolygonMesh<Mesh>::show_texture1D(const int tex_type)
     drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    load_texture(drawlist.tri_text_id, tex_type);
+    drawlist.texture.type = tex_type;
+    switch (tex_type)
+    {
+        case TEXTURE_1D_ISOLINES :            texture_isolines1D(drawlist.texture);             break;
+        case TEXTURE_1D_HSV_RAMP :            texture_HSV_ramp(drawlist.texture);               break;
+        case TEXTURE_1D_HSV_RAMP_W_ISOLINES : texture_HSV_ramp_with_isolines(drawlist.texture); break;
+        default: assert("Unknown Texture!" && false);
+    }
     updateGL();
 }
 
@@ -425,8 +432,15 @@ void AbstractDrawablePolygonMesh<Mesh>::show_texture2D(const int tex_type, const
     drawlist.draw_mode &= ~DRAW_TRI_FACECOLOR;
     drawlist.draw_mode &= ~DRAW_TRI_QUALITY;
 
-    drawlist.tri_text_unit_scalar = tex_unit_scalar;
-    load_texture(drawlist.tri_text_id, tex_type, bitmap);
+    drawlist.texture.type           = tex_type;
+    drawlist.texture.scaling_factor = tex_unit_scalar;
+    switch (tex_type)
+    {
+        case TEXTURE_2D_CHECKERBOARD : texture_checkerboard(drawlist.texture);   break;
+        case TEXTURE_2D_ISOLINES:      texture_isolines2D(drawlist.texture);     break;
+        case TEXTURE_2D_BITMAP:        texture_bitmap(drawlist.texture, bitmap); break;
+        default: assert("Unknown Texture!" && false);
+    }
     updateGL();
 }
 

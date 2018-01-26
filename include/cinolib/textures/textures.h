@@ -55,50 +55,57 @@ enum
     TEXTURE_2D_ISOLINES,
     TEXTURE_2D_CHECKERBOARD,
     TEXTURE_2D_BITMAP
-};
+}; // texture types currently supported
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+typedef struct
+{
+    int      type;
+    GLuint   id             = 0;
+    GLsizei  size           = 0;
+    double   scaling_factor = 1.0;
+    uint8_t *data           = nullptr;
+}
+Texture;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void load_texture(GLuint & texture_id, const int & texture_type, const char *bitmap = NULL);
+void texture_HSV_ramp(Texture & texture);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_HSV_ramp(const GLuint texture_id);
+void texture_HSV_ramp_with_isolines(Texture & texture);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_HSV_ramp_with_isolines(const GLuint texture_id);
+void texture_isolines1D(      Texture & texture,
+                        const Color   & c0 = Color::BLACK(),
+                        const Color   & c1 = Color::WHITE(),
+                        const uint      n_bands = 32);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_isolines1D(const GLuint   texture_id,
-                        const Color  & c0 = Color::BLACK(),
-                        const Color  & c1 = Color::WHITE(),
-                        const uint     n_bands = 32);
+void texture_checkerboard(      Texture & texture,
+                          const Color   & c0 = Color(.5,.5,.5),
+                          const Color   & c1 = Color::WHITE());
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_checkerboard(const GLuint   texture_id,
-                          const Color  & c0 = Color(.5,.5,.5),
-                          const Color  & c1 = Color::WHITE());
+void texture_isolines2D(      Texture & texture,
+                        const Color   & u_isolines = Color::BLUE(),
+                        const Color   & v_isolines = Color::RED(),
+                        const Color   & background = Color::WHITE());
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_isolines2D(const GLuint   texture_id,
-                        const Color  & u_isolines = Color::BLUE(),
-                        const Color  & v_isolines = Color::RED(),
-                        const Color  & background = Color::WHITE());
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void texture_bitmap(const GLuint texture_id, const char *bitmap);
+void texture_bitmap(Texture & texture, const char *bitmap);
 
 }
 
