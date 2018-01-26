@@ -45,10 +45,8 @@ namespace cinolib
 CINO_INLINE
 GLcanvas2::GLcanvas2(QWidget * parent) : QOpenGLWidget(parent)
 {
-    scene_radius  = 1.0;
-    scene_center  = vec3d(0,0,0);
-    mouse_pressed = false;
-
+    scene_radius = 1.0;
+    scene_center = vec3d(0,0,0);
     initializeGL();
 }
 
@@ -67,7 +65,7 @@ void GLcanvas2::initializeGL()
     // scene pos and size
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glGetDoublev(GL_MODELVIEW_MATRIX, modelview_matrix);
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview_matrix);
     update_projection_matrix();
     fit_scene();
 }
@@ -110,18 +108,18 @@ void GLcanvas2::fit_scene()
     }
     if (count>0) scene_center /= (double)count;
 
-    translate(vec3d(-(modelview_matrix[0]*scene_center[0] +
-                      modelview_matrix[4]*scene_center[1] +
-                      modelview_matrix[8]*scene_center[2] +
-                      modelview_matrix[12]),
-                    -(modelview_matrix[1]*scene_center[0] +
-                      modelview_matrix[5]*scene_center[1] +
-                      modelview_matrix[9]*scene_center[2] +
-                      modelview_matrix[13]),
-                    -(modelview_matrix[2]*scene_center[0] +
-                      modelview_matrix[6]*scene_center[1] +
-                      modelview_matrix[10]*scene_center[2] +
-                      modelview_matrix[14] +
+    translate(vec3d(-(trackball.modelview_matrix[0]*scene_center[0] +
+                      trackball.modelview_matrix[4]*scene_center[1] +
+                      trackball.modelview_matrix[8]*scene_center[2] +
+                      trackball.modelview_matrix[12]),
+                    -(trackball.modelview_matrix[1]*scene_center[0] +
+                      trackball.modelview_matrix[5]*scene_center[1] +
+                      trackball.modelview_matrix[9]*scene_center[2] +
+                      trackball.modelview_matrix[13]),
+                    -(trackball.modelview_matrix[2]*scene_center[0] +
+                      trackball.modelview_matrix[6]*scene_center[1] +
+                      trackball.modelview_matrix[10]*scene_center[2] +
+                      trackball.modelview_matrix[14] +
                       3.0*scene_radius)));
 
     update_projection_matrix();
@@ -149,7 +147,7 @@ void GLcanvas2::update_projection_matrix()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45.0, (GLfloat)width()/(GLfloat)height(), 0.01*scene_radius, 100.0*scene_radius);
-    glGetDoublev(GL_PROJECTION_MATRIX, projection_matrix);
+    glGetDoublev(GL_PROJECTION_MATRIX, trackball.projection_matrix);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -169,7 +167,7 @@ void GLcanvas2::map_to_sphere(const QPoint & p2d, vec3d & p3d)
 
     p3d[0] = xval;
     p3d[1] = yval;
-    p3d[2] = (x2y2 < 0.5*TRACKBALL_RADIUS_SQRD) ? sqrt(TRACKBALL_RADIUS_SQRD - x2y2) : 0.5*TRACKBALL_RADIUS_SQRD/sqrt(x2y2);
+    p3d[2] = (x2y2 < 0.5*trackball.radius) ? sqrt(trackball.radius - x2y2) : 0.5*trackball.radius/sqrt(x2y2);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -180,41 +178,41 @@ void GLcanvas2::translate(const vec3d & t)
     makeCurrent();
     glLoadIdentity();
     glTranslated(t[0], t[1], t[2]);
-    glMultMatrixd(modelview_matrix);
-    glGetDoublev(GL_MODELVIEW_MATRIX, modelview_matrix);
+    glMultMatrixd(trackball.modelview_matrix);
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview_matrix);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::rotate(const vec3d & axis, double angle)
+void GLcanvas2::rotate(const vec3d & axis, const double angle)
 {
-    vec3d t(modelview_matrix[0]*scene_center[0] +
-            modelview_matrix[4]*scene_center[1] +
-            modelview_matrix[8]*scene_center[2] +
-            modelview_matrix[12],
-            modelview_matrix[1]*scene_center[0] +
-            modelview_matrix[5]*scene_center[1] +
-            modelview_matrix[9]*scene_center[2] +
-            modelview_matrix[13],
-            modelview_matrix[2]*scene_center[0] +
-            modelview_matrix[6]*scene_center[1] +
-            modelview_matrix[10]*scene_center[2] +
-            modelview_matrix[14] );
+    vec3d t(trackball.modelview_matrix[0]*scene_center[0] +
+            trackball.modelview_matrix[4]*scene_center[1] +
+            trackball.modelview_matrix[8]*scene_center[2] +
+            trackball.modelview_matrix[12],
+            trackball.modelview_matrix[1]*scene_center[0] +
+            trackball.modelview_matrix[5]*scene_center[1] +
+            trackball.modelview_matrix[9]*scene_center[2] +
+            trackball.modelview_matrix[13],
+            trackball.modelview_matrix[2]*scene_center[0] +
+            trackball.modelview_matrix[6]*scene_center[1] +
+            trackball.modelview_matrix[10]*scene_center[2] +
+            trackball.modelview_matrix[14] );
 
     makeCurrent();
     glLoadIdentity();
     glTranslatef(t[0], t[1], t[2]);
     glRotated(angle, axis[0], axis[1], axis[2]);
     glTranslatef(-t[0], -t[1], -t[2]);
-    glMultMatrixd(modelview_matrix);
-    glGetDoublev(GL_MODELVIEW_MATRIX, modelview_matrix);
+    glMultMatrixd(trackball.modelview_matrix);
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview_matrix);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::push_obj(DrawableObject *obj, bool refit_scene)
+void GLcanvas2::push_obj(const DrawableObject *obj, bool refit_scene)
 {
     drawlist.push_back(obj);
     if (refit_scene) fit_scene();
@@ -239,7 +237,7 @@ bool GLcanvas2::pop_all_occurrences_of(int type)
 CINO_INLINE
 bool GLcanvas2::pop_first_occurrence_of(int type)
 {
-    for(std::vector<DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
+    for(std::vector<const DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
     {
         const DrawableObject *obj = *it;
 
@@ -255,9 +253,9 @@ bool GLcanvas2::pop_first_occurrence_of(int type)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool GLcanvas2::pop(DrawableObject *obj)
+bool GLcanvas2::pop(const DrawableObject *obj)
 {
-    for(std::vector<DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
+    for(std::vector<const DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
     {
         if (obj == *it)
         {
@@ -274,9 +272,9 @@ CINO_INLINE
 void GLcanvas2::mousePressEvent(QMouseEvent *event)
 {
     event->accept();
-    mouse_pressed = true;
-    last_point_2d = event->pos();
-    map_to_sphere(last_point_2d, last_point_3d);
+    trackball.mouse_pressed = true;
+    trackball.last_point_2d = event->pos();
+    map_to_sphere(trackball.last_point_2d, trackball.last_point_3d);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -285,7 +283,7 @@ CINO_INLINE
 void GLcanvas2::mouseReleaseEvent(QMouseEvent *event)
 {
     event->accept();
-    mouse_pressed = false;
+    trackball.mouse_pressed = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -299,16 +297,16 @@ void GLcanvas2::mouseMoveEvent(QMouseEvent *event)
     if (event->modifiers() & Qt::ShiftModifier)
     {
         QPoint p2d = event->pos();
-        float  dx  = p2d.x() - last_point_2d.x();
-        float  dy  = p2d.y() - last_point_2d.y();
-        float  z   = - (modelview_matrix[ 2]*scene_center[0] +
-                        modelview_matrix[ 6]*scene_center[1] +
-                        modelview_matrix[10]*scene_center[2] +
-                        modelview_matrix[14]) /
-                       (modelview_matrix[ 3]*scene_center[0] +
-                        modelview_matrix[ 7]*scene_center[1] +
-                        modelview_matrix[11]*scene_center[2] +
-                        modelview_matrix[15]);
+        float  dx  = p2d.x() - trackball.last_point_2d.x();
+        float  dy  = p2d.y() - trackball.last_point_2d.y();
+        float  z   = - (trackball.modelview_matrix[ 2]*scene_center[0] +
+                        trackball.modelview_matrix[ 6]*scene_center[1] +
+                        trackball.modelview_matrix[10]*scene_center[2] +
+                        trackball.modelview_matrix[14]) /
+                       (trackball.modelview_matrix[ 3]*scene_center[0] +
+                        trackball.modelview_matrix[ 7]*scene_center[1] +
+                        trackball.modelview_matrix[11]*scene_center[2] +
+                        trackball.modelview_matrix[15]);
 
         float w          = width();
         float h          = height();
@@ -318,7 +316,7 @@ void GLcanvas2::mouseMoveEvent(QMouseEvent *event)
         float right      = aspect*top;
 
         translate(vec3d(2.0*dx/w*right/near_plane*z, -2.0*dy/h*top/near_plane*z, 0.0f));
-        last_point_2d = p2d;
+        trackball.last_point_2d = p2d;
         update();
         return;
     }
@@ -329,16 +327,16 @@ void GLcanvas2::mouseMoveEvent(QMouseEvent *event)
         QPoint p2d = event->pos();
         vec3d  p3d;
         map_to_sphere(p2d, p3d);
-        if (mouse_pressed)
+        if (trackball.mouse_pressed)
         {
-            vec3d axis = last_point_3d.cross(p3d);
+            vec3d axis = trackball.last_point_3d.cross(p3d);
 
             if (axis.length_squared()<1e-7) axis = vec3d(1,0,0);
             axis.normalize();
 
             // find the amount of rotation
-            vec3d d = last_point_3d - p3d;
-            float t = 0.5*d.length()/TRACKBALL_RADIUS;
+            vec3d d = trackball.last_point_3d - p3d;
+            float t = 0.5*d.length()/trackball.radius;
 
             if      (t < -1.0)  t = -1.0;
             else if ( t > 1.0 ) t = 1.0;
@@ -348,8 +346,8 @@ void GLcanvas2::mouseMoveEvent(QMouseEvent *event)
 
             rotate(axis, angle);
         }
-        last_point_2d = p2d;
-        last_point_3d = p3d;
+        trackball.last_point_2d = p2d;
+        trackball.last_point_3d = p3d;
         update();
         return;
     }
