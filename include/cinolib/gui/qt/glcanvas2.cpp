@@ -30,6 +30,9 @@
 **********************************************************************************/
 #include <cinolib/gui/qt/glcanvas2.h>
 #include <cinolib/cino_inline.h>
+#include <cinolib/gl/draw_sphere.h>
+#include <cinolib/gl/draw_cylinder.h>
+#include <cinolib/color.h>
 
 #include <sstream>
 #include <QApplication>
@@ -43,11 +46,18 @@ namespace cinolib
 {
 
 CINO_INLINE
-GLcanvas2::GLcanvas2(QWidget * parent) : QOpenGLWidget(parent)
+GLcanvas2::GLcanvas2(QWidget * parent) : QOpenGLWidget(parent), QOpenGLFunctions()
 {
     scene_radius = 1.0;
     scene_center = vec3d(0,0,0);
-    initializeGL();
+    render_axis  = true;
+
+    // enables depth buffer
+    QSurfaceFormat format;
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setDepthBufferSize(32);
+    format.setSamples(0);
+    setFormat(format);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -55,6 +65,9 @@ GLcanvas2::GLcanvas2(QWidget * parent) : QOpenGLWidget(parent)
 CINO_INLINE
 void GLcanvas2::initializeGL()
 {
+    initializeOpenGLFunctions();
+    glClearColor(1.0,1.0,1.0,1.0);
+
     makeCurrent();
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING);
@@ -65,7 +78,7 @@ void GLcanvas2::initializeGL()
     // scene pos and size
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview_matrix);
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
     update_projection_matrix();
     fit_scene();
 }
@@ -89,6 +102,20 @@ void GLcanvas2::paintGL()
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     for(auto obj : drawlist) obj->draw(scene_radius);
+
+    for(auto p : points) sphere(p, scene_radius*0.07, Color::BLACK().rgba);
+
+    if (render_axis)
+    {
+        vec3d O = scene_center;  //(0,0,0);
+        vec3d X = scene_center + vec3d(1,0,0)*scene_radius;
+        vec3d Y = scene_center + vec3d(0,1,0)*scene_radius;
+        vec3d Z = scene_center + vec3d(0,0,1)*scene_radius;
+        cylinder(O, X, scene_radius*0.015, scene_radius*0.015, Color::RED().rgba);
+        cylinder(O, Y, scene_radius*0.015, scene_radius*0.015, Color::GREEN().rgba);
+        cylinder(O, Z, scene_radius*0.015, scene_radius*0.015, Color::BLUE().rgba);
+        sphere(O, scene_radius*0.02, Color::WHITE().rgba);
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -108,18 +135,18 @@ void GLcanvas2::fit_scene()
     }
     if (count>0) scene_center /= (double)count;
 
-    translate(vec3d(-(trackball.modelview_matrix[0]*scene_center[0] +
-                      trackball.modelview_matrix[4]*scene_center[1] +
-                      trackball.modelview_matrix[8]*scene_center[2] +
-                      trackball.modelview_matrix[12]),
-                    -(trackball.modelview_matrix[1]*scene_center[0] +
-                      trackball.modelview_matrix[5]*scene_center[1] +
-                      trackball.modelview_matrix[9]*scene_center[2] +
-                      trackball.modelview_matrix[13]),
-                    -(trackball.modelview_matrix[2]*scene_center[0] +
-                      trackball.modelview_matrix[6]*scene_center[1] +
-                      trackball.modelview_matrix[10]*scene_center[2] +
-                      trackball.modelview_matrix[14] +
+    translate(vec3d(-(trackball.modelview[0]*scene_center[0] +
+                      trackball.modelview[4]*scene_center[1] +
+                      trackball.modelview[8]*scene_center[2] +
+                      trackball.modelview[12]),
+                    -(trackball.modelview[1]*scene_center[0] +
+                      trackball.modelview[5]*scene_center[1] +
+                      trackball.modelview[9]*scene_center[2] +
+                      trackball.modelview[13]),
+                    -(trackball.modelview[2]*scene_center[0] +
+                      trackball.modelview[6]*scene_center[1] +
+                      trackball.modelview[10]*scene_center[2] +
+                      trackball.modelview[14] +
                       3.0*scene_radius)));
 
     update_projection_matrix();
@@ -146,8 +173,8 @@ void GLcanvas2::update_projection_matrix()
     makeCurrent();
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, (GLfloat)width()/(GLfloat)height(), 0.01*scene_radius, 100.0*scene_radius);
-    glGetDoublev(GL_PROJECTION_MATRIX, trackball.projection_matrix);
+    gluPerspective(45.0, (GLfloat)width()/(GLfloat)height(), 0.5*scene_radius, 10.0*scene_radius);
+    glGetDoublev(GL_PROJECTION_MATRIX, trackball.projection);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -178,8 +205,8 @@ void GLcanvas2::translate(const vec3d & t)
     makeCurrent();
     glLoadIdentity();
     glTranslated(t[0], t[1], t[2]);
-    glMultMatrixd(trackball.modelview_matrix);
-    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview_matrix);
+    glMultMatrixd(trackball.modelview);
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -187,26 +214,26 @@ void GLcanvas2::translate(const vec3d & t)
 CINO_INLINE
 void GLcanvas2::rotate(const vec3d & axis, const double angle)
 {
-    vec3d t(trackball.modelview_matrix[0]*scene_center[0] +
-            trackball.modelview_matrix[4]*scene_center[1] +
-            trackball.modelview_matrix[8]*scene_center[2] +
-            trackball.modelview_matrix[12],
-            trackball.modelview_matrix[1]*scene_center[0] +
-            trackball.modelview_matrix[5]*scene_center[1] +
-            trackball.modelview_matrix[9]*scene_center[2] +
-            trackball.modelview_matrix[13],
-            trackball.modelview_matrix[2]*scene_center[0] +
-            trackball.modelview_matrix[6]*scene_center[1] +
-            trackball.modelview_matrix[10]*scene_center[2] +
-            trackball.modelview_matrix[14] );
+    vec3d t(trackball.modelview[0]*scene_center[0] +
+            trackball.modelview[4]*scene_center[1] +
+            trackball.modelview[8]*scene_center[2] +
+            trackball.modelview[12],
+            trackball.modelview[1]*scene_center[0] +
+            trackball.modelview[5]*scene_center[1] +
+            trackball.modelview[9]*scene_center[2] +
+            trackball.modelview[13],
+            trackball.modelview[2]*scene_center[0] +
+            trackball.modelview[6]*scene_center[1] +
+            trackball.modelview[10]*scene_center[2] +
+            trackball.modelview[14]);
 
     makeCurrent();
     glLoadIdentity();
     glTranslatef(t[0], t[1], t[2]);
     glRotated(angle, axis[0], axis[1], axis[2]);
     glTranslatef(-t[0], -t[1], -t[2]);
-    glMultMatrixd(trackball.modelview_matrix);
-    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview_matrix);
+    glMultMatrixd(trackball.modelview);
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -275,6 +302,81 @@ void GLcanvas2::mousePressEvent(QMouseEvent *event)
     trackball.mouse_pressed = true;
     trackball.last_point_2d = event->pos();
     map_to_sphere(trackball.last_point_2d, trackball.last_point_3d);
+
+
+
+
+
+//      QOpenGLContext *ctx = QOpenGLContext::currentContext();
+
+//      QOpenGLFramebufferObjectFormat format;
+//      format.setSamples(0);
+//      format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+//      QOpenGLFrameBufferObject *mFBO = new QOpenGLFramebufferObject(size(), format);
+
+//      glBindFramebuffer(GL_READ_FRAMEBUFFER, defaultFramebufferObject());
+//      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFBO->handle());
+//      ctx->extraFunctions()->glBlitFramebuffer(0, 0, width(), height(), 0, 0, mFBO->width(), mFBO->height(), GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+//      mFBO->bind(); // must rebind, otherwise it won't work!
+
+//      float mouseDepth = 1.f;
+//      glReadPixels(50, 50, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &mouseDepth);
+
+//      mFBO->release();
+//      delete mFBO;
+
+
+
+
+    // https://www.opengl.org/discussion_boards/showthread.php/145308-Depth-Buffer-How-do-I-get-the-pixel-s-Z-coord
+    QPoint  click = event->pos();
+    GLfloat depth_comp;
+
+    GLfloat winX = click.x();
+    GLfloat winY = -click.y() + height();
+    glReadPixels(winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth_comp);
+    std::cout << "click: " << winX << "  " << winY << std::endl;
+    std::cout << "depth val: " << depth_comp << std::endl<< std::endl;
+
+//    GLfloat clip_z  = (depth_comp - 0.5) * 2.0;
+//    GLfloat near_z  = 0.5*scene_radius;
+//    GLfloat far_z   = 10.0*scene_radius;
+//    GLfloat world_z = 2.0*far_z*near_z/(clip_z*(far_z-near_z)-(far_z+near_z));
+//    //far_z*near_z/(far_z-clip_z*(far_z-near_z));
+//    // 2*far_z*near_z/(clip_z*(far_z-near_z)-(far_z+near_z));
+
+//    double mv[16], pr[16];
+//    int vp[4];
+//    glGetDoublev( GL_MODELVIEW_MATRIX, mv);
+//    glGetDoublev( GL_PROJECTION_MATRIX, pr);
+//    glGetIntegerv( GL_VIEWPORT, vp);
+//    vec3d p;
+//    gluUnProject(click.x(), click.y(), world_z, mv, pr, vp, &p.x(), &p.y(), &p.z());
+
+////    std::cout << "depth val in -1 1: " << clip_z << std::endl;
+////    std::cout << "near_z: " << near_z << std::endl;
+////    std::cout << "far_z: " << far_z << std::endl;
+////    std::cout << p << std::endl;
+//    points.push_back(p);
+
+////    QPoint  click = event->pos();
+////    float x = click.x();
+////    float y = click.y();
+////    GLint viewport[4];
+////    GLdouble modelview[16];
+////    GLdouble projection[16];
+////    GLfloat winX, winY, winZ;
+////    GLdouble posX, posY, posZ;
+////    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+////    glGetDoublev( GL_PROJECTION_MATRIX, projection );
+////    glGetIntegerv( GL_VIEWPORT, viewport );
+////    winX = (float)x;
+////    winY = /*(float)viewport[3] -*/ (float)y;
+////    glReadPixels( x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
+////    gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+////    points.push_back(vec3d(posX,posY,posZ));
+////    std::cout << points.back() << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -299,14 +401,14 @@ void GLcanvas2::mouseMoveEvent(QMouseEvent *event)
         QPoint p2d = event->pos();
         float  dx  = p2d.x() - trackball.last_point_2d.x();
         float  dy  = p2d.y() - trackball.last_point_2d.y();
-        float  z   = - (trackball.modelview_matrix[ 2]*scene_center[0] +
-                        trackball.modelview_matrix[ 6]*scene_center[1] +
-                        trackball.modelview_matrix[10]*scene_center[2] +
-                        trackball.modelview_matrix[14]) /
-                       (trackball.modelview_matrix[ 3]*scene_center[0] +
-                        trackball.modelview_matrix[ 7]*scene_center[1] +
-                        trackball.modelview_matrix[11]*scene_center[2] +
-                        trackball.modelview_matrix[15]);
+        float  z   = - (trackball.modelview[ 2]*scene_center[0] +
+                        trackball.modelview[ 6]*scene_center[1] +
+                        trackball.modelview[10]*scene_center[2] +
+                        trackball.modelview[14]) /
+                       (trackball.modelview[ 3]*scene_center[0] +
+                        trackball.modelview[ 7]*scene_center[1] +
+                        trackball.modelview[11]*scene_center[2] +
+                        trackball.modelview[15]);
 
         float w          = width();
         float h          = height();
@@ -361,6 +463,7 @@ void GLcanvas2::wheelEvent(QWheelEvent *event)
     event->accept();
     float d = -(float) event->delta()/120.0*0.2*scene_radius;
     translate(vec3d(0,0,d));
+    // Jan 27, 2018: maybe move clipping planes to avoid front clipping?
     update();
 }
 

@@ -43,6 +43,7 @@
 #include <vector>
 #include <string>
 #include <QOpenGLWidget>
+#include <QOpenGLFunctions>
 #include <QColor>
 #include <QMenu>
 #include <cinolib/drawable_object.h>
@@ -61,14 +62,14 @@ typedef struct
     bool     mouse_pressed = false;
     QPoint   last_point_2d;
     vec3d    last_point_3d;
-    GLdouble projection_matrix[16];
-    GLdouble modelview_matrix[16];
+    GLdouble projection[16];
+    GLdouble modelview[16];
 }
 Trackball;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-class GLcanvas2 : public QOpenGLWidget
+class GLcanvas2 : public QOpenGLWidget, protected QOpenGLFunctions
 {
     public:
 
@@ -110,9 +111,11 @@ class GLcanvas2 : public QOpenGLWidget
 
         vec3d     scene_center;
         float     scene_radius;
+        double    render_axis;
         Trackball trackball;
 
         std::vector<const DrawableObject*> drawlist;
+        std::vector<vec3d> points;
 };
 
 }
