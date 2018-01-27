@@ -35,6 +35,7 @@ int main(int argc, char **argv)
     layout.addWidget(&gui,1,0,1,2);
     window.setLayout(&layout);
     window.show();
+    window.resize(800,600);
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/sphere.MESH";
     DrawableTetmesh<> m(s.c_str());
@@ -45,9 +46,8 @@ int main(int argc, char **argv)
     VolumeMeshControlPanel<DrawableTetmesh<>> m_controls(&m, &gui);
     m_controls.show();
 
-    Profiler profiler;
-
     // use the spin box to increase the harmonicity index
+    Profiler profiler;
     QSpinBox::connect(&n_harmonicity, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), [&]()
     {
         std::map<uint,double> bc = {{0,0.0}, {999,1.0}}; // Dirichlet boundary conditions
@@ -60,6 +60,5 @@ int main(int argc, char **argv)
 
     n_harmonicity.valueChanged(1); // start with a 1-harmonic map
 
-    a.setActiveWindow(&gui);
     return a.exec();
 }

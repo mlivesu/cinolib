@@ -66,7 +66,7 @@ void render_tris(const RenderData & data)
         else if (data.draw_mode & DRAW_TRI_TEXTURE2D)
         {
             glBindTexture(GL_TEXTURE_2D, data.texture.id);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data.texture.size, data.texture.size, 0, GL_RGB, GL_UNSIGNED_BYTE, data.texture.data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, data.texture.size, data.texture.size, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.texture.data);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

@@ -48,7 +48,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-GLcanvas::GLcanvas(QWidget * parent) : QOpenGLWidget(parent), QOpenGLFunctions()
+GLcanvas::GLcanvas(QWidget *parent) : QOpenGLWidget(parent), QOpenGLFunctions()
 {
     scene_radius = 1.0;
     scene_center = vec3d(0,0,0);
@@ -72,6 +72,15 @@ GLcanvas::GLcanvas(QWidget * parent) : QOpenGLWidget(parent), QOpenGLFunctions()
     });
 }
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+GLcanvas::~GLcanvas()
+{
+    delete popup;
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
@@ -84,7 +93,6 @@ void GLcanvas::initializeGL()
     glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST); // this should go elsewhere! (cinolib/gl/draw_lines_tris)
     glEnable(GL_COLOR_MATERIAL);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // scene pos and size
     glMatrixMode(GL_MODELVIEW);
@@ -164,6 +172,7 @@ void GLcanvas::fit_scene()
                       3.0*scene_radius)));
 
     update_projection_matrix();
+    updateGL();
 
     //std::cout << std::endl;
     //std::cout << "Scene Center: " << scene_center << std::endl;
@@ -210,11 +219,11 @@ void GLcanvas::update_projection_matrix()
 CINO_INLINE
 void GLcanvas::map_to_sphere(const QPoint & p2d, vec3d & p3d)
 {
-    double x =  (2.0 *  p2d.x() - width()) / width();
-    double y = -(2.0 *  p2d.y() - height()) / height();
+    double x =  (2.0*p2d.x() - width())  / width();
+    double y = -(2.0*p2d.y() - height()) / height();
     double xval = x;
     double yval = y;
-    double x2y2 = xval * xval + yval * yval;
+    double x2y2 = xval*xval + yval*yval;
 
     p3d[0] = xval;
     p3d[1] = yval;
@@ -333,8 +342,8 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
 CINO_INLINE
 void GLcanvas::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button()   == Qt::RightButton &&
-        event->buttons()  == Qt::RightButton)
+    if (event->button()  == Qt::RightButton &&
+        event->buttons() == Qt::RightButton)
     {
         event->accept();
         popup->exec(QCursor::pos());

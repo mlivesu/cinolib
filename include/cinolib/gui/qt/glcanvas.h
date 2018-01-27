@@ -75,6 +75,7 @@ class GLcanvas : public QOpenGLWidget, protected QOpenGLFunctions
     public:
 
         explicit GLcanvas(QWidget * parent = 0);
+        ~GLcanvas();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

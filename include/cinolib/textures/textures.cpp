@@ -56,28 +56,31 @@ void texture_isolines2D(      Texture & texture,
 
     delete[] texture.data;
     texture.size = 8;
-    texture.data = new uint8_t[texture.size*texture.size*3];
+    texture.data = new uint8_t[texture.size*texture.size*4];
     for(int32_t r=0; r<texture.size; ++r)
     for(int32_t c=0; c<texture.size; ++c)
     {
-        uint i = 3 * serialize_2D_index(r,c,texture.size);
+        uint i = 4 * serialize_2D_index(r,c,texture.size);
         texture.data[i  ] = background.r_uchar();
         texture.data[i+1] = background.g_uchar();
         texture.data[i+2] = background.b_uchar();
+        texture.data[i+3] = background.a_uchar();
     }
     for(int32_t c=0; c<texture.size; ++c)
     {
-        uint i = 3 * serialize_2D_index(0,c,texture.size);
+        uint i = 4 * serialize_2D_index(0,c,texture.size);
         texture.data[i  ] = u_isolines.r_uchar();
         texture.data[i+1] = u_isolines.g_uchar();
         texture.data[i+2] = u_isolines.b_uchar();
+        texture.data[i+3] = u_isolines.a_uchar();
     }
     for(int32_t r=0; r<texture.size; ++r)
     {
-        uint i = 3 * serialize_2D_index(r,0,texture.size);
+        uint i = 4 * serialize_2D_index(r,0,texture.size);
         texture.data[i  ] = v_isolines.r_uchar();
         texture.data[i+1] = v_isolines.g_uchar();
         texture.data[i+2] = v_isolines.b_uchar();
+        texture.data[i+3] = u_isolines.a_uchar();
     }
 }
 
@@ -93,22 +96,24 @@ void texture_checkerboard(      Texture & texture,
 
     delete[] texture.data;
     texture.size = 8;
-    texture.data = new uint8_t[texture.size*texture.size*3];
+    texture.data = new uint8_t[texture.size*texture.size*4];
     for(int32_t r=0; r<texture.size; ++r)
     for(int32_t c=0; c<texture.size; ++c)
     {
-        uint i = 3 * serialize_2D_index(r,c,texture.size);
+        uint i = 4 * serialize_2D_index(r,c,texture.size);
         if (r%2 == c%2)
         {
             texture.data[i  ] = c0.r_uchar();
             texture.data[i+1] = c0.g_uchar();
             texture.data[i+2] = c0.b_uchar();
+            texture.data[i+3] = c0.a_uchar();
         }
         else
         {
             texture.data[i  ] = c1.r_uchar();
             texture.data[i+1] = c1.g_uchar();
             texture.data[i+2] = c1.b_uchar();
+            texture.data[i+3] = c1.a_uchar();
         }
     }
 }
@@ -188,9 +193,10 @@ void texture_bitmap(Texture & texture, const char *bitmap)
     if (texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
 
+    delete[] texture.data;
     texture.size = img.height();
-    texture.data = new uint8_t[texture.size*texture.size*3];
-    std::copy(img.bits(), img.bits()+texture.size*texture.size*3, texture.data);
+    texture.data = new uint8_t[texture.size*texture.size*4];
+    std::copy(img.bits(), img.bits()+(texture.size*texture.size*4), texture.data);
 #else
     std::cerr << "ERROR : Qt missing. Install Qt and recompile defining symbol CINOLIB_USES_QT" << std::endl;
 #endif
