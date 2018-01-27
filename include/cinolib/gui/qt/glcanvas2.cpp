@@ -36,7 +36,9 @@
 
 #include <sstream>
 #include <QApplication>
+#include <QClipboard>
 #include <QColorDialog>
+#include <QGLWidget>
 #include <QShortcut>
 #include <QMouseEvent>
 #include <QMimeData>
@@ -50,7 +52,24 @@ GLcanvas2::GLcanvas2(QWidget * parent) : QOpenGLWidget(parent), QOpenGLFunctions
 {
     scene_radius = 1.0;
     scene_center = vec3d(0,0,0);
-    render_axis  = true;
+    z_near_plane = scene_radius*0.5;
+    z_far_plane  = scene_radius*10.0;
+    clear_color  = QColor(200, 200, 200);
+
+    make_popup_menu();
+
+    // enable cut/paste shortcuts to copy/paste points of view for fast reproduction of paper images/comparisons
+    //
+    connect(new QShortcut(QKeySequence::Copy, this), &QShortcut::activated, [&](){
+        QApplication::clipboard()->setText(serialize_camera().data());
+    });
+    //
+    connect(new QShortcut(QKeySequence::Paste, this), &QShortcut::activated, [&](){
+        if (QApplication::clipboard()->mimeData()->hasText())
+        {
+            deserialize_camera(QApplication::clipboard()->mimeData()->text().toStdString());
+        }
+    });
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -59,7 +78,6 @@ CINO_INLINE
 void GLcanvas2::initializeGL()
 {
     initializeOpenGLFunctions();
-    glClearColor(1.0,1.0,1.0,1.0);
 
     makeCurrent();
     glEnable(GL_LIGHT0);
@@ -91,21 +109,23 @@ void GLcanvas2::resizeGL(int w, int h)
 CINO_INLINE
 void GLcanvas2::paintGL()
 {
-    makeCurrent();
+    glClearColor(clear_color.redF(), clear_color.greenF(), clear_color.blueF(), clear_color.alphaF());
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     for(auto obj : drawlist) obj->draw(scene_radius);
 
-    if (render_axis)
+    if (trackball.render_axis)
     {
         vec3d O = scene_center;
         vec3d X = scene_center + vec3d(1,0,0)*scene_radius;
         vec3d Y = scene_center + vec3d(0,1,0)*scene_radius;
         vec3d Z = scene_center + vec3d(0,0,1)*scene_radius;
+        glDisable(GL_DEPTH_TEST);
         cylinder(O, X, scene_radius*0.015, scene_radius*0.015, Color::RED().rgba);
         cylinder(O, Y, scene_radius*0.015, scene_radius*0.015, Color::GREEN().rgba);
         cylinder(O, Z, scene_radius*0.015, scene_radius*0.015, Color::BLUE().rgba);
         sphere(O, scene_radius*0.02, Color::WHITE().rgba);
+        glEnable(GL_DEPTH_TEST);
     }
 }
 
@@ -126,6 +146,9 @@ void GLcanvas2::fit_scene()
     }
     if (count>0) scene_center /= (double)count;
 
+    z_near_plane =  0.5 * scene_radius;
+    z_far_plane  = 10.0 * scene_radius;
+
     translate(vec3d(-(trackball.modelview[0]*scene_center[0] +
                       trackball.modelview[4]*scene_center[1] +
                       trackball.modelview[8]*scene_center[2] +
@@ -142,10 +165,19 @@ void GLcanvas2::fit_scene()
 
     update_projection_matrix();
 
-    std::cout << std::endl;
-    std::cout << "Scene Center: " << scene_center << std::endl;
-    std::cout << "Scene Radius: " << scene_radius << std::endl;
-    std::cout << std::endl;
+    //std::cout << std::endl;
+    //std::cout << "Scene Center: " << scene_center << std::endl;
+    //std::cout << "Scene Radius: " << scene_radius << std::endl;
+    //std::cout << std::endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas2::set_clear_color(const QColor &c)
+{
+    clear_color = c;
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -164,15 +196,16 @@ void GLcanvas2::update_projection_matrix()
     makeCurrent();
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, (GLfloat)width()/(GLfloat)height(), 0.5*scene_radius, 10.0*scene_radius);
+    gluPerspective(45.0, (GLfloat)width()/(GLfloat)height(), z_near_plane, z_far_plane);
     glGetDoublev(GL_PROJECTION_MATRIX, trackball.projection);
     glMatrixMode(GL_MODELVIEW);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// This is actually doing the Sphere/Hyperbolic sheet hybrid thing,
-// based on Ken Shoemake's ArcBall in Graphics Gems IV, 1993.
+// Arcball rotation control
+// Ken Shoemake
+// Graphics Gems IV, 1993
 //
 CINO_INLINE
 void GLcanvas2::map_to_sphere(const QPoint & p2d, vec3d & p3d)
@@ -185,7 +218,7 @@ void GLcanvas2::map_to_sphere(const QPoint & p2d, vec3d & p3d)
 
     p3d[0] = xval;
     p3d[1] = yval;
-    p3d[2] = (x2y2 < 0.5*trackball.radius) ? sqrt(trackball.radius - x2y2) : 0.5*trackball.radius/sqrt(x2y2);
+    p3d[2] = (x2y2 < 0.5*trackball.r) ? sqrt(trackball.r - x2y2) : 0.5*trackball.r/sqrt(x2y2);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -287,12 +320,32 @@ bool GLcanvas2::pop(const DrawableObject *obj)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void GLcanvas2::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key())
+    {
+        case Qt::Key_A: trackball.render_axis=!trackball.render_axis; updateGL(); break;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas2::mousePressEvent(QMouseEvent *event)
 {
-    event->accept();
-    trackball.mouse_pressed = true;
-    trackball.last_point_2d = event->pos();
-    map_to_sphere(trackball.last_point_2d, trackball.last_point_3d);
+    if (event->button()   == Qt::RightButton &&
+        event->buttons()  == Qt::RightButton)
+    {
+        event->accept();
+        popup->exec(QCursor::pos());
+    }
+    else
+    {
+        event->accept();
+        trackball.mouse_pressed = true;
+        trackball.last_point_2d = event->pos();
+        map_to_sphere(trackball.last_point_2d, trackball.last_point_3d);
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -309,31 +362,27 @@ void GLcanvas2::mouseReleaseEvent(QMouseEvent *event)
 CINO_INLINE
 void GLcanvas2::mouseMoveEvent(QMouseEvent *event)
 {
-    event->accept();
-
     // translate
     if (event->modifiers() & Qt::ShiftModifier)
     {
-        QPoint p2d = event->pos();
-        float  dx  = p2d.x() - trackball.last_point_2d.x();
-        float  dy  = p2d.y() - trackball.last_point_2d.y();
-        float  z   = - (trackball.modelview[ 2]*scene_center[0] +
-                        trackball.modelview[ 6]*scene_center[1] +
-                        trackball.modelview[10]*scene_center[2] +
-                        trackball.modelview[14]) /
-                       (trackball.modelview[ 3]*scene_center[0] +
-                        trackball.modelview[ 7]*scene_center[1] +
-                        trackball.modelview[11]*scene_center[2] +
-                        trackball.modelview[15]);
-
-        float w          = width();
-        float h          = height();
-        float aspect     = w/h;
-        float near_plane = 0.01 * scene_radius;
-        float top        = tan(45.f/2.0f*M_PI/180.0f) * near_plane;
-        float right      = aspect*top;
-
-        translate(vec3d(2.0*dx/w*right/near_plane*z, -2.0*dy/h*top/near_plane*z, 0.0f));
+        event->accept();
+        QPoint p2d    = event->pos();
+        float  dx     = p2d.x() - trackball.last_point_2d.x();
+        float  dy     = p2d.y() - trackball.last_point_2d.y();
+        float  w      = width();
+        float  h      = height();
+        float  aspect = w/h;
+        float  top    = tan(45.f/2.0f*M_PI/180.0f) * z_near_plane;
+        float  right  = aspect*top;
+        float  z      = - (trackball.modelview[ 2]*scene_center[0] +
+                           trackball.modelview[ 6]*scene_center[1] +
+                           trackball.modelview[10]*scene_center[2] +
+                           trackball.modelview[14]) /
+                          (trackball.modelview[ 3]*scene_center[0] +
+                           trackball.modelview[ 7]*scene_center[1] +
+                           trackball.modelview[11]*scene_center[2] +
+                           trackball.modelview[15]);
+        translate(vec3d(2.0*dx/w*right/z_near_plane*z, -2.0*dy/h*top/z_near_plane*z, 0.0f));
         trackball.last_point_2d = p2d;
         update();
         return;
@@ -342,26 +391,21 @@ void GLcanvas2::mouseMoveEvent(QMouseEvent *event)
     // rotate
     if (event->buttons() == Qt::LeftButton)
     {
+        event->accept();
         QPoint p2d = event->pos();
         vec3d  p3d;
         map_to_sphere(p2d, p3d);
         if (trackball.mouse_pressed)
         {
             vec3d axis = trackball.last_point_3d.cross(p3d);
-
             if (axis.length_squared()<1e-7) axis = vec3d(1,0,0);
             axis.normalize();
-
-            // find the amount of rotation
             vec3d d = trackball.last_point_3d - p3d;
-            float t = 0.5*d.length()/trackball.radius;
-
-            if      (t < -1.0)  t = -1.0;
+            float t = 0.5*d.length()/trackball.r;
+            if (t < -1.0) t = -1.0;
             else if ( t > 1.0 ) t = 1.0;
-
             float   phi = 2.0*asin(t);
             float angle = phi*180.0/M_PI;
-
             rotate(axis, angle);
         }
         trackball.last_point_2d = p2d;
@@ -381,6 +425,66 @@ void GLcanvas2::wheelEvent(QWheelEvent *event)
     translate(vec3d(0,0,d));
     // Jan 27, 2018: maybe move clipping planes to avoid front clipping?
     update();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::string GLcanvas2::serialize_camera() const
+{
+    std::stringstream ss;
+    ss << trackball.modelview[ 0] << " " << trackball.modelview[ 1] << " " << trackball.modelview[ 2] << " " << trackball.modelview[ 3] << " "
+       << trackball.modelview[ 4] << " " << trackball.modelview[ 5] << " " << trackball.modelview[ 6] << " " << trackball.modelview[ 7] << " "
+       << trackball.modelview[ 8] << " " << trackball.modelview[ 9] << " " << trackball.modelview[10] << " " << trackball.modelview[11] << " "
+       << trackball.modelview[12] << " " << trackball.modelview[13] << " " << trackball.modelview[14] << " " << trackball.modelview[15];
+    return ss.str();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas2::deserialize_camera(const std::string & s)
+{
+    std::stringstream ss(s);
+    ss >> trackball.modelview[ 0] >> trackball.modelview[ 1] >> trackball.modelview[ 2] >> trackball.modelview[ 3]
+       >> trackball.modelview[ 4] >> trackball.modelview[ 5] >> trackball.modelview[ 6] >> trackball.modelview[ 7]
+       >> trackball.modelview[ 8] >> trackball.modelview[ 9] >> trackball.modelview[10] >> trackball.modelview[11]
+       >> trackball.modelview[12] >> trackball.modelview[13] >> trackball.modelview[14] >> trackball.modelview[15];
+    makeCurrent();
+    glLoadIdentity();
+    glMultMatrixd(trackball.modelview);
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas2::make_popup_menu()
+{
+    popup = new QMenu(this);
+
+    QAction *background_color = new QAction("Brackground color", this);
+    connect(background_color, &QAction::triggered, [&]() {
+        set_clear_color(QColorDialog::getColor(Qt::white, this));
+        updateGL();
+    });
+    popup->addAction(background_color);
+
+    QAction *copy_POV = new QAction("Copy POV", this);
+    connect(copy_POV, &QAction::triggered, [&]() {
+        QApplication::clipboard()->setText(serialize_camera().data());
+    });
+    popup->addAction(copy_POV);
+
+    QAction *paste_POV = new QAction("Paste POV", this);
+    connect(paste_POV, &QAction::triggered, [&]() {
+        if (QApplication::clipboard()->mimeData()->hasText())
+        {
+            deserialize_camera(QApplication::clipboard()->mimeData()->text().toStdString());
+        }
+    });
+    popup->addAction(paste_POV);
 }
 
 }

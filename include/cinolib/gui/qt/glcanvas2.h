@@ -57,9 +57,10 @@ namespace cinolib
 
 typedef struct
 {
-    double   radius        = 0.5;
-    double   radius_sqrd   = radius*radius;
+    bool     render_axis   = false;
     bool     mouse_pressed = false;
+    double   r             = 0.5;
+    double   r_sqrd        = r*r;
     QPoint   last_point_2d;
     vec3d    last_point_3d;
     GLdouble projection[16];
@@ -77,6 +78,7 @@ class GLcanvas2 : public QOpenGLWidget, protected QOpenGLFunctions
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void keyPressEvent    (QKeyEvent   *event);
         void mousePressEvent  (QMouseEvent *event);
         void mouseReleaseEvent(QMouseEvent *event);
         void mouseMoveEvent   (QMouseEvent *event);
@@ -91,14 +93,16 @@ class GLcanvas2 : public QOpenGLWidget, protected QOpenGLFunctions
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void fit_scene();
+        void make_popup_menu();
+        void set_clear_color(const QColor & c);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void fit_scene();
         void update_projection_matrix(void);
         void map_to_sphere(const QPoint & v2D, vec3d & v3D);
-        void translate(const vec3d & trans);
         void rotate(const vec3d & axis, const double angle);
+        void translate(const vec3d & trans);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -107,12 +111,20 @@ class GLcanvas2 : public QOpenGLWidget, protected QOpenGLFunctions
         bool pop_first_occurrence_of(int type);
         bool pop_all_occurrences_of (int type);
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        std::string serialize_camera() const;
+        void        deserialize_camera(const std::string & s);
+
     private:
 
         vec3d     scene_center;
         float     scene_radius;
-        double    render_axis;
+        QColor    clear_color;
+        float     z_near_plane; // view frustum front clipping plane
+        float     z_far_plane;  // view frustum back  clipping plane
         Trackball trackball;
+        QMenu    *popup;
 
         std::vector<const DrawableObject*> drawlist;
 };
