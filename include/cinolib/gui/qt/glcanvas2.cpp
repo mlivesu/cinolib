@@ -51,13 +51,6 @@ GLcanvas2::GLcanvas2(QWidget * parent) : QOpenGLWidget(parent), QOpenGLFunctions
     scene_radius = 1.0;
     scene_center = vec3d(0,0,0);
     render_axis  = true;
-
-    // enables depth buffer
-    QSurfaceFormat format;
-    format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setDepthBufferSize(32);
-    format.setSamples(0);
-    setFormat(format);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -103,11 +96,9 @@ void GLcanvas2::paintGL()
 
     for(auto obj : drawlist) obj->draw(scene_radius);
 
-    for(auto p : points) sphere(p, scene_radius*0.07, Color::BLACK().rgba);
-
     if (render_axis)
     {
-        vec3d O = scene_center;  //(0,0,0);
+        vec3d O = scene_center;
         vec3d X = scene_center + vec3d(1,0,0)*scene_radius;
         vec3d Y = scene_center + vec3d(0,1,0)*scene_radius;
         vec3d Z = scene_center + vec3d(0,0,1)*scene_radius;
@@ -302,81 +293,6 @@ void GLcanvas2::mousePressEvent(QMouseEvent *event)
     trackball.mouse_pressed = true;
     trackball.last_point_2d = event->pos();
     map_to_sphere(trackball.last_point_2d, trackball.last_point_3d);
-
-
-
-
-
-//      QOpenGLContext *ctx = QOpenGLContext::currentContext();
-
-//      QOpenGLFramebufferObjectFormat format;
-//      format.setSamples(0);
-//      format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-//      QOpenGLFrameBufferObject *mFBO = new QOpenGLFramebufferObject(size(), format);
-
-//      glBindFramebuffer(GL_READ_FRAMEBUFFER, defaultFramebufferObject());
-//      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFBO->handle());
-//      ctx->extraFunctions()->glBlitFramebuffer(0, 0, width(), height(), 0, 0, mFBO->width(), mFBO->height(), GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-
-//      mFBO->bind(); // must rebind, otherwise it won't work!
-
-//      float mouseDepth = 1.f;
-//      glReadPixels(50, 50, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &mouseDepth);
-
-//      mFBO->release();
-//      delete mFBO;
-
-
-
-
-    // https://www.opengl.org/discussion_boards/showthread.php/145308-Depth-Buffer-How-do-I-get-the-pixel-s-Z-coord
-    QPoint  click = event->pos();
-    GLfloat depth_comp;
-
-    GLfloat winX = click.x();
-    GLfloat winY = -click.y() + height();
-    glReadPixels(winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth_comp);
-    std::cout << "click: " << winX << "  " << winY << std::endl;
-    std::cout << "depth val: " << depth_comp << std::endl<< std::endl;
-
-//    GLfloat clip_z  = (depth_comp - 0.5) * 2.0;
-//    GLfloat near_z  = 0.5*scene_radius;
-//    GLfloat far_z   = 10.0*scene_radius;
-//    GLfloat world_z = 2.0*far_z*near_z/(clip_z*(far_z-near_z)-(far_z+near_z));
-//    //far_z*near_z/(far_z-clip_z*(far_z-near_z));
-//    // 2*far_z*near_z/(clip_z*(far_z-near_z)-(far_z+near_z));
-
-//    double mv[16], pr[16];
-//    int vp[4];
-//    glGetDoublev( GL_MODELVIEW_MATRIX, mv);
-//    glGetDoublev( GL_PROJECTION_MATRIX, pr);
-//    glGetIntegerv( GL_VIEWPORT, vp);
-//    vec3d p;
-//    gluUnProject(click.x(), click.y(), world_z, mv, pr, vp, &p.x(), &p.y(), &p.z());
-
-////    std::cout << "depth val in -1 1: " << clip_z << std::endl;
-////    std::cout << "near_z: " << near_z << std::endl;
-////    std::cout << "far_z: " << far_z << std::endl;
-////    std::cout << p << std::endl;
-//    points.push_back(p);
-
-////    QPoint  click = event->pos();
-////    float x = click.x();
-////    float y = click.y();
-////    GLint viewport[4];
-////    GLdouble modelview[16];
-////    GLdouble projection[16];
-////    GLfloat winX, winY, winZ;
-////    GLdouble posX, posY, posZ;
-////    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-////    glGetDoublev( GL_PROJECTION_MATRIX, projection );
-////    glGetIntegerv( GL_VIEWPORT, viewport );
-////    winX = (float)x;
-////    winY = /*(float)viewport[3] -*/ (float)y;
-////    glReadPixels( x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
-////    gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
-////    points.push_back(vec3d(posX,posY,posZ));
-////    std::cout << points.back() << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

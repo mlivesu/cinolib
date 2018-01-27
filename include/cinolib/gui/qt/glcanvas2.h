@@ -115,7 +115,6 @@ class GLcanvas2 : public QOpenGLWidget, protected QOpenGLFunctions
         Trackball trackball;
 
         std::vector<const DrawableObject*> drawlist;
-        std::vector<vec3d> points;
 };
 
 }
