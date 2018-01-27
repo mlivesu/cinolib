@@ -30,10 +30,15 @@
 **********************************************************************************/
 #include <cinolib/gui/qt/glcanvas.h>
 #include <cinolib/cino_inline.h>
+#include <cinolib/gl/draw_sphere.h>
+#include <cinolib/gl/draw_cylinder.h>
+#include <cinolib/color.h>
 
 #include <sstream>
 #include <QApplication>
+#include <QClipboard>
 #include <QColorDialog>
+#include <QGLWidget>
 #include <QShortcut>
 #include <QMouseEvent>
 #include <QMimeData>
@@ -43,12 +48,15 @@ namespace cinolib
 {
 
 CINO_INLINE
-GLcanvas::GLcanvas(QWidget * parent)
+GLcanvas::GLcanvas(QWidget * parent) : QOpenGLWidget(parent), QOpenGLFunctions()
 {
-    setParent(parent);
-    make_popup_menu();
+    scene_radius = 1.0;
+    scene_center = vec3d(0,0,0);
+    z_near_plane = scene_radius*0.5;
+    z_far_plane  = scene_radius*10.0;
+    clear_color  = QColor(200, 200, 200);
 
-    clear_color = QColor(200, 200, 200);
+    make_popup_menu();
 
     // enable cut/paste shortcuts to copy/paste points of view for fast reproduction of paper images/comparisons
     //
@@ -67,13 +75,398 @@ GLcanvas::GLcanvas(QWidget * parent)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void GLcanvas::initializeGL()
+{
+    initializeOpenGLFunctions();
+
+    makeCurrent();
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST); // this should go elsewhere! (cinolib/gl/draw_lines_tris)
+    glEnable(GL_COLOR_MATERIAL);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // scene pos and size
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
+    update_projection_matrix();
+    fit_scene();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+void GLcanvas::resizeGL(int w, int h)
+{
+    makeCurrent();
+    update_projection_matrix();
+    glViewport(0, 0, w, h);
+    update();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::paintGL()
+{
+    glClearColor(clear_color.redF(), clear_color.greenF(), clear_color.blueF(), clear_color.alphaF());
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+    for(auto obj : drawlist) obj->draw(scene_radius);
+
+    if (trackball.render_axis)
+    {
+        vec3d O = scene_center;
+        vec3d X = scene_center + vec3d(1,0,0)*scene_radius;
+        vec3d Y = scene_center + vec3d(0,1,0)*scene_radius;
+        vec3d Z = scene_center + vec3d(0,0,1)*scene_radius;
+        glDisable(GL_DEPTH_TEST);
+        cylinder(O, X, scene_radius*0.015, scene_radius*0.015, Color::RED().rgba);
+        cylinder(O, Y, scene_radius*0.015, scene_radius*0.015, Color::GREEN().rgba);
+        cylinder(O, Z, scene_radius*0.015, scene_radius*0.015, Color::BLUE().rgba);
+        sphere(O, scene_radius*0.02, Color::WHITE().rgba);
+        glEnable(GL_DEPTH_TEST);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::fit_scene()
+{
+    scene_center = vec3d(0,0,0);
+    scene_radius = 0.0;
+
+    int count  = 0;
+    for(const DrawableObject *obj : drawlist)
+    {
+        scene_center += obj->scene_center();
+        scene_radius  = std::max(scene_radius, obj->scene_radius());
+        ++count;
+    }
+    if (count>0) scene_center /= (double)count;
+
+    z_near_plane =  0.5 * scene_radius;
+    z_far_plane  = 10.0 * scene_radius;
+
+    translate(vec3d(-(trackball.modelview[0]*scene_center[0] +
+                      trackball.modelview[4]*scene_center[1] +
+                      trackball.modelview[8]*scene_center[2] +
+                      trackball.modelview[12]),
+                    -(trackball.modelview[1]*scene_center[0] +
+                      trackball.modelview[5]*scene_center[1] +
+                      trackball.modelview[9]*scene_center[2] +
+                      trackball.modelview[13]),
+                    -(trackball.modelview[2]*scene_center[0] +
+                      trackball.modelview[6]*scene_center[1] +
+                      trackball.modelview[10]*scene_center[2] +
+                      trackball.modelview[14] +
+                      3.0*scene_radius)));
+
+    update_projection_matrix();
+
+    //std::cout << std::endl;
+    //std::cout << "Scene Center: " << scene_center << std::endl;
+    //std::cout << "Scene Radius: " << scene_radius << std::endl;
+    //std::cout << std::endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::set_clear_color(const QColor &c)
+{
+    clear_color = c;
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::updateGL()
+{
+    update();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::update_projection_matrix()
+{
+    makeCurrent();
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, (GLfloat)width()/(GLfloat)height(), z_near_plane, z_far_plane);
+    glGetDoublev(GL_PROJECTION_MATRIX, trackball.projection);
+    glMatrixMode(GL_MODELVIEW);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Arcball rotation control
+// Ken Shoemake
+// Graphics Gems IV, 1993
+//
+CINO_INLINE
+void GLcanvas::map_to_sphere(const QPoint & p2d, vec3d & p3d)
+{
+    double x =  (2.0 *  p2d.x() - width()) / width();
+    double y = -(2.0 *  p2d.y() - height()) / height();
+    double xval = x;
+    double yval = y;
+    double x2y2 = xval * xval + yval * yval;
+
+    p3d[0] = xval;
+    p3d[1] = yval;
+    p3d[2] = (x2y2 < 0.5*trackball.r) ? sqrt(trackball.r - x2y2) : 0.5*trackball.r/sqrt(x2y2);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::translate(const vec3d & t)
+{
+    makeCurrent();
+    glLoadIdentity();
+    glTranslated(t[0], t[1], t[2]);
+    glMultMatrixd(trackball.modelview);
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::rotate(const vec3d & axis, const double angle)
+{
+    vec3d t(trackball.modelview[0]*scene_center[0] +
+            trackball.modelview[4]*scene_center[1] +
+            trackball.modelview[8]*scene_center[2] +
+            trackball.modelview[12],
+            trackball.modelview[1]*scene_center[0] +
+            trackball.modelview[5]*scene_center[1] +
+            trackball.modelview[9]*scene_center[2] +
+            trackball.modelview[13],
+            trackball.modelview[2]*scene_center[0] +
+            trackball.modelview[6]*scene_center[1] +
+            trackball.modelview[10]*scene_center[2] +
+            trackball.modelview[14]);
+
+    makeCurrent();
+    glLoadIdentity();
+    glTranslatef(t[0], t[1], t[2]);
+    glRotated(angle, axis[0], axis[1], axis[2]);
+    glTranslatef(-t[0], -t[1], -t[2]);
+    glMultMatrixd(trackball.modelview);
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::push_obj(const DrawableObject *obj, bool refit_scene)
+{
+    drawlist.push_back(obj);
+    if (refit_scene) fit_scene();
+    update();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool GLcanvas::pop_all_occurrences_of(int type)
+{
+    bool found = false;
+    while (pop_first_occurrence_of(type))
+    {
+        found = true;
+    };
+    return found;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool GLcanvas::pop_first_occurrence_of(int type)
+{
+    for(std::vector<const DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
+    {
+        const DrawableObject *obj = *it;
+
+        if (obj->object_type() == type)
+        {
+            drawlist.erase(it);
+            return true;
+        }
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool GLcanvas::pop(const DrawableObject *obj)
+{
+    for(std::vector<const DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
+    {
+        if (obj == *it)
+        {
+            drawlist.erase(it);
+            return true;
+        }
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key())
+    {
+        case Qt::Key_A: trackball.render_axis=!trackball.render_axis; updateGL(); break;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button()   == Qt::RightButton &&
+        event->buttons()  == Qt::RightButton)
+    {
+        event->accept();
+        popup->exec(QCursor::pos());
+    }
+    else
+    {
+        event->accept();
+        trackball.mouse_pressed = true;
+        trackball.last_point_2d = event->pos();
+        map_to_sphere(trackball.last_point_2d, trackball.last_point_3d);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::mouseReleaseEvent(QMouseEvent *event)
+{
+    event->accept();
+    trackball.mouse_pressed = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::mouseMoveEvent(QMouseEvent *event)
+{
+    // translate
+    if (event->modifiers() & Qt::ShiftModifier)
+    {
+        event->accept();
+        QPoint p2d    = event->pos();
+        float  dx     = p2d.x() - trackball.last_point_2d.x();
+        float  dy     = p2d.y() - trackball.last_point_2d.y();
+        float  w      = width();
+        float  h      = height();
+        float  aspect = w/h;
+        float  top    = tan(45.f/2.0f*M_PI/180.0f) * z_near_plane;
+        float  right  = aspect*top;
+        float  z      = - (trackball.modelview[ 2]*scene_center[0] +
+                           trackball.modelview[ 6]*scene_center[1] +
+                           trackball.modelview[10]*scene_center[2] +
+                           trackball.modelview[14]) /
+                          (trackball.modelview[ 3]*scene_center[0] +
+                           trackball.modelview[ 7]*scene_center[1] +
+                           trackball.modelview[11]*scene_center[2] +
+                           trackball.modelview[15]);
+        translate(vec3d(2.0*dx/w*right/z_near_plane*z, -2.0*dy/h*top/z_near_plane*z, 0.0f));
+        trackball.last_point_2d = p2d;
+        update();
+        return;
+    }
+
+    // rotate
+    if (event->buttons() == Qt::LeftButton)
+    {
+        event->accept();
+        QPoint p2d = event->pos();
+        vec3d  p3d;
+        map_to_sphere(p2d, p3d);
+        if (trackball.mouse_pressed)
+        {
+            vec3d axis = trackball.last_point_3d.cross(p3d);
+            if (axis.length_squared()<1e-7) axis = vec3d(1,0,0);
+            axis.normalize();
+            vec3d d = trackball.last_point_3d - p3d;
+            float t = 0.5*d.length()/trackball.r;
+            if (t < -1.0) t = -1.0;
+            else if ( t > 1.0 ) t = 1.0;
+            float   phi = 2.0*asin(t);
+            float angle = phi*180.0/M_PI;
+            rotate(axis, angle);
+        }
+        trackball.last_point_2d = p2d;
+        trackball.last_point_3d = p3d;
+        update();
+        return;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::wheelEvent(QWheelEvent *event)
+{
+    event->accept();
+    float d = -(float) event->delta()/120.0*0.2*scene_radius;
+    translate(vec3d(0,0,d));
+    // Jan 27, 2018: maybe move clipping planes to avoid front clipping?
+    update();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::string GLcanvas::serialize_camera() const
+{
+    std::stringstream ss;
+    ss << trackball.modelview[ 0] << " " << trackball.modelview[ 1] << " " << trackball.modelview[ 2] << " " << trackball.modelview[ 3] << " "
+       << trackball.modelview[ 4] << " " << trackball.modelview[ 5] << " " << trackball.modelview[ 6] << " " << trackball.modelview[ 7] << " "
+       << trackball.modelview[ 8] << " " << trackball.modelview[ 9] << " " << trackball.modelview[10] << " " << trackball.modelview[11] << " "
+       << trackball.modelview[12] << " " << trackball.modelview[13] << " " << trackball.modelview[14] << " " << trackball.modelview[15];
+    return ss.str();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::deserialize_camera(const std::string & s)
+{
+    std::stringstream ss(s);
+    ss >> trackball.modelview[ 0] >> trackball.modelview[ 1] >> trackball.modelview[ 2] >> trackball.modelview[ 3]
+       >> trackball.modelview[ 4] >> trackball.modelview[ 5] >> trackball.modelview[ 6] >> trackball.modelview[ 7]
+       >> trackball.modelview[ 8] >> trackball.modelview[ 9] >> trackball.modelview[10] >> trackball.modelview[11]
+       >> trackball.modelview[12] >> trackball.modelview[13] >> trackball.modelview[14] >> trackball.modelview[15];
+    makeCurrent();
+    glLoadIdentity();
+    glMultMatrixd(trackball.modelview);
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::make_popup_menu()
 {
     popup = new QMenu(this);
 
     QAction *background_color = new QAction("Brackground color", this);
     connect(background_color, &QAction::triggered, [&]() {
-        this->set_clear_color(QColorDialog::getColor(Qt::white, this));
+        set_clear_color(QColorDialog::getColor(Qt::white, this));
         updateGL();
     });
     popup->addAction(background_color);
@@ -92,234 +485,6 @@ void GLcanvas::make_popup_menu()
         }
     });
     popup->addAction(paste_POV);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button()   == Qt::RightButton &&
-        event->buttons()  == Qt::RightButton &&
-        event->modifiers()== Qt::ControlModifier)
-    {
-        event->accept();
-        popup->exec(QCursor::pos());
-        return;
-    }
-    QGLViewer::mousePressEvent(event);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::init()
-{
-    setFPSIsDisplayed(true);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::clear()
-{
-    drawlist.clear();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::draw()
-{
-    setBackgroundColor(clear_color);
-
-    for(auto obj : drawlist)
-    {
-        obj->draw( sceneRadius() );
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::push_obj(DrawableObject *obj, bool refit_scene)
-{
-    drawlist.push_back(obj);
-
-    if (refit_scene)
-    {
-        fit_scene();
-    }
-
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::fit_scene()
-{
-    vec3d center(0,0,0);
-    float radius = 0.0;
-    int   count  = 0;
-
-    for(const DrawableObject *obj : drawlist)
-    {
-        center += obj->scene_center();
-        radius  = std::max(radius, obj->scene_radius());
-        ++count;
-    }
-
-    center /= (double)count;
-
-    setSceneCenter(qglviewer::Vec(center.x(), center.y(), center.z()));
-    setSceneRadius(radius);
-
-    showEntireScene();
-
-    //cout << endl;
-    //cout << "Update Scene Center: " << center << endl;
-    //cout << "Update Scene Radius: " << radius << endl;
-    //cout << endl;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::set_clear_color(const QColor &color)
-{
-    clear_color = color;
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool GLcanvas::pop_all_occurrences_of(int type)
-{
-    bool found = false;
-
-    while (pop_first_occurrence_of(type))
-    {
-        found = true;
-    };
-
-    return found;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-std::string GLcanvas::serialize_drawlist() const
-{
-    std::stringstream ss;
-    for(const DrawableObject *obj : drawlist)
-    {
-        switch (obj->object_type())
-        {
-            case DRAWABLE_TRIMESH        : ss << "Trimesh        "; break;
-            case DRAWABLE_QUADMESH       : ss << "Quadmesh       "; break;
-            case DRAWABLE_POLYGONMESH    : ss << "Polygonmesh    "; break;
-            case DRAWABLE_TETMESH        : ss << "Tetmesh        "; break;
-            case DRAWABLE_HEXMESH        : ss << "Hexmesh        "; break;
-            case DRAWABLE_POLYHEDRALMESH : ss << "Polyhedralmesh "; break;
-            case DRAWABLE_CURVE          : ss << "Curve          "; break;
-            case DRAWABLE_SKELETON       : ss << "Skeleton       "; break;
-            case DRAWABLE_ISOSURFACE     : ss << "Isosurface     "; break;
-            case DRAWABLE_VECTOR_FIELD   : ss << "VectorField    "; break;
-            default                      : assert(false && "Unknown Drawable Object!");
-        }
-    }
-    return ss.str();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-std::string GLcanvas::serialize_camera() const
-{
-    std::stringstream ss;
-    ss << this->camera()->position().x      << " "
-       << this->camera()->position().y      << " "
-       << this->camera()->position().z      << " "
-       << this->camera()->orientation()[0]  << " "
-       << this->camera()->orientation()[1]  << " "
-       << this->camera()->orientation()[2]  << " "
-       << this->camera()->orientation()[3]  << " "
-       << this->camera()->upVector().x      << " "
-       << this->camera()->upVector().y      << " "
-       << this->camera()->upVector().z      << " "
-       << this->camera()->viewDirection().x << " "
-       << this->camera()->viewDirection().y << " "
-       << this->camera()->viewDirection().z;
-    return ss.str();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::deserialize_camera(const std::string & s)
-{
-    double pos_x, pos_y, pos_z, or_i, or_j, or_k, or_l, up_x, up_y, up_z, dir_x, dir_y, dir_z;
-
-    std::stringstream ss(s);
-    ss >> pos_x >> pos_y >> pos_z
-       >> or_i  >> or_j  >> or_k >> or_l
-       >> up_x  >> up_y  >> up_z
-       >> dir_x >> dir_y >> dir_z;
-
-    this->camera()->setPosition     (qglviewer::Vec(pos_x, pos_y, pos_z));
-    this->camera()->setUpVector     (qglviewer::Vec(up_x,up_y,up_z));
-    this->camera()->setViewDirection(qglviewer::Vec(dir_x,dir_y,dir_z));
-    this->camera()->setOrientation  (qglviewer::Quaternion(or_i,or_j,or_k,or_l));
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool GLcanvas::pop_first_occurrence_of(int type)
-{
-    for(std::vector<DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
-    {
-        const DrawableObject *obj = *it;
-
-        if (obj->object_type() == type)
-        {
-            drawlist.erase(it);
-            return true;
-        }
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool GLcanvas::pop(DrawableObject *obj)
-{
-    for(std::vector<DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
-    {
-        if (obj == *it)
-        {
-            drawlist.erase(it);
-            return true;
-        }
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::updateGL()
-{
-    // http://libqglviewer.com/changeLog.html
-    #if QGLVIEWER_VERSION < 0x020700
-        QGLViewer::updateGL();
-    #else
-        QGLViewer::update();
-    #endif
 }
 
 }
