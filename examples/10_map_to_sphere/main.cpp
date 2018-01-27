@@ -29,11 +29,11 @@ int main(int argc, char **argv)
     cinolib::DrawableTrimesh<> m_xyz(s.c_str());
     cinolib::DrawableTrimesh<> m_uvw = m_xyz;
 
-    QWidget  gui;
+    QWidget  window;
     QGridLayout layout;
-    gui.setLayout(&layout);
-    cinolib::GLcanvas gui_xyz(&gui);
-    cinolib::GLcanvas gui_uvw(&gui);
+    window.setLayout(&layout);
+    cinolib::GLcanvas gui_xyz(&window);
+    cinolib::GLcanvas gui_uvw(&window);
     gui_xyz.push_obj(&m_xyz);
     gui_uvw.push_obj(&m_uvw);
     QLabel lt("Time step:");
@@ -47,10 +47,10 @@ int main(int argc, char **argv)
     iters.setMinimum(1);
     iters.setMaximum(100);
     iters.setValue(10);
-    QCheckBox conformalized("Conformalized", &gui);
+    QCheckBox conformalized("Conformalized", &window);
     conformalized.setChecked(true);
-    QPushButton but("MCF", &gui);
-    QPushButton reset("Reset", &gui);
+    QPushButton but("MCF", &window);
+    QPushButton reset("Reset", &window);
     QVBoxLayout mid;
     mid.addWidget(&lt);
     mid.addWidget(&t);
@@ -63,7 +63,9 @@ int main(int argc, char **argv)
     layout.addWidget(&gui_xyz,0,0);
     layout.addLayout(&mid,0,1);
     layout.addWidget(&gui_uvw,0,2);
-    gui.show();
+    window.show();
+    gui_xyz.setMinimumSize(400,400);
+    gui_uvw.setMinimumSize(400,400);
 
     m_xyz.show_wireframe(true);
     m_uvw.show_wireframe(true);

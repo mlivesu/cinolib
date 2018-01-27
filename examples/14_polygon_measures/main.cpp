@@ -67,6 +67,7 @@ int main(int argc, char **argv)
     layout.addWidget(&canvas);
     window.setLayout(&layout);
     window.show();
+    window.resize(600,600);
 
     Profiler profiler;
 

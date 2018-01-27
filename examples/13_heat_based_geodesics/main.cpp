@@ -41,11 +41,12 @@ int main(int argc, char **argv)
     layout.addWidget(&gui,1,0,1,4);
     window.setLayout(&layout);
     window.show();
+    window.resize(600,600);
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.obj";
     DrawableTrimesh<> m(s.c_str());
     m.show_texture1D(TEXTURE_1D_HSV_RAMP_W_ISOLINES);
-    gui.push_obj(&m);
+    gui.push_obj(&m);   
 
     SurfaceMeshControlPanel<DrawableTrimesh<>> m_controls(&m, &gui);
     m_controls.show();
@@ -73,6 +74,5 @@ int main(int argc, char **argv)
     le_heat_sources.setText("0"); // start by placing heat on vertex #0...
     but_compute_geod.click();
 
-    a.setActiveWindow(&gui);
     return a.exec();
 }

@@ -57,6 +57,7 @@ int main(int argc, char **argv)
     gui_tri.push_obj(&trimesh);
     gui_poly.push_obj(&polymesh);
     gui.show();
+    gui.resize(600,400);
     m_in.show_wireframe(true);
     trimesh.show_wireframe(true);
     polymesh.show_wireframe(true);

@@ -36,7 +36,7 @@
 namespace cinolib
 {
 
-static const u_char quality_ramp_texture1D_with_isolines[768] =
+static const uint8_t quality_ramp_texture1D_with_isolines[768] =
 {
     0, 0, 255,
     0, 4, 255,

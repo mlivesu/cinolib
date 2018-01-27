@@ -33,8 +33,9 @@
 #include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
 #include <cinolib/serialize_2D.h>
 #include <stdint.h>
+#include <iterator>
 
-#ifdef CINOLIB_USES_QT_AND_QGLVIEWER
+#ifdef CINOLIB_USES_QT
 #include <QImage>
 #include <QGLWidget>
 #endif
@@ -45,171 +46,159 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void load_texture(GLuint & texture_id, const int & texture_type, const char *bitmap)
+void texture_isolines2D(      Texture & texture,
+                        const Color   & u_isolines,
+                        const Color   & v_isolines,
+                        const Color   & background)
 {
-    if (texture_id > 0) glDeleteTextures(1, &texture_id);
-    glGenTextures(1, &texture_id);
+    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    glGenTextures(1, &texture.id);
 
-    switch (texture_type)
+    delete[] texture.data;
+    texture.size = 8;
+    texture.data = new uint8_t[texture.size*texture.size*4];
+    for(int32_t r=0; r<texture.size; ++r)
+    for(int32_t c=0; c<texture.size; ++c)
     {
-        case TEXTURE_1D_ISOLINES :            texture_isolines1D(texture_id);             break;
-        case TEXTURE_1D_HSV_RAMP :            texture_HSV_ramp(texture_id);               break;
-        case TEXTURE_1D_HSV_RAMP_W_ISOLINES : texture_HSV_ramp_with_isolines(texture_id); break;
-        case TEXTURE_2D_CHECKERBOARD :        texture_checkerboard(texture_id);           break;
-        case TEXTURE_2D_ISOLINES:             texture_isolines2D(texture_id);             break;
-        case TEXTURE_2D_BITMAP:               texture_bitmap(texture_id, bitmap);         break;
-        default: assert("Unknown Texture!" && false);
+        uint i = 4 * serialize_2D_index(r,c,texture.size);
+        texture.data[i  ] = background.r_uchar();
+        texture.data[i+1] = background.g_uchar();
+        texture.data[i+2] = background.b_uchar();
+        texture.data[i+3] = background.a_uchar();
+    }
+    for(int32_t c=0; c<texture.size; ++c)
+    {
+        uint i = 4 * serialize_2D_index(0,c,texture.size);
+        texture.data[i  ] = u_isolines.r_uchar();
+        texture.data[i+1] = u_isolines.g_uchar();
+        texture.data[i+2] = u_isolines.b_uchar();
+        texture.data[i+3] = u_isolines.a_uchar();
+    }
+    for(int32_t r=0; r<texture.size; ++r)
+    {
+        uint i = 4 * serialize_2D_index(r,0,texture.size);
+        texture.data[i  ] = v_isolines.r_uchar();
+        texture.data[i+1] = v_isolines.g_uchar();
+        texture.data[i+2] = v_isolines.b_uchar();
+        texture.data[i+3] = u_isolines.a_uchar();
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_isolines2D(const GLuint   texture_id,
-                        const Color  & u_isolines,
-                        const Color  & v_isolines,
-                        const Color  & background)
+void texture_checkerboard(      Texture & texture,
+                          const Color   & c0,
+                          const Color   & c1)
 {
-    uint size = 8;
-    uint8_t texels[3*size*size];
-    for(uint r=0; r<size; ++r)
-    for(uint c=0; c<size; ++c)
-    {
-        uint i = 3 * serialize_2D_index(r,c,size);
-        texels[i  ] = background.r_uchar();
-        texels[i+1] = background.g_uchar();
-        texels[i+2] = background.b_uchar();
-    }
-    for(uint c=0; c<size; ++c)
-    {
-        uint i = 3 * serialize_2D_index(0,c,size);
-        texels[i  ] = u_isolines.r_uchar();
-        texels[i+1] = u_isolines.g_uchar();
-        texels[i+2] = u_isolines.b_uchar();
-    }
-    for(uint r=0; r<size; ++r)
-    {
-        uint i = 3 * serialize_2D_index(r,0,size);
-        texels[i  ] = v_isolines.r_uchar();
-        texels[i+1] = v_isolines.g_uchar();
-        texels[i+2] = v_isolines.b_uchar();
-    }
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, texels);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glGenerateMipmap(GL_TEXTURE_2D);
-}
+    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    glGenTextures(1, &texture.id);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void texture_checkerboard(const GLuint   texture_id,
-                          const Color  & c0,
-                          const Color  & c1)
-{
-    uint size = 8;
-    uint8_t texels[size*size*3];
-    for(uint r=0; r<size; ++r)
-    for(uint c=0; c<size; ++c)
+    delete[] texture.data;
+    texture.size = 8;
+    texture.data = new uint8_t[texture.size*texture.size*4];
+    for(int32_t r=0; r<texture.size; ++r)
+    for(int32_t c=0; c<texture.size; ++c)
     {
-        uint i = 3 * serialize_2D_index(r,c,size);
+        uint i = 4 * serialize_2D_index(r,c,texture.size);
         if (r%2 == c%2)
         {
-            texels[i  ] = c0.r_uchar();
-            texels[i+1] = c0.g_uchar();
-            texels[i+2] = c0.b_uchar();
+            texture.data[i  ] = c0.r_uchar();
+            texture.data[i+1] = c0.g_uchar();
+            texture.data[i+2] = c0.b_uchar();
+            texture.data[i+3] = c0.a_uchar();
         }
         else
         {
-            texels[i  ] = c1.r_uchar();
-            texels[i+1] = c1.g_uchar();
-            texels[i+2] = c1.b_uchar();
+            texture.data[i  ] = c1.r_uchar();
+            texture.data[i+1] = c1.g_uchar();
+            texture.data[i+2] = c1.b_uchar();
+            texture.data[i+3] = c1.a_uchar();
         }
     }
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, texels);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_isolines1D(const GLuint   texture_id,
-                        const Color  & c0,
-                        const Color  & c1,
+void texture_isolines1D(      Texture & texture,
+                        const Color   & c0,
+                        const Color   & c1,
                         const uint     n_bands)
 {
-    uint8_t texels[3*n_bands];
-    for(uint i=0; i<n_bands; ++i)
+    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    glGenTextures(1, &texture.id);
+
+    delete[] texture.data;
+    texture.size = n_bands;
+    texture.data = new uint8_t[3*texture.size];
+    for(int32_t i=0; i<texture.size; ++i)
     {
         if (i%2)
         {
-            texels[3*i  ] = c0.r_uchar();
-            texels[3*i+1] = c0.g_uchar();
-            texels[3*i+2] = c0.b_uchar();
+            texture.data[3*i  ] = c0.r_uchar();
+            texture.data[3*i+1] = c0.g_uchar();
+            texture.data[3*i+2] = c0.b_uchar();
         }
         else
         {
-            texels[3*i  ] = c1.r_uchar();
-            texels[3*i+1] = c1.g_uchar();
-            texels[3*i+2] = c1.b_uchar();
+            texture.data[3*i  ] = c1.r_uchar();
+            texture.data[3*i+1] = c1.g_uchar();
+            texture.data[3*i+2] = c1.b_uchar();
         }
     };
-    glBindTexture(GL_TEXTURE_1D, texture_id);
-    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, n_bands, 0, GL_RGB, GL_UNSIGNED_BYTE, texels);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_HSV_ramp(const GLuint texture_id)
+void texture_HSV_ramp(Texture & texture)
 {
-    glBindTexture(GL_TEXTURE_1D, texture_id);
-    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
+    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    glGenTextures(1, &texture.id);
+
+    delete[] texture.data;
+    texture.size = 256;
+    texture.data = new uint8_t[768];
+    std::copy(std::begin(quality_ramp_texture1D), std::end(quality_ramp_texture1D), texture.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_HSV_ramp_with_isolines(const GLuint texture_id)
+void texture_HSV_ramp_with_isolines(Texture & texture)
 {
-    glBindTexture(GL_TEXTURE_1D, texture_id);
-    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, quality_ramp_texture1D_with_isolines);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R,     GL_REPEAT);
+    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    glGenTextures(1, &texture.id);
+
+    delete[] texture.data;
+    texture.size = 256;
+    texture.data = new uint8_t[768];
+    std::copy(std::begin(quality_ramp_texture1D_with_isolines), std::end(quality_ramp_texture1D_with_isolines), texture.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_bitmap(const GLuint texture_id, const char *bitmap)
+void texture_bitmap(Texture & texture, const char *bitmap)
 {
-#ifdef CINOLIB_USES_QT_AND_QGLVIEWER
+#ifdef CINOLIB_USES_QT
+    // https://stackoverflow.com/questions/20245865/render-qimage-with-opengl
     QImage img = QGLWidget::convertToGLFormat(QImage(bitmap));
-    //
-    // useful link: https://stackoverflow.com/questions/20245865/render-qimage-with-opengl
-    //
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.height(), img.width(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    if (img.height()!=img.width())
+    {
+        std::cerr << "CinoLib supports only textures with 1:1 ratio. Image discarded!" << std::endl;
+        return;
+    }
+    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    glGenTextures(1, &texture.id);
+
+    delete[] texture.data;
+    texture.size = img.height();
+    texture.data = new uint8_t[texture.size*texture.size*4];
+    std::copy(img.bits(), img.bits()+(texture.size*texture.size*4), texture.data);
+#else
+    std::cerr << "ERROR : Qt missing. Install Qt and recompile defining symbol CINOLIB_USES_QT" << std::endl;
 #endif
 }
 

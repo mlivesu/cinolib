@@ -57,6 +57,7 @@ int main(int argc, char **argv)
     gui_tet.push_obj(&tetmesh);
     gui_poly.push_obj(&polymesh);
     gui.show();
+    gui.resize(800,600);
     m_in.show_wireframe(true);
 
     // show interior

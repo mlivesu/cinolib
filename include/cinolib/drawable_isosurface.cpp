@@ -60,6 +60,7 @@ void DrawableIsosurface<M,V,E,F,P>::draw(const float) const
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glDisable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
     glShadeModel(GL_SMOOTH);
 
     for(uint i=0; i<this->tris.size(); i+=3)

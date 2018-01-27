@@ -28,9 +28,10 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_GLCANVAS_H
-#define CINO_GLCANVAS_H
+#ifndef CINO_LIBQGLVIEWER_CANVAS_H
+#define CINO_LIBQGLVIEWER_CANVAS_H
 
+#ifdef CINOLIB_YES_I_KNOW_LIBQGLVIEWER_CANVAS_IS_DEPRECATED
 #ifdef CINOLIB_USES_OPENGL
 #ifdef CINOLIB_USES_QT
 
@@ -42,10 +43,10 @@
 
 #include <vector>
 #include <string>
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QGLWidget>
 #include <QColor>
 #include <QMenu>
+#include <qglviewer.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/bbox.h>
 
@@ -53,81 +54,47 @@
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-typedef struct
-{
-    bool     render_axis   = false;
-    bool     mouse_pressed = false;
-    double   r             = 0.5;
-    double   r_sqrd        = r*r;
-    QPoint   last_point_2d;
-    vec3d    last_point_3d;
-    GLdouble projection[16];
-    GLdouble modelview[16];
-}
-Trackball;
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-class GLcanvas : public QOpenGLWidget, protected QOpenGLFunctions
+class GLcanvas : public QGLViewer
 {
     public:
 
         explicit GLcanvas(QWidget * parent = 0);
-        ~GLcanvas();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void keyPressEvent    (QKeyEvent   *event);
-        void mousePressEvent  (QMouseEvent *event);
-        void mouseReleaseEvent(QMouseEvent *event);
-        void mouseMoveEvent   (QMouseEvent *event);
-        void wheelEvent       (QWheelEvent *event);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void initializeGL();
-        void resizeGL(int w, int h);
-        void paintGL();
-        void updateGL();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void make_popup_menu();
-        void set_clear_color(const QColor & c);
+        void mousePressEvent(QMouseEvent *event);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void updateGL();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void init();
+        void draw();
+        void clear();
+        void set_clear_color(const QColor & color);
         void fit_scene();
-        void update_projection_matrix(void);
-        void map_to_sphere(const QPoint & v2D, vec3d & v3D);
-        void rotate(const vec3d & axis, const double angle);
-        void translate(const vec3d & trans);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void push_obj(const DrawableObject * obj, bool refit_scene = true);
-        bool pop(const DrawableObject * obj);
+        void push_obj(DrawableObject * obj, bool refit_scene = true);
+        bool pop(DrawableObject * obj);
         bool pop_first_occurrence_of(int type);
         bool pop_all_occurrences_of (int type);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        std::string serialize_drawlist() const;
         std::string serialize_camera() const;
         void        deserialize_camera(const std::string & s);
 
     private:
 
-        vec3d     scene_center;
-        float     scene_radius;
-        QColor    clear_color;
-        float     z_near_plane; // view frustum front clipping plane
-        float     z_far_plane;  // view frustum back  clipping plane
-        Trackball trackball;
-        QMenu    *popup;
-
-        std::vector<const DrawableObject*> drawlist;
+        QMenu                       *popup;
+        QColor                       clear_color;
+        std::vector<DrawableObject*> drawlist;
 };
 
 }
@@ -138,5 +105,6 @@ class GLcanvas : public QOpenGLWidget, protected QOpenGLFunctions
 
 #endif // #ifdef CINOLIB_USES_QT
 #endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_YES_I_KNOW_LIBQGLVIEWER_CANVAS_IS_DEPRECATED
 
-#endif // CINO_GLCANVAS_H
+#endif // CINO_LIBQGLVIEWER_CANVAS_H

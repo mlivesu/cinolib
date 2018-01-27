@@ -31,7 +31,7 @@
 #ifndef CINO_VOLUME_MESH_CONTROL_PANEL_H
 #define CINO_VOLUME_MESH_CONTROL_PANEL_H
 
-#ifdef CINOLIB_USES_QT_AND_QGLVIEWER
+#ifdef CINOLIB_USES_QT
 
 #include <cinolib/scalar_field.h>
 #include <cinolib/drawable_vector_field.h>
@@ -183,6 +183,6 @@ class VolumeMeshControlPanel
 #include "volume_mesh_control_panel.cpp"
 #endif
 
-#endif // #ifdef CINOLIB_USES_QT_AND_QGLVIEWER
+#endif // #ifdef CINOLIB_USES_QT
 
 #endif // CINO_VOLUME_MESH_CONTROL_PANEL_H

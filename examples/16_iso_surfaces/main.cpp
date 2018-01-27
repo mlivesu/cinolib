@@ -44,6 +44,7 @@ int main(int argc, char **argv)
     layout.addWidget(&canvas);
     window.setLayout(&layout);
     window.show();
+    window.resize(600,600);
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/sphere.mesh";
     DrawableTetmesh<> m(s.c_str());

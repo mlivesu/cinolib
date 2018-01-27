@@ -37,6 +37,7 @@ int main(int argc, char **argv)
     layout.addWidget(&gui,1,0,1,4);
     window.setLayout(&layout);
     window.show();
+    window.resize(600,600);
 
     std::vector<vec3d> samples;
     sphere_coverage(100, samples);
