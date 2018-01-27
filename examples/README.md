@@ -2,13 +2,7 @@
 This folder contains a number of sample programs that illustrate the core functionalities of CinoLib. 
 
 ### How to compile the example projects
-To compile the examples you must download CinoLib and [Eigen](http://eigen.tuxfamily.org) on your machine, and install [Qt](https://www.qt.io) and [libQGLViewer](http://libqglviewer.com/index.html) for the GUI. Each sample project comes with its own configuration file (.pro), in which links to the aforementioned libraries are specified. Alternatively, you can compile all the examples together by considering the file `build_all_examples.pro`. Configuration files require minimal editing prior compilation. Specifically, you need to:
-
-* change the path `/usr/local/include/eigen3` with the local path to your Eigen headers
-* change the path `/Library/Frameworks/QGLViewer.framework/Versions/2/Headers` with the local path to your QGLViewer headers
-* change the `.` in `-L. -lQGLViewer` with your local path to the QGLViewer library
-
-Once you do it, you can open your terminal on the selected examples folder, and type
+To compile the examples you must download CinoLib and [Eigen](http://eigen.tuxfamily.org) on your machine and install [Qt](https://www.qt.io) for the GUI. Each sample project comes with its own configuration file (.pro), in which links to the aforementioned libraries are specified. Alternatively, you can compile all the examples together by considering the file `build_all_examples.pro`. Configuration files require minimal editing prior compilation. You just need to change the path `/usr/local/include/eigen3` with the local path to your Eigen headers. Once you do it, you can open your terminal on the selected examples folder, and type
 ```
 qmake .
 make -j4
