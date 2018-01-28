@@ -93,8 +93,6 @@ void GLcanvas::initializeGL()
     makeCurrent();
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING);
-    glEnable(GL_DEPTH_TEST); // this should go elsewhere! (cinolib/gl/draw_lines_tris)
-    glEnable(GL_COLOR_MATERIAL);
 
     // scene pos and size
     glMatrixMode(GL_MODELVIEW);
@@ -124,19 +122,7 @@ void GLcanvas::paintGL()
 
     for(auto obj : drawlist) obj->draw(scene_radius);
 
-    if (trackball.render_axis)
-    {
-        vec3d O = scene_center;
-        vec3d X = scene_center + vec3d(1,0,0)*scene_radius;
-        vec3d Y = scene_center + vec3d(0,1,0)*scene_radius;
-        vec3d Z = scene_center + vec3d(0,0,1)*scene_radius;
-        glDisable(GL_DEPTH_TEST);
-        cylinder(O, X, scene_radius*0.015, scene_radius*0.015, Color::RED().rgba);
-        cylinder(O, Y, scene_radius*0.015, scene_radius*0.015, Color::GREEN().rgba);
-        cylinder(O, Z, scene_radius*0.015, scene_radius*0.015, Color::BLUE().rgba);
-        sphere(O, scene_radius*0.02, Color::WHITE().rgba);
-        glEnable(GL_DEPTH_TEST);
-    }
+    if (trackball.render_axis) draw_scene_axis();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -194,6 +180,25 @@ void GLcanvas::set_clear_color(const QColor &c)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void GLcanvas::draw_scene_axis()
+{
+    vec3d O = scene_center;
+    vec3d X = scene_center + vec3d(1,0,0)*scene_radius;
+    vec3d Y = scene_center + vec3d(0,1,0)*scene_radius;
+    vec3d Z = scene_center + vec3d(0,0,1)*scene_radius;
+    glEnable(GL_COLOR_MATERIAL);
+    glDisable(GL_DEPTH_TEST);
+    cylinder(O, X, scene_radius*0.015, scene_radius*0.015, Color::RED().rgba);
+    cylinder(O, Y, scene_radius*0.015, scene_radius*0.015, Color::GREEN().rgba);
+    cylinder(O, Z, scene_radius*0.015, scene_radius*0.015, Color::BLUE().rgba);
+    sphere(O, scene_radius*0.02, Color::WHITE().rgba);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_COLOR_MATERIAL);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::updateGL()
 {
     update();
@@ -219,7 +224,7 @@ void GLcanvas::update_projection_matrix()
 // Graphics Gems IV, 1993
 //
 CINO_INLINE
-void GLcanvas::map_to_sphere(const QPoint & p2d, vec3d & p3d)
+void GLcanvas::map_to_sphere(const QPoint & p2d, vec3d & p3d) const
 {
     double x =  (2.0*p2d.x() - width())  / width();
     double y = -(2.0*p2d.y() - height()) / height();

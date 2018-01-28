@@ -96,12 +96,13 @@ class GLcanvas : public QOpenGLWidget, protected QOpenGLFunctions
 
         void make_popup_menu();
         void set_clear_color(const QColor & c);
+        void draw_scene_axis();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void fit_scene();
         void update_projection_matrix(void);
-        void map_to_sphere(const QPoint & v2D, vec3d & v3D);
+        void map_to_sphere(const QPoint & v2D, vec3d & v3D) const;
         void rotate(const vec3d & axis, const double angle);
         void translate(const vec3d & trans);
 
