@@ -9,6 +9,7 @@
 */
 
 #include <QApplication>
+#include <QHBoxLayout>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/gui/qt/glcanvas.h>
 #include <cinolib/harmonic_map.h>
@@ -50,10 +51,13 @@ int main(int argc, char **argv)
     for(uint vid=0; vid<m.num_verts(); ++vid) m.vert_data(vid).uvw = m_uv.vert(vid);
 
     // visualize original and parametric mesh in two separated windows
+    QWidget window;
     GLcanvas gui;
     GLcanvas gui_uv;
-    gui.show();
-    gui_uv.show();
+    QHBoxLayout layout;
+    layout.addWidget(&gui);
+    layout.addWidget(&gui_uv);
+    window.setLayout(&layout);
     m.show_wireframe(true);
     m.show_wireframe_transparency(0.6);
     m.show_texture2D(TEXTURE_2D_ISOLINES, 3.0);
@@ -62,6 +66,8 @@ int main(int argc, char **argv)
     m_uv.show_wireframe_transparency(0.6);
     m_uv.show_texture2D(TEXTURE_2D_ISOLINES, 3.0);
     gui_uv.push_obj(&m_uv);
+    window.resize(800,600);
+    window.show();
 
     return a.exec();
 }

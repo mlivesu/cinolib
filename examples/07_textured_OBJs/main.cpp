@@ -11,6 +11,7 @@
 */
 
 #include <QApplication>
+#include <QHBoxLayout>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/gui/qt/glcanvas.h>
 
@@ -22,11 +23,14 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
+    QWidget window;
     GLcanvas gui_xyz, gui_uvw;
-    gui_xyz.resize(800,600);
-    gui_uvw.resize(400,300);
-    gui_xyz.show();
-    gui_uvw.show();
+    QHBoxLayout layout;
+    layout.addWidget(&gui_xyz);
+    layout.addWidget(&gui_uvw);
+    window.setLayout(&layout);
+    window.resize(800,600);
+    window.show();
 
     std::vector<vec3d> xyz, uvw;
     std::vector<std::vector<uint>> poly;
