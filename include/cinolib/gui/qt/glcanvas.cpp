@@ -50,6 +50,8 @@ namespace cinolib
 CINO_INLINE
 GLcanvas::GLcanvas(QWidget *parent) : QOpenGLWidget(parent), QOpenGLFunctions()
 {
+    setFocusPolicy(Qt::StrongFocus);
+
     scene_radius = 1.0;
     scene_center = vec3d(0,0,0);
     z_near_plane = scene_radius*0.5;
