@@ -96,7 +96,7 @@ class GLcanvas : public QOpenGLWidget, protected QOpenGLFunctions
 
         void make_popup_menu();
         void set_clear_color(const QColor & c);
-        void draw_scene_axis();
+        void draw_axis();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -115,8 +115,8 @@ class GLcanvas : public QOpenGLWidget, protected QOpenGLFunctions
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::string serialize_camera() const;
-        void        deserialize_camera(const std::string & s);
+        std::string serialize_POV() const;
+        void        deserialize_POV(const std::string & s);
 
     private:
 

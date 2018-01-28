@@ -122,7 +122,7 @@ void GLcanvas::paintGL()
 
     for(auto obj : drawlist) obj->draw(scene_radius);
 
-    if (trackball.render_axis) draw_scene_axis();
+    if (trackball.render_axis) draw_axis();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -180,7 +180,7 @@ void GLcanvas::set_clear_color(const QColor &c)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::draw_scene_axis()
+void GLcanvas::draw_axis()
 {
     vec3d O = scene_center;
     vec3d X = scene_center + vec3d(1,0,0)*scene_radius;
@@ -340,8 +340,13 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key())
     {
-        case Qt::Key_A: trackball.render_axis=!trackball.render_axis; updateGL(); break;
+        case Qt::Key_A:     trackball.render_axis=!trackball.render_axis; break;
+        case Qt::Key_Left:  rotate(vec3d(0,1,0), -3); break;
+        case Qt::Key_Right: rotate(vec3d(0,1,0), +3); break;
+        case Qt::Key_Up:    rotate(vec3d(1,0,0), -3); break;
+        case Qt::Key_Down:  rotate(vec3d(1,0,0), +3); break;
     }
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
