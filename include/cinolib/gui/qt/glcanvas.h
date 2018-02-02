@@ -105,7 +105,6 @@ class GLcanvas : public QOpenGLWidget, protected QOpenGLFunctions
         void map_to_sphere(const QPoint & v2D, vec3d & v3D) const;
         void rotate(const vec3d & axis, const double angle);
         void translate(const vec3d & trans);
-        void snap_to_axis();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

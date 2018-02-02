@@ -342,7 +342,6 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
     switch (event->key())
     {
         case Qt::Key_A:     trackball.render_axis=!trackball.render_axis; break;
-        case Qt::Key_S:     snap_to_axis(); break;
         case Qt::Key_Left:  rotate(vec3d(0,1,0), -3); break;
         case Qt::Key_Right: rotate(vec3d(0,1,0), +3); break;
         case Qt::Key_Up:    rotate(vec3d(1,0,0), -3); break;
@@ -508,61 +507,6 @@ void GLcanvas::make_popup_menu()
         }
     });
     popup->addAction(paste_POV);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::snap_to_axis()
-{
-    vec3d objX = vec3d(1,0,0);
-    vec3d objY = vec3d(0,1,0);
-    vec3d objZ = vec3d(0,0,1);
-
-    // https://stackoverflow.com/questions/15697273/how-can-i-get-view-direction-from-the-opengl-modelview-matrix
-    // http://blog.db-in.com/cameras-on-opengl-es-2-x/
-    vec3d glY(trackball.modelview[1],trackball.modelview[5],trackball.modelview[9]);
-    vec3d glZ(trackball.modelview[2],trackball.modelview[6],trackball.modelview[10]);
-    glY.normalize();
-    glZ.normalize();
-
-    double dots[6] =
-    {
-        glZ.dot( objX), glZ.dot( objY), glZ.dot( objZ),
-        glZ.dot(-objX), glZ.dot(-objY), glZ.dot(-objZ),
-    };
-
-    switch(std::distance(dots,std::max_element(dots,dots+6)))
-    {
-        case 0: rotate( objX.cross(glZ), acos(dots[0])*180.0/M_PI); break;
-        case 1: rotate( objY.cross(glZ), acos(dots[1])*180.0/M_PI); break;
-        case 2: rotate( objZ.cross(glZ), acos(dots[2])*180.0/M_PI); break;
-        case 3: rotate((-objX).cross(glZ), acos(dots[3])*180.0/M_PI); break;
-        case 4: rotate((-objY).cross(glZ), acos(dots[4])*180.0/M_PI); break;
-        case 5: rotate((-objZ).cross(glZ), acos(dots[5])*180.0/M_PI); break;
-        default: assert(false);
-    }
-
-//    double z_dot_X = std::fabs(z.dot(X));
-//    double z_dot_Y = std::fabs(z.dot(Y));
-//    double z_dot_Z = std::fabs(z.dot(Z));
-
-//    if(z_dot_X <= std::min(z_dot_Y,z_dot_Z))
-//    {
-//        vec3d axis = X.cross(z);
-//        rotate(axis, acos(z_dot_X)*180.0/M_PI);
-//    }
-//    else if(z_dot_Y <= std::min(z_dot_X,z_dot_Z))
-//    {
-//        vec3d axis = Y.cross(z);
-//        rotate(axis, acos(z_dot_Y)*180.0/M_PI);
-//    }
-//    else if(z_dot_Z <= std::min(z_dot_X,z_dot_Y))
-//    {
-//        vec3d axis = Z.cross(z);
-//        rotate(axis, acos(z_dot_Z)*180.0/M_PI);
-//    }
-//    else assert(false);
 }
 
 }
