@@ -104,6 +104,7 @@ void GLcanvas::initializeGL()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 void GLcanvas::resizeGL(int w, int h)
 {
     makeCurrent();
