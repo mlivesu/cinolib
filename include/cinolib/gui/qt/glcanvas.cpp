@@ -283,6 +283,7 @@ void GLcanvas::rotate(const vec3d & axis, const double angle)
 CINO_INLINE
 void GLcanvas::push_obj(const DrawableObject *obj, bool refit_scene)
 {
+    if (obj==NULL) return;
     drawlist.push_back(obj);
     if (refit_scene) fit_scene();
     update();
