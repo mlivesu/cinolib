@@ -3,7 +3,9 @@
 - remove virtual from mesh hierarchy whenever possible
 - read vectors of meshes rather than meshes in GUI control panel
 - make sure 1D textures are always drawn covering full spectrum (RED to BLUE in HSV RAMP)
-- refactor ray/line/plane intersections and integral curve tracing (check Robust Polylines Tracing for N-Symmetry Direction Field on Triangulated Surfaces)
+- use Möller–Trumbore algorithm for 3D ray-triangle intersection 
+- refactor ray/line/plane intersections and integral curve tracing 
+  (check Robust Polylines Tracing for N-Symmetry Direction Field on Triangulated Surfaces)
 - add topological operators (add/remove/collapse) also for volumetric meshes
      => then deprecate update_adjacency and make connectivity through poly_add and vert_add instead
         (I already tested for surfaces. The code is much cleaner and loading becomes slightly faster!)
