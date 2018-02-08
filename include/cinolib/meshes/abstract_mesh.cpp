@@ -519,6 +519,18 @@ void AbstractMesh<M,V,E,P>::vert_set_alpha(const float alpha)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractMesh<M,V,E,P>::vert_unmark_all()
+{
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        vert_data(vid).marked = false;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 uint AbstractMesh<M,V,E,P>::edge_vert_id(const uint eid, const uint offset) const
 {
     uint   eid_ptr = eid * 2;

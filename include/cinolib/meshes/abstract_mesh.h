@@ -187,6 +187,7 @@ class AbstractMesh
         virtual       double           vert_max_uvw_value   (const int tex_coord = U_param) const;
         virtual       void             vert_set_color       (const Color & c);
         virtual       void             vert_set_alpha       (const float alpha);
+        virtual       void             vert_unmark_all      ();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
