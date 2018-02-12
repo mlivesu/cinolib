@@ -1,3 +1,4 @@
+- add callbacks to viewer
 - put cotangents (tets/tris) on a separate .h/cpp file?
 - add inverse and transpose operators for 2x2 matrices
 - remove virtual from mesh hierarchy whenever possible
@@ -21,8 +22,6 @@
 - Add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
 - Refactor PointInsideMeshCache, it should return ALL the elements containing the
   query point and let the application choose the best one
-- make a DrawableOctree (and visually test the octree)
-- Add cache for eigen solvers - avoid refactoring matrices multiple times
 - Use robust geometric computations (volumes, dihedral angles ecc.) 
   (ref. => Lecture Notes on Geometric Robustness di Jonathan Richard Shewchuk)
 - Add cotan laplacian  normalization
