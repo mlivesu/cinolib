@@ -42,7 +42,8 @@ CINO_INLINE
 ScalarField heat_flow(const AbstractMesh<M,V,E,P> & m,
                       const std::vector<uint>     & heat_charges,
                       const double                  time,
-                      const int                     laplacian_mode)
+                      const int                     laplacian_mode,
+                      const bool                    hard_contraint_bcs)
 {
     assert(heat_charges.size() > 0);
 
@@ -52,8 +53,18 @@ ScalarField heat_flow(const AbstractMesh<M,V,E,P> & m,
     Eigen::SparseMatrix<double> MM  = mass_matrix(m);
     Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
 
-    for(uint vid : heat_charges) rhs[vid] = 1.0;
-    solve_square_system(MM - time * L, rhs, heat);
+    if (hard_contraint_bcs) // heat flow as a boundary problem (charges do not lose heat)
+    {
+        std::map<uint,double> bcs;
+        for(uint vid: heat_charges) bcs[vid] = 1.0;
+        solve_square_system_with_bc(MM - time * L, rhs, heat, bcs);
+    }
+    else // heat flow as a diffusion problem (charges lose heat)
+    {
+        for(uint vid : heat_charges) rhs[vid] = 1.0;
+        solve_square_system(MM - time * L, rhs, heat);
+    }
+
 
     return heat;
 }
