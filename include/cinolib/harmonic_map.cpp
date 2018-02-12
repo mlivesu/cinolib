@@ -54,7 +54,7 @@ ScalarField harmonic_map(const AbstractMesh<M,V,E,P> & m,
     Eigen::SparseMatrix<double> Ln = -L;
     Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
 
-    for(uint i=1; i<n; ++i) Ln  = Ln * L;
+    for(uint i=1; i<n; ++i) Ln  = Ln * (-L); // keep it PSD
 
     solve_square_system_with_bc(Ln, rhs, f, bc, solver);
 
