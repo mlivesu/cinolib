@@ -497,6 +497,8 @@ void SurfaceMeshControlPanel<Mesh>::set_isocurve()
         isocontour.thickness = thickness;
         isocontour.color     = color;
         canvas->push_obj(&isocontour,false);
+
+        std::cout << "Isocontour " << isovalue << std::endl;
     }
     canvas->updateGL();
 }
