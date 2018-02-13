@@ -4,7 +4,7 @@ A generic programming header only C++ library for processing polygonal and polyh
 <p align="center"><img src="cinolib_rep_image.png" width="500"></p>
 
 ## Usage
-CinoLib is header only, it does not need to be installed. All you have to do is to clone the repo with
+CinoLib is header only. It does not need to be installed, all you have to do is to clone the repo with
 ```
 git clone --recursive https://github.com/maxicino/cinolib.git
 ```
