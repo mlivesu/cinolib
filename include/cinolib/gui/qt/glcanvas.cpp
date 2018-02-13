@@ -240,6 +240,22 @@ void GLcanvas::push_label(const vec3d & p, const std::string & label)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void GLcanvas::pop_label()
+{
+    labels.pop_back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::pop_all_labels()
+{
+    labels.clear();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::update_projection_matrix()
 {
     makeCurrent();
