@@ -1,5 +1,18 @@
 TEMPLATE = subdirs
 
+# To compile the projects either open this file with QtCreator or launch a terminal
+# in this folder and type:
+#
+#  qmake .
+#  make -j4
+#
+# Notice that some of the projects have external dependecies (see comments below).
+# To be able to compile these projects, you need to install the external libraries
+# from which they depend, and edit the corresponding project files (.pro) providing
+# paths for compiler and linker. If you are not interested in these projects, you can
+# easily exclude them from the build by adding # at the beginning of the corresponding
+# lines.
+
 SUBDIRS += 01_base_app_trimesh
 SUBDIRS += 02_base_app_quadmesh
 SUBDIRS += 03_base_app_polygonmesh
