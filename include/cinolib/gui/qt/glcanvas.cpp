@@ -38,7 +38,6 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QColorDialog>
-#include <QGLWidget>
 #include <QShortcut>
 #include <QMouseEvent>
 #include <QMimeData>
@@ -48,7 +47,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-GLcanvas::GLcanvas(QWidget *parent) : QOpenGLWidget(parent), QOpenGLFunctions()
+GLcanvas::GLcanvas(QWidget *parent) : QGLWidget(parent) //QOpenGLWidget(parent), QOpenGLFunctions()
 {
     setFocusPolicy(Qt::StrongFocus);
 
@@ -88,8 +87,6 @@ GLcanvas::~GLcanvas()
 CINO_INLINE
 void GLcanvas::initializeGL()
 {
-    initializeOpenGLFunctions();
-
     makeCurrent();
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING);
@@ -121,9 +118,18 @@ void GLcanvas::paintGL()
     glClearColor(clear_color.redF(), clear_color.greenF(), clear_color.blueF(), clear_color.alphaF());
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    for(auto obj : drawlist) obj->draw(scene_radius);
+    // render objects
+    for(auto obj : objects) obj->draw(scene_radius);
 
+    // render axis
     if (trackball.render_axis) draw_axis();
+
+    // render labels
+    for(auto l : labels)
+    {
+        if (l.is_3d) renderText(l.xyz.x(), l.xyz.y(), l.xyz.z(), l.label.c_str());
+        else         renderText(l.x, l.y, l.label.c_str());
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -135,7 +141,7 @@ void GLcanvas::fit_scene()
     scene_radius = 0.0;
 
     int count  = 0;
-    for(const DrawableObject *obj : drawlist)
+    for(const DrawableObject *obj : objects)
     {
         scene_center += obj->scene_center();
         scene_radius  = std::max(scene_radius, obj->scene_radius());
@@ -204,6 +210,31 @@ CINO_INLINE
 void GLcanvas::updateGL()
 {
     update();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::push_label(const uint x, const uint y, const std::string & label)
+{
+    TextLabel l;
+    l.is_3d = false;
+    l.x     = x;
+    l.y     = y;
+    l.label = label;
+    labels.push_back(l);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::push_label(const vec3d & p, const std::string & label)
+{
+    TextLabel l;
+    l.is_3d = true;
+    l.xyz   = p;
+    l.label = label;
+    labels.push_back(l);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -284,7 +315,7 @@ CINO_INLINE
 void GLcanvas::push_obj(const DrawableObject *obj, bool refit_scene)
 {
     if (obj==NULL) return;
-    drawlist.push_back(obj);
+    objects.push_back(obj);
     if (refit_scene) fit_scene();
     update();
 }
@@ -307,13 +338,13 @@ bool GLcanvas::pop_all_occurrences_of(int type)
 CINO_INLINE
 bool GLcanvas::pop_first_occurrence_of(int type)
 {
-    for(std::vector<const DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
+    for(std::vector<const DrawableObject*>::iterator it=objects.begin(); it!=objects.end(); ++it)
     {
         const DrawableObject *obj = *it;
 
         if (obj->object_type() == type)
         {
-            drawlist.erase(it);
+            objects.erase(it);
             return true;
         }
     }
@@ -325,11 +356,11 @@ bool GLcanvas::pop_first_occurrence_of(int type)
 CINO_INLINE
 bool GLcanvas::pop(const DrawableObject *obj)
 {
-    for(std::vector<const DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
+    for(std::vector<const DrawableObject*>::iterator it=objects.begin(); it!=objects.end(); ++it)
     {
         if (obj == *it)
         {
-            drawlist.erase(it);
+            objects.erase(it);
             return true;
         }
     }
@@ -447,7 +478,6 @@ void GLcanvas::wheelEvent(QWheelEvent *event)
     event->accept();
     float d = -(float) event->delta()/120.0*0.2*scene_radius;
     translate(vec3d(0,0,d));
-    // Jan 27, 2018: maybe move clipping planes to avoid front clipping?
     update();
 }
 
