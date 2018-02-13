@@ -42,36 +42,46 @@
 
 #include <vector>
 #include <string>
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QGLWidget>
 #include <QColor>
 #include <QMenu>
 #include <cinolib/drawable_object.h>
 #include <cinolib/bbox.h>
 
-
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-typedef struct
+class GLcanvas : public QGLWidget
 {
-    bool     render_axis   = false;
-    bool     mouse_pressed = false;
-    double   r             = 0.5;
-    double   r_sqrd        = r*r;
-    QPoint   last_point_2d;
-    vec3d    last_point_3d;
-    GLdouble projection[16];
-    GLdouble modelview[16];
-}
-Trackball;
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    typedef struct
+    {
+        bool     render_axis   = false;
+        bool     mouse_pressed = false;
+        double   r             = 0.5;
+        double   r_sqrd        = r*r;
+        QPoint   last_point_2d;
+        vec3d    last_point_3d;
+        GLdouble projection[16];
+        GLdouble modelview[16];
+    }
+    Trackball;
 
-class GLcanvas : public QOpenGLWidget, protected QOpenGLFunctions
-{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    typedef struct
+    {
+        std::string label;
+        vec3d       xyz;   // pos 3D
+        uint        x,y;   // pos 2D
+        bool        is_3d; // if true the label will be positioned projecting xyz on screen,
+                           // otherwise (x,y) will be used as window coordiantes to position it
+    }
+    TextLabel;
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     public:
 
         explicit GLcanvas(QWidget * parent = 0);
@@ -115,6 +125,13 @@ class GLcanvas : public QOpenGLWidget, protected QOpenGLFunctions
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void push_label(const vec3d & p, const std::string & label);
+        void push_label(const uint x, const uint y, const std::string & label);
+        void pop_label();
+        void pop_all_labels();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         std::string serialize_POV() const;
         void        deserialize_POV(const std::string & s);
 
@@ -128,7 +145,8 @@ class GLcanvas : public QOpenGLWidget, protected QOpenGLFunctions
         Trackball trackball;
         QMenu    *popup;
 
-        std::vector<const DrawableObject*> drawlist;
+        std::vector<const DrawableObject*> objects;
+        std::vector<const TextLabel>       labels;
 };
 
 }
