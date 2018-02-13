@@ -2,14 +2,14 @@
 This folder contains a number of sample programs that illustrate the core functionalities of CinoLib. 
 
 ### How to compile the example projects
-To compile the examples you must download CinoLib and [Eigen](http://eigen.tuxfamily.org) on your machine and install [Qt](https://www.qt.io) for the GUI. Each sample project comes with its own configuration file (.pro), in which links to the aforementioned libraries are specified. Alternatively, you can compile all the examples together by considering the file `build_all_examples.pro`. Configuration files require minimal editing prior compilation. You just need to change the path `/usr/local/include/eigen3` with the local path to your Eigen headers. Once you do it, you can either open the pro file in [QtCreator](https://www.qt.io/qt-features-libraries-apis-tools-and-ide/) and build the project, or open your terminal on the selected examples folder, and type
+To compile the examples you must download CinoLib on your machine and install [Qt](https://www.qt.io) for the GUI. You can compile all the examples together by considering the file `build_all_examples.pro`, or compile a specific example by considering its project file (.pro). Project files can be compiled either with [QtCreator](https://www.qt.io/qt-features-libraries-apis-tools-and-ide/) or by opening a terminal in the same folder and typing
 ```
 qmake .
 make -j4
 ```
 
-### Additional dependencies
-Notice that some of the projects also depend from external libraries which are wrapped in CinoLib (e.g. [Triangle](https://www.cs.cmu.edu/~quake/triangle.html), [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) or [VTK](https://www.vtk.org)). In this case, such libraries should be installed separately, and the configuration files updated with correct paths for compiler and linker. If you are not interested in these examples, you can safely comment them by adding `#` at the beginning of the corresponding lines in `build_all_examples.pro`, and they will be automatically ignored by qmake.
+### External dependencies
+Some of the projects (e.g. 4,5,9,11,12,14) depend from external libraries which are wrapped in CinoLib (e.g. [Triangle](https://www.cs.cmu.edu/~quake/triangle.html), [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) or [VTK](https://www.vtk.org)). These libraries should be installed separately, and the project files updated with correct paths for compiler and linker. If you are not interested in these examples, you can safely comment them by adding `#` at the beginning of the corresponding lines in `build_all_examples.pro`, and they will be automatically ignored by qmake.
 
 # List of Examples
 Here is a list of the sample programs available in CinoLib.
