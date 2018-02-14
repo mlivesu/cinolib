@@ -38,7 +38,7 @@ namespace cinolib
 
 /* This class implements a very basic UNDO/REDO paradigm for general objects.
  * It is an abstract class, hence cannot be used directly. To use it, create
- * a new class that inherits from Abstract_UndoRedo and implement set_state()
+ * a new class that inherits from AbstractUndoRedo and implement set_state()
 */
 
 template<class Object, class State>
