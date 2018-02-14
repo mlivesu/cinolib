@@ -57,14 +57,17 @@ class GLcanvas : public QGLWidget
 
     typedef struct
     {
-        bool     render_axis   = false;
-        bool     mouse_pressed = false;
-        double   r             = 0.5;
-        double   r_sqrd        = r*r;
-        QPoint   last_point_2d;
-        vec3d    last_point_3d;
-        GLdouble projection[16];
-        GLdouble modelview[16];
+        bool     render_axis   = false;        // toggle axis rendering
+        bool     mouse_pressed = false;        // true if mouse is pressed
+        double   radius        = 0.5;          // trackball radius
+        QPoint   last_click_2d;                // window coords
+        vec3d    last_click_3d;                // world  coords
+        GLdouble projection[16];               // openGL projection matrix
+        GLdouble modelview[16];                // openGL modelview  matrix
+        float    z_near        = 0.1;          // front clipping plane
+        float    z_far         = 1.0;          // back  clipping plane
+        vec3d    scene_center  = vec3d(0,0,0); // scene_center
+        float    scene_size    = 1.0;          // scene_size
     }
     Trackball;
 
@@ -111,6 +114,7 @@ class GLcanvas : public QGLWidget
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void fit_scene();
+        void set_scene_center(const vec3d & center);
         void update_projection_matrix(void);
         void map_to_sphere(const QPoint & v2D, vec3d & v3D) const;
         void rotate(const vec3d & axis, const double angle);
@@ -137,11 +141,7 @@ class GLcanvas : public QGLWidget
 
     private:
 
-        vec3d     scene_center;
-        float     scene_radius;
         QColor    clear_color;
-        float     z_near_plane; // view frustum front clipping plane
-        float     z_far_plane;  // view frustum back  clipping plane
         Trackball trackball;
         QMenu    *popup;
 
