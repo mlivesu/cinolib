@@ -60,6 +60,8 @@ static void cylinder(const vec3  & a,
     vec3 normal  = dir.cross(z);
     double angle = acos(dir.dot(z)) * 180 / M_PI;
 
+    glEnable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
     glColor3fv(color);
     glPushMatrix();
     glTranslated(a[0], a[1], a[2]);
@@ -72,6 +74,8 @@ static void cylinder(const vec3  & a,
     gluQuadricOrientation(cylinder, GLU_OUTSIDE);
     gluCylinder(cylinder, top_radius, bottom_radius, (a-b).length(), 10, 5);
     glPopMatrix();
+    glDisable(GL_COLOR_MATERIAL);
+    glDisable(GL_LIGHTING);
 }
 
 }

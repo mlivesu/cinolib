@@ -53,7 +53,7 @@ static void sphere(const vec3  & center,
                    const float * color)
 {
     glEnable(GL_LIGHTING);
-    glShadeModel(GL_SMOOTH);
+    glEnable(GL_COLOR_MATERIAL);
     glColor3fv(color);
     glPushMatrix();
     glTranslated(center[0], center[1], center[2]);
@@ -62,6 +62,8 @@ static void sphere(const vec3  & center,
     gluQuadricOrientation(sphere, GLU_OUTSIDE);
     gluSphere(sphere, radius, 30, 30);
     glPopMatrix();
+    glDisable(GL_COLOR_MATERIAL);
+    glDisable(GL_LIGHTING);
 }
 
 }
