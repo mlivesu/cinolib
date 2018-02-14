@@ -43,14 +43,19 @@
 #include <QMimeData>
 #include <QMenu>
 
+
 namespace cinolib
 {
+
+vec3d p(0,0,0);
 
 CINO_INLINE
 GLcanvas::GLcanvas(QWidget *parent) : QGLWidget(parent)
 {
     setFocusPolicy(Qt::StrongFocus);
     clear_color = QColor(200, 200, 200);
+    font = QFont("Courier New", 14);
+    show_helper = true;
     make_popup_menu();
 
     // enable cut/paste shortcuts to copy/paste points of view for fast reproduction of paper images/comparisons
@@ -83,6 +88,8 @@ void GLcanvas::initializeGL()
     makeCurrent();
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
 
     // scene pos and size
     glMatrixMode(GL_MODELVIEW);
@@ -115,15 +122,19 @@ void GLcanvas::paintGL()
     // render objects
     for(auto obj : objects) obj->draw(trackball.scene_size);
 
-    // render axis
+    // render axis/helper
     if (trackball.render_axis) draw_axis();
+    if (show_helper)           draw_helper();
 
     // render labels
     for(auto l : labels)
-    {
-        if (l.is_3d) renderText(l.xyz.x(), l.xyz.y(), l.xyz.z(), l.label.c_str());
-        else         renderText(l.x, l.y, l.label.c_str());
+    {        
+        if (l.is_3d) renderText(l.xyz.x(), l.xyz.y(), l.xyz.z(), l.label.c_str(), font);
+        else         renderText(l.x, l.y, l.label.c_str(), font);
     }
+
+
+    sphere(p, trackball.scene_size*0.01, Color::RED().rgba);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -154,19 +165,33 @@ void GLcanvas::translate(const vec3d & t)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void GLcanvas::zoom(double d)
+{
+    // coming closer would make depth values unstable
+    if(d>trackball.z_near) d = trackball.z_near - 1e-3;
+    translate(vec3d(0,0,d));
+    trackball.z_near -= d;
+    trackball.z_far  -= d;
+    update_projection_matrix();
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::rotate(const vec3d & axis, const double angle)
 {
-    vec3d t(trackball.modelview[0]*trackball.scene_center[0] +
-            trackball.modelview[4]*trackball.scene_center[1] +
-            trackball.modelview[8]*trackball.scene_center[2] +
+    vec3d t(trackball.modelview[0]*trackball.pivot[0] +
+            trackball.modelview[4]*trackball.pivot[1] +
+            trackball.modelview[8]*trackball.pivot[2] +
             trackball.modelview[12],
-            trackball.modelview[1]*trackball.scene_center[0] +
-            trackball.modelview[5]*trackball.scene_center[1] +
-            trackball.modelview[9]*trackball.scene_center[2] +
+            trackball.modelview[1]*trackball.pivot[0] +
+            trackball.modelview[5]*trackball.pivot[1] +
+            trackball.modelview[9]*trackball.pivot[2] +
             trackball.modelview[13],
-            trackball.modelview[2]*trackball.scene_center[0] +
-            trackball.modelview[6]*trackball.scene_center[1] +
-            trackball.modelview[10]*trackball.scene_center[2] +
+            trackball.modelview[2]*trackball.pivot[0] +
+            trackball.modelview[6]*trackball.pivot[1] +
+            trackball.modelview[10]*trackball.pivot[2] +
             trackball.modelview[14]);
 
     makeCurrent();
@@ -185,6 +210,8 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key())
     {
+        case Qt::Key_H:     show_helper=!show_helper; break;
+        case Qt::Key_R:     trackball.pivot = trackball.scene_center; break;
         case Qt::Key_A:     trackball.render_axis=!trackball.render_axis; break;
         case Qt::Key_Left:  rotate(vec3d(0,1,0), -3); break;
         case Qt::Key_Right: rotate(vec3d(0,1,0), +3); break;
@@ -197,10 +224,19 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void GLcanvas::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (unproject(event->pos(), p)) trackball.pivot = p;
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button()  == Qt::RightButton &&
-        event->buttons() == Qt::RightButton)
+    if (event->button()    == Qt::RightButton &&
+        event->modifiers() == Qt::ControlModifier)
     {
         event->accept();
         popup->exec(QCursor::pos());
@@ -229,7 +265,7 @@ CINO_INLINE
 void GLcanvas::mouseMoveEvent(QMouseEvent *event)
 {
     // translate
-    if (event->modifiers() & Qt::ShiftModifier)
+    if (event->buttons() == Qt::RightButton)
     {
         event->accept();
         QPoint p2d    = event->pos();
@@ -449,13 +485,7 @@ void GLcanvas::wheelEvent(QWheelEvent *event) // zoom
 {
     event->accept();
     float d = -(float)event->delta()/120.0*0.2*trackball.scene_size;
-    // coming closer would make depth values unstable
-    if(d>trackball.z_near) d = trackball.z_near - 1e-3;
-    translate(vec3d(0,0,d));
-    trackball.z_near -= d;
-    trackball.z_far  -= d;
-    update_projection_matrix();
-    updateGL();
+    zoom(d);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -493,9 +523,10 @@ void GLcanvas::set_scene_center(const vec3d & center)
     translate(vec3d(-dx,-dy,-dz));
 
     // keep distance between z_far and z_near as short as possible
-    trackball.z_near       = 2.5*trackball.scene_size;
-    trackball.z_far        = 3.5*trackball.scene_size;
+    trackball.z_near       = 2.0*trackball.scene_size;
+    trackball.z_far        = 4.0*trackball.scene_size;
     trackball.scene_center = center;
+    trackball.pivot        = center;
     update_projection_matrix();
     updateGL();
 }
@@ -577,6 +608,43 @@ void GLcanvas::map_to_sphere(const QPoint & p2d, vec3d & p3d) const
     p3d[0] = xval;
     p3d[1] = yval;
     p3d[2] = (x2y2 < 0.5*trackball.radius) ? sqrt(trackball.radius - x2y2) : 0.5*trackball.radius/sqrt(x2y2);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool GLcanvas::unproject(const QPoint & p2d, vec3d &p3d) const
+{
+    // Qt uses upper corner for its origin while GL uses the lower corner.
+    // We address this by setting the vieport as follows
+    GLint    viewport[4] = { 0, height(), width(), -height() };
+    GLfloat  depth;
+    GLdouble x,y,z;
+    glReadPixels(p2d.x(), height()-1-p2d.y(), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+    if (depth >= 1) return false;
+    std::cout << "depth: " << depth << std::endl;
+    gluUnProject(p2d.x(), p2d.y(), depth, trackball.modelview, trackball.projection, viewport,  &x, &y, &z);
+    p3d = vec3d(x,y,z);
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::draw_helper()
+{
+    uint x    = 10;
+    uint y    = 25;
+    uint step = 17;
+    glColor3fv(Color::BLACK().rgba);
+    renderText(x, y,"Cmd + click  : popup menu   ", font); y+=step;
+    renderText(x, y,"Right button : translate    ", font); y+=step;
+    renderText(x, y,"Double click : set pivot    ", font); y+=step;
+    renderText(x, y,"Key R        : reset pivot  ", font); y+=step;
+    renderText(x, y,"Key A        : toggle axis  ", font); y+=step;
+    renderText(x, y,"Key H        : toggle helper", font); y+=step;
+    renderText(x, y,"Cmd + Key C  : copy POV     ", font); y+=step;
+    renderText(x, y,"Cmd + Key V  : paste POV    ", font); y+=step;
 }
 
 }
