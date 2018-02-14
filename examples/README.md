@@ -70,6 +70,7 @@ Maintaining a library alone is very time consuming, and the amount of time I can
 
 * Copy/paste points of view from the GL canvas for accurate visual comparisons and fast snapshot reproduction
 * Customize data structures with user defined mesh/vertex/edge/polygon/polyhedron attributes
+* Navigate application history exploiting Cinolib undo/redo facilities
 * Generate, process and visualize scalar fields
 * Generate, process and visualize vector fields
 * Overview of the topology editing operators implemented in CinoLib
