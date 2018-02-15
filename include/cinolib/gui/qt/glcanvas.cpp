@@ -54,7 +54,7 @@ GLcanvas::GLcanvas(QWidget *parent) : QGLWidget(parent)
 
     clear_color = QColor(200, 200, 200);
     font        = QFont("Courier New", 14);
-    show_helper = true;
+    show_helper = false;
     show_axis   = false;
 
     // enable cut/paste shortcuts to copy/paste points of view for fast reproduction of paper images/comparisons
@@ -116,10 +116,10 @@ void GLcanvas::paintGL()
     // render objects
     for(auto obj:objects) obj->draw(trackball.scene_size);
 
-    // render axis/helper/labels
+    // render axis/labels/helper
     if (show_axis)     draw_axis();
-    if (show_helper)   draw_helper();
     for(auto l:labels) draw_text(l);
+    draw_helper();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -665,22 +665,29 @@ void GLcanvas::draw_helper()
     vec2i p(10,25);
     uint  step = 17; // line spacing
     glColor3f(0,0,0);
-    draw_text(p, "Left  but       : rotate         "); p.y()+=step;
-    draw_text(p, "Right but       : translate      "); p.y()+=step;
-    draw_text(p, "Double click    : change pivot   "); p.y()+=step;
-    draw_text(p, "Key C           : pivot at center"); p.y()+=step;
-    draw_text(p, "Key R           : reset trackball"); p.y()+=step;
-    draw_text(p, "Key A           : toggle axis    "); p.y()+=step;
-    draw_text(p, "Key H           : toggle helper  "); p.y()+=step;
-    draw_text(p, "Key Left        : rotate left    "); p.y()+=step;
-    draw_text(p, "Key Right       : rotate right   "); p.y()+=step;
-    draw_text(p, "Key Up          : rotate up      "); p.y()+=step;
-    draw_text(p, "Key Down        : rotate down    "); p.y()+=step;
-    draw_text(p, "Cmd + Key C     : copy POV       "); p.y()+=step;
-    draw_text(p, "Cmd + Key V     : paste POV      "); p.y()+=step;
-    draw_text(p, "Cmd + Right but : popup menu     "); p.y()+=step;
-    // add +/shift+ to move znear
-    // add -/shift- to move zfar
+    if (show_helper)
+    {
+        draw_text(p, "Left  but       : rotate         "); p.y()+=step;
+        draw_text(p, "Right but       : translate      "); p.y()+=step;
+        draw_text(p, "Double click    : change pivot   "); p.y()+=step;
+        draw_text(p, "Key C           : pivot at center"); p.y()+=step;
+        draw_text(p, "Key R           : reset trackball"); p.y()+=step;
+        draw_text(p, "Key A           : toggle axis    "); p.y()+=step;
+        draw_text(p, "Key H           : toggle helper  "); p.y()+=step;
+        draw_text(p, "Key Left        : rotate left    "); p.y()+=step;
+        draw_text(p, "Key Right       : rotate right   "); p.y()+=step;
+        draw_text(p, "Key Up          : rotate up      "); p.y()+=step;
+        draw_text(p, "Key Down        : rotate down    "); p.y()+=step;
+        draw_text(p, "Cmd + Key C     : copy  POV      "); p.y()+=step;
+        draw_text(p, "Cmd + Key V     : paste POV      "); p.y()+=step;
+        draw_text(p, "Cmd + Right but : popup menu     "); p.y()+=step;
+        // add +/shift+ to move znear
+        // add -/shift- to move zfar
+    }
+    else
+    {
+        draw_text(p, "Key H: toggle helper");
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
