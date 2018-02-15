@@ -2,7 +2,6 @@
 - put cotangents (tets/tris) on a separate .h/cpp file?
 - add inverse and transpose operators for 2x2 matrices
 - remove virtual from mesh hierarchy whenever possible
-- read vectors of meshes rather than meshes in GUI control panel
 - make sure 1D textures are always drawn covering full spectrum (RED to BLUE in HSV RAMP)
 - use Möller–Trumbore algorithm for 3D ray-triangle intersection 
 - refactor ray/line/plane intersections and integral curve tracing 
