@@ -46,16 +46,16 @@
 namespace cinolib
 {
 
-vec3d p(0,0,0);
-
 CINO_INLINE
 GLcanvas::GLcanvas(QWidget *parent) : QGLWidget(parent)
 {
-    setFocusPolicy(Qt::StrongFocus);
-    clear_color = QColor(200, 200, 200);
-    font = QFont("Courier New", 14);
-    show_helper = true;
     make_popup_menu();
+    setFocusPolicy(Qt::StrongFocus);
+
+    clear_color = QColor(200, 200, 200);
+    font        = QFont("Courier New", 14);
+    show_helper = true;
+    show_axis   = false;
 
     // enable cut/paste shortcuts to copy/paste points of view for fast reproduction of paper images/comparisons
     //
@@ -90,12 +90,7 @@ void GLcanvas::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    // scene pos and size
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
-    update_projection_matrix();
-    fit_scene();
+    reset_trackball();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -119,21 +114,12 @@ void GLcanvas::paintGL()
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     // render objects
-    for(auto obj : objects) obj->draw(trackball.scene_size);
+    for(auto obj:objects) obj->draw(trackball.scene_size);
 
-    // render axis/helper
-    if (trackball.render_axis) draw_axis();
-    if (show_helper)           draw_helper();
-
-    // render labels
-    for(auto l : labels)
-    {        
-        glColor3f(0,0,0);
-        if (l.is_3d) renderText(l.xyz.x(), l.xyz.y(), l.xyz.z(), l.label.c_str(), font);
-        else         renderText(l.x, l.y, l.label.c_str(), font); // create wraps to handle color and font...
-    }
-
-    sphere(p, trackball.scene_size*0.01, Color::RED().rgba);
+    // render axis/helper/labels
+    if (show_axis)     draw_axis();
+    if (show_helper)   draw_helper();
+    for(auto l:labels) draw_text(l);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -209,13 +195,14 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key())
     {
-        case Qt::Key_H:     show_helper=!show_helper; break;
-        case Qt::Key_R:     trackball.pivot = trackball.scene_center; break;
-        case Qt::Key_A:     trackball.render_axis=!trackball.render_axis; break;
-        case Qt::Key_Left:  rotate(vec3d(0,1,0), -3); break;
-        case Qt::Key_Right: rotate(vec3d(0,1,0), +3); break;
-        case Qt::Key_Up:    rotate(vec3d(1,0,0), -3); break;
-        case Qt::Key_Down:  rotate(vec3d(1,0,0), +3); break;
+        case Qt::Key_H:     show_helper=!show_helper;                 break;
+        case Qt::Key_A:     show_axis=!show_axis;                     break;
+        case Qt::Key_R:     reset_trackball();                        break;
+        case Qt::Key_C:     trackball.pivot = trackball.scene_center; break;
+        case Qt::Key_Left:  rotate(vec3d(0,1,0), -3);                 break;
+        case Qt::Key_Right: rotate(vec3d(0,1,0), +3);                 break;
+        case Qt::Key_Up:    rotate(vec3d(1,0,0), -3);                 break;
+        case Qt::Key_Down:  rotate(vec3d(1,0,0), +3);                 break;
     }
     updateGL();
 }
@@ -225,18 +212,9 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
 CINO_INLINE
 void GLcanvas::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    //QImage img(width(),height(), QImage::Format_RGB32);
-    //QRgb b = qRgb(0,0,0);
-    //QRgb w = qRgb(255,255,255);
-    //for(uint x=0; x<width();  ++x)
-    //for(uint y=0; y<height(); ++y)
-    //{
-    //    vec3d p;
-    //    if (unproject(QPoint(x,y),p)) img.setPixel(x,y,w); else img.setPixel(x,y,b);
-    //}
-    //img.save("/Users/cino/Desktop/test.png");
-    if (unproject(event->pos(), p)) trackball.pivot = p;
-    updateGL();
+    event->accept();
+    vec3d new_pivot;
+    if (unproject(event->pos(), new_pivot)) set_rotation_pivot(new_pivot);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -449,25 +427,26 @@ bool GLcanvas::pop(const DrawableObject *obj)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::push_label(const uint x, const uint y, const std::string & label)
+void GLcanvas::push_label(const vec2i & p, const std::string & label, const Color & c)
 {
     TextLabel l;
-    l.is_3d = false;
-    l.x     = x;
-    l.y     = y;
     l.label = label;
+    l.is_3d = false;
+    l.p2d   = p;
+    l.color = c;
     labels.push_back(l);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::push_label(const vec3d & p, const std::string & label)
+void GLcanvas::push_label(const vec3d & p, const std::string & label, const Color & c)
 {
     TextLabel l;
-    l.is_3d = true;
-    l.xyz   = p;
     l.label = label;
+    l.is_3d = true;
+    l.p3d   = p;
+    l.color = c;
     labels.push_back(l);
 }
 
@@ -500,7 +479,17 @@ void GLcanvas::wheelEvent(QWheelEvent *event) // zoom
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::set_scene_center(const vec3d & center)
+void GLcanvas::set_rotation_pivot(const vec3d & new_pivot)
+{
+    trackball.pivot = new_pivot;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::set_scene_center(const vec3d  & new_center,
+                                const double   dist_from_camera,
+                                const bool     pivot_at_center)
 {
     // https://stackoverflow.com/questions/15697273/how-can-i-get-view-direction-from-the-opengl-modelview-matrix
     // http://blog.db-in.com/cameras-on-opengl-es-2-x/
@@ -513,29 +502,26 @@ void GLcanvas::set_scene_center(const vec3d & center)
     // MV[13] => Ty
     // MV[14] => Tz
     //
-    double dx = trackball.modelview[ 0]*center[0] +
-                trackball.modelview[ 4]*center[1] +
-                trackball.modelview[ 8]*center[2] +
+    double dx = trackball.modelview[ 0]*new_center[0] +
+                trackball.modelview[ 4]*new_center[1] +
+                trackball.modelview[ 8]*new_center[2] +
                 trackball.modelview[12];
-    double dy = trackball.modelview[ 1]*center[0] +
-                trackball.modelview[ 5]*center[1] +
-                trackball.modelview[ 9]*center[2] +
+    double dy = trackball.modelview[ 1]*new_center[0] +
+                trackball.modelview[ 5]*new_center[1] +
+                trackball.modelview[ 9]*new_center[2] +
                 trackball.modelview[13];
-    double dz = trackball.modelview[ 2]*center[0] +
-                trackball.modelview[ 6]*center[1] +
-                trackball.modelview[10]*center[2] +
-                trackball.modelview[14]+3.0*trackball.scene_size;
-                // without this latter sum the scene would be centered exactly
-                // at the camera. This shifts the center of the scene away along
-                // the Look vector by a factor proportional to the scene size.
+    double dz = trackball.modelview[ 2]*new_center[0] +
+                trackball.modelview[ 6]*new_center[1] +
+                trackball.modelview[10]*new_center[2] +
+                trackball.modelview[14]+dist_from_camera;
 
-    translate(vec3d(-dx,-dy,-dz));
+    translate(vec3d(-dx,-dy,-dz)); // move camera "dist_from_camera" from center (along Z)
 
-    // keep distance between z_far and z_near as short as possible
-    trackball.z_near       = 2.0*trackball.scene_size;
-    trackball.z_far        = 4.0*trackball.scene_size;
-    trackball.scene_center = center;
-    trackball.pivot        = center;
+    trackball.scene_center = new_center;
+    trackball.z_far        = dist_from_camera + trackball.scene_size;
+    trackball.z_near       = dist_from_camera - trackball.scene_size;
+    if(trackball.z_near<1e-3) trackball.z_near = 1e-3; // avoid <=0 z_near
+    if(pivot_at_center)       set_rotation_pivot(new_center);
     update_projection_matrix();
     updateGL();
 }
@@ -558,7 +544,7 @@ void GLcanvas::fit_scene()
     center /= (double)count;
 
     trackball.scene_size = size;
-    set_scene_center(center);
+    set_scene_center(center, 3.0*trackball.scene_size, true);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -601,17 +587,18 @@ void GLcanvas::set_clear_color(const QColor &c)
 CINO_INLINE
 void GLcanvas::draw_axis()
 {
-    vec3d O = trackball.scene_center;
-    vec3d X = trackball.scene_center + vec3d(1,0,0)*trackball.scene_size;
-    vec3d Y = trackball.scene_center + vec3d(0,1,0)*trackball.scene_size;
-    vec3d Z = trackball.scene_center + vec3d(0,0,1)*trackball.scene_size;
+    vec3d  O = trackball.scene_center;
+    vec3d  X = trackball.scene_center + vec3d(1,0,0)*trackball.scene_size;
+    vec3d  Y = trackball.scene_center + vec3d(0,1,0)*trackball.scene_size;
+    vec3d  Z = trackball.scene_center + vec3d(0,0,1)*trackball.scene_size;
+    double r = trackball.scene_size*0.01;
 
     makeCurrent();
     glEnable(GL_COLOR_MATERIAL);
     glDisable(GL_DEPTH_TEST);
-    cylinder(O, X, trackball.scene_size*0.015, trackball.scene_size*0.015, Color::RED().rgba);
-    cylinder(O, Y, trackball.scene_size*0.015, trackball.scene_size*0.015, Color::GREEN().rgba);
-    cylinder(O, Z, trackball.scene_size*0.015, trackball.scene_size*0.015, Color::BLUE().rgba);
+    cylinder(O, X, r, r, Color::RED().rgba);
+    cylinder(O, Y, r, r, Color::GREEN().rgba);
+    cylinder(O, Z, r, r, Color::BLUE().rgba);
     sphere(O, trackball.scene_size*0.02, Color::WHITE().rgba);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_COLOR_MATERIAL);
@@ -640,26 +627,33 @@ void GLcanvas::map_to_sphere(const QPoint & p2d, vec3d & p3d) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool GLcanvas::unproject(const QPoint & p2d, vec3d &p3d)
+bool GLcanvas::unproject(const QPoint & click, vec3d & p)
 {
     makeCurrent();
-    // accout for retina displays (http://doc.qt.io/qt-5/qwindow.html#devicePixelRatio)
-    GLint x = p2d.x()*devicePixelRatio();
-    GLint y = p2d.y()*devicePixelRatio();
+
+    // accout for retina displays when reading buffers
+    // http://doc.qt.io/qt-5/qwindow.html#devicePixelRatio
+    //
+    GLint x = click.x() * devicePixelRatio();
+    GLint y = click.y() * devicePixelRatio();
     GLfloat depth;
     glReadPixels(x, height_retina()-1-y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+
     if (depth >= 1)
     {
-        std::cout << "click(" << p2d.x() << "," << p2d.y() << ") depth: -1 [back clipping plane, discarded!]" << std::endl;
+        std::cout << "Unproject click(" << click.x() << "," << click.y() << ") depth: -1 [failed]" << std::endl;
         return false;
     }
+
     GLint viewport[4] =
     {
         0,        height(), // top left corner
         width(), -height()  // bottom right corner
     };
-    gluUnProject(p2d.x(), p2d.y(), depth, trackball.modelview, trackball.projection, viewport,  &p3d.x(), &p3d.y(), &p3d.z());
-    std::cout << "click(" << p2d.x() << "," << p2d.y() << ") depth: " << depth << " => " << p3d <<std::endl;
+
+    gluUnProject(click.x(), click.y(), depth, trackball.modelview, trackball.projection, viewport,  &p.x(), &p.y(), &p.z());
+
+    std::cout << "Unproject click(" << click.x() << "," << click.y() << ") depth: " << depth << " => " << p <<std::endl;
     return true;
 }
 
@@ -668,23 +662,64 @@ bool GLcanvas::unproject(const QPoint & p2d, vec3d &p3d)
 CINO_INLINE
 void GLcanvas::draw_helper()
 {
-    uint x    = 10;
-    uint y    = 25;
-    uint step = 17;
+    vec2i p(10,25);
+    uint  step = 17; // line spacing
     glColor3f(0,0,0);
-    renderText(x, y,"Left  but       : rotate       ", font); y+=step;
-    renderText(x, y,"Right but       : translate    ", font); y+=step;
-    renderText(x, y,"Double click    : set pivot    ", font); y+=step;
-    renderText(x, y,"Key R           : reset pivot  ", font); y+=step;
-    renderText(x, y,"Key H           : toggle helper", font); y+=step;
-    renderText(x, y,"Key A           : toggle axis  ", font); y+=step;
-    renderText(x, y,"Key Left        : rotate left  ", font); y+=step;
-    renderText(x, y,"Key Right       : rotate right ", font); y+=step;
-    renderText(x, y,"Key Up          : rotate up    ", font); y+=step;
-    renderText(x, y,"Key Down        : rotate down  ", font); y+=step;
-    renderText(x, y,"Cmd + Key C     : copy POV     ", font); y+=step;
-    renderText(x, y,"Cmd + Key V     : paste POV    ", font); y+=step;
-    renderText(x, y,"Cmd + Right but : popup menu   ", font); y+=step;
+    draw_text(p, "Left  but       : rotate         "); p.y()+=step;
+    draw_text(p, "Right but       : translate      "); p.y()+=step;
+    draw_text(p, "Double click    : change pivot   "); p.y()+=step;
+    draw_text(p, "Key C           : pivot at center"); p.y()+=step;
+    draw_text(p, "Key R           : reset trackball"); p.y()+=step;
+    draw_text(p, "Key A           : toggle axis    "); p.y()+=step;
+    draw_text(p, "Key H           : toggle helper  "); p.y()+=step;
+    draw_text(p, "Key Left        : rotate left    "); p.y()+=step;
+    draw_text(p, "Key Right       : rotate right   "); p.y()+=step;
+    draw_text(p, "Key Up          : rotate up      "); p.y()+=step;
+    draw_text(p, "Key Down        : rotate down    "); p.y()+=step;
+    draw_text(p, "Cmd + Key C     : copy POV       "); p.y()+=step;
+    draw_text(p, "Cmd + Key V     : paste POV      "); p.y()+=step;
+    draw_text(p, "Cmd + Right but : popup menu     "); p.y()+=step;
+    // add +/shift+ to move znear
+    // add -/shift- to move zfar
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::draw_text(const TextLabel & t)
+{
+    if (t.is_3d) draw_text(t.p3d, t.label.c_str(), t.color);
+    else         draw_text(t.p2d, t.label.c_str(), t.color);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::draw_text(const vec3d & pos, const std::string & text, const Color & c)
+{
+    glColor3fv(c.rgba);
+    renderText(pos.x(), pos.y(), pos.z(), text.c_str(), font);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::draw_text(const vec2i & pos, const std::string & text, const Color & c)
+{
+    glColor3fv(c.rgba);
+    renderText(pos.x(), pos.y(), text.c_str(), font);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::reset_trackball()
+{
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
+    update_projection_matrix();
+    fit_scene();
 }
 
 }

@@ -47,6 +47,8 @@
 #include <QMenu>
 #include <cinolib/drawable_object.h>
 #include <cinolib/bbox.h>
+#include <cinolib/geometry/vec2.h>
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
@@ -57,7 +59,6 @@ class GLcanvas : public QGLWidget
 
     typedef struct
     {
-        bool     render_axis   = false;        // toggle axis rendering
         bool     mouse_pressed = false;        // true if mouse is pressed
         double   radius        = 0.5;          // trackball radius
         vec3d    pivot         = vec3d(0,0,0); // trackball rotation origin
@@ -76,12 +77,12 @@ class GLcanvas : public QGLWidget
 
     typedef struct
     {
-        std::string label;
-        vec3d       xyz;   // pos 3D
-        uint        x,y;   // pos 2D
-        bool        is_3d; // if true the label will be positioned projecting xyz on screen,
-                           // otherwise (x,y) will be used as window coordiantes to position it
-    }
+        std::string label;    // text to render
+        Color       color;    // text color
+        vec3d       p3d;      // pos 3D
+        vec2i       p2d;      // pos 2D
+        bool        is_3d;    // if true the label will be positioned projecting p3d on
+    }                         // screen, otherwise p2d will be used as window coordinates
     TextLabel;
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -114,21 +115,23 @@ class GLcanvas : public QGLWidget
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void draw_axis();
         void draw_helper();
+        void draw_axis();
+        void draw_text(const TextLabel & t);
+        void draw_text(const vec3d & pos, const std::string & text, const Color & c = Color::BLACK());
+        void draw_text(const vec2i & pos, const std::string & text, const Color & c = Color::BLACK());
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void make_popup_menu();
         void set_clear_color(const QColor & c);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+        void reset_trackball();
         void fit_scene();
-        void set_scene_center(const vec3d & center);
+        void set_scene_center(const vec3d & new_center, const double dist_from_camera, const bool pivot_at_center);
+        void set_rotation_pivot(const vec3d & new_pivot);
         void update_projection_matrix(void);
-        void map_to_sphere(const QPoint & v2D, vec3d & v3D) const;
-        bool unproject(const QPoint & p2d, vec3d & p3d);
+        void map_to_sphere(const QPoint & p2d, vec3d & p3d) const;
+        bool unproject(const QPoint & click, vec3d & p);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -145,8 +148,8 @@ class GLcanvas : public QGLWidget
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void push_label(const vec3d & p, const std::string & label);
-        void push_label(const uint x, const uint y, const std::string & label);
+        void push_label(const vec3d & p, const std::string & label, const Color & c = Color::BLACK());
+        void push_label(const vec2i & p, const std::string & label, const Color & c = Color::BLACK());
         void pop_label();
         void pop_all_labels();
 
@@ -162,6 +165,7 @@ class GLcanvas : public QGLWidget
         QMenu    *popup;
         QFont     font;
         bool      show_helper;
+        bool      show_axis;
 
         std::vector<const DrawableObject*> objects;
         std::vector<const TextLabel>       labels;
