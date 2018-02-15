@@ -80,7 +80,7 @@ void texture_isolines2D(      Texture & texture,
         texture.data[i  ] = v_isolines.r_uchar();
         texture.data[i+1] = v_isolines.g_uchar();
         texture.data[i+2] = v_isolines.b_uchar();
-        texture.data[i+3] = u_isolines.a_uchar();
+        texture.data[i+3] = v_isolines.a_uchar();
     }
 }
 
