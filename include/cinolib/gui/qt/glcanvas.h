@@ -109,6 +109,11 @@ class GLcanvas : public QGLWidget
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        int height_retina();
+        int width_retina();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void draw_axis();
         void draw_helper();
 
@@ -123,7 +128,7 @@ class GLcanvas : public QGLWidget
         void set_scene_center(const vec3d & center);
         void update_projection_matrix(void);
         void map_to_sphere(const QPoint & v2D, vec3d & v3D) const;
-        bool unproject(const QPoint & p2d, vec3d & p3d) const;
+        bool unproject(const QPoint & p2d, vec3d & p3d);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -43,7 +43,6 @@
 #include <QMimeData>
 #include <QMenu>
 
-
 namespace cinolib
 {
 
@@ -129,10 +128,10 @@ void GLcanvas::paintGL()
     // render labels
     for(auto l : labels)
     {        
+        glColor3f(0,0,0);
         if (l.is_3d) renderText(l.xyz.x(), l.xyz.y(), l.xyz.z(), l.label.c_str(), font);
-        else         renderText(l.x, l.y, l.label.c_str(), font);
+        else         renderText(l.x, l.y, l.label.c_str(), font); // create wraps to handle color and font...
     }
-
 
     sphere(p, trackball.scene_size*0.01, Color::RED().rgba);
 }
@@ -181,16 +180,16 @@ void GLcanvas::zoom(double d)
 CINO_INLINE
 void GLcanvas::rotate(const vec3d & axis, const double angle)
 {
-    vec3d t(trackball.modelview[0]*trackball.pivot[0] +
-            trackball.modelview[4]*trackball.pivot[1] +
-            trackball.modelview[8]*trackball.pivot[2] +
+    vec3d t(trackball.modelview[ 0]*trackball.pivot[0] +
+            trackball.modelview[ 4]*trackball.pivot[1] +
+            trackball.modelview[ 8]*trackball.pivot[2] +
             trackball.modelview[12],
-            trackball.modelview[1]*trackball.pivot[0] +
-            trackball.modelview[5]*trackball.pivot[1] +
-            trackball.modelview[9]*trackball.pivot[2] +
+            trackball.modelview[ 1]*trackball.pivot[0] +
+            trackball.modelview[ 5]*trackball.pivot[1] +
+            trackball.modelview[ 9]*trackball.pivot[2] +
             trackball.modelview[13],
-            trackball.modelview[2]*trackball.pivot[0] +
-            trackball.modelview[6]*trackball.pivot[1] +
+            trackball.modelview[ 2]*trackball.pivot[0] +
+            trackball.modelview[ 6]*trackball.pivot[1] +
             trackball.modelview[10]*trackball.pivot[2] +
             trackball.modelview[14]);
 
@@ -226,6 +225,16 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
 CINO_INLINE
 void GLcanvas::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    //QImage img(width(),height(), QImage::Format_RGB32);
+    //QRgb b = qRgb(0,0,0);
+    //QRgb w = qRgb(255,255,255);
+    //for(uint x=0; x<width();  ++x)
+    //for(uint y=0; y<height(); ++y)
+    //{
+    //    vec3d p;
+    //    if (unproject(QPoint(x,y),p)) img.setPixel(x,y,w); else img.setPixel(x,y,b);
+    //}
+    //img.save("/Users/cino/Desktop/test.png");
     if (unproject(event->pos(), p)) trackball.pivot = p;
     updateGL();
 }
@@ -563,6 +572,24 @@ void GLcanvas::updateGL()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+int GLcanvas::height_retina()
+{
+    // http://doc.qt.io/qt-5/qwindow.html#devicePixelRatio
+    return height() * devicePixelRatio();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+int GLcanvas::width_retina()
+{
+    // http://doc.qt.io/qt-5/qwindow.html#devicePixelRatio
+    return width() * devicePixelRatio();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::set_clear_color(const QColor &c)
 {
     clear_color = c;
@@ -613,18 +640,26 @@ void GLcanvas::map_to_sphere(const QPoint & p2d, vec3d & p3d) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool GLcanvas::unproject(const QPoint & p2d, vec3d &p3d) const
+bool GLcanvas::unproject(const QPoint & p2d, vec3d &p3d)
 {
-    // Qt uses upper corner for its origin while GL uses the lower corner.
-    // We address this by setting the vieport as follows
-    GLint    viewport[4] = { 0, height(), width(), -height() };
-    GLfloat  depth;
-    GLdouble x,y,z;
-    glReadPixels(p2d.x(), height()-1-p2d.y(), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-    if (depth >= 1) return false;
-    std::cout << "depth: " << depth << std::endl;
-    gluUnProject(p2d.x(), p2d.y(), depth, trackball.modelview, trackball.projection, viewport,  &x, &y, &z);
-    p3d = vec3d(x,y,z);
+    makeCurrent();
+    // accout for retina displays (http://doc.qt.io/qt-5/qwindow.html#devicePixelRatio)
+    GLint x = p2d.x()*devicePixelRatio();
+    GLint y = p2d.y()*devicePixelRatio();
+    GLfloat depth;
+    glReadPixels(x, height_retina()-1-y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+    if (depth >= 1)
+    {
+        std::cout << "click(" << p2d.x() << "," << p2d.y() << ") depth: -1 [back clipping plane, discarded!]" << std::endl;
+        return false;
+    }
+    GLint viewport[4] =
+    {
+        0,        height(), // top left corner
+        width(), -height()  // bottom right corner
+    };
+    gluUnProject(p2d.x(), p2d.y(), depth, trackball.modelview, trackball.projection, viewport,  &p3d.x(), &p3d.y(), &p3d.z());
+    std::cout << "click(" << p2d.x() << "," << p2d.y() << ") depth: " << depth << " => " << p3d <<std::endl;
     return true;
 }
 
@@ -636,15 +671,20 @@ void GLcanvas::draw_helper()
     uint x    = 10;
     uint y    = 25;
     uint step = 17;
-    glColor3fv(Color::BLACK().rgba);
-    renderText(x, y,"Cmd + click  : popup menu   ", font); y+=step;
-    renderText(x, y,"Right button : translate    ", font); y+=step;
-    renderText(x, y,"Double click : set pivot    ", font); y+=step;
-    renderText(x, y,"Key R        : reset pivot  ", font); y+=step;
-    renderText(x, y,"Key A        : toggle axis  ", font); y+=step;
-    renderText(x, y,"Key H        : toggle helper", font); y+=step;
-    renderText(x, y,"Cmd + Key C  : copy POV     ", font); y+=step;
-    renderText(x, y,"Cmd + Key V  : paste POV    ", font); y+=step;
+    glColor3f(0,0,0);
+    renderText(x, y,"Left  but       : rotate       ", font); y+=step;
+    renderText(x, y,"Right but       : translate    ", font); y+=step;
+    renderText(x, y,"Double click    : set pivot    ", font); y+=step;
+    renderText(x, y,"Key R           : reset pivot  ", font); y+=step;
+    renderText(x, y,"Key H           : toggle helper", font); y+=step;
+    renderText(x, y,"Key A           : toggle axis  ", font); y+=step;
+    renderText(x, y,"Key Left        : rotate left  ", font); y+=step;
+    renderText(x, y,"Key Right       : rotate right ", font); y+=step;
+    renderText(x, y,"Key Up          : rotate up    ", font); y+=step;
+    renderText(x, y,"Key Down        : rotate down  ", font); y+=step;
+    renderText(x, y,"Cmd + Key C     : copy POV     ", font); y+=step;
+    renderText(x, y,"Cmd + Key V     : paste POV    ", font); y+=step;
+    renderText(x, y,"Cmd + Right but : popup menu   ", font); y+=step;
 }
 
 }
