@@ -15,7 +15,9 @@ SOURCES        += main.cpp
 # ------------------------------------ #
 # ------- EXTERNAL DEPENDENCIES ------ #
 # ------------------------------------ #
-# enable VTK readers (used in cinolib/io/read_write.h -- .vtu and .vtk file formats)
+# Enable VTK readers (used in cinolib/io/read_write.h -- .vtu and .vtk file formats)
+# NOTE: this is an OPTIONAL dependency. If you are not interested in reading VTK
+# files, just comment the lines below (with #)
 DEFINES        += CINOLIB_USES_VTK
 INCLUDEPATH    += /usr/local/include/vtk-7.1
 QMAKE_LFLAGS   *= -L/usr/local/lib
