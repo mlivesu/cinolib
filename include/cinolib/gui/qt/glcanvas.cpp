@@ -117,9 +117,9 @@ void GLcanvas::paintGL()
     for(auto obj:objects) obj->draw(trackball.scene_size);
 
     // render axis/labels/pivot/helper
-    if (show_axis)     draw_axis();
-    if (show_pivot)    draw_marker(trackball.pivot);
-    for(auto l:labels) draw_text(l);
+    if (show_axis)  draw_axis();
+    if (show_pivot) draw_sphere(trackball.pivot);
+    if (show_pivot) for(auto l:labels) draw_text(l);
     draw_helper();
 }
 
@@ -723,7 +723,7 @@ void GLcanvas::draw_text(const vec2i & pos, const std::string & text, const Colo
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::draw_marker(const vec3d & pos, const Color & c)
+void GLcanvas::draw_sphere(const vec3d & pos, const Color & c)
 {
     sphere(pos, trackball.scene_size*0.01, c.rgba);
 }

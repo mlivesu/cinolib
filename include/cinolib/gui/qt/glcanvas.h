@@ -94,15 +94,6 @@ class GLcanvas : public QGLWidget
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void keyPressEvent        (QKeyEvent   *event);
-        void mouseDoubleClickEvent(QMouseEvent *event);
-        void mousePressEvent      (QMouseEvent *event);
-        void mouseReleaseEvent    (QMouseEvent *event);
-        void mouseMoveEvent       (QMouseEvent *event);
-        void wheelEvent           (QWheelEvent *event);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void initializeGL();
         void resizeGL(int w, int h);
         void paintGL();
@@ -117,28 +108,12 @@ class GLcanvas : public QGLWidget
 
         void draw_helper();
         void draw_axis();
-        void draw_text(const TextLabel & t);
-        void draw_text(const vec3d & pos, const std::string & text, const Color & c = Color::BLACK());
-        void draw_text(const vec2i & pos, const std::string & text, const Color & c = Color::BLACK());
-        void draw_marker(const vec3d & pos, const Color & c = Color::RED());
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void make_popup_menu();
         void set_clear_color(const QColor & c);
-        void reset_trackball();
         void fit_scene();
-        void set_scene_center(const vec3d & new_center, const double dist_from_camera, const bool pivot_at_center);
-        void set_rotation_pivot(const vec3d & new_pivot);
-        void update_projection_matrix(void);
-        void map_to_sphere(const QPoint & p2d, vec3d & p3d) const;
         bool unproject(const QPoint & click, vec3d & p);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void rotate(const vec3d & axis, const double angle);
-        void translate(const vec3d & trans);
-        void zoom(double d);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -158,6 +133,39 @@ class GLcanvas : public QGLWidget
 
         std::string serialize_POV() const;
         void        deserialize_POV(const std::string & s);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void keyPressEvent        (QKeyEvent   *event);
+        void mouseDoubleClickEvent(QMouseEvent *event);
+        void mousePressEvent      (QMouseEvent *event);
+        void mouseReleaseEvent    (QMouseEvent *event);
+        void mouseMoveEvent       (QMouseEvent *event);
+        void wheelEvent           (QWheelEvent *event);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    protected:
+
+        void make_popup_menu();
+        void draw_text(const TextLabel & t);
+        void draw_text(const vec3d & pos, const std::string & text, const Color & c = Color::BLACK());
+        void draw_text(const vec2i & pos, const std::string & text, const Color & c = Color::BLACK());
+        void draw_sphere(const vec3d & pos, const Color & c = Color::RED());
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void rotate(const vec3d & axis, const double angle);
+        void translate(const vec3d & trans);
+        void zoom(double d);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void reset_trackball();
+        void set_scene_center(const vec3d & new_center, const double dist_from_camera, const bool pivot_at_center);
+        void set_rotation_pivot(const vec3d & new_pivot);
+        void update_projection_matrix(void);
+        void map_to_sphere(const QPoint & p2d, vec3d & p3d) const;
 
     private:
 
