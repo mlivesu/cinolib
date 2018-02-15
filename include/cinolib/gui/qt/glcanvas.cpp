@@ -41,7 +41,6 @@
 #include <QShortcut>
 #include <QMouseEvent>
 #include <QMimeData>
-#include <QMenu>
 
 namespace cinolib
 {
@@ -56,6 +55,7 @@ GLcanvas::GLcanvas(QWidget *parent) : QGLWidget(parent)
     font        = QFont("Courier New", 14);
     show_helper = false;
     show_axis   = false;
+    show_pivot  = false;
 
     // enable cut/paste shortcuts to copy/paste points of view for fast reproduction of paper images/comparisons
     //
@@ -116,8 +116,9 @@ void GLcanvas::paintGL()
     // render objects
     for(auto obj:objects) obj->draw(trackball.scene_size);
 
-    // render axis/labels/helper
+    // render axis/labels/pivot/helper
     if (show_axis)     draw_axis();
+    if (show_pivot)    draw_marker(trackball.pivot);
     for(auto l:labels) draw_text(l);
     draw_helper();
 }
@@ -195,14 +196,15 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key())
     {
-        case Qt::Key_H:     show_helper=!show_helper;                 break;
-        case Qt::Key_A:     show_axis=!show_axis;                     break;
-        case Qt::Key_R:     reset_trackball();                        break;
-        case Qt::Key_C:     trackball.pivot = trackball.scene_center; break;
-        case Qt::Key_Left:  rotate(vec3d(0,1,0), -3);                 break;
-        case Qt::Key_Right: rotate(vec3d(0,1,0), +3);                 break;
-        case Qt::Key_Up:    rotate(vec3d(1,0,0), -3);                 break;
-        case Qt::Key_Down:  rotate(vec3d(1,0,0), +3);                 break;
+        case Qt::Key_H:     show_helper=!show_helper;               break;
+        case Qt::Key_A:     show_axis=!show_axis;                   break;
+        case Qt::Key_S:     show_pivot=!show_pivot;                 break;
+        case Qt::Key_R:     reset_trackball();                      break;
+        case Qt::Key_C:     trackball.pivot=trackball.scene_center; break;
+        case Qt::Key_Left:  rotate(vec3d(0,1,0), -3);               break;
+        case Qt::Key_Right: rotate(vec3d(0,1,0), +3);               break;
+        case Qt::Key_Up:    rotate(vec3d(1,0,0), -3);               break;
+        case Qt::Key_Down:  rotate(vec3d(1,0,0), +3);               break;
     }
     updateGL();
 }
@@ -215,6 +217,7 @@ void GLcanvas::mouseDoubleClickEvent(QMouseEvent *event)
     event->accept();
     vec3d new_pivot;
     if (unproject(event->pos(), new_pivot)) set_rotation_pivot(new_pivot);
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -671,6 +674,7 @@ void GLcanvas::draw_helper()
         draw_text(p, "Right but       : translate      "); p.y()+=step;
         draw_text(p, "Double click    : change pivot   "); p.y()+=step;
         draw_text(p, "Key C           : pivot at center"); p.y()+=step;
+        draw_text(p, "Key S           : show pivot     "); p.y()+=step;
         draw_text(p, "Key R           : reset trackball"); p.y()+=step;
         draw_text(p, "Key A           : toggle axis    "); p.y()+=step;
         draw_text(p, "Key H           : toggle helper  "); p.y()+=step;
@@ -715,6 +719,13 @@ void GLcanvas::draw_text(const vec2i & pos, const std::string & text, const Colo
 {
     glColor3fv(c.rgba);
     renderText(pos.x(), pos.y(), text.c_str(), font);
+}
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::draw_marker(const vec3d & pos, const Color & c)
+{
+    sphere(pos, trackball.scene_size*0.01, c.rgba);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

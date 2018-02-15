@@ -120,6 +120,7 @@ class GLcanvas : public QGLWidget
         void draw_text(const TextLabel & t);
         void draw_text(const vec3d & pos, const std::string & text, const Color & c = Color::BLACK());
         void draw_text(const vec2i & pos, const std::string & text, const Color & c = Color::BLACK());
+        void draw_marker(const vec3d & pos, const Color & c = Color::RED());
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -166,6 +167,7 @@ class GLcanvas : public QGLWidget
         QFont     font;
         bool      show_helper;
         bool      show_axis;
+        bool      show_pivot;
 
         std::vector<const DrawableObject*> objects;
         std::vector<const TextLabel>       labels;
