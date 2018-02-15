@@ -298,6 +298,7 @@ std::ostream& operator<<(std::ostream &in, const vec3<real> &val)
 
 typedef vec3<double> vec3d;
 typedef vec3<float>  vec3f;
+typedef vec3<int>    vec3i;
 
 
 template<typename vec3>
