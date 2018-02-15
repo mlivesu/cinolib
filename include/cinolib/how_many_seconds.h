@@ -28,58 +28,23 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_DRAW_CYLINDER_H
-#define CINO_DRAW_CYLINDER_H
-
-#ifdef CINOLIB_USES_OPENGL
-
-#ifdef __APPLE__
-#include <gl.h>
-#include <glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#ifndef CINO_HOW_MANY_SECONDS_H
+#define CINO_HOW_MANY_SECONDS_H
 
 #include <cinolib/cino_inline.h>
-#include <cmath>
+#include <chrono>
 
 namespace cinolib
 {
 
-template <typename vec3>
 CINO_INLINE
-static void cylinder(const vec3  & a,
-                     const vec3  & b,
-                     float         top_radius,
-                     float         bottom_radius,
-                     const float * color)
-{
-    vec3 dir     = b - a; dir.normalize();
-    vec3 z       = vec3(0,0,1);
-    vec3 normal  = dir.cross(z);
-    double angle = acos(dir.dot(z)) * 180 / M_PI;
-
-    glEnable(GL_LIGHTING);
-    glEnable(GL_COLOR_MATERIAL);
-    glColor3fv(color);
-    glPushMatrix();
-    glTranslated(a[0], a[1], a[2]);
-    glRotatef(-angle, normal[0], normal[1], normal[2]);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glPolygonMode(GL_FRONT, GL_FILL);
-    GLUquadric *cylinder = gluNewQuadric();
-    gluQuadricNormals(cylinder, GLU_SMOOTH);
-    gluQuadricOrientation(cylinder, GLU_OUTSIDE);
-    gluCylinder(cylinder, top_radius, bottom_radius, (a-b).length(), 10, 5);
-    glPopMatrix();
-    glDisable(GL_COLOR_MATERIAL);
-    glDisable(GL_LIGHTING);
-}
+double how_many_seconds(const std::chrono::high_resolution_clock::time_point & t0,
+                        const std::chrono::high_resolution_clock::time_point & t1);
 
 }
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#ifndef  CINO_STATIC_LIB
+#include "how_many_seconds.cpp"
+#endif
 
-#endif // CINO_DRAW_CYLINDER_H
+#endif // CINO_HOW_MANY_SECONDS_H
