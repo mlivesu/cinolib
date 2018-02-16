@@ -219,7 +219,8 @@ void GLcanvas::mouseDoubleClickEvent(QMouseEvent *event)
 {
     event->accept();
     vec3d new_pivot;
-    if (unproject(event->pos(), new_pivot))
+    vec2i click(event->x(), event->y());
+    if (unproject(click, new_pivot))
     {
         set_rotation_pivot(new_pivot);
         show_pivot = true;
@@ -639,21 +640,44 @@ void GLcanvas::map_to_sphere(const QPoint & p2d, vec3d & p3d) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool GLcanvas::unproject(const QPoint & click, vec3d & p)
+bool GLcanvas::project(const vec3d & p3d, vec2i & p2d)
+{
+    makeCurrent();
+
+    GLint viewport[4] =
+    {
+        0,        height(), // top left corner
+        width(), -height()  // bottom right corner
+    };
+
+    GLdouble winX, winY, winZ;
+    gluProject(p3d.x(), p3d.y(), p3d.z(), trackball.modelview, trackball.projection, viewport,  &winX, &winY, &winZ);
+
+    p2d.x() = static_cast<int>(winX);
+    p2d.y() = static_cast<int>(winY);
+
+    std::cout << "project point(" << p3d << " => " << p2d <<std::endl;
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool GLcanvas::unproject(const vec2i & p2d, vec3d & p3d)
 {
     makeCurrent();
 
     // accout for retina displays when reading buffers
     // http://doc.qt.io/qt-5/qwindow.html#devicePixelRatio
     //
-    GLint x = click.x() * devicePixelRatio();
-    GLint y = click.y() * devicePixelRatio();
+    GLint x = p2d.x() * devicePixelRatio();
+    GLint y = p2d.y() * devicePixelRatio();
     GLfloat depth;
     glReadPixels(x, height_retina()-1-y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 
     if (depth >= 1)
     {
-        std::cout << "Unproject click(" << click.x() << "," << click.y() << ") depth: -1 [failed]" << std::endl;
+        std::cout << "Unproject click(" << p2d.x() << "," << p2d.y() << ") depth: -1 [failed]" << std::endl;
         return false;
     }
 
@@ -663,9 +687,9 @@ bool GLcanvas::unproject(const QPoint & click, vec3d & p)
         width(), -height()  // bottom right corner
     };
 
-    gluUnProject(click.x(), click.y(), depth, trackball.modelview, trackball.projection, viewport,  &p.x(), &p.y(), &p.z());
+    gluUnProject(p2d.x(), p2d.y(), depth, trackball.modelview, trackball.projection, viewport,  &p3d.x(), &p3d.y(), &p3d.z());
 
-    std::cout << "Unproject click(" << click.x() << "," << click.y() << ") depth: " << depth << " => " << p <<std::endl;
+    std::cout << "Unproject click(" << p2d.x() << "," << p2d.y() << ") depth: " << depth << " => " << p3d <<std::endl;
     return true;
 }
 

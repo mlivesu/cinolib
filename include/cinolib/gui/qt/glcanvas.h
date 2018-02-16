@@ -114,7 +114,11 @@ class GLcanvas : public QGLWidget
 
         void set_clear_color(const QColor & c);
         void fit_scene();
-        bool unproject(const QPoint & click, vec3d & p);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        bool project  (const vec3d & p3d, vec2i & p2d);
+        bool unproject(const vec2i & p2d, vec3d & p3d);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
