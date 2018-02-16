@@ -52,7 +52,6 @@ GLcanvas::GLcanvas(QWidget *parent) : QGLWidget(parent)
     setFocusPolicy(Qt::StrongFocus);
 
     clear_color = QColor(200, 200, 200);
-    font        = QFont("Courier New", 14);
     show_helper = false;
     show_axis   = false;
     show_pivot  = false;
@@ -699,25 +698,27 @@ CINO_INLINE
 void GLcanvas::draw_helper()
 {
     vec2i p(10,25);
-    uint  step = 17; // line spacing
+    uint  step    = 17;  // line   spacing
+    uint  fir_col = 10;  // first  text column
+    uint  sec_col = 111; // second text column
     glColor3f(0,0,0);
     if(show_helper)
     {
-        draw_text(p, "Left  but       : rotate         "); p.y()+=step;
-        draw_text(p, "Right but       : translate      "); p.y()+=step;
-        draw_text(p, "Double click    : change pivot   "); p.y()+=step;
-        draw_text(p, "Key C           : pivot at center"); p.y()+=step;
-        draw_text(p, "Key S           : show pivot     "); p.y()+=step;
-        draw_text(p, "Key R           : reset trackball"); p.y()+=step;
-        draw_text(p, "Key A           : toggle axis    "); p.y()+=step;
-        draw_text(p, "Key H           : toggle helper  "); p.y()+=step;
-        draw_text(p, "Key Left        : rotate left    "); p.y()+=step;
-        draw_text(p, "Key Right       : rotate right   "); p.y()+=step;
-        draw_text(p, "Key Up          : rotate up      "); p.y()+=step;
-        draw_text(p, "Key Down        : rotate down    "); p.y()+=step;
-        draw_text(p, "Cmd + Key C     : copy  POV      "); p.y()+=step;
-        draw_text(p, "Cmd + Key V     : paste POV      "); p.y()+=step;
-        draw_text(p, "Cmd + Right but : popup menu     "); p.y()+=step;
+                       draw_text(p, "Left  but      "); p.x()=sec_col; draw_text(p, ": rotate         "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Right but      "); p.x()=sec_col; draw_text(p, ": translate      "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Double click   "); p.x()=sec_col; draw_text(p, ": change pivot   "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Key C          "); p.x()=sec_col; draw_text(p, ": pivot at center"); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Key S          "); p.x()=sec_col; draw_text(p, ": show pivot     "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Key R          "); p.x()=sec_col; draw_text(p, ": reset trackball"); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Key A          "); p.x()=sec_col; draw_text(p, ": toggle axis    "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Key H          "); p.x()=sec_col; draw_text(p, ": toggle helper  "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Key Left       "); p.x()=sec_col; draw_text(p, ": rotate left    "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Key Right      "); p.x()=sec_col; draw_text(p, ": rotate right   "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Key Up         "); p.x()=sec_col; draw_text(p, ": rotate up      "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Key Down       "); p.x()=sec_col; draw_text(p, ": rotate down    "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Cmd + Key C    "); p.x()=sec_col; draw_text(p, ": copy  POV      "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Cmd + Key V    "); p.x()=sec_col; draw_text(p, ": paste POV      "); p.y()+=step;
+        p.x()=fir_col; draw_text(p, "Cmd + Right but"); p.x()=sec_col; draw_text(p, ": popup menu     ");
         // add +/shift+ to move znear
         // add -/shift- to move zfar
     }
@@ -753,7 +754,7 @@ void GLcanvas::draw_text(const vec3d & pos, const std::string & text, const Colo
 {
     if (text.empty()) return;
     glColor3fv(c.rgba);
-    renderText(pos.x(), pos.y(), pos.z(), text.c_str(), font); // violates const
+    renderText(pos.x(), pos.y(), pos.z(), text.c_str()); // violates const
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -763,7 +764,7 @@ void GLcanvas::draw_text(const vec2i & pos, const std::string & text, const Colo
 {
     if (text.empty()) return;
     glColor3fv(c.rgba);
-    renderText(pos.x(), pos.y(), text.c_str(), font);  // violates const
+    renderText(pos.x(), pos.y(), text.c_str());  // violates const
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -177,7 +177,6 @@ class GLcanvas : public QGLWidget
         QColor    clear_color;
         Trackball trackball;
         QMenu    *popup;
-        QFont     font;
         bool      show_helper;
         bool      show_axis;
         bool      show_pivot;
