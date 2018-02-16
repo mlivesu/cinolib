@@ -77,13 +77,14 @@ class GLcanvas : public QGLWidget
 
     typedef struct
     {
-        std::string label;    // text to render
-        Color       color;    // text color
-        vec3d       p3d;      // pos 3D
-        vec2i       p2d;      // pos 2D
-        bool        is_3d;    // if true the label will be positioned projecting p3d on
-    }                         // screen, otherwise p2d will be used as window coordinates
-    TextLabel;
+        vec3d       p3d;        // pos 3D
+        vec2i       p2d;        // pos 2D
+        std::string label;      // text to render
+        Color       color;      // text (and sphere) color
+        bool        has_sphere; // draws a little sphere centerd in p3d
+        bool        is_3d;      // if true the label will be positioned projecting p3d on
+    }                           // screen, otherwise p2d will be used as window coordinates
+    Marker;
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -124,10 +125,10 @@ class GLcanvas : public QGLWidget
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void push_label(const vec3d & p, const std::string & label, const Color & c = Color::BLACK());
-        void push_label(const vec2i & p, const std::string & label, const Color & c = Color::BLACK());
-        void pop_label();
-        void pop_all_labels();
+        void push_marker(const vec3d & p, const std::string & label, const Color & c = Color::BLACK(), const bool has_sphere = true);
+        void push_marker(const vec2i & p, const std::string & label, const Color & c = Color::BLACK());
+        void pop_marker();
+        void pop_all_markers();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -148,10 +149,10 @@ class GLcanvas : public QGLWidget
     protected:
 
         void make_popup_menu();
-        void draw_text(const TextLabel & t);
+        void draw_marker(const Marker & t);
+        void draw_marker(const vec3d & pos, const std::string & text = "", const Color & c = Color::RED(), const bool has_sphere = true);
         void draw_text(const vec3d & pos, const std::string & text, const Color & c = Color::BLACK());
         void draw_text(const vec2i & pos, const std::string & text, const Color & c = Color::BLACK());
-        void draw_sphere(const vec3d & pos, const Color & c = Color::RED());
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -178,7 +179,7 @@ class GLcanvas : public QGLWidget
         bool      show_pivot;
 
         std::vector<const DrawableObject*> objects;
-        std::vector<const TextLabel>       labels;
+        std::vector<const Marker>          markers;
 };
 
 }

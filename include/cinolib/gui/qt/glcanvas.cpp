@@ -114,12 +114,15 @@ void GLcanvas::paintGL()
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     // render objects
-    for(auto obj:objects) obj->draw(trackball.scene_size);
+    for(auto obj : objects) obj->draw(trackball.scene_size);
 
-    // render axis/labels/pivot/helper
+    // render markers
+    for(auto l : markers) draw_marker(l);
+
+    // render axis/pivot
     if (show_axis)  draw_axis();
-    if (show_pivot) draw_sphere(trackball.pivot);
-    if (show_pivot) for(auto l:labels) draw_text(l);
+    if (show_pivot) draw_marker(trackball.pivot, "pivot");
+
     draw_helper();
 }
 
@@ -216,7 +219,11 @@ void GLcanvas::mouseDoubleClickEvent(QMouseEvent *event)
 {
     event->accept();
     vec3d new_pivot;
-    if (unproject(event->pos(), new_pivot)) set_rotation_pivot(new_pivot);
+    if (unproject(event->pos(), new_pivot))
+    {
+        set_rotation_pivot(new_pivot);
+        show_pivot = true;
+    }
     updateGL();
 }
 
@@ -430,43 +437,45 @@ bool GLcanvas::pop(const DrawableObject *obj)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::push_label(const vec2i & p, const std::string & label, const Color & c)
+void GLcanvas::push_marker(const vec2i & p, const std::string & label, const Color & c)
 {
-    TextLabel l;
-    l.label = label;
-    l.is_3d = false;
-    l.p2d   = p;
-    l.color = c;
-    labels.push_back(l);
+    Marker l;
+    l.label      = label;
+    l.is_3d      = false;
+    l.has_sphere = false;
+    l.p2d        = p;
+    l.color      = c;
+    markers.push_back(l);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::push_label(const vec3d & p, const std::string & label, const Color & c)
+void GLcanvas::push_marker(const vec3d & p, const std::string & label, const Color & c, const bool has_sphere)
 {
-    TextLabel l;
-    l.label = label;
-    l.is_3d = true;
-    l.p3d   = p;
-    l.color = c;
-    labels.push_back(l);
+    Marker l;
+    l.label      = label;
+    l.is_3d      = true;
+    l.has_sphere = has_sphere;
+    l.p3d        = p;
+    l.color      = c;
+    markers.push_back(l);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::pop_label()
+void GLcanvas::pop_marker()
 {
-    labels.pop_back();
+    markers.pop_back();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::pop_all_labels()
+void GLcanvas::pop_all_markers()
 {
-    labels.clear();
+    markers.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -668,7 +677,7 @@ void GLcanvas::draw_helper()
     vec2i p(10,25);
     uint  step = 17; // line spacing
     glColor3f(0,0,0);
-    if (show_helper)
+    if(show_helper)
     {
         draw_text(p, "Left  but       : rotate         "); p.y()+=step;
         draw_text(p, "Right but       : translate      "); p.y()+=step;
@@ -690,17 +699,27 @@ void GLcanvas::draw_helper()
     }
     else
     {
-        draw_text(p, "Key H: toggle helper");
+        draw_text(p, "Key H for help");
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::draw_text(const TextLabel & t)
+void GLcanvas::draw_marker(const Marker & t)
 {
-    if (t.is_3d) draw_text(t.p3d, t.label.c_str(), t.color);
-    else         draw_text(t.p2d, t.label.c_str(), t.color);
+    if (t.is_3d) draw_marker(t.p3d, t.label, t.color, t.has_sphere);
+    else         draw_text(t.p2d, t.label, t.color);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::draw_marker(const vec3d & pos, const std::string & text, const Color & c, const bool has_sphere)
+{
+    double r  = trackball.scene_size*0.01;
+    if(has_sphere) sphere(pos, r, c.rgba);
+    draw_text(pos + vec3d(r,r,r), text, c);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -708,6 +727,7 @@ void GLcanvas::draw_text(const TextLabel & t)
 CINO_INLINE
 void GLcanvas::draw_text(const vec3d & pos, const std::string & text, const Color & c)
 {
+    if (text.empty()) return;
     glColor3fv(c.rgba);
     renderText(pos.x(), pos.y(), pos.z(), text.c_str(), font);
 }
@@ -717,15 +737,9 @@ void GLcanvas::draw_text(const vec3d & pos, const std::string & text, const Colo
 CINO_INLINE
 void GLcanvas::draw_text(const vec2i & pos, const std::string & text, const Color & c)
 {
+    if (text.empty()) return;
     glColor3fv(c.rgba);
     renderText(pos.x(), pos.y(), text.c_str(), font);
-}
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::draw_sphere(const vec3d & pos, const Color & c)
-{
-    sphere(pos, trackball.scene_size*0.01, c.rgba);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
