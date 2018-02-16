@@ -656,8 +656,8 @@ bool GLcanvas::project(const vec3d & p3d, vec2i & p2d)
     p2d.x() = static_cast<int>(winX);
     p2d.y() = static_cast<int>(winY);
 
-    std::cout << "project point(" << p3d << " => " << p2d <<std::endl;
-    return true;
+    if(winX>=0 && winX<=width() && winY>=0 && winY<=height()) return true;
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
