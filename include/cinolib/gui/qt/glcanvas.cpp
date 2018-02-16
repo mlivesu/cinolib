@@ -571,7 +571,7 @@ void GLcanvas::updateGL()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-int GLcanvas::height_retina()
+int GLcanvas::height_retina() const
 {
     // http://doc.qt.io/qt-5/qwindow.html#devicePixelRatio
     return height() * devicePixelRatio();
@@ -580,7 +580,7 @@ int GLcanvas::height_retina()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-int GLcanvas::width_retina()
+int GLcanvas::width_retina() const
 {
     // http://doc.qt.io/qt-5/qwindow.html#devicePixelRatio
     return width() * devicePixelRatio();
@@ -642,7 +642,7 @@ void GLcanvas::map_to_sphere(const QPoint & p2d, vec3d & p3d) const
 CINO_INLINE
 bool GLcanvas::project(const vec3d & p3d, vec2i & p2d)
 {
-    makeCurrent();
+    makeCurrent(); // violates const
 
     GLint viewport[4] =
     {
@@ -665,7 +665,7 @@ bool GLcanvas::project(const vec3d & p3d, vec2i & p2d)
 CINO_INLINE
 bool GLcanvas::unproject(const vec2i & p2d, vec3d & p3d)
 {
-    makeCurrent();
+    makeCurrent(); // violates const
 
     // accout for retina displays when reading buffers
     // http://doc.qt.io/qt-5/qwindow.html#devicePixelRatio
@@ -753,7 +753,7 @@ void GLcanvas::draw_text(const vec3d & pos, const std::string & text, const Colo
 {
     if (text.empty()) return;
     glColor3fv(c.rgba);
-    renderText(pos.x(), pos.y(), pos.z(), text.c_str(), font);
+    renderText(pos.x(), pos.y(), pos.z(), text.c_str(), font); // violates const
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -763,7 +763,7 @@ void GLcanvas::draw_text(const vec2i & pos, const std::string & text, const Colo
 {
     if (text.empty()) return;
     glColor3fv(c.rgba);
-    renderText(pos.x(), pos.y(), text.c_str(), font);
+    renderText(pos.x(), pos.y(), text.c_str(), font);  // violates const
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

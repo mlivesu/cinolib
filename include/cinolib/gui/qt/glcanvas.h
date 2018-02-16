@@ -102,8 +102,8 @@ class GLcanvas : public QGLWidget
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int height_retina();
-        int width_retina();
+        int height_retina() const;
+        int width_retina()  const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
