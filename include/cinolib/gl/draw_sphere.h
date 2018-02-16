@@ -62,6 +62,7 @@ static void sphere(const vec3  & center,
     gluQuadricOrientation(sphere, GLU_OUTSIDE);
     gluSphere(sphere, radius, 10, 10);
     glPopMatrix();
+    glColor3f(1.f,1.f,1.f);
     glDisable(GL_COLOR_MATERIAL);
     glDisable(GL_LIGHTING);
 }
