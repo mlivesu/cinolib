@@ -42,6 +42,7 @@
 
 #include <vector>
 #include <string>
+#include <functional>
 #include <QGLWidget>
 #include <QColor>
 #include <QMenu>
@@ -147,6 +148,18 @@ class GLcanvas : public QGLWidget
         void mouseReleaseEvent    (QMouseEvent *event);
         void mouseMoveEvent       (QMouseEvent *event);
         void wheelEvent           (QWheelEvent *event);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        // these callbacks can be used to execute external code when mouse and keyboard
+        // events occurr (e.g. for picking, drawing). If defined, they will be called
+        // **before** the internal event handlers
+        std::function<void(GLcanvas *canvas, QKeyEvent   *event)> callback_key_press;
+        std::function<void(GLcanvas *canvas, QMouseEvent *event)> callback_mouse_double_click;
+        std::function<void(GLcanvas *canvas, QMouseEvent *event)> callback_mouse_press;
+        std::function<void(GLcanvas *canvas, QMouseEvent *event)> callback_mouse_release;
+        std::function<void(GLcanvas *canvas, QMouseEvent *event)> callback_mouse_move;
+        std::function<void(GLcanvas *canvas, QWheelEvent *event)> callback_wheel;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
