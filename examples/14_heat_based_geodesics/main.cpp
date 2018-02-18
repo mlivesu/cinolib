@@ -17,6 +17,17 @@
 #include <cinolib/geodesics.h>
 #include <cinolib/profiler.h>
 #include <cinolib/gui/qt/glcanvas.h>
+#include <algorithm>
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+uint closest_vertex(const cinolib::vec3d & p, const cinolib::Trimesh<> & m)
+{
+    std::vector<std::pair<double,uint>> closest;
+    for(uint vid=0; vid<m.num_verts(); ++vid) closest.push_back(std::make_pair(m.vert(vid).dist(p),vid));
+    std::sort(closest.begin(), closest.end());
+    return closest.front().second;
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -39,12 +50,7 @@ int main(int argc, char **argv)
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.obj";
     DrawableTrimesh<> m(s.c_str());
-    m.show_texture1D(TEXTURE_1D_HSV_RAMP_W_ISOLINES);
     gui.push_obj(&m);
-
-    ScalarField zero(m.num_verts());
-    zero.copy_to_mesh(m);
-    m.updateGL();
 
     Profiler profiler;
     std::vector<uint> sources;
@@ -58,15 +64,13 @@ int main(int argc, char **argv)
             vec2i click(e->x(), e->y());
             if (c->unproject(click, p)) // transform click in a 3d point
             {
-                // find mesh vertex closest to p
-                std::set<std::pair<double,uint>> closest;
-                for(uint vid=0; vid<m.num_verts(); ++vid) closest.insert(std::make_pair(m.vert(vid).dist(p),vid));
-                // add it to source list and re-compute heat geodesics
-                sources.push_back(closest.begin()->second);
+                // add selected vertex to source list and re-compute heat geodesics
+                uint vid = closest_vertex(p,m);
+                sources.push_back(vid);
                 profiler.push("compute_geodesics");
                 compute_geodesics_amortized(m, prefactored_matrices, sources).copy_to_mesh(m);
                 profiler.pop();
-                m.updateGL();
+                m.show_texture1D(TEXTURE_1D_HSV_RAMP_W_ISOLINES);
                 c->updateGL();
             }
         }
@@ -77,8 +81,7 @@ int main(int argc, char **argv)
     {
         // reset heat sources
         sources.clear();
-        zero.copy_to_mesh(m);
-        m.updateGL();
+        m.show_vert_color();
         gui.updateGL();
     });
 
