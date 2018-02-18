@@ -701,7 +701,6 @@ void GLcanvas::draw_helper()
     uint  step    = 17;  // line   spacing
     uint  fir_col = 10;  // first  text column
     uint  sec_col = 111; // second text column
-    glColor3f(0,0,0);
     if(show_helper)
     {
                        draw_text(p, "Left  but      "); p.x()=sec_col; draw_text(p, ": rotate         "); p.y()+=step;
@@ -755,6 +754,7 @@ void GLcanvas::draw_text(const vec3d & pos, const std::string & text, const Colo
     if (text.empty()) return;
     glColor3fv(c.rgba);
     renderText(pos.x(), pos.y(), pos.z(), text.c_str()); // violates const
+    glColor3f(1.0,1.0,1.0);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -765,6 +765,7 @@ void GLcanvas::draw_text(const vec2i & pos, const std::string & text, const Colo
     if (text.empty()) return;
     glColor3fv(c.rgba);
     renderText(pos.x(), pos.y(), text.c_str());  // violates const
+    glColor3f(1.0,1.0,1.0);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
