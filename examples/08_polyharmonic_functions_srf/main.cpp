@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     GLcanvas gui(&window);    
     QLabel label("Harmonicity index (1 => harmonic, 2 => bi-harmonic, ...):", &window);
     QSpinBox n_harmonicity(&window);
-    n_harmonicity.setMaximum(10);
+    n_harmonicity.setMaximum(5);
     n_harmonicity.setMinimum(1);
     QGridLayout layout;
     layout.addWidget(&label,0,0);
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     {
         std::map<uint,double> bc = {{7,0.0}, {99,1.0}}; // Dirichlet boundary conditions
         profiler.push("harmonic_map");
-        harmonic_map(m, bc, n_harmonicity.value(), COTANGENT, SIMPLICIAL_LDLT).copy_to_mesh(m);
+        harmonic_map(m, bc, n_harmonicity.value(), COTANGENT).copy_to_mesh(m);
         profiler.pop();
         m.updateGL();
         gui.updateGL();

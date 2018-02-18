@@ -52,10 +52,6 @@ namespace cinolib
  * n = 2  | biharmonic  | C^1 at boundary conditions, C^2 everywhere else
  * n = 3  | triharmonic | C^2 at boundary conditions, C^3 everywhere else
  * ...
- *
- * WARNING: the matrix is guaranteed Positive Semi Definite only for n=1. If
- * higher values of n are chosen I suggest avoiding the SIMPLICIAL_LLT solver
- * and using something like SIMPLICIAL_LDLT instead.
 */
 
 template<class M, class V, class E, class P>

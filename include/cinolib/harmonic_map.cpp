@@ -83,7 +83,7 @@ std::vector<vec3d> harmonic_map_3d(const AbstractMesh<M,V,E,P> & m,
     Eigen::SparseMatrix<double> Ln = -L;
     Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(3*m.num_verts());
 
-    for(uint i=1; i<n; ++i) Ln  = Ln * L;
+    for(uint i=1; i<n; ++i) Ln  = Ln * (-L); // keep it PSD
 
     uint y_off = m.num_verts();
     uint z_off = m.num_verts() + y_off;
