@@ -78,7 +78,7 @@ int main(int argc, char **argv)
                 uint vid = closest_vertex(p,m);
                 dirichlet_bcs[vid] = 1.0;
                 has_at_least_one_max = true;
-                c->push_marker(m.vert(vid), "", Color::BLUE());
+                c->push_marker(m.vert(vid), "", Color::RED());
                 c->updateGL();
             }
         }
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
                 uint vid = closest_vertex(p,m);
                 dirichlet_bcs[vid] = 0.0;
                 has_at_least_one_min = true;
-                c->push_marker(m.vert(vid), "", Color::RED());
+                c->push_marker(m.vert(vid), "", Color::BLUE());
                 c->updateGL();
             }
         }
