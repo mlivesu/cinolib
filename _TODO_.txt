@@ -1,8 +1,6 @@
-- add callbacks to viewer
-- put cotangents (tets/tris) on a separate .h/cpp file?
+- put cotangents (tets/tris) on a separate .h/cpp file
 - add inverse and transpose operators for 2x2 matrices
 - remove virtual from mesh hierarchy whenever possible
-- make sure 1D textures are always drawn covering full spectrum (RED to BLUE in HSV RAMP)
 - use Möller–Trumbore algorithm for 3D ray-triangle intersection 
 - refactor ray/line/plane intersections and integral curve tracing 
   (check Robust Polylines Tracing for N-Symmetry Direction Field on Triangulated Surfaces)
@@ -10,12 +8,10 @@
      => then deprecate update_adjacency and make connectivity through poly_add and vert_add instead
         (I already tested for surfaces. The code is much cleaner and loading becomes slightly faster!)
 - Add GUI controls: load/save labeling
-- Turn gradient GUI control in vector field (gradient button to make a gradient)
 - avoid headers from serialized vector and scalar fields (it’s far more general)
 - update skeleton data structure (and make relative control panel)
 - Gradients on hexmeshes are buggy. hint: check per face normals!
 - add max_depth to Profiler to avoid lengthy reports
-- consider avoiding to use a tree into the profiler. Sorting entries w.r.t. call time should do the job…
 - extend the concept of subdivisions from hexmesh to any mesh
 - add Additive Manufacturing stuff (load and process CLI files)…
 - Add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
