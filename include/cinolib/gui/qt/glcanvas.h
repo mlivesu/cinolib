@@ -48,6 +48,7 @@
 #include <QMenu>
 #include <cinolib/drawable_object.h>
 #include <cinolib/bbox.h>
+#include <cinolib/color.h>
 #include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>
 
