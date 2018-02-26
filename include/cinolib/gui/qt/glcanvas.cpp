@@ -124,7 +124,7 @@ void GLcanvas::paintGL()
     for(auto obj : objects) obj->draw(trackball.scene_size);
 
     // render markers
-    for(auto l : markers) draw_marker(l);
+    for(auto l : markers) draw_marker(*l);
 
     // render axis/pivot
     if (show_axis)  draw_axis();
@@ -461,12 +461,12 @@ bool GLcanvas::pop(const DrawableObject *obj)
 CINO_INLINE
 void GLcanvas::push_marker(const vec2i & p, const std::string & label, const Color & c)
 {
-    Marker l;
-    l.label      = label;
-    l.is_3d      = false;
-    l.has_sphere = false;
-    l.p2d        = p;
-    l.color      = c;
+    Marker *l    = new Marker;
+    l->label      = label;
+    l->is_3d      = false;
+    l->has_sphere = false;
+    l->p2d        = p;
+    l->color      = c;
     markers.push_back(l);
 }
 
@@ -475,12 +475,12 @@ void GLcanvas::push_marker(const vec2i & p, const std::string & label, const Col
 CINO_INLINE
 void GLcanvas::push_marker(const vec3d & p, const std::string & label, const Color & c, const bool has_sphere)
 {
-    Marker l;
-    l.label      = label;
-    l.is_3d      = true;
-    l.has_sphere = has_sphere;
-    l.p3d        = p;
-    l.color      = c;
+    Marker *l     = new Marker;
+    l->label      = label;
+    l->is_3d      = true;
+    l->has_sphere = has_sphere;
+    l->p3d        = p;
+    l->color      = c;
     markers.push_back(l);
 }
 

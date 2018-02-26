@@ -196,7 +196,7 @@ class GLcanvas : public QGLWidget
         bool      show_pivot;
 
         std::vector<const DrawableObject*> objects;
-        std::vector<const Marker>          markers;
+        std::vector<const Marker*>         markers;
 };
 
 }
