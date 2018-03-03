@@ -83,6 +83,7 @@ GLcanvas::GLcanvas(QWidget *parent) : QGLWidget(parent)
 CINO_INLINE
 GLcanvas::~GLcanvas()
 {
+    pop_all_markers();
     delete popup;
 }
 
