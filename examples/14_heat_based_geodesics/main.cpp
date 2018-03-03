@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     GLcanvas gui(&window);
     QPushButton but_reset("Reset");
     QGridLayout layout;
-    gui.push_marker(vec2i(10, gui.height()-20), "CMD + click to add a heat source");
+    gui.push_marker(vec2i(10, gui.height()-20), "CMD + click to add a heat source", Color::BLACK(), 12, 0);
     layout.addWidget(&but_reset,0,9);
     layout.addWidget(&gui,1,0,1,10);
     window.setLayout(&layout);

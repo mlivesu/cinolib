@@ -55,41 +55,39 @@
 namespace cinolib
 {
 
+typedef struct
+{
+    vec2i       p2d = vec2i(-1,-1);       // pos 2D
+    vec3d       p3d;                      // if p2d points offscreen (i.e. p.x<0) a projection of p3d will be used instead
+    uint        disk_size = 5;            // disk radius (in pixels). set zero if don't want a disk to appear
+    uint        font_size = 10;           // font size;
+    std::string label     = "";           // text to render. empty string if don't want any text to appear
+    Color       color     = Color::RED(); // color, for both text and disk
+}
+Marker;
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+typedef struct
+{
+    bool     mouse_pressed = false;        // true if mouse is pressed
+    double   radius        = 0.5;          // trackball radius
+    vec3d    pivot         = vec3d(0,0,0); // trackball rotation origin
+    QPoint   last_click_2d;                // window coords
+    vec3d    last_click_3d;                // world  coords
+    GLdouble projection[16];               // openGL projection matrix
+    GLdouble modelview[16];                // openGL modelview  matrix
+    float    z_near        = 0.1;          // front clipping plane
+    float    z_far         = 1.0;          // back  clipping plane
+    vec3d    scene_center  = vec3d(0,0,0); // scene_center
+    float    scene_size    = 1.0;          // scene_size
+}
+Trackball;
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 class GLcanvas : public QGLWidget
 {
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    typedef struct
-    {
-        bool     mouse_pressed = false;        // true if mouse is pressed
-        double   radius        = 0.5;          // trackball radius
-        vec3d    pivot         = vec3d(0,0,0); // trackball rotation origin
-        QPoint   last_click_2d;                // window coords
-        vec3d    last_click_3d;                // world  coords
-        GLdouble projection[16];               // openGL projection matrix
-        GLdouble modelview[16];                // openGL modelview  matrix
-        float    z_near        = 0.1;          // front clipping plane
-        float    z_far         = 1.0;          // back  clipping plane
-        vec3d    scene_center  = vec3d(0,0,0); // scene_center
-        float    scene_size    = 1.0;          // scene_size
-    }
-    Trackball;
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    typedef struct
-    {
-        vec3d       p3d;        // pos 3D
-        vec2i       p2d;        // pos 2D
-        std::string label;      // text to render
-        Color       color;      // text (and sphere) color
-        bool        has_sphere; // draws a little sphere centerd in p3d
-        bool        is_3d;      // if true the label will be positioned projecting p3d on
-    }                           // screen, otherwise p2d will be used as window coordinates
-    Marker;
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     public:
 
         explicit GLcanvas(QWidget * parent = 0);
@@ -109,7 +107,7 @@ class GLcanvas : public QGLWidget
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void draw_helper();
+        void draw_helper(QPainter & painter);
         void draw_axis();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -119,8 +117,10 @@ class GLcanvas : public QGLWidget
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool project  (const vec3d & p3d, vec2i & p2d);
-        bool unproject(const vec2i & p2d, vec3d & p3d);
+        bool read_Z_buffer(const vec2i & p2d, GLfloat & depth);
+        bool depth_test   (const vec3d & p3d);
+        bool project      (const vec3d & p3d, vec2i & p2d, GLdouble & depth);
+        bool unproject    (const vec2i & p2d, vec3d & p3d);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -131,8 +131,9 @@ class GLcanvas : public QGLWidget
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void push_marker(const vec3d & p, const std::string & label, const Color & c = Color::BLACK(), const bool has_sphere = true);
-        void push_marker(const vec2i & p, const std::string & label, const Color & c = Color::BLACK());
+        void push_marker(const Marker * m);
+        void push_marker(const vec3d & p, const std::string & label, const Color & c = Color::RED(), const uint font_size = 10, const uint disk_size = 5);
+        void push_marker(const vec2i & p, const std::string & label, const Color & c = Color::RED(), const uint font_size = 10, const uint disk_size = 5);
         void pop_marker();
         void pop_all_markers();
 
@@ -167,10 +168,12 @@ class GLcanvas : public QGLWidget
     protected:
 
         void make_popup_menu();
-        void draw_marker(const Marker & t);
-        void draw_marker(const vec3d & pos, const std::string & text = "", const Color & c = Color::RED(), const bool has_sphere = true);
-        void draw_text(const vec3d & pos, const std::string & text, const Color & c = Color::BLACK());
-        void draw_text(const vec2i & pos, const std::string & text, const Color & c = Color::BLACK());
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void draw_marker(QPainter & painter, const Marker & t);
+        void draw_text  (QPainter & painter, const vec2i & pos, const std::string & text, const uint font_size = 9, const Color & c = Color::BLACK());
+        void draw_disk  (QPainter & painter, const vec2i & center, const uint radius, const Color & c = Color::BLACK());
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

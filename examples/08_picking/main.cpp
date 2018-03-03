@@ -46,7 +46,7 @@ int main(int argc, char **argv)
     GLcanvas gui;
     gui.show();
     gui.push_obj(&m);
-    gui.push_marker(vec2i(10, gui.height()-20), "CMD + click to select a vertex");
+    gui.push_marker(vec2i(10, gui.height()-20), "CMD + click to select a vertex", Color::BLACK(), 12, 0);
 
     Profiler profiler;
 

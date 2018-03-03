@@ -55,8 +55,8 @@ int main(int argc, char **argv)
     window.setLayout(&layout);
     window.show();
     window.resize(600,600);
-    gui.push_marker(vec2i(10, gui.height()-20), "CMD + click to add a maximum");
-    gui.push_marker(vec2i(10, gui.height()-40), "SHIFT + click to add a minimum");
+    gui.push_marker(vec2i(10, gui.height()-20), "CMD + click to add a maximum", Color::BLACK(), 12, 0);
+    gui.push_marker(vec2i(10, gui.height()-40), "SHIFT + click to add a minimum", Color::BLACK(), 12, 0);
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.obj";
     DrawableTrimesh<> m(s.c_str());
@@ -121,8 +121,8 @@ int main(int argc, char **argv)
         dirichlet_bcs.clear();
         m.show_poly_color();
         gui.pop_all_markers();
-        gui.push_marker(vec2i(10, gui.height()-20), "CMD + click to add a maximum");
-        gui.push_marker(vec2i(10, gui.height()-40), "SHIFT + click to add a minimum");
+        gui.push_marker(vec2i(10, gui.height()-20), "CMD + click to add a maximum", Color::BLACK(), 12, 0);
+        gui.push_marker(vec2i(10, gui.height()-40), "SHIFT + click to add a minimum", Color::BLACK(), 12, 0);
         gui.updateGL();
     });
 

@@ -97,6 +97,11 @@ void GLcanvas::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
+    // For compatibility between native GL code and QPainter, see (end of the page)
+    // http://www.informit.com/articles/article.aspx?p=1405557&seqNum=2
+    setAutoFillBackground(false);
+    setAutoBufferSwap(false);
+
     reset_trackball();
 }
 
@@ -116,21 +121,37 @@ void GLcanvas::resizeGL(int w, int h)
 CINO_INLINE
 void GLcanvas::paintGL()
 {
-    makeCurrent();
+    // --------------- NATIVE OPEN GL RENDERING ---------------- //
+
     glClearColor(clear_color.redF(), clear_color.greenF(), clear_color.blueF(), clear_color.alphaF());
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    // render objects
+    // render drawable objects (meshes, curve-skeletons, ...)
     for(auto obj : objects) obj->draw(trackball.scene_size);
 
+    // render global XYZ axis
+    if (show_axis) draw_axis();
+
+    // ------ QPAINTER-BASED RENDERING (text,circles,...) ------ //
+
+    QPainter painter(this);
+
     // render markers
-    for(auto l : markers) draw_marker(*l);
+    for(auto l : markers) draw_marker(painter, *l);
 
-    // render axis/pivot
-    if (show_axis)  draw_axis();
-    if (show_pivot) draw_marker(trackball.pivot, "pivot");
+    // render center of trackball (pivot)
+    if (show_pivot)
+    {
+        Marker m;
+        m.p3d   = trackball.pivot;
+        m.label = "pivot";
+        draw_marker(painter, m);
+    }
 
-    draw_helper();
+    // render helper
+    draw_helper(painter);
+
+    swapBuffers();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -459,13 +480,21 @@ bool GLcanvas::pop(const DrawableObject *obj)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::push_marker(const vec2i & p, const std::string & label, const Color & c)
+void GLcanvas::push_marker(const Marker * m)
 {
-    Marker *l    = new Marker;
-    l->label      = label;
-    l->is_3d      = false;
-    l->has_sphere = false;
+    markers.push_back(m);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::push_marker(const vec2i & p, const std::string & label, const Color & c, const uint font_size, const uint disk_size)
+{
+    Marker *l     = new Marker;
     l->p2d        = p;
+    l->label      = label;
+    l->font_size  = font_size;
+    l->disk_size  = disk_size;
     l->color      = c;
     markers.push_back(l);
 }
@@ -473,13 +502,13 @@ void GLcanvas::push_marker(const vec2i & p, const std::string & label, const Col
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::push_marker(const vec3d & p, const std::string & label, const Color & c, const bool has_sphere)
+void GLcanvas::push_marker(const vec3d & p, const std::string & label, const Color & c, const uint font_size, const uint disk_size)
 {
     Marker *l     = new Marker;
-    l->label      = label;
-    l->is_3d      = true;
-    l->has_sphere = has_sphere;
     l->p3d        = p;
+    l->label      = label;
+    l->font_size  = font_size;
+    l->disk_size  = disk_size;
     l->color      = c;
     markers.push_back(l);
 }
@@ -489,6 +518,7 @@ void GLcanvas::push_marker(const vec3d & p, const std::string & label, const Col
 CINO_INLINE
 void GLcanvas::pop_marker()
 {
+    delete markers.back();
     markers.pop_back();
 }
 
@@ -497,6 +527,7 @@ void GLcanvas::pop_marker()
 CINO_INLINE
 void GLcanvas::pop_all_markers()
 {
+    for(auto *ptr : markers) delete ptr;
     markers.clear();
 }
 
@@ -651,30 +682,7 @@ void GLcanvas::map_to_sphere(const QPoint & p2d, vec3d & p3d) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool GLcanvas::project(const vec3d & p3d, vec2i & p2d)
-{
-    makeCurrent(); // violates const
-
-    GLint viewport[4] =
-    {
-        0,        height(), // top left corner
-        width(), -height()  // bottom right corner
-    };
-
-    GLdouble winX, winY, winZ;
-    gluProject(p3d.x(), p3d.y(), p3d.z(), trackball.modelview, trackball.projection, viewport,  &winX, &winY, &winZ);
-
-    p2d.x() = static_cast<int>(winX);
-    p2d.y() = static_cast<int>(winY);
-
-    if(winX>=0 && winX<=width() && winY>=0 && winY<=height()) return true;
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool GLcanvas::unproject(const vec2i & p2d, vec3d & p3d)
+bool GLcanvas::read_Z_buffer(const vec2i & p2d, GLfloat & depth)
 {
     makeCurrent(); // violates const
 
@@ -683,12 +691,21 @@ bool GLcanvas::unproject(const vec2i & p2d, vec3d & p3d)
     //
     GLint x = p2d.x() * devicePixelRatio();
     GLint y = p2d.y() * devicePixelRatio();
-    GLfloat depth;
     glReadPixels(x, height_retina()-1-y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 
-    if (depth >= 1)
+    if (depth >= 1 || depth <= 0) return false;
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool GLcanvas::unproject(const vec2i & p2d, vec3d & p3d)
+{
+    GLfloat depth;
+    if (!read_Z_buffer(p2d, depth))
     {
-        std::cout << "Unproject click(" << p2d.x() << "," << p2d.y() << ") depth: -1 [failed]" << std::endl;
+        std::cout << "Unproject click(" << p2d.x() << "," << p2d.y() << ") depth: 1 [failed]" << std::endl;
         return false;
     }
 
@@ -707,7 +724,47 @@ bool GLcanvas::unproject(const vec2i & p2d, vec3d & p3d)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::draw_helper()
+bool GLcanvas::project(const vec3d & p3d, vec2i & p2d, GLdouble & depth)
+{
+    makeCurrent(); // violates const
+
+    GLint viewport[4] =
+    {
+        0,        height(), // top left corner
+        width(), -height()  // bottom right corner
+    };
+
+    GLdouble winX, winY;
+    gluProject(p3d.x(), p3d.y(), p3d.z(), trackball.modelview, trackball.projection, viewport,  &winX, &winY, &depth);
+
+    p2d.x() = static_cast<int>(winX);
+    p2d.y() = static_cast<int>(winY);
+
+    if(winX>=0 && winX<=width() && winY>=0 && winY<=height()) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// true if p3d stays in front of what is currently stored in the depth buffer
+//
+CINO_INLINE
+bool GLcanvas::depth_test(const vec3d & p3d)
+{
+    GLdouble depth;
+    vec2i    p2d;
+    project(p3d, p2d, depth);
+
+    GLfloat z_buff;
+    if (!read_Z_buffer(p2d, z_buff)) return true; // if reading the z-buffer fails, the test is passed by default
+    if (z_buff >= depth) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::draw_helper(QPainter & painter)
 {
     vec2i p(10,25);
     uint  step    = 17;  // line   spacing
@@ -715,69 +772,70 @@ void GLcanvas::draw_helper()
     uint  sec_col = 111; // second text column
     if(show_helper)
     {
-                       draw_text(p, "Left  but      "); p.x()=sec_col; draw_text(p, ": rotate         "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Right but      "); p.x()=sec_col; draw_text(p, ": translate      "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Double click   "); p.x()=sec_col; draw_text(p, ": change pivot   "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Key C          "); p.x()=sec_col; draw_text(p, ": pivot at center"); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Key S          "); p.x()=sec_col; draw_text(p, ": show pivot     "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Key R          "); p.x()=sec_col; draw_text(p, ": reset trackball"); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Key A          "); p.x()=sec_col; draw_text(p, ": toggle axis    "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Key H          "); p.x()=sec_col; draw_text(p, ": toggle helper  "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Key Left       "); p.x()=sec_col; draw_text(p, ": rotate left    "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Key Right      "); p.x()=sec_col; draw_text(p, ": rotate right   "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Key Up         "); p.x()=sec_col; draw_text(p, ": rotate up      "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Key Down       "); p.x()=sec_col; draw_text(p, ": rotate down    "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Cmd + Key C    "); p.x()=sec_col; draw_text(p, ": copy  POV      "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Cmd + Key V    "); p.x()=sec_col; draw_text(p, ": paste POV      "); p.y()+=step;
-        p.x()=fir_col; draw_text(p, "Cmd + Right but"); p.x()=sec_col; draw_text(p, ": popup menu     ");
+                       draw_text(painter, p, "Left  but      ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate         ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Right but      ", 12); p.x()=sec_col; draw_text(painter, p, ": translate      ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Double click   ", 12); p.x()=sec_col; draw_text(painter, p, ": change pivot   ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key C          ", 12); p.x()=sec_col; draw_text(painter, p, ": pivot at center", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key S          ", 12); p.x()=sec_col; draw_text(painter, p, ": show pivot     ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key R          ", 12); p.x()=sec_col; draw_text(painter, p, ": reset trackball", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key A          ", 12); p.x()=sec_col; draw_text(painter, p, ": toggle axis    ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key H          ", 12); p.x()=sec_col; draw_text(painter, p, ": toggle helper  ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key Left       ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate left    ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key Right      ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate right   ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key Up         ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate up      ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key Down       ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate down    ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Cmd + Key C    ", 12); p.x()=sec_col; draw_text(painter, p, ": copy  POV      ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Cmd + Key V    ", 12); p.x()=sec_col; draw_text(painter, p, ": paste POV      ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Cmd + Right but", 12); p.x()=sec_col; draw_text(painter, p, ": popup menu     ", 12);
         // add +/shift+ to move znear
         // add -/shift- to move zfar
     }
     else
     {
-        draw_text(p, "Key H for help");
+        draw_text(painter, p, "H for help", 12);
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::draw_marker(const Marker & t)
+void GLcanvas::draw_marker(QPainter & painter, const Marker & t)
 {
-    if (t.is_3d) draw_marker(t.p3d, t.label, t.color, t.has_sphere);
-    else         draw_text(t.p2d, t.label, t.color);
+    vec2i p = t.p2d;
+    if (p.x()<0) // 2D coordinates point offscreen, use the projection of 3D point instead
+    {
+        GLdouble depth;
+        project(t.p3d, p, depth);
+    }
+
+    if (t.disk_size>0)
+    {
+        draw_disk(painter, p, t.disk_size, t.color);
+        draw_text(painter, p + vec2i(0,-2), t.label, t.font_size, t.color); // shift text to detach it from the disk
+    }
+    else draw_text(painter, p, t.label, t.font_size, t.color);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::draw_marker(const vec3d & pos, const std::string & text, const Color & c, const bool has_sphere)
-{
-    double r  = trackball.scene_size*0.01;
-    if(has_sphere) sphere(pos, r, c.rgba);
-    draw_text(pos + vec3d(r,r,r), text, c);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void GLcanvas::draw_text(const vec3d & pos, const std::string & text, const Color & c)
+void GLcanvas::draw_text(QPainter & painter, const vec2i & pos, const std::string & text, const uint font_size, const Color & c)
 {
     if (text.empty()) return;
-    glColor3fv(c.rgba);
-    renderText(pos.x(), pos.y(), pos.z(), text.c_str()); // violates const
-    glColor3f(1.0,1.0,1.0);
+    painter.setPen(QColor(c.r_uchar(), c.g_uchar(), c.b_uchar()));
+    painter.setFont(QFont("Helvetica",font_size));
+    painter.drawText(pos.x(), pos.y(), text.c_str());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::draw_text(const vec2i & pos, const std::string & text, const Color & c)
+void GLcanvas::draw_disk(QPainter & painter, const vec2i & center, const uint radius, const Color & c)
 {
-    if (text.empty()) return;
-    glColor3fv(c.rgba);
-    renderText(pos.x(), pos.y(), text.c_str());  // violates const
-    glColor3f(1.0,1.0,1.0);
+    if (radius<1) return;
+    painter.setPen(QColor(c.r_uchar(), c.g_uchar(), c.b_uchar()));
+    painter.setBrush(QColor(c.r_uchar(), c.g_uchar(), c.b_uchar()));
+    painter.drawEllipse(center.x(), center.y(), radius, radius);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -785,6 +843,7 @@ void GLcanvas::draw_text(const vec2i & pos, const std::string & text, const Colo
 CINO_INLINE
 void GLcanvas::reset_trackball()
 {
+    makeCurrent();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
