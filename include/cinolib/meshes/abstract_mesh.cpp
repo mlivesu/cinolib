@@ -298,6 +298,7 @@ void AbstractMesh<M,V,E,P>::copy_uvw_to_xyz(const int mode)
             default: assert(false);
         }
     }
+    update_bbox();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -48,9 +48,8 @@ int main(int argc, char **argv)
     s = (argc==3) ? std::string(argv[2]) : std::string(DATA_PATH) + "/blub_texture.png";
 
     m_xyz.show_texture2D(TEXTURE_2D_BITMAP, 1.0, s.c_str());
-    gui_xyz.push_obj(&m_xyz);
-
     m_uvw.show_texture2D(TEXTURE_2D_BITMAP, 1.0, s.c_str());
+    gui_xyz.push_obj(&m_xyz);
     gui_uvw.push_obj(&m_uvw);
 
     return a.exec();
