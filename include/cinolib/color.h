@@ -44,14 +44,15 @@ class Color
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        static Color RED()     { return Color(1,0,0); }
-        static Color GREEN()   { return Color(0,1,0); }
-        static Color BLUE()    { return Color(0,0,1); }
-        static Color YELLOW()  { return Color(1,1,0); }
-        static Color MAGENTA() { return Color(1,0,1); }
-        static Color CYAN()    { return Color(0,1,1); }
-        static Color BLACK()   { return Color(0,0,0); }
-        static Color WHITE()   { return Color(1,1,1); }
+        static Color RED()     { return Color( 1, 0, 0); }
+        static Color GREEN()   { return Color( 0, 1, 0); }
+        static Color BLUE()    { return Color( 0, 0, 1); }
+        static Color YELLOW()  { return Color( 1, 1, 0); }
+        static Color MAGENTA() { return Color( 1, 0, 1); }
+        static Color CYAN()    { return Color( 0, 1, 1); }
+        static Color BLACK()   { return Color( 0, 0, 0); }
+        static Color WHITE()   { return Color( 1, 1, 1); }
+        static Color GRAY()    { return Color(.5,.5,.5); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
