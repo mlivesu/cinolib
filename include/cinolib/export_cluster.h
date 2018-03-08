@@ -41,7 +41,6 @@
 * a submesh M' containing all and only the polygons/polyhedra having L as label.
 */
 
-
 namespace cinolib
 {
 
