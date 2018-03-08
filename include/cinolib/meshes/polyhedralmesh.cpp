@@ -66,7 +66,6 @@ Polyhedralmesh<M,V,E,F,P>::Polyhedralmesh(const std::vector<vec3d>             &
     this->faces = faces;
     this->polys = polys;
     this->polys_face_winding = polys_face_winding;
-
     init();
 }
 

@@ -28,36 +28,54 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_LABELING_H
-#define CINO_LABELING_H
+#ifndef CINO_EXPORT_CLUSTER_H
+#define CINO_EXPORT_CLUSTER_H
 
 #include <map>
 #include <sys/types.h>
 #include <cinolib/cino_inline.h>
-#include <cinolib/meshes/tetmesh.h>
+#include <cinolib/meshes/meshes.h>
 
 namespace cinolib
 {
 
-template<class M, class V, class E, class F, class P>
+template<class M, class V, class E, class P>
 CINO_INLINE
-void export_labeled_subregion(const Tetmesh<M,V,E,F,P> & m,
-                              const int                  label,
-                                    Tetmesh<M,V,E,F,P> & subm);
+void export_cluster(const AbstractPolygonMesh<M,V,E,P> & m,
+                    const int                            label,
+                          AbstractPolygonMesh<M,V,E,P> & subm);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
+                    const int                             label,
+                          AbstractPolygonMesh<M,V,E,P>  & subm,
+                          std::map<uint,uint>           & m2subm_vmap,
+                          std::map<uint,uint>           & subm2m_vmap);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void export_labeled_subregion(const Tetmesh<M,V,E,F,P>  & m,
-                              const int                   label,
-                                    Tetmesh<M,V,E,F,P>  & subm,
-                                    std::map<uint,uint> & m2subm_vmap,
-                                    std::map<uint,uint> & subm2m_vmap);
+void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                    const int                                 label,
+                          AbstractPolyhedralMesh<M,V,E,F,P> & subm);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P>  & m,
+                    const int                                  label,
+                          AbstractPolyhedralMesh<M,V,E,F,P>  & subm,
+                          std::map<uint,uint>                & m2subm_vmap,
+                          std::map<uint,uint>                & subm2m_vmap);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "labeling.cpp"
+#include "export_cluster.cpp"
 #endif
 
-#endif // CINO_LABELING_H
+#endif // CINO_EXPORT_CLUSTER_H
