@@ -95,7 +95,7 @@ void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
     //
     // with:
     //
-    // void func(DrawablePolygonmesh<M,V,E,P> & m)
+    // void func(AbstractPolygonmesh<M,V,E,P> & m)
     // {
     //    m = Polygonmesh<M,V,E,P>(...);
     // }
