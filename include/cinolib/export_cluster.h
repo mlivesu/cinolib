@@ -36,6 +36,12 @@
 #include <cinolib/cino_inline.h>
 #include <cinolib/meshes/meshes.h>
 
+/* 
+* These methods take in input a surface/volumetric mesh M and a label L, and output
+* a submesh M' containing all and only the polygons/polyhedra having L as label.
+*/
+
+
 namespace cinolib
 {
 
