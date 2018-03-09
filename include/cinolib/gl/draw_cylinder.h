@@ -74,6 +74,7 @@ static void cylinder(const vec3  & a,
     gluQuadricOrientation(cylinder, GLU_OUTSIDE);
     gluCylinder(cylinder, top_radius, bottom_radius, (a-b).length(), 10, 5);
     glPopMatrix();
+    glColor3f(1.f,1.f,1.f);
     glDisable(GL_COLOR_MATERIAL);
     glDisable(GL_LIGHTING);
 }
