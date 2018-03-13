@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/curve.h>
+#include <cinolib/inf.h>
 
 namespace cinolib
 {
@@ -270,7 +271,7 @@ uint Curve::sample_closest_to(const float t) const
     assert(t>=0);
     assert(t<=1);
 
-    float best_err = inf;
+    float best_err = inf_float;
     uint  best_sam = 0;
 
     for(uint pos=0; pos<sample_list.size()-1; ++pos)
