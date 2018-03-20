@@ -1249,6 +1249,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & p,
 
     uint pid = this->num_polys();
     this->polys.push_back(p);
+    this->polys_face_winding.push_back(face_winding);
 
     P data;
     this->p_data.push_back(data);
@@ -1285,7 +1286,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & p,
 
         for(uint nbr : this->adj_f2p(fid))
         {
-            if (DOES_NOT_CONTAIN_VEC(this->p2p.at(pid),nbr))
+            if (pid!=nbr && DOES_NOT_CONTAIN_VEC(this->p2p.at(pid),nbr))
             {
                 assert(DOES_NOT_CONTAIN_VEC(this->p2p.at(nbr),pid));
                 this->p2p.at(pid).push_back(nbr);
