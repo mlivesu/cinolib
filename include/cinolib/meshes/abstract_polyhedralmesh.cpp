@@ -1338,8 +1338,6 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & p,
     // update connectivity
     for(uint fid : p)
     {
-        this->f2p.at(fid).push_back(pid);
-
         std::vector<uint> &f = faces.at(fid);
         for(uint i=0; i<f.size(); ++i)
         {
@@ -1368,6 +1366,29 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & p,
                 assert(DOES_NOT_CONTAIN_VEC(this->p2p.at(nbr),pid));
                 this->p2p.at(pid).push_back(nbr);
                 this->p2p.at(nbr).push_back(pid);
+            }
+        }
+
+        this->f2p.at(fid).push_back(pid);
+
+        // update f_on_srf flags
+        this->f_on_srf.at(fid) = (this->f2p.at(fid).size()<2);
+        // update e_on_srf flags
+        for(uint eid : this->adj_f2e(fid))
+        {
+            this->e_on_srf.at(eid) = false;
+            for(uint inc_fid : this->adj_e2f(eid))
+            {
+                if(this->f_on_srf.at(inc_fid)) this->e_on_srf.at(eid) = true;
+            }
+        }
+        // update v_on_srf flags
+        for(uint vid : f)
+        {
+            this->v_on_srf.at(vid) = false;
+            for(uint inc_fid : this->adj_v2f(vid))
+            {
+                if(this->f_on_srf.at(inc_fid)) this->v_on_srf.at(vid) = true;
             }
         }
     }
