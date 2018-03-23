@@ -46,10 +46,6 @@ template<class M = Mesh_std_attributes, // default template arguments
          class P = Polyhedron_std_attributes>
 class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 {
-    protected:
-
-        std::vector<std::vector<uint>> triangulated_faces; // triangles covering each face (e.g., for rendering)
-
     public:
 
         explicit Polyhedralmesh(){}
@@ -67,20 +63,12 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void init();
-        void clear();
         void load(const char * filename);
         void save(const char * filename) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_face_tessellation();
-        void update_face_tessellation(const uint fid);
-        void update_f_normal         (const uint fid);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        std::vector<uint> face_tessellation(const uint fid) const;
+        void update_f_normal(const uint fid);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

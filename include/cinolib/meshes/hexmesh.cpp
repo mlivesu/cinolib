@@ -434,24 +434,6 @@ vec3d Hexmesh<M,V,E,F,P>::verts_average(const std::vector<uint> &vids) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> Hexmesh<M,V,E,F,P>::face_tessellation(const uint fid) const
-{
-    std::vector<uint> triangulation =
-    {
-        this->face_vert_id(fid,0),
-        this->face_vert_id(fid,1),
-        this->face_vert_id(fid,2),
-        this->face_vert_id(fid,0),
-        this->face_vert_id(fid,2),
-        this->face_vert_id(fid,3),
-    };
-    return triangulation;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 void Hexmesh<M,V,E,F,P>::update_hex_quality(const uint pid)
 {
     this->poly_data(pid).quality = hex_scaled_jacobian(this->poly_vert(pid,0),

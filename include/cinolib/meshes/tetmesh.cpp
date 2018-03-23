@@ -342,15 +342,6 @@ void Tetmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> Tetmesh<M,V,E,F,P>::face_tessellation(const uint fid) const
-{
-    return this->faces.at(fid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 double Tetmesh<M,V,E,F,P>::face_area(const uint fid) const
 {
     return triangle_area(this->face_vert(fid,0),

@@ -50,7 +50,7 @@ CINO_INLINE
 Polyhedralmesh<M,V,E,F,P>::Polyhedralmesh(const char * filename)
 {
     load(filename);
-    init();
+    this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -66,7 +66,7 @@ Polyhedralmesh<M,V,E,F,P>::Polyhedralmesh(const std::vector<vec3d>             &
     this->faces = faces;
     this->polys = polys;
     this->polys_face_winding = polys_face_winding;
-    init();
+    this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -131,101 +131,12 @@ void Polyhedralmesh<M,V,E,F,P>::save(const char * filename) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Polyhedralmesh<M,V,E,F,P>::init()
-{
-    AbstractPolyhedralMesh<M,V,E,F,P>::init();
-    update_face_tessellation();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Polyhedralmesh<M,V,E,F,P>::clear()
-{
-    AbstractPolyhedralMesh<M,V,E,F,P>::clear();
-    triangulated_faces.clear();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Polyhedralmesh<M,V,E,F,P>::update_face_tessellation(const uint fid)
-{
-    // Assume convexity and try trivial tessellation first. If something flips
-    // apply earcut algorithm to get a valid triangulation
-
-    std::vector<vec3d> n;
-    for (uint i=2; i<this->verts_per_face(fid); ++i)
-    {
-        uint vid0 = this->faces.at(fid).at( 0 );
-        uint vid1 = this->faces.at(fid).at(i-1);
-        uint vid2 = this->faces.at(fid).at( i );
-
-        triangulated_faces.at(fid).push_back(vid0);
-        triangulated_faces.at(fid).push_back(vid1);
-        triangulated_faces.at(fid).push_back(vid2);
-
-        n.push_back((this->vert(vid1)-this->vert(vid0)).cross(this->vert(vid2)-this->vert(vid0)));
-    }
-
-    bool bad_tessellation = false;
-    for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_tessellation = true;
-
-    if (bad_tessellation)
-    {
-        // NOTE: the triangulation is constructed on a proxy polygon obtained
-        // projecting the actual polygon onto the best fitting plane. Bad things
-        // can still happen for highly non-planar polygons...
-
-        std::vector<vec3d> vlist(this->verts_per_face(fid));
-        for (uint i=0; i<this->verts_per_face(fid); ++i)
-        {
-            vlist.at(i) = this->face_vert(fid,i);
-        }
-        //
-        std::vector<uint> tris;
-        if (polygon_triangulate(vlist, tris))
-        {
-            triangulated_faces.at(fid).clear();
-            for(uint off : tris) triangulated_faces.at(fid).push_back(this->face_vert_id(fid,off));
-        }
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Polyhedralmesh<M,V,E,F,P>::update_face_tessellation()
-{
-    triangulated_faces.resize(this->num_faces());
-    for(uint fid=0; fid<this->num_faces(); ++fid)
-    {
-        update_face_tessellation(fid);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 void Polyhedralmesh<M,V,E,F,P>::update_f_normal(const uint fid)
 {
     assert(this->verts_per_face(fid)>2);
     std::vector<vec3d> points;
     for(uint off=0; off<this->verts_per_face(fid); ++off) points.push_back(this->face_vert(fid,off));
     this->face_data(fid).normal = polygon_normal(points);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-std::vector<uint> Polyhedralmesh<M,V,E,F,P>::face_tessellation(const uint fid) const
-{
-    return triangulated_faces.at(fid);
 }
 
 }

@@ -62,6 +62,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         std::vector<std::vector<uint>> f2p; // face to poly adjacency
         std::vector<std::vector<uint>> p2v; // poly to vert adjacency
 
+        std::vector<std::vector<uint>> triangulated_faces; // per face triangulation (e.g., for rendering)
+
     public:
 
         typedef F F_type;
@@ -82,8 +84,11 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual void update_normals();
         virtual void update_f_normals();
         virtual void update_f_normal(const uint fid) = 0;
+        virtual void update_face_tessellation();
+        virtual void update_face_tessellation(const uint fid);
         virtual void update_v_normals();
         virtual void update_v_normal(const uint vid);
+
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -170,8 +175,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual uint              face_add                (const std::vector<uint> & f);
         virtual void              face_remove             (const uint fid);
         virtual void              face_remove_unreferenced(const uint fid);
-        virtual std::vector<uint> face_tessellation       (const uint fid) const = 0;
-
+        virtual std::vector<uint> face_tessellation       (const uint fid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
