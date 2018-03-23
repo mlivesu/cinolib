@@ -1147,12 +1147,13 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::face_switch_id(const uint fid0, const ui
 {
     if (fid0 == fid1) return;
 
-    std::swap(this->faces.at(fid0),   this->faces.at(fid1));
-    std::swap(this->f_data.at(fid0),  this->f_data.at(fid1));
-    std::swap(this->f2e.at(fid0),     this->f2e.at(fid1));
-    std::swap(this->f2f.at(fid0),     this->f2f.at(fid1));
-    std::swap(this->f2p.at(fid0),     this->f2p.at(fid1));
-    std::swap(this->f_on_srf.at(fid0),this->f_on_srf.at(fid1));
+    std::swap(this->faces.at(fid0),          this->faces.at(fid1));
+    std::swap(this->f_data.at(fid0),         this->f_data.at(fid1));
+    std::swap(this->f2e.at(fid0),            this->f2e.at(fid1));
+    std::swap(this->f2f.at(fid0),            this->f2f.at(fid1));
+    std::swap(this->f2p.at(fid0),            this->f2p.at(fid1));
+    std::swap(this->f_on_srf.at(fid0),       this->f_on_srf.at(fid1));
+    std::swap(this->face_triangles.at(fid0), this->face_triangles.at(fid1));
 
     std::unordered_set<uint> verts_to_update;
     verts_to_update.insert(this->adj_f2v(fid0).begin(), this->adj_f2v(fid0).end());
@@ -1267,6 +1268,9 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_add(const std::vector<uint> & f)
     this->update_f_normal(fid);
     for(uint vid : f) this->update_v_normal(vid);
 
+    this->face_triangles.push_back(std::vector<uint>());
+    update_face_tessellation(fid);
+
     return fid;
 }
 
@@ -1288,6 +1292,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::face_remove_unreferenced(const uint fid)
     this->f2e.at(fid).clear();
     this->f2f.at(fid).clear();
     this->f2p.at(fid).clear();
+    this->face_triangles.at(fid).clear();
     face_switch_id(fid, this->num_faces()-1);
     this->faces.pop_back();
     this->f_data.pop_back();
@@ -1295,6 +1300,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::face_remove_unreferenced(const uint fid)
     this->f2f.pop_back();
     this->f2p.pop_back();
     this->f_on_srf.pop_back();
+    this->face_triangles.pop_back();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
