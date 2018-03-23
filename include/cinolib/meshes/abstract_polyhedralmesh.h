@@ -62,7 +62,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         std::vector<std::vector<uint>> f2p; // face to poly adjacency
         std::vector<std::vector<uint>> p2v; // poly to vert adjacency
 
-        std::vector<std::vector<uint>> triangulated_faces; // per face triangulation (e.g., for rendering)
+        std::vector<std::vector<uint>> face_triangles; // per face serialized triangulation (e.g., for rendering)
 
     public:
 

@@ -42,7 +42,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::clear()
     AbstractMesh<M,V,E,P>::clear();
     //
     faces.clear();
-    triangulated_faces.clear();
+    face_triangles.clear();
     polys_face_winding.clear();
     //
     v_on_srf.clear();
@@ -233,7 +233,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::update_face_tessellation()
 {
-    this->triangulated_faces.resize(this->num_faces());
+    this->face_triangles.resize(this->num_faces());
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
         update_face_tessellation(fid);
@@ -256,9 +256,9 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_face_tessellation(const uint fid)
         uint vid1 = this->faces.at(fid).at(i-1);
         uint vid2 = this->faces.at(fid).at( i );
 
-        triangulated_faces.at(fid).push_back(vid0);
-        triangulated_faces.at(fid).push_back(vid1);
-        triangulated_faces.at(fid).push_back(vid2);
+        face_triangles.at(fid).push_back(vid0);
+        face_triangles.at(fid).push_back(vid1);
+        face_triangles.at(fid).push_back(vid2);
 
         n.push_back((this->vert(vid1)-this->vert(vid0)).cross(this->vert(vid2)-this->vert(vid0)));
     }
@@ -281,8 +281,8 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_face_tessellation(const uint fid)
         std::vector<uint> tris;
         if (polygon_triangulate(vlist, tris))
         {
-            triangulated_faces.at(fid).clear();
-            for(uint off : tris) triangulated_faces.at(fid).push_back(this->face_vert_id(fid,off));
+            face_triangles.at(fid).clear();
+            for(uint off : tris) face_triangles.at(fid).push_back(this->face_vert_id(fid,off));
         }
     }
 }
@@ -320,7 +320,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_tessellation(const uint fid) const
 {
-    return triangulated_faces.at(fid);
+    return face_triangles.at(fid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
