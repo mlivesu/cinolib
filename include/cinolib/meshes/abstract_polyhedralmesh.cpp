@@ -956,6 +956,11 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::vert_switch_id(const uint vid0, const ui
             if (vid == vid0) vid = vid1; else
             if (vid == vid1) vid = vid0;
         }
+        for(uint & vid : this->face_triangles.at(fid))
+        {
+            if (vid == vid0) vid = vid1; else
+            if (vid == vid1) vid = vid0;
+        }
     }
 
     for(uint pid : polys_to_update)
@@ -1309,7 +1314,66 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::poly_switch_id(const uint pid0, const uint pid1)
 {
+    if (pid0 == pid1) return;
 
+    std::swap(this->polys.at(pid0),              this->polys.at(pid1));
+    std::swap(this->p_data.at(pid0),             this->p_data.at(pid1));
+    std::swap(this->p2v.at(pid0),                this->p2v.at(pid1));
+    std::swap(this->p2e.at(pid0),                this->p2e.at(pid1));
+    std::swap(this->p2p.at(pid0),                this->p2p.at(pid1));
+    std::swap(this->polys_face_winding.at(pid0), this->polys_face_winding.at(pid1));
+
+    std::unordered_set<uint> verts_to_update;
+    verts_to_update.insert(this->adj_p2v(pid0).begin(), this->adj_p2v(pid0).end());
+    verts_to_update.insert(this->adj_p2v(pid1).begin(), this->adj_p2v(pid1).end());
+
+    std::unordered_set<uint> edges_to_update;
+    edges_to_update.insert(this->adj_p2e(pid0).begin(), this->adj_p2e(pid0).end());
+    edges_to_update.insert(this->adj_p2e(pid1).begin(), this->adj_p2e(pid1).end());
+
+    std::unordered_set<uint> faces_to_update;
+    faces_to_update.insert(this->adj_p2f(pid0).begin(), this->adj_p2f(pid0).end());
+    faces_to_update.insert(this->adj_p2f(pid1).begin(), this->adj_p2f(pid1).end());
+
+    std::unordered_set<uint> polys_to_update;
+    polys_to_update.insert(this->adj_p2p(pid0).begin(), this->adj_p2p(pid0).end());
+    polys_to_update.insert(this->adj_p2p(pid1).begin(), this->adj_p2p(pid1).end());
+
+    for(uint vid : verts_to_update)
+    {
+        for(uint & pid : this->v2p.at(vid))
+        {
+            if (pid == pid0) pid = pid1; else
+            if (pid == pid1) pid = pid0;
+        }
+    }
+
+    for(uint eid : edges_to_update)
+    {
+        for(uint & pid : this->e2p.at(eid))
+        {
+            if (pid == pid0) pid = pid1; else
+            if (pid == pid1) pid = pid0;
+        }
+    }
+
+    for(uint fid : faces_to_update)
+    {
+        for(uint & pid : this->f2p.at(fid))
+        {
+            if (pid == pid0) pid = pid1; else
+            if (pid == pid1) pid = pid0;
+        }
+    }
+
+    for(uint nbr : polys_to_update)
+    {
+        for(uint & pid : this->p2p.at(nbr))
+        {
+            if (pid == pid0) nbr = pid1; else
+            if (pid == pid1) nbr = pid0;
+        }
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
