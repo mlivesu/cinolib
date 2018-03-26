@@ -1150,6 +1150,8 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::face_switch_id(const uint fid0, const uint fid1)
 {
+    // should I do something for poly_face_winding?
+
     if (fid0 == fid1) return;
 
     std::swap(this->faces.at(fid0),          this->faces.at(fid1));
@@ -1370,8 +1372,8 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_switch_id(const uint pid0, const ui
     {
         for(uint & pid : this->p2p.at(nbr))
         {
-            if (pid == pid0) nbr = pid1; else
-            if (pid == pid1) nbr = pid0;
+            if (pid == pid0) pid = pid1; else
+            if (pid == pid1) pid = pid0;
         }
     }
 }
