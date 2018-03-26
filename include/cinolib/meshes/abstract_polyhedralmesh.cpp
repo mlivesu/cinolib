@@ -1207,8 +1207,8 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::face_switch_id(const uint fid0, const ui
     {
         for(uint & fid : this->polys.at(pid))
         {
-            if (fid == fid0) pid = fid1; else
-            if (fid == fid1) pid = fid0;
+            if (fid == fid0) fid = fid1; else
+            if (fid == fid1) fid = fid0;
         }
     }
 }
