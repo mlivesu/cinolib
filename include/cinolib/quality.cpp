@@ -138,7 +138,7 @@ CINO_INLINE
 double hex_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
                            const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7)
 {
-    // cross-derivatives
+    // principal axes
     vec3d X1  = (p1 - p0) + (p2 - p3) + (p5 - p4) + (p6 - p7);
     vec3d X2  = (p3 - p0) + (p2 - p1) + (p7 - p4) + (p6 - p5);
     vec3d X3  = (p4 - p0) + (p5 - p1) + (p6 - p2) + (p7 - p3);
