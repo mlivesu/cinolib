@@ -695,7 +695,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
     QPushButton::connect(but_save, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        std::string filename = QFileDialog::getSaveFileName(NULL, "Save mesh", ".", "3D Meshes (*.MESH *.HEDRA *.VTU *.VTK)").toStdString();
+        std::string filename = QFileDialog::getSaveFileName(NULL, "Save mesh", ".", "3D Meshes (*.MESH *.TET *.HEDRA *.VTU *.VTK)").toStdString();
         if (!filename.empty()) m->save(filename.c_str());
     });
 
