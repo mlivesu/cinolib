@@ -37,9 +37,53 @@ namespace cinolib
 {
 
 CINO_INLINE
+void write_TET(const char               * filename,
+               const std::vector<vec3d> & verts,
+               const std::vector<uint>  & tets)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    FILE *fp = fopen(filename, "w");
+
+    if(!fp)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_TET() : couldn't write output file " << filename << std::endl;
+        exit(-1);
+    }
+
+    int nv = (int)verts.size();
+    int nt = (int)tets.size()/4;
+
+    fprintf(fp, "%d vertices\n", nv);
+    fprintf(fp, "%d tets\n",     nt);
+
+    if (nv > 0)
+    {
+        for(const vec3d & v : verts)
+        {
+            // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+            //
+            fprintf(fp, "%.17g %.17g %.17g\n", v.x(), v.y(), v.z());
+        }
+    }
+
+    if (nt > 0)
+    {
+        for(size_t i=0; i<tets.size(); i+=4)
+        {
+            fprintf(fp, "4 %d %d %d %d\n", tets[i+0], tets[i+3], tets[i+2], tets[i+1]);
+        }
+    }
+
+    fclose(fp);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void write_TET(const char                * filename,
                const std::vector<double> & xyz,
-               const std::vector<uint>  & tets)
+               const std::vector<uint>   & tets)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 

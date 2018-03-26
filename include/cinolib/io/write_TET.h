@@ -34,9 +34,17 @@
 #include <sys/types.h>
 #include <vector>
 #include <cinolib/cino_inline.h>
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
+
+CINO_INLINE
+void write_TET(const char               * filename,
+               const std::vector<vec3d> & verts,
+               const std::vector<uint>  & tets);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void write_TET(const char               * filename,
