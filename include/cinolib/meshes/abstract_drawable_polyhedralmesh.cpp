@@ -33,6 +33,7 @@
 #include <cinolib/gl/draw_lines_tris.h>
 #include <cinolib/textures/textures.h>
 #include <cinolib/color.h>
+#include <set>
 
 namespace cinolib
 {
