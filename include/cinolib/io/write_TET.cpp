@@ -37,9 +37,9 @@ namespace cinolib
 {
 
 CINO_INLINE
-void write_TET(const char               * filename,
-               const std::vector<vec3d> & verts,
-               const std::vector<uint>  & tets)
+void write_TET(const char                           * filename,
+               const std::vector<vec3d>             & verts,
+               const std::vector<std::vector<uint>> & tets)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -51,28 +51,19 @@ void write_TET(const char               * filename,
         exit(-1);
     }
 
-    int nv = (int)verts.size();
-    int nt = (int)tets.size()/4;
+    fprintf(fp, "%d vertices\n", (int)verts.size());
+    fprintf(fp, "%d tets\n",     (int)tets.size());
 
-    fprintf(fp, "%d vertices\n", nv);
-    fprintf(fp, "%d tets\n",     nt);
-
-    if (nv > 0)
+    for(const vec3d & v : verts)
     {
-        for(const vec3d & v : verts)
-        {
-            // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
-            //
-            fprintf(fp, "%.17g %.17g %.17g\n", v.x(), v.y(), v.z());
-        }
+        // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
+        //
+        fprintf(fp, "%.17g %.17g %.17g\n", v.x(), v.y(), v.z());
     }
 
-    if (nt > 0)
+    for(const std::vector<uint> & tet : tets)
     {
-        for(size_t i=0; i<tets.size(); i+=4)
-        {
-            fprintf(fp, "4 %d %d %d %d\n", tets[i+0], tets[i+3], tets[i+2], tets[i+1]);
-        }
+        fprintf(fp, "4 %d %d %d %d\n", tet.at(0), tet.at(1), tet.at(2), tet.at(3));
     }
 
     fclose(fp);

@@ -40,9 +40,9 @@ namespace cinolib
 {
 
 CINO_INLINE
-void write_TET(const char               * filename,
-               const std::vector<vec3d> & verts,
-               const std::vector<uint>  & tets);
+void write_TET(const char                           * filename,
+               const std::vector<vec3d>             & verts,
+               const std::vector<std::vector<uint>> & tets);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
