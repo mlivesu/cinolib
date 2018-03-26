@@ -101,7 +101,7 @@ double hex_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2,
     vec3d L2  = p3 - p2;    vec3d L6  = p6 - p2;    vec3d L10 = p7 - p6;
     vec3d L3  = p3 - p0;    vec3d L7  = p7 - p3;    vec3d L11 = p7 - p4;
 
-    // cross-derivatives
+    // principal axes
     vec3d X1  = (p1 - p0) + (p2 - p3) + (p5 - p4) + (p6 - p7);
     vec3d X2  = (p3 - p0) + (p2 - p1) + (p7 - p4) + (p6 - p5);
     vec3d X3  = (p4 - p0) + (p5 - p1) + (p6 - p2) + (p7 - p3);
