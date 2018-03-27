@@ -1285,7 +1285,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_add(const std::vector<uint> & f)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void AbstractPolyhedralMesh<M,V,E,F,P>::face_remove(const uint fid)
+void AbstractPolyhedralMesh<M,V,E,F,P>::face_remove(const uint /*fid*/)
 {
 }
 
@@ -1488,14 +1488,91 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove(const uint pid)
 {
+    std::set<uint,std::greater<uint>> dangling_verts; // higher ids first
+    std::set<uint,std::greater<uint>> dangling_edges; // higher ids first
+    std::set<uint,std::greater<uint>> dangling_faces; // higher ids first
 
+    // disconnect from vertices
+    for(uint vid : this->adj_p2v(pid))
+    {
+        REMOVE_FROM_VEC(this->v2p.at(vid), pid);
+        if (this->v2p.at(vid).empty()) dangling_verts.insert(vid);
+    }
+
+    // disconnect from edges
+    for(uint eid : this->adj_p2e(pid))
+    {
+        REMOVE_FROM_VEC(this->e2p.at(eid), pid);
+        if (this->e2p.at(eid).empty()) dangling_edges.insert(eid);
+    }
+
+    // disconnect from faces
+    for(uint fid : this->adj_p2f(pid))
+    {
+        REMOVE_FROM_VEC(this->f2p.at(fid), pid);
+        switch(this->f2p.at(fid).size())
+        {
+            case 0 :
+            {
+                dangling_faces.insert(fid);
+                break;
+            }
+            case 1 :
+            {
+                this->f_on_srf.at(fid) = true;
+                for(uint eid : this->adj_f2e(fid)) this->e_on_srf.at(eid) = true;
+                for(uint vid : this->adj_f2v(fid)) this->v_on_srf.at(vid) = true;
+                break;
+            }
+        }
+    }
+
+    // disconnect from other polygons
+    for(uint nbr : this->adj_p2p(pid)) REMOVE_FROM_VEC(this->p2p.at(nbr), pid);
+
+    // delete dangling faces
+    for(uint fid : dangling_faces)
+    {
+        assert(this->adj_f2p(fid).empty());
+        for(uint vid : this->faces.at(fid)) REMOVE_FROM_VEC(this->v2f.at(vid), fid);
+        for(uint eid : this->f2e.at(fid))   REMOVE_FROM_VEC(this->e2f.at(eid), fid);
+        for(uint nbr : this->f2f.at(fid))   REMOVE_FROM_VEC(this->f2f.at(nbr), fid);
+        face_remove_unreferenced(fid);
+    }
+
+    // delete dangling edges
+    for(uint eid : dangling_edges)
+    {
+        assert(this->adj_e2f(eid).empty());
+        assert(this->adj_e2p(eid).empty());
+        uint vid0 = this->edge_vert_id(eid,0);
+        uint vid1 = this->edge_vert_id(eid,1);
+        //if (vid1 > vid0) std::swap(vid0,vid1); // make sure the highest id is processed first
+        REMOVE_FROM_VEC(this->v2e.at(vid0), eid);
+        REMOVE_FROM_VEC(this->v2e.at(vid1), eid);
+        REMOVE_FROM_VEC(this->v2v.at(vid0), vid1);
+        REMOVE_FROM_VEC(this->v2v.at(vid1), vid0);
+        edge_remove_unreferenced(eid);
+    }
+
+    // delete dangling vertices
+    for(uint vid : dangling_verts)
+    {
+        assert(this->adj_v2e(vid).empty());
+        assert(this->adj_v2f(vid).empty());
+        assert(this->adj_v2p(vid).empty());
+        for(uint nbr : this->adj_v2v(vid)) REMOVE_FROM_VEC(this->v2v.at(nbr), vid);
+        vert_remove_unreferenced(vid);
+    }
+
+    poly_remove_unreferenced(pid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void AbstractPolyhedralMesh<M,V,E,F,P>::polys_remove(const std::vector<uint> & pids)
+void AbstractPolyhedralMesh<M,V,E,F,P>::polys_remove(const std::vector<uint> & /*pids*/)
 {
 
 }
