@@ -1285,8 +1285,9 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_add(const std::vector<uint> & f)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void AbstractPolyhedralMesh<M,V,E,F,P>::face_remove(const uint /*fid*/)
+void AbstractPolyhedralMesh<M,V,E,F,P>::face_remove(const uint fid)
 {
+    polys_remove(this->adj_f2p(fid));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1572,9 +1573,15 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove(const uint pid)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void AbstractPolyhedralMesh<M,V,E,F,P>::polys_remove(const std::vector<uint> & /*pids*/)
+void AbstractPolyhedralMesh<M,V,E,F,P>::polys_remove(const std::vector<uint> & pids)
 {
-
+    // in order to avoid id conflicts remove all the
+    // polys starting from the one with highest id
+    //
+    std::vector<uint> tmp = pids;
+    std::sort(tmp.begin(), tmp.end());
+    std::reverse(tmp.begin(), tmp.end());
+    for(uint pid : tmp) poly_remove(pid);
 }
 
 }
