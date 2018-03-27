@@ -120,67 +120,67 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::update_adjacency()
 {
-    this->v2v.clear(); this->v2v.resize(this->num_verts());
-    this->v2e.clear(); this->v2e.resize(this->num_verts());
-    this->v2p.clear(); this->v2p.resize(this->num_verts());
-    this->p2p.clear(); this->p2p.resize(this->num_polys());
-    this->p2e.clear(); this->p2e.resize(this->num_polys());
+//    this->v2v.clear(); this->v2v.resize(this->num_verts());
+//    this->v2e.clear(); this->v2e.resize(this->num_verts());
+//    this->v2p.clear(); this->v2p.resize(this->num_verts());
+//    this->p2p.clear(); this->p2p.resize(this->num_polys());
+//    this->p2e.clear(); this->p2e.resize(this->num_polys());
 
-    std::map<ipair,std::vector<uint>> e2f_map;
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        for(uint offset=0; offset<this->verts_per_poly(pid); ++offset)
-        {
-            uint vid0 = this->poly_vert_id(pid,offset);
-            uint vid1 = this->poly_vert_id(pid,(offset+1)%this->verts_per_poly(pid));
-            this->v2p.at(vid0).push_back(pid);
-            e2f_map[unique_pair(vid0,vid1)].push_back(pid);
-        }
-    }
+//    std::map<ipair,std::vector<uint>> e2f_map;
+//    for(uint pid=0; pid<this->num_polys(); ++pid)
+//    {
+//        for(uint offset=0; offset<this->verts_per_poly(pid); ++offset)
+//        {
+//            uint vid0 = this->poly_vert_id(pid,offset);
+//            uint vid1 = this->poly_vert_id(pid,(offset+1)%this->verts_per_poly(pid));
+//            this->v2p.at(vid0).push_back(pid);
+//            e2f_map[unique_pair(vid0,vid1)].push_back(pid);
+//        }
+//    }
 
-    this->edges.clear();
-    this->e2p.clear();
-    this->e2p.resize(e2f_map.size());
+//    this->edges.clear();
+//    this->e2p.clear();
+//    this->e2p.resize(e2f_map.size());
 
-    uint fresh_id = 0;
-    for(auto e2f_it : e2f_map)
-    {
-        ipair e    = e2f_it.first;
-        uint  eid  = fresh_id++;
-        uint  vid0 = e.first;
-        uint  vid1 = e.second;
+//    uint fresh_id = 0;
+//    for(auto e2f_it : e2f_map)
+//    {
+//        ipair e    = e2f_it.first;
+//        uint  eid  = fresh_id++;
+//        uint  vid0 = e.first;
+//        uint  vid1 = e.second;
 
-        this->edges.push_back(vid0);
-        this->edges.push_back(vid1);
+//        this->edges.push_back(vid0);
+//        this->edges.push_back(vid1);
 
-        this->v2v.at(vid0).push_back(vid1);
-        this->v2v.at(vid1).push_back(vid0);
+//        this->v2v.at(vid0).push_back(vid1);
+//        this->v2v.at(vid1).push_back(vid0);
 
-        this->v2e.at(vid0).push_back(eid);
-        this->v2e.at(vid1).push_back(eid);
+//        this->v2e.at(vid0).push_back(eid);
+//        this->v2e.at(vid1).push_back(eid);
 
-        std::vector<uint> pids = e2f_it.second;
-        for(uint pid : pids)
-        {
-            this->p2e.at(pid).push_back(eid);
-            this->e2p.at(eid).push_back(pid);
-            for(uint adj_pid : pids) if (pid != adj_pid) this->p2p.at(pid).push_back(adj_pid);
-        }
+//        std::vector<uint> pids = e2f_it.second;
+//        for(uint pid : pids)
+//        {
+//            this->p2e.at(pid).push_back(eid);
+//            this->e2p.at(eid).push_back(pid);
+//            for(uint adj_pid : pids) if (pid != adj_pid) this->p2p.at(pid).push_back(adj_pid);
+//        }
 
-        // MANIFOLDNESS CHECKS
-        //
-        //bool is_manifold = (pids.size() > 2 || pids.size() < 1);
-        //if (is_manifold && !support_non_manifold_edges)
-        //{
-        //    std::cerr << "Non manifold edge found! To support non manifoldness,";
-        //    std::cerr << "enable the 'support_non_manifold_edges' flag in cinolib.h" << std::endl;
-        //    assert(false);
-        //}
-        //if (is_manifold && print_non_manifold_edges)
-        //{
-        //    std::cerr << "Non manifold edge! (" << vid0 << "," << vid1 << ")" << std::endl;
-        //}
-    }
+//        // MANIFOLDNESS CHECKS
+//        //
+//        //bool is_manifold = (pids.size() > 2 || pids.size() < 1);
+//        //if (is_manifold && !support_non_manifold_edges)
+//        //{
+//        //    std::cerr << "Non manifold edge found! To support non manifoldness,";
+//        //    std::cerr << "enable the 'support_non_manifold_edges' flag in cinolib.h" << std::endl;
+//        //    assert(false);
+//        //}
+//        //if (is_manifold && print_non_manifold_edges)
+//        //{
+//        //    std::cerr << "Non manifold edge! (" << vid0 << "," << vid1 << ")" << std::endl;
+//        //}
+//    }
 
     std::cout << "new mesh\t"      <<
                  this->num_verts() << "V / " <<

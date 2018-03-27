@@ -104,10 +104,6 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<uint> face_tessellation(const uint fid) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void   poly_subdivide(const std::vector<std::vector<std::vector<uint>>> & split_scheme);
         double poly_volume   (const uint pid) const;
 

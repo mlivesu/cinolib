@@ -30,7 +30,7 @@
 **********************************************************************************/
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/geometry/triangle.h>
-
+#include <unordered_set>
 
 namespace cinolib
 {
@@ -42,6 +42,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::clear()
     AbstractMesh<M,V,E,P>::clear();
     //
     faces.clear();
+    face_triangles.clear();
     polys_face_winding.clear();
     //
     v_on_srf.clear();
@@ -65,14 +66,14 @@ CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::init()
 {
     this->update_adjacency();
-    this->update_bbox();
 
+    this->update_bbox();
     this->v_data.resize(this->num_verts());
     this->e_data.resize(this->num_edges());
     this->f_data.resize(this->num_faces());
     this->p_data.resize(this->num_polys());
-
     this->update_normals();
+    this->update_face_tessellation();
 
     this->copy_xyz_to_uvw(UVW_param);
 }
@@ -230,6 +231,66 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_f_normals()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::update_face_tessellation()
+{
+    this->face_triangles.resize(this->num_faces());
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        update_face_tessellation(fid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::update_face_tessellation(const uint fid)
+{
+    // Assume convexity and try trivial tessellation first. If something flips
+    // apply earcut algorithm to get a valid triangulation
+
+    std::vector<vec3d> n;
+    for (uint i=2; i<this->verts_per_face(fid); ++i)
+    {
+        uint vid0 = this->faces.at(fid).at( 0 );
+        uint vid1 = this->faces.at(fid).at(i-1);
+        uint vid2 = this->faces.at(fid).at( i );
+
+        face_triangles.at(fid).push_back(vid0);
+        face_triangles.at(fid).push_back(vid1);
+        face_triangles.at(fid).push_back(vid2);
+
+        n.push_back((this->vert(vid1)-this->vert(vid0)).cross(this->vert(vid2)-this->vert(vid0)));
+    }
+
+    bool bad_tessellation = false;
+    for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_tessellation = true;
+
+    if (bad_tessellation)
+    {
+        // NOTE: the triangulation is constructed on a proxy polygon obtained
+        // projecting the actual polygon onto the best fitting plane. Bad things
+        // can still happen for highly non-planar polygons...
+
+        std::vector<vec3d> vlist(this->verts_per_face(fid));
+        for (uint i=0; i<this->verts_per_face(fid); ++i)
+        {
+            vlist.at(i) = this->face_vert(fid,i);
+        }
+        //
+        std::vector<uint> tris;
+        if (polygon_triangulate(vlist, tris))
+        {
+            face_triangles.at(fid).clear();
+            for(uint off : tris) face_triangles.at(fid).push_back(this->face_vert_id(fid,off));
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::update_v_normals()
 {
     for(uint vid=0; vid<this->num_verts(); ++vid)
@@ -251,6 +312,15 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_v_normal(const uint vid)
     }
     if (n.length()>0) n.normalize();
     this->vert_data(vid).normal = n;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_tessellation(const uint fid) const
+{
+    return face_triangles.at(fid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -397,6 +467,20 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::faces_are_disjoint(const uint fid0, cons
         if (face_vert_id(fid0,i) == face_vert_id(fid1,j)) return false;
     }
     return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::faces_are_adjacent(const uint fid0, const uint fid1) const
+{
+    for(uint eid : this->adj_f2e(fid0))
+    for(uint nbr : this->adj_e2f(eid))
+    {
+        if(nbr==fid1) return true;
+    }
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -814,5 +898,690 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::edge_adj_srf_faces(const ui
     return srf_f;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::vert_switch_id(const uint vid0, const uint vid1)
+{
+    if (vid0 == vid1) return;
+
+    std::swap(this->verts.at(vid0),   this->verts.at(vid1));
+    std::swap(this->v2v.at(vid0),     this->v2v.at(vid1));
+    std::swap(this->v2e.at(vid0),     this->v2e.at(vid1));
+    std::swap(this->v2f.at(vid0),     this->v2f.at(vid1));
+    std::swap(this->v2p.at(vid0),     this->v2p.at(vid1));
+    std::swap(this->v_data.at(vid0),  this->v_data.at(vid1));
+    std::swap(this->v_on_srf.at(vid0),this->v_on_srf.at(vid1));
+
+    std::unordered_set<uint> verts_to_update;
+    verts_to_update.insert(this->adj_v2v(vid0).begin(), this->adj_v2v(vid0).end());
+    verts_to_update.insert(this->adj_v2v(vid1).begin(), this->adj_v2v(vid1).end());
+
+    std::unordered_set<uint> edges_to_update;
+    edges_to_update.insert(this->adj_v2e(vid0).begin(), this->adj_v2e(vid0).end());
+    edges_to_update.insert(this->adj_v2e(vid1).begin(), this->adj_v2e(vid1).end());
+
+    std::unordered_set<uint> faces_to_update;
+    faces_to_update.insert(this->adj_v2f(vid0).begin(), this->adj_v2f(vid0).end());
+    faces_to_update.insert(this->adj_v2f(vid1).begin(), this->adj_v2f(vid1).end());
+
+    std::unordered_set<uint> polys_to_update;
+    polys_to_update.insert(this->adj_v2p(vid0).begin(), this->adj_v2p(vid0).end());
+    polys_to_update.insert(this->adj_v2p(vid1).begin(), this->adj_v2p(vid1).end());
+
+    for(uint nbr : verts_to_update)
+    {
+        for(uint & vid : this->v2v.at(nbr))
+        {
+            if (vid == vid0) vid = vid1; else
+            if (vid == vid1) vid = vid0;
+        }
+    }
+
+    for(uint eid : edges_to_update)
+    {
+        for(uint i=0; i<2; ++i)
+        {
+            uint & vid = this->edges.at(2*eid+i);
+            if (vid == vid0) vid = vid1; else
+            if (vid == vid1) vid = vid0;
+        }
+    }
+
+    for(uint fid : faces_to_update)
+    {
+        for(uint & vid : this->faces.at(fid))
+        {
+            if (vid == vid0) vid = vid1; else
+            if (vid == vid1) vid = vid0;
+        }
+        for(uint & vid : this->face_triangles.at(fid))
+        {
+            if (vid == vid0) vid = vid1; else
+            if (vid == vid1) vid = vid0;
+        }
+    }
+
+    for(uint pid : polys_to_update)
+    {
+        for(uint & vid : this->p2v.at(pid))
+        {
+            if (vid == vid0) vid = vid1; else
+            if (vid == vid1) vid = vid0;
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::vert_remove(const uint vid)
+{
+    polys_remove(this->adj_v2p(vid));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::vert_remove_unreferenced(const uint vid)
+{
+    this->v2v.at(vid).clear();
+    this->v2e.at(vid).clear();
+    this->v2f.at(vid).clear();
+    this->v2p.at(vid).clear();
+    vert_switch_id(vid, this->num_verts()-1);
+    this->verts.pop_back();
+    this->v_data.pop_back();
+    this->v2v.pop_back();
+    this->v2e.pop_back();
+    this->v2f.pop_back();
+    this->v2p.pop_back();
+    this->v_on_srf.pop_back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::vert_add(const vec3d & pos)
+{
+    uint vid = this->num_verts();
+    //
+    this->verts.push_back(pos);
+    //
+    V data;
+    this->v_data.push_back(data);
+    //
+    this->v2v.push_back(std::vector<uint>());
+    this->v2e.push_back(std::vector<uint>());
+    this->v2f.push_back(std::vector<uint>());
+    this->v2p.push_back(std::vector<uint>());
+    //
+    this->v_on_srf.push_back(false);
+    //
+    this->bb.min = this->bb.min.min(pos);
+    this->bb.max = this->bb.max.max(pos);
+    //
+    return vid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::edge_switch_id(const uint eid0, const uint eid1)
+{
+    if (eid0 == eid1) return;
+
+    for(uint off=0; off<2; ++off) std::swap(this->edges.at(2*eid0+off), this->edges.at(2*eid1+off));
+
+    std::swap(this->e2f.at(eid0),     this->e2f.at(eid1));
+    std::swap(this->e2p.at(eid0),     this->e2p.at(eid1));
+    std::swap(this->e_data.at(eid0),  this->e_data.at(eid1));
+    std::swap(this->e_on_srf.at(eid0),this->e_on_srf.at(eid1));
+
+    std::unordered_set<uint> verts_to_update;
+    verts_to_update.insert(this->edge_vert_id(eid0,0));
+    verts_to_update.insert(this->edge_vert_id(eid0,1));
+    verts_to_update.insert(this->edge_vert_id(eid1,0));
+    verts_to_update.insert(this->edge_vert_id(eid1,1));
+
+    std::unordered_set<uint> faces_to_update;
+    faces_to_update.insert(this->adj_e2f(eid0).begin(), this->adj_e2f(eid0).end());
+    faces_to_update.insert(this->adj_e2f(eid1).begin(), this->adj_e2f(eid1).end());
+
+    std::unordered_set<uint> polys_to_update;
+    polys_to_update.insert(this->adj_e2p(eid0).begin(), this->adj_e2p(eid0).end());
+    polys_to_update.insert(this->adj_e2p(eid1).begin(), this->adj_e2p(eid1).end());
+
+    for(uint vid : verts_to_update)
+    {
+        for(uint & eid : this->v2e.at(vid))
+        {
+            if (eid == eid0) eid = eid1; else
+            if (eid == eid1) eid = eid0;
+        }
+    }
+
+    for(uint fid : faces_to_update)
+    {
+        for(uint & eid : this->f2e.at(fid))
+        {
+            if (eid == eid0) eid = eid1; else
+            if (eid == eid1) eid = eid0;
+        }
+    }
+    for(uint pid : polys_to_update)
+    {
+        for(uint & eid : this->p2e.at(pid))
+        {
+            if (eid == eid0) eid = eid1; else
+            if (eid == eid1) eid = eid0;
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::edge_add(const uint vid0, const uint vid1)
+{
+    assert(vid0 < this->num_verts());
+    assert(vid1 < this->num_verts());
+    assert(!this->verts_are_adjacent(vid0, vid1));
+    assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid0), vid1));
+    assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid1), vid0));
+    assert(this->edge_id(vid0, vid1) == -1);
+    //
+    uint eid = this->num_edges();
+    //
+    this->edges.push_back(vid0);
+    this->edges.push_back(vid1);
+    //
+    this->e2f.push_back(std::vector<uint>());
+    this->e2p.push_back(std::vector<uint>());
+    //
+    E data;
+    this->e_data.push_back(data);
+    //
+    this->v2v.at(vid1).push_back(vid0);
+    this->v2v.at(vid0).push_back(vid1);
+    //
+    this->v2e.at(vid0).push_back(eid);
+    this->v2e.at(vid1).push_back(eid);
+    //
+    this->e_on_srf.push_back(false);
+    //
+    return eid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::edge_remove(const uint eid)
+{
+    polys_remove(this->adj_e2p(eid));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::edge_remove_unreferenced(const uint eid)
+{
+    this->e2f.at(eid).clear();
+    this->e2p.at(eid).clear();
+    edge_switch_id(eid, this->num_edges()-1);
+    this->edges.resize(this->edges.size()-2);
+    this->e_data.pop_back();
+    this->e2f.pop_back();
+    this->e2p.pop_back();
+    this->e_on_srf.pop_back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::face_switch_id(const uint fid0, const uint fid1)
+{
+    // should I do something for poly_face_winding?
+
+    if (fid0 == fid1) return;
+
+    std::swap(this->faces.at(fid0),          this->faces.at(fid1));
+    std::swap(this->f_data.at(fid0),         this->f_data.at(fid1));
+    std::swap(this->f2e.at(fid0),            this->f2e.at(fid1));
+    std::swap(this->f2f.at(fid0),            this->f2f.at(fid1));
+    std::swap(this->f2p.at(fid0),            this->f2p.at(fid1));
+    std::swap(this->f_on_srf.at(fid0),       this->f_on_srf.at(fid1));
+    std::swap(this->face_triangles.at(fid0), this->face_triangles.at(fid1));
+
+    std::unordered_set<uint> verts_to_update;
+    verts_to_update.insert(this->adj_f2v(fid0).begin(), this->adj_f2v(fid0).end());
+    verts_to_update.insert(this->adj_f2v(fid1).begin(), this->adj_f2v(fid1).end());
+
+    std::unordered_set<uint> edges_to_update;
+    edges_to_update.insert(this->adj_f2e(fid0).begin(), this->adj_f2e(fid0).end());
+    edges_to_update.insert(this->adj_f2e(fid1).begin(), this->adj_f2e(fid1).end());
+
+    std::unordered_set<uint> faces_to_update;
+    faces_to_update.insert(this->adj_f2f(fid0).begin(), this->adj_f2f(fid0).end());
+    faces_to_update.insert(this->adj_f2f(fid1).begin(), this->adj_f2f(fid1).end());
+
+    std::unordered_set<uint> polys_to_update;
+    polys_to_update.insert(this->adj_f2p(fid0).begin(), this->adj_f2p(fid0).end());
+    polys_to_update.insert(this->adj_f2p(fid1).begin(), this->adj_f2p(fid1).end());
+
+    for(uint vid : verts_to_update)
+    {
+        for(uint & fid : this->v2f.at(vid))
+        {
+            if (fid == fid0) fid = fid1; else
+            if (fid == fid1) fid = fid0;
+        }
+    }
+
+    for(uint eid : edges_to_update)
+    {
+        for(uint & fid : this->e2f.at(eid))
+        {
+            if (fid == fid0) fid = fid1; else
+            if (fid == fid1) fid = fid0;
+        }
+    }
+
+    for(uint nbr : faces_to_update)
+    {
+        for(uint & fid : this->f2f.at(nbr))
+        {
+            if (fid == fid0) fid = fid1; else
+            if (fid == fid1) fid = fid0;
+        }
+    }
+
+    for(uint pid : polys_to_update)
+    {
+        for(uint & fid : this->polys.at(pid))
+        {
+            if (fid == fid0) fid = fid1; else
+            if (fid == fid1) fid = fid0;
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::face_add(const std::vector<uint> & f)
+{
+#ifndef NDEBUG
+    for(uint vid : f) assert(vid < this->num_verts());
+#endif
+
+    uint fid = this->num_faces();
+    this->faces.push_back(f);
+
+    F data;
+    this->f_data.push_back(data);
+
+    this->f2e.push_back(std::vector<uint>());
+    this->f2f.push_back(std::vector<uint>());
+    this->f2p.push_back(std::vector<uint>());
+
+    // add missing edges and handle on_surf flags...
+    for(uint i=0; i<f.size(); ++i)
+    {
+        uint vid0 = f.at(i);
+        uint vid1 = f.at((i+1)%f.size());
+        int  eid = this->edge_id(vid0, vid1);
+        if (eid == -1) eid = this->edge_add(vid0, vid1);
+        this->v_on_srf.at(vid0) = true;
+        this->e_on_srf.at(eid)  = true;
+    }
+    this->f_on_srf.push_back(true);
+
+    // update connectivity
+    for(uint vid : f)
+    {
+        this->v2f.at(vid).push_back(fid);
+    }
+    //
+    for(uint i=0; i<f.size(); ++i)
+    {
+        uint vid0 = f.at(i);
+        uint vid1 = f.at((i+1)%f.size());
+        int  eid = this->edge_id(vid0, vid1);
+        assert(eid >= 0);
+
+        for(uint nbr : this->e2f.at(eid))
+        {
+            assert(nbr!=fid);
+            if (this->faces_are_adjacent(fid,nbr)) continue;
+            this->f2f.at(nbr).push_back(fid);
+            this->f2f.at(fid).push_back(nbr);
+        }
+
+        this->e2f.at(eid).push_back(fid);
+        this->f2e.at(fid).push_back(eid);
+    }
+
+    this->update_f_normal(fid);
+    for(uint vid : f) this->update_v_normal(vid);
+
+    this->face_triangles.push_back(std::vector<uint>());
+    update_face_tessellation(fid);
+
+    return fid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::face_remove(const uint fid)
+{
+    polys_remove(this->adj_f2p(fid));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::face_remove_unreferenced(const uint fid)
+{
+    this->faces.at(fid).clear();
+    this->f2e.at(fid).clear();
+    this->f2f.at(fid).clear();
+    this->f2p.at(fid).clear();
+    this->face_triangles.at(fid).clear();
+    face_switch_id(fid, this->num_faces()-1);
+    this->faces.pop_back();
+    this->f_data.pop_back();
+    this->f2e.pop_back();
+    this->f2f.pop_back();
+    this->f2p.pop_back();
+    this->f_on_srf.pop_back();
+    this->face_triangles.pop_back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::poly_switch_id(const uint pid0, const uint pid1)
+{
+    if (pid0 == pid1) return;
+
+    std::swap(this->polys.at(pid0),              this->polys.at(pid1));
+    std::swap(this->p_data.at(pid0),             this->p_data.at(pid1));
+    std::swap(this->p2v.at(pid0),                this->p2v.at(pid1));
+    std::swap(this->p2e.at(pid0),                this->p2e.at(pid1));
+    std::swap(this->p2p.at(pid0),                this->p2p.at(pid1));
+    std::swap(this->polys_face_winding.at(pid0), this->polys_face_winding.at(pid1));
+
+    std::unordered_set<uint> verts_to_update;
+    verts_to_update.insert(this->adj_p2v(pid0).begin(), this->adj_p2v(pid0).end());
+    verts_to_update.insert(this->adj_p2v(pid1).begin(), this->adj_p2v(pid1).end());
+
+    std::unordered_set<uint> edges_to_update;
+    edges_to_update.insert(this->adj_p2e(pid0).begin(), this->adj_p2e(pid0).end());
+    edges_to_update.insert(this->adj_p2e(pid1).begin(), this->adj_p2e(pid1).end());
+
+    std::unordered_set<uint> faces_to_update;
+    faces_to_update.insert(this->adj_p2f(pid0).begin(), this->adj_p2f(pid0).end());
+    faces_to_update.insert(this->adj_p2f(pid1).begin(), this->adj_p2f(pid1).end());
+
+    std::unordered_set<uint> polys_to_update;
+    polys_to_update.insert(this->adj_p2p(pid0).begin(), this->adj_p2p(pid0).end());
+    polys_to_update.insert(this->adj_p2p(pid1).begin(), this->adj_p2p(pid1).end());
+
+    for(uint vid : verts_to_update)
+    {
+        for(uint & pid : this->v2p.at(vid))
+        {
+            if (pid == pid0) pid = pid1; else
+            if (pid == pid1) pid = pid0;
+        }
+    }
+
+    for(uint eid : edges_to_update)
+    {
+        for(uint & pid : this->e2p.at(eid))
+        {
+            if (pid == pid0) pid = pid1; else
+            if (pid == pid1) pid = pid0;
+        }
+    }
+
+    for(uint fid : faces_to_update)
+    {
+        for(uint & pid : this->f2p.at(fid))
+        {
+            if (pid == pid0) pid = pid1; else
+            if (pid == pid1) pid = pid0;
+        }
+    }
+
+    for(uint nbr : polys_to_update)
+    {
+        for(uint & pid : this->p2p.at(nbr))
+        {
+            if (pid == pid0) pid = pid1; else
+            if (pid == pid1) pid = pid0;
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & p,
+                                                 const std::vector<bool> & face_winding)
+{
+#ifndef NDEBUG
+    for(uint fid : p) assert(fid < this->num_faces());
+#endif
+    assert(p.size() == face_winding.size());
+
+    uint pid = this->num_polys();
+    this->polys.push_back(p);
+    this->polys_face_winding.push_back(face_winding);
+
+    P data;
+    this->p_data.push_back(data);
+
+    this->p2v.push_back(std::vector<uint>());
+    this->p2e.push_back(std::vector<uint>());
+    this->p2p.push_back(std::vector<uint>());
+
+    // update connectivity
+    for(uint fid : p)
+    {
+        std::vector<uint> &f = faces.at(fid);
+        for(uint i=0; i<f.size(); ++i)
+        {
+            uint vid0 = f.at(i);
+            uint vid1 = f.at((i+1)%f.size());
+            int  eid = this->edge_id(vid0, vid1);
+            assert(eid >= 0);
+
+            if (!this->poly_contains_edge(pid,eid))
+            {
+                this->e2p.at(eid).push_back(pid);
+                this->p2e.at(pid).push_back(eid);
+            }
+
+            if (!this->poly_contains_vert(pid,vid0))
+            {
+                this->p2v.at(pid).push_back(vid0);
+                this->v2p.at(vid0).push_back(pid);
+            }
+        }
+
+        for(uint nbr : this->adj_f2p(fid))
+        {
+            if (pid!=nbr && DOES_NOT_CONTAIN_VEC(this->p2p.at(pid),nbr))
+            {
+                assert(DOES_NOT_CONTAIN_VEC(this->p2p.at(nbr),pid));
+                this->p2p.at(pid).push_back(nbr);
+                this->p2p.at(nbr).push_back(pid);
+            }
+        }
+
+        this->f2p.at(fid).push_back(pid);
+
+        // update f_on_srf flags
+        this->f_on_srf.at(fid) = (this->f2p.at(fid).size()<2);
+        // update e_on_srf flags
+        for(uint eid : this->adj_f2e(fid))
+        {
+            this->e_on_srf.at(eid) = false;
+            for(uint inc_fid : this->adj_e2f(eid))
+            {
+                if(this->f_on_srf.at(inc_fid)) this->e_on_srf.at(eid) = true;
+            }
+        }
+        // update v_on_srf flags
+        for(uint vid : f)
+        {
+            this->v_on_srf.at(vid) = false;
+            for(uint inc_fid : this->adj_v2f(vid))
+            {
+                if(this->f_on_srf.at(inc_fid)) this->v_on_srf.at(vid) = true;
+            }
+        }
+    }
+
+    return pid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove_unreferenced(const uint pid)
+{
+    this->polys.at(pid).clear();
+    this->p2v.at(pid).clear();
+    this->p2e.at(pid).clear();
+    this->p2p.at(pid).clear();
+    this->polys_face_winding.at(pid).clear();
+    poly_switch_id(pid, this->num_polys()-1);
+    this->polys.pop_back();
+    this->p_data.pop_back();
+    this->p2v.pop_back();
+    this->p2e.pop_back();
+    this->p2p.pop_back();
+    this->polys_face_winding.pop_back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove(const uint pid)
+{
+    std::set<uint,std::greater<uint>> dangling_verts; // higher ids first
+    std::set<uint,std::greater<uint>> dangling_edges; // higher ids first
+    std::set<uint,std::greater<uint>> dangling_faces; // higher ids first
+
+    // disconnect from vertices
+    for(uint vid : this->adj_p2v(pid))
+    {
+        REMOVE_FROM_VEC(this->v2p.at(vid), pid);
+        if (this->v2p.at(vid).empty()) dangling_verts.insert(vid);
+    }
+
+    // disconnect from edges
+    for(uint eid : this->adj_p2e(pid))
+    {
+        REMOVE_FROM_VEC(this->e2p.at(eid), pid);
+        if (this->e2p.at(eid).empty()) dangling_edges.insert(eid);
+    }
+
+    // disconnect from faces
+    for(uint fid : this->adj_p2f(pid))
+    {
+        REMOVE_FROM_VEC(this->f2p.at(fid), pid);
+        switch(this->f2p.at(fid).size())
+        {
+            case 0 :
+            {
+                dangling_faces.insert(fid);
+                break;
+            }
+            case 1 :
+            {
+                this->f_on_srf.at(fid) = true;
+                for(uint eid : this->adj_f2e(fid)) this->e_on_srf.at(eid) = true;
+                for(uint vid : this->adj_f2v(fid)) this->v_on_srf.at(vid) = true;
+                break;
+            }
+        }
+    }
+
+    // disconnect from other polygons
+    for(uint nbr : this->adj_p2p(pid)) REMOVE_FROM_VEC(this->p2p.at(nbr), pid);
+
+    // delete dangling faces
+    for(uint fid : dangling_faces)
+    {
+        assert(this->adj_f2p(fid).empty());
+        for(uint vid : this->faces.at(fid)) REMOVE_FROM_VEC(this->v2f.at(vid), fid);
+        for(uint eid : this->f2e.at(fid))   REMOVE_FROM_VEC(this->e2f.at(eid), fid);
+        for(uint nbr : this->f2f.at(fid))   REMOVE_FROM_VEC(this->f2f.at(nbr), fid);
+        face_remove_unreferenced(fid);
+    }
+
+    // delete dangling edges
+    for(uint eid : dangling_edges)
+    {
+        assert(this->adj_e2f(eid).empty());
+        assert(this->adj_e2p(eid).empty());
+        uint vid0 = this->edge_vert_id(eid,0);
+        uint vid1 = this->edge_vert_id(eid,1);
+        //if (vid1 > vid0) std::swap(vid0,vid1); // make sure the highest id is processed first
+        REMOVE_FROM_VEC(this->v2e.at(vid0), eid);
+        REMOVE_FROM_VEC(this->v2e.at(vid1), eid);
+        REMOVE_FROM_VEC(this->v2v.at(vid0), vid1);
+        REMOVE_FROM_VEC(this->v2v.at(vid1), vid0);
+        edge_remove_unreferenced(eid);
+    }
+
+    // delete dangling vertices
+    for(uint vid : dangling_verts)
+    {
+        assert(this->adj_v2e(vid).empty());
+        assert(this->adj_v2f(vid).empty());
+        assert(this->adj_v2p(vid).empty());
+        for(uint nbr : this->adj_v2v(vid)) REMOVE_FROM_VEC(this->v2v.at(nbr), vid);
+        vert_remove_unreferenced(vid);
+    }
+
+    poly_remove_unreferenced(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::polys_remove(const std::vector<uint> & pids)
+{
+    // in order to avoid id conflicts remove all the
+    // polys starting from the one with highest id
+    //
+    std::vector<uint> tmp = pids;
+    std::sort(tmp.begin(), tmp.end());
+    std::reverse(tmp.begin(), tmp.end());
+    for(uint pid : tmp) poly_remove(pid);
+}
 
 }
