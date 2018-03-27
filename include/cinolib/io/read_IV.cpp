@@ -48,7 +48,7 @@ bool seek_keyword(FILE *fp, const char *kw)
 CINO_INLINE
 void read_IV(const char          * filename,
              std::vector<double> & xyz,
-             std::vector<uint>  & tri,
+             std::vector<uint>   & tri,
              std::vector<int>    & patch)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
