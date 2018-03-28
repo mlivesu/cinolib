@@ -476,10 +476,26 @@ uint Tetmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex lis
     if(fid3 == -1) { fid3 = this->face_add(f3); w.at(3) = true; }
 
     // add tet
-    return poly_add({static_cast<uint>(fid0),
-                     static_cast<uint>(fid1),
-                     static_cast<uint>(fid2),
-                     static_cast<uint>(fid3)},w);
+    return AbstractPolyhedralMesh<M,V,E,F,P>::poly_add({static_cast<uint>(fid0),
+                                                        static_cast<uint>(fid1),
+                                                        static_cast<uint>(fid2),
+                                                        static_cast<uint>(fid3)},w);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
+{
+    uint vid = this->vert_add(p);
+    for(uint fid : this->adj_p2f(pid))
+    {
+        std::vector<uint> vlist = this->face_verts(fid);
+        vlist.push_back(vid);
+        this->poly_add(vlist);
+    }
+    this->poly_remove(pid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

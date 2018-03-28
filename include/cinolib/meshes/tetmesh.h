@@ -115,6 +115,7 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         bool   poly_bary_coords          (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
         double poly_volume               (const uint pid) const;
         uint   poly_add                  (const std::vector<uint> & vlist); // vertex list
+        void   poly_split                (const uint pid, const vec3d & p);
 
         using  AbstractPolyhedralMesh<M,V,E,F,P>::poly_add; // avoid hiding poly_add(flist,fwinding);
 
