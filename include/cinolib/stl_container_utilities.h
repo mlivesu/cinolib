@@ -73,6 +73,18 @@ template<typename T>
 CINO_INLINE
 void REMOVE_FROM_VEC(std::vector<T> & vec, const T & elem);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void SORT_VEC(std::vector<T> & vec, const bool biggest_first = true);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+std::vector<T> SORT_VEC(const std::vector<T> & vec, const bool biggest_first = true);
+
 }
 
 #ifndef  CINO_STATIC_LIB

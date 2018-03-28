@@ -450,6 +450,42 @@ double Tetmesh<M,V,E,F,P>::poly_volume(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+uint Tetmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex list
+{
+    assert(vlist.size()==4);
+
+    // detect faces
+    std::vector<uint> f0 = { vlist.at(TET_FACES[0][0]), vlist.at(TET_FACES[0][1]), vlist.at(TET_FACES[0][2]) };
+    std::vector<uint> f1 = { vlist.at(TET_FACES[1][0]), vlist.at(TET_FACES[1][1]), vlist.at(TET_FACES[1][2]) };
+    std::vector<uint> f2 = { vlist.at(TET_FACES[2][0]), vlist.at(TET_FACES[2][1]), vlist.at(TET_FACES[2][2]) };
+    std::vector<uint> f3 = { vlist.at(TET_FACES[3][0]), vlist.at(TET_FACES[3][1]), vlist.at(TET_FACES[3][2]) };
+
+    // assume faces already exist and they will be seen CW for the new element)
+    std::vector<bool> w = { false, false, false, false };
+
+    // detect face ids
+    int fid0 = this->face_id(f0);
+    int fid1 = this->face_id(f1);
+    int fid2 = this->face_id(f2);
+    int fid3 = this->face_id(f3);
+
+    // add missing faces (with vertices CCW)
+    if(fid0 == -1) { fid0 = this->face_add(f0); w.at(0) = true; }
+    if(fid1 == -1) { fid1 = this->face_add(f1); w.at(1) = true; }
+    if(fid2 == -1) { fid2 = this->face_add(f2); w.at(2) = true; }
+    if(fid3 == -1) { fid3 = this->face_add(f3); w.at(3) = true; }
+
+    // add tet
+    return poly_add({static_cast<uint>(fid0),
+                     static_cast<uint>(fid1),
+                     static_cast<uint>(fid2),
+                     static_cast<uint>(fid3)},w);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 double Tetmesh<M,V,E,F,P>::poly_dihedral_angle(const uint pid, const uint fid0, const uint fid1) const
 {
     double  alpha = acos(this->poly_face_normal(pid,fid0).dot(-this->poly_face_normal(pid,fid1)));

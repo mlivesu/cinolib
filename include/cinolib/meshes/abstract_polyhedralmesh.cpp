@@ -327,6 +327,40 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_tessellation(const uin
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_verts(const uint fid) const
+{
+    return this->adj_f2v(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_verts_sorted(const uint fid) const
+{
+    return SORT_VEC(face_verts(fid));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int AbstractPolyhedralMesh<M,V,E,F,P>::face_id(const std::vector<uint> & f) const
+{
+    std::vector<uint> query = SORT_VEC(f);
+
+    uint vid = f.front();
+    for(uint fid : this->adj_v2f(vid))
+    {
+        if(this->face_verts_sorted(fid)==query) return fid;
+    }
+    return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::face_set_color(const Color & c)
 {
     for(uint fid=0; fid<num_faces(); ++fid)
@@ -1383,17 +1417,17 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_switch_id(const uint pid0, const ui
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & p,
-                                                 const std::vector<bool> & face_winding)
+uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & flist,
+                                                 const std::vector<bool> & fwinding)
 {
 #ifndef NDEBUG
-    for(uint fid : p) assert(fid < this->num_faces());
+    for(uint fid : flist) assert(fid < this->num_faces());
 #endif
-    assert(p.size() == face_winding.size());
+    assert(flist.size() == fwinding.size());
 
     uint pid = this->num_polys();
-    this->polys.push_back(p);
-    this->polys_face_winding.push_back(face_winding);
+    this->polys.push_back(flist);
+    this->polys_face_winding.push_back(fwinding);
 
     P data;
     this->p_data.push_back(data);
@@ -1403,7 +1437,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & p,
     this->p2p.push_back(std::vector<uint>());
 
     // update connectivity
-    for(uint fid : p)
+    for(uint fid : flist)
     {
         std::vector<uint> &f = faces.at(fid);
         for(uint i=0; i<f.size(); ++i)

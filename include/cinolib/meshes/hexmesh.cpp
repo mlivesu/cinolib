@@ -513,4 +513,48 @@ double Hexmesh<M,V,E,F,P>::poly_volume(const uint pid) const
                                this->poly_vert(pid,7));
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint Hexmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex list
+{
+    assert(vlist.size()==8);
+
+    // detect faces
+    std::vector<uint> f0 = { vlist.at(HEXA_FACES[0][0]), vlist.at(HEXA_FACES[0][1]), vlist.at(HEXA_FACES[0][2]), vlist.at(HEXA_FACES[0][3]) };
+    std::vector<uint> f1 = { vlist.at(HEXA_FACES[1][0]), vlist.at(HEXA_FACES[1][1]), vlist.at(HEXA_FACES[1][2]), vlist.at(HEXA_FACES[1][3]) };
+    std::vector<uint> f2 = { vlist.at(HEXA_FACES[2][0]), vlist.at(HEXA_FACES[2][1]), vlist.at(HEXA_FACES[2][2]), vlist.at(HEXA_FACES[2][3]) };
+    std::vector<uint> f3 = { vlist.at(HEXA_FACES[3][0]), vlist.at(HEXA_FACES[3][1]), vlist.at(HEXA_FACES[3][2]), vlist.at(HEXA_FACES[3][3]) };
+    std::vector<uint> f4 = { vlist.at(HEXA_FACES[4][0]), vlist.at(HEXA_FACES[4][1]), vlist.at(HEXA_FACES[4][2]), vlist.at(HEXA_FACES[4][3]) };
+    std::vector<uint> f5 = { vlist.at(HEXA_FACES[5][0]), vlist.at(HEXA_FACES[5][1]), vlist.at(HEXA_FACES[5][2]), vlist.at(HEXA_FACES[5][3]) };
+
+    // assume faces already exist and they will be seen CW for the new element)
+    std::vector<bool> w = { false, false, false, false, false, false };
+
+    // detect face ids
+    int fid0 = this->face_id(f0);
+    int fid1 = this->face_id(f1);
+    int fid2 = this->face_id(f2);
+    int fid3 = this->face_id(f3);
+    int fid4 = this->face_id(f4);
+    int fid5 = this->face_id(f5);
+
+    // add missing faces (with vertices CCW)
+    if(fid0 == -1) { fid0 = this->face_add(f0); w.at(0) = true; }
+    if(fid1 == -1) { fid1 = this->face_add(f1); w.at(1) = true; }
+    if(fid2 == -1) { fid2 = this->face_add(f2); w.at(2) = true; }
+    if(fid3 == -1) { fid3 = this->face_add(f3); w.at(3) = true; }
+    if(fid4 == -1) { fid4 = this->face_add(f4); w.at(4) = true; }
+    if(fid5 == -1) { fid5 = this->face_add(f5); w.at(5) = true; }
+
+    // add hexa
+    return poly_add({static_cast<uint>(fid0),
+                     static_cast<uint>(fid1),
+                     static_cast<uint>(fid2),
+                     static_cast<uint>(fid3),
+                     static_cast<uint>(fid4),
+                     static_cast<uint>(fid5),},w);
+}
+
 }

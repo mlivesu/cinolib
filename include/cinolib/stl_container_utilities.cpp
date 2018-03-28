@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/stl_container_utilities.h>
+#include <algorithm>
 
 namespace cinolib
 {
@@ -99,4 +100,24 @@ void REMOVE_FROM_VEC(std::vector<T> & vec, const T & elem)
     vec.erase(std::remove(vec.begin(), vec.end(), elem), vec.end());
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void SORT_VEC(std::vector<T> & vec, const bool biggest_first)
+{
+    std::sort(vec.begin(), vec.end()); // ascending order (smallest first)
+    if (biggest_first) std::reverse(vec.begin(), vec.end());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+std::vector<T> SORT_VEC(const std::vector<T> & vec, const bool biggest_first)
+{
+    std::vector<T> tmp = vec;
+    SORT_VEC(tmp, biggest_first);
+    return tmp;
+}
 }
