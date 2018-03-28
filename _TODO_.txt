@@ -2,12 +2,8 @@
 - put cotangents (tets/tris) on a separate .h/cpp file
 - add inverse and transpose operators for 2x2 matrices
 - remove virtual from mesh hierarchy whenever possible
-- use Möller–Trumbore algorithm for 3D ray-triangle intersection 
 - refactor ray/line/plane intersections and integral curve tracing 
   (check Robust Polylines Tracing for N-Symmetry Direction Field on Triangulated Surfaces)
-- add topological operators (add/remove/collapse) also for volumetric meshes
-     => then deprecate update_adjacency and make connectivity through poly_add and vert_add instead
-        (I already tested for surfaces. The code is much cleaner and loading becomes slightly faster!)
 - Add GUI controls: load/save labeling
 - avoid headers from serialized vector and scalar fields (it’s far more general)
 - update skeleton data structure (and make relative control panel)
