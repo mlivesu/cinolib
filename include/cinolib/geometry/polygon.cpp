@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/geometry/polygon.h>
 #include <cinolib/geometry/plane.h>
+#include <cinolib/geometry/triangle.h>
 #include <cinolib/Shewchuk_predicates.h>
 
 namespace cinolib
