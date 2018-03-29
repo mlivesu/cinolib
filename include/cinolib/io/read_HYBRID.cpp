@@ -36,16 +36,17 @@ namespace cinolib
 
 CINO_INLINE
 void read_HYBDRID(const char                     * filename,
-                  std::vector<double>            & coords,
+                  std::vector<vec3d>             & verts,
                   std::vector<std::vector<uint>> & faces,
                   std::vector<std::vector<uint>> & polys,
                   std::vector<std::vector<bool>> & polys_face_winding)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
-    coords.clear();
+    verts.clear();
     faces.clear();
     polys.clear();
+    polys_face_winding.clear();
 
     FILE *fp = fopen(filename, "r");
 
@@ -63,9 +64,7 @@ void read_HYBDRID(const char                     * filename,
     {
         double x, y, z;
         fscanf(fp, "%lf %lf %lf", &x, &y, &z);
-        coords.push_back(x);
-        coords.push_back(y);
-        coords.push_back(z);
+        verts.push_back(vec3d(x,y,z));
     }
 
     for(uint i=0; i<nf; ++i)
