@@ -50,7 +50,6 @@ CINO_INLINE
 Polyhedralmesh<M,V,E,F,P>::Polyhedralmesh(const char * filename)
 {
     load(filename);
-    this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -62,11 +61,7 @@ Polyhedralmesh<M,V,E,F,P>::Polyhedralmesh(const std::vector<vec3d>             &
                                           const std::vector<std::vector<uint>> & polys,
                                           const std::vector<std::vector<bool>> & polys_face_winding)
 {
-    this->verts = verts;
-    this->faces = faces;
-    this->polys = polys;
-    this->polys_face_winding = polys_face_winding;
-    this->init();
+    this->init(verts, faces, polys, polys_face_winding);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -76,7 +71,12 @@ CINO_INLINE
 void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
 {
     this->clear();
-    std::vector<double> coords;
+    this->mesh_data().filename = std::string(filename);
+
+    std::vector<vec3d>             tmp_verts;
+    std::vector<std::vector<uint>> tmp_faces;
+    std::vector<std::vector<uint>> tmp_polys;
+    std::vector<std::vector<bool>> tmp_polys_face_winding;
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-6,6);
@@ -84,12 +84,12 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
     if (filetype.compare("hybrid") == 0 ||
         filetype.compare("HYBRID") == 0)
     {
-        read_HYBDRID(filename, coords, this->faces, this->polys, this->polys_face_winding);
+        read_HYBDRID(filename, tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
     }
     else if (filetype.compare(".hedra") == 0 ||
              filetype.compare(".HEDRA") == 0)
     {
-        read_HEDRA(filename, coords, this->faces, this->polys, this->polys_face_winding);
+        read_HEDRA(filename, tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
     }
     else
     {
@@ -97,13 +97,7 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
         exit(-1);
     }
 
-    this->verts = vec3d_from_serialized_xyz(coords);
-
-    std::cout << this->num_verts() << " verts read" << std::endl;
-    std::cout << this->num_faces() << " faces read" << std::endl;
-    std::cout << this->num_polys() << " polys read" << std::endl;
-
-    this->mesh_data().filename = std::string(filename);
+    this->init(tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

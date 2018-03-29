@@ -45,10 +45,6 @@ template<class M = Mesh_std_attributes, // default template arguments
          class P = Polygon_std_attributes>
 class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
 {
-    protected:
-
-        std::vector<std::vector<uint>> triangulated_polys; // triangles covering each polygon. Useful for
-                                                           // robust normal estimation and rendering
     public:
 
         explicit Polygonmesh(){}
@@ -69,33 +65,7 @@ class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void clear();
-        void init();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void operator+=(const Polygonmesh<M,V,E,P> & m);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void update_p_normal(const uint fid);
-        void update_poly_tessellation();
-        void update_poly_tessellation(const uint pid);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         std::vector<uint> get_ordered_boundary_vertices() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void vert_switch_id(const uint vid0, const uint vid1);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        const std::vector<uint> & poly_tessellation       (const uint pid) const;
-              uint                poly_add                (const std::vector<uint> & p);
-              void                poly_switch_id          (const uint pid0, const uint pid1);
-              void                poly_remove_unreferenced(const uint pid);
 };
 
 }

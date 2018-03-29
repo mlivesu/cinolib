@@ -63,20 +63,19 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         explicit Hexmesh(const std::vector<vec3d>             & verts,
                          const std::vector<std::vector<uint>> & polys);
 
-        explicit Hexmesh(const std::vector<vec3d>             & verts,
-                         const std::vector<std::vector<uint>> & faces,
-                         const std::vector<std::vector<uint>> & polys,
-                         const std::vector<std::vector<bool>> & polys_face_winding);
-
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         MeshType mesh_type() const { return HEXMESH; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void init();
         void load(const char * filename);
         void save(const char * filename) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void init_hexmesh(const std::vector<vec3d>             & verts,
+                          const std::vector<std::vector<uint>> & polys);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -112,14 +111,6 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    protected:
-
-        void from_serialized_hexa_to_general_polyhedra(const std::vector<uint>              & hexa);
-        void from_serialized_hexa_to_general_polyhedra(const std::vector<std::vector<uint>> & hexa);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void reorder_p2v();
         void reorder_p2v(const uint pid);
 
         // reorder_p2v() makes sure the p2v adjacency stores vertices
