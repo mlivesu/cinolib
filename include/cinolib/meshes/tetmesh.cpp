@@ -47,10 +47,7 @@ CINO_INLINE
 Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d> & verts,
                             const std::vector<uint>  & polys)
 {
-    this->verts = verts;
-    from_serialized_tets_to_general_polyhedra(polys);
-
-    init();
+    init_tetmesh(verts, polys_from_serialized_vids(polys,4));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -60,9 +57,7 @@ CINO_INLINE
 Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<double> & coords,
                             const std::vector<uint>   & polys)
 {
-    this->verts = vec3d_from_serialized_xyz(coords);
-    from_serialized_tets_to_general_polyhedra(polys);
-    init();
+    init_tetmesh(vec3d_from_serialized_xyz(coords), polys_from_serialized_vids(polys,4));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -72,25 +67,7 @@ CINO_INLINE
 Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d>             & verts,
                             const std::vector<std::vector<uint>> & polys)
 {
-    this->verts = verts;
-    from_serialized_tets_to_general_polyhedra(polys);
-    init();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d>             & verts,
-                            const std::vector<std::vector<uint>> & faces,
-                            const std::vector<std::vector<uint>> & polys,
-                            const std::vector<std::vector<bool>> & polys_face_winding)
-{
-    this->verts = verts;
-    this->faces = faces;
-    this->polys = polys;
-    this->polys_face_winding = polys_face_winding;
-    init();
+    init_tetmesh(verts, polys);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -100,108 +77,6 @@ CINO_INLINE
 Tetmesh<M,V,E,F,P>::Tetmesh(const char * filename)
 {
     load(filename);
-    init();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Tetmesh<M,V,E,F,P>::from_serialized_tets_to_general_polyhedra(const std::vector<uint> & tets)
-{
-    this->faces.clear();
-    this->polys.clear();
-    this->polys_face_winding.clear();
-
-    uint n_tets = tets.size()/4;
-
-    std::map<std::vector<uint>,uint> f_map;
-    for(uint tid=0; tid<n_tets; ++tid)
-    {
-        std::vector<uint> p_faces;
-        std::vector<bool> p_winding;
-
-        for(uint i=0; i<faces_per_poly(); ++i)
-        {
-            uint base = tid*verts_per_poly();
-            std::vector<uint> f =
-            {
-                tets.at(base + TET_FACES[i][0]),
-                tets.at(base + TET_FACES[i][1]),
-                tets.at(base + TET_FACES[i][2]),
-            };
-            std::vector<uint> sorted_f = f;
-            sort(sorted_f.begin(), sorted_f.end());
-            auto query = f_map.find(sorted_f);
-
-            if (query == f_map.end())
-            {
-                uint fresh_id = f_map.size();
-                f_map[sorted_f] = fresh_id;
-                this->faces.push_back(f);
-                p_faces.push_back(fresh_id);
-                p_winding.push_back(true);
-            }
-            else
-            {
-                p_faces.push_back(query->second);
-                p_winding.push_back(false);
-            }
-        }
-
-        this->polys.push_back(p_faces);
-        this->polys_face_winding.push_back(p_winding);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Tetmesh<M,V,E,F,P>::from_serialized_tets_to_general_polyhedra(const std::vector<std::vector<uint>> & tets)
-{
-    this->faces.clear();
-    this->polys.clear();
-    this->polys_face_winding.clear();
-
-    std::map<std::vector<uint>,uint> f_map;
-    for(uint tid=0; tid<tets.size(); ++tid)
-    {
-        assert(tets.at(tid).size() == 4);
-
-        std::vector<uint> p_faces;
-        std::vector<bool> p_winding;
-
-        for(uint i=0; i<faces_per_poly(); ++i)
-        {
-            std::vector<uint> f =
-            {
-                tets.at(tid).at(TET_FACES[i][0]),
-                tets.at(tid).at(TET_FACES[i][1]),
-                tets.at(tid).at(TET_FACES[i][2]),
-            };
-            std::vector<uint> sorted_f = f;
-            sort(sorted_f.begin(), sorted_f.end());
-            auto query = f_map.find(sorted_f);
-
-            if (query == f_map.end())
-            {
-                uint fresh_id = f_map.size();
-                f_map[sorted_f] = fresh_id;
-                this->faces.push_back(f);
-                p_faces.push_back(fresh_id);
-                p_winding.push_back(true);
-            }
-            else
-            {
-                p_faces.push_back(query->second);
-                p_winding.push_back(false);
-            }
-        }
-
-        this->polys.push_back(p_faces);
-        this->polys_face_winding.push_back(p_winding);
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -211,8 +86,10 @@ CINO_INLINE
 void Tetmesh<M,V,E,F,P>::load(const char * filename)
 {
     this->clear();
+    this->mesh_data().filename = std::string(filename);
 
-    std::vector<std::vector<uint>> tets;
+    std::vector<vec3d>             tmp_verts;
+    std::vector<std::vector<uint>> tmp_polys;
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -220,22 +97,22 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        read_MESH(filename, this->verts, tets);
+        read_MESH(filename, tmp_verts, tmp_polys);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
     {
-        read_VTU(filename, this->verts, tets);
+        read_VTU(filename, tmp_verts, tmp_polys);
     }
     else if (filetype.compare(".vtk") == 0 ||
              filetype.compare(".VTK") == 0)
     {
-        read_VTK(filename, this->verts, tets);
+        read_VTK(filename, tmp_verts, tmp_polys);
     }
     else if (filetype.compare(".tet") == 0 ||
              filetype.compare(".TET") == 0)
     {
-        read_TET(filename, this->verts, tets);
+        read_TET(filename, tmp_verts, tmp_polys);
     }
     else
     {
@@ -243,12 +120,7 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
         exit(-1);
     }
 
-    from_serialized_tets_to_general_polyhedra(tets);
-
-    std::cout << this->num_polys() << " tetrahedra read" << std::endl;
-    std::cout << this->num_verts() << " vertices   read" << std::endl;
-
-    this->mesh_data().filename = std::string(filename);
+    init_tetmesh(tmp_verts, tmp_polys);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -291,11 +163,19 @@ void Tetmesh<M,V,E,F,P>::save(const char * filename) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::init()
+void Tetmesh<M,V,E,F,P>::init_tetmesh(const std::vector<vec3d>             & verts,
+                                      const std::vector<std::vector<uint>> & polys)
 {
-    AbstractPolyhedralMesh<M,V,E,F,P>::init();
-    reorder_p2v(); // makes sure the p2v adjacency stores vertices in a way that uniquely defines per element connectivity
-    update_tet_quality();
+    for(auto v : verts) this->vert_add(v);
+    for(auto p : polys) this->poly_add(p);
+
+    this->copy_xyz_to_uvw(UVW_param);
+
+    std::cout << "new mesh\t"      <<
+                 this->num_verts() << "V / " <<
+                 this->num_edges() << "E / " <<
+                 this->num_faces() << "F / " <<
+                 this->num_polys() << "P   " << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -313,15 +193,6 @@ void Tetmesh<M,V,E,F,P>::update_f_normal(const uint fid)
     vec3d n = u.cross(v); n.normalize();
 
     this->face_data(fid).normal = n;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Tetmesh<M,V,E,F,P>::reorder_p2v()
-{
-    for(uint pid=0; pid<this->num_polys(); ++pid) reorder_p2v(pid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -475,11 +346,14 @@ uint Tetmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex lis
     if(fid2 == -1) { fid2 = this->face_add(f2); w.at(2) = true; }
     if(fid3 == -1) { fid3 = this->face_add(f3); w.at(3) = true; }
 
-    // add tet
-    return AbstractPolyhedralMesh<M,V,E,F,P>::poly_add({static_cast<uint>(fid0),
-                                                        static_cast<uint>(fid1),
-                                                        static_cast<uint>(fid2),
-                                                        static_cast<uint>(fid3)},w);
+    uint pid = poly_add({static_cast<uint>(fid0),
+                         static_cast<uint>(fid1),
+                         static_cast<uint>(fid2),
+                         static_cast<uint>(fid3)},w);
+
+    reorder_p2v(pid); // make sure p2v stores tet vertices in the standard way
+    update_tet_quality(pid);
+    return pid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

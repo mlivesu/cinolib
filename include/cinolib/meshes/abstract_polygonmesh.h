@@ -44,6 +44,11 @@ template<class M,
          class P>
 class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 {
+    protected:
+
+        std::vector<std::vector<uint>> poly_triangles; // triangles covering each quad. Useful for
+                                                       // robust normal estimation and rendering
+
     public:
 
         explicit AbstractPolygonMesh() : AbstractMesh<M,V,E,P>() {}
@@ -53,13 +58,19 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         virtual void load(const char * filename);
         virtual void save(const char * filename) const;
-        virtual void init();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void update_adjacency();
-        virtual void update_p_normal(const uint pid) = 0;
+        virtual void clear();
+        virtual void init(const std::vector<vec3d>             & verts,
+                          const std::vector<std::vector<uint>> & polys);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual void update_p_tessellation(const uint pid);
+        virtual void update_p_normal(const uint pid);
         virtual void update_v_normal(const uint vid);
+        virtual void update_p_tessellations();
         virtual void update_p_normals();
         virtual void update_v_normals();
         virtual void update_normals();
@@ -151,7 +162,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         virtual       int                  poly_opposite_to        (const uint eid, const uint pid) const;
         virtual       bool                 poly_verts_are_CCW      (const uint pid, const uint curr, const uint prev) const;
         virtual       std::vector<vec3d>   poly_vlist              (const uint pid) const;
-        virtual const std::vector<uint>  & poly_tessellation       (const uint pid) const = 0;
+        virtual const std::vector<uint>  & poly_tessellation       (const uint pid) const;
 };
 
 }

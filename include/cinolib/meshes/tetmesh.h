@@ -63,20 +63,19 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         explicit Tetmesh(const std::vector<vec3d>             & verts,
                          const std::vector<std::vector<uint>> & polys);
 
-        explicit Tetmesh(const std::vector<vec3d>             & verts,
-                         const std::vector<std::vector<uint>> & faces,
-                         const std::vector<std::vector<uint>> & polys,
-                         const std::vector<std::vector<bool>> & polys_face_winding);
-
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         MeshType mesh_type() const { return TETMESH; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void init();
         void load(const char * filename);
         void save(const char * filename) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void init_tetmesh(const std::vector<vec3d>             & verts,
+                          const std::vector<std::vector<uint>> & polys);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -114,21 +113,13 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         int    poly_shared_vert          (const uint pid, const std::vector<uint> & incident_edges) const; // TODO: move to global ids!!!!!!
         bool   poly_bary_coords          (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
         double poly_volume               (const uint pid) const;
-        uint   poly_add                  (const std::vector<uint> & vlist); // vertex list
         void   poly_split                (const uint pid, const vec3d & p);
+        uint   poly_add                  (const std::vector<uint> & vlist); // vertex list
 
         using  AbstractPolyhedralMesh<M,V,E,F,P>::poly_add; // avoid hiding poly_add(flist,fwinding);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    protected:
-
-        void from_serialized_tets_to_general_polyhedra(const std::vector<uint>              & tets);
-        void from_serialized_tets_to_general_polyhedra(const std::vector<std::vector<uint>> & tets);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void reorder_p2v();
         void reorder_p2v(const uint pid);
 
         /* reorder_p2v() makes sure the p2v adjacency stores vertices

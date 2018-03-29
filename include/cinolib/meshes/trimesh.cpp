@@ -46,7 +46,6 @@ CINO_INLINE
 Trimesh<M,V,E,P>::Trimesh(const char * filename)
 {
     this->load(filename);
-    this->init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -54,12 +53,10 @@ Trimesh<M,V,E,P>::Trimesh(const char * filename)
 template<class M, class V, class E, class P>
 CINO_INLINE
 Trimesh<M,V,E,P>::Trimesh(const std::vector<vec3d>              & verts,
-                          const std::vector<std::vector<uint>>  & faces)
+                          const std::vector<std::vector<uint>>  & polys)
 
 {
-    this->verts = verts;
-    this->polys = faces;
-    this->init();
+    this->init(verts, polys);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -67,11 +64,9 @@ Trimesh<M,V,E,P>::Trimesh(const std::vector<vec3d>              & verts,
 template<class M, class V, class E, class P>
 CINO_INLINE
 Trimesh<M,V,E,P>::Trimesh(const std::vector<double>             & coords,
-                          const std::vector<std::vector<uint>>  & faces)
+                          const std::vector<std::vector<uint>>  & polys)
 {
-    this->verts = vec3d_from_serialized_xyz(coords);
-    this->polys = faces;
-    this->init();
+    this->init(vec3d_from_serialized_xyz(coords), polys);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -79,11 +74,9 @@ Trimesh<M,V,E,P>::Trimesh(const std::vector<double>             & coords,
 template<class M, class V, class E, class P>
 CINO_INLINE
 Trimesh<M,V,E,P>::Trimesh(const std::vector<vec3d> & verts,
-                          const std::vector<uint>  & faces)
+                          const std::vector<uint>  & polys)
 {
-    this->verts = verts;
-    this->polys = faces_from_serialized_vids(faces,3);
-    this->init();
+    this->init(verts, polys_from_serialized_vids(polys,3));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -91,11 +84,9 @@ Trimesh<M,V,E,P>::Trimesh(const std::vector<vec3d> & verts,
 template<class M, class V, class E, class P>
 CINO_INLINE
 Trimesh<M,V,E,P>::Trimesh(const std::vector<double> & coords,
-                          const std::vector<uint>   & faces)
+                          const std::vector<uint>   & polys)
 {
-    this->verts = vec3d_from_serialized_xyz(coords);
-    this->polys = faces_from_serialized_vids(faces,3);
-    this->init();
+    this->init(vec3d_from_serialized_xyz(coords), polys_from_serialized_vids(polys,3));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -483,7 +474,7 @@ std::vector<uint> Trimesh<M,V,E,P>::get_ordered_boundary_vertices() const
 {
     // NOTE: assumes the mesh contains exactly ONE simply connected boundary!
 
-    std::vector<uint>  faces;
+    std::vector<uint>  polys;
     std::vector<vec3d> verts = this->vector_verts();
     verts.push_back(this->centroid());
 
@@ -496,13 +487,13 @@ std::vector<uint> Trimesh<M,V,E,P>::get_ordered_boundary_vertices() const
             uint vid0 = this->edge_vert_id(eid,0);
             uint vid1 = this->edge_vert_id(eid,1);
             if (!this->poly_verts_are_CCW(pid, vid1, vid0)) std::swap(vid0,vid1);
-            faces.push_back(vid0);
-            faces.push_back(vid1);
-            faces.push_back(cid);
+            polys.push_back(vid0);
+            polys.push_back(vid1);
+            polys.push_back(cid);
         }
     }
 
-    Trimesh<> tmp(verts,faces);
+    Trimesh<> tmp(verts,polys);
     return tmp.vert_ordered_vert_ring(cid);
 }
 

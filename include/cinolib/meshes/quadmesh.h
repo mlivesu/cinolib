@@ -45,11 +45,6 @@ template<class M = Mesh_std_attributes, // default template arguments
          class P = Polygon_std_attributes>
 class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 {
-    protected:
-
-        std::vector<std::vector<uint>> triangulated_polys; // triangles covering each quad. Useful for
-                                                           // robust normal estimation and rendering
-
     public:
 
         explicit Quadmesh(){}
@@ -74,16 +69,6 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void clear();
-        void init();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void update_p_normal(const uint pid);
-        void update_poly_tessellation();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         uint verts_per_poly(const uint) const { return 4; }
         uint verts_per_poly()           const { return 4; }
         uint edges_per_poly(const uint) const { return 4; }
@@ -91,15 +76,10 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void operator+=(const Quadmesh<M,V,E,P> & m);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         std::vector<uint> get_ordered_boundary_vertices() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void              vert_switch_id  (const uint vid0, const uint vid1);
         bool              vert_is_singular(const uint vid) const;
         bool              vert_is_regular (const uint vid) const;
         std::vector<uint> vert_chain      (const uint start, const uint next) const;
@@ -110,12 +90,6 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
         std::vector<uint>              edges_opposite_to(const uint eid) const;
         std::vector<uint>              edge_chain(const uint eid) const;
         std::vector<std::vector<uint>> edge_chains() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        const std::vector<uint> & poly_tessellation       (const uint pid) const;
-              void                poly_switch_id          (const uint pid0, const uint pid1);
-              void                poly_remove_unreferenced(const uint pid);
 };
 
 }

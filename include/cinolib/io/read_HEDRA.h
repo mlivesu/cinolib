@@ -34,14 +34,14 @@
 #include <sys/types.h>
 #include <vector>
 #include <cinolib/cino_inline.h>
-
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
 
 CINO_INLINE
 void read_HEDRA(const char                     * filename,
-                std::vector<double>            & coords,
+                std::vector<vec3d>             & verts,
                 std::vector<std::vector<uint>> & faces,
                 std::vector<std::vector<uint>> & polys,
                 std::vector<std::vector<bool>> & polys_winding);

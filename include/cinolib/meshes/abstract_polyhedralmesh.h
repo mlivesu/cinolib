@@ -74,18 +74,20 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual void clear();
-        virtual void init();
-        virtual void load(const char * filename) = 0;
-        virtual void save(const char * filename) const = 0;
+        //virtual void load(const char * filename) = 0;
+        //virtual void save(const char * filename) const = 0;
+        virtual void init(const std::vector<vec3d>             & verts,
+                          const std::vector<std::vector<uint>> & faces,
+                          const std::vector<std::vector<uint>> & polys,
+                          const std::vector<std::vector<bool>> & polys_face_winding);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void update_adjacency();
         virtual void update_normals();
         virtual void update_f_normals();
         virtual void update_f_normal(const uint fid) = 0;
-        virtual void update_face_tessellation();
-        virtual void update_face_tessellation(const uint fid);
+        virtual void update_f_tessellation();
+        virtual void update_f_tessellation(const uint fid);
         virtual void update_v_normals();
         virtual void update_v_normal(const uint vid);
 

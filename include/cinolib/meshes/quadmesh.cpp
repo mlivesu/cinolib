@@ -35,7 +35,6 @@
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/stl_container_utilities.h>
 #include <cinolib/vector_serialization.h>
-
 #include <queue>
 
 namespace cinolib
@@ -45,10 +44,9 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-Quadmesh<M,V,E,P>::Quadmesh(const char * filename) : AbstractPolygonMesh<M,V,E,P>()
+Quadmesh<M,V,E,P>::Quadmesh(const char * filename)
 {
     this->load(filename);
-    init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -56,11 +54,9 @@ Quadmesh<M,V,E,P>::Quadmesh(const char * filename) : AbstractPolygonMesh<M,V,E,P
 template<class M, class V, class E, class P>
 CINO_INLINE
 Quadmesh<M,V,E,P>::Quadmesh(const std::vector<vec3d> & verts,
-                            const std::vector<uint>  & faces) : AbstractPolygonMesh<M,V,E,P>()
+                            const std::vector<uint>  & polys)
 {
-    this->verts = verts;
-    this->polys = faces_from_serialized_vids(faces,4);
-    init();
+    this->init(verts, polys_from_serialized_vids(polys,4));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -68,11 +64,9 @@ Quadmesh<M,V,E,P>::Quadmesh(const std::vector<vec3d> & verts,
 template<class M, class V, class E, class P>
 CINO_INLINE
 Quadmesh<M,V,E,P>::Quadmesh(const std::vector<double> & coords,
-                            const std::vector<uint>   & faces) : AbstractPolygonMesh<M,V,E,P>()
+                            const std::vector<uint>   & polys)
 {
-    this->verts = vec3d_from_serialized_xyz(coords);
-    this->polys = faces_from_serialized_vids(faces,4);
-    init();
+    this->init(vec3d_from_serialized_xyz(coords), polys_from_serialized_vids(polys,4));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -80,11 +74,9 @@ Quadmesh<M,V,E,P>::Quadmesh(const std::vector<double> & coords,
 template<class M, class V, class E, class P>
 CINO_INLINE
 Quadmesh<M,V,E,P>::Quadmesh(const std::vector<vec3d>             & verts,
-                            const std::vector<std::vector<uint>> & faces) : AbstractPolygonMesh<M,V,E,P>()
+                            const std::vector<std::vector<uint>> & polys)
 {
-    this->verts = verts;
-    this->polys = faces;
-    init();
+    this->init(verts, polys);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -92,95 +84,9 @@ Quadmesh<M,V,E,P>::Quadmesh(const std::vector<vec3d>             & verts,
 template<class M, class V, class E, class P>
 CINO_INLINE
 Quadmesh<M,V,E,P>::Quadmesh(const std::vector<double>            & coords,
-                            const std::vector<std::vector<uint>> & faces) : AbstractPolygonMesh<M,V,E,P>()
+                            const std::vector<std::vector<uint>> & polys)
 {
-    this->verts = vec3d_from_serialized_xyz(coords);
-    this->polys = faces;
-    init();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Quadmesh<M,V,E,P>::clear()
-{
-    AbstractMesh<M,V,E,P>::clear();
-    triangulated_polys.clear();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Quadmesh<M,V,E,P>::init()
-{
-    update_poly_tessellation();
-    AbstractPolygonMesh<M,V,E,P>::init();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Quadmesh<M,V,E,P>::update_poly_tessellation()
-{
-    triangulated_polys.clear();
-    triangulated_polys.resize(this->num_polys());
-
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        uint vid0 = this->poly_vert_id(pid,0);
-        uint vid1 = this->poly_vert_id(pid,1);
-        uint vid2 = this->poly_vert_id(pid,2);
-        uint vid3 = this->poly_vert_id(pid,3);
-
-        vec3d n1 = (this->vert(vid1)-this->vert(vid0)).cross(this->vert(vid2)-this->vert(vid0));
-        vec3d n2 = (this->vert(vid2)-this->vert(vid0)).cross(this->vert(vid3)-this->vert(vid0));
-
-        bool flip = (n1.dot(n2) < 0); // flip diag: t(0,1,2) t(0,2,3) => t(0,1,3) t(1,2,3)
-
-        triangulated_polys.at(pid).push_back(vid0);
-        triangulated_polys.at(pid).push_back(vid1);
-        triangulated_polys.at(pid).push_back(flip ? vid3 : vid2);
-        triangulated_polys.at(pid).push_back(flip ? vid1 : vid0);
-        triangulated_polys.at(pid).push_back(vid2);
-        triangulated_polys.at(pid).push_back(vid3);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Quadmesh<M,V,E,P>::update_p_normal(const uint pid)
-{
-    // compute the best fitting plane
-    std::vector<vec3d> points;
-    for(uint off=0; off<this->verts_per_poly(pid); ++off) points.push_back(this->poly_vert(pid,off));
-    this->poly_data(pid).normal = polygon_normal(points);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Quadmesh<M,V,E,P>::vert_switch_id(const uint vid0, const uint vid1)
-{
-    AbstractPolygonMesh<M,V,E,P>::vert_switch_id(vid0, vid1);
-
-    std::unordered_set<uint> polys_to_update;
-    polys_to_update.insert(this->adj_v2p(vid0).begin(), this->adj_v2p(vid0).end());
-    polys_to_update.insert(this->adj_v2p(vid1).begin(), this->adj_v2p(vid1).end());
-
-    for(uint pid : polys_to_update)
-    {
-        for(uint & vid : this->triangulated_polys.at(pid))
-        {
-            if (vid == vid0) vid = vid1; else
-            if (vid == vid1) vid = vid0;
-        }
-    }
+    this->init(vec3d_from_serialized_xyz(coords), polys);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -362,44 +268,5 @@ std::vector<uint> Quadmesh<M,V,E,P>::get_ordered_boundary_vertices() const
 
     Trimesh<> tmp(coords,tris);
     return tmp.vert_ordered_vert_ring(pid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Quadmesh<M,V,E,P>::operator+=(const Quadmesh<M,V,E,P> & m)
-{
-    AbstractPolygonMesh<M,V,E,P>::operator +=(m);
-    update_poly_tessellation();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-const std::vector<uint> & Quadmesh<M,V,E,P>::poly_tessellation(const uint pid) const
-{
-    return triangulated_polys.at(pid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Quadmesh<M,V,E,P>::poly_switch_id(const uint pid0, const uint pid1)
-{
-    AbstractPolygonMesh<M,V,E,P>::poly_switch_id(pid0, pid1);    
-    std::swap(triangulated_polys.at(pid0), triangulated_polys.at(pid1));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Quadmesh<M,V,E,P>::poly_remove_unreferenced(const uint pid)
-{
-    AbstractPolygonMesh<M,V,E,P>::poly_remove_unreferenced(pid);
-    triangulated_polys.pop_back();
 }
 }

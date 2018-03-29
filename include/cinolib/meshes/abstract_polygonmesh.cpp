@@ -32,7 +32,7 @@
 #include <cinolib/io/read_write.h>
 #include <cinolib/quality.h>
 #include <cinolib/stl_container_utilities.h>
-
+#include <cinolib/geometry/polygon.h>
 #include <unordered_set>
 
 namespace cinolib
@@ -45,6 +45,10 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
 {
     this->clear();
+    this->mesh_data().filename = std::string(filename);
+
+    std::vector<vec3d>             tmp_verts;
+    std::vector<std::vector<uint>> tmp_polys;
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -52,12 +56,12 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
     if (filetype.compare(".off") == 0 ||
         filetype.compare(".OFF") == 0)
     {
-        read_OFF(filename, this->verts, this->polys);
+        read_OFF(filename, tmp_verts, tmp_polys);
     }
     else if (filetype.compare(".obj") == 0 ||
              filetype.compare(".OBJ") == 0)
     {
-        read_OBJ(filename, this->verts, this->polys);
+        read_OBJ(filename, tmp_verts, tmp_polys);
     }
     else
     {
@@ -65,7 +69,7 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
         exit(-1);
     }
 
-    this->mesh_data().filename = std::string(filename);
+    init(tmp_verts, tmp_polys);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -100,92 +104,75 @@ void AbstractPolygonMesh<M,V,E,P>::save(const char * filename) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractPolygonMesh<M,V,E,P>::init()
+void AbstractPolygonMesh<M,V,E,P>::clear()
 {
-    this->update_adjacency();
-    this->update_bbox();
-
-    this->v_data.resize(this->num_verts());
-    this->e_data.resize(this->num_edges());
-    this->p_data.resize(this->num_polys());
-
-    this->update_normals();
-
-    this->copy_xyz_to_uvw(UVW_param);
+    AbstractMesh<M,V,E,P>::clear();
+    poly_triangles.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractPolygonMesh<M,V,E,P>::update_adjacency()
+void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & verts,
+                                        const std::vector<std::vector<uint>> & polys)
 {
-    this->v2v.clear(); this->v2v.resize(this->num_verts());
-    this->v2e.clear(); this->v2e.resize(this->num_verts());
-    this->v2p.clear(); this->v2p.resize(this->num_verts());
-    this->p2p.clear(); this->p2p.resize(this->num_polys());
-    this->p2e.clear(); this->p2e.resize(this->num_polys());
+    for(auto v : verts) this->vert_add(v);
+    for(auto p : polys) this->poly_add(p);
 
-    std::map<ipair,std::vector<uint>> e2f_map;
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        for(uint offset=0; offset<this->verts_per_poly(pid); ++offset)
-        {
-            uint vid0 = this->poly_vert_id(pid,offset);
-            uint vid1 = this->poly_vert_id(pid,(offset+1)%this->verts_per_poly(pid));
-            this->v2p.at(vid0).push_back(pid);
-            e2f_map[unique_pair(vid0,vid1)].push_back(pid);
-        }
-    }
-
-    this->edges.clear();
-    this->e2p.clear();
-    this->e2p.resize(e2f_map.size());
-
-    uint fresh_id = 0;
-    for(auto e2f_it : e2f_map)
-    {
-        ipair e    = e2f_it.first;
-        uint  eid  = fresh_id++;
-        uint  vid0 = e.first;
-        uint  vid1 = e.second;
-
-        this->edges.push_back(vid0);
-        this->edges.push_back(vid1);
-
-        this->v2v.at(vid0).push_back(vid1);
-        this->v2v.at(vid1).push_back(vid0);
-
-        this->v2e.at(vid0).push_back(eid);
-        this->v2e.at(vid1).push_back(eid);
-
-        std::vector<uint> pids = e2f_it.second;
-        for(uint pid : pids)
-        {
-            this->p2e.at(pid).push_back(eid);
-            this->e2p.at(eid).push_back(pid);
-            for(uint adj_pid : pids) if (pid != adj_pid) this->p2p.at(pid).push_back(adj_pid);
-        }
-
-        // MANIFOLDNESS CHECKS
-        //
-        //bool is_manifold = (pids.size() > 2 || pids.size() < 1);
-        //if (is_manifold && !support_non_manifold_edges)
-        //{
-        //    std::cerr << "Non manifold edge found! To support non manifoldness,";
-        //    std::cerr << "enable the 'support_non_manifold_edges' flag in cinolib.h" << std::endl;
-        //    assert(false);
-        //}
-        //if (is_manifold && print_non_manifold_edges)
-        //{
-        //    std::cerr << "Non manifold edge! (" << vid0 << "," << vid1 << ")" << std::endl;
-        //}
-    }
+    this->copy_xyz_to_uvw(UVW_param);
 
     std::cout << "new mesh\t"      <<
                  this->num_verts() << "V / " <<
                  this->num_edges() << "E / " <<
                  this->num_polys() << "P   " << std::endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::update_p_tessellation(const uint pid)
+{
+    // Assume convexity and try trivial tessellation first. If something flips
+    // apply earcut algorithm to get a valid triangulation
+
+    std::vector<vec3d> n;
+    for (uint i=2; i<this->verts_per_poly(pid); ++i)
+    {
+        uint vid0 = this->polys.at(pid).at( 0 );
+        uint vid1 = this->polys.at(pid).at(i-1);
+        uint vid2 = this->polys.at(pid).at( i );
+
+        poly_triangles.at(pid).push_back(vid0);
+        poly_triangles.at(pid).push_back(vid1);
+        poly_triangles.at(pid).push_back(vid2);
+
+        n.push_back((this->vert(vid1)-this->vert(vid0)).cross(this->vert(vid2)-this->vert(vid0)));
+    }
+
+    bool bad_tessellation = false;
+    for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_tessellation = true;
+
+    if (bad_tessellation)
+    {
+        // NOTE: the triangulation is constructed on a proxy polygon obtained
+        // projecting the actual polygon onto the best fitting plane. Bad things
+        // can still happen for highly non-planar polygons...
+
+        std::vector<vec3d> vlist(this->verts_per_poly(pid));
+        for (uint i=0; i<this->verts_per_poly(pid); ++i)
+        {
+            vlist.at(i) = this->poly_vert(pid,i);
+        }
+        //
+        std::vector<uint> tris;
+        if (polygon_triangulate(vlist, tris))
+        {
+            poly_triangles.at(pid).clear();
+            for(uint off : tris) poly_triangles.at(pid).push_back(this->poly_vert_id(pid,off));
+        }
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -207,11 +194,35 @@ void AbstractPolygonMesh<M,V,E,P>::update_v_normal(const uint vid)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::update_p_normal(const uint pid)
+{
+    // compute the best fitting plane
+    std::vector<vec3d> points;
+    for(uint off=0; off<this->verts_per_poly(pid); ++off) points.push_back(this->poly_vert(pid,off));
+    this->poly_data(pid).normal = polygon_normal(points);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::update_p_normals()
 {
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
         update_p_normal(pid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::update_p_tessellations()
+{
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        update_p_tessellation(pid);
     }
 }
 
@@ -591,6 +602,11 @@ void AbstractPolygonMesh<M,V,E,P>::vert_switch_id(const uint vid0, const uint vi
             if (vid == vid0) vid = vid1; else
             if (vid == vid1) vid = vid0;
         }
+        for(uint & vid : this->poly_triangles.at(pid))
+        {
+            if (vid == vid0) vid = vid1; else
+            if (vid == vid1) vid = vid0;
+        }
     }
 }
 
@@ -881,6 +897,15 @@ std::vector<vec3d> AbstractPolygonMesh<M,V,E,P>::poly_vlist(const uint pid) cons
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+const std::vector<uint> & AbstractPolygonMesh<M,V,E,P>::poly_tessellation(const uint pid) const
+{
+    return poly_triangles.at(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolygonMesh<M,V,E,P>::polys_adjacent_along(const uint pid, const uint vid0, const uint vid1) const
 {
     uint eid = this->poly_edge_id(pid, vid0, vid1);
@@ -935,10 +960,11 @@ void AbstractPolygonMesh<M,V,E,P>::poly_switch_id(const uint pid0, const uint pi
 
     if (pid0 == pid1) return;
 
-    std::swap(this->polys.at(pid0),  this->polys.at(pid1));
-    std::swap(this->p_data.at(pid0), this->p_data.at(pid1));
-    std::swap(this->p2e.at(pid0),    this->p2e.at(pid1));
-    std::swap(this->p2p.at(pid0),    this->p2p.at(pid1));
+    std::swap(this->polys.at(pid0),          this->polys.at(pid1));
+    std::swap(this->p_data.at(pid0),         this->p_data.at(pid1));
+    std::swap(this->p2e.at(pid0),            this->p2e.at(pid1));
+    std::swap(this->p2p.at(pid0),            this->p2p.at(pid1));
+    std::swap(this->poly_triangles.at(pid0), this->poly_triangles.at(pid1));
 
     std::unordered_set<uint> verts_to_update;
     verts_to_update.insert(this->adj_p2v(pid0).begin(), this->adj_p2v(pid0).end());
@@ -1037,6 +1063,9 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & p)
     this->update_p_normal(pid);
     for(uint vid : p) this->update_v_normal(vid);
 
+    this->poly_triangles.push_back(std::vector<uint>());
+    update_p_tessellation(pid);
+
     return pid;
 }
 
@@ -1121,6 +1150,7 @@ void AbstractPolygonMesh<M,V,E,P>::poly_remove_unreferenced(const uint pid)
     this->p_data.pop_back();
     this->p2e.pop_back();
     this->p2p.pop_back();
+    this->poly_triangles.pop_back();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1238,15 +1268,15 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P> & m)
 {
     uint nv = this->num_verts();
-    uint nf = this->num_polys();
     uint ne = this->num_edges();
+    uint np = this->num_polys();
 
     std::vector<uint> tmp;
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        std::vector<uint> f;
-        for(uint off=0; off<m.verts_per_poly(pid); ++off) f.push_back(nv + m.poly_vert_id(pid,off));
-        this->polys.push_back(f);
+        std::vector<uint> p;
+        for(uint vid : m.adj_p2v(pid)) p.push_back(nv + vid);
+        this->polys.push_back(p);
 
         this->p_data.push_back(m.poly_data(pid));
 
@@ -1255,8 +1285,12 @@ void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P>
         this->p2e.push_back(tmp);
 
         tmp.clear();
-        for(uint nbr : m.p2p.at(pid)) tmp.push_back(nf + nbr);
+        for(uint nbr : m.p2p.at(pid)) tmp.push_back(np + nbr);
         this->p2p.push_back(tmp);
+
+        tmp.clear();
+        for(uint vid : m.poly_tessellation(pid)) tmp.push_back(np + vid);
+        this->poly_triangles.push_back(tmp);
     }
     for(uint eid=0; eid<m.num_edges(); ++eid)
     {
@@ -1266,7 +1300,7 @@ void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P>
         this->e_data.push_back(m.edge_data(eid));
 
         tmp.clear();
-        for(uint tid : m.e2p.at(eid)) tmp.push_back(nf + tid);
+        for(uint tid : m.e2p.at(eid)) tmp.push_back(np + tid);
         this->e2p.push_back(tmp);
     }
     for(uint vid=0; vid<m.num_verts(); ++vid)
@@ -1279,7 +1313,7 @@ void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P>
         this->v2e.push_back(tmp);
 
         tmp.clear();
-        for(uint tid : m.v2p.at(vid)) tmp.push_back(nf + tid);
+        for(uint tid : m.v2p.at(vid)) tmp.push_back(np + tid);
         this->v2p.push_back(tmp);
 
         tmp.clear();
@@ -1290,8 +1324,9 @@ void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P>
     this->update_bbox();
 
     std::cout << "Appended " << m.mesh_data().filename << " to mesh " << this->mesh_data().filename << std::endl;
-    std::cout << this->num_polys() << " faces" << std::endl;
     std::cout << this->num_verts() << " verts" << std::endl;
+    std::cout << this->num_edges() << " edges" << std::endl;
+    std::cout << this->num_polys() << " polys" << std::endl;
 }
 
 }

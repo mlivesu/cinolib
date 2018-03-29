@@ -100,14 +100,13 @@ class AbstractMesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual void clear();
-        virtual void init() = 0;
         virtual void load(const char * filename) = 0;
         virtual void save(const char * filename) const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual void update_bbox();
-        virtual void update_adjacency() = 0;
+        //virtual void update_adjacency() = 0;
         virtual void update_normals() = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

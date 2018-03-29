@@ -77,7 +77,7 @@ int main(int argc, char **argv)
         m.vert(2) = vec3d(2,  3,0)*t + vec3d(2,1,0)*(1.0-t);
         m.vert(3) = vec3d(1,0.1,0)*t + vec3d(1,1,0)*(1.0-t);
         m.vert(4) = vec3d(0,  3,0)*t + vec3d(0,1,0)*(1.0-t);
-        m.update_poly_tessellation();
+        m.update_p_tessellations();
         m.updateGL();
 
         profiler.push("Compute polygon kernel");

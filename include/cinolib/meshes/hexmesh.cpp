@@ -52,9 +52,7 @@ CINO_INLINE
 Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d> & verts,
                             const std::vector<uint>  & polys)
 {
-    this->verts = verts;
-    from_serialized_hexa_to_general_polyhedra(polys);
-    init();
+    init_hexmesh(verts, polys_from_serialized_vids(polys,8));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -64,9 +62,7 @@ CINO_INLINE
 Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<double> & coords,
                             const std::vector<uint>   & polys)
 {
-    this->verts = vec3d_from_serialized_xyz(coords);
-    from_serialized_hexa_to_general_polyhedra(polys);
-    init();
+    init_hexmesh(vec3d_from_serialized_xyz(coords), polys_from_serialized_vids(polys,8));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -76,25 +72,7 @@ CINO_INLINE
 Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d>             & verts,
                             const std::vector<std::vector<uint>> & polys)
 {
-    this->verts = verts;
-    from_serialized_hexa_to_general_polyhedra(polys);
-    init();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d>             & verts,
-                            const std::vector<std::vector<uint>> & faces,
-                            const std::vector<std::vector<uint>> & polys,
-                            const std::vector<std::vector<bool>> & polys_face_winding)
-{
-    this->verts = verts;
-    this->faces = faces;
-    this->polys = polys;
-    this->polys_face_winding = polys_face_winding;
-    init();
+    init_hexmesh(verts, polys);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -104,58 +82,75 @@ CINO_INLINE
 Hexmesh<M,V,E,F,P>::Hexmesh(const char * filename)
 {
     load(filename);
-    init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Hexmesh<M,V,E,F,P>::from_serialized_hexa_to_general_polyhedra(const std::vector<uint> & hexa)
+void Hexmesh<M,V,E,F,P>::load(const char * filename)
 {
-    this->faces.clear();
-    this->polys.clear();
-    this->polys_face_winding.clear();
+    this->clear();
+    this->mesh_data().filename = std::string(filename);
 
-    uint n_hexa = hexa.size()/8;
+    std::vector<vec3d>             tmp_verts;
+    std::vector<std::vector<uint>> tmp_polys;
 
-    std::map<std::vector<uint>,uint> f_map;
-    for(uint hid=0; hid<n_hexa; ++hid)
+    std::string str(filename);
+    std::string filetype = str.substr(str.size()-4,4);
+
+    if (filetype.compare("mesh") == 0 ||
+        filetype.compare("MESH") == 0)
     {
-        std::vector<uint> p_faces;
-        std::vector<bool> p_winding;
+        read_MESH(filename, tmp_verts, tmp_polys);
+    }
+    else if (filetype.compare(".vtu") == 0 ||
+             filetype.compare(".VTU") == 0)
+    {
+        read_VTU(filename, tmp_verts, tmp_polys);
+    }
+    else if (filetype.compare(".vtk") == 0 ||
+             filetype.compare(".VTK") == 0)
+    {
+        read_VTK(filename, tmp_verts, tmp_polys);
+    }
+    else
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
+        exit(-1);
+    }
 
-        for(uint i=0; i<faces_per_poly(); ++i)
-        {
-            uint base = hid*verts_per_poly();
-            std::vector<uint> f =
-            {
-                hexa.at(base + HEXA_FACES[i][0]),
-                hexa.at(base + HEXA_FACES[i][1]),
-                hexa.at(base + HEXA_FACES[i][2]),
-                hexa.at(base + HEXA_FACES[i][3]),
-            };
-            std::vector<uint> sorted_f = f;
-            sort(sorted_f.begin(), sorted_f.end());
-            auto query = f_map.find(sorted_f);
+    init_hexmesh(tmp_verts, tmp_polys);
+}
 
-            if (query == f_map.end())
-            {
-                uint fresh_id = f_map.size();
-                f_map[sorted_f] = fresh_id;
-                this->faces.push_back(f);
-                p_faces.push_back(fresh_id);
-                p_winding.push_back(true);
-            }
-            else
-            {
-                p_faces.push_back(query->second);
-                p_winding.push_back(false);
-            }
-        }
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        this->polys.push_back(p_faces);
-        this->polys_face_winding.push_back(p_winding);
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Hexmesh<M,V,E,F,P>::save(const char * filename) const
+{
+    std::string str(filename);
+    std::string filetype = str.substr(str.size()-4,4);
+
+    if (filetype.compare("mesh") == 0 ||
+        filetype.compare("MESH") == 0)
+    {
+        write_MESH(filename, this->verts, this->p2v);
+    }
+    else if (filetype.compare(".vtu") == 0 ||
+             filetype.compare(".VTU") == 0)
+    {
+        write_VTU(filename, this->verts, this->p2v);
+    }
+    else if (filetype.compare(".vtk") == 0 ||
+             filetype.compare(".VTK") == 0)
+    {
+        write_VTK(filename, this->verts, this->p2v);
+    }
+    else
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
+        exit(-1);
     }
 }
 
@@ -163,60 +158,39 @@ void Hexmesh<M,V,E,F,P>::from_serialized_hexa_to_general_polyhedra(const std::ve
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Hexmesh<M,V,E,F,P>::from_serialized_hexa_to_general_polyhedra(const std::vector<std::vector<uint>> & hexa)
+void Hexmesh<M,V,E,F,P>::init_hexmesh(const std::vector<vec3d>              & verts,
+                                       const std::vector<std::vector<uint>> & polys)
 {
-    this->faces.clear();
-    this->polys.clear();
-    this->polys_face_winding.clear();
+     for(auto v : verts) this->vert_add(v);
+     for(auto p : polys) this->poly_add(p);
 
-    std::map<std::vector<uint>,uint> f_map;
-    for(uint hid=0; hid<hexa.size(); ++hid)
-    {
-        assert(hexa.at(hid).size() == 8);
+     this->copy_xyz_to_uvw(UVW_param);
 
-        std::vector<uint> p_faces;
-        std::vector<bool> p_winding;
+     std::cout << "new mesh\t"      <<
+                  this->num_verts() << "V / " <<
+                  this->num_edges() << "E / " <<
+                  this->num_faces() << "F / " <<
+                  this->num_polys() << "P   " << std::endl;
 
-        for(uint i=0; i<faces_per_poly(); ++i)
-        {
-            std::vector<uint> f =
-            {
-                hexa.at(hid).at(HEXA_FACES[i][0]),
-                hexa.at(hid).at(HEXA_FACES[i][1]),
-                hexa.at(hid).at(HEXA_FACES[i][2]),
-                hexa.at(hid).at(HEXA_FACES[i][3]),
-            };
-            std::vector<uint> sorted_f = f;
-            sort(sorted_f.begin(), sorted_f.end());
-            auto query = f_map.find(sorted_f);
-
-            if (query == f_map.end())
-            {
-                uint fresh_id = f_map.size();
-                f_map[sorted_f] = fresh_id;
-                this->faces.push_back(f);
-                p_faces.push_back(fresh_id);
-                p_winding.push_back(true);
-            }
-            else
-            {
-                p_faces.push_back(query->second);
-                p_winding.push_back(false);
-            }
-        }
-
-        this->polys.push_back(p_faces);
-        this->polys_face_winding.push_back(p_winding);
-    }
+     print_quality();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Hexmesh<M,V,E,F,P>::reorder_p2v()
+void Hexmesh<M,V,E,F,P>::update_f_normal(const uint fid)
 {
-    for(uint pid=0; pid<this->num_polys(); ++pid) reorder_p2v(pid);
+    // STEAL BETTER NORMAL ESTIMATION FROM QUADMESH!
+    vec3d v0 = this->face_vert(fid,0);
+    vec3d v1 = this->face_vert(fid,1);
+    vec3d v2 = this->face_vert(fid,2);
+
+    vec3d u = v1 - v0;    u.normalize();
+    vec3d v = v2 - v0;    v.normalize();
+    vec3d n = u.cross(v); n.normalize();
+
+    this->face_data(fid).normal = n;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -293,109 +267,6 @@ void Hexmesh<M,V,E,F,P>::print_quality(const bool list_folded_elements)
     std::cout << "AVG SJ : " << asj << std::endl;
     std::cout << "INV EL : " << inv << " (out of " << this->num_polys() << ")" << std::endl;
     std::cout << std::endl;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Hexmesh<M,V,E,F,P>::load(const char * filename)
-{
-    this->clear();
-
-    std::vector<std::vector<uint>> hexa;
-
-    std::string str(filename);
-    std::string filetype = str.substr(str.size()-4,4);
-
-    if (filetype.compare("mesh") == 0 ||
-        filetype.compare("MESH") == 0)
-    {
-        read_MESH(filename, this->verts, hexa);
-    }
-    else if (filetype.compare(".vtu") == 0 ||
-             filetype.compare(".VTU") == 0)
-    {
-        read_VTU(filename, this->verts, hexa);
-    }
-    else if (filetype.compare(".vtk") == 0 ||
-             filetype.compare(".VTK") == 0)
-    {
-        read_VTK(filename, this->verts, hexa);
-    }
-    else
-    {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
-        exit(-1);
-    }
-
-    from_serialized_hexa_to_general_polyhedra(hexa);
-
-    std::cout << this->num_polys() << " hexahedra read" << std::endl;
-    std::cout << this->num_verts() << " vertices  read" << std::endl;
-
-    this->mesh_data().filename = std::string(filename);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Hexmesh<M,V,E,F,P>::save(const char * filename) const
-{
-    std::string str(filename);
-    std::string filetype = str.substr(str.size()-4,4);
-
-    if (filetype.compare("mesh") == 0 ||
-        filetype.compare("MESH") == 0)
-    {
-        write_MESH(filename, this->verts, this->p2v);
-    }
-    else if (filetype.compare(".vtu") == 0 ||
-             filetype.compare(".VTU") == 0)
-    {
-        write_VTU(filename, this->verts, this->p2v);
-    }
-    else if (filetype.compare(".vtk") == 0 ||
-             filetype.compare(".VTK") == 0)
-    {
-        write_VTK(filename, this->verts, this->p2v);
-    }
-    else
-    {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
-        exit(-1);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Hexmesh<M,V,E,F,P>::init()
-{
-    AbstractPolyhedralMesh<M,V,E,F,P>::init();
-    reorder_p2v(); // makes sure the p2v adjacency stores vertices in a way that uniquely defines per element connectivity
-    update_hex_quality();
-    print_quality();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Hexmesh<M,V,E,F,P>::update_f_normal(const uint fid)
-{
-    // STEAL BETTER NORMAL ESTIMATION FROM QUADMESH!
-    vec3d v0 = this->face_vert(fid,0);
-    vec3d v1 = this->face_vert(fid,1);
-    vec3d v2 = this->face_vert(fid,2);
-
-    vec3d u = v1 - v0;    u.normalize();
-    vec3d v = v2 - v0;    v.normalize();
-    vec3d n = u.cross(v); n.normalize();
-
-    this->face_data(fid).normal = n;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -549,12 +420,16 @@ uint Hexmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex lis
     if(fid5 == -1) { fid5 = this->face_add(f5); w.at(5) = true; }
 
     // add hexa
-    return poly_add({static_cast<uint>(fid0),
-                     static_cast<uint>(fid1),
-                     static_cast<uint>(fid2),
-                     static_cast<uint>(fid3),
-                     static_cast<uint>(fid4),
-                     static_cast<uint>(fid5),},w);
+    uint pid = poly_add({static_cast<uint>(fid0),
+                         static_cast<uint>(fid1),
+                         static_cast<uint>(fid2),
+                         static_cast<uint>(fid3),
+                         static_cast<uint>(fid4),
+                         static_cast<uint>(fid5),},w);
+
+    reorder_p2v(pid); // make sure p2v stores hex vertices in the standard way
+    update_hex_quality(pid);
+    return pid;
 }
 
 }
