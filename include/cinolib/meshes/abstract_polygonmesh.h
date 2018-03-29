@@ -56,24 +56,24 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void load(const char * filename);
-        virtual void save(const char * filename) const;
+        void load(const char * filename);
+        void save(const char * filename) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void clear();
-        virtual void init(const std::vector<vec3d>             & verts,
-                          const std::vector<std::vector<uint>> & polys);
+        void clear();
+        void init (const std::vector<vec3d>             & verts,
+                   const std::vector<std::vector<uint>> & polys);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void update_p_tessellation(const uint pid);
+                void update_p_tessellation(const uint pid);
         virtual void update_p_normal(const uint pid);
-        virtual void update_v_normal(const uint vid);
-        virtual void update_p_tessellations();
-        virtual void update_p_normals();
-        virtual void update_v_normals();
-        virtual void update_normals();
+                void update_v_normal(const uint vid);
+                void update_p_tessellations();
+                void update_p_normals();
+                void update_v_normals();
+                void update_normals();
 
          //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -81,7 +81,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual const std::vector<uint> & adj_p2v(const uint pid) const { return this->polys.at(pid); }
+        const std::vector<uint> & adj_p2v(const uint pid) const { return this->polys.at(pid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -89,40 +89,40 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual std::vector<int>   export_per_poly_labels() const;
-        virtual std::vector<Color> export_per_poly_colors() const;
+        std::vector<int>   export_per_poly_labels() const;
+        std::vector<Color> export_per_poly_colors() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual std::vector<uint>  get_boundary_vertices() const;
-        virtual std::vector<ipair> get_boundary_edges() const;
+        std::vector<uint>  get_boundary_vertices() const;
+        std::vector<ipair> get_boundary_edges() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual double mesh_volume() const;
-        virtual double mesh_area()   const;
+        double mesh_volume() const;
+        double mesh_area()   const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void normalize_area();
+        void normalize_area();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual bool              vert_is_saddle          (const uint vid, const int tex_coord = U_param) const;
-        virtual bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
-        virtual double            vert_area               (const uint vid) const;
+                bool              vert_is_saddle          (const uint vid, const int tex_coord = U_param) const;
+                bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
+                double            vert_area               (const uint vid) const;
         virtual double            vert_mass               (const uint vid) const;
-        virtual bool              vert_is_boundary        (const uint vid) const;
-        virtual void              vert_switch_id          (const uint vid0, const uint vid1);
-        virtual void              vert_remove             (const uint vid);
-        virtual void              vert_remove_unreferenced(const uint vid);
-        virtual uint              vert_add                (const vec3d & pos);
-        virtual std::vector<uint> vert_boundary_edges     (const uint vid) const;
-        virtual std::vector<uint> vert_ordered_vert_ring  (const uint vid) const;
-        virtual std::vector<uint> vert_ordered_poly_ring  (const uint vid) const;
-        virtual std::vector<uint> vert_ordered_edge_ring  (const uint vid) const;
-        virtual std::vector<uint> vert_ordered_edge_link  (const uint vid) const;
-        virtual void              vert_ordered_one_ring   (const uint          vid,
+                bool              vert_is_boundary        (const uint vid) const;
+                void              vert_switch_id          (const uint vid0, const uint vid1);
+                void              vert_remove             (const uint vid);
+                void              vert_remove_unreferenced(const uint vid);
+                uint              vert_add                (const vec3d & pos);
+                std::vector<uint> vert_boundary_edges     (const uint vid) const;
+                std::vector<uint> vert_ordered_vert_ring  (const uint vid) const;
+                std::vector<uint> vert_ordered_poly_ring  (const uint vid) const;
+                std::vector<uint> vert_ordered_edge_ring  (const uint vid) const;
+                std::vector<uint> vert_ordered_edge_link  (const uint vid) const;
+                void              vert_ordered_one_ring   (const uint          vid,
                                                            std::vector<uint> & v_ring,        // sorted list of adjacent vertices
                                                            std::vector<uint> & f_ring,        // sorted list of adjacent triangles
                                                            std::vector<uint> & e_ring,        // sorted list of edges incident to vid
@@ -130,39 +130,39 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual bool  edge_is_manifold             (const uint eid) const;
-        virtual bool  edge_is_boundary             (const uint eid) const;
-        virtual bool  edges_share_poly             (const uint eid1, const uint eid2) const;
-        virtual uint  edge_shared                  (const uint pid0, const uint pid1) const;
-        virtual void  edge_switch_id               (const uint eid0, const uint eid1);
-        virtual uint  edge_add                     (const uint vid0, const uint vid1);
-        virtual void  edge_remove                  (const uint eid);
-        virtual void  edge_remove_unreferenced     (const uint eid);
-        virtual void  edge_mark_labeling_boundaries();
-        virtual void  edge_mark_boundaries();
+        bool  edge_is_manifold             (const uint eid) const;
+        bool  edge_is_boundary             (const uint eid) const;
+        bool  edges_share_poly             (const uint eid1, const uint eid2) const;
+        uint  edge_shared                  (const uint pid0, const uint pid1) const;
+        void  edge_switch_id               (const uint eid0, const uint eid1);
+        uint  edge_add                     (const uint vid0, const uint vid1);
+        void  edge_remove                  (const uint eid);
+        void  edge_remove_unreferenced     (const uint eid);
+        void  edge_mark_labeling_boundaries();
+        void  edge_mark_boundaries();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual       uint                 poly_vert_offset        (const uint pid, const uint vid) const;
-        virtual       double               poly_angle_at_vert      (const uint pid, const uint vid, const int unit = RAD) const;
-        virtual       double               poly_area               (const uint pid) const;
-        virtual       double               poly_perimeter          (const uint pid) const;
-        virtual       double               poly_mass               (const uint pid) const;
-        virtual       int                  poly_shared             (const uint eid0, const uint eid1) const;
-        virtual       bool                 polys_are_adjacent      (const uint pid0, const uint pid1) const;
-        virtual       std::vector<uint>    polys_adjacent_along    (const uint pid, const uint vid0, const uint vid1) const;
-        virtual       std::vector<uint>    polys_adjacent_along    (const uint pid, const uint eid) const;
-        virtual       void                 poly_flip_winding_order (const uint pid);
-        virtual       void                 poly_switch_id          (const uint pid0, const uint pid1);
-        virtual       bool                 poly_is_boundary        (const uint pid) const;
-        virtual       uint                 poly_add                (const std::vector<uint> & p);
-        virtual       void                 poly_remove_unreferenced(const uint pid);
-        virtual       void                 poly_remove             (const uint pid);
-        virtual       void                 polys_remove            (const std::vector<uint> & pids);
-        virtual       int                  poly_opposite_to        (const uint eid, const uint pid) const;
-        virtual       bool                 poly_verts_are_CCW      (const uint pid, const uint curr, const uint prev) const;
-        virtual       std::vector<vec3d>   poly_vlist              (const uint pid) const;
-        virtual const std::vector<uint>  & poly_tessellation       (const uint pid) const;
+              uint                 poly_vert_offset        (const uint pid, const uint vid) const;
+              double               poly_angle_at_vert      (const uint pid, const uint vid, const int unit = RAD) const;
+              double               poly_area               (const uint pid) const;
+              double               poly_perimeter          (const uint pid) const;
+              double               poly_mass               (const uint pid) const;
+              int                  poly_shared             (const uint eid0, const uint eid1) const;
+              bool                 polys_are_adjacent      (const uint pid0, const uint pid1) const;
+              std::vector<uint>    polys_adjacent_along    (const uint pid, const uint vid0, const uint vid1) const;
+              std::vector<uint>    polys_adjacent_along    (const uint pid, const uint eid) const;
+              void                 poly_flip_winding_order (const uint pid);
+              void                 poly_switch_id          (const uint pid0, const uint pid1);
+              bool                 poly_is_boundary        (const uint pid) const;
+              uint                 poly_add                (const std::vector<uint> & p);
+              void                 poly_remove_unreferenced(const uint pid);
+              void                 poly_remove             (const uint pid);
+              void                 polys_remove            (const std::vector<uint> & pids);
+              int                  poly_opposite_to        (const uint eid, const uint pid) const;
+              bool                 poly_verts_are_CCW      (const uint pid, const uint curr, const uint prev) const;
+              std::vector<vec3d>   poly_vlist              (const uint pid) const;
+        const std::vector<uint>  & poly_tessellation       (const uint pid) const;
 };
 
 }

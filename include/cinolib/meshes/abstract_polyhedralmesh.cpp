@@ -688,7 +688,7 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_vert_ring(
     std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
     std::vector<uint> e_ring; // sorted list of surface edges incident to vid
     std::vector<uint> f_ring; // sorted list of adjacent surface faces
-    verd_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
     return v_ring;
 }
 
@@ -701,7 +701,7 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_edge_ring(
     std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
     std::vector<uint> e_ring; // sorted list of surface edges incident to vid
     std::vector<uint> f_ring; // sorted list of adjacent surface faces
-    verd_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
     return e_ring;
 }
 
@@ -714,7 +714,7 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_face_ring(
     std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
     std::vector<uint> e_ring; // sorted list of surface edges incident to vid
     std::vector<uint> f_ring; // sorted list of adjacent surface faces
-    verd_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
     return f_ring;
 }
 
@@ -722,7 +722,7 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_face_ring(
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-void AbstractPolyhedralMesh<M,V,E,F,C>::verd_ordered_srf_one_ring(const uint          vid,
+void AbstractPolyhedralMesh<M,V,E,F,C>::vert_ordered_srf_one_ring(const uint          vid,
                                                                   std::vector<uint> & v_ring,
                                                                   std::vector<uint> & e_ring,
                                                                   std::vector<uint> & f_ring) const

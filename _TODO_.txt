@@ -1,7 +1,6 @@
 - Polyhedral meshes seem to have duplicated surface vertices ... check it!
 - put cotangents (tets/tris) on a separate .h/cpp file
 - add inverse and transpose operators for 2x2 matrices
-- remove virtual from mesh hierarchy whenever possible
 - refactor ray/line/plane intersections and integral curve tracing 
   (check Robust Polylines Tracing for N-Symmetry Direction Field on Triangulated Surfaces)
 - Add GUI controls: load/save labeling

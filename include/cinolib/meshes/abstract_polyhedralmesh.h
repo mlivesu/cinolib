@@ -73,24 +73,21 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void clear();
-        //virtual void load(const char * filename) = 0;
-        //virtual void save(const char * filename) const = 0;
-        virtual void init(const std::vector<vec3d>             & verts,
-                          const std::vector<std::vector<uint>> & faces,
-                          const std::vector<std::vector<uint>> & polys,
-                          const std::vector<std::vector<bool>> & polys_face_winding);
+        void clear();
+        void init (const std::vector<vec3d>             & verts,
+                   const std::vector<std::vector<uint>> & faces,
+                   const std::vector<std::vector<uint>> & polys,
+                   const std::vector<std::vector<bool>> & polys_face_winding);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void update_normals();
-        virtual void update_f_normals();
+                void update_normals();
+                void update_f_normals();
         virtual void update_f_normal(const uint fid) = 0;
-        virtual void update_f_tessellation();
-        virtual void update_f_tessellation(const uint fid);
-        virtual void update_v_normals();
-        virtual void update_v_normal(const uint vid);
-
+                void update_f_tessellation();
+                void update_f_tessellation(const uint fid);
+                void update_v_normals();
+                void update_v_normal(const uint vid);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -101,105 +98,105 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual uint num_faces() const { return faces.size(); }
+        uint num_faces() const { return faces.size(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual const std::vector<std::vector<uint>> & vector_faces() const { return faces; }
+        const std::vector<std::vector<uint>> & vector_faces() const { return faces; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid);         }
-        virtual const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid);         }
-        virtual const std::vector<uint> & adj_f2v(const uint fid) const { return this->faces.at(fid); }
-        virtual const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid);         }
-        virtual const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid);         }
-        virtual const std::vector<uint> & adj_f2p(const uint fid) const { return f2p.at(fid);         }
-        virtual const std::vector<uint> & adj_p2f(const uint pid) const { return this->polys.at(pid); }
+                const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid);         }
+                const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid);         }
+                const std::vector<uint> & adj_f2v(const uint fid) const { return this->faces.at(fid); }
+                const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid);         }
+                const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid);         }
+                const std::vector<uint> & adj_f2p(const uint fid) const { return f2p.at(fid);         }
+                const std::vector<uint> & adj_p2f(const uint pid) const { return this->polys.at(pid); }
         virtual const std::vector<uint> & adj_p2v(const uint pid) const { return p2v.at(pid);         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual const F & face_data(const uint fid) const { return f_data.at(fid); }
-        virtual       F & face_data(const uint fid)       { return f_data.at(fid); }
+        const F & face_data(const uint fid) const { return f_data.at(fid); }
+              F & face_data(const uint fid)       { return f_data.at(fid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void              vert_switch_id            (const uint vid0, const uint vid1);
-        virtual void              vert_remove               (const uint vid);
-        virtual void              vert_remove_unreferenced  (const uint vid);
-        virtual uint              vert_add                  (const vec3d & pos);
-        virtual bool              vert_is_on_srf            (const uint vid) const;
+                void              vert_switch_id            (const uint vid0, const uint vid1);
+                void              vert_remove               (const uint vid);
+                void              vert_remove_unreferenced  (const uint vid);
+                uint              vert_add                  (const vec3d & pos);
+                bool              vert_is_on_srf            (const uint vid) const;
         virtual double            vert_mass                 (const uint vid) const;
-        virtual double            vert_volume               (const uint vid) const;
-        virtual std::vector<uint> vert_adj_srf_edges        (const uint vid) const;
-        virtual std::vector<uint> vert_ordered_srf_vert_ring(const uint vid) const;
-        virtual std::vector<uint> vert_ordered_srf_edge_ring(const uint vid) const;
-        virtual std::vector<uint> vert_ordered_srf_face_ring(const uint vid) const;
-        virtual void              verd_ordered_srf_one_ring (const uint vid,
+                double            vert_volume               (const uint vid) const;
+                std::vector<uint> vert_adj_srf_edges        (const uint vid) const;
+                std::vector<uint> vert_ordered_srf_vert_ring(const uint vid) const;
+                std::vector<uint> vert_ordered_srf_edge_ring(const uint vid) const;
+                std::vector<uint> vert_ordered_srf_face_ring(const uint vid) const;
+                void              vert_ordered_srf_one_ring (const uint vid,
                                                              std::vector<uint> & v_ring,
                                                              std::vector<uint> & e_ring,
                                                              std::vector<uint> & f_ring) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void              edge_switch_id          (const uint eid0, const uint eid1);
-        virtual uint              edge_add                (const uint vid0, const uint vid1);
-        virtual void              edge_remove             (const uint eid);
-        virtual void              edge_remove_unreferenced(const uint eid);
-        virtual bool              edge_is_on_srf          (const uint eid) const;
-        virtual std::vector<uint> edge_ordered_poly_ring  (const uint eid) const;
-        virtual std::vector<uint> edge_adj_srf_faces      (const uint eid) const;
+        void              edge_switch_id          (const uint eid0, const uint eid1);
+        uint              edge_add                (const uint vid0, const uint vid1);
+        void              edge_remove             (const uint eid);
+        void              edge_remove_unreferenced(const uint eid);
+        bool              edge_is_on_srf          (const uint eid) const;
+        std::vector<uint> edge_ordered_poly_ring  (const uint eid) const;
+        std::vector<uint> edge_adj_srf_faces      (const uint eid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual vec3d             face_vert               (const uint fid, const uint off) const;
-        virtual uint              face_vert_id            (const uint fid, const uint off) const;
-        virtual uint              face_edge_id            (const uint fid, const uint vid0, const uint vid1) const;
-        virtual uint              face_edge_id            (const uint fid, const uint off) const;
-        virtual bool              face_is_on_srf          (const uint fid) const;
-        virtual bool              face_contains_vert      (const uint fid, const uint vid) const;
-        virtual bool              face_contains_edge      (const uint fid, const uint eid) const;
-        virtual uint              face_adj_through_edge   (const uint fid, const uint eid, const uint pid) const;
-        virtual ipair             face_edges_from_vert    (const uint fid, const uint vid) const;
-        virtual uint              face_adj_srf_edge       (const uint fid, const uint eid, const uint vid) const;
-        virtual uint              face_opp_to_srf_edge    (const uint fid, const uint eid) const;
-        virtual uint              face_shared_edge        (const uint fid0, const uint fid1) const;
-        virtual vec3d             face_centroid           (const uint fid) const;
-        virtual double            face_mass               (const uint fid) const;
-        virtual double            face_area               (const uint fid) const;
-        virtual bool              faces_are_disjoint      (const uint fid0, const uint fid1) const;
-        virtual bool              faces_are_adjacent      (const uint fid0, const uint fid1) const;
-        virtual void              face_unmark_all         ();
-        virtual int               face_id                 (const std::vector<uint> & f) const;
+                vec3d             face_vert               (const uint fid, const uint off) const;
+                uint              face_vert_id            (const uint fid, const uint off) const;
+                uint              face_edge_id            (const uint fid, const uint vid0, const uint vid1) const;
+                uint              face_edge_id            (const uint fid, const uint off) const;
+                bool              face_is_on_srf          (const uint fid) const;
+                bool              face_contains_vert      (const uint fid, const uint vid) const;
+                bool              face_contains_edge      (const uint fid, const uint eid) const;
+                uint              face_adj_through_edge   (const uint fid, const uint eid, const uint pid) const;
+                ipair             face_edges_from_vert    (const uint fid, const uint vid) const;
+                uint              face_adj_srf_edge       (const uint fid, const uint eid, const uint vid) const;
+                uint              face_opp_to_srf_edge    (const uint fid, const uint eid) const;
+                uint              face_shared_edge        (const uint fid0, const uint fid1) const;
+                vec3d             face_centroid           (const uint fid) const;
+                double            face_mass               (const uint fid) const;
+                double            face_area               (const uint fid) const;
+                bool              faces_are_disjoint      (const uint fid0, const uint fid1) const;
+                bool              faces_are_adjacent      (const uint fid0, const uint fid1) const;
+                void              face_unmark_all         ();
+                int               face_id                 (const std::vector<uint> & f) const;
         virtual void              face_set_color          (const Color & c);
         virtual void              face_set_alpha          (const float alpha);
-        virtual void              face_switch_id          (const uint fid0, const uint fid1);
-        virtual uint              face_add                (const std::vector<uint> & f);
-        virtual void              face_remove             (const uint fid);
-        virtual void              face_remove_unreferenced(const uint fid);
-        virtual std::vector<uint> face_tessellation       (const uint fid) const;
-        virtual std::vector<uint> face_verts              (const uint fid) const;
-        virtual std::vector<uint> face_verts_sorted       (const uint fid) const;
+                void              face_switch_id          (const uint fid0, const uint fid1);
+                uint              face_add                (const std::vector<uint> & f);
+                void              face_remove             (const uint fid);
+                void              face_remove_unreferenced(const uint fid);
+                std::vector<uint> face_tessellation       (const uint fid) const;
+                std::vector<uint> face_verts              (const uint fid) const;
+                std::vector<uint> face_verts_sorted       (const uint fid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual double            poly_volume             (const uint pid) const = 0;
         virtual double            poly_mass               (const uint pid) const;
-        virtual bool              poly_contains_face      (const uint pid, const uint fid) const;
-        virtual bool              poly_is_on_surf         (const uint pid) const;
-        virtual int               poly_shared_face        (const uint pid0, const uint pid1) const;
-        virtual uint              poly_face_id            (const uint pid, const uint off) const;
-        virtual bool              poly_face_is_CCW        (const uint pid, const uint fid) const;
-        virtual bool              poly_face_is_CW         (const uint pid, const uint fid) const;
-        virtual uint              poly_face_offset        (const uint pid, const uint fid) const;
-        virtual vec3d             poly_face_normal        (const uint pid, const uint fid) const;
-        virtual int               poly_adj_through_face   (const uint pid, const uint fid) const;
-        virtual void              poly_switch_id          (const uint pid0, const uint pid1);
-        virtual uint              poly_add                (const std::vector<uint> & flist, const std::vector<bool> & fwinding);
-        virtual void              poly_remove_unreferenced(const uint pid);
-        virtual void              poly_remove             (const uint pid);
-        virtual void              polys_remove            (const std::vector<uint> & pids);
+                bool              poly_contains_face      (const uint pid, const uint fid) const;
+                bool              poly_is_on_surf         (const uint pid) const;
+                int               poly_shared_face        (const uint pid0, const uint pid1) const;
+                uint              poly_face_id            (const uint pid, const uint off) const;
+                bool              poly_face_is_CCW        (const uint pid, const uint fid) const;
+                bool              poly_face_is_CW         (const uint pid, const uint fid) const;
+                uint              poly_face_offset        (const uint pid, const uint fid) const;
+                vec3d             poly_face_normal        (const uint pid, const uint fid) const;
+                int               poly_adj_through_face   (const uint pid, const uint fid) const;
+                void              poly_switch_id          (const uint pid0, const uint pid1);
+                uint              poly_add                (const std::vector<uint> & flist, const std::vector<bool> & fwinding);
+                void              poly_remove_unreferenced(const uint pid);
+                void              poly_remove             (const uint pid);
+                void              polys_remove            (const std::vector<uint> & pids);
 };
 
 }

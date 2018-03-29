@@ -105,18 +105,17 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void update_bbox();
-        //virtual void update_adjacency() = 0;
+                void update_bbox();
         virtual void update_normals() = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void  translate(const vec3d & delta);
-        virtual void  center_bbox();
-        virtual void  rotate(const vec3d & axis, const double angle);
-        virtual void  scale(const double scale_factor);
-        virtual void  normalize_bbox();
-        virtual vec3d centroid() const;
+        void  translate(const vec3d & delta);
+        void  center_bbox();
+        void  rotate(const vec3d & axis, const double angle);
+        void  scale(const double scale_factor);
+        void  normalize_bbox();
+        vec3d centroid() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -141,84 +140,84 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual std::vector<double> serialize_uvw  (const int mode) const;
-        virtual void                deserialize_uvw(const std::vector<vec3d> & uvw);
-        virtual void                copy_xyz_to_uvw(const int mode);
-        virtual void                copy_uvw_to_xyz(const int mode);
-        virtual void                swap_xyz_uvw(const bool normals = true, const bool bbox = true);
+        std::vector<double> serialize_uvw  (const int mode) const;
+        void                deserialize_uvw(const std::vector<vec3d> & uvw);
+        void                copy_xyz_to_uvw(const int mode);
+        void                copy_uvw_to_xyz(const int mode);
+        void                swap_xyz_uvw(const bool normals = true, const bool bbox = true);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
-        virtual const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
-        virtual const std::vector<uint> & adj_v2p(const uint vid) const { return v2p.at(vid); }
-        virtual const std::vector<uint> & adj_e2p(const uint eid) const { return e2p.at(eid); }
-        virtual const std::vector<uint> & adj_p2e(const uint pid) const { return p2e.at(pid); }
-        virtual const std::vector<uint> & adj_p2p(const uint pid) const { return p2p.at(pid); }
+                const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
+                const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
+                const std::vector<uint> & adj_v2p(const uint vid) const { return v2p.at(vid); }
+                const std::vector<uint> & adj_e2p(const uint eid) const { return e2p.at(eid); }
+                const std::vector<uint> & adj_p2e(const uint pid) const { return p2e.at(pid); }
+                const std::vector<uint> & adj_p2p(const uint pid) const { return p2p.at(pid); }
         virtual const std::vector<uint> & adj_p2v(const uint pid) const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual const M & mesh_data()               const { return m_data;         }
-        virtual       M & mesh_data()                     { return m_data;         }
-        virtual const V & vert_data(const uint vid) const { return v_data.at(vid); }
-        virtual       V & vert_data(const uint vid)       { return v_data.at(vid); }
-        virtual const E & edge_data(const uint eid) const { return e_data.at(eid); }
-        virtual       E & edge_data(const uint eid)       { return e_data.at(eid); }
-        virtual const P & poly_data(const uint pid) const { return p_data.at(pid); }
-        virtual       P & poly_data(const uint pid)       { return p_data.at(pid); }
+        const M & mesh_data()               const { return m_data;         }
+              M & mesh_data()                     { return m_data;         }
+        const V & vert_data(const uint vid) const { return v_data.at(vid); }
+              V & vert_data(const uint vid)       { return v_data.at(vid); }
+        const E & edge_data(const uint eid) const { return e_data.at(eid); }
+              E & edge_data(const uint eid)       { return e_data.at(eid); }
+        const P & poly_data(const uint pid) const { return p_data.at(pid); }
+              P & poly_data(const uint pid)       { return p_data.at(pid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual const vec3d          & vert                 (const uint vid) const { return verts.at(vid); }
-        virtual       vec3d          & vert                 (const uint vid)       { return verts.at(vid); }
-        virtual       void             vert_weights         (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
-        virtual       void             vert_weights_uniform (const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
-        virtual       std::set<uint>   vert_n_ring          (const uint vid, const uint n) const;
-        virtual       uint             vert_opposite_to     (const uint eid, const uint vid) const;
-        virtual       bool             verts_are_adjacent   (const uint vid0, const uint vid1) const;
-        virtual       bool             vert_is_local_min    (const uint vid, const int tex_coord = U_param) const;
-        virtual       bool             vert_is_local_max    (const uint vid, const int tex_coord = U_param) const;
-        virtual       uint             vert_valence         (const uint vid) const;
-        virtual       double           vert_mass            (const uint vid) const = 0;
-        virtual       uint             vert_shared          (const uint eid0, const uint eid1) const;
-        virtual       double           vert_min_uvw_value   (const int tex_coord = U_param) const;
-        virtual       double           vert_max_uvw_value   (const int tex_coord = U_param) const;
-        virtual       void             vert_set_color       (const Color & c);
-        virtual       void             vert_set_alpha       (const float alpha);
-        virtual       void             vert_unmark_all      ();
+          const vec3d          & vert                 (const uint vid) const { return verts.at(vid); }
+                vec3d          & vert                 (const uint vid)       { return verts.at(vid); }
+                void             vert_weights_uniform (const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
+                std::set<uint>   vert_n_ring          (const uint vid, const uint n) const;
+                bool             verts_are_adjacent   (const uint vid0, const uint vid1) const;
+                bool             vert_is_local_min    (const uint vid, const int tex_coord = U_param) const;
+                bool             vert_is_local_max    (const uint vid, const int tex_coord = U_param) const;
+                uint             vert_valence         (const uint vid) const;
+                uint             vert_shared          (const uint eid0, const uint eid1) const;
+                double           vert_min_uvw_value   (const int tex_coord = U_param) const;
+                double           vert_max_uvw_value   (const int tex_coord = U_param) const;
+                void             vert_unmark_all      ();
+        virtual double           vert_mass            (const uint vid) const = 0;
+        virtual void             vert_set_color       (const Color & c);
+        virtual void             vert_set_alpha       (const float alpha);
+        virtual uint             vert_opposite_to     (const uint eid, const uint vid) const;
+        virtual void             vert_weights         (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual       vec3d  edge_vert         (const uint eid, const uint offset) const;
-        virtual       uint   edge_vert_id      (const uint eid, const uint offset) const;
-        virtual       int    edge_id           (const uint vid0, const uint vid1) const;
-        virtual       vec3d  edge_sample_at    (const uint eid, double lambda) const; // arc-length param
-        virtual       uint   edge_valence      (const uint eid) const;
-        virtual       bool   edge_contains_vert(const uint eid, const uint vid) const;
-        virtual       double edge_length       (const uint eid) const;
-        virtual       double edge_avg_length   () const;
-        virtual       double edge_max_length   () const;
-        virtual       double edge_min_length   () const;
-        virtual       void   edge_set_color    (const Color & c);
-        virtual       void   edge_set_alpha    (const float alpha);
-        virtual       void   edge_unmark_all   ();
+                vec3d  edge_vert         (const uint eid, const uint offset) const;
+                uint   edge_vert_id      (const uint eid, const uint offset) const;
+                int    edge_id           (const uint vid0, const uint vid1) const;
+                vec3d  edge_sample_at    (const uint eid, double lambda) const; // arc-length param
+                uint   edge_valence      (const uint eid) const;
+                bool   edge_contains_vert(const uint eid, const uint vid) const;
+                double edge_length       (const uint eid) const;
+                double edge_avg_length   () const;
+                double edge_max_length   () const;
+                double edge_min_length   () const;
+                void   edge_unmark_all   ();
+        virtual void   edge_set_color    (const Color & c);
+        virtual void   edge_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual       vec3d              poly_vert           (const uint pid, const uint offset) const;
-        virtual       std::vector<vec3d> poly_verts          (const uint pid) const;
-        virtual       uint               poly_vert_id        (const uint pid, const uint offset) const;
-        virtual       vec3d              poly_centroid       (const uint pid) const;
-        virtual       double             poly_mass           (const uint pid) const = 0;
-        virtual       uint               poly_edge_id        (const uint pid, const uint vid0, const uint vid1) const;
-        virtual       bool               poly_contains_vert  (const uint pid, const uint vid) const;
-        virtual       bool               poly_contains_edge  (const uint pid, const uint eid) const;
-        virtual       bool               poly_contains_edge  (const uint pid, const uint vid0, const uint vid1) const;
-        virtual       void               poly_show_all       ();
-        virtual       void               poly_color_wrt_label(const float s=.5f, float v=.85f); // s => saturation, v => value in HSV color space
-        virtual       void               poly_set_color      (const Color & c);
-        virtual       void               poly_set_alpha      (const float alpha);
+                vec3d              poly_vert           (const uint pid, const uint offset) const;
+                std::vector<vec3d> poly_verts          (const uint pid) const;
+                uint               poly_vert_id        (const uint pid, const uint offset) const;
+                vec3d              poly_centroid       (const uint pid) const;
+                uint               poly_edge_id        (const uint pid, const uint vid0, const uint vid1) const;
+                bool               poly_contains_vert  (const uint pid, const uint vid) const;
+                bool               poly_contains_edge  (const uint pid, const uint eid) const;
+                bool               poly_contains_edge  (const uint pid, const uint vid0, const uint vid1) const;
+                void               poly_show_all       ();
+                void               poly_color_wrt_label(const float s=.5f, float v=.85f); // s => saturation, v => value in HSV color space
+        virtual double             poly_mass           (const uint pid) const = 0;
+        virtual void               poly_set_color      (const Color & c);
+        virtual void               poly_set_alpha      (const float alpha);
 };
 
 }
