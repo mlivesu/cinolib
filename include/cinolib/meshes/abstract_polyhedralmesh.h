@@ -194,6 +194,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 uint              poly_face_offset        (const uint pid, const uint fid) const;
                 vec3d             poly_face_normal        (const uint pid, const uint fid) const;
                 int               poly_adj_through_face   (const uint pid, const uint fid) const;
+                std::vector<uint> poly_edge_faces         (const uint pid, const uint eid) const;
                 void              poly_switch_id          (const uint pid0, const uint pid1);
                 uint              poly_add                (const std::vector<uint> & flist, const std::vector<bool> & fwinding);
                 void              poly_remove_unreferenced(const uint pid);

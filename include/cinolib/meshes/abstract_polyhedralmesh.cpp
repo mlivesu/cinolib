@@ -343,6 +343,25 @@ int AbstractPolyhedralMesh<M,V,E,F,P>::poly_adj_through_face(const uint pid, con
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_edge_faces(const uint pid, const uint eid) const
+{
+    assert(this->poly_contains_edge(pid,eid));
+    std::vector<uint> faces;
+    for(uint fid : this->adj_e2f(eid))
+    {
+        if (this->poly_contains_face(pid,fid))
+        {
+            faces.push_back(fid);
+        }
+    }
+    assert(faces.size()==2);
+    return faces;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_on_surf(const uint pid) const
 {
     for(uint off=0; off<faces_per_poly(pid); ++off)

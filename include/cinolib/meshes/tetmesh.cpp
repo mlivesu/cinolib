@@ -226,6 +226,37 @@ double Tetmesh<M,V,E,F,P>::face_area(const uint fid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const double lambda)
+{
+    this->edge_split(eid, this->edge_sample_at(eid,lambda));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
+{
+    uint new_vid = this->vert_add(p);
+
+    for(uint pid : this->adj_e2p(eid))
+    for(uint fid : this->poly_faces_opposite_to(pid,eid))
+    {
+        std::vector<uint> tet(4);
+        tet[0] = this->face_vert_id(fid,TET_FACES[0][0]);
+        tet[1] = this->face_vert_id(fid,TET_FACES[0][1]);
+        tet[2] = this->face_vert_id(fid,TET_FACES[0][2]);
+        tet[3] = new_vid;
+        if (this->poly_face_is_CW(pid,fid)) std::swap(tet[1],tet[2]);
+        this->poly_add(tet);
+    }
+    this->edge_remove(eid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void Tetmesh<M,V,E,F,P>::face_split(const uint fid, const std::vector<double> & bary)
 {
     assert(bary.size()==3);
@@ -250,13 +281,13 @@ void Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
         uint opp_vid = this->poly_vert_opposite_to(pid, fid);
         for(uint off=0; off<3; ++off)
         {
-            std::vector<uint> vlist(4);
-            vlist[0] = this->face_vert_id(fid,off);
-            vlist[1] = new_vid;
-            vlist[2] = this->face_vert_id(fid,(off+1)%3);
-            vlist[3] = opp_vid;
-            if (this->poly_face_is_CW(pid,fid)) std::swap(vlist[1],vlist[2]);
-            this->poly_add(vlist);
+            std::vector<uint> tet(4);
+            tet[0] = this->face_vert_id(fid,off);
+            tet[1] = new_vid;
+            tet[2] = this->face_vert_id(fid,(off+1)%3);
+            tet[3] = opp_vid;
+            if (this->poly_face_is_CW(pid,fid)) std::swap(tet[1],tet[2]);
+            this->poly_add(tet);
         }
     }
 
@@ -423,11 +454,11 @@ void Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
 
     for(uint i=0; i<4; ++i)
     {
-        std::vector<uint> vlist(4, new_vid);
-        vlist[TET_FACES[i][0]] = this->poly_vert_id(pid,TET_FACES[i][0]);
-        vlist[TET_FACES[i][1]] = this->poly_vert_id(pid,TET_FACES[i][1]);
-        vlist[TET_FACES[i][2]] = this->poly_vert_id(pid,TET_FACES[i][2]);
-        this->poly_add(vlist);
+        std::vector<uint> tet(4, new_vid);
+        tet[TET_FACES[i][0]] = this->poly_vert_id(pid,TET_FACES[i][0]);
+        tet[TET_FACES[i][1]] = this->poly_vert_id(pid,TET_FACES[i][1]);
+        tet[TET_FACES[i][2]] = this->poly_vert_id(pid,TET_FACES[i][2]);
+        this->poly_add(tet);
     }
     this->poly_remove(pid);
 }
@@ -501,6 +532,16 @@ uint Tetmesh<M,V,E,F,P>::poly_face_opposite_to(const uint pid, const uint vid) c
         if (!this->face_contains_vert(fid,vid)) return fid;
     }
     assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> Tetmesh<M,V,E,F,P>::poly_faces_opposite_to(const uint pid, const uint eid) const
+{
+    assert(this->poly_contains_edge(pid, eid));
+    return this->poly_edge_faces(pid, this->poly_edge_opposite_to(pid,eid));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
