@@ -101,14 +101,14 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void edge_split(const uint eid, const vec3d & p);
-        void edge_split(const uint eid, const double lambda = 0.5); // use linear interpolation: e0*(1-lambda) + e1*lambda
+        uint edge_split(const uint eid, const vec3d & p);
+        uint edge_split(const uint eid, const double lambda = 0.5); // use linear interpolation: e0*(1-lambda) + e1*lambda
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double face_area (const uint fid) const;
-        void   face_split(const uint fid, const vec3d & p);
-        void   face_split(const uint fid, const std::vector<double> & bary = { 1./3., 1./3., 1./3. });
+        uint   face_split(const uint fid, const vec3d & p);
+        uint   face_split(const uint fid, const std::vector<double> & bary = { 1./3., 1./3., 1./3. });
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -121,8 +121,8 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         int               poly_shared_vert     (const uint pid, const std::vector<uint> & incident_edges) const; // TODO: move to global ids!!!!!!
         bool              poly_bary_coords     (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
         double            poly_volume          (const uint pid) const;
-        void              poly_split           (const uint pid, const vec3d & p);
-        void              poly_split           (const uint pid, const std::vector<double> & bary = { 0.25, 0.25, 0.25, 0.25 });
+        uint              poly_split           (const uint pid, const vec3d & p);
+        uint              poly_split           (const uint pid, const std::vector<double> & bary = { 0.25, 0.25, 0.25, 0.25 });
         uint              poly_add             (const std::vector<uint> & vlist); // vertex list
 
         using  AbstractPolyhedralMesh<M,V,E,F,P>::poly_add; // avoid hiding poly_add(flist,fwinding);

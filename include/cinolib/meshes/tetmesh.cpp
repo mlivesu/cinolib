@@ -226,16 +226,16 @@ double Tetmesh<M,V,E,F,P>::face_area(const uint fid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const double lambda)
+uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const double lambda)
 {
-    this->edge_split(eid, this->edge_sample_at(eid,lambda));
+    return edge_split(eid, this->edge_sample_at(eid,lambda));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
+uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
 {
     uint new_vid = this->vert_add(p);
 
@@ -251,13 +251,15 @@ void Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
         this->poly_add(tet);
     }
     this->edge_remove(eid);
+
+    return new_vid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::face_split(const uint fid, const std::vector<double> & bary)
+uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const std::vector<double> & bary)
 {
     assert(bary.size()==3);
 
@@ -265,14 +267,14 @@ void Tetmesh<M,V,E,F,P>::face_split(const uint fid, const std::vector<double> & 
               this->face_vert(fid,1) * bary.at(1) +
               this->face_vert(fid,2) * bary.at(2);
 
-    face_split(fid, p);
+    return face_split(fid, p);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
+uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
 {
     uint new_vid = this->vert_add(p);
 
@@ -292,6 +294,7 @@ void Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
     }
 
     this->face_remove(fid);
+    return new_vid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -432,7 +435,7 @@ uint Tetmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex lis
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const std::vector<double> & bary)
+uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const std::vector<double> & bary)
 {
     assert(bary.size()==4);
 
@@ -441,14 +444,14 @@ void Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const std::vector<double> & 
               this->poly_vert(pid,2) * bary.at(2) +
               this->poly_vert(pid,3) * bary.at(3);
 
-    poly_split(pid, p);
+    return poly_split(pid, p);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
+uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
 {
     uint new_vid = this->vert_add(p);
 
@@ -461,6 +464,8 @@ void Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
         this->poly_add(tet);
     }
     this->poly_remove(pid);
+
+    return new_vid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
