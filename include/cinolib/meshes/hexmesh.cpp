@@ -199,38 +199,23 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Hexmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
 {
-    std::vector<uint> new_p2v;
-
-    uint off_f0 = 0;
-    uint off_f1 = 1;
-
-    // put the first four vertices CCW
-    uint fid0 = this->poly_face_id(pid,off_f0);
-    std::vector<uint> f0;
-    for(uint i=0; i<this->verts_per_face(fid0); ++i) f0.push_back(this->face_vert_id(fid0,i));
-    if (this->poly_face_is_CCW(pid,fid0)) std::reverse(f0.begin(),f0.end());
-    for(uint vid : f0) new_p2v.push_back(vid);
-
-    // find its opposite face and sort it CW
-    uint fid1 = this->poly_face_id(pid,off_f1);
-    while(!this->faces_are_disjoint(fid0,fid1) && off_f1<6)
+    uint fid_bot = this->poly_face_id(pid,0);
+    uint fid_top = this->poly_face_opposite_to(pid, fid_bot);
+    std::vector<uint> vlist(8);
+    vlist[0] = this->face_vert_id(fid_bot,HEXA_FACES[0][0]);
+    vlist[1] = this->face_vert_id(fid_bot,HEXA_FACES[0][1]);
+    vlist[2] = this->face_vert_id(fid_bot,HEXA_FACES[0][2]);
+    vlist[3] = this->face_vert_id(fid_bot,HEXA_FACES[0][3]);
+    if (this->poly_face_is_CW(pid,fid_bot)) std::swap(vlist[1],vlist[3]);
+    for(uint vid : this->face_verts(fid_top))
     {
-        fid1 = this->poly_face_id(pid,++off_f1);
+        if(this->verts_are_adjacent(vid,vlist[0])) vlist[4] = vid; else
+        if(this->verts_are_adjacent(vid,vlist[1])) vlist[5] = vid; else
+        if(this->verts_are_adjacent(vid,vlist[2])) vlist[6] = vid; else
+        if(this->verts_are_adjacent(vid,vlist[3])) vlist[7] = vid; else
+        assert(false);
     }
-    assert(off_f1 < 6);
-    std::vector<uint> f1;
-    for(uint i=0; i<this->verts_per_face(fid1); ++i) f1.push_back(this->face_vert_id(fid1,i));
-    if (this->poly_face_is_CW(pid,fid1)) std::reverse(f1.begin(),f1.end());
-
-    // align the first vertices of f0 and f1 so that there exists
-    // an edge in the polyhedron directly connecting them
-    uint offset = 0;
-    while (!this->poly_contains_edge(pid,f0.front(),f1.at(offset)) && offset<4) ++offset;
-    assert(offset<4);
-
-    for(uint i=0; i<4; ++i) new_p2v.push_back(f1.at((offset+i)%4));
-
-    this->p2v.at(pid) = new_p2v;
+    this->p2v.at(pid) = vlist;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -327,6 +312,20 @@ void Hexmesh<M,V,E,F,P>::update_hex_quality()
     {
         update_hex_quality(pid);
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint Hexmesh<M,V,E,F,P>::poly_face_opposite_to(const uint pid, const uint fid) const
+{
+    assert(this->poly_contains_face(pid, fid));
+    for(uint f : this->adj_p2f(pid))
+    {
+        if(this->faces_are_disjoint(fid,f)) return f;
+    }
+    assert(false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

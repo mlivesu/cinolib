@@ -103,9 +103,10 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void   poly_subdivide(const std::vector<std::vector<std::vector<uint>>> & split_scheme);
-        double poly_volume   (const uint pid) const;
-        uint   poly_add      (const std::vector<uint> & vlist); // vertex list
+        uint   poly_face_opposite_to(const uint pid, const uint fid) const;
+        void   poly_subdivide       (const std::vector<std::vector<std::vector<uint>>> & split_scheme);
+        double poly_volume          (const uint pid) const;
+        uint   poly_add             (const std::vector<uint> & vlist); // vertex list
 
         using  AbstractPolyhedralMesh<M,V,E,F,P>::poly_add; // avoid hiding poly_add(flist,fwinding);
 
@@ -116,10 +117,13 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         // reorder_p2v() makes sure the p2v adjacency stores vertices
         // in a way that uniquely defines per element connectivity:
         //
-        //   TOP         BOTTOM
-        //  7 -- 6       3 -- 2
-        //  |    |       |    |
-        //  4 -- 5       0 -- 1
+        //       v7------v6
+        //      / |     / |
+        //    v4------v5  |
+        //    |   |    |  |
+        //    |  v3----|--v2
+        //    | /      | /
+        //    v0------v1
 };
 
 }

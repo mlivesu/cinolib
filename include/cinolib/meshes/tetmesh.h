@@ -126,9 +126,13 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         /* reorder_p2v() makes sure the p2v adjacency stores vertices
            in a way that uniquely defines per element connectivity:
 
-           3 -- 2      with 0,1,2 CCW (i.e. outgoing normal)
-            \  /  \
-             0 --- 1
+                    v2
+                   /| \
+                 /  |   \
+               v0---|----v3
+                \   |   /
+                  \ | /
+                   v1
         */
 };
 

@@ -33,6 +33,17 @@
 
 #include <sys/types.h>
 
+// Reference               Reference
+// Hexahedron:             Tetrahedron:
+//
+//       v7------v6             v2
+//      / |     / |             /| \
+//    v4------v5  |           /  |   \
+//    |   |    |  |         v0---|----v3
+//    |  v3----|--v2         \   |   /
+//    | /      | /             \ | /
+//    v0------v1                 v1
+
 namespace cinolib
 {
 
