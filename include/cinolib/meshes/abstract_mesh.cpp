@@ -736,9 +736,9 @@ uint AbstractMesh<M,V,E,P>::poly_edge_id(const uint fid, const uint vid0, const 
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractMesh<M,V,E,P>::poly_contains_edge(const uint fid, const uint eid) const
+bool AbstractMesh<M,V,E,P>::poly_contains_edge(const uint pid, const uint eid) const
 {
-    for(uint e : adj_p2e(fid)) if (e == eid) return true;
+    for(uint e : adj_p2e(pid)) if (e == eid) return true;
     return false;
 }
 
