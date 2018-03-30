@@ -415,6 +415,19 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_vert_id(const uint fid, const uint 
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::face_vert_offset(const uint fid, const uint vid) const
+{
+    for(uint off=0; off<verts_per_face(fid); ++off)
+    {
+        if (face_vert_id(fid,off) == vid) return off;
+    }
+    assert(false); // something went wrong
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::face_edge_id(const uint fid, const uint vid0, const uint vid1) const
 {
     assert(face_contains_vert(fid,vid0));
@@ -571,6 +584,22 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_contains_edge(const uint fid, const
     {
         if (e == eid) return true;
     }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::face_winding_agrees_with(const uint fid, const uint vid0, const uint vid1) const
+{
+    assert(face_contains_vert(fid, vid0));
+    assert(face_contains_vert(fid, vid1));
+
+    uint off0 = face_vert_offset(fid, vid0);
+    uint off1 = face_vert_offset(fid, vid1);
+
+    if (off1 == (off0+1)%verts_per_face(fid)) return true;
     return false;
 }
 

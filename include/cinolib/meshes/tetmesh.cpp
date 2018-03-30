@@ -201,17 +201,14 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Tetmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
 {
-    std::vector<uint> new_p2v;
-    uint f = this->poly_face_id(pid,0);
-    for(uint i=0; i<this->verts_per_face(f); ++i) new_p2v.push_back(this->face_vert_id(f,i));
-    if (this->poly_face_is_CCW(pid,f)) std::reverse(new_p2v.begin(),new_p2v.end());
-    for(uint vid : this->adj_p2v(pid))
-    {
-        if (this->face_contains_vert(f,vid)) continue;
-        new_p2v.push_back(vid);
-    }
-    assert(new_p2v.size()==4);
-    this->p2v.at(pid) = new_p2v;
+    uint fid = this->poly_face_id(pid,0);
+    std::vector<uint> vlist(4);
+    vlist[0] = this->face_vert_id(fid,TET_FACES[0][0]);
+    vlist[1] = this->face_vert_id(fid,TET_FACES[0][1]);
+    vlist[2] = this->face_vert_id(fid,TET_FACES[0][2]);
+    vlist[3] = this->poly_vert_opposite_to(pid,fid);
+    if (this->poly_face_is_CW(pid,fid)) std::swap(vlist[1],vlist[2]);
+    this->p2v.at(pid) = vlist;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -331,9 +328,6 @@ uint Tetmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex lis
     std::vector<uint> f2 = { vlist.at(TET_FACES[2][0]), vlist.at(TET_FACES[2][1]), vlist.at(TET_FACES[2][2]) };
     std::vector<uint> f3 = { vlist.at(TET_FACES[3][0]), vlist.at(TET_FACES[3][1]), vlist.at(TET_FACES[3][2]) };
 
-    // assume faces already exist and they will be seen CW for the new element)
-    std::vector<bool> w = { false, false, false, false };
-
     // detect face ids
     int fid0 = this->face_id(f0);
     int fid1 = this->face_id(f1);
@@ -341,10 +335,16 @@ uint Tetmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex lis
     int fid3 = this->face_id(f3);
 
     // add missing faces (with vertices CCW)
-    if(fid0 == -1) { fid0 = this->face_add(f0); w.at(0) = true; }
-    if(fid1 == -1) { fid1 = this->face_add(f1); w.at(1) = true; }
-    if(fid2 == -1) { fid2 = this->face_add(f2); w.at(2) = true; }
-    if(fid3 == -1) { fid3 = this->face_add(f3); w.at(3) = true; }
+    if(fid0 == -1) fid0 = this->face_add(f0);
+    if(fid1 == -1) fid1 = this->face_add(f1);
+    if(fid2 == -1) fid2 = this->face_add(f2);
+    if(fid3 == -1) fid3 = this->face_add(f3);
+
+    std::vector<bool> w(4,false); // assume CW for each face w.r.t. new poly
+    if(this->face_winding_agrees_with(fid0, f0.at(0), f0.at(1))) w[0] = true; // set CCW
+    if(this->face_winding_agrees_with(fid1, f1.at(0), f1.at(1))) w[1] = true; // set CCW
+    if(this->face_winding_agrees_with(fid2, f2.at(0), f2.at(1))) w[2] = true; // set CCW
+    if(this->face_winding_agrees_with(fid3, f3.at(0), f3.at(1))) w[3] = true; // set CCW
 
     uint pid = poly_add({static_cast<uint>(fid0),
                          static_cast<uint>(fid1),
@@ -362,11 +362,14 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
 {
-    uint vid = this->vert_add(p);
-    for(uint fid : this->adj_p2f(pid))
+    uint new_vid = this->vert_add(p);
+
+    for(uint i=0; i<4; ++i)
     {
-        std::vector<uint> vlist = this->face_verts(fid);
-        vlist.push_back(vid);
+        std::vector<uint> vlist(4, new_vid);
+        vlist[TET_FACES[i][0]] = this->poly_vert_id(pid,TET_FACES[i][0]);
+        vlist[TET_FACES[i][1]] = this->poly_vert_id(pid,TET_FACES[i][1]);
+        vlist[TET_FACES[i][2]] = this->poly_vert_id(pid,TET_FACES[i][2]);
         this->poly_add(vlist);
     }
     this->poly_remove(pid);

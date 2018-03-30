@@ -51,7 +51,7 @@ static const uint QUAD_EDGES[4][2] =
     { 3, 0 }, // e3
 };
 
-static const uint TET_FACES[4][3] =
+static const uint TET_FACES[4][3] = // for outgoing normals
 {
     { 0, 2, 1 } , // f0
     { 0, 1, 3 } , // f1
@@ -77,7 +77,7 @@ static const uint TET_INCIDENT_EDEGES[4][3] =
     { 3, 4, 5 }, // edges incident to v3
 };
 
-static const uint HEXA_FACES[6][4] =
+static const uint HEXA_FACES[6][4] = // for outgoing normals
 {
     { 0 , 3 , 2 , 1 } , // f0
     { 1 , 2 , 6 , 5 } , // f1
