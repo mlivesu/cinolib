@@ -33,11 +33,9 @@
 
 #include <sys/types.h>
 #include <vector>
-#include <map>
 #include <cinolib/ipair.h>
 #include <cinolib/meshes/tetmesh.h>
 #include <cinolib/meshes/trimesh.h>
-
 
 namespace cinolib
 {
@@ -60,29 +58,14 @@ class Isosurface
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void tessellate(std::vector<double> & coords,
-                        std::vector<uint>   & new_polys,
-                        std::vector<double> & new_field) const;
+        std::vector<uint> tessellate(Tetmesh<M,V,E,F,P> & m) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const std::map<ipair,double> & edges_split() const { return split_info; }
-
-    protected:
-
-        void fix_subtet_orientation(const uint                  pid,
-                                    const uint                  n_subtets,
-                                    const std::vector<double> & coords,
-                                          std::vector<uint>   & cells) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        const Tetmesh<M,V,E,F,P> *m_ptr;
-        float                     iso_value;
-        std::vector<double>       coords;
-        std::vector<uint>         tris;
-        std::vector<double>       t_norms;
-        std::map<ipair,double>    split_info;
+        float               iso_value;
+        std::vector<double> coords;
+        std::vector<uint>   tris;
+        std::vector<double> t_norms;
 };
 
 

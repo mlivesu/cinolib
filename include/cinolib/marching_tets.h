@@ -47,11 +47,7 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
                    const double               isovalue,
                    std::vector<double>      & coords,
                    std::vector<uint>        & tris,
-                   std::vector<double>      & norm,
-                   std::map<ipair,double>   & split_info); // (v0,v1) => lambda
-                                                           // meaning that the edge (v0,v1) should
-                                                           // be split at
-                                                           // lambda * v0 + (1 - lambda) * v1
+                   std::vector<double>      & norm);
 }
 
 #ifndef  CINO_STATIC_LIB

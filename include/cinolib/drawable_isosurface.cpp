@@ -88,7 +88,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 vec3d DrawableIsosurface<M,V,E,F,P>::scene_center() const
 {
-    return this->m_ptr->bbox().center();
+    return vec3d();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -97,7 +97,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 float DrawableIsosurface<M,V,E,F,P>::scene_radius() const
 {
-    return this->m_ptr->bbox().diag();
+    return 0.0;
 }
 
 }

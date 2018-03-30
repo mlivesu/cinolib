@@ -31,18 +31,26 @@
 #include <cinolib/isosurface.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/marching_tets.h>
-#include <cinolib/symbols.h>
-#include <cinolib/tetrahedralization.h>
 
 namespace cinolib
 {
 
+CINO_INLINE
+bool is_into_interval(double v, double bound_0, double bound1)
+{
+    if (v >= bound_0 && v <= bound1) return true;
+    if (v <= bound_0 && v >= bound1) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 Isosurface<M,V,E,F,P>::Isosurface(const Tetmesh<M,V,E,F,P> &m, const float iso_value)
-    : m_ptr(&m), iso_value(iso_value)
+    : iso_value(iso_value)
 {
-    marching_tets(m, iso_value, coords, tris, t_norms, split_info);
+    marching_tets(m, iso_value, coords, tris, t_norms);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -58,175 +66,32 @@ Trimesh<M,V,E,F> Isosurface<M,V,E,F,P>::export_as_trimesh() const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Isosurface<M,V,E,F,P>::tessellate(std::vector<double> & new_coords,
-                                       std::vector<uint>   & new_polys,
-                                       std::vector<double> & new_field) const
+std::vector<uint> Isosurface<M,V,E,F,P>::tessellate(Tetmesh<M,V,E,F,P> & m) const
 {
-    new_polys.clear();
-    new_coords = m_ptr->vector_coords();
-    new_field  = m_ptr->serialize_uvw(U_param);
+    typedef std::pair<uint,double> split_data;
+    std::set<split_data,std::greater<split_data>> edges_to_split; // from highest to lowest id
 
-    // add vertices at split points
-    //
-    std::map<ipair,int> v_map;
-    for(auto obj : split_info)
+    for(uint eid=0; eid<m.num_edges(); ++eid)
     {
-        v_map[obj.first] = new_coords.size()/3;
+        double f0 = m.vert_data(m.edge_vert_id(eid,0)).uvw[0];
+        double f1 = m.vert_data(m.edge_vert_id(eid,1)).uvw[0];
 
-        uint   v_a   = obj.first.first;
-        uint   v_b   = obj.first.second;
-        double alpha = obj.second;
-        vec3d  pos   = alpha*m_ptr->vert(v_a) + (1.0-alpha)*m_ptr->vert(v_b);
-        float  f     = alpha*m_ptr->vert_data(v_a).uvw[0] + (1.0-alpha)*m_ptr->vert_data(v_b).uvw[0];
-
-        new_coords.push_back(pos.x());
-        new_coords.push_back(pos.y());
-        new_coords.push_back(pos.z());
-        new_field.push_back(f);
-    }
-
-    for(uint pid=0; pid<m_ptr->num_polys(); ++pid)
-    {
-        std::vector<uint>   edges_split;
-        std::vector<uint>   edges_not_split;
-        std::map<uint,uint> edges_vids;
-
-        for(uint e=0; e<m_ptr->edges_per_poly(); ++e)
+        if (is_into_interval(iso_value, f0, f1))
         {
-            uint  v_a   = m_ptr->poly_vert_id(pid, TET_EDGES[e][0]);
-            uint  v_b   = m_ptr->poly_vert_id(pid, TET_EDGES[e][1]);
-            ipair eid   = unique_pair(v_a,v_b);
-            auto  query = v_map.find(eid);
-
-            if (query != v_map.end())
-            {
-                edges_split.push_back(e);
-                edges_vids[e] = query->second;
-            }
-            else edges_not_split.push_back(e);
-        }
-
-        switch (edges_split.size())
-        {
-            case 0 : // replicate the whole tet
-            {
-                new_polys.push_back(m_ptr->poly_vert_id(pid, 0));
-                new_polys.push_back(m_ptr->poly_vert_id(pid, 1));
-                new_polys.push_back(m_ptr->poly_vert_id(pid, 2));
-                new_polys.push_back(m_ptr->poly_vert_id(pid, 3));
-                break;
-            }
-
-            case 3 : // decompose the tet into a tet and a prism having triangular section
-            {
-                assert(edges_vids.size() == 3);
-                auto vids_it  = edges_vids.begin();
-                int  tet_tip  = m_ptr->poly_shared_vert(pid, edges_split); assert(tet_tip!=-1);
-                uint prism[6] =
-                {
-                    m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[0]][0]),
-                    m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[1]][0]),
-                    m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[2]][0]),
-                    (  vids_it)->second,
-                    (++vids_it)->second,
-                    (++vids_it)->second,
-                };
-                if ((int)prism[0] == tet_tip) prism[0] = m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[0]][1]);
-                if ((int)prism[1] == tet_tip) prism[1] = m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[1]][1]);
-                if ((int)prism[2] == tet_tip) prism[2] = m_ptr->poly_vert_id(pid, TET_EDGES[edges_split[2]][1]);
-                //
-                tetrahedralize_prism(prism, new_polys);
-                //
-                new_polys.push_back(tet_tip);
-                new_polys.push_back(prism[3]);
-                new_polys.push_back(prism[4]);
-                new_polys.push_back(prism[5]);
-                //
-                fix_subtet_orientation(pid, 4, new_coords, new_polys);
-                break;
-            }
-
-            case 4 : // decompose the tet into two prisms having triangular section
-            {
-                assert(edges_not_split.size() == 2);
-                for(uint e : edges_not_split)
-                {
-                    uint top = TET_EDGES[e][0];
-                    uint bot = TET_EDGES[e][1];
-                    std::vector<uint> split_edges_top;
-                    std::vector<uint> split_edges_bot;
-                    for(uint i=0; i<3; ++i)
-                    {
-                        if (TET_INCIDENT_EDEGES[top][i] != e) split_edges_top.push_back(TET_INCIDENT_EDEGES[top][i]);
-                        if (TET_INCIDENT_EDEGES[bot][i] != e) split_edges_bot.push_back(TET_INCIDENT_EDEGES[bot][i]);
-                    }
-                    assert(split_edges_top.size() == 2);
-                    assert(split_edges_bot.size() == 2);
-                    //
-                    std::vector<uint> tmp;
-                    tmp.push_back(split_edges_top.front());
-                    tmp.push_back(split_edges_bot.front());
-                    if (m_ptr->poly_shared_vert(pid, tmp) == -1)
-                    {
-                        std::swap(split_edges_top[0], split_edges_top[1]);
-                        tmp.clear();
-                        tmp.push_back(split_edges_top.front());
-                        tmp.push_back(split_edges_bot.front());
-                        assert(m_ptr->poly_shared_vert(pid, tmp) != -1);
-                    }
-                    //
-                    uint prism[6] =
-                    {
-                        m_ptr->poly_vert_id(pid, top),
-                        edges_vids.at(split_edges_top[0]),
-                        edges_vids.at(split_edges_top[1]),
-                        m_ptr->poly_vert_id(pid, bot),
-                        edges_vids.at(split_edges_bot[0]),
-                        edges_vids.at(split_edges_bot[1]),
-                    };
-                    //
-                    tetrahedralize_prism(prism, new_polys);
-                }
-                fix_subtet_orientation(pid, 6, new_coords, new_polys);
-                break;
-            }
-
-            default:
-            {
-                std::cerr << edges_split.size() << " edges traversed!!!!!" << std::endl;
-                assert(false);
-            }
+            double alpha = std::fabs(iso_value - f0)/fabs(f1 - f0);
+            edges_to_split.insert(std::make_pair(eid,alpha));
         }
     }
-}
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Isosurface<M,V,E,F,P>::fix_subtet_orientation(const uint                  pid,
-                                                   const uint                  n_subtets,
-                                                   const std::vector<double> & coords,
-                                                         std::vector<uint>   & polys) const
-{
-    bool og_tet_was_flipped = m_ptr->poly_data(pid).quality;
-
-    for(uint i=1; i<=n_subtets; ++i)
+    std::vector<uint> new_vids;
+    for(auto e : edges_to_split)
     {
-        uint  base_ptr = polys.size() - (4*i);
-        uint  v0_ptr   = polys.at(base_ptr+0);
-        uint  v1_ptr   = polys.at(base_ptr+1);
-        uint  v2_ptr   = polys.at(base_ptr+2);
-        uint  v3_ptr   = polys.at(base_ptr+3);
-        vec3d v0(coords.at(3*v0_ptr+0), coords.at(3*v0_ptr+1), coords.at(3*v0_ptr+2));
-        vec3d v1(coords.at(3*v1_ptr+0), coords.at(3*v1_ptr+1), coords.at(3*v1_ptr+2));
-        vec3d v2(coords.at(3*v2_ptr+0), coords.at(3*v2_ptr+1), coords.at(3*v2_ptr+2));
-        vec3d v3(coords.at(3*v3_ptr+0), coords.at(3*v3_ptr+1), coords.at(3*v3_ptr+2));
-        if (tet_scaled_jacobian(v0,v1,v2,v3) < 0 && !og_tet_was_flipped)
-        {
-            std::swap(polys.at(base_ptr+1),polys.at(base_ptr+3));
-        }
+        uint vid = m.edge_split(e.first, e.second);
+        m.vert_data(vid).uvw[0] = iso_value;
+        new_vids.push_back(vid);
     }
+
+    return new_vids;
 }
 
 }
