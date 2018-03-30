@@ -226,6 +226,47 @@ double Tetmesh<M,V,E,F,P>::face_area(const uint fid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void Tetmesh<M,V,E,F,P>::face_split(const uint fid, const std::vector<double> & bary)
+{
+    assert(bary.size()==3);
+
+    vec3d p = this->face_vert(fid,0) * bary.at(0) +
+              this->face_vert(fid,1) * bary.at(1) +
+              this->face_vert(fid,2) * bary.at(2);
+
+    face_split(fid, p);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
+{
+    uint new_vid = this->vert_add(p);
+
+    for(uint pid : this->adj_f2p(fid))
+    {
+        uint opp_vid = this->poly_vert_opposite_to(pid, fid);
+        for(uint off=0; off<3; ++off)
+        {
+            std::vector<uint> vlist(4);
+            vlist[0] = this->face_vert_id(fid,off);
+            vlist[1] = new_vid;
+            vlist[2] = this->face_vert_id(fid,(off+1)%3);
+            vlist[3] = opp_vid;
+            if (this->poly_face_is_CW(pid,fid)) std::swap(vlist[1],vlist[2]);
+            this->poly_add(vlist);
+        }
+    }
+
+    this->face_remove(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void Tetmesh<M,V,E,F,P>::vert_weights(const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const
 {
     switch (type)
