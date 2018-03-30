@@ -360,6 +360,22 @@ uint Tetmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex lis
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const std::vector<double> & bary)
+{
+    assert(bary.size()==4);
+
+    vec3d p = this->poly_vert(pid,0) * bary.at(0) +
+              this->poly_vert(pid,1) * bary.at(1) +
+              this->poly_vert(pid,2) * bary.at(2) +
+              this->poly_vert(pid,3) * bary.at(3);
+
+    poly_split(pid, p);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
 {
     uint new_vid = this->vert_add(p);
