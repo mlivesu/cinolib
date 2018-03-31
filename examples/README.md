@@ -62,11 +62,14 @@ Here is a list of the sample programs available in CinoLib.
 #### 16 - Use spherical Fibonacci to evenly sample the unit sphere
 <p align="left"><img src="snapshots/16_sphere_sampling.png" width="500"></p>
 
-#### 17 - Extract ISO surfaces using marching cubes for tetrahedral meshes
-<p align="left"><img src="snapshots/17_iso_surfaces.png" width="500"></p>
+#### 17 - Extract ISO contours from surface meshes
+<p align="left"><img src="snapshots/17_iso_contours.png" width="500"></p>
 
-#### 18 - Compute discrete harmonic maps
-<p align="left"><img src="snapshots/18_harmonic_map.png" width="500"></p>
+#### 18 - Extract ISO surfaces using marching cubes for tetrahedral meshes
+<p align="left"><img src="snapshots/18_iso_surfaces.png" width="500"></p>
+
+#### 19 - Compute discrete harmonic maps
+<p align="left"><img src="snapshots/19_harmonic_map.png" width="500"></p>
 
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
@@ -88,4 +91,3 @@ Maintaining a library alone is very time consuming, and the amount of time I can
 * Evaluation of mapping distortions (angle/areas distortion popular metrics)
 * Solve multi-labeling problems on surfaces and volumes using the [GraphCuts](http://vision.csd.uwo.ca/code/) wrapper
 * Integral curve computation (and tessellation)
-* Iso curve computation (and tessellation)
