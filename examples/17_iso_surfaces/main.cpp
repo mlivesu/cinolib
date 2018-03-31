@@ -13,7 +13,8 @@
 
 #include <QApplication>
 #include <QSlider>
-#include <QVBoxLayout>
+#include <QPushButton>
+#include <QGridLayout>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/geodesics.h>
 #include <cinolib/profiler.h>
@@ -31,7 +32,8 @@ int main(int argc, char **argv)
     QWidget     window;
     QSlider     sl_iso(Qt::Horizontal);
     QSlider     sl_slice(Qt::Horizontal);
-    QVBoxLayout layout;
+    QPushButton but_tessellate("Tessellate");
+    QGridLayout layout;
     GLcanvas    canvas(&window);
     sl_iso.setMaximum(100);
     sl_iso.setMinimum(0);
@@ -39,9 +41,10 @@ int main(int argc, char **argv)
     sl_slice.setMaximum(100);
     sl_slice.setMinimum(0);
     sl_slice.setValue(50);
-    layout.addWidget(&sl_iso);
-    layout.addWidget(&sl_slice);
-    layout.addWidget(&canvas);
+    layout.addWidget(&sl_iso,0,0,1,9);
+    layout.addWidget(&sl_slice,1,0,1,9);
+    layout.addWidget(&but_tessellate,0,9,2,1);
+    layout.addWidget(&canvas,2,0,1,10);
     window.setLayout(&layout);
     window.show();
     window.resize(600,600);
@@ -72,13 +75,22 @@ int main(int argc, char **argv)
 
     QSlider::connect(&sl_slice, &QSlider::valueChanged, [&]()
     {
-        SlicerState ss;
         ss.Z_thresh = static_cast<float>(sl_slice.value())/100.0;
         profiler.push("update slicing");
         m.slice(ss);
         profiler.pop();
         canvas.updateGL();
     });
+
+    QSlider::connect(&but_tessellate, &QPushButton::clicked, [&]()
+    {
+        profiler.push("tessellate iso-surface");
+        iso.tessellate(m);
+        profiler.pop();
+        m.slice(ss);
+        canvas.updateGL();
+    });
+
 
     return a.exec();
 }
