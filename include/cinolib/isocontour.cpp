@@ -30,18 +30,11 @@
 **********************************************************************************/
 #include <cinolib/isocontour.h>
 #include <cinolib/cino_inline.h>
+#include <cinolib/interval.h>
 #include <queue>
 
 namespace cinolib
 {
-
-CINO_INLINE
-bool is_into_interval(double v, double bound_0, double bound1)
-{
-    if (v >= bound_0 && v <= bound1) return true;
-    if (v <= bound_0 && v >= bound1) return true;
-    return false;
-}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -81,9 +74,9 @@ Isocontour<M,V,E,P>::Isocontour(AbstractPolygonMesh<M,V,E,P> & m, double iso_val
         bool through_v0    = (iso_value == f0);
         bool through_v1    = (iso_value == f1);
         bool through_v2    = (iso_value == f2);
-        bool crosses_v0_v1 = is_into_interval(iso_value, f0, f1);
-        bool crosses_v1_v2 = is_into_interval(iso_value, f1, f2);
-        bool crosses_v2_v0 = is_into_interval(iso_value, f2, f0);
+        bool crosses_v0_v1 = is_into_interval<double>(iso_value, f0, f1, true);
+        bool crosses_v1_v2 = is_into_interval<double>(iso_value, f1, f2, true);
+        bool crosses_v2_v0 = is_into_interval<double>(iso_value, f2, f0, true);
 
         if (through_v0 && through_v1) // case 1) the curve coincides with (v0,v1)
         {
@@ -138,7 +131,7 @@ std::vector<uint> Isocontour<M,V,E,P>::tessellate(Trimesh<M,V,E,P> & m) const
         double f0 = m.vert_data(m.edge_vert_id(eid,0)).uvw[0];
         double f1 = m.vert_data(m.edge_vert_id(eid,1)).uvw[0];
 
-        if (is_into_interval(iso_value, f0, f1))
+        if (is_into_interval<double>(iso_value, f0, f1))
         {
             double alpha = std::fabs(iso_value - f0)/fabs(f1 - f0);
             edges_to_split.insert(std::make_pair(eid,alpha));
