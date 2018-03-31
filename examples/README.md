@@ -76,11 +76,16 @@ Maintaining a library alone is very time consuming, and the amount of time I can
 * Navigate application history exploiting Cinolib undo/redo facilities
 * Generate, process and visualize scalar fields
 * Generate, process and visualize vector fields
-* Overview of the topology editing operators implemented in CinoLib
-* Evaluation of mapping distortions (angle/areas distortion popular metrics)
-* Parameterization based hexahedral remeshing
 * Surface and volumetric format converters
+* Coarse quad layouts for quadrilateral meshes
+* Coarse hex layouts for hexahedral meshes
+* Topology editing operators for triangle meshes
+* Topology editing operators for tetrahedral meshes
+* Topology editing operators for general polygonal meshes
+* Topology editing operators for general polyhedral meshes
+* Subdivision schemas for hexahedral meshes
+* Parameterization based hexahedral remeshing
+* Evaluation of mapping distortions (angle/areas distortion popular metrics)
 * Solve multi-labeling problems on surfaces and volumes using the [GraphCuts](http://vision.csd.uwo.ca/code/) wrapper
 * Integral curve computation (and tessellation)
 * Iso curve computation (and tessellation)
-* Subdivision schemas for hexahedral meshes
