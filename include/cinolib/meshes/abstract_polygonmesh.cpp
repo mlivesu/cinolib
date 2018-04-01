@@ -674,19 +674,17 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint AbstractPolygonMesh<M,V,E,P>::edge_shared(const uint pid0, const uint pid1) const
 {
-    std::vector<uint> shared_verts;
-    uint v0 = this->poly_vert_id(pid0,0);
-    uint v1 = this->poly_vert_id(pid0,1);
-    uint v2 = this->poly_vert_id(pid0,2);
-
-    if (this->poly_contains_vert(pid1,v0)) shared_verts.push_back(v0);
-    if (this->poly_contains_vert(pid1,v1)) shared_verts.push_back(v1);
-    if (this->poly_contains_vert(pid1,v2)) shared_verts.push_back(v2);
-    assert(shared_verts.size() == 2);
-
-    int eid = this->edge_id(shared_verts.front(),shared_verts.back());
-    assert(eid>=0);
-    return eid;
+    std::vector<uint> shared_edges;
+    for(uint eid : this->adj_p2e(pid0))
+    {
+        if (this->poly_contains_edge(pid1,eid))
+        {
+            shared_edges.push_back(eid);
+        }
+    }
+    assert(shared_edges.size()==1); // this limits the class of polygon meshes that I can handle...
+                                    // I might decide to change this!!!!
+    return shared_edges.front();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
