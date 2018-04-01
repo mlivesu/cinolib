@@ -95,6 +95,10 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 bool Quadmesh<M,V,E,P>::vert_is_singular(const uint vid) const
 {
+    if (this->vert_is_boundary(vid))
+    {
+        return (this->vert_valence(vid)!=3);
+    }
     return (this->vert_valence(vid)!=4);
 }
 
@@ -103,42 +107,85 @@ bool Quadmesh<M,V,E,P>::vert_is_singular(const uint vid) const
 template<class M, class V, class E, class P>
 CINO_INLINE
 bool Quadmesh<M,V,E,P>::vert_is_regular(const uint vid) const
-{
-    return (this->vert_valence(vid)==4);
+{    
+    return (!this->vert_is_singular(vid));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> Quadmesh<M,V,E,P>::vert_chain(const uint start, const uint next) const
+int Quadmesh<M,V,E,P>::vert_next_along_chain(const uint curr, const uint prev) const
 {
-    assert(this->verts_are_adjacent(start,next));
-    assert(this->vert_is_regular(start)); // if there is a singularity along there will be no loop!
+    if(vert_is_singular(curr)) return -1; // walking through a singular vertex is ambiguous...
 
-    uint curr = next;
-    uint prev = start;
+    int e1 = this->edge_id(curr, prev);
+    assert(e1>=0);
 
-    std::vector<uint> loop;
-    loop.push_back(prev);
+    for(uint e2 : this->adj_v2e(curr))
+    {
+        if (!this->edges_share_poly(e1,e2)) return this->vert_opposite_to(e2,curr);
+    }
+    assert(false);
+}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> Quadmesh<M,V,E,P>::vert_chain(const uint curr, const uint prev) const
+{
+    assert(this->verts_are_adjacent(curr,prev));
+
+    std::vector<uint> chain = { prev, curr };
+    int vid;
     do
     {
-        assert(this->vert_is_regular(curr));
-        loop.push_back(curr);
-
-        std::vector<uint> v_ring = this->vert_ordered_vert_ring(curr);
-        auto it  = std::find(v_ring.begin(), v_ring.end(), prev); assert(it != v_ring.end());
-        uint pos = std::distance(v_ring.begin(),it);
-
-        prev = curr;
-        curr = v_ring.at((pos+4)%v_ring.size());
-
-        assert(loop.size() < this->num_verts()); // sanity check for inifnite loops...
+        if ((vid = vert_next_along_chain(curr, prev)) >= 0)
+        {
+            chain.push_back(vid);
+        }
+        else return chain; // ended up in a singular vertex
     }
-    while(curr != start);
+    while (vid != (int)chain.front()); // if loop, terminate
+    return chain;
+}
 
-    return loop;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+int Quadmesh<M,V,E,P>::edge_next_along_chain(const uint eid, const uint vid) const
+{
+    if(vert_is_singular(vid)) return -1; // walking through a singular vertex is ambiguous...
+
+    for(uint nbr : this->adj_v2e(vid))
+    {
+        if (!this->edges_share_poly(eid,nbr)) return nbr;
+    }
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> Quadmesh<M,V,E,P>::edge_chain(const uint eid, const uint vid) const
+{
+    std::vector<uint> chain = { eid };
+    int curr_vid = vid;
+    int curr_eid = eid;
+    do
+    {
+        if ((curr_eid = edge_next_along_chain(curr_eid, curr_vid)) >= 0)
+        {
+            chain.push_back(curr_eid);
+            curr_vid = this->vert_opposite_to(curr_eid, curr_vid);
+        }
+        else return chain; // ended up in a singular vertex
+    }
+    while (curr_eid != (int)chain.front()); // if loop, terminate
+    return chain;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -182,8 +229,10 @@ uint Quadmesh<M,V,E,P>::edge_opposite_to(const uint pid, const uint eid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> Quadmesh<M,V,E,P>::edge_chain(const uint eid) const
+std::vector<uint> Quadmesh<M,V,E,P>::edge_parallel_chain(const uint eid) const
 {
+    // NOTE: this is a chain of PARALLEL edges
+
     std::vector<uint> chain;
     std::set<uint>    visited;
     std::queue<uint>  q;
@@ -215,15 +264,17 @@ std::vector<uint> Quadmesh<M,V,E,P>::edge_chain(const uint eid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<std::vector<uint>> Quadmesh<M,V,E,P>::edge_chains() const
+std::vector<std::vector<uint>> Quadmesh<M,V,E,P>::edge_parallel_chains() const
 {
+    // NOTE: these are chains of PARALLEL edges
+
     std::set<uint> visited;
     std::vector<std::vector<uint>> chains;
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         if (DOES_NOT_CONTAIN(visited,eid))
         {
-            std::vector<uint> chain = edge_chain(eid);
+            std::vector<uint> chain = edge_parallel_chain(eid);
             for(uint e : chain) visited.insert(e);
             chains.push_back(chain);
         }
