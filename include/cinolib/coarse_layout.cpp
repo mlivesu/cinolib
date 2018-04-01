@@ -1,0 +1,100 @@
+/*********************************************************************************
+*  Copyright(C) 2016: Marco Livesu                                               *
+*  All rights reserved.                                                          *
+*                                                                                *
+*  This file is part of CinoLib                                                  *
+*                                                                                *
+*  CinoLib is dual-licensed:                                                     *
+*                                                                                *
+*   - For non-commercial use you can redistribute it and/or modify it under the  *
+*     terms of the GNU General Public License as published by the Free Software  *
+*     Foundation; either version 3 of the License, or (at your option) any later *
+*     version.                                                                   *
+*                                                                                *
+*   - If you wish to use it as part of a commercial software, a proper agreement *
+*     with the Author(s) must be reached, based on a proper licensing contract.  *
+*                                                                                *
+*  This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE       *
+*  WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.     *
+*                                                                                *
+*  Author(s):                                                                    *
+*                                                                                *
+*     Marco Livesu (marco.livesu@gmail.com)                                      *
+*     http://pers.ge.imati.cnr.it/livesu/                                        *
+*                                                                                *
+*     Italian National Research Council (CNR)                                    *
+*     Institute for Applied Mathematics and Information Technologies (IMATI)     *
+*     Via de Marini, 6                                                           *
+*     16149 Genoa,                                                               *
+*     Italy                                                                      *
+**********************************************************************************/
+#include <cinolib/coarse_layout.h>
+#include <cinolib/bfs.h>
+#include <queue>
+
+namespace cinolib
+{
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
+{
+    m.vert_unmark_all();
+    m.edge_unmark_all();
+    m.poly_unmark_all();
+
+    // find singular vertices
+    std::queue<uint> sing_verts;
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        if (m.vert_is_singular(vid)) sing_verts.push(vid);
+    }
+
+    // trace separatrices
+    std::vector<bool> is_patch_border(m.num_edges(), false);
+    while(!sing_verts.empty())
+    {
+        uint vid = sing_verts.front();
+        sing_verts.pop();
+
+        m.vert_data(vid).marked = true;
+
+        for(uint eid : m.adj_v2e(vid))
+        {
+            if(m.edge_data(eid).marked) continue; // this path was already visited
+            m.edge_data(eid).marked = true;
+
+            for(uint curr : m.edge_chain(eid, m.vert_opposite_to(eid,vid)))
+            {
+                m.edge_data(curr).marked = true;
+                is_patch_border.at(curr) = true;
+            }
+        }
+    }
+
+    // flood faces
+    int patch_id = 0;
+    for(uint pid=0; pid<m.num_polys(); ++pid)
+    {
+        if (m.poly_data(pid).marked) continue; // already visited
+        std::unordered_set<uint> patch;
+        bfs_on_dual_w_edge_barriers(m, pid, is_patch_border, patch);
+        for(uint p : patch)
+        {
+            m.poly_data(p).label  = patch_id;
+            m.poly_data(p).marked = true;
+        }
+        ++patch_id;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
+{
+
+}
+
+}
