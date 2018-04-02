@@ -235,10 +235,10 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
         case Qt::Key_S:     show_pivot=!show_pivot;                 break;
         case Qt::Key_R:     reset_trackball();                      break;
         case Qt::Key_C:     trackball.pivot=trackball.scene_center; break;
-        case Qt::Key_Left:  rotate(vec3d(0,1,0), -3);               break;
-        case Qt::Key_Right: rotate(vec3d(0,1,0), +3);               break;
-        case Qt::Key_Up:    rotate(vec3d(1,0,0), -3);               break;
-        case Qt::Key_Down:  rotate(vec3d(1,0,0), +3);               break;
+        case Qt::Key_Left:  rotate(vec3d(0,1,0), -2);               break;
+        case Qt::Key_Right: rotate(vec3d(0,1,0), +2);               break;
+        case Qt::Key_Up:    rotate(vec3d(1,0,0), -2);               break;
+        case Qt::Key_Down:  rotate(vec3d(1,0,0), +2);               break;
     }
     updateGL();
 }
