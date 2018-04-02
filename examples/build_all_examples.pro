@@ -4,7 +4,7 @@ TEMPLATE = subdirs
 # in this folder and type:
 #
 #  qmake .
-#  make -j4
+#  make -j6
 #
 # Notice that some of the projects have external dependecies (see comments below).
 # To be able to compile these projects you need to install the external libraries
@@ -33,5 +33,8 @@ SUBDIRS += 14_heat_based_geodesics
 SUBDIRS += 15_polygon_measures           # requires Boost (http://www.boost.org)
 SUBDIRS += 16_sphere_sampling
 SUBDIRS += 17_iso_contours
-SUBDIRS += 18_iso_surfaces
+SUBDIRS += 18_iso_surfaces               # OPTIONALLY requires VTK (https://www.vtk.org/)
 SUBDIRS += 19_harmonic_map
+SUBDIRS += 20_coarse_quad_layouts
+SUBDIRS += 21_coarse_hex_layouts        # OPTIONALLY requires VTK (https://www.vtk.org/)
+

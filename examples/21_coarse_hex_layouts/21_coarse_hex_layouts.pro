@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = iso_surfaces
+TARGET          = coarse_hex_layouts
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle
