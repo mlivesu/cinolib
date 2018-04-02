@@ -51,7 +51,7 @@ void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
     }
 
     // trace separatrices
-    std::vector<bool> is_patch_border(m.num_edges(), false);
+    std::vector<bool> on_domain_border(m.num_edges(), false);
     while(!sing_verts.empty())
     {
         uint vid = sing_verts.front();
@@ -67,18 +67,18 @@ void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
             for(uint curr : m.edge_chain(eid, m.vert_opposite_to(eid,vid)))
             {
                 m.edge_data(curr).marked = true;
-                is_patch_border.at(curr) = true;
+                on_domain_border.at(curr) = true;
             }
         }
     }
 
-    // flood faces
+    // flood polys
     int patch_id = 0;
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
         if (m.poly_data(pid).marked) continue; // already visited
         std::unordered_set<uint> patch;
-        bfs_on_dual_w_edge_barriers(m, pid, is_patch_border, patch);
+        bfs_on_dual_w_edge_barriers(m, pid, on_domain_border, patch);
         for(uint p : patch)
         {
             m.poly_data(p).label  = patch_id;
@@ -86,6 +86,8 @@ void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
         }
         ++patch_id;
     }
+
+    std::cout << "coarse quad layout. " << patch_id << " patches detected." << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -94,7 +96,56 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
 {
+    m.vert_unmark_all();
+    m.edge_unmark_all();
+    m.face_unmark_all();
+    m.poly_unmark_all();
 
+    // find singular vertices
+    std::queue<uint> sing_edges;
+    for(uint eid=0; eid<m.num_edges(); ++eid)
+    {        
+        if (m.edge_is_singular(eid)) sing_edges.push(eid);
+    }
+
+    // trace interfaces
+    std::vector<bool> on_domain_border(m.num_faces(), false);
+    while(!sing_edges.empty())
+    {
+        uint eid = sing_edges.front();
+        sing_edges.pop();
+
+        m.edge_data(eid).marked = true;
+
+        for(uint fid : m.adj_e2f(eid))
+        {
+            if(m.face_data(fid).marked) continue; // this interfaces was already created
+            m.face_data(fid).marked = true;
+
+            for(uint curr : m.face_sheet(fid))
+            {
+                m.face_data(curr).marked = true;
+                on_domain_border.at(curr) = true;
+            }
+        }
+    }
+
+    // flood polys
+    int patch_id = 0;
+    for(uint pid=0; pid<m.num_polys(); ++pid)
+    {
+        if (m.poly_data(pid).marked) continue; // already visited
+        std::unordered_set<uint> patch;
+        bfs_on_dual_w_edge_barriers(m, pid, on_domain_border, patch);
+        for(uint p : patch)
+        {
+            m.poly_data(p).label  = patch_id;
+            m.poly_data(p).marked = true;
+        }
+        ++patch_id;
+    }
+
+    std::cout << "coarse hex layout. " << patch_id << " patches detected." << std::endl;
 }
 
 }
