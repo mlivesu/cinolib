@@ -191,4 +191,38 @@ void bfs_on_dual_w_edge_barriers(const AbstractPolygonMesh<M,V,E,P> & m,
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// floodfill (with barriers on faces)
+//
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void bfs_on_dual_w_edge_barriers(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                                 const uint                                source,
+                                 const std::vector<bool>                 & mask_faces, // if mask[f] = true, bfs canno expand through face f
+                                 std::unordered_set<uint>                & visited)
+{
+    visited.clear();
+    visited.insert(source);
+
+    std::queue<uint> q;
+    q.push(source);
+
+    while(!q.empty())
+    {
+        uint pid = q.front();
+        q.pop();
+
+        for(uint fid : m.adj_p2f(pid))
+        {
+            int nbr = (m.poly_adj_through_face(pid,fid));
+            if (nbr>=0 && !mask_faces.at(fid) && DOES_NOT_CONTAIN(visited,nbr))
+            {
+                visited.insert(nbr);
+                q.push(nbr);
+            }
+        }
+    }
+}
+
 }

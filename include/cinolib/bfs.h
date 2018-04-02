@@ -79,7 +79,7 @@ void bfs_on_dual(const AbstractMesh<M,V,E,P>    & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// floodfill (with barriers on edges) [just for surface meshes]
+// floodfill (with barriers on edges)
 //
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -88,6 +88,16 @@ void bfs_on_dual_w_edge_barriers(const AbstractPolygonMesh<M,V,E,P> & m,
                                  const std::vector<bool>            & mask_edges, // if mask[e] = true, bfs canno expand through edge e
                                  std::unordered_set<uint>           & visited);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// floodfill (with barriers on faces)
+//
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void bfs_on_dual_w_edge_barriers(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                                 const uint                                source,
+                                 const std::vector<bool>                 & mask_faces, // if mask[f] = true, bfs canno expand through face f
+                                 std::unordered_set<uint>                & visited);
 }
 
 #ifndef  CINO_STATIC_LIB
