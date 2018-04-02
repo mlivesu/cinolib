@@ -71,6 +71,13 @@ Here is a list of the sample programs available in CinoLib.
 #### 19 - Compute discrete harmonic maps
 <p align="left"><img src="snapshots/19_harmonic_map.png" width="500"></p>
 
+#### 20 - Compute coarse quad layouts
+<p align="left"><img src="snapshots/20_coarse_quad_layouts.png" width="500"></p>
+
+#### 21 - Compute coarse hex layouts
+<p align="left"><img src="snapshots/21_coarse_hex_layouts.png" width="500"></p>
+
+
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
@@ -80,8 +87,6 @@ Maintaining a library alone is very time consuming, and the amount of time I can
 * Generate, process and visualize scalar fields
 * Generate, process and visualize vector fields
 * Surface and volumetric format converters
-* Coarse quad layouts for quadrilateral meshes
-* Coarse hex layouts for hexahedral meshes
 * Topology editing operators for triangle meshes
 * Topology editing operators for tetrahedral meshes
 * Topology editing operators for general polygonal meshes
