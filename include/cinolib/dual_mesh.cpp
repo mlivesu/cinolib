@@ -75,25 +75,25 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     // For clipped dual cells: add boundary vertices,
     // boundary edges midpoints and surface face midpoints
     //
-    std::map<uint,uint> v2verts;
-    std::map<uint,uint> e2verts;
+    //std::map<uint,uint> v2verts;
+    //std::map<uint,uint> e2verts;
     std::map<uint,uint> f2verts;
-    for(uint vid=0; vid<primal.num_verts(); ++vid)
-    {
-        if (primal.vert_is_on_srf(vid))
-        {
-            v2verts[vid] = dual_verts.size();
-            dual_verts.push_back(primal.vert(vid));
-        }
-    }
-    for(uint eid=0; eid<primal.num_edges(); ++eid)
-    {
-        if (primal.edge_is_on_srf(eid))
-        {
-            e2verts[eid] = dual_verts.size();
-            dual_verts.push_back(primal.edge_sample_at(eid, 0.5));
-        }
-    }
+    //for(uint vid=0; vid<primal.num_verts(); ++vid)
+    //{
+    //    if (primal.vert_is_on_srf(vid))
+    //    {
+    //        v2verts[vid] = dual_verts.size();
+    //        dual_verts.push_back(primal.vert(vid));
+    //    }
+    //}
+    //for(uint eid=0; eid<primal.num_edges(); ++eid)
+    //{
+    //    if (primal.edge_is_on_srf(eid))
+    //    {
+    //        e2verts[eid] = dual_verts.size();
+    //        dual_verts.push_back(primal.edge_sample_at(eid, 0.5));
+    //    }
+    //}
     for(uint fid=0; fid<primal.num_faces(); ++fid)
     {
         if (primal.face_is_on_srf(fid))
