@@ -28,80 +28,44 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_BFS_H
-#define CINO_BFS_H
+#ifndef CINO_COARSE_LAYOUT_H
+#define CINO_COARSE_LAYOUT_H
 
 #include <cinolib/cino_inline.h>
-#include <cinolib/meshes/meshes.h>
-#include <unordered_set>
+#include <cinolib/meshes/quadmesh.h>
+#include <cinolib/meshes/hexmesh.h>
+
+/* Compute coarse layouts for structured surface (quad)
+ * and volume (hexa) meshes. The layout will be encoded
+ * in the labels of each element.
+ *
+ * One label per domain will be generated, and all the
+ * mesh elements will receive a label corresponding to
+ * the domain they blong to.
+ *
+ * Interfaces between adjacent domains will also be marked.
+ * For surfaces, boundary edges and vertices will be marked.
+ * Similarly, for volumes boundary edges, vertices and faces
+ * will be marked.
+*/
 
 namespace cinolib
 {
 
-// floodfill (for general graphs - i.e. not meshes)
-//
-CINO_INLINE
-void bfs(const std::vector<std::vector<uint>> & nodes_adjacency,
-         const uint                             source,
-               std::unordered_set<uint>       & visited);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// floodfill
-//
 template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs(const AbstractMesh<M,V,E,P>    & m,
-         const uint                       source,
-               std::unordered_set<uint> & visited);
+void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// floodfill (with barriers)
-//
 template<class M, class V, class E, class P>
 CINO_INLINE
-void bfs(const AbstractMesh<M,V,E,P>    & m,
-         const uint                       source,
-         const std::vector<bool>        & mask, // if mask[p] = true, bfs cannot visit polygon/polyhedron p
-               std::unordered_set<uint> & visited);
+void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// floodfill (with barriers) on the dual mesh (polygons/polyhedra instead of vertices)
-//
-template<class M, class V, class E, class P>
-CINO_INLINE
-void bfs_on_dual(const AbstractMesh<M,V,E,P>    & m,
-                 const uint                       source,
-                 const std::vector<bool>        & mask, // if mask[p] = true, bfs cannot visit polygon/polyhedron p
-                       std::unordered_set<uint> & visited);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// floodfill (with barriers on edges)
-//
-template<class M, class V, class E, class P>
-CINO_INLINE
-void bfs_on_dual_w_edge_barriers(const AbstractPolygonMesh<M,V,E,P> & m,
-                                 const uint                           source,
-                                 const std::vector<bool>            & mask_edges, // if mask[e] = true, bfs canno expand through edge e
-                                 std::unordered_set<uint>           & visited);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// floodfill (with barriers on faces)
-//
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void bfs_on_dual_w_edge_barriers(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
-                                 const uint                                source,
-                                 const std::vector<bool>                 & mask_faces, // if mask[f] = true, bfs canno expand through face f
-                                 std::unordered_set<uint>                & visited);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "bfs.cpp"
+#include "coarse_layout.cpp"
 #endif
 
-#endif // CINO_BFS_H
+#endif // CINO_COARSE_LAYOUT_H

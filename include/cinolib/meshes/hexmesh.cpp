@@ -37,7 +37,7 @@
 #include <cinolib/subdivision_schemas.h>
 #include <cinolib/vector_serialization.h>
 
-
+#include <queue>
 #include <float.h>
 #include <map>
 #include <set>
@@ -278,7 +278,69 @@ bool Hexmesh<M,V,E,F,P>::vert_is_regular(const uint vid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-vec3d Hexmesh<M,V,E,F,P>::verts_average(const std::vector<uint> &vids) const
+bool Hexmesh<M,V,E,F,P>::edge_is_singular(const uint eid) const
+{
+    if (this->edge_is_on_srf(eid))
+    {
+        if(this->edge_valence(eid)!=2) return true;
+        return false;
+    }
+    if (this->edge_valence(eid)!=4) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool Hexmesh<M,V,E,F,P>::edge_is_regular(const uint eid) const
+{
+    return !this->edge_is_singular(eid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> Hexmesh<M,V,E,F,P>::face_sheet(const uint fid) const
+{
+    std::vector<uint> sheet;
+
+    std::queue<uint>  q;
+    q.push(fid);
+
+    std::unordered_set<uint> visited;
+    visited.insert(fid);
+
+    while(!q.empty())
+    {
+        uint fid = q.front();
+        q.pop();
+
+        sheet.push_back(fid);
+
+        for(uint eid : this->adj_f2e(fid))
+        {
+            if (this->edge_is_singular(eid)) continue;
+
+            for(uint nbr : this->adj_e2f(eid))
+            {
+                if(!this->faces_share_poly(fid,nbr) && DOES_NOT_CONTAIN(visited,nbr))
+                {
+                    visited.insert(nbr);
+                    q.push(nbr);
+                }
+            }
+        }
+    }
+    return sheet;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+vec3d Hexmesh<M,V,E,F,P>::verts_average(const std::vector<uint> & vids) const
 {
     vec3d res(0,0,0);
     for(uint vid: vids) res += this->vert(vid);

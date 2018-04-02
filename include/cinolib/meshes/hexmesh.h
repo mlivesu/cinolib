@@ -103,6 +103,15 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        bool  edge_is_singular(const uint eid) const;
+        bool  edge_is_regular (const uint eid) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        std::vector<uint> face_sheet(const uint fid) const; // stop at singular edges
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         uint   poly_face_opposite_to(const uint pid, const uint fid) const;
         void   poly_subdivide       (const std::vector<std::vector<std::vector<uint>>> & split_scheme);
         double poly_volume          (const uint pid) const;

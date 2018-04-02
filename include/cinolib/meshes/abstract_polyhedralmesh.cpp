@@ -416,6 +416,20 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::faces_are_adjacent(const uint fid0, cons
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::faces_share_poly(const uint fid0, const uint fid1) const
+{
+    for(uint pid0 : this->adj_f2p(fid0))
+    for(uint pid1 : this->adj_f2p(fid1))
+    {
+        if (pid0 == pid1) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 vec3d AbstractPolyhedralMesh<M,V,E,F,P>::face_vert(const uint fid, const uint off) const
 {
     return this->vert(face_vert_id(fid,off));

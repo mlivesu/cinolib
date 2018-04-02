@@ -80,16 +80,19 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool              vert_is_singular(const uint vid) const;
-        bool              vert_is_regular (const uint vid) const;
-        std::vector<uint> vert_chain      (const uint start, const uint next) const;
+        bool              vert_is_singular     (const uint vid) const;
+        bool              vert_is_regular      (const uint vid) const;
+        int               vert_next_along_chain(const uint curr, const uint prev) const;
+        std::vector<uint> vert_chain           (const uint start, const uint next) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        int                            edge_next_along_chain(const uint eid, const uint vid) const;
         uint                           edge_opposite_to(const uint pid, const uint eid) const;
         std::vector<uint>              edges_opposite_to(const uint eid) const;
-        std::vector<uint>              edge_chain(const uint eid) const;
-        std::vector<std::vector<uint>> edge_chains() const;
+        std::vector<uint>              edge_chain(const uint eid, const uint vid) const; // chain of ADJACENT edges
+        std::vector<uint>              edge_parallel_chain(const uint eid) const;        // chain of PARALLEL edges
+        std::vector<std::vector<uint>> edge_parallel_chains() const;                     // chain of PARALLEL edges
 };
 
 }
