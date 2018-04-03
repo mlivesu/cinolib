@@ -260,12 +260,12 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 bool Hexmesh<M,V,E,F,P>::vert_is_singular(const uint vid) const
 {
-    if (this->vert_is_on_srf(vid))
+    uint count = 0;
+    for(uint eid : this->adj_v2e(vid))
     {
-        if(this->vert_valence(vid)!=5) return true;
-        return false;
+        if(this->edge_is_singular(eid)) ++count;
     }
-    if (this->vert_valence(vid)!=6) return true;
+    if (count>0 && count!=2) return true;
     return false;
 }
 
