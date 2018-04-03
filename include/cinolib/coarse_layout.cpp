@@ -145,7 +145,14 @@ void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
         ++patch_id;
     }
 
-    std::cout << "coarse hex layout. " << patch_id << " patches detected." << std::endl;
+    uint ne = sing_edges.size();
+    uint nv = 0;
+    for(uint vid=0; vid<m.num_verts(); ++vid) if(m.vert_is_singular(vid)) ++nv;
+
+    std::cout << "coarse hex layout:" << std::endl;
+    std::cout << "\t" << nv       << " singular vertices found" << std::endl;
+    std::cout << "\t" << ne       << " singular vertices found" << std::endl;
+    std::cout << "\t" << patch_id << " patches detected       " << std::endl;
 }
 
 }
