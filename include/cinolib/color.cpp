@@ -170,9 +170,9 @@ Color Color::hsv2rgb(float h, float s, float v)
 CINO_INLINE
 Color Color::scatter(uint n_colors, uint pos, float sat, float val)
 {
-    assert(pos<n_colors);
-
     n_colors += 1; // for some reason I am getting duplicated colors without this... :(
+
+    assert(pos<n_colors);
 
     // Magic stolen from VCG :P
 
