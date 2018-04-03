@@ -49,6 +49,7 @@ void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
     {
         if (m.vert_is_singular(vid)) sing_verts.push(vid);
     }
+    uint nv = sing_verts.size();
 
     // trace separatrices
     std::vector<bool> on_domain_border(m.num_edges(), false);
@@ -87,7 +88,9 @@ void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
         ++patch_id;
     }
 
-    std::cout << "coarse quad layout. " << patch_id << " patches detected." << std::endl;
+    std::cout << "coarse quad layout:" << std::endl;
+    std::cout << "\t" << nv            << " singular vertices found" << std::endl;
+    std::cout << "\t" << patch_id      << " patches detected       " << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -107,6 +110,10 @@ void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
     {        
         if (m.edge_is_singular(eid)) sing_edges.push(eid);
     }
+
+    uint ne = sing_edges.size();
+    uint nv = 0;
+    for(uint vid=0; vid<m.num_verts(); ++vid) if(m.vert_is_singular(vid)) ++nv;
 
     // trace interfaces
     std::vector<bool> on_domain_border(m.num_faces(), false);
@@ -145,14 +152,10 @@ void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
         ++patch_id;
     }
 
-    uint ne = sing_edges.size();
-    uint nv = 0;
-    for(uint vid=0; vid<m.num_verts(); ++vid) if(m.vert_is_singular(vid)) ++nv;
-
     std::cout << "coarse hex layout:" << std::endl;
-    std::cout << "\t" << nv       << " singular vertices found" << std::endl;
-    std::cout << "\t" << ne       << " singular vertices found" << std::endl;
-    std::cout << "\t" << patch_id << " patches detected       " << std::endl;
+    std::cout << "\t" << nv           << " singular vertices found" << std::endl;
+    std::cout << "\t" << ne           << " singular edges    found" << std::endl;
+    std::cout << "\t" << patch_id     << " patches  detected      " << std::endl;
 }
 
 }
