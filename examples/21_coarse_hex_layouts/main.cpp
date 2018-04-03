@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/ellipsoid.vtk";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/ellipsoid.mesh";
     DrawableHexmesh<> m(s.c_str());
 
     Profiler profiler;
