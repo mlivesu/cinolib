@@ -105,7 +105,7 @@ void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
     //
     if (m.mesh_type()==POLYGONMESH)
     {
-        dynamic_cast<Polygonmesh<M,V,E,P>*>(&subm)->update_poly_tessellation();
+        dynamic_cast<Polygonmesh<M,V,E,P>*>(&subm)->update_p_tessellations();
     }
 }
 
