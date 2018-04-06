@@ -1,5 +1,7 @@
+- update per element properties in split operators
 - set default parameters (wireframe, marked visuals enabled, mark non manif and boundaries)
 - add ambient occlusion
+- add verdict metrics for tris/quads/tets/hexa
 - put cotangents (tets/tris) on a separate .h/cpp file
 - add inverse and transpose operators for 2x2 matrices
 - refactor ray/line/plane intersections and integral curve tracing 
