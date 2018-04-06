@@ -831,6 +831,24 @@ void AbstractMesh<M,V,E,P>::poly_color_wrt_label(const float s, const float v) /
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_label_wrt_color()
+{
+    std::map<Color,int> colormap;
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        const Color & c = this->poly_data(pid).color;
+        if (DOES_NOT_CONTAIN(colormap,c)) colormap[c] = colormap.size();
+    }
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        this->poly_data(pid).label = colormap.at(this->poly_data(pid).color);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 bool AbstractMesh<M,V,E,P>::poly_contains_vert(const uint pid, const uint vid) const
 {
     for(uint v : adj_p2v(pid)) if(v == vid) return true;
