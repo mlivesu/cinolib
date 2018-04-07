@@ -99,6 +99,7 @@ class GLcanvas : public QGLWidget
         void resizeGL(int w, int h);
         void paintGL();
         void updateGL();
+        void updateGL_for_animation();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
