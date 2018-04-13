@@ -265,6 +265,66 @@ uint Trimesh<M,V,E,P>::edge_split(const uint eid, const double lambda)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+bool Trimesh<M,V,E,P>::edge_is_flippable(const uint eid)
+{
+    if( this->edge_is_boundary(eid)) return false;
+    if(!this->edge_is_manifold(eid)) return false;
+
+    // geometric check (if the projected outline is a concave quad, discard the move)
+    assert(this->adj_e2p(eid).size()==2);
+    uint pid0 = this->adj_e2p(eid).front();
+    uint pid1 = this->adj_e2p(eid).back();
+    uint vid0 = this->edge_vert_id(eid,0);
+    uint vid1 = this->edge_vert_id(eid,1);
+    uint opp  = this->vert_opposite_to(pid1,vid0,vid1);
+    std::vector<vec3d> p =
+    {
+        this->poly_vert(pid0,0),
+        this->poly_vert(pid0,1),
+        this->poly_vert(pid0,2),
+        this->vert(opp)
+    };
+    std::vector<vec2d> p2d;
+    polygon_flatten(p,p2d);
+    if(!polygon_is_convex(p2d)) return false;
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool Trimesh<M,V,E,P>::edge_flip(const uint eid)
+{
+    if(!edge_is_flippable(eid)) return false;
+
+    assert(this->adj_e2p(eid).size()==2);
+    uint pid0 = this->adj_e2p(eid).front();
+    uint pid1 = this->adj_e2p(eid).back();
+    assert(pid0!=pid1);
+    uint vid0 = this->edge_vert_id(eid,0);
+    uint vid1 = this->edge_vert_id(eid,1);
+    uint opp0 = this->vert_opposite_to(pid0,vid0,vid1);
+    uint opp1 = this->vert_opposite_to(pid1,vid0,vid1);
+    std::vector<uint> p0 = { opp0, vid0, opp1 };
+    std::vector<uint> p1 = { opp1, vid1, opp0 };
+    //if(!this->poly_verts_are_CCW(pid0, vid0, vid1))
+    //{
+    //    std::swap(p0[0],p0[1]);
+    //    std::swap(p1[0],p1[1]);
+    //}
+    //std::cout << p0[0] << " " << p0[1] << " " << p0[2] << std::endl;
+    //std::cout << p1[0] << " " << p1[1] << " " << p1[2] << std::endl;
+    this->poly_add(p0);
+    this->poly_add(p1);
+    this->edge_remove(eid);
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 bool Trimesh<M,V,E,P>::poly_bary_coords(const uint pid, const vec3d & p, std::vector<double> & wgts) const
 {
     return triangle_barycentric_coords(this->poly_vert(pid,0),
