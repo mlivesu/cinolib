@@ -251,8 +251,10 @@ uint Trimesh<M,V,E,P>::edge_split(const uint eid, const double lambda)
     {
         uint v_opp = this->vert_opposite_to(pid, vid0, vid1);
         if (this->poly_verts_are_CCW(pid, vid0, vid1)) std::swap(vid0, vid1);
-        this->poly_add(v_opp, vid0, new_vid);
-        this->poly_add(v_opp, new_vid, vid1);
+        uint new_pid1 = this->poly_add(v_opp, vid0, new_vid);
+        uint new_pid2 = this->poly_add(v_opp, new_vid, vid1);
+        this->poly_data(new_pid1) = this->poly_data(pid);
+        this->poly_data(new_pid2) = this->poly_data(pid);
     }
     this->polys_remove(this->adj_e2p(eid));
 
@@ -423,6 +425,20 @@ uint Trimesh<M,V,E,P>::vert_opposite_to(const uint pid, const uint vid0, const u
     }
     assert(false);
     return 0; // warning killer
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> Trimesh<M,V,E,P>::verts_opposite_to(const uint eid) const
+{
+    std::vector<uint> vlist;
+    for(uint pid : this->adj_e2p(eid))
+    {
+        vlist.push_back(this->vert_opposite_to(pid, this->edge_vert_id(eid,0), this->edge_vert_id(eid,1)));
+    }
+    return vlist;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

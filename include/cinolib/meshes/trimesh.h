@@ -84,9 +84,10 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void   vert_weights            (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
-        void   vert_weights_cotangent  (const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
-        uint   vert_opposite_to        (const uint pid, const uint vid0, const uint vid1) const;
+        void              vert_weights          (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
+        void              vert_weights_cotangent(const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
+        uint              vert_opposite_to      (const uint pid, const uint vid0, const uint vid1) const;
+        std::vector<uint> verts_opposite_to     (const uint eid) const;
 
         using  AbstractMesh<M,V,E,P>::vert_opposite_to; // avoid hiding vert_opposite_to(eid,vid)
 
@@ -102,8 +103,6 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double              poly_area          (const uint pid) const;
-      //bool                poly_split         (const uint pid, std::vector<double> & wgts);
-      //bool                poly_split         (const uint pid, const vec3d & p);
         bool                poly_is_cap        (const uint pid, const double angle_thresh_deg = 177.0) const;
         bool                poly_is_needle     (const uint pid, const double angle_thresh_deg = 3.0) const;
         bool                poly_bary_coords   (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
