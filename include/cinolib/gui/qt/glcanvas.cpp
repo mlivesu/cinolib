@@ -366,9 +366,7 @@ void GLcanvas::timerEvent(QTimerEvent *event) // refresh canvas
 {
     if (callback_timer) callback_timer(this, event);
 
-    // force immediate rendering
-    // http://doc.qt.io/qt-5/qwidget.html#repaint
-    repaint();
+    updateGL_strict();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -621,10 +619,18 @@ void GLcanvas::fit_scene()
 CINO_INLINE
 void GLcanvas::updateGL()
 {
-    // schedules a rendering and does it when Qt returns
-    // to the main application loop (no good for animations!)
-    //
+    // schedule rendering
     update();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::updateGL_strict()
+{
+    // force immediate rendering
+    // http://doc.qt.io/qt-5/qwidget.html#repaint
+    repaint();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
