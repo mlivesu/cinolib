@@ -87,26 +87,6 @@ void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
         case POLYGONMESH : subm = Polygonmesh<M,V,E,P>(verts, polys); break;
         default          : assert(false);
     }
-
-    // Bugfix (8 Mar 2018): this is necessary because in any code similar to:
-    //
-    // DrawablePolygonmesh<M,V,E,P> m;
-    // func(m);
-    //
-    // with:
-    //
-    // void func(AbstractPolygonmesh<M,V,E,P> & m)
-    // {
-    //    m = Polygonmesh<M,V,E,P>(...);
-    // }
-    //
-    // triangulated_polys is not copied in the drawable mesh, and any call to this method
-    // would throw an exception std::out_of_range
-    //
-    if (m.mesh_type()==POLYGONMESH)
-    {
-        dynamic_cast<Polygonmesh<M,V,E,P>*>(&subm)->update_p_tessellations();
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -203,26 +183,6 @@ void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P>  & m,
         case HEXMESH        : subm = Hexmesh<M,V,E,F,P>(verts, faces, polys, polys_face_winding);        break;
         case POLYHEDRALMESH : subm = Polyhedralmesh<M,V,E,F,P>(verts, faces, polys, polys_face_winding); break;
         default             : assert(false);
-    }
-
-    // Bugfix (8 Mar 2018): this is necessary because in any code similar to:
-    //
-    // DrawablePolyhedralmesh<M,V,E,F,P> m;
-    // func(m);
-    //
-    // with:
-    //
-    // void func(AbstractPolyhedralMesh<M,V,E,F,P> & m)
-    // {
-    //    m = Polyhedralmesh<M,V,E,F,P>(...);
-    // }
-    //
-    // triangulated_faces is not copied in the drawable mesh, and any call to this method
-    // would throw an exception std::out_of_range
-    //
-    if (m.mesh_type()==POLYHEDRALMESH)
-    {
-        dynamic_cast<Polyhedralmesh<M,V,E,F,P>*>(&subm)->update_face_tessellation();
     }
 }
 
