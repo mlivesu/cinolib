@@ -99,7 +99,11 @@ class GLcanvas : public QGLWidget
         void resizeGL(int w, int h);
         void paintGL();
         void updateGL();
-        void updateGL_for_animation();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void animation_start(const int period_ms);
+        void animation_stop();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -151,6 +155,7 @@ class GLcanvas : public QGLWidget
         void mouseReleaseEvent    (QMouseEvent *event);
         void mouseMoveEvent       (QMouseEvent *event);
         void wheelEvent           (QWheelEvent *event);
+        void timerEvent           (QTimerEvent *event);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -163,6 +168,7 @@ class GLcanvas : public QGLWidget
         std::function<void(GLcanvas *canvas, QMouseEvent *event)> callback_mouse_release;
         std::function<void(GLcanvas *canvas, QMouseEvent *event)> callback_mouse_move;
         std::function<void(GLcanvas *canvas, QWheelEvent *event)> callback_wheel;
+        std::function<void(GLcanvas *canvas, QTimerEvent *event)> callback_timer;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -192,6 +198,7 @@ class GLcanvas : public QGLWidget
 
     private:
 
+        int       timer_id;
         QColor    clear_color;
         Trackball trackball;
         QMenu    *popup;

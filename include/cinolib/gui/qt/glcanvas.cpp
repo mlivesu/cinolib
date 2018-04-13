@@ -51,6 +51,7 @@ GLcanvas::GLcanvas(QWidget *parent) : QGLWidget(parent)
     make_popup_menu();
     setFocusPolicy(Qt::StrongFocus);
 
+    timer_id    = 0;
     clear_color = QColor(200, 200, 200);
     show_helper = false;
     show_axis   = false;
@@ -359,6 +360,18 @@ void GLcanvas::wheelEvent(QWheelEvent *event) // zoom
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::timerEvent(QTimerEvent *event) // refresh canvas
+{
+    if (callback_timer) callback_timer(this, event);
+
+    // force immediate rendering
+    // http://doc.qt.io/qt-5/qwidget.html#repaint
+    repaint();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 CINO_INLINE
 std::string GLcanvas::serialize_POV() const
 {
@@ -610,17 +623,32 @@ void GLcanvas::updateGL()
 {
     // schedules a rendering and does it when Qt returns
     // to the main application loop (no good for animations!)
+    //
     update();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::updateGL_for_animation()
+void GLcanvas::animation_start(const int period_ms)
 {
-    // force immediate rendering
-    // http://doc.qt.io/qt-5/qwidget.html#repaint
-    repaint();
+    // WARNING: for single-threaded applications that run both
+    // the GUI and the algorithms in the same thread, refresh
+    // will not occur until the algorithm returns to the main
+    // application loop. This may result in unresponsive GUIs
+    //
+    timer_id = startTimer(period_ms); // milliseconds
+    if (timer_id == 0) std::cout << "WARNING: could not start animation timer" << std::endl;
+    else               std::cout << "Start animation timer " << timer_id << std::endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::animation_stop()
+{
+    std::cout << "Stop animation timer " << timer_id << std::endl;
+    killTimer(timer_id);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
