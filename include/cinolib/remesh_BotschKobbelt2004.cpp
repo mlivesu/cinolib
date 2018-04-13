@@ -76,21 +76,24 @@ void remesh_Botsch_Kobbelt_2004(Trimesh<M,V,E,P> & m,
 
         // 3) flip edges in order to minimize the deviation from valence 6 (or 4 on boundaries).
         //
-//        uint count = 0;
-//        for(uint eid=0; eid<m.num_edges(); ++eid)
-//        {
-//            uint valA = m.vert_valence(m.edge_vert_id(eid,0));
-//            uint valB = m.vert_valence(m.edge_vert_id(eid,1));
+        count = 0;
+        for(uint eid=0; eid<m.num_edges(); ++eid)
+        {
+            uint A = m.vert_valence(m.edge_vert_id(eid,0));
+            uint B = m.vert_valence(m.edge_vert_id(eid,1));
+            std::vector<uint> vopp = m.verts_opposite_to(eid);
+            if (vopp.size()!=2) continue;
+            uint C = m.vert_valence(vopp.at(0));
+            uint D = m.vert_valence(vopp.at(1));
 
-//            std::vector<uint> vopp = m.verts_opposite_to(eid);
-
-//            if (m.edge_length(eid) < 4./5.*l)
-//            {
-//                m.edge_flip is missing!!!
-//                ++count;
-//            }
-//        }
-//        std::cout << "\t" << count << " edges flips" << std::endl;
+            if((A-6)*(A-6)+(B-6)*(B-6)+(C-6)*(C-6)+(D-6)*(D-6)>
+               (A-5)*(A-5)+(B-5)*(B-5)+(C-7)*(C-7)+(D-7)*(D-7))
+            {
+                m.edge_flip(eid);
+                ++count;
+            }
+        }
+        std::cout << "\t" << count << " edges flips" << std::endl;
     }
 }
 
