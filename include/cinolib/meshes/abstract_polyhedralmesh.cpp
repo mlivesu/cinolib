@@ -85,6 +85,62 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::num_srf_verts() const
+{
+    uint count = 0;
+    for(uint vid=0; vid<this->num_verts(); ++vid)
+    {
+        if(this->vert_is_on_srf(vid)) ++count;
+    }
+    return count;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::num_srf_edges() const
+{
+    uint count = 0;
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if(this->edge_is_on_srf(eid)) ++count;
+    }
+    return count;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::num_srf_faces() const
+{
+    uint count = 0;
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        if(this->face_is_on_srf(fid)) ++count;
+    }
+    return count;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::num_srf_polys() const
+{
+    uint count = 0;
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {        
+        if(this->poly_is_on_surf(pid)) ++count;
+    }
+    return count;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::update_normals()
 {
     update_f_normals();
@@ -366,7 +422,7 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_on_surf(const uint pid) const
 {
     for(uint off=0; off<faces_per_poly(pid); ++off)
     {
-        if (f_on_srf.at(poly_face_id(pid,off))) return true;
+        if(f_on_srf.at(poly_face_id(pid,off))) return true;
     }
     return false;
 }
@@ -1217,10 +1273,10 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_add(const std::vector<uint> & f)
         uint vid1 = f.at((i+1)%f.size());
         int  eid = this->edge_id(vid0, vid1);
         if (eid == -1) eid = this->edge_add(vid0, vid1);
-        this->v_on_srf.at(vid0) = true;
-        this->e_on_srf.at(eid)  = true;
+        this->v_on_srf.at(vid0) = false;
+        this->e_on_srf.at(eid)  = false;
     }
-    this->f_on_srf.push_back(true);
+    this->f_on_srf.push_back(false);
 
     // update connectivity
     for(uint vid : f)
@@ -1413,10 +1469,13 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & flist
         }
 
         this->f2p.at(fid).push_back(pid);
+    }
 
-        // update f_on_srf flags
+    // update x_on_srf flags
+    for(uint fid : flist)
+    {
         this->f_on_srf.at(fid) = (this->f2p.at(fid).size()<2);
-        // update e_on_srf flags
+        //
         for(uint eid : this->adj_f2e(fid))
         {
             this->e_on_srf.at(eid) = false;
@@ -1425,8 +1484,8 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & flist
                 if(this->f_on_srf.at(inc_fid)) this->e_on_srf.at(eid) = true;
             }
         }
-        // update v_on_srf flags
-        for(uint vid : f)
+        //
+        for(uint vid : this->adj_f2v(fid))
         {
             this->v_on_srf.at(vid) = false;
             for(uint inc_fid : this->adj_v2f(vid))
@@ -1469,42 +1528,35 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove(const uint pid)
     std::set<uint,std::greater<uint>> dangling_edges; // higher ids first
     std::set<uint,std::greater<uint>> dangling_faces; // higher ids first
 
+    std::vector<uint> verts_to_update;
+    std::vector<uint> edges_to_update;
+    std::vector<uint> faces_to_update;
+
     // disconnect from vertices
     for(uint vid : this->adj_p2v(pid))
     {
         REMOVE_FROM_VEC(this->v2p.at(vid), pid);
-        if (this->v2p.at(vid).empty()) dangling_verts.insert(vid);
+        if(this->v2p.at(vid).empty()) dangling_verts.insert(vid);
+        else                          verts_to_update.push_back(vid);
     }
 
     // disconnect from edges
     for(uint eid : this->adj_p2e(pid))
     {
         REMOVE_FROM_VEC(this->e2p.at(eid), pid);
-        if (this->e2p.at(eid).empty()) dangling_edges.insert(eid);
+        if(this->e2p.at(eid).empty()) dangling_edges.insert(eid);
+        else                          edges_to_update.push_back(eid);
     }
 
     // disconnect from faces
     for(uint fid : this->adj_p2f(pid))
     {
         REMOVE_FROM_VEC(this->f2p.at(fid), pid);
-        switch(this->f2p.at(fid).size())
-        {
-            case 0 :
-            {
-                dangling_faces.insert(fid);
-                break;
-            }
-            case 1 :
-            {
-                this->f_on_srf.at(fid) = true;
-                for(uint eid : this->adj_f2e(fid)) this->e_on_srf.at(eid) = true;
-                for(uint vid : this->adj_f2v(fid)) this->v_on_srf.at(vid) = true;
-                break;
-            }
-        }
+        if(this->f2p.at(fid).empty()) dangling_faces.insert(fid);
+        else                          faces_to_update.push_back(fid);
     }
 
-    // disconnect from other polygons
+    // disconnect from other polyhedra
     for(uint nbr : this->adj_p2p(pid)) REMOVE_FROM_VEC(this->p2p.at(nbr), pid);
 
     // delete dangling faces
@@ -1540,6 +1592,24 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove(const uint pid)
         assert(this->adj_v2p(vid).empty());
         for(uint nbr : this->adj_v2v(vid)) REMOVE_FROM_VEC(this->v2v.at(nbr), vid);
         vert_remove_unreferenced(vid);
+    }
+
+    // update f_on_srf flags
+    for(uint fid : faces_to_update)
+    {
+        this->f_on_srf.at(fid) = this->adj_f2p(fid).size()<2;
+    }
+    // update e_on_srf flags
+    for(uint eid : edges_to_update)
+    {
+        this->e_on_srf.at(eid) = false;
+        for(uint fid : this->adj_e2f(eid)) if(this->face_is_on_srf(fid)) this->e_on_srf.at(eid) = true;
+    }
+    // update v_on_srf flags
+    for(uint vid : verts_to_update)
+    {
+        this->v_on_srf.at(vid) = false;
+        for(uint fid : this->adj_v2f(vid)) if(this->face_is_on_srf(fid)) this->v_on_srf.at(vid) = true;
     }
 
     poly_remove_unreferenced(pid);

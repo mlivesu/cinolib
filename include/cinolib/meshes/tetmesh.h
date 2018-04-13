@@ -63,6 +63,11 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         explicit Tetmesh(const std::vector<vec3d>             & verts,
                          const std::vector<std::vector<uint>> & polys);
 
+        explicit Tetmesh(const std::vector<vec3d>             & verts,
+                         const std::vector<std::vector<uint>> & faces,
+                         const std::vector<std::vector<uint>> & polys,
+                         const std::vector<std::vector<bool>> & polys_face_winding);
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         MeshType mesh_type() const { return TETMESH; }
@@ -106,9 +111,10 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double face_area (const uint fid) const;
-        uint   face_split(const uint fid, const vec3d & p);
-        uint   face_split(const uint fid, const std::vector<double> & bary = { 1./3., 1./3., 1./3. });
+        double face_area            (const uint fid) const;
+        uint   face_edge_opposite_to(const uint fid, const uint vid) const;
+        uint   face_split           (const uint fid, const vec3d & p);
+        uint   face_split           (const uint fid, const std::vector<double> & bary = { 1./3., 1./3., 1./3. });
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -123,6 +129,7 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         double            poly_volume          (const uint pid) const;
         uint              poly_split           (const uint pid, const vec3d & p);
         uint              poly_split           (const uint pid, const std::vector<double> & bary = { 0.25, 0.25, 0.25, 0.25 });
+        void              polys_split          (const std::vector<uint> & pids);
         uint              poly_add             (const std::vector<uint> & vlist); // vertex list
 
         using  AbstractPolyhedralMesh<M,V,E,F,P>::poly_add; // avoid hiding poly_add(flist,fwinding);
