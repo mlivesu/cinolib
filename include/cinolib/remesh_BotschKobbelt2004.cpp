@@ -29,72 +29,120 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/remesh_BotschKobbelt2004.h>
+#include <cinolib/tangential_smoothing.h>
 
 namespace cinolib
 {
 
+/* This method implements one iteration of the remeshing algorithm
+ * described in:
+ *
+ * A Remeshing Approach to Multiresolution Modeling
+ * M.Botsch, L.Kobbelt
+ * Symposium on Geomtry Processing, 2004
+*/
+
 template<class M, class V, class E, class P>
 CINO_INLINE
-void remesh_Botsch_Kobbelt_2004(Trimesh<M,V,E,P> & m,
-                                const double       target_edge_length,
-                                const bool         preserve_marked_features,
-                                const uint         n_iter)
+void remesh_Botsch_Kobbelt_2004(DrawableTrimesh<M,V,E,P> & m,
+                                const double               target_edge_length,
+                                const bool                 preserve_marked_features)
 {
     double l = (target_edge_length>0) ? target_edge_length : m.edge_avg_length();
 
-    typedef std::pair<uint,double> split_data;
-    std::set<split_data,std::greater<split_data>> edge_list;    // from highest to lowest id
-
-    for(uint i=0; i<n_iter; ++i)
+    // 1) split too long edges
+    //
+    uint count = 0;
+    uint ne = m.num_edges();
+    for(uint eid=0; eid<ne; ++eid)
     {
-        std::cout << "Remeshing iter #" << i << std::endl;
+        if (preserve_marked_features && m.edge_data(eid).marked) continue;
 
-        // 1) split all edges that are longer than 4/3*l
-        //
-        for(uint eid=0; eid<m.num_edges(); ++eid)
+        if (m.edge_length(eid) > 4./3.*l)
         {
-            if (m.edge_length(eid) > 4./3.*l) edge_list.insert(std::make_pair(eid,0.5));
+            m.edge_split(eid, 0.5);
+            ++count;
         }
-        std::cout << "\t" << edge_list.size() << " edges split" << std::endl;
-        for(auto e : edge_list) m.edge_split(e.first, e.second);
-        edge_list.clear();
-
-
-        // 2) collapse all edges that are shorter than 4/5*l
-        //
-        uint count = 0;
-        for(uint eid=0; eid<m.num_edges(); ++eid)
-        {
-            if (m.edge_length(eid) < 4./5.*l)
-            {
-                m.edge_collapse(eid, 0.5);
-                ++count;
-            }
-        }
-        std::cout << "\t" << count << " edges collapsed" << std::endl;
-
-
-        // 3) flip edges in order to minimize the deviation from valence 6 (or 4 on boundaries).
-        //
-        count = 0;
-        for(uint eid=0; eid<m.num_edges(); ++eid)
-        {
-            uint A = m.vert_valence(m.edge_vert_id(eid,0));
-            uint B = m.vert_valence(m.edge_vert_id(eid,1));
-            std::vector<uint> vopp = m.verts_opposite_to(eid);
-            if (vopp.size()!=2) continue;
-            uint C = m.vert_valence(vopp.at(0));
-            uint D = m.vert_valence(vopp.at(1));
-
-            if((A-6)*(A-6)+(B-6)*(B-6)+(C-6)*(C-6)+(D-6)*(D-6)>
-               (A-5)*(A-5)+(B-5)*(B-5)+(C-7)*(C-7)+(D-7)*(D-7))
-            {
-                m.edge_flip(eid);
-                ++count;
-            }
-        }
-        std::cout << "\t" << count << " edges flips" << std::endl;
     }
+    std::cout << "\t" << count << " edges longer than " << 4./3.*l << " were split." << std::endl;
+
+
+    // 2) collapse too short edges
+    //
+    count = 0;
+    for(uint eid=0; eid<m.num_edges(); ++eid)
+    {
+        if (preserve_marked_features && m.edge_data(eid).marked) continue;
+
+        if (m.edge_length(eid) < 4./5.*l)
+        {
+            m.edge_collapse(eid, 0.5);
+            ++count;
+        }
+    }
+    std::cout << "\t" << count << " edges shorter than " << 4./5.*l << " were collapsed." << std::endl;
+
+
+    // 3) optimize per vert valence
+    //
+    count = 0;
+    ne = m.num_edges();
+    for(uint eid=0; eid<ne; ++eid)
+    {
+        if (preserve_marked_features && m.edge_data(eid).marked) continue;
+
+        std::vector<uint> vopp = m.verts_opposite_to(eid);
+        if (vopp.size()!=2) continue;
+
+        uint vid0 = m.edge_vert_id(eid,0);
+        uint vid1 = m.edge_vert_id(eid,1);
+        uint vid2 = vopp.at(0);
+        uint vid3 = vopp.at(1);
+
+        uint val0 = m.vert_valence(vid0);
+        uint val1 = m.vert_valence(vid1);
+        uint val2 = m.vert_valence(vid2);
+        uint val3 = m.vert_valence(vid3);
+
+        uint val_opt0 = m.vert_is_boundary(vid0) ? 4 : 6;
+        uint val_opt1 = m.vert_is_boundary(vid1) ? 4 : 6;
+        uint val_opt2 = m.vert_is_boundary(vid2) ? 4 : 6;
+        uint val_opt3 = m.vert_is_boundary(vid3) ? 4 : 6;
+
+        uint before = (val0 - val_opt0)*(val0 - val_opt0) +
+                      (val1 - val_opt1)*(val1 - val_opt1) +
+                      (val2 - val_opt2)*(val2 - val_opt2) +
+                      (val3 - val_opt3)*(val3 - val_opt3);
+
+        --val0; --val1;
+        ++val2; ++val3;
+
+        uint after = (val0 - val_opt0)*(val0 - val_opt0) +
+                     (val1 - val_opt1)*(val1 - val_opt1) +
+                     (val2 - val_opt2)*(val2 - val_opt2) +
+                     (val3 - val_opt3)*(val3 - val_opt3);
+
+        if(before>after) // flip only if minimize sqrd deviation from ideal valence
+        {
+            m.edge_flip(eid);
+            ++count;
+        }
+    }
+    std::cout << "\t" << count << " edge flip were performed to normalize vertex valence to 6" << std::endl;
+
+
+    // 4) relocate vertices by tangential smoothing
+    //
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        bool anchored = false;
+        for(uint eid : m.adj_v2e(vid))
+        {
+            if (preserve_marked_features && m.edge_data(eid).marked) anchored = true;
+        }
+        if (!anchored) tangential_smoothing(m,vid);
+    }
+    std::cout << "\ttangential smoothing" << std::endl;
 }
 
 }
