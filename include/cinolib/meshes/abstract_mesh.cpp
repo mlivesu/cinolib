@@ -588,6 +588,19 @@ bool AbstractMesh<M,V,E,P>::edge_contains_vert(const uint eid, const uint vid) c
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+bool AbstractMesh<M,V,E,P>::edges_are_adjacent(const uint eid0, const uint eid1) const
+{
+    if (edge_vert_id(eid0,0)==edge_vert_id(eid1,0)) return true;
+    if (edge_vert_id(eid0,0)==edge_vert_id(eid1,1)) return true;
+    if (edge_vert_id(eid0,1)==edge_vert_id(eid1,0)) return true;
+    if (edge_vert_id(eid0,1)==edge_vert_id(eid1,1)) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 vec3d AbstractMesh<M,V,E,P>::edge_sample_at(const uint eid, const double lambda) const
 {
     return ((1.0-lambda)*edge_vert(eid,0) + lambda*edge_vert(eid,1));

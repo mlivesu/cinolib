@@ -195,6 +195,7 @@ class AbstractMesh
                 vec3d  edge_sample_at    (const uint eid, double lambda) const; // arc-length param
                 uint   edge_valence      (const uint eid) const;
                 bool   edge_contains_vert(const uint eid, const uint vid) const;
+                bool   edges_are_adjacent(const uint eid0, const uint eid1) const;
                 double edge_length       (const uint eid) const;
                 double edge_avg_length   () const;
                 double edge_max_length   () const;
