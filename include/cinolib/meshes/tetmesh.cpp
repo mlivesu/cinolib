@@ -74,18 +74,6 @@ Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d>             & verts,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d>             & verts,
-                            const std::vector<std::vector<uint>> & faces,
-                            const std::vector<std::vector<uint>> & polys,
-                            const std::vector<std::vector<bool>> & polys_face_winding)
-{
-    this->init(verts, faces, polys, polys_face_winding);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 Tetmesh<M,V,E,F,P>::Tetmesh(const char * filename)
 {
     load(filename);
