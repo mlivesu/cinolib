@@ -272,21 +272,24 @@ bool Trimesh<M,V,E,P>::edge_is_flippable(const uint eid)
 
     // geometric check (if the projected outline is a concave quad, discard the move)
     assert(this->adj_e2p(eid).size()==2);
-    uint pid0 = this->adj_e2p(eid).front();
-    uint pid1 = this->adj_e2p(eid).back();
-    uint vid0 = this->edge_vert_id(eid,0);
-    uint vid1 = this->edge_vert_id(eid,1);
-    uint opp  = this->vert_opposite_to(pid1,vid0,vid1);
-    std::vector<vec3d> p =
-    {
-        this->poly_vert(pid0,0),
-        this->poly_vert(pid0,1),
-        this->poly_vert(pid0,2),
-        this->vert(opp)
-    };
-    std::vector<vec2d> p2d;
-    polygon_flatten(p,p2d);
-    if(!polygon_is_convex(p2d)) return false;
+    uint  pid0 = this->adj_e2p(eid).front();
+    uint  pid1 = this->adj_e2p(eid).back();
+    uint  vid0 = this->edge_vert_id(eid,0);
+    uint  vid1 = this->edge_vert_id(eid,1);
+    uint  opp0 = this->vert_opposite_to(pid0,vid0,vid1);
+    uint  opp1 = this->vert_opposite_to(pid1,vid0,vid1);
+    vec3d n0   = this->poly_data(pid0).normal;
+    vec3d n1   = this->poly_data(pid0).normal;
+    if(triangle_area(this->vert(opp0),this->vert(vid0),this->vert(opp1))<1e-5) return false;
+    if(triangle_area(this->vert(opp1),this->vert(vid1),this->vert(opp0))<1e-5) return false;
+    vec3d n2   = triangle_normal(this->vert(opp0),this->vert(vid0),this->vert(opp1));
+    vec3d n3   = triangle_normal(this->vert(opp1),this->vert(vid1),this->vert(opp0));
+    if(std::fabs(1.f-n2.length())>0.1) return false;
+    if(std::fabs(1.f-n3.length())>0.1) return false;
+    if(n0.dot(n2)<0) return false;
+    if(n0.dot(n3)<0) return false;
+    if(n1.dot(n2)<0) return false;
+    if(n2.dot(n2)<0) return false;
     return true;
 }
 

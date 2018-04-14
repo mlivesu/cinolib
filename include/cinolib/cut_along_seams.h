@@ -39,32 +39,36 @@
 namespace cinolib
 {
 
-/* This switches from OBJ vertex representation (xyz coordinates and
- * texture coordinates represented as different entities) to OpenGL
- * vertex representation (unified vertex entity, having both xyz and
- * texture coordinates).
- *
- * It is important when reading textured meshes from OBJ files, where the
- * mesh may not be homeomorphic to a disk from a geometric point of view
- * but often contain seams (vertices with multiple texture coordinates) that
- * allow to flatten it to a plane from a texturing point of view.
- *
- * What it does is to create one unified vertex entity for each unique pair
- * of xyz and uv(w) coordinates, updating the references in the polygon list
- * accordingly.
+/* These methods serve to switch from separated representations for
+ * each vertex property (position, texture coordinates, normals) to
+ * an unified (OpenGL-like) vertex representation, where position,
+ * texture coordinates and normals are all attributes of the same entity
  *
  * https://stackoverflow.com/questions/29867926/why-does-the-number-of-vt-and-v-elements-in-a-blender-obj-file-differ
 */
 
 CINO_INLINE
-void cut_mesh_along_seams(const std::vector<vec3d>             & xyz,
-                          const std::vector<vec3d>             & uvw,
-                          const std::vector<std::vector<uint>> & xyz_poly,
-                          const std::vector<std::vector<uint>> & uvw_poly,
-                                std::vector<vec3d>             & unified_xyz,
-                                std::vector<vec3d>             & unified_uvw,
-                                std::vector<std::vector<uint>> & unified_poly);
+void cut_mesh_along_seams(const std::vector<vec3d>             & v_attr_0,          // xyz or uvw or nor
+                          const std::vector<vec3d>             & v_attr_1,          // xyz or uvw or nor
+                          const std::vector<std::vector<uint>> & v2v_v_attr_0,      // connectivity attr #0
+                          const std::vector<std::vector<uint>> & v2v_v_attr_1,      // connectivity attr #1
+                                std::vector<vec3d>             & unified_v_attr_0,
+                                std::vector<vec3d>             & unified_v_attr_1,
+                                std::vector<std::vector<uint>> & unified_v2v);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void cut_mesh_along_seams(const std::vector<vec3d>             & v_attr_0,
+                          const std::vector<vec3d>             & v_attr_1,
+                          const std::vector<vec3d>             & v_attr_2,
+                          const std::vector<std::vector<uint>> & v2v_attr_0,
+                          const std::vector<std::vector<uint>> & v2v_attr_1,
+                          const std::vector<std::vector<uint>> & v2v_attr_2,
+                                std::vector<vec3d>             & unified_v_attr_0,
+                                std::vector<vec3d>             & unified_v_attr_1,
+                                std::vector<vec3d>             & unified_v_attr_2,
+                                std::vector<std::vector<uint>> & unified_v2v);
 }
 
 #ifndef  CINO_STATIC_LIB

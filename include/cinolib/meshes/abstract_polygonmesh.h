@@ -62,8 +62,13 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void clear();
-        void init (const std::vector<vec3d>             & verts,
-                   const std::vector<std::vector<uint>> & polys);
+        void init(      std::vector<vec3d>             & pos,       // vertex xyz positions
+                        std::vector<vec3d>             & tex,       // vertex uv(w) texture coordinates
+                        std::vector<vec3d>             & nor,       // vertex normals
+                        std::vector<std::vector<uint>> & poly_pos,  // polygons with references to pos
+                  const std::vector<std::vector<uint>> & poly_tex,  // polygons with references to tex
+                  const std::vector<std::vector<uint>> & poly_nor,  // polygons with references to nor
+                  const std::vector<Color>             & poly_col); // per polygon colors
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
