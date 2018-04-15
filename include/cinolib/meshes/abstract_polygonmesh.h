@@ -62,6 +62,8 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void clear();
+        void init(const std::vector<vec3d>             & verts,
+                  const std::vector<std::vector<uint>> & polys);
         void init(      std::vector<vec3d>             & pos,       // vertex xyz positions
                         std::vector<vec3d>             & tex,       // vertex uv(w) texture coordinates
                         std::vector<vec3d>             & nor,       // vertex normals
@@ -135,16 +137,18 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool  edge_is_manifold             (const uint eid) const;
-        bool  edge_is_boundary             (const uint eid) const;
-        bool  edges_share_poly             (const uint eid1, const uint eid2) const;
-        uint  edge_shared                  (const uint pid0, const uint pid1) const;
-        void  edge_switch_id               (const uint eid0, const uint eid1);
-        uint  edge_add                     (const uint vid0, const uint vid1);
-        void  edge_remove                  (const uint eid);
-        void  edge_remove_unreferenced     (const uint eid);
-        void  edge_mark_labeling_boundaries();
-        void  edge_mark_boundaries();
+        bool   edge_is_manifold               (const uint eid) const;
+        bool   edge_is_boundary               (const uint eid) const;
+        double edge_crease_angle            (const uint eid) const;
+        bool   edges_share_poly               (const uint eid1, const uint eid2) const;
+        uint   edge_shared                    (const uint pid0, const uint pid1) const;
+        void   edge_switch_id                 (const uint eid0, const uint eid1);
+        uint   edge_add                       (const uint vid0, const uint vid1);
+        void   edge_remove                    (const uint eid);
+        void   edge_remove_unreferenced       (const uint eid);
+        void   edge_mark_labeling_boundaries  ();
+        void   edge_mark_color_discontinuities();
+        void   edge_mark_boundaries           ();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

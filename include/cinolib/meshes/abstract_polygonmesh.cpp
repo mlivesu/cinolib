@@ -121,6 +121,30 @@ void AbstractPolygonMesh<M,V,E,P>::clear()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & verts,
+                                        const std::vector<std::vector<uint>> & polys)
+{
+    // initialize mesh connectivity (and normals)
+    for(auto v : verts) this->vert_add(v);
+    for(auto p : polys) this->poly_add(p);
+
+    this->copy_xyz_to_uvw(UVW_param);
+
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        this->edge_data(eid).marked = (this->edge_is_boundary(eid) || !this->edge_is_manifold(eid));
+    }
+
+    std::cout << "new mesh\t"      <<
+                 this->num_verts() << "V / " <<
+                 this->num_edges() << "E / " <<
+                 this->num_polys() << "P   " << std::endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & pos,       // vertex xyz positions
                                               std::vector<vec3d>             & tex,       // vertex uv(w) texture coordinates
                                               std::vector<vec3d>             & nor,       // vertex normals
@@ -196,6 +220,11 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
         {
             this->poly_data(pid).color = poly_col.at(pid);
         }
+    }
+
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        this->edge_data(eid).marked = (this->edge_is_boundary(eid) || !this->edge_is_manifold(eid));
     }
 
     std::cout << "new mesh\t"      <<
@@ -725,6 +754,23 @@ bool AbstractPolygonMesh<M,V,E,P>::edge_is_manifold(const uint eid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+double AbstractPolygonMesh<M,V,E,P>::edge_crease_angle(const uint eid) const
+{
+    assert( this->edge_is_manifold(eid));
+    assert(!this->edge_is_boundary(eid));
+
+    uint   pid0  = this->adj_e2p(eid).front();
+    uint   pid1  = this->adj_e2p(eid).back();
+    vec3d  n0    = this->poly_data(pid0).normal;
+    vec3d  n1    = this->poly_data(pid1).normal;
+
+    return n0.angle_rad(n1);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 bool AbstractPolygonMesh<M,V,E,P>::edge_is_boundary(const uint eid) const
 {
     return (this->edge_valence(eid) == 1);
@@ -873,6 +919,21 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_labeling_boundaries()
         for(uint pid : this->adj_e2p(eid)) unique_labels.insert(this->poly_data(pid).label);
 
         this->edge_data(eid).marked = (unique_labels.size()>=2);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::edge_mark_color_discontinuities()
+{
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        std::set<Color> unique_colors;
+        for(uint pid : this->adj_e2p(eid)) unique_colors.insert(this->poly_data(pid).color);
+
+        this->edge_data(eid).marked = (unique_colors.size()>=2);
     }
 }
 
