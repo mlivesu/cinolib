@@ -45,7 +45,7 @@ void AbstractDrawablePolygonMesh<Mesh>::init_drawable_stuff()
 {
     slicer = MeshSlicer<Mesh>(*this);
 
-    drawlist.draw_mode        = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR;
+    drawlist.draw_mode        = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_marked.draw_mode = DRAW_SEGS;
     drawlist_marked.seg_width = 3;
     marked_edge_color         = Color::RED();

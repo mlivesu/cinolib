@@ -192,6 +192,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         sl_wireframe_alpha->setValue(99);
         gbox->setFont(global_font);
         cb_wireframe->setFont(global_font);
+        cb_wireframe->setChecked(true);
         sl_wireframe_width->setFont(global_font);
         sl_wireframe_alpha->setFont(global_font);
         but_wireframe_color->setFont(global_font);
@@ -384,6 +385,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         sl_marked_edges_width->setMaximum(10);
         sl_marked_edges_width->setTickPosition(QSlider::TicksBelow);
         sl_marked_edges_width->setTickInterval(1);
+        cb_marked_edges->setChecked(true);
         gbox->setFont(global_font);
         but_marked_edges_color->setFont(global_font);
         l_width->setFont(global_font);
