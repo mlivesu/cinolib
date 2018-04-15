@@ -18,8 +18,7 @@
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/harmonic_map.h>
 #include <cinolib/profiler.h>
-#include <cinolib/gui/qt/glcanvas.h>
-#include <cinolib/gui/qt/surface_mesh_control_panel.h>
+#include <cinolib/gui/qt/qt_gui_tools.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

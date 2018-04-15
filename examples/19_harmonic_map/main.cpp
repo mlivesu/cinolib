@@ -11,7 +11,7 @@
 #include <QApplication>
 #include <QHBoxLayout>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gui/qt/glcanvas.h>
+#include <cinolib/gui/qt/qt_gui_tools.h>
 #include <cinolib/harmonic_map.h>
 #include <cinolib/geometry/n_sided_poygon.h>
 #include <cinolib/textures/textures.h>

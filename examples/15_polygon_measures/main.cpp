@@ -9,9 +9,8 @@
 #include <QApplication>
 #include <QSlider>
 #include <QVBoxLayout>
-
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gui/qt/glcanvas.h>
+#include <cinolib/gui/qt/qt_gui_tools.h>
 #include <cinolib/polygon_kernel.h>
 #include <cinolib/profiler.h>
 #include <cinolib/polygon_maximum_inscribed_circle.h>

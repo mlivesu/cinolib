@@ -13,7 +13,7 @@
 #include <QApplication>
 #include <QHBoxLayout>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gui/qt/glcanvas.h>
+#include <cinolib/gui/qt/qt_gui_tools.h>
 
 using namespace cinolib;
 

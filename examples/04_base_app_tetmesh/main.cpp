@@ -11,8 +11,7 @@
 
 #include <QApplication>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gui/qt/glcanvas.h>
-#include <cinolib/gui/qt/volume_mesh_control_panel.h>
+#include <cinolib/gui/qt/qt_gui_tools.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

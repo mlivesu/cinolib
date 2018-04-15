@@ -19,7 +19,7 @@
 #include <cinolib/geodesics.h>
 #include <cinolib/profiler.h>
 #include <cinolib/drawable_isosurface.h>
-#include <cinolib/gui/qt/glcanvas.h>
+#include <cinolib/gui/qt/qt_gui_tools.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -16,7 +16,7 @@
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/geodesics.h>
 #include <cinolib/profiler.h>
-#include <cinolib/gui/qt/glcanvas.h>
+#include <cinolib/gui/qt/qt_gui_tools.h>
 #include <algorithm>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
