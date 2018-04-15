@@ -77,6 +77,9 @@ Here is a list of the sample programs available in CinoLib.
 #### 21 - Compute coarse hex layouts
 <p align="left"><img src="snapshots/21_coarse_hex_layouts.png" width="500"></p>
 
+#### 22 - Remesh, preserving sharp creases or color patches
+<p align="left"><img src="snapshots/22_remeshing.png" width="500"></p>
+
 
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
