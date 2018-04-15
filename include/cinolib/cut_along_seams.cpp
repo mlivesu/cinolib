@@ -29,6 +29,8 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/cut_along_seams.h>
+#include <map>
+#include <tuple>
 
 namespace cinolib
 {
@@ -36,41 +38,41 @@ namespace cinolib
 // https://stackoverflow.com/questions/29867926/why-does-the-number-of-vt-and-v-elements-in-a-blender-obj-file-differ
 //
 CINO_INLINE
-void cut_mesh_along_seams(const std::vector<vec3d>             & xyz,
-                          const std::vector<vec3d>             & uvw,
-                          const std::vector<std::vector<uint>> & xyz_poly,
-                          const std::vector<std::vector<uint>> & uvw_poly,
-                                std::vector<vec3d>             & unified_xyz,
-                                std::vector<vec3d>             & unified_uvw,
-                                std::vector<std::vector<uint>> & unified_poly)
+void cut_mesh_along_seams(const std::vector<vec3d>             & v_attr_0,          // xyz or uvw or nor
+                          const std::vector<vec3d>             & v_attr_1,          // xyz or uvw or nor
+                          const std::vector<std::vector<uint>> & v2v_v_attr_0,      // connectivity attr #0
+                          const std::vector<std::vector<uint>> & v2v_v_attr_1,      // connectivity attr #1
+                                std::vector<vec3d>             & unified_v_attr_0,
+                                std::vector<vec3d>             & unified_v_attr_1,
+                                std::vector<std::vector<uint>> & unified_v2v)
 {
-    assert(xyz_poly.size() == uvw_poly.size());
+    assert(v2v_v_attr_0.size() == v2v_v_attr_1.size());
 
-    unified_xyz.clear();
-    unified_uvw.clear();
-    unified_poly.clear();
-    unified_poly.reserve(xyz_poly.size());
+    unified_v_attr_0.clear();
+    unified_v_attr_1.clear();
+    unified_v2v.clear();
+    unified_v2v.reserve(v2v_v_attr_0.size());
 
     typedef std::pair<uint,uint> v_vt_pair;
     std::map<v_vt_pair,uint> v_map;
 
-    for(uint pid=0; pid<xyz_poly.size(); ++pid)
+    for(uint pid=0; pid<v2v_v_attr_0.size(); ++pid)
     {
-        assert(xyz_poly.at(pid).size() == uvw_poly.at(pid).size());
+        assert(v2v_v_attr_0.at(pid).size() == v2v_v_attr_1.at(pid).size());
         std::vector<uint> poly;
-        for(uint off=0; off<xyz_poly.at(pid).size(); ++off)
+        for(uint off=0; off<v2v_v_attr_0.at(pid).size(); ++off)
         {
-            uint v  = xyz_poly.at(pid).at(off);
-            uint vt = uvw_poly.at(pid).at(off);
+            uint v  = v2v_v_attr_0.at(pid).at(off);
+            uint vt = v2v_v_attr_1.at(pid).at(off);
             v_vt_pair key = std::make_pair(v,vt);
 
             auto query = v_map.find(key);
             if (query == v_map.end())
             {
-                uint fresh_id = unified_xyz.size();
+                uint fresh_id = unified_v_attr_0.size();
                 v_map[key] = fresh_id;
-                unified_xyz.push_back(xyz.at(v));
-                unified_uvw.push_back(uvw.at(vt));
+                unified_v_attr_0.push_back(v_attr_0.at(v));
+                unified_v_attr_1.push_back(v_attr_1.at(vt));
                 poly.push_back(fresh_id);
             }
             else
@@ -78,7 +80,63 @@ void cut_mesh_along_seams(const std::vector<vec3d>             & xyz,
                 poly.push_back(query->second);
             }
         }
-        unified_poly.push_back(poly);
+        unified_v2v.push_back(poly);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void cut_mesh_along_seams(const std::vector<vec3d>             & v_attr_0,
+                          const std::vector<vec3d>             & v_attr_1,
+                          const std::vector<vec3d>             & v_attr_2,
+                          const std::vector<std::vector<uint>> & v2v_attr_0,
+                          const std::vector<std::vector<uint>> & v2v_attr_1,
+                          const std::vector<std::vector<uint>> & v2v_attr_2,
+                                std::vector<vec3d>             & unified_v_attr_0,
+                                std::vector<vec3d>             & unified_v_attr_1,
+                                std::vector<vec3d>             & unified_v_attr_2,
+                                std::vector<std::vector<uint>> & unified_v2v)
+{
+    assert(v2v_attr_0.size() == v2v_attr_1.size());
+
+    unified_v_attr_0.clear();
+    unified_v_attr_1.clear();
+    unified_v2v.clear();
+    unified_v2v.reserve(v2v_attr_0.size());
+
+    typedef std::tuple<uint,uint,uint> v_vt_vn;
+    std::map<v_vt_vn,uint> v_map;
+
+    for(uint pid=0; pid<v2v_attr_0.size(); ++pid)
+    {
+        assert(v2v_attr_0.at(pid).size() == v2v_attr_1.at(pid).size());
+        assert(v2v_attr_0.at(pid).size() == v2v_attr_2.at(pid).size());
+
+        std::vector<uint> poly;
+        for(uint off=0; off<v2v_attr_0.at(pid).size(); ++off)
+        {
+            uint v  = v2v_attr_0.at(pid).at(off);
+            uint vt = v2v_attr_1.at(pid).at(off);
+            uint vn = v2v_attr_2.at(pid).at(off);
+            v_vt_vn key = std::make_tuple(v,vt,vn);
+
+            auto query = v_map.find(key);
+            if (query == v_map.end())
+            {
+                uint fresh_id = unified_v_attr_0.size();
+                v_map[key] = fresh_id;
+                unified_v_attr_0.push_back(v_attr_0.at(v));
+                unified_v_attr_1.push_back(v_attr_1.at(vt));
+                unified_v_attr_2.push_back(v_attr_2.at(vn));
+                poly.push_back(fresh_id);
+            }
+            else
+            {
+                poly.push_back(query->second);
+            }
+        }
+        unified_v2v.push_back(poly);
     }
 }
 

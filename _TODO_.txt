@@ -1,7 +1,5 @@
 - read/write labels from Medit .MESH format (5th number on tets, 9th on hexas) 
 - read colors from off
-- make mesh loaders read any possible information encoded in the input file (colors, uv, normals)
-- update per element properties in split operators
 - set default parameters (wireframe, marked visuals enabled, mark non manif and boundaries)
 - add ambient occlusion
 - add verdict metrics for tris/quads/tets/hexa

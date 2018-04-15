@@ -207,9 +207,9 @@ bool Trimesh<M,V,E,P>::edge_is_geometrically_collapsible(const uint eid, const d
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda)
+int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda)
 {
-    if (!edge_is_collapsible(eid, lambda)) return false;
+    if (!edge_is_collapsible(eid, lambda)) return -1;
 
     uint vert_to_keep   = this->edge_vert_id(eid,0);
     uint vert_to_remove = this->edge_vert_id(eid,1);
@@ -234,7 +234,7 @@ bool Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda)
     this->update_v_normal(vert_to_keep);
 
     this->vert_remove(vert_to_remove);
-    return true;
+    return vert_to_keep;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -256,9 +256,78 @@ uint Trimesh<M,V,E,P>::edge_split(const uint eid, const double lambda)
         this->poly_data(new_pid1) = this->poly_data(pid);
         this->poly_data(new_pid2) = this->poly_data(pid);
     }
-    this->polys_remove(this->adj_e2p(eid));
 
+    // copy edge data
+    int eid0 = this->edge_id(vid0,new_vid); assert(eid0>=0);
+    int eid1 = this->edge_id(vid1,new_vid); assert(eid1>=0);
+    this->edge_data(eid0) = this->edge_data(eid);
+    this->edge_data(eid1) = this->edge_data(eid);
+
+    this->polys_remove(this->adj_e2p(eid));
     return new_vid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool Trimesh<M,V,E,P>::edge_is_flippable(const uint eid)
+{
+    if( this->edge_is_boundary(eid)) return false;
+    if(!this->edge_is_manifold(eid)) return false;
+
+    // geometric check (if the projected outline is a concave quad, discard the move)
+    assert(this->adj_e2p(eid).size()==2);
+    uint  pid0 = this->adj_e2p(eid).front();
+    uint  pid1 = this->adj_e2p(eid).back();
+    uint  vid0 = this->edge_vert_id(eid,0);
+    uint  vid1 = this->edge_vert_id(eid,1);
+    uint  opp0 = this->vert_opposite_to(pid0,vid0,vid1);
+    uint  opp1 = this->vert_opposite_to(pid1,vid0,vid1);
+    vec3d n0   = this->poly_data(pid0).normal;
+    vec3d n1   = this->poly_data(pid0).normal;
+    if(triangle_area(this->vert(opp0),this->vert(vid0),this->vert(opp1))<1e-5) return false;
+    if(triangle_area(this->vert(opp1),this->vert(vid1),this->vert(opp0))<1e-5) return false;
+    vec3d n2   = triangle_normal(this->vert(opp0),this->vert(vid0),this->vert(opp1));
+    vec3d n3   = triangle_normal(this->vert(opp1),this->vert(vid1),this->vert(opp0));
+    if(std::fabs(1.f-n2.length())>0.1) return false;
+    if(std::fabs(1.f-n3.length())>0.1) return false;
+    if(n0.dot(n2)<0) return false;
+    if(n0.dot(n3)<0) return false;
+    if(n1.dot(n2)<0) return false;
+    if(n2.dot(n2)<0) return false;
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+int Trimesh<M, V, E, P>::edge_flip(const uint eid)
+{
+    if(!edge_is_flippable(eid)) return -1;
+
+    assert(this->adj_e2p(eid).size()==2);
+    uint pid0 = this->adj_e2p(eid).front();
+    uint pid1 = this->adj_e2p(eid).back();
+    assert(pid0!=pid1);
+    uint vid0 = this->edge_vert_id(eid,0);
+    uint vid1 = this->edge_vert_id(eid,1);
+    uint opp0 = this->vert_opposite_to(pid0,vid0,vid1);
+    uint opp1 = this->vert_opposite_to(pid1,vid0,vid1);
+    std::vector<uint> p0 = { opp0, vid0, opp1 };
+    std::vector<uint> p1 = { opp1, vid1, opp0 };
+    // SHOULD I HANDLE WINDING ORDER? IT SEEM OK ALREADY...
+    this->poly_add(p0);
+    this->poly_add(p1);
+
+    this->edge_remove(eid);
+
+    // copy edge data
+    int new_eid = this->edge_id(opp0,opp1); assert(new_eid>=0);
+    this->edge_data(new_eid) = this->edge_data(eid);
+
+    return new_eid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

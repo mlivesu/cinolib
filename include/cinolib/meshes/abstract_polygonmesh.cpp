@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/meshes/abstract_polygonmesh.h>
+#include <cinolib/cut_along_seams.h>
 #include <cinolib/io/read_write.h>
 #include <cinolib/quality.h>
 #include <cinolib/stl_container_utilities.h>
@@ -47,8 +48,13 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
     this->clear();
     this->mesh_data().filename = std::string(filename);
 
-    std::vector<vec3d>             tmp_verts;
-    std::vector<std::vector<uint>> tmp_polys;
+    std::vector<vec3d>             pos;      // vertex xyz positions
+    std::vector<vec3d>             tex;      // vertex uv(w) texture coordinates
+    std::vector<vec3d>             nor;      // vertex normals
+    std::vector<std::vector<uint>> poly_pos; // polygons with references to pos
+    std::vector<std::vector<uint>> poly_tex; // polygons with references to tex
+    std::vector<std::vector<uint>> poly_nor; // polygons with references to nor
+    std::vector<Color>             poly_col; // per polygon colors
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -56,12 +62,13 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
     if (filetype.compare(".off") == 0 ||
         filetype.compare(".OFF") == 0)
     {
-        read_OFF(filename, tmp_verts, tmp_polys);
+        read_OFF(filename, pos, poly_pos);
     }
     else if (filetype.compare(".obj") == 0 ||
              filetype.compare(".OBJ") == 0)
     {
-        read_OBJ(filename, tmp_verts, tmp_polys);
+        //read_OBJ(filename, pos, poly_pos);
+        read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col);
     }
     else
     {
@@ -69,7 +76,7 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
         exit(-1);
     }
 
-    init(tmp_verts, tmp_polys);
+    init(pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -114,13 +121,82 @@ void AbstractPolygonMesh<M,V,E,P>::clear()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & verts,
-                                        const std::vector<std::vector<uint>> & polys)
+void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & pos,       // vertex xyz positions
+                                              std::vector<vec3d>             & tex,       // vertex uv(w) texture coordinates
+                                              std::vector<vec3d>             & nor,       // vertex normals
+                                              std::vector<std::vector<uint>> & poly_pos,  // polygons with references to pos
+                                        const std::vector<std::vector<uint>> & poly_tex,  // polygons with references to tex
+                                        const std::vector<std::vector<uint>> & poly_nor,  // polygons with references to nor
+                                        const std::vector<Color>             & poly_col)  // per polygon colors
 {
-    for(auto v : verts) this->vert_add(v);
-    for(auto p : polys) this->poly_add(p);
+    // if the model is textured or has multiple normals per vertex (or both),
+    // cut mesh along seams to create unique openGL-like vertices having
+    // xyz, uvw and normals all condensed in a single entity
+    //
+    if (poly_pos.size() == poly_tex.size() &&
+        poly_pos.size() == poly_nor.size())
+    {
+        std::vector<vec3d> tmp_xyz, tmp_uvw, tmp_nor;
+        std::vector<std::vector<uint>> tmp_poly;
+        cut_mesh_along_seams(pos, tex, nor, poly_pos, poly_tex, poly_nor, tmp_xyz, tmp_uvw, tmp_nor, tmp_poly);
+        pos      = tmp_xyz;
+        tex      = tmp_uvw;
+        nor      = tmp_nor;
+        poly_pos = tmp_poly;
+    }
+    else if (poly_pos.size() == poly_tex.size())
+    {
+        std::vector<vec3d> tmp_xyz, tmp_uvw;
+        std::vector<std::vector<uint>> tmp_poly;
+        cut_mesh_along_seams(pos, tex, poly_pos, poly_tex, tmp_xyz, tmp_uvw, tmp_poly);
+        pos      = tmp_xyz;
+        tex      = tmp_uvw;
+        poly_pos = tmp_poly;
+    }
+    else if (poly_pos.size() == poly_nor.size())
+    {
+        std::vector<vec3d> tmp_xyz, tmp_nor;
+        std::vector<std::vector<uint>> tmp_poly;
+        cut_mesh_along_seams(pos, tex, poly_pos, poly_tex, tmp_xyz, tmp_nor, tmp_poly);
+        pos      = tmp_xyz;
+        nor      = tmp_nor;
+        poly_pos = tmp_poly;
+    }
 
-    this->copy_xyz_to_uvw(UVW_param);
+    // initialize mesh connectivity (and normals)
+    for(auto v : pos     ) this->vert_add(v);
+    for(auto p : poly_pos) this->poly_add(p);
+
+    // customize uv(w) coordinates
+    if (pos.size()==tex.size())
+    {
+        std::cout << "load textures" << std::endl;
+        for(uint vid=0; vid<this->num_verts(); ++vid)
+        {
+            this->vert_data(vid).uvw = tex.at(vid);
+        }
+    }
+    else this->copy_xyz_to_uvw(UVW_param);
+
+    // customize normals
+    if (pos.size()==nor.size())
+    {
+        std::cout << "load normals" << std::endl;
+        for(uint vid=0; vid<this->num_verts(); ++vid)
+        {
+            this->vert_data(vid).normal = nor.at(vid);
+        }
+    }
+
+    // customize colors
+    if (poly_col.size()==this->num_polys())
+    {
+        std::cout << "load per polygon colors" << std::endl;
+        for(uint pid=0; pid<this->num_polys(); ++pid)
+        {
+            this->poly_data(pid).color = poly_col.at(pid);
+        }
+    }
 
     std::cout << "new mesh\t"      <<
                  this->num_verts() << "V / " <<

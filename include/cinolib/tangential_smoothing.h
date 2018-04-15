@@ -28,51 +28,37 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_CUT_ALONG_SEAMS_H
-#define CINO_CUT_ALONG_SEAMS_H
+#ifndef CINO_TANGENTIAL_SMOOTHING_H
+#define CINO_TANGENTIAL_SMOOTHING_H
 
-#include <sys/types.h>
-#include <vector>
 #include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/meshes/trimesh.h>
 
 namespace cinolib
 {
 
-/* These methods serve to switch from separated representations for
- * each vertex property (position, texture coordinates, normals) to
- * an unified (OpenGL-like) vertex representation, where position,
- * texture coordinates and normals are all attributes of the same entity
+/* These functions implement per vertex tangential smoothing,
+ * as described in the paper:
  *
- * https://stackoverflow.com/questions/29867926/why-does-the-number-of-vt-and-v-elements-in-a-blender-obj-file-differ
+ * A Remeshing Approach to Multiresolution Modeling
+ * M.Botsch, L.Kobbelt
+ * Symposium on Geomtry Processing, 2004
 */
 
+template<class M, class V, class E, class P>
 CINO_INLINE
-void cut_mesh_along_seams(const std::vector<vec3d>             & v_attr_0,          // xyz or uvw or nor
-                          const std::vector<vec3d>             & v_attr_1,          // xyz or uvw or nor
-                          const std::vector<std::vector<uint>> & v2v_v_attr_0,      // connectivity attr #0
-                          const std::vector<std::vector<uint>> & v2v_v_attr_1,      // connectivity attr #1
-                                std::vector<vec3d>             & unified_v_attr_0,
-                                std::vector<vec3d>             & unified_v_attr_1,
-                                std::vector<std::vector<uint>> & unified_v2v);
+void tangential_smoothing(Trimesh<M,V,E,P> & m, const uint vid);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class P>
 CINO_INLINE
-void cut_mesh_along_seams(const std::vector<vec3d>             & v_attr_0,
-                          const std::vector<vec3d>             & v_attr_1,
-                          const std::vector<vec3d>             & v_attr_2,
-                          const std::vector<std::vector<uint>> & v2v_attr_0,
-                          const std::vector<std::vector<uint>> & v2v_attr_1,
-                          const std::vector<std::vector<uint>> & v2v_attr_2,
-                                std::vector<vec3d>             & unified_v_attr_0,
-                                std::vector<vec3d>             & unified_v_attr_1,
-                                std::vector<vec3d>             & unified_v_attr_2,
-                                std::vector<std::vector<uint>> & unified_v2v);
+void tangential_smoothing(Trimesh<M,V,E,P> & m);
+
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "cut_along_seams.cpp"
+#include "tangential_smoothing.cpp"
 #endif
 
-#endif // CINO_CUT_ALONG_SEAMS_H
+#endif // CINO_TANGENTIAL_SMOOTHING_H

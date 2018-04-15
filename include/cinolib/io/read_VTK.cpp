@@ -73,7 +73,7 @@ void read_VTK(const char                      * filename,
             case VTK_HEXAHEDRON: for(uint j=0; j<8; ++j) polyhedron.push_back(c->GetPointId(j)); break;
         }
 
-        poly.push_back(polyhedron);
+        if(!polyhedron.empty()) poly.push_back(polyhedron);
     }
 }
 
@@ -112,7 +112,7 @@ void read_VTK(const char                      * filename,
             case VTK_HEXAHEDRON: for(uint j=0; j<8; ++j) polyhedron.push_back(c->GetPointId(j)); break;
         }
 
-        poly.push_back(polyhedron);
+        if(!polyhedron.empty()) poly.push_back(polyhedron);
     }
 }
 
