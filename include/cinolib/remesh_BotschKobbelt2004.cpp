@@ -101,8 +101,7 @@ void remesh_Botsch_Kobbelt_2004(DrawableTrimesh<M,V,E,P> & m,
     // 3) optimize per vert valence
     //
     count = 0;
-    ne = m.num_edges();
-    for(uint eid=0; eid<ne; ++eid)
+    for(uint eid=0; eid<m.num_edges(); ++eid)
     {
         if (preserve_marked_features && m.edge_data(eid).marked) continue;
 
