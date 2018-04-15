@@ -75,7 +75,6 @@ void remesh_Botsch_Kobbelt_2004(DrawableTrimesh<M,V,E,P> & m,
     }
     std::cout << "\t" << count << " edges longer than " << 4./3.*l << " were split." << std::endl;
 
-
     // 2) collapse too short edges
     //
     count = 0;
@@ -98,7 +97,6 @@ void remesh_Botsch_Kobbelt_2004(DrawableTrimesh<M,V,E,P> & m,
         }
     }
     std::cout << "\t" << count << " edges shorter than " << 4./5.*l << " were collapsed." << std::endl;
-
 
     // 3) optimize per vert valence
     //
@@ -141,7 +139,13 @@ void remesh_Botsch_Kobbelt_2004(DrawableTrimesh<M,V,E,P> & m,
 
         if(before>after) // flip only if minimize sqrd deviation from ideal valence
         {
-            m.edge_flip(eid);
+            P   data    = m.poly_data(m.adj_e2p(eid).front());
+            int new_eid = m.edge_flip(eid);
+
+            if(new_eid>=0) // copy per poly attributes in the newly generated poly
+            {
+                for(uint pid : m.adj_e2p(new_eid)) m.poly_data(pid) = data;
+            }
             ++count;
         }
     }
