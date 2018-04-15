@@ -504,9 +504,9 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 double Tetmesh<M,V,E,F,P>::poly_dihedral_angle(const uint pid, const uint fid0, const uint fid1) const
 {
-    double  alpha = acos(this->poly_face_normal(pid,fid0).dot(-this->poly_face_normal(pid,fid1)));
-    assert(!std::isnan(alpha));
-    return alpha;
+    vec3d n0 =  this->poly_face_normal(pid,fid0);
+    vec3d n1 = -this->poly_face_normal(pid,fid1);
+    return n0.angle_rad(n1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

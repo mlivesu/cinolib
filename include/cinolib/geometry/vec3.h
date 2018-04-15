@@ -260,11 +260,11 @@ template<typename real> class vec3
         {
             vec3<real> u = *this; u.normalize();
             vec3<real> v = in;    v.normalize();
-            double angle = acos(u.dot(v));
-            if (std::isnan(angle))
-            {
-                std::cerr << "WARNING: NaN!" << std::endl;
-            }
+            // ensure dot stays srictly in between 0 and 1 (included)
+            double dot   = std::min( 1.0, u.dot(v));
+                   dot   = std::max(-1.0, dot);
+            double angle = acos(dot);
+            assert(!std::isnan(angle));
             return angle;
         }
 
