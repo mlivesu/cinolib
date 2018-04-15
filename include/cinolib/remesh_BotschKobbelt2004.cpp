@@ -56,12 +56,21 @@ void remesh_Botsch_Kobbelt_2004(DrawableTrimesh<M,V,E,P> & m,
     uint ne = m.num_edges();
     for(uint eid=0; eid<ne; ++eid)
     {
-        if (preserve_marked_features && m.edge_data(eid).marked) continue;
-
         if (m.edge_length(eid) > 4./3.*l)
         {
-            m.edge_split(eid, 0.5);
+            bool mark_children = (preserve_marked_features && m.edge_data(eid).marked);
+            uint vid0 = m.edge_vert_id(eid, 0);
+            uint vid1 = m.edge_vert_id(eid, 1);
+            uint vid  = m.edge_split(eid, 0.5);
             ++count;
+
+            if(mark_children)
+            {
+                int e0 = m.edge_id(vid,vid0); assert(e0>=0);
+                int e1 = m.edge_id(vid,vid1); assert(e1>=0);
+                m.edge_data(e0).marked = true;
+                m.edge_data(e1).marked = true;
+            }
         }
     }
     std::cout << "\t" << count << " edges longer than " << 4./3.*l << " were split." << std::endl;
@@ -72,7 +81,15 @@ void remesh_Botsch_Kobbelt_2004(DrawableTrimesh<M,V,E,P> & m,
     count = 0;
     for(uint eid=0; eid<m.num_edges(); ++eid)
     {
-        if (preserve_marked_features && m.edge_data(eid).marked) continue;
+        bool inc_to_marked = false;
+        if(preserve_marked_features)
+        {
+            uint vid0 = m.edge_vert_id(eid,0);
+            uint vid1 = m.edge_vert_id(eid,1);
+            for(uint nbr : m.adj_v2e(vid0)) if (m.edge_data(nbr).marked) inc_to_marked = true;
+            for(uint nbr : m.adj_v2e(vid1)) if (m.edge_data(nbr).marked) inc_to_marked = true;
+        }
+        if (preserve_marked_features && inc_to_marked) continue;
 
         if (m.edge_length(eid) < 4./5.*l)
         {
