@@ -141,9 +141,15 @@ void remesh_Botsch_Kobbelt_2004(DrawableTrimesh<M,V,E,P> & m,
             P   data    = m.poly_data(m.adj_e2p(eid).front());
             int new_eid = m.edge_flip(eid);
 
-            if(new_eid>=0) // copy per poly attributes in the newly generated poly
+            if(new_eid>=0) // copy per poly attributes in the newly generated poly (but restore right normal!)
             {
-                for(uint pid : m.adj_e2p(new_eid)) m.poly_data(pid) = data;
+                for(uint pid : m.adj_e2p(new_eid))
+                {
+                    m.poly_data(pid) = data;
+                    m.update_p_normal(pid);
+                }
+                m.update_v_normal(m.edge_vert_id(new_eid,0));
+                m.update_v_normal(m.edge_vert_id(new_eid,1));
             }
             ++count;
         }

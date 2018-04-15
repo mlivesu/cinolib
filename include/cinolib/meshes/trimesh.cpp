@@ -255,7 +255,10 @@ uint Trimesh<M,V,E,P>::edge_split(const uint eid, const double lambda)
         uint new_pid2 = this->poly_add(v_opp, new_vid, vid1);
         this->poly_data(new_pid1) = this->poly_data(pid);
         this->poly_data(new_pid2) = this->poly_data(pid);
+        this->update_p_normal(new_pid1);
+        this->update_p_normal(new_pid2);
     }
+    this->update_v_normal(new_vid);
 
     // copy edge data
     int eid0 = this->edge_id(vid0,new_vid); assert(eid0>=0);
