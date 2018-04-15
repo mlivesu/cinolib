@@ -96,7 +96,7 @@ int main(int argc, char **argv)
         double thresh_rad = static_cast<double>(sb_crease_angle.value()) * M_PI/180.0;
         for(uint eid=0; eid<m.num_edges(); ++eid)
         {
-            if(m.edge_dihedral_angle(eid) > thresh_rad)
+            if(m.edge_crease_angle(eid) > thresh_rad)
             {
                 m.edge_data(eid).marked = true;
             }
