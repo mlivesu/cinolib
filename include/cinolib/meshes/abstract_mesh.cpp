@@ -207,6 +207,20 @@ std::vector<uint> AbstractMesh<M,V,E,P>::vector_serialized_polys() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+std::vector<Color> AbstractMesh<M,V,E,P>::vector_poly_colors() const
+{
+    std::vector<Color> colors;
+    colors.reserve(num_polys());
+    for(uint pid=0; pid<num_polys(); ++pid)
+    {
+        colors.push_back(poly_data(pid).color);
+    }
+    return colors;
+}
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<double> AbstractMesh<M,V,E,P>::serialize_uvw(const int mode) const
 {
     std::vector<double> uvw;
@@ -880,6 +894,20 @@ void AbstractMesh<M,V,E,P>::poly_unmark_all()
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool AbstractMesh<M,V,E,P>::polys_are_colored() const
+{
+    std::set<Color> colors;
+    for(uint pid=0; pid<num_polys(); ++pid)
+    {
+        colors.insert(poly_data(pid).color);
+    }
+    if (colors.size()>1) return true;
+    return false;
+}
 
 
 }

@@ -136,6 +136,7 @@ class AbstractMesh
         const std::vector<uint>              & vector_edges()            const { return edges; }
         const std::vector<std::vector<uint>> & vector_polys()            const { return polys; }
               std::vector<std::vector<uint>> & vector_polys()                  { return polys; }
+              std::vector<Color>               vector_poly_colors() const;
               std::vector<uint>                vector_serialized_polys() const ;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -218,6 +219,7 @@ class AbstractMesh
                 void               poly_color_wrt_label(const float s=.5f, float v=.85f); // s => saturation, v => value in HSV color space
                 void               poly_label_wrt_color();
                 void               poly_unmark_all     ();
+                bool               polys_are_colored   () const;
         virtual double             poly_mass           (const uint pid) const = 0;
         virtual void               poly_set_color      (const Color & c);
         virtual void               poly_set_alpha      (const float alpha);

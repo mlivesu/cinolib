@@ -98,7 +98,11 @@ void AbstractPolygonMesh<M,V,E,P>::save(const char * filename) const
     else if (filetype.compare("obj") == 0 ||
              filetype.compare("OBJ") == 0)
     {
-        write_OBJ(filename, coords, this->polys);
+        if(this->polys_are_colored())
+        {
+            write_OBJ(filename, coords, this->polys, this->vector_poly_colors());
+        }
+        else write_OBJ(filename, coords, this->polys);
     }
     else
     {
