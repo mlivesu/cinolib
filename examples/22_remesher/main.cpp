@@ -1,6 +1,6 @@
 /* This sample program reads a triangle mesh and performs
- * a area equalizing remeshing, using the a variant of the
- * algorithm described in
+ * an area equalizing remeshing scheme. This is a variant 
+ * of the algorithm described in
  *
  *    A Remeshing Approach to Multiresolution Modeling
  *    M.Botsch, L.Kobbelt
