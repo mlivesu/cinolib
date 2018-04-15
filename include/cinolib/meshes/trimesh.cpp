@@ -207,9 +207,9 @@ bool Trimesh<M,V,E,P>::edge_is_geometrically_collapsible(const uint eid, const d
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda)
+int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda)
 {
-    if (!edge_is_collapsible(eid, lambda)) return false;
+    if (!edge_is_collapsible(eid, lambda)) return -1;
 
     uint vert_to_keep   = this->edge_vert_id(eid,0);
     uint vert_to_remove = this->edge_vert_id(eid,1);
@@ -234,7 +234,7 @@ bool Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda)
     this->update_v_normal(vert_to_keep);
 
     this->vert_remove(vert_to_remove);
-    return true;
+    return vert_to_keep;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -256,8 +256,14 @@ uint Trimesh<M,V,E,P>::edge_split(const uint eid, const double lambda)
         this->poly_data(new_pid1) = this->poly_data(pid);
         this->poly_data(new_pid2) = this->poly_data(pid);
     }
-    this->polys_remove(this->adj_e2p(eid));
 
+    // copy edge data
+    int eid0 = this->edge_id(vid0,new_vid); assert(eid0>=0);
+    int eid1 = this->edge_id(vid1,new_vid); assert(eid1>=0);
+    this->edge_data(eid0) = this->edge_data(eid);
+    this->edge_data(eid1) = this->edge_data(eid);
+
+    this->polys_remove(this->adj_e2p(eid));
     return new_vid;
 }
 
@@ -297,9 +303,9 @@ bool Trimesh<M,V,E,P>::edge_is_flippable(const uint eid)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,P>::edge_flip(const uint eid)
+int Trimesh<M, V, E, P>::edge_flip(const uint eid)
 {
-    if(!edge_is_flippable(eid)) return false;
+    if(!edge_is_flippable(eid)) return -1;
 
     assert(this->adj_e2p(eid).size()==2);
     uint pid0 = this->adj_e2p(eid).front();
@@ -311,17 +317,17 @@ bool Trimesh<M,V,E,P>::edge_flip(const uint eid)
     uint opp1 = this->vert_opposite_to(pid1,vid0,vid1);
     std::vector<uint> p0 = { opp0, vid0, opp1 };
     std::vector<uint> p1 = { opp1, vid1, opp0 };
-    //if(!this->poly_verts_are_CCW(pid0, vid0, vid1))
-    //{
-    //    std::swap(p0[0],p0[1]);
-    //    std::swap(p1[0],p1[1]);
-    //}
-    //std::cout << p0[0] << " " << p0[1] << " " << p0[2] << std::endl;
-    //std::cout << p1[0] << " " << p1[1] << " " << p1[2] << std::endl;
+    // SHOULD I HANDLE WINDING ORDER? IT SEEM OK ALREADY...
     this->poly_add(p0);
     this->poly_add(p1);
+
     this->edge_remove(eid);
-    return true;
+
+    // copy edge data
+    int new_eid = this->edge_id(opp0,opp1); assert(new_eid>=0);
+    this->edge_data(new_eid) = this->edge_data(eid);
+
+    return new_eid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

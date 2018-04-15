@@ -94,13 +94,13 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         int    edge_opposite_to                 (const uint pid, const uint vid) const;
-        bool   edge_collapse                    (const uint eid, const double lambda = 0.5);
+        int    edge_collapse                    (const uint eid, const double lambda = 0.5);
         bool   edge_is_collapsible              (const uint eid, const double lambda) const;
         bool   edge_is_geometrically_collapsible(const uint eid, const double lambda) const;
         bool   edge_is_topologically_collapsible(const uint eid) const;
         uint   edge_split                       (const uint eid, const double lambda = 0.5);
         bool   edge_is_flippable                (const uint eid);
-        bool   edge_flip                        (const uint eid);
+        int    edge_flip                        (const uint eid);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
