@@ -3,10 +3,6 @@
  * shown with a texture applied on it (texture seams are shown in red). On the
  * second canvas the shape is shown flattened on the uv space.
  *
- * NOTE: if for some reason the texture is not automatically loaded, please
- * click on the "Load Text2D" button on the control panel, and select the file
- * "blub_texture.png". This should fix the problem.
- *
  * Enjoy!
 */
 
@@ -32,14 +28,8 @@ int main(int argc, char **argv)
     window.resize(800,600);
     window.show();
 
-    std::vector<vec3d> xyz, uvw;
-    std::vector<std::vector<uint>> poly;
     std::string s = (argc==3) ? std::string(argv[1]) : std::string(DATA_PATH) + "/blub_triangulated.obj";
-    read_OBJ(s.c_str(), xyz, uvw, poly);
-
-    DrawableTrimesh<> m_xyz(xyz, poly);
-    for(uint vid=0; vid<m_xyz.num_verts(); ++vid) m_xyz.vert_data(vid).uvw = uvw.at(vid);
-    m_xyz.edge_mark_boundaries();
+    DrawableTrimesh<> m_xyz(s.c_str());
 
     DrawableTrimesh<> m_uvw = m_xyz;
     m_uvw.copy_uvw_to_xyz(UVW_param);
