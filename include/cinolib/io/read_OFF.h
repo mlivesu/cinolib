@@ -35,14 +35,23 @@
 #include <vector>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/color.h>
 
 namespace cinolib
 {
 
+//CINO_INLINE
+//void read_OFF(const char                     * filename,
+//              std::vector<vec3d>             & verts,
+//              std::vector<std::vector<uint>> & polys);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void read_OFF(const char                     * filename,
               std::vector<vec3d>             & verts,
-              std::vector<std::vector<uint>> & polys);
+              std::vector<std::vector<uint>> & polys,
+              std::vector<Color>             & poly_colors);
 
 }
 

@@ -62,7 +62,7 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
     if (filetype.compare(".off") == 0 ||
         filetype.compare(".OFF") == 0)
     {
-        read_OFF(filename, pos, poly_pos);
+        read_OFF(filename, pos, poly_pos, poly_col);
     }
     else if (filetype.compare(".obj") == 0 ||
              filetype.compare(".OBJ") == 0)

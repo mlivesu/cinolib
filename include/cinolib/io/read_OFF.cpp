@@ -41,49 +41,67 @@ namespace cinolib
 CINO_INLINE
 void read_OFF(const char                     * filename,
               std::vector<vec3d>             & verts,
-              std::vector<std::vector<uint>> & polys)
+              std::vector<std::vector<uint>> & polys,
+              std::vector<Color>             & poly_colors)
 {
+    verts.clear();
+    polys.clear();
+    poly_colors.clear();
+
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
-    FILE *fp = fopen(filename, "r");
+    FILE *f = fopen(filename, "r");
 
-    if(!fp)
+    if(!f)
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OFF() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 
-    int read_value;
-    (void) read_value;
-    uint nv, nfaces, dummy;
+    int err;
+    uint nv, np, ne;
+    bool has_colors;
 
-    read_value = fscanf(fp, "OFF\n");
-    read_value = fscanf(fp, "%d %d %d\n", &nv, &nfaces, &dummy);
+    char header[100];
+    err = fscanf(f, "%s", header);
+    if(strcmp(header, "OFF" )==0) has_colors = false; else
+    if(strcmp(header, "COFF")==0) has_colors = true;  else
+    assert(false);
+
+    err = fscanf(f, "%d %d %d\n", &nv, &np, &ne);
+    std::cout << nv << " " << np << " " << ne << std::endl;
 
     for(uint i=0; i<nv; ++i)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         double x, y, z;
-        read_value = fscanf(fp, "%lf %lf %lf\n", &x, &y, &z);
+        err = fscanf(f, "%lf %lf %lf\n", &x, &y, &z);
         verts.push_back(vec3d(x,y,z));
     }
 
-    for(uint i=0; i<nfaces; ++i)
+    for(uint i=0; i<np; ++i)
     {
         uint n_corners;
-        read_value = fscanf(fp, "%d", &n_corners);
+        err = fscanf(f, "%d", &n_corners);
 
-        std::vector<uint> face;
+        std::vector<uint> poly;
         for(uint j=0; j<n_corners; ++j)
         {
             uint vid;
-            read_value = fscanf(fp, "%d", &vid);
-            face.push_back(vid);
+            err = fscanf(f, "%d", &vid);
+            poly.push_back(vid);
         }
-        polys.push_back(face);
+        polys.push_back(poly);
+
+        if(has_colors)
+        {
+            Color c;
+            err = fscanf(f, "%f %f %f %f\n", &c.r, &c.g, &c.b, &c.a);
+            poly_colors.push_back(c);
+        }
     }
-    fclose(fp);
+    fclose(f);
 }
 
 
