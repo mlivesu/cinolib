@@ -287,8 +287,9 @@ bool Trimesh<M,V,E,P>::edge_is_flippable(const uint eid)
     uint  vid1 = this->edge_vert_id(eid,1);
     uint  opp0 = this->vert_opposite_to(pid0,vid0,vid1);
     uint  opp1 = this->vert_opposite_to(pid1,vid0,vid1);
+    if(!this->poly_verts_are_CCW(pid0, vid1, vid0)) std::swap(vid0,vid1);
     vec3d n0   = this->poly_data(pid0).normal;
-    vec3d n1   = this->poly_data(pid0).normal;
+    vec3d n1   = this->poly_data(pid1).normal;
     if(triangle_area(this->vert(opp0),this->vert(vid0),this->vert(opp1))<1e-5) return false;
     if(triangle_area(this->vert(opp1),this->vert(vid1),this->vert(opp0))<1e-5) return false;
     vec3d n2   = triangle_normal(this->vert(opp0),this->vert(vid0),this->vert(opp1));
@@ -313,14 +314,13 @@ int Trimesh<M, V, E, P>::edge_flip(const uint eid)
     assert(this->adj_e2p(eid).size()==2);
     uint pid0 = this->adj_e2p(eid).front();
     uint pid1 = this->adj_e2p(eid).back();
-    assert(pid0!=pid1);
     uint vid0 = this->edge_vert_id(eid,0);
     uint vid1 = this->edge_vert_id(eid,1);
     uint opp0 = this->vert_opposite_to(pid0,vid0,vid1);
     uint opp1 = this->vert_opposite_to(pid1,vid0,vid1);
+    if(!this->poly_verts_are_CCW(pid0, vid1, vid0)) std::swap(vid0,vid1);
     std::vector<uint> p0 = { opp0, vid0, opp1 };
     std::vector<uint> p1 = { opp1, vid1, opp0 };
-    // SHOULD I HANDLE WINDING ORDER? IT SEEM OK ALREADY...
     this->poly_add(p0);
     this->poly_add(p1);
 
