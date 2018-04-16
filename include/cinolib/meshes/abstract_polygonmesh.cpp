@@ -1428,7 +1428,7 @@ void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P>
         this->p2p.push_back(tmp);
 
         tmp.clear();
-        for(uint vid : m.poly_tessellation(pid)) tmp.push_back(np + vid);
+        for(uint vid : m.poly_tessellation(pid)) tmp.push_back(nv + vid);
         this->poly_triangles.push_back(tmp);
     }
     for(uint eid=0; eid<m.num_edges(); ++eid)
