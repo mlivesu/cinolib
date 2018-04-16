@@ -72,7 +72,10 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double poly_volume(const uint) const { assert(false && "TODO!"); return 1.0; }
+        double poly_volume       (const uint) const { assert(false && "TODO!"); return 1.0; }
+        bool   poly_is_hexahedron(const uint pid) const;
+        bool   poly_is_prism     (const uint pid) const;
+        bool   poly_is_prism     (const uint pid, const uint fid) const; // check if it is a prism using fid as base
 };
 
 }

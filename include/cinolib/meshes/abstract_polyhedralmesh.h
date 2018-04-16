@@ -95,6 +95,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual uint edges_per_poly(const uint pid) const { return this->p2e.at(pid).size();   }
         virtual uint faces_per_poly(const uint pid) const { return this->polys.at(pid).size(); }
         virtual uint verts_per_face(const uint fid) const { return this->faces.at(fid).size(); }
+        virtual uint edges_per_face(const uint fid) const { return this->faces.at(fid).size(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -176,6 +177,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool              faces_share_poly        (const uint fid0, const uint fid1) const;
                 void              face_unmark_all         ();
                 int               face_id                 (const std::vector<uint> & f) const;
+                bool              face_is_tri             (const uint fid) const;
+                bool              face_is_quad            (const uint fid) const;
         virtual void              face_set_color          (const Color & c);
         virtual void              face_set_alpha          (const float alpha);
                 void              face_switch_id          (const uint fid0, const uint fid1);

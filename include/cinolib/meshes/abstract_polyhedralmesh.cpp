@@ -293,6 +293,26 @@ int AbstractPolyhedralMesh<M,V,E,F,P>::face_id(const std::vector<uint> & f) cons
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_tri(const uint fid) const
+{
+    if(this->verts_per_face(fid)==3) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_quad(const uint fid) const
+{
+    if(this->verts_per_face(fid)==4) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::face_set_color(const Color & c)
 {
     for(uint fid=0; fid<num_faces(); ++fid)
