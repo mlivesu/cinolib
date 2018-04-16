@@ -45,6 +45,9 @@ int main(int argc, char **argv)
     sb_crease_angle.setMinimum(0);
     sb_crease_angle.setValue(60);
     sb_niters.setValue(1);
+    sb_target_length.setDecimals(4);
+    sb_target_length.setMinimum(0.0001);
+    sb_target_length.setMaximum(9999);
     layout.addWidget(&but_mark_color,0,0,1,2);
     layout.addWidget(&but_mark_creases,0,2,1,2);
     layout.addWidget(new QLabel("Crease angle >=",&window),1,2);
