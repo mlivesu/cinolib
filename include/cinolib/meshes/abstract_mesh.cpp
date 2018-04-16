@@ -724,6 +724,21 @@ vec3d AbstractMesh<M,V,E,P>::poly_centroid(const uint pid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+vec3d AbstractMesh<M,V,E,P>::poly_sample_at(const uint pid, const std::vector<double> & bary) const
+{
+    assert(bary.size() == verts_per_poly(pid));
+    vec3d p(0,0,0);
+    for(uint off=0; off<verts_per_poly(pid); ++off)
+    {
+        p += bary.at(off) * poly_vert(pid,off);
+    }
+    return p;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 vec3d AbstractMesh<M,V,E,P>::poly_vert(const uint pid, const uint offset) const
 {
     return vert(poly_vert_id(pid,offset));
