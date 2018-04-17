@@ -1,5 +1,4 @@
 - cleanup IO (read/write colors,uv's and normals, remove useless methods)
-- read/write labels from Medit .MESH format (5th number on tets, 9th on hexas) 
 - edit HEDRA format to account for labels (similarly to .MESH)
 - add ambient occlusion
 - add verdict metrics for tris/quads/tets/hexa
