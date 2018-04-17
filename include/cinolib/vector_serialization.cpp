@@ -63,13 +63,13 @@ std::vector<double> serialized_xyz_from_vec3d(const std::vector<vec3d> & verts)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<std::vector<uint>> polys_from_serialized_vids(const std::vector<uint> & vids, const uint vids_per_face)
+std::vector<std::vector<uint>> polys_from_serialized_vids(const std::vector<uint> & vids, const uint vids_per_poly)
 {
-    uint nf = vids.size()/vids_per_face;
+    uint nf = vids.size()/vids_per_poly;
     std::vector<std::vector<uint>> tmp(nf);
     for(uint fid=0; fid<nf; ++fid)
     {
-        for(uint off=0; off<vids_per_face; ++off) tmp.at(fid).push_back(vids.at(fid*vids_per_face+off));
+        for(uint off=0; off<vids_per_poly; ++off) tmp.at(fid).push_back(vids.at(fid*vids_per_poly+off));
     }
     return tmp;
 }
@@ -77,10 +77,10 @@ std::vector<std::vector<uint>> polys_from_serialized_vids(const std::vector<uint
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<uint> serialized_vids_from_faces(const std::vector<std::vector<uint>> & faces)
+std::vector<uint> serialized_vids_from_polys(const std::vector<std::vector<uint>> & polys)
 {
     std::vector<uint> tmp;
-    for(const auto & f   : faces)
+    for(const auto & f   : polys)
     for(const auto & vid : f    )
     {
         tmp.push_back(vid);

@@ -50,12 +50,12 @@ std::vector<double> serialized_xyz_from_vec3d(const std::vector<vec3d> & verts);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<std::vector<uint>> polys_from_serialized_vids(const std::vector<uint> & vids, const uint vids_per_face);
+std::vector<std::vector<uint>> polys_from_serialized_vids(const std::vector<uint> & vids, const uint vids_per_poly);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<uint> serialized_vids_from_faces(const std::vector<std::vector<uint>> & faces);
+std::vector<uint> serialized_vids_from_polys(const std::vector<std::vector<uint>> & polys);
 
 }
 

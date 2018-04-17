@@ -13,6 +13,7 @@
 #include <cinolib/dual_mesh.h>
 #include <cinolib/tetgen_wrap.h>
 #include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/vector_serialization.h>
 #include <cinolib/profiler.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -32,7 +33,7 @@ int main(int argc, char **argv)
     double vol_thresh = 0.01 * m_in.bbox().diag(); // force tets to be smaller than 5% of bbox diag
     char opt[100];
     sprintf(opt, "YQqa%f", vol_thresh);
-    tetgen_wrap(m_in.vector_coords(), m_in.vector_serialized_polys(), edges, opt, verts, tets);
+    tetgen_wrap(m_in.vector_coords(), serialized_vids_from_polys(m_in.vector_polys()), edges, opt, verts, tets);
     DrawableTetmesh<> tetmesh(verts, tets);
 
     Profiler profiler;
