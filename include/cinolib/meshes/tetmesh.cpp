@@ -90,6 +90,8 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
 
     std::vector<vec3d>             tmp_verts;
     std::vector<std::vector<uint>> tmp_polys;
+    std::vector<int>               vert_labels;
+    std::vector<int>               poly_labels;
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -97,7 +99,7 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        read_MESH(filename, tmp_verts, tmp_polys);
+        read_MESH(filename, tmp_verts, tmp_polys, vert_labels, poly_labels);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
@@ -109,18 +111,13 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
     {
         read_VTK(filename, tmp_verts, tmp_polys);
     }
-    else if (filetype.compare(".tet") == 0 ||
-             filetype.compare(".TET") == 0)
-    {
-        read_TET(filename, tmp_verts, tmp_polys);
-    }
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
         exit(-1);
     }
 
-    init_tetmesh(tmp_verts, tmp_polys);
+    init_tetmesh(tmp_verts, tmp_polys, vert_labels, poly_labels);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -176,6 +173,37 @@ void Tetmesh<M,V,E,F,P>::init_tetmesh(const std::vector<vec3d>             & ver
                  this->num_edges() << "E / " <<
                  this->num_faces() << "F / " <<
                  this->num_polys() << "P   " << std::endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::init_tetmesh(const std::vector<vec3d>             & verts,
+                                      const std::vector<std::vector<uint>> & polys,
+                                      const std::vector<int>               & vert_labels,
+                                      const std::vector<int>               & poly_labels)
+{
+    init_tetmesh(verts, polys);
+
+    if(vert_labels.size()==this->num_verts())
+    {
+        std::cout << "set vert labels" << std::endl;
+        for(uint vid=0; vid<this->num_verts(); ++vid)
+        {
+            this->vert_data(vid).label = vert_labels.at(vid);
+        }
+    }
+
+    if(poly_labels.size()==this->num_polys())
+    {
+        std::cout << "set poly labels" << std::endl;
+        for(uint pid=0; pid<this->num_polys(); ++pid)
+        {
+            this->poly_data(pid).label = poly_labels.at(pid);
+        }
+        this->poly_color_wrt_label();
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
