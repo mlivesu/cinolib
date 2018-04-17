@@ -1,4 +1,4 @@
-- cleanup IO (read/write colors,uv's and normals, remove useless methods)
+- remove vector_coords() and use vector_serialization utilities instead
 - edit HEDRA format to account for labels (similarly to .MESH)
 - add ambient occlusion
 - add verdict metrics for tris/quads/tets/hexa
@@ -6,11 +6,9 @@
 - add inverse and transpose operators for 2x2 matrices
 - refactor ray/line/plane intersections and integral curve tracing 
   (check Robust Polylines Tracing for N-Symmetry Direction Field on Triangulated Surfaces)
-- Add GUI controls: load/save labeling
 - avoid headers from serialized vector and scalar fields (it’s far more general)
 - update skeleton data structure (and make relative control panel)
 - Gradients on hexmeshes are buggy. hint: check per face normals!
-- add max_depth to Profiler to avoid lengthy reports
 - extend the concept of subdivisions from hexmesh to any mesh
 - add Additive Manufacturing stuff (load and process CLI files)…
 - Add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point

@@ -85,17 +85,16 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 std::vector<uint> Polygonmesh<M,V,E,P>::get_ordered_boundary_vertices() const
 {
-    // NOTE: assumes the mesh contains exactly ONE simply connected boundary!
+    // NOTE #1: assumes the mesh contains exactly ONE simply connected boundary!
+    // NOTE #2: although this method is duplicated both in Quadmesh and Polygonmesh,
+    //          I cannot move it up to the AbstractPolygonMesh level because it uses
+    //          a method of trimesh :(
 
-    std::vector<double> coords = this->vector_coords();
-    std::vector<uint>   tris;
+    std::vector<uint>  polys;
+    std::vector<vec3d> verts = this->vector_verts();
+    verts.push_back(this->centroid());
 
-    vec3d c   = this->centroid();
-    uint  pid = this->num_verts();
-    coords.push_back(c.x());
-    coords.push_back(c.y());
-    coords.push_back(c.z());
-
+    uint cid = this->num_verts();
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         if (this->edge_is_boundary(eid))
@@ -103,18 +102,15 @@ std::vector<uint> Polygonmesh<M,V,E,P>::get_ordered_boundary_vertices() const
             uint pid  = this->adj_e2p(eid).front();
             uint vid0 = this->edge_vert_id(eid,0);
             uint vid1 = this->edge_vert_id(eid,1);
-            if (this->poly_vert_offset(pid,vid0) > this->poly_vert_offset(pid,vid1))
-            {
-                std::swap(vid0,vid1);
-            }
-            tris.push_back(vid0);
-            tris.push_back(vid1);
-            tris.push_back(pid);
+            if (!this->poly_verts_are_CCW(pid, vid1, vid0)) std::swap(vid0,vid1);
+            polys.push_back(vid0);
+            polys.push_back(vid1);
+            polys.push_back(cid);
         }
     }
 
-    Trimesh<M,V,E,P> tmp(coords,tris);
-    return tmp.vert_ordered_vert_ring(pid);
+    Trimesh<> tmp(verts,polys);
+    return tmp.vert_ordered_vert_ring(cid);
 }
 
 }

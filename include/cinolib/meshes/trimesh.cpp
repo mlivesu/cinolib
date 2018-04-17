@@ -453,26 +453,6 @@ uint Trimesh<M,V,E,P>::poly_add(const uint vid0, const uint vid1, const uint vid
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void Trimesh<M,V,E,P>::poly_set(const uint pid, const uint vid0, const uint vid1, const uint vid2)
-{
-    /* WARNING!!!! This completely screws up edge connectivity!!!!!! */
-
-    assert(vid0 < this->num_verts());
-    assert(vid1 < this->num_verts());
-    assert(vid2 < this->num_verts());
-
-    this->polys.at(pid).clear();
-    this->polys.at(pid).push_back(vid0);
-    this->polys.at(pid).push_back(vid1);
-    this->polys.at(pid).push_back(vid2);
-
-    this->update_p_normal(pid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 double Trimesh<M,V,E,P>::poly_area(const uint pid) const
 {
     vec3d p = this->poly_vert(pid,0);
@@ -560,7 +540,10 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 std::vector<uint> Trimesh<M,V,E,P>::get_ordered_boundary_vertices() const
 {
-    // NOTE: assumes the mesh contains exactly ONE simply connected boundary!
+    // NOTE #1: assumes the mesh contains exactly ONE simply connected boundary!
+    // NOTE #2: although this method is duplicated both in Quadmesh and Polygonmesh,
+    //          I cannot move it up to the AbstractPolygonMesh level because it uses
+    //          a method of trimesh :(
 
     std::vector<uint>  polys;
     std::vector<vec3d> verts = this->vector_verts();
