@@ -53,6 +53,8 @@ int main(int argc, char **argv)
     mic.show_wireframe_width(3);
     sec.show_wireframe_color(Color::RED());
     mic.show_wireframe_color(Color::BLUE());
+    sec.show_marked_edge(false);
+    mic.show_marked_edge(false);
 
     QWidget     window;
     QSlider     slider(Qt::Horizontal);

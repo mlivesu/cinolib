@@ -59,6 +59,7 @@ int main(int argc, char **argv)
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.obj";
     DrawableTrimesh<> m(s.c_str());
+    m.show_wireframe(false);
     gui.push_obj(&m);
 
     Profiler profiler;

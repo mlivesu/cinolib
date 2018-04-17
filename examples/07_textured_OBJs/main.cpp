@@ -30,9 +30,11 @@ int main(int argc, char **argv)
 
     std::string s = (argc==3) ? std::string(argv[1]) : std::string(DATA_PATH) + "/blub_triangulated.obj";
     DrawableTrimesh<> m_xyz(s.c_str());
+    m_xyz.show_wireframe(false);
 
     DrawableTrimesh<> m_uvw = m_xyz;
     m_uvw.copy_uvw_to_xyz(UVW_param);
+    m_uvw.show_wireframe(false);
     m_uvw.update_normals();
 
     s = (argc==3) ? std::string(argv[2]) : std::string(DATA_PATH) + "/blub_texture.png";
