@@ -209,6 +209,8 @@ class AbstractMesh
 
                 vec3d              poly_vert           (const uint pid, const uint offset) const;
                 std::vector<vec3d> poly_verts          (const uint pid) const;
+                std::vector<uint>  poly_adj_verts      (const uint pid, const uint vid) const;
+                uint               poly_vert_valence   (const uint pid, const uint vid) const;
                 uint               poly_vert_id        (const uint pid, const uint offset) const;
                 vec3d              poly_centroid       (const uint pid) const;
                 vec3d              poly_sample_at      (const uint pid, const std::vector<double> & bary) const;
