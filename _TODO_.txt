@@ -1,4 +1,3 @@
-- remove vector_coords() and use vector_serialization utilities instead
 - edit HEDRA format to account for labels (similarly to .MESH)
 - add ambient occlusion
 - add verdict metrics for tris/quads/tets/hexa
