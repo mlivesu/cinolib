@@ -217,6 +217,22 @@ std::vector<Color> AbstractMesh<M,V,E,P>::vector_poly_colors() const
     }
     return colors;
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<int> AbstractMesh<M,V,E,P>::vector_poly_labels() const
+{
+    std::vector<int> labels;
+    labels.reserve(num_polys());
+    for(uint pid=0; pid<num_polys(); ++pid)
+    {
+        labels.push_back(poly_data(pid).label);
+    }
+    return labels;
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
@@ -948,5 +964,19 @@ bool AbstractMesh<M,V,E,P>::polys_are_colored() const
     return false;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool AbstractMesh<M,V,E,P>::polys_are_labeled() const
+{
+    std::set<int> labels;
+    for(uint pid=0; pid<num_polys(); ++pid)
+    {
+        labels.insert(poly_data(pid).label);
+    }
+    if (labels.size()>1) return true;
+    return false;
+}
 
 }

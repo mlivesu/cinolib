@@ -38,8 +38,13 @@ namespace cinolib
 CINO_INLINE
 void write_MESH(const char                           * filename,
                 const std::vector<vec3d>             & verts,
-                const std::vector<std::vector<uint>> & polys)
+                const std::vector<std::vector<uint>> & polys,
+                const std::vector<int>               & vert_labels,
+                const std::vector<int>               & poly_labels)
 {
+    assert(vert_labels.size() == verts.size());
+    assert(poly_labels.size() == polys.size());
+
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
     FILE *fp = fopen(filename, "w");
@@ -70,7 +75,7 @@ void write_MESH(const char                           * filename,
         {
             // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
             //
-            fprintf( fp, "%.17g %.17g %.17g 0\n", verts.at(vid).x(), verts.at(vid).y(), verts.at(vid).z());
+            fprintf( fp, "%.17g %.17g %.17g %d\n", verts.at(vid).x(), verts.at(vid).y(), verts.at(vid).z(), vert_labels.at(vid));
         }
     }
 
@@ -78,11 +83,12 @@ void write_MESH(const char                           * filename,
     {
         fprintf(fp, "Tetrahedra\n" );
         fprintf(fp, "%d\n", nt );
-        for(auto tet : polys)
+        for(uint pid=0; pid<polys.size(); ++pid)
         {
+            const std::vector<uint> & tet = polys.at(pid);
             if (tet.size() == 4)
             {
-                fprintf(fp, "%d %d %d %d 0\n", tet.at(0)+1, tet.at(1)+1, tet.at(2)+1, tet.at(3)+1);
+                fprintf(fp, "%d %d %d %d %d\n", tet.at(0)+1, tet.at(1)+1, tet.at(2)+1, tet.at(3)+1, poly_labels.at(pid));
             }
         }
     }
@@ -91,12 +97,14 @@ void write_MESH(const char                           * filename,
     {
         fprintf(fp, "Hexahedra\n" );
         fprintf(fp, "%d\n", nh );
-        for(auto hex : polys)
+        for(uint pid=0; pid<polys.size(); ++pid)
         {
+            const std::vector<uint> & hex = polys.at(pid);
             if (hex.size() == 8)
             {
-                fprintf(fp, "%d %d %d %d %d %d %d %d 0\n", hex.at(0)+1, hex.at(1)+1, hex.at(2)+1, hex.at(3)+1,
-                                                           hex.at(4)+1, hex.at(5)+1, hex.at(6)+1, hex.at(7)+1);
+                fprintf(fp, "%d %d %d %d %d %d %d %d %d\n", hex.at(0)+1, hex.at(1)+1, hex.at(2)+1, hex.at(3)+1,
+                                                            hex.at(4)+1, hex.at(5)+1, hex.at(6)+1, hex.at(7)+1,
+                                                            poly_labels.at(pid));
             }
         }
     }
@@ -108,66 +116,13 @@ void write_MESH(const char                           * filename,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void write_MESH(const char                * filename,
-                const std::vector<double> & xyz,
-                const std::vector<uint>   & tets,
-                const std::vector<uint>   & hexa)
+void write_MESH(const char                           * filename,
+                const std::vector<vec3d>             & verts,
+                const std::vector<std::vector<uint>> & polys)
 {
-    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
-
-    FILE *fp = fopen(filename, "w");
-
-    if(!fp)
-    {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_MESH() : couldn't write output file " << filename << std::endl;
-        exit(-1);
-    }
-
-    fprintf(fp, "MeshVersionFormatted 1\n" );
-    fprintf(fp, "Dimension 3\n" );
-
-    int nv = (int)xyz.size()/3;
-    int nt = (int)tets.size()/4;
-    int nh = (int)hexa.size()/8;
-
-    if (nv > 0)
-    {
-        fprintf(fp, "Vertices\n" );
-        fprintf(fp, "%d\n", nv);
-
-        for(size_t i=0; i<xyz.size(); i+=3)
-        {
-            // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
-            //
-            fprintf( fp, "%.17g %.17g %.17g 0\n", xyz[i], xyz[i+1], xyz[i+2]);
-        }
-    }
-
-    if (nt > 0)
-    {
-        fprintf(fp, "Tetrahedra\n" );
-        fprintf(fp, "%d\n", nt );
-
-        for(size_t i=0; i<tets.size(); i+=4)
-        {
-            fprintf(fp, "%d %d %d %d 0\n", tets[i+0]+1, tets[i+1]+1, tets[i+2]+1, tets[i+3]+1);
-        }
-    }
-
-    if (nh > 0)
-    {
-        fprintf(fp, "Hexahedra\n" );
-        fprintf(fp, "%d\n", nh );
-
-        for(size_t i=0; i<hexa.size(); i+=8)
-        {
-            fprintf(fp, "%d %d %d %d %d %d %d %d 0\n", hexa[i+0]+1, hexa[i+1]+1, hexa[i+2]+1, hexa[i+3]+1,
-                                                       hexa[i+4]+1, hexa[i+5]+1, hexa[i+6]+1, hexa[i+7]+1);
-        }
-    }
-
-    fprintf(fp, "End\n\n");
-    fclose(fp);
+    std::vector<int> vert_labels(verts.size(),0);
+    std::vector<int> poly_labels(polys.size(),0);
+    write_MESH(filename, verts, polys, vert_labels, poly_labels);
 }
 
 }

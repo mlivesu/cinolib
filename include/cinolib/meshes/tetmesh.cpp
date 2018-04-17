@@ -132,7 +132,11 @@ void Tetmesh<M,V,E,F,P>::save(const char * filename) const
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        write_MESH(filename, this->verts, this->p2v);
+        if(this->polys_are_labeled())
+        {
+            write_MESH(filename, this->verts, this->p2v, std::vector<int>(this->num_verts(),0), this->vector_poly_labels());
+        }
+        else write_MESH(filename, this->verts, this->p2v);
     }
     else if (filetype.compare(".tet") == 0 ||
              filetype.compare(".TET") == 0)
