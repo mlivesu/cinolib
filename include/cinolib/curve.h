@@ -58,7 +58,7 @@ class Curve
             // important for some algorithm, for example to embed the curve
             // mesh tessellation..
             //
-            int                 eid  = -1;
+            int                 pid  = -1;
             std::vector<double> bary = std::vector<double>();            
         }
         Sample;
@@ -99,22 +99,6 @@ class Curve
         vec3d             sample_curve_at(const float t, const double tot_length) const;
         void              resample_curve(const uint n_samples);
         std::vector<uint> select_n_samples(const uint n_samples) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        std::vector<uint> tessellate(Trimesh<> & m) const;
-        void              tessellate(Trimesh<> & m, const std::vector<uint> & split_list) const;
-
-        void split_in_2(const Trimesh<>          & m,
-                        const uint                 fid,
-                        const ipair              & edg,
-                              std::vector<uint>  & split_list) const;
-
-        void split_in_3(const Trimesh<>         & m,
-                        const uint                fid,
-                        const ipair             & edg0,
-                        const ipair             & edg1,
-                              std::vector<uint> & split_list) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
