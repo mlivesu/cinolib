@@ -64,7 +64,7 @@ int main(int argc, char **argv)
     window.show();
     window.resize(800,600);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/soccerball.obj";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/pyramid.off";
     cinolib::DrawableTrimesh<> m(s.c_str());
     m.show_marked_edge(true);
     m.show_wireframe(true);
