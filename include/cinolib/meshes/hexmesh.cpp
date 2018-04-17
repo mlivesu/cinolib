@@ -204,6 +204,7 @@ void Hexmesh<M,V,E,F,P>::init_hexmesh(const std::vector<vec3d>             & ver
         {
             this->poly_data(pid).label = poly_labels.at(pid);
         }
+        this->poly_color_wrt_label();
     }
 }
 

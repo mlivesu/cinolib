@@ -31,6 +31,7 @@
 #include <cinolib/io/read_MESH.h>
 #include <cinolib/vector_serialization.h>
 #include <iostream>
+#include <set>
 
 namespace cinolib
 {
@@ -60,6 +61,9 @@ void read_MESH(const char                     * filename,
     fgets(line,1024,f);
     fgets(line,1024,f);
 
+    std::set<int> v_unique_labels;
+    std::set<int> p_unique_labels;
+
     while(fgets(line, 1024, f))
     {
         // read vertices
@@ -79,6 +83,7 @@ void read_MESH(const char                     * filename,
                 sscanf(line, "%lf %lf %lf %d", &x, &y, &z, &l);
                 verts.push_back(vec3d(x,y,z));
                 vert_labels.push_back(l);
+                v_unique_labels.insert(l);
             }
         }
 
@@ -98,6 +103,7 @@ void read_MESH(const char                     * filename,
                 for(uint & vid : tet) vid -= 1;
                 polys.push_back(tet);
                 poly_labels.push_back(l);
+                p_unique_labels.insert(l);
             }
         }
 
@@ -118,9 +124,13 @@ void read_MESH(const char                     * filename,
                 for(uint & vid : hex) vid -= 1;
                 polys.push_back(hex);
                 poly_labels.push_back(l);
+                p_unique_labels.insert(l);
             }
         }
     }
+
+    if(v_unique_labels.size()<2) vert_labels.clear();
+    if(p_unique_labels.size()<2) poly_labels.clear();
 
     fclose(f);
 }
