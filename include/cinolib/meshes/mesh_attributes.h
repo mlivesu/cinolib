@@ -79,6 +79,7 @@ typedef struct
     vec3d  normal  = vec3d(0,0,0);
     Color  color   = Color::WHITE();
     vec3d  uvw     = vec3d(0,0,0);
+    int    label   = -1;
     float  quality = 0.0;
     bool   marked  = false;
 }

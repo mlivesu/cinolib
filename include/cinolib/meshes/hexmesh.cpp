@@ -95,6 +95,8 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
 
     std::vector<vec3d>             tmp_verts;
     std::vector<std::vector<uint>> tmp_polys;
+    std::vector<int>               vert_labels;
+    std::vector<int>               poly_labels;
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -102,7 +104,7 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
     {
-        read_MESH(filename, tmp_verts, tmp_polys);
+        read_MESH(filename, tmp_verts, tmp_polys, vert_labels, poly_labels);
     }
     else if (filetype.compare(".vtu") == 0 ||
              filetype.compare(".VTU") == 0)
@@ -120,7 +122,7 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
         exit(-1);
     }
 
-    init_hexmesh(tmp_verts, tmp_polys);
+    init_hexmesh(tmp_verts, tmp_polys, vert_labels, poly_labels);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -158,8 +160,8 @@ void Hexmesh<M,V,E,F,P>::save(const char * filename) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Hexmesh<M,V,E,F,P>::init_hexmesh(const std::vector<vec3d>              & verts,
-                                       const std::vector<std::vector<uint>> & polys)
+void Hexmesh<M,V,E,F,P>::init_hexmesh(const std::vector<vec3d>             & verts,
+                                      const std::vector<std::vector<uint>> & polys)
 {
      for(auto v : verts) this->vert_add(v);
      for(auto p : polys) this->poly_add(p);
@@ -173,6 +175,36 @@ void Hexmesh<M,V,E,F,P>::init_hexmesh(const std::vector<vec3d>              & ve
                   this->num_polys() << "P   " << std::endl;
 
      print_quality();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Hexmesh<M,V,E,F,P>::init_hexmesh(const std::vector<vec3d>             & verts,
+                                      const std::vector<std::vector<uint>> & polys,
+                                      const std::vector<int>               & vert_labels,
+                                      const std::vector<int>               & poly_labels)
+{
+    init_hexmesh(verts, polys);
+
+    if(vert_labels.size()==this->num_verts())
+    {
+        std::cout << "set vert labels" << std::endl;
+        for(uint vid=0; vid<this->num_verts(); ++vid)
+        {
+            this->vert_data(vid).label = vert_labels.at(vid);
+        }
+    }
+
+    if(poly_labels.size()==this->num_polys())
+    {
+        std::cout << "set poly labels" << std::endl;
+        for(uint pid=0; pid<this->num_polys(); ++pid)
+        {
+            this->poly_data(pid).label = poly_labels.at(pid);
+        }
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

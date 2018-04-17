@@ -76,6 +76,10 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         void init_hexmesh(const std::vector<vec3d>             & verts,
                           const std::vector<std::vector<uint>> & polys);
+        void init_hexmesh(const std::vector<vec3d>             & verts,
+                          const std::vector<std::vector<uint>> & polys,
+                          const std::vector<int>               & vert_labels,
+                          const std::vector<int>               & poly_labels);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

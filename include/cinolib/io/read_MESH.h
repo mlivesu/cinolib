@@ -41,24 +41,25 @@ namespace cinolib
 {
 
 CINO_INLINE
-void read_MESH(const char          * filename,
-               std::vector<double> & xyz,
-               std::vector<uint>   & tet,
-               std::vector<uint>   & hexa);
+void read_MESH(const char                     * filename,
+               std::vector<vec3d>             & verts,
+               std::vector<std::vector<uint>> & polys,
+               std::vector<int>               & vert_labels,
+               std::vector<int>               & poly_labels);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_MESH(const char                     * filename,
                std::vector<vec3d>             & verts,
-               std::vector<std::vector<uint>> & poly);
+               std::vector<std::vector<uint>> & polys);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_MESH(const char                     * filename,
                std::vector<double>            & coords,
-               std::vector<std::vector<uint>> & poly);
+               std::vector<std::vector<uint>> & polys);
 }
 
 #ifndef  CINO_STATIC_LIB
