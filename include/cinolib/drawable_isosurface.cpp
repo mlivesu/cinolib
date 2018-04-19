@@ -45,7 +45,7 @@ DrawableIsosurface<M,V,E,F,P>::DrawableIsosurface() : Isosurface<M,V,E,F,P>()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-DrawableIsosurface<M,V,E,F,P>::DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value)
+DrawableIsosurface<M,V,E,F,P>::DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const double iso_value)
     : Isosurface<M,V,E,F,P>(m, iso_value)
 {
     color = Color::RED();
@@ -65,21 +65,20 @@ void DrawableIsosurface<M,V,E,F,P>::draw(const float) const
 
     for(uint i=0; i<this->tris.size(); i+=3)
     {
-        uint vid0     = this->tris[i+0];
-        uint vid1     = this->tris[i+1];
-        uint vid2     = this->tris[i+2];
-        uint vid0_ptr = 3 * vid0;
-        uint vid1_ptr = 3 * vid1;
-        uint vid2_ptr = 3 * vid2;
+        uint vid0 = this->tris[i+0];
+        uint vid1 = this->tris[i+1];
+        uint vid2 = this->tris[i+2];
 
         glBegin(GL_TRIANGLES);
         glColor3fv(color.rgba);
-        glNormal3dv(&(this->t_norms[i]));
-        glVertex3dv(&(this->coords[vid0_ptr]));
-        glVertex3dv(&(this->coords[vid1_ptr]));
-        glVertex3dv(&(this->coords[vid2_ptr]));
+        glNormal3dv(this->norms.at(i/3).ptr());
+        glVertex3dv(this->verts.at(vid0).ptr());
+        glVertex3dv(this->verts.at(vid1).ptr());
+        glVertex3dv(this->verts.at(vid2).ptr());
         glEnd();
     }
+
+    glColor3f(1.0,1.0,1.0);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
