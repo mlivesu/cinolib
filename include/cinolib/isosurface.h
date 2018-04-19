@@ -51,8 +51,8 @@ class Isosurface
 
         explicit Isosurface(){}
         explicit Isosurface(const Tetmesh<M,V,E,F,P> & m,
-                            const double               iso_value,
-                            const bool                 run_marching_tets=true);
+                            const float                iso_value,
+                            const bool                 run_marching_tets = true);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
