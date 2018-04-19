@@ -35,6 +35,8 @@
 #include <cinolib/color.h>
 
 #include <sstream>
+#include <chrono>
+#include <thread>
 #include <QApplication>
 #include <QClipboard>
 #include <QColorDialog>
@@ -236,6 +238,7 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
         case Qt::Key_S:     show_pivot=!show_pivot;                 break;
         case Qt::Key_R:     reset_trackball();                      break;
         case Qt::Key_C:     trackball.pivot=trackball.scene_center; break;
+        case Qt::Key_O:     animation_orbit();                      break;
         case Qt::Key_Left:  rotate(vec3d(0,1,0), -2);               break;
         case Qt::Key_Right: rotate(vec3d(0,1,0), +2);               break;
         case Qt::Key_Up:    rotate(vec3d(1,0,0), -2);               break;
@@ -440,6 +443,8 @@ void GLcanvas::push_obj(const DrawableObject *obj, bool refit_scene)
     objects.push_back(obj);
     if (refit_scene) fit_scene();
     updateGL();
+    std::cout << trackball.scene_size   << "\t"
+              << trackball.scene_center << "\t" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -660,6 +665,19 @@ void GLcanvas::animation_stop()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void GLcanvas::animation_orbit(const vec3d & axis, const uint step)
+{
+    for(uint alpha=0; std::fabs(alpha)<360; alpha+=step)
+    {
+        rotate(axis,step);
+        updateGL_strict();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 int GLcanvas::height_retina() const
 {
     // http://doc.qt.io/qt-5/qwindow.html#devicePixelRatio
@@ -827,6 +845,7 @@ void GLcanvas::draw_helper(QPainter & painter)
         p.x()=fir_col; draw_text(painter, p, "Key R          ", 12); p.x()=sec_col; draw_text(painter, p, ": reset trackball", 12); p.y()+=step;
         p.x()=fir_col; draw_text(painter, p, "Key A          ", 12); p.x()=sec_col; draw_text(painter, p, ": toggle axis    ", 12); p.y()+=step;
         p.x()=fir_col; draw_text(painter, p, "Key H          ", 12); p.x()=sec_col; draw_text(painter, p, ": toggle helper  ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key O          ", 12); p.x()=sec_col; draw_text(painter, p, ": orbit animation", 12); p.y()+=step;
         p.x()=fir_col; draw_text(painter, p, "Key Left       ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate left    ", 12); p.y()+=step;
         p.x()=fir_col; draw_text(painter, p, "Key Right      ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate right   ", 12); p.y()+=step;
         p.x()=fir_col; draw_text(painter, p, "Key Up         ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate up      ", 12); p.y()+=step;

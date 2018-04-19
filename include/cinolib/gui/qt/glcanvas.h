@@ -51,6 +51,7 @@
 #include <cinolib/color.h>
 #include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/symbols.h>
 
 namespace cinolib
 {
@@ -103,8 +104,9 @@ class GLcanvas : public QGLWidget
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void animation_start(const int period_ms);
+        void animation_start(const int period_ms = 30);
         void animation_stop();
+        void animation_orbit(const vec3d & axis = vec3d(0,1,0), const uint step = 1); // step is expressed in degrees
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
