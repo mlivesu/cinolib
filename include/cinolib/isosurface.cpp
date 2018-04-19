@@ -40,10 +40,12 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Isosurface<M,V,E,F,P>::Isosurface(const Tetmesh<M,V,E,F,P> &m, const float iso_value)
+Isosurface<M,V,E,F,P>::Isosurface(const Tetmesh<M,V,E,F,P> & m,
+                                  const double               iso_value,
+                                  const bool                 run_marching_tets)
     : iso_value(iso_value)
 {
-    marching_tets(m, iso_value, coords, tris, t_norms);
+    if(run_marching_tets) marching_tets(m, iso_value, verts, tris, norms);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -52,7 +54,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 Trimesh<M,V,E,F> Isosurface<M,V,E,F,P>::export_as_trimesh() const
 {
-    return Trimesh<M,V,E,F>(coords, tris);
+    return Trimesh<M,V,E,F>(verts, tris);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

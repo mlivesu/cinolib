@@ -50,7 +50,9 @@ class Isosurface
     public:
 
         explicit Isosurface(){}
-        explicit Isosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value);
+        explicit Isosurface(const Tetmesh<M,V,E,F,P> & m,
+                            const double               iso_value,
+                            const bool                 run_marching_tets=true);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -62,10 +64,10 @@ class Isosurface
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        float               iso_value;
-        std::vector<double> coords;
-        std::vector<uint>   tris;
-        std::vector<double> t_norms;
+        float              iso_value;
+        std::vector<vec3d> verts;
+        std::vector<uint>  tris;
+        std::vector<vec3d> norms;
 };
 
 

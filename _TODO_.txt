@@ -1,3 +1,4 @@
+- fix marching tets: degenerate triangles will be generated in some cases (see comments inside cpp file)
 - edit HEDRA format to account for labels (similarly to .MESH)
 - add ambient occlusion
 - add verdict metrics for tris/quads/tets/hexa

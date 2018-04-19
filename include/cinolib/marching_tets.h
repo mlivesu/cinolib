@@ -45,9 +45,9 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void marching_tets(const Tetmesh<M,V,E,F,P> & m,
                    const double               isovalue,
-                   std::vector<double>      & coords,
+                   std::vector<vec3d>       & verts,
                    std::vector<uint>        & tris,
-                   std::vector<double>      & norm);
+                   std::vector<vec3d>       & norms);
 }
 
 #ifndef  CINO_STATIC_LIB
