@@ -32,14 +32,16 @@
 #define CINO_SAMPLING_H
 
 #include <vector>
+#include <sys/types.h>
 #include <cinolib/cino_inline.h>
 
 namespace cinolib
 {
+    template<class T>
     CINO_INLINE
-    std::vector<float> sample_within_interval(const int  min,
-                                              const int  max,
-                                              const uint n_samples);
+    std::vector<T> sample_within_interval(const T    min,
+                                          const T    max,
+                                          const uint n_samples);
 }
 
 #ifndef  CINO_STATIC_LIB
