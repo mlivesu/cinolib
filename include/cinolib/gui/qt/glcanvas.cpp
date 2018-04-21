@@ -443,8 +443,6 @@ void GLcanvas::push_obj(const DrawableObject *obj, bool refit_scene)
     objects.push_back(obj);
     if (refit_scene) fit_scene();
     updateGL();
-    std::cout << trackball.scene_size   << "\t"
-              << trackball.scene_center << "\t" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
