@@ -608,7 +608,7 @@ CINO_INLINE
 std::vector<uint> Tetmesh<M,V,E,F,P>::poly_faces_opposite_to(const uint pid, const uint eid) const
 {
     assert(this->poly_contains_edge(pid, eid));
-    return this->poly_edge_faces(pid, this->poly_edge_opposite_to(pid,eid));
+    return this->poly_e2f(pid, this->poly_edge_opposite_to(pid,eid));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

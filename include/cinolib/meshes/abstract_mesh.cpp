@@ -760,15 +760,30 @@ std::vector<vec3d> AbstractMesh<M,V,E,P>::poly_verts(const uint pid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> AbstractMesh<M,V,E,P>::poly_adj_verts(const uint pid, const uint vid) const
+std::vector<uint> AbstractMesh<M,V,E,P>::poly_v2v(const uint pid, const uint vid) const
 {
     assert(this->poly_contains_vert(pid,vid));
-    std::vector<uint> nbrs;
+    std::vector<uint> verts;
     for(uint nbr : this->adj_v2v(vid))
     {
-        if(this->poly_contains_vert(pid,nbr)) nbrs.push_back(nbr);
+        if(this->poly_contains_vert(pid,nbr)) verts.push_back(nbr);
     }
-    return nbrs;
+    return verts;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> AbstractMesh<M,V,E,P>::poly_v2e(const uint pid, const uint vid) const
+{
+    assert(this->poly_contains_vert(pid,vid));
+    std::vector<uint> edges;
+    for(uint eid : this->adj_v2e(vid))
+    {
+        if(this->poly_contains_edge(pid,eid)) edges.push_back(eid);
+    }
+    return edges;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -777,7 +792,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint AbstractMesh<M,V,E,P>::poly_vert_valence(const uint pid, const uint vid) const
 {
-    return this->poly_adj_verts(pid,vid).size();
+    return this->poly_v2v(pid,vid).size();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
