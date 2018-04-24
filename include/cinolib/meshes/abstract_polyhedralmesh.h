@@ -160,6 +160,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 uint              face_vert_offset        (const uint fid, const uint vid) const;
                 uint              face_edge_id            (const uint fid, const uint vid0, const uint vid1) const;
                 uint              face_edge_id            (const uint fid, const uint off) const;
+                std::vector<uint> face_v2e                (const uint fid, const uint vid) const;
                 bool              face_is_on_srf          (const uint fid) const;
                 bool              face_contains_vert      (const uint fid, const uint vid) const;
                 bool              face_contains_edge      (const uint fid, const uint eid) const;

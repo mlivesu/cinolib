@@ -686,6 +686,22 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_on_srf(const uint fid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_v2e(const uint fid, const uint vid) const
+{
+    assert(this->face_contains_vert(fid,vid));
+    std::vector<uint> edges;
+    for(uint eid : this->adj_v2e(vid))
+    {
+        if (this->face_contains_edge(fid,eid)) edges.push_back(eid);
+    }
+    assert(edges.size()==2);
+    return edges;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_contains_vert(const uint fid, const uint vid) const
 {
     for(uint v : this->adj_f2v(fid))
