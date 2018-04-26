@@ -85,6 +85,14 @@ template<typename T>
 CINO_INLINE
 std::vector<T> SORT_VEC(const std::vector<T> & vec, const bool biggest_first = true);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+bool INTERSECTION_IS_EMPTY_VEC(const std::vector<T> & vec1, const std::vector<T> & vec2);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 }
 
 #ifndef  CINO_STATIC_LIB

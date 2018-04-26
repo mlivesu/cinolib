@@ -120,4 +120,16 @@ std::vector<T> SORT_VEC(const std::vector<T> & vec, const bool biggest_first)
     SORT_VEC(tmp, biggest_first);
     return tmp;
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+bool INTERSECTION_IS_EMPTY_VEC(const std::vector<T> & vec1, const std::vector<T> & vec2)
+{
+    // https://stackoverflow.com/questions/27131628/check-whether-two-elements-have-a-common-element-in-c
+    return (std::find_first_of(vec1.begin(), vec1.end(),
+                               vec2.begin(), vec2.end()) == vec1.end());
+}
+
 }
