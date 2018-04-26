@@ -45,7 +45,8 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void midpoint_subdivision(AbstractPolyhedralMesh<M,V,E,F,P> & m);
+void midpoint_subdivision(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
+                                AbstractPolyhedralMesh<M,V,E,F,P> & m_out);
 
 }
 

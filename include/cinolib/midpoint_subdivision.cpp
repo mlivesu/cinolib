@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/midpoint_subdivision.h>
+#include <cinolib/sort_poly_vertices.h>
 #include <map>
 
 namespace cinolib
@@ -36,21 +37,22 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void midpoint_subdivision(AbstractPolyhedralMesh<M,V,E,F,P> & m)
+void midpoint_subdivision(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
+                                AbstractPolyhedralMesh<M,V,E,F,P> & m_out)
 {
+    std::vector<vec3d>             verts = m_in.vector_verts();
+    std::vector<std::vector<uint>> faces;
+    std::vector<std::vector<uint>> polys;
+    std::vector<std::vector<bool>> polys_winding;
+
     // 1) add one new vert for each edge/face/poly
     //
     std::map<uint,uint> edge_verts;
     std::map<uint,uint> face_verts;
     std::map<uint,uint> poly_verts;
-    for(uint eid=0; eid<m.num_edges(); ++eid) edge_verts[eid] = m.vert_add(m.edge_sample_at(eid,0.5));
-    for(uint fid=0; fid<m.num_faces(); ++fid) face_verts[fid] = m.vert_add(m.face_centroid(fid));
-    for(uint pid=0; pid<m.num_polys(); ++pid) poly_verts[pid] = m.vert_add(m.poly_centroid(pid));
-
-    std::vector<vec3d>             verts = m.vector_verts();
-    std::vector<std::vector<uint>> faces;
-    std::vector<std::vector<uint>> polys;
-    std::vector<std::vector<bool>> polys_winding;
+    for(uint eid=0; eid<m_in.num_edges(); ++eid) { edge_verts[eid] = verts.size(); verts.push_back(m_in.edge_sample_at(eid,0.5)); }
+    for(uint fid=0; fid<m_in.num_faces(); ++fid) { face_verts[fid] = verts.size(); verts.push_back(m_in.face_centroid(fid)); }
+    for(uint pid=0; pid<m_in.num_polys(); ++pid) { poly_verts[pid] = verts.size(); verts.push_back(m_in.poly_centroid(pid)); }
 
     // 2) for each pair (edge,poly), make a quad with:
     //      - poly centroid
@@ -58,10 +60,10 @@ void midpoint_subdivision(AbstractPolyhedralMesh<M,V,E,F,P> & m)
     //      - edge midpoint
     //
     std::map<ipair,uint> eid_pid_fmap;
-    for(uint pid=0; pid<m.num_polys(); ++pid)
-    for(uint eid : m.adj_p2e(pid))
+    for(uint pid=0; pid<m_in.num_polys(); ++pid)
+    for(uint eid : m_in.adj_p2e(pid))
     {
-        std::vector<uint> inc_f = m.poly_e2f(pid,eid);
+        std::vector<uint> inc_f = m_in.poly_e2f(pid,eid);
         std::vector<uint> f;
         f.push_back(poly_verts.at(pid));
         f.push_back(face_verts.at(inc_f.front()));
@@ -77,10 +79,10 @@ void midpoint_subdivision(AbstractPolyhedralMesh<M,V,E,F,P> & m)
     //      - edge midpoint
     //
     std::map<ipair,uint> vid_fid_fmap;
-    for(uint fid = 0; fid<m.num_faces(); ++fid)
-    for(uint vid : m.adj_f2v(fid))
+    for(uint fid = 0; fid<m_in.num_faces(); ++fid)
+    for(uint vid : m_in.adj_f2v(fid))
     {
-        std::vector<uint> e = m.face_v2e(fid,vid);
+        std::vector<uint> e = m_in.face_v2e(fid,vid);
         std::vector<uint> f;
         f.push_back(face_verts.at(fid));
         f.push_back(edge_verts.at(e.front()));
@@ -93,18 +95,18 @@ void midpoint_subdivision(AbstractPolyhedralMesh<M,V,E,F,P> & m)
     // 4) for each vertex of each poly, make a new polyhedron
     //    using the faces created at steps (2) and (3)
     //
-    for(uint pid = 0; pid<m.num_polys(); ++pid)
+    for(uint pid = 0; pid<m_in.num_polys(); ++pid)
     {
-        for(uint vid : m.adj_p2v(pid))
+        for(uint vid : m_in.adj_p2v(pid))
         {
             std::vector<uint> f;
             std::vector<bool> w;
-            for(uint fid : m.poly_v2f(pid,vid))
+            for(uint fid : m_in.poly_v2f(pid,vid))
             {
                 f.push_back(vid_fid_fmap.at(std::make_pair(vid,fid)));
                 w.push_back(true);
             }
-            for(uint eid : m.poly_v2e(pid,vid))
+            for(uint eid : m_in.poly_v2e(pid,vid))
             {
                 f.push_back(eid_pid_fmap.at(std::make_pair(eid,pid)));
                 w.push_back(true);
@@ -114,7 +116,23 @@ void midpoint_subdivision(AbstractPolyhedralMesh<M,V,E,F,P> & m)
         }
     }
 
-    m = Polyhedralmesh<M,V,E,F,P>(verts, faces, polys, polys_winding);
+    switch(m_in.mesh_type())
+    {
+        case TETMESH :
+        case HEXMESH :
+        {
+            std::vector<std::vector<uint>> hexas;
+            sort_poly_vertices_as_hexa(faces, polys, polys_winding, hexas);
+            m_out = Hexmesh<M,V,E,F,P>(verts, hexas);
+            break;
+        }
+        case POLYHEDRALMESH : m_out = Polyhedralmesh<M,V,E,F,P>(verts, faces, polys, polys_winding);
+                              break;
+
+        default : assert(false);
+    }
+
+
 }
 
 }
