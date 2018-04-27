@@ -1,3 +1,4 @@
+- fix per face winding in midpoint subdivision
 - substitute some of the error assertions or warnings with throw std::runtime_error("my error");
 - fix marching tets: degenerate triangles will be generated in some cases (see comments inside cpp file)
 - edit HEDRA format to account for labels (similarly to .MESH)

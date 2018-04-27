@@ -103,12 +103,14 @@ void midpoint_subdivision(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
             std::vector<bool> w;
             for(uint fid : m_in.poly_v2f(pid,vid))
             {
-                f.push_back(vid_fid_fmap.at(std::make_pair(vid,fid)));
+                f.push_back(vid_fid_fmap.at(std::make_pair(vid,fid)));                                
+                // TODO: fix winding order
                 w.push_back(true);
             }
             for(uint eid : m_in.poly_v2e(pid,vid))
             {
                 f.push_back(eid_pid_fmap.at(std::make_pair(eid,pid)));
+                // TODO: check on what side the vertex stays w.r.t. oriented plane to assign correct winding
                 w.push_back(true);
             }
             polys.push_back(f);
