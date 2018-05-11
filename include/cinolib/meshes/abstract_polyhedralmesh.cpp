@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/geometry/triangle.h>
+#include <cinolib/geometry/polygon.h>
 #include <unordered_set>
 
 namespace cinolib
