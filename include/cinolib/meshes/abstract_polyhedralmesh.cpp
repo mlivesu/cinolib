@@ -667,6 +667,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::face_shared_edge(const uint fid0, const uint fid1) const
 {
+    assert(fid0!=fid1);
     for(uint eid : this->adj_f2e(fid0))
     {
         if (this->face_contains_edge(fid1, eid)) return eid;
