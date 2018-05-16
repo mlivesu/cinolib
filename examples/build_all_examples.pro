@@ -38,4 +38,5 @@ SUBDIRS += 19_harmonic_map
 SUBDIRS += 20_coarse_quad_layouts
 SUBDIRS += 21_coarse_hex_layouts        # OPTIONALLY requires VTK (https://www.vtk.org/)
 SUBDIRS += 22_remesher
+SUBDIRS += 23_sharp_creases
 
