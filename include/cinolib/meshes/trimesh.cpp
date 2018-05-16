@@ -397,6 +397,27 @@ uint Trimesh<M,V,E,P>::poly_edge_id(const uint pid, const uint offset) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint Trimesh<M,V,E,P>::poly_split(const uint pid, const vec3d & p)
+{
+    uint vids[4] =
+    {
+        this->poly_vert_id(pid, 0),
+        this->poly_vert_id(pid, 1),
+        this->poly_vert_id(pid, 2),
+        this->vert_add(p)
+    };
+    uint new_pid;
+    new_pid = poly_add(vids[0], vids[1], vids[3]); this->poly_data(new_pid) = this->poly_data(pid);
+    new_pid = poly_add(vids[1], vids[2], vids[3]); this->poly_data(new_pid) = this->poly_data(pid);
+    new_pid = poly_add(vids[2], vids[0], vids[3]); this->poly_data(new_pid) = this->poly_data(pid);
+    this->poly_remove(pid);
+    return vids[3];
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // for a definition of cap and needles, see:
 // A Robust Procedure to Eliminate Degenerate Faces from Triangle Meshes
 // Mario Botsch, Leif P. Kobbelt

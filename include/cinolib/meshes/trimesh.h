@@ -112,6 +112,7 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         bool                poly_bary_is_edge  (const uint pid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
         uint                poly_add           (const uint vid0, const uint vid1, const uint vid2);
         uint                poly_edge_id       (const uint pid, const uint offset) const;
+        uint                poly_split         (const uint pid, const vec3d & p);
 
         using AbstractMesh<M,V,E,P>::poly_edge_id;    // avoid hiding poly_ege_id(pid,vid0,vid1)
         using AbstractPolygonMesh<M,V,E,P>::poly_add; // avoid hiding poly_add(p)
