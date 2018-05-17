@@ -11,3 +11,9 @@ QMAKE_CXXFLAGS += -Wno-deprecated-declarations # gluQuadric gluSphere and gluCyl
 DATA_PATH       = \\\"$$PWD/../data/\\\"
 DEFINES        += DATA_PATH=$$DATA_PATH
 SOURCES        += main.cpp
+
+# just for Linux
+unix:!macx {
+DEFINES += GL_GLEXT_PROTOTYPES
+LIBS    += -lGLU
+}
