@@ -32,6 +32,7 @@
 #define CINO_VEC3_H
 
 #include <cinolib/cino_inline.h>
+#include <cinolib/ANSI_color_codes.h>
 #include <cmath>
 #include <iostream>
 #include <assert.h>
@@ -112,7 +113,7 @@ template<typename real> class vec3
             if (len == 0)
             {
                 len = 1e-10;
-                std::cerr << "WARNING: normalization of zero length vector!" << std::endl;
+                std::cout << ANSI_fg_color_red << "WARNING: normalization of zero length vector!" << ANSI_fg_color_default << std::endl;
             }
             m_x /= len;
             m_y /= len;
