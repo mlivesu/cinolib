@@ -739,6 +739,27 @@ vec3d AbstractMesh<M,V,E,P>::poly_sample_at(const uint pid, const std::vector<do
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+double AbstractMesh<M,V,E,P>::poly_sample_param_at(const uint pid, const std::vector<double> & bary, const int tex_coord) const
+{
+    assert(bary.size() == verts_per_poly(pid));
+    double val = 0;
+    for(uint off=0; off<verts_per_poly(pid); ++off)
+    {
+        switch(tex_coord)
+        {
+            case U_param : val += bary.at(off) * this->vert_data(this->poly_vert_id(pid,off)).uvw[0]; break;
+            case V_param : val += bary.at(off) * this->vert_data(this->poly_vert_id(pid,off)).uvw[1]; break;
+            case W_param : val += bary.at(off) * this->vert_data(this->poly_vert_id(pid,off)).uvw[2]; break;
+            default: assert(false);
+        }
+    }
+    return val;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 vec3d AbstractMesh<M,V,E,P>::poly_vert(const uint pid, const uint offset) const
 {
     return vert(poly_vert_id(pid,offset));
