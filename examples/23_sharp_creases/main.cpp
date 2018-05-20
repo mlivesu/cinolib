@@ -51,6 +51,9 @@ int main(int argc, char **argv)
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube_minus_sphere.obj";
     DrawableTrimesh<> m(s.c_str());
+    m.show_mesh_flat();
+    m.show_marked_edge_width(4);
+
     Profiler          profiler;
     QWidget           window;
     QPushButton       but_mark_creases("Mark Creases", &window);
