@@ -57,13 +57,13 @@ void bfs(const AbstractMesh<M,V,E,P>    & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// floodfill (with barriers)
+// floodfill (with vertex barriers)
 //
 template<class M, class V, class E, class P>
 CINO_INLINE
 void bfs(const AbstractMesh<M,V,E,P>    & m,
          const uint                       source,
-         const std::vector<bool>        & mask, // if mask[p] = true, bfs cannot visit polygon/polyhedron p
+         const std::vector<bool>        & mask, // if mask[vid] = true, path cannot pass through vertex vid
                std::unordered_set<uint> & visited);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

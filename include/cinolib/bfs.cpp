@@ -101,7 +101,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void bfs(const AbstractMesh<M,V,E,P>    & m,
          const uint                       source,
-         const std::vector<bool>        & mask, // if mask[p] = true, path cannot pass through it
+         const std::vector<bool>        & mask, // if mask[vid] = true, path cannot pass through vertex vid
                std::unordered_set<uint> & visited)
 {
     visited.clear();
