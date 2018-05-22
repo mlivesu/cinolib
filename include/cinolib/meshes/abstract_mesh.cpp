@@ -781,6 +781,21 @@ std::vector<vec3d> AbstractMesh<M,V,E,P>::poly_verts(const uint pid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+std::vector<uint> AbstractMesh<M,V,E,P>::poly_verts_id(const uint pid, const bool sort_by_vid) const
+{
+    if(sort_by_vid)
+    {
+        std::vector<uint> v_list = this->adj_p2v(pid);
+        SORT_VEC(v_list);
+        return v_list;
+    }
+    return this->adj_p2v(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<uint> AbstractMesh<M,V,E,P>::poly_v2v(const uint pid, const uint vid) const
 {
     assert(this->poly_contains_vert(pid,vid));
@@ -997,6 +1012,35 @@ bool AbstractMesh<M,V,E,P>::polys_are_labeled() const
     }
     if (labels.size()>1) return true;
     return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_apply_labels(const std::vector<int> & labels)
+{
+    assert(labels.size() == this->num_polys());
+    for(uint pid=0; pid<num_polys(); ++pid)
+    {
+        poly_data(pid).label = labels.at(pid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+int AbstractMesh<M,V,E,P>::poly_id(const std::vector<uint> & vids) const
+{
+    std::vector<uint> query = SORT_VEC(vids);
+
+    uint vid = vids.front();
+    for(uint pid : this->adj_v2p(vid))
+    {
+        if(this->poly_verts_id(pid,true)==query) return pid;
+    }
+    return -1;
 }
 
 }

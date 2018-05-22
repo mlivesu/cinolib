@@ -217,6 +217,7 @@ class AbstractMesh
 
                 vec3d              poly_vert           (const uint pid, const uint offset) const;
                 std::vector<vec3d> poly_verts          (const uint pid) const;
+                std::vector<uint>  poly_verts_id       (const uint pid, const bool sort_by_vid = false) const;
                 std::vector<uint>  poly_v2v            (const uint pid, const uint vid) const;
                 std::vector<uint>  poly_v2e            (const uint pid, const uint vid) const;
                 uint               poly_vert_valence   (const uint pid, const uint vid) const;
@@ -234,6 +235,8 @@ class AbstractMesh
                 void               poly_unmark_all     ();
                 bool               polys_are_colored   () const;
                 bool               polys_are_labeled   () const;
+                void               poly_apply_labels   (const std::vector<int> & labels);
+                int                poly_id             (const std::vector<uint> & vids) const;
         virtual double             poly_mass           (const uint pid) const = 0;
         virtual void               poly_set_color      (const Color & c);
         virtual void               poly_set_alpha      (const float alpha);

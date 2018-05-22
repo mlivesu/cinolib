@@ -260,18 +260,15 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_tessellation(const uin
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_verts(const uint fid) const
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_verts_id(const uint fid, const bool sort_by_vid) const
 {
+    if(sort_by_vid)
+    {
+        std::vector<uint> v_list = this->adj_f2v(fid);
+        SORT_VEC(v_list);
+        return v_list;
+    }
     return this->adj_f2v(fid);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_verts_sorted(const uint fid) const
-{
-    return SORT_VEC(face_verts(fid));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -285,7 +282,7 @@ int AbstractPolyhedralMesh<M,V,E,F,P>::face_id(const std::vector<uint> & f) cons
     uint vid = f.front();
     for(uint fid : this->adj_v2f(vid))
     {
-        if(this->face_verts_sorted(fid)==query) return fid;
+        if(this->face_verts_id(fid,true)==query) return fid;
     }
     return -1;
 }

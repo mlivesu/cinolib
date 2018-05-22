@@ -244,7 +244,7 @@ void Hexmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
     vlist[2] = this->face_vert_id(fid_bot,HEXA_FACES[0][2]);
     vlist[3] = this->face_vert_id(fid_bot,HEXA_FACES[0][3]);
     if (this->poly_face_is_CW(pid,fid_bot)) std::swap(vlist[1],vlist[3]);
-    for(uint vid : this->face_verts(fid_top))
+    for(uint vid : this->face_verts_id(fid_top))
     {
         if(this->verts_are_adjacent(vid,vlist[0])) vlist[4] = vid; else
         if(this->verts_are_adjacent(vid,vlist[1])) vlist[5] = vid; else
