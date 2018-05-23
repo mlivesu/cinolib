@@ -1,3 +1,4 @@
+- improve OFF reader (labels/colors, ignore header OFF/COFF, ignore comments and empty lines)
 - improve canvas focus (when double click, center geometry e zoom on it, possibly adjusting clipping planes)
 - make sure field_serialize is lossless in terms of numeric precision
 - fix per face winding in midpoint subdivision
