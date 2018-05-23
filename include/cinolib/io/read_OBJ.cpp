@@ -179,14 +179,7 @@ void read_OBJ(const char                     * filename,
                 char mtu_c[1024];
                 if (sscanf(line, "mtllib %s", mtu_c) == 1)
                 {
-                    if (mtu_c[0] == '.')
-                    {
-                        std::string obj(filename); // path of the OBJ file in string format
-                        std::string mtu(mtu_c);    // path of the MTU file in string format
-                        std::string path = obj.substr(0, obj.find_last_of("/")) + mtu.substr(1, mtu.size()-1);
-                        read_MTU(path.c_str(), color_map);
-                    }
-                    else read_MTU(mtu_c, color_map);
+                    read_MTU(mtu_c, color_map);
                     has_per_face_color = true;
                 }
                 break;
