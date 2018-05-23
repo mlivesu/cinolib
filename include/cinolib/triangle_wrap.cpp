@@ -152,6 +152,28 @@ void triangle_wrap(const std::vector<double> & verts_in,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void triangle_wrap(const std::vector<double> & verts_in,  // serialized input xy coordinates
+                   const std::vector<uint>   & segs_in,   // serialized segments
+                   const std::vector<double> & holes_in,  // serialized xy holes
+                   const double                z_coord,   // lift triangulation to z_coord
+                   const std::string         & flags,     // https://www.cs.cmu.edu/~quake/triangle.switch.html
+                         std::vector<double> & verts_out, // serialized output xy+z_coord coordinates
+                         std::vector<uint>   & tris_out) // serialized tris
+{
+    std::vector<double> tmp_verts;
+    triangle_wrap(verts_in, segs_in, holes_in, flags, tmp_verts, tris_out);
+    uint nv = tmp_verts.size()/2;
+    for(uint vid=0; vid<nv; ++vid)
+    {
+        verts_out.push_back(tmp_verts.at(vid*2  ));
+        verts_out.push_back(tmp_verts.at(vid*2+1));
+        verts_out.push_back(z_coord);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void triangle_wrap(const std::vector<vec2d>             & verts_in,
                    const std::vector<uint>              & segs_in,
                    const std::vector<vec2d>             & holes_in,
