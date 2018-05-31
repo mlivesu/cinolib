@@ -130,7 +130,6 @@ class AbstractMesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         const Bbox                           & bbox()          const { return bb;    }
-              std::vector<double>              vector_coords() const; //remove me!
         const std::vector<vec3d>             & vector_verts()  const { return verts; }
               std::vector<vec3d>             & vector_verts()        { return verts; }
         const std::vector<uint>              & vector_edges()  const { return edges; }
@@ -153,7 +152,7 @@ class AbstractMesh
         void                deserialize_uvw(const std::vector<vec3d> & uvw);
         void                copy_xyz_to_uvw(const int mode);
         void                copy_uvw_to_xyz(const int mode);
-        void                swap_xyz_uvw(const bool normals = true, const bool bbox = true);
+        void                swap_xyz_uvw   (const bool normals = true, const bool bbox = true);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

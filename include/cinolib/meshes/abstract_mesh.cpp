@@ -175,22 +175,6 @@ void AbstractMesh<M,V,E,P>::update_bbox()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<double> AbstractMesh<M,V,E,P>::vector_coords() const
-{
-    std::vector<double> coords;
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        coords.push_back(vert(vid).x());
-        coords.push_back(vert(vid).y());
-        coords.push_back(vert(vid).z());
-    }
-    return coords;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 std::vector<Color> AbstractMesh<M,V,E,P>::vector_poly_colors() const
 {
     std::vector<Color> colors;
