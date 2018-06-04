@@ -50,6 +50,8 @@ class DrawableTrimesh : public AbstractDrawablePolygonMesh<Trimesh<M,V,E,P>>
         explicit DrawableTrimesh(Trimesh<M,V,E,P>) : Trimesh<M,V,E,P>()
         {}
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         explicit DrawableTrimesh() : Trimesh<M,V,E,P>()
         {
             this->init_drawable_stuff();
