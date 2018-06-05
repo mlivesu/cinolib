@@ -15,8 +15,6 @@
 - avoid headers from serialized vector and scalar fields (it’s far more general)
 - update skeleton data structure (and make relative control panel)
 - Gradients on hexmeshes are buggy. hint: check per face normals!
-- extend the concept of subdivisions from hexmesh to any mesh
-- add Additive Manufacturing stuff (load and process CLI files)…
 - Add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
 - Refactor PointInsideMeshCache, it should return ALL the elements containing the
   query point and let the application choose the best one
