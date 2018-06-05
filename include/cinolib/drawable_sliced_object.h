@@ -85,10 +85,6 @@ class DrawableSlicedObj : public AbstractDrawablePolygonMesh<SlicedObj<M,V,E,P>>
 
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "drawable_sliced_object.cpp"
-#endif
-
 #endif // CINO_USES_TRIANGLE
 #endif // CINO_USES_BOOST
 
