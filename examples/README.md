@@ -1,5 +1,5 @@
 # Examples
-This folder contains a number of sample programs that illustrate the core functionalities of CinoLib. 
+This folder contains a number of sample programs that illustrate the core functionalities of CinoLib.
 
 ### How to compile the example projects
 To compile the examples you must download CinoLib on your machine and install [Qt](https://www.qt.io) for the GUI. You can compile all the examples together by considering the file `build_all_examples.pro`, or compile a specific example by considering its project file (.pro). Project files can be compiled either with [QtCreator](https://www.qt.io/qt-features-libraries-apis-tools-and-ide/) or by opening a terminal in the same folder and typing
@@ -83,6 +83,8 @@ Here is a list of the sample programs available in CinoLib.
 #### 23 - Find, adjust, and export sharp creases from a mesh
 <p align="left"><img src="snapshots/23_sharp_creases.png" width="500"></p>
 
+#### 24 - Read and visualize a sliced object for 3D printing
+<p align="left"><img src="snapshots/24_sliced_obj.png" width="500"></p>
 
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
