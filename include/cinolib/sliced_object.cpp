@@ -207,7 +207,7 @@ void SlicedObj<M,V,E,P>::thicken_open_polylines(const std::vector<std::vector<ve
                                                       std::vector<double>             & points,
                                                       std::vector<uint>               & segs)
 {
-    // boost::buffer strategies
+    // https://www.boost.org/doc/libs/1_63_0/libs/geometry/doc/html/geometry/reference/algorithms/buffer/buffer_7_with_strategies.html
     boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(thickness);
     boost::geometry::strategy::buffer::join_miter                 join_strategy;
     boost::geometry::strategy::buffer::end_flat                   end_strategy;
