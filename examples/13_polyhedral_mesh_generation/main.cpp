@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     double vol_thresh = 0.01 * m_in.bbox().diag(); // force tets to be smaller than 5% of bbox diag
     char opt[100];
     sprintf(opt, "YQqa%f", vol_thresh);
-    tetgen_wrap(m_in.vector_coords(), serialized_vids_from_polys(m_in.vector_polys()), edges, opt, verts, tets);
+    tetgen_wrap(serialized_xyz_from_vec3d(m_in.vector_verts()), serialized_vids_from_polys(m_in.vector_polys()), edges, opt, verts, tets);
     DrawableTetmesh<> tetmesh(verts, tets);
 
     Profiler profiler;
