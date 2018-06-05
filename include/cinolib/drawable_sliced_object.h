@@ -28,41 +28,67 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_DRAWABLE_OBJECT_H
-#define CINO_DRAWABLE_OBJECT_H
+#ifndef CINO_DRAWABLE_SLICED_OBJ
+#define CINO_DRAWABLE_SLICED_OBJ
 
-#include <cinolib/geometry/vec3.h>
+// Boost polygons and Triangle are used to create and tessellate slices...
+#ifdef CINOLIB_USES_BOOST
+#ifdef CINOLIB_USES_TRIANGLE
+
+#include <cinolib/meshes/meshes.h>
+#include <cinolib/sliced_object.h>
 
 namespace cinolib
 {
 
-typedef enum
+template<class M = Mesh_std_attributes, // default template arguments
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class P = Polygon_std_attributes>
+class DrawableSlicedObj : public AbstractDrawablePolygonMesh<SlicedObj<M,V,E,P>>
 {
-    DRAWABLE_TRIMESH       ,
-    DRAWABLE_TETMESH       ,
-    DRAWABLE_QUADMESH      ,
-    DRAWABLE_HEXMESH       ,
-    DRAWABLE_POLYGONMESH   ,
-    DRAWABLE_POLYHEDRALMESH,
-    DRAWABLE_SKELETON      ,
-    DRAWABLE_CURVE         ,
-    DRAWABLE_ISOSURFACE    ,
-    DRAWABLE_SLICED_OBJ    ,
-    DRAWABLE_VECTOR_FIELD
-}
-ObjectType;
+    public:
 
-class DrawableObject
-{
-    public :
+        explicit DrawableSlicedObj() : SlicedObj<M,V,E,P>() {}
 
-        virtual ~DrawableObject(){}
-        virtual ObjectType  object_type()                    const = 0;
-        virtual void        draw(const float scene_size = 1) const = 0;  // do rendering
-        virtual vec3d       scene_center()                   const = 0;  // get position in space
-        virtual float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        explicit DrawableSlicedObj(const char * filename) : SlicedObj<M,V,E,P>(filename)
+        {
+            this->init_drawable_stuff();
+            this->show_marked_edge_color(Color::BLACK());
+            this->show_marked_edge_width(3.0);
+            this->show_wireframe(false);
+            this->updateGL();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        explicit DrawableSlicedObj(const std::vector<std::vector<std::vector<vec3d>>> & internal_polylines,
+                                   const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
+                                   const std::vector<std::vector<std::vector<vec3d>>> & open_polylines,
+                                   const std::vector<std::vector<std::vector<vec3d>>> & hatches)
+        : SlicedObj<M,V,E,P>(internal_polylines,external_polylines,open_polylines,hatches)
+        {
+            this->init_drawable_stuff();
+            this->show_marked_edge_color(Color::BLACK());
+            this->show_marked_edge_width(3.0);
+            this->show_wireframe(false);
+            this->updateGL();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        ObjectType object_type() const { return DRAWABLE_SLICED_OBJ; }
 };
 
 }
 
-#endif // CINO_DRAWABLE_OBJECT_H
+#ifndef  CINO_STATIC_LIB
+#include "drawable_sliced_object.cpp"
+#endif
+
+#endif // CINO_USES_TRIANGLE
+#endif // CINO_USES_BOOST
+
+#endif // CINO_DRAWABLE_SLICED_OBJ
