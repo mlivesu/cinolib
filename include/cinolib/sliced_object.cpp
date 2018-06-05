@@ -49,7 +49,9 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-SlicedObj<M,V,E,P>::SlicedObj(const char * filename) : Trimesh<M,V,E,P>()
+SlicedObj<M,V,E,P>::SlicedObj(const char * filename, const double hatch_size)
+    : Trimesh<M,V,E,P>()
+    , hatch_size(hatch_size)
 {
     std::vector<std::vector<std::vector<vec3d>>> internal_polylines;
     std::vector<std::vector<std::vector<vec3d>>> external_polylines;
@@ -67,8 +69,10 @@ CINO_INLINE
 SlicedObj<M,V,E,P>::SlicedObj(const std::vector<std::vector<std::vector<vec3d>>> & internal_polylines,
                               const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
                               const std::vector<std::vector<std::vector<vec3d>>> & open_polylines,
-                              const std::vector<std::vector<std::vector<vec3d>>> & hatches)
-: Trimesh<M,V,E,P>()
+                              const std::vector<std::vector<std::vector<vec3d>>> & hatches,
+                              const double hatch_size)
+    : Trimesh<M,V,E,P>()
+    , hatch_size(hatch_size)
 {
     init(internal_polylines, external_polylines, open_polylines, hatches);
 }
@@ -136,7 +140,7 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
         std::vector<double> holes_in;
         points_inside_holes(internal_polylines.at(sid), holes_in);
 
-        thicken_open_polylines(open_polylines.at(sid), 0.01, verts_in, segs_in);
+        thicken_open_polylines(open_polylines.at(sid), hatch_size, verts_in, segs_in);
 
         triangle_wrap(verts_in, segs_in, holes_in, "Q", verts_out, tris_out);
 

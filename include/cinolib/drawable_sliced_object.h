@@ -53,7 +53,7 @@ class DrawableSlicedObj : public AbstractDrawablePolygonMesh<SlicedObj<M,V,E,P>>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        explicit DrawableSlicedObj(const char * filename) : SlicedObj<M,V,E,P>(filename)
+        explicit DrawableSlicedObj(const char * filename, const double hatch_size = 0.01) : SlicedObj<M,V,E,P>(filename, hatch_size)
         {
             this->init_drawable_stuff();
             this->show_marked_edge_color(Color::BLACK());
@@ -67,8 +67,9 @@ class DrawableSlicedObj : public AbstractDrawablePolygonMesh<SlicedObj<M,V,E,P>>
         explicit DrawableSlicedObj(const std::vector<std::vector<std::vector<vec3d>>> & internal_polylines,
                                    const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
                                    const std::vector<std::vector<std::vector<vec3d>>> & open_polylines,
-                                   const std::vector<std::vector<std::vector<vec3d>>> & hatches)
-        : SlicedObj<M,V,E,P>(internal_polylines,external_polylines,open_polylines,hatches)
+                                   const std::vector<std::vector<std::vector<vec3d>>> & hatches,
+                                   const double hatch_size = 0.01)
+        : SlicedObj<M,V,E,P>(internal_polylines, external_polylines, open_polylines, hatches, hatch_size)
         {
             this->init_drawable_stuff();
             this->show_marked_edge_color(Color::BLACK());

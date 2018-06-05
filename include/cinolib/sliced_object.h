@@ -57,14 +57,15 @@ class SlicedObj : public Trimesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        explicit SlicedObj(const char * filename);
+        explicit SlicedObj(const char * filename, const double hatch_size = 0.01);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         explicit SlicedObj(const std::vector<std::vector<std::vector<vec3d>>> & internal_polylines,
                            const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
                            const std::vector<std::vector<std::vector<vec3d>>> & open_polylines,
-                           const std::vector<std::vector<std::vector<vec3d>>> & hatches);
+                           const std::vector<std::vector<std::vector<vec3d>>> & hatches,
+                           const double hatch_size = 0.01);
 
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -87,13 +88,16 @@ class SlicedObj : public Trimesh<M,V,E,P>
         void points_inside_holes(const std::vector<std::vector<vec3d>> & internal_polylines,
                                        std::vector<double>             & holes);
 
-
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void thicken_open_polylines(const std::vector<std::vector<vec3d>> & open_polylines,
                                     const double                          & thickness,
                                           std::vector<double>             & verts,
                                           std::vector<uint>               & segs);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        double hatch_size;
 };
 
 }
