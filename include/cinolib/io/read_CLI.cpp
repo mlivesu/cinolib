@@ -85,6 +85,8 @@ void read_CLI(const char                                   * filename,
               std::vector<std::vector<std::vector<vec3d>>> & open_polylines,     // support structures
               std::vector<std::vector<std::vector<vec3d>>> & hatches)            // supports/infills
 {
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
     internal_polylines.clear();
     external_polylines.clear();
     open_polylines.clear();

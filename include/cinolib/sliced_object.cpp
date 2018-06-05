@@ -224,10 +224,8 @@ void SlicedObj<M,V,E,P>::thicken_open_polylines(const std::vector<std::vector<ve
         }
 
         std::vector<BoostPolygon> res;
-        boost::geometry::buffer(ls, res, distance_strategy, side_strategy,
-                                join_strategy, end_strategy, circle_strategy);
-        assert(res.size()==1);
-        buffered_polylines.push_back(res.front());
+        boost::geometry::buffer(ls, res, distance_strategy, side_strategy, join_strategy, end_strategy, circle_strategy);
+        for(auto p : res) buffered_polylines.push_back(p);
     }
 
     // open polylines may intersect. So I unify them all in a single (multi)polygon
