@@ -38,7 +38,6 @@
 #include <boost/geometry/geometries/multi_polygon.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
-#include <boost/geometry/algorithms/difference.hpp>
 
 typedef boost::geometry::model::d2::point_xy<double>        BoostPoint;
 typedef boost::geometry::model::polygon<BoostPoint>         BoostPolygon;
@@ -99,8 +98,6 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
                                             const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
                                             const std::vector<std::vector<std::vector<vec3d>>> & open_polylines)
 {
-    (void)open_polylines; // warning killer => TODO: buffer curves, union of polys, then tessellaation
-
     uint n_slices = external_polylines.size();
 
     for(uint sid=0; sid<n_slices; ++sid)
@@ -138,6 +135,8 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
 
         std::vector<double> holes_in;
         points_inside_holes(internal_polylines.at(sid), holes_in);
+
+        thicken_open_polylines(open_polylines.at(sid), 0.01, verts_in, segs_in);
 
         triangle_wrap(verts_in, segs_in, holes_in, "Q", verts_out, tris_out);
 
@@ -192,6 +191,70 @@ void SlicedObj<M,V,E,P>::points_inside_holes(const std::vector<std::vector<vec3d
         uint v2 = tris_out.at(2);
         points.push_back((verts_out.at(2*v0+0) + verts_out.at(2*v1+0) + verts_out.at(2*v2+0))/3.0);
         points.push_back((verts_out.at(2*v0+1) + verts_out.at(2*v1+1) + verts_out.at(2*v2+1))/3.0);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void SlicedObj<M,V,E,P>::thicken_open_polylines(const std::vector<std::vector<vec3d>> & open_polylines,
+                                                const double                          & thickness,
+                                                      std::vector<double>             & points,
+                                                      std::vector<uint>               & segs)
+{
+    // boost::buffer strategies
+    boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(thickness);
+    boost::geometry::strategy::buffer::join_miter                 join_strategy;
+    boost::geometry::strategy::buffer::end_flat                   end_strategy;
+    boost::geometry::strategy::buffer::point_square               circle_strategy;
+    boost::geometry::strategy::buffer::side_straight              side_strategy;
+
+    std::vector<BoostPolygon> buffered_polylines;
+    for(auto polyline : open_polylines)
+    {
+        BoostLinestring ls;
+        for(uint i=0; i<polyline.size(); ++i)
+        {
+            boost::geometry::append(ls, BoostPoint(polyline.at(i).x(),polyline.at(i).y()));
+        }
+
+        std::vector<BoostPolygon> res;
+        boost::geometry::buffer(ls, res, distance_strategy, side_strategy,
+                                join_strategy, end_strategy, circle_strategy);
+        assert(res.size()==1);
+        buffered_polylines.push_back(res.front());
+    }
+
+    // open polylines may intersect. So I unify them all in a single (multi)polygon
+    BoostMultiPolygon unified_polylines;
+    for(uint i=0; i<buffered_polylines.size(); ++i)
+    {
+        BoostMultiPolygon res;
+        boost::geometry::union_(unified_polylines, buffered_polylines.at(i), res);
+        unified_polylines = res;
+    }
+
+    for(uint i=0; i<unified_polylines.size(); ++i)
+    {
+        uint base_addr = points.size()/2;
+        for(uint j=0; j<unified_polylines[i].outer().size()-1; ++j)
+        {
+            points.push_back(boost::geometry::get<0>(unified_polylines[i].outer()[j]));
+            points.push_back(boost::geometry::get<1>(unified_polylines[i].outer()[j]));
+            segs.push_back(base_addr + j);
+            segs.push_back(base_addr + (j+1)%(unified_polylines[i].outer().size()-1));
+        }
+
+        base_addr = points.size()/2;
+        for(auto p : unified_polylines[i].inners())
+        for(uint j=0; j<p.size()-1; ++j)
+        {
+            points.push_back(boost::geometry::get<0>(p[j]));
+            points.push_back(boost::geometry::get<1>(p[j]));
+            segs.push_back(base_addr + j);
+            segs.push_back(base_addr + (j+1)%(p.size()-1));
+        }
     }
 }
 

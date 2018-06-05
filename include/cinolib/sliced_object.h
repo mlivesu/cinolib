@@ -86,6 +86,14 @@ class SlicedObj : public Trimesh<M,V,E,P>
 
         void points_inside_holes(const std::vector<std::vector<vec3d>> & internal_polylines,
                                        std::vector<double>             & holes);
+
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void thicken_open_polylines(const std::vector<std::vector<vec3d>> & open_polylines,
+                                    const double                          & thickness,
+                                          std::vector<double>             & verts,
+                                          std::vector<uint>               & segs);
 };
 
 }
