@@ -1,3 +1,4 @@
+- add a folder "file_formats", containing a description of all the non standard files used in cinolb (.hedra, scalar and vector fields, sharp features)
 - improve OFF reader (labels/colors, ignore header OFF/COFF, ignore comments and empty lines)
 - improve canvas focus (when double click, center geometry e zoom on it, possibly adjusting clipping planes)
 - make sure field_serialize is lossless in terms of numeric precision
