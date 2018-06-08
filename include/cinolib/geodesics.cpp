@@ -43,7 +43,8 @@ CINO_INLINE
 ScalarField compute_geodesics(      Mesh              & m,
                               const std::vector<uint> & heat_charges,
                               const int                 laplacian_mode,
-                              const float               time_scalar)
+                              const float               time_scalar,
+                              const bool                hard_constrain_charges)
 {
     // optimize position and scale to get better numerical precision
     double d = m.bbox().diag();
@@ -70,13 +71,25 @@ ScalarField compute_geodesics(      Mesh              & m,
     grad.normalize();
 
     ScalarField geodesics(m.num_verts());
-    solve_square_system(-L, G.transpose() * grad, geodesics, SIMPLICIAL_LDLT);
-    geodesics.normalize_in_01();
+
+    // this is of course not supported in the amortized version,
+    // as the matrix changes every time
+    if(hard_constrain_charges)
+    {
+        std::map<uint,double> bcs;
+        for(uint vid : heat_charges) bcs[vid] = 1.0;
+        solve_square_system_with_bc(-L, G.transpose() * grad, geodesics, bcs, SIMPLICIAL_LDLT);
+    }
+    else
+    {
+        solve_square_system(-L, G.transpose() * grad, geodesics, SIMPLICIAL_LDLT);
+    }
 
     // restore original scale and position
     m.scale(d);
     m.translate(c);
 
+    geodesics.normalize_in_01();
     return geodesics;
 }
 
