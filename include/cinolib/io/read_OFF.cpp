@@ -29,9 +29,10 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/io/read_OFF.h>
-
-
-#include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <stdio.h>
 
 namespace cinolib
 {
@@ -50,59 +51,66 @@ void read_OFF(const char                     * filename,
 
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
-    FILE *f = fopen(filename, "r");
-
-    if(!f)
+    std::ifstream f(filename);
+    if(!f.is_open())
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OFF() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
 
-    int err;
-    uint nv, np, ne;
-    bool has_colors;
+    std::string line;
+    uint        nv, np, ne;
 
-    char header[100];
-    err = fscanf(f, "%s", header);
-    if(strcmp(header, "OFF" )==0) has_colors = false; else
-    if(strcmp(header, "COFF")==0) has_colors = true;  else
-    assert(false);
+    // read header and number of elements
+    do getline(f, line, '\n'); while(line.find("OFF")==std::string::npos);
+    do getline(f, line, '\n'); while(sscanf(line.c_str(), "%d %d %d\n", &nv, &np, &ne)!=3);
 
-    err = fscanf(f, "%d %d %d\n", &nv, &np, &ne);
-    std::cout << nv << " " << np << " " << ne << std::endl;
-
+    // read verts
     for(uint i=0; i<nv; ++i)
     {
-        // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
-        //
+        getline(f, line, '\n');
+        std::stringstream ss(line);
+
         double x, y, z;
-        err = fscanf(f, "%lf %lf %lf\n", &x, &y, &z);
-        verts.push_back(vec3d(x,y,z));
+        if(ss >> x >> y >> z)
+        {
+            verts.push_back(vec3d(x,y,z));
+        }
+        else --i;
     }
 
+    // read polys
     for(uint i=0; i<np; ++i)
     {
-        uint n_corners;
-        err = fscanf(f, "%d", &n_corners);
+        getline(f, line, '\n');
+        std::stringstream ss(line);
 
-        std::vector<uint> poly;
-        for(uint j=0; j<n_corners; ++j)
+        uint n_corners;
+        if(ss >> n_corners)
         {
             uint vid;
-            err = fscanf(f, "%d", &vid);
-            poly.push_back(vid);
-        }
-        polys.push_back(poly);
+            std::vector<uint> p;
+            for(uint j=0; j<n_corners; ++j)
+            {
+                assert(ss >> vid);
+                p.push_back(vid);
+            }
+            polys.push_back(p);
 
-        if(has_colors)
-        {
-            Color c;
-            err = fscanf(f, "%f %f %f %f\n", &c.r, &c.g, &c.b, &c.a);
-            poly_colors.push_back(c);
+            float val;
+            std::vector<float> attr;
+            while(ss >> val) attr.push_back(val);
+
+            switch(attr.size())
+            {
+                case 1 : break; // TODO: READ LABEL (cast to int)!!!
+                case 3 : poly_colors.push_back(Color(attr.at(0), attr.at(1), attr.at(2))); break;
+                case 4 : poly_colors.push_back(Color(attr.at(0), attr.at(1), attr.at(2), attr.at(3))); break;
+                default: break;
+            }
         }
+        else --i;
     }
-    fclose(f);
 }
-
 
 }
