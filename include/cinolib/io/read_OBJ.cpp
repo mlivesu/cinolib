@@ -30,6 +30,7 @@
 **********************************************************************************/
 #include <cinolib/io/read_OBJ.h>
 #include <cinolib/cut_along_seams.h>
+#include <cinolib/string_utilities.h>
 #include <sstream>
 #include <string.h>
 #include <iostream>
@@ -179,7 +180,10 @@ void read_OBJ(const char                     * filename,
                 char mtu_c[1024];
                 if (sscanf(line, "mtllib %s", mtu_c) == 1)
                 {
-                    read_MTU(mtu_c, color_map);
+                    std::string s0(filename);
+                    std::string s1(mtu_c);
+                    std::string s2 = get_file_path(s0) + get_file_name(s1);
+                    read_MTU(s2.c_str(), color_map);
                     has_per_face_color = true;
                 }
                 break;
