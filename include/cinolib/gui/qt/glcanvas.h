@@ -82,6 +82,7 @@ typedef struct
     float    z_far         = 1.0;          // back  clipping plane
     vec3d    scene_center  = vec3d(0,0,0); // scene_center
     float    scene_size    = 1.0;          // scene_size
+    bool     mode_2d       = false;        // disable rotations
 }
 Trackball;
 
@@ -101,6 +102,10 @@ class GLcanvas : public QGLWidget
         void paintGL();
         void updateGL();
         void updateGL_strict();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void set_2d_mode(const bool b);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

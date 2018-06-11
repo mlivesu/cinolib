@@ -202,6 +202,8 @@ void GLcanvas::zoom(double d)
 CINO_INLINE
 void GLcanvas::rotate(const vec3d & axis, const double angle)
 {
+    if(trackball.mode_2d) return; // disable rotations in 2D mode
+
     vec3d t(trackball.modelview[ 0]*trackball.pivot[0] +
             trackball.modelview[ 4]*trackball.pivot[1] +
             trackball.modelview[ 8]*trackball.pivot[2] +
@@ -634,6 +636,14 @@ void GLcanvas::updateGL_strict()
     // force immediate rendering
     // http://doc.qt.io/qt-5/qwidget.html#repaint
     repaint();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::set_2d_mode(const bool b)
+{
+    trackball.mode_2d = b;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
