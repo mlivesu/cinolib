@@ -37,6 +37,7 @@
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/meshes/meshes.h>
 
 namespace cinolib
 {
@@ -79,6 +80,17 @@ void triangle_wrap(const std::vector<vec3d>             & verts_in,  // automati
                    const std::string                    & flags,
                          std::vector<vec3d>             & verts_out, // automatically sets the third component (z) to zero
                          std::vector<std::vector<uint>> & tris_out);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void triangle_wrap(const std::vector<double> & verts_in,  // serialized input xy coordinates
+                   const std::vector<uint>   & segs_in,   // serialized segments
+                   const std::vector<double> & holes_in,  // serialized xy holes
+                   const double                z_coord,   // lift triangulation to z_coord
+                   const std::string         & flags,     // https://www.cs.cmu.edu/~quake/triangle.switch.html
+                         Trimesh<M,V,E,P>    & m);
 }
 
 #ifndef  CINO_STATIC_LIB

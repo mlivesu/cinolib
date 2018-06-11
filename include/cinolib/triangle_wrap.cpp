@@ -278,6 +278,23 @@ void triangle_wrap(const std::vector<vec3d>             & verts_in,  // automati
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void triangle_wrap(const std::vector<double> & verts_in,  // serialized input xy coordinates
+                   const std::vector<uint>   & segs_in,   // serialized segments
+                   const std::vector<double> & holes_in,  // serialized xy holes
+                   const double                z_coord,   // lift triangulation to z_coord
+                   const std::string         & flags,     // https://www.cs.cmu.edu/~quake/triangle.switch.html
+                         Trimesh<M,V,E,P>    & m)
+{
+    std::vector<double> verts;
+    std::vector<uint>   polys;
+    triangle_wrap(verts_in, segs_in, holes_in, z_coord, flags, verts, polys);
+    m = Trimesh<M,V,E,P>(verts,polys);
+}
+
 
 }
 
