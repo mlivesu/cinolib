@@ -37,11 +37,15 @@ namespace cinolib
 CINO_INLINE
 VectorField::VectorField() {}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 VectorField::VectorField(const int size)
 {
     setZero(3 * size);
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 VectorField::VectorField(const std::vector<vec3d> & data)
@@ -50,12 +54,16 @@ VectorField::VectorField(const std::vector<vec3d> & data)
     for(uint i=0; i<data.size(); ++i) set(i,data.at(i));
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 vec3d VectorField::vec_at(const int pos) const
 {
     int ptr = pos * 3;
     return vec3d((*this)[ptr], (*this)[ptr+1], (*this)[ptr+2]);
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void VectorField::set(const int pos, const vec3d & vec)
@@ -65,6 +73,8 @@ void VectorField::set(const int pos, const vec3d & vec)
     (*this)[ptr + 1] = vec.y();
     (*this)[ptr + 2] = vec.z();
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void VectorField::normalize()
@@ -90,6 +100,7 @@ void VectorField::normalize()
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void VectorField::serialize(const char *filename) const
@@ -106,6 +117,7 @@ void VectorField::serialize(const char *filename) const
     f.close();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void VectorField::deserialize(const char *filename)
@@ -122,6 +134,7 @@ void VectorField::deserialize(const char *filename)
     f.close();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // for more info, see:
 // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html

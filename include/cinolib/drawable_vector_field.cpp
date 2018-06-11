@@ -28,57 +28,101 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_VECTOR_FIELD_H
-#define CINO_VECTOR_FIELD_H
-
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/serializable.h>
-#include <Eigen/Dense>
+#include <cinolib/drawable_vector_field.h>
 
 namespace cinolib
 {
 
-class VectorField : public Eigen::VectorXd, public Serializable
+template<class Mesh>
+CINO_INLINE
+DrawableVectorField<Mesh>::DrawableVectorField()
 {
-    public:
-
-        explicit VectorField();
-        explicit VectorField(const int size);
-        explicit VectorField(const std::vector<vec3d> & data);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d vec_at(const int pos) const;
-        void  set(const int pos, const vec3d & vec);
-        void  normalize();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void serialize  (const char *filename) const;
-        void deserialize(const char *filename);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        // for more info, see:
-        // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
-        //
-        // This method allows you to assign Eigen expressions to VectorField
-        //
-        template<typename OtherDerived>
-        VectorField & operator= (const Eigen::MatrixBase<OtherDerived>& other);
-
-        //
-        // This constructor allows you to construct VectorField from Eigen expressions
-        //
-        template<typename OtherDerived>
-        VectorField(const Eigen::MatrixBase<OtherDerived>& other);
-};
-
+    m_ptr         = nullptr;
+    arrow_color   = Color::RED();
+    arrow_size    = 0.5;
+    field_on_poly = true;
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "vector_field.cpp"
-#endif
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class Mesh>
+CINO_INLINE
+DrawableVectorField<Mesh>::DrawableVectorField(const Mesh &m, const bool field_on_poly)
+: VectorField(m.num_polys())
+, field_on_poly(field_on_poly)
+{
+    m_ptr = &m;
+    set_arrow_color(Color::RED());
+    set_arrow_size(0.5);
+}
 
-#endif // CINO_VECTOR_FIELD_H
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void DrawableVectorField<Mesh>::draw(const float) const
+{
+    if(m_ptr == nullptr) return;
+
+    if(field_on_poly) // per polygon/polyhedron field
+    {
+        for(uint pid=0; pid<m_ptr->num_polys(); ++pid)
+        {
+            vec3d base = m_ptr->poly_centroid(pid);
+            vec3d tip  = base + arrow_length * vec_at(pid);
+            arrow<vec3d>(base, tip, arrow_thicknes, arrow_color.rgba);
+        }
+    }
+    else // per vertex field
+    {
+        for(uint vid=0; vid<m_ptr->num_verts(); ++vid)
+        {
+            vec3d base = m_ptr->vert(vid);
+            vec3d tip  = base + arrow_length * vec_at(vid);
+            arrow<vec3d>(base, tip, arrow_thicknes, arrow_color.rgba);
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void DrawableVectorField<Mesh>::set_arrow_color(const Color &c)
+{
+    arrow_color = c;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void DrawableVectorField<Mesh>::set_arrow_size(float s)
+{
+    if (m_ptr)
+    {
+        arrow_size     = s;
+        arrow_length   = m_ptr->edge_avg_length() * s;
+        arrow_thicknes = arrow_length * 0.1;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+Color DrawableVectorField<Mesh>::get_arrow_color() const
+{
+    return arrow_color;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+float DrawableVectorField<Mesh>::get_arrow_size() const
+{
+    return arrow_size;
+}
+
+}

@@ -45,18 +45,8 @@ class DrawableVectorField : public VectorField, public DrawableObject
 {
     public:
 
-        explicit DrawableVectorField()
-        {
-            arrow_color = Color::RED();
-            arrow_size  = 0.5;
-        }
-
-        explicit DrawableVectorField(const Mesh & m) : VectorField(m.num_polys())
-        {
-            m_ptr = &m;
-            set_arrow_color(Color::RED());
-            set_arrow_size(0.5);
-        }
+        explicit DrawableVectorField();
+        explicit DrawableVectorField(const Mesh & m, const bool field_on_poly = true);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -64,41 +54,16 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void draw(const float) const
-        {
-            if (m_ptr)
-            {
-                for(uint eid=0; eid<m_ptr->num_polys(); ++eid)
-                {
-                    vec3d base = m_ptr->poly_centroid(eid);
-                    vec3d tip  = base + arrow_length * vec_at(eid);
-
-                    arrow<vec3d>(base, tip, arrow_thicknes, arrow_color.rgba);
-                }
-            }
-        }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+        void draw(const float) const;
         vec3d scene_center() const { return vec3d(); }
         float scene_radius() const { return 0.0;     }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void set_arrow_color(const Color & c) { arrow_color = c; }
-
-        void set_arrow_size(float s)
-        {
-            if (m_ptr)
-            {                
-                arrow_size     = s;
-                arrow_length   = m_ptr->edge_avg_length() * s;
-                arrow_thicknes = arrow_length * 0.1;
-            }
-        }
-
-        Color get_arrow_color() const { return arrow_color; }
-        float get_arrow_size()  const { return arrow_size;  }
+        void  set_arrow_color(const Color & c);
+        void  set_arrow_size (float s);
+        Color get_arrow_color() const;
+        float get_arrow_size () const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -122,13 +87,18 @@ class DrawableVectorField : public VectorField, public DrawableObject
     private:
 
         const Mesh *m_ptr;
-
-        float arrow_size;
-        float arrow_length;
-        float arrow_thicknes;
-        Color arrow_color;
+        float       arrow_size;
+        float       arrow_length;
+        float       arrow_thicknes;
+        Color       arrow_color;
+        bool        field_on_poly; // true : field is defined per polygon/polyhedron;
+                                   // false: field is defined per vertex
 };
 
 }
+
+#ifndef  CINO_STATIC_LIB
+#include "drawable_vector_field.cpp"
+#endif
 
 #endif // CINO_DRAWABLE_VECTOR_FIELD_H
