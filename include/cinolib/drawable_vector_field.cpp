@@ -48,9 +48,11 @@ DrawableVectorField<Mesh>::DrawableVectorField()
 template<class Mesh>
 CINO_INLINE
 DrawableVectorField<Mesh>::DrawableVectorField(const Mesh &m, const bool field_on_poly)
-: VectorField(m.num_polys())
+: VectorField()
 , field_on_poly(field_on_poly)
 {
+    uint size = (field_on_poly) ? 3*m.num_polys() : 3*m.num_verts();
+    this->setZero(size);
     m_ptr = &m;
     set_arrow_color(Color::RED());
     set_arrow_size(0.5);
