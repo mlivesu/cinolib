@@ -1,3 +1,5 @@
+- add ARAP deformation (https://www.igl.ethz.ch/projects/ARAP/arap_web.pdf)
+- add hybrid ARAP/ASAP parameterization (http://cs.harvard.edu/~sjg/papers/arap.pdf)
 - refactor interfaces for triangle and tetgen (the basic one should use serialized data, the others should refer to it)
 - add a folder "file_formats", containing a description of all the non standard files used in cinolib (.hedra, scalar and vector fields, sharp features)
 - add support to read/write per element labels in OFF and HEDRA
