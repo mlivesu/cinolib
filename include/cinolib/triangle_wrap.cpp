@@ -59,28 +59,28 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void triangle_wrap(const std::vector<double> & verts_in,
+void triangle_wrap(const std::vector<double> & coords_in,
                    const std::vector<uint>   & segs_in,
                    const std::vector<double> & holes_in,
                    const std::string         & flags,
-                         std::vector<double> & verts_out,
+                         std::vector<double> & coords_out,
                          std::vector<uint>   & tris_out)
 {
-    verts_out.clear();
+    coords_out.clear();
     tris_out.clear();
 
 #ifdef CINOLIB_USES_TRIANGLE
 
     triangulateio in, out;
 
-    assert(!verts_in.empty());
+    assert(!coords_in.empty());
 
-    in.numberofpoints = verts_in.size()/2;
-    in.pointlist      = (double*)calloc(verts_in.size(),sizeof(double));
+    in.numberofpoints = coords_in.size()/2;
+    in.pointlist      = (double*)calloc(coords_in.size(),sizeof(double));
     for(int vid=0; vid<in.numberofpoints; ++vid)
     {
-        in.pointlist[vid*2  ] = verts_in.at(vid*2  );
-        in.pointlist[vid*2+1] = verts_in.at(vid*2+1);
+        in.pointlist[vid*2  ] = coords_in.at(vid*2  );
+        in.pointlist[vid*2+1] = coords_in.at(vid*2+1);
     }
     in.numberofpointattributes = 0;
     in.pointmarkerlist         = (int*)calloc(in.numberofpoints,sizeof(int));
@@ -120,11 +120,11 @@ void triangle_wrap(const std::vector<double> & verts_in,
 
     triangulate(const_cast<char*>(s.c_str()), &in, &out, NULL);
 
-    verts_out.reserve(out.numberofpoints*2);
+    coords_out.reserve(out.numberofpoints*2);
     for(int vid=0; vid<out.numberofpoints; ++vid)
     {
-        verts_out.push_back(out.pointlist[vid*2  ]);
-        verts_out.push_back(out.pointlist[vid*2+1]);
+        coords_out.push_back(out.pointlist[vid*2  ]);
+        coords_out.push_back(out.pointlist[vid*2+1]);
     }
 
     tris_out.reserve(out.numberoftriangles * 3);
@@ -152,22 +152,22 @@ void triangle_wrap(const std::vector<double> & verts_in,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void triangle_wrap(const std::vector<double> & verts_in,  // serialized input xy coordinates
-                   const std::vector<uint>   & segs_in,   // serialized segments
-                   const std::vector<double> & holes_in,  // serialized xy holes
-                   const double                z_coord,   // lift triangulation to z_coord
-                   const std::string         & flags,     // https://www.cs.cmu.edu/~quake/triangle.switch.html
-                         std::vector<double> & verts_out, // serialized output xy+z_coord coordinates
-                         std::vector<uint>   & tris_out) // serialized tris
+void triangle_wrap(const std::vector<double> & coords_in,  // serialized input xy coordinates
+                   const std::vector<uint>   & segs_in,    // serialized segments
+                   const std::vector<double> & holes_in,   // serialized xy holes
+                   const double                z_coord,    // lift triangulation to z_coord
+                   const std::string         & flags,      // https://www.cs.cmu.edu/~quake/triangle.switch.html
+                         std::vector<double> & coords_out, // serialized output xy+z_coord coordinates
+                         std::vector<uint>   & tris_out)   // serialized tris
 {
     std::vector<double> tmp_verts;
-    triangle_wrap(verts_in, segs_in, holes_in, flags, tmp_verts, tris_out);
+    triangle_wrap(coords_in, segs_in, holes_in, flags, tmp_verts, tris_out);
     uint nv = tmp_verts.size()/2;
     for(uint vid=0; vid<nv; ++vid)
     {
-        verts_out.push_back(tmp_verts.at(vid*2  ));
-        verts_out.push_back(tmp_verts.at(vid*2+1));
-        verts_out.push_back(z_coord);
+        coords_out.push_back(tmp_verts.at(vid*2  ));
+        coords_out.push_back(tmp_verts.at(vid*2+1));
+        coords_out.push_back(z_coord);
     }
 }
 
@@ -181,17 +181,17 @@ void triangle_wrap(const std::vector<vec2d>             & verts_in,
                          std::vector<vec2d>             & verts_out,
                          std::vector<std::vector<uint>> & tris_out)
 {
-    std::vector<double> tmp_verts_in, tmp_holes_in, tmp_verts_out;
+    std::vector<double> tmp_coords_in, tmp_holes_in, tmp_coords_out;
     std::vector<uint>   tmp_tris_out;
 
-    tmp_verts_in.reserve(verts_in.size()*2);
+    tmp_coords_in.reserve(verts_in.size()*2);
     tmp_holes_in.reserve(holes_in.size()*2);
-    tmp_verts_out.reserve(tmp_verts_in.size());
+    tmp_coords_out.reserve(tmp_coords_in.size());
 
     for(const vec2d & p : verts_in)
     {
-        tmp_verts_in.push_back(p.x());
-        tmp_verts_in.push_back(p.y());
+        tmp_coords_in.push_back(p.x());
+        tmp_coords_in.push_back(p.y());
     }
     for(const vec2d & h : holes_in)
     {
@@ -199,14 +199,14 @@ void triangle_wrap(const std::vector<vec2d>             & verts_in,
         tmp_holes_in.push_back(h.y());
     }
 
-    triangle_wrap(tmp_verts_in, segs_in, tmp_holes_in, flags, tmp_verts_out, tmp_tris_out);
+    triangle_wrap(tmp_coords_in, segs_in, tmp_holes_in, flags, tmp_coords_out, tmp_tris_out);
 
     verts_out.clear();
-    uint nv = tmp_verts_out.size()/2;
+    uint nv = tmp_coords_out.size()/2;
     for(uint vid=0; vid<nv; ++vid)
     {
-        verts_out.push_back(vec2d(tmp_verts_out.at(vid*2  ),
-                                  tmp_verts_out.at(vid*2+1)));
+        verts_out.push_back(vec2d(tmp_coords_out.at(vid*2  ),
+                                  tmp_coords_out.at(vid*2+1)));
     }
 
     uint nt = tmp_tris_out.size()/3;
@@ -234,17 +234,17 @@ void triangle_wrap(const std::vector<vec3d>             & verts_in,  // automati
                          std::vector<vec3d>             & verts_out, // automatically sets the third component (z) to zero
                          std::vector<std::vector<uint>> & tris_out)
 {
-    std::vector<double> tmp_verts_in, tmp_holes_in, tmp_verts_out;
+    std::vector<double> tmp_coords_in, tmp_holes_in, tmp_coords_out;
     std::vector<uint>   tmp_tris_out;
 
-    tmp_verts_in.reserve(verts_in.size()*2);
+    tmp_coords_in.reserve(verts_in.size()*2);
     tmp_holes_in.reserve(holes_in.size()*2);
-    tmp_verts_out.reserve(tmp_verts_in.size());
+    tmp_coords_out.reserve(tmp_coords_in.size());
 
     for(const vec3d & p : verts_in)
     {
-        tmp_verts_in.push_back(p.x());
-        tmp_verts_in.push_back(p.y());
+        tmp_coords_in.push_back(p.x());
+        tmp_coords_in.push_back(p.y());
     }
     for(const vec3d & h : holes_in)
     {
@@ -252,14 +252,14 @@ void triangle_wrap(const std::vector<vec3d>             & verts_in,  // automati
         tmp_holes_in.push_back(h.y());
     }
 
-    triangle_wrap(tmp_verts_in, segs_in, tmp_holes_in, flags, tmp_verts_out, tmp_tris_out);
+    triangle_wrap(tmp_coords_in, segs_in, tmp_holes_in, flags, tmp_coords_out, tmp_tris_out);
 
     verts_out.clear();
-    uint nv = tmp_verts_out.size()/2;
+    uint nv = tmp_coords_out.size()/2;
     for(uint vid=0; vid<nv; ++vid)
     {
-        verts_out.push_back(vec3d(tmp_verts_out.at(vid*2  ),
-                                  tmp_verts_out.at(vid*2+1),
+        verts_out.push_back(vec3d(tmp_coords_out.at(vid*2  ),
+                                  tmp_coords_out.at(vid*2+1),
                                   0.0));
     }
 
@@ -282,17 +282,17 @@ void triangle_wrap(const std::vector<vec3d>             & verts_in,  // automati
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void triangle_wrap(const std::vector<double> & verts_in,  // serialized input xy coordinates
+void triangle_wrap(const std::vector<double> & coords_in, // serialized input xy coordinates
                    const std::vector<uint>   & segs_in,   // serialized segments
                    const std::vector<double> & holes_in,  // serialized xy holes
                    const double                z_coord,   // lift triangulation to z_coord
                    const std::string         & flags,     // https://www.cs.cmu.edu/~quake/triangle.switch.html
                          Trimesh<M,V,E,P>    & m)
 {
-    std::vector<double> verts;
+    std::vector<double> coords;
     std::vector<uint>   polys;
-    triangle_wrap(verts_in, segs_in, holes_in, z_coord, flags, verts, polys);
-    m = Trimesh<M,V,E,P>(verts,polys);
+    triangle_wrap(coords_in, segs_in, holes_in, z_coord, flags, coords, polys);
+    m = Trimesh<M,V,E,P>(coords,polys);
 }
 
 

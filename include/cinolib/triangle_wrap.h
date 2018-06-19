@@ -43,23 +43,23 @@ namespace cinolib
 {
 
 CINO_INLINE
-void triangle_wrap(const std::vector<double> & verts_in,  // serialized input xy coordinates
-                   const std::vector<uint>   & segs_in,   // serialized segments
-                   const std::vector<double> & holes_in,  // serialized xy holes
-                   const std::string         & flags,     // https://www.cs.cmu.edu/~quake/triangle.switch.html
-                         std::vector<double> & verts_out, // serialized output xy coordinates
-                         std::vector<uint>   & tris_out); // serialized tris
+void triangle_wrap(const std::vector<double> & coords_in,  // serialized input xy coordinates
+                   const std::vector<uint>   & segs_in,    // serialized segments
+                   const std::vector<double> & holes_in,   // serialized xy holes
+                   const std::string         & flags,      // https://www.cs.cmu.edu/~quake/triangle.switch.html
+                         std::vector<double> & coords_out, // serialized output xy coordinates
+                         std::vector<uint>   & tris_out);  // serialized tris
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void triangle_wrap(const std::vector<double> & verts_in,  // serialized input xy coordinates
-                   const std::vector<uint>   & segs_in,   // serialized segments
-                   const std::vector<double> & holes_in,  // serialized xy holes
-                   const double                z_coord,   // lift triangulation to z_coord
-                   const std::string         & flags,     // https://www.cs.cmu.edu/~quake/triangle.switch.html
-                         std::vector<double> & verts_out, // serialized output xy+z_coord coordinates
-                         std::vector<uint>   & tris_out); // serialized tris
+void triangle_wrap(const std::vector<double> & coords_in,  // serialized input xy coordinates
+                   const std::vector<uint>   & segs_in,    // serialized segments
+                   const std::vector<double> & holes_in,   // serialized xy holes
+                   const double                z_coord,    // lift triangulation to z_coord
+                   const std::string         & flags,      // https://www.cs.cmu.edu/~quake/triangle.switch.html
+                         std::vector<double> & coords_out, // serialized output xy+z_coord coordinates
+                         std::vector<uint>   & tris_out);  // serialized tris
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -85,7 +85,7 @@ void triangle_wrap(const std::vector<vec3d>             & verts_in,  // automati
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void triangle_wrap(const std::vector<double> & verts_in,  // serialized input xy coordinates
+void triangle_wrap(const std::vector<double> & coords_in, // serialized input xy coordinates
                    const std::vector<uint>   & segs_in,   // serialized segments
                    const std::vector<double> & holes_in,  // serialized xy holes
                    const double                z_coord,   // lift triangulation to z_coord
