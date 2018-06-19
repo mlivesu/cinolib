@@ -1,3 +1,4 @@
+- add matrix class (i.e. mat4<T>, with operators and contructors from quaternions, rotations, identity, diagonal, ecc)
 - add ARAP deformation (https://www.igl.ethz.ch/projects/ARAP/arap_web.pdf)
 - add hybrid ARAP/ASAP parameterization (http://cs.harvard.edu/~sjg/papers/arap.pdf)
 - refactor interfaces for triangle and tetgen (the basic one should use serialized data, the others should refer to it)
