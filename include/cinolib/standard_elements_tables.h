@@ -33,16 +33,17 @@
 
 #include <sys/types.h>
 
-// Reference               Reference
-// Hexahedron:             Tetrahedron:
-//
-//       v7------v6              v3
-//      / |     / |             /| \
-//    v4------v5  |           /  |   \
-//    |   |    |  |         v0---|----v2
-//    |  v3----|--v2         \   |   /
-//    | /      | /             \ | /
-//    v0------v1                 v1
+/*    Reference               Reference
+ *    Hexahedron:             Tetrahedron:
+ *
+ *       v7------v6              v3
+ *      / |     / |             /| \
+ *    v4------v5  |           /  |   \
+ *    |   |    |  |         v0---|----v2
+ *    |  v3----|--v2         \   |   /
+ *    | /      | /             \ | /
+ *    v0------v1                 v1
+*/
 
 namespace cinolib
 {
@@ -125,8 +126,6 @@ static const uint HEXA_INCIDENT_EDGES[8][3] =
     { 5, 6, 10 }, // edges incident to v6
     { 6, 7, 11 }, // edges incident to v7
 };
-
-
 
 }
 
