@@ -47,6 +47,24 @@ namespace cinolib
 template<class M, class V, class E, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolygonMesh<M,V,E,P> & m,
+                    const std::set<int>                & labels,
+                          AbstractPolygonMesh<M,V,E,P> & subm);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
+                    const std::set<int>                & labels,
+                          AbstractPolygonMesh<M,V,E,P>  & subm,
+                          std::map<uint,uint>           & m2subm_vmap,
+                          std::map<uint,uint>           & subm2m_vmap);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void export_cluster(const AbstractPolygonMesh<M,V,E,P> & m,
                     const int                            label,
                           AbstractPolygonMesh<M,V,E,P> & subm);
 
@@ -59,6 +77,24 @@ void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
                           AbstractPolygonMesh<M,V,E,P>  & subm,
                           std::map<uint,uint>           & m2subm_vmap,
                           std::map<uint,uint>           & subm2m_vmap);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                    const std::set<int>                     & labels,
+                          AbstractPolyhedralMesh<M,V,E,F,P> & subm);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P>  & m,
+                    const std::set<int>                      & labels,
+                          AbstractPolyhedralMesh<M,V,E,F,P>  & subm,
+                          std::map<uint,uint>                & m2subm_vmap,
+                          std::map<uint,uint>                & subm2m_vmap);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
