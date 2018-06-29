@@ -278,6 +278,11 @@ template<typename real> class vec3
         {
             return (*this - in).length();
         }
+
+        double dist_squared(const vec3<real> &in) const
+        {
+            return (*this - in).length_squared();
+        }
 };
 
 template<typename real>
