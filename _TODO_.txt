@@ -1,23 +1,16 @@
-- add matrix class (i.e. mat4<T>, with operators and contructors from quaternions, rotations, identity, diagonal, ecc)
-- add ARAP deformation (https://www.igl.ethz.ch/projects/ARAP/arap_web.pdf)
-- add hybrid ARAP/ASAP parameterization (http://cs.harvard.edu/~sjg/papers/arap.pdf)
+- add matrix class (i.e. mat<real,size>, with operators and constructors from quaternions, rotations, identity, diagonal, ecc)
+- move from vec2d and vec3d in vec<real,size> (DOABLE?)
 - refactor interfaces for triangle and tetgen (the basic one should use serialized data, the others should refer to it)
 - add a folder "file_formats", containing a description of all the non standard files used in cinolib (.hedra, scalar and vector fields, sharp features)
 - add support to read/write per element labels in OFF and HEDRA
 - improve canvas focus (when double click, center geometry and zoom on it, possibly adjusting clipping planes)
 - make sure field_serialize is lossless in terms of numeric precision
-- fix per face winding in midpoint subdivision
-- fix marching tets: degenerate triangles will be generated in some cases (see comments inside cpp file)
-- add ambient occlusion
 - add verdict metrics for tris/quads/tets/hexa
 - put edge flip and similar operators on separate files
 - put cotangents (tets/tris) on a separate .h/cpp file
 - add inverse and transpose operators for 2x2 and 3x3 matrices
-- refactor ray/line/plane intersections and integral curve tracing 
-  (check Robust Polylines Tracing for N-Symmetry Direction Field on Triangulated Surfaces)
 - remove headers from serialized vector and scalar fields (it’s far more general)
 - update skeleton data structure (and make relative control panel)
-- Gradients on hexmeshes are buggy. hint: check per face normals!
 - Add cylinder and spheres list (with colors, size and so forth) in the render list used for meshes, so that there will be only on unified rendering access point
 - Refactor PointInsideMeshCache, it should return ALL the elements containing the
   query point and let the application choose the best one
@@ -26,4 +19,17 @@
 - Add cotan laplacian  normalization
   (ref => https://www.ceremade.dauphine.fr/~peyre/teaching/manifold/tp4.html)
 - Improve on mesh rendering (shaders, VBOs (https://www.khronos.org/opengl/wiki/VBO_-_just_examples))
-- add a system of binary flags to be used by algorithms internal ti cinolib
+- add a system of binary flags to be used by algorithms internal to cinolib
+
+
+KNOWN BUGS/THINGS TO BE FIXED:
+ - fix per face winding in midpoint subdivision
+ - fix marching tets: degenerate triangles will be generated in some cases (see comments inside cpp file)
+ - fix integral curve tracing (also refactor ray/line/plane intersections)
+ - gradients on hex-meshes are buggy. maybe something wrong with face normals?
+
+
+ALGORITHMS TO IMPLEMENT:
+ - object space ambient occlusion 
+ - ARAP parameterization and shape deformation
+ - linear blend skinning and dual quaternions
