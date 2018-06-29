@@ -1,3 +1,5 @@
+- add Lagrange multipliers to linear solvers
+- add convenient wraps to do back-substitution directly into linear_solvers.h
 - add matrix class (i.e. mat<real,size>, with operators and constructors from quaternions, rotations, identity, diagonal, ecc)
 - move from vec2d and vec3d in vec<real,size> (DOABLE?)
 - refactor interfaces for triangle and tetgen (the basic one should use serialized data, the others should refer to it)
