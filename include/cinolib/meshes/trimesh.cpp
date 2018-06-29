@@ -307,7 +307,33 @@ bool Trimesh<M,V,E,P>::edge_is_flippable(const uint eid)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int Trimesh<M, V, E, P>::edge_flip(const uint eid)
+double Trimesh<M,V,E,P>::edge_cotangent_weight(const uint eid) const
+{
+    assert(this->edge_is_manifold(eid));
+    uint   vid0  = this->edge_vert_id(eid,0);
+    uint   vid1  = this->edge_vert_id(eid,1);
+    double count = 0.0;
+    double sum   = 0.0;
+    for(uint pid : this->adj_e2p(eid))
+    {
+        uint   v_opp = this->vert_opposite_to(pid, vid0, vid1);
+        double alpha = this->poly_angle_at_vert(pid, v_opp);
+        double c     = cot(alpha);
+        if (!std::isnan(c))
+        {
+            sum   += std::max(1e-5, cot(alpha)); // avoid negative weights
+            count += 1.0;
+        }
+    }
+    if(count==0) return 0.0;
+    return sum/count;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+int Trimesh<M,V,E,P>::edge_flip(const uint eid)
 {
     if(!edge_is_flippable(eid)) return -1;
 
@@ -489,6 +515,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint Trimesh<M,V,E,P>::vert_opposite_to(const uint pid, const uint vid0, const uint vid1) const
 {
+    assert(vid0!=vid1);
     assert(this->poly_contains_vert(pid, vid0));
     assert(this->poly_contains_vert(pid, vid1));
     for(uint off=0; off<this->verts_per_poly(pid); ++off)
@@ -537,20 +564,8 @@ void Trimesh<M,V,E,P>::vert_weights_cotangent(const uint vid, std::vector<std::p
     wgts.clear();
     for(uint eid : this->adj_v2e(vid))
     {
-        assert(this->edge_is_manifold(eid));
-        uint   nbr   = this->vert_opposite_to(eid, vid);
-        double wgt   = 0.0;
-        uint   count = 0;
-        for(uint pid : this->adj_e2p(eid))
-        {
-            double alpha = this->poly_angle_at_vert(pid, vert_opposite_to(pid, vid, nbr));
-            if (!std::isnan(alpha))
-            {
-                wgt += cot(alpha);
-                ++count;
-            }
-        }
-        wgt = (count > 0) ? wgt/static_cast<double>(count) : 0.0;
+        uint   nbr = this->vert_opposite_to(eid, vid);
+        double wgt = this->edge_cotangent_weight(eid);
         wgts.push_back(std::make_pair(nbr,wgt));
     }
 }
