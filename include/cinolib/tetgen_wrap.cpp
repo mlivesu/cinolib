@@ -29,6 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/tetgen_wrap.h>
+#include <cinolib/vector_serialization.h>
 
 #ifdef CINOLIB_USES_TETGEN
 #include <tetgen.h>
@@ -37,19 +38,18 @@
 namespace cinolib
 {
 
-
 CINO_INLINE
-void tetgen_wrap(const std::vector<double> & coords_in,
-                 const std::vector<uint>   & tris_in,
-                 const std::vector<uint>   & edges_in,
-                 const std::string         & flags,       // options
-                       std::vector<double> & coords_out,
-                       std::vector<uint>   & tets_out)
+void tetgen_wrap(const std::vector<double>            & coords_in,
+                 const std::vector<std::vector<uint>> & polys_in,
+                 const std::vector<uint>              & edges_in,
+                 const std::string                    & flags,       // options
+                       std::vector<double>            & coords_out,
+                       std::vector<uint>              & tets_out)
 {
 #ifdef CINOLIB_USES_TETGEN
 
     assert(!coords_in.empty());
-    assert(!tris_in.empty());
+    assert(!polys_in.empty());
     coords_out.clear();
     tets_out.clear();
 
@@ -70,7 +70,7 @@ void tetgen_wrap(const std::vector<double> & coords_in,
 
     // faces
     //
-    in.numberoffacets = tris_in.size() / 3;
+    in.numberoffacets = polys_in.size();
     in.facetlist      = new tetgenio::facet[in.numberoffacets];
 
     for(int fid=0; fid<in.numberoffacets; ++fid)
@@ -81,11 +81,12 @@ void tetgen_wrap(const std::vector<double> & coords_in,
         f->numberofholes = 0;
         f->holelist = NULL;
         p = &f->polygonlist[0];
-        p->numberofvertices = 3;
+        p->numberofvertices = polys_in.at(fid).size();
         p->vertexlist = new int[p->numberofvertices];
-        p->vertexlist[0] = tris_in[fid * 3];
-        p->vertexlist[1] = tris_in[fid * 3 + 1];
-        p->vertexlist[2] = tris_in[fid * 3 + 2];
+        for(int i=0; i<p->numberofvertices; ++i)
+        {
+            p->vertexlist[i] = polys_in.at(fid).at(i);
+        }
     }
 
     // edges
@@ -126,6 +127,81 @@ void tetgen_wrap(const std::vector<double> & coords_in,
     std::cerr << "ERROR : Tetgen missing. Install Tetgen and recompile defining symbol CINOLIB_USES_TETGEN" << std::endl;
     exit(-1);
 #endif
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void tetgen_wrap(const std::vector<double> & coords_in,
+                 const std::vector<uint>   & tris_in,
+                 const std::vector<uint>   & edges_in,
+                 const std::string         & flags,       // options
+                       std::vector<double> & coords_out,
+                       std::vector<uint>   & tets_out)
+{
+    tetgen_wrap(coords_in, polys_from_serialized_vids(tris_in,3), edges_in, flags, coords_out, tets_out);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void tetgen_wrap(const std::vector<vec3d>             & verts_in,
+                 const std::vector<std::vector<uint>> & polys_in,
+                 const std::vector<uint>              & edges_in,
+                 const std::string                    & flags,       // options
+                       std::vector<vec3d>             & verts_out,
+                       std::vector<uint>              & tets_out)
+{
+    std::vector<double> coords_out;
+    tetgen_wrap(serialized_xyz_from_vec3d(verts_in), polys_in, edges_in, flags, coords_out, tets_out);
+    verts_out = vec3d_from_serialized_xyz(coords_out);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void tetgen_wrap(const std::vector<vec3d>  & verts_in,
+                 const std::vector<uint>   & tris_in,
+                 const std::vector<uint>   & edges_in,
+                 const std::string         & flags,       // options
+                       std::vector<vec3d>  & verts_out,
+                       std::vector<uint>   & tets_out)
+{
+    std::vector<double> coords_out;
+    tetgen_wrap(serialized_xyz_from_vec3d(verts_in), polys_from_serialized_vids(tris_in,3), edges_in, flags, coords_out, tets_out);
+    verts_out = vec3d_from_serialized_xyz(coords_out);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void tetgen_wrap(const std::vector<vec3d>  & verts_in,
+                 const std::vector<uint>   & tris_in,
+                 const std::vector<uint>   & edges_in,
+                 const std::string         & flags,       // options
+                       Tetmesh<M,V,E,F,P>  & m)
+{
+    std::vector<vec3d> verts;
+    std::vector<uint>  tets;
+    tetgen_wrap(verts_in, tris_in, edges_in, flags, verts, tets);
+    m = Tetmesh<M,V,E,F,P>(verts,tets);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void tetgen_wrap(const std::vector<vec3d>             & verts_in,
+                 const std::vector<std::vector<uint>> & polys_in,
+                 const std::vector<uint>              & edges_in,
+                 const std::string                    & flags,       // options
+                       Tetmesh<M,V,E,F,P>             & m)
+{
+    std::vector<vec3d> verts;
+    std::vector<uint>  tets;
+    tetgen_wrap(verts_in, polys_in, edges_in, flags, verts, tets);
+    m = Tetmesh<M,V,E,F,P>(verts,tets);
 }
 
 }

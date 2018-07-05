@@ -35,10 +35,21 @@
 #include <sys/types.h>
 #include <string>
 #include <cinolib/cino_inline.h>
+#include <cinolib/meshes/tetmesh.h>
 
 
 namespace cinolib
 {
+
+CINO_INLINE
+void tetgen_wrap(const std::vector<double>            & coords_in,
+                 const std::vector<std::vector<uint>> & polys_in,
+                 const std::vector<uint>              & edges_in,
+                 const std::string                    & flags,       // options
+                       std::vector<double>            & coords_out,
+                       std::vector<uint>              & tets_out);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void tetgen_wrap(const std::vector<double> & coords_in,
@@ -47,6 +58,46 @@ void tetgen_wrap(const std::vector<double> & coords_in,
                  const std::string         & flags,       // options
                        std::vector<double> & coords_out,
                        std::vector<uint>   & tets_out);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void tetgen_wrap(const std::vector<vec3d>             & verts_in,
+                 const std::vector<std::vector<uint>> & polys_in,
+                 const std::vector<uint>              & edges_in,
+                 const std::string                    & flags,       // options
+                       std::vector<vec3d>             & coords_out,
+                       std::vector<uint>              & tets_out);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void tetgen_wrap(const std::vector<vec3d>  & verts_in,
+                 const std::vector<uint>   & tris_in,
+                 const std::vector<uint>   & edges_in,
+                 const std::string         & flags,       // options
+                       std::vector<vec3d>  & coords_out,
+                       std::vector<uint>   & tets_out);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void tetgen_wrap(const std::vector<vec3d>  & verts_in,
+                 const std::vector<uint>   & tris_in,
+                 const std::vector<uint>   & edges_in,
+                 const std::string         & flags,       // options
+                       Tetmesh<M,V,E,F,P>  & m);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void tetgen_wrap(const std::vector<vec3d>             & verts_in,
+                 const std::vector<std::vector<uint>> & polys_in,
+                 const std::vector<uint>              & edges_in,
+                 const std::string                    & flags,       // options
+                       Tetmesh<M,V,E,F,P>             & m);
 }
 
 #ifndef  CINO_STATIC_LIB
