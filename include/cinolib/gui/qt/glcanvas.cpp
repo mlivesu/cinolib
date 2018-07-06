@@ -166,7 +166,7 @@ void GLcanvas::update_projection_matrix()
     makeCurrent();
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, (GLfloat)width()/(GLfloat)height(), trackball.z_near, trackball.z_far);
+    gluPerspective(45.0, (GLfloat)width()/(GLfloat)height(), 0.01, trackball.scene_size*10.0);//trackball.z_near, trackball.z_far);
     glGetDoublev(GL_PROJECTION_MATRIX, trackball.projection);
     glMatrixMode(GL_MODELVIEW);
 }
@@ -189,10 +189,10 @@ CINO_INLINE
 void GLcanvas::zoom(double d)
 {
     // coming closer would make depth values unstable
-    if(d>trackball.z_near) d = trackball.z_near - 1e-3;
+    //if(d>trackball.z_near) d = trackball.z_near - 1e-3;
     translate(vec3d(0,0,d));
-    trackball.z_near -= d;
-    trackball.z_far  -= d;
+    //trackball.z_near -= d;
+    //trackball.z_far  -= d;
     update_projection_matrix();
     updateGL();
 }
