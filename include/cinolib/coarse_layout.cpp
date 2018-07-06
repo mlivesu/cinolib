@@ -143,7 +143,7 @@ void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
     {
         if (m.poly_data(pid).marked) continue; // already visited
         std::unordered_set<uint> patch;
-        bfs_on_dual_w_edge_barriers(m, pid, on_domain_border, patch);
+        bfs_on_dual_w_face_barriers(m, pid, on_domain_border, patch);
         for(uint p : patch)
         {
             m.poly_data(p).label  = patch_id;
