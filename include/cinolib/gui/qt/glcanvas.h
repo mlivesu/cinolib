@@ -80,6 +80,7 @@ typedef struct
     GLdouble modelview[16];                // openGL modelview  matrix
     float    z_near        = 0.1;          // front clipping plane
     float    z_far         = 1.0;          // back  clipping plane
+    float    z_comp        = 0.0;
     vec3d    scene_center  = vec3d(0,0,0); // scene_center
     float    scene_size    = 1.0;          // scene_size
     bool     mode_2d       = false;        // disable rotations
