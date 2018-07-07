@@ -36,4 +36,5 @@ DOCUMENTATION/LICENSE
 ALGORITHMS TO IMPLEMENT:
  - object space ambient occlusion 
  - ARAP parameterization and shape deformation
+ - Least Squares Conformal Maps
  - linear blend skinning and dual quaternions
