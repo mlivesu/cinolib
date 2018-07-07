@@ -47,6 +47,7 @@ enum
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 std::vector<vec3d> read_polyline(std::string line, const double z)
 {
     std::replace(line.begin(), line.end(), '$', ' ');
