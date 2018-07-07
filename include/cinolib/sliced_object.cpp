@@ -87,9 +87,10 @@ void SlicedObj<M,V,E,P>::init(const std::vector<std::vector<std::vector<vec3d>>>
                               const std::vector<std::vector<std::vector<vec3d>>> & open_polylines,
                               const std::vector<std::vector<std::vector<vec3d>>> & hatches)
 {
-    std::cout << "new sliced object (" << internal_polylines.size() << " slices)" << std::endl;
-
+    n_slices = internal_polylines.size();
     (void)hatches; // warning killer => DO SOMETHING WITH THEM!
+
+    std::cout << "new sliced object (" << n_slices << " slices)" << std::endl;
 
     triangulate_slices(internal_polylines, external_polylines, open_polylines);
     this->edge_mark_boundaries();
@@ -103,8 +104,6 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
                                             const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
                                             const std::vector<std::vector<std::vector<vec3d>>> & open_polylines)
 {
-    uint n_slices = external_polylines.size();
-
     for(uint sid=0; sid<n_slices; ++sid)
     {        
         bool has_external_polyline = !external_polylines.at(sid).empty();
@@ -168,6 +167,7 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
             {
                 uint vid = this->vert_add(p);
                 this->vert_data(vid).uvw[0] = static_cast<double>(sid)/static_cast<double>(n_slices);
+                this->vert_data(vid).label  = sid;
             }
             for(uint i=0; i<n_tris; ++i)
             {
@@ -175,6 +175,7 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
                                           base_addr + tris_out.at(3*i+1),
                                           base_addr + tris_out.at(3*i+2));
                 this->poly_data(pid).label = sid;
+                for(uint eid : this->adj_p2e(pid)) this->edge_data(eid).label = sid;
             }
         }
     }
@@ -282,6 +283,43 @@ void SlicedObj<M,V,E,P>::thicken_open_polylines(const std::vector<std::vector<ve
             segs.push_back(base_addr + (j+1)%(p.size()-1));
         }
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void SlicedObj<M,V,E,P>::slice_segments(const uint           sid,
+                                        std::vector<vec3d> & verts,
+                                        std::vector<uint>  & segs) const
+{
+    verts.clear();
+    segs.clear();
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if(this->edge_is_boundary(eid) && this->edge_data(eid).label == (int)sid)
+        {
+            uint base_addr = verts.size();
+            segs.push_back(base_addr  );
+            segs.push_back(base_addr+1);
+            verts.push_back(this->edge_vert(eid,0));
+            verts.push_back(this->edge_vert(eid,1));
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double SlicedObj<M,V,E,P>::slice_z(const uint sid) const
+{
+    for(uint vid=0; vid<this->num_verts(); ++vid)
+    {
+        if(this->vert_data(vid).label == (int)sid) return this->vert(vid).z();
+    }
+    assert(false);
+    return 0;
 }
 
 }

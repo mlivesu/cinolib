@@ -67,6 +67,14 @@ class SlicedObj : public Trimesh<M,V,E,P>
                            const std::vector<std::vector<std::vector<vec3d>>> & hatches,
                            const double hatch_size = 0.01);
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        uint num_slices() const { return n_slices; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void   slice_segments(const uint sid, std::vector<vec3d> & verts, std::vector<uint> & segs) const;
+        double slice_z       (const uint sid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -98,6 +106,7 @@ class SlicedObj : public Trimesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double hatch_size;
+        uint   n_slices;
 };
 
 }
