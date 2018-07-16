@@ -49,7 +49,6 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
 #ifdef CINOLIB_USES_TETGEN
 
     assert(!coords_in.empty());
-    assert(!polys_in.empty());
     coords_out.clear();
     tets_out.clear();
 
