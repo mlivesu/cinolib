@@ -1,3 +1,5 @@
+- add constructors to create basic meshes (regular 2D/3D lattices,...)
+- add converter from hex to tetmesh
 - add Lagrange multipliers to linear solvers
 - add convenient wraps to do back-substitution directly into linear_solvers.h
 - add matrix class (i.e. mat<real,size>, with operators and constructors from quaternions, rotations, identity, diagonal, ecc)
