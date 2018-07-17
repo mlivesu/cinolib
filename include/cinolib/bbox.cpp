@@ -119,16 +119,20 @@ double Bbox::max_entry() const
 CINO_INLINE
 std::vector<vec3d> Bbox::corners(const double scaling_factor) const
 {
+    double dx = delta_x();
+    double dy = delta_y();
+    double dz = delta_z();
+
     std::vector<vec3d> c =
     {
         min,
-        min + vec3d(max.x(),       0,       0),
-        min + vec3d(max.x(),       0, max.z()),
-        min + vec3d(      0,       0, max.z()),
-        min + vec3d(      0, max.y(),       0),
-        min + vec3d(max.x(), max.y(),       0),
-        min + vec3d(max.x(), max.y(), max.z()),
-        min + vec3d(      0, max.y(), max.z()),
+        min + vec3d(dx,  0,  0),
+        min + vec3d(dx,  0, dz),
+        min + vec3d( 0,  0, dz),
+        min + vec3d( 0, dy,  0),
+        min + vec3d(dx, dy,  0),
+        min + vec3d(dx, dy, dz),
+        min + vec3d( 0, dy, dz),
     };
 
     if(scaling_factor!=1.0)
