@@ -44,21 +44,22 @@ class Bbox
 
         explicit Bbox() { reset(); }
 
-        void reset()
-        {
-            min = vec3d( inf_double,  inf_double,  inf_double);
-            max = vec3d(-inf_double, -inf_double, -inf_double);
-        }
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d  min, max;
-        inline vec3d  center()    const { return (min + max) * 0.5;    }
-        inline double diag()      const { return (min - max).length(); }
-        inline double delta_x()   const { return (max.x() - min.x());  }
-        inline double delta_y()   const { return (max.y() - min.y());  }
-        inline double delta_z()   const { return (max.z() - min.z());  }
-        inline vec3d  delta()     const { return (max     - min);      }
-        inline double min_entry() const { return  std::min(min.min_entry(), max.min_entry()); }
-        inline double max_entry() const { return  std::max(min.max_entry(), max.max_entry()); }
+        void               reset();
+        vec3d              center()    const;
+        double             diag()      const;
+        double             delta_x()   const;
+        double             delta_y()   const;
+        double             delta_z()   const;
+        vec3d              delta()     const;
+        double             min_entry() const;
+        double             max_entry() const;
+        std::vector<vec3d> corners(const double scaling_factor = 1.0) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d min, max;
 };
 
 CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb);

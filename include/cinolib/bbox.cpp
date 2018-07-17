@@ -41,4 +41,104 @@ CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb)
     return in;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Bbox::reset()
+{
+    min = vec3d( inf_double,  inf_double,  inf_double);
+    max = vec3d(-inf_double, -inf_double, -inf_double);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d Bbox::center() const
+{
+    return (min + max) * 0.5;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Bbox::diag() const
+{
+    return (min - max).length();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Bbox::delta_x() const
+{
+    return (max.x() - min.x());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Bbox::delta_y() const
+{
+    return (max.y() - min.y());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Bbox::delta_z() const
+{
+    return (max.z() - min.z());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d Bbox::delta() const
+{
+    return (max - min);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Bbox::min_entry() const
+{
+    return std::min(min.min_entry(), max.min_entry());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Bbox::max_entry() const
+{
+    return  std::max(min.max_entry(), max.max_entry());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<vec3d> Bbox::corners(const double scaling_factor) const
+{
+    std::vector<vec3d> c =
+    {
+        min,
+        min + vec3d(max.x(),       0,       0),
+        min + vec3d(max.x(),       0, max.z()),
+        min + vec3d(      0,       0, max.z()),
+        min + vec3d(      0, max.y(),       0),
+        min + vec3d(max.x(), max.y(),       0),
+        min + vec3d(max.x(), max.y(), max.z()),
+        min + vec3d(      0, max.y(), max.z()),
+    };
+
+    if(scaling_factor!=1.0)
+    {
+        for(vec3d & p : c) p -= center();
+        for(vec3d & p : c) p *= scaling_factor;
+        for(vec3d & p : c) p += center();
+    }
+
+    return c;
+}
+
 }
