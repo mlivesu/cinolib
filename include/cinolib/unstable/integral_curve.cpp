@@ -49,7 +49,7 @@ template<class Mesh>
 CINO_INLINE
 IntegralCurve<Mesh>::IntegralCurve(const Mesh                & m,
                                    const VectorField         & grad,
-                                   const uint                  eid,
+                                   const uint                  pid,
                                    const std::vector<double> & bary)
     : DrawableCurve()
     , status(COMPUTING)
@@ -57,9 +57,9 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh                & m,
     , grad_ptr(&grad)
 {
     Sample seed;
-    seed.eid  = eid;
+    seed.pid  = pid;
     seed.bary = bary;
-    for(uint off=0; off<m.verts_per_poly(); ++off) seed.pos += bary.at(off) * m.poly_vert(eid, off);
+    for(uint off=0; off<m.verts_per_poly(); ++off) seed.pos += bary.at(off) * m.poly_vert(pid, off);
 
     trace_curve(seed);
 }
@@ -75,18 +75,18 @@ IntegralCurve<Mesh>::IntegralCurve(const Mesh        & m,
     , grad_ptr(&grad)
 {
     assert(!m.adj_v2p(vid).empty());
-    uint eid = m.adj_v2p(vid).front();
+    uint pid = m.adj_v2p(vid).front();
 
     uint off = 0;
-    while(off<m.verts_per_poly() && m.poly_vert_id(eid,off)!=vid) ++off;
-    assert(m.poly_vert_id(eid,off)==vid && "Cannot find incident element to begin with");
+    while(off<m.verts_per_poly() && m.poly_vert_id(pid,off)!=vid) ++off;
+    assert(m.poly_vert_id(pid,off)==vid && "Cannot find incident element to begin with");
 
     std::vector<double> bary = std::vector<double>(m.verts_per_poly(),0);
     bary[off] = 1.0;
 
     Sample seed;
     seed.pos  = m.vert(vid);
-    seed.eid  = eid;
+    seed.pid  = pid;
     seed.bary = bary;
 
     trace_curve(seed);
@@ -114,7 +114,7 @@ template<class Mesh>
 CINO_INLINE
 bool IntegralCurve<Mesh>::is_on_vertex(const Sample & s, uint & vid, const double tol) const
 {
-    assert(s.eid!=-1);
+    assert(s.pid!=-1);
 
     std::vector<uint> non_zero_coords;
     for(uint off=0; off<s.bary.size(); ++off)
@@ -124,7 +124,7 @@ bool IntegralCurve<Mesh>::is_on_vertex(const Sample & s, uint & vid, const doubl
 
     if (non_zero_coords.size() == 1)
     {
-        vid = m_ptr->poly_vert_id(s.eid, non_zero_coords.front());
+        vid = m_ptr->poly_vert_id(s.pid, non_zero_coords.front());
         return true;
     }
     return false;
@@ -136,7 +136,7 @@ template<class Mesh>
 CINO_INLINE
 bool IntegralCurve<Mesh>::is_on_edge(const Sample & s, uint & eid, const double tol) const
 {
-    assert(s.eid!=-1);
+    assert(s.pid!=-1);
 
     std::vector<uint> non_zero_coords;
     for(size_t off=0; off<s.bary.size(); ++off)
@@ -146,9 +146,9 @@ bool IntegralCurve<Mesh>::is_on_edge(const Sample & s, uint & eid, const double 
 
     if (non_zero_coords.size() == 2)
     {
-        uint vid0 = m_ptr->poly_vert_id(s.eid, non_zero_coords.at(0));
-        uint vid1 = m_ptr->poly_vert_id(s.eid, non_zero_coords.at(1));
-        for(uint id : m_ptr->adj_p2e(s.eid))
+        uint vid0 = m_ptr->poly_vert_id(s.pid, non_zero_coords.at(0));
+        uint vid1 = m_ptr->poly_vert_id(s.pid, non_zero_coords.at(1));
+        for(uint id : m_ptr->adj_p2e(s.pid))
         {
             if (m_ptr->edge_contains_vert(id, vid0) &&
                 m_ptr->edge_contains_vert(id, vid1))
@@ -173,7 +173,7 @@ Curve::Sample IntegralCurve<Mesh>::make_sample(const uint vid) const
     uint off = m_ptr->poly_vert_offset(pid, vid);
     Sample s;
     s.pos  = m_ptr->vert(vid);
-    s.eid  = pid;
+    s.pid  = pid;
     s.bary = std::vector<double>(m_ptr->verts_per_poly(pid),0);
     s.bary.at(off) = 1.0;
     return s;
@@ -191,7 +191,7 @@ template<>
 CINO_INLINE
 bool IntegralCurve<Trimesh<>>::is_on_face(const Sample & s, uint & fid, const double tol) const
 {
-    assert(s.eid!=-1);
+    assert(s.pid!=-1);
 
     std::vector<uint> non_zero_coords;
     for(uint off=0; off<s.bary.size(); ++off)
@@ -201,7 +201,7 @@ bool IntegralCurve<Trimesh<>>::is_on_face(const Sample & s, uint & fid, const do
 
     if (non_zero_coords.size() == 3)
     {
-        fid = s.eid;
+        fid = s.pid;
         return true;
     }
     return false;
@@ -239,7 +239,7 @@ Curve::Sample IntegralCurve<Trimesh<>>::move_forward_from_vertex(const uint vid)
         if (intersection(Ray(v,grad), Segment(e0,e1), inters))
         {
             Sample sample;
-            sample.eid = fid;
+            sample.pid = fid;
             triangle_barycentric_coords(tangent_space.at( m_ptr->poly_vert_id(fid,0) ),
                                         tangent_space.at( m_ptr->poly_vert_id(fid,1) ),
                                         tangent_space.at( m_ptr->poly_vert_id(fid,2) ),
@@ -320,7 +320,7 @@ Curve::Sample IntegralCurve<Trimesh<>>::move_forward_from_edge(const uint eid, c
         if (intersection(Ray(p,grad), Segment(v0,v1), inters))
         {
             Sample sample;
-            sample.eid = fid;
+            sample.pid = fid;
             triangle_barycentric_coords(tangent_space.at( m_ptr->poly_vert_id(fid,0) ),
                                         tangent_space.at( m_ptr->poly_vert_id(fid,1) ),
                                         tangent_space.at( m_ptr->poly_vert_id(fid,2) ),
@@ -352,7 +352,7 @@ Curve::Sample IntegralCurve<Trimesh<>>::move_forward_from_face(const uint fid, c
         {
             Sample sample;
             sample.pos = inters;
-            sample.eid = fid;
+            sample.pid = fid;
             triangle_barycentric_coords(m_ptr->poly_vert(fid,0),
                                         m_ptr->poly_vert(fid,1),
                                         m_ptr->poly_vert(fid,2),
@@ -394,7 +394,7 @@ template<>
 CINO_INLINE
 bool IntegralCurve<Trimesh<>>::is_converged(const Curve::Sample & sample)
 {
-    if (sample.eid == -1) // i.e. boundary reached. Remove dummy sample
+    if (sample.pid == -1) // i.e. boundary reached. Remove dummy sample
     {
         status = END_ON_BORDER;
         pop_back();
@@ -457,7 +457,7 @@ template<>
 CINO_INLINE
 bool IntegralCurve<Tetmesh<>>::is_on_face(const Curve::Sample & s, uint & tid, uint & fid, const double tol) const
 {
-    assert(s.eid!=-1);
+    assert(s.pid!=-1);
 
     std::vector<uint> non_zero_coords;
     for(uint off=0; off<s.bary.size(); ++off)
@@ -468,22 +468,22 @@ bool IntegralCurve<Tetmesh<>>::is_on_face(const Curve::Sample & s, uint & tid, u
     if (non_zero_coords.size() == 3)
     {
         std::vector<uint> my_f;
-        my_f.push_back(m_ptr->poly_vert_id(s.eid, non_zero_coords.at(0)));
-        my_f.push_back(m_ptr->poly_vert_id(s.eid, non_zero_coords.at(1)));
-        my_f.push_back(m_ptr->poly_vert_id(s.eid, non_zero_coords.at(2)));
+        my_f.push_back(m_ptr->poly_vert_id(s.pid, non_zero_coords.at(0)));
+        my_f.push_back(m_ptr->poly_vert_id(s.pid, non_zero_coords.at(1)));
+        my_f.push_back(m_ptr->poly_vert_id(s.pid, non_zero_coords.at(2)));
         std::sort(my_f.begin(), my_f.end());
 
         for(uint f=0; f<4; ++f)
         {
             std::vector<uint> curr_f;
-            curr_f.push_back(m_ptr->poly_vert_id(s.eid, TET_FACES[f][0]));
-            curr_f.push_back(m_ptr->poly_vert_id(s.eid, TET_FACES[f][1]));
-            curr_f.push_back(m_ptr->poly_vert_id(s.eid, TET_FACES[f][2]));
+            curr_f.push_back(m_ptr->poly_vert_id(s.pid, TET_FACES[f][0]));
+            curr_f.push_back(m_ptr->poly_vert_id(s.pid, TET_FACES[f][1]));
+            curr_f.push_back(m_ptr->poly_vert_id(s.pid, TET_FACES[f][2]));
             std::sort(curr_f.begin(), curr_f.end());
 
             if (my_f == curr_f)
             {
-                tid = s.eid;
+                tid = s.pid;
                 fid = f;
                 return true;
             }
@@ -499,7 +499,7 @@ template<>
 CINO_INLINE
 bool IntegralCurve<Tetmesh<>>::is_on_poly(const Curve::Sample & s, uint & pid, const double tol) const
 {
-    assert(s.eid!=-1);
+    assert(s.pid!=-1);
 
     std::vector<uint> non_zero_coords;
     for(uint off=0; off<s.bary.size(); ++off)
@@ -509,7 +509,7 @@ bool IntegralCurve<Tetmesh<>>::is_on_poly(const Curve::Sample & s, uint & pid, c
 
     if (non_zero_coords.size() == 4)
     {
-        pid = s.eid;
+        pid = s.pid;
         return true;
     }
     return false;
@@ -538,7 +538,7 @@ Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_vertex(const uint vid)
         {
             Sample sample;
             sample.pos = inters;
-            sample.eid = pid;
+            sample.pid = pid;
             tet_barycentric_coords(m_ptr->poly_vert(pid, 0),
                                    m_ptr->poly_vert(pid, 1),
                                    m_ptr->poly_vert(pid, 2),
@@ -593,7 +593,7 @@ Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_edge(const uint eid, c
             {
                 Sample sample;
                 sample.pos = inters;
-                sample.eid = pid;
+                sample.pid = pid;
                 tet_barycentric_coords(m_ptr->poly_vert(pid, 0),
                                        m_ptr->poly_vert(pid, 1),
                                        m_ptr->poly_vert(pid, 2),
@@ -658,7 +658,7 @@ Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_face(const uint pid, c
             {
                 Sample sample;
                 sample.pos = inters;
-                sample.eid = curr_poly;
+                sample.pid = curr_poly;
                 tet_barycentric_coords(m_ptr->poly_vert(curr_poly, 0),
                                        m_ptr->poly_vert(curr_poly, 1),
                                        m_ptr->poly_vert(curr_poly, 2),
@@ -693,7 +693,7 @@ Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_poly(const uint pid, c
         {
             Sample sample;
             sample.pos = inters;
-            sample.eid = pid;
+            sample.pid = pid;
             tet_barycentric_coords(m_ptr->poly_vert(pid,0),
                                    m_ptr->poly_vert(pid,1),
                                    m_ptr->poly_vert(pid,2),
@@ -737,7 +737,7 @@ template<>
 CINO_INLINE
 bool IntegralCurve<Tetmesh<>>::is_converged(const Curve::Sample & sample)
 {
-    if (sample.eid == -1) // i.e. boundary reached. Remove dummy sample
+    if (sample.pid == -1) // i.e. boundary reached. Remove dummy sample
     {
         status = END_ON_BORDER;
         pop_back();

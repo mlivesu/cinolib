@@ -47,7 +47,7 @@ class IntegralCurve : public DrawableCurve
 
         explicit IntegralCurve(const Mesh                & m,
                                const VectorField         & grad,
-                               const uint                  eid,
+                               const uint                  pid,
                                const std::vector<double> & bary);
 
         explicit IntegralCurve(const Mesh        & m,
