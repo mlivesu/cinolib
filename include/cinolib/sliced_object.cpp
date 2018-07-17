@@ -295,15 +295,25 @@ void SlicedObj<M,V,E,P>::slice_segments(const uint           sid,
 {
     verts.clear();
     segs.clear();
+    std::map<uint,uint> v_map;
+    uint fresh_id = 0;
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         if(this->edge_is_boundary(eid) && this->edge_data(eid).label == (int)sid)
         {
-            uint base_addr = verts.size();
-            segs.push_back(base_addr  );
-            segs.push_back(base_addr+1);
-            verts.push_back(this->edge_vert(eid,0));
-            verts.push_back(this->edge_vert(eid,1));
+            for(uint off=0; off<2; ++off)
+            {
+                uint vid   = this->edge_vert_id(eid,off);
+                auto query = v_map.find(vid);
+                if(query == v_map.end())
+                {
+                    verts.push_back(this->vert(vid));
+                    v_map[vid] = fresh_id;
+                    vid = fresh_id;
+                    fresh_id++;
+                } else vid = query->second;
+                segs.push_back(vid);
+            }
         }
     }
 }
@@ -320,6 +330,26 @@ double SlicedObj<M,V,E,P>::slice_z(const uint sid) const
     }
     assert(false);
     return 0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool SlicedObj<M,V,E,P>::slice_contains(const uint sid, const vec2d & p) const
+{
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        if(this->poly_data(pid).label == (int)sid)
+        {
+            if(triangle_point_is_inside(vec2d(this->poly_vert(pid,0)),
+                                        vec2d(this->poly_vert(pid,1)),
+                                        vec2d(this->poly_vert(pid,2)),
+                                        p))
+                return true;
+        }
+    }
+    return false;
 }
 
 }
