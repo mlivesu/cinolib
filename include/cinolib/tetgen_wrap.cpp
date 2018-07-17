@@ -42,7 +42,7 @@ CINO_INLINE
 void tetgen_wrap(const std::vector<double>            & coords_in,
                  const std::vector<std::vector<uint>> & polys_in,
                  const std::vector<uint>              & edges_in,
-                 const std::string                    & flags,       // options
+                 const std::string                    & flags, // options
                        std::vector<double>            & coords_out,
                        std::vector<uint>              & tets_out)
 {
@@ -134,7 +134,7 @@ CINO_INLINE
 void tetgen_wrap(const std::vector<double> & coords_in,
                  const std::vector<uint>   & tris_in,
                  const std::vector<uint>   & edges_in,
-                 const std::string         & flags,       // options
+                 const std::string         & flags,
                        std::vector<double> & coords_out,
                        std::vector<uint>   & tets_out)
 {
@@ -147,7 +147,7 @@ CINO_INLINE
 void tetgen_wrap(const std::vector<vec3d>             & verts_in,
                  const std::vector<std::vector<uint>> & polys_in,
                  const std::vector<uint>              & edges_in,
-                 const std::string                    & flags,       // options
+                 const std::string                    & flags,
                        std::vector<vec3d>             & verts_out,
                        std::vector<uint>              & tets_out)
 {
@@ -162,7 +162,7 @@ CINO_INLINE
 void tetgen_wrap(const std::vector<vec3d>  & verts_in,
                  const std::vector<uint>   & tris_in,
                  const std::vector<uint>   & edges_in,
-                 const std::string         & flags,       // options
+                 const std::string         & flags,
                        std::vector<vec3d>  & verts_out,
                        std::vector<uint>   & tets_out)
 {
@@ -178,7 +178,7 @@ CINO_INLINE
 void tetgen_wrap(const std::vector<vec3d>  & verts_in,
                  const std::vector<uint>   & tris_in,
                  const std::vector<uint>   & edges_in,
-                 const std::string         & flags,       // options
+                 const std::string         & flags,
                        Tetmesh<M,V,E,F,P>  & m)
 {
     std::vector<vec3d> verts;
@@ -194,13 +194,24 @@ CINO_INLINE
 void tetgen_wrap(const std::vector<vec3d>             & verts_in,
                  const std::vector<std::vector<uint>> & polys_in,
                  const std::vector<uint>              & edges_in,
-                 const std::string                    & flags,       // options
+                 const std::string                    & flags,
                        Tetmesh<M,V,E,F,P>             & m)
 {
     std::vector<vec3d> verts;
     std::vector<uint>  tets;
     tetgen_wrap(verts_in, polys_in, edges_in, flags, verts, tets);
     m = Tetmesh<M,V,E,F,P>(verts,tets);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void tetgen_wrap(const AbstractPolygonMesh<M,V,E,F> & m_srf,
+                 const std::string                  & flags,
+                       Tetmesh<M,V,E,F,P>           & m)
+{
+    tetgen_wrap(m_srf.vector_verts(), m_srf.vector_polys(), {}, flags, m);
 }
 
 }
