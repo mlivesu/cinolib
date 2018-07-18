@@ -230,7 +230,7 @@ class AbstractMesh
                 bool               poly_contains_edge  (const uint pid, const uint eid) const;
                 bool               poly_contains_edge  (const uint pid, const uint vid0, const uint vid1) const;
                 void               poly_show_all       ();
-                void               poly_color_wrt_label(const float s=.5f, float v=.85f); // s => saturation, v => value in HSV color space
+                void               poly_color_wrt_label(const bool sorted=false, const float s=.5f, float v=.85f); // s => saturation, v => value in HSV color space
                 void               poly_label_wrt_color();
                 void               poly_unmark_all     ();
                 bool               polys_are_colored   () const;
