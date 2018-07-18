@@ -80,7 +80,7 @@ bool triangle_barycentric_coords(const vec & A,
                                  const vec & C,
                                  const vec & P,
                                  std::vector<double> & wgts,
-                                 const double   tol = 1e-5);
+                                 const double   tol = 1e-10);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -90,21 +90,21 @@ bool triangle_point_is_inside(const vec    & A,
                               const vec    & B,
                               const vec    & C,
                               const vec    & P,
-                              const double   tol = 0.0);
+                              const double   tol = 1e-10);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool triangle_bary_is_vertex(const std::vector<double> & bary,
                              uint                      & vid, // 0,1,2
-                             const double                tol = 1e-5);
+                             const double                tol = 1e-10);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool triangle_bary_is_edge(const std::vector<double> & bary,
                            uint                      & eid, // 0,1,2 (see TRI_EDGES)
-                           const double              tol = 1e-5);
+                           const double              tol = 1e-10);
 }
 
 #ifndef  CINO_STATIC_LIB
