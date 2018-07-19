@@ -100,7 +100,7 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
                                             const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
                                             const std::vector<std::vector<std::vector<vec3d>>> & open_polylines)
 {
-    // Empty slices will be ignored, so keep a separate count of slices.
+    // Empty slices will be ignored, so keep a separate count of slice ids.
     // NOTE: empty slices may happen when a slice contains only open polylines
     // and the hatch_size is set to zero
     uint sid        = 0;
@@ -115,10 +115,13 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
         if(has_hatch) z.push_back(open_polylines.at(i).front().front().z());     else
         continue; // empty slice, skip it
 
+        std::vector<double> slice_verts;
+        std::vector<uint>   slice_tris;
+
         if(has_poly)
         {
-            std::vector<double> verts_in, verts_out;
-            std::vector<uint>   segs_in, tris_out;
+            std::vector<double> v_in, v_out;
+            std::vector<uint>   s_in, t_out;
             uint base_addr = 0;
 
             // process external polylines
@@ -126,82 +129,69 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
             {
                 for(uint i=0; i<polyline.size(); ++i)
                 {
-                    verts_in.push_back(polyline.at(i).x());
-                    verts_in.push_back(polyline.at(i).y());
-                    segs_in.push_back(base_addr + i);
-                    segs_in.push_back(base_addr + (i+1)%polyline.size());
+                    v_in.push_back(polyline.at(i).x());
+                    v_in.push_back(polyline.at(i).y());
+                    s_in.push_back(base_addr + i);
+                    s_in.push_back(base_addr + (i+1)%polyline.size());
                 }
-                base_addr = verts_in.size()/2;
+                base_addr = v_in.size()/2;
             }
             // process internal polylines (i.e. holes)
             for(const std::vector<vec3d> & polyline : internal_polylines.at(i))
             {
                 for(uint i=0; i<polyline.size(); ++i)
                 {
-                    verts_in.push_back(polyline.at(i).x());
-                    verts_in.push_back(polyline.at(i).y());
-                    segs_in.push_back(base_addr + i);
-                    segs_in.push_back(base_addr + (i+1)%polyline.size());
+                    v_in.push_back(polyline.at(i).x());
+                    v_in.push_back(polyline.at(i).y());
+                    s_in.push_back(base_addr + i);
+                    s_in.push_back(base_addr + (i+1)%polyline.size());
                 }
-                base_addr = verts_in.size()/2;
+                base_addr = v_in.size()/2;
             }
 
             // find robust seeds to eat triangles inside holes
             std::vector<double> holes_in;
             points_inside_holes(internal_polylines.at(i), holes_in);
 
-            triangle_wrap(verts_in, segs_in, holes_in, "Q", verts_out, tris_out);
+            triangle_wrap(v_in, s_in, holes_in, "Q", v_out, t_out);
 
-            base_addr   = this->num_verts();
-            uint n_tris = tris_out.size()/3;
-
-            std::vector<vec3d> verts = vec3d_from_serialized_xy(verts_out, z.back());
-
-            for(auto p : verts)
-            {
-                uint vid = this->vert_add(p);
-                this->vert_data(vid).uvw[0] = static_cast<double>(i)/static_cast<double>(tot_slices);
-                this->vert_data(vid).label  = sid;
-            }
-            for(uint i=0; i<n_tris; ++i)
-            {
-                uint pid = this->poly_add(base_addr + tris_out.at(3*i+0),
-                                          base_addr + tris_out.at(3*i+1),
-                                          base_addr + tris_out.at(3*i+2));
-                this->poly_data(pid).label = sid;
-                for(uint eid : this->adj_p2e(pid)) this->edge_data(eid).label = sid;
-            }
+            base_addr = this->num_verts();
+            std::copy(v_out.begin(), v_out.end(), std::back_inserter(slice_verts));
+            for(uint vid : t_out) slice_tris.push_back(base_addr + vid);
         }
 
         if(has_hatch)
         {
-            std::vector<double> verts_in, verts_out;
-            std::vector<uint>   segs_in, tris_out;
+            std::vector<double> v_in, v_out;
+            std::vector<uint>   s_in, t_out;
             uint base_addr = 0;
 
-            thicken_open_polylines(open_polylines.at(i), hatch_size, verts_in, segs_in);
+            thicken_open_polylines(open_polylines.at(i), hatch_size, v_in, s_in);
 
-            triangle_wrap(verts_in, segs_in, {}, "Q", verts_out, tris_out);
+            triangle_wrap(v_in, s_in, {}, "Q", v_out, t_out);
 
-            base_addr   = this->num_verts();
-            uint n_tris = tris_out.size()/3;
+            base_addr = this->num_verts() + slice_verts.size()/2;
+            std::copy(v_out.begin(), v_out.end(), std::back_inserter(slice_verts));
+            for(uint vid : t_out) slice_tris.push_back(base_addr + vid);
+        }
 
-            std::vector<vec3d> verts = vec3d_from_serialized_xy(verts_out, z.back());
+        assert(!slice_verts.empty());
+        uint n_tris = slice_tris.size()/3;
+        std::vector<vec3d> verts = vec3d_from_serialized_xy(slice_verts, z.back());
 
-            for(auto p : verts)
-            {
-                uint vid = this->vert_add(p);
-                this->vert_data(vid).uvw[0] = static_cast<double>(i)/static_cast<double>(tot_slices);
-                this->vert_data(vid).label  = sid;
-            }
-            for(uint i=0; i<n_tris; ++i)
-            {
-                uint pid = this->poly_add(base_addr + tris_out.at(3*i+0),
-                                          base_addr + tris_out.at(3*i+1),
-                                          base_addr + tris_out.at(3*i+2));
-                this->poly_data(pid).label = sid;
-                for(uint eid : this->adj_p2e(pid)) this->edge_data(eid).label = sid;
-            }
+        for(auto p : verts)
+        {
+            uint vid = this->vert_add(p);
+            this->vert_data(vid).uvw[0] = static_cast<double>(i)/static_cast<double>(tot_slices);
+            this->vert_data(vid).label  = sid;
+        }
+        for(uint i=0; i<n_tris; ++i)
+        {
+            uint pid = this->poly_add(slice_tris.at(3*i+0),
+                                      slice_tris.at(3*i+1),
+                                      slice_tris.at(3*i+2));
+            this->poly_data(pid).label = sid;
+            for(uint eid : this->adj_p2e(pid)) this->edge_data(eid).label = sid;
         }
 
         ++sid;
