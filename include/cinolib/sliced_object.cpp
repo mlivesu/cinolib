@@ -87,11 +87,7 @@ void SlicedObj<M,V,E,P>::init(const std::vector<std::vector<std::vector<vec3d>>>
                               const std::vector<std::vector<std::vector<vec3d>>> & open_polylines,
                               const std::vector<std::vector<std::vector<vec3d>>> & hatches)
 {
-    n_slices = internal_polylines.size();
     (void)hatches; // warning killer => DO SOMETHING WITH THEM!
-
-    std::cout << "new sliced object (" << n_slices << " slices)" << std::endl;
-
     triangulate_slices(internal_polylines, external_polylines, open_polylines);
     this->edge_mark_boundaries();
 }
@@ -104,16 +100,22 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
                                             const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
                                             const std::vector<std::vector<std::vector<vec3d>>> & open_polylines)
 {
-    for(uint sid=0; sid<n_slices; ++sid)
+    // Empty slices will be ignored, so keep a separate count of slices.
+    // NOTE: empty slices may happen when a slice contains only open polylines
+    // and the hatch_size is set to zero
+    uint sid  = 0;
+    uint size = internal_polylines.size();
+
+    for(uint i=0; i<size; ++i)
     {        
-        bool has_external_polyline = !external_polylines.at(sid).empty();
-        bool has_open_polyline     = !open_polylines.at(sid).empty();
+        bool has_external_polyline = !external_polylines.at(i).empty();
+        bool has_open_polyline     = !open_polylines.at(i).empty();
 
         double z;
-        if(has_external_polyline) z = external_polylines.at(sid).front().front().z(); else
-        if(has_open_polyline    ) z = open_polylines.at(sid).front().front().z();     else
+        if(has_external_polyline) z = external_polylines.at(i).front().front().z(); else
+        if(has_open_polyline    ) z = open_polylines.at(i).front().front().z();     else
         {
-            std::cout << ANSI_fg_color_red << "WARNING: slice " << sid << " is empty" << ANSI_fg_color_default << std::endl;
+            std::cout << ANSI_fg_color_red << "WARNING: slice " << i << " is empty" << ANSI_fg_color_default << std::endl;
             continue;
         }
 
@@ -122,7 +124,7 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
         uint base_addr = 0;
 
         // process external polylines
-        for(const std::vector<vec3d> & polyline : external_polylines.at(sid))
+        for(const std::vector<vec3d> & polyline : external_polylines.at(i))
         {
             for(uint i=0; i<polyline.size(); ++i)
             {
@@ -134,7 +136,7 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
             base_addr = verts_in.size()/2;
         }
         // process internal polylines (i.e. holes)
-        for(const std::vector<vec3d> & polyline : internal_polylines.at(sid))
+        for(const std::vector<vec3d> & polyline : internal_polylines.at(i))
         {
             for(uint i=0; i<polyline.size(); ++i)
             {
@@ -148,11 +150,11 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
 
         // find robust seeds to eat triangles inside holes
         std::vector<double> holes_in;
-        points_inside_holes(internal_polylines.at(sid), holes_in);
+        points_inside_holes(internal_polylines.at(i), holes_in);
 
         // WARNING: thickening may create intersections between open polylines and the
         // rest of the slice. If this is the case, should I do anything about it?
-        thicken_open_polylines(open_polylines.at(sid), hatch_size, verts_in, segs_in);
+        thicken_open_polylines(open_polylines.at(i), hatch_size, verts_in, segs_in);
 
         if(!verts_in.empty())
         {
@@ -166,7 +168,7 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
             for(auto p : verts)
             {
                 uint vid = this->vert_add(p);
-                this->vert_data(vid).uvw[0] = static_cast<double>(sid)/static_cast<double>(n_slices);
+                this->vert_data(vid).uvw[0] = static_cast<double>(i)/static_cast<double>(size);
                 this->vert_data(vid).label  = sid;
             }
             for(uint i=0; i<n_tris; ++i)
@@ -177,8 +179,12 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
                 this->poly_data(pid).label = sid;
                 for(uint eid : this->adj_p2e(pid)) this->edge_data(eid).label = sid;
             }
+
+            ++sid;
         }
     }
+    n_slices = sid;
+    std::cout << "new sliced object (" << n_slices << " slices)" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
