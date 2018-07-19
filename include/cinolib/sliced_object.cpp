@@ -103,72 +103,67 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
     // Empty slices will be ignored, so keep a separate count of slices.
     // NOTE: empty slices may happen when a slice contains only open polylines
     // and the hatch_size is set to zero
-    uint sid  = 0;
-    uint size = internal_polylines.size();
+    uint sid        = 0;
+    uint tot_slices = internal_polylines.size();
 
-    for(uint i=0; i<size; ++i)
+    for(uint i=0; i<tot_slices; ++i)
     {        
-        bool has_external_polyline = !external_polylines.at(i).empty();
-        bool has_open_polyline     = !open_polylines.at(i).empty();
+        bool has_poly  = !external_polylines.at(i).empty();
+        bool has_hatch = !open_polylines.at(i).empty() && hatch_size>0;
 
-        double z;
-        if(has_external_polyline) z = external_polylines.at(i).front().front().z(); else
-        if(has_open_polyline    ) z = open_polylines.at(i).front().front().z();     else
+        if(has_poly ) z.push_back(external_polylines.at(i).front().front().z()); else
+        if(has_hatch) z.push_back(open_polylines.at(i).front().front().z());     else
+        continue; // empty slice, skip it
+
+        std::vector<double> verts;
+        std::vector<uint>   tris;
+
+        if(has_poly)
         {
-            std::cout << ANSI_fg_color_red << "WARNING: slice " << i << " is empty" << ANSI_fg_color_default << std::endl;
-            continue;
-        }
+            std::vector<double> verts_in;
+            std::vector<uint>   segs_in;
+            uint base_addr = 0;
 
-        std::vector<double> verts_in, verts_out;
-        std::vector<uint>   segs_in, tris_out;
-        uint base_addr = 0;
-
-        // process external polylines
-        for(const std::vector<vec3d> & polyline : external_polylines.at(i))
-        {
-            for(uint i=0; i<polyline.size(); ++i)
+            // process external polylines
+            for(const std::vector<vec3d> & polyline : external_polylines.at(i))
             {
-                verts_in.push_back(polyline.at(i).x());
-                verts_in.push_back(polyline.at(i).y());
-                segs_in.push_back(base_addr + i);
-                segs_in.push_back(base_addr + (i+1)%polyline.size());
+                for(uint i=0; i<polyline.size(); ++i)
+                {
+                    verts_in.push_back(polyline.at(i).x());
+                    verts_in.push_back(polyline.at(i).y());
+                    segs_in.push_back(base_addr + i);
+                    segs_in.push_back(base_addr + (i+1)%polyline.size());
+                }
+                base_addr = verts_in.size()/2;
             }
-            base_addr = verts_in.size()/2;
-        }
-        // process internal polylines (i.e. holes)
-        for(const std::vector<vec3d> & polyline : internal_polylines.at(i))
-        {
-            for(uint i=0; i<polyline.size(); ++i)
+            // process internal polylines (i.e. holes)
+            for(const std::vector<vec3d> & polyline : internal_polylines.at(i))
             {
-                verts_in.push_back(polyline.at(i).x());
-                verts_in.push_back(polyline.at(i).y());
-                segs_in.push_back(base_addr + i);
-                segs_in.push_back(base_addr + (i+1)%polyline.size());
+                for(uint i=0; i<polyline.size(); ++i)
+                {
+                    verts_in.push_back(polyline.at(i).x());
+                    verts_in.push_back(polyline.at(i).y());
+                    segs_in.push_back(base_addr + i);
+                    segs_in.push_back(base_addr + (i+1)%polyline.size());
+                }
+                base_addr = verts_in.size()/2;
             }
-            base_addr = verts_in.size()/2;
-        }
 
-        // find robust seeds to eat triangles inside holes
-        std::vector<double> holes_in;
-        points_inside_holes(internal_polylines.at(i), holes_in);
+            // find robust seeds to eat triangles inside holes
+            std::vector<double> holes_in;
+            points_inside_holes(internal_polylines.at(i), holes_in);
 
-        // WARNING: thickening may create intersections between open polylines and the
-        // rest of the slice. If this is the case, should I do anything about it?
-        thicken_open_polylines(open_polylines.at(i), hatch_size, verts_in, segs_in);
-
-        if(!verts_in.empty())
-        {
             triangle_wrap(verts_in, segs_in, holes_in, "Q", verts_out, tris_out);
 
             base_addr   = this->num_verts();
             uint n_tris = tris_out.size()/3;
 
-            std::vector<vec3d> verts = vec3d_from_serialized_xy(verts_out, z);
+            std::vector<vec3d> verts = vec3d_from_serialized_xy(verts_out, z.back());
 
             for(auto p : verts)
             {
                 uint vid = this->vert_add(p);
-                this->vert_data(vid).uvw[0] = static_cast<double>(i)/static_cast<double>(size);
+                this->vert_data(vid).uvw[0] = static_cast<double>(i)/static_cast<double>(tot_slices);
                 this->vert_data(vid).label  = sid;
             }
             for(uint i=0; i<n_tris; ++i)
@@ -179,12 +174,42 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
                 this->poly_data(pid).label = sid;
                 for(uint eid : this->adj_p2e(pid)) this->edge_data(eid).label = sid;
             }
-
-            ++sid;
         }
+
+        if(has_hatch)
+        {
+            std::vector<double> verts_in, verts_out;
+            std::vector<uint>   segs_in, tris_out;
+            uint base_addr = 0;
+
+            thicken_open_polylines(open_polylines.at(i), hatch_size, verts_in, segs_in);
+
+            triangle_wrap(verts_in, segs_in, {}, "Q", verts_out, tris_out);
+
+            base_addr   = this->num_verts();
+            uint n_tris = tris_out.size()/3;
+
+            std::vector<vec3d> verts = vec3d_from_serialized_xy(verts_out, z.back());
+
+            for(auto p : verts)
+            {
+                uint vid = this->vert_add(p);
+                this->vert_data(vid).uvw[0] = static_cast<double>(i)/static_cast<double>(tot_slices);
+                this->vert_data(vid).label  = sid;
+            }
+            for(uint i=0; i<n_tris; ++i)
+            {
+                uint pid = this->poly_add(base_addr + tris_out.at(3*i+0),
+                                          base_addr + tris_out.at(3*i+1),
+                                          base_addr + tris_out.at(3*i+2));
+                this->poly_data(pid).label = sid;
+                for(uint eid : this->adj_p2e(pid)) this->edge_data(eid).label = sid;
+            }
+        }
+
+        ++sid;
     }
-    n_slices = sid;
-    std::cout << "new sliced object (" << n_slices << " slices)" << std::endl;
+    std::cout << "new sliced object (" << num_slices() << " slices)" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -328,14 +353,9 @@ void SlicedObj<M,V,E,P>::slice_segments(const uint           sid,
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-double SlicedObj<M,V,E,P>::slice_z(const uint sid) const
+float SlicedObj<M,V,E,P>::slice_z(const uint sid) const
 {
-    for(uint vid=0; vid<this->num_verts(); ++vid)
-    {
-        if(this->vert_data(vid).label == (int)sid) return this->vert(vid).z();
-    }
-    assert(false);
-    return 0;
+    return z.at(sid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
