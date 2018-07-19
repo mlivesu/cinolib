@@ -115,13 +115,10 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
         if(has_hatch) z.push_back(open_polylines.at(i).front().front().z());     else
         continue; // empty slice, skip it
 
-        std::vector<double> verts;
-        std::vector<uint>   tris;
-
         if(has_poly)
         {
-            std::vector<double> verts_in;
-            std::vector<uint>   segs_in;
+            std::vector<double> verts_in, verts_out;
+            std::vector<uint>   segs_in, tris_out;
             uint base_addr = 0;
 
             // process external polylines
