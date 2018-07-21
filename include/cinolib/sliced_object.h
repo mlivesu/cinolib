@@ -42,6 +42,17 @@
  * as 1D curves in CLI files) are thickened and triangulated as well.
 */
 
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/geometries/multi_polygon.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/linestring.hpp>
+
+typedef boost::geometry::model::d2::point_xy<double>        BoostPoint;
+typedef boost::geometry::model::polygon<BoostPoint>         BoostPolygon;
+typedef boost::geometry::model::multi_polygon<BoostPolygon> BoostMultiPolygon;
+typedef boost::geometry::model::linestring<BoostPoint>      BoostLinestring;
+
 namespace cinolib
 {
 
@@ -94,15 +105,15 @@ class SlicedObj : public Trimesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void points_inside_holes(const std::vector<std::vector<vec3d>> & internal_polylines,
-                                       std::vector<double>             & holes);
+        void points_inside_holes(const BoostMultiPolygon   & mp,
+                                       std::vector<double> & points) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void thicken_open_polylines(const std::vector<std::vector<vec3d>> & open_polylines,
-                                    const double                          & thickness,
-                                          std::vector<double>             & verts,
-                                          std::vector<uint>               & segs);
+        BoostPolygon make_polygon (const std::vector<vec3d> & polyline) const;
+
+        BoostPolygon thicken_hatch(const std::vector<vec3d> & polyline,
+                                   const double               thickness) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

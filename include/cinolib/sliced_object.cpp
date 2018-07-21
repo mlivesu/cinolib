@@ -34,17 +34,6 @@
 #include <cinolib/vector_serialization.h>
 #include <cinolib/ANSI_color_codes.h>
 
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/geometries/multi_polygon.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/linestring.hpp>
-
-typedef boost::geometry::model::d2::point_xy<double>        BoostPoint;
-typedef boost::geometry::model::polygon<BoostPoint>         BoostPolygon;
-typedef boost::geometry::model::multi_polygon<BoostPolygon> BoostMultiPolygon;
-typedef boost::geometry::model::linestring<BoostPoint>      BoostLinestring;
-
 namespace cinolib
 {
 
@@ -107,77 +96,76 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
     uint tot_slices = internal_polylines.size();
 
     for(uint i=0; i<tot_slices; ++i)
-    {        
-        bool has_poly  = !external_polylines.at(i).empty();
-        bool has_hatch = !open_polylines.at(i).empty() && hatch_size>0;
+    {
+        uint np = external_polylines.at(i).size();
+        uint nh = internal_polylines.at(i).size();
+        uint ns = (hatch_size>0) ? open_polylines.at(i).size() : 0;
 
-        if(has_poly ) z.push_back(external_polylines.at(i).front().front().z()); else
-        if(has_hatch) z.push_back(open_polylines.at(i).front().front().z());     else
+        std::cout << "processing slice " << i << " out of " << tot_slices << "\t(" << np << " polys / " << nh << " holes / "  << ns << " supports)" << std::endl;
+
+        if(np>0) z.push_back(external_polylines.at(i).front().front().z()); else
+        if(ns>0) z.push_back(open_polylines.at(i).front().front().z());     else
         continue; // empty slice, skip it
 
-        std::vector<double> slice_verts;
-        std::vector<uint>   slice_tris;
-
-        if(has_poly)
+        std::vector<BoostPolygon> polys;
+        std::vector<BoostPolygon> holes;
+        for(auto p : external_polylines.at(i)) polys.push_back(make_polygon(p));
+        for(auto p : internal_polylines.at(i)) holes.push_back(make_polygon(p));
+        if(hatch_size>0)
         {
-            std::vector<double> v_in, v_out;
-            std::vector<uint>   s_in, t_out;
-            uint base_addr = 0;
-
-            // process external polylines
-            for(const std::vector<vec3d> & polyline : external_polylines.at(i))
-            {
-                for(uint i=0; i<polyline.size(); ++i)
-                {
-                    v_in.push_back(polyline.at(i).x());
-                    v_in.push_back(polyline.at(i).y());
-                    s_in.push_back(base_addr + i);
-                    s_in.push_back(base_addr + (i+1)%polyline.size());
-                }
-                base_addr = v_in.size()/2;
-            }
-            // process internal polylines (i.e. holes)
-            for(const std::vector<vec3d> & polyline : internal_polylines.at(i))
-            {
-                for(uint i=0; i<polyline.size(); ++i)
-                {
-                    v_in.push_back(polyline.at(i).x());
-                    v_in.push_back(polyline.at(i).y());
-                    s_in.push_back(base_addr + i);
-                    s_in.push_back(base_addr + (i+1)%polyline.size());
-                }
-                base_addr = v_in.size()/2;
-            }
-
-            // find robust seeds to eat triangles inside holes
-            std::vector<double> holes_in;
-            points_inside_holes(internal_polylines.at(i), holes_in);
-
-            triangle_wrap(v_in, s_in, holes_in, "Q", v_out, t_out);
-
-            base_addr = this->num_verts();
-            std::copy(v_out.begin(), v_out.end(), std::back_inserter(slice_verts));
-            for(uint vid : t_out) slice_tris.push_back(base_addr + vid);
+            for(auto p : open_polylines.at(i)) polys.push_back(thicken_hatch(p, hatch_size));
         }
 
-        if(has_hatch)
+        BoostMultiPolygon mp;
+        for(auto p : polys)
         {
-            std::vector<double> v_in, v_out;
-            std::vector<uint>   s_in, t_out;
-            uint base_addr = 0;
-
-            thicken_open_polylines(open_polylines.at(i), hatch_size, v_in, s_in);
-
-            triangle_wrap(v_in, s_in, {}, "Q", v_out, t_out);
-
-            base_addr = this->num_verts() + slice_verts.size()/2;
-            std::copy(v_out.begin(), v_out.end(), std::back_inserter(slice_verts));
-            for(uint vid : t_out) slice_tris.push_back(base_addr + vid);
+            BoostMultiPolygon res;
+            boost::geometry::union_(mp, p, res);
+            mp = res;
+        }
+        for(auto p : holes)
+        {
+            BoostMultiPolygon res;
+            boost::geometry::difference(mp, p, res);
+            mp = res;
         }
 
-        assert(!slice_verts.empty());
-        uint n_tris = slice_tris.size()/3;
-        std::vector<vec3d> verts = vec3d_from_serialized_xy(slice_verts, z.back());
+        BoostMultiPolygon mp2;
+        boost::geometry::simplify(mp, mp2, hatch_size*0.01); // Douglas-Peucker
+        assert(mp.size()>0 && mp.size()==mp2.size());
+
+        std::vector<double> verts_in, verts_out, hole_seeds;
+        std::vector<uint> segs, tris;
+        points_inside_holes(mp2, hole_seeds);
+        for(const BoostPolygon & p : mp)
+        {
+            uint base_addr = verts_in.size()/2;
+            uint nv = p.outer().size()-1; // first and last verts coincide...
+            for(uint vid=0; vid<nv; ++vid)
+            {
+                verts_in.push_back(boost::geometry::get<0>(p.outer().at(vid)));
+                verts_in.push_back(boost::geometry::get<1>(p.outer().at(vid)));
+                segs.push_back(base_addr + vid);
+                segs.push_back(base_addr + (vid+1)%nv);
+            }
+            for(uint hid=0; hid<p.inners().size(); ++hid)
+            {
+                uint base_addr = verts_in.size()/2;
+                uint nv = p.inners().at(hid).size()-1; // first and last verts coincide...
+                for(uint vid=0; vid<nv; ++vid)
+                {
+                    verts_in.push_back(boost::geometry::get<0>(p.inners().at(hid).at(vid)));
+                    verts_in.push_back(boost::geometry::get<1>(p.inners().at(hid).at(vid)));
+                    segs.push_back(base_addr + vid);
+                    segs.push_back(base_addr + (vid+1)%nv);
+                }
+            }
+        }
+        triangle_wrap(verts_in, segs, hole_seeds, "Q", verts_out, tris);
+
+        uint base_addr = this->num_verts();
+        uint n_tris    = tris.size()/3;
+        std::vector<vec3d> verts = vec3d_from_serialized_xy(verts_out, z.back());
 
         for(auto p : verts)
         {
@@ -187,50 +175,54 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
         }
         for(uint i=0; i<n_tris; ++i)
         {
-            uint pid = this->poly_add(slice_tris.at(3*i+0),
-                                      slice_tris.at(3*i+1),
-                                      slice_tris.at(3*i+2));
+            uint pid = this->poly_add(base_addr + tris.at(3*i+0),
+                                      base_addr + tris.at(3*i+1),
+                                      base_addr + tris.at(3*i+2));
             this->poly_data(pid).label = sid;
             for(uint eid : this->adj_p2e(pid)) this->edge_data(eid).label = sid;
         }
 
         ++sid;
     }
+    std::cout << std::endl;
     std::cout << "new sliced object (" << num_slices() << " slices)" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-/* This serves to reliably find an inner point for each internal contour (a slice hole).
- * Triangle uses this information to eat triangles inside holes and clean the triangulation.
- * Basically each contour is triangulated, and the centroid of the first triangle in the
- * tessellation is returned.
+/* This serves to reliably find an inner point for each hole in the slice. Triangle
+ * uses this information to eat triangles inside holes and clean the triangulation.
+ * Basically each contour is triangulated, and the centroid of the first triangle in
+ * the tessellation is returned.
 */
 template<class M, class V, class E, class P>
 CINO_INLINE
-void SlicedObj<M,V,E,P>::points_inside_holes(const std::vector<std::vector<vec3d>> & holes,
-                                                   std::vector<double>             & points)
+void SlicedObj<M,V,E,P>::points_inside_holes(const BoostMultiPolygon   & mp,
+                                                   std::vector<double> & points) const
 {
     points.clear();
-    for(const std::vector<vec3d> & hole : holes)
+    for(const BoostPolygon & p : mp)
     {
-        std::vector<double> verts_in, verts_out, dummy;
-        std::vector<uint>   segs_in, tris_out;
-        for(uint i=0; i<hole.size(); ++i)
+        for(uint hid=0; hid<p.inners().size(); ++hid)
         {
-            verts_in.push_back(hole.at(i).x());
-            verts_in.push_back(hole.at(i).y());
-            segs_in.push_back(i);
-            segs_in.push_back((i+1)%hole.size());
+            std::vector<double> verts_in, verts_out, dummy;
+            std::vector<uint>   segs_in, tris_out;
+            uint nv = p.inners().at(hid).size()-1; // first and last verts coincide...
+            for(uint i=0; i<nv; ++i)
+            {
+                verts_in.push_back(boost::geometry::get<0>(p.inners().at(hid).at(i)));
+                verts_in.push_back(boost::geometry::get<1>(p.inners().at(hid).at(i)));
+                segs_in.push_back(i);
+                segs_in.push_back((i+1)%nv);
+            }
+            triangle_wrap(verts_in, segs_in, dummy, "Q", verts_out, tris_out);
+            assert(tris_out.size()>2);
+            uint v0 = tris_out.at(0);
+            uint v1 = tris_out.at(1);
+            uint v2 = tris_out.at(2);
+            points.push_back((verts_out.at(2*v0+0) + verts_out.at(2*v1+0) + verts_out.at(2*v2+0))/3.0);
+            points.push_back((verts_out.at(2*v0+1) + verts_out.at(2*v1+1) + verts_out.at(2*v2+1))/3.0);
         }
-
-        triangle_wrap(verts_in, segs_in, dummy, "Q", verts_out, tris_out);
-        assert(tris_out.size()>2);
-        uint v0 = tris_out.at(0);
-        uint v1 = tris_out.at(1);
-        uint v2 = tris_out.at(2);
-        points.push_back((verts_out.at(2*v0+0) + verts_out.at(2*v1+0) + verts_out.at(2*v2+0))/3.0);
-        points.push_back((verts_out.at(2*v0+1) + verts_out.at(2*v1+1) + verts_out.at(2*v2+1))/3.0);
     }
 }
 
@@ -238,12 +230,14 @@ void SlicedObj<M,V,E,P>::points_inside_holes(const std::vector<std::vector<vec3d
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void SlicedObj<M,V,E,P>::thicken_open_polylines(const std::vector<std::vector<vec3d>> & open_polylines,
-                                                const double                          & thickness,
-                                                      std::vector<double>             & points,
-                                                      std::vector<uint>               & segs)
+BoostPolygon SlicedObj<M,V,E,P>::thicken_hatch(const std::vector<vec3d> & polyline,
+                                               const double               thickness) const
 {
-    if(thickness<=0) return;
+    assert(polyline.size()>1); // make sure it is at least a segment
+    assert(thickness > 0);
+
+    BoostLinestring ls;
+    for(vec3d p : polyline) boost::geometry::append(ls, BoostPoint(p.x(), p.y()));
 
     // https://www.boost.org/doc/libs/1_63_0/libs/geometry/doc/html/geometry/reference/algorithms/buffer/buffer_7_with_strategies.html
     boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(thickness);
@@ -251,56 +245,27 @@ void SlicedObj<M,V,E,P>::thicken_open_polylines(const std::vector<std::vector<ve
     boost::geometry::strategy::buffer::end_flat                   end_strategy;
     boost::geometry::strategy::buffer::point_square               circle_strategy;
     boost::geometry::strategy::buffer::side_straight              side_strategy;
+    std::vector<BoostPolygon> res;
+    boost::geometry::buffer(ls, res, distance_strategy, side_strategy, join_strategy, end_strategy, circle_strategy);
+    assert(res.size()==1); // topological check: thickening should not create more than one polygon
 
-    std::vector<BoostPolygon> buffered_polylines;
-    for(auto polyline : open_polylines)
-    {
-        BoostLinestring ls;
-        for(uint i=0; i<polyline.size(); ++i)
-        {
-            boost::geometry::append(ls, BoostPoint(polyline.at(i).x(),polyline.at(i).y()));
-        }
+    BoostPolygon p;
+    boost::geometry::simplify(res.front(), p, thickness*0.01); // Douglas-Peucker
 
-        std::vector<BoostPolygon> res;
-        boost::geometry::buffer(ls, res, distance_strategy, side_strategy, join_strategy, end_strategy, circle_strategy);
-        assert(res.size()==1); // topological check: thickening should not create more than one conn. comp.
-        for(auto p : res) buffered_polylines.push_back(p);
-    }
+    return p;
+}
 
-    // open polylines may intersect. So I unify them all in a single (multi)polygon
-    // and simplify them to remove spurious vertices
-    BoostMultiPolygon unified_polylines;
-    for(uint i=0; i<buffered_polylines.size(); ++i)
-    {
-        BoostMultiPolygon res;
-        boost::geometry::union_(unified_polylines, buffered_polylines.at(i), res);
-        unified_polylines = res;
-    }
-    // Douglas Peucker
-    BoostMultiPolygon simplified_polylines;
-    boost::geometry::simplify(unified_polylines, simplified_polylines, thickness*0.01);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    for(uint i=0; i<simplified_polylines.size(); ++i)
-    {
-        uint base_addr = points.size()/2;
-        for(uint j=0; j<simplified_polylines[i].outer().size()-1; ++j)
-        {
-            points.push_back(boost::geometry::get<0>(simplified_polylines[i].outer()[j]));
-            points.push_back(boost::geometry::get<1>(simplified_polylines[i].outer()[j]));
-            segs.push_back(base_addr + j);
-            segs.push_back(base_addr + (j+1)%(simplified_polylines[i].outer().size()-1));
-        }
-
-        base_addr = points.size()/2;
-        for(auto p : simplified_polylines[i].inners())
-        for(uint j=0; j<p.size()-1; ++j)
-        {
-            points.push_back(boost::geometry::get<0>(p[j]));
-            points.push_back(boost::geometry::get<1>(p[j]));
-            segs.push_back(base_addr + j);
-            segs.push_back(base_addr + (j+1)%(p.size()-1));
-        }
-    }
+template<class M, class V, class E, class P>
+CINO_INLINE
+BoostPolygon SlicedObj<M,V,E,P>::make_polygon(const std::vector<vec3d> & polyline) const
+{
+    assert(polyline.size()>2); // make sure it is a closed polygon
+    BoostPolygon poly;
+    for(vec3d p : polyline) boost::geometry::append(poly, BoostPoint(p.x(), p.y()));
+    boost::geometry::correct(poly);
+    return poly;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
