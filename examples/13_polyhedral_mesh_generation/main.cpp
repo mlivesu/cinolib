@@ -61,6 +61,11 @@ int main(int argc, char **argv)
     gui.resize(800,600);
     m_in.show_wireframe(true);
 
+    std::string pov("0.284799 -0.950278 0.125944 0 -0.908966 -0.225991 0.3503 0 -0.30442 -0.214244 -0.928131 0 0.501663 0.748304 -1.53602 1 1.32704 2.47434");
+    gui_in.deserialize_POV(pov);
+    gui_tet.deserialize_POV(pov);
+    gui_poly.deserialize_POV(pov);
+
     // show interior
     SlicerState slice_params;
     slice_params.Z_thresh = 0.6;
