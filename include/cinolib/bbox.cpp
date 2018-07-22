@@ -63,6 +63,7 @@ vec3d Bbox::center() const
 CINO_INLINE
 double Bbox::diag() const
 {
+    if(min.x()==inf_double) return 0.0;
     return (min - max).length();
 }
 

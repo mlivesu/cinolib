@@ -632,6 +632,8 @@ void GLcanvas::fit_scene()
     uint  count = 0;
     for(const DrawableObject *obj : objects)
     {
+        if(obj->scene_radius()==0) continue;
+
         center += obj->scene_center();
         size  = std::max(size, obj->scene_radius());
         ++count;
