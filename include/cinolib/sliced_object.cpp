@@ -256,18 +256,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 bool SlicedObj<M,V,E,P>::slice_contains(const uint sid, const vec2d & p) const
 {
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        if(this->poly_data(pid).label == (int)sid)
-        {
-            if(triangle_point_is_inside(vec2d(this->poly_vert(pid,0)),
-                                        vec2d(this->poly_vert(pid,1)),
-                                        vec2d(this->poly_vert(pid,2)),
-                                        p))
-                return true;
-        }
-    }
-    return false;
+    return polygon_contains(slices.at(sid), p, true);
 }
 
 }
