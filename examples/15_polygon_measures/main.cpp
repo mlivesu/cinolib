@@ -33,6 +33,7 @@ int main(int argc, char **argv)
         vec3d(0,1,0), // v4
     });
     m.show_wireframe(true);
+    m.show_marked_edge(false);
 
     std::vector<vec3d> kernel;
     polygon_kernel(m.vector_verts(), kernel);
@@ -86,6 +87,7 @@ int main(int argc, char **argv)
         profiler.pop();
         k = DrawablePolygonmesh<>(kernel);
         k.poly_set_color(Color::PASTEL_RED());
+        k.show_marked_edge(false);
 
         profiler.push("Compute smallest enclosing circle");
         smallest_enclosing_disk(m.vector_verts(), sec_c, sec_r);

@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     gui.resize(800,600);
     m_in.show_wireframe(true);
 
-    std::string pov("0.284799 -0.950278 0.125944 0 -0.908966 -0.225991 0.3503 0 -0.30442 -0.214244 -0.928131 0 0.501663 0.748304 -1.53602 1 1.32704 2.47434");
+    std::string pov("0.217281 -0.976103 0.00348926 0 0.94495 0.209448 -0.2514 0 0.244662 0.0579212 0.967876 0 -0.747865 0.366815 -2.40522 1 1.32704 2.47434");
     gui_in.deserialize_POV(pov);
     gui_tet.deserialize_POV(pov);
     gui_poly.deserialize_POV(pov);

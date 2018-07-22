@@ -59,11 +59,11 @@ int main(int argc, char **argv)
     layout.addWidget(&gui_uv);
     window.setLayout(&layout);
     m.show_wireframe(true);
-    m.show_wireframe_transparency(0.6);
+    m.show_wireframe_transparency(0.4);
     m.show_texture2D(TEXTURE_2D_ISOLINES, 3.0);
     gui.push_obj(&m);
     m_uv.show_wireframe(true);
-    m_uv.show_wireframe_transparency(0.6);
+    m_uv.show_wireframe_transparency(0.4);
     m_uv.show_texture2D(TEXTURE_2D_ISOLINES, 3.0);
     gui_uv.push_obj(&m_uv);
     window.resize(800,600);
