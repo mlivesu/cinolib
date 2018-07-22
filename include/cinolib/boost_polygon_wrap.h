@@ -70,6 +70,11 @@ namespace cinolib
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+    template<typename TP, typename vec>
+    bool polygon_contains(const TP & poly, const vec & point, const bool border_counts);
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     template<typename TP0, typename TP1>
     BoostMultiPolygon polygon_union(const TP0 & p0, const TP1 & p1);
 
@@ -77,6 +82,9 @@ namespace cinolib
 
     template<typename TP0, typename TP1>
     BoostMultiPolygon polygon_difference(const TP0 & p0, const TP1 & p1);
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 }
 
 #ifndef  CINO_STATIC_LIB

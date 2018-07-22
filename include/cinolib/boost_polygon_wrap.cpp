@@ -94,6 +94,18 @@ TP polygon_simplify(const TP & p, const double max_dist)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<typename TP, typename vec>
+bool polygon_contains(const TP & poly, const vec & point, const bool border_counts)
+{
+    double x = point.x();
+    double y = point.y();
+
+    if(border_counts) return boost::geometry::covered_by(BoostPoint(x,y), poly);
+                      return boost::geometry::within    (BoostPoint(x,y), poly);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<typename TP0, typename TP1>
 BoostMultiPolygon polygon_union(const TP0 & p0, const TP1 & p1)
 {
