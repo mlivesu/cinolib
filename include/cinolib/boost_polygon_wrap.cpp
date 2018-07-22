@@ -29,11 +29,17 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/boost_polygon_wrap.h>
+#include <cinolib/vector_serialization.h>
+
+#ifdef CINOLIB_USES_TRIANGLE
+#include <cinolib/triangle_wrap.h>
+#endif
 
 namespace cinolib
 {
 
 template<typename vec>
+CINO_INLINE
 BoostPolygon make_polygon(const std::vector<vec> & outer_ring)
 {
     assert(outer_ring.size()>2); // make sure it is a closed polygon
@@ -46,6 +52,7 @@ BoostPolygon make_polygon(const std::vector<vec> & outer_ring)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<typename vec>
+CINO_INLINE
 BoostPolygon make_polygon(const std::vector<vec>              & outer_ring,
                           const std::vector<std::vector<vec>> & inner_rings)
 {
@@ -57,6 +64,7 @@ BoostPolygon make_polygon(const std::vector<vec>              & outer_ring,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<typename vec>
+CINO_INLINE
 BoostPolygon make_polygon(const std::vector<vec> & polyline,
                           const double             thickening_radius)
 {
@@ -85,6 +93,7 @@ BoostPolygon make_polygon(const std::vector<vec> & polyline,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<typename TP>
+CINO_INLINE
 TP polygon_simplify(const TP & p, const double max_dist)
 {
     TP simplified_p;
@@ -95,6 +104,7 @@ TP polygon_simplify(const TP & p, const double max_dist)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<typename TP, typename vec>
+CINO_INLINE
 bool polygon_contains(const TP & poly, const vec & point, const bool border_counts)
 {
     double x = point.x();
@@ -107,6 +117,7 @@ bool polygon_contains(const TP & poly, const vec & point, const bool border_coun
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<typename TP0, typename TP1>
+CINO_INLINE
 BoostMultiPolygon polygon_union(const TP0 & p0, const TP1 & p1)
 {
     BoostMultiPolygon res;
@@ -117,11 +128,113 @@ BoostMultiPolygon polygon_union(const TP0 & p0, const TP1 & p1)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<typename TP0, typename TP1>
+CINO_INLINE
 BoostMultiPolygon polygon_difference(const TP0 & p0, const TP1 & p1)
 {
     BoostMultiPolygon res;
     boost::geometry::difference(p0, p1, res);
     return res;
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void polygon_get_edges(const BoostPolygon       & poly,
+                             std::vector<vec2d> & verts,
+                             std::vector<uint>  & edges)
+{
+    verts.clear();
+    edges.clear();
+
+    // extract outer edges
+    uint nv = poly.outer().size()-1; // first and last verts coincide...
+    for(uint vid=0; vid<nv; ++vid)
+    {
+        verts.push_back(vec2d(boost::geometry::get<0>(poly.outer().at(vid)),
+                              boost::geometry::get<1>(poly.outer().at(vid))));
+        edges.push_back(vid);
+        edges.push_back((vid+1)%nv);
+    }
+
+    // extract inner edges (holes)
+    for(uint hid=0; hid<poly.inners().size(); ++hid)
+    {
+        uint base_addr = verts.size();
+        uint nv = poly.inners().at(hid).size()-1; // first and last verts coincide...
+        for(uint vid=0; vid<nv; ++vid)
+        {
+            verts.push_back(vec2d(boost::geometry::get<0>(poly.inners().at(hid).at(vid)),
+                                  boost::geometry::get<1>(poly.inners().at(hid).at(vid))));
+            edges.push_back(base_addr + vid);
+            edges.push_back(base_addr + (vid+1)%nv);
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void polygon_get_edges(const BoostMultiPolygon  & poly,
+                             std::vector<vec2d> & verts,
+                             std::vector<uint>  & edges)
+{
+    verts.clear();
+    edges.clear();
+
+    for(const BoostPolygon & p : poly)
+    {
+        std::vector<vec2d> v;
+        std::vector<uint>  e;
+        polygon_get_edges(p, v, e);
+
+        uint base_addr = verts.size();
+        std::copy(v.begin(), v.end(), std::back_inserter(verts));
+        for(auto vid : e) edges.push_back(base_addr + vid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void polygon_get_edges(const BoostPolygon       & poly,
+                       const double             & z, // add third coordinate
+                             std::vector<vec3d> & verts,
+                             std::vector<uint>  & edges)
+{
+    std::vector<vec2d> v2d;
+    polygon_get_edges(poly, v2d, edges);
+    verts = vec3d_from_vec2d(v2d, z);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void polygon_get_edges(const BoostMultiPolygon  & poly,
+                       const double             & z, // add third coordinate
+                             std::vector<vec3d> & verts,
+                             std::vector<uint>  & edges)
+{
+    std::vector<vec2d> v2d;
+    polygon_get_edges(poly, v2d, edges);
+    verts = vec3d_from_vec2d(v2d, z);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<typename TP>
+//CINO_INLINE
+//void triangulate_polygon(const TP                 & poly,
+//                               std::vector<vec3d> & verts,
+//                               std::vector<uint>  & tris)
+//{
+//    verts.clear();
+//    tris.clear();
+
+//    std::vector<vec3d> v;
+//    std::vector<uint>  e;
+//    polygon_get_edges(poly, 0, v, e);
+
+//    triangle_wrap(v, e, {}, 0, "", verts, tris);
+//}
 
 }

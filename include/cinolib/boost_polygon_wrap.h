@@ -33,6 +33,8 @@
 
 #ifdef CINOLIB_USES_BOOST
 
+#include <cinolib/geometry/vec2.h>
+
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/multi_polygon.hpp>
@@ -49,42 +51,84 @@ namespace cinolib
     // any vec type is fine, as long as it provides vec::x() and vec::y()
 
     template<typename vec>
+    CINO_INLINE
     BoostPolygon make_polygon(const std::vector<vec> & outer_ring);
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     template<typename vec>
+    CINO_INLINE
     BoostPolygon make_polygon(const std::vector<vec>              & outer_ring,
                               const std::vector<std::vector<vec>> & inner_rings);
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     template<typename vec>
+    CINO_INLINE
     BoostPolygon make_polygon(const std::vector<vec> & polyline,
                               const double             thickening_radius);
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     template<typename TP>
+    CINO_INLINE
     TP polygon_simplify(const TP & p, const double max_dist);
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     template<typename TP, typename vec>
+    CINO_INLINE
     bool polygon_contains(const TP & poly, const vec & point, const bool border_counts);
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     template<typename TP0, typename TP1>
+    CINO_INLINE
     BoostMultiPolygon polygon_union(const TP0 & p0, const TP1 & p1);
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     template<typename TP0, typename TP1>
+    CINO_INLINE
     BoostMultiPolygon polygon_difference(const TP0 & p0, const TP1 & p1);
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+    CINO_INLINE
+    void polygon_get_edges(const BoostPolygon       & poly,
+                                 std::vector<vec2d> & verts,
+                                 std::vector<uint>  & edges);
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    CINO_INLINE
+    void polygon_get_edges(const BoostMultiPolygon  & poly,
+                                 std::vector<vec2d> & verts,
+                                 std::vector<uint>  & edges);
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    CINO_INLINE
+    void polygon_get_edges(const BoostPolygon       & poly,
+                           const double             & z, // adds third coordinate
+                                 std::vector<vec3d> & verts,
+                                 std::vector<uint>  & edges);
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    CINO_INLINE
+    void polygon_get_edges(const BoostMultiPolygon  & poly,
+                           const double             & z, // adds third coordinate
+                                 std::vector<vec3d> & verts,
+                                 std::vector<uint>  & edges);
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//    template<typename TP>
+//    CINO_INLINE
+//    void triangulate_polygon(const TP                 & poly,
+//                                   std::vector<vec3d> & verts,
+//                                   std::vector<uint>  & tris);
 }
 
 #ifndef  CINO_STATIC_LIB
