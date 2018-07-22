@@ -5,7 +5,6 @@
 - add matrix class (i.e. mat<real,size>, with operators and constructors from quaternions, rotations, identity, diagonal, ecc)
 - move from vec2d and vec3d in vec<real,size> (DOABLE?)
 - add support to read/write per element labels in OFF and HEDRA
-- improve canvas focus (when double click, center geometry and zoom on it, possibly adjusting clipping planes)
 - make sure field_serialize is lossless in terms of numeric precision
 - add verdict metrics for tris/quads/tets/hexa
 - put edge flip and similar operators on separate files
@@ -29,6 +28,7 @@ KNOWN BUGS/THINGS TO BE FIXED:
  - fix marching tets: degenerate triangles will be generated in some cases (see comments inside cpp file)
  - fix integral curve tracing (also refactor ray/line/plane intersections)
  - gradients on hex-meshes are buggy. maybe something wrong with face normals?
+
 
 DOCUMENTATION/LICENSE
  - move to MIT License
