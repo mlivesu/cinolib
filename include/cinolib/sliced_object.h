@@ -32,26 +32,15 @@
 #define CINO_SLICED_OBJ
 
 // Boost polygons and Triangle are used to create and tessellate slices...
-#ifdef CINOLIB_USES_BOOST
 #ifdef CINOLIB_USES_TRIANGLE
 
 #include <cinolib/meshes/trimesh.h>
+#include <cinolib/boost_polygon_wrap.h>
 
 /* This class represents a sliced object as a triangle mesh. Each slice is triangulated,
  * considering both outer and inner contours (holes). Support structures (usually represented
  * as 1D curves in CLI files) are thickened and triangulated as well.
 */
-
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/geometries/multi_polygon.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/linestring.hpp>
-
-typedef boost::geometry::model::d2::point_xy<double>        BoostPoint;
-typedef boost::geometry::model::polygon<BoostPoint>         BoostPolygon;
-typedef boost::geometry::model::multi_polygon<BoostPolygon> BoostMultiPolygon;
-typedef boost::geometry::model::linestring<BoostPoint>      BoostLinestring;
 
 namespace cinolib
 {
@@ -68,15 +57,15 @@ class SlicedObj : public Trimesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        explicit SlicedObj(const char * filename, const double hatch_size = 0.01);
+        explicit SlicedObj(const char * filename, const double thick_radius = 0.01);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        explicit SlicedObj(const std::vector<std::vector<std::vector<vec3d>>> & internal_polylines,
-                           const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
-                           const std::vector<std::vector<std::vector<vec3d>>> & open_polylines,
+        explicit SlicedObj(const std::vector<std::vector<std::vector<vec3d>>> & slice_polys,
+                           const std::vector<std::vector<std::vector<vec3d>>> & slice_holes,
+                           const std::vector<std::vector<std::vector<vec3d>>> & supports,
                            const std::vector<std::vector<std::vector<vec3d>>> & hatches,
-                           const double hatch_size = 0.01);
+                           const double thick_radius = 0.01);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -92,16 +81,15 @@ class SlicedObj : public Trimesh<M,V,E,P>
 
     protected:
 
-        void init(const std::vector<std::vector<std::vector<vec3d>>> & internal_polylines,
-                  const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
-                  const std::vector<std::vector<std::vector<vec3d>>> & open_polylines,
-                  const std::vector<std::vector<std::vector<vec3d>>> & hatches);
+        void init(const std::vector<std::vector<std::vector<vec3d>>> & slice_polys,
+                  const std::vector<std::vector<std::vector<vec3d>>> & slice_holes,
+                  const std::vector<std::vector<std::vector<vec3d>>> & supports);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void triangulate_slices(const std::vector<std::vector<std::vector<vec3d>>> & internal_polylines,
-                                const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
-                                const std::vector<std::vector<std::vector<vec3d>>> & open_polylines);
+        void triangulate_slices(const std::vector<std::vector<std::vector<vec3d>>> & slice_polys,
+                                const std::vector<std::vector<std::vector<vec3d>>> & slice_holes,
+                                const std::vector<std::vector<std::vector<vec3d>>> & supports);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -110,15 +98,10 @@ class SlicedObj : public Trimesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        BoostPolygon make_polygon (const std::vector<vec3d> & polyline) const;
-
-        BoostPolygon thicken_hatch(const std::vector<vec3d> & polyline,
-                                   const double               thickness) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        double hatch_size;
-        std::vector<float> z;
+        double                                       thick_radius; // supports thickening radius
+        std::vector<float>                           z;            // per slice z-coord
+        std::vector<BoostMultiPolygon>               slices;       // slices (included thickened supports)
+        std::vector<std::vector<std::vector<vec3d>>> hatches;      // unused so far, just keeping them
 };
 
 }
@@ -128,6 +111,4 @@ class SlicedObj : public Trimesh<M,V,E,P>
 #endif
 
 #endif // CINO_USES_TRIANGLE
-#endif // CINO_USES_BOOST
-
 #endif // CINO_DRAWABLE_SLICED_OBJ

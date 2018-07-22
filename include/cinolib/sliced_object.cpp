@@ -39,45 +39,42 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-SlicedObj<M,V,E,P>::SlicedObj(const char * filename, const double hatch_size)
+SlicedObj<M,V,E,P>::SlicedObj(const char * filename, const double thick_radius)
     : Trimesh<M,V,E,P>()
-    , hatch_size(hatch_size)
+    , thick_radius(thick_radius)
 {
-    std::vector<std::vector<std::vector<vec3d>>> internal_polylines;
-    std::vector<std::vector<std::vector<vec3d>>> external_polylines;
-    std::vector<std::vector<std::vector<vec3d>>> open_polylines;
-    std::vector<std::vector<std::vector<vec3d>>> hatches;
-    read_CLI(filename,internal_polylines,external_polylines,open_polylines,hatches);
-
-    init(internal_polylines, external_polylines, open_polylines, hatches);
+    std::vector<std::vector<std::vector<vec3d>>> slice_polys;
+    std::vector<std::vector<std::vector<vec3d>>> slice_holes;
+    std::vector<std::vector<std::vector<vec3d>>> supports;
+    read_CLI(filename, slice_polys, slice_holes, supports, hatches);
+    init(slice_polys, slice_holes, supports);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-SlicedObj<M,V,E,P>::SlicedObj(const std::vector<std::vector<std::vector<vec3d>>> & internal_polylines,
-                              const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
-                              const std::vector<std::vector<std::vector<vec3d>>> & open_polylines,
+SlicedObj<M,V,E,P>::SlicedObj(const std::vector<std::vector<std::vector<vec3d>>> & slice_polys,
+                              const std::vector<std::vector<std::vector<vec3d>>> & slice_holes,
+                              const std::vector<std::vector<std::vector<vec3d>>> & supports,
                               const std::vector<std::vector<std::vector<vec3d>>> & hatches,
-                              const double hatch_size)
+                              const double thick_radius)
     : Trimesh<M,V,E,P>()
-    , hatch_size(hatch_size)
+    , hatches(hatches)
+    , thick_radius(thick_radius)
 {
-    init(internal_polylines, external_polylines, open_polylines, hatches);
+    init(slice_polys, slice_holes, supports);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void SlicedObj<M,V,E,P>::init(const std::vector<std::vector<std::vector<vec3d>>> & internal_polylines,
-                              const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
-                              const std::vector<std::vector<std::vector<vec3d>>> & open_polylines,
-                              const std::vector<std::vector<std::vector<vec3d>>> & hatches)
+void SlicedObj<M,V,E,P>::init(const std::vector<std::vector<std::vector<vec3d>>> & slice_polys,
+                              const std::vector<std::vector<std::vector<vec3d>>> & slice_holes,
+                              const std::vector<std::vector<std::vector<vec3d>>> & supports)
 {
-    (void)hatches; // warning killer => DO SOMETHING WITH THEM!
-    triangulate_slices(internal_polylines, external_polylines, open_polylines);
+    triangulate_slices(slice_polys, slice_holes, supports);
     this->edge_mark_boundaries();
 }
 
@@ -99,7 +96,7 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
     {
         uint np = external_polylines.at(i).size();
         uint nh = internal_polylines.at(i).size();
-        uint ns = (hatch_size>0) ? open_polylines.at(i).size() : 0;
+        uint ns = (thick_radius>0) ? open_polylines.at(i).size() : 0;
 
         std::cout << "processing slice " << i << " out of " << tot_slices << "\t(" << np << " polys / " << nh << " holes / "  << ns << " supports)" << std::endl;
 
@@ -111,32 +108,18 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
         std::vector<BoostPolygon> holes;
         for(auto p : external_polylines.at(i)) polys.push_back(make_polygon(p));
         for(auto p : internal_polylines.at(i)) holes.push_back(make_polygon(p));
-        if(hatch_size>0)
+        if(thick_radius>0)
         {
-            for(auto p : open_polylines.at(i)) polys.push_back(thicken_hatch(p, hatch_size));
+            for(auto p : open_polylines.at(i)) polys.push_back(make_polygon(p, thick_radius));
         }
 
         BoostMultiPolygon mp;
-        for(auto p : polys)
-        {
-            BoostMultiPolygon res;
-            boost::geometry::union_(mp, p, res);
-            mp = res;
-        }
-        for(auto p : holes)
-        {
-            BoostMultiPolygon res;
-            boost::geometry::difference(mp, p, res);
-            mp = res;
-        }
-
-        BoostMultiPolygon mp2;
-        boost::geometry::simplify(mp, mp2, hatch_size*0.01); // Douglas-Peucker
-        assert(mp.size()>0 && mp.size()==mp2.size());
+        for(auto p : polys) mp = polygon_union(mp, p);
+        for(auto p : holes) mp = polygon_difference(mp, p);
 
         std::vector<double> verts_in, verts_out, hole_seeds;
         std::vector<uint> segs, tris;
-        points_inside_holes(mp2, hole_seeds);
+        points_inside_holes(mp, hole_seeds);
         for(const BoostPolygon & p : mp)
         {
             uint base_addr = verts_in.size()/2;
@@ -224,48 +207,6 @@ void SlicedObj<M,V,E,P>::points_inside_holes(const BoostMultiPolygon   & mp,
             points.push_back((verts_out.at(2*v0+1) + verts_out.at(2*v1+1) + verts_out.at(2*v2+1))/3.0);
         }
     }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-BoostPolygon SlicedObj<M,V,E,P>::thicken_hatch(const std::vector<vec3d> & polyline,
-                                               const double               thickness) const
-{
-    assert(polyline.size()>1); // make sure it is at least a segment
-    assert(thickness > 0);
-
-    BoostLinestring ls;
-    for(vec3d p : polyline) boost::geometry::append(ls, BoostPoint(p.x(), p.y()));
-
-    // https://www.boost.org/doc/libs/1_63_0/libs/geometry/doc/html/geometry/reference/algorithms/buffer/buffer_7_with_strategies.html
-    boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(thickness);
-    boost::geometry::strategy::buffer::join_miter                 join_strategy;
-    boost::geometry::strategy::buffer::end_flat                   end_strategy;
-    boost::geometry::strategy::buffer::point_square               circle_strategy;
-    boost::geometry::strategy::buffer::side_straight              side_strategy;
-    std::vector<BoostPolygon> res;
-    boost::geometry::buffer(ls, res, distance_strategy, side_strategy, join_strategy, end_strategy, circle_strategy);
-    assert(res.size()==1); // topological check: thickening should not create more than one polygon
-
-    BoostPolygon p;
-    boost::geometry::simplify(res.front(), p, thickness*0.01); // Douglas-Peucker
-
-    return p;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-BoostPolygon SlicedObj<M,V,E,P>::make_polygon(const std::vector<vec3d> & polyline) const
-{
-    assert(polyline.size()>2); // make sure it is a closed polygon
-    BoostPolygon poly;
-    for(vec3d p : polyline) boost::geometry::append(poly, BoostPoint(p.x(), p.y()));
-    boost::geometry::correct(poly);
-    return poly;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
