@@ -53,6 +53,16 @@ void triangle_wrap(const std::vector<double> & coords_in,  // serialized input x
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void triangle_wrap(const std::vector<vec2d> & verts_in,
+                   const std::vector<uint>  & segs_in,
+                   const std::vector<vec2d> & holes_in,
+                   const std::string        & flags,
+                         std::vector<vec2d> & verts_out,
+                         std::vector<uint>  & tris_out);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void triangle_wrap(const std::vector<double> & coords_in,  // serialized input xy coordinates
                    const std::vector<uint>   & segs_in,    // serialized segments
                    const std::vector<double> & holes_in,   // serialized xy holes
@@ -64,22 +74,13 @@ void triangle_wrap(const std::vector<double> & coords_in,  // serialized input x
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void triangle_wrap(const std::vector<vec2d>             & verts_in,
-                   const std::vector<uint>              & segs_in,
-                   const std::vector<vec2d>             & holes_in,
-                   const std::string                    & flags,
-                         std::vector<vec2d>             & verts_out,
-                         std::vector<std::vector<uint>> & tris_out);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void triangle_wrap(const std::vector<vec3d>             & verts_in,  // automatically ignores the third component (z)
-                   const std::vector<uint>              & segs_in,
-                   const std::vector<vec3d>             & holes_in,  // automatically ignores the third component (z)
-                   const std::string                    & flags,
-                         std::vector<vec3d>             & verts_out, // automatically sets the third component (z) to zero
-                         std::vector<std::vector<uint>> & tris_out);
+void triangle_wrap(const std::vector<vec2d>  & verts_in,  // serialized input xy coordinates
+                   const std::vector<uint>   & segs_in,    // serialized segments
+                   const std::vector<vec2d>  & holes_in,   // serialized xy holes
+                   const double                z_coord,    // lift triangulation to z_coord
+                   const std::string         & flags,      // https://www.cs.cmu.edu/~quake/triangle.switch.html
+                         std::vector<vec2d>  & verts_out, // serialized output xy+z_coord coordinates
+                         std::vector<uint>   & tris_out);  // serialized tris
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -91,6 +92,29 @@ void triangle_wrap(const std::vector<double> & coords_in, // serialized input xy
                    const double                z_coord,   // lift triangulation to z_coord
                    const std::string         & flags,     // https://www.cs.cmu.edu/~quake/triangle.switch.html
                          Trimesh<M,V,E,P>    & m);
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void triangle_wrap(const std::vector<vec2d> & verts_in,
+                   const std::vector<uint>  & segs_in,   // serialized segments
+                   const std::vector<vec2d> & holes_in,
+                   const double               z_coord,   // lift triangulation to z_coord
+                   const std::string        & flags,     // https://www.cs.cmu.edu/~quake/triangle.switch.html
+                         Trimesh<M,V,E,P>   & m);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void triangle_wrap(const std::vector<vec3d> & verts_in,
+                   const std::vector<uint>  & segs_in,   // serialized segments
+                   const std::vector<vec3d> & holes_in,
+                   const double               z_coord,   // lift triangulation to z_coord
+                   const std::string        & flags,     // https://www.cs.cmu.edu/~quake/triangle.switch.html
+                         Trimesh<M,V,E,P>   & m);
 }
 
 #ifndef  CINO_STATIC_LIB
