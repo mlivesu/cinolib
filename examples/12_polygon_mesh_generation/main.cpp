@@ -32,6 +32,7 @@ int main(int argc, char **argv)
     sprintf(opt, "Qqa%f", area_thresh);
     DrawableTrimesh<> trimesh;
     triangle_wrap(m_in.vector_verts(), m_in.vector_edges(), {}, 0, opt, trimesh);
+    trimesh.updateGL();
 
     Profiler profiler;
 
