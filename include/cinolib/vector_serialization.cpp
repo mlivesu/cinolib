@@ -47,6 +47,17 @@ std::vector<vec3d> vec3d_from_serialized_xyz(const std::vector<double> & coords)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+std::vector<vec3d> vec3d_from_vec2d(const std::vector<vec2d> & verts, const double z)
+{
+    uint nv = verts.size();
+    std::vector<vec3d> tmp(nv);
+    for(uint vid=0; vid<nv; ++vid) tmp.at(vid) = vec3d(verts.at(vid).x(), verts.at(vid).y(), z);
+    return tmp;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 std::vector<vec3d> vec3d_from_serialized_xy(const std::vector<double> & coords, const double z)
 {
     uint nv = coords.size()/2;

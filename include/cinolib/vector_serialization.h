@@ -35,12 +35,18 @@
 #include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec2.h>
 
 namespace cinolib
 {
 
 CINO_INLINE
 std::vector<vec3d> vec3d_from_serialized_xyz(const std::vector<double> & coords);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<vec3d> vec3d_from_vec2d(const std::vector<vec2d> & verts, const double z);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
