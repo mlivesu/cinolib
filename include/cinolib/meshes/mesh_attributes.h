@@ -79,7 +79,7 @@ typedef struct
     vec3d  normal  = vec3d(0,0,0);
     Color  color   = Color::WHITE();
     vec3d  uvw     = vec3d(0,0,0);
-    int    label   = 0;
+    int    label   = -1;
     float  quality = 0.0;
     bool   marked  = false;
 }
@@ -91,7 +91,7 @@ typedef struct
 {
     Color color  = Color::BLACK();
     bool  marked = false;
-    int   label  = 0;
+    int   label  = -1;
 }
 Edge_std_attributes;
 
@@ -101,7 +101,7 @@ typedef struct
 {
     vec3d  normal  = vec3d(0,0,0);
     Color  color   = Color::WHITE();
-    int    label   = 0;
+    int    label   = -1;
     bool   visible = true;
     float  quality = 0.0;
     bool   marked  = false;
@@ -113,7 +113,7 @@ Polygon_std_attributes;
 typedef struct
 {
     Color  color   = Color::WHITE();
-    int    label   = 0;
+    int    label   = -1;
     bool   visible = true;
     float  quality = 0.0;
     bool   marked  = false;
