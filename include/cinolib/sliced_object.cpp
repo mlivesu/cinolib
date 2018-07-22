@@ -74,50 +74,49 @@ void SlicedObj<M,V,E,P>::init(const std::vector<std::vector<std::vector<vec3d>>>
                               const std::vector<std::vector<std::vector<vec3d>>> & slice_holes,
                               const std::vector<std::vector<std::vector<vec3d>>> & supports)
 {
-    triangulate_slices(slice_polys, slice_holes, supports);
-    this->edge_mark_boundaries();
+    uint num_slices = slice_polys.size();
+
+    for(uint sid=0; sid<num_slices; ++sid)
+    {
+        uint np = slice_holes.at(sid).size();
+        uint nh = slice_polys.at(sid).size();
+        uint ns = (thick_radius>0) ? supports.at(sid).size() : 0;
+
+        std::cout << "processing slice " << sid << " out of " << num_slices << "\t(" << np << " polys / " << nh << " holes / "  << ns << " supports)" << std::endl;
+
+        if(np>0) z.push_back(slice_holes.at(sid).front().front().z()); else
+        if(ns>0) z.push_back(supports.at(sid).front().front().z());    else
+        continue; // empty slice, skip it
+
+        std::vector<BoostPolygon> polys;
+        std::vector<BoostPolygon> holes;
+        for(auto p : slice_holes.at(sid)) polys.push_back(make_polygon(p));
+        for(auto h : slice_polys.at(sid)) holes.push_back(make_polygon(h));
+        if(thick_radius>0)
+        {
+            for(auto s : supports.at(sid)) polys.push_back(make_polygon(s, thick_radius));
+        }
+
+        BoostMultiPolygon mp;
+        for(auto p : polys) mp = polygon_union(mp, p);
+        for(auto p : holes) mp = polygon_difference(mp, p);
+
+        assert(mp.size()>0);
+        slices.push_back(mp);
+    }
+
+    triangulate_slices();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::vector<vec3d>>> & slice_polys,
-                                            const std::vector<std::vector<std::vector<vec3d>>> & slice_holes,
-                                            const std::vector<std::vector<std::vector<vec3d>>> & supports)
+void SlicedObj<M,V,E,P>::triangulate_slices()
 {
-    // Empty slices will be ignored, so keep a separate count of slice ids.
-    // NOTE: empty slices may happen when a slice contains only open polylines
-    // and the hatch_size is set to zero
-    uint sid        = 0;
-    uint tot_slices = slice_polys.size();
-
-    for(uint i=0; i<tot_slices; ++i)
+    for(uint sid=0; sid<slices.size(); ++sid)
     {
-        uint np = slice_holes.at(i).size();
-        uint nh = slice_polys.at(i).size();
-        uint ns = (thick_radius>0) ? supports.at(i).size() : 0;
-
-        std::cout << "processing slice " << i << " out of " << tot_slices << "\t(" << np << " polys / " << nh << " holes / "  << ns << " supports)" << std::endl;
-
-        if(np>0) z.push_back(slice_holes.at(i).front().front().z()); else
-        if(ns>0) z.push_back(supports.at(i).front().front().z());     else
-        continue; // empty slice, skip it
-
-        std::vector<BoostPolygon> polys;
-        std::vector<BoostPolygon> holes;
-        for(auto p : slice_holes.at(i)) polys.push_back(make_polygon(p));
-        for(auto h : slice_polys.at(i)) holes.push_back(make_polygon(h));
-        if(thick_radius>0)
-        {
-            for(auto s : supports.at(i)) polys.push_back(make_polygon(s, thick_radius));
-        }
-
-        BoostMultiPolygon mp;
-        for(auto p : polys) mp = polygon_union(mp, p);
-        for(auto p : holes) mp = polygon_difference(mp, p);
-        assert(mp.size()>0);
-        slices.push_back(mp);
+        const BoostMultiPolygon & mp = slices.at(sid);
 
         std::vector<double> verts_in, verts_out, hole_seeds;
         std::vector<uint> segs, tris;
@@ -150,12 +149,12 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
 
         uint base_addr = this->num_verts();
         uint n_tris    = tris.size()/3;
-        std::vector<vec3d> verts = vec3d_from_serialized_xy(verts_out, z.back());
+        std::vector<vec3d> verts = vec3d_from_serialized_xy(verts_out, z.at(sid));
 
         for(auto p : verts)
         {
             uint vid = this->vert_add(p);
-            this->vert_data(vid).uvw[0] = static_cast<double>(i)/static_cast<double>(tot_slices);
+            this->vert_data(vid).uvw[0] = static_cast<double>(sid)/static_cast<double>(num_slices());
             this->vert_data(vid).label  = sid;
         }
         for(uint i=0; i<n_tris; ++i)
@@ -166,11 +165,9 @@ void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::v
             this->poly_data(pid).label = sid;
             for(uint eid : this->adj_p2e(pid)) this->edge_data(eid).label = sid;
         }
-
-        ++sid;
     }
-    std::cout << std::endl;
     std::cout << "new sliced object (" << num_slices() << " slices)" << std::endl;
+    this->edge_mark_boundaries();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

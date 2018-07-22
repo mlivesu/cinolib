@@ -69,7 +69,7 @@ class SlicedObj : public Trimesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint num_slices() const { return z.size(); }
+        uint num_slices() const { return slices.size(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -87,9 +87,7 @@ class SlicedObj : public Trimesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void triangulate_slices(const std::vector<std::vector<std::vector<vec3d>>> & slice_polys,
-                                const std::vector<std::vector<std::vector<vec3d>>> & slice_holes,
-                                const std::vector<std::vector<std::vector<vec3d>>> & supports);
+        void triangulate_slices();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
