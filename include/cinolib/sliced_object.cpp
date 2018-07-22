@@ -82,40 +82,42 @@ void SlicedObj<M,V,E,P>::init(const std::vector<std::vector<std::vector<vec3d>>>
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::vector<vec3d>>> & internal_polylines,
-                                            const std::vector<std::vector<std::vector<vec3d>>> & external_polylines,
-                                            const std::vector<std::vector<std::vector<vec3d>>> & open_polylines)
+void SlicedObj<M,V,E,P>::triangulate_slices(const std::vector<std::vector<std::vector<vec3d>>> & slice_polys,
+                                            const std::vector<std::vector<std::vector<vec3d>>> & slice_holes,
+                                            const std::vector<std::vector<std::vector<vec3d>>> & supports)
 {
     // Empty slices will be ignored, so keep a separate count of slice ids.
     // NOTE: empty slices may happen when a slice contains only open polylines
     // and the hatch_size is set to zero
     uint sid        = 0;
-    uint tot_slices = internal_polylines.size();
+    uint tot_slices = slice_polys.size();
 
     for(uint i=0; i<tot_slices; ++i)
     {
-        uint np = external_polylines.at(i).size();
-        uint nh = internal_polylines.at(i).size();
-        uint ns = (thick_radius>0) ? open_polylines.at(i).size() : 0;
+        uint np = slice_holes.at(i).size();
+        uint nh = slice_polys.at(i).size();
+        uint ns = (thick_radius>0) ? supports.at(i).size() : 0;
 
         std::cout << "processing slice " << i << " out of " << tot_slices << "\t(" << np << " polys / " << nh << " holes / "  << ns << " supports)" << std::endl;
 
-        if(np>0) z.push_back(external_polylines.at(i).front().front().z()); else
-        if(ns>0) z.push_back(open_polylines.at(i).front().front().z());     else
+        if(np>0) z.push_back(slice_holes.at(i).front().front().z()); else
+        if(ns>0) z.push_back(supports.at(i).front().front().z());     else
         continue; // empty slice, skip it
 
         std::vector<BoostPolygon> polys;
         std::vector<BoostPolygon> holes;
-        for(auto p : external_polylines.at(i)) polys.push_back(make_polygon(p));
-        for(auto p : internal_polylines.at(i)) holes.push_back(make_polygon(p));
+        for(auto p : slice_holes.at(i)) polys.push_back(make_polygon(p));
+        for(auto h : slice_polys.at(i)) holes.push_back(make_polygon(h));
         if(thick_radius>0)
         {
-            for(auto p : open_polylines.at(i)) polys.push_back(make_polygon(p, thick_radius));
+            for(auto s : supports.at(i)) polys.push_back(make_polygon(s, thick_radius));
         }
 
         BoostMultiPolygon mp;
         for(auto p : polys) mp = polygon_union(mp, p);
         for(auto p : holes) mp = polygon_difference(mp, p);
+        assert(mp.size()>0);
+        slices.push_back(mp);
 
         std::vector<double> verts_in, verts_out, hole_seeds;
         std::vector<uint> segs, tris;
