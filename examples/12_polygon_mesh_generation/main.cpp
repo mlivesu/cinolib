@@ -27,13 +27,11 @@ int main(int argc, char **argv)
     DrawablePolygonmesh<> m_in(s.c_str());
 
     // make trimesh
-    std::vector<std::vector<uint>> tris;
-    std::vector<vec3d> holes, verts;
     double area_thresh = 0.01 * m_in.bbox().diag(); // force triangles to be smaller than 5% of bbox diag
     char opt[100];
     sprintf(opt, "Qqa%f", area_thresh);
-    triangle_wrap(m_in.vector_verts(), m_in.vector_edges(), holes, opt, verts, tris);
-    DrawableTrimesh<> trimesh(verts, tris);
+    DrawableTrimesh<> trimesh;
+    triangle_wrap(m_in.vector_verts(), m_in.vector_edges(), {}, 0, opt, trimesh);
 
     Profiler profiler;
 
