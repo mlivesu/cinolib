@@ -216,6 +216,9 @@ void SlicedObj<M,V,E,P>::slice_segments(const uint           sid,
                                         std::vector<vec3d> & verts,
                                         std::vector<uint>  & segs) const
 {
+    // eventually substitute the whole thing with:
+    //polygon_get_edges(slices.at(sid), z.at(sid), verts, segs);
+
     verts.clear();
     segs.clear();
     std::map<uint,uint> v_map;
