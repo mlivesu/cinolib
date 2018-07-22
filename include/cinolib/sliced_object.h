@@ -91,11 +91,6 @@ class SlicedObj : public Trimesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void points_inside_holes(const BoostMultiPolygon   & mp,
-                                       std::vector<double> & points) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         double                                       thick_radius; // supports thickening radius
         std::vector<float>                           z;            // per slice z-coord
         std::vector<BoostMultiPolygon>               slices;       // slices (included thickened supports)

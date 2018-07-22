@@ -118,38 +118,12 @@ void SlicedObj<M,V,E,P>::triangulate_slices()
     {
         const BoostMultiPolygon & mp = slices.at(sid);
 
-        std::vector<double> verts_in, verts_out, hole_seeds;
-        std::vector<uint> segs, tris;
-        points_inside_holes(mp, hole_seeds);
-        for(const BoostPolygon & p : mp)
-        {
-            uint base_addr = verts_in.size()/2;
-            uint nv = p.outer().size()-1; // first and last verts coincide...
-            for(uint vid=0; vid<nv; ++vid)
-            {
-                verts_in.push_back(boost::geometry::get<0>(p.outer().at(vid)));
-                verts_in.push_back(boost::geometry::get<1>(p.outer().at(vid)));
-                segs.push_back(base_addr + vid);
-                segs.push_back(base_addr + (vid+1)%nv);
-            }
-            for(uint hid=0; hid<p.inners().size(); ++hid)
-            {
-                uint base_addr = verts_in.size()/2;
-                uint nv = p.inners().at(hid).size()-1; // first and last verts coincide...
-                for(uint vid=0; vid<nv; ++vid)
-                {
-                    verts_in.push_back(boost::geometry::get<0>(p.inners().at(hid).at(vid)));
-                    verts_in.push_back(boost::geometry::get<1>(p.inners().at(hid).at(vid)));
-                    segs.push_back(base_addr + vid);
-                    segs.push_back(base_addr + (vid+1)%nv);
-                }
-            }
-        }
-        triangle_wrap(verts_in, segs, hole_seeds, "Q", verts_out, tris);
+        std::vector<vec3d> verts;
+        std::vector<uint>  tris;
+        triangulate_polygon(mp, "Q", z.at(sid), verts, tris);
 
         uint base_addr = this->num_verts();
-        uint n_tris    = tris.size()/3;
-        std::vector<vec3d> verts = vec3d_from_serialized_xy(verts_out, z.at(sid));
+        uint n_tris = tris.size()/3;
 
         for(auto p : verts)
         {
@@ -168,44 +142,6 @@ void SlicedObj<M,V,E,P>::triangulate_slices()
     }
     std::cout << "new sliced object (" << num_slices() << " slices)" << std::endl;
     this->edge_mark_boundaries();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-/* This serves to reliably find an inner point for each hole in the slice. Triangle
- * uses this information to eat triangles inside holes and clean the triangulation.
- * Basically each contour is triangulated, and the centroid of the first triangle in
- * the tessellation is returned.
-*/
-template<class M, class V, class E, class P>
-CINO_INLINE
-void SlicedObj<M,V,E,P>::points_inside_holes(const BoostMultiPolygon   & mp,
-                                                   std::vector<double> & points) const
-{
-    points.clear();
-    for(const BoostPolygon & p : mp)
-    {
-        for(uint hid=0; hid<p.inners().size(); ++hid)
-        {
-            std::vector<double> verts_in, verts_out, dummy;
-            std::vector<uint>   segs_in, tris_out;
-            uint nv = p.inners().at(hid).size()-1; // first and last verts coincide...
-            for(uint i=0; i<nv; ++i)
-            {
-                verts_in.push_back(boost::geometry::get<0>(p.inners().at(hid).at(i)));
-                verts_in.push_back(boost::geometry::get<1>(p.inners().at(hid).at(i)));
-                segs_in.push_back(i);
-                segs_in.push_back((i+1)%nv);
-            }
-            triangle_wrap(verts_in, segs_in, dummy, "Q", verts_out, tris_out);
-            assert(tris_out.size()>2);
-            uint v0 = tris_out.at(0);
-            uint v1 = tris_out.at(1);
-            uint v2 = tris_out.at(2);
-            points.push_back((verts_out.at(2*v0+0) + verts_out.at(2*v1+0) + verts_out.at(2*v2+0))/3.0);
-            points.push_back((verts_out.at(2*v0+1) + verts_out.at(2*v1+1) + verts_out.at(2*v2+1))/3.0);
-        }
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
