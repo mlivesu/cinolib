@@ -23,11 +23,12 @@
 - add a system of binary flags to be used by algorithms internal to cinolib
 
 
-KNOWN BUGS/THINGS TO BE FIXED:
+KNOWN BUGS/THINGS TO BE FIXED/IMPROVED:
  - fix per face winding in midpoint subdivision
  - fix marching tets: degenerate triangles will be generated in some cases (see comments inside cpp file)
  - fix integral curve tracing (also refactor ray/line/plane intersections)
  - gradients on hex-meshes are buggy. maybe something wrong with face normals?
+ - SlicedObj should not be a trimesh. Its drawable counterpart should!
 
 
 DOCUMENTATION/LICENSE
