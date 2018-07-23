@@ -104,3 +104,4 @@ Maintaining a library alone is very time consuming, and the amount of time I can
 * Evaluation of mapping distortions (angle/areas distortion popular metrics)
 * Solve multi-labeling problems on surfaces and volumes using the [GraphCuts](http://vision.csd.uwo.ca/code/) wrapper
 * Integral curve computation (and tessellation)
+* Processing of 2D polygons (booleans, thickening), using the [Boost Polygon Library](https://www.boost.org/doc/libs/1_67_0/libs/polygon/doc/index.htm) wrapper
