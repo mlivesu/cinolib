@@ -31,15 +31,11 @@
 #ifndef CINO_SLICED_OBJ
 #define CINO_SLICED_OBJ
 
-// Boost polygons and Triangle are used to create and tessellate slices...
-#ifdef CINOLIB_USES_TRIANGLE
-
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/boost_polygon_wrap.h>
 
-/* This class represents a sliced object as a triangle mesh. Each slice is triangulated,
- * considering both outer and inner contours (holes). Support structures (usually represented
- * as 1D curves in CLI files) are thickened and triangulated as well.
+/* This class represents a sliced object as a stack of polygons.
+ * Silces are also triangulated for ease of processing, IO and rendering.
 */
 
 namespace cinolib
@@ -103,5 +99,4 @@ class SlicedObj : public Trimesh<M,V,E,P>
 #include "sliced_object.cpp"
 #endif
 
-#endif // CINO_USES_TRIANGLE
 #endif // CINO_DRAWABLE_SLICED_OBJ
