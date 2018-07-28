@@ -100,6 +100,7 @@ void SlicedObj<M,V,E,P>::init(const std::vector<std::vector<std::vector<vec3d>>>
         BoostMultiPolygon mp;
         for(auto p : polys) mp = polygon_union(mp, p);
         for(auto p : holes) mp = polygon_difference(mp, p);
+        mp = polygon_simplify(mp, 0.1*thick_radius);
 
         assert(mp.size()>0);
         slices.push_back(mp);
