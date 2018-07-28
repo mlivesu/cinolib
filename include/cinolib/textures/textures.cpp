@@ -202,8 +202,8 @@ void texture_parula_with_isolines(Texture & texture)
     glGenTextures(1, &texture.id);
 
     delete[] texture.data;
-    texture.size = 64;
-    texture.data = new uint8_t[192];
+    texture.size = 80;
+    texture.data = new uint8_t[240];
     std::copy(std::begin(parula_w_isolines_texture1D), std::end(parula_w_isolines_texture1D), texture.data);
 }
 
