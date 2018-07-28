@@ -52,8 +52,8 @@ int main(int argc, char **argv)
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/sphere.mesh";
     DrawableTetmesh<> m(s.c_str());
     compute_geodesics(m, {0, 10}, COTANGENT).copy_to_mesh(m); // generate some scalar field
-    m.show_in_texture1D(TEXTURE_1D_HSV_RAMP_W_ISOLINES);
-    m.show_out_texture1D(TEXTURE_1D_HSV_RAMP_W_ISOLINES);
+    m.show_in_texture1D(TEXTURE_1D_HSV_W_ISOLINES);
+    m.show_out_texture1D(TEXTURE_1D_HSV_W_ISOLINES);
     canvas.push_obj(&m);
 
     SlicerState ss;

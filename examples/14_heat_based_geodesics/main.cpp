@@ -71,7 +71,7 @@ int main(int argc, char **argv)
                 profiler.push("compute_geodesics");
                 compute_geodesics_amortized(m, prefactored_matrices, sources).copy_to_mesh(m);
                 profiler.pop();
-                m.show_texture1D(TEXTURE_1D_HSV_RAMP_W_ISOLINES);
+                m.show_texture1D(TEXTURE_1D_HSV_W_ISOLINES);
                 c->updateGL();
             }
         }

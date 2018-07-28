@@ -38,8 +38,8 @@ int main(int argc, char **argv)
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/sphere.MESH";
     DrawableTetmesh<> m(s.c_str());
-    m.show_out_texture1D(TEXTURE_1D_HSV_RAMP_W_ISOLINES);
-    m.show_in_texture1D (TEXTURE_1D_HSV_RAMP_W_ISOLINES);
+    m.show_out_texture1D(TEXTURE_1D_HSV_W_ISOLINES);
+    m.show_in_texture1D (TEXTURE_1D_HSV_W_ISOLINES);
     gui.push_obj(&m);
 
     VolumeMeshControlPanel<DrawableTetmesh<>> m_controls(&m, &gui);
