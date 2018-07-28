@@ -131,6 +131,8 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         cb_tex1D_type->insertItem(0,"ISO");
         cb_tex1D_type->insertItem(1,"RAMP");
         cb_tex1D_type->insertItem(2,"RAMP + ISO");
+        cb_tex1D_type->insertItem(3,"PARULA");
+        cb_tex1D_type->insertItem(4,"PARULA + ISO");
         cb_tex2D_type->insertItem(0,"ISO");
         cb_tex2D_type->insertItem(1,"CB");
         cb_tex2D_type->insertItem(2,"IMG");
@@ -449,7 +451,7 @@ void SurfaceMeshControlPanel<Mesh>::set_tex2d()
 {
     if (m == NULL || canvas == NULL) return;
     rb_tex2D->setChecked(true);
-    int    tex_type = cb_tex2D_type->currentIndex() + 3; // first three are for tex1D
+    int    tex_type = cb_tex2D_type->currentIndex() + 5; // first five are for tex1D
     double density  = (double)sl_tex2D_density->value()/10.0;
     if (tex_type == TEXTURE_2D_BITMAP && tex2d_filename.empty())
     {

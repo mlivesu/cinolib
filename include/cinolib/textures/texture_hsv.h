@@ -28,15 +28,15 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_QUALITY_RAMP_TEXTURE_H
-#define CINO_QUALITY_RAMP_TEXTURE_H
+#ifndef CINO_TEXTURE_HSV_H
+#define CINO_TEXTURE_HSV_H
 
 #include <stdint.h>
 
 namespace cinolib
 {
 
-static const uint8_t quality_ramp_texture1D[768] =
+static const uint8_t hsv_texture1D[768] =
 {
     0, 0, 255,
     0, 4, 255,
@@ -298,4 +298,4 @@ static const uint8_t quality_ramp_texture1D[768] =
 
 }
 
-#endif // CINO_QUALITY_RAMP_TEXTURE_H
+#endif // CINO_TEXTURE_HSV_H

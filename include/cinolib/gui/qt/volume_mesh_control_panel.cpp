@@ -134,8 +134,10 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         but_load_out_tex2d->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         rb_out_poly_color->setChecked(true);
         cb_out_tex1D_type->insertItem(0,"ISO");
-        cb_out_tex1D_type->insertItem(1,"RAMP");
-        cb_out_tex1D_type->insertItem(2,"RAMP + ISO");
+        cb_out_tex1D_type->insertItem(1,"HSV");
+        cb_out_tex1D_type->insertItem(2,"HSV + ISO");
+        cb_out_tex1D_type->insertItem(3,"PARULA");
+        cb_out_tex1D_type->insertItem(4,"PARULA + ISO");
         cb_out_tex2D_type->insertItem(0,"ISO");
         cb_out_tex2D_type->insertItem(1,"CB");
         cb_out_tex2D_type->insertItem(2,"IMG");
@@ -209,8 +211,10 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         in_tex2d_filename     = "";
         rb_in_poly_color->setChecked(true);
         cb_in_tex1D_type->insertItem(0,"ISO");
-        cb_in_tex1D_type->insertItem(1,"RAMP");
-        cb_in_tex1D_type->insertItem(2,"RAMP + ISO");
+        cb_in_tex1D_type->insertItem(1,"HSV");
+        cb_in_tex1D_type->insertItem(2,"HSV + ISO");
+        cb_in_tex1D_type->insertItem(3,"PARULA");
+        cb_in_tex1D_type->insertItem(4,"PARULA + ISO");
         cb_in_tex2D_type->insertItem(0,"ISO");
         cb_in_tex2D_type->insertItem(1,"CB");
         cb_in_tex2D_type->insertItem(2,"IMG");
@@ -609,7 +613,7 @@ void VolumeMeshControlPanel<Mesh>::set_tex2d(const int in_out)
     if (in_out == OUTSIDE)
     {
         rb_out_tex2D->setChecked(true);
-        int    tex_type = cb_out_tex2D_type->currentIndex() + 3; // first three are for tex1D
+        int    tex_type = cb_out_tex2D_type->currentIndex() + 5; // first five are for tex1D
         double density  = (double)sl_out_tex2D_density->value()/10.0;
         if (tex_type == TEXTURE_2D_BITMAP && out_tex2d_filename.empty())
         {
@@ -620,7 +624,7 @@ void VolumeMeshControlPanel<Mesh>::set_tex2d(const int in_out)
     else if (in_out == INSIDE)
     {
         rb_in_tex2D->setChecked(true);
-        int    tex_type = cb_in_tex2D_type->currentIndex() + 3; // first three are for tex1D
+        int    tex_type = cb_in_tex2D_type->currentIndex() + 5; // first five are for tex1D
         double density  = (double)sl_in_tex2D_density->value()/10.0;
         if (tex_type == TEXTURE_2D_BITMAP && out_tex2d_filename.empty())
         {

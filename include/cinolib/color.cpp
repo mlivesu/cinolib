@@ -29,7 +29,8 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include "color.h"
-#include <cinolib/textures/quality_ramp_texture.h>
+#include <cinolib/textures/texture_hsv.h>
+#include <cinolib/textures/texture_parula.h>
 #include <assert.h>
 #include <algorithm>
 #include <cmath>
@@ -204,9 +205,25 @@ Color Color::hsv_ramp(uint n_colors, uint pos)
 
     uint i = std::round(255 * static_cast<float>(pos)/static_cast<float>(n_colors));
 
-    float r = quality_ramp_texture1D[3*i+0]/255.0;
-    float g = quality_ramp_texture1D[3*i+1]/255.0;
-    float b = quality_ramp_texture1D[3*i+2]/255.0;
+    float r = hsv_texture1D[3*i+0]/255.0;
+    float g = hsv_texture1D[3*i+1]/255.0;
+    float b = hsv_texture1D[3*i+2]/255.0;
+
+    return Color(r,g,b);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+Color Color::parula_ramp(uint n_colors, uint pos)
+{
+    assert(pos<n_colors);
+
+    uint i = std::round(64 * static_cast<float>(pos)/static_cast<float>(n_colors));
+
+    float r = parula_texture1D[3*i+0]/255.0;
+    float g = parula_texture1D[3*i+1]/255.0;
+    float b = parula_texture1D[3*i+2]/255.0;
 
     return Color(r,g,b);
 }

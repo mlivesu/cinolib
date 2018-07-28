@@ -28,102 +28,129 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#ifndef CINO_TEXTURES_H
-#define CINO_TEXTURES_H
+#ifndef CINO_TEXTURE_PARULA_W_ISOLINES_H
+#define CINO_TEXTURE_PARULA_W_ISOLINES_H
 
-#ifdef CINOLIB_USES_OPENGL
-
-#ifdef __APPLE__
-#include <gl.h>
-#include <glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
-#include <cinolib/cino_inline.h>
-#include <cinolib/color.h>
+#include <stdint.h>
 
 namespace cinolib
 {
 
-enum
+static const uint8_t parula_w_isolines_texture1D[192] =
 {
-    TEXTURE_1D_ISOLINES,
-    TEXTURE_1D_HSV,
-    TEXTURE_1D_HSV_W_ISOLINES,
-    TEXTURE_1D_PARULA,
-    TEXTURE_1D_PARULA_W_ISOLINES,
-    TEXTURE_2D_ISOLINES,
-    TEXTURE_2D_CHECKERBOARD,
-    TEXTURE_2D_BITMAP
-}; // texture types currently supported
+    53, 42, 134,
+    53, 48, 147,
+    54, 54, 159,
+//    53, 60, 172,
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    255, 255, 255,
 
-typedef struct
-{
-    int      type;
-    GLuint   id             = 0;
-    GLsizei  size           = 0;
-    double   scaling_factor = 1.0;
-    uint8_t *data           = nullptr;
+    49, 67, 185,
+    43, 74, 198,
+    31, 82, 211,
+//    15, 91, 221,
+
+    255, 255, 255,
+
+    2, 98, 224,
+    1, 104, 225,
+    4, 108, 224,
+//    8, 112, 222,
+
+    255, 255, 255,
+
+    12, 116, 220,
+    16, 120, 218,
+    18, 124, 215,
+//    19, 128, 213,
+
+    255, 255, 255,
+
+    20, 132, 211,
+    19, 137, 210,
+    16, 142, 210,
+//    12, 147, 209,
+
+    255, 255, 255,
+
+    8, 152, 209,
+    6, 156, 207,
+    6, 160, 204,
+//    5, 163, 201,
+
+    255, 255, 255,
+
+    5, 166, 198,
+    6, 169, 193,
+    9, 171, 189,
+//    15, 174, 184,
+
+    255, 255, 255,
+
+    21, 176, 180,
+    28, 178, 174,
+    37, 180, 169,
+//    45, 183, 163,
+
+    255, 255, 255,
+
+    55, 184, 157,
+    65, 186, 151,
+    77, 188, 145,
+//    88, 189, 139,
+
+    255, 255, 255,
+
+    100, 190, 133,
+    112, 190, 128,
+    124, 191, 123,
+//    135, 191, 118,
+
+    255, 255, 255,
+
+    145, 190, 114,
+    155, 190, 110,
+    165, 190, 106,
+//    174, 189, 103,
+
+    255, 255, 255,
+
+    183, 188, 99,
+    191, 188, 96,
+    200, 187, 92,
+//    208, 186, 89,
+
+    255, 255, 255,
+
+    216, 186, 85,
+    225, 185, 82,
+    233, 185, 78,
+//    240, 185, 73,
+
+    255, 255, 255,
+
+    248, 186, 67,
+    253, 190, 61,
+    254, 195, 55,
+//    253, 200, 50,
+
+    255, 255, 255,
+
+    251, 205, 45,
+    249, 210, 41,
+    247, 216, 37,
+//    245, 221, 33,
+
+    255, 255, 255,
+
+    244, 228, 28,
+    244, 235, 24,
+    246, 242, 19,
+//    248, 250, 13,
+
+    255, 255, 255
+};
+
 }
-Texture;
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void texture_HSV(Texture & texture);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void texture_HSV_with_isolines(Texture & texture);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void texture_parula(Texture & texture);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void texture_parula_with_isolines(Texture & texture);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void texture_isolines1D(      Texture & texture,
-                        const Color   & c0 = Color::BLACK(),
-                        const Color   & c1 = Color::WHITE(),
-                        const uint      n_bands = 32);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void texture_checkerboard(      Texture & texture,
-                          const Color   & c0 = Color(.5,.5,.5),
-                          const Color   & c1 = Color::WHITE());
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void texture_isolines2D(      Texture & texture,
-                        const Color   & u_isolines = Color::BLUE(),
-                        const Color   & v_isolines = Color::RED(),
-                        const Color   & background = Color::WHITE());
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void texture_bitmap(Texture & texture, const char *bitmap);
-
-}
-
-#ifndef  CINO_STATIC_LIB
-#include "textures.cpp"
-#endif
-
-#endif // CINOLIB_USES_OPENGL
-#endif // CINO_TEXTURES_H
+#endif // CINO_TEXTURE_PARULA_W_ISOLINES_H

@@ -92,6 +92,7 @@ class Color
 
         static Color scatter(uint range, uint value, float sat=.5f, float val=.85f);
         static Color hsv_ramp(uint range, uint value);
+        static Color parula_ramp(uint range, uint value);
         static Color quality2rgb(float q);
         static Color hsv2rgb(float h, float s, float v);
 

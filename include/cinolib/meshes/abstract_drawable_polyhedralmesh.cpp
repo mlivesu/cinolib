@@ -705,9 +705,11 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture1D(const int tex_type
     drawlist_out.texture.type = tex_type;
     switch (tex_type)
     {
-        case TEXTURE_1D_ISOLINES :            texture_isolines1D(drawlist_out.texture);             break;
-        case TEXTURE_1D_HSV_RAMP :            texture_HSV_ramp(drawlist_out.texture);               break;
-        case TEXTURE_1D_HSV_RAMP_W_ISOLINES : texture_HSV_ramp_with_isolines(drawlist_out.texture); break;
+        case TEXTURE_1D_ISOLINES :          texture_isolines1D(drawlist_out.texture);           break;
+        case TEXTURE_1D_HSV :               texture_HSV(drawlist_out.texture);                  break;
+        case TEXTURE_1D_HSV_W_ISOLINES :    texture_HSV_with_isolines(drawlist_out.texture);    break;
+        case TEXTURE_1D_PARULA :            texture_parula(drawlist_out.texture);               break;
+        case TEXTURE_1D_PARULA_W_ISOLINES : texture_parula_with_isolines(drawlist_out.texture); break;
         default: assert("Unknown Texture!" && false);
     }
     updateGL_out();
@@ -834,9 +836,11 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture1D(const int tex_type)
     drawlist_in.texture.type = tex_type;
     switch (tex_type)
     {
-        case TEXTURE_1D_ISOLINES :            texture_isolines1D(drawlist_in.texture);             break;
-        case TEXTURE_1D_HSV_RAMP :            texture_HSV_ramp(drawlist_in.texture);               break;
-        case TEXTURE_1D_HSV_RAMP_W_ISOLINES : texture_HSV_ramp_with_isolines(drawlist_in.texture); break;
+        case TEXTURE_1D_ISOLINES :          texture_isolines1D(drawlist_in.texture);           break;
+        case TEXTURE_1D_HSV :               texture_HSV(drawlist_in.texture);                  break;
+        case TEXTURE_1D_HSV_W_ISOLINES :    texture_HSV_with_isolines(drawlist_in.texture);    break;
+        case TEXTURE_1D_PARULA :            texture_parula(drawlist_in.texture);               break;
+        case TEXTURE_1D_PARULA_W_ISOLINES : texture_parula_with_isolines(drawlist_in.texture); break;
         default: assert("Unknown Texture!" && false);
     }
     updateGL_in();

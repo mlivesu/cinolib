@@ -29,8 +29,10 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/textures/textures.h>
-#include <cinolib/textures/quality_ramp_texture.h>
-#include <cinolib/textures/quality_ramp_texture_plus_isolines.h>
+#include <cinolib/textures/texture_hsv.h>
+#include <cinolib/textures/texture_hsv_w_isolines.h>
+#include <cinolib/textures/texture_parula.h>
+#include <cinolib/textures/texture_parula_w_isolines.h>
 #include <cinolib/serialize_2D.h>
 #include <stdint.h>
 #include <iterator>
@@ -152,7 +154,7 @@ void texture_isolines1D(      Texture & texture,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_HSV_ramp(Texture & texture)
+void texture_HSV(Texture & texture)
 {
     if (texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
@@ -160,13 +162,13 @@ void texture_HSV_ramp(Texture & texture)
     delete[] texture.data;
     texture.size = 256;
     texture.data = new uint8_t[768];
-    std::copy(std::begin(quality_ramp_texture1D), std::end(quality_ramp_texture1D), texture.data);
+    std::copy(std::begin(hsv_texture1D), std::end(hsv_texture1D), texture.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_HSV_ramp_with_isolines(Texture & texture)
+void texture_HSV_with_isolines(Texture & texture)
 {
     if (texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
@@ -174,7 +176,35 @@ void texture_HSV_ramp_with_isolines(Texture & texture)
     delete[] texture.data;
     texture.size = 256;
     texture.data = new uint8_t[768];
-    std::copy(std::begin(quality_ramp_texture1D_with_isolines), std::end(quality_ramp_texture1D_with_isolines), texture.data);
+    std::copy(std::begin(hsv_texture1D_with_isolines), std::end(hsv_texture1D_with_isolines), texture.data);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void texture_parula(Texture & texture)
+{
+    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    glGenTextures(1, &texture.id);
+
+    delete[] texture.data;
+    texture.size = 64;
+    texture.data = new uint8_t[192];
+    std::copy(std::begin(parula_texture1D), std::end(parula_texture1D), texture.data);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void texture_parula_with_isolines(Texture & texture)
+{
+    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    glGenTextures(1, &texture.id);
+
+    delete[] texture.data;
+    texture.size = 64;
+    texture.data = new uint8_t[192];
+    std::copy(std::begin(parula_w_isolines_texture1D), std::end(parula_w_isolines_texture1D), texture.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

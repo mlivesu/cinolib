@@ -412,9 +412,11 @@ void AbstractDrawablePolygonMesh<Mesh>::show_texture1D(const int tex_type)
     drawlist.texture.type = tex_type;
     switch (tex_type)
     {
-        case TEXTURE_1D_ISOLINES :            texture_isolines1D(drawlist.texture);             break;
-        case TEXTURE_1D_HSV_RAMP :            texture_HSV_ramp(drawlist.texture);               break;
-        case TEXTURE_1D_HSV_RAMP_W_ISOLINES : texture_HSV_ramp_with_isolines(drawlist.texture); break;
+        case TEXTURE_1D_ISOLINES :          texture_isolines1D(drawlist.texture);           break;
+        case TEXTURE_1D_HSV :               texture_HSV(drawlist.texture);                  break;
+        case TEXTURE_1D_HSV_W_ISOLINES :    texture_HSV_with_isolines(drawlist.texture);    break;
+        case TEXTURE_1D_PARULA :            texture_parula(drawlist.texture);               break;
+        case TEXTURE_1D_PARULA_W_ISOLINES : texture_parula_with_isolines(drawlist.texture); break;
         default: assert("Unknown Texture!" && false);
     }
     updateGL();
