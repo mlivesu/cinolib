@@ -141,18 +141,24 @@ Color Color::quality2rgb(float q)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Color Color::normal2rgb(const vec3d & n)
+Color Color::normal2rgb(const vec3d & n, bool flip_neg_z)
 {
-    float r = (1.0 + n.x())*0.5;
-    float g = (1.0 + n.y())*0.5;
-    float b = (1.0 + n.z())*0.5;
-    if(r<0) r=0;
-    if(r>1) r=1;
-    if(g<0) g=0;
-    if(g>1) g=1;
-    if(b<0) b=0;
-    if(b>1) b=1;
-    return Color(r,g,b);
+    double dir[3] =
+    {
+        n.x(),
+        n.y(),
+        (flip_neg_z) ? std::fabs(n.z()) : n.z()
+    };
+
+    float c[3];
+    for(int i=0; i<3; ++i)
+    {
+        c[i] = (1.0 + dir[i])*0.5;
+        if(c[i]<0) c[i]=0;
+        if(c[i]>1) c[i]=1;
+    }
+
+    return Color(c[0], c[1], c[2]);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -95,7 +95,7 @@ class Color
         static Color hsv_ramp(uint range, uint value);
         static Color parula_ramp(uint range, uint value);
         static Color quality2rgb(float q);
-        static Color normal2rgb(const vec3d & n);
+        static Color normal2rgb(const vec3d & n, bool flip_neg_z);
         static Color hsv2rgb(float h, float s, float v);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
