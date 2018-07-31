@@ -38,10 +38,10 @@ namespace cinolib
 template<class M, class V, class E, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
-                    const std::set<int>                & labels,
+                    const std::unordered_set<int>       & labels,
                           AbstractPolygonMesh<M,V,E,P>  & subm,
-                          std::map<uint,uint>           & m2subm_vmap,
-                          std::map<uint,uint>           & subm2m_vmap)
+                          std::unordered_map<uint,uint> & m2subm_vmap,
+                          std::unordered_map<uint,uint> & subm2m_vmap)
 {
     m2subm_vmap.clear();
     subm2m_vmap.clear();
@@ -94,10 +94,10 @@ void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
 template<class M, class V, class E, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolygonMesh<M,V,E,P> & m,
-                    const std::set<int>                & labels,
+                    const std::unordered_set<int>      & labels,
                           AbstractPolygonMesh<M,V,E,P> & subm)
 {
-    std::map<uint,uint> m2subm_vmap, subm2m_vmap;
+    std::unordered_map<uint,uint> m2subm_vmap, subm2m_vmap;
     export_cluster(m, labels, subm, m2subm_vmap, subm2m_vmap);
 }
 
@@ -108,10 +108,12 @@ CINO_INLINE
 void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
                     const int                             label,
                           AbstractPolygonMesh<M,V,E,P>  & subm,
-                          std::map<uint,uint>           & m2subm_vmap,
-                          std::map<uint,uint>           & subm2m_vmap)
+                          std::unordered_map<uint,uint> & m2subm_vmap,
+                          std::unordered_map<uint,uint> & subm2m_vmap)
 {
-    export_cluster(m, {label}, subm, m2subm_vmap, subm2m_vmap);
+    std::unordered_set<int> s;
+    s.insert(label);
+    export_cluster(m, s, subm, m2subm_vmap, subm2m_vmap);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -122,8 +124,10 @@ void export_cluster(const AbstractPolygonMesh<M,V,E,P> & m,
                     const int                            label,
                           AbstractPolygonMesh<M,V,E,P> & subm)
 {
-    std::map<uint,uint> m2subm_vmap, subm2m_vmap;
-    export_cluster(m, {label}, subm, m2subm_vmap, subm2m_vmap);
+    std::unordered_set<int> s;
+    s.insert(label);
+    std::unordered_map<uint,uint> m2subm_vmap, subm2m_vmap;
+    export_cluster(m, s, subm, m2subm_vmap, subm2m_vmap);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -131,10 +135,10 @@ void export_cluster(const AbstractPolygonMesh<M,V,E,P> & m,
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P>  & m,
-                    const std::set<int>                      & labels,
+                    const std::unordered_set<int>            & labels,
                           AbstractPolyhedralMesh<M,V,E,F,P>  & subm,
-                          std::map<uint,uint>                & m2subm_vmap,
-                          std::map<uint,uint>                & subm2m_vmap)
+                          std::unordered_map<uint,uint>      & m2subm_vmap,
+                          std::unordered_map<uint,uint>      & subm2m_vmap)
 {
     m2subm_vmap.clear();
     subm2m_vmap.clear();
@@ -203,7 +207,7 @@ void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P>  & m,
             if (has_label) f_list.push_back(fid);
         }
 
-        std::map<uint,uint> fmap;
+        std::unordered_map<uint,uint> fmap;
         uint fresh_vid = 0;
         for(uint fresh_fid=0; fresh_fid<f_list.size(); ++fresh_fid)
         {
@@ -258,10 +262,10 @@ void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P>  & m,
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
-                    const std::set<int>                     & labels,
+                    const std::unordered_set<int>           & labels,
                           AbstractPolyhedralMesh<M,V,E,F,P> & subm)
 {
-    std::map<uint,uint> m2subm_vmap, subm2m_vmap;
+    std::unordered_map<uint,uint> m2subm_vmap, subm2m_vmap;
     export_cluster(m, labels, subm, m2subm_vmap, subm2m_vmap);
 }
 
@@ -272,10 +276,12 @@ CINO_INLINE
 void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P>  & m,
                     const int                                  label,
                           AbstractPolyhedralMesh<M,V,E,F,P>  & subm,
-                          std::map<uint,uint>                & m2subm_vmap,
-                          std::map<uint,uint>                & subm2m_vmap)
+                          std::unordered_map<uint,uint>                & m2subm_vmap,
+                          std::unordered_map<uint,uint>                & subm2m_vmap)
 {
-    export_cluster(m, {label}, subm, m2subm_vmap, subm2m_vmap);
+    std::unordered_set<int> s;
+    s.insert(label);
+    export_cluster(m, s, subm, m2subm_vmap, subm2m_vmap);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -286,8 +292,10 @@ void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                     const int                                 label,
                           AbstractPolyhedralMesh<M,V,E,F,P> & subm)
 {
-    std::map<uint,uint> m2subm_vmap, subm2m_vmap;
-    export_cluster(m, {label}, subm, m2subm_vmap, subm2m_vmap);
+    std::unordered_set<int> s;
+    s.insert(label);
+    std::unordered_map<uint,uint> m2subm_vmap, subm2m_vmap;
+    export_cluster(m, s, subm, m2subm_vmap, subm2m_vmap);
 }
 
 }
