@@ -84,7 +84,7 @@ class SurfaceMeshControlPanel
 
         Mesh                        *m;
         DrawableIsocontour<M,V,E,P>  isocontour;
-        DrawableVectorField<Mesh>    gradient;
+        DrawableVectorField          gradient;
         GLcanvas                    *canvas;
         QWidget                     *widget;
         QHBoxLayout                 *global_layout;

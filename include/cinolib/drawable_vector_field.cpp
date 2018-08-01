@@ -33,96 +33,103 @@
 namespace cinolib
 {
 
-template<class Mesh>
 CINO_INLINE
-DrawableVectorField<Mesh>::DrawableVectorField()
+DrawableVectorField::DrawableVectorField()
 {
-    m_ptr         = nullptr;
-    arrow_color   = Color::RED();
-    arrow_size    = 0.5;
-    field_on_poly = true;
+    arrow_color = Color::RED();
+    arrow_size  = 1.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class Mesh>
 CINO_INLINE
-DrawableVectorField<Mesh>::DrawableVectorField(const Mesh &m, const bool field_on_poly)
-: VectorField()
-, field_on_poly(field_on_poly)
+DrawableVectorField::DrawableVectorField(const uint size) : VectorField(size)
 {
-    uint size = (field_on_poly) ? 3*m.num_polys() : 3*m.num_verts();
-    this->setZero(size);
-    m_ptr = &m;
-    set_arrow_color(Color::RED());
-    set_arrow_size(0.5);
+    pos.resize(size);
+    arrow_color = Color::RED();
+    arrow_size  = 1.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class Mesh>
 CINO_INLINE
-void DrawableVectorField<Mesh>::draw(const float) const
+DrawableVectorField::DrawableVectorField(const std::vector<vec3d> & data,
+                                         const std::vector<vec3d> & pos)
+    : VectorField(data)
+    , pos(pos)
 {
-    if(m_ptr == nullptr) return;
+    arrow_color = Color::RED();
+    arrow_size  = 1.0;
+}
 
-    if(field_on_poly) // per polygon/polyhedron field
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+DrawableVectorField::DrawableVectorField(const AbstractMesh<M,V,E,P> &m, const bool field_on_poly)
+{
+    if(field_on_poly)
     {
-        for(uint pid=0; pid<m_ptr->num_polys(); ++pid)
+        setZero(3*m.num_polys());
+        pos.resize(m.num_polys());
+        for(uint pid=0; pid<m.num_polys(); ++pid)
         {
-            vec3d base = m_ptr->poly_centroid(pid);
-            vec3d tip  = base + arrow_length * vec_at(pid);
-            arrow<vec3d>(base, tip, arrow_thicknes, arrow_color.rgba);
+            pos.at(pid) = m.poly_centroid(pid);
         }
     }
-    else // per vertex field
+    else
     {
-        for(uint vid=0; vid<m_ptr->num_verts(); ++vid)
+        setZero(3*m.num_verts());
+        pos.resize(m.num_verts());
+        for(uint vid=0; vid<m.num_verts(); ++vid)
         {
-            vec3d base = m_ptr->vert(vid);
-            vec3d tip  = base + arrow_length * vec_at(vid);
-            arrow<vec3d>(base, tip, arrow_thicknes, arrow_color.rgba);
+            pos.at(vid) = m.vert(vid);
         }
+    }
+    arrow_color = Color::RED();
+    arrow_size  = 0.5 * m.edge_avg_length();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableVectorField::draw(const float) const
+{
+    for(uint i=0; i<pos.size(); ++i)
+    {
+        vec3d tip  = pos.at(i) + arrow_size * vec_at(i);
+        arrow<vec3d>(pos.at(i), tip, arrow_size*0.1, arrow_color.rgba);
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class Mesh>
 CINO_INLINE
-void DrawableVectorField<Mesh>::set_arrow_color(const Color &c)
+void DrawableVectorField::set_arrow_color(const Color &c)
 {
     arrow_color = c;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class Mesh>
 CINO_INLINE
-void DrawableVectorField<Mesh>::set_arrow_size(float s)
+void DrawableVectorField::set_arrow_size(float s)
 {
-    if (m_ptr)
-    {
-        arrow_size     = s;
-        arrow_length   = m_ptr->edge_avg_length() * s;
-        arrow_thicknes = arrow_length * 0.1;
-    }
+    arrow_size = s;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class Mesh>
 CINO_INLINE
-Color DrawableVectorField<Mesh>::get_arrow_color() const
+Color DrawableVectorField::get_arrow_color() const
 {
     return arrow_color;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class Mesh>
 CINO_INLINE
-float DrawableVectorField<Mesh>::get_arrow_size() const
+float DrawableVectorField::get_arrow_size() const
 {
     return arrow_size;
 }
