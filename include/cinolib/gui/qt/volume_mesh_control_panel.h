@@ -90,7 +90,7 @@ class VolumeMeshControlPanel
 
         Mesh                          *m;
         DrawableIsosurface<M,V,E,F,P>  isosurface;
-        DrawableVectorField<Mesh>      gradient;
+        DrawableVectorField            gradient;
         GLcanvas                      *canvas;
         QWidget                       *widget;
         QHBoxLayout                   *global_layout;

@@ -34,19 +34,27 @@
 #include <cinolib/vector_field.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/meshes/abstract_mesh.h>
 #include <cinolib/color.h>
 #include <cinolib/gl/draw_arrow.h>
 
 namespace cinolib
 {
 
-template <class Mesh>
 class DrawableVectorField : public VectorField, public DrawableObject
 {
     public:
 
         explicit DrawableVectorField();
-        explicit DrawableVectorField(const Mesh & m, const bool field_on_poly = true);
+
+        explicit DrawableVectorField(const uint size);
+
+        explicit DrawableVectorField(const std::vector<vec3d> & data,
+                                     const std::vector<vec3d> & pos);
+
+        template<class M, class V, class E, class P>
+        explicit DrawableVectorField(const AbstractMesh<M,V,E,P> & m,
+                                     const bool field_on_poly = true);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -86,13 +94,9 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
     private:
 
-        const Mesh *m_ptr;
-        float       arrow_size;
-        float       arrow_length;
-        float       arrow_thicknes;
-        Color       arrow_color;
-        bool        field_on_poly; // true : field is defined per polygon/polyhedron;
-                                   // false: field is defined per vertex
+        std::vector<vec3d> pos; // application points for each element in the field
+        float arrow_size;
+        Color arrow_color;
 };
 
 }

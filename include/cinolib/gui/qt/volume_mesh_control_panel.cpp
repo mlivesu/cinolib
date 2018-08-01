@@ -1112,13 +1112,11 @@ void VolumeMeshControlPanel<Mesh>::connect()
         canvas->pop(&gradient);
         if (cb_gradient->isChecked())
         {
-            float  size    = gradient.get_arrow_size();
-            Color  color   = gradient.get_arrow_color();
-            gradient = DrawableVectorField<Mesh>(*m);
+            Color  color = gradient.get_arrow_color();
+            gradient = DrawableVectorField(*m);
             ScalarField f(m->serialize_uvw(U_param));
             gradient = gradient_matrix(*m) * f;
             gradient.normalize();
-            gradient.set_arrow_size(size);
             gradient.set_arrow_color(color);
             canvas->push_obj(&gradient,false);
         }
@@ -1139,7 +1137,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     QSlider::connect(sl_gradient_size, &QSlider::valueChanged, [&]()
     {
-        gradient.set_arrow_size(2.0 * static_cast<float>(sl_gradient_size->value())/100.0);
+        double l = m->edge_avg_length();
+        gradient.set_arrow_size(2.0*l*static_cast<float>(sl_gradient_size->value())/100.0);
         canvas->updateGL();
     });
 

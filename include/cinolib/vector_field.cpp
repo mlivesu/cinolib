@@ -40,7 +40,7 @@ VectorField::VectorField() {}
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-VectorField::VectorField(const int size)
+VectorField::VectorField(const uint size)
 {
     setZero(3 * size);
 }
