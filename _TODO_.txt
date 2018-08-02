@@ -1,3 +1,5 @@
+- add rosy field
+- add green gauss gradients average on vertices
 - add constructors to create basic meshes (regular 2D/3D lattices,...)
 - add converter from hex to tetmesh
 - add Lagrange multipliers to linear solvers
