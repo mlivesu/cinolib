@@ -530,9 +530,8 @@ void AbstractPolygonMesh<M,V,E,P>::vert_ordered_one_ring(const uint vid,
         curr_e = this->poly_edge_id(curr_p, vid, v_ring.back()); assert(edge_is_manifold(curr_e));
         curr_p = (this->adj_e2p(curr_e).front() == curr_p) ? this->adj_e2p(curr_e).back() : this->adj_e2p(curr_e).front();
 
-        v_ring.pop_back();
-
-        if (edge_is_boundary(curr_e)) e_ring.push_back(curr_e);
+        if(edge_is_boundary(curr_e)) e_ring.push_back(curr_e);
+        else v_ring.pop_back();
     }
     while(e_ring.size() < this->adj_v2e(vid).size());
 }
