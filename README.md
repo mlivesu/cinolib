@@ -23,9 +23,9 @@ BibTeX entry:
 ```
 
 ## Other contributors
-Claudio Mancinelli (University of Genoa, Italy)
+* Claudio Mancinelli (University of Genoa): per vertex gradient fields
 
 ## Research institutes and universities using CinoLib
-[CNR IMATI](http://www.imati.cnr.it),
-[University of Cagliari](http://sites.unica.it/cg3hci/),
-[University of Genoa](https://www.dibris.unige.it),
+* [CNR IMATI](http://www.imati.cnr.it),
+* [University of Cagliari](http://sites.unica.it/cg3hci/),
+* [University of Genoa](https://www.dibris.unige.it),
