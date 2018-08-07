@@ -10,9 +10,6 @@ git clone --recursive https://github.com/maxicino/cinolib.git
 ```
 and include in your C++ application the header files you need. A tutorial with detailed info on how to use the library is under developement. In the meanwhile, you can explore the [**/examples**](https://github.com/maxicino/cinolib/tree/master/examples)  folder, which contains a constantly growing number of sample projects that showcase the core features of the library, and will be the backbone of the forthcoming tutorial.
 
-## Contributors
-Claudio Mancinelli (University of Genoa, Italy)
-
 ## Acknowldegment
 If you use cinolib in your academic projects, please cite the library using the following 
 BibTeX entry:
@@ -24,3 +21,11 @@ BibTeX entry:
   note   = {https://github.com/maxicino/cinolib/},
   year   = {2017}}
 ```
+
+## Other contributors
+Claudio Mancinelli (University of Genoa, Italy)
+
+## Research institutes and universities using CinoLib
+[CNR IMATI](http://www.imati.cnr.it),
+[University of Cagliari](http://sites.unica.it/cg3hci/),
+[University of Genoa](https://www.dibris.unige.it),
