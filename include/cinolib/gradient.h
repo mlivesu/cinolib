@@ -53,7 +53,7 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> & m);
+Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> & m, const bool per_poly = true);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
