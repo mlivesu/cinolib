@@ -23,7 +23,7 @@ BibTeX entry:
 ```
 
 ## Other contributors
-* Claudio Mancinelli (University of Genoa): per vertex gradient fields
+* Claudio Mancinelli: per vertex gradient fields
 
 ## Research institutes and universities using CinoLib
 * [CNR IMATI](http://www.imati.cnr.it),
