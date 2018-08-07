@@ -23,4 +23,4 @@ BibTeX entry:
 ```
 
 ## Other contributors
-* Claudio Mancinelli: per vertex gradient fields
+* Claudio Mancinelli (per vertex gradient fields)
