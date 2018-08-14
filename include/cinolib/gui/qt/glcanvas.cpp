@@ -908,7 +908,7 @@ void GLcanvas::draw_marker(QPainter & painter, const Marker & t)
         project(t.p3d, p, depth);
     }
 
-    if (t.disk_size>0)
+    if(t.disk_size>0)
     {
         draw_disk(painter, p, t.disk_size, t.color);
         draw_text(painter, p + vec2i(0,-2), t.label, t.font_size, t.color); // shift text to detach it from the disk
