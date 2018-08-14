@@ -312,6 +312,20 @@ void AbstractMesh<M,V,E,P>::swap_xyz_uvw(const bool normals, const bool bbox)
     if (normals) update_normals();
     if (bbox)    update_bbox();
 }
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> AbstractMesh<M,V,E,P>::adj_e2e(const uint eid) const
+{
+    // WARNING: if two verts are connected by a second edge (!= eid), such edge will be duplicated
+    std::vector<uint> e_list;
+    uint v0 = this->edge_vert_id(eid,0);
+    uint v1 = this->edge_vert_id(eid,1);
+    for(uint nbr : this->adj_v2e(v0)) if(nbr != eid) e_list.push_back(nbr);
+    for(uint nbr : this->adj_v2e(v1)) if(nbr != eid) e_list.push_back(nbr);
+    return e_list;
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

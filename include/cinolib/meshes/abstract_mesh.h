@@ -159,6 +159,7 @@ class AbstractMesh
                 const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
                 const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
                 const std::vector<uint> & adj_v2p(const uint vid) const { return v2p.at(vid); }
+                      std::vector<uint>   adj_e2e(const uint eid) const;
                 const std::vector<uint> & adj_e2p(const uint eid) const { return e2p.at(eid); }
                 const std::vector<uint> & adj_p2e(const uint pid) const { return p2e.at(pid); }
                 const std::vector<uint> & adj_p2p(const uint pid) const { return p2p.at(pid); }
