@@ -1,3 +1,5 @@
+- add 2D medial axis computation facilities using qgarlib
+- for consistency, vert coords should be part of vert_data
 - add rosy field
 - add green gauss gradients average on vertices
 - add constructors to create basic meshes (regular 2D/3D lattices,...)
