@@ -128,6 +128,41 @@ void bfs(const AbstractMesh<M,V,E,P>    & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void bfs_srf_only(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                  const uint                                source,
+                  const std::vector<bool>                 & mask, // if mask[vid] = true, path cannot pass through vertex vid
+                  std::unordered_set<uint>                & visited)
+{
+    visited.clear();
+    visited.insert(source);
+
+    std::queue<uint> q;
+    q.push(source);
+
+    while(!q.empty())
+    {
+        uint vid = q.front();
+        q.pop();
+
+        for(uint eid : m.adj_v2e(vid))
+        {
+            if(m.edge_is_on_srf(eid))
+            {
+                uint nbr = m.vert_opposite_to(eid,vid);
+                if (!mask.at(nbr) && DOES_NOT_CONTAIN(visited,nbr))
+                {
+                    visited.insert(nbr);
+                    q.push(nbr);
+                }
+            }
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class P>
 CINO_INLINE
 void bfs_on_dual(const AbstractMesh<M,V,E,P>    & m,

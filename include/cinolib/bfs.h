@@ -68,6 +68,17 @@ void bfs(const AbstractMesh<M,V,E,P>    & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// floodfill only the surface of a polyhedral mesh (with vertex barriers).
+//
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void bfs_srf_only(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                  const uint                                source,
+                  const std::vector<bool>                 & mask, // if mask[vid] = true, path cannot pass through vertex vid
+                  std::unordered_set<uint>                & visited);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // floodfill (with barriers) on the dual mesh (polygons/polyhedra instead of vertices)
 //
 template<class M, class V, class E, class P>
