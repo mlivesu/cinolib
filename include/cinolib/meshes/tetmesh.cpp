@@ -306,6 +306,20 @@ uint Tetmesh<M,V,E,F,P>::face_edge_opposite_to(const uint fid, const uint vid) c
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+uint Tetmesh<M,V,E,F,P>::face_vert_opposite_to(const uint fid, const uint eid) const
+{
+    assert(this->face_contains_edge(fid,eid));
+    for(uint vid : this->adj_f2v(fid))
+    {
+        if(!this->edge_contains_vert(eid,vid)) return vid;
+    }
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const std::vector<double> & bary)
 {
     assert(bary.size()==3);

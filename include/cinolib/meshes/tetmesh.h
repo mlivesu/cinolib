@@ -112,6 +112,7 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         double face_area            (const uint fid) const;
         uint   face_edge_opposite_to(const uint fid, const uint vid) const;
+        uint   face_vert_opposite_to(const uint fid, const uint eid) const;
         uint   face_split           (const uint fid, const vec3d & p);
         uint   face_split           (const uint fid, const std::vector<double> & bary = { 1./3., 1./3., 1./3. });
 
