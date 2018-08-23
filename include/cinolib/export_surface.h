@@ -60,4 +60,4 @@ void export_surface(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 #include "export_surface.cpp"
 #endif
 
-#endif // CINO_LABELING_H
+#endif // CINO_EXPORT_SURFACE_H
