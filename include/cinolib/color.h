@@ -45,18 +45,17 @@ class Color
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        static Color RED()     { return Color( 1, 0, 0); }
-        static Color GREEN()   { return Color( 0, 1, 0); }
-        static Color BLUE()    { return Color( 0, 0, 1); }
-        static Color YELLOW()  { return Color( 1, 1, 0); }
-        static Color MAGENTA() { return Color( 1, 0, 1); }
-        static Color CYAN()    { return Color( 0, 1, 1); }
-        static Color BLACK()   { return Color( 0, 0, 0); }
-        static Color WHITE()   { return Color( 1, 1, 1); }
-        static Color GRAY()    { return Color(.5,.5,.5); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+        static Color BLACK() { return Color( 0, 0, 0); }
+        static Color WHITE() { return Color( 1, 1, 1); }
+        //
+        static Color RED    (const float lum = 1.0) { return Color( lum*1.0,     0.0,     0.0); }
+        static Color GREEN  (const float lum = 1.0) { return Color(     0.0, lum*1.0,     0.0); }
+        static Color BLUE   (const float lum = 1.0) { return Color(     0.0,     0.0, lum*1.0); }
+        static Color YELLOW (const float lum = 1.0) { return Color( lum*1.0, lum*1.0,     0.0); }
+        static Color MAGENTA(const float lum = 1.0) { return Color( lum*1.0,     0.0, lum*1.0); }
+        static Color CYAN   (const float lum = 1.0) { return Color(     0.0, lum*1.0, lum*1.0); }
+        static Color GRAY   (const float lum = 1.0) { return Color( lum*0.5, lum*0.5, lum*0.5); }
+        //
         static Color PASTEL_YELLOW()  { return Color(254.0/255.0, 229.0/255.0, 157.0/255.0); }
         static Color PASTEL_MAGENTA() { return Color(252.0/255.0,  89.0/255.0, 148.0/255.0); }
         static Color PASTEL_GREEN()   { return Color(198.0/255.0, 223.0/255.0, 182.0/255.0); }
