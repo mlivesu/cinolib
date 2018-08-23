@@ -1606,39 +1606,35 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove(const uint pid)
     // disconnect from other polyhedra
     for(uint nbr : this->adj_p2p(pid)) REMOVE_FROM_VEC(this->p2p.at(nbr), pid);
 
-    // delete dangling faces
+    // disconnect dangling faces
     for(uint fid : dangling_faces)
     {
         assert(this->adj_f2p(fid).empty());
         for(uint vid : this->faces.at(fid)) REMOVE_FROM_VEC(this->v2f.at(vid), fid);
         for(uint eid : this->f2e.at(fid))   REMOVE_FROM_VEC(this->e2f.at(eid), fid);
         for(uint nbr : this->f2f.at(fid))   REMOVE_FROM_VEC(this->f2f.at(nbr), fid);
-        face_remove_unreferenced(fid);
     }
 
-    // delete dangling edges
+    // disconnect dangling edges
     for(uint eid : dangling_edges)
     {
         assert(this->adj_e2f(eid).empty());
         assert(this->adj_e2p(eid).empty());
         uint vid0 = this->edge_vert_id(eid,0);
         uint vid1 = this->edge_vert_id(eid,1);
-        //if (vid1 > vid0) std::swap(vid0,vid1); // make sure the highest id is processed first
         REMOVE_FROM_VEC(this->v2e.at(vid0), eid);
         REMOVE_FROM_VEC(this->v2e.at(vid1), eid);
         REMOVE_FROM_VEC(this->v2v.at(vid0), vid1);
         REMOVE_FROM_VEC(this->v2v.at(vid1), vid0);
-        edge_remove_unreferenced(eid);
     }
 
-    // delete dangling vertices
+    // disconnect dangling vertices
     for(uint vid : dangling_verts)
     {
         assert(this->adj_v2e(vid).empty());
         assert(this->adj_v2f(vid).empty());
         assert(this->adj_v2p(vid).empty());
         for(uint nbr : this->adj_v2v(vid)) REMOVE_FROM_VEC(this->v2v.at(nbr), vid);
-        vert_remove_unreferenced(vid);
     }
 
     // update f_on_srf flags
@@ -1659,6 +1655,10 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove(const uint pid)
         for(uint fid : this->adj_v2f(vid)) if(this->face_is_on_srf(fid)) this->v_on_srf.at(vid) = true;
     }
 
+    // remove dangling elements
+    for(uint fid : dangling_faces) face_remove_unreferenced(fid);
+    for(uint eid : dangling_edges) edge_remove_unreferenced(eid);
+    for(uint vid : dangling_verts) vert_remove_unreferenced(vid);
     poly_remove_unreferenced(pid);
 }
 
