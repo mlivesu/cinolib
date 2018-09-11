@@ -18,7 +18,7 @@ BibTeX entry:
 @misc{cinolib,
   title  = {{cinolib}: a generic programming header only {C++} library for processing polygonal and polyhedral meshes.},
   author = {Livesu, Marco},
-  note   = {https://github.com/maxicino/cinolib/},
+  note   = {https://github.com/mlivesu/cinolib/},
   year   = {2017}}
 ```
 
