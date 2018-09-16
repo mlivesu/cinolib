@@ -1,3 +1,4 @@
+- look for a MSVC compliant version of Shechuk's predicates (see issue opened by 461353349)
 - add 2D medial axis computation facilities using qgarlib
 - for consistency, vert coords should be part of vert_data
 - add rosy field
