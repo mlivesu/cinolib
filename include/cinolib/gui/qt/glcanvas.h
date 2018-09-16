@@ -34,12 +34,6 @@
 #ifdef CINOLIB_USES_OPENGL
 #ifdef CINOLIB_USES_QT
 
-#ifdef __APPLE__
-#include <gl.h>
-#else
-#include <GL/gl.h>
-#endif
-
 #include <vector>
 #include <string>
 #include <functional>
