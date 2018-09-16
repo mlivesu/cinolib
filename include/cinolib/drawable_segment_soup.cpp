@@ -64,6 +64,7 @@ void DrawableSegmentSoup::draw(const float scene_size) const
     }
     else
     {
+        glDisable(GL_LIGHTING);
         glColor3fv(color.rgba);
         for(uint i=0; i<size()/2; ++i)
         {
@@ -74,6 +75,8 @@ void DrawableSegmentSoup::draw(const float scene_size) const
                 glVertex3d(b.x(), b.y(), b.z());
             glEnd();
         }
+        glColor3f(0,0,0);
+        glEnable(GL_LIGHTING);
     }
 }
 
