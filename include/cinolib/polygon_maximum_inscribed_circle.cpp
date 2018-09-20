@@ -133,7 +133,14 @@ void polygon_maximum_inscribed_circle(const std::vector<vec2d> & poly,
         min = min.min(p);
         max = max.max(p);
     }
-    double scale_factor = std::numeric_limits<int>::max() / min.dist(max);
+
+    double scale_factor;
+    double diag = min.diag(max);
+
+    if(diag >= 1.0) scale_factor = std::numeric_limits<int>::max() / diag;
+    else            scale_factor = std::numeric_limits<int>::max() * diag;
+
+    scale_factor *= 0.5; // dumb attempt to stay on the safe side and avoid overflows...
 
     // Boost implementation of Generazlied Voronoi uses integer coordinates.
     // In order to achieve maximum precision I am scaling the polygon as much
