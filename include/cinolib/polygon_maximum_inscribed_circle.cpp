@@ -27,6 +27,16 @@
 *     Via de Marini, 6                                                           *
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
+*                                                                                *
+*                                                                                *
+*     Daniela Cabiddu                                                            *
+*     http://www.imati.cnr.it/index.php/people/8-curricula/119-daniela-cabiddu   *
+*                                                                                *
+*     Italian National Research Council (CNR)                                    *
+*     Institute for Applied Mathematics and Information Technologies (IMATI)     *
+*     Via de Marini, 6                                                           *
+*     16149 Genoa,                                                               *
+*     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/polygon_maximum_inscribed_circle.h>
 #include <cinolib/geometry/segment.h>
