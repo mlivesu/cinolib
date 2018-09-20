@@ -139,9 +139,14 @@ namespace cinolib
 
 #define REAL double                      /* float or double */
 #define REALPRINT doubleprint
-#define REALRAND doublerand
-#define NARROWRAND narrowdoublerand
-#define UNIFORMRAND uniformdoublerand
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/* Cino edit: I am commenting out all the stuff that uses C random() function */
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//#define REALRAND doublerand
+//#define NARROWRAND narrowdoublerand
+//#define UNIFORMRAND uniformdoublerand
 
 /* Which of the following two methods of finding the absolute values is      */
 /*   fastest is compiler-dependent.  A few compilers can inline and optimize */
@@ -498,146 +503,153 @@ REAL *e;
 }
 */
 
-/*****************************************************************************/
-/*                                                                           */
-/*  doublerand()   Generate a double with random 53-bit significand and a    */
-/*                 random exponent in [0, 511].                              */
-/*                                                                           */
-/*****************************************************************************/
 
-CINO_INLINE
-double doublerand()
-{
-  double result;
-  double expo;
-  long a, b, c;
-  long i;
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/* Cino edit: I am commenting out all the stuff that uses C random() function */
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  a = random();
-  b = random();
-  c = random();
-  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-  for (i = 512, expo = 2; i <= 131072; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
+///*****************************************************************************/
+///*                                                                           */
+///*  doublerand()   Generate a double with random 53-bit significand and a    */
+///*                 random exponent in [0, 511].                              */
+///*                                                                           */
+///*****************************************************************************/
 
-/*****************************************************************************/
-/*                                                                           */
-/*  narrowdoublerand()   Generate a double with random 53-bit significand    */
-/*                       and a random exponent in [0, 7].                    */
-/*                                                                           */
-/*****************************************************************************/
+//CINO_INLINE
+//double doublerand()
+//{
+//  double result;
+//  double expo;
+//  long a, b, c;
+//  long i;
 
-CINO_INLINE
-double narrowdoublerand()
-{
-  double result;
-  double expo;
-  long a, b, c;
-  long i;
+//  a = random();
+//  b = random();
+//  c = random();
+//  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
+//  for (i = 512, expo = 2; i <= 131072; i *= 2, expo = expo * expo) {
+//    if (c & i) {
+//      result *= expo;
+//    }
+//  }
+//  return result;
+//}
 
-  a = random();
-  b = random();
-  c = random();
-  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
+///*****************************************************************************/
+///*                                                                           */
+///*  narrowdoublerand()   Generate a double with random 53-bit significand    */
+///*                       and a random exponent in [0, 7].                    */
+///*                                                                           */
+///*****************************************************************************/
 
-/*****************************************************************************/
-/*                                                                           */
-/*  uniformdoublerand()   Generate a double with random 53-bit significand.  */
-/*                                                                           */
-/*****************************************************************************/
+//CINO_INLINE
+//double narrowdoublerand()
+//{
+//  double result;
+//  double expo;
+//  long a, b, c;
+//  long i;
 
-CINO_INLINE
-double uniformdoublerand()
-{
-  double result;
-  long a, b;
+//  a = random();
+//  b = random();
+//  c = random();
+//  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
+//  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
+//    if (c & i) {
+//      result *= expo;
+//    }
+//  }
+//  return result;
+//}
 
-  a = random();
-  b = random();
-  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-  return result;
-}
+///*****************************************************************************/
+///*                                                                           */
+///*  uniformdoublerand()   Generate a double with random 53-bit significand.  */
+///*                                                                           */
+///*****************************************************************************/
 
-/*****************************************************************************/
-/*                                                                           */
-/*  floatrand()   Generate a float with random 24-bit significand and a      */
-/*                random exponent in [0, 63].                                */
-/*                                                                           */
-/*****************************************************************************/
+//CINO_INLINE
+//double uniformdoublerand()
+//{
+//  double result;
+//  long a, b;
 
-CINO_INLINE
-float floatrand()
-{
-  float result;
-  float expo;
-  long a, c;
-  long i;
+//  a = random();
+//  b = random();
+//  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
+//  return result;
+//}
 
-  a = random();
-  c = random();
-  result = (float) ((a - 1073741824) >> 6);
-  for (i = 512, expo = 2; i <= 16384; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
+///*****************************************************************************/
+///*                                                                           */
+///*  floatrand()   Generate a float with random 24-bit significand and a      */
+///*                random exponent in [0, 63].                                */
+///*                                                                           */
+///*****************************************************************************/
 
-/*****************************************************************************/
-/*                                                                           */
-/*  narrowfloatrand()   Generate a float with random 24-bit significand and  */
-/*                      a random exponent in [0, 7].                         */
-/*                                                                           */
-/*****************************************************************************/
+//CINO_INLINE
+//float floatrand()
+//{
+//  float result;
+//  float expo;
+//  long a, c;
+//  long i;
 
-CINO_INLINE
-float narrowfloatrand()
-{
-  float result;
-  float expo;
-  long a, c;
-  long i;
+//  a = random();
+//  c = random();
+//  result = (float) ((a - 1073741824) >> 6);
+//  for (i = 512, expo = 2; i <= 16384; i *= 2, expo = expo * expo) {
+//    if (c & i) {
+//      result *= expo;
+//    }
+//  }
+//  return result;
+//}
 
-  a = random();
-  c = random();
-  result = (float) ((a - 1073741824) >> 6);
-  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
+///*****************************************************************************/
+///*                                                                           */
+///*  narrowfloatrand()   Generate a float with random 24-bit significand and  */
+///*                      a random exponent in [0, 7].                         */
+///*                                                                           */
+///*****************************************************************************/
 
-/*****************************************************************************/
-/*                                                                           */
-/*  uniformfloatrand()   Generate a float with random 24-bit significand.    */
-/*                                                                           */
-/*****************************************************************************/
+//CINO_INLINE
+//float narrowfloatrand()
+//{
+//  float result;
+//  float expo;
+//  long a, c;
+//  long i;
 
-CINO_INLINE
-float uniformfloatrand()
-{
-  float result;
-  long a;
+//  a = random();
+//  c = random();
+//  result = (float) ((a - 1073741824) >> 6);
+//  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
+//    if (c & i) {
+//      result *= expo;
+//    }
+//  }
+//  return result;
+//}
 
-  a = random();
-  result = (float) ((a - 1073741824) >> 6);
-  return result;
-}
+///*****************************************************************************/
+///*                                                                           */
+///*  uniformfloatrand()   Generate a float with random 24-bit significand.    */
+///*                                                                           */
+///*****************************************************************************/
+
+//CINO_INLINE
+//float uniformfloatrand()
+//{
+//  float result;
+//  long a;
+
+//  a = random();
+//  result = (float) ((a - 1073741824) >> 6);
+//  return result;
+//}
 
 /*****************************************************************************/
 /*                                                                           */
