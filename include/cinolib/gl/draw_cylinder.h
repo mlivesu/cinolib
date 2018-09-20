@@ -42,7 +42,7 @@
 #endif
 
 #include <cinolib/cino_inline.h>
-#include <cmath>
+#include <cinolib/pi.h>
 
 namespace cinolib
 {

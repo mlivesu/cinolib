@@ -29,7 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/deg_rad.h>
-#include <cmath>
+#include <cinolib/pi.h>
 
 namespace cinolib
 {

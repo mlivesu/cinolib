@@ -33,6 +33,7 @@
 
 #include <cinolib/cino_inline.h>
 #include <cinolib/ANSI_color_codes.h>
+#include <cinolib/pi.h>
 #include <cmath>
 #include <iostream>
 #include <assert.h>

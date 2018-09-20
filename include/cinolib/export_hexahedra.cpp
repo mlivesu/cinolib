@@ -59,9 +59,9 @@ void export_hexahedra(Polyhedralmesh<M,V,E,F,P>   m_in,
             f.push_back(fid);
             w.push_back(m_in.poly_face_is_CCW(pid,fid));
         }
-        uint id = m_out.poly_add(f,w);
-        m_out.reorder_p2v(id);
+        m_out.poly_add(f,w);
     }
+    m_out.poly_fix_orientation();
 }
 
 }

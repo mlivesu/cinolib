@@ -28,18 +28,22 @@
 *     16149 Genoa,                                                               *
 *     Italy                                                                      *
 **********************************************************************************/
-#include <cinolib/cot.h>
-#include <cinolib/pi.h>
+#ifndef CINO_PI_H
+#define CINO_PI_H
+
+#include <cmath>
 
 namespace cinolib
 {
 
-// http://stackoverflow.com/questions/3738384/stable-cotangent
-//
-CINO_INLINE
-double cot(double x)
-{
-    return tan(M_PI_2 - x);
-}
+#ifndef M_PI
+#define M_PI 3.1415926535897932384626433832795
+#endif
+
+#ifndef M_PI_2
+#define M_PI_2 1.57079632679489661923
+#endif
 
 }
+
+#endif // CINO_PI_H

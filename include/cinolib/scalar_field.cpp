@@ -75,7 +75,7 @@ CINO_INLINE
 void ScalarField::copy_to_mesh(Mesh & m, const int tex_coord) const
 {
     assert(rows() == m.num_verts());
-    for(uint vid=0; vid<rows(); ++vid)
+    for(uint vid=0; vid<(uint)rows(); ++vid)
     {
         switch (tex_coord)
         {

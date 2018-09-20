@@ -31,6 +31,7 @@
 #include <cinolib/unstable/polygon2d.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/inf.h>
+#include <cinolib/pi.h>
 
 namespace cinolib
 {

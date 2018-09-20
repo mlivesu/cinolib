@@ -34,6 +34,7 @@
 #include <cmath>
 #include <iostream>
 #include <assert.h>
+#include <cinolib/pi.h>
 #include <cinolib/geometry/vec3.h>
 
 namespace cinolib

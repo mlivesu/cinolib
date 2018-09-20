@@ -33,6 +33,7 @@
 #include <cinolib/gl/draw_sphere.h>
 #include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/color.h>
+#include <cinolib/pi.h>
 
 #include <sstream>
 #include <chrono>
