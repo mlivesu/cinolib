@@ -30,7 +30,7 @@
 **********************************************************************************/
 #include <cinolib/meshes/skel.h>
 #include <cinolib/io/read_write.h>
-
+#include <queue>
 
 namespace cinolib
 {
