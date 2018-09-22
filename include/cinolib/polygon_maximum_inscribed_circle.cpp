@@ -145,7 +145,7 @@ void polygon_maximum_inscribed_circle(const std::vector<vec2d> & poly,
     }
 
     double scale_factor;
-    double diag = min.diag(max);
+    double diag = min.dist(max);
 
     if(diag >= 1.0) scale_factor = std::numeric_limits<int>::max() / diag;
     else            scale_factor = std::numeric_limits<int>::max() * diag;
