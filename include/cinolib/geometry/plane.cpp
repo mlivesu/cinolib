@@ -43,6 +43,7 @@ std::ostream & operator<<(std::ostream & in, const Plane & plane)
     return in;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 Plane::Plane(const vec3d & p0, const vec3d & p1, const vec3d & p2)
@@ -55,6 +56,7 @@ Plane::Plane(const vec3d & p0, const vec3d & p1, const vec3d & p2)
     assert(fabs(operator[](p2)) < 1e-10);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 Plane::Plane(const vec3d & point, const vec3d & normal)
@@ -63,6 +65,7 @@ Plane::Plane(const vec3d & point, const vec3d & normal)
     assert(fabs(operator[](point)) < 1e-10);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 CINO_INLINE
@@ -105,6 +108,7 @@ Plane::Plane(const std::vector<vec3d> & samples)
     set_plane(c,n);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void Plane::set_plane(const vec3d & point, const vec3d & normal)
@@ -116,6 +120,7 @@ void Plane::set_plane(const vec3d & point, const vec3d & normal)
     assert(fabs(operator[](point)) < 1e-10);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 double Plane::operator[](const vec3d & p) const
@@ -123,7 +128,7 @@ double Plane::operator[](const vec3d & p) const
     return (n.dot(p) - d);
 }
 
-
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // http://mathworld.wolfram.com/HessianNormalForm.html
 // http://mathworld.wolfram.com/Point-PlaneDistance.html (eq. 13)
@@ -139,9 +144,10 @@ double Plane::point_plane_dist(const vec3d & p) const
     return dist;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-vec3d Plane::project_onto(const vec3d & p)
+vec3d Plane::project_onto(const vec3d & p) const
 {
     vec3d res;
     if (this->operator [](p) > 0)
