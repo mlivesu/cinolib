@@ -62,10 +62,10 @@ Here is a list of the sample programs available in CinoLib.
 #### 16 - Use spherical Fibonacci to evenly sample the unit sphere
 <p align="left"><img src="snapshots/16_sphere_sampling.png" width="500"></p>
 
-#### 17 - Extract (and tessellate) ISO contours from surface meshes
+#### 17 - Extract (and tessellate) ISO contours on surface meshes
 <p align="left"><img src="snapshots/17_iso_contours.png" width="500"></p>
 
-#### 18 - Extract  (and tessellate) ISO surfaces using marching cubes for tetrahedral meshes
+#### 18 - Extract  (and tessellate) ISO surfaces on tetrahedral meshes
 <p align="left"><img src="snapshots/18_iso_surfaces.png" width="500"></p>
 
 #### 19 - Compute discrete harmonic maps
