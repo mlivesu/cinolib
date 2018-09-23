@@ -23,7 +23,5 @@ BibTeX entry:
 ```
 
 ## Other contributors
-* Claudio Mancinelli (University of Genoa)
-* Daniela Cabiddu (CNR IMATI)
-* Chrystiano Araújo (UBC)
+* Claudio Mancinelli (University of Genoa), Daniela Cabiddu (CNR IMATI), Chrystiano Araújo (UBC)
 
