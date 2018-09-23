@@ -940,6 +940,11 @@ void GLcanvas::reset_trackball()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
+
+    trackball.mode_2d     = false;
+    trackball.perspective = true;
+    trackball.zoom_ortho  = 1.0;
+    trackball.zoom_persp  = 45.0;
     update_projection_matrix();
     fit_scene();
 }
