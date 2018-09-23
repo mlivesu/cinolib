@@ -32,6 +32,10 @@
 #undef CINO_INLINE
 #endif
 
+#ifndef uint
+#define uint unsigned int
+#endif
+
 #ifndef CINO_STATIC_LIB
 #define CINO_INLINE inline
 #else
