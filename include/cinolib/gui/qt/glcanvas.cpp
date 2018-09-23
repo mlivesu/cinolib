@@ -167,7 +167,20 @@ void GLcanvas::update_projection_matrix()
     makeCurrent();
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, (GLfloat)width()/(GLfloat)height(), trackball.z_near, trackball.z_far);
+    GLfloat ratio = (GLfloat)width()/(GLfloat)height();
+    if(trackball.perspective)
+    {
+        gluPerspective(trackball.zoom_persp, ratio, trackball.z_near, trackball.z_far);
+    }
+    else
+    {
+        glOrtho(-trackball.scene_size*trackball.zoom_ortho*ratio,
+                 trackball.scene_size*trackball.zoom_ortho*ratio,
+                -trackball.scene_size*trackball.zoom_ortho,
+                 trackball.scene_size*trackball.zoom_ortho,
+                 trackball.z_near,
+                 trackball.z_far);
+    }
     glGetDoublev(GL_PROJECTION_MATRIX, trackball.projection);
     glMatrixMode(GL_MODELVIEW);
 }
@@ -189,37 +202,11 @@ void GLcanvas::translate(const vec3d & t)
 CINO_INLINE
 void GLcanvas::zoom(double d)
 {
-    translate(vec3d(0,0,d));
-
-    // adjust clipping planes
-    //
-    if(d>0) //zoom in
-    {
-        trackball.z_near -= d;
-        trackball.z_far  -= d;
-        if(trackball.z_near < 1e-3)
-        {
-            trackball.z_comp += (1e-3 - trackball.z_near);
-            trackball.z_near  = 1e-3;
-        }
-    }
-    else // zoom out
-    {
-        if(-d<=trackball.z_comp)
-        {
-            trackball.z_comp += d;
-            trackball.z_far  -= d;
-        }
-        else
-        {
-            trackball.z_near -= (d + trackball.z_comp);
-            trackball.z_far  -= d;
-            trackball.z_comp  = 0;
-        }
-    }
-
+    trackball.zoom_persp += -20.f * d;
+    trackball.zoom_ortho += -d;
     update_projection_matrix();
     updateGL();
+    return;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -270,6 +257,8 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
         case Qt::Key_Right: rotate(vec3d(0,1,0), +2);               break;
         case Qt::Key_Up:    rotate(vec3d(1,0,0), -2);               break;
         case Qt::Key_Down:  rotate(vec3d(1,0,0), +2);               break;
+        case Qt::Key_P:     trackball.perspective=!trackball.perspective;
+                            update_projection_matrix();             break;
     }
     updateGL();
 }
@@ -408,7 +397,8 @@ std::string GLcanvas::serialize_POV() const
        << trackball.modelview[ 4] << " " << trackball.modelview[ 5] << " " << trackball.modelview[ 6] << " " << trackball.modelview[ 7] << " "
        << trackball.modelview[ 8] << " " << trackball.modelview[ 9] << " " << trackball.modelview[10] << " " << trackball.modelview[11] << " "
        << trackball.modelview[12] << " " << trackball.modelview[13] << " " << trackball.modelview[14] << " " << trackball.modelview[15] << " "
-       << trackball.z_near        << " " << trackball.z_far;
+       << trackball.z_near        << " " << trackball.z_far         << " "
+       << trackball.perspective   << " " << trackball.zoom_persp    << " " << trackball.zoom_ortho;
     return ss.str();
 }
 
@@ -422,7 +412,8 @@ void GLcanvas::deserialize_POV(const std::string & s)
        >> trackball.modelview[ 4] >> trackball.modelview[ 5] >> trackball.modelview[ 6] >> trackball.modelview[ 7]
        >> trackball.modelview[ 8] >> trackball.modelview[ 9] >> trackball.modelview[10] >> trackball.modelview[11]
        >> trackball.modelview[12] >> trackball.modelview[13] >> trackball.modelview[14] >> trackball.modelview[15]
-       >> trackball.z_near        >> trackball.z_far;
+       >> trackball.z_near        >> trackball.z_far
+       >> trackball.perspective   >> trackball.zoom_persp    >> trackball.zoom_ortho;
     makeCurrent();
     glLoadIdentity();
     glMultMatrixd(trackball.modelview);
@@ -872,22 +863,23 @@ void GLcanvas::draw_helper(QPainter & painter)
     uint  sec_col = 111; // second text column
     if(show_helper)
     {
-                       draw_text(painter, p, "Left  but      ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate         ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Right but      ", 12); p.x()=sec_col; draw_text(painter, p, ": translate      ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Double click   ", 12); p.x()=sec_col; draw_text(painter, p, ": change pivot   ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Key C          ", 12); p.x()=sec_col; draw_text(painter, p, ": pivot at center", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Key S          ", 12); p.x()=sec_col; draw_text(painter, p, ": show pivot     ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Key R          ", 12); p.x()=sec_col; draw_text(painter, p, ": reset trackball", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Key A          ", 12); p.x()=sec_col; draw_text(painter, p, ": toggle axis    ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Key H          ", 12); p.x()=sec_col; draw_text(painter, p, ": toggle helper  ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Key O          ", 12); p.x()=sec_col; draw_text(painter, p, ": orbit animation", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Key Left       ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate left    ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Key Right      ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate right   ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Key Up         ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate up      ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Key Down       ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate down    ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Cmd + Key C    ", 12); p.x()=sec_col; draw_text(painter, p, ": copy  POV      ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Cmd + Key V    ", 12); p.x()=sec_col; draw_text(painter, p, ": paste POV      ", 12); p.y()+=step;
-        p.x()=fir_col; draw_text(painter, p, "Cmd + Right but", 12); p.x()=sec_col; draw_text(painter, p, ": popup menu     ", 12);
+                       draw_text(painter, p, "Left  but      ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate          ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Right but      ", 12); p.x()=sec_col; draw_text(painter, p, ": translate       ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Double click   ", 12); p.x()=sec_col; draw_text(painter, p, ": change pivot    ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key C          ", 12); p.x()=sec_col; draw_text(painter, p, ": pivot at center ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key S          ", 12); p.x()=sec_col; draw_text(painter, p, ": show pivot      ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key R          ", 12); p.x()=sec_col; draw_text(painter, p, ": reset trackball ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key A          ", 12); p.x()=sec_col; draw_text(painter, p, ": toggle axis     ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key H          ", 12); p.x()=sec_col; draw_text(painter, p, ": toggle helper   ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key O          ", 12); p.x()=sec_col; draw_text(painter, p, ": orbit animation ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key P          ", 12); p.x()=sec_col; draw_text(painter, p, ": persp/ortho view", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key Left       ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate left     ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key Right      ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate right    ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key Up         ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate up       ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Key Down       ", 12); p.x()=sec_col; draw_text(painter, p, ": rotate down     ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Cmd + Key C    ", 12); p.x()=sec_col; draw_text(painter, p, ": copy  POV       ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Cmd + Key V    ", 12); p.x()=sec_col; draw_text(painter, p, ": paste POV       ", 12); p.y()+=step;
+        p.x()=fir_col; draw_text(painter, p, "Cmd + Right but", 12); p.x()=sec_col; draw_text(painter, p, ": popup menu      ", 12);
         // add +/shift+ to move znear
         // add -/shift- to move zfar
     }

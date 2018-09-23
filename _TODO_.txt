@@ -1,4 +1,3 @@
-- add orthographic camera to GLcanvas
 - add 2D medial axis computation facilities using qgarlib
 - for consistency, vert coords should be part of vert_data
 - add rosy field
