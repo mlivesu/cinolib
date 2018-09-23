@@ -38,13 +38,13 @@ Here is a list of the sample programs available in CinoLib.
 #### 08 - Do vertex picking for interactive applications
 <p align="left"><img src="snapshots/08_picking.png" width="500"></p>
 
-#### 09 - Compute polyharmonic functions on discrete surfaces
+#### 09 - Compute n-harmonic functions on discrete surfaces
 <p align="left"><img src="snapshots/09_polyharmonic_functions_srf.png" width="500"></p>
 
-#### 10 - Compute polyharmonic functions on discrete volumes
+#### 10 - Compute n-harmonic functions on discrete volumes
 <p align="left"><img src="snapshots/10_polyharmonic_functions_vol.png" width="500"></p>
 
-#### 11 - Map a closed object to a sphere using conformalized mean curvature flow
+#### 11 - Map a genus zero object to a sphere using conformalized mean curvature flow
 <p align="left"><img src="snapshots/11_map_to_sphere.png" width="500"></p>
 
 #### 12 - Generate triangular and polygonal tessellations of 2D domains
@@ -62,22 +62,22 @@ Here is a list of the sample programs available in CinoLib.
 #### 16 - Use spherical Fibonacci to evenly sample the unit sphere
 <p align="left"><img src="snapshots/16_sphere_sampling.png" width="500"></p>
 
-#### 17 - Extract ISO contours from surface meshes
+#### 17 - Extract (and tessellate) ISO contours from surface meshes
 <p align="left"><img src="snapshots/17_iso_contours.png" width="500"></p>
 
-#### 18 - Extract ISO surfaces using marching cubes for tetrahedral meshes
+#### 18 - Extract  (and tessellate) ISO surfaces using marching cubes for tetrahedral meshes
 <p align="left"><img src="snapshots/18_iso_surfaces.png" width="500"></p>
 
 #### 19 - Compute discrete harmonic maps
 <p align="left"><img src="snapshots/19_harmonic_map.png" width="500"></p>
 
-#### 20 - Compute coarse quad layouts
+#### 20 - Compute coarse layouts of quadrilateral meshes
 <p align="left"><img src="snapshots/20_coarse_quad_layouts.png" width="500"></p>
 
-#### 21 - Compute coarse hex layouts
+#### 21 - Compute coarse layouts of hexahedral meshes
 <p align="left"><img src="snapshots/21_coarse_hex_layouts.png" width="500"></p>
 
-#### 22 - Remesh, preserving sharp creases or color patches
+#### 22 - Remesh, preserving sharp creases and/or color patches
 <p align="left"><img src="snapshots/22_remeshing.png" width="500"></p>
 
 #### 23 - Find, adjust, and export sharp creases from a mesh
