@@ -88,7 +88,7 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
      * vertex (<,>,=). In this case each configuration will be 100% correct
     */
 
-    std::vector<u_char> c(m.num_polys(),0x0);
+    std::vector<uint8_t> c(m.num_polys(),0x0);
 
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
