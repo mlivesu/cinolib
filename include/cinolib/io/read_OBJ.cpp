@@ -178,7 +178,7 @@ void read_OBJ(const char                     * filename,
             case 'm':
             {
                 char mtu_c[1024];
-                if (sscanf(line, "mtllib %s", mtu_c) == 1)
+                if (sscanf(line, "mtllib %[^\n]s", mtu_c) == 1)
                 {
                     std::string s0(filename);
                     std::string s1(mtu_c);
