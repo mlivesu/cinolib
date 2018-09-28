@@ -191,7 +191,7 @@ class GLcanvas : public QGLWidget
 
         void rotate(const vec3d & axis, const double angle);
         void translate(const vec3d & trans);
-        void zoom(double d);
+        void zoom(const double angle);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

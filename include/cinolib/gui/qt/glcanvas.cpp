@@ -200,10 +200,15 @@ void GLcanvas::translate(const vec3d & t)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::zoom(double d)
-{
-    trackball.zoom_persp += -20.f * d;
-    trackball.zoom_ortho += -d;
+void GLcanvas::zoom(const double angle)
+{   
+    trackball.zoom_persp += angle;
+    trackball.zoom_ortho += angle*0.01;
+
+    if(trackball.zoom_persp < 1e-5 ) trackball.zoom_persp = 1e-5;
+    if(trackball.zoom_persp > 179.0) trackball.zoom_persp = 179.0;
+    if(trackball.zoom_ortho < 1e-5 ) trackball.zoom_ortho = 1e-5;
+
     update_projection_matrix();
     updateGL();
     return;
@@ -374,8 +379,7 @@ void GLcanvas::wheelEvent(QWheelEvent *event) // zoom
 {
     if (callback_wheel) callback_wheel(this, event);
 
-    float d = -(float)event->delta()/120.0*0.2*trackball.scene_size;
-    zoom(d);
+    zoom(event->delta()/8.f);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
