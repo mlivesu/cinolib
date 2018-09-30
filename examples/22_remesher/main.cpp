@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     sb_crease_angle.setMaximum(180);
     sb_crease_angle.setMinimum(0);
     sb_crease_angle.setValue(60);
-    sb_niters.setValue(1);
+    sb_niters.setValue(10);
     sb_target_length.setDecimals(4);
     sb_target_length.setMinimum(0.0001);
     sb_target_length.setMaximum(9999);
@@ -68,11 +68,8 @@ int main(int argc, char **argv)
     cinolib::DrawableTrimesh<> m(s.c_str());
     m.show_marked_edge(true);
     m.show_wireframe(true);
+    m.show_mesh_flat();
     gui.push_obj(&m);
-    sb_target_length.setValue(m.edge_avg_length());
-
-    SurfaceMeshControlPanel<DrawableTrimesh<>> panel(&m,&gui);
-    panel.show();
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -131,6 +128,14 @@ int main(int argc, char **argv)
             gui.updateGL();
         }
     });
+
+    // default params: remesh with 1/10th edge length, preserving sharp features
+    sb_target_length.setValue(m.edge_avg_length()*0.1);
+    emit but_mark_creases.clicked();
+
+    // CMD+1 to show mesh controls.
+    SurfaceMeshControlPanel<DrawableTrimesh<>> panel(&m, &gui);
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
 
     return a.exec();
 }
