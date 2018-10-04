@@ -93,6 +93,12 @@ bool INTERSECTION_IS_EMPTY_VEC(const std::vector<T> & vec1, const std::vector<T>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<typename T>
+CINO_INLINE
+void REMOVE_DUPLICATES_FROM_VEC(std::vector<T> & vec);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 }
 
 #ifndef  CINO_STATIC_LIB

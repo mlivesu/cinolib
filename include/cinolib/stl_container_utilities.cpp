@@ -132,4 +132,17 @@ bool INTERSECTION_IS_EMPTY_VEC(const std::vector<T> & vec1, const std::vector<T>
                                vec2.begin(), vec2.end()) == vec1.end());
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void REMOVE_DUPLICATES_FROM_VEC(std::vector<T> & vec)
+{
+    // https://stackoverflow.com/questions/1041620/whats-the-most-efficient-way-to-erase-duplicates-and-sort-a-vector
+    sort(vec.begin(), vec.end());
+    vec.erase(unique(vec.begin(), vec.end()), vec.end());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 }
