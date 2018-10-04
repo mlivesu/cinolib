@@ -139,8 +139,8 @@ CINO_INLINE
 void REMOVE_DUPLICATES_FROM_VEC(std::vector<T> & vec)
 {
     // https://stackoverflow.com/questions/1041620/whats-the-most-efficient-way-to-erase-duplicates-and-sort-a-vector
-    sort(vec.begin(), vec.end());
-    vec.erase(unique(vec.begin(), vec.end()), vec.end());
+    std::sort(vec.begin(), vec.end());
+    vec.erase(std::unique(vec.begin(), vec.end()), vec.end());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
