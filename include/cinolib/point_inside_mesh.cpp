@@ -62,7 +62,7 @@ PointInsideMeshCache<Mesh>::PointInsideMeshCache(const Mesh & m, const uint octr
 */
 template<class Mesh>
 CINO_INLINE
-void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & eid, std::vector<double> & wgts) const
+void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & pid, std::vector<double> & wgts) const
 {
     std::set<uint> items;
     octree.get_items(p, items);
@@ -71,7 +71,7 @@ void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & eid, std::vector<d
     {
         if (m_ptr->poly_bary_coords(id, p, wgts)) // if is inside...
         {
-            eid = id;
+            pid = id;
             return;
         }
     }
@@ -90,8 +90,8 @@ void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & eid, std::vector<d
         ordered_items.insert(std::make_pair(m_ptr->poly_centroid(item).dist(p),item));
     }
     assert(ordered_items.size()>0);
-    eid = (*ordered_items.begin()).second;
-    wgts = std::vector<double>(m_ptr->verts_per_poly(eid), 1.0/double(m_ptr->verts_per_poly(eid))); // centroid
+    pid = (*ordered_items.begin()).second;
+    wgts = std::vector<double>(m_ptr->verts_per_poly(pid), 1.0/double(m_ptr->verts_per_poly(pid))); // centroid
 }
 
 
