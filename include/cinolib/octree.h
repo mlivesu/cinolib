@@ -107,7 +107,7 @@ template<typename item_type> class Octree
             if (query[0] >= bb_min[0] - eps && query[1] >= bb_min[1] - eps && query[2] >= bb_min[2] - eps &&
                 query[0] <= bb_max[0] + eps && query[1] <= bb_max[1] + eps && query[2] <= bb_max[2] + eps)
             {
-                if (children.empty())
+                if(children.empty())
                 {
                     for(auto it : item_list) items.insert(it);
                 }
