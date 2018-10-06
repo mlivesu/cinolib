@@ -31,6 +31,7 @@
 #include <cinolib/io/write_OBJ.h>
 #include <cinolib/color.h>
 #include <cinolib/stl_container_utilities.h>
+#include <cinolib/string_utilities.h>
 
 #include <iostream>
 #include <algorithm>
@@ -148,7 +149,7 @@ void write_OBJ(const char                * filename,
         }
     }
 
-    fprintf(f_obj, "mtllib %s\n", mtl_filename.c_str());
+    fprintf(f_obj, "mtllib %s\n", get_file_name(mtl_filename).c_str());
 
     for(uint i=0; i<xyz.size(); i+=3)
     {
@@ -198,7 +199,7 @@ void write_OBJ(const char                * filename,
     }
 
     fprintf(f_mtl, "newmtl color\nKd %f %f %f\n", color.r, color.g, color.b);
-    fprintf(f_obj, "mtllib %s\n", mtl_filename.c_str());
+    fprintf(f_obj, "mtllib %s\n", get_file_name(mtl_filename).c_str());
 
     for(uint i=0; i<xyz.size(); i+=3)
     {
@@ -260,7 +261,7 @@ void write_OBJ(const char                           * filename,
         }
     }
 
-    fprintf(f_obj, "mtllib %s\n", mtl_filename.c_str());
+    fprintf(f_obj, "mtllib %s\n", get_file_name(mtl_filename).c_str());
 
     for(uint i=0; i<xyz.size(); i+=3)
     {
@@ -315,7 +316,7 @@ void write_OBJ(const char                           * filename,
 //        fprintf(f_mtl, "newmtl label_%d\nKd %f %f %f\n", l, c.r, c.g, c.b);
 //    }
 
-//    fprintf(f_obj, "mtllib %s\n", mtl_filename.c_str());
+//    fprintf(f_obj, "mtllib %s\n", get_file_name(mtl_filename).c_str().c_str());
 
 //    for(uint i=0; i<xyz.size(); i+=3)
 //    {
