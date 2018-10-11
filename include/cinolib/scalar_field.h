@@ -58,6 +58,10 @@ class ScalarField : public Eigen::VectorXd, public Serializable
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        uint size() const { return rows(); }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void normalize_in_01();
         uint min_element_index() const;
 
