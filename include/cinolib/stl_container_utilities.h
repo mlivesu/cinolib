@@ -99,6 +99,10 @@ void REMOVE_DUPLICATES_FROM_VEC(std::vector<T> & vec);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<typename T>
+CINO_INLINE
+T AVERAGE_VEC(std::vector<T> & vec);
+
 }
 
 #ifndef  CINO_STATIC_LIB
