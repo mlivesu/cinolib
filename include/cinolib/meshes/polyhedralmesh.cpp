@@ -182,7 +182,7 @@ bool Polyhedralmesh<M,V,E,F,P>::poly_is_prism(const uint pid, const uint fid) co
     f_visited.insert(fid);
     for(uint eid : this->adj_f2e(fid))
     {
-        uint nbr = this->face_adj_through_edge(fid, eid, pid);
+        uint nbr = this->poly_face_adj_through_edge(pid, fid, eid);
         if (!this->face_is_quad(nbr)) return false;
         f_visited.insert(nbr);
     }

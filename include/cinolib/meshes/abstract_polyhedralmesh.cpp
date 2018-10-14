@@ -32,6 +32,7 @@
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/geometry/polygon.h>
 #include <unordered_set>
+#include <queue>
 
 namespace cinolib
 {
@@ -356,6 +357,28 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_id(const uint pid, const uint 
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_flip_winding(const uint pid, const uint fid)
+{
+    uint off = poly_face_offset(pid, fid);
+    polys_face_winding.at(pid).at(off) = !polys_face_winding.at(pid).at(off);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::poly_flip_winding(const uint pid)
+{
+    for(uint fid : this->adj_p2f(pid))
+    {
+        this->poly_face_flip_winding(pid,fid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_is_CW(const uint pid, const uint fid) const
 {
     uint off = poly_face_offset(pid, fid);
@@ -426,6 +449,22 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_e2f(const uint pid, co
         if (this->poly_contains_face(pid,fid)) faces.push_back(fid);
     }
     assert(faces.size()==2);
+    return faces;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_f2f(const uint pid, const uint fid) const
+{
+    assert(this->poly_contains_face(pid,fid));
+    std::vector<uint> faces;
+    for(uint nbr : this->adj_f2f(fid))
+    {
+        if(this->poly_contains_face(pid,nbr)) faces.push_back(nbr);
+    }
+    assert(faces.size()==this->edges_per_face(fid));
     return faces;
 }
 
@@ -580,20 +619,18 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_edge_id(const uint fid, const uint 
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint AbstractPolyhedralMesh<M,V,E,F,P>::face_adj_through_edge(const uint fid, const uint eid, const uint pid) const
+uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_adj_through_edge(const uint pid, const uint fid, const uint eid) const
 {
     assert(this->poly_contains_face(pid, fid));
     assert(this->poly_contains_edge(pid, eid));
     assert(this->face_contains_edge(fid, eid));
-
-    for(uint f : this->adj_e2f(eid))
+    for(uint nbr : this->adj_e2f(eid))
     {
-        if (f!=fid && poly_contains_face(pid,f)) return f;
+        if (nbr!=fid && poly_contains_face(pid,nbr)) return nbr;
     }
-
+    assert(false);
     return 0;
 }
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -946,7 +983,7 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::edge_ordered_poly_ring(cons
 
     do
     {
-        curr_f = face_adj_through_edge(curr_f, eid, curr_p);
+        curr_f = poly_face_adj_through_edge(curr_p, curr_f, eid);
         int tmp = poly_adj_through_face(curr_p, curr_f);
         if (tmp >= 0)
         {
@@ -1673,6 +1710,138 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::polys_remove(const std::vector<uint> & p
     //
     std::vector<uint> tmp = SORT_VEC(pids, true);
     for(uint pid : tmp) poly_remove(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_faces_share_orientation(const uint pid, const uint fid0, const uint fid1) const
+{
+    // two faces adjacent along an edge describe a surface with consistent orientation if they
+    // have the same winding order. This means that the shared edge (v0,v1) must be oriented in
+    // a way (e.g. v0=>v1) if seen from a face, and in the opposite way (v1=>v0) if seen from
+    // the other face
+
+    assert(this->poly_contains_face(pid, fid0));
+    assert(this->poly_contains_face(pid, fid1));
+
+    uint eid         = this->face_shared_edge(fid0, fid1);
+    uint vid0        = this->edge_vert_id(eid,0);
+    uint vid1        = this->edge_vert_id(eid,1);
+    uint vid0_f0     = this->face_vert_offset(fid0,vid0);
+    uint vid1_f0     = this->face_vert_offset(fid0,vid1);
+    uint vid0_f1     = this->face_vert_offset(fid1,vid0);
+    uint vid1_f1     = this->face_vert_offset(fid1,vid1);
+    bool v0v1_wrt_f0 = (vid0_f0+1)%this->verts_per_face(fid0) == vid1_f0;
+    bool v0v1_wrt_f1 = (vid0_f1+1)%this->verts_per_face(fid1) == vid1_f1;
+
+    if(this->poly_face_is_CW(pid,fid0)) v0v1_wrt_f0 = !v0v1_wrt_f0;
+    if(this->poly_face_is_CW(pid,fid1)) v0v1_wrt_f1 = !v0v1_wrt_f1;
+
+    return (v0v1_wrt_f0 != v0v1_wrt_f1);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// adjusts per face winding in order to have all faces consistently pointing
+// in the same direction (given by a reference face). Returns false if the
+// element is not orientable (this should never happen on a mesh element!)
+//
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_fix_orientation(const uint pid, const uint fid)
+{
+    assert(this->poly_contains_face(pid,fid));
+
+    std::vector<bool> visited(this->faces_per_poly(pid),false);
+    std::queue<uint> q;
+    q.push(fid);
+    visited.at(this->poly_face_offset(pid,fid)) = true;
+
+    while(!q.empty())
+    {
+        uint fid = q.front();
+        q.pop();
+
+        for(uint nbr : this->poly_f2f(pid,fid))
+        {
+            uint off = this->poly_face_offset(pid,nbr);
+            if(!visited.at(off))
+            {
+                visited.at(off) = true;
+                q.push(nbr);
+                if(!this->poly_faces_share_orientation(pid,fid,nbr))
+                {
+                    this->poly_face_flip_winding(pid,nbr);
+                }
+            }
+            else
+            {
+                assert(this->poly_faces_share_orientation(pid,fid,nbr));
+                if(!this->poly_faces_share_orientation(pid,fid,nbr))
+                {
+                    // the polyhedron is non orientable? This should never happen!
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_fix_orientation()
+{
+    uint fid = 0;
+    while(fid<this->num_faces() && !this->face_is_on_srf(fid)) ++fid;
+    assert(fid<this->num_faces());
+    assert(this->face_is_on_srf(fid));
+    assert(this->adj_f2p(fid).size()==1);
+    uint pid = this->adj_f2p(fid).front();
+
+    std::queue<uint> q;
+    q.push(pid);
+    assert(this->poly_fix_orientation(pid,fid));
+
+    this->poly_unmark_all();
+    this->poly_data(pid).marked = true;
+
+    while(!q.empty())
+    {
+        uint pid = q.front();
+        q.pop();
+
+        for(uint nbr : this->adj_p2p(pid))
+        {
+            int fid = this->poly_shared_face(pid,nbr);
+            assert(fid>=0);
+
+            if(!this->poly_data(nbr).marked)
+            {
+                if(poly_face_is_CCW(pid,fid) == poly_face_is_CCW(nbr,fid))
+                {
+                    poly_face_flip_winding(nbr,fid);
+                }
+                assert(this->poly_fix_orientation(nbr,fid));
+                this->poly_data(nbr).marked = true;
+                q.push(nbr);
+            }
+            else
+            {                
+                assert(poly_face_is_CCW(pid,fid) != poly_face_is_CCW(nbr,fid));
+                if(poly_face_is_CCW(pid,fid) == poly_face_is_CCW(nbr,fid))
+                {
+                    // the polyhedron is non orientable? This should never happen!
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }
 
 }

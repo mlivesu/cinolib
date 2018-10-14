@@ -165,7 +165,6 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool              face_contains_vert      (const uint fid, const uint vid) const;
                 bool              face_contains_edge      (const uint fid, const uint eid) const;
                 bool              face_winding_agrees_with(const uint fid, const uint vid0, const uint vid1) const;
-                uint              face_adj_through_edge   (const uint fid, const uint eid, const uint pid) const;
                 ipair             face_edges_from_vert    (const uint fid, const uint vid) const;
                 uint              face_adj_srf_edge       (const uint fid, const uint eid, const uint vid) const;
                 uint              face_opp_to_srf_edge    (const uint fid, const uint eid) const;
@@ -191,24 +190,31 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual double            poly_volume             (const uint pid) const = 0;
-        virtual double            poly_mass               (const uint pid) const;
-                bool              poly_contains_face      (const uint pid, const uint fid) const;
-                bool              poly_is_on_surf         (const uint pid) const;
-                int               poly_shared_face        (const uint pid0, const uint pid1) const;
-                uint              poly_face_id            (const uint pid, const uint off) const;
-                bool              poly_face_is_CCW        (const uint pid, const uint fid) const;
-                bool              poly_face_is_CW         (const uint pid, const uint fid) const;
-                uint              poly_face_offset        (const uint pid, const uint fid) const;
-                vec3d             poly_face_normal        (const uint pid, const uint fid) const;
-                int               poly_adj_through_face   (const uint pid, const uint fid) const;
-                std::vector<uint> poly_e2f                (const uint pid, const uint eid) const;
-                std::vector<uint> poly_v2f                (const uint pid, const uint vid) const;
-                void              poly_switch_id          (const uint pid0, const uint pid1);
-                uint              poly_add                (const std::vector<uint> & flist, const std::vector<bool> & fwinding);
-                void              poly_remove_unreferenced(const uint pid);
-                void              poly_remove             (const uint pid);
-                void              polys_remove            (const std::vector<uint> & pids);
+        virtual double            poly_volume                 (const uint pid) const = 0;
+        virtual double            poly_mass                   (const uint pid) const;
+                bool              poly_contains_face          (const uint pid, const uint fid) const;
+                bool              poly_is_on_surf             (const uint pid) const;
+                int               poly_shared_face            (const uint pid0, const uint pid1) const;
+                uint              poly_face_id                (const uint pid, const uint off) const;
+                void              poly_face_flip_winding      (const uint pid, const uint fid);
+                void              poly_flip_winding           (const uint pid);
+                bool              poly_face_is_CCW            (const uint pid, const uint fid) const;
+                bool              poly_face_is_CW             (const uint pid, const uint fid) const;
+                uint              poly_face_offset            (const uint pid, const uint fid) const;
+                vec3d             poly_face_normal            (const uint pid, const uint fid) const;
+                int               poly_adj_through_face       (const uint pid, const uint fid) const;
+                std::vector<uint> poly_v2f                    (const uint pid, const uint vid) const;
+                std::vector<uint> poly_e2f                    (const uint pid, const uint eid) const;
+                std::vector<uint> poly_f2f                    (const uint pid, const uint fid) const;
+                void              poly_switch_id              (const uint pid0, const uint pid1);
+                uint              poly_add                    (const std::vector<uint> & flist, const std::vector<bool> & fwinding);
+                void              poly_remove_unreferenced    (const uint pid);
+                void              poly_remove                 (const uint pid);
+                void              polys_remove                (const std::vector<uint> & pids);
+                uint              poly_face_adj_through_edge  (const uint pid, const uint fid, const uint eid) const;
+                bool              poly_faces_share_orientation(const uint pid, const uint fid0, const uint fid1) const;
+                bool              poly_fix_orientation        (const uint pid, const uint fid);
+                bool              poly_fix_orientation        ();
 };
 
 }

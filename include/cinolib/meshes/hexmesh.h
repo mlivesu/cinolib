@@ -119,6 +119,7 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         uint   poly_face_opposite_to(const uint pid, const uint fid) const;
         void   poly_subdivide       (const std::vector<std::vector<std::vector<uint>>> & split_scheme);
         double poly_volume          (const uint pid) const;
+        bool   poly_fix_orientation ();
         uint   poly_add             (const std::vector<uint> & vlist); // vertex list
 
         using  AbstractPolyhedralMesh<M,V,E,F,P>::poly_add; // avoid hiding poly_add(flist,fwinding);

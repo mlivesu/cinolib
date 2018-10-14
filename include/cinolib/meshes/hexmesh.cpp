@@ -534,4 +534,33 @@ uint Hexmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex lis
     return pid;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool Hexmesh<M,V,E,F,P>::poly_fix_orientation()
+{
+    if(AbstractPolyhedralMesh<M,V,E,F,P>::poly_fix_orientation())
+    {
+        uint bad = 0;
+        for(uint pid=0; pid<this->num_polys(); ++pid)
+        {
+            this->reorder_p2v(pid);
+            this->update_hex_quality(pid);
+            if(this->poly_data(pid).quality < 0.0) ++bad;
+        }
+        if(bad > 0.5*this->num_polys())
+        {
+            for(uint pid=0; pid<this->num_polys(); ++pid)
+            {
+                this->poly_flip_winding(pid);
+                this->reorder_p2v(pid);
+            }
+            this->update_hex_quality();
+        }
+        return true;
+    }
+    return false;
+}
+
 }
