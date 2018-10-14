@@ -47,8 +47,8 @@ class DrawableTrimesh : public AbstractDrawablePolygonMesh<Trimesh<M,V,E,P>>
 {
     public:
 
-        explicit DrawableTrimesh(Trimesh<M,V,E,P>) : Trimesh<M,V,E,P>()
-        {}
+        //explicit DrawableTrimesh(const Trimesh<M,V,E,P> &) : Trimesh<M,V,E,P>()
+        //{}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

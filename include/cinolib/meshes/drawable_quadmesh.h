@@ -47,8 +47,8 @@ class DrawableQuadmesh : public AbstractDrawablePolygonMesh<Quadmesh<M,V,E,P>>
 {
     public:
 
-        explicit DrawableQuadmesh(Quadmesh<M,V,E,P>) : Quadmesh<M,V,E,P>()
-        {}
+        //explicit DrawableQuadmesh(const Quadmesh<M,V,E,P> &) : Quadmesh<M,V,E,P>()
+        //{}
 
         explicit DrawableQuadmesh() : Quadmesh<M,V,E,P>()
         {
