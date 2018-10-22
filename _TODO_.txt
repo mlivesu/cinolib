@@ -6,6 +6,7 @@ KNOWN BUGS/THINGS TO BE FIXED:
 
 
 EXTENSIONS/IMPROVEMENTS:
+ - add a "soup" flag to meshes (i.e., no connectivity will be computed)
  - add Lagrange multipliers to linear solvers
  - add copy constructors for meshes
  - add rosy field
