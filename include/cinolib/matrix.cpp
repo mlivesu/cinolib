@@ -29,7 +29,7 @@
 *     Italy                                                                      *
 **********************************************************************************/
 #include <cinolib/matrix.h>
-#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
 
 namespace cinolib
 {
@@ -115,6 +115,122 @@ CINO_INLINE
 double determinant_2x2(const vec2d a0, const vec2d a1)
 {
     return determinant_2x2(a0[0], a0[1], a1[0], a1[1]);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void eigen_decomposition_3x3(const double   a[3][3],
+                                   vec3d  & v_min, // eigenvectors
+                                   vec3d  & v_mid,
+                                   vec3d  & v_max,
+                                   double & min,   // eigenvalues
+                                   double & mid,
+                                   double & max)
+{
+    eigen_decomposition_3x3(a[0][0], a[0][1], a[0][2],
+                            a[1][0], a[1][1], a[1][2],
+                            a[2][0], a[2][1], a[2][2],
+                            v_min, v_mid, v_max,
+                            min, mid, max);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void eigen_decomposition_3x3(const double   a00,
+                             const double   a01,
+                             const double   a02,
+                             const double   a10,
+                             const double   a11,
+                             const double   a12,
+                             const double   a20,
+                             const double   a21,
+                             const double   a22,
+                                   vec3d  & v_min, // eigenvectors
+                                   vec3d  & v_mid,
+                                   vec3d  & v_max,
+                                   double & min,   // eigenvalues
+                                   double & mid,
+                                   double & max)
+{
+    Eigen::Matrix3d m;
+    m << a00, a01, a02,
+         a10, a11, a12,
+         a20, a21, a22;
+
+    bool symmetric = (a10==a01) && (a20==a02) && (a21==a12);
+
+    if(symmetric)
+    {
+        // eigen decomposition for self-adjoint matrices
+        Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eig(m);
+        assert(eig.info() == Eigen::Success);
+
+        v_min = vec3d(eig.eigenvectors()(0,0), eig.eigenvectors()(1,0), eig.eigenvectors()(2,0));
+        v_mid = vec3d(eig.eigenvectors()(0,1), eig.eigenvectors()(1,1), eig.eigenvectors()(2,1));
+        v_max = vec3d(eig.eigenvectors()(0,2), eig.eigenvectors()(1,2), eig.eigenvectors()(2,2));
+
+        min = eig.eigenvalues()[0];
+        mid = eig.eigenvalues()[1];
+        max = eig.eigenvalues()[2];
+    }
+    else
+    {
+        // eigen decomposition for general matrices
+        Eigen::EigenSolver<Eigen::Matrix3d> eig(m);
+        assert(eig.info() == Eigen::Success);
+
+        // WARNING: I am taking only the real part!
+        v_min = vec3d(eig.eigenvectors()(0,0).real(), eig.eigenvectors()(1,0).real(), eig.eigenvectors()(2,0).real());
+        v_mid = vec3d(eig.eigenvectors()(0,1).real(), eig.eigenvectors()(1,1).real(), eig.eigenvectors()(2,1).real());
+        v_max = vec3d(eig.eigenvectors()(0,2).real(), eig.eigenvectors()(1,2).real(), eig.eigenvectors()(2,2).real());
+
+        // WARNING: I am taking only the real part!
+        min = eig.eigenvalues()[0].real();
+        mid = eig.eigenvalues()[1].real();
+        max = eig.eigenvalues()[2].real();
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void eigenvalues_3x3(const double   a00,
+                     const double   a01,
+                     const double   a02,
+                     const double   a10,
+                     const double   a11,
+                     const double   a12,
+                     const double   a20,
+                     const double   a21,
+                     const double   a22,
+                           double & min,
+                           double & mid,
+                           double & max)
+{
+    vec3d v_min, v_mid, v_max;
+    eigen_decomposition_3x3(a00, a01, a02, a10, a11, a12, a20, a21, a22, v_min, v_mid, v_max, min, mid, max);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void eigenvectors_3x3(const double   a00,
+                      const double   a01,
+                      const double   a02,
+                      const double   a10,
+                      const double   a11,
+                      const double   a12,
+                      const double   a20,
+                      const double   a21,
+                      const double   a22,
+                            vec3d  & v_min,
+                            vec3d  & v_mid,
+                            vec3d  & v_max)
+{
+    double min, mid, max;
+    eigen_decomposition_3x3(a00, a01, a02, a10, a11, a12, a20, a21, a22, v_min, v_mid, v_max, min, mid, max);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

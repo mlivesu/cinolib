@@ -82,6 +82,68 @@ double determinant_2x2(const vec2d a0, const vec2d a1);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void eigen_decomposition_3x3(const double   a[3][3],
+                                   vec3d  & v_min, // eigenvectors
+                                   vec3d  & v_mid,
+                                   vec3d  & v_max,
+                                   double & min,   // eigenvalues
+                                   double & mid,
+                                   double & max);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void eigen_decomposition_3x3(const double   a00,
+                             const double   a01,
+                             const double   a02,
+                             const double   a10,
+                             const double   a11,
+                             const double   a12,
+                             const double   a20,
+                             const double   a21,
+                             const double   a22,
+                                   vec3d  & v_min, // eigenvectors
+                                   vec3d  & v_mid,
+                                   vec3d  & v_max,
+                                   double & min,   // eigenvalues
+                                   double & mid,
+                                   double & max);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void eigenvalues_3x3(const double   a00,
+                     const double   a01,
+                     const double   a02,
+                     const double   a10,
+                     const double   a11,
+                     const double   a12,
+                     const double   a20,
+                     const double   a21,
+                     const double   a22,
+                           double & min,
+                           double & mid,
+                           double & max);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void eigenvectors_3x3(const double   a00,
+                      const double   a01,
+                      const double   a02,
+                      const double   a10,
+                      const double   a11,
+                      const double   a12,
+                      const double   a20,
+                      const double   a21,
+                      const double   a22,
+                            vec3d  & v_min,
+                            vec3d  & v_mid,
+                            vec3d  & v_max);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 double determinant_3x3(const double a00, const double a01, const double a02,
                        const double a10, const double a11, const double a12,
                        const double a20, const double a21, const double a22);
