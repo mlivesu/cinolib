@@ -44,8 +44,7 @@
 namespace cinolib
 {
 
-// Compute an approximate (though good) approximation of the even
-// coverage of a sphere. Reference:
+// Compute an approximate (though good) even coverage of the unit sphere. Reference:
 //
 // http://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere
 //
@@ -66,7 +65,6 @@ void sphere_coverage(const uint n_samples, std::vector<vec3d> & points)
         double phi = ((i + int(rnd)) % n_samples) * increment;
         double x   = cos(phi) * r;
         double z   = sin(phi) * r;
-
         points.push_back(vec3d(x,y,z));
     }
 }
