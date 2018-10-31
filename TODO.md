@@ -8,6 +8,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* prevent averaging of normals on sharp creases in smooth shading
 * add a "soup" flag to meshes (i.e., no connectivity will be computed)
 * add Lagrange multipliers to linear solvers
 * add copy constructors for meshes
