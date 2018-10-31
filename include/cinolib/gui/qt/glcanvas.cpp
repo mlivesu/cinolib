@@ -668,6 +668,22 @@ void GLcanvas::updateGL_strict()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+double GLcanvas::scene_size() const
+{
+    return trackball.scene_size;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d GLcanvas::scene_center() const
+{
+    return trackball.scene_center;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::set_2d_mode(const bool b)
 {
     trackball.mode_2d = b;
