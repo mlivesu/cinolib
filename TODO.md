@@ -8,6 +8,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* add AO property to mesh vertices, and enable loading AO from text file
 * prevent averaging of normals on sharp creases in smooth shading
 * add a "soup" flag to meshes (i.e., no connectivity will be computed)
 * add Lagrange multipliers to linear solvers
