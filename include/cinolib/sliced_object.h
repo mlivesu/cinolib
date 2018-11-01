@@ -74,9 +74,11 @@ class SlicedObj : public Trimesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void  slice_segments(const uint sid, std::vector<vec3d> & verts, std::vector<uint> & segs) const;
-        float slice_z       (const uint sid) const;
-        bool  slice_contains(const uint sid, const vec2d & p) const;
+        void  slice_segments     (const uint sid, std::vector<vec3d> & verts, std::vector<uint> & segs) const;
+        float slice_z            (const uint sid) const;
+        float slice_thickness    (const uint sid) const;
+        float slice_avg_thickness() const;
+        bool  slice_contains     (const uint sid, const vec2d & p) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

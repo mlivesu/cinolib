@@ -199,6 +199,27 @@ float SlicedObj<M,V,E,P>::slice_z(const uint sid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+float SlicedObj<M,V,E,P>::slice_thickness(const uint sid) const
+{
+    return z.at(sid+1) - z.at(sid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+float SlicedObj<M,V,E,P>::slice_avg_thickness() const
+{
+    float avg=0;
+    for(uint sid=0; sid<z.size()-1; ++sid) avg += slice_thickness(sid);
+    avg /= static_cast<float>(z.size()-1);
+    return avg;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 bool SlicedObj<M,V,E,P>::slice_contains(const uint sid, const vec2d & p) const
 {
     return polygon_contains(slices.at(sid), p, true);
