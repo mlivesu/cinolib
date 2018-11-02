@@ -142,7 +142,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool   edge_is_manifold               (const uint eid) const;
+        bool   edge_is_manifold               (const uint eid, const bool boundaries_allowed = true) const;
         bool   edge_is_boundary               (const uint eid) const;
         double edge_crease_angle              (const uint eid) const;
         bool   edges_share_poly               (const uint eid1, const uint eid2) const;

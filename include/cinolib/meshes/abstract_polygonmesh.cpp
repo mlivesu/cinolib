@@ -753,9 +753,11 @@ void AbstractPolygonMesh<M,V,E,P>::vert_remove_unreferenced(const uint vid)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractPolygonMesh<M,V,E,P>::edge_is_manifold(const uint eid) const
+bool AbstractPolygonMesh<M,V,E,P>::edge_is_manifold(const uint eid, const bool boundaries_allowed) const
 {
-    return (this->edge_valence(eid) <= 2);
+    uint val = this->edge_valence(eid);
+    if(boundaries_allowed) return (val>0 && val<3);
+    return (val==2);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
