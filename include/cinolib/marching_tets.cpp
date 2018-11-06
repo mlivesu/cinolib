@@ -32,8 +32,18 @@
 *     Via de Marini, 6                                                          *
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
+*                                                                               *
+*     Thomas Alderighi (thomas.alderighi@isti.cnr.it)                           *
+*     http://vcg.isti.cnr.it/~alderighi/                                        *
+*                                                                               *
+*     Italian National Research Council (CNR)                                   *
+*     Institute for Computer Science and Technologies (ISTI)                    *
+*     Via Moruzzi, 1                                                            *
+*     56124 Pisa,                                                               *
+*     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/marching_tets.h>
+#include <array>
 
 namespace cinolib
 {
@@ -66,7 +76,7 @@ void make_triangle(const Tetmesh<M,V,E,F,P> & m,
                    const double               isovalue,
                    const uint                 vids[],
                    const double               func[],
-                   const uint                 e[],
+                   const std::array<uint,3> & e,
                    std::map<ipair,uint>     & e2v_map,
                    std::vector<vec3d>       & verts,
                    std::vector<uint>        & tris,
@@ -93,7 +103,8 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
      * vertex (<,>,=). In this case each configuration will be 100% correct
     */
 
-    std::vector<uint8_t> c(m.num_polys(),0x0);
+    std::vector<unsigned char> c(m.num_polys(),0x0);
+    std::vector<bool> swapped(m.num_polys(), false);
 
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
@@ -131,6 +142,7 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
         */
         if (c.at(pid) == C_1111)
         {
+            swapped.at(pid) = true;
             c.at(pid) = 0x0;
             if (isovalue <= func[0]) c.at(pid) |= C_1000;
             if (isovalue <= func[1]) c.at(pid) |= C_0100;
@@ -168,7 +180,7 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
         };
 
         int adj_tet[] // not uint because it may be -1 if there is no adjacent tet!
-        {            
+        {
             m.poly_adj_through_face(pid, m.poly_face_id(pid,0)),
             m.poly_adj_through_face(pid, m.poly_face_id(pid,1)),
             m.poly_adj_through_face(pid, m.poly_face_id(pid,2)),
@@ -207,26 +219,34 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
         // triangle generation
         switch (c.at(pid))
         {
-            case C_1000 : { uint e [] = { 2, 0, 4 }; make_triangle(m, isovalue, vids, func, e , e2v_map, verts, tris, norms); break; }
-            case C_0111 : { uint e [] = { 0, 2, 4 }; make_triangle(m, isovalue, vids, func, e , e2v_map, verts, tris, norms); break; }
-            case C_1011 : { uint e [] = { 2, 1, 3 }; make_triangle(m, isovalue, vids, func, e , e2v_map, verts, tris, norms); break; }
-            case C_0100 : { uint e [] = { 1, 2, 3 }; make_triangle(m, isovalue, vids, func, e , e2v_map, verts, tris, norms); break; }
-            case C_1101 : { uint e [] = { 1, 0, 5 }; make_triangle(m, isovalue, vids, func, e , e2v_map, verts, tris, norms); break; }
-            case C_0010 : { uint e [] = { 0, 1, 5 }; make_triangle(m, isovalue, vids, func, e , e2v_map, verts, tris, norms); break; }
-            case C_0001 : { uint e [] = { 5, 3, 4 }; make_triangle(m, isovalue, vids, func, e , e2v_map, verts, tris, norms); break; }
-            case C_1110 : { uint e [] = { 3, 5, 4 }; make_triangle(m, isovalue, vids, func, e , e2v_map, verts, tris, norms); break; }
-            case C_0101 : { uint e0[] = { 5, 2, 4 }; make_triangle(m, isovalue, vids, func, e0, e2v_map, verts, tris, norms);
-                            uint e1[] = { 2, 5, 1 }; make_triangle(m, isovalue, vids, func, e1, e2v_map, verts, tris, norms); break; }
-            case C_1010 : { uint e0[] = { 2, 5, 4 }; make_triangle(m, isovalue, vids, func, e0, e2v_map, verts, tris, norms);
-                            uint e1[] = { 5, 2, 1 }; make_triangle(m, isovalue, vids, func, e1, e2v_map, verts, tris, norms); break; }
-            case C_0011 : { uint e0[] = { 3, 4, 1 }; make_triangle(m, isovalue, vids, func, e0, e2v_map, verts, tris, norms);
-                            uint e1[] = { 1, 4, 0 }; make_triangle(m, isovalue, vids, func, e1, e2v_map, verts, tris, norms); break; }
-            case C_1100 : { uint e0[] = { 4, 3, 1 }; make_triangle(m, isovalue, vids, func, e0, e2v_map, verts, tris, norms);
-                            uint e1[] = { 4, 1, 0 }; make_triangle(m, isovalue, vids, func, e1, e2v_map, verts, tris, norms); break; }
-            case C_1001 : { uint e0[] = { 3, 2, 0 }; make_triangle(m, isovalue, vids, func, e0, e2v_map, verts, tris, norms);
-                            uint e1[] = { 5, 3, 0 }; make_triangle(m, isovalue, vids, func, e1, e2v_map, verts, tris, norms); break; }
-            case C_0110 : { uint e0[] = { 2, 3, 0 }; make_triangle(m, isovalue, vids, func, e0, e2v_map, verts, tris, norms);
-                            uint e1[] = { 3, 5, 0 }; make_triangle(m, isovalue, vids, func, e1, e2v_map, verts, tris, norms); break; }
+            case C_1000 : { make_triangle(m, isovalue, vids, func, {2,0,4}, e2v_map, verts, tris, norms); break; }
+            case C_0111 : { swapped.at(pid)?
+                            make_triangle(m, isovalue, vids, func, {2,0,4}, e2v_map, verts, tris, norms) :
+                            make_triangle(m, isovalue, vids, func, {0,2,4}, e2v_map, verts, tris, norms); break; }
+            case C_1011 : { swapped.at(pid)?
+                            make_triangle(m, isovalue, vids, func, {1,2,3}, e2v_map, verts, tris, norms) :
+                            make_triangle(m, isovalue, vids, func, {2,1,3}, e2v_map, verts, tris, norms); break; }
+            case C_0100 : { make_triangle(m, isovalue, vids, func, {1,2,3}, e2v_map, verts, tris, norms); break; }
+            case C_1101 : { swapped.at(pid)?
+                            make_triangle(m, isovalue, vids, func, {0,1,5}, e2v_map, verts, tris, norms) :
+                            make_triangle(m, isovalue, vids, func, {1,0,5}, e2v_map, verts, tris, norms); break; }
+            case C_0010 : { make_triangle(m, isovalue, vids, func, {0,1,5}, e2v_map, verts, tris, norms); break; }
+            case C_0001 : { make_triangle(m, isovalue, vids, func, {5,3,4}, e2v_map, verts, tris, norms); break; }
+            case C_1110 : { swapped.at(pid)?
+                            make_triangle(m, isovalue, vids, func, {5,3,4}, e2v_map, verts, tris, norms) :
+                            make_triangle(m, isovalue, vids, func, {3,5,4}, e2v_map, verts, tris, norms); break; }
+            case C_0101 : { make_triangle(m, isovalue, vids, func, {5,2,4}, e2v_map, verts, tris, norms);
+                            make_triangle(m, isovalue, vids, func, {2,5,1}, e2v_map, verts, tris, norms); break; }
+            case C_1010 : { make_triangle(m, isovalue, vids, func, {2,5,4}, e2v_map, verts, tris, norms);
+                            make_triangle(m, isovalue, vids, func, {5,2,1}, e2v_map, verts, tris, norms); break; }
+            case C_0011 : { make_triangle(m, isovalue, vids, func, {3,4,1}, e2v_map, verts, tris, norms);
+                            make_triangle(m, isovalue, vids, func, {1,4,0}, e2v_map, verts, tris, norms); break; }
+            case C_1100 : { make_triangle(m, isovalue, vids, func, {4,3,1}, e2v_map, verts, tris, norms);
+                            make_triangle(m, isovalue, vids, func, {4,1,0}, e2v_map, verts, tris, norms); break; }
+            case C_1001 : { make_triangle(m, isovalue, vids, func, {3,2,0}, e2v_map, verts, tris, norms);
+                            make_triangle(m, isovalue, vids, func, {5,3,0}, e2v_map, verts, tris, norms); break; }
+            case C_0110 : { make_triangle(m, isovalue, vids, func, {2,3,0}, e2v_map, verts, tris, norms);
+                            make_triangle(m, isovalue, vids, func, {3,5,0}, e2v_map, verts, tris, norms); break; }
             default : break;
         }
     }
@@ -240,7 +260,7 @@ void make_triangle(const Tetmesh<M,V,E,F,P> & m,
                    const double               isovalue,
                    const uint                 vids[],
                    const double               func[],
-                   const uint                 e[],
+                   const std::array<uint,3> & e,
                    std::map<ipair,uint>     & e2v_map,
                    std::vector<vec3d>       & verts,
                    std::vector<uint>        & tris,
