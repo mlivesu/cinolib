@@ -1849,4 +1849,27 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_fix_orientation()
     return true;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int AbstractPolyhedralMesh<M,V,E,F,P>::poly_euler_characteristic(const uint pid) const
+{
+    // https://en.wikipedia.org/wiki/Euler_characteristic
+    uint nv = verts_per_poly(pid);
+    uint ne = edges_per_poly(pid);
+    uint nf = faces_per_poly(pid);
+    return nv - ne + nf;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_spherical(const uint pid) const
+{
+    // https://en.wikipedia.org/wiki/Spherical_polyhedron
+    return poly_euler_characteristic(pid)==2;
+}
+
 }

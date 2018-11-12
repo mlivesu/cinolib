@@ -220,6 +220,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool              poly_faces_share_orientation(const uint pid, const uint fid0, const uint fid1) const;
                 bool              poly_fix_orientation        (const uint pid, const uint fid);
                 bool              poly_fix_orientation        ();
+                int               poly_euler_characteristic   (const uint pid) const;
+                bool              poly_is_spherical           (const uint pid) const;
 };
 
 }
