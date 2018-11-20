@@ -27,4 +27,4 @@ INCLUDEPATH  += /usr/local/include
 # enable Triangle
 DEFINES     += CINOLIB_USES_TRIANGLE
 INCLUDEPATH += /usr/local/include
-LIBS        += -ltriangle
+LIBS        += -L/usr/local/lib -ltriangle

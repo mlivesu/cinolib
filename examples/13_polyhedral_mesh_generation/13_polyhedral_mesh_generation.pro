@@ -25,4 +25,4 @@ LIBS    += -lGLU
 DEFINES     += CINOLIB_USES_TETGEN
 DEFINES     += TETLIBRARY # this is to link tetgen in "library mode"
 INCLUDEPATH += /usr/local/include
-LIBS        += -ltet
+LIBS        += -L/usr/local/lib -ltet
