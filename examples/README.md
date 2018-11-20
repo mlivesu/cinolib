@@ -86,6 +86,9 @@ Here is a list of the sample programs available in CinoLib.
 #### 24 - Read and visualize a sliced object for 3D printing
 <p align="left"><img src="snapshots/24_sliced_obj.png" width="500"></p>
 
+#### 25 - Paint on a 3D surface using brushes of different sizes
+<p align="left"><img src="snapshots/25_surface_painter.png" width="500"></p>
+
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
