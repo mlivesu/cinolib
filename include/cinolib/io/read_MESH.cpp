@@ -73,7 +73,7 @@ void read_MESH(const char                     * filename,
     {
         // read vertices
         //
-        if (line[0] == 'V')
+        if (line[0] == 'V' || (line[0] == ' ' && line[1] == 'V' ))
         {
             uint   nverts;
             double x,y,z;
@@ -94,7 +94,7 @@ void read_MESH(const char                     * filename,
 
         // read tetrahedra
         //
-        if (line[0] == 'T' && line[1] == 'e')
+        if ((line[0] == 'T' && line[1] == 'e') || ( line[0] == ' ' && line[1] == 'T' && line[2] == 'e')  )
         {
             uint ntets;
             fgets(line, 1024, f);
