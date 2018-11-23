@@ -37,6 +37,7 @@
 #include <cinolib/stl_container_utilities.h>
 #include <cinolib/inf.h>
 #include <map>
+#include <unordered_set>
 
 namespace cinolib
 {
@@ -1003,15 +1004,37 @@ void AbstractMesh<M,V,E,P>::poly_unmark_all()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractMesh<M,V,E,P>::polys_are_colored() const
+uint AbstractMesh<M,V,E,P>::polys_n_unique_colors() const
 {
     std::set<Color> colors;
     for(uint pid=0; pid<num_polys(); ++pid)
     {
         colors.insert(poly_data(pid).color);
     }
-    if (colors.size()>1) return true;
-    return false;
+    return colors.size();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint AbstractMesh<M,V,E,P>::polys_n_unique_labels() const
+{
+    std::unordered_set<int> labels;
+    for(uint pid=0; pid<num_polys(); ++pid)
+    {
+        labels.insert(poly_data(pid).label);
+    }
+    return labels.size();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool AbstractMesh<M,V,E,P>::polys_are_colored() const
+{
+    return (polys_n_unique_colors()>1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1020,13 +1043,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 bool AbstractMesh<M,V,E,P>::polys_are_labeled() const
 {
-    std::set<int> labels;
-    for(uint pid=0; pid<num_polys(); ++pid)
-    {
-        labels.insert(poly_data(pid).label);
-    }
-    if (labels.size()>1) return true;
-    return false;
+    return (polys_n_unique_labels()>1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
