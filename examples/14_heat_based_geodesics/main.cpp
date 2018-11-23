@@ -86,5 +86,9 @@ int main(int argc, char **argv)
         gui.updateGL();
     });
 
+    // CMD+1 to show mesh controls.
+    SurfaceMeshControlPanel<DrawableTrimesh<>> panel(&m, &gui);
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
+
     return a.exec();
 }

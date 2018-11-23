@@ -34,16 +34,16 @@ int main(int argc, char **argv)
     char opt[100];
     sprintf(opt, "YQqa%f", vol_thresh);
     tetgen_wrap(serialized_xyz_from_vec3d(m_in.vector_verts()), serialized_vids_from_polys(m_in.vector_polys()), edges, opt, verts, tets);
-    DrawableTetmesh<> tetmesh(verts, tets);
+    DrawableTetmesh<> m_tet(verts, tets);
 
     Profiler profiler;
 
     // make polygon mesh
-    DrawablePolyhedralmesh<> polymesh;
+    DrawablePolyhedralmesh<> m_poly;
     profiler.push("Dualize mesh");
-    dual_mesh(tetmesh, polymesh, true);
+    dual_mesh(m_tet, m_poly, true);
     profiler.pop();
-    polymesh.updateGL();
+    m_poly.updateGL();
 
     QWidget  gui;
     QHBoxLayout layout;
@@ -55,8 +55,8 @@ int main(int argc, char **argv)
     layout.addWidget(&gui_tet);
     layout.addWidget(&gui_poly);
     gui_in.push_obj(&m_in);
-    gui_tet.push_obj(&tetmesh);
-    gui_poly.push_obj(&polymesh);
+    gui_tet.push_obj(&m_tet);
+    gui_poly.push_obj(&m_poly);
     gui.show();
     gui.resize(800,600);
     m_in.show_wireframe(true);
@@ -70,8 +70,19 @@ int main(int argc, char **argv)
     SlicerState slice_params;
     slice_params.Z_thresh = 0.6;
     m_in.slice(slice_params);
-    tetmesh.slice(slice_params);
-    polymesh.slice(slice_params);
+    m_tet.slice(slice_params);
+    m_poly.slice(slice_params);
+
+    // CMD+1 to show in   mesh controls.
+    // CMD+2 to show tet  mesh controls.
+    // CMD+3 to show poly mesh controls.
+    SurfaceMeshControlPanel<DrawableTrimesh<>>        panel_in  (&m_in,   &gui_in);
+    VolumeMeshControlPanel<DrawableTetmesh<>>         panel_tet (&m_tet,  &gui_tet);
+    VolumeMeshControlPanel<DrawablePolyhedralmesh<>>  panel_poly(&m_poly, &gui_poly);
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui_in),   &QShortcut::activated, [&](){panel_in.show();});
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_2), &gui_tet),  &QShortcut::activated, [&](){panel_tet.show();});
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_3), &gui_poly), &QShortcut::activated, [&](){panel_poly.show();});
+
 
     return app.exec();
 }

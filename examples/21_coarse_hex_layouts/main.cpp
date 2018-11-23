@@ -35,8 +35,9 @@ int main(int argc, char **argv)
     gui.push_obj(&m);
     gui.show();
 
-    VolumeMeshControlPanel<DrawableHexmesh<>> panel(&m,&gui);
-    panel.show();
+    // CMD+1 to show mesh controls.
+    VolumeMeshControlPanel<DrawableHexmesh<>> panel(&m, &gui);
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
 
     return a.exec();
 }

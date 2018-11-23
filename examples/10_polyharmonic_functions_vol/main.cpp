@@ -59,5 +59,9 @@ int main(int argc, char **argv)
 
     n_harmonicity.valueChanged(1); // start with a 1-harmonic map
 
+    // CMD+1 to show mesh controls.
+    VolumeMeshControlPanel<DrawableTetmesh<>> panel(&m, &gui);
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
+
     return a.exec();
 }

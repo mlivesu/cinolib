@@ -35,8 +35,9 @@ int main(int argc, char **argv)
     gui.push_obj(&m);
     gui.show();
 
-    SurfaceMeshControlPanel<DrawableQuadmesh<>> panel(&m,&gui);
-    panel.show();
+    // CMD+1 to show mesh controls.
+    SurfaceMeshControlPanel<DrawableQuadmesh<>> panel(&m, &gui);
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
 
     return a.exec();
 }
