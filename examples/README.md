@@ -93,7 +93,7 @@ Here is a list of the sample programs available in CinoLib.
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
 * Export the skin of a volumetric mesh
-* Export a cluster from a labeled mesh
+* Export a cluster from a labeled surface or volumetric mesh
 * Copy/paste points of view from the GL canvas for accurate visual comparisons and fast snapshot reproduction
 * Customize data structures with user defined mesh/vertex/edge/polygon/polyhedron attributes
 * Navigate application history exploiting Cinolib undo/redo facilities
