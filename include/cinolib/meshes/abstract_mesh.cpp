@@ -211,6 +211,28 @@ std::vector<int> AbstractMesh<M,V,E,P>::vector_poly_labels() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+std::vector<Color> AbstractMesh<M,V,E,P>::vector_poly_unique_colors() const
+{
+    std::vector<Color> colors = vector_poly_colors();
+    REMOVE_DUPLICATES_FROM_VEC(colors);
+    return colors;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<int> AbstractMesh<M,V,E,P>::vector_poly_unique_labels() const
+{
+    std::vector<int> labels = vector_poly_labels();
+    REMOVE_DUPLICATES_FROM_VEC(labels);
+    return labels;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<double> AbstractMesh<M,V,E,P>::serialize_uvw(const int mode) const
 {
     std::vector<double> uvw;
@@ -1006,12 +1028,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint AbstractMesh<M,V,E,P>::polys_n_unique_colors() const
 {
-    std::set<Color> colors;
-    for(uint pid=0; pid<num_polys(); ++pid)
-    {
-        colors.insert(poly_data(pid).color);
-    }
-    return colors.size();
+    return vector_poly_unique_colors().size();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1020,12 +1037,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint AbstractMesh<M,V,E,P>::polys_n_unique_labels() const
 {
-    std::unordered_set<int> labels;
-    for(uint pid=0; pid<num_polys(); ++pid)
-    {
-        labels.insert(poly_data(pid).label);
-    }
-    return labels.size();
+    return vector_poly_unique_labels().size();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
