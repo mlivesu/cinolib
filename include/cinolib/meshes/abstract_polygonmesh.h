@@ -101,11 +101,6 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<int>   export_per_poly_labels() const;
-        std::vector<Color> export_per_poly_colors() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         std::vector<uint>  get_boundary_vertices() const;
         std::vector<ipair> get_boundary_edges() const;
 

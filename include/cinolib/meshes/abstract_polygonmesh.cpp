@@ -1370,34 +1370,6 @@ double AbstractPolygonMesh<M,V,E,P>::poly_perimeter(const uint pid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<int> AbstractPolygonMesh<M,V,E,P>::export_per_poly_labels() const
-{
-    std::vector<int> labels(this->num_polys());
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        labels.at(this->poly_data(pid).label);
-    }
-    return labels;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-std::vector<Color> AbstractPolygonMesh<M,V,E,P>::export_per_poly_colors() const
-{
-    std::vector<Color> colors(this->num_polys());
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        colors.at(pid) = this->poly_data(pid).color;
-    }
-    return colors;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::poly_flip_winding_order(const uint pid)
 {
     std::reverse(this->polys.at(pid).begin(), this->polys.at(pid).end());
