@@ -181,6 +181,15 @@ void AbstractMesh<M,V,E,P>::update_bbox()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+int AbstractMesh<M,V,E,P>::genus() const
+{
+    return Euler_characteristic() - 2;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<Color> AbstractMesh<M,V,E,P>::vector_poly_colors() const
 {
     std::vector<Color> colors;

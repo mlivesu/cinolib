@@ -86,6 +86,10 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        int Euler_characteristic() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
                 void update_normals();
                 void update_f_normals();
         virtual void update_f_normal(const uint fid) = 0;

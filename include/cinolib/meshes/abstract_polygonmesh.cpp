@@ -366,6 +366,18 @@ void AbstractPolygonMesh<M,V,E,P>::update_normals()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+int AbstractPolygonMesh<M,V,E,P>::Euler_characteristic() const
+{
+    uint nv = this->num_verts();
+    uint ne = this->num_edges();
+    uint np = this->num_polys();
+    return nv - ne + np;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 double AbstractPolygonMesh<M,V,E,P>::mesh_area() const
 {
     double area = 0;

@@ -92,6 +92,18 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+int AbstractPolyhedralMesh<M,V,E,F,P>::Euler_characteristic() const
+{
+    uint nv = this->num_srf_verts();
+    uint ne = this->num_srf_edges();
+    uint nf = this->num_srf_faces();
+    return nv - ne + nf;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::num_srf_verts() const
 {
     uint count = 0;

@@ -87,7 +87,11 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
                 void update_v_normals();
                 void update_normals();
 
-         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        int Euler_characteristic() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual uint verts_per_poly(const uint pid) const { return this->polys.at(pid).size(); }
 
@@ -103,7 +107,6 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         std::vector<uint>  get_boundary_vertices() const;
         std::vector<ipair> get_boundary_edges() const;
-
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double mesh_volume() const;
