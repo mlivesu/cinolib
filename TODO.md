@@ -2,6 +2,7 @@
 Please consider this to be just development notes and not any real planning.
 
 ### Things to be fixed:
+* use a less verbose naming for ANSI text colors
 * fix per face winding in midpoint subdivision
 * fix marching tets: degenerate triangles will be generated in some cases (see comments inside cpp file)
 * fix integral curve tracing (also refactor ray/line/plane intersections)
