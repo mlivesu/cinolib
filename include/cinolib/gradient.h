@@ -32,6 +32,14 @@
 *     Via de Marini, 6                                                          *
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
+*                                                                               *
+*                                                                               *
+*     Claudio Mancinelli (claudio.f.mancinelli@gmail.com)                       *
+*                                                                               *
+*     University of Genoa                                                       *
+*     Via Dodecaneso, 35                                                        *
+*     16146 Genoa,                                                              *
+*     Italy                                                                     *
 *********************************************************************************/
 #ifndef CINO_GRADIENT_H
 #define CINO_GRADIENT_H
@@ -45,18 +53,28 @@ namespace cinolib
 {
 
 /* Compute the gradient of a mesh as a 3M x N matrix, where M is the
- * number of elements and N the number of vertices. References:
+ * number of elements and N the number of vertices. If per_poly is true,
+ * the matrix size is 3N x N, and the gradient is computed per vertex,
+ * as average between the elements incident to it.
  *
- * Gradient Calculation Methods on Arbitrary Polyhedral Unstructured Meshes for Cell-Centered CFD Solvers
- * Emre Sozer, Christoph Brehm and Cetin C. Kiris
- * American Institute of Aeronautics and Astronautics (2014)
+ * Gradients are always computed using the Green-Gauss method. For simplicial
+ * meshes, this is equivalent to extending the function within each tri/tet
+ * with linear interpolation using the barycentri coordinates, which uniquely
+ * defines a piece-wise constant gradient field.
  *
- * A Comparison of Gradient Estimation Methods for Volume Rendering on Unstructured Meshes
- * Carlos D. Correa, Robert Hero and Kwan-Liu Ma
- * IEEE Transactions on Visualization and Computer Graphics (2011)
+ * References:
  *
- * If per_poly is true, the matrix size is 3N x N, and the gradient is computed per vertex,
- * as average between the elements incident to each vertex.
+ *   Gradient Field Estimation on Triangle Meshes
+ *   Claudio Mancinelli, Marco Livesu, Enrico Puppo
+ *   STAG - Smart Tools and Apps for Graphics (2018)
+ *
+ *   Gradient Calculation Methods on Arbitrary Polyhedral Unstructured Meshes for Cell-Centered CFD Solvers
+ *   Emre Sozer, Christoph Brehm and Cetin C. Kiris
+ *   American Institute of Aeronautics and Astronautics (2014)
+ *
+ *   A Comparison of Gradient Estimation Methods for Volume Rendering on Unstructured Meshes
+ *   Carlos D. Correa, Robert Hero and Kwan-Liu Ma
+ *   IEEE Transactions on Visualization and Computer Graphics (2011)
 */
 
 template<class M, class V, class E, class P>
