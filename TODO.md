@@ -48,6 +48,5 @@ Please consider this to be just development notes and not any real planning.
 
 ### Documentation:
 * create a mirror repo for eigen (and kill that annoying warning)
-* create a mirror repo for graph cuts (the version without warnings) and Shewcuck's predicates
 * add a description of all the non standard files used in cinolib (.hedra, scalar and vector fields, sharp features)
 
