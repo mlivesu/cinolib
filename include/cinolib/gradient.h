@@ -54,6 +54,9 @@ namespace cinolib
  * A Comparison of Gradient Estimation Methods for Volume Rendering on Unstructured Meshes
  * Carlos D. Correa, Robert Hero and Kwan-Liu Ma
  * IEEE Transactions on Visualization and Computer Graphics (2011)
+ *
+ * If per_poly is true, the matrix size is 3N x N, and the gradient is computed per vertex,
+ * as average between the elements incident to each vertex.
 */
 
 template<class M, class V, class E, class P>
@@ -64,7 +67,7 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> &
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F,P> & m);
+Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F,P> & m, const bool per_poly = true);
 
 }
 
