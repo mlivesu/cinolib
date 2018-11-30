@@ -819,9 +819,9 @@ CINO_INLINE
 bool GLcanvas::unproject(const vec2i & p2d, vec3d & p3d)
 {
     GLfloat depth;
-    if (!read_Z_buffer(p2d, depth))
+    if(!read_Z_buffer(p2d, depth))
     {
-        std::cout << "Unproject click(" << p2d.x() << "," << p2d.y() << ") depth: 1 [failed]" << std::endl;
+        //std::cout << "Unproject click(" << p2d.x() << "," << p2d.y() << ") depth: 1 [failed]" << std::endl;
         return false;
     }
 
@@ -833,7 +833,7 @@ bool GLcanvas::unproject(const vec2i & p2d, vec3d & p3d)
 
     gluUnProject(p2d.x(), p2d.y(), depth, trackball.modelview, trackball.projection, viewport,  &p3d.x(), &p3d.y(), &p3d.z());
 
-    std::cout << "Unproject click(" << p2d.x() << "," << p2d.y() << ") depth: " << depth << " => " << p3d <<std::endl;
+    //std::cout << "Unproject click(" << p2d.x() << "," << p2d.y() << ") depth: " << depth << " => " << p3d <<std::endl;
     return true;
 }
 
