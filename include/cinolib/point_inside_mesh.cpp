@@ -67,7 +67,7 @@ PointInsideMeshCache<Mesh>::PointInsideMeshCache(const Mesh & m, const uint octr
 */
 template<class Mesh>
 CINO_INLINE
-void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & pid, std::vector<double> & wgts) const
+bool PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & pid, std::vector<double> & wgts) const
 {
     std::set<uint> items;
     octree.get_items(p, items);
@@ -77,26 +77,23 @@ void PointInsideMeshCache<Mesh>::locate(const vec3d p, uint & pid, std::vector<d
         if (m_ptr->poly_bary_coords(id, p, wgts)) // if is inside...
         {
             pid = id;
-            return;
+            return true;
         }
     }
+    return false;
 
-    /* this should not be here... it's a matter of the application, not of the data structure
-     * to handle corner cases...
-    */
-    std::cerr << "WARNING! point " << p << " is not inside the mesh! " << std::endl;
-    std::cerr << "I'll assign it to its closest mesh element         " << std::endl;
-    std::cerr << "BBmin: " << m_ptr->bbox().min << std::endl;
-    std::cerr << "BBmax: " << m_ptr->bbox().max << std::endl;
+    //std::cerr << "I'll assign it to its closest mesh element         " << std::endl;
+    //std::cerr << "BBmin: " << m_ptr->bbox().min << std::endl;
+    //std::cerr << "BBmax: " << m_ptr->bbox().max << std::endl;
 
-    std::set<std::pair<double,uint>,std::greater<std::pair<double,uint>>> ordered_items;
-    for(int item : items)
-    {
-        ordered_items.insert(std::make_pair(m_ptr->poly_centroid(item).dist(p),item));
-    }
-    assert(ordered_items.size()>0);
-    pid = (*ordered_items.begin()).second;
-    wgts = std::vector<double>(m_ptr->verts_per_poly(pid), 1.0/double(m_ptr->verts_per_poly(pid))); // centroid
+    //std::set<std::pair<double,uint>,std::greater<std::pair<double,uint>>> ordered_items;
+    //for(int item : items)
+    //{
+    //    ordered_items.insert(std::make_pair(m_ptr->poly_centroid(item).dist(p),item));
+    //}
+    //assert(ordered_items.size()>0);
+    //pid = (*ordered_items.begin()).second;
+    //wgts = std::vector<double>(m_ptr->verts_per_poly(pid), 1.0/double(m_ptr->verts_per_poly(pid))); // centroid
 }
 
 
@@ -110,14 +107,20 @@ vec3d PointInsideMeshCache<Mesh>::locate(const vec3d p, const Mesh & m) const
 {
     uint eid;
     std::vector<double> wgts;
-    locate(p, eid, wgts);
-
-    vec3d tmp(0,0,0);
-    for(uint off=0; off<m.verts_per_poly(eid); ++off)
+    if(locate(p, eid, wgts))
     {
-        tmp += wgts.at(off) * m.poly_vert(eid,off);
+        vec3d tmp(0,0,0);
+        for(uint off=0; off<m.verts_per_poly(eid); ++off)
+        {
+            tmp += wgts.at(off) * m.poly_vert(eid,off);
+        }
+        return tmp;
     }
-    return tmp;
+    else
+    {
+        std::cerr << "WARNING! point " << p << " is not inside the mesh! " << std::endl;
+        return p;
+    }
 }
 
 }
