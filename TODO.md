@@ -9,6 +9,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* add non-manifoldness checks for vertices in srf and vol meshes
 * adjust examples #1-#6 such that will read multiple meshes from command line input 
 * add reader/writer for .MSH files
 * add AO property to mesh vertices, and enable loading AO from text file
