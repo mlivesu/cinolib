@@ -902,6 +902,24 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_srf_edges(const ui
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_srf_verts(const uint vid) const
+{
+    // NOTE: the intent is to provide a "surface one ring". Therefore,
+    // only vertices adjacent through a SURFACE EDGE will be returned
+    //
+    std::vector<uint> srf_e = vert_adj_srf_edges(vid);
+    std::vector<uint> srf_v;
+    for(uint eid : srf_e)
+    {
+        srf_v.push_back(this->vert_opposite_to(eid,vid));
+    }
+    return srf_v;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_vert_ring(const uint vid) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
