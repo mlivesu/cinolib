@@ -387,9 +387,8 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        if (this->face_is_on_srf(fid)) continue;
+        if(this->face_is_on_srf(fid)) continue;
 
-        assert(this->adj_f2p(fid).size()==2);
         std::vector<uint> visible_polys;
         for(uint pid : this->adj_f2p(fid))
         {
