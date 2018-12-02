@@ -138,8 +138,6 @@ void midpoint_subdivision(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
 
         default : assert(false);
     }
-
-
 }
 
 }
