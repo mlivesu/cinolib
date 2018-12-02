@@ -37,6 +37,7 @@
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/geometry/polygon.h>
 #include <unordered_set>
+#include <unordered_map>
 #include <queue>
 
 namespace cinolib
@@ -1900,6 +1901,38 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_spherical(const uint pid) const
 {
     // https://en.wikipedia.org/wiki/Spherical_polyhedron
     return poly_euler_characteristic(pid)==2;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::poly_export_element(const uint                       pid,
+                                                            std::vector<vec3d>             & verts,
+                                                            std::vector<std::vector<uint>> & faces) const
+{
+    std::unordered_map<uint,uint> v_map;
+    verts.clear();
+    faces.clear();
+    for(uint fid : this->adj_p2f(pid))
+    {
+        std::vector<uint> f;
+        for(uint vid : this->adj_f2v(fid))
+        {
+            auto it = v_map.find(vid);
+            if(it==v_map.end())
+            {
+                uint fresh_id = v_map.size();
+                v_map[vid] = fresh_id;
+                verts.push_back(this->vert(vid));
+                f.push_back(fresh_id);
+            }
+            else f.push_back(it->second);
+            if(this->poly_face_is_CW(pid,fid)) std::reverse(f.begin(), f.end());
+        }
+        faces.push_back(f);
+    }
 }
 
 }

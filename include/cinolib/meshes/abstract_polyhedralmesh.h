@@ -227,6 +227,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool              poly_fix_orientation        ();
                 int               poly_euler_characteristic   (const uint pid) const;
                 bool              poly_is_spherical           (const uint pid) const;
+                void              poly_export_element         (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const;
 };
 
 }
