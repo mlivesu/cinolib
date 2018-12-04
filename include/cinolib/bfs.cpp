@@ -205,7 +205,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void bfs_on_dual_w_edge_barriers(const AbstractPolygonMesh<M,V,E,P> & m,
                                  const uint                           source,
-                                 const std::vector<bool>            & mask_edges, // if mask[e] = true, bfs canno expand through edge e
+                                 const std::vector<bool>            & mask_edges, // if mask[e] = true, bfs cannot expand through edge e
                                  std::unordered_set<uint>           & visited)
 {
     visited.clear();
