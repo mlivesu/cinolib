@@ -143,8 +143,9 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool              vert_is_on_srf            (const uint vid) const;
         virtual double            vert_mass                 (const uint vid) const;
                 double            vert_volume               (const uint vid) const;
-                std::vector<uint> vert_adj_srf_edges        (const uint vid) const;
                 std::vector<uint> vert_adj_srf_verts        (const uint vid) const;
+                std::vector<uint> vert_adj_srf_edges        (const uint vid) const;
+                std::vector<uint> vert_adj_srf_faces        (const uint vid) const;
                 std::vector<uint> vert_ordered_srf_vert_ring(const uint vid) const;
                 std::vector<uint> vert_ordered_srf_edge_ring(const uint vid) const;
                 std::vector<uint> vert_ordered_srf_face_ring(const uint vid) const;

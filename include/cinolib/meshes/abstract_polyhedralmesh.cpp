@@ -903,6 +903,20 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_srf_edges(const ui
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_srf_faces(const uint vid) const
+{
+    std::vector<uint> srf_f;
+    for(uint fid : this->adj_v2f(vid))
+    {
+        if (this->face_is_on_srf(fid)) srf_f.push_back(fid);
+    }
+    return srf_f;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_srf_verts(const uint vid) const
 {
     // NOTE: the intent is to provide a "surface one ring". Therefore,
