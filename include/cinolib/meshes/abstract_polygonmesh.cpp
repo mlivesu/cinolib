@@ -937,9 +937,8 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_labeling_boundaries()
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        std::set<int> unique_labels;
+        std::unordered_set<int> unique_labels;
         for(uint pid : this->adj_e2p(eid)) unique_labels.insert(this->poly_data(pid).label);
-
         this->edge_data(eid).marked = (unique_labels.size()>=2);
     }
 }
