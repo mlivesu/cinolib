@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/quality.h>
-#include <cinolib/inf.h>
+#include <cinolib/min_max_inf.h>
 
 /*
  * All metrics implemented here all based on:
@@ -202,7 +202,7 @@ CINO_INLINE
 double frobenius(const vec3d & col0, const vec3d & col1, const vec3d & col2)
 {
     double det = determinant(col0, col1, col2);
-    if(det <= std::numeric_limits<double>::min()) return std::numeric_limits<double>::max();
+    if(det <= min_double) return max_double;
 
     double term1 = col0.dot(col0) + col1.dot(col1) + col2.dot(col2);
     double term2 = (col0.cross(col1)).dot(col0.cross(col1)) +
@@ -271,11 +271,11 @@ double hex_max_edge_ratio(const vec3d & p0, const vec3d & p1, const vec3d & p2, 
     hex_principal_axes(p0, p1, p2, p3, p4, p5, p6, p7, X, false);
     norms(X, 3, X_norms);
 
-    if (X_norms[0] < std::numeric_limits<double>::min()||
-        X_norms[1] < std::numeric_limits<double>::min()||
-        X_norms[2] < std::numeric_limits<double>::min())
+    if (X_norms[0] < min_double||
+        X_norms[1] < min_double||
+        X_norms[2] < min_double)
     {
-        return std::numeric_limits<double>::max();
+        return max_double;
     }
 
     double max_ratios[3] =
@@ -305,7 +305,7 @@ double hex_max_aspect_Frobenius(const vec3d & p0, const vec3d & p1, const vec3d 
         vec3d tet[3];
         hex_subtets(L, X, i, tet);
         frob[i] = frobenius(tet[0], tet[1], tet[2]);
-        if(frob[i]==std::numeric_limits<double>::max()) return frob[i];
+        if(frob[i]==max_double) return frob[i];
     }
     return *std::max_element(frob, frob+8);
 }
@@ -351,7 +351,7 @@ double hex_oddy(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3
         hex_subtets(L, X, i, tet);
         double det = determinant(tet[0], tet[1], tet[2]);
 
-        if(det > std::numeric_limits<double>::min())
+        if(det > min_double)
         {
             double a11 = tet[0].dot(tet[0]);
             double a12 = tet[0].dot(tet[1]);
@@ -365,7 +365,7 @@ double hex_oddy(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3
 
             oddy[i] = (AtA_sqrd - A_sqrd*A_sqrd/3.0) / pow(det,four_over_three);
         }
-        else return std::numeric_limits<double>::max();
+        else return max_double;
     }
     return *std::max_element(oddy,oddy+9);
 }
@@ -380,7 +380,7 @@ double hex_relative_size_squared(const vec3d & p0, const vec3d & p1, const vec3d
     hex_principal_axes(p0, p1, p2, p3, p4, p5, p6, p7, X, false);
     double D = determinant(X[0], X[1], X[2]) / (64.0*avgV);
 
-    if(avgV<=std::numeric_limits<double>::min() || D<=std::numeric_limits<double>::min()) return 0;
+    if(avgV<=min_double || D<=min_double) return 0;
     return std::pow(std::min(D, 1.f/D), 2);
 }
 
@@ -426,10 +426,10 @@ double hex_shape(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec
         vec3d tet[3];
         hex_subtets(L, X, i, tet);
         double det = determinant(tet[0], tet[1], tet[2]);
-        if(det<=std::numeric_limits<double>::min()) return 0;
+        if(det<=min_double) return 0;
         double num = pow(det, two_over_three);
         double den = tet[0].dot(tet[0]) + tet[1].dot(tet[1]) + tet[2].dot(tet[2]);
-        if(den<=std::numeric_limits<double>::min()) return 0;
+        if(den<=min_double) return 0;
         shape[i] = 3.0 * num/den;
     }
     return *std::min_element(shape, shape+9);
@@ -462,7 +462,7 @@ double hex_shear(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec
         vec3d tet[3];
         hex_subtets(L, X, i, tet);
         shear[i] = determinant(tet[0], tet[1], tet[2]);
-        if(shear[i]<=std::numeric_limits<double>::min()) return 0;
+        if(shear[i]<=min_double) return 0;
     }
     return *std::min_element(shear, shear+9);
 }
@@ -486,9 +486,9 @@ double hex_skew(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3
     vec3d X[3];
     hex_principal_axes(p0, p1, p2, p3, p4, p5, p6, p7, X, true);
 
-    if(X[0].length() <= std::numeric_limits<double>::min()) return 0;
-    if(X[1].length() <= std::numeric_limits<double>::min()) return 0;
-    if(X[2].length() <= std::numeric_limits<double>::min()) return 0;
+    if(X[0].length() <= min_double) return 0;
+    if(X[1].length() <= min_double) return 0;
+    if(X[2].length() <= min_double) return 0;
 
     double skew[3] =
     {
@@ -537,9 +537,9 @@ double hex_taper(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec
     norms(X, 3, X_norms);
     norms(XX, 3, XX_norms);
 
-    if(X_norms[0] <= std::numeric_limits<double>::min()) return std::numeric_limits<double>::max();
-    if(X_norms[1] <= std::numeric_limits<double>::min()) return std::numeric_limits<double>::max();
-    if(X_norms[2] <= std::numeric_limits<double>::min()) return std::numeric_limits<double>::max();
+    if(X_norms[0] <= min_double) return max_double;
+    if(X_norms[1] <= min_double) return max_double;
+    if(X_norms[2] <= min_double) return max_double;
 
     double taper[3] =
     {
