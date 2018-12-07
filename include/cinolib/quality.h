@@ -47,27 +47,133 @@
  *
 */
 
-
 namespace cinolib
 {
 
 CINO_INLINE
 double tet_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double tet_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 double tet_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_diagonal(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                    const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_edge_ratio(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                      const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                    const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_max_edge_ratio(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                          const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_max_aspect_Frobenius(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                                const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_mean_aspect_Frobenius(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                                 const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_oddy(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_relative_size_squared(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                                 const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7,
+                                 const double & avgV);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 double hex_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
                            const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_shape(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                 const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_shape_and_size(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                          const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7,
+                          const double & avg_V);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_shear(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                 const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_shear_and_size(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                          const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7,
+                          const double & avg_V);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_skew(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_stretch(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                   const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_taper(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                 const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double hex_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
+                  const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 double hex_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3,
                            const vec3d & p4, const vec3d & p5, const vec3d & p6, const vec3d & p7);
-}
 
+}
 
 #ifndef  CINO_STATIC_LIB
 #include "quality.cpp"
