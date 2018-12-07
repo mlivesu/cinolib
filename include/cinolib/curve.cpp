@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/curve.h>
-#include <cinolib/inf.h>
+#include <cinolib/min_max_inf.h>
 
 namespace cinolib
 {

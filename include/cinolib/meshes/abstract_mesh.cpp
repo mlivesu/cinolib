@@ -35,7 +35,7 @@
 *********************************************************************************/
 #include <cinolib/meshes/abstract_mesh.h>
 #include <cinolib/stl_container_utilities.h>
-#include <cinolib/inf.h>
+#include <cinolib/min_max_inf.h>
 #include <map>
 #include <unordered_set>
 

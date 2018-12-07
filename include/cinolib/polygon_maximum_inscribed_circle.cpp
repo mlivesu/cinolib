@@ -38,7 +38,7 @@
 *********************************************************************************/
 #include <cinolib/polygon_maximum_inscribed_circle.h>
 #include <cinolib/geometry/segment.h>
-#include <cinolib/inf.h>
+#include <cinolib/min_max_inf.h>
 
 // Most of this is coming from here:
 // http://www.boost.org/doc/libs/1_65_1/libs/polygon/doc/voronoi_diagram.htm

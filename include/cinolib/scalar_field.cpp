@@ -35,7 +35,7 @@
 *********************************************************************************/
 #include <cinolib/scalar_field.h>
 #include <cinolib/cino_inline.h>
-#include <cinolib/inf.h>
+#include <cinolib/min_max_inf.h>
 #include <fstream>
 
 namespace cinolib
