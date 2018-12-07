@@ -25,7 +25,6 @@ Please consider this to be just development notes and not any real planning.
 * add matrix class (i.e. mat<real,size>, with operators and constructors from quaternions, rotations, identity, diagonal, ecc)
 * add support to read/write per element labels in OFF and HEDRA
 * make sure field_serialize is lossless in terms of numeric precision
-* add verdict metrics for tris/quads/tets/hexa
 * put edge flip and similar operators on separate files
 * add inverse and transpose operators for 2x2 and 3x3 matrices
 * remove headers from serialized vector and scalar fields (it’s far more general)
