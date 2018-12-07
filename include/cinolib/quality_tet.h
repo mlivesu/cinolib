@@ -33,10 +33,40 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_QUALITY
-#define CINO_QUALITY
+#ifndef CINO_QUALITY_TET
+#define CINO_QUALITY_TET
 
-#include <cinolib/quality_tet.h>
-#include <cinolib/quality_hex.h>
+#include <cinolib/cino_inline.h>
+#include <cinolib/geometry/vec3.h>
 
-#endif // CINO_QUALITY
+/*
+ * Scaled Jacobian and Volume computations are all based on:
+ *
+ * The Verdict Geometric Quality Library
+ * SANDIA Report SAND2007-1751
+ *
+*/
+
+namespace cinolib
+{
+
+CINO_INLINE
+double tet_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double tet_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double tet_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d & p3);
+
+}
+
+#ifndef  CINO_STATIC_LIB
+#include "quality_tet.cpp"
+#endif
+
+#endif // CINO_QUALITY_TET
