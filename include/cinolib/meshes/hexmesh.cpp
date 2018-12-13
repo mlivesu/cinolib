@@ -124,7 +124,6 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
-        exit(-1);
     }
 
     init_hexmesh(tmp_verts, tmp_polys, vert_labels, poly_labels);
@@ -161,7 +160,6 @@ void Hexmesh<M,V,E,F,P>::save(const char * filename) const
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
-        exit(-1);
     }
 }
 

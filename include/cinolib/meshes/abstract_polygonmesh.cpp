@@ -78,7 +78,6 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
-        exit(-1);
     }
 
     init(pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col);
@@ -112,7 +111,6 @@ void AbstractPolygonMesh<M,V,E,P>::save(const char * filename) const
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
-        exit(-1);
     }
 }
 
