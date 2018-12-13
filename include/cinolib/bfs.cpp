@@ -239,7 +239,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void bfs_on_dual_w_face_barriers(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                                  const uint                                source,
-                                 const std::vector<bool>                 & mask_faces, // if mask[f] = true, bfs canno expand through face f
+                                 const std::vector<bool>                 & mask_faces, // if mask[f] = true, bfs cannot expand through face f
                                  std::unordered_set<uint>                & visited)
 {
     visited.clear();
