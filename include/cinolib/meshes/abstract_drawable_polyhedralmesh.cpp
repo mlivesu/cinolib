@@ -291,7 +291,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             else if (drawlist_out.draw_mode & DRAW_TRI_QUALITY)
             {
                 float q = this->poly_data(pid).quality;
-                Color c = Color::quality2rgb(q);
+                Color c = Color::red_white_blue_ramp_01(q);
                 drawlist_out.tri_v_colors.push_back(c.r);
                 drawlist_out.tri_v_colors.push_back(c.g);
                 drawlist_out.tri_v_colors.push_back(c.b);
@@ -488,7 +488,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
             else if (drawlist_in.draw_mode & DRAW_TRI_QUALITY)
             {
                 float q = this->poly_data(pid).quality;
-                Color c = Color::quality2rgb(q);
+                Color c = Color::red_white_blue_ramp_01(q);
                 drawlist_in.tri_v_colors.push_back(c.r);
                 drawlist_in.tri_v_colors.push_back(c.g);
                 drawlist_in.tri_v_colors.push_back(c.b);

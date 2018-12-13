@@ -257,7 +257,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
                 else if (drawlist.draw_mode & DRAW_TRI_QUALITY)
                 {
                     float q = this->poly_data(pid).quality;
-                    Color c = Color::quality2rgb(q);
+                    Color c = Color::red_white_blue_ramp_01(q);
                     drawlist.tri_v_colors.push_back(c.r);
                     drawlist.tri_v_colors.push_back(c.g);
                     drawlist.tri_v_colors.push_back(c.b);

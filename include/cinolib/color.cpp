@@ -132,28 +132,39 @@ bool Color::operator<=(const Color & c) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Color Color::quality2rgb(float q)
+Color Color::red_white_blue_ramp_01(float val)
 {
-    if (q < 0) return Color(1,0,0);
+    if(val<0) return RED();
+    if(val>1) return BLUE();
 
-    if (q <= 0.5)
+    if(val<=0.5)
     {
-        q *= 2.0;
-        return Color(WHITE().r * q + RED().r * (1.0 - q),
-                     WHITE().g * q + RED().g * (1.0 - q),
-                     WHITE().b * q + RED().b * (1.0 - q));
+        val *= 2.0;
+        return Color(WHITE().r * val + RED().r * (1.0 - val),
+                     WHITE().g * val + RED().g * (1.0 - val),
+                     WHITE().b * val + RED().b * (1.0 - val));
     }
 
-    if (q <= 1.0)
+    if(val<=1.0)
     {
-        q = 2.0 * q - 1.0;
-        return Color(BLUE().r * q + WHITE().r * (1.0 - q),
-                     BLUE().g * q + WHITE().g * (1.0 - q),
-                     BLUE().b * q + WHITE().b * (1.0 - q));
+        val = 2.0*val - 1.0;
+        return Color(BLUE().r * val + WHITE().r * (1.0 - val),
+                     BLUE().g * val + WHITE().g * (1.0 - val),
+                     BLUE().b * val + WHITE().b * (1.0 - val));
     }
 
     assert(false);
     return Color(); // warning killer
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+Color Color::red_ramp_01(float val)
+{
+    if(val<0) return RED();
+    if(val>1) return WHITE();
+    return Color(1,val,val);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
