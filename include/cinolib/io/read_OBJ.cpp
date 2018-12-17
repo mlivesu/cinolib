@@ -102,14 +102,16 @@ void read_OBJ(const char                     * filename,
 
 CINO_INLINE
 void read_OBJ(const char                     * filename,
-              std::vector<vec3d>             & pos,         // vertex xyz positions
-              std::vector<vec3d>             & tex,         // vertex uv(w) texture coordinates
-              std::vector<vec3d>             & nor,         // vertex normals
-              std::vector<std::vector<uint>> & poly_pos,    // polygons with references to pos
-              std::vector<std::vector<uint>> & poly_tex,    // polygons with references to tex
-              std::vector<std::vector<uint>> & poly_nor,    // polygons with references to nor
-              std::vector<Color>             & poly_col,    // per polygon colors
-              Texture                        & texture)
+              std::vector<vec3d>             & pos,           // vertex xyz positions
+              std::vector<vec3d>             & tex,           // vertex uv(w) texture coordinates
+              std::vector<vec3d>             & nor,           // vertex normals
+              std::vector<std::vector<uint>> & poly_pos,      // polygons with references to pos
+              std::vector<std::vector<uint>> & poly_tex,      // polygons with references to tex
+              std::vector<std::vector<uint>> & poly_nor,      // polygons with references to nor
+              std::vector<Color>             & poly_col,      // per polygon colors
+              std::string                    & diffuse_path,  // path of the image encoding the diffuse  texture component
+              std::string                    & specular_path, // path of the image encoding the specular texture component
+              std::string                    & normal_path)   // path of the image encoding the normal   texture component
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -120,6 +122,9 @@ void read_OBJ(const char                     * filename,
     poly_tex.clear();
     poly_nor.clear();
     poly_col.clear();
+    diffuse_path.clear();
+    specular_path.clear();
+    normal_path.clear();
 
     FILE *f = fopen(filename, "r");
 
@@ -197,7 +202,7 @@ void read_OBJ(const char                     * filename,
                     std::string s0(filename);
                     std::string s1(mtu_c);
                     std::string s2 = get_file_path(s0) + get_file_name(s1);
-                    read_MTU(s2.c_str(), color_map, texture);
+                    read_MTU(s2.c_str(), color_map, diffuse_path, specular_path, normal_path);
                     has_per_face_color = true;
                 }
                 break;
@@ -220,8 +225,10 @@ void read_OBJ(const char                     * filename,
               std::vector<std::vector<uint>> & poly_nor,    // polygons with references to nor
               std::vector<Color>             & poly_col)    // per polygon colors
 {
-    Texture texture;
-    read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col, texture);
+    std::string  diffuse_path;
+    std::string  specular_path;
+    std::string  normal_path;
+    read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col, diffuse_path, specular_path, normal_path);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -229,8 +236,13 @@ void read_OBJ(const char                     * filename,
 CINO_INLINE
 void read_MTU(const char                  * filename,
               std::map<std::string,Color> & color_map,
-              Texture                     & texture)
+              std::string                 & diffuse_path,  // path of the image encoding the diffuse  texture component
+              std::string                 & specular_path, // path of the image encoding the specular texture component
+              std::string                 & normal_path)  // path of the image encoding the normal   texture component
 {
+    diffuse_path.clear();
+    specular_path.clear();
+    normal_path.clear();
     color_map.clear();
 
     FILE *f = fopen(filename, "r");
@@ -268,7 +280,7 @@ void read_MTU(const char                  * filename,
                 {
                     std::string s(filename);
                     iss >> token;
-                    texture.diffuse_path = get_file_path(s) + token;
+                    diffuse_path = get_file_path(s) + token;
                 }
             }
         }
@@ -282,8 +294,10 @@ CINO_INLINE
 void read_MTU(const char                  * filename,
               std::map<std::string,Color> & color_map)
 {
-    Texture texture;
-    read_MTU(filename, color_map, texture);
+    std::string  diffuse_path;
+    std::string  specular_path;
+    std::string  normal_path;
+    read_MTU(filename, color_map, diffuse_path, specular_path, normal_path);
 }
 
 }

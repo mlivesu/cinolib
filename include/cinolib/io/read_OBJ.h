@@ -43,7 +43,6 @@
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
-#include <cinolib/textures/textures.h>
 
 namespace cinolib
 {
@@ -52,14 +51,16 @@ namespace cinolib
 
 CINO_INLINE
 void read_OBJ(const char                     * filename,
-              std::vector<vec3d>             & pos,         // vertex xyz positions
-              std::vector<vec3d>             & tex,         // vertex uv(w) texture coordinates
-              std::vector<vec3d>             & nor,         // vertex normals
-              std::vector<std::vector<uint>> & poly_pos,    // polygons with references to pos
-              std::vector<std::vector<uint>> & poly_tex,    // polygons with references to tex
-              std::vector<std::vector<uint>> & poly_nor,    // polygons with references to nor
-              std::vector<Color>             & poly_col,    // per polygon colors
-              Texture                        & texture);
+              std::vector<vec3d>             & pos,           // vertex xyz positions
+              std::vector<vec3d>             & tex,           // vertex uv(w) texture coordinates
+              std::vector<vec3d>             & nor,           // vertex normals
+              std::vector<std::vector<uint>> & poly_pos,      // polygons with references to pos
+              std::vector<std::vector<uint>> & poly_tex,      // polygons with references to tex
+              std::vector<std::vector<uint>> & poly_nor,      // polygons with references to nor
+              std::vector<Color>             & poly_col,      // per polygon colors
+              std::string                    & diffuse_path,  // path of the image encoding the diffuse  texture component
+              std::string                    & specular_path, // path of the image encoding the specular texture component
+              std::string                    & normal_path);  // path of the image encoding the normal   texture component
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -93,7 +94,9 @@ void read_OBJ(const char                     * filename,
 CINO_INLINE
 void read_MTU(const char                  * filename,
               std::map<std::string,Color> & color_map,
-              Texture                     & texture);
+              std::string                 & diffuse_path,  // path of the image encoding the diffuse  texture component
+              std::string                 & specular_path, // path of the image encoding the specular texture component
+              std::string                 & normal_path);  // path of the image encoding the normal   texture component
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
