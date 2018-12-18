@@ -152,6 +152,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         void   edge_mark_labeling_boundaries  ();
         void   edge_mark_color_discontinuities();
         void   edge_mark_boundaries           ();
+        void   edge_mark_sharp_creases        (const float thresh_rad = 1.0472); // 60 degrees
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
