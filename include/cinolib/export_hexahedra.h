@@ -37,14 +37,24 @@
 #define CINO_EXPORT_HEXAHEDRA_H
 
 #include <cinolib/meshes/meshes.h>
+#include <unordered_map>
 
 namespace cinolib
 {
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void export_hexahedra(Polyhedralmesh<M,V,E,F,P>   m_in,
-                      Hexmesh<M,V,E,F,P>        & m_out);
+void export_hexahedra(const Polyhedralmesh<M,V,E,F,P>         m_in,
+                            Hexmesh<M,V,E,F,P>              & m_out,
+                              std::unordered_map<uint,uint> & v_map); // (m_in to m_out)
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void export_hexahedra(const Polyhedralmesh<M,V,E,F,P>   m_in,
+                            Hexmesh<M,V,E,F,P>        & m_out);
+
 }
 
 #ifndef  CINO_STATIC_LIB
