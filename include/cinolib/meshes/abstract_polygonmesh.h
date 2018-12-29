@@ -43,10 +43,10 @@
 namespace cinolib
 {
 
-template<class M,
-         class V,
-         class E,
-         class P>
+template<class M = Mesh_std_attributes,
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class P = Polygon_std_attributes>
 class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 {
     protected:

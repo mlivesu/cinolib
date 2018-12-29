@@ -41,4 +41,6 @@ SUBDIRS += 22_remesher
 SUBDIRS += 23_sharp_creases
 SUBDIRS += 24_sliced_obj                # requires Boost (http://www.boost.org) and Triangle (https://www.cs.cmu.edu/%7Equake/triangle.html)
 SUBDIRS += 25_surface_painter
+SUBDIRS += 26_export_surface            # OPTIONALLY requires VTK (https://www.vtk.org/)
+SUBDIRS += 27_import_surface            # OPTIONALLY requires VTK (https://www.vtk.org/)
 

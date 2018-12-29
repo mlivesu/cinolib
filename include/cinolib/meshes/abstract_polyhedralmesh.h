@@ -37,16 +37,17 @@
 #define CINO_ABSTRACT_POLYHEDRAL_MESH_H
 
 #include <cinolib/meshes/abstract_mesh.h>
+#include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/ipair.h>
 
 namespace cinolib
 {
 
-template<class M, // mesh attributes
-         class V, // vert attributes
-         class E, // edge attributes
-         class F, // face attributes
-         class P> // polyhedron attributes
+template<class M = Mesh_std_attributes,
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class F = Polygon_std_attributes,
+         class P = Polyhedron_std_attributes>
 class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 {
     protected:
