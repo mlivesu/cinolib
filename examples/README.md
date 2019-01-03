@@ -89,7 +89,7 @@ Here is a list of the sample programs available in CinoLib.
 #### 25 - Paint on a 3D surface using brushes of different sizes
 <p align="left"><img src="snapshots/25_surface_painter.png" width="500"></p>
 
-#### 26 - Export the skin of a volumetric mesh as a surface mesh (command line tool)
+#### 26 - Export the skin of a volumetric mesh to a surface mesh (command line tool)
 
 #### 27 - Update the skin of a volumetric mesh from a surface mesh (command line tool)
 
