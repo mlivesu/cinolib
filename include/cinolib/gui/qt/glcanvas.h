@@ -161,6 +161,7 @@ class GLcanvas : public QGLWidget
 
         std::string serialize_POV() const;
         void        deserialize_POV(const std::string & s);
+        void        deserialize_POV_from_GL_matrices(const std::string & s);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

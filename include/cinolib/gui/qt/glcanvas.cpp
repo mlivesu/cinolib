@@ -441,6 +441,38 @@ void GLcanvas::deserialize_POV(const std::string & s)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void GLcanvas::deserialize_POV_from_GL_matrices(const std::string & s)
+{
+    double w, h;
+
+    std::stringstream ss(s);
+       // modelview
+    ss >> trackball.modelview[ 0] >> trackball.modelview[ 1] >> trackball.modelview[ 2] >> trackball.modelview[ 3]
+       >> trackball.modelview[ 4] >> trackball.modelview[ 5] >> trackball.modelview[ 6] >> trackball.modelview[ 7]
+       >> trackball.modelview[ 8] >> trackball.modelview[ 9] >> trackball.modelview[10] >> trackball.modelview[11]
+       >> trackball.modelview[12] >> trackball.modelview[13] >> trackball.modelview[14] >> trackball.modelview[15]
+       // projection
+       >> trackball.projection[ 0] >> trackball.projection[ 1] >> trackball.projection[ 2] >> trackball.projection[ 3]
+       >> trackball.projection[ 4] >> trackball.projection[ 5] >> trackball.projection[ 6] >> trackball.projection[ 7]
+       >> trackball.projection[ 8] >> trackball.projection[ 9] >> trackball.projection[10] >> trackball.projection[11]
+       >> trackball.projection[12] >> trackball.projection[13] >> trackball.projection[14] >> trackball.projection[15]
+       // viewport
+       >> w >> h;
+
+    makeCurrent();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glMultMatrixd(trackball.modelview);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMultMatrixd(trackball.projection);
+    glViewport(0, 0, w, h);
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::make_popup_menu()
 {
     popup = new QMenu(this);
