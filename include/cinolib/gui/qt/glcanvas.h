@@ -185,9 +185,16 @@ class GLcanvas : public QGLWidget
         std::function<void(GLcanvas *canvas, QWheelEvent *event)> callback_wheel;
         std::function<void(GLcanvas *canvas, QTimerEvent *event)> callback_timer;
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        // set any of these to true to disable default event handler and use callbacks only
+        bool skip_default_keypress_handler           = false;
+        bool skip_default_mouse_double_click_handler = false;
+        bool skip_default_mouse_press_handler        = false;
+        bool skip_default_mouse_release_handler      = false;
+        bool skip_default_mouse_move_handler         = false;
+        bool skip_default_wheel_handler              = false;
+        bool skip_default_timer_handler              = false;
 
-    protected:
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void make_popup_menu();
 
@@ -211,7 +218,7 @@ class GLcanvas : public QGLWidget
         void update_projection_matrix(void);
         void map_to_sphere(const QPoint & p2d, vec3d & p3d) const;
 
-    private:
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         int       timer_id;
         QColor    clear_color;

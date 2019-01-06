@@ -253,7 +253,8 @@ void GLcanvas::rotate(const vec3d & axis, const double angle)
 CINO_INLINE
 void GLcanvas::keyPressEvent(QKeyEvent *event)
 {
-    if (callback_key_press) callback_key_press(this, event);
+    if(callback_key_press) callback_key_press(this, event);
+    if(skip_default_keypress_handler) return;
 
     switch (event->key())
     {
@@ -278,7 +279,8 @@ void GLcanvas::keyPressEvent(QKeyEvent *event)
 CINO_INLINE
 void GLcanvas::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (callback_mouse_double_click) callback_mouse_double_click(this, event);
+    if(callback_mouse_double_click) callback_mouse_double_click(this, event);
+    if(skip_default_mouse_double_click_handler) return;
 
     vec3d new_pivot;
     vec2i click(event->x(), event->y());
@@ -295,10 +297,11 @@ void GLcanvas::mouseDoubleClickEvent(QMouseEvent *event)
 CINO_INLINE
 void GLcanvas::mousePressEvent(QMouseEvent *event)
 {
-    if (callback_mouse_press) callback_mouse_press(this, event);
+    if(callback_mouse_press) callback_mouse_press(this, event);
+    if(skip_default_mouse_press_handler) return;
 
-    if (event->button()    == Qt::RightButton &&
-        event->modifiers() == Qt::ControlModifier)
+    if(event->button()    == Qt::RightButton &&
+       event->modifiers() == Qt::ControlModifier)
     {
         popup->exec(QCursor::pos());
     }
@@ -315,7 +318,8 @@ void GLcanvas::mousePressEvent(QMouseEvent *event)
 CINO_INLINE
 void GLcanvas::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (callback_mouse_release) callback_mouse_release(this, event);
+    if(callback_mouse_release) callback_mouse_release(this, event);
+    if(skip_default_mouse_release_handler) return;
     trackball.mouse_pressed = false;
 }
 
@@ -324,10 +328,11 @@ void GLcanvas::mouseReleaseEvent(QMouseEvent *event)
 CINO_INLINE
 void GLcanvas::mouseMoveEvent(QMouseEvent *event)
 {
-    if (callback_mouse_move) callback_mouse_move(this, event);
+    if(callback_mouse_move) callback_mouse_move(this, event);
+    if(skip_default_mouse_move_handler) return;
 
     // translate
-    if (event->buttons() == Qt::RightButton)
+    if(event->buttons() == Qt::RightButton)
     {
         QPoint p2d    = event->pos();
         float  dx     = p2d.x() - trackball.last_click_2d.x();
@@ -352,7 +357,7 @@ void GLcanvas::mouseMoveEvent(QMouseEvent *event)
     }
 
     // rotate
-    if (event->buttons() == Qt::LeftButton)
+    if(event->buttons() == Qt::LeftButton)
     {
         QPoint p2d = event->pos();
         vec3d  p3d;
@@ -382,7 +387,8 @@ void GLcanvas::mouseMoveEvent(QMouseEvent *event)
 CINO_INLINE
 void GLcanvas::wheelEvent(QWheelEvent *event) // zoom
 {
-    if (callback_wheel) callback_wheel(this, event);
+    if(callback_wheel) callback_wheel(this, event);
+    if(skip_default_wheel_handler) return;
 
     zoom(event->delta()/8.f);
 }
@@ -392,7 +398,8 @@ void GLcanvas::wheelEvent(QWheelEvent *event) // zoom
 CINO_INLINE
 void GLcanvas::timerEvent(QTimerEvent *event) // refresh canvas
 {
-    if (callback_timer) callback_timer(this, event);
+    if(callback_timer) callback_timer(this, event);
+    if(skip_default_timer_handler) return;
 
     updateGL_strict();
 }
