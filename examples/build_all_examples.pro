@@ -43,4 +43,5 @@ SUBDIRS += 24_sliced_obj                # requires Boost (http://www.boost.org) 
 SUBDIRS += 25_surface_painter
 SUBDIRS += 26_export_surface            # OPTIONALLY requires VTK (https://www.vtk.org/)
 SUBDIRS += 27_import_surface            # OPTIONALLY requires VTK (https://www.vtk.org/)
+SUBDIRS += 28_tetrahedralize            # requires Tetgen (http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1)
 
