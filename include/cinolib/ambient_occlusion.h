@@ -51,11 +51,11 @@ class AO : public QGLPixelBuffer
 {
     public:
 
-        ScalarField ao_vert_values;
+        ScalarField ao_poly_values;
 
         AO(Mesh & m, const int size = 500, const int ndirs = 256) : QGLPixelBuffer(size,size)
         {
-            ao_vert_values = ScalarField(m.num_verts());
+            ao_poly_values = ScalarField(m.num_polys());
 
             makeCurrent();
             glEnable(GL_DEPTH_TEST);
@@ -110,16 +110,16 @@ class AO : public QGLPixelBuffer
 
                 // accumulate AO values, weighting views with the dot between
                 // local surface normal and ray direction
-                for(uint vid=0; vid<m.num_verts(); ++vid)
+                for(uint pid=0; pid<m.num_polys(); ++pid)
                 {
-                    vec3d  p = m.vert(vid);
+                    vec3d  p = m.poly_centroid(pid);
                     double x, y, depth;
                     gluProject(p.x(), p.y(), p.z(), modelview, projection, viewport, &x, &y, &depth);
 
                     if(depth_buffer[size*int(y)+int(x)]+0.0025 > depth)
                     {
-                        double diff = std::max(-u.dot(m.vert_data(vid).normal), 0.0);
-                        ao_vert_values[vid] += diff;
+                        double diff = std::max(-u.dot(m.poly_data(pid).normal), 0.0);
+                        ao_poly_values[pid] += diff;
                     }
                 }
             }
@@ -128,11 +128,11 @@ class AO : public QGLPixelBuffer
             glMatrixMode(GL_MODELVIEW);
             glPopMatrix();
 
-            ao_vert_values.normalize_in_01();
-            for(uint vid=0; vid<m.num_verts(); ++vid)
+            ao_poly_values.normalize_in_01();
+            for(uint pid=0; pid<m.num_polys(); ++pid)
             {
                 //std::cout << ao[vid] << std::endl;
-                m.vert_data(vid).color *= ao_vert_values[vid];
+                m.poly_data(pid).color *= ao_poly_values[pid];
             }
             m.updateGL();
         }
