@@ -38,6 +38,7 @@
 #include <cinolib/meshes/mesh_slicer.h>
 #include <cinolib/gradient.h>
 #include <cinolib/symbols.h>
+#include <cinolib/ambient_occlusion.h>
 
 namespace cinolib
 {
@@ -281,6 +282,26 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         layout->addWidget(but_gradient_color,2,0,1,2);
         layout->addWidget(but_gradient_serialize,3,0);
         layout->addWidget(but_gradient_deserialize,3,1);
+        gbox->setLayout(layout);
+        left_col->addWidget(gbox);
+    }
+
+    // AMBIENT OCCLUSION
+    {
+        QGroupBox *gbox      = new QGroupBox(widget);
+        sl_ambient_occlusion = new QSlider(Qt::Horizontal, gbox);
+        but_compute_AO       = new QPushButton("Compute AO", gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_ambient_occlusion->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_compute_AO->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_ambient_occlusion->setMinimum(0);
+        sl_ambient_occlusion->setMaximum(99);
+        sl_ambient_occlusion->setValue(99);
+        gbox->setFont(global_font);
+        but_compute_AO->setFont(global_font);
+        QVBoxLayout *layout = new QVBoxLayout();
+        layout->addWidget(sl_ambient_occlusion);
+        layout->addWidget(but_compute_AO);
         gbox->setLayout(layout);
         left_col->addWidget(gbox);
     }
@@ -940,6 +961,27 @@ void SurfaceMeshControlPanel<Mesh>::connect()
         if (m == NULL || canvas == NULL) return;
         m->show_marked_edge_width(sl_marked_edges_width->value());
         cb_marked_edges->setChecked(true);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_ambient_occlusion, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        float alpha = float(sl_ambient_occlusion->value()) / 99.0;
+        m->show_AO_alpha(alpha);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_compute_AO, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        AO<Mesh> ao(*m);
+        ao.copy_to_mesh(*m);
+        m->updateGL();
         canvas->updateGL();
     });
 }

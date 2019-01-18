@@ -104,12 +104,13 @@ Edge_std_attributes;
 
 typedef struct
 {
-    vec3d  normal  = vec3d(0,0,0);
-    Color  color   = Color::WHITE();
-    int    label   = -1;
-    bool   visible = true;
-    float  quality = 0.0;
-    bool   marked  = false;
+    vec3d  normal   = vec3d(0,0,0);
+    Color  color    = Color::WHITE();
+    int    label    = -1;
+    bool   visible  = true;
+    float  quality  = 0.0;
+    bool   marked   = false;
+    float  AO       = 1.0;
 }
 Polygon_std_attributes;
 

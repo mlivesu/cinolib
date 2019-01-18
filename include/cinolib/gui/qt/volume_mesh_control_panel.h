@@ -180,6 +180,9 @@ class VolumeMeshControlPanel
         //
         QCheckBox                     *cb_marked_faces;
         QPushButton                   *but_marked_faces_color;
+        //
+        QSlider                     *sl_ambient_occlusion;
+        QPushButton                 *but_compute_AO;
 };
 
 }

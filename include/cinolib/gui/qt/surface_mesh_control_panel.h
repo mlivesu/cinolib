@@ -150,6 +150,9 @@ class SurfaceMeshControlPanel
         QPushButton                 *but_marked_edges_color;
         QSlider                     *sl_marked_edges_width;
         //
+        QSlider                     *sl_ambient_occlusion;
+        QPushButton                 *but_compute_AO;
+        //
         //QPushButton                 *but_mark_border_edges;
         //QPushButton                 *but_mark_labeling_border;
         //QPushButton                 *but_mark_sharp_creases;
