@@ -294,6 +294,47 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_verts_id(const uint fi
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & pid_beneath) const
+{
+    // note: returns also the ID of the poy that makes the face visible
+
+    if(this->face_is_on_srf(fid))
+    {
+        assert(this->adj_f2p(fid).size()==1);
+        pid_beneath = this->adj_f2p(fid).front();
+        return this->poly_data(pid_beneath).visible;
+    }
+    else
+    {
+        std::vector<uint> pids;
+        for(uint pid : this->adj_f2p(fid))
+        {
+            if(this->poly_data(pid).visible) pids.push_back(pid);
+        }
+        if(pids.size()==1)
+        {
+            pid_beneath = pids.front();
+            return true;
+        }
+        return false;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_adj_visible_faces(const uint fid, const double ang_thresh)
+{
+    // TODO
+    std::vector<uint> nbrs;
+    return nbrs;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 int AbstractPolyhedralMesh<M,V,E,F,P>::face_id(const std::vector<uint> & f) const
 {
     std::vector<uint> query = SORT_VEC(f);

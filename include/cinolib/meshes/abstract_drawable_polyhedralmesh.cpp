@@ -205,10 +205,8 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
     {
         if (!this->face_is_on_srf(fid)) continue;
 
-        assert(this->adj_f2p(fid).size()==1);
-        uint pid = this->adj_f2p(fid).front();
-
-        if (!(this->poly_data(pid).visible)) continue;
+        uint pid_beneath;
+        if(!this->face_is_visible(fid,pid_beneath)) continue;
 
         float AO = this->face_data(fid).AO*AO_alpha + (1.0 - AO_alpha);
 
@@ -262,18 +260,18 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
 
             if (drawlist_out.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
             {
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.r*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.g*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.b*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.a);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.r*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.g*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.b*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.a);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.r*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.g*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.b*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid).color.a);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.a);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.a);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.a);
             }
             else if (drawlist_out.draw_mode & DRAW_TRI_VERTCOLOR)
             {
@@ -292,7 +290,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             }
             else if (drawlist_out.draw_mode & DRAW_TRI_QUALITY)
             {
-                float q = this->poly_data(pid).quality;
+                float q = this->poly_data(pid_beneath).quality;
                 Color c = Color::red_white_blue_ramp_01(q);
                 drawlist_out.tri_v_colors.push_back(c.r*AO);
                 drawlist_out.tri_v_colors.push_back(c.g*AO);
@@ -391,15 +389,10 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
     {
         if(this->face_is_on_srf(fid)) continue;
 
-        std::vector<uint> visible_polys;
-        for(uint pid : this->adj_f2p(fid))
-        {
-            if (this->poly_data(pid).visible) visible_polys.push_back(pid);
-        }
-        if (visible_polys.size()!=1) continue;
+        uint pid_beneath;
+        if(!this->face_is_visible(fid, pid_beneath)) continue;
 
-        uint pid   = visible_polys.front();
-        bool is_CW = this->poly_face_is_CW(pid,fid);
+        bool is_CW = this->poly_face_is_CW(pid_beneath, fid);
 
         for(uint eid : this->adj_f2e(fid))
         {
@@ -461,18 +454,18 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
 
             if (drawlist_in.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
             {
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.r*AO);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.g*AO);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.b*AO);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.a);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.r*AO);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.g*AO);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.b*AO);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.a);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.r*AO);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.g*AO);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.b*AO);
-                drawlist_in.tri_v_colors.push_back(this->poly_data(pid).color.a);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.a);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.a);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO);
+                drawlist_in.tri_v_colors.push_back(this->poly_data(pid_beneath).color.a);
             }
             else if (drawlist_in.draw_mode & DRAW_TRI_VERTCOLOR)
             {
@@ -491,7 +484,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
             }
             else if (drawlist_in.draw_mode & DRAW_TRI_QUALITY)
             {
-                float q = this->poly_data(pid).quality;
+                float q = this->poly_data(pid_beneath).quality;
                 Color c = Color::red_white_blue_ramp_01(q);
                 drawlist_in.tri_v_colors.push_back(c.r*AO);
                 drawlist_in.tri_v_colors.push_back(c.g*AO);

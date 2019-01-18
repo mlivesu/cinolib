@@ -199,6 +199,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 void              face_remove_unreferenced(const uint fid);
                 std::vector<uint> face_tessellation       (const uint fid) const;
                 std::vector<uint> face_verts_id           (const uint fid, const bool sort_by_vid = false) const;
+                bool              face_is_visible         (const uint fid, uint & pid_beneath) const;
+                std::vector<uint> face_adj_visible_faces  (const uint fid, const double ang_thresh = 60.0);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -979,7 +979,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QPushButton::connect(but_compute_AO, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        AO<Mesh> ao(*m);
+        AO_srf<Mesh> ao(*m);
         ao.copy_to_mesh(*m);
         m->updateGL();
         canvas->updateGL();
