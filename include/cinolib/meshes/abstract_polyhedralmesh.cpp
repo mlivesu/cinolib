@@ -324,10 +324,18 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & p
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_adj_visible_faces(const uint fid, const double ang_thresh)
+std::vector<ipair> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_visible_faces(const uint vid, const vec3d dir, const double ang_thresh)
 {
-    // TODO
-    std::vector<uint> nbrs;
+    std::vector<ipair> nbrs; // vector or pairs (visible face, poly benath)
+    for(uint fid : this->adj_v2f(vid))
+    {
+        uint pid_beneath;
+        if(this->face_is_visible(fid, pid_beneath))
+        {
+            vec3d n = this->poly_face_normal(pid_beneath, fid);
+            if(dir.angle_deg(n) < ang_thresh) nbrs.push_back(std::make_pair(fid, pid_beneath));
+        }
+    }
     return nbrs;
 }
 
