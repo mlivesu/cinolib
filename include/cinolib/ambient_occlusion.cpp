@@ -101,6 +101,8 @@ AO_srf<Mesh>::AO_srf(const Mesh & m,
         // local surface normal and ray direction
         for(uint pid=0; pid<m.num_polys(); ++pid)
         {
+            if(!m.poly_data(pid).visible) continue;
+
             vec3d  p = m.poly_centroid(pid);
             double x, y, depth;
             gluProject(p.x(), p.y(), p.z(), modelview, projection, viewport, &x, &y, &depth);
@@ -126,7 +128,10 @@ template<class Mesh>
 CINO_INLINE
 void AO_srf<Mesh>::copy_to_mesh(Mesh & m)
 {
-    for(uint pid=0; pid<m.num_polys(); ++pid) m.poly_data(pid).AO = ao[pid];
+    for(uint pid=0; pid<m.num_polys(); ++pid)
+    {
+        m.poly_data(pid).AO = (m.poly_data(pid).visible) ? ao[pid] : 1.0;
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -190,26 +195,21 @@ AO_vol<Mesh>::AO_vol(const Mesh &m, const int buffer_size, const int n_dirs) : Q
 
         // accumulate AO values, weighting views with the dot between
         // local surface normal and ray direction
-        for(uint pid=0; pid<m.num_polys(); ++pid)
+        //
+        visible.resize(m.num_faces(), false);
+        for(uint fid=0; fid<m.num_faces(); ++fid)
         {
-            if (!m.poly_data(pid).visible) continue;
-
-            for(uint fid : m.adj_p2f(pid))
+            uint pid_beneath;
+            if(m.face_is_visible(fid, pid_beneath))
             {
-                std::vector<uint> visible_polys;
-                for(uint nbr : m.adj_f2p(fid))
-                {
-                    if (m.poly_data(nbr).visible) visible_polys.push_back(nbr);
-                }
-                if (visible_polys.size()!=1) continue;
-
-                vec3d  p = m.face_centroid(fid);
+                visible.at(fid) = true;
+                vec3d  c = m.face_centroid(fid);
                 double x, y, depth;
-                gluProject(p.x(), p.y(), p.z(), modelview, projection, viewport, &x, &y, &depth);
+                gluProject(c.x(), c.y(), c.z(), modelview, projection, viewport, &x, &y, &depth);
 
                 if(depth_buffer[buffer_size*int(y)+int(x)]+0.0025 > depth)
                 {
-                    double diff = std::max(-u.dot(m.poly_face_normal(pid,fid)), 0.0);
+                    double diff = std::max(-u.dot(m.poly_face_normal(pid_beneath,fid)), 0.0);
                     ao[fid] += diff;
                 }
             }
@@ -229,7 +229,10 @@ template<class Mesh>
 CINO_INLINE
 void AO_vol<Mesh>::copy_to_mesh(Mesh &m)
 {
-    for(uint fid=0; fid<m.num_faces(); ++fid) m.face_data(fid).AO = ao[fid];
+    for(uint fid=0; fid<m.num_faces(); ++fid)
+    {
+        m.face_data(fid).AO = (visible.at(fid)) ? ao[fid] : 1.0;
+    }
 }
 
 }

@@ -55,11 +55,12 @@ namespace cinolib
 template<class Mesh>
 class AO_srf : public QGLPixelBuffer
 {
+    ScalarField ao;
+
     public:
 
         AO_srf(const Mesh & m, const int buffer_size = 500, const int n_dirs = 256);
         void copy_to_mesh(Mesh & m);
-        ScalarField ao;
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -67,11 +68,13 @@ class AO_srf : public QGLPixelBuffer
 template<class Mesh>
 class AO_vol : public QGLPixelBuffer
 {
+    ScalarField ao;
+    std::vector<bool> visible;
+
     public:
 
         AO_vol(const Mesh & m, const int buffer_size = 500, const int n_dirs = 256);
         void copy_to_mesh(Mesh & m);
-        ScalarField ao;
 };
 
 }
