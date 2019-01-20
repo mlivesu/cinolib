@@ -652,6 +652,24 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_boundary_edges(const uint v
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_adj_visible_polys(const uint vid, const vec3d dir, const double ang_thresh)
+{
+    std::vector<uint> nbrs;
+    for(uint pid : this->adj_v2p(vid))
+    {
+        if(this->poly_data(pid).visible)
+        {
+            vec3d n = this->poly_data(pid).normal;
+            if(dir.angle_deg(n) < ang_thresh) nbrs.push_back(pid);
+        }
+    }
+    return nbrs;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 uint AbstractPolygonMesh<M,V,E,P>::vert_add(const vec3d & pos)
 {
     uint vid = this->num_verts();

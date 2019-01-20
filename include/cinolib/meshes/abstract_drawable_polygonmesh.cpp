@@ -161,13 +161,27 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
         {
             if (!(this->poly_data(pid).visible)) continue;
 
+            vec3d n = this->poly_data(pid).normal;
+
             for(uint i=0; i<this->poly_tessellation(pid).size()/3; ++i)
             {
                 uint vid0 = this->poly_tessellation(pid).at(3*i+0);
                 uint vid1 = this->poly_tessellation(pid).at(3*i+1);
                 uint vid2 = this->poly_tessellation(pid).at(3*i+2);
 
-                float AO = this->poly_data(pid).AO*AO_alpha + (1.0 - AO_alpha);
+                // average AO with adjacent visible faces having dihedral angle lower than 60 degrees
+                auto  vid0_vis_pids = this->vert_adj_visible_polys(vid0, n, 60.0);
+                auto  vid1_vis_pids = this->vert_adj_visible_polys(vid1, n, 60.0);
+                auto  vid2_vis_pids = this->vert_adj_visible_polys(vid2, n, 60.0);
+                float AO_vid0 = 0.0;
+                float AO_vid1 = 0.0;
+                float AO_vid2 = 0.0;
+                for(uint pid : vid0_vis_pids) AO_vid0 += this->poly_data(pid).AO*AO_alpha + (1.0 - AO_alpha);
+                for(uint pid : vid1_vis_pids) AO_vid1 += this->poly_data(pid).AO*AO_alpha + (1.0 - AO_alpha);
+                for(uint pid : vid2_vis_pids) AO_vid2 += this->poly_data(pid).AO*AO_alpha + (1.0 - AO_alpha);
+                AO_vid0 /= static_cast<float>(vid0_vis_pids.size());
+                AO_vid1 /= static_cast<float>(vid1_vis_pids.size());
+                AO_vid2 /= static_cast<float>(vid2_vis_pids.size());
 
                 uint base_addr = drawlist.tri_coords.size()/3;
 
@@ -187,27 +201,38 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
 
                 if (drawlist.draw_mode & DRAW_TRI_SMOOTH)
                 {
-                    drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.x());
-                    drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.y());
-                    drawlist.tri_v_norms.push_back(this->vert_data(vid0).normal.z());
-                    drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.x());
-                    drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.y());
-                    drawlist.tri_v_norms.push_back(this->vert_data(vid1).normal.z());
-                    drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.x());
-                    drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.y());
-                    drawlist.tri_v_norms.push_back(this->vert_data(vid2).normal.z());
+                    // average normals with adjacent visible faces having dihedral angle lower than 60 degrees
+                    vec3d n_vid0(0,0,0);
+                    vec3d n_vid1(0,0,0);
+                    vec3d n_vid2(0,0,0);
+                    for(uint pid : vid0_vis_pids) n_vid0 += this->poly_data(pid).normal;
+                    for(uint pid : vid1_vis_pids) n_vid1 += this->poly_data(pid).normal;
+                    for(uint pid : vid2_vis_pids) n_vid2 += this->poly_data(pid).normal;
+                    n_vid0 /= static_cast<double>(vid0_vis_pids.size());
+                    n_vid1 /= static_cast<double>(vid1_vis_pids.size());
+                    n_vid2 /= static_cast<double>(vid2_vis_pids.size());
+
+                    drawlist.tri_v_norms.push_back(n_vid0.x());
+                    drawlist.tri_v_norms.push_back(n_vid0.y());
+                    drawlist.tri_v_norms.push_back(n_vid0.z());
+                    drawlist.tri_v_norms.push_back(n_vid1.x());
+                    drawlist.tri_v_norms.push_back(n_vid1.y());
+                    drawlist.tri_v_norms.push_back(n_vid1.z());
+                    drawlist.tri_v_norms.push_back(n_vid2.x());
+                    drawlist.tri_v_norms.push_back(n_vid2.y());
+                    drawlist.tri_v_norms.push_back(n_vid2.z());
                 }
                 else if (drawlist.draw_mode & DRAW_TRI_FLAT)
                 {
-                    drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.x());
-                    drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.y());
-                    drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.z());
-                    drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.x());
-                    drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.y());
-                    drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.z());
-                    drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.x());
-                    drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.y());
-                    drawlist.tri_v_norms.push_back(this->poly_data(pid).normal.z());
+                    drawlist.tri_v_norms.push_back(n.x());
+                    drawlist.tri_v_norms.push_back(n.y());
+                    drawlist.tri_v_norms.push_back(n.z());
+                    drawlist.tri_v_norms.push_back(n.x());
+                    drawlist.tri_v_norms.push_back(n.y());
+                    drawlist.tri_v_norms.push_back(n.z());
+                    drawlist.tri_v_norms.push_back(n.x());
+                    drawlist.tri_v_norms.push_back(n.y());
+                    drawlist.tri_v_norms.push_back(n.z());
                 }
 
                 if (drawlist.draw_mode & DRAW_TRI_TEXTURE1D)
@@ -228,49 +253,49 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
 
                 if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
                 {
-                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.r*AO);
-                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.g*AO);
-                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.b*AO);
+                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.r*AO_vid0);
+                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.g*AO_vid0);
+                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.b*AO_vid0);
                     drawlist.tri_v_colors.push_back(this->poly_data(pid).color.a);
-                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.r*AO);
-                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.g*AO);
-                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.b*AO);
+                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.r*AO_vid1);
+                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.g*AO_vid1);
+                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.b*AO_vid1);
                     drawlist.tri_v_colors.push_back(this->poly_data(pid).color.a);
-                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.r*AO);
-                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.g*AO);
-                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.b*AO);
+                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.r*AO_vid2);
+                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.g*AO_vid2);
+                    drawlist.tri_v_colors.push_back(this->poly_data(pid).color.b*AO_vid2);
                     drawlist.tri_v_colors.push_back(this->poly_data(pid).color.a);
                 }
                 else if (drawlist.draw_mode & DRAW_TRI_VERTCOLOR)
                 {
-                    drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.r*AO);
-                    drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.g*AO);
-                    drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.b*AO);
+                    drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.r*AO_vid0);
+                    drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.g*AO_vid0);
+                    drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.b*AO_vid0);
                     drawlist.tri_v_colors.push_back(this->vert_data(vid0).color.a);
-                    drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.r*AO);
-                    drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.g*AO);
-                    drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.b*AO);
+                    drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.r*AO_vid1);
+                    drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.g*AO_vid1);
+                    drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.b*AO_vid1);
                     drawlist.tri_v_colors.push_back(this->vert_data(vid1).color.a);
-                    drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.r*AO);
-                    drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.g*AO);
-                    drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.b*AO);
+                    drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.r*AO_vid2);
+                    drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.g*AO_vid2);
+                    drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.b*AO_vid2);
                     drawlist.tri_v_colors.push_back(this->vert_data(vid2).color.a);
                 }
                 else if (drawlist.draw_mode & DRAW_TRI_QUALITY)
                 {
                     float q = this->poly_data(pid).quality;
                     Color c = Color::red_white_blue_ramp_01(q);
-                    drawlist.tri_v_colors.push_back(c.r*AO);
-                    drawlist.tri_v_colors.push_back(c.g*AO);
-                    drawlist.tri_v_colors.push_back(c.b*AO);
+                    drawlist.tri_v_colors.push_back(c.r*AO_vid0);
+                    drawlist.tri_v_colors.push_back(c.g*AO_vid0);
+                    drawlist.tri_v_colors.push_back(c.b*AO_vid0);
                     drawlist.tri_v_colors.push_back(c.a);
-                    drawlist.tri_v_colors.push_back(c.r*AO);
-                    drawlist.tri_v_colors.push_back(c.g*AO);
-                    drawlist.tri_v_colors.push_back(c.b*AO);
+                    drawlist.tri_v_colors.push_back(c.r*AO_vid1);
+                    drawlist.tri_v_colors.push_back(c.g*AO_vid1);
+                    drawlist.tri_v_colors.push_back(c.b*AO_vid1);
                     drawlist.tri_v_colors.push_back(c.a);
-                    drawlist.tri_v_colors.push_back(c.r*AO);
-                    drawlist.tri_v_colors.push_back(c.g*AO);
-                    drawlist.tri_v_colors.push_back(c.b*AO);
+                    drawlist.tri_v_colors.push_back(c.r*AO_vid2);
+                    drawlist.tri_v_colors.push_back(c.g*AO_vid2);
+                    drawlist.tri_v_colors.push_back(c.b*AO_vid2);
                     drawlist.tri_v_colors.push_back(c.a);
                 }
             }

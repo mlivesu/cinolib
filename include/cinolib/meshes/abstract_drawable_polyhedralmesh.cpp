@@ -250,9 +250,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             if (drawlist_out.draw_mode & DRAW_TRI_SMOOTH)
             {
                 // average normals with adjacent visible faces having dihedral angle lower than 60 degrees
-                auto  vid0_vis_fids = this->vert_adj_visible_faces(vid0, n, 60.0);
-                auto  vid1_vis_fids = this->vert_adj_visible_faces(vid1, n, 60.0);
-                auto  vid2_vis_fids = this->vert_adj_visible_faces(vid2, n, 60.0);
                 vec3d n_vid0(0,0,0);
                 vec3d n_vid1(0,0,0);
                 vec3d n_vid2(0,0,0);
@@ -486,9 +483,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
             if (drawlist_in.draw_mode & DRAW_TRI_SMOOTH)
             {
                 // average normals with adjacent visible faces having dihedral angle lower than 60 degrees
-                auto  vid0_vis_fids = this->vert_adj_visible_faces(vid0, n, 60.0);
-                auto  vid1_vis_fids = this->vert_adj_visible_faces(vid1, n, 60.0);
-                auto  vid2_vis_fids = this->vert_adj_visible_faces(vid2, n, 60.0);
                 vec3d n_vid0(0,0,0);
                 vec3d n_vid1(0,0,0);
                 vec3d n_vid2(0,0,0);

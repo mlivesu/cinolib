@@ -127,6 +127,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
                 void              vert_remove             (const uint vid);
                 void              vert_remove_unreferenced(const uint vid);
                 uint              vert_add                (const vec3d & pos);
+                std::vector<uint> vert_adj_visible_polys  (const uint vid, const vec3d dir, const double ang_thresh = 60.0);
                 std::vector<uint> vert_boundary_edges     (const uint vid) const;
                 std::vector<uint> vert_ordered_vert_ring  (const uint vid) const;
                 std::vector<uint> vert_ordered_poly_ring  (const uint vid) const;
