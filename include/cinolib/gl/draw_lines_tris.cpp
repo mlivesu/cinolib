@@ -168,7 +168,7 @@ void render(const RenderData & data)
         else // default: FLAT shading
         {
             glEnable(GL_LIGHTING);
-            glShadeModel(GL_FLAT);
+            glShadeModel(GL_SMOOTH); // flatness is given by input normals
             glDepthRange(0.01, 1.0);
             render_tris(data);
         }
