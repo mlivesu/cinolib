@@ -56,7 +56,7 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         RenderData       drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces/poly too)
         Color            marked_edge_color;
         Color            marked_face_color;
-        float            AO_alpha = 1.0;
+        float            AO_alpha;
 
     public:
 

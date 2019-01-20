@@ -49,12 +49,13 @@ void AbstractDrawablePolyhedralMesh<Mesh>::init_drawable_stuff()
 {
     slicer = MeshSlicer<Mesh>(*this);
 
-    drawlist_in.draw_mode     = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
-    drawlist_out.draw_mode    = DRAW_TRIS | DRAW_TRI_FLAT | DRAW_TRI_FACECOLOR | DRAW_SEGS;
+    drawlist_in.draw_mode     = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
+    drawlist_out.draw_mode    = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_marked.draw_mode = DRAW_TRIS | DRAW_SEGS;
     drawlist_marked.seg_width = 3;
     marked_edge_color         = Color::RED();
     marked_face_color         = Color::BLUE();
+    AO_alpha                  = 1.0;
 
     updateGL();
 }
@@ -208,13 +209,27 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
         uint pid_beneath;
         if(!this->face_is_visible(fid,pid_beneath)) continue;
 
-        float AO = this->face_data(fid).AO*AO_alpha + (1.0 - AO_alpha);
+        vec3d n = this->poly_face_normal(pid_beneath, fid);
 
         for(uint i=0; i<this->face_tessellation(fid).size()/3; ++i)
         {
             uint vid0 = this->face_tessellation(fid).at(3*i+0);
             uint vid1 = this->face_tessellation(fid).at(3*i+1);
             uint vid2 = this->face_tessellation(fid).at(3*i+2);
+
+            // average AO with adjacent visible faces having dihedral angle lower than 60 degrees
+            auto  vid0_vis_fids = this->vert_adj_visible_faces(vid0, n, 60.0);
+            auto  vid1_vis_fids = this->vert_adj_visible_faces(vid1, n, 60.0);
+            auto  vid2_vis_fids = this->vert_adj_visible_faces(vid2, n, 60.0);
+            float AO_vid0 = 0.0;
+            float AO_vid1 = 0.0;
+            float AO_vid2 = 0.0;
+            for(auto fp : vid0_vis_fids) AO_vid0 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
+            for(auto fp : vid1_vis_fids) AO_vid1 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
+            for(auto fp : vid2_vis_fids) AO_vid2 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
+            AO_vid0 /= static_cast<float>(vid0_vis_fids.size());
+            AO_vid1 /= static_cast<float>(vid1_vis_fids.size());
+            AO_vid2 /= static_cast<float>(vid2_vis_fids.size());
 
             int base_addr = drawlist_out.tri_coords.size()/3;
 
@@ -232,15 +247,44 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             drawlist_out.tri_coords.push_back(this->vert(vid2).y());
             drawlist_out.tri_coords.push_back(this->vert(vid2).z());
 
-            drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.x());
-            drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.y());
-            drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.z());
-            drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.x());
-            drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.y());
-            drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.z());
-            drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.x());
-            drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.y());
-            drawlist_out.tri_v_norms.push_back(this->face_data(fid).normal.z());
+            if (drawlist_out.draw_mode & DRAW_TRI_SMOOTH)
+            {
+                // average normals with adjacent visible faces having dihedral angle lower than 60 degrees
+                auto  vid0_vis_fids = this->vert_adj_visible_faces(vid0, n, 60.0);
+                auto  vid1_vis_fids = this->vert_adj_visible_faces(vid1, n, 60.0);
+                auto  vid2_vis_fids = this->vert_adj_visible_faces(vid2, n, 60.0);
+                vec3d n_vid0(0,0,0);
+                vec3d n_vid1(0,0,0);
+                vec3d n_vid2(0,0,0);
+                for(auto fp : vid0_vis_fids) n_vid0 += this->poly_face_normal(fp.second, fp.first);
+                for(auto fp : vid1_vis_fids) n_vid1 += this->poly_face_normal(fp.second, fp.first);
+                for(auto fp : vid2_vis_fids) n_vid2 += this->poly_face_normal(fp.second, fp.first);
+                n_vid0 /= static_cast<double>(vid0_vis_fids.size());
+                n_vid1 /= static_cast<double>(vid1_vis_fids.size());
+                n_vid2 /= static_cast<double>(vid2_vis_fids.size());
+
+                drawlist_out.tri_v_norms.push_back(n_vid0.x());
+                drawlist_out.tri_v_norms.push_back(n_vid0.y());
+                drawlist_out.tri_v_norms.push_back(n_vid0.z());
+                drawlist_out.tri_v_norms.push_back(n_vid1.x());
+                drawlist_out.tri_v_norms.push_back(n_vid1.y());
+                drawlist_out.tri_v_norms.push_back(n_vid1.z());
+                drawlist_out.tri_v_norms.push_back(n_vid2.x());
+                drawlist_out.tri_v_norms.push_back(n_vid2.y());
+                drawlist_out.tri_v_norms.push_back(n_vid2.z());
+            }
+            else if (drawlist_out.draw_mode & DRAW_TRI_FLAT)
+            {
+                drawlist_out.tri_v_norms.push_back(n.x());
+                drawlist_out.tri_v_norms.push_back(n.y());
+                drawlist_out.tri_v_norms.push_back(n.z());
+                drawlist_out.tri_v_norms.push_back(n.x());
+                drawlist_out.tri_v_norms.push_back(n.y());
+                drawlist_out.tri_v_norms.push_back(n.z());
+                drawlist_out.tri_v_norms.push_back(n.x());
+                drawlist_out.tri_v_norms.push_back(n.y());
+                drawlist_out.tri_v_norms.push_back(n.z());
+            }
 
             if (drawlist_out.draw_mode & DRAW_TRI_TEXTURE1D)
             {
@@ -260,49 +304,49 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
 
             if (drawlist_out.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
             {
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO_vid0);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO_vid0);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO_vid0);
                 drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.a);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO_vid1);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO_vid1);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO_vid1);
                 drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.a);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO);
-                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.r*AO_vid2);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.g*AO_vid2);
+                drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.b*AO_vid2);
                 drawlist_out.tri_v_colors.push_back(this->poly_data(pid_beneath).color.a);
             }
             else if (drawlist_out.draw_mode & DRAW_TRI_VERTCOLOR)
             {
-                drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.r*AO);
-                drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.g*AO);
-                drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.b*AO);
+                drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.r*AO_vid0);
+                drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.g*AO_vid0);
+                drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.b*AO_vid0);
                 drawlist_out.tri_v_colors.push_back(this->vert_data(vid0).color.a);
-                drawlist_out.tri_v_colors.push_back(this->vert_data(vid1).color.r*AO);
-                drawlist_out.tri_v_colors.push_back(this->vert_data(vid1).color.g*AO);
-                drawlist_out.tri_v_colors.push_back(this->vert_data(vid1).color.b*AO);
+                drawlist_out.tri_v_colors.push_back(this->vert_data(vid1).color.r*AO_vid1);
+                drawlist_out.tri_v_colors.push_back(this->vert_data(vid1).color.g*AO_vid1);
+                drawlist_out.tri_v_colors.push_back(this->vert_data(vid1).color.b*AO_vid1);
                 drawlist_out.tri_v_colors.push_back(this->vert_data(vid1).color.a);
-                drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.r*AO);
-                drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.g*AO);
-                drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.b*AO);
+                drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.r*AO_vid2);
+                drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.g*AO_vid2);
+                drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.b*AO_vid2);
                 drawlist_out.tri_v_colors.push_back(this->vert_data(vid2).color.a);
             }
             else if (drawlist_out.draw_mode & DRAW_TRI_QUALITY)
             {
                 float q = this->poly_data(pid_beneath).quality;
                 Color c = Color::red_white_blue_ramp_01(q);
-                drawlist_out.tri_v_colors.push_back(c.r*AO);
-                drawlist_out.tri_v_colors.push_back(c.g*AO);
-                drawlist_out.tri_v_colors.push_back(c.b*AO);
+                drawlist_out.tri_v_colors.push_back(c.r*AO_vid0);
+                drawlist_out.tri_v_colors.push_back(c.g*AO_vid0);
+                drawlist_out.tri_v_colors.push_back(c.b*AO_vid0);
                 drawlist_out.tri_v_colors.push_back(c.a);
-                drawlist_out.tri_v_colors.push_back(c.r*AO);
-                drawlist_out.tri_v_colors.push_back(c.g*AO);
-                drawlist_out.tri_v_colors.push_back(c.b*AO);
+                drawlist_out.tri_v_colors.push_back(c.r*AO_vid1);
+                drawlist_out.tri_v_colors.push_back(c.g*AO_vid1);
+                drawlist_out.tri_v_colors.push_back(c.b*AO_vid1);
                 drawlist_out.tri_v_colors.push_back(c.a);
-                drawlist_out.tri_v_colors.push_back(c.r*AO);
-                drawlist_out.tri_v_colors.push_back(c.g*AO);
-                drawlist_out.tri_v_colors.push_back(c.b*AO);
+                drawlist_out.tri_v_colors.push_back(c.r*AO_vid2);
+                drawlist_out.tri_v_colors.push_back(c.g*AO_vid2);
+                drawlist_out.tri_v_colors.push_back(c.b*AO_vid2);
                 drawlist_out.tri_v_colors.push_back(c.a);
             }
         }
@@ -439,15 +483,44 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
             drawlist_in.tri_coords.push_back(this->vert(vid2).y());
             drawlist_in.tri_coords.push_back(this->vert(vid2).z());
 
-            drawlist_in.tri_v_norms.push_back(n.x());
-            drawlist_in.tri_v_norms.push_back(n.y());
-            drawlist_in.tri_v_norms.push_back(n.z());
-            drawlist_in.tri_v_norms.push_back(n.x());
-            drawlist_in.tri_v_norms.push_back(n.y());
-            drawlist_in.tri_v_norms.push_back(n.z());
-            drawlist_in.tri_v_norms.push_back(n.x());
-            drawlist_in.tri_v_norms.push_back(n.y());
-            drawlist_in.tri_v_norms.push_back(n.z());
+            if (drawlist_in.draw_mode & DRAW_TRI_SMOOTH)
+            {
+                // average normals with adjacent visible faces having dihedral angle lower than 60 degrees
+                auto  vid0_vis_fids = this->vert_adj_visible_faces(vid0, n, 60.0);
+                auto  vid1_vis_fids = this->vert_adj_visible_faces(vid1, n, 60.0);
+                auto  vid2_vis_fids = this->vert_adj_visible_faces(vid2, n, 60.0);
+                vec3d n_vid0(0,0,0);
+                vec3d n_vid1(0,0,0);
+                vec3d n_vid2(0,0,0);
+                for(auto fp : vid0_vis_fids) n_vid0 += this->poly_face_normal(fp.second, fp.first);
+                for(auto fp : vid1_vis_fids) n_vid1 += this->poly_face_normal(fp.second, fp.first);
+                for(auto fp : vid2_vis_fids) n_vid2 += this->poly_face_normal(fp.second, fp.first);
+                n_vid0 /= static_cast<double>(vid0_vis_fids.size());
+                n_vid1 /= static_cast<double>(vid1_vis_fids.size());
+                n_vid2 /= static_cast<double>(vid2_vis_fids.size());
+
+                drawlist_in.tri_v_norms.push_back(n_vid0.x());
+                drawlist_in.tri_v_norms.push_back(n_vid0.y());
+                drawlist_in.tri_v_norms.push_back(n_vid0.z());
+                drawlist_in.tri_v_norms.push_back(n_vid1.x());
+                drawlist_in.tri_v_norms.push_back(n_vid1.y());
+                drawlist_in.tri_v_norms.push_back(n_vid1.z());
+                drawlist_in.tri_v_norms.push_back(n_vid2.x());
+                drawlist_in.tri_v_norms.push_back(n_vid2.y());
+                drawlist_in.tri_v_norms.push_back(n_vid2.z());
+            }
+            else if (drawlist_in.draw_mode & DRAW_TRI_FLAT)
+            {
+                drawlist_in.tri_v_norms.push_back(n.x());
+                drawlist_in.tri_v_norms.push_back(n.y());
+                drawlist_in.tri_v_norms.push_back(n.z());
+                drawlist_in.tri_v_norms.push_back(n.x());
+                drawlist_in.tri_v_norms.push_back(n.y());
+                drawlist_in.tri_v_norms.push_back(n.z());
+                drawlist_in.tri_v_norms.push_back(n.x());
+                drawlist_in.tri_v_norms.push_back(n.y());
+                drawlist_in.tri_v_norms.push_back(n.z());
+            }
 
             if (drawlist_in.draw_mode & DRAW_TRI_TEXTURE1D)
             {
@@ -617,6 +690,8 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_flat()
     drawlist_out.draw_mode |=  DRAW_TRI_FLAT;
     drawlist_out.draw_mode &= ~DRAW_TRI_SMOOTH;
     drawlist_out.draw_mode &= ~DRAW_TRI_POINTS;
+
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -632,6 +707,8 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_smooth()
     drawlist_out.draw_mode |=  DRAW_TRI_SMOOTH;
     drawlist_out.draw_mode &= ~DRAW_TRI_FLAT;
     drawlist_out.draw_mode &= ~DRAW_TRI_POINTS;
+
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -647,6 +724,8 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_points()
     drawlist_out.draw_mode |=  DRAW_TRI_POINTS;
     drawlist_out.draw_mode &= ~DRAW_TRI_FLAT;
     drawlist_out.draw_mode &= ~DRAW_TRI_SMOOTH;
+
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
