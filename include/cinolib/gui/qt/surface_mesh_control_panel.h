@@ -50,6 +50,7 @@
 #include <QComboBox>
 #include <QSlider>
 #include <QCheckBox>
+#include <QDoubleSpinBox>
 #include <QRadioButton>
 #include <QPushButton>
 #include <QHBoxLayout>
@@ -153,10 +154,7 @@ class SurfaceMeshControlPanel
         QSlider                     *sl_ambient_occlusion;
         QPushButton                 *but_compute_AO;
         //
-        //QPushButton                 *but_mark_border_edges;
-        //QPushButton                 *but_mark_labeling_border;
-        //QPushButton                 *but_mark_sharp_creases;
-        //QSpinBox                    *but_sharp_crease_angle;
+        QComboBox                   *cb_actions;
 };
 
 }
