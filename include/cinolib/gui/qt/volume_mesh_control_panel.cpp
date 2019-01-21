@@ -577,6 +577,24 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         left_col->addWidget(gbox);
     }
 
+    // actions
+    {
+        QGroupBox *gbox = new QGroupBox(widget);
+        cb_actions      = new QComboBox(gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_actions->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_actions->insertItem(0,"Action:");
+        cb_actions->insertItem(1,"Unmark all edges");
+        cb_actions->insertItem(2,"Unmark all faces");
+        cb_actions->insertItem(3,"Color wrt label");
+        cb_actions->insertItem(4,"Label wrt color");
+        cb_actions->setFont(global_font);
+        QVBoxLayout *layout = new QVBoxLayout();
+        layout->addWidget(cb_actions);
+        gbox->setLayout(layout);
+        middle_col->addWidget(gbox);
+    }
+
     global_layout->addStretch();
     left_col->addStretch();
     middle_col->addStretch();
@@ -1354,6 +1372,22 @@ void VolumeMeshControlPanel<Mesh>::connect()
         if (m == NULL) return;
         AO_vol<Mesh> ao(*m);
         ao.copy_to_mesh(*m);
+        m->updateGL();
+        canvas->updateGL();
+    });
+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QComboBox::connect(cb_actions, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated), [&]()
+    {
+        switch(cb_actions->currentIndex())
+        {
+            case 1: m->edge_unmark_all(); break;
+            case 2: m->face_unmark_all(); break;
+            case 3: m->poly_color_wrt_label(); break;
+            case 4: m->poly_label_wrt_color(); break;
+        }
         m->updateGL();
         canvas->updateGL();
     });

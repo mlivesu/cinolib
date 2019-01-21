@@ -183,6 +183,8 @@ class VolumeMeshControlPanel
         //
         QSlider                     *sl_ambient_occlusion;
         QPushButton                 *but_compute_AO;
+        //
+        QComboBox                   *cb_actions;
 };
 
 }
