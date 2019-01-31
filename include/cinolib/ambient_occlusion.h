@@ -33,21 +33,57 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_INF
-#define CINO_INF
+#ifndef CINO_AMBIENT_OCCLUSION_H
+#define CINO_AMBIENT_OCCLUSION_H
 
-#include <sys/types.h>
-#include <limits>
+#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_QT
+
+#include <QGLPixelBuffer>
+#include <cinolib/scalar_field.h>
 
 namespace cinolib
 {
-    // https://stackoverflow.com/questions/20016600/negative-infinity
-    static_assert(std::numeric_limits<double>::is_iec559, "IEEE 754 required");
 
-    const double inf_double = std::numeric_limits<double>::infinity();
-    const uint   inf_uint   = std::numeric_limits<uint>::infinity();
-    const float  inf_float  = std::numeric_limits<float>::infinity();
-    const int    inf_int    = std::numeric_limits<int>::infinity();
+/* These classes compute per face AO values by projecting the mesh on the framebuffer and
+ * using the depth buffer to test visiblity. AO values are stored on mesh faces, and averaged
+ * at mesh vertices only if smooth shading is enabled, as happens for surface normals. AO_srf
+ * is dedicated to triangle, hexahedral and polygonal meshes. AO_vol is for tetraheral, hexahedral
+ * and general polyhedral meshes
+*/
+
+template<class Mesh>
+class AO_srf : public QGLPixelBuffer
+{
+    ScalarField ao;
+
+    public:
+
+        AO_srf(const Mesh & m, const int buffer_size = 500, const int n_dirs = 256);
+        void copy_to_mesh(Mesh & m);
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+class AO_vol : public QGLPixelBuffer
+{
+    ScalarField ao;
+    std::vector<bool> visible;
+
+    public:
+
+        AO_vol(const Mesh & m, const int buffer_size = 500, const int n_dirs = 256);
+        void copy_to_mesh(Mesh & m);
+};
+
 }
 
-#endif // CINO_INF
+#ifndef  CINO_STATIC_LIB
+#include "ambient_occlusion.cpp"
+#endif
+
+#endif // #ifdef CINOLIB_USES_QT
+#endif // #ifdef CINOLIB_USES_OPENGL
+
+#endif // CINO_AMBIENT_OCCLUSION_H

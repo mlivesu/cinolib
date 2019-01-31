@@ -84,13 +84,7 @@ int main(int argc, char **argv)
     QPushButton::connect(&but_mark_creases, &QPushButton::clicked, [&]()
     {
         double thresh_rad = static_cast<double>(sb_crease_angle.value()) * M_PI/180.0;
-        for(uint eid=0; eid<m.num_edges(); ++eid)
-        {
-            if(m.edge_crease_angle(eid) > thresh_rad)
-            {
-                m.edge_data(eid).marked = true;
-            }
-        }
+        m.edge_mark_sharp_creases(thresh_rad);
         m.updateGL();
         gui.updateGL();
     });

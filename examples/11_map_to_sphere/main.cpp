@@ -23,17 +23,19 @@
 
 int main(int argc, char **argv)
 {
+    using namespace cinolib;
+
     QApplication app(argc, argv);
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.obj";
-    cinolib::DrawableTrimesh<> m_xyz(s.c_str());
-    cinolib::DrawableTrimesh<> m_uvw = m_xyz;
+    DrawableTrimesh<> m_xyz(s.c_str());
+    DrawableTrimesh<> m_uvw = m_xyz;
 
     QWidget  window;
     QGridLayout layout;
     window.setLayout(&layout);
-    cinolib::GLcanvas gui_xyz(&window);
-    cinolib::GLcanvas gui_uvw(&window);
+    GLcanvas gui_xyz(&window);
+    GLcanvas gui_uvw(&window);
     gui_xyz.push_obj(&m_xyz);
     gui_uvw.push_obj(&m_uvw);
     QLabel lt("Time step:");
@@ -70,12 +72,12 @@ int main(int argc, char **argv)
     m_xyz.show_wireframe(true);
     m_uvw.show_wireframe(true);
 
-    cinolib::Profiler profiler;
+    Profiler profiler;
 
     QPushButton::connect(&but, &QPushButton::clicked, [&]()
     {
         profiler.push("Compute MCF");
-        cinolib::MCF(m_uvw, iters.value(), t.value(), conformalized.isChecked());
+        MCF(m_uvw, iters.value(), t.value(), conformalized.isChecked());
         profiler.pop();
         m_uvw.updateGL();
         gui_uvw.fit_scene();
@@ -87,6 +89,13 @@ int main(int argc, char **argv)
         m_uvw.updateGL();
         gui_uvw.fit_scene();
     });
+
+    // CMD+1 to show XYZ mesh controls.
+    // CMD+2 to show UVW mesh controls.
+    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_xyz(&m_xyz, &gui_xyz);
+    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_uvw(&m_uvw, &gui_uvw);
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui_xyz), &QShortcut::activated, [&](){panel_xyz.show();});
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_2), &gui_uvw), &QShortcut::activated, [&](){panel_uvw.show();});
 
     return app.exec();
 }

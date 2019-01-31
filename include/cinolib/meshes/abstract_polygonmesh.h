@@ -43,10 +43,10 @@
 namespace cinolib
 {
 
-template<class M,
-         class V,
-         class E,
-         class P>
+template<class M = Mesh_std_attributes,
+         class V = Vert_std_attributes,
+         class E = Edge_std_attributes,
+         class P = Polygon_std_attributes>
 class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 {
     protected:
@@ -87,7 +87,11 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
                 void update_v_normals();
                 void update_normals();
 
-         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        int Euler_characteristic() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual uint verts_per_poly(const uint pid) const { return this->polys.at(pid).size(); }
 
@@ -101,14 +105,8 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<int>   export_per_poly_labels() const;
-        std::vector<Color> export_per_poly_colors() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         std::vector<uint>  get_boundary_vertices() const;
         std::vector<ipair> get_boundary_edges() const;
-
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double mesh_volume() const;
@@ -129,6 +127,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
                 void              vert_remove             (const uint vid);
                 void              vert_remove_unreferenced(const uint vid);
                 uint              vert_add                (const vec3d & pos);
+                std::vector<uint> vert_adj_visible_polys  (const uint vid, const vec3d dir, const double ang_thresh = 60.0);
                 std::vector<uint> vert_boundary_edges     (const uint vid) const;
                 std::vector<uint> vert_ordered_vert_ring  (const uint vid) const;
                 std::vector<uint> vert_ordered_poly_ring  (const uint vid) const;
@@ -154,6 +153,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         void   edge_mark_labeling_boundaries  ();
         void   edge_mark_color_discontinuities();
         void   edge_mark_boundaries           ();
+        void   edge_mark_sharp_creases        (const float thresh_rad = 1.0472); // 60 degrees
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

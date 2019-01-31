@@ -37,7 +37,7 @@
 #include <cinolib/cino_inline.h>
 #include <cinolib/quality.h>
 #include <cinolib/io/read_write.h>
-#include <cinolib/inf.h>
+#include <cinolib/min_max_inf.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/subdivision_schemas.h>
 #include <cinolib/vector_serialization.h>
@@ -124,7 +124,6 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
-        exit(-1);
     }
 
     init_hexmesh(tmp_verts, tmp_polys, vert_labels, poly_labels);
@@ -161,7 +160,6 @@ void Hexmesh<M,V,E,F,P>::save(const char * filename) const
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
-        exit(-1);
     }
 }
 

@@ -55,7 +55,7 @@ class PointInsideMeshCache
 
         explicit PointInsideMeshCache(const Mesh & m, const uint octree_depth = 5);
 
-        void  locate(const vec3d p, uint & pid, std::vector<double> & wgts) const;
+        bool  locate(const vec3d p, uint & pid, std::vector<double> & wgts) const;
         vec3d locate(const vec3d p, const Mesh & m) const;
 };
 

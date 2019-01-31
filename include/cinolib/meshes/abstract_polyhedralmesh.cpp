@@ -37,6 +37,7 @@
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/geometry/polygon.h>
 #include <unordered_set>
+#include <unordered_map>
 #include <queue>
 
 namespace cinolib
@@ -86,6 +87,18 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
                  this->num_edges() << "E / " <<
                  this->num_faces() << "F / " <<
                  this->num_polys() << "P   " << std::endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int AbstractPolyhedralMesh<M,V,E,F,P>::Euler_characteristic() const
+{
+    uint nv = this->num_srf_verts();
+    uint ne = this->num_srf_edges();
+    uint nf = this->num_srf_faces();
+    return nv - ne + nf;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -275,6 +288,55 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_verts_id(const uint fi
         return v_list;
     }
     return this->adj_f2v(fid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & pid_beneath) const
+{
+    // note: returns also the ID of the poy that makes the face visible
+
+    if(this->face_is_on_srf(fid))
+    {
+        assert(this->adj_f2p(fid).size()==1);
+        pid_beneath = this->adj_f2p(fid).front();
+        return this->poly_data(pid_beneath).visible;
+    }
+    else
+    {
+        std::vector<uint> pids;
+        for(uint pid : this->adj_f2p(fid))
+        {
+            if(this->poly_data(pid).visible) pids.push_back(pid);
+        }
+        if(pids.size()==1)
+        {
+            pid_beneath = pids.front();
+            return true;
+        }
+        return false;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<ipair> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_visible_faces(const uint vid, const vec3d dir, const double ang_thresh)
+{
+    std::vector<ipair> nbrs; // vector or pairs (visible face, poly benath)
+    for(uint fid : this->adj_v2f(vid))
+    {
+        uint pid_beneath;
+        if(this->face_is_visible(fid, pid_beneath))
+        {
+            vec3d n = this->poly_face_normal(pid_beneath, fid);
+            if(dir.angle_deg(n) < ang_thresh) nbrs.push_back(std::make_pair(fid, pid_beneath));
+        }
+    }
+    return nbrs;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -884,6 +946,38 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_srf_edges(const ui
         if (this->edge_is_on_srf(eid)) srf_e.push_back(eid);
     }
     return srf_e;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_srf_faces(const uint vid) const
+{
+    std::vector<uint> srf_f;
+    for(uint fid : this->adj_v2f(vid))
+    {
+        if (this->face_is_on_srf(fid)) srf_f.push_back(fid);
+    }
+    return srf_f;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_srf_verts(const uint vid) const
+{
+    // NOTE: the intent is to provide a "surface one ring". Therefore,
+    // only vertices adjacent through a SURFACE EDGE will be returned
+    //
+    std::vector<uint> srf_e = vert_adj_srf_edges(vid);
+    std::vector<uint> srf_v;
+    for(uint eid : srf_e)
+    {
+        srf_v.push_back(this->vert_opposite_to(eid,vid));
+    }
+    return srf_v;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1870,6 +1964,38 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_spherical(const uint pid) const
 {
     // https://en.wikipedia.org/wiki/Spherical_polyhedron
     return poly_euler_characteristic(pid)==2;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::poly_export_element(const uint                       pid,
+                                                            std::vector<vec3d>             & verts,
+                                                            std::vector<std::vector<uint>> & faces) const
+{
+    std::unordered_map<uint,uint> v_map;
+    verts.clear();
+    faces.clear();
+    for(uint fid : this->adj_p2f(pid))
+    {
+        std::vector<uint> f;
+        for(uint vid : this->adj_f2v(fid))
+        {
+            auto it = v_map.find(vid);
+            if(it==v_map.end())
+            {
+                uint fresh_id = v_map.size();
+                v_map[vid] = fresh_id;
+                verts.push_back(this->vert(vid));
+                f.push_back(fresh_id);
+            }
+            else f.push_back(it->second);
+            if(this->poly_face_is_CW(pid,fid)) std::reverse(f.begin(), f.end());
+        }
+        faces.push_back(f);
+    }
 }
 
 }

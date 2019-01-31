@@ -36,7 +36,7 @@
 #ifndef CINO_BBOX_H
 #define CINO_BBOX_H
 
-#include <cinolib/inf.h>
+#include <cinolib/min_max_inf.h>
 #include <cinolib/geometry/vec3.h>
 #include <algorithm>
 

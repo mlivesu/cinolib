@@ -89,9 +89,16 @@ Here is a list of the sample programs available in CinoLib.
 #### 25 - Paint on a 3D surface using brushes of different sizes
 <p align="left"><img src="snapshots/25_surface_painter.png" width="500"></p>
 
+#### 26 - Export the skin of a volumetric mesh to a surface mesh (command line tool)
+
+#### 27 - Update the skin of a volumetric mesh from a surface mesh (command line tool)
+
+#### 28 - Wrap tetgen to tetrahedralize a PLC in any file format supported by cinolib (command line tool)
+
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
+* Export a cluster from a labeled surface or volumetric mesh
 * Copy/paste points of view from the GL canvas for accurate visual comparisons and fast snapshot reproduction
 * Customize data structures with user defined mesh/vertex/edge/polygon/polyhedron attributes
 * Navigate application history exploiting Cinolib undo/redo facilities

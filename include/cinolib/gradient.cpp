@@ -133,38 +133,94 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> &
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F,P> & m)
+Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F,P> & m, const bool per_poly)
 {
-    Eigen::SparseMatrix<double> G(m.num_polys()*3, m.num_verts());
-    std::vector<Entry> entries;
-
-    for(uint pid=0; pid<m.num_polys(); ++pid)
+    if(per_poly)
     {
-        double vol = std::max(m.poly_volume(pid), 1e-5);
+        Eigen::SparseMatrix<double> G(m.num_polys()*3, m.num_verts());
+        std::vector<Entry> entries;
 
-        for(uint vid : m.adj_p2v(pid))
+        for(uint pid=0; pid<m.num_polys(); ++pid)
         {
-            vec3d per_vert_sum_over_f_normals(0,0,0);
-            for(uint fid : m.adj_p2f(pid))
-            {
-                if (m.face_contains_vert(fid,vid))
-                {
-                    vec3d  n   = m.poly_face_normal(pid,fid);
-                    double a   = m.face_area(fid);
-                    double avg = static_cast<double>(m.verts_per_face(fid));
-                    per_vert_sum_over_f_normals += (n*a)/avg;
-                }
-            }
-            per_vert_sum_over_f_normals /= vol;
-            uint row = 3 * pid;
-            entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.x())); ++row;
-            entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.y())); ++row;
-            entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.z()));
-        }
-    }
+            double vol = std::max(m.poly_volume(pid), 1e-5);
 
-    G.setFromTriplets(entries.begin(), entries.end());
-    return G;
+            for(uint vid : m.adj_p2v(pid))
+            {
+                vec3d per_vert_sum_over_f_normals(0,0,0);
+                for(uint fid : m.adj_p2f(pid))
+                {
+                    if (m.face_contains_vert(fid,vid))
+                    {
+                        vec3d  n   = m.poly_face_normal(pid,fid);
+                        double a   = m.face_area(fid);
+                        double avg = static_cast<double>(m.verts_per_face(fid));
+                        per_vert_sum_over_f_normals += (n*a)/avg;
+                    }
+                }
+                per_vert_sum_over_f_normals /= vol;
+                uint row = 3 * pid;
+                entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.x())); ++row;
+                entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.y())); ++row;
+                entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.z()));
+            }
+        }
+
+        G.setFromTriplets(entries.begin(), entries.end());
+        return G;
+    }
+    else // per vert
+    {
+        Eigen::SparseMatrix<double> G(m.num_polys()*3, m.num_verts());
+        std::vector<Entry> entries;
+
+        for(uint pid=0; pid<m.num_polys(); ++pid)
+        {
+            double vol = std::max(m.poly_volume(pid), 1e-5);
+
+            for(uint vid : m.adj_p2v(pid))
+            {
+                vec3d per_vert_sum_over_f_normals(0,0,0);
+                for(uint fid : m.adj_p2f(pid))
+                {
+                    if (m.face_contains_vert(fid,vid))
+                    {
+                        vec3d  n   = m.poly_face_normal(pid,fid);
+                        double a   = m.face_area(fid);
+                        double avg = static_cast<double>(m.verts_per_face(fid));
+                        per_vert_sum_over_f_normals += (n*a)/avg;
+                    }
+                }
+                per_vert_sum_over_f_normals /= vol;
+                uint row = 3 * pid;
+                entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.x())); ++row;
+                entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.y())); ++row;
+                entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.z()));
+            }
+        }
+        G.setFromTriplets(entries.begin(), entries.end());
+
+        Eigen::SparseMatrix<double> A(m.num_verts()*3, m.num_polys()*3);
+        entries.clear();
+
+        for(uint vid=0;vid<m.num_verts();++vid)
+        {
+            double total_volume=0;
+            for(uint pid : m.adj_v2p(vid))
+            {
+                total_volume += m.poly_volume(pid);
+            }
+            uint row = 3*vid;
+            for(uint pid : m.adj_v2p(vid))
+            {
+                uint col=3*pid;
+                entries.push_back(Entry(row,  col,   m.poly_volume(pid)/total_volume));
+                entries.push_back(Entry(row+1,col+1, m.poly_volume(pid)/total_volume));
+                entries.push_back(Entry(row+2,col+2, m.poly_volume(pid)/total_volume));
+            }
+        }
+        A.setFromTriplets(entries.begin(), entries.end());
+        return A*G;
+    }
 }
 
 }

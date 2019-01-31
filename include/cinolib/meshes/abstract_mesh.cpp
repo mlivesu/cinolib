@@ -35,8 +35,9 @@
 *********************************************************************************/
 #include <cinolib/meshes/abstract_mesh.h>
 #include <cinolib/stl_container_utilities.h>
-#include <cinolib/inf.h>
+#include <cinolib/min_max_inf.h>
 #include <map>
+#include <unordered_set>
 
 namespace cinolib
 {
@@ -180,6 +181,15 @@ void AbstractMesh<M,V,E,P>::update_bbox()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+int AbstractMesh<M,V,E,P>::genus() const
+{
+    return Euler_characteristic() - 2;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<Color> AbstractMesh<M,V,E,P>::vector_poly_colors() const
 {
     std::vector<Color> colors;
@@ -203,6 +213,28 @@ std::vector<int> AbstractMesh<M,V,E,P>::vector_poly_labels() const
     {
         labels.push_back(poly_data(pid).label);
     }
+    return labels;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<Color> AbstractMesh<M,V,E,P>::vector_poly_unique_colors() const
+{
+    std::vector<Color> colors = vector_poly_colors();
+    REMOVE_DUPLICATES_FROM_VEC(colors);
+    return colors;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<int> AbstractMesh<M,V,E,P>::vector_poly_unique_labels() const
+{
+    std::vector<int> labels = vector_poly_labels();
+    REMOVE_DUPLICATES_FROM_VEC(labels);
     return labels;
 }
 
@@ -954,8 +986,8 @@ void AbstractMesh<M,V,E,P>::poly_color_wrt_label(const bool sorted, const float 
     uint n_labels = l_map.size();
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        if(sorted) this->poly_data(pid).color      = Color::hsv_ramp(n_labels, this->poly_data(pid).label);
-        else            this->poly_data(pid).color = Color::scatter(n_labels,l_map.at(this->poly_data(pid).label), s, v);
+        if(sorted) this->poly_data(pid).color = Color::hsv_ramp(n_labels, this->poly_data(pid).label);
+        else       this->poly_data(pid).color = Color::scatter(n_labels,l_map.at(this->poly_data(pid).label), s, v);
     }
 }
 
@@ -1003,15 +1035,27 @@ void AbstractMesh<M,V,E,P>::poly_unmark_all()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+uint AbstractMesh<M,V,E,P>::polys_n_unique_colors() const
+{
+    return vector_poly_unique_colors().size();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint AbstractMesh<M,V,E,P>::polys_n_unique_labels() const
+{
+    return vector_poly_unique_labels().size();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 bool AbstractMesh<M,V,E,P>::polys_are_colored() const
 {
-    std::set<Color> colors;
-    for(uint pid=0; pid<num_polys(); ++pid)
-    {
-        colors.insert(poly_data(pid).color);
-    }
-    if (colors.size()>1) return true;
-    return false;
+    return (polys_n_unique_colors()>1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1020,13 +1064,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 bool AbstractMesh<M,V,E,P>::polys_are_labeled() const
 {
-    std::set<int> labels;
-    for(uint pid=0; pid<num_polys(); ++pid)
-    {
-        labels.insert(poly_data(pid).label);
-    }
-    if (labels.size()>1) return true;
-    return false;
+    return (polys_n_unique_labels()>1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

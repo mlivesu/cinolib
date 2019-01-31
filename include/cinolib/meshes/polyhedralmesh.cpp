@@ -99,7 +99,6 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
-        exit(-1);
     }
 
     this->init(tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
@@ -122,7 +121,6 @@ void Polyhedralmesh<M,V,E,F,P>::save(const char * filename) const
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
-        exit(-1);
     }
 }
 

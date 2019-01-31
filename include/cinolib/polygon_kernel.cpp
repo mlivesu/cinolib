@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/polygon_kernel.h>
-#include <cinolib/inf.h>
+#include <cinolib/min_max_inf.h>
 
 #ifdef CINOLIB_USES_BOOST
 #include <boost/geometry/geometries/polygon.hpp>

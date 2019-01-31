@@ -2,15 +2,17 @@
 Please consider this to be just development notes and not any real planning.
 
 ### Things to be fixed:
+* use a less verbose naming for ANSI text colors
 * fix per face winding in midpoint subdivision
 * fix marching tets: degenerate triangles will be generated in some cases (see comments inside cpp file)
 * fix integral curve tracing (also refactor ray/line/plane intersections)
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* transform all std::cerr into std::cout << ANSI_fg_color_red << 
+* add non-manifoldness checks for vertices in srf and vol meshes
+* adjust examples #1-#6 such that will read multiple meshes from command line input 
 * add reader/writer for .MSH files
-* add AO property to mesh vertices, and enable loading AO from text file
-* prevent averaging of normals on sharp creases in smooth shading
 * add a "soup" flag to meshes (i.e., no connectivity will be computed)
 * add Lagrange multipliers to linear solvers
 * add copy constructors for meshes
@@ -21,7 +23,6 @@ Please consider this to be just development notes and not any real planning.
 * add matrix class (i.e. mat<real,size>, with operators and constructors from quaternions, rotations, identity, diagonal, ecc)
 * add support to read/write per element labels in OFF and HEDRA
 * make sure field_serialize is lossless in terms of numeric precision
-* add verdict metrics for tris/quads/tets/hexa
 * put edge flip and similar operators on separate files
 * add inverse and transpose operators for 2x2 and 3x3 matrices
 * remove headers from serialized vector and scalar fields (it’s far more general)
@@ -46,6 +47,5 @@ Please consider this to be just development notes and not any real planning.
 
 ### Documentation:
 * create a mirror repo for eigen (and kill that annoying warning)
-* create a mirror repo for graph cuts (the version without warnings) and Shewcuck's predicates
 * add a description of all the non standard files used in cinolib (.hedra, scalar and vector fields, sharp features)
 

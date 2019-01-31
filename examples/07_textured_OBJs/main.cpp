@@ -44,5 +44,12 @@ int main(int argc, char **argv)
     gui_xyz.push_obj(&m_xyz);
     gui_uvw.push_obj(&m_uvw);
 
+    // CMD+1 to show XYZ mesh controls.
+    // CMD+2 to show UVW mesh controls.
+    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_xyz(&m_xyz, &gui_xyz);
+    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_uvw(&m_uvw, &gui_uvw);
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui_xyz), &QShortcut::activated, [&](){panel_xyz.show();});
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_2), &gui_uvw), &QShortcut::activated, [&](){panel_uvw.show();});
+
     return a.exec();
 }

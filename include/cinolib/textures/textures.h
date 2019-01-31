@@ -32,6 +32,14 @@
 *     Via de Marini, 6                                                          *
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
+*                                                                               *
+*     Fabrizio Corda (cordafab@gmail.com)                                       *
+*     http://www.fabriziocorda.com                                              *
+*                                                                               *
+*     University of Cagliari                                                    *
+*     Via Ospedale, 72                                                          *
+*     09124 Cagliari,                                                           *
+*     Italy                                                                     *                                                                               *
 *********************************************************************************/
 #ifndef CINO_TEXTURES_H
 #define CINO_TEXTURES_H
@@ -68,11 +76,14 @@ enum
 
 typedef struct
 {
-    int      type;
-    GLuint   id             = 0;
-    GLsizei  size           = 0;
-    double   scaling_factor = 1.0;
-    uint8_t *data           = nullptr;
+    int          type;
+    GLuint       id             = 0;
+    GLsizei      size           = 0;
+    double       scaling_factor = 1.0;
+    uint8_t     *data           = nullptr;
+    std::string  diffuse_path;
+    std::string  specular_path;
+    std::string  normal_path;
 }
 Texture;
 

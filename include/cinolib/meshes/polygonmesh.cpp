@@ -35,8 +35,6 @@
 *********************************************************************************/
 #include <cinolib/meshes/polygonmesh.h>
 #include <cinolib/meshes/trimesh.h>
-#include <cinolib/geometry/plane.h>
-#include <cinolib/geometry/polygon.h>
 #include <cinolib/vector_serialization.h>
 #include <numeric>
 #include <map>

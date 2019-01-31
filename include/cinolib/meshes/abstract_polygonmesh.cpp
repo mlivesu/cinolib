@@ -78,7 +78,6 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
-        exit(-1);
     }
 
     init(pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col);
@@ -112,7 +111,6 @@ void AbstractPolygonMesh<M,V,E,P>::save(const char * filename) const
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
-        exit(-1);
     }
 }
 
@@ -360,6 +358,18 @@ void AbstractPolygonMesh<M,V,E,P>::update_normals()
 {
     this->update_p_normals();
     this->update_v_normals();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+int AbstractPolygonMesh<M,V,E,P>::Euler_characteristic() const
+{
+    uint nv = this->num_verts();
+    uint ne = this->num_edges();
+    uint np = this->num_polys();
+    return nv - ne + np;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -636,6 +646,24 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_boundary_edges(const uint v
     std::vector<uint> b_edges;
     for(uint eid : this->adj_v2e(vid)) if (edge_is_boundary(eid)) b_edges.push_back(eid);
     return b_edges;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_adj_visible_polys(const uint vid, const vec3d dir, const double ang_thresh)
+{
+    std::vector<uint> nbrs;
+    for(uint pid : this->adj_v2p(vid))
+    {
+        if(this->poly_data(pid).visible)
+        {
+            vec3d n = this->poly_data(pid).normal;
+            if(dir.angle_deg(n) < ang_thresh) nbrs.push_back(pid);
+        }
+    }
+    return nbrs;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -925,9 +953,8 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_labeling_boundaries()
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        std::set<int> unique_labels;
+        std::unordered_set<int> unique_labels;
         for(uint pid : this->adj_e2p(eid)) unique_labels.insert(this->poly_data(pid).label);
-
         this->edge_data(eid).marked = (unique_labels.size()>=2);
     }
 }
@@ -956,6 +983,18 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_boundaries()
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         this->edge_data(eid).marked = edge_is_boundary(eid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::edge_mark_sharp_creases(const float thresh)
+{
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        this->edge_data(eid).marked = (edge_crease_angle(eid) >= thresh);
     }
 }
 
@@ -1364,34 +1403,6 @@ double AbstractPolygonMesh<M,V,E,P>::poly_perimeter(const uint pid) const
     double perimeter = 0.0;
     for(uint eid : this->adj_p2e(pid)) perimeter += this->edge_length(eid);
     return perimeter;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-std::vector<int> AbstractPolygonMesh<M,V,E,P>::export_per_poly_labels() const
-{
-    std::vector<int> labels(this->num_polys());
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        labels.at(this->poly_data(pid).label);
-    }
-    return labels;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-std::vector<Color> AbstractPolygonMesh<M,V,E,P>::export_per_poly_colors() const
-{
-    std::vector<Color> colors(this->num_polys());
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        colors.at(pid) = this->poly_data(pid).color;
-    }
-    return colors;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -281,8 +281,8 @@ CINO_INLINE
 void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P>  & m,
                     const int                                  label,
                           AbstractPolyhedralMesh<M,V,E,F,P>  & subm,
-                          std::unordered_map<uint,uint>                & m2subm_vmap,
-                          std::unordered_map<uint,uint>                & subm2m_vmap)
+                          std::unordered_map<uint,uint>      & m2subm_vmap,
+                          std::unordered_map<uint,uint>      & subm2m_vmap)
 {
     std::unordered_set<int> s;
     s.insert(label);

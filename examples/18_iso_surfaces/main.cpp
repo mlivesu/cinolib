@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     QSlider     sl_slice(Qt::Horizontal);
     QPushButton but_tessellate("Tessellate");
     QGridLayout layout;
-    GLcanvas    canvas(&window);
+    GLcanvas    gui(&window);
     sl_iso.setMaximum(100);
     sl_iso.setMinimum(0);
     sl_iso.setValue(50);
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     layout.addWidget(&sl_iso,0,0,1,9);
     layout.addWidget(&sl_slice,1,0,1,9);
     layout.addWidget(&but_tessellate,0,9,2,1);
-    layout.addWidget(&canvas,2,0,1,10);
+    layout.addWidget(&gui,2,0,1,10);
     window.setLayout(&layout);
     window.show();
     window.resize(600,600);
@@ -54,14 +54,14 @@ int main(int argc, char **argv)
     compute_geodesics(m, {0, 10}, COTANGENT).copy_to_mesh(m); // generate some scalar field
     m.show_in_texture1D(TEXTURE_1D_HSV_W_ISOLINES);
     m.show_out_texture1D(TEXTURE_1D_HSV_W_ISOLINES);
-    canvas.push_obj(&m);
+    gui.push_obj(&m);
 
     SlicerState ss;
     ss.Z_thresh = 0.5;
     m.slice(ss);
 
     DrawableIsosurface<> iso(m, 0.5);
-    canvas.push_obj(&iso, false);
+    gui.push_obj(&iso, false);
 
     Profiler profiler;
 
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
         profiler.push("update iso-surface");
         iso = DrawableIsosurface<>(m, static_cast<float>(sl_iso.value())/100.0);
         profiler.pop();
-        canvas.updateGL();
+        gui.updateGL();
     });
 
     QSlider::connect(&sl_slice, &QSlider::valueChanged, [&]()
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
         profiler.push("update slicing");
         m.slice(ss);
         profiler.pop();
-        canvas.updateGL();
+        gui.updateGL();
     });
 
     QSlider::connect(&but_tessellate, &QPushButton::clicked, [&]()
@@ -88,9 +88,12 @@ int main(int argc, char **argv)
         iso.tessellate(m);
         profiler.pop();
         m.slice(ss);
-        canvas.updateGL();
+        gui.updateGL();
     });
 
+    // CMD+1 to show mesh controls.
+    VolumeMeshControlPanel<DrawableTetmesh<>> panel(&m, &gui);
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
 
     return a.exec();
 }

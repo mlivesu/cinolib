@@ -38,6 +38,8 @@
 #include <cinolib/meshes/mesh_slicer.h>
 #include <cinolib/gradient.h>
 #include <cinolib/symbols.h>
+#include <cinolib/ambient_occlusion.h>
+#include <cinolib/deg_rad.h>
 
 namespace cinolib
 {
@@ -285,6 +287,26 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         left_col->addWidget(gbox);
     }
 
+    // AMBIENT OCCLUSION
+    {
+        QGroupBox *gbox      = new QGroupBox(widget);
+        sl_ambient_occlusion = new QSlider(Qt::Horizontal, gbox);
+        but_compute_AO       = new QPushButton("Compute AO", gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_ambient_occlusion->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_compute_AO->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_ambient_occlusion->setMinimum(0);
+        sl_ambient_occlusion->setMaximum(99);
+        sl_ambient_occlusion->setValue(99);
+        gbox->setFont(global_font);
+        but_compute_AO->setFont(global_font);
+        QVBoxLayout *layout = new QVBoxLayout();
+        layout->addWidget(sl_ambient_occlusion);
+        layout->addWidget(but_compute_AO);
+        gbox->setLayout(layout);
+        left_col->addWidget(gbox);
+    }
+
     // SLICING
     {
         QGroupBox *gbox = new QGroupBox("Slice" ,widget);
@@ -402,6 +424,26 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         layout->addWidget(l_width,1,0);
         layout->addWidget(sl_marked_edges_width,1,1);
         layout->addWidget(but_marked_edges_color,2,1);
+        gbox->setLayout(layout);
+        right_col->addWidget(gbox);
+    }
+
+    // actions
+    {
+        QGroupBox *gbox = new QGroupBox(widget);
+        cb_actions      = new QComboBox(gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_actions->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_actions->insertItem(0,"Action:");
+        cb_actions->insertItem(1,"Unmark all edges");
+        cb_actions->insertItem(2,"Color wrt label");
+        cb_actions->insertItem(3,"Label wrt color");
+        cb_actions->insertItem(4,"Mark color discontinuities");
+        cb_actions->insertItem(5,"Mark sharp creases (>60deg)");
+        cb_actions->insertItem(6,"Mark sharp creases (>30deg)");
+        cb_actions->setFont(global_font);
+        QVBoxLayout *layout = new QVBoxLayout();
+        layout->addWidget(cb_actions);
         gbox->setLayout(layout);
         right_col->addWidget(gbox);
     }
@@ -940,6 +982,44 @@ void SurfaceMeshControlPanel<Mesh>::connect()
         if (m == NULL || canvas == NULL) return;
         m->show_marked_edge_width(sl_marked_edges_width->value());
         cb_marked_edges->setChecked(true);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_ambient_occlusion, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        float alpha = float(sl_ambient_occlusion->value()) / 99.0;
+        m->show_AO_alpha(alpha);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_compute_AO, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        AO_srf<Mesh> ao(*m);
+        ao.copy_to_mesh(*m);
+        m->updateGL();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QComboBox::connect(cb_actions, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated), [&]()
+    {
+        switch(cb_actions->currentIndex())
+        {
+            case 1: m->edge_unmark_all(); break;
+            case 2: m->poly_color_wrt_label(); break;
+            case 3: m->poly_label_wrt_color(); break;
+            case 4: m->edge_mark_color_discontinuities(); break;
+            case 5: m->edge_mark_sharp_creases(to_rad(60.0)); break;
+            case 6: m->edge_mark_sharp_creases(to_rad(30.0)); break;
+        }
+        m->updateGL();
         canvas->updateGL();
     });
 }

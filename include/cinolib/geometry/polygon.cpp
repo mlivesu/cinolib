@@ -188,7 +188,7 @@ bool polygon_triangulate(std::vector<vec2d> & poly,
         int curr = polygon_find_ear(sub_poly);
         if (curr<0)
         {
-            std::cerr << "WARNING: ear cut algorithm failure (is the polygon degenerate?)" << std::endl;
+            //std::cerr << "WARNING: ear cut algorithm failure (is the polygon degenerate?)" << std::endl;
             tris.clear();
             return false;
         }

@@ -38,6 +38,7 @@
 #include <cinolib/meshes/mesh_slicer.h>
 #include <cinolib/gradient.h>
 #include <cinolib/symbols.h>
+#include <cinolib/ambient_occlusion.h>
 #include <iostream>
 
 namespace cinolib
@@ -376,6 +377,26 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         middle_col->addWidget(gbox);
     }
 
+    // AMBIENT OCCLUSION
+    {
+        QGroupBox *gbox      = new QGroupBox(widget);
+        sl_ambient_occlusion = new QSlider(Qt::Horizontal, gbox);
+        but_compute_AO       = new QPushButton("Compute AO", gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_ambient_occlusion->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        but_compute_AO->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sl_ambient_occlusion->setMinimum(0);
+        sl_ambient_occlusion->setMaximum(99);
+        sl_ambient_occlusion->setValue(99);
+        gbox->setFont(global_font);
+        but_compute_AO->setFont(global_font);
+        QVBoxLayout *layout = new QVBoxLayout();
+        layout->addWidget(sl_ambient_occlusion);
+        layout->addWidget(but_compute_AO);
+        gbox->setLayout(layout);
+        left_col->addWidget(gbox);
+    }
+
     // ISO-SURFACES
     {
         QGroupBox *gbox       = new QGroupBox(widget);
@@ -554,6 +575,24 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         layout->addWidget(but_marked_faces_color,0,1);
         gbox->setLayout(layout);
         left_col->addWidget(gbox);
+    }
+
+    // actions
+    {
+        QGroupBox *gbox = new QGroupBox(widget);
+        cb_actions      = new QComboBox(gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_actions->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        cb_actions->insertItem(0,"Action:");
+        cb_actions->insertItem(1,"Unmark all edges");
+        cb_actions->insertItem(2,"Unmark all faces");
+        cb_actions->insertItem(3,"Color wrt label");
+        cb_actions->insertItem(4,"Label wrt color");
+        cb_actions->setFont(global_font);
+        QVBoxLayout *layout = new QVBoxLayout();
+        layout->addWidget(cb_actions);
+        gbox->setLayout(layout);
+        middle_col->addWidget(gbox);
     }
 
     global_layout->addStretch();
@@ -1313,6 +1352,43 @@ void VolumeMeshControlPanel<Mesh>::connect()
         if (m == NULL) return;
         QColor c = QColorDialog::getColor(Qt::white, widget, "", QColorDialog::ShowAlphaChannel);
         m->show_marked_face_color(Color(c.redF(), c.greenF(), c.blueF(), c.alphaF()));
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QSlider::connect(sl_ambient_occlusion, &QSlider::valueChanged, [&]()
+    {
+        if (m == NULL || canvas == NULL) return;
+        float alpha = float(sl_ambient_occlusion->value()) / 99.0;
+        m->show_AO_alpha(alpha);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QPushButton::connect(but_compute_AO, &QPushButton::clicked, [&]()
+    {
+        if (m == NULL) return;
+        AO_vol<Mesh> ao(*m);
+        ao.copy_to_mesh(*m);
+        m->updateGL();
+        canvas->updateGL();
+    });
+
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QComboBox::connect(cb_actions, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated), [&]()
+    {
+        switch(cb_actions->currentIndex())
+        {
+            case 1: m->edge_unmark_all(); break;
+            case 2: m->face_unmark_all(); break;
+            case 3: m->poly_color_wrt_label(); break;
+            case 4: m->poly_label_wrt_color(); break;
+        }
+        m->updateGL();
         canvas->updateGL();
     });
 }

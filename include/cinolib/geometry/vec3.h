@@ -289,6 +289,14 @@ template<typename real> class vec3
         {
             return (*this - in).length_squared();
         }
+
+        bool isnan() const
+        {
+            if(std::isnan(m_x)) return true;
+            if(std::isnan(m_y)) return true;
+            if(std::isnan(m_z)) return true;
+            return false;
+        }
 };
 
 template<typename real>
