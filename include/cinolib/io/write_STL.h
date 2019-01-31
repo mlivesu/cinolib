@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2019: Daniela Cabiddu
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -24,8 +24,7 @@
 *                                                                               *
 *  Author(s):                                                                   *
 *                                                                               *
-*     Marco Livesu (marco.livesu@gmail.com)                                     *
-*     http://pers.ge.imati.cnr.it/livesu/                                       *
+*     Daniela Cabiddu (daniela.cabiddu@ge.imati.cnr.it)                         *
 *                                                                               *
 *     Italian National Research Council (CNR)                                   *
 *     Institute for Applied Mathematics and Information Technologies (IMATI)    *
