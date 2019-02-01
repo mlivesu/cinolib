@@ -575,7 +575,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     QPushButton::connect(but_save, &QPushButton::clicked, [&]()
     {
         if (m == NULL) return;
-        std::string filename = QFileDialog::getSaveFileName(NULL, "Save mesh", ".", "3D Meshes (*.off *.obj *.iv);; OBJ(*.obj);; OFF(*.off);; IV(*.iv)").toStdString();
+        std::string filename = QFileDialog::getSaveFileName(NULL, "Save mesh", ".", "3D Meshes (*.off *.obj *.iv *.stl);; OBJ(*.obj);; OFF(*.off);; IV(*.iv);; STL(*.stl)").toStdString();
         if (!filename.empty()) m->save(filename.c_str());
     });
 

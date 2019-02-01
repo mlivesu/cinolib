@@ -48,16 +48,14 @@ void write_STL(const char                               * filename,
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
-    std::cout << "Saving " << filename << std::endl;
-
     FILE *fp = fopen(filename, "w");
-
     if(!fp)
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_STL() : couldn't save file " << filename << std::endl;
         exit(-1);
     }
 
+    fprintf(fp, "solid T_MESH\n");
     for (uint pid=0; pid < poly.size(); pid++)
     {
         fprintf(fp, " facet normal %f %f %f\n", normals.at(pid*3+0), normals.at(pid*3+1), normals.at(pid*3+2));
