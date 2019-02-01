@@ -99,21 +99,6 @@ void AbstractPolygonMesh<M,V,E,P>::save(const char * filename) const
     {
         write_OFF(filename, coords, this->polys);
     }
-    else
-    if (filetype.compare("stl") == 0 ||
-        filetype.compare("STL") == 0)
-    {
-        std::vector<double> normals;
-
-        for (uint pid=0; pid < this->num_polys(); pid++)
-        {
-            normals.push_back(this->poly_data(pid).normal.x());
-            normals.push_back(this->poly_data(pid).normal.y());
-            normals.push_back(this->poly_data(pid).normal.z());
-        }
-
-        write_STL(filename, serialized_xyz_from_vec3d(this->vector_verts()), this->polys, normals);
-    }
     else if (filetype.compare("obj") == 0 ||
              filetype.compare("OBJ") == 0)
     {
@@ -122,6 +107,20 @@ void AbstractPolygonMesh<M,V,E,P>::save(const char * filename) const
             write_OBJ(filename, coords, this->polys, this->vector_poly_colors());
         }
         else write_OBJ(filename, coords, this->polys);
+    }
+    else if (filetype.compare("stl") == 0 ||
+             filetype.compare("STL") == 0)
+    {
+        std::vector<double> normals;
+        normals.reserve(3*this->num_polys());
+        for (uint pid=0; pid<this->num_polys(); ++pid)
+        {
+            normals.push_back(this->poly_data(pid).normal.x());
+            normals.push_back(this->poly_data(pid).normal.y());
+            normals.push_back(this->poly_data(pid).normal.z());
+        }
+
+        write_STL(filename, serialized_xyz_from_vec3d(this->vector_verts()), this->polys, normals);
     }
     else
     {
