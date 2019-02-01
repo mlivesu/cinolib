@@ -9,7 +9,7 @@ make -j4
 ```
 
 ### External dependencies
-Some of the projects depend from external libraries which are not wrapped in CinoLib (e.g. [Triangle](https://www.cs.cmu.edu/~quake/triangle.html), [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) or [VTK](https://www.vtk.org)). These libraries should be installed separately, and the project files updated with correct paths for compiler and linker. Projects with external dependencies are marked in `build_all_examples.pro`. If you are not interested in these examples, you can safely comment them by adding `#` at the beginning of the corresponding lines in the project file, and they will be automatically ignored by qmake.
+Some of the projects depend from external libraries which are not included in CinoLib (e.g. [Triangle](https://www.cs.cmu.edu/~quake/triangle.html), [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) or [VTK](https://www.vtk.org)). These libraries should be installed separately, and the project files updated with correct paths for compiler and linker. Projects with external dependencies are marked in `build_all_examples.pro`. If you are not interested in these examples, you can safely comment them by adding `#` at the beginning of the corresponding lines in the project file, and they will be automatically ignored by qmake.
 
 # List of Examples
 Here is a list of the sample programs available in CinoLib.
