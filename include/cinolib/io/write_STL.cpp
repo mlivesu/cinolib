@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2019: Daniela Cabiddu
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -24,8 +24,7 @@
 *                                                                               *
 *  Author(s):                                                                   *
 *                                                                               *
-*     Marco Livesu (marco.livesu@gmail.com)                                     *
-*     http://pers.ge.imati.cnr.it/livesu/                                       *
+*     Daniela Cabiddu (daniela.cabiddu@ge.imati.cnr.it)                         *
 *                                                                               *
 *     Italian National Research Council (CNR)                                   *
 *     Institute for Applied Mathematics and Information Technologies (IMATI)    *
@@ -33,42 +32,45 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_READ_WRITE_H
-#define CINO_READ_WRITE_H
-
-// SURFACE READERS
-#include <cinolib/io/read_OBJ.h>
-#include <cinolib/io/read_OFF.h>
-#include <cinolib/io/read_IV.h>
-// SURFACE WRITERS
-#include <cinolib/io/write_OBJ.h>
-#include <cinolib/io/write_OFF.h>
 #include <cinolib/io/write_STL.h>
-#include <cinolib/io/write_NODE_ELE.h>
 
 
-// VOLUME READERS
-#include <cinolib/io/read_HEDRA.h>
-#include <cinolib/io/read_HYBRID.h>
-#include <cinolib/io/read_MESH.h>
-#include <cinolib/io/read_TET.h>
-#include <cinolib/io/read_VTU.h>
-#include <cinolib/io/read_VTK.h>
-#include <cinolib/io/read_HEXEX.h>
-// VOLUME WRITERS
-#include <cinolib/io/write_HEDRA.h>
-#include <cinolib/io/write_MESH.h>
-#include <cinolib/io/write_TET.h>
-#include <cinolib/io/write_VTU.h>
-#include <cinolib/io/write_VTK.h>
+#include <iostream>
 
+namespace cinolib
+{
 
-// SKELETON READERS
-#include <cinolib/io/read_LIVESU2012.h>
-#include <cinolib/io/read_TAGLIASACCHI2012.h>
-#include <cinolib/io/read_DEYSUN2006.h>
-#include <cinolib/io/read_CSV.h>
-// SKELETON WRITERS
-#include <cinolib/io/write_LIVESU2012.h>
+CINO_INLINE
+void write_STL(const char                               * filename,
+               const std::vector<double>                & xyz,
+               const std::vector<std::vector<uint>>     & poly,
+               const std::vector<double>                & normals)
+{
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
-#endif // CINO_READ_WRITE
+    std::cout << "Saving " << filename << std::endl;
+
+    FILE *fp = fopen(filename, "w");
+
+    if(!fp)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_STL() : couldn't save file " << filename << std::endl;
+        exit(-1);
+    }
+
+    for (uint pid=0; pid < poly.size(); pid++)
+    {
+        fprintf(fp, " facet normal %f %f %f\n", normals.at(pid*3+0), normals.at(pid*3+1), normals.at(pid*3+2));
+        fprintf(fp, "  outer loop\n");
+        fprintf(fp, "   vertex %f %f %f\n", xyz.at(poly.at(pid).at(0)*3+0), xyz.at(poly.at(pid).at(0)*3+1), xyz.at(poly.at(pid).at(0)*3+2));
+        fprintf(fp, "   vertex %f %f %f\n", xyz.at(poly.at(pid).at(1)*3+0), xyz.at(poly.at(pid).at(1)*3+1), xyz.at(poly.at(pid).at(1)*3+2));
+        fprintf(fp, "   vertex %f %f %f\n", xyz.at(poly.at(pid).at(2)*3+0), xyz.at(poly.at(pid).at(2)*3+1), xyz.at(poly.at(pid).at(2)*3+2));
+        fprintf(fp, "  endloop\n");
+        fprintf(fp, " endfacet\n");
+    }
+    fprintf(fp, "endsolid T_MESH\n");
+
+    fclose(fp);
+}
+
+}
