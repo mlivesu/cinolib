@@ -45,13 +45,13 @@ namespace cinolib
 
 CINO_INLINE
 void write_STL(const char                            * filename,
-               const std::vector<double>             &xyz,
-               const std::vector<std::vector<uint> > & tri,
-               const std::vector<double>             & tri_normals);
+               const std::vector<double>             & xyz,
+               const std::vector<std::vector<uint> > & poly,
+               const std::vector<double>             & normals);
 }
 
 #ifndef  CINO_STATIC_LIB
 #include "write_STL.cpp"
 #endif
 
-#endif // CINO_WRITE_OFF
+#endif // CINO_WRITE_STL

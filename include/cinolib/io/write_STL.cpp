@@ -42,9 +42,9 @@ namespace cinolib
 
 CINO_INLINE
 void write_STL(const char                               * filename,
-               const std::vector<double>                 & xyz,
-               const std::vector<std::vector<uint>>     & tri,
-               const std::vector<double>                & tri_normals)
+               const std::vector<double>                & xyz,
+               const std::vector<std::vector<uint>>     & poly,
+               const std::vector<double>                & normals)
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
@@ -58,15 +58,13 @@ void write_STL(const char                               * filename,
         exit(-1);
     }
 
-    fprintf(fp, "solid T_MESH\n");
-
-    for (uint pid=0; pid < tri.size(); pid++)
+    for (uint pid=0; pid < poly.size(); pid++)
     {
-        fprintf(fp, " facet normal %f %f %f\n", tri_normals.at(pid*3+0), tri_normals.at(pid*3+1), tri_normals.at(pid*3+2));
+        fprintf(fp, " facet normal %f %f %f\n", normals.at(pid*3+0), normals.at(pid*3+1), normals.at(pid*3+2));
         fprintf(fp, "  outer loop\n");
-        fprintf(fp, "   vertex %f %f %f\n", xyz.at(tri.at(pid).at(0)*3+0), xyz.at(tri.at(pid).at(0)*3+1), xyz.at(tri.at(pid).at(0)*3+2));
-        fprintf(fp, "   vertex %f %f %f\n", xyz.at(tri.at(pid).at(1)*3+0), xyz.at(tri.at(pid).at(1)*3+1), xyz.at(tri.at(pid).at(1)*3+2));
-        fprintf(fp, "   vertex %f %f %f\n", xyz.at(tri.at(pid).at(2)*3+0), xyz.at(tri.at(pid).at(2)*3+1), xyz.at(tri.at(pid).at(2)*3+2));
+        fprintf(fp, "   vertex %f %f %f\n", xyz.at(poly.at(pid).at(0)*3+0), xyz.at(poly.at(pid).at(0)*3+1), xyz.at(poly.at(pid).at(0)*3+2));
+        fprintf(fp, "   vertex %f %f %f\n", xyz.at(poly.at(pid).at(1)*3+0), xyz.at(poly.at(pid).at(1)*3+1), xyz.at(poly.at(pid).at(1)*3+2));
+        fprintf(fp, "   vertex %f %f %f\n", xyz.at(poly.at(pid).at(2)*3+0), xyz.at(poly.at(pid).at(2)*3+1), xyz.at(poly.at(pid).at(2)*3+2));
         fprintf(fp, "  endloop\n");
         fprintf(fp, " endfacet\n");
     }

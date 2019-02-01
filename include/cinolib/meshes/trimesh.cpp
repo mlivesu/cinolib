@@ -39,8 +39,6 @@
 #include <cinolib/cot.h>
 #include <cinolib/vector_serialization.h>
 
-#include <cinolib/io/write_STL.h>
-
 #include <unordered_set>
 
 namespace cinolib
@@ -94,24 +92,6 @@ Trimesh<M,V,E,P>::Trimesh(const std::vector<double> & coords,
                           const std::vector<uint>   & polys)
 {
     this->init(vec3d_from_serialized_xyz(coords), polys_from_serialized_vids(polys,3));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void Trimesh<M,V,E,P>::save_stl(const char *filename) const
-{
-    std::vector<double> normals;
-
-    for (uint pid=0; pid < this->num_polys(); pid++)
-    {
-        normals.push_back(this->poly_data(pid).normal.x());
-        normals.push_back(this->poly_data(pid).normal.y());
-        normals.push_back(this->poly_data(pid).normal.z());
-    }
-
-    write_STL(filename, serialized_xyz_from_vec3d(this->vector_verts()), this->polys, normals);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

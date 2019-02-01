@@ -43,6 +43,7 @@
 // SURFACE WRITERS
 #include <cinolib/io/write_OBJ.h>
 #include <cinolib/io/write_OFF.h>
+#include <cinolib/io/write_STL.h>
 #include <cinolib/io/write_NODE_ELE.h>
 
 
