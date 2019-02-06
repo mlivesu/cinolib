@@ -81,6 +81,12 @@ namespace cinolib
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+    template<typename Poly>
+    CINO_INLINE
+    double polygon_area(const Poly & p);
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     template<typename Poly, typename Point>
     CINO_INLINE
     bool polygon_contains(const Poly & poly, const Point & point, const bool border_counts);
@@ -96,6 +102,12 @@ namespace cinolib
     template<typename Poly0, typename Poly1>
     CINO_INLINE
     BoostMultiPolygon polygon_difference(const Poly0 & p0, const Poly1 & p1);
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    template<typename Poly0, typename Poly1>
+    CINO_INLINE
+    BoostMultiPolygon polygon_intersection(const Poly0 & p0, const Poly1 & p1);
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

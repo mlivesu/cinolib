@@ -108,6 +108,15 @@ Poly polygon_simplify(const Poly & p, const double max_dist)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<typename Poly>
+CINO_INLINE
+double polygon_area(const Poly & p)
+{
+    return boost::geometry::area(p);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<typename Poly, typename Point>
 CINO_INLINE
 bool polygon_contains(const Poly & poly, const Point & point, const bool border_counts)
@@ -138,6 +147,17 @@ BoostMultiPolygon polygon_difference(const Poly0 & p0, const Poly1 & p1)
 {
     BoostMultiPolygon res;
     boost::geometry::difference(p0, p1, res);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename Poly0, typename Poly1>
+CINO_INLINE
+BoostMultiPolygon polygon_intersection(const Poly0 & p0, const Poly1 & p1)
+{
+    BoostMultiPolygon res;
+    boost::geometry::intersection(p0, p1, res);
     return res;
 }
 
