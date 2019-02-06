@@ -75,6 +75,15 @@ SlicedObj<M,V,E,P>::SlicedObj(const std::vector<std::vector<std::vector<vec3d>>>
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+BoostMultiPolygon SlicedObj<M,V,E,P>::slice_as_boost_poly(const uint sid) const
+{
+    return slices.at(sid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void SlicedObj<M,V,E,P>::init(const std::vector<std::vector<std::vector<vec3d>>> & slice_polys,
                               const std::vector<std::vector<std::vector<vec3d>>> & slice_holes,
                               const std::vector<std::vector<std::vector<vec3d>>> & supports)
