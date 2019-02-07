@@ -44,4 +44,4 @@ SUBDIRS += 25_surface_painter
 SUBDIRS += 26_export_surface            # OPTIONALLY requires VTK (https://www.vtk.org/)
 SUBDIRS += 27_import_surface            # OPTIONALLY requires VTK (https://www.vtk.org/)
 SUBDIRS += 28_tetrahedralize            # requires Tetgen (http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1)
-
+SUBDIRS += 29_ambient_occlusion
