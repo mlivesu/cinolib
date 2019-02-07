@@ -42,6 +42,15 @@
 namespace cinolib
 {
 
+CINO_INLINE
+void read_OFF(const char                     * filename,
+              std::vector<vec3d>             & verts,
+              std::vector<std::vector<uint>> & polys)
+{
+    std::vector<Color> poly_colors;
+    read_OFF(filename, verts, polys, poly_colors);
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
