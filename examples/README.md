@@ -98,6 +98,8 @@ Here is a list of the sample programs available in CinoLib.
 #### 29 - Use ambient occlusion for realistic yet more revealing snapshots
 <p align="left"><img src="snapshots/29_ambient_occlusion.png" width="500"></p>
 
+#### 30 - Convert all supported meshes from one file format to another (command line tool)
+
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
