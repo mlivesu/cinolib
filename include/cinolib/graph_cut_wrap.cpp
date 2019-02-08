@@ -52,30 +52,30 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
 
     try
     {
-        GCoptimizationGeneralGraph *gc = new GCoptimizationGeneralGraph(m.num_polys(), n_labels);
+        GCoptimizationGeneralGraph gc = GCoptimizationGeneralGraph(m.num_polys(), n_labels);
 
         // set graph connectivity
         for(uint pid=0; pid<m.num_polys(); ++pid)
         for(uint nbr : m.adj_p2p(pid))
         {
-            if (pid > nbr) gc->setNeighbors(pid, nbr);
+            if (pid > nbr) gc.setNeighbors(pid, nbr);
         }
 
         // set data terms
         for(uint pid=0; pid<m.num_polys(); ++pid)
         for(int label=0; label<n_labels; ++label)
         {
-            gc->setDataCost(pid, label, data_term.at(pid*n_labels + label));
+            gc.setDataCost(pid, label, data_term.at(pid*n_labels + label));
         }
 
-        gc->setSmoothCost(smooth_term, smooth_data);
-        double energy = gc->swap(-1);
+        gc.setSmoothCost(smooth_term, smooth_data);
+        double energy = gc.swap(-1);
 
         std::cout << "graph cut energy: " << energy << std::endl;
 
         for(uint pid=0; pid<m.num_polys(); ++pid)
         {
-            labels.at(pid) = gc->whatLabel(pid);
+            labels.at(pid) = gc.whatLabel(pid);
         }
     }
     catch (GCException e)
@@ -102,13 +102,13 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
 
     try
     {
-        GCoptimizationGeneralGraph *gc = new GCoptimizationGeneralGraph(m.num_polys(), n_labels);
+        GCoptimizationGeneralGraph gc = GCoptimizationGeneralGraph(m.num_polys(), n_labels);
 
         // set graph connectivity
         for(uint pid=0; pid<m.num_polys(); ++pid)
         for(uint nbr : m.adj_p2p(pid))
         {
-            if (pid > nbr) gc->setNeighbors(pid, nbr);
+            if (pid > nbr) gc.setNeighbors(pid, nbr);
         }
 
         // set data terms
@@ -116,7 +116,7 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
         for(int label=0; label<n_labels; ++label)
         {
             uint count = 0;
-            GCoptimization::SparseDataCost *data = new GCoptimization::SparseDataCost[feasible_region.at(label).size()];
+            GCoptimization::SparseDataCost data[feasible_region.at(label).size()];
 
             for(uint i=0; i<feasible_region.at(label).size(); ++i)
             {
@@ -127,18 +127,17 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
                 data[count++] = record;
             }
 
-            gc->setDataCost(label, data, count);
-            delete [] data;
+            gc.setDataCost(label, data, count);
         }
 
-        gc->setSmoothCost(smooth_term, smooth_data);
-        double energy = gc->swap(-1);
+        gc.setSmoothCost(smooth_term, smooth_data);
+        double energy = gc.swap(-1);
 
         std::cout << "graph cut energy: " << energy << std::endl;
 
         for(uint pid=0; pid<m.num_polys(); ++pid)
         {
-            labels.at(pid) = gc->whatLabel(pid);
+            labels.at(pid) = gc.whatLabel(pid);
         }
     }
     catch (GCException e)
