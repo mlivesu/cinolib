@@ -415,9 +415,8 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         but_serialize_field->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         but_deserialize_field->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         l_value->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sl_isovalue->setMaximum(999);
-        sl_isovalue->setValue(499);
-        sl_isovalue->setSliderPosition(499);
+        sl_isovalue->setMaximum(99);
+        sl_isovalue->setValue(50);
         gbox->setFont(global_font);
         but_serialize_field->setFont(global_font);
         but_deserialize_field->setFont(global_font);
@@ -712,8 +711,10 @@ void VolumeMeshControlPanel<Mesh>::set_isosurface()
     canvas->pop(&isosurface);
     if (cb_isosurface->isChecked())
     {
+        double max              = m->vert_max_uvw_value(U_param);
+        double min              = m->vert_min_uvw_value(U_param);
+        double isovalue         = min + (max-min) * static_cast<double>(sl_isovalue->value())/99.0;
         Color  color            = isosurface.color;
-        double isovalue         = static_cast<double>(sl_isovalue->value())/999.0;
         Tetmesh<M,V,E,F,P> *ptr = dynamic_cast<Tetmesh<M,V,E,F,P>*>(m);
         isosurface              = DrawableIsosurface<M,V,E,F,P>(*ptr, isovalue);
         isosurface.color        = color;

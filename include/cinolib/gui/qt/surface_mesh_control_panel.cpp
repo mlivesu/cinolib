@@ -198,7 +198,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         sl_wireframe_width->setTickInterval(1);
         sl_wireframe_alpha->setMinimum(0);
         sl_wireframe_alpha->setMaximum(99);
-        sl_wireframe_alpha->setValue(99);
+        sl_wireframe_alpha->setValue(50);
         gbox->setFont(global_font);
         cb_wireframe->setFont(global_font);
         cb_wireframe->setChecked(true);
@@ -541,7 +541,9 @@ void SurfaceMeshControlPanel<Mesh>::set_isocurve()
     canvas->pop(&isocontour);
     if (cb_isocurve->isChecked())
     {
-        double isovalue      = static_cast<double>(sl_isovalue->value())/999.0;
+        double max           = m->vert_max_uvw_value(U_param);
+        double min           = m->vert_min_uvw_value(U_param);
+        double isovalue      = min + (max-min) * static_cast<double>(sl_isovalue->value())/99.0;
         int    thickness     = isocontour.thickness;
         Color  color         = isocontour.color;
         isocontour           = DrawableIsocontour<M,V,E,P>(*m, isovalue);
