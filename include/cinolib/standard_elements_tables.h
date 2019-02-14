@@ -37,6 +37,7 @@
 #define CINO_STANDARD_ELEMENTS_TABLES_H
 
 #include <sys/types.h>
+#include <cinolib/geometry/vec3.h>
 
 /*    Reference               Reference
  *    Hexahedron:             Tetrahedron:
@@ -53,12 +54,16 @@
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 static const uint TRI_EDGES[3][2] =
 {
     { 0, 1 }, // e0
     { 1, 2 }, // e1
     { 2, 0 }, // e2
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 static const uint QUAD_EDGES[4][2] =
 {
@@ -68,6 +73,8 @@ static const uint QUAD_EDGES[4][2] =
     { 3, 0 }, // e3
 };
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 static const uint TET_FACES[4][3] = // for outgoing normals
 {
     { 0, 2, 1 } , // f0
@@ -75,6 +82,8 @@ static const uint TET_FACES[4][3] = // for outgoing normals
     { 0, 3, 2 } , // f2
     { 1, 2, 3 }   // f3
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 static const uint TET_EDGES[6][2] =
 {
@@ -86,6 +95,18 @@ static const uint TET_EDGES[6][2] =
     { 3, 2 }  // e5
 };
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const vec3d TET_VERTS[4] =
+{
+    vec3d( 0.94280904158,  0,             -0.333333333), // v0
+    vec3d(-0.47140452079,  0.81649658092, -0.333333333), // v1
+    vec3d(-0.47140452079, -0.81649658092, -0.333333333), // v2
+    vec3d(             0,              0,            1)  // v3
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 static const uint TET_INCIDENT_EDEGES[4][3] =
 {
     { 0, 2, 4 }, // edges incident to v0
@@ -93,6 +114,8 @@ static const uint TET_INCIDENT_EDEGES[4][3] =
     { 0, 1, 5 }, // edges incident to v2
     { 3, 4, 5 }, // edges incident to v3
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 static const uint HEXA_FACES[6][4] = // for outgoing normals
 {
@@ -103,6 +126,8 @@ static const uint HEXA_FACES[6][4] = // for outgoing normals
     { 0 , 1 , 5 , 4 } , // f4
     { 2 , 3 , 7 , 6 }   // f5
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 static const uint HEXA_EDGES[12][2] =
 {
@@ -120,6 +145,8 @@ static const uint HEXA_EDGES[12][2] =
     { 3, 7 }  // e11
 };
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 static const uint HEXA_INCIDENT_EDGES[8][3] =
 {
     { 0, 3,  8 }, // edges incident to v0
@@ -131,6 +158,8 @@ static const uint HEXA_INCIDENT_EDGES[8][3] =
     { 5, 6, 10 }, // edges incident to v6
     { 6, 7, 11 }, // edges incident to v7
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 }
 
