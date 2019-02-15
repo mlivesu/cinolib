@@ -97,7 +97,7 @@ static const uint TET_EDGES[6][2] =
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-static const vec3d TET_VERTS[4] =
+static const vec3d REFERENCE_TET_VERTS[4] =
 {
     vec3d( 0.94280904158,  0,             -0.333333333), // v0
     vec3d(-0.47140452079,  0.81649658092, -0.333333333), // v1
