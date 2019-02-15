@@ -86,7 +86,7 @@ void solve_IRLS(const Eigen::SparseMatrix<double> & A,
         if(max_iter>0 && ++iter>max_iter) return;
 
         res = p_norm(b - A*x, A.rows(), p);
-        std::cout << "res: " << res << "\tdelta: " << std::fabs(res-prev_res) << std::endl;
+        //std::cout << "res: " << res << "\tdelta: " << std::fabs(res-prev_res) << std::endl;
     }
     while(std::fabs(res-prev_res)>conv_thresh);
 }
