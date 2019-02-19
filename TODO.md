@@ -7,6 +7,7 @@ Please consider this to be just development notes and not any real planning.
 * fix marching tets: degenerate triangles will be generated in some cases (see comments inside cpp file)
 * fix integral curve tracing (also refactor ray/line/plane intersections)
 * gradients on hex-meshes look buggy. Find out why
+* express topological conditions for edge contraction in terms of the "link condition" (see "Topology Preserving Edge Contraction" - T.K.Dey, H.Edelsbrunner, S.Guha, D.V.Nekhayev)
 
 ### Extensions/improvements:
 * transform all std::cerr into std::cout << ANSI_fg_color_red << 
