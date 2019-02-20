@@ -170,7 +170,7 @@ bool Trimesh<M,V,E,P>::edge_is_topologically_collapsible(const uint eid) const
     uint inf_vert = this->num_verts();
     if(this->vert_is_boundary(v0))  v0_v_link.push_back(inf_vert);
     if(this->vert_is_boundary(v1))  v1_v_link.push_back(inf_vert);
-    if(this->edge_is_boundary(eid)) e_v_link.push_back(inf_vert);
+    if(this->edge_is_boundary(eid)) e_v_link.push_back(inf_vert); // (last position in the vector is ok, as inf_vert is the biggest id!)
 
     SET_INTERSECTION(v0_v_link, v1_v_link, inters, true);
     if(inters!=e_v_link) return false;
