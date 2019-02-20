@@ -129,7 +129,9 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
                 uint              vert_add                (const vec3d & pos);
                 std::vector<uint> vert_adj_visible_polys  (const uint vid, const vec3d dir, const double ang_thresh = 60.0);
                 std::vector<uint> vert_boundary_edges     (const uint vid) const;
-                std::vector<uint> vert_ordered_verts_link (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
+                std::vector<uint> vert_verts_link         (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
+                std::vector<uint> vert_edges_link         (const uint vid) const;
+                std::vector<uint> vert_ordered_verts_link (const uint vid) const;
                 std::vector<uint> vert_ordered_polys_star (const uint vid) const;
                 std::vector<uint> vert_ordered_edges_star (const uint vid) const;
                 std::vector<uint> vert_ordered_edges_link (const uint vid) const;

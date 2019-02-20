@@ -507,6 +507,8 @@ void AbstractPolygonMesh<M,V,E,P>::vert_ordered_one_ring(const uint vid,
                                                          std::vector<uint> & e_star,       // sorted list of edges incident to vid
                                                          std::vector<uint> & e_link) const // sorted list of edges opposite to vid
 {
+    // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
+
     v_link.clear();
     f_star.clear();
     e_star.clear();
@@ -563,6 +565,30 @@ void AbstractPolygonMesh<M,V,E,P>::vert_ordered_one_ring(const uint vid,
         else v_link.pop_back();
     }
     while(e_star.size() < this->adj_v2e(vid).size());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_verts_link(const uint vid) const
+{
+    return this->adj_v2v(vid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_edges_link(const uint vid) const
+{
+    std::unordered_set<uint> e_link;
+    for(uint pid : this->adj_v2p(vid))
+    for(uint eid : this->adj_p2e(pid))
+    {
+        if(!this->edge_contains_vert(eid,vid)) e_link.insert(eid);
+    }
+    return std::vector<uint>(e_link.begin(),e_link.end());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -133,20 +133,8 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 bool Trimesh<M,V,E,P>::edge_is_collapsible(const uint eid, const double lambda) const
 {
-    // HYPER-CONSERVATIVE CHECKS THAT SHOULD BE RELAXED SOMEDAY...
-    {
-        if (!this->edge_is_manifold(eid)) return false;
-
-        uint vid0 = this->edge_vert_id(eid,0);
-        uint vid1 = this->edge_vert_id(eid,1);
-        if (this->vert_is_boundary(vid0)) return false;
-        if (this->vert_is_boundary(vid1)) return false;
-        for(uint nbr : this->adj_v2v(vid0)) if (this->vert_is_boundary(nbr)) return false;
-        for(uint nbr : this->adj_v2v(vid1)) if (this->vert_is_boundary(nbr)) return false;
-    }
-
-    if (!edge_is_topologically_collapsible(eid)) return false;
-    if (!edge_is_geometrically_collapsible(eid, lambda)) return false;
+    if(!edge_is_topologically_collapsible(eid)) return false;
+    if(!edge_is_geometrically_collapsible(eid, lambda)) return false;
     return true;
 }
 
@@ -156,22 +144,37 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 bool Trimesh<M,V,E,P>::edge_is_topologically_collapsible(const uint eid) const
 {
-    // https://stackoverflow.com/questions/27049163/mesh-simplification-edge-collapse-conditions
+    // implements the "Link Condition" for 2-complexes described in:
+    // Topology preserving edge contraction
+    // Tamal K. Dey, Herbert Edelsbrunner, Sumanta Guha and Dmitry V. Nekhayev
+    // 1999
 
-    uint vid0 = this->edge_vert_id(eid,0);
-    uint vid1 = this->edge_vert_id(eid,1);
+    uint v0 = this->edge_vert_id(eid,0);
+    uint v1 = this->edge_vert_id(eid,1);
 
-    std::set<uint> v0_ring(this->adj_v2v(vid0).begin(), this->adj_v2v(vid0).end());
-    std::set<uint> v1_ring(this->adj_v2v(vid1).begin(), this->adj_v2v(vid1).end());
+    auto v0_e_link = this->vert_edges_link(v0);
+    auto v1_e_link = this->vert_edges_link(v1);
+    SORT_VEC(v0_e_link, false);
+    SORT_VEC(v1_e_link, false);
+    std::vector<uint> inters;
+    std::set_intersection(v0_e_link.begin(), v0_e_link.end(),
+                          v1_e_link.begin(), v1_e_link.end(),
+                          std::back_inserter(inters));
+    if(!inters.empty()) return false;
 
-    // http://en.cppreference.com/w/cpp/algorithm/set_intersection
-    std::vector<uint> shared_verts;
-    std::set_intersection(v0_ring.begin(), v0_ring.end(),
-                          v1_ring.begin(), v1_ring.end(),
-                          std::back_inserter(shared_verts));
+    auto v0_v_link = this->vert_verts_link(v0);
+    auto v1_v_link = this->vert_verts_link(v1);
+    SORT_VEC(v0_v_link, false);
+    SORT_VEC(v1_v_link, false);
+    inters.clear();
+    std::set_intersection(v0_v_link.begin(), v0_v_link.end(),
+                          v1_v_link.begin(), v1_v_link.end(),
+                          std::back_inserter(inters));
 
-    if ( this->edge_is_boundary(eid) && shared_verts.size() > 1) return false;
-    if (!this->edge_is_boundary(eid) && shared_verts.size() > 2) return false;
+    auto e_v_link = this->verts_opposite_to(eid);
+    SORT_VEC(e_v_link, false);
+    if(e_v_link!=inters) return false;
+
     return true;
 }
 
@@ -212,9 +215,10 @@ bool Trimesh<M,V,E,P>::edge_is_geometrically_collapsible(const uint eid, const d
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda)
+int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const double topological_check, const double geometric_check)
 {
-    if (!edge_is_collapsible(eid, lambda)) return -1;
+    if(topological_check && !edge_is_topologically_collapsible(eid)) return -1;
+    if(geometric_check && !edge_is_geometrically_collapsible(eid, lambda)) return -1;
 
     uint vert_to_keep   = this->edge_vert_id(eid,0);
     uint vert_to_remove = this->edge_vert_id(eid,1);
