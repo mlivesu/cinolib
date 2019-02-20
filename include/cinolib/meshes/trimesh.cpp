@@ -166,7 +166,7 @@ bool Trimesh<M,V,E,P>::edge_is_topologically_collapsible(const uint eid) const
     auto e_v_link  = this->verts_opposite_to(eid);
     SORT_VEC(e_v_link, false);
 
-    // to avoid topological changes at the border, boundary edges are assumed to form a triangle with an infinite vertex, which enters in the various vert links
+    // to avoid topological changes at the border, boundary edges are assumed to form a triangle with an infinite vertex, which thus enters in the various vert links
     uint inf_vert = this->num_verts();
     if(this->vert_is_boundary(v0))  v0_v_link.push_back(inf_vert);
     if(this->vert_is_boundary(v1))  v1_v_link.push_back(inf_vert);
