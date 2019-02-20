@@ -184,30 +184,30 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 bool Trimesh<M,V,E,P>::edge_is_geometrically_collapsible(const uint eid, const double lambda) const
 {
-    // GEOMETRIC CONDITIONS: no triangle should flip
-    //
+    // no triangle should flip or collapse
     vec3d new_vert = this->edge_sample_at(eid, lambda);
     uint  vid0     = this->edge_vert_id(eid,0);
     uint  vid1     = this->edge_vert_id(eid,1);
 
     std::unordered_set<uint> polys_to_test;
-    for(uint pid : this->adj_v2p(vid0)) if (!this->poly_contains_edge(pid, eid)) polys_to_test.insert(pid);
-    for(uint pid : this->adj_v2p(vid1)) if (!this->poly_contains_edge(pid, eid)) polys_to_test.insert(pid);
+    for(uint pid : this->adj_v2p(vid0)) if(!this->poly_contains_edge(pid, eid)) polys_to_test.insert(pid);
+    for(uint pid : this->adj_v2p(vid1)) if(!this->poly_contains_edge(pid, eid)) polys_to_test.insert(pid);
 
     for(uint pid : polys_to_test)
     {
-        int e_opp = -1;
-        if (this->poly_contains_vert(pid, vid0)) e_opp = this->edge_opposite_to(pid, vid0); else
-        if (this->poly_contains_vert(pid, vid1)) e_opp = this->edge_opposite_to(pid, vid1); else
-        assert(false);
-
-        uint A = this->edge_vert_id(e_opp,0);
-        uint B = this->edge_vert_id(e_opp,1);
-        if (this->poly_verts_are_CCW(pid,A,B)) std::swap(A, B);
-        vec3d new_n = triangle_normal(this->vert(A), this->vert(B), new_vert);
-
-        if (this->poly_data(pid).normal.dot(new_n) < 0) return false;
+        vec3d v[3];
+        for(int i=0; i<3; ++i)
+        {
+            bool is_v0 = (this->poly_vert_id(pid,i) == vid0);
+            bool is_v1 = (this->poly_vert_id(pid,i) == vid1);
+            v[i] = (is_v0 || is_v1) ? new_vert : this->poly_vert(pid,i);
+        }
+        // avoid tiny triangles
+        if(triangle_area(v[0], v[1], v[2]) < 1e-10) return false;
+        // avoid flips and collapses
+        if(triangle_normal(v[0], v[1], v[2]).dot(this->poly_data(pid).normal) <= 0) return false;
     }
+
     return true;
 }
 
