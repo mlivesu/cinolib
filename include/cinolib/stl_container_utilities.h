@@ -108,6 +108,12 @@ template<typename T>
 CINO_INLINE
 T AVERAGE_VEC(const std::vector<T> & vec);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename C, typename E>
+CINO_INLINE
+void SET_INTERSECTION(C & set1, C & set2, std::vector<E> & inters, const bool pre_sort_sets = false);
+
 }
 
 #ifndef  CINO_STATIC_LIB

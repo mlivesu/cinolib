@@ -158,5 +158,24 @@ T AVERAGE_VEC(const std::vector<T> & vec)
     return std::accumulate(vec.begin(), vec.end(), 0.0)/static_cast<double>(vec.size());
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename C, typename E>
+CINO_INLINE
+void SET_INTERSECTION(C & set1, C & set2, std::vector<E> & inters, const bool pre_sort_sets)
+{
+    // std::set_intersection requires the sets to be pre-ordered from smaller to bigger,
+    // so if the input sets are not (i.e. they are vectors) use true to ask ordering or
+    // order them yourself
+
+    if(pre_sort_sets)
+    {
+        SORT_VEC(set1, false);
+        SORT_VEC(set2, false);
+    }
+    inters.clear();
+    std::set_intersection(set1.begin(), set1.end(), set2.begin(), set2.end(), std::back_inserter(inters));
+}
+
 
 }
