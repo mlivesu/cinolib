@@ -449,7 +449,7 @@ CINO_INLINE
 bool AbstractPolygonMesh<M,V,E,P>::vert_is_saddle(const uint vid, const int tex_coord) const
 {
     std::vector<bool> signs;
-    for(uint nbr : vert_ordered_vert_ring(vid))
+    for(uint nbr : vert_ordered_verts_link(vid))
     {
         // Discard == signs. For references, see:
         // Decomposing Polygon Meshes by Means of Critical Points
@@ -502,14 +502,14 @@ bool AbstractPolygonMesh<M,V,E,P>::poly_verts_are_CCW(const uint pid, const uint
 template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::vert_ordered_one_ring(const uint vid,
-                                                         std::vector<uint> & v_ring,       // sorted list of adjacent vertices
-                                                         std::vector<uint> & p_ring,       // sorted list of adjacent triangles
-                                                         std::vector<uint> & e_ring,       // sorted list of edges incident to vid
+                                                         std::vector<uint> & v_link,       // sorted list of adjacent vertices
+                                                         std::vector<uint> & f_star,       // sorted list of adjacent triangles
+                                                         std::vector<uint> & e_star,       // sorted list of edges incident to vid
                                                          std::vector<uint> & e_link) const // sorted list of edges opposite to vid
 {
-    v_ring.clear();
-    p_ring.clear();
-    e_ring.clear();
+    v_link.clear();
+    f_star.clear();
+    e_star.clear();
     e_link.clear();
 
     if (this->adj_v2e(vid).empty()) return;
@@ -545,31 +545,31 @@ void AbstractPolygonMesh<M,V,E,P>::vert_ordered_one_ring(const uint vid,
 
     do
     {
-        e_ring.push_back(curr_e);
-        p_ring.push_back(curr_p);
+        e_star.push_back(curr_e);
+        f_star.push_back(curr_p);
 
         uint off = this->poly_vert_offset(curr_p, curr_v);
         for(uint i=0; i<this->verts_per_poly(curr_p)-1; ++i)
         {
             curr_v = this->poly_vert_id(curr_p,(off+i)%this->verts_per_poly(curr_p));
-            if (i>0) e_link.push_back( this->poly_edge_id(curr_p, curr_v, v_ring.back()) );
-            v_ring.push_back(curr_v);
+            if (i>0) e_link.push_back( this->poly_edge_id(curr_p, curr_v, v_link.back()) );
+            v_link.push_back(curr_v);
         }
 
-        curr_e = this->poly_edge_id(curr_p, vid, v_ring.back()); assert(edge_is_manifold(curr_e));
+        curr_e = this->poly_edge_id(curr_p, vid, v_link.back()); assert(edge_is_manifold(curr_e));
         curr_p = (this->adj_e2p(curr_e).front() == curr_p) ? this->adj_e2p(curr_e).back() : this->adj_e2p(curr_e).front();
 
-        if(edge_is_boundary(curr_e)) e_ring.push_back(curr_e);
-        else v_ring.pop_back();
+        if(edge_is_boundary(curr_e)) e_star.push_back(curr_e);
+        else v_link.pop_back();
     }
-    while(e_ring.size() < this->adj_v2e(vid).size());
+    while(e_star.size() < this->adj_v2e(vid).size());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_vert_ring(const uint vid) const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_verts_link(const uint vid) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent vertices
     std::vector<uint> f_ring; // sorted list of adjacent triangles
@@ -583,7 +583,7 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_vert_ring(const uin
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_poly_ring(const uint vid) const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_polys_star(const uint vid) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent vertices
     std::vector<uint> f_ring; // sorted list of adjacent triangles
@@ -597,7 +597,7 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_poly_ring(const uin
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_edge_ring(const uint vid) const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_edges_star(const uint vid) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent vertices
     std::vector<uint> f_ring; // sorted list of adjacent triangles
@@ -611,7 +611,7 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_edge_ring(const uin
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_edge_link(const uint vid) const
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_ordered_edges_link(const uint vid) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent vertices
     std::vector<uint> f_ring; // sorted list of adjacent triangles

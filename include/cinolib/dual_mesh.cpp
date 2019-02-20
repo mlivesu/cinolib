@@ -249,11 +249,11 @@ void dual_mesh(const AbstractPolygonMesh<M,V,E,P>   & primal,
         bool clipped_cell = primal.vert_is_boundary(vid);
         if (clipped_cell && !with_clipped_cells) continue;
 
-        std::vector<uint> poly = primal.vert_ordered_poly_ring(vid);
+        std::vector<uint> poly = primal.vert_ordered_polys_star(vid);
 
         if (clipped_cell) // add boundary portion (vertex vid + boundary edges' midpoints)
         {
-            std::vector<uint> e_star = primal.vert_ordered_edge_ring(vid);
+            std::vector<uint> e_star = primal.vert_ordered_edges_star(vid);
             poly.push_back(e2verts.at(e_star.back()));
             poly.push_back(v2verts.at(vid));
             poly.push_back(e2verts.at(e_star.front()));

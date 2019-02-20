@@ -129,14 +129,14 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
                 uint              vert_add                (const vec3d & pos);
                 std::vector<uint> vert_adj_visible_polys  (const uint vid, const vec3d dir, const double ang_thresh = 60.0);
                 std::vector<uint> vert_boundary_edges     (const uint vid) const;
-                std::vector<uint> vert_ordered_vert_ring  (const uint vid) const;
-                std::vector<uint> vert_ordered_poly_ring  (const uint vid) const;
-                std::vector<uint> vert_ordered_edge_ring  (const uint vid) const;
-                std::vector<uint> vert_ordered_edge_link  (const uint vid) const;
+                std::vector<uint> vert_ordered_verts_link (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
+                std::vector<uint> vert_ordered_polys_star (const uint vid) const;
+                std::vector<uint> vert_ordered_edges_star (const uint vid) const;
+                std::vector<uint> vert_ordered_edges_link (const uint vid) const;
                 void              vert_ordered_one_ring   (const uint          vid,
-                                                           std::vector<uint> & v_ring,        // sorted list of adjacent vertices
-                                                           std::vector<uint> & f_ring,        // sorted list of adjacent triangles
-                                                           std::vector<uint> & e_ring,        // sorted list of edges incident to vid
+                                                           std::vector<uint> & v_link,        // sorted list of adjacent vertices
+                                                           std::vector<uint> & f_star,        // sorted list of adjacent triangles
+                                                           std::vector<uint> & e_star,        // sorted list of edges incident to vid
                                                            std::vector<uint> & e_link) const; // sorted list of edges opposite to vid
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

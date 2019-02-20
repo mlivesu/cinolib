@@ -606,7 +606,7 @@ std::vector<uint> Trimesh<M,V,E,P>::get_ordered_boundary_vertices() const
     }
 
     Trimesh<> tmp(verts,polys);
-    return tmp.vert_ordered_vert_ring(cid);
+    return tmp.vert_ordered_verts_link(cid);
 }
 
 }
