@@ -140,6 +140,8 @@ bool Trimesh<M,V,E,P>::edge_is_collapsible(const uint eid, const double lambda) 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class P>
 CINO_INLINE
 bool Trimesh<M,V,E,P>::edge_is_topologically_collapsible(const uint eid) const
@@ -154,26 +156,24 @@ bool Trimesh<M,V,E,P>::edge_is_topologically_collapsible(const uint eid) const
 
     auto v0_e_link = this->vert_edges_link(v0);
     auto v1_e_link = this->vert_edges_link(v1);
-    SORT_VEC(v0_e_link, false);
-    SORT_VEC(v1_e_link, false);
+
     std::vector<uint> inters;
-    std::set_intersection(v0_e_link.begin(), v0_e_link.end(),
-                          v1_e_link.begin(), v1_e_link.end(),
-                          std::back_inserter(inters));
+    SET_INTERSECTION(v0_e_link, v1_e_link, inters, true);
     if(!inters.empty()) return false;
 
     auto v0_v_link = this->vert_verts_link(v0);
     auto v1_v_link = this->vert_verts_link(v1);
-    SORT_VEC(v0_v_link, false);
-    SORT_VEC(v1_v_link, false);
-    inters.clear();
-    std::set_intersection(v0_v_link.begin(), v0_v_link.end(),
-                          v1_v_link.begin(), v1_v_link.end(),
-                          std::back_inserter(inters));
-
-    auto e_v_link = this->verts_opposite_to(eid);
+    auto e_v_link  = this->verts_opposite_to(eid);
     SORT_VEC(e_v_link, false);
-    if(e_v_link!=inters) return false;
+
+    // to avoid topological changes at the border, boundary edges are assumed to form a triangle with an infinite vertex, which enters in the various vert links
+    uint inf_vert = this->num_verts();
+    if(this->vert_is_boundary(v0))  v0_v_link.push_back(inf_vert);
+    if(this->vert_is_boundary(v1))  v1_v_link.push_back(inf_vert);
+    if(this->edge_is_boundary(eid)) e_v_link.push_back(inf_vert);
+
+    SET_INTERSECTION(v0_v_link, v1_v_link, inters, true);
+    if(inters!=e_v_link) return false;
 
     return true;
 }
