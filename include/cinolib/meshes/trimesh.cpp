@@ -330,7 +330,7 @@ double Trimesh<M,V,E,P>::edge_cotangent_weight(const uint eid) const
         double c     = cot(alpha);
         if (!std::isnan(c))
         {
-            sum   += std::max(1e-5, c); // avoid negative weights
+            sum   += std::max(1e-10, c); // avoid negative weights
             count += 1.0;
         }
     }
