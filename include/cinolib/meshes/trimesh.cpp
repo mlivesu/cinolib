@@ -218,7 +218,7 @@ CINO_INLINE
 int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const double topological_check, const double geometric_check)
 {
     if(topological_check && !edge_is_topologically_collapsible(eid)) return -1;
-    if(geometric_check && !edge_is_geometrically_collapsible(eid, lambda)) return -1;
+    if(geometric_check   && !edge_is_geometrically_collapsible(eid, lambda)) return -1;
 
     uint vert_to_keep   = this->edge_vert_id(eid,0);
     uint vert_to_remove = this->edge_vert_id(eid,1);
