@@ -730,7 +730,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 {
     QPushButton::connect(but_load, &QPushButton::clicked, [&]()
     {
-        std::string filename = QFileDialog::getOpenFileName(NULL, "Load mesh", ".", "3D Meshes (*.MESH *.HEDRA *.VTU *.VTK)").toStdString();
+        std::string filename = QFileDialog::getOpenFileName(NULL, "Load mesh", ".", "3D Meshes (*.mesh *.hedra*.vtu *.vtk)").toStdString();
         if (!filename.empty())
         {
             *m = Mesh(filename.c_str());
