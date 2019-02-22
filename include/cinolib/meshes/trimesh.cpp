@@ -163,7 +163,7 @@ bool Trimesh<M,V,E,P>::edge_is_topologically_collapsible(const uint eid) const
 
     auto v0_v_link = this->vert_verts_link(v0);
     auto v1_v_link = this->vert_verts_link(v1);
-    auto e_v_link  = this->verts_opposite_to(eid);
+    auto e_v_link  = this->edge_verts_link(eid);
     SORT_VEC(e_v_link, false);
 
     // to avoid topological changes at the border, boundary edges are assumed to form a triangle with an infinite vertex, which thus enters in the various vert links
@@ -215,10 +215,10 @@ bool Trimesh<M,V,E,P>::edge_is_geometrically_collapsible(const uint eid, const d
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const double topological_check, const double geometric_check)
+int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const double topologic_check, const double geometric_check)
 {
-    if(topological_check && !edge_is_topologically_collapsible(eid)) return -1;
-    if(geometric_check   && !edge_is_geometrically_collapsible(eid, lambda)) return -1;
+    if(topologic_check && !edge_is_topologically_collapsible(eid))         return -1;
+    if(geometric_check && !edge_is_geometrically_collapsible(eid, lambda)) return -1;
 
     uint vert_to_keep   = this->edge_vert_id(eid,0);
     uint vert_to_remove = this->edge_vert_id(eid,1);
@@ -548,6 +548,15 @@ std::vector<uint> Trimesh<M,V,E,P>::verts_opposite_to(const uint eid) const
         vlist.push_back(this->vert_opposite_to(pid, this->edge_vert_id(eid,0), this->edge_vert_id(eid,1)));
     }
     return vlist;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> Trimesh<M,V,E,P>::edge_verts_link(const uint eid) const
+{
+    return verts_opposite_to(eid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
