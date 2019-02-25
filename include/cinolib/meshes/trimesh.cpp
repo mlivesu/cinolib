@@ -140,8 +140,6 @@ bool Trimesh<M,V,E,P>::edge_is_collapsible(const uint eid, const double lambda) 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
 bool Trimesh<M,V,E,P>::edge_is_topologically_collapsible(const uint eid) const
