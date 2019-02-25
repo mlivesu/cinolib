@@ -324,6 +324,97 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & p
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_verts_link(const uint vid) const
+{
+    return this->adj_v2v(vid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_edges_link(const uint vid) const
+{
+    std::unordered_set<uint> e_link;
+    for(uint pid : this->adj_v2p(vid))
+    for(uint eid : this->adj_p2e(pid))
+    {
+        if(!this->edge_contains_vert(eid,vid)) e_link.insert(eid);
+    }
+    return std::vector<uint>(e_link.begin(),e_link.end());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_faces_link(const uint vid) const
+{
+    std::unordered_set<uint> f_link;
+    for(uint pid : this->adj_v2p(vid))
+    for(uint fid : this->adj_p2f(pid))
+    {
+        if(!this->face_contains_vert(fid,vid)) f_link.insert(fid);
+    }
+    return std::vector<uint>(f_link.begin(),f_link.end());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::edge_verts_link(const uint eid) const
+{
+    std::unordered_set<uint> v_link;
+    for(uint pid : this->adj_e2p(eid))
+    for(uint vid : this->adj_p2v(pid))
+    {
+        if(!this->edge_contains_vert(eid,vid)) v_link.insert(vid);
+    }
+    return std::vector<uint>(v_link.begin(),v_link.end());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::edge_edges_link(const uint eid) const
+{
+    std::unordered_set<uint> e_link;
+    for(uint pid : this->adj_e2p(eid))
+    for(uint id :  this->adj_p2e(pid))
+    {
+        if(!this->edges_are_adjacent(eid,id)) e_link.insert(id);
+    }
+    return std::vector<uint>(e_link.begin(),e_link.end());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::edge_faces_link(const uint eid) const
+{
+    uint v0 = this->edge_vert_id(eid, 0);
+    uint v1 = this->edge_vert_id(eid, 1);
+
+    std::unordered_set<uint> f_link;
+    for(uint pid : this->adj_e2p(eid))
+    for(uint fid : this->adj_p2f(pid))
+    {
+        if(!this->face_contains_vert(fid,v0) &&
+           !this->face_contains_vert(fid,v1))
+        {
+            f_link.insert(fid);
+        }
+    }
+    return std::vector<uint>(f_link.begin(),f_link.end());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 std::vector<ipair> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_visible_faces(const uint vid, const vec3d dir, const double ang_thresh)
 {
     std::vector<ipair> nbrs; // vector or pairs (visible face, poly benath)

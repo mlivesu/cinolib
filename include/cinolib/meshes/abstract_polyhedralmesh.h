@@ -144,6 +144,9 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool               vert_is_on_srf            (const uint vid) const;
         virtual double             vert_mass                 (const uint vid) const;
                 double             vert_volume               (const uint vid) const;
+                std::vector<uint>  vert_verts_link           (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
+                std::vector<uint>  vert_edges_link           (const uint vid) const;
+                std::vector<uint>  vert_faces_link           (const uint vid) const;
                 std::vector<ipair> vert_adj_visible_faces    (const uint vid, const vec3d dir, const double ang_thresh = 60.0);
                 std::vector<uint>  vert_adj_srf_verts        (const uint vid) const;
                 std::vector<uint>  vert_adj_srf_edges        (const uint vid) const;
@@ -165,6 +168,9 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         bool              edge_is_on_srf          (const uint eid) const;
         std::vector<uint> edge_ordered_poly_ring  (const uint eid) const;
         std::vector<uint> edge_adj_srf_faces      (const uint eid) const;
+        std::vector<uint> edge_verts_link         (const uint eid) const;
+        std::vector<uint> edge_edges_link         (const uint eid) const;
+        std::vector<uint> edge_faces_link         (const uint eid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

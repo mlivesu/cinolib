@@ -295,6 +295,124 @@ uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool Tetmesh<M,V,E,F,P>::edge_is_collapsible(const uint eid, const double lambda) const
+{
+    if(!edge_is_topologically_collapsible(eid)) return false;
+    if(!edge_is_geometrically_collapsible(eid, lambda)) return false;
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool Tetmesh<M,V,E,F,P>::edge_is_topologically_collapsible(const uint eid) const
+{
+    // implements the "Link Condition" for 3-complexes described in:
+    // Topology preserving edge contraction
+    // Tamal K. Dey, Herbert Edelsbrunner, Sumanta Guha and Dmitry V. Nekhayev
+    // 1999
+
+    uint v0 = this->edge_vert_id(eid,0);
+    uint v1 = this->edge_vert_id(eid,1);
+
+    // TODO: add point at infinity to robustly check elements at
+    // the boundary! (see the Trimesh counterpart for an example)
+    if(this->vert_is_on_srf(v0) || this->vert_is_on_srf(v1))
+    {
+        //std::cout << "surface edge" << std::endl;
+        return false;
+    }
+
+    auto v0_f_link = this->vert_faces_link(v0);
+    auto v1_f_link = this->vert_faces_link(v1);
+
+    std::vector<uint> inters;
+    SET_INTERSECTION(v0_f_link, v1_f_link, inters, true);
+    if(!inters.empty())
+    {
+        //std::cout << "f-link not empty" << std::endl;
+        return false;
+    }
+
+    auto v0_e_link = this->vert_edges_link(v0);
+    auto v1_e_link = this->vert_edges_link(v1);
+    auto e_e_link  = this->edge_edges_link(eid);
+    SORT_VEC(e_e_link, false);
+
+    SET_INTERSECTION(v0_e_link, v1_e_link, inters, true);
+    if(inters!=e_e_link)
+    {
+        //std::cout << "e-link intersection mismatch" << std::endl;
+        return false;
+    }
+
+    auto v0_v_link = this->vert_verts_link(v0);
+    auto v1_v_link = this->vert_verts_link(v1);
+    auto e_v_link  = this->edge_verts_link(eid);
+    SORT_VEC(e_v_link, false);
+
+    SET_INTERSECTION(v0_v_link, v1_v_link, inters, true);
+    if(inters!=e_v_link)
+    {
+        //std::cout << "v-link intersection mismatch" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool Tetmesh<M,V,E,F,P>::edge_is_geometrically_collapsible(const uint /*eid*/, const double /*lambda*/) const
+{
+    //TODO!!!
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int Tetmesh<M,V,E,F,P>::edge_collapse(const uint eid, const double lambda, const double topologic_check, const double geometric_check)
+{
+    if(topologic_check && !edge_is_topologically_collapsible(eid))         return -1;
+    if(geometric_check && !edge_is_geometrically_collapsible(eid, lambda)) return -1;
+
+    uint vert_to_keep   = this->edge_vert_id(eid,0);
+    uint vert_to_remove = this->edge_vert_id(eid,1);
+    if (vert_to_remove < vert_to_keep) std::swap(vert_to_keep, vert_to_remove); // remove vert with highest ID
+
+    this->vert(vert_to_keep) = this->edge_sample_at(eid, lambda); // reposition vertex
+
+    for(uint pid : this->adj_v2p(vert_to_remove))
+    {
+        if (this->poly_contains_edge(pid, eid)) continue; // no need to update. will collapse
+
+        uint off   = this->poly_vert_offset(pid, vert_to_remove);
+        auto vlist = this->poly_verts_id(pid);
+        vlist.at(off) = vert_to_keep;
+        uint new_pid = this->poly_add(vlist);
+
+        this->poly_data(new_pid) = this->poly_data(pid);
+
+        for(uint fid: this->adj_p2f(pid))
+        {
+            if(this->face_is_on_srf(fid)) this->update_f_normal(fid);
+        }
+    }
+    if(this->vert_is_on_srf(vert_to_keep)) this->update_v_normal(vert_to_keep);
+
+    this->vert_remove(vert_to_remove);
+    return vert_to_keep;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::face_edge_opposite_to(const uint fid, const uint vid) const
 {
     assert(this->face_contains_vert(fid,vid));

@@ -758,6 +758,20 @@ uint AbstractMesh<M,V,E,P>::poly_vert_id(const uint pid, const uint offset) cons
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+uint AbstractMesh<M,V,E,P>::poly_vert_offset(const uint pid, const uint vid) const
+{
+    assert(poly_contains_vert(pid,vid));
+    for(uint off=0; off<verts_per_poly(pid); ++off)
+    {
+        if(poly_vert_id(pid,off) == vid) return off;
+    }
+    assert(false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 vec3d AbstractMesh<M,V,E,P>::poly_centroid(const uint pid) const
 {
     vec3d c(0,0,0);
