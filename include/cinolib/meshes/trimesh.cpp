@@ -228,12 +228,10 @@ int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const d
     {
         if (this->poly_contains_edge(pid, eid)) continue; // no need to update. will collapse
 
-        int  e_opp = this->edge_opposite_to(pid, vert_to_remove);
-        uint A     = this->edge_vert_id(e_opp,0);
-        uint B     = this->edge_vert_id(e_opp,1);
-
-        if (this->poly_verts_are_CCW(pid,A,B)) std::swap(A, B);
-        uint new_pid = this->poly_add(A, B, vert_to_keep);
+        uint off   = this->poly_vert_offset(pid, vert_to_remove);
+        auto vlist = this->poly_verts_id(pid);
+        vlist.at(off) = vert_to_keep;
+        uint new_pid = this->poly_add(vlist);
 
         this->poly_data(new_pid) = this->poly_data(pid);
         this->update_p_normal(new_pid);
