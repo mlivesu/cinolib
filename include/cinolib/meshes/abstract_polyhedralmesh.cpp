@@ -93,18 +93,6 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-int AbstractPolyhedralMesh<M,V,E,F,P>::Euler_characteristic() const
-{
-    uint nv = this->num_srf_verts();
-    uint ne = this->num_srf_edges();
-    uint nf = this->num_srf_faces();
-    return nv - ne + nf;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::num_srf_verts() const
 {
     uint count = 0;
@@ -264,6 +252,20 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_v_normal(const uint vid)
     }
     if (n.length()>0) n.normalize();
     this->vert_data(vid).normal = n;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int AbstractPolyhedralMesh<M,V,E,F,P>::Euler_characteristic() const
+{
+    // https://math.stackexchange.com/questions/1680607/eulers-formula-for-tetrahedral-mesh
+    uint nv = this->num_verts();
+    uint ne = this->num_edges();
+    uint nf = this->num_faces();
+    uint np = this->num_polys();
+    return nv - ne + nf - np;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
