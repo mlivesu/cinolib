@@ -74,6 +74,12 @@ bool DOES_NOT_CONTAIN_VEC(const C & container, const E & element);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<typename C>
+CINO_INLINE
+void PRINT(const C & container, const std::string & name = "");
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<typename T>
 CINO_INLINE
 void REMOVE_FROM_VEC(std::vector<T> & vec, const T & elem);
