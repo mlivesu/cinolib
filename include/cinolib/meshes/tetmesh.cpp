@@ -312,16 +312,20 @@ bool Tetmesh<M,V,E,F,P>::edge_is_topologically_collapsible(const uint eid) const
     // Topology preserving edge contraction
     // Tamal K. Dey, Herbert Edelsbrunner, Sumanta Guha and Dmitry V. Nekhayev
     // 1999
+    //
+    // NOTE: to avoid topological changes at the border, boundary faces are assumed
+    // to form a tet with an infinite vertex, which thus enters in the various simplex links
 
     uint v0 = this->edge_vert_id(eid,0);
     uint v1 = this->edge_vert_id(eid,1);
 
-    // TODO: add point at infinity to robustly check elements at
-    // the boundary! (see the Trimesh counterpart for an example)
-    if(this->vert_is_on_srf(v0) || this->vert_is_on_srf(v1)) return false;
-
     auto v0_f_link = this->vert_faces_link(v0);
     auto v1_f_link = this->vert_faces_link(v1);
+
+    // add faces at infinity (if any)
+    // ("fake" unique ids for faces at infinity are obained by summing the number of faces with the id of the edge from which the each face emanates)
+    if(this->vert_is_on_srf(v0)) for(uint fid : this->vert_adj_srf_faces(v0)) v0_f_link.push_back(this->num_faces()+this->face_edge_opposite_to(fid,v0));
+    if(this->vert_is_on_srf(v1)) for(uint fid : this->vert_adj_srf_faces(v1)) v1_f_link.push_back(this->num_faces()+this->face_edge_opposite_to(fid,v1));
 
     std::vector<uint> inters;
     SET_INTERSECTION(v0_f_link, v1_f_link, inters, true);
@@ -330,6 +334,12 @@ bool Tetmesh<M,V,E,F,P>::edge_is_topologically_collapsible(const uint eid) const
     auto v0_e_link = this->vert_edges_link(v0);
     auto v1_e_link = this->vert_edges_link(v1);
     auto e_e_link  = this->edge_edges_link(eid);
+
+    // add edges at infinity (if any)
+    // ("fake" unique ids for edges at infinity are obained by summing the number of edges with the id of the vertex from which the each edge emanates)
+    if(this->vert_is_on_srf(v0))  for(uint vid : this->vert_adj_srf_verts(v0))  v0_e_link.push_back(this->num_edges()+vid);
+    if(this->vert_is_on_srf(v1))  for(uint vid : this->vert_adj_srf_verts(v1))  v1_e_link.push_back(this->num_edges()+vid);
+    if(this->edge_is_on_srf(eid)) for(uint fid : this->edge_adj_srf_faces(eid)) e_e_link.push_back (this->num_edges()+this->face_vert_opposite_to(fid,eid));
     SORT_VEC(e_e_link, false);
 
     SET_INTERSECTION(v0_e_link, v1_e_link, inters, true);
@@ -339,6 +349,12 @@ bool Tetmesh<M,V,E,F,P>::edge_is_topologically_collapsible(const uint eid) const
     auto v1_v_link = this->vert_verts_link(v1);
     auto e_v_link  = this->edge_verts_link(eid);
     SORT_VEC(e_v_link, false);
+
+    // add verts at infinity (if any)
+    uint inf_vert = this->num_verts();
+    if(this->vert_is_on_srf(v0))  v0_v_link.push_back(inf_vert);
+    if(this->vert_is_on_srf(v1))  v1_v_link.push_back(inf_vert);
+    if(this->edge_is_on_srf(eid)) e_v_link.push_back(inf_vert); // (last position in the vector is ok, as inf_vert is the biggest id!)
 
     SET_INTERSECTION(v0_v_link, v1_v_link, inters, true);
     if(inters!=e_v_link) return false;
@@ -350,9 +366,30 @@ bool Tetmesh<M,V,E,F,P>::edge_is_topologically_collapsible(const uint eid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,P>::edge_is_geometrically_collapsible(const uint /*eid*/, const double /*lambda*/) const
+bool Tetmesh<M,V,E,F,P>::edge_is_geometrically_collapsible(const uint eid, const double lambda) const
 {
-    //TODO!!!
+    // no tet should flip or collapse
+    vec3d new_vert = this->edge_sample_at(eid, lambda);
+    uint  vid0     = this->edge_vert_id(eid,0);
+    uint  vid1     = this->edge_vert_id(eid,1);
+
+    std::unordered_set<uint> polys_to_test;
+    for(uint pid : this->adj_v2p(vid0)) if(!this->poly_contains_edge(pid, eid)) polys_to_test.insert(pid);
+    for(uint pid : this->adj_v2p(vid1)) if(!this->poly_contains_edge(pid, eid)) polys_to_test.insert(pid);
+
+    for(uint pid : polys_to_test)
+    {
+        vec3d v[4];
+        for(int i=0; i<4; ++i)
+        {
+            bool is_v0 = (this->poly_vert_id(pid,i) == vid0);
+            bool is_v1 = (this->poly_vert_id(pid,i) == vid1);
+            v[i] = (is_v0 || is_v1) ? new_vert : this->poly_vert(pid,i);
+        }
+        // avoid collapses (but also tiny tets)
+        if(tet_volume(v[0], v[1], v[2], v[3]) < 1e-10) return false;
+    }
+
     return true;
 }
 
