@@ -218,6 +218,8 @@ int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const d
     if(topologic_check && !edge_is_topologically_collapsible(eid))         return -1;
     if(geometric_check && !edge_is_geometrically_collapsible(eid, lambda)) return -1;
 
+    int euler_before = this->Euler_characteristic();
+
     uint vert_to_keep   = this->edge_vert_id(eid,0);
     uint vert_to_remove = this->edge_vert_id(eid,1);
     if (vert_to_remove < vert_to_keep) std::swap(vert_to_keep, vert_to_remove); // remove vert with highest ID
@@ -239,6 +241,9 @@ int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const d
     this->update_v_normal(vert_to_keep);
 
     this->vert_remove(vert_to_remove);
+
+    if(topologic_check) assert(euler_before == this->Euler_characteristic());
+
     return vert_to_keep;
 }
 
