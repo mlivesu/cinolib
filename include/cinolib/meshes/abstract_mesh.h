@@ -254,7 +254,6 @@ class AbstractMesh
                 bool               polys_are_colored    () const;
                 bool               polys_are_labeled    () const;
                 void               poly_apply_labels    (const std::vector<int> & labels);
-                int                poly_id              (const std::vector<uint> & vids) const;
         virtual double             poly_mass            (const uint pid) const = 0;
         virtual void               poly_set_color       (const Color & c);
         virtual void               poly_set_alpha       (const float alpha);

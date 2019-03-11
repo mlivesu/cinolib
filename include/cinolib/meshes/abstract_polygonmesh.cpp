@@ -893,12 +893,12 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint AbstractPolygonMesh<M,V,E,P>::edge_add(const uint vid0, const uint vid1)
 {
+    assert(this->edge_id(vid0, vid1)==-1); // make sure it doesn't exist already
     assert(vid0 < this->num_verts());
     assert(vid1 < this->num_verts());
     assert(!this->verts_are_adjacent(vid0, vid1));
     assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid0), vid1));
     assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid1), vid0));
-    assert(this->edge_id(vid0, vid1) == -1);
     //
     uint eid = this->num_edges();
     //
@@ -1093,6 +1093,22 @@ int AbstractPolygonMesh<M,V,E,P>::poly_shared(const uint eid0, const uint eid1) 
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+int AbstractPolygonMesh<M,V,E,P>::poly_id(const std::vector<uint> & vlist) const
+{
+    std::vector<uint> query = SORT_VEC(vlist);
+
+    uint vid = vlist.front();
+    for(uint pid : this->adj_v2p(vid))
+    {
+        if(this->poly_verts_id(pid,true)==query) return pid;
+    }
+    return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolygonMesh<M,V,E,P>::polys_adjacent_along(const uint pid, const uint eid) const
 {
     std::vector<uint> polys;
@@ -1234,14 +1250,13 @@ void AbstractPolygonMesh<M,V,E,P>::poly_switch_id(const uint pid0, const uint pi
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & p)
+uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & vlist)
 {
-#ifndef NDEBUG
-    for(uint vid : p) assert(vid < this->num_verts());
-#endif
+    assert(poly_id(vlist)==-1); // make sure it doesn't exist already
+    for(uint vid : vlist) assert(vid < this->num_verts());
 
     uint pid = this->num_polys();
-    this->polys.push_back(p);
+    this->polys.push_back(vlist);
 
     P data;
     this->p_data.push_back(data);
@@ -1250,25 +1265,25 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & p)
     this->p2p.push_back(std::vector<uint>());
 
     // add missing edges
-    for(uint i=0; i<p.size(); ++i)
+    for(uint i=0; i<vlist.size(); ++i)
     {
-        uint vid0 = p.at(i);
-        uint vid1 = p.at((i+1)%p.size());
+        uint vid0 = vlist.at(i);
+        uint vid1 = vlist.at((i+1)%vlist.size());
         int  eid = this->edge_id(vid0, vid1);
 
         if (eid == -1) eid = this->edge_add(vid0, vid1);
     }
 
     // update connectivity
-    for(uint vid : p)
+    for(uint vid : vlist)
     {
         this->v2p.at(vid).push_back(pid);
     }
     //
-    for(uint i=0; i<p.size(); ++i)
+    for(uint i=0; i<vlist.size(); ++i)
     {
-        uint vid0 = p.at(i);
-        uint vid1 = p.at((i+1)%p.size());
+        uint vid0 = vlist.at(i);
+        uint vid1 = vlist.at((i+1)%vlist.size());
         int  eid = this->edge_id(vid0, vid1);
         assert(eid >= 0);
 
@@ -1285,7 +1300,7 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & p)
     }
 
     this->update_p_normal(pid);
-    for(uint vid : p) this->update_v_normal(vid);
+    for(uint vid : vlist) this->update_v_normal(vid);
 
     this->poly_triangles.push_back(std::vector<uint>());
     update_p_tessellation(pid);

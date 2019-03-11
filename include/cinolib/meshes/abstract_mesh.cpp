@@ -1094,20 +1094,4 @@ void AbstractMesh<M,V,E,P>::poly_apply_labels(const std::vector<int> & labels)
     }
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-int AbstractMesh<M,V,E,P>::poly_id(const std::vector<uint> & vids) const
-{
-    std::vector<uint> query = SORT_VEC(vids);
-
-    uint vid = vids.front();
-    for(uint pid : this->adj_v2p(vid))
-    {
-        if(this->poly_verts_id(pid,true)==query) return pid;
-    }
-    return -1;
-}
-
 }

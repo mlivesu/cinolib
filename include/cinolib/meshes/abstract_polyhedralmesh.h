@@ -214,6 +214,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         virtual double             poly_mass                   (const uint pid) const;
                 bool               poly_contains_face          (const uint pid, const uint fid) const;
                 bool               poly_is_on_surf             (const uint pid) const;
+                int                poly_id                     (const std::vector<uint> & flist) const;
                 int                poly_shared_face            (const uint pid0, const uint pid1) const;
                 uint               poly_face_id                (const uint pid, const uint off) const;
                 void               poly_face_flip_winding      (const uint pid, const uint fid);
@@ -238,6 +239,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 int                poly_euler_characteristic   (const uint pid) const;
                 bool               poly_is_spherical           (const uint pid) const;
                 void               poly_export_element         (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const;
+                std::vector<uint>  poly_faces_id               (const uint pid, const bool sort_by_fid = false) const;
 
 };
 

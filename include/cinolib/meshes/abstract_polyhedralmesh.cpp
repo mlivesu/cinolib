@@ -973,6 +973,23 @@ double AbstractPolyhedralMesh<M,V,E,F,P>::face_area(const uint fid) const
     }
     return area;
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int AbstractPolyhedralMesh<M,V,E,F,P>::poly_id(const std::vector<uint> & flist) const
+{
+    std::vector<uint> query = SORT_VEC(flist);
+
+    uint fid = flist.front();
+    for(uint pid : this->adj_f2p(fid))
+    {
+        if(this->poly_faces_id(pid,true)==query) return pid;
+    }
+    return -1;
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
@@ -1395,12 +1412,12 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::edge_add(const uint vid0, const uint vid1)
 {
+    assert(this->edge_id(vid0, vid1)==-1); // make sure it doesn't exist already
     assert(vid0 < this->num_verts());
     assert(vid1 < this->num_verts());
     assert(!this->verts_are_adjacent(vid0, vid1));
     assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid0), vid1));
     assert(DOES_NOT_CONTAIN_VEC(this->v2v.at(vid1), vid0));
-    assert(this->edge_id(vid0, vid1) == -1);
     //
     uint eid = this->num_edges();
     //
@@ -1527,9 +1544,8 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::face_add(const std::vector<uint> & f)
 {
-#ifndef NDEBUG
+    assert(face_id(f)==-1); // make sure it doesn't exist already
     for(uint vid : f) assert(vid < this->num_verts());
-#endif
 
     uint fid = this->num_faces();
     this->faces.push_back(f);
@@ -1693,9 +1709,8 @@ CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & flist,
                                                  const std::vector<bool> & fwinding)
 {
-#ifndef NDEBUG
+    assert(poly_id(flist)==-1); // make sure it doesn't exist already
     for(uint fid : flist) assert(fid < this->num_faces());
-#endif
     assert(flist.size() == fwinding.size());
 
     uint pid = this->num_polys();
@@ -2089,6 +2104,21 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_export_element(const uint          
         }
         faces.push_back(f);
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_faces_id(const uint pid, const bool sort_by_fid) const
+{
+    if(sort_by_fid)
+    {
+        std::vector<uint> f_list = this->adj_p2f(pid);
+        SORT_VEC(f_list);
+        return f_list;
+    }
+    return this->adj_p2f(pid);
 }
 
 }
