@@ -33,10 +33,26 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SUBDIVISION_SCHEMAS_H
-#define CINO_SUBDIVISION_SCHEMAS_H
+#ifndef CINO_SUBDIVISION_BARYCENTRIC_H
+#define CINO_SUBDIVISION_BARYCENTRIC_H
 
-#include <cinolib/subdivision_barycentric.h>
-#include <cinolib/subdivision_legacy_hexa_schemes.h>
+#include <cinolib/meshes/tetmesh.h>
 
-#endif // CINO_SUBDIVISION_SCHEMAS_H
+namespace cinolib
+{
+
+/* Implementation of barycentric subdivision for simplicial complexes of dimension 3.
+ * See also: https://en.wikipedia.org/wiki/Barycentric_subdivision
+*/
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void subdivision_barycentric(Tetmesh<M,V,E,F,P> & m);
+
+}
+
+#ifndef  CINO_STATIC_LIB
+#include "subdivision_barycentric.cpp"
+#endif
+
+#endif // CINO_SUBDIVISION_BARYCENTRIC_H
