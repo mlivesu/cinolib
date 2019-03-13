@@ -39,7 +39,6 @@
 #include <cinolib/io/read_write.h>
 #include <cinolib/min_max_inf.h>
 #include <cinolib/standard_elements_tables.h>
-#include <cinolib/subdivision_schemas.h>
 #include <cinolib/vector_serialization.h>
 
 #include <queue>
