@@ -36,6 +36,7 @@
 #ifndef CINO_SUBDIVISION_SCHEMAS_H
 #define CINO_SUBDIVISION_SCHEMAS_H
 
+#include <cinolib/subdivision_midpoint.h>
 #include <cinolib/subdivision_barycentric.h>
 #include <cinolib/subdivision_legacy_hexa_schemes.h>
 

@@ -33,7 +33,7 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/midpoint_subdivision.h>
+#include <cinolib/subdivision_midpoint.h>
 #include <cinolib/sort_poly_vertices.h>
 #include <map>
 
@@ -42,7 +42,7 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void midpoint_subdivision(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
+void subdivision_midpoint(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
                                 AbstractPolyhedralMesh<M,V,E,F,P> & m_out)
 {
     std::vector<vec3d>             verts = m_in.vector_verts();

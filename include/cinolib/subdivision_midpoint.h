@@ -33,8 +33,8 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_MIDPOINT_SUBDIVISION_H
-#define CINO_MIDPOINT_SUBDIVISION_H
+#ifndef CINO_SUBDIVISION_MIDPOINT_H
+#define CINO_SUBDIVISION_MIDPOINT_H
 
 #include <cinolib/meshes/meshes.h>
 
@@ -50,13 +50,13 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void midpoint_subdivision(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
+void subdivision_midpoint(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
                                 AbstractPolyhedralMesh<M,V,E,F,P> & m_out);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "midpoint_subdivision.cpp"
+#include "subdivision_midpoint.cpp"
 #endif
 
-#endif // CINO_MIDPOINT_SUBDIVISION_H
+#endif // CINO_SUBDIVISION_MIDPOINT_H
