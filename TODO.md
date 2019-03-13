@@ -7,7 +7,6 @@ Please consider this to be just development notes and not any real planning.
 * fix marching tets: degenerate triangles will be generated in some cases (see comments inside cpp file)
 * fix integral curve tracing (also refactor ray/line/plane intersections)
 * gradients on hex-meshes look buggy. Find out why
-* express topological conditions for edge contraction in terms of the "link condition" (see "Topology Preserving Edge Contraction" - T.K.Dey, H.Edelsbrunner, S.Guha, D.V.Nekhayev)
 
 ### Extensions/improvements:
 * transform all std::cerr into std::cout << ANSI_fg_color_red << 
@@ -24,7 +23,6 @@ Please consider this to be just development notes and not any real planning.
 * add matrix class (i.e. mat<real,size>, with operators and constructors from quaternions, rotations, identity, diagonal, ecc)
 * add support to read/write per element labels in OFF and HEDRA
 * make sure field_serialize is lossless in terms of numeric precision
-* put edge flip and similar operators on separate files
 * add inverse and transpose operators for 2x2 and 3x3 matrices
 * remove headers from serialized vector and scalar fields (it’s far more general)
 * update skeleton data structure (and make relative control panel)
@@ -41,7 +39,6 @@ Please consider this to be just development notes and not any real planning.
 * Use robust geometric computations (volumes, dihedral angles ecc.) 
   (ref. => Lecture Notes on Geometric Robustness di Jonathan Richard Shewchuk)
 * add 2D medial axis computation facilities using qgarlib
-* object space ambient occlusion 
 * ARAP parameterization and shape deformation
 * Least Squares Conformal Maps
 * linear blend skinning and dual quaternions
