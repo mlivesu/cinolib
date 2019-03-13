@@ -22,16 +22,6 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-uint closest_vertex(const cinolib::vec3d & p, const cinolib::Trimesh<> & m)
-{
-    std::vector<std::pair<double,uint>> closest;
-    for(uint vid=0; vid<m.num_verts(); ++vid) closest.push_back(std::make_pair(m.vert(vid).dist(p),vid));
-    std::sort(closest.begin(), closest.end());
-    return closest.front().second;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 int main(int argc, char **argv)
 {
     using namespace cinolib;
@@ -59,7 +49,7 @@ int main(int argc, char **argv)
             if (c->unproject(click, p)) // transform click in a 3d point
             {
                 profiler.push("Pick Vertex");
-                uint vid = closest_vertex(p,m);
+                uint vid = m.pick_vert(p);
                 profiler.pop();
                 m.vert_data(vid).color = Color::RED();
                 m.updateGL();
