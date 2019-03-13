@@ -1094,4 +1094,40 @@ void AbstractMesh<M,V,E,P>::poly_apply_labels(const std::vector<int> & labels)
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint AbstractMesh<M,V,E,P>::pick_vert(const vec3d & p) const
+{
+    std::vector<std::pair<double,uint>> closest;
+    for(uint vid=0; vid<this->num_verts(); ++vid) closest.push_back(std::make_pair(this->vert(vid).dist(p),vid));
+    std::sort(closest.begin(), closest.end());
+    return closest.front().second;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint AbstractMesh<M,V,E,P>::pick_edge(const vec3d & p) const
+{
+    std::vector<std::pair<double,uint>> closest;
+    for(uint eid=0; eid<this->num_edges(); ++eid) closest.push_back(std::make_pair(this->edge_sample_at(eid, 0.5).dist(p),eid));
+    std::sort(closest.begin(), closest.end());
+    return closest.front().second;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint AbstractMesh<M,V,E,P>::pick_poly(const vec3d & p) const
+{
+    std::vector<std::pair<double,uint>> closest;
+    for(uint pid=0; pid<this->num_polys(); ++pid) closest.push_back(std::make_pair(this->poly_centroid(pid).dist(p),pid));
+    std::sort(closest.begin(), closest.end());
+    return closest.front().second;
+}
+
 }

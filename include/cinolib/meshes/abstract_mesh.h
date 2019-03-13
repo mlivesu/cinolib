@@ -192,6 +192,13 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        // useful for GUIs with mouse picking
+        uint pick_vert(const vec3d & p) const;
+        uint pick_edge(const vec3d & p) const;
+        uint pick_poly(const vec3d & p) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
           const vec3d          & vert                 (const uint vid) const { return verts.at(vid); }
                 vec3d          & vert                 (const uint vid)       { return verts.at(vid); }
                 void             vert_weights_uniform (const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
