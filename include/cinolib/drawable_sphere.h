@@ -33,43 +33,47 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_DRAWABLE_OBJECT_H
-#define CINO_DRAWABLE_OBJECT_H
+#ifndef CINO_DRAWABLE_SPHERE_H
+#define CINO_DRAWABLE_SPHERE_H
 
+#include <cinolib/drawable_object.h>
+#include <cinolib/gl/draw_sphere.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/color.h>
 
 namespace cinolib
 {
 
-typedef enum
-{
-    DRAWABLE_TRIMESH       ,
-    DRAWABLE_TETMESH       ,
-    DRAWABLE_QUADMESH      ,
-    DRAWABLE_HEXMESH       ,
-    DRAWABLE_POLYGONMESH   ,
-    DRAWABLE_POLYHEDRALMESH,
-    DRAWABLE_SKELETON      ,
-    DRAWABLE_CURVE         ,
-    DRAWABLE_ISOSURFACE    ,
-    DRAWABLE_SLICED_OBJ    ,
-    DRAWABLE_VECTOR_FIELD  ,
-    ARROW                  ,
-    SPHERE
-}
-ObjectType;
-
-class DrawableObject
+class DrawableSphere : public DrawableObject
 {
     public :
 
-        virtual ~DrawableObject(){}
-        virtual ObjectType  object_type()                    const = 0;
-        virtual void        draw(const float scene_size = 1) const = 0;  // do rendering
-        virtual vec3d       scene_center()                   const = 0;  // get position in space
-        virtual float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
+        DrawableSphere(const vec3d & center) : center(center)
+        {
+            size  = 1.0;
+            color = Color::RED();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d  center;
+        Color  color;
+        double size;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        ObjectType object_type()  const { return SPHERE; }
+        vec3d      scene_center() const { return center; }
+        float      scene_radius() const { return 0.0;    }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void draw(const float scene_size) const
+        {
+            sphere<vec3d>(center, size*scene_size/100.0, color.rgba);
+        }
 };
 
 }
 
-#endif // CINO_DRAWABLE_OBJECT_H
+#endif // CINO_DRAWABLE_SPHERE_H
