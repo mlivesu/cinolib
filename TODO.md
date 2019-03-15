@@ -40,7 +40,6 @@ Please consider this to be just development notes and not any real planning.
   (ref. => Lecture Notes on Geometric Robustness di Jonathan Richard Shewchuk)
 * add 2D medial axis computation facilities using qgarlib
 * ARAP parameterization and shape deformation
-* Least Squares Conformal Maps
 * linear blend skinning and dual quaternions
 
 ### Documentation:
