@@ -100,6 +100,9 @@ Here is a list of the sample programs available in CinoLib.
 
 #### 30 - Convert all supported meshes from one file format to another (command line tool)
 
+#### 31 - compute a Least Squares Conformal Map (LSCM)
+<p align="left"><img src="snapshots/31_LSCM.png" width="500"></p>
+
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 

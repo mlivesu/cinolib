@@ -79,17 +79,52 @@ template<class Mesh>
 CINO_INLINE
 void ScalarField::copy_to_mesh(Mesh & m, const int tex_coord) const
 {
-    assert(rows() == m.num_verts());
-    for(uint vid=0; vid<(uint)rows(); ++vid)
+    uint nv = m.num_verts();
+
+    if((uint)rows() == nv)
     {
-        switch (tex_coord)
+        for(uint vid=0; vid<nv; ++vid)
         {
-            case U_param : m.vert_data(vid).uvw[0] = (*this)[vid]; break;
-            case V_param : m.vert_data(vid).uvw[1] = (*this)[vid]; break;
-            case W_param : m.vert_data(vid).uvw[2] = (*this)[vid]; break; break;
-            default: assert(false);
+            switch (tex_coord)
+            {
+                case U_param : m.vert_data(vid).uvw[0] = (*this)[vid]; break;
+                case V_param : m.vert_data(vid).uvw[1] = (*this)[vid]; break;
+                case W_param : m.vert_data(vid).uvw[2] = (*this)[vid]; break;
+                default: assert(false);
+            }
         }
     }
+    else if((uint)rows() == nv+nv)
+    {        
+        for(uint vid=0; vid<nv; ++vid)
+        {
+            switch (tex_coord)
+            {
+                case UV_param : m.vert_data(vid).uvw[0] = (*this)[vid];
+                                m.vert_data(vid).uvw[1] = (*this)[vid + nv];
+                                break;
+                case UW_param : m.vert_data(vid).uvw[0] = (*this)[vid];
+                                m.vert_data(vid).uvw[2] = (*this)[vid + nv];
+                                break;
+                case VW_param : m.vert_data(vid).uvw[1] = (*this)[vid];
+                                m.vert_data(vid).uvw[2] = (*this)[vid + nv];
+                                break;
+                default: assert(false);
+            }
+        }
+    }
+    else if((uint)rows() == nv+nv+nv)
+    {
+        assert(tex_coord == UVW_param);
+        uint nv2 = nv*2;
+        for(uint vid=0; vid<nv; ++vid)
+        {
+            m.vert_data(vid).uvw[0] = (*this)[vid];
+            m.vert_data(vid).uvw[1] = (*this)[vid + nv];
+            m.vert_data(vid).uvw[2] = (*this)[vid + nv2];
+        }
+    }
+    else assert(false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
