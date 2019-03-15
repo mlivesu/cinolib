@@ -112,7 +112,6 @@ Maintaining a library alone is very time consuming, and the amount of time I can
 * Navigate application history exploiting Cinolib undo/redo facilities
 * Generate, process and visualize scalar fields
 * Generate, process and visualize vector fields
-* Surface and volumetric format converters
 * Topology editing operators for triangle meshes
 * Topology editing operators for tetrahedral meshes
 * Topology editing operators for general polygonal meshes
