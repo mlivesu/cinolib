@@ -40,17 +40,23 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> mass_matrix(const AbstractMesh<M,V,E,P> & m)
+Eigen::SparseMatrix<double> mass_matrix(const AbstractMesh<M,V,E,P> & m, const int n)
 {
     typedef Eigen::Triplet<double> Entry;
+
+    uint nv = m.num_verts();
+    uint base[n];
+    for(int i=0; i<n; ++i) base[i] = nv*i;
 
     std::vector<Entry>  entries;
     for(uint vid=0; vid<m.num_verts(); ++vid)
     {
-        entries.push_back(Entry(vid, vid, m.vert_mass(vid)));
+        double mass = m.vert_mass(vid);
+        for(int i=0; i<n; ++i) entries.push_back(Entry(base[i] + vid, base[i] + vid, mass));
     }
 
-    Eigen::SparseMatrix<double> MM(m.num_verts(), m.num_verts());
+    nv = n*m.num_verts();
+    Eigen::SparseMatrix<double> MM(nv, nv);
     MM.setFromTriplets(entries.begin(), entries.end());
 
     return MM;

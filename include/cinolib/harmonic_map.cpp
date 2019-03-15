@@ -84,7 +84,7 @@ std::vector<vec3d> harmonic_map_3d(const AbstractMesh<M,V,E,P> & m,
 
     ScalarField f(3*m.num_verts());
 
-    Eigen::SparseMatrix<double> L   = laplacian_3d(m, laplacian_mode);
+    Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode, 3);
     Eigen::SparseMatrix<double> Ln = -L;
     Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(3*m.num_verts());
 

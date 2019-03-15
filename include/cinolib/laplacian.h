@@ -49,28 +49,22 @@ typedef Eigen::Triplet<double> Entry;
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> laplacian(const AbstractMesh<M,V,E,P> & m, const int mode);
+Eigen::SparseMatrix<double> laplacian(const AbstractMesh<M,V,E,P> & m,
+                                      const int mode,   // modes: UNIFORM | COTANGENT
+                                      const int n = 1); // diagonally replicate laplacian matrix n times:
+                                                        //
+                                                        //  n=1      n=2        n=3
+                                                        //  | L |   | L 0 |   | L 0 0 |
+                                                        //          | 0 L |   | 0 L 0 |
+                                                        //                    | 0 0 L |
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<Eigen::Triplet<double>> laplacian_matrix_entries(const AbstractMesh<M,V,E,P> & m, const int mode);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-Eigen::SparseMatrix<double> laplacian_3d(const AbstractMesh<M,V,E,P> & m, const int mode);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-std::vector<Eigen::Triplet<double>> laplacian_3d_matrix_entries(const AbstractMesh<M,V,E,P> & m, const int mode);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+std::vector<Eigen::Triplet<double>> laplacian_matrix_entries(const AbstractMesh<M,V,E,P> & m,
+                                                             const int mode,
+                                                             const int n);
 }
 
 #ifndef  CINO_STATIC_LIB

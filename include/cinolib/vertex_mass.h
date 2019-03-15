@@ -44,7 +44,13 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> mass_matrix(const AbstractMesh<M,V,E,P> & m);
+Eigen::SparseMatrix<double> mass_matrix(const AbstractMesh<M,V,E,P> & m,
+                                        const int n = 1); // diagonally replicate mass matrix n times:
+                                                          //
+                                                          //  n=1      n=2        n=3
+                                                          //  | M |   | M 0 |   | M 0 0 |
+                                                          //          | 0 M |   | 0 M 0 |
+                                                          //                    | 0 0 M |
 
 }
 
