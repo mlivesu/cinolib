@@ -49,13 +49,13 @@ namespace cinolib
  * Patrick Mullen, Yiying Tong, Pierre Alliez, Mathieu Desbrun
  * Symposium on Geometry Processing, 2008
  *
- * which is shown to be equivalent to the original LSCM paper:
+ * which is shown to be equivalent to the original formulation, presented in:
  *
  * Least Squares Conformal Maps for Automatic Texture Atlas Generation
- * Bruno Levy, Sylvain Petitjean, Nicolas Ray, Jérome Maillot
+ * Bruno Levy, Sylvain Petitjean, Nicolas Ray, Jérome Maillot
  * ACM Transactions on Graphics, 2002
  *
- * The function returns a scalar 2*#V scalar field containing the
+ * The function returns a 2 x #V scalar field containing the
  * serialized UV mesh coordinates (i.e. {u0,u1,..,un,v0,v1,..,vn}).
  *
  * NOTE: if the (at least two) required Dirichlet boundary conditions are
