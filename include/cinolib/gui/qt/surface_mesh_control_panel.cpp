@@ -441,6 +441,7 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         cb_actions->insertItem(4,"Mark color discontinuities");
         cb_actions->insertItem(5,"Mark sharp creases (>60deg)");
         cb_actions->insertItem(6,"Mark sharp creases (>30deg)");
+        cb_actions->insertItem(7,"Mark boundary edges");
         cb_actions->setFont(global_font);
         QVBoxLayout *layout = new QVBoxLayout();
         layout->addWidget(cb_actions);
@@ -1020,6 +1021,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
             case 4: m->edge_mark_color_discontinuities(); break;
             case 5: m->edge_mark_sharp_creases(to_rad(60.0)); break;
             case 6: m->edge_mark_sharp_creases(to_rad(30.0)); break;
+            case 7: m->edge_mark_boundaries(); break;
         }
         m->updateGL();
         canvas->updateGL();
