@@ -40,6 +40,7 @@
 #include <cinolib/stl_container_utilities.h>
 #include <cinolib/geometry/polygon.h>
 #include <unordered_set>
+#include <queue>
 
 namespace cinolib
 {
@@ -681,6 +682,47 @@ bool AbstractPolygonMesh<M,V,E,P>::vert_is_boundary(const uint vid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+bool AbstractPolygonMesh<M,V,E,P>::vert_is_manifold(const uint vid) const
+{
+    for(uint eid : this->adj_v2e(vid))
+    {
+        if(!this->edge_is_manifold(eid)) return false;
+    }
+
+    std::vector<uint> e_link = this->vert_edges_link(vid);
+    std::unordered_set<uint> edge_set(e_link.begin(), e_link.end());
+
+    std::queue<uint> q;
+    q.push(e_link.front());
+
+    std::unordered_set<uint> visited;
+    visited.insert(e_link.front());
+
+    while(!q.empty())
+    {
+        uint curr = q.front();
+        q.pop();
+
+        assert(CONTAINS(visited, curr));
+
+        for(uint nbr : this->adj_e2e(curr))
+        {
+            // still in the link of vid, but not visited yet
+            if(CONTAINS(edge_set, nbr) && !CONTAINS(visited, nbr))
+            {
+                visited.insert(nbr);
+                q.push(nbr);
+            }
+        }
+    }
+
+    return (visited.size() == e_link.size());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_boundary_edges(const uint vid) const
 {
     std::vector<uint> b_edges;
@@ -821,11 +863,10 @@ void AbstractPolygonMesh<M,V,E,P>::vert_remove_unreferenced(const uint vid)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractPolygonMesh<M,V,E,P>::edge_is_manifold(const uint eid, const bool boundaries_allowed) const
+bool AbstractPolygonMesh<M,V,E,P>::edge_is_manifold(const uint eid) const
 {
     uint val = this->edge_valence(eid);
-    if(boundaries_allowed) return (val>0 && val<3);
-    return (val==2);
+    return (val>0 && val<3);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -834,8 +875,8 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 double AbstractPolygonMesh<M,V,E,P>::edge_crease_angle(const uint eid) const
 {
-    assert( this->edge_is_manifold(eid));
-    assert(!this->edge_is_boundary(eid));
+    if( this->edge_is_manifold(eid)) return 0;
+    if(!this->edge_is_boundary(eid)) return 0;
 
     uint   pid0  = this->adj_e2p(eid).front();
     uint   pid1  = this->adj_e2p(eid).back();
