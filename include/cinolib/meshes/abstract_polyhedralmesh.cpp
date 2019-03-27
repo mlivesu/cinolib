@@ -1049,32 +1049,30 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,C>::vert_is_manifold(const uint vid) const
 {
-    std::unordered_map<uint,uint> e_count; // count how many faces in the link contain each edge (in the link)
-
+    // for each edge in the link, count how many faces in the link are incident to it
+    std::unordered_map<uint,uint> e_count;
     for(uint fid : this->vert_faces_link(vid))
-    for(uint eid : this->adj_f2e(fid))
+    for(uint id  : this->adj_f2e(fid))
     {
-        e_count[eid]++;
+        e_count[id]++;
     }
 
     bool on_srf = this->vert_is_on_srf(vid);
     std::unordered_set<uint> boundary;
-    for(auto ec : e_count)
+    for(auto e : e_count)
     {
-        switch (ec.second)
-        {
-            case  2: break;                              // regular edge in the link, so far so good
-            case  1: if(on_srf) boundary.insert(ec.first); // boundary edge in the link, ok only if on srf
-                     else return false;                  // (srf neighborhood must be homotopic to a halph sphere)
-                     break;
-            default: return false;                       // not manifold edge in the link
-        }
+        if(e.second==2) continue;     // regular edge in the link. so far so good
+        if(e.second!=1) return false; // non manifold edge in the link
+        assert(e.second==1);
+        // boundary edge in the link, ok only if on srf
+        // (srf neighborhood must be homotopic to a halph sphere)
+        if(on_srf) boundary.insert(e.first);
+        else return false;
     }
 
     if(on_srf)
     {
-        if(boundary.empty()) return false; // srf vertices must have a link with exactly one boundary
-
+        if(boundary.empty()) return false; // srf elements must have a link with exactly one boundary
         // count connected components in boundary edges
         std::unordered_set<uint> visited;
         std::queue<uint> q;
@@ -1082,10 +1080,9 @@ bool AbstractPolyhedralMesh<M,V,E,F,C>::vert_is_manifold(const uint vid) const
         visited.insert(*boundary.begin());
         while(!q.empty())
         {
-            uint eid = q.front();
+            uint id = q.front();
             q.pop();
-
-            for(uint nbr : this->adj_e2e(eid))
+            for(uint nbr : this->adj_e2e(id))
             {
                 if(CONTAINS(boundary,nbr) && DOES_NOT_CONTAIN(visited,nbr))
                 {
@@ -1096,8 +1093,60 @@ bool AbstractPolyhedralMesh<M,V,E,F,C>::vert_is_manifold(const uint vid) const
         }
         return (visited.size() == boundary.size());
     }
+    else return boundary.empty(); // inner vertices mush have a closed sphere as link
+}
 
-    return true;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,C>::edge_is_manifold(const uint eid) const
+{
+    // for each edge in the link, count how many faces in the link are incident to it
+    std::unordered_map<uint,uint> e_count;
+    for(uint fid : this->edge_faces_link(eid))
+    for(uint id  : this->adj_f2e(fid))
+    {
+        e_count[id]++;
+    }
+
+    bool on_srf = this->edge_is_on_srf(eid);
+    std::unordered_set<uint> boundary;
+    for(auto e : e_count)
+    {
+        if(e.second==2) continue;     // regular edge in the link. so far so good
+        if(e.second!=1) return false; // non manifold edge in the link
+        assert(e.second==1);
+        // boundary edge in the link, ok only if on srf
+        // (srf neighborhood must be homotopic to a halph sphere)
+        if(on_srf) boundary.insert(e.first);
+        else return false;
+    }
+
+    if(on_srf)
+    {
+        if(boundary.empty()) return false; // srf elements must have a link with exactly one boundary
+        // count connected components in boundary edges
+        std::unordered_set<uint> visited;
+        std::queue<uint> q;
+        q.push(*boundary.begin());
+        visited.insert(*boundary.begin());
+        while(!q.empty())
+        {
+            uint id = q.front();
+            q.pop();
+            for(uint nbr : this->adj_e2e(id))
+            {
+                if(CONTAINS(boundary,nbr) && DOES_NOT_CONTAIN(visited,nbr))
+                {
+                    visited.insert(nbr);
+                    q.push(nbr);
+                }
+            }
+        }
+        return (visited.size() == boundary.size());
+    }
+    else return boundary.empty(); // inner vertices mush have a closed sphere as link
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
