@@ -355,7 +355,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 std::vector<uint> AbstractMesh<M,V,E,P>::adj_e2e(const uint eid) const
 {
-    std::set<uint> unique_e_list;
+    std::unordered_set<uint> unique_e_list;
     uint v0 = this->edge_vert_id(eid,0);
     uint v1 = this->edge_vert_id(eid,1);
     for(uint nbr : this->adj_v2e(v0)) if(nbr != eid) unique_e_list.insert(nbr);
