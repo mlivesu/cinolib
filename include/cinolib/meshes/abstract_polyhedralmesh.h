@@ -144,6 +144,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool               vert_is_on_srf            (const uint vid) const;
         virtual double             vert_mass                 (const uint vid) const;
                 double             vert_volume               (const uint vid) const;
+                bool               vert_is_manifold          (const uint vid) const;
                 std::vector<uint>  vert_verts_link           (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
                 std::vector<uint>  vert_edges_link           (const uint vid) const;
                 std::vector<uint>  vert_faces_link           (const uint vid) const;
@@ -163,6 +164,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         void              edge_switch_id          (const uint eid0, const uint eid1);
         uint              edge_add                (const uint vid0, const uint vid1);
+        bool              edge_is_manifold        (const uint eid) const;
         void              edge_remove             (const uint eid);
         void              edge_remove_unreferenced(const uint eid);
         bool              edge_is_on_srf          (const uint eid) const;
