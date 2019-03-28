@@ -349,6 +349,17 @@ void AbstractMesh<M,V,E,P>::swap_xyz_uvw(const bool normals, const bool bbox)
     if (normals) update_normals();
     if (bbox)    update_bbox();
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> AbstractMesh<M,V,E,P>::adj_e2v(const uint eid) const
+{
+    return { this->edge_vert_id(eid,0),
+             this->edge_vert_id(eid,1) };
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
