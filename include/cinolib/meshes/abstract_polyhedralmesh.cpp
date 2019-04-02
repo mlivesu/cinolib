@@ -1100,7 +1100,7 @@ bool AbstractPolyhedralMesh<M,V,E,F,C>::vert_is_manifold(const uint vid) const
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
-bool AbstractPolyhedralMesh<M,V,E,F,C>::edge_is_manifold(const uint eid) const
+bool AbstractPolyhedralMesh<M,V,E,F,C>::edge_is_manifold(const uint /*eid*/) const
 {
 //    // for each edge in the link, count how many faces in the link are incident to it
 //    std::unordered_map<uint,uint> e_count;
