@@ -16,7 +16,7 @@ and include in your C++ application the header files you need. A tutorial with d
 
 
 ## Acknowldegment
-If you use cinolib in your academic projects, please cite the library using the following 
+If you use cinolib in your academic projects, please consider citing the library using the following 
 BibTeX entry:
 
 ```bibtex
