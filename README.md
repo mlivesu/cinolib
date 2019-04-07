@@ -20,9 +20,12 @@ If you use cinolib in your academic projects, please cite the library using the 
 BibTeX entry:
 
 ```bibtex
-@misc{cinolib,
-  title  = {cinolib: a generic programming header only C++ library for processing polygonal and polyhedral meshes},
-  author = {Livesu, Marco},
-  note   = {https://github.com/mlivesu/cinolib/},
-  year   = {2017}}
+@article{cinolib,
+  title   = {cinolib: a generic programming header only C++ library for processing polygonal and polyhedral meshes},
+  author  = {Livesu, Marco},
+  journal = {Transactions on Computational Science},
+  series  = {Lecture Notes in Computer Science},
+  editor  = {Springer},
+  note    = {https://github.com/mlivesu/cinolib/},
+  year    = {2019 (to appear)}}
 ```
