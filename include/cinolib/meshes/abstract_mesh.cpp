@@ -183,7 +183,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 int AbstractMesh<M,V,E,P>::genus() const
 {
-    return Euler_characteristic() - 2;
+    return  (2 - Euler_characteristic())*0.5;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
