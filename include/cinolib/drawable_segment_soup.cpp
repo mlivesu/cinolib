@@ -88,6 +88,25 @@ void DrawableSegmentSoup::draw(const float scene_size) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void DrawableSegmentSoup::push_seg(const vec3d v0, const vec3d v1)
+{
+    push_back(v0);
+    push_back(v1);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableSegmentSoup::pop_seg()
+{
+    assert(size()>1);
+    pop_back();
+    pop_back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void DrawableSegmentSoup::set_cheap_rendering(const bool b)
 {
     use_gl_lines = b;

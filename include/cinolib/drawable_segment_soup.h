@@ -71,6 +71,11 @@ class DrawableSegmentSoup: public std::vector<vec3d>, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void push_seg(const vec3d v0, const vec3d v1);
+        void pop_seg();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         vec3d scene_center() const { return vec3d(); } // TODO
         float scene_radius() const { return 0.0;     }
 
