@@ -294,6 +294,69 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// Shortest path (with barriers on edges). The path cannot
+// pass throuh edges for which mask[e] = true
+//
+template<class M, class V, class E, class P>
+CINO_INLINE
+void dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
+                            const uint                    source,
+                            const uint                    dest,
+                            const std::vector<bool>     & mask, // if mask[e] = true, path cannot pass through edge e
+                                  std::vector<uint>     & path)
+{
+    path.clear();
+    assert(mask.size() == m.num_edges());
+
+    std::vector<int> prev(m.num_verts(), -1);
+
+    std::vector<double> dist(m.num_verts(), inf_double);
+    dist.at(source) = 0.0;
+
+    std::set<std::pair<double,uint>> active_set;
+    active_set.insert(std::make_pair(0.0,source));
+
+    while(!active_set.empty())
+    {
+        uint vid = active_set.begin()->second;
+        active_set.erase(active_set.begin());
+
+        if (vid==dest)
+        {
+            int tmp = vid;
+            do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
+            std::reverse(path.begin(), path.end());
+            return;
+        }
+
+        for(uint nbr : m.adj_v2v(vid))
+        {
+            int eid = m.edge_id(vid,nbr);
+            assert(eid>=0);
+
+            if(mask.at(eid)) continue;
+
+            double new_dist = dist.at(vid) + m.vert(vid).dist(m.vert(nbr));
+
+            if(dist.at(nbr) > new_dist)
+            {
+                if (dist.at(nbr) < inf_double) // otherwise it won't be found
+                {
+                    auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=active_set.end());
+                    active_set.erase(it);
+                }
+                dist.at(nbr) = new_dist;
+                prev.at(nbr) = vid;
+                active_set.insert(std::make_pair(new_dist,nbr));
+            }
+        }
+    }
+    assert(false && "Dijkstra did not converge!");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // Shortest path (with barriers and multiple destinations). The path
 // cannot pass throuh vertices for which mask[v] = true. The algorithm
 // stops as soon as it reaches one of the destinations

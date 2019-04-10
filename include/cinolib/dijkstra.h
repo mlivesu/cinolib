@@ -102,6 +102,16 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
                     std::vector<uint>     & path);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
+                            const uint                    source,
+                            const uint                    dest,
+                            const std::vector<bool>     & mask, // if mask[e] = true, path cannot pass through edge e
+                                  std::vector<uint>     & path);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //::::::::::::: DIJKSTRAs ON DUAL GRAPH (POLYGONS/POLYHEDRA) :::::::::::::
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
