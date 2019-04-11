@@ -78,7 +78,7 @@ Here is a list of the sample programs available in CinoLib.
 [<p align="left"><img src="snapshots/21_coarse_hex_layouts.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/21_coarse_hex_layouts)
 
 #### 22 - Remesh, preserving sharp creases and/or color patches
-[<p align="left"><img src="snapshots/22_remeshing.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/22_remeshing)
+[<p align="left"><img src="snapshots/22_remeshing.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/22_remesher)
 
 #### 23 - Find, adjust, and export sharp creases from a mesh
 [<p align="left"><img src="snapshots/23_sharp_creases.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/23_sharp_creases)
