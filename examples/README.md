@@ -21,96 +21,73 @@ Here is a list of the sample programs available in CinoLib.
 [<p align="left"><img src="snapshots/02_base_app_quadmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/02_base_app_quadmesh)
 
 #### 03 - Load and render a general polygonal mesh
-[<p align="left"><img src="snapshots/03_base_app_polygonmesh.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/blob/master/examples/03_base_app_polygonmesh)
+[<p align="left"><img src="snapshots/03_base_app_polygonmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/03_base_app_polygonmesh)
 
 #### 04 - Load and render a tetrahedral mesh
-[<p align="left"><img src="snapshots/04_base_app_tetmesh.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/blob/master/examples/04_base_app_tetmesh)
+[<p align="left"><img src="snapshots/04_base_app_tetmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/04_base_app_tetmesh)
 
 #### 05 - Load and render a hexahedral mesh
-[<p align="left"><img src="snapshots/05_base_app_hexmesh.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/05_base_app_hexmesh)
+[<p align="left"><img src="snapshots/05_base_app_hexmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/05_base_app_hexmesh)
 
 #### 06 - Load and render a general polyhedral mesh
-[<p align="left"><img src="snapshots/06_base_app_polyhedralmesh.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/06_base_app_polyhedralmesh)
+[<p align="left"><img src="snapshots/06_base_app_polyhedralmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/06_base_app_polyhedralmesh)
 
 #### 07 - Load and render a textured object in OBJ format
-[<p align="left"><img src="snapshots/07_textured_OBJs.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/07_textured_OBJs)
+[<p align="left"><img src="snapshots/07_textured_OBJs.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/07_textured_OBJs)
 
 #### 08 - Do vertex picking for interactive applications
-[<p align="left"><img src="snapshots/08_picking.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/08_picking)
+[<p align="left"><img src="snapshots/08_picking.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/08_picking)
 
 #### 09 - Compute n-harmonic functions on discrete surfaces
-[<p align="left"><img src="snapshots/09_polyharmonic_functions_srf.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/09_polyharmonic_functions_srf)
+[<p align="left"><img src="snapshots/09_polyharmonic_functions_srf.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/09_polyharmonic_functions_srf)
 
 #### 10 - Compute n-harmonic functions on discrete volumes
-[<p align="left"><img src="snapshots/10_polyharmonic_functions_vol.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/10_polyharmonic_functions_vol)
+[<p align="left"><img src="snapshots/10_polyharmonic_functions_vol.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/10_polyharmonic_functions_vol)
 
 #### 11 - Map a genus zero object to a sphere using conformalized mean curvature flow
-[<p align="left"><img src="snapshots/11_map_to_sphere.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/11_map_to_sphere)
+[<p align="left"><img src="snapshots/11_map_to_sphere.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/11_map_to_sphere)
 
 #### 12 - Generate triangular and polygonal tessellations of 2D domains
-[<p align="left"><img src="snapshots/12_polygon_mesh_generation.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/12_polygon_mesh_generation)
+[<p align="left"><img src="snapshots/12_polygon_mesh_generation.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/12_polygon_mesh_generation)
 
 #### 13 - Generate tetrahedral and polyhedral tessellations of 3D domains
-[<p align="left"><img src="snapshots/13_polyhedral_mesh_generation.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/13_polyhedral_mesh_generation)
+[<p align="left"><img src="snapshots/13_polyhedral_mesh_generation.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/13_polyhedral_mesh_generation)
 
 #### 14 - Compute geodesic distances using the heat flow method
-[<p align="left"><img src="snapshots/14_heat_based_geodesics.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/14_heat_based_geodesics)
+[<p align="left"><img src="snapshots/14_heat_based_geodesics.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/14_heat_based_geodesics)
 
 #### 15 - Compute kernels, incircles and circumcircles of 2D polygons
-[<p align="left"><img src="snapshots/15_polygon_measures.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/15_polygon_measures)
+[<p align="left"><img src="snapshots/15_polygon_measures.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/15_polygon_measures)
 
 #### 16 - Use spherical Fibonacci to evenly sample the unit sphere
-[<p align="left"><img src="snapshots/16_sphere_sampling.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/16_sphere_sampling)
+[<p align="left"><img src="snapshots/16_sphere_sampling.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/16_sphere_sampling)
 
 #### 17 - Extract (and tessellate) ISO contours on surface meshes
-[<p align="left"><img src="snapshots/17_iso_contours.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/17_iso_contours)
+[<p align="left"><img src="snapshots/17_iso_contours.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/17_iso_contours)
 
 #### 18 - Extract  (and tessellate) ISO surfaces on tetrahedral meshes
-[<p align="left"><img src="snapshots/18_iso_surfaces.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/18_iso_surfaces)
+[<p align="left"><img src="snapshots/18_iso_surfaces.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/18_iso_surfaces)
 
 #### 19 - Compute discrete harmonic maps
-[<p align="left"><img src="snapshots/19_harmonic_map.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/19_harmonic_map)
+[<p align="left"><img src="snapshots/19_harmonic_map.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/19_harmonic_map)
 
 #### 20 - Compute coarse layouts of quadrilateral meshes
-[<p align="left"><img src="snapshots/20_coarse_quad_layouts.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/20_coarse_quad_layouts)
+[<p align="left"><img src="snapshots/20_coarse_quad_layouts.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/20_coarse_quad_layouts)
 
 #### 21 - Compute coarse layouts of hexahedral meshes
-[<p align="left"><img src="snapshots/21_coarse_hex_layouts.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/21_coarse_hex_layouts)
+[<p align="left"><img src="snapshots/21_coarse_hex_layouts.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/21_coarse_hex_layouts)
 
 #### 22 - Remesh, preserving sharp creases and/or color patches
-[<p align="left"><img src="snapshots/22_remeshing.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/22_remeshing)
+[<p align="left"><img src="snapshots/22_remeshing.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/22_remeshing)
 
 #### 23 - Find, adjust, and export sharp creases from a mesh
-[<p align="left"><img src="snapshots/23_sharp_creases.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/23_sharp_creases)
+[<p align="left"><img src="snapshots/23_sharp_creases.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/23_sharp_creases)
 
 #### 24 - Read and visualize a sliced object for 3D printing
-[<p align="left"><img src="snapshots/24_sliced_obj.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/24_sliced_obj)
+[<p align="left"><img src="snapshots/24_sliced_obj.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/24_sliced_obj)
 
 #### 25 - Paint on a 3D surface using brushes of different sizes
-[<p align="left"><img src="snapshots/25_surface_painter.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/25_surface_painter)
+[<p align="left"><img src="snapshots/25_surface_painter.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/25_surface_painter)
 
 #### 26 - Export the skin of a volumetric mesh to a surface mesh (command line tool)
 
@@ -119,14 +96,12 @@ Here is a list of the sample programs available in CinoLib.
 #### 28 - Wrap tetgen to tetrahedralize a PLC in any file format supported by cinolib (command line tool)
 
 #### 29 - Use ambient occlusion for realistic yet more revealing snapshots
-[<p align="left"><img src="snapshots/29_ambient_occlusion.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/29_ambient_occlusion)
+[<p align="left"><img src="snapshots/29_ambient_occlusion.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/29_ambient_occlusion)
 
 #### 30 - Convert all supported meshes from one file format to another (command line tool)
 
 #### 31 - Compute a Least Squares Conformal Map (LSCM)
-[<p align="left"><img src="snapshots/31_LSCM.png" width="500"></p>]
-(https://github.com/mlivesu/cinolib/tree/master/examples/31_LSCM)
+[<p align="left"><img src="snapshots/31_LSCM.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/31_LSCM)
 
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
