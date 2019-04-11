@@ -46,6 +46,16 @@ int main(int argc, char **argv)
     m.show_wireframe(false);
     gui.push_obj(&m);
 
+    Profiler profiler;
+    std::vector<std::vector<uint>> basis;
+    std::vector<bool> tree, cotree;
+
+    profiler.push("Homotopy basis");
+    homotopy_basis(m, basis, tree, cotree);
+    profiler.pop();
+
+    // Visualization part
+
     DrawableSegmentSoup ss_basis;
     ss_basis.set_cheap_rendering(true);
     ss_basis.set_color(Color::BLACK());
@@ -61,14 +71,6 @@ int main(int argc, char **argv)
     ss_tree.set_cheap_rendering(true);
     ss_tree.set_color(Color::RED());
     ss_tree.set_thickness(3);
-
-    Profiler profiler;
-    std::vector<std::vector<uint>> basis;
-    std::vector<bool> tree, cotree;
-
-    profiler.push("Homotopy basis");
-    homotopy_basis(m, basis, tree, cotree);
-    profiler.pop();
 
     for(auto loop : basis)
     for(uint i=0; i<loop.size(); ++i)
