@@ -69,6 +69,7 @@ void DrawableSegmentSoup::draw(const float scene_size) const
     }
     else
     {
+        glLineWidth(thickness);
         glDisable(GL_LIGHTING);
         glColor3fv(color.rgba);
         for(uint i=0; i<size()/2; ++i)
