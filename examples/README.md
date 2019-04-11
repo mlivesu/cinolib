@@ -103,6 +103,9 @@ Here is a list of the sample programs available in CinoLib.
 #### 31 - Compute a Least Squares Conformal Map (LSCM)
 [<p align="left"><img src="snapshots/31_LSCM.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/31_LSCM)
 
+#### 32 - Compute a homotopy basis using the tree-cotree algorithm
+[<p align="left"><img src="snapshots/32_homotopy_basis.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/32_homotopy_basis)
+
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 

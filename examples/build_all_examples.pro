@@ -47,3 +47,4 @@ SUBDIRS += 28_tetrahedralize            # requires Tetgen (http://wias-berlin.de
 SUBDIRS += 29_ambient_occlusion
 SUBDIRS += 30_file_converter            # OPTIONALLY requires VTK (https://www.vtk.org/)
 SUBDIRS += 31_LSCM
+SUBDIRS += 32_homotopy_basis
