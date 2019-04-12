@@ -101,7 +101,7 @@ int main(int argc, char **argv)
 
     QCheckBox::connect(&cb_tree, &QCheckBox::stateChanged, [&]()
     {
-        if(cb_tree.isChecked()) gui.push_obj(&ss_tree);
+        if(cb_tree.isChecked()) gui.push_obj(&ss_tree, false);
         else                    gui.pop(&ss_tree);
         gui.updateGL();
     });
@@ -110,8 +110,8 @@ int main(int argc, char **argv)
 
     QCheckBox::connect(&cb_cotree, &QCheckBox::stateChanged, [&]()
     {
-        if(cb_cotree.isChecked()) gui.push_obj(&ss_cotree);
-        else                     gui.pop(&ss_cotree);
+        if(cb_cotree.isChecked()) gui.push_obj(&ss_cotree, false);
+        else                      gui.pop(&ss_cotree);
         gui.updateGL();
     });
 
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 
     QCheckBox::connect(&cb_basis, &QCheckBox::stateChanged, [&]()
     {
-        if(cb_basis.isChecked()) gui.push_obj(&ss_basis);
+        if(cb_basis.isChecked()) gui.push_obj(&ss_basis, false);
         else                     gui.pop(&ss_basis);
         gui.updateGL();
     });
