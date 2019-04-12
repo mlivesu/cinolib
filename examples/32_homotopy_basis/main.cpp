@@ -57,9 +57,9 @@ int main(int argc, char **argv)
     // Visualization part
 
     DrawableSegmentSoup ss_basis;
-    ss_basis.set_cheap_rendering(true);
+    ss_basis.set_cheap_rendering(false);
     ss_basis.set_color(Color::BLACK());
-    ss_basis.set_thickness(3);
+    ss_basis.set_thickness(2);
     gui.push_obj(&ss_basis);
 
     DrawableSegmentSoup ss_cotree;
