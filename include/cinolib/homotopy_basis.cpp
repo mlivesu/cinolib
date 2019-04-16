@@ -128,9 +128,13 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
     // start from each edge in loop generator and close a loop with its two endpoints
     for(uint eid : generators)
     {
-        std::vector<uint> loop;
-        dijkstra_mask_on_edges(m, m.edge_vert_id(eid,0), m.edge_vert_id(eid,1), edge_mask, loop);
-        basis.push_back(loop);
+        std::vector<uint> e0_to_root, e1_to_root;
+        dijkstra_mask_on_edges(m, m.edge_vert_id(eid,0), 0, edge_mask, e0_to_root);
+        dijkstra_mask_on_edges(m, m.edge_vert_id(eid,1), 0, edge_mask, e1_to_root);
+        e1_to_root.pop_back();
+        std::reverse(e1_to_root.begin(), e1_to_root.end());
+        std::copy(e1_to_root.begin(), e1_to_root.end(), std::back_inserter(e0_to_root));
+        basis.push_back(e0_to_root);
     }
 }
 
