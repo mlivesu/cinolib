@@ -213,6 +213,121 @@ bool Trimesh<M,V,E,P>::edge_is_geometrically_collapsible(const uint eid, const d
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
+{
+    uint v0 = this->vert_shared(eid0, eid1);
+    uint v1 = this->vert_add(vec3d(0,0,0));
+
+    // bi-partition the umbrella around the two edges
+    std::vector<uint> p_ring = this->vert_ordered_polys_star(v0);
+    std::vector<uint> pids0, pids1;
+    bool push0 = true;
+    for(uint i=0; i<p_ring.size(); ++i)
+    {
+        uint curr = p_ring.at(i);
+        uint next = p_ring.at((i+1)%p_ring.size());
+         int eid  = this->edge_shared(curr,next);
+        assert(eid>=0);
+
+        if(push0) pids0.push_back(curr);
+        else      pids1.push_back(curr);
+
+        if((uint)eid==eid0 || (uint)eid==eid1) push0 = !push0;
+    }
+    assert(pids0.size() + pids1.size() == p_ring.size());
+    assert(!p_ring.empty());
+
+    // put left and right verts at the centroid of their reference polys
+    vec3d xyz0(0,0,0);
+    vec3d xyz1(0,0,0);
+    for(uint pid : pids0) xyz0 += this->poly_centroid(pid);
+    for(uint pid : pids1) xyz1 += this->poly_centroid(pid);
+    if(!pids0.empty()) xyz0 /= static_cast<double>(pids0.size()); else xyz0 = this->vert(v0);
+    if(!pids1.empty()) xyz1 /= static_cast<double>(pids1.size()); else xyz1 = this->vert(v0);
+    this->vert(v0) = xyz0;
+    this->vert(v1) = xyz1;
+
+    // tessellate the quad-like hole
+    uint v2 = this->vert_opposite_to(eid0, v0);
+    uint v3 = this->vert_opposite_to(eid1, v0);
+    uint p0 = this->poly_add({v0, v1, v2});
+    uint p1 = this->poly_add({v1, v0, v3});
+    this->poly_data(p0).color = Color::PASTEL_RED();
+    this->poly_data(p1).color = Color::PASTEL_RED();
+
+    for(uint pid : pids0)
+    {
+        this->update_p_normal(pid);
+        this->poly_data(pid).color = Color::PASTEL_YELLOW();
+    }
+    this->update_v_normal(v0);
+
+    for(uint pid : pids1)
+    {
+        auto v_list = this->poly_verts_id(pid);
+        for(uint & v : v_list) if(v==v0) v = v1;
+        uint new_pid = this->poly_add(v_list);
+        this->poly_data(new_pid) = this->poly_data(pid);
+        this->update_p_normal(new_pid);
+        this->poly_data(new_pid).color = Color::PASTEL_CYAN();
+    }
+    this->update_v_normal(v1);
+
+    this->polys_remove(pids1);
+    return v1;
+
+//    // determine which group of polys (left or right) should connect to the new vertex (new_vert)
+//    // (this is a trivial heuristic based on p2p distances)
+//    if(left.empty())
+//    {
+//        // do nothing
+//    }
+//    else if(right.empty())
+//    {
+//        // swap left and right (the right set of polys is the one that will take the new vertex)
+//        std::swap(left, right);
+//    }
+//    else
+//    {
+//        double sum_left    = 0;
+//        double sum_right   = 0;
+//        for(uint pid : left)  sum_left  += new_vert.dist(this->poly_centroid(pid));
+//        for(uint pid : right) sum_right += new_vert.dist(this->poly_centroid(pid));
+//        sum_left  /= static_cast<double>(left.size());
+//        sum_right /= static_cast<double>(right.size());
+//        // swap left and right (the right set of polys is the one that will take the new vertex)
+//        if(sum_left < sum_right) std::swap(left, right);
+//    }
+
+//    // the right set of polys will connect to the new vertex
+//    uint new_vid = this->vert_add(new_vert);
+//    for(uint pid : right)
+//    {
+//        auto v_list = this->poly_verts_id(pid);
+//        for(uint & v : v_list) if(v==vid_left) v = new_vid;
+//        uint new_pid = this->poly_add(v_list);
+//        this->poly_data(new_pid) = this->poly_data(pid);
+//        this->update_p_normal(new_pid);
+//        this->poly_data(new_pid).color = Color::PASTEL_CYAN();
+//    }
+//    this->update_v_normal(new_vid);
+
+//    // update normal for the left part, remove the old polys, and return
+//    for(uint pid : left)
+//    {
+//        this->update_p_normal(pid);
+//        this->poly_data(pid).color = Color::PASTEL_YELLOW();
+//    }
+//    this->update_v_normal(vid_left);
+//    this->polys_remove(right);
+//    return new_vid;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const double topologic_check, const double geometric_check)
 {
     if(topologic_check && !edge_is_topologically_collapsible(eid))         return -1;
