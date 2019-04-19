@@ -225,14 +225,14 @@ int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
     for(uint i=0; i<p_ring.size(); ++i)
     {
         uint curr = p_ring.at(i);
-        uint next = p_ring.at((i+1)%p_ring.size());
-         int eid  = this->edge_shared(curr,next);
-        assert(eid>=0);
-
         if(push0) pids0.push_back(curr);
         else      pids1.push_back(curr);
-
-        if((uint)eid==eid0 || (uint)eid==eid1) push0 = !push0;
+        if(i<p_ring.size()-1)
+        {
+            uint next = p_ring.at(i+1);
+             int eid  = this->edge_shared(curr,next); assert(eid>=0);
+            if((uint)eid==eid0 || (uint)eid==eid1) push0 = !push0;
+        }
     }
     assert(pids0.size() + pids1.size() == p_ring.size());
     assert(!p_ring.empty());
