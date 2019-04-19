@@ -275,52 +275,6 @@ int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
 
     this->polys_remove(pids1);
     return v1;
-
-//    // determine which group of polys (left or right) should connect to the new vertex (new_vert)
-//    // (this is a trivial heuristic based on p2p distances)
-//    if(left.empty())
-//    {
-//        // do nothing
-//    }
-//    else if(right.empty())
-//    {
-//        // swap left and right (the right set of polys is the one that will take the new vertex)
-//        std::swap(left, right);
-//    }
-//    else
-//    {
-//        double sum_left    = 0;
-//        double sum_right   = 0;
-//        for(uint pid : left)  sum_left  += new_vert.dist(this->poly_centroid(pid));
-//        for(uint pid : right) sum_right += new_vert.dist(this->poly_centroid(pid));
-//        sum_left  /= static_cast<double>(left.size());
-//        sum_right /= static_cast<double>(right.size());
-//        // swap left and right (the right set of polys is the one that will take the new vertex)
-//        if(sum_left < sum_right) std::swap(left, right);
-//    }
-
-//    // the right set of polys will connect to the new vertex
-//    uint new_vid = this->vert_add(new_vert);
-//    for(uint pid : right)
-//    {
-//        auto v_list = this->poly_verts_id(pid);
-//        for(uint & v : v_list) if(v==vid_left) v = new_vid;
-//        uint new_pid = this->poly_add(v_list);
-//        this->poly_data(new_pid) = this->poly_data(pid);
-//        this->update_p_normal(new_pid);
-//        this->poly_data(new_pid).color = Color::PASTEL_CYAN();
-//    }
-//    this->update_v_normal(new_vid);
-
-//    // update normal for the left part, remove the old polys, and return
-//    for(uint pid : left)
-//    {
-//        this->update_p_normal(pid);
-//        this->poly_data(pid).color = Color::PASTEL_YELLOW();
-//    }
-//    this->update_v_normal(vid_left);
-//    this->polys_remove(right);
-//    return new_vid;
 }
 
 
