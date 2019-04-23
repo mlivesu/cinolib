@@ -247,14 +247,6 @@ int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
     this->vert(v0) = xyz0;
     this->vert(v1) = xyz1;
 
-    // tessellate the quad-like hole
-    uint v2 = this->vert_opposite_to(eid0, v0);
-    uint v3 = this->vert_opposite_to(eid1, v0);
-    uint p0 = this->poly_add({v0, v1, v2});
-    uint p1 = this->poly_add({v1, v0, v3});
-    this->poly_data(p0).color = Color::PASTEL_RED();
-    this->poly_data(p1).color = Color::PASTEL_RED();
-
     for(uint pid : pids0)
     {
         this->update_p_normal(pid);
@@ -272,8 +264,36 @@ int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
         this->poly_data(new_pid).color = Color::PASTEL_CYAN();
     }
     this->update_v_normal(v1);
-
     this->polys_remove(pids1);
+
+    // tessellate the quad-like hole
+    uint v2 = this->vert_opposite_to(eid0, v0);
+    uint v3 = this->vert_opposite_to(eid1, v0);
+    assert(this->adj_e2p(eid0).size()==1);
+    assert(this->adj_e2p(eid1).size()==1);
+    uint p0 = this->adj_e2p(eid0).front();
+    uint p1 = this->adj_e2p(eid1).front();
+    if(this->poly_verts_are_CCW(p0, v0, v2))
+    {
+        uint pid = this->poly_add({v0, v2, v1});
+        this->poly_data(pid).color = Color::PASTEL_RED();
+    }
+    else
+    {
+        uint pid = this->poly_add({v2, v0, v1});
+        this->poly_data(pid).color = Color::PASTEL_RED();
+    }
+    if(this->poly_verts_are_CCW(p1, v0, v3))
+    {
+        uint pid = this->poly_add({v0, v3, v1});
+        this->poly_data(pid).color = Color::PASTEL_RED();
+    }
+    else
+    {
+        uint pid = this->poly_add({v3, v0, v1});
+        this->poly_data(pid).color = Color::PASTEL_RED();
+    }
+
     return v1;
 }
 
