@@ -214,7 +214,7 @@ bool Trimesh<M,V,E,P>::edge_is_geometrically_collapsible(const uint eid, const d
 template<class M, class V, class E, class P>
 CINO_INLINE
 int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
-{
+{    
     uint v0 = this->vert_shared(eid0, eid1);
     uint v1 = this->vert_add(vec3d(0,0,0));
 
@@ -270,31 +270,15 @@ int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
     uint v2 = this->vert_opposite_to(eid0, v0);
     uint v3 = this->vert_opposite_to(eid1, v0);
     assert(this->adj_e2p(eid0).size()==1);
-    assert(this->adj_e2p(eid1).size()==1);
-    uint p0 = this->adj_e2p(eid0).front();
-    uint p1 = this->adj_e2p(eid1).front();
-    if(this->poly_verts_are_CCW(p0, v0, v2))
-    {
-        uint pid = this->poly_add({v0, v2, v1});
-        this->poly_data(pid).color = Color::PASTEL_RED();
-    }
-    else
-    {
-        uint pid = this->poly_add({v2, v0, v1});
-        this->poly_data(pid).color = Color::PASTEL_RED();
-    }
-    if(this->poly_verts_are_CCW(p1, v0, v3))
-    {
-        uint pid = this->poly_add({v0, v3, v1});
-        this->poly_data(pid).color = Color::PASTEL_RED();
-    }
-    else
-    {
-        uint pid = this->poly_add({v3, v0, v1});
-        this->poly_data(pid).color = Color::PASTEL_RED();
-    }
+    uint vid_new = v1;
+    uint ref_pid = this->adj_e2p(eid0).front();
+    if(this->poly_verts_are_CCW(ref_pid, v0, v2)) std::swap(v0,v1);
+    uint pid0 = this->poly_add({v2, v0, v1});
+    uint pid1 = this->poly_add({v3, v1, v0});
+    this->poly_data(pid0).color = Color::PASTEL_RED();
+    this->poly_data(pid1).color = Color::PASTEL_RED();
 
-    return v1;
+    return vid_new;
 }
 
 
