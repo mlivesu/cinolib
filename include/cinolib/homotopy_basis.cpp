@@ -42,10 +42,11 @@ namespace cinolib
 template<class M, class V, class E, class P>
 CINO_INLINE
 void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
+                    const uint                       root,
                     std::vector<std::vector<uint>> & basis)
 {
     std::vector<bool> tree, cotree;
-    homotopy_basis(m, basis, tree, cotree);
+    homotopy_basis(m, root, basis, tree, cotree);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -53,22 +54,23 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
 template<class M, class V, class E, class P>
 CINO_INLINE
 void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
+                    const uint                      root,
                     std::vector<std::vector<uint>> & basis,
                     std::vector<bool>              & tree,
                     std::vector<bool>              & cotree)
 {
+    assert(root<m.num_verts());
+
     basis.clear();
     tree   = std::vector<bool>(m.num_edges(), false);
     cotree = std::vector<bool>(m.num_edges(), false);
-
-    if(m.num_verts()==0) return;
 
     m.vert_unmark_all();
     m.poly_unmark_all();
 
     std::queue<uint> q;
-    q.push(0);
-    m.vert_data(0).marked = true;
+    q.push(root);
+    m.vert_data(root).marked = true;
 
     while(!q.empty())
     {
@@ -89,8 +91,9 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
     }
 
     assert(q.empty());
-    q.push(0);
-    m.poly_data(0).marked = true;
+    uint pid = m.adj_v2p(root).front();
+    q.push(pid);
+    m.poly_data(pid).marked = true;
 
     while(!q.empty())
     {
@@ -129,8 +132,8 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
     for(uint eid : generators)
     {
         std::vector<uint> e0_to_root, e1_to_root;
-        dijkstra_mask_on_edges(m, m.edge_vert_id(eid,0), 0, edge_mask, e0_to_root);
-        dijkstra_mask_on_edges(m, m.edge_vert_id(eid,1), 0, edge_mask, e1_to_root);
+        dijkstra_mask_on_edges(m, m.edge_vert_id(eid,0), root, edge_mask, e0_to_root);
+        dijkstra_mask_on_edges(m, m.edge_vert_id(eid,1), root, edge_mask, e1_to_root);
         e1_to_root.pop_back();
         std::reverse(e1_to_root.begin(), e1_to_root.end());
         std::copy(e1_to_root.begin(), e1_to_root.end(), std::back_inserter(e0_to_root));

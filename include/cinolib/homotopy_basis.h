@@ -59,6 +59,7 @@ namespace cinolib
 template<class M, class V, class E, class P>
 CINO_INLINE
 void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
+                    const uint                       root,
                     std::vector<std::vector<uint>> & basis);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -66,6 +67,7 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
 template<class M, class V, class E, class P>
 CINO_INLINE
 void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
+                    const uint                      root,
                     std::vector<std::vector<uint>> & basis,
                     std::vector<bool>              & tree,
                     std::vector<bool>              & cotree);

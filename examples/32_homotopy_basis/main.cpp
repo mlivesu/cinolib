@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     std::vector<bool> tree, cotree;
 
     profiler.push("Homotopy basis");
-    homotopy_basis(m, basis, tree, cotree);
+    homotopy_basis(m, 0, basis, tree, cotree);
     profiler.pop();
 
     // Visualization part
