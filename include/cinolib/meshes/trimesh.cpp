@@ -218,7 +218,7 @@ int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
     uint v0 = this->vert_shared(eid0, eid1);
     uint v1 = this->vert_add(vec3d(0,0,0));
 
-    // bi-partition the umbrella around the two edges
+    // bi-partition the umbrella around the two split edges
     std::vector<uint> p_ring = this->vert_ordered_polys_star(v0);
     std::vector<uint> pids0, pids1;
     bool push0 = true;
@@ -238,6 +238,7 @@ int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
     assert(!p_ring.empty());
 
     // put left and right verts at the centroid of their reference polys
+    // WARNING: not ideal for highly non planar umbrellas. should rather project on the actual surface
     vec3d xyz0(0,0,0);
     vec3d xyz1(0,0,0);
     for(uint pid : pids0) xyz0 += this->poly_centroid(pid);
@@ -247,13 +248,7 @@ int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
     this->vert(v0) = xyz0;
     this->vert(v1) = xyz1;
 
-    for(uint pid : pids0)
-    {
-        this->update_p_normal(pid);
-        this->poly_data(pid).color = Color::PASTEL_YELLOW();
-    }
-    this->update_v_normal(v0);
-
+    for(uint pid : pids0) this->update_p_normal(pid);
     for(uint pid : pids1)
     {
         auto v_list = this->poly_verts_id(pid);
@@ -261,8 +256,8 @@ int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
         uint new_pid = this->poly_add(v_list);
         this->poly_data(new_pid) = this->poly_data(pid);
         this->update_p_normal(new_pid);
-        this->poly_data(new_pid).color = Color::PASTEL_CYAN();
     }
+    this->update_v_normal(v0);
     this->update_v_normal(v1);
     this->polys_remove(pids1);
 
@@ -273,10 +268,8 @@ int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
     uint vid_new = v1;
     uint ref_pid = this->adj_e2p(eid0).front();
     if(this->poly_verts_are_CCW(ref_pid, v0, v2)) std::swap(v0,v1);
-    uint pid0 = this->poly_add({v2, v0, v1});
-    uint pid1 = this->poly_add({v3, v1, v0});
-    this->poly_data(pid0).color = Color::PASTEL_RED();
-    this->poly_data(pid1).color = Color::PASTEL_RED();
+    this->poly_add({v2, v0, v1});
+    this->poly_add({v3, v1, v0});
 
     return vid_new;
 }
