@@ -37,12 +37,17 @@
 #define CINO_HOMOTOPY_BASIS_H
 
 #include <cinolib/meshes/abstract_polygonmesh.h>
+#include <cinolib/meshes/trimesh.h>
 
 namespace cinolib
 {
 
 /* Compute the greedy homotopy basis of a surface mesh M
  * using the algorithm described in:
+ *
+ *   Dynamic Generators of Topologically Embedded Graphs
+ *   David Eppstein
+ *   ACM-SIAM Symposium on Discrete algorithms, 2003
  *
  *   Greedy optimal homotopy and homology generators
  *   Jeff Erickson and Kim Whittlesey
@@ -58,9 +63,10 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
+void homotopy_basis(Trimesh<M,V,E,P>               & m,
                     const uint                       root,
-                    std::vector<std::vector<uint>> & basis);
+                    std::vector<std::vector<uint>> & basis,
+                    const bool                       detach_loops); // refine the mesh to make sure each edge is contained in at most one basis loop
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -71,6 +77,7 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
                     std::vector<std::vector<uint>> & basis,
                     std::vector<bool>              & tree,
                     std::vector<bool>              & cotree);
+
 }
 
 #ifndef  CINO_STATIC_LIB
