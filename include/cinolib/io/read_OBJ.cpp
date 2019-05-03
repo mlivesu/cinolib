@@ -42,7 +42,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/io/read_OBJ.h>
-#include <cinolib/cut_along_seams.h>
+#include <cinolib/to_openGL_unified_verts.h>
 #include <cinolib/string_utilities.h>
 #include <sstream>
 #include <string.h>
@@ -94,7 +94,7 @@ void read_OBJ(const char                     * filename,
 
     if (poly_pos.size() == poly_tex.size())
     {
-        cut_mesh_along_seams(pos, tex, poly_pos, poly_tex, xyz, uvw, poly);
+        to_openGL_unified_verts(pos, tex, poly_pos, poly_tex, xyz, uvw, poly);
     }
 }
 

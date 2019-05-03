@@ -33,8 +33,8 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_CUT_ALONG_SEAMS_H
-#define CINO_CUT_ALONG_SEAMS_H
+#ifndef CINO_TO_OPENGL_UNIFIED_VERTS_H
+#define CINO_TO_OPENGL_UNIFIED_VERTS_H
 
 #include <sys/types.h>
 #include <vector>
@@ -53,31 +53,31 @@ namespace cinolib
 */
 
 CINO_INLINE
-void cut_mesh_along_seams(const std::vector<vec3d>             & v_attr_0,          // xyz or uvw or nor
-                          const std::vector<vec3d>             & v_attr_1,          // xyz or uvw or nor
-                          const std::vector<std::vector<uint>> & v2v_v_attr_0,      // connectivity attr #0
-                          const std::vector<std::vector<uint>> & v2v_v_attr_1,      // connectivity attr #1
-                                std::vector<vec3d>             & unified_v_attr_0,
-                                std::vector<vec3d>             & unified_v_attr_1,
-                                std::vector<std::vector<uint>> & unified_v2v);
+void to_openGL_unified_verts(const std::vector<vec3d>             & v_attr_0,          // xyz or uvw or nor
+                             const std::vector<vec3d>             & v_attr_1,          // xyz or uvw or nor
+                             const std::vector<std::vector<uint>> & v2v_v_attr_0,      // connectivity attr #0
+                             const std::vector<std::vector<uint>> & v2v_v_attr_1,      // connectivity attr #1
+                                   std::vector<vec3d>             & unified_v_attr_0,
+                                   std::vector<vec3d>             & unified_v_attr_1,
+                                   std::vector<std::vector<uint>> & unified_v2v);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void cut_mesh_along_seams(const std::vector<vec3d>             & v_attr_0,
-                          const std::vector<vec3d>             & v_attr_1,
-                          const std::vector<vec3d>             & v_attr_2,
-                          const std::vector<std::vector<uint>> & v2v_attr_0,
-                          const std::vector<std::vector<uint>> & v2v_attr_1,
-                          const std::vector<std::vector<uint>> & v2v_attr_2,
-                                std::vector<vec3d>             & unified_v_attr_0,
-                                std::vector<vec3d>             & unified_v_attr_1,
-                                std::vector<vec3d>             & unified_v_attr_2,
-                                std::vector<std::vector<uint>> & unified_v2v);
+void to_openGL_unified_verts(const std::vector<vec3d>             & v_attr_0,
+                             const std::vector<vec3d>             & v_attr_1,
+                             const std::vector<vec3d>             & v_attr_2,
+                             const std::vector<std::vector<uint>> & v2v_attr_0,
+                             const std::vector<std::vector<uint>> & v2v_attr_1,
+                             const std::vector<std::vector<uint>> & v2v_attr_2,
+                                   std::vector<vec3d>             & unified_v_attr_0,
+                                   std::vector<vec3d>             & unified_v_attr_1,
+                                   std::vector<vec3d>             & unified_v_attr_2,
+                                   std::vector<std::vector<uint>> & unified_v2v);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "cut_along_seams.cpp"
+#include "to_openGL_unified_verts.cpp"
 #endif
 
-#endif // CINO_CUT_ALONG_SEAMS_H
+#endif // CINO_TO_OPENGL_UNIFIED_VERTS_H

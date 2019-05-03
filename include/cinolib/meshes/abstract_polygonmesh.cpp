@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/meshes/abstract_polygonmesh.h>
-#include <cinolib/cut_along_seams.h>
+#include <cinolib/to_openGL_unified_verts.h>
 #include <cinolib/io/read_write.h>
 #include <cinolib/quality.h>
 #include <cinolib/stl_container_utilities.h>
@@ -184,7 +184,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
     {
         std::vector<vec3d> tmp_xyz, tmp_uvw, tmp_nor;
         std::vector<std::vector<uint>> tmp_poly;
-        cut_mesh_along_seams(pos, tex, nor, poly_pos, poly_tex, poly_nor, tmp_xyz, tmp_uvw, tmp_nor, tmp_poly);
+        to_openGL_unified_verts(pos, tex, nor, poly_pos, poly_tex, poly_nor, tmp_xyz, tmp_uvw, tmp_nor, tmp_poly);
         pos      = tmp_xyz;
         tex      = tmp_uvw;
         nor      = tmp_nor;
@@ -194,7 +194,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
     {
         std::vector<vec3d> tmp_xyz, tmp_uvw;
         std::vector<std::vector<uint>> tmp_poly;
-        cut_mesh_along_seams(pos, tex, poly_pos, poly_tex, tmp_xyz, tmp_uvw, tmp_poly);
+        to_openGL_unified_verts(pos, tex, poly_pos, poly_tex, tmp_xyz, tmp_uvw, tmp_poly);
         pos      = tmp_xyz;
         tex      = tmp_uvw;
         poly_pos = tmp_poly;
@@ -203,7 +203,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
     {
         std::vector<vec3d> tmp_xyz, tmp_nor;
         std::vector<std::vector<uint>> tmp_poly;
-        cut_mesh_along_seams(pos, tex, poly_pos, poly_tex, tmp_xyz, tmp_nor, tmp_poly);
+        to_openGL_unified_verts(pos, tex, poly_pos, poly_tex, tmp_xyz, tmp_nor, tmp_poly);
         pos      = tmp_xyz;
         nor      = tmp_nor;
         poly_pos = tmp_poly;
