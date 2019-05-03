@@ -27,5 +27,5 @@ BibTeX entry:
   series  = {Lecture Notes in Computer Science},
   editor  = {Springer},
   note    = {https://github.com/mlivesu/cinolib/},
-  year    = {2019 (to appear)}}
+  year    = {2019}}
 ```
