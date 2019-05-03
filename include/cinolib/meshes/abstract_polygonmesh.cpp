@@ -734,6 +734,57 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_boundary_edges(const uint v
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::vert_cluster_one_ring(const uint                       vid,
+                                                         std::vector<std::vector<uint>> & clusters,
+                                                         const bool                       marked_edges_are_borders)
+{
+    /* separate the polys incident to vid in clusters. Clusters are naturally separated
+     * by boundary edges, but also marked edges can be optionally considered as barriers
+     */
+    clusters.clear();
+    std::unordered_set<uint> visited;
+
+    for(uint pid : this->adj_v2p(vid))
+    {
+        if(CONTAINS(visited, pid)) continue;
+        visited.insert(pid);
+
+        std::vector<uint> c;
+        c.push_back(pid);
+
+        std::queue<uint> q;
+        q.push(pid);
+
+        while(!q.empty())
+        {
+            uint pid = q.front();
+            q.pop();
+
+            for(uint nbr : this->adj_p2p(pid))
+            {
+                if(!this->poly_contains_vert(nbr,vid)) continue; // not in the umbrella
+                if(CONTAINS(visited,nbr)) continue; // already visited
+
+                uint eid   = this->edge_shared(pid,nbr);
+                bool flood = true;
+                if(marked_edges_are_borders && this->edge_data(eid).marked) flood = false;
+
+                if(flood)
+                {
+                    visited.insert(nbr);
+                    q.push(nbr);
+                    c.push_back(nbr);
+                }
+            }
+        }
+        clusters.push_back(c);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_adj_visible_polys(const uint vid, const vec3d dir, const double ang_thresh)
 {
     std::vector<uint> nbrs;
