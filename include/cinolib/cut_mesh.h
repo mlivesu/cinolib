@@ -37,6 +37,7 @@
 #define CINO_CUT_MESH_H
 
 #include <cinolib/meshes/abstract_polygonmesh.h>
+#include <unordered_map>
 
 namespace cinolib
 {
@@ -45,10 +46,16 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void cut_mesh_along_marked_edges(AbstractPolygonMesh<M,V,E,P> & m);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void cut_mesh_along_marked_edges(AbstractPolygonMesh<M,V,E,P>               & m,
+                                 std::unordered_map<uint,std::vector<uint>> & v_map);
 }
 
 #ifndef  CINO_STATIC_LIB
 #include "cut_mesh.cpp"
 #endif
 
-#endif // CINO_MESH_H
+#endif // CINO_CUT_MESH_H

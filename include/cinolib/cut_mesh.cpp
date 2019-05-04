@@ -40,6 +40,43 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void cut_mesh_along_marked_edges(AbstractPolygonMesh<M,V,E,P>               & m,
+                                 std::unordered_map<uint,std::vector<uint>> & v_map)
+{
+    m.vert_unmark_all();
+    v_map.clear();
+
+    uint nv = m.num_verts();
+    for(uint vid=0; vid<nv; ++vid)
+    {
+        if(m.vert_data(vid).marked) continue;
+        m.vert_data(vid).marked = true;
+
+        std::vector<std::vector<uint>> clusters;
+        m.vert_cluster_one_ring(vid, clusters, true);
+
+        std::vector<uint> to_remove;
+        for(uint i=1; i<clusters.size(); ++i)
+        {
+            uint new_vid = m.vert_add(m.vert(vid));
+            v_map[vid].push_back(new_vid);
+
+            for(uint pid : clusters.at(i))
+            {
+                auto verts = m.poly_verts_id(pid);
+                for(uint & id : verts) if(id==vid) id = new_vid;
+                m.poly_add(verts);
+                to_remove.push_back(pid);
+            }
+        }
+        m.polys_remove(to_remove);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void cut_mesh_along_marked_edges(AbstractPolygonMesh<M,V,E,P> & m)
 {
     m.vert_unmark_all();
