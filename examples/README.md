@@ -14,7 +14,7 @@ Some of the projects depend from external libraries which are not included in Ci
 # List of Examples
 Here is a list of the sample programs available in CinoLib.
 
-#### 01 - Load and render a triangle mesh]
+#### 01 - Load and render a triangle mesh
 [<p align="left"><img src="snapshots/01_base_app_trimesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/01_base_app_trimesh)
 
 #### 02 - Load and render a quadrilateral mesh
