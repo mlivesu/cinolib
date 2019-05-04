@@ -46,7 +46,7 @@ std::vector<T> sample_within_interval(const T    min,
 {
     assert(n_samples >= 2);
     std::vector<T> samples;
-    T step = (max-min)/static_cast<T>(n_samples-1);
+    T step = (max-min)/(n_samples-1);
     T s    = min;
 
     do
