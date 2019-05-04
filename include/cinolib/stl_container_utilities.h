@@ -120,6 +120,12 @@ template<typename C, typename E>
 CINO_INLINE
 void SET_INTERSECTION(C & set1, C & set2, std::vector<E> & inters, const bool pre_sort_sets = false);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void CIRCULAR_SHIFT_VEC(std::vector<T> & vec, const T & new_first_elem);
+
 }
 
 #ifndef  CINO_STATIC_LIB

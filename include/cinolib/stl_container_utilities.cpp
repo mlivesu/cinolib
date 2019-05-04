@@ -188,5 +188,16 @@ void SET_INTERSECTION(C & set1, C & set2, std::vector<E> & inters, const bool pr
     std::set_intersection(set1.begin(), set1.end(), set2.begin(), set2.end(), std::back_inserter(inters));
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void CIRCULAR_SHIFT_VEC(std::vector<T> & vec, const T & new_first_elem)
+{
+    auto ptr = std::find(vec.begin(), vec.end(), new_first_elem);
+    assert(ptr!=vec.end());
+    std::rotate(vec.begin(), ptr, vec.end());
+}
+
 
 }
