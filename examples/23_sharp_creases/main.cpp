@@ -32,19 +32,6 @@ using namespace cinolib;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-uint closest_edge(const vec3d & p, const Trimesh<> & m)
-{
-    std::vector<std::pair<double,uint>> closest;
-    for(uint eid=0; eid<m.num_edges(); ++eid)
-    {
-        closest.push_back(std::make_pair(m.edge_sample_at(eid,0.5).dist(p),eid));
-    }
-    std::sort(closest.begin(), closest.end());
-    return closest.front().second;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
@@ -54,7 +41,6 @@ int main(int argc, char **argv)
     m.show_mesh_flat();
     m.show_marked_edge_width(4);
 
-    Profiler          profiler;
     QWidget           window;
     QPushButton       but_mark_creases("Mark Creases", &window);
     QPushButton       but_pad_creases("Pad Creases", &window);
@@ -137,9 +123,7 @@ int main(int argc, char **argv)
             vec2i click(e->x(), e->y());
             if (c->unproject(click, p)) // transform click in a 3d point
             {
-                profiler.push("Pick Edge");
-                uint eid = closest_edge(p,m);
-                profiler.pop();
+                uint eid = m.pick_edge(p);
                 m.edge_data(eid).marked = !m.edge_data(eid).marked;
                 m.updateGL();
                 c->updateGL();
