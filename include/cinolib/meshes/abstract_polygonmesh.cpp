@@ -926,8 +926,8 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 double AbstractPolygonMesh<M,V,E,P>::edge_crease_angle(const uint eid) const
 {
-    if( this->edge_is_manifold(eid)) return 0;
-    if(!this->edge_is_boundary(eid)) return 0;
+    if(!this->edge_is_manifold(eid)) return 0;
+    if( this->edge_is_boundary(eid)) return 0;
 
     uint   pid0  = this->adj_e2p(eid).front();
     uint   pid1  = this->adj_e2p(eid).back();
