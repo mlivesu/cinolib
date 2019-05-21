@@ -34,21 +34,10 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/io/read_IV.h>
-#include <string.h>
-#include <iostream>
+#include <cinolib/io/io_utilities.h>
 
 namespace cinolib
 {
-
-CINO_INLINE
-bool seek_keyword(FILE *fp, const char *kw)
-{
-    static char s[256];
-    s[0]='\0';
-    do fscanf(fp,"%255s",s); while (strcmp(s,kw) && !feof(fp));
-    if (feof(fp)) return 0;
-    return 1;
-}
 
 CINO_INLINE
 void read_IV(const char          * filename,
@@ -103,6 +92,5 @@ void read_IV(const char          * filename,
 
     fclose(fp);
 }
-
 
 }
