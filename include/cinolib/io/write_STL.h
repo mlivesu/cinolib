@@ -35,19 +35,17 @@
 #ifndef CINO_WRITE_STL_H
 #define CINO_WRITE_STL_H
 
-#include <sys/types.h>
 #include <vector>
 #include <cinolib/cino_inline.h>
-
 
 namespace cinolib
 {
 
 CINO_INLINE
-void write_STL(const char                            * filename,
-               const std::vector<double>             & xyz,
-               const std::vector<std::vector<uint> > & poly,
-               const std::vector<double>             & normals);
+void write_STL(const char                           * filename,
+               const std::vector<double>            & xyz,
+               const std::vector<std::vector<uint>> & poly,
+               const std::vector<double>            & normals);
 }
 
 #ifndef  CINO_STATIC_LIB
