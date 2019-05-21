@@ -39,6 +39,7 @@
 #include <cinolib/quality.h>
 #include <cinolib/stl_container_utilities.h>
 #include <cinolib/geometry/polygon.h>
+#include <cinolib/vector_serialization.h>
 #include <unordered_set>
 #include <queue>
 
@@ -75,6 +76,13 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
     {
         //read_OBJ(filename, pos, poly_pos);
         read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col);
+    }
+    else if (filetype.compare(".stl") == 0 ||
+             filetype.compare(".STL") == 0)
+    {
+        std::vector<uint> tris;
+        read_STL(filename, pos, tris);
+        poly_pos = polys_from_serialized_vids(tris, 3);
     }
     else
     {

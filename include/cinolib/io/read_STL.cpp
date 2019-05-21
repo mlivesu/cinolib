@@ -32,44 +32,91 @@
 *     Via de Marini, 6                                                          *
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
+*                                                                               *
+*     Fabrizio Corda (cordafab@gmail.com)                                       *
+*     http://www.fabriziocorda.com                                              *
+*                                                                               *
+*     University of Cagliari                                                    *
+*     Via Ospedale, 72                                                          *
+*     09124 Cagliari,                                                           *
+*     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_READ_WRITE_H
-#define CINO_READ_WRITE_H
-
-// SURFACE READERS
-#include <cinolib/io/read_OBJ.h>
-#include <cinolib/io/read_OFF.h>
-#include <cinolib/io/read_IV.h>
 #include <cinolib/io/read_STL.h>
-// SURFACE WRITERS
-#include <cinolib/io/write_OBJ.h>
-#include <cinolib/io/write_OFF.h>
-#include <cinolib/io/write_STL.h>
-#include <cinolib/io/write_NODE_ELE.h>
+#include <cinolib/io/io_utilities.h>
+#include <map>
 
+namespace cinolib
+{
 
-// VOLUME READERS
-#include <cinolib/io/read_HEDRA.h>
-#include <cinolib/io/read_HYBRID.h>
-#include <cinolib/io/read_MESH.h>
-#include <cinolib/io/read_TET.h>
-#include <cinolib/io/read_VTU.h>
-#include <cinolib/io/read_VTK.h>
-#include <cinolib/io/read_HEXEX.h>
-// VOLUME WRITERS
-#include <cinolib/io/write_HEDRA.h>
-#include <cinolib/io/write_MESH.h>
-#include <cinolib/io/write_TET.h>
-#include <cinolib/io/write_VTU.h>
-#include <cinolib/io/write_VTK.h>
+CINO_INLINE
+void read_STL(const char         * filename,
+              std::vector<vec3d> & verts,
+              std::vector<uint>  & tris)
+{
+    std::vector<vec3d> normals;
+    read_STL(filename, verts, normals, tris);
+}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// SKELETON READERS
-#include <cinolib/io/read_LIVESU2012.h>
-#include <cinolib/io/read_TAGLIASACCHI2012.h>
-#include <cinolib/io/read_DEYSUN2006.h>
-#include <cinolib/io/read_CSV.h>
-// SKELETON WRITERS
-#include <cinolib/io/write_LIVESU2012.h>
+CINO_INLINE
+void read_STL(const char         * filename,
+              std::vector<vec3d> & verts,
+              std::vector<vec3d> & normals,
+              std::vector<uint>  & tris)
+{
+    // https://en.wikipedia.org/wiki/STL_(file_format)
 
-#endif // CINO_READ_WRITE
+    verts.clear();
+    normals.clear();
+    tris.clear();
+
+    setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
+
+    FILE *fp = fopen(filename, "r");
+
+    if(!fp)
+    {
+        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_STL() : couldn't open input file " << filename << std::endl;
+        exit(-1);
+    }
+
+    std::map<vec3d,uint> vmap;
+
+    assert(seek_keyword(fp, "solid"));
+    while (seek_keyword(fp, "facet"))
+    {
+        vec3d n;
+        assert(seek_keyword(fp, "normal"));
+        assert(eat_double(fp, n.x()));
+        assert(eat_double(fp, n.y()));
+        assert(eat_double(fp, n.z()));
+        normals.push_back(n);
+
+        assert(seek_keyword(fp, "outer"));
+        assert(seek_keyword(fp, "loop"));
+        for(int i=0; i<3; ++i)
+        {
+            vec3d v;
+            assert(seek_keyword(fp, "vertex"));
+            assert(eat_double(fp, v.x()));
+            assert(eat_double(fp, v.y()));
+            assert(eat_double(fp, v.z()));
+
+            auto it = vmap.find(v);
+            if (it == vmap.end())
+            {
+                uint fresh_id = vmap.size();
+                vmap[v] = fresh_id;
+                verts.push_back(v);
+                tris.push_back(fresh_id);
+            }
+            else tris.push_back(it->second);
+        }
+        assert(seek_keyword(fp, "endloop"));
+        assert(seek_keyword(fp, "endfacet"));
+    }
+    fclose(fp);
+}
+
+}

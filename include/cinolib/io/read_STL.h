@@ -33,43 +33,31 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_READ_WRITE_H
-#define CINO_READ_WRITE_H
+#ifndef CINO_READ_STL_H
+#define CINO_READ_STL_H
 
-// SURFACE READERS
-#include <cinolib/io/read_OBJ.h>
-#include <cinolib/io/read_OFF.h>
-#include <cinolib/io/read_IV.h>
-#include <cinolib/io/read_STL.h>
-// SURFACE WRITERS
-#include <cinolib/io/write_OBJ.h>
-#include <cinolib/io/write_OFF.h>
-#include <cinolib/io/write_STL.h>
-#include <cinolib/io/write_NODE_ELE.h>
+#include <vector>
+#include <cinolib/geometry/vec3.h>
 
+namespace cinolib
+{
 
-// VOLUME READERS
-#include <cinolib/io/read_HEDRA.h>
-#include <cinolib/io/read_HYBRID.h>
-#include <cinolib/io/read_MESH.h>
-#include <cinolib/io/read_TET.h>
-#include <cinolib/io/read_VTU.h>
-#include <cinolib/io/read_VTK.h>
-#include <cinolib/io/read_HEXEX.h>
-// VOLUME WRITERS
-#include <cinolib/io/write_HEDRA.h>
-#include <cinolib/io/write_MESH.h>
-#include <cinolib/io/write_TET.h>
-#include <cinolib/io/write_VTU.h>
-#include <cinolib/io/write_VTK.h>
+CINO_INLINE
+void read_STL(const char         * filename,
+              std::vector<vec3d> & verts,
+              std::vector<uint>  & tris);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// SKELETON READERS
-#include <cinolib/io/read_LIVESU2012.h>
-#include <cinolib/io/read_TAGLIASACCHI2012.h>
-#include <cinolib/io/read_DEYSUN2006.h>
-#include <cinolib/io/read_CSV.h>
-// SKELETON WRITERS
-#include <cinolib/io/write_LIVESU2012.h>
+CINO_INLINE
+void read_STL(const char         * filename,
+              std::vector<vec3d> & verts,
+              std::vector<vec3d> & normals,
+              std::vector<uint>  & tris);
+}
 
-#endif // CINO_READ_WRITE
+#ifndef  CINO_STATIC_LIB
+#include "read_STL.cpp"
+#endif
+
+#endif // CINO_READ_STL
