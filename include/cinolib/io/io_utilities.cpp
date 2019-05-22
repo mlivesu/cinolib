@@ -88,4 +88,24 @@ bool eat_double(FILE * f, double & d)
     return true;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool eat_int(FILE * f, int & i)
+{
+    if(feof(f)) return false;
+    fscanf(f, "%d", &i);
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool eat_uint(FILE * f, uint & i)
+{
+    if(feof(f)) return false;
+    fscanf(f, "%d", &i);
+    return true;
+}
+
 }

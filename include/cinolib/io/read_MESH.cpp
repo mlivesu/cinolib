@@ -35,8 +35,9 @@
 *********************************************************************************/
 #include <cinolib/io/read_MESH.h>
 #include <cinolib/vector_serialization.h>
+#include <cinolib/io/io_utilities.h>
 #include <iostream>
-#include <set>
+#include <unordered_set>
 
 namespace cinolib
 {
@@ -62,72 +63,74 @@ void read_MESH(const char                     * filename,
         exit(-1);
     }
 
-    char line[1024];
-    fgets(line,1024,f);
-    fgets(line,1024,f);
+    std::unordered_set<int> v_unique_labels;
+    std::unordered_set<int> p_unique_labels;
 
-    std::set<int> v_unique_labels;
-    std::set<int> p_unique_labels;
+    // read header
+    int ver, dim, nv, nc;
+    assert(seek_keyword(f, "MeshVersionFormatted"));
+    eat_int(f, ver);
+    assert(seek_keyword(f, "Dimension"));
+    eat_int(f, dim);
 
-    while(fgets(line, 1024, f))
+    // read verts
+    assert(seek_keyword(f, "Vertices"));
+    eat_int(f, nv);
+    for(int i=0; i<nv; ++i)
     {
-        // read vertices
-        //
-        if (line[0] == 'V' || (line[0] == ' ' && line[1] == 'V' ))
-        {
-            uint   nverts;
-            double x,y,z;
-            int    l;
-            fgets(line,1024,f);
-            sscanf(line, "%d", &nverts);
-            for(uint i=0; i<nverts; ++i)
-            {
-                // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
-                //
-                fgets(line, 1024, f);
-                sscanf(line, "%lf %lf %lf %d", &x, &y, &z, &l);
-                verts.push_back(vec3d(x,y,z));
-                vert_labels.push_back(l);
-                v_unique_labels.insert(l);
-            }
-        }
+        double x,y,z;
+        int l;
+        assert(eat_double(f, x));
+        assert(eat_double(f, y));
+        assert(eat_double(f, z));
+        assert(eat_int(f, l));
+        verts.push_back(vec3d(x,y,z));
+        vert_labels.push_back(l);
+        v_unique_labels.insert(l);
+    }
 
-        // read tetrahedra
-        //
-        if ((line[0] == 'T' && line[1] == 'e') || ( line[0] == ' ' && line[1] == 'T' && line[2] == 'e')  )
+    // read cells
+    char cell_type[50];
+    if(eat_word(f, cell_type))
+    {
+        assert(eat_int(f, nc));
+
+        if(strcmp(cell_type, "Hexahedra")==0)
         {
-            uint ntets;
-            fgets(line, 1024, f);
-            sscanf(line, "%d", &ntets);
-            for(uint i=0; i<ntets; ++i)
+            for(int i=0; i<nc; ++i)
             {
                 int l;
-                std::vector<uint> tet(4);
-                fgets(line,1024,f);
-                sscanf(line, "%d %d %d %d %d", &tet[0], &tet[1], &tet[2], &tet[3], &l);
-                for(uint & vid : tet) vid -= 1;
-                polys.push_back(tet);
+                std::vector<uint> hex(8);
+                assert(eat_uint(f, hex[0]));
+                assert(eat_uint(f, hex[1]));
+                assert(eat_uint(f, hex[2]));
+                assert(eat_uint(f, hex[3]));
+                assert(eat_uint(f, hex[4]));
+                assert(eat_uint(f, hex[5]));
+                assert(eat_uint(f, hex[6]));
+                assert(eat_uint(f, hex[7]));
+                assert(eat_int(f, l));
+
+                for(uint & vid : hex) vid -= 1;
+                polys.push_back(hex);
                 poly_labels.push_back(l);
                 p_unique_labels.insert(l);
             }
         }
-
-        // read hexahedra
-        //
-        if (line[0] == 'H' && line[1] == 'e')
+        else if(strcmp(cell_type, "Tetrahedra")==0)
         {
-            uint nhexa;
-            fgets(line, 1024, f);
-            sscanf(line, "%d", &nhexa);
-            for(uint i=0; i<nhexa; ++i)
+            for(int i=0; i<nc; ++i)
             {
                 int l;
-                std::vector<uint> hex(8);
-                fgets(line,1024,f);
-                sscanf(line, "%d %d %d %d %d %d %d %d %d", &hex[0], &hex[1], &hex[2], &hex[3],
-                                                           &hex[4], &hex[5], &hex[6], &hex[7], &l);
-                for(uint & vid : hex) vid -= 1;
-                polys.push_back(hex);
+                std::vector<uint> tet(4);
+                assert(eat_uint(f, tet[0]));
+                assert(eat_uint(f, tet[1]));
+                assert(eat_uint(f, tet[2]));
+                assert(eat_uint(f, tet[3]));
+                assert(eat_int(f, l));
+
+                for(uint & vid : tet) vid -= 1;
+                polys.push_back(tet);
                 poly_labels.push_back(l);
                 p_unique_labels.insert(l);
             }
