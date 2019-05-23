@@ -91,12 +91,41 @@ void read_MESH(const char                     * filename,
 
     // read cells
     char cell_type[50];
-    if(eat_word(f, cell_type))
+    while(eat_word(f, cell_type))
     {
-        assert(eat_int(f, nc));
-
-        if(strcmp(cell_type, "Hexahedra")==0)
+        if(strcmp(cell_type, "End")==0)
         {
+            fclose(f);
+            return;
+        }
+        else if(strcmp(cell_type, "#")==0)
+        {
+            // comment, ignore whole line up to next \n
+            char line[1024];
+            fgets(line, 1024, f);
+        }
+        else if(strcmp(cell_type, "Tetrahedra")==0)
+        {
+            assert(eat_int(f, nc));
+            for(int i=0; i<nc; ++i)
+            {
+                int l;
+                std::vector<uint> tet(4);
+                assert(eat_uint(f, tet[0]));
+                assert(eat_uint(f, tet[1]));
+                assert(eat_uint(f, tet[2]));
+                assert(eat_uint(f, tet[3]));
+                assert(eat_int(f, l));
+
+                for(uint & vid : tet) vid -= 1;
+                polys.push_back(tet);
+                poly_labels.push_back(l);
+                p_unique_labels.insert(l);
+            }
+        }
+        else if(strcmp(cell_type, "Hexahedra")==0)
+        {
+            assert(eat_int(f, nc));
             for(int i=0; i<nc; ++i)
             {
                 int l;
@@ -117,30 +146,62 @@ void read_MESH(const char                     * filename,
                 p_unique_labels.insert(l);
             }
         }
-        else if(strcmp(cell_type, "Tetrahedra")==0)
+        else if(strcmp(cell_type, "Triangles")==0)
         {
+            assert(eat_int(f, nc));
             for(int i=0; i<nc; ++i)
             {
                 int l;
-                std::vector<uint> tet(4);
-                assert(eat_uint(f, tet[0]));
-                assert(eat_uint(f, tet[1]));
-                assert(eat_uint(f, tet[2]));
-                assert(eat_uint(f, tet[3]));
+                std::vector<uint> tri(4);
+                assert(eat_uint(f, tri[0]));
+                assert(eat_uint(f, tri[1]));
+                assert(eat_uint(f, tri[2]));
                 assert(eat_int(f, l));
-
-                for(uint & vid : tet) vid -= 1;
-                polys.push_back(tet);
-                poly_labels.push_back(l);
-                p_unique_labels.insert(l);
+                // discard these elements
+            }
+        }
+        else if(strcmp(cell_type, "Quadrilaterals")==0)
+        {
+            assert(eat_int(f, nc));
+            for(int i=0; i<nc; ++i)
+            {
+                int l;
+                std::vector<uint> quad(4);
+                assert(eat_uint(f, quad[0]));
+                assert(eat_uint(f, quad[1]));
+                assert(eat_uint(f, quad[2]));
+                assert(eat_uint(f, quad[3]));
+                assert(eat_int(f, l));
+                // discard these elements
+            }
+        }
+        else if(strcmp(cell_type, "Edges")==0)
+        {
+            assert(eat_int(f, nc));
+            for(int i=0; i<nc; ++i)
+            {
+                int l;
+                std::vector<uint> edge(4);
+                assert(eat_uint(f, edge[0]));
+                assert(eat_uint(f, edge[1]));
+                assert(eat_int(f, l));
+                // discard these elements
+            }
+        }
+        else if(strcmp(cell_type, "Corners")==0)
+        {
+            assert(eat_int(f, nc));
+            for(int i=0; i<nc; ++i)
+            {
+                std::vector<uint> corner(4);
+                assert(eat_uint(f, corner[0]));
+                // discard these elements
             }
         }
     }
 
     if(v_unique_labels.size()<2) vert_labels.clear();
     if(p_unique_labels.size()<2) poly_labels.clear();
-
-    fclose(f);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
