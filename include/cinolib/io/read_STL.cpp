@@ -74,7 +74,6 @@ void read_STL(const char         * filename,
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
     FILE *fp = fopen(filename, "r");
-
     if(!fp)
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_STL() : couldn't open input file " << filename << std::endl;
@@ -83,40 +82,88 @@ void read_STL(const char         * filename,
 
     std::map<vec3d,uint> vmap;
 
-    assert(seek_keyword(fp, "solid"));
-    while (seek_keyword(fp, "facet"))
+    if(seek_keyword(fp, "solid")) // ASCII file
     {
-        vec3d n;
-        assert(seek_keyword(fp, "normal"));
-        assert(eat_double(fp, n.x()));
-        assert(eat_double(fp, n.y()));
-        assert(eat_double(fp, n.z()));
-        normals.push_back(n);
-
-        assert(seek_keyword(fp, "outer"));
-        assert(seek_keyword(fp, "loop"));
-        for(int i=0; i<3; ++i)
+        while(seek_keyword(fp, "facet"))
         {
-            vec3d v;
-            assert(seek_keyword(fp, "vertex"));
-            assert(eat_double(fp, v.x()));
-            assert(eat_double(fp, v.y()));
-            assert(eat_double(fp, v.z()));
+            vec3d n;
+            assert(seek_keyword(fp, "normal"));
+            assert(eat_double(fp, n.x()));
+            assert(eat_double(fp, n.y()));
+            assert(eat_double(fp, n.z()));
+            normals.push_back(n);
 
-            auto it = vmap.find(v);
-            if (it == vmap.end())
+            assert(seek_keyword(fp, "outer"));
+            assert(seek_keyword(fp, "loop"));
+            for(int i=0; i<3; ++i)
             {
-                uint fresh_id = vmap.size();
-                vmap[v] = fresh_id;
-                verts.push_back(v);
-                tris.push_back(fresh_id);
+                vec3d v;
+                assert(seek_keyword(fp, "vertex"));
+                assert(eat_double(fp, v.x()));
+                assert(eat_double(fp, v.y()));
+                assert(eat_double(fp, v.z()));
+
+                auto it = vmap.find(v);
+                if(it == vmap.end())
+                {
+                    uint fresh_id = vmap.size();
+                    vmap[v] = fresh_id;
+                    verts.push_back(v);
+                    tris.push_back(fresh_id);
+                }
+                else tris.push_back(it->second);
             }
-            else tris.push_back(it->second);
+            assert(seek_keyword(fp, "endloop"));
+            assert(seek_keyword(fp, "endfacet"));
         }
-        assert(seek_keyword(fp, "endloop"));
-        assert(seek_keyword(fp, "endfacet"));
+        fclose(fp);
     }
-    fclose(fp);
+    else // BINARY file
+    {
+        // close file in ASCII mode and reopen it in binary mode
+        fclose(fp);
+        FILE *fp = fopen(filename, "rb");
+        assert(fp!=NULL);
+
+        // read header
+        char header[80];
+        assert(fread(header, 1, 80, fp)==80);
+
+        // read triangles
+        unsigned int nt;
+        assert(fread(&nt, sizeof(unsigned int), 1, fp)==1);
+        for(unsigned int i=0; i<nt; ++i)
+        {
+            // read normal
+            float nf[3];
+            assert(fread(&nf, sizeof(float), 3, fp)==3);
+            vec3d n(nf[0], nf[1], nf[2]);
+            normals.push_back(n);
+
+            // read verts
+            for(int j=0; j<3; ++j)
+            {
+                float vf[3];
+                assert(fread(&vf, sizeof(float), 3, fp)==3);
+
+                vec3d v(vf[0], vf[1], vf[2]);
+                auto it = vmap.find(v);
+                if(it == vmap.end())
+                {
+                    uint fresh_id = vmap.size();
+                    vmap[v] = fresh_id;
+                    verts.push_back(v);
+                    tris.push_back(fresh_id);
+                }
+                else tris.push_back(it->second);
+            }
+
+            // read (and discard) attribute
+            unsigned short attribute;
+            assert(fread(&attribute, sizeof(unsigned short), 1, fp)==1);
+        }
+        fclose(fp);
+    }
 }
 
 }
