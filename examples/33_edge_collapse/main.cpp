@@ -44,7 +44,6 @@ int main(int argc, char **argv)
                     {
                         converged = false;
                         m.updateGL();
-                        m.edge_mark_boundaries();
                         c->updateGL_strict();
                     }
                 }
