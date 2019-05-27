@@ -44,6 +44,7 @@
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
 #include <cinolib/symbols.h>
+#include <cinolib/ipair.h>
 
 typedef enum
 {
@@ -222,6 +223,7 @@ class AbstractMesh
 
                 vec3d  edge_vert         (const uint eid, const uint offset) const;
                 uint   edge_vert_id      (const uint eid, const uint offset) const;
+                ipair  edge_vert_ids     (const uint eid) const;
                 int    edge_id           (const uint vid0, const uint vid1) const;
                 vec3d  edge_sample_at    (const uint eid, double lambda) const; // arc-length param
                 uint   edge_valence      (const uint eid) const;

@@ -602,6 +602,16 @@ uint AbstractMesh<M,V,E,P>::edge_vert_id(const uint eid, const uint offset) cons
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+ipair AbstractMesh<M,V,E,P>::edge_vert_ids(const uint eid) const
+{
+    return std::make_pair(this->edge_vert_id(eid,0),
+                          this->edge_vert_id(eid,1));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 int AbstractMesh<M,V,E,P>::edge_id(const uint vid0, const uint vid1) const
 {
     assert(vid0 != vid1);
