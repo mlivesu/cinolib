@@ -48,3 +48,4 @@ SUBDIRS += 29_ambient_occlusion
 SUBDIRS += 30_file_converter            # OPTIONALLY requires VTK (https://www.vtk.org/)
 SUBDIRS += 31_LSCM
 SUBDIRS += 32_homotopy_basis
+SUBDIRS += 33_edge_collapse
