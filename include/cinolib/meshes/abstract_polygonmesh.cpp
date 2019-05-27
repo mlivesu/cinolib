@@ -958,6 +958,16 @@ bool AbstractPolygonMesh<M,V,E,P>::edge_is_boundary(const uint eid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+bool AbstractPolygonMesh<M,V,E,P>::edge_is_incident_to_boundary(const uint eid) const
+{
+    for(uint vid : this->adj_e2v(eid)) if(this->vert_is_boundary(vid)) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 bool AbstractPolygonMesh<M,V,E,P>::edges_share_poly(const uint eid1, const uint eid2) const
 {
     for(uint pid1 : this->adj_e2p(eid1))
