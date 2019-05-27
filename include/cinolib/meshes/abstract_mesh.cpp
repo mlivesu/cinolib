@@ -629,6 +629,15 @@ int AbstractMesh<M,V,E,P>::edge_id(const uint vid0, const uint vid1) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+int AbstractMesh<M,V,E,P>::edge_id(const ipair & vids) const
+{
+    return edge_id(vids.first, vids.second);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 uint AbstractMesh<M,V,E,P>::edge_valence(const uint eid) const
 {
     return this->adj_e2p(eid).size();
