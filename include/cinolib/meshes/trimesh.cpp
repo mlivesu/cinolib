@@ -279,7 +279,7 @@ int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const double topologic_check, const double geometric_check)
+int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const bool topologic_check, const bool geometric_check)
 {
     if(topologic_check && !edge_is_topologically_collapsible(eid))         return -1;
     if(geometric_check && !edge_is_geometrically_collapsible(eid, lambda)) return -1;
