@@ -190,6 +190,66 @@ int AbstractMesh<M,V,E,P>::genus() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+std::vector<Color> AbstractMesh<M,V,E,P>::vector_vert_colors() const
+{
+    std::vector<Color> colors;
+    colors.reserve(num_verts());
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        colors.push_back(vert_data(vid).color);
+    }
+    return colors;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<int> AbstractMesh<M,V,E,P>::vector_vert_labels() const
+{
+    std::vector<int> labels;
+    labels.reserve(num_verts());
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        labels.push_back(vert_data(vid).label);
+    }
+    return labels;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<Color> AbstractMesh<M,V,E,P>::vector_edge_colors() const
+{
+    std::vector<Color> colors;
+    colors.reserve(num_edges());
+    for(uint eid=0; eid<num_edges(); ++eid)
+    {
+        colors.push_back(edge_data(eid).color);
+    }
+    return colors;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<int> AbstractMesh<M,V,E,P>::vector_edge_labels() const
+{
+    std::vector<int> labels;
+    labels.reserve(num_edges());
+    for(uint eid=0; eid<num_edges(); ++eid)
+    {
+        labels.push_back(edge_data(eid).label);
+    }
+    return labels;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 std::vector<Color> AbstractMesh<M,V,E,P>::vector_poly_colors() const
 {
     std::vector<Color> colors;
