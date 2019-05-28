@@ -501,6 +501,16 @@ uint Trimesh<M,V,E,P>::poly_edge_id(const uint pid, const uint offset) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+uint Trimesh<M,V,E,P>::poly_split(const uint pid)
+{
+    // uses centroid as default split point
+    return this->poly_split(pid, this->poly_centroid(pid));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 uint Trimesh<M,V,E,P>::poly_split(const uint pid, const vec3d & p)
 {
     uint vids[4] =
