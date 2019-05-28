@@ -34,169 +34,11 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/homotopy_basis.h>
+#include <cinolib/homotopy_basis_detach_loops.h>
 #include <cinolib/dijkstra.h>
 
 namespace cinolib
 {
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void extend_loop_through_umbrella(Trimesh<M,V,E,P> & m, const uint v_in, const uint v_mid, const uint v_out, const uint valence)
-{
-    int e0 = m.edge_id(v_in,  v_mid); assert(e0>=0);
-    int e1 = m.edge_id(v_mid, v_out); assert(e1>=0);
-    m.edge_data(e0).label+= valence;
-    m.edge_data(e1).label+= valence;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void refine_mesh_to_detach_loops(Trimesh<M,V,E,P> & m, const uint root)
-{
-    // enque vertices with more than 2 incident loop edges
-    std::queue<uint> q;
-    for(uint vid=0; vid<m.num_verts(); ++vid)
-    {
-        if(vid == root) continue;
-        uint count = 0;
-        for(uint eid : m.adj_v2e(vid)) if(m.edge_data(eid).label>0) ++count;
-        if(count>2) q.push(vid);
-    }
-
-    // iteratively duplicate edges traversed by more than one loop
-    while(!q.empty())
-    {
-        uint vid = q.front();
-        q.pop();
-
-        std::vector<ipair> edges_on_loop;
-        for(uint eid : m.adj_v2e(vid))
-        {
-            int val = m.edge_data(eid).label;
-            if (val>0) edges_on_loop.push_back(std::make_pair(val, m.vert_opposite_to(eid, vid)));
-        }
-        SORT_VEC(edges_on_loop, false); // the last one is the "outgoing edge" (the one that takes to the root)
-        // sanity check: the outgoing edge should condensate all the loops coming into the umbrella
-        uint sum = 0;
-        for(uint i=0; i<edges_on_loop.size()-1; ++i) sum += edges_on_loop.at(i).first;
-        assert(sum == edges_on_loop.back().first);
-
-        if(edges_on_loop.size()>2)
-        {
-            uint v_in  = edges_on_loop.front().second;
-            uint v_out = edges_on_loop.back().second;
-            uint v_new = m.vert_split(m.edge_id(vid,v_in), m.edge_id(vid,v_out));
-
-            for(uint eid : m.adj_v2e( vid )) m.edge_data(eid).label = 0;
-            for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).label = 0;
-
-            // connect the ones for which there is only one way possible first
-            std::vector<ipair> to_redo;
-            uint count[2] = {0,0};
-            for(uint i=0; i<edges_on_loop.size()-1; ++i)
-            {
-                uint v_in = edges_on_loop.at(i).second;
-                uint val  = edges_on_loop.at(i).first;
-                int  e0   = m.edge_id(v_in, v_new);
-                int  e1   = m.edge_id(v_in, vid);
-                if(e0==-1 && e1>=0)
-                {
-                    count[0]++;
-                    extend_loop_through_umbrella(m, v_in, vid, v_out, val);
-                }
-                else if(e0>=0  && e1==-1)
-                {
-                    count[1]++;
-                    extend_loop_through_umbrella(m, v_in, v_new, v_out, val);
-                }
-                else
-                {
-                    to_redo.push_back(std::make_pair(v_in,val));
-                }
-            }
-            // then connect the others (in order to chose the right path within the umbrella)
-            for(auto v : to_redo)
-            {
-                uint v_mid = (count[0] < count[1]) ? vid : v_new;
-                extend_loop_through_umbrella(m, v.first, v_mid, v_out, v.second);
-            }
-
-            if(v_out!=root) q.push(v_out);
-            bool add_vid  = false;
-            bool add_vnew = false;
-            for(uint eid : m.adj_v2e( vid )) if(m.edge_data(eid).label>1) add_vid  = true;
-            for(uint eid : m.adj_v2e(v_new)) if(m.edge_data(eid).label>1) add_vnew = true;
-            if(add_vid)  q.push(vid);
-            if(add_vnew) q.push(v_new);
-        }
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void refine_mesh_to_detach_loops(Trimesh<M,V,E,P> & m, const uint root, std::vector<std::vector<uint>> & basis)
-{
-    // PRE-PROCESSING:
-    // mark edges on basis loops, and count loops per edge (using edge labels)
-    for(uint eid=0; eid<m.num_edges(); ++eid)
-    {
-        m.edge_data(eid).label = 0;
-    }
-    for(auto loop : basis)
-    {
-        for(uint i=0; i<loop.size(); ++i)
-        {
-            uint v0  = loop.at(i);
-            uint v1  = loop.at((i+1)%loop.size());
-             int eid = m.edge_id(v0, v1);
-            m.edge_data(eid).label++;
-        }
-    }
-
-    refine_mesh_to_detach_loops(m, root);
-
-    // POST-PROCESSING: update basis
-    basis.clear();
-    m.edge_unmark_all();
-    for(uint eid: m.adj_v2e(root))
-    {
-        if(m.edge_data(eid).marked) continue;
-        if(m.edge_data(eid).label>0)
-        {
-            std::vector<uint> loop;
-            loop.push_back(root);
-            loop.push_back(m.vert_opposite_to(eid, root));
-            m.edge_data(eid).marked = true;
-
-            uint curr = loop.back();
-            do
-            {
-                int next = -1;
-                for(uint eid : m.adj_v2e(curr))
-                {
-                    if(m.edge_data(eid).label>0 && !m.edge_data(eid).marked)
-                    {
-                        assert(next==-1);
-                        next = m.vert_opposite_to(eid, curr);
-                        m.edge_data(eid).marked = true;
-                    }
-                }
-                assert(next>=0);
-                if((uint)next != root) loop.push_back(next);
-                curr = next;
-            }
-            while(curr != root);
-            basis.push_back(loop);
-        }
-    }
-    assert((int)basis.size() == m.genus()*2);
-}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -209,16 +51,7 @@ void homotopy_basis(Trimesh<M,V,E,P>               & m,
 {
     std::vector<bool> tree, cotree;
     homotopy_basis(m, root, basis, tree, cotree);
-
-    // refine the mesh so that each edge participates in at most a single loop.
-    // This is achieved via a sequence of vertex_split operations. An alternative
-    // approach, based on edge_splits, is described in:
-    //
-    // Globally Optimal Surface Mapping for Surfaces with Arbitrary Topology
-    // Xin Li, Yunfan Bao, Xiaohu Guo, Miao Jin, Xianfeng Gu and Hong Qin
-    // IEEE Transactions on Visualization and Computer Graphics, 2008
-    //
-    if(detach_loops) refine_mesh_to_detach_loops(m, root, basis);
+    if(detach_loops) homotopy_basis_detach_loops_by_edge_split(m, root, basis);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
