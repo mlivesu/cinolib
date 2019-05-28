@@ -126,6 +126,12 @@ template<typename T>
 CINO_INLINE
 void CIRCULAR_SHIFT_VEC(std::vector<T> & vec, const T & new_first_elem);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void REVERSE_VEC(std::vector<T> & vec);
+
 }
 
 #ifndef  CINO_STATIC_LIB

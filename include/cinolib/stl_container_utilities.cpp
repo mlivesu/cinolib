@@ -199,5 +199,14 @@ void CIRCULAR_SHIFT_VEC(std::vector<T> & vec, const T & new_first_elem)
     std::rotate(vec.begin(), ptr, vec.end());
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void REVERSE_VEC(std::vector<T> & vec)
+{
+    std::reverse(vec.begin(), vec.end());
+}
+
 
 }
