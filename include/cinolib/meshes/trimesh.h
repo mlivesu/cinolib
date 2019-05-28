@@ -100,7 +100,7 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         int               edge_opposite_to                 (const uint pid, const uint vid) const;
-        int               edge_collapse                    (const uint eid, const double lambda = 0.5, const double topologic_check = true, const double geometric_check = true);
+        int               edge_collapse                    (const uint eid, const double lambda = 0.5, const bool topologic_check = true, const bool geometric_check = true);
         bool              edge_is_collapsible              (const uint eid, const double lambda) const;
         bool              edge_is_geometrically_collapsible(const uint eid, const double lambda) const;
         bool              edge_is_topologically_collapsible(const uint eid) const;
@@ -120,6 +120,7 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         bool                poly_bary_is_edge  (const uint pid, const std::vector<double> & wgts, uint & eid, const double tol = 1e-5) const;
         uint                poly_add           (const uint vid0, const uint vid1, const uint vid2);
         uint                poly_edge_id       (const uint pid, const uint offset) const;
+        uint                poly_split         (const uint pid); // uses centroid as default split point
         uint                poly_split         (const uint pid, const vec3d & p);
 
         using AbstractMesh<M,V,E,P>::poly_edge_id;    // avoid hiding poly_ege_id(pid,vid0,vid1)
