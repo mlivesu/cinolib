@@ -47,11 +47,16 @@ CINO_INLINE
 void homotopy_basis(Trimesh<M,V,E,P>               & m,
                     const uint                       root,
                     std::vector<std::vector<uint>> & basis,
-                    const bool                       detach_loops)
+                    const bool                       detach_loops,   // refine the mesh to make sure each edge is contained in at most one basis loop
+                    const bool                       by_edge_splits) // true: use the edge_split strategy; false: use the vert_split strategy
 {
     std::vector<bool> tree, cotree;
     homotopy_basis(m, root, basis, tree, cotree);
-    if(detach_loops) homotopy_basis_detach_loops_by_edge_split(m, root, basis);
+    if(detach_loops)
+    {
+        if(by_edge_splits) homotopy_basis_detach_loops_by_edge_split(m, root, basis);
+        else               homotopy_basis_detach_loops_by_vert_split(m, root, basis);
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
