@@ -233,12 +233,25 @@ int refine_umbrella(Trimesh<M,V,E,P> & m, const uint vid)
     CIRCULAR_SHIFT_VEC(e_star, e_out);
     assert(e_star.front() == e_out);
 
-    //std::cout << "handle vert: " << vid << std::endl;
-    //for(uint eid : e_star) std::cout << eid << "\t" << m.edge_data(eid).label << std::endl;
-
     // due to mesh refinement, it's safer to store edges as pairs of vertex ids and retrieve the ID each time is needed
     std::vector<ipair> e_star_as_vpairs;
     for(uint eid : e_star) e_star_as_vpairs.push_back(m.edge_vert_ids(eid));
+
+    // if the closest edge loop is found rotating CW rather than CCW,
+    // revert the vector to minimize the number of edge splits
+    std::vector<uint> gaps;
+    for(uint i=1; i<e_star.size(); ++i)
+    {
+        uint eid = e_star.at(i);;
+        if(m.edge_data(eid).label>0) gaps.push_back(i);
+    }
+    if(gaps.front() > (e_star.size()-gaps.back()))
+    {
+        e_star.push_back(e_star.front());
+        e_star_as_vpairs.push_back(e_star_as_vpairs.front());
+        REVERSE_VEC(e_star);
+        REVERSE_VEC(e_star_as_vpairs);
+    }
 
     // rotate around the vertex until an incoming edge participating in a basis loop is found
     std::vector<ipair> split_list;
@@ -266,7 +279,7 @@ int refine_umbrella(Trimesh<M,V,E,P> & m, const uint vid)
         {
              int eid   = m.edge_id(e);
             assert(eid>=0);
-            assert(m.edge_data(eid).label==0);
+            assert(m.edge_data(eid).label==0);                        
             uint v_new = m.edge_split(eid);
             for(uint e : m.adj_v2e(v_new)) m.edge_data(e).label = 0;
             int e_new = m.edge_id(v_prev, v_new);
@@ -324,7 +337,7 @@ void homotopy_basis_detach_loops_by_edge_split(Trimesh<M,V,E,P>               & 
         if(count>2) q.push(vid);
     }
 
-    // PROCESSING: mesh refinement
+    // mesh refinement
     while(!q.empty())
     {
         uint vid = q.front();
