@@ -217,19 +217,20 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 int refine_umbrella(Trimesh<M,V,E,P> & m, const uint vid)
 {
-    auto  e_star    = m.vert_ordered_edges_star(vid); assert(!e_star.empty());
-    uint  e_out     = e_star.front(); // will contain the ID of the edge pointing towards the root of the homotopy basis
-     int  val_check = 0;
-    uint count      = 0;
+    auto  e_star  = m.vert_ordered_edges_star(vid); assert(!e_star.empty());
+    uint  e_out   = e_star.front(); // will contain the ID of the edge pointing towards the root of the homotopy basis
+     int  val_out = 0;
+    uint count    = 0;
     for(uint eid : e_star)
     {
         int val = m.edge_data(eid).label;
         if(m.edge_data(e_out).label < val) e_out = eid;
-        val_check += val;
+        val_out += val;
         if(val>0) ++count;
     }
     if(count<3) return -1;
-    assert(val_check == 2*m.edge_data(e_out).label);
+    val_out -= m.edge_data(e_out).label;
+    assert(val_out == m.edge_data(e_out).label);
     CIRCULAR_SHIFT_VEC(e_star, e_out);
     assert(e_star.front() == e_out);
 
@@ -255,17 +256,17 @@ int refine_umbrella(Trimesh<M,V,E,P> & m, const uint vid)
 
     // rotate around the vertex until an incoming edge participating in a basis loop is found
     std::vector<ipair> split_list;
-    int val;
+    int val_in;
     int e_in;
     for(uint i=1; i<e_star.size(); ++i)
     {
         e_in = e_star.at(i);
-        val  = m.edge_data(e_in).label;
-        if(val==0) split_list.push_back(e_star_as_vpairs.at(i));
+        val_in  = m.edge_data(e_in).label;
+        if(val_in==0) split_list.push_back(e_star_as_vpairs.at(i));
         else break;
     }
-    assert(val>0);
-    assert(m.edge_data(e_in).label==val);
+    assert(val_in>0);
+    assert(m.edge_data(e_in).label==val_in);
     assert(split_list.size()<e_star.size()-1);
     int v_in = m.vert_opposite_to(e_in, vid);
     assert(v_in>=0);
@@ -279,22 +280,28 @@ int refine_umbrella(Trimesh<M,V,E,P> & m, const uint vid)
         {
              int eid   = m.edge_id(e);
             assert(eid>=0);
-            assert(m.edge_data(eid).label==0);                        
-            uint v_new = m.edge_split(eid);
+            assert(m.edge_data(eid).label==0);
+            vec3d A = m.vert(vid);
+            vec3d B = m.vert(m.vert_opposite_to(eid,vid));
+            // optimally place newly inserted vertex according to the valence balance between the two disjoint paths
+            float t = static_cast<float>(val_out - val_in)/static_cast<float>(val_out);
+            assert(t>0.f && t<1.f);
+            vec3d C = A*(1.f-t) + B*t;
+            uint v_new = m.edge_split(eid, C);
             for(uint e : m.adj_v2e(v_new)) m.edge_data(e).label = 0;
             int e_new = m.edge_id(v_prev, v_new);
-            m.edge_data(e_new).label = val;
+            m.edge_data(e_new).label = val_in;
             v_prev = v_new;
             assert((int)e_out == m.edge_id(vid, v_out)); // after the edge splits can the original e_out become inconsistent?
         }
         // close the path
         int e_last = m.edge_id(v_prev, v_in);
         assert(m.edge_data(e_last).label==0);
-        assert(m.edge_data(e_in  ).label==val);
-        assert(m.edge_data(e_out ).label >val);
-        m.edge_data(e_last).label = val;
-        m.edge_data(e_in  ).label-= val; // reduce valence of previous path
-        m.edge_data(e_out ).label-= val; // reduce valence of outgoing edge
+        assert(m.edge_data(e_in  ).label==val_in);
+        assert(m.edge_data(e_out ).label >val_in);
+        m.edge_data(e_last).label = val_in;
+        m.edge_data(e_in  ).label-= val_in; // reduce valence of previous path
+        m.edge_data(e_out ).label-= val_in; // reduce valence of outgoing edge
     }
     else // e_in and e_out share the same face. To detach them I just split the face
     {
@@ -303,12 +310,12 @@ int refine_umbrella(Trimesh<M,V,E,P> & m, const uint vid)
         for(uint e : m.adj_v2e(v_new)) m.edge_data(e).label = 0;
         int e0     = m.edge_id(v_new, v_out);
         int e1     = m.edge_id(v_new, v_in);
-        assert(m.edge_data(e_in  ).label==val);
-        assert(m.edge_data(e_out ).label >val);
-        m.edge_data(e0).label     = val;
-        m.edge_data(e1).label     = val;
-        m.edge_data(e_in).label  -= val; // reduce valence of previous path
-        m.edge_data(e_out).label -= val; // reduce valence of outgoing edge
+        assert(m.edge_data(e_in  ).label==val_in);
+        assert(m.edge_data(e_out ).label >val_in);
+        m.edge_data(e0).label     = val_in;
+        m.edge_data(e1).label     = val_in;
+        m.edge_data(e_in).label  -= val_in; // reduce valence of previous path
+        m.edge_data(e_out).label -= val_in; // reduce valence of outgoing edge
     }
 
     count = 0;
