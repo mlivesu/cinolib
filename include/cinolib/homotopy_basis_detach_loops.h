@@ -50,6 +50,13 @@ namespace cinolib
  *
  * Why two versions?
  *
+ * Short version:
+ *
+ *  - use EDGE SPLITS for max precision (no deviation from input surface)
+ *  - use VERT SPLITS for minimal mesh size increase
+ *
+ * Longer version:
+ *
  * VERT SPLIT: requires minimal mesh refinement, but there are corner cases
  * where either degenerate elements are introduced, or the newly inserted
  * vertices must deviate from the original surce (imagine a wiggly non planar
