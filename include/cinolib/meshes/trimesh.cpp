@@ -319,7 +319,16 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint Trimesh<M,V,E,P>::edge_split(const uint eid, const double lambda)
 {
-    uint new_vid = this->vert_add(this->edge_sample_at(eid,lambda));
+    return edge_split(eid, this->edge_sample_at(eid,lambda));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint Trimesh<M,V,E,P>::edge_split(const uint eid, const vec3d & p)
+{
+    uint new_vid = this->vert_add(p);
     uint vid0    = this->edge_vert_id(eid,0);
     uint vid1    = this->edge_vert_id(eid,1);
 
