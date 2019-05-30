@@ -69,6 +69,7 @@ void cut_mesh_along_marked_edges(AbstractPolygonMesh<M,V,E,P>               & m,
         for(uint i=1; i<clusters.size(); ++i)
         {
             uint new_vid = m.vert_add(m.vert(vid));
+            m.vert_data(new_vid) = m.vert_data(vid);
             v_map[vid].push_back(new_vid);
 
             for(uint pid : clusters.at(i))
