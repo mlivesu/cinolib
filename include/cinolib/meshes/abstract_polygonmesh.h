@@ -105,8 +105,10 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<uint>  get_boundary_vertices() const;
-        std::vector<ipair> get_boundary_edges() const;
+        std::vector<uint>  get_boundary_vertices()         const;
+        std::vector<uint>  get_ordered_boundary_vertices() const;
+        std::vector<ipair> get_boundary_edges()            const;
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double mesh_volume() const;

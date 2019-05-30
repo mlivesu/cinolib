@@ -85,10 +85,6 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<uint> get_ordered_boundary_vertices() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         int               vert_split            (const uint eid0, const uint eid1);
         void              vert_weights          (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
         void              vert_weights_cotangent(const uint vid, std::vector<std::pair<uint,double>> & wgts) const;

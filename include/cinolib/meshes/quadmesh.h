@@ -81,10 +81,6 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<uint> get_ordered_boundary_vertices() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         bool              vert_is_singular     (const uint vid) const;
         bool              vert_is_regular      (const uint vid) const;
         int               vert_next_along_chain(const uint curr, const uint prev) const;

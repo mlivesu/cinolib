@@ -1650,4 +1650,48 @@ void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P>
     std::cout << this->num_polys() << " polys" << std::endl;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::get_ordered_boundary_vertices() const
+{
+    // WARNING: assumes the mesh contains exactly ONE simply connected boundary!
+
+    std::vector<uint> b_verts;
+
+    uint seed = 0;
+    while(seed<this->num_edges() && !this->edge_is_boundary(seed)) ++seed;
+    if(seed >= this->num_edges()) return b_verts;
+
+    b_verts.push_back(this->edge_vert_id(seed,0));
+    b_verts.push_back(this->edge_vert_id(seed,1));
+
+    uint prev = b_verts.front();
+    uint curr = b_verts.back();
+
+    do
+    {
+        bool found_next = false;
+        for(uint eid : this->adj_v2e(curr))
+        {
+            if(!this->edge_is_boundary(eid)) continue;
+            uint vid = this->vert_opposite_to(eid, curr);
+            if(vid!=prev && this->vert_is_boundary(vid))
+            {
+                b_verts.push_back(vid);
+                prev = curr;
+                curr = vid;
+                found_next = true;
+                break;
+            }
+        }
+        assert(found_next);
+        assert(b_verts.size()<this->num_verts());
+    }
+    while(b_verts.front()!=b_verts.back());
+    b_verts.pop_back();
+    return b_verts;
+}
+
 }

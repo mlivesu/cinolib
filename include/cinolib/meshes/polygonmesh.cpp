@@ -82,38 +82,4 @@ Polygonmesh<M,V,E,P>::Polygonmesh(const std::vector<double>            & coords,
     this->init(vec3d_from_serialized_xyz(coords), polys);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-std::vector<uint> Polygonmesh<M,V,E,P>::get_ordered_boundary_vertices() const
-{
-    // NOTE #1: assumes the mesh contains exactly ONE simply connected boundary!
-    // NOTE #2: although this method is duplicated both in Quadmesh and Polygonmesh,
-    //          I cannot move it up to the AbstractPolygonMesh level because it uses
-    //          a method of trimesh :(
-
-    std::vector<uint>  polys;
-    std::vector<vec3d> verts = this->vector_verts();
-    verts.push_back(this->centroid());
-
-    uint cid = this->num_verts();
-    for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
-        if (this->edge_is_boundary(eid))
-        {
-            uint pid  = this->adj_e2p(eid).front();
-            uint vid0 = this->edge_vert_id(eid,0);
-            uint vid1 = this->edge_vert_id(eid,1);
-            if (!this->poly_verts_are_CCW(pid, vid1, vid0)) std::swap(vid0,vid1);
-            polys.push_back(vid0);
-            polys.push_back(vid1);
-            polys.push_back(cid);
-        }
-    }
-
-    Trimesh<> tmp(verts,polys);
-    return tmp.vert_ordered_verts_link(cid);
-}
-
 }
