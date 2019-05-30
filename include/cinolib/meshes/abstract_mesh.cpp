@@ -1188,6 +1188,32 @@ void AbstractMesh<M,V,E,P>::poly_apply_labels(const std::vector<int> & labels)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractMesh<M,V,E,P>::edge_apply_labels(const std::vector<int> & labels)
+{
+    assert(labels.size() == this->num_edges());
+    for(uint eid=0; eid<num_edges(); ++eid)
+    {
+        edge_data(eid).label = labels.at(eid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::vert_apply_labels(const std::vector<int> & labels)
+{
+    assert(labels.size() == this->num_verts());
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        vert_data(vid).label = labels.at(vid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 uint AbstractMesh<M,V,E,P>::pick_vert(const vec3d & p) const
 {
     std::vector<std::pair<double,uint>> closest;
