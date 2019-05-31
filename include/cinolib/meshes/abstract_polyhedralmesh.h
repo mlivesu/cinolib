@@ -168,6 +168,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         void              edge_remove             (const uint eid);
         void              edge_remove_unreferenced(const uint eid);
         bool              edge_is_on_srf          (const uint eid) const;
+        bool              edge_is_incident_to_srf (const uint eid) const;
         std::vector<uint> edge_ordered_poly_ring  (const uint eid) const;
         std::vector<uint> edge_adj_srf_faces      (const uint eid) const;
         std::vector<uint> edge_verts_link         (const uint eid) const;
