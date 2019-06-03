@@ -59,6 +59,7 @@ AO_srf<Mesh>::AO_srf(const Mesh & m,
     std::vector<vec3d> dirs;
     sphere_coverage(n_dirs, dirs);
 
+    float* depth_buffer = new float[buffer_size*buffer_size];
     for(vec3d u : dirs)
     {
         // for each POV render on a buffer, and do a visibility check
@@ -94,7 +95,6 @@ AO_srf<Mesh>::AO_srf(const Mesh & m,
         glViewport(0, 0, buffer_size, buffer_size);
 
         m.draw();
-        float* depth_buffer = new float[buffer_size*buffer_size];
         glReadPixels(0, 0, buffer_size, buffer_size, GL_DEPTH_COMPONENT, GL_FLOAT, depth_buffer);
 
         // accumulate AO values, weighting views with the dot between
@@ -113,8 +113,9 @@ AO_srf<Mesh>::AO_srf(const Mesh & m,
                 ao[pid] += diff;
             }
         }
-        delete[] depth_buffer;
     }
+    delete[] depth_buffer;
+
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
