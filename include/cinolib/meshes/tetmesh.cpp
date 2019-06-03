@@ -295,11 +295,20 @@ uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,P>::edge_is_collapsible(const uint eid, const double lambda) const
+bool Tetmesh<M,V,E,F,P>::edge_is_collapsible(const uint eid, const vec3d & p) const
 {
     if(!edge_is_topologically_collapsible(eid)) return false;
-    if(!edge_is_geometrically_collapsible(eid, lambda)) return false;
+    if(!edge_is_geometrically_collapsible(eid, p)) return false;
     return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool Tetmesh<M,V,E,F,P>::edge_is_collapsible(const uint eid, const double lambda) const
+{
+    return edge_is_collapsible(eid, this->edge_sample_at(eid, lambda));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -366,12 +375,11 @@ bool Tetmesh<M,V,E,F,P>::edge_is_topologically_collapsible(const uint eid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,P>::edge_is_geometrically_collapsible(const uint eid, const double lambda) const
+bool Tetmesh<M,V,E,F,P>::edge_is_geometrically_collapsible(const uint eid, const vec3d & p) const
 {
     // no tet should flip or collapse
-    vec3d new_vert = this->edge_sample_at(eid, lambda);
-    uint  vid0     = this->edge_vert_id(eid,0);
-    uint  vid1     = this->edge_vert_id(eid,1);
+    uint vid0 = this->edge_vert_id(eid,0);
+    uint vid1 = this->edge_vert_id(eid,1);
 
     std::unordered_set<uint> polys_to_test;
     for(uint pid : this->adj_v2p(vid0)) if(!this->poly_contains_edge(pid, eid)) polys_to_test.insert(pid);
@@ -384,7 +392,7 @@ bool Tetmesh<M,V,E,F,P>::edge_is_geometrically_collapsible(const uint eid, const
         {
             bool is_v0 = (this->poly_vert_id(pid,i) == vid0);
             bool is_v1 = (this->poly_vert_id(pid,i) == vid1);
-            v[i] = (is_v0 || is_v1) ? new_vert : this->poly_vert(pid,i);
+            v[i] = (is_v0 || is_v1) ? p : this->poly_vert(pid,i);
         }
         // avoid collapses (but also tiny tets)
         if(tet_volume(v[0], v[1], v[2], v[3]) < 1e-10) return false;
@@ -399,16 +407,25 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 int Tetmesh<M,V,E,F,P>::edge_collapse(const uint eid, const double lambda, const double topologic_check, const double geometric_check)
 {
-    if(topologic_check && !edge_is_topologically_collapsible(eid))         return -1;
-    if(geometric_check && !edge_is_geometrically_collapsible(eid, lambda)) return -1;
+    vec3d p = this->edge_sample_at(eid, lambda);
+    return edge_collapse(eid, p, topologic_check, geometric_check);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int Tetmesh<M,V,E,F,P>::edge_collapse(const uint eid, const vec3d & p, const double topologic_check, const double geometric_check)
+{
+    if(topologic_check && !edge_is_topologically_collapsible(eid))    return -1;
+    if(geometric_check && !edge_is_geometrically_collapsible(eid, p)) return -1;
 
     int euler_before = this->Euler_characteristic();
 
     uint vert_to_keep   = this->edge_vert_id(eid,0);
     uint vert_to_remove = this->edge_vert_id(eid,1);
-    if (vert_to_remove < vert_to_keep) std::swap(vert_to_keep, vert_to_remove); // remove vert with highest ID
-
-    this->vert(vert_to_keep) = this->edge_sample_at(eid, lambda); // reposition vertex
+    if(vert_to_remove < vert_to_keep) std::swap(vert_to_keep, vert_to_remove); // remove vert with highest ID
+    this->vert(vert_to_keep) = p; // reposition vertex
 
     for(uint pid : this->adj_v2p(vert_to_remove))
     {
