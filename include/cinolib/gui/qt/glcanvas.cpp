@@ -210,9 +210,9 @@ void GLcanvas::zoom(const double angle)
     trackball.zoom_persp += angle;
     trackball.zoom_ortho += angle*0.01;
 
-    if(trackball.zoom_persp < 1e-5 ) trackball.zoom_persp = 1e-5;
-    if(trackball.zoom_persp > 179.0) trackball.zoom_persp = 179.0;
-    if(trackball.zoom_ortho < 1e-5 ) trackball.zoom_ortho = 1e-5;
+    if(trackball.zoom_persp < 1e-5 ) trackball.zoom_persp = 1e-5f;
+    if(trackball.zoom_persp > 179.0) trackball.zoom_persp = 179.0f;
+    if(trackball.zoom_ortho < 1e-5 ) trackball.zoom_ortho = 1e-5f;
 
     update_projection_matrix();
     updateGL();
@@ -624,7 +624,7 @@ void GLcanvas::set_scene_center(const vec3d  & new_center,
     trackball.scene_center = new_center;
     trackball.z_far        = dist_from_camera + trackball.scene_size;
     trackball.z_near       = dist_from_camera - trackball.scene_size;
-    if(trackball.z_near<1e-3) trackball.z_near = 1e-3; // avoid <=0 z_near
+    if(trackball.z_near<1e-3) trackball.z_near = 1e-3f; // avoid <=0 z_near
     if(pivot_at_center)       set_rotation_pivot(new_center);
     update_projection_matrix();
     updateGL();

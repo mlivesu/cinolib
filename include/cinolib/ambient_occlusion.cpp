@@ -94,7 +94,7 @@ AO_srf<Mesh>::AO_srf(const Mesh & m,
         glViewport(0, 0, buffer_size, buffer_size);
 
         m.draw();
-        float depth_buffer[buffer_size*buffer_size];
+        float* depth_buffer = new float[buffer_size*buffer_size];
         glReadPixels(0, 0, buffer_size, buffer_size, GL_DEPTH_COMPONENT, GL_FLOAT, depth_buffer);
 
         // accumulate AO values, weighting views with the dot between
@@ -113,6 +113,7 @@ AO_srf<Mesh>::AO_srf(const Mesh & m,
                 ao[pid] += diff;
             }
         }
+        delete depth_buffer;
     }
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();

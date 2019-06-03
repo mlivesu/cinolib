@@ -61,14 +61,14 @@ class Color
         static Color CYAN   (const float lum = 1.0) { return Color(     0.0, lum*1.0, lum*1.0); }
         static Color GRAY   (const float lum = 1.0) { return Color( lum*0.5, lum*0.5, lum*0.5); }
         //
-        static Color PASTEL_YELLOW()  { return Color(254.0/255.0, 229.0/255.0, 157.0/255.0); }
-        static Color PASTEL_MAGENTA() { return Color(252.0/255.0,  89.0/255.0, 148.0/255.0); }
-        static Color PASTEL_GREEN()   { return Color(198.0/255.0, 223.0/255.0, 182.0/255.0); }
-        static Color PASTEL_CYAN()    { return Color( 77.0/255.0, 193.0/255.0, 198.0/255.0); }
-        static Color PASTEL_VIOLET()  { return Color(124.0/255.0, 158.0/255.0, 251.0/255.0); }
-        static Color PASTEL_PINK()    { return Color(182.0/255.0, 200.0/255.0, 230.0/255.0); }
-        static Color PASTEL_RED()     { return Color(253.0/255.0, 104.0/255.0, 118.0/255.0); }
-        static Color PASTEL_ORANGE()  { return Color(253.0/255.0, 135.0/255.0,  86.0/255.0); }
+        static Color PASTEL_YELLOW()  { return Color(254.f/255.f, 229.f/255.f, 157.f/255.f); }
+        static Color PASTEL_MAGENTA() { return Color(252.f/255.f,  89.f/255.f, 148.f/255.f); }
+        static Color PASTEL_GREEN()   { return Color(198.f/255.f, 223.f/255.f, 182.f/255.f); }
+        static Color PASTEL_CYAN()    { return Color( 77.f/255.f, 193.f/255.f, 198.f/255.f); }
+        static Color PASTEL_VIOLET()  { return Color(124.f/255.f, 158.f/255.f, 251.f/255.f); }
+        static Color PASTEL_PINK()    { return Color(182.f/255.f, 200.f/255.f, 230.f/255.f); }
+        static Color PASTEL_RED()     { return Color(253.f/255.f, 104.f/255.f, 118.f/255.f); }
+        static Color PASTEL_ORANGE()  { return Color(253.f/255.f, 135.f/255.f,  86.f/255.f); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
