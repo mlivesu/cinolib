@@ -113,7 +113,7 @@ AO_srf<Mesh>::AO_srf(const Mesh & m,
                 ao[pid] += diff;
             }
         }
-        delete depth_buffer;
+        delete[] depth_buffer;
     }
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
