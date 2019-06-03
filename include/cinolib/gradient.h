@@ -64,9 +64,9 @@ namespace cinolib
  *
  * References:
  *
- *   Gradient Field Estimation on Triangle Meshes
+ *   A Comparison of Methods for Gradient Field Estimation on Simplicial Meshes
  *   Claudio Mancinelli, Marco Livesu, Enrico Puppo
- *   STAG - Smart Tools and Apps for Graphics (2018)
+ *   Computers & Graphics (2019)
  *
  *   Gradient Calculation Methods on Arbitrary Polyhedral Unstructured Meshes for Cell-Centered CFD Solvers
  *   Emre Sozer, Christoph Brehm and Cetin C. Kiris
