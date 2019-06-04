@@ -85,7 +85,7 @@ std::pair<uint,double> homotopy_basis(Trimesh<M,V,E,P>               & m,
                                       const bool                       by_edge_splits) // true: use the edge_split strategy; false: use the vert_split strategy
 {
     std::vector<bool> tree, cotree;
-    auto root_length = homotopy_basis(m, basis, tree, cotree);
+    std::pair<uint,double> root_length = homotopy_basis(m, basis, tree, cotree);
     if(detach_loops)
     {
         if(by_edge_splits) homotopy_basis_detach_loops_by_edge_split(m, root_length.first, basis);
@@ -155,7 +155,7 @@ double homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
 
     // Start from each such edge, and close a loop with its two endpoints
     basis.clear();
-    double length = 0;
+    double length = 0.0;
     for(uint eid : generators)
     {
         std::vector<uint> e0_to_root, e1_to_root;
