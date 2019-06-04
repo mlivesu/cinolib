@@ -35,7 +35,7 @@
 *********************************************************************************/
 #include <cinolib/homotopy_basis.h>
 #include <cinolib/homotopy_basis_detach_loops.h>
-#include <cinolib/dijkstra.h>
+#include <cinolib/shortest_path_tree.h>
 
 namespace cinolib
 {
@@ -71,40 +71,15 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
 {
     assert(root<m.num_verts());
 
-    basis.clear();
-    tree   = std::vector<bool>(m.num_edges(), false);
-    cotree = std::vector<bool>(m.num_edges(), false);
+    shortest_path_tree(m, root, tree);
 
-    m.vert_unmark_all();
-    m.poly_unmark_all();
-
-    std::queue<uint> q;
-    q.push(root);
-    m.vert_data(root).marked = true;
-
-    while(!q.empty())
-    {
-        uint vid = q.front();
-        q.pop();
-
-        for(uint nbr : m.adj_v2v(vid))
-        {
-            if(!m.vert_data(nbr).marked)
-            {
-                m.vert_data(nbr).marked = true;
-                q.push(nbr);
-                int eid = m.edge_id(vid, nbr);
-                assert(eid>=0);
-                tree.at(eid) = true;
-            }
-        }
-    }
-
-    assert(q.empty());
     uint pid = m.adj_v2p(root).front();
-    q.push(pid);
+    m.poly_unmark_all();
     m.poly_data(pid).marked = true;
+    std::queue<uint> q;
+    q.push(pid);
 
+    cotree = std::vector<bool>(m.num_edges(), false);
     while(!q.empty())
     {
         uint pid = q.front();
@@ -139,6 +114,7 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
     for(uint eid=0; eid<m.num_edges(); ++eid) edge_mask.at(eid) = !tree.at(eid);
 
     // start from each edge in loop generator and close a loop with its two endpoints
+    basis.clear();
     for(uint eid : generators)
     {
         std::vector<uint> e0_to_root, e1_to_root;
