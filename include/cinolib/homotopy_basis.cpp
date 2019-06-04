@@ -36,6 +36,7 @@
 #include <cinolib/homotopy_basis.h>
 #include <cinolib/homotopy_basis_detach_loops.h>
 #include <cinolib/shortest_path_tree.h>
+#include <cinolib/mst.h>
 
 namespace cinolib
 {
@@ -73,35 +74,24 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
 
     shortest_path_tree(m, root, tree);
 
-    uint pid = m.adj_v2p(root).front();
-    m.poly_unmark_all();
-    m.poly_data(pid).marked = true;
-    std::queue<uint> q;
-    q.push(pid);
-
-    cotree = std::vector<bool>(m.num_edges(), false);
-    while(!q.empty())
+    // Compute the cotree as the Maximum Spanning Tree of the dual of M,
+    // without considering dual edges that cross edges of primal tree.
+    //
+    // I'm using a classical Minimum Spanning Tree algorithm (Prim's) with negative weights
+    std::vector<float> edge_weights(m.num_edges(),0);
+    std::vector<bool>  edge_mask(m.num_edges()); // restrict Dijkstra to the edges in tree only
+    for(uint eid=0; eid<m.num_edges(); ++eid) edge_mask.at(eid) = !tree.at(eid);
+    for(uint eid=0; eid<m.num_edges(); ++eid)
     {
-        uint pid = q.front();
-        q.pop();
-
-        for(uint nbr : m.adj_p2p(pid))
-        {
-            if(!m.poly_data(nbr).marked)
-            {
-                int eid = m.edge_shared(pid, nbr);
-                assert(eid>=0);
-                if(!tree.at(eid))
-                {
-                    q.push(nbr);
-                    m.poly_data(nbr).marked = true;
-                    cotree.at(eid) = true;
-                }
-            }
-        }
+        if(tree.at(eid)) continue;
+        std::vector<uint> tmp;
+        edge_weights.at(eid) -= m.edge_length(eid);
+        edge_weights.at(eid) -= dijkstra_mask_on_edges(m, m.edge_vert_id(eid,0), root, edge_mask, tmp);
+        edge_weights.at(eid) -= dijkstra_mask_on_edges(m, m.edge_vert_id(eid,1), root, edge_mask, tmp);
     }
+    MST_on_dual_mask_on_edges(m, edge_weights, tree, cotree); // use tree as edge mask
 
-    // find edges neither in tree, nor in cotree
+    // Find the edges neither in tree, nor in cotree
     std::vector<uint> generators;
     for(uint eid=0; eid<m.num_edges(); ++eid)
     {
@@ -109,11 +99,7 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
     }
     assert(m.genus()*2 == (int)generators.size());
 
-    // to restrict Dijkstra to the edges in tree only
-    std::vector<bool> edge_mask(m.num_edges());
-    for(uint eid=0; eid<m.num_edges(); ++eid) edge_mask.at(eid) = !tree.at(eid);
-
-    // start from each edge in loop generator and close a loop with its two endpoints
+    // Start from each such edge, and close a loop with its two endpoints
     basis.clear();
     for(uint eid : generators)
     {
