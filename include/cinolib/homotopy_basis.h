@@ -52,33 +52,45 @@ namespace cinolib
  *   Greedy optimal homotopy and homology generators
  *   Jeff Erickson and Kim Whittlesey
  *   ACM-SIAM symposium on Discrete algorithms, 2005
- *
- * TODO #1: the cotree is currently not a minimum spanning
- * tree. I should be using Kruskal to compute it
- *
- * TODO #2: the method computes a basis in O(n log n).
- * Iteratively running the algorithm at any point one
- * can compute the shortest homotopic basis in O(n^2 log n)
 */
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void homotopy_basis(Trimesh<M,V,E,P>               & m,
-                    const uint                       root,
-                    std::vector<std::vector<uint>> & basis,
-                    const bool                       detach_loops,    // refine the mesh to make sure each edge is contained in at most one basis loop
-                    const bool                       by_edge_splits); // true: use the edge_split strategy; false: use the vert_split strategy
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
-                    const uint                      root,
-                    std::vector<std::vector<uint>> & basis,
-                    std::vector<bool>              & tree,
-                    std::vector<bool>              & cotree);
+std::pair<uint,double> homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
+                                      std::vector<std::vector<uint>> & basis,
+                                      std::vector<bool>              & tree,
+                                      std::vector<bool>              & cotree);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::pair<uint,double> homotopy_basis(Trimesh<M,V,E,P>               & m,
+                                      std::vector<std::vector<uint>> & basis,
+                                      const bool                       detach_loops,    // refine the mesh to make sure each edge is contained in at most one basis loop
+                                      const bool                       by_edge_splits); // true: use the edge_split strategy; false: use the vert_split strategy
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double homotopy_basis(Trimesh<M,V,E,P>               & m,
+                      const uint                       root,
+                      std::vector<std::vector<uint>> & basis,
+                      const bool                       detach_loops,    // refine the mesh to make sure each edge is contained in at most one basis loop
+                      const bool                       by_edge_splits); // true: use the edge_split strategy; false: use the vert_split strategy
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
+                      const uint                      root,
+                      std::vector<std::vector<uint>> & basis,
+                      std::vector<bool>              & tree,
+                      std::vector<bool>              & cotree);
 }
 
 #ifndef  CINO_STATIC_LIB
