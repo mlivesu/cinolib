@@ -84,9 +84,9 @@ void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
         {
             double new_dist = distances.at(vid) + m.vert(vid).dist(m.vert(nbr));
 
-            if (distances.at(nbr) > new_dist)
+            if(distances.at(nbr) > new_dist)
             {
-                if (distances.at(nbr) < inf_double) // otherwise it won't be found
+                if(distances.at(nbr) < inf_double) // otherwise it won't be found
                 {
                     auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
                     assert(it!=active_set.end());
@@ -122,9 +122,9 @@ void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
         {
             double new_dist = distances.at(vid) + m.vert(vid).dist(m.vert(nbr));
 
-            if (distances.at(nbr) > new_dist)
+            if(distances.at(nbr) > new_dist)
             {
-                if (distances.at(nbr) < inf_double) // otherwise it won't be found
+                if(distances.at(nbr) < inf_double) // otherwise it won't be found
                 {
                     auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
                     assert(it!=active_set.end());
@@ -183,10 +183,10 @@ void dijkstra_exhaustive_srf_only(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void dijkstra(const AbstractMesh<M,V,E,P> & m,
-              const uint                    source,
-              const uint                    dest,
-                    std::vector<uint>     & path)
+double dijkstra(const AbstractMesh<M,V,E,P> & m,
+                const uint                    source,
+                const uint                    dest,
+                      std::vector<uint>     & path)
 {
     path.clear();
 
@@ -203,21 +203,21 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
         uint vid = active_set.begin()->second;
         active_set.erase(active_set.begin());
 
-        if (vid==dest)
+        if(vid==dest)
         {
             int tmp = vid;
             do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
             std::reverse(path.begin(), path.end());
-            return;
+            return dist.at(dest);
         }
 
         for(uint nbr : m.adj_v2v(vid))
         {
             double new_dist = dist.at(vid) + m.vert(vid).dist(m.vert(nbr));
 
-            if (dist.at(nbr) > new_dist)
+            if(dist.at(nbr) > new_dist)
             {
-                if (dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found
                 {
                     auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
                     assert(it!=active_set.end());
@@ -230,6 +230,7 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
         }
     }
     assert(false && "Dijkstra did not converge!");
+    return 0.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -239,11 +240,11 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
 //
 template<class M, class V, class E, class P>
 CINO_INLINE
-void dijkstra(const AbstractMesh<M,V,E,P> & m,
-              const uint                    source,
-              const uint                    dest,
-              const std::vector<bool>     & mask,
-                    std::vector<uint>     & path)
+double dijkstra(const AbstractMesh<M,V,E,P> & m,
+                const uint                    source,
+                const uint                    dest,
+                const std::vector<bool>     & mask,
+                      std::vector<uint>     & path)
 {
     path.clear();
     assert(mask.size() == m.num_verts());
@@ -261,23 +262,23 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
         uint vid = active_set.begin()->second;
         active_set.erase(active_set.begin());
 
-        if (vid==dest)
+        if(vid==dest)
         {
             int tmp = vid;
             do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
             std::reverse(path.begin(), path.end());
-            return;
+            return dist.at(dest);
         }
 
         for(uint nbr : m.adj_v2v(vid))
         {
-            if (mask.at(nbr)) continue;
+            if(mask.at(nbr)) continue;
 
             double new_dist = dist.at(vid) + m.vert(vid).dist(m.vert(nbr));
 
-            if (dist.at(nbr) > new_dist)
+            if(dist.at(nbr) > new_dist)
             {
-                if (dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found
                 {
                     auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
                     assert(it!=active_set.end());
@@ -290,6 +291,7 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
         }
     }
     assert(false && "Dijkstra did not converge!");
+    return 0.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -299,11 +301,11 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
 //
 template<class M, class V, class E, class P>
 CINO_INLINE
-void dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
-                            const uint                    source,
-                            const uint                    dest,
-                            const std::vector<bool>     & mask, // if mask[e] = true, path cannot pass through edge e
-                                  std::vector<uint>     & path)
+double dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
+                              const uint                    source,
+                              const uint                    dest,
+                              const std::vector<bool>     & mask, // if mask[e] = true, path cannot pass through edge e
+                                    std::vector<uint>     & path)
 {
     path.clear();
     assert(mask.size() == m.num_edges());
@@ -321,12 +323,12 @@ void dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
         uint vid = active_set.begin()->second;
         active_set.erase(active_set.begin());
 
-        if (vid==dest)
+        if(vid==dest)
         {
             int tmp = vid;
             do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
             std::reverse(path.begin(), path.end());
-            return;
+            return dist.at(dest);
         }
 
         for(uint nbr : m.adj_v2v(vid))
@@ -340,7 +342,7 @@ void dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
 
             if(dist.at(nbr) > new_dist)
             {
-                if (dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found
                 {
                     auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
                     assert(it!=active_set.end());
@@ -353,6 +355,7 @@ void dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
         }
     }
     assert(false && "Dijkstra did not converge!");
+    return 0.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -363,11 +366,11 @@ void dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
 //
 template<class M, class V, class E, class P>
 CINO_INLINE
-void dijkstra(const AbstractMesh<M,V,E,P> & m,
-              const uint                    source,
-              const std::set<uint>        & dest,
-              const std::vector<bool>     & mask,
-                    std::vector<uint>     & path)
+double dijkstra(const AbstractMesh<M,V,E,P> & m,
+                const uint                    source,
+                const std::set<uint>        & dest,
+                const std::vector<bool>     & mask,
+                      std::vector<uint>     & path)
 {
     path.clear();
     assert(mask.size() == m.num_verts());
@@ -385,23 +388,23 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
         uint vid = active_set.begin()->second;
         active_set.erase(active_set.begin());
 
-        if (CONTAINS(dest,vid))
+        if(CONTAINS(dest,vid))
         {
             int tmp = vid;
             do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
             std::reverse(path.begin(), path.end());
-            return;
+            return dist.at(vid);
         }
 
         for(uint nbr : m.adj_v2v(vid))
         {
-            if (mask.at(nbr)) continue;
+            if(mask.at(nbr)) continue;
 
             double new_dist = dist.at(vid) + m.vert(vid).dist(m.vert(nbr));
 
-            if (dist.at(nbr) > new_dist)
+            if(dist.at(nbr) > new_dist)
             {
-                if (dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found
                 {
                     auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
                     assert(it!=active_set.end());
@@ -414,6 +417,7 @@ void dijkstra(const AbstractMesh<M,V,E,P> & m,
         }
     }
     assert(false && "Dijkstra did not converge!");
+    return 0.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -439,9 +443,9 @@ void dijkstra_exhaustive_on_dual(const AbstractMesh<M,V,E,P> & m,
         {
             double new_dist = distances.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
 
-            if (distances.at(nbr) > new_dist)
+            if(distances.at(nbr) > new_dist)
             {
-                if (distances.at(nbr) < inf_double) // otherwise it won't be found
+                if(distances.at(nbr) < inf_double) // otherwise it won't be found
                 {
                     auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
                     assert(it!=active_set.end());
@@ -481,9 +485,9 @@ void dijkstra_exhaustive_on_dual(const AbstractMesh<M,V,E,P> & m,
         {
             double new_dist = distances.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
 
-            if (distances.at(nbr) > new_dist)
+            if(distances.at(nbr) > new_dist)
             {
-                if (distances.at(nbr) < inf_double) // otherwise it won't be found
+                if(distances.at(nbr) < inf_double) // otherwise it won't be found
                 {
                     auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
                     assert(it!=active_set.end());
@@ -500,10 +504,10 @@ void dijkstra_exhaustive_on_dual(const AbstractMesh<M,V,E,P> & m,
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
-                      const uint                    source,
-                      const uint                    dest,
-                            std::vector<uint>     & path)
+double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
+                        const uint                    source,
+                        const uint                    dest,
+                              std::vector<uint>     & path)
 {
     path.clear();
 
@@ -520,21 +524,21 @@ void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
         uint vid = active_set.begin()->second;
         active_set.erase(active_set.begin());
 
-        if (vid==dest)
+        if(vid==dest)
         {
             int tmp = vid;
             do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
             std::reverse(path.begin(), path.end());
-            return;
+            return dist.at(dest);
         }
 
         for(uint nbr : m.adj_p2p(vid))
         {
             double new_dist = dist.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
 
-            if (dist.at(nbr) > new_dist)
+            if(dist.at(nbr) > new_dist)
             {
-                if (dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found
                 {
                     auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
                     assert(it!=active_set.end());
@@ -547,17 +551,18 @@ void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
         }
     }
     assert(false && "Dijkstra did not converge!");
+    return 0.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
-                      const uint                    source,
-                      const uint                    dest,
-                      const std::vector<bool>     & mask,
-                            std::vector<uint>     & path)
+double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
+                        const uint                    source,
+                        const uint                    dest,
+                        const std::vector<bool>     & mask,
+                              std::vector<uint>     & path)
 {
     path.clear();
 
@@ -574,23 +579,23 @@ void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
         uint vid = active_set.begin()->second;
         active_set.erase(active_set.begin());
 
-        if (vid==dest)
+        if(vid==dest)
         {
             int tmp = vid;
             do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
             std::reverse(path.begin(), path.end());
-            return;
+            return dist.at(dest);
         }
 
         for(uint nbr : m.adj_p2p(vid))
         {
-            if (mask.at(nbr)) continue;
+            if(mask.at(nbr)) continue;
 
             double new_dist = dist.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
 
-            if (dist.at(nbr) > new_dist)
+            if(dist.at(nbr) > new_dist)
             {
-                if (dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found
                 {
                     auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
                     assert(it!=active_set.end());
@@ -603,17 +608,18 @@ void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
         }
     }
     assert(false && "Dijkstra did not converge!");
+    return 0.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
-                      const uint                    source,
-                      const std::set<uint>        & dest,
-                      const std::vector<bool>     & mask,
-                            std::vector<uint>     & path)
+double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
+                        const uint                    source,
+                        const std::set<uint>        & dest,
+                        const std::vector<bool>     & mask,
+                              std::vector<uint>     & path)
 {
     path.clear();
 
@@ -630,23 +636,23 @@ void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
         uint vid = active_set.begin()->second;
         active_set.erase(active_set.begin());
 
-        if (CONTAINS(dest,vid))
+        if(CONTAINS(dest,vid))
         {
             int tmp = vid;
             do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
             std::reverse(path.begin(), path.end());
-            return;
+            return dist.at(vid);
         }
 
         for(uint nbr : m.adj_p2p(vid))
         {
-            if (mask.at(nbr)) continue;
+            if(mask.at(nbr)) continue;
 
             double new_dist = dist.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
 
-            if (dist.at(nbr) > new_dist)
+            if(dist.at(nbr) > new_dist)
             {
-                if (dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found
                 {
                     auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
                     assert(it!=active_set.end());
@@ -659,6 +665,7 @@ void dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
         }
     }
     assert(false && "Dijkstra did not converge!");
+    return 0.0;
 }
 
 }
