@@ -67,33 +67,33 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
                          const uint                    source,
-                               std::vector<double>   & distances)
+                               std::vector<double>   & dist)
 {
-    distances = std::vector<double>(m.num_verts(), inf_double);
-    distances.at(source) = 0.0;
+    dist = std::vector<double>(m.num_verts(), inf_double);
+    dist.at(source) = 0.0;
 
-    std::set<std::pair<double,uint>> active_set;
-    active_set.insert(std::make_pair(0.0,source));
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         for(uint nbr : m.adj_v2v(vid))
         {
-            double new_dist = distances.at(vid) + m.vert(vid).dist(m.vert(nbr));
+            double new_dist = dist.at(vid) + m.vert(vid).dist(m.vert(nbr));
 
-            if(distances.at(nbr) > new_dist)
+            if(dist.at(nbr) > new_dist)
             {
-                if(distances.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                 {
-                    auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
-                    assert(it!=active_set.end());
-                    active_set.erase(it);
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
                 }
-                distances.at(nbr) = new_dist;
-                active_set.insert(std::make_pair(new_dist,nbr));
+                dist.at(nbr) = new_dist;
+                q.insert(std::make_pair(new_dist,nbr));
             }
         }
     }
@@ -105,33 +105,33 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
                          const std::vector<uint>     & sources,
-                               std::vector<double>   & distances)
+                               std::vector<double>   & dist)
 {
-    distances = std::vector<double>(m.num_verts(), inf_double);
-    for(uint vid : sources) distances.at(vid) = 0.0;
+    dist = std::vector<double>(m.num_verts(), inf_double);
+    for(uint vid : sources) dist.at(vid) = 0.0;
 
-    std::set<std::pair<double,uint>> active_set;
-    for(uint vid : sources) active_set.insert(std::make_pair(0.0,vid));
+    std::set<std::pair<double,uint>> q;
+    for(uint vid : sources) q.insert(std::make_pair(0.0,vid));
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         for(uint nbr : m.adj_v2v(vid))
         {
-            double new_dist = distances.at(vid) + m.vert(vid).dist(m.vert(nbr));
+            double new_dist = dist.at(vid) + m.vert(vid).dist(m.vert(nbr));
 
-            if(distances.at(nbr) > new_dist)
+            if(dist.at(nbr) > new_dist)
             {
-                if(distances.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                 {
-                    auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
-                    assert(it!=active_set.end());
-                    active_set.erase(it);
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
                 }
-                distances.at(nbr) = new_dist;
-                active_set.insert(std::make_pair(new_dist,nbr));
+                dist.at(nbr) = new_dist;
+                q.insert(std::make_pair(new_dist,nbr));
             }
         }
     }
@@ -143,36 +143,36 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void dijkstra_exhaustive_srf_only(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                                   const std::vector<uint>                 & sources,
-                                        std::vector<double>               & distances)
+                                        std::vector<double>               & dist)
 {
-    distances = std::vector<double>(m.num_verts(), inf_double);
-    for(uint vid : sources) distances.at(vid) = 0.0;
+    dist = std::vector<double>(m.num_verts(), inf_double);
+    for(uint vid : sources) dist.at(vid) = 0.0;
 
-    std::set<std::pair<double,uint>> active_set;
-    for(uint vid : sources) active_set.insert(std::make_pair(0.0,vid));
+    std::set<std::pair<double,uint>> q;
+    for(uint vid : sources) q.insert(std::make_pair(0.0,vid));
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         for(uint eid : m.adj_v2e(vid))
         {
             if(m.edge_is_on_srf(eid))
             {
                 uint   nbr      = m.vert_opposite_to(eid,vid);
-                double new_dist = distances.at(vid) + m.vert(vid).dist(m.vert(nbr));
+                double new_dist = dist.at(vid) + m.vert(vid).dist(m.vert(nbr));
 
-                if(distances.at(nbr) > new_dist)
+                if(dist.at(nbr) > new_dist)
                 {
-                    if(distances.at(nbr) < inf_double) // otherwise it won't be found
+                    if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                     {
-                        auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
-                        assert(it!=active_set.end());
-                        active_set.erase(it);
+                        auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                        assert(it!=q.end());
+                        q.erase(it);
                     }
-                    distances.at(nbr) = new_dist;
-                    active_set.insert(std::make_pair(new_dist,nbr));
+                    dist.at(nbr) = new_dist;
+                    q.insert(std::make_pair(new_dist,nbr));
                 }
             }
         }
@@ -195,13 +195,13 @@ double dijkstra(const AbstractMesh<M,V,E,P> & m,
     std::vector<double> dist(m.num_verts(), inf_double);
     dist.at(source) = 0.0;
 
-    std::set<std::pair<double,uint>> active_set;
-    active_set.insert(std::make_pair(0.0,source));
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         if(vid==dest)
         {
@@ -217,15 +217,15 @@ double dijkstra(const AbstractMesh<M,V,E,P> & m,
 
             if(dist.at(nbr) > new_dist)
             {
-                if(dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                 {
-                    auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
-                    assert(it!=active_set.end());
-                    active_set.erase(it);
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
                 }
                 dist.at(nbr) = new_dist;
                 prev.at(nbr) = vid;
-                active_set.insert(std::make_pair(new_dist,nbr));
+                q.insert(std::make_pair(new_dist,nbr));
             }
         }
     }
@@ -254,13 +254,13 @@ double dijkstra(const AbstractMesh<M,V,E,P> & m,
     std::vector<double> dist(m.num_verts(), inf_double);
     dist.at(source) = 0.0;
 
-    std::set<std::pair<double,uint>> active_set;
-    active_set.insert(std::make_pair(0.0,source));
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         if(vid==dest)
         {
@@ -278,15 +278,15 @@ double dijkstra(const AbstractMesh<M,V,E,P> & m,
 
             if(dist.at(nbr) > new_dist)
             {
-                if(dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                 {
-                    auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
-                    assert(it!=active_set.end());
-                    active_set.erase(it);
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
                 }
                 dist.at(nbr) = new_dist;
                 prev.at(nbr) = vid;
-                active_set.insert(std::make_pair(new_dist,nbr));
+                q.insert(std::make_pair(new_dist,nbr));
             }
         }
     }
@@ -315,13 +315,13 @@ double dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
     std::vector<double> dist(m.num_verts(), inf_double);
     dist.at(source) = 0.0;
 
-    std::set<std::pair<double,uint>> active_set;
-    active_set.insert(std::make_pair(0.0,source));
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         if(vid==dest)
         {
@@ -342,15 +342,15 @@ double dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
 
             if(dist.at(nbr) > new_dist)
             {
-                if(dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                 {
-                    auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
-                    assert(it!=active_set.end());
-                    active_set.erase(it);
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
                 }
                 dist.at(nbr) = new_dist;
                 prev.at(nbr) = vid;
-                active_set.insert(std::make_pair(new_dist,nbr));
+                q.insert(std::make_pair(new_dist,nbr));
             }
         }
     }
@@ -380,13 +380,13 @@ double dijkstra(const AbstractMesh<M,V,E,P> & m,
     std::vector<double> dist(m.num_verts(), inf_double);
     dist.at(source) = 0.0;
 
-    std::set<std::pair<double,uint>> active_set;
-    active_set.insert(std::make_pair(0.0,source));
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         if(CONTAINS(dest,vid))
         {
@@ -404,15 +404,15 @@ double dijkstra(const AbstractMesh<M,V,E,P> & m,
 
             if(dist.at(nbr) > new_dist)
             {
-                if(dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                 {
-                    auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
-                    assert(it!=active_set.end());
-                    active_set.erase(it);
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
                 }
                 dist.at(nbr) = new_dist;
                 prev.at(nbr) = vid;
-                active_set.insert(std::make_pair(new_dist,nbr));
+                q.insert(std::make_pair(new_dist,nbr));
             }
         }
     }
@@ -426,33 +426,33 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_exhaustive_on_dual(const AbstractMesh<M,V,E,P> & m,
                                  const uint                    source,
-                                       std::vector<double>   & distances)
+                                       std::vector<double>   & dist)
 {
-    distances = std::vector<double>(m.num_polys(), inf_double);
-    distances.at(source) = 0.0;
+    dist = std::vector<double>(m.num_polys(), inf_double);
+    dist.at(source) = 0.0;
 
-    std::set<std::pair<double,uint>> active_set;
-    active_set.insert(std::make_pair(0.0,source));
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         for(uint nbr : m.adj_p2p(vid))
         {
-            double new_dist = distances.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
+            double new_dist = dist.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
 
-            if(distances.at(nbr) > new_dist)
+            if(dist.at(nbr) > new_dist)
             {
-                if(distances.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                 {
-                    auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
-                    assert(it!=active_set.end());
-                    active_set.erase(it);
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
                 }
-                distances.at(nbr) = new_dist;
-                active_set.insert(std::make_pair(new_dist,nbr));
+                dist.at(nbr) = new_dist;
+                q.insert(std::make_pair(new_dist,nbr));
             }
         }
     }
@@ -464,37 +464,37 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_exhaustive_on_dual(const AbstractMesh<M,V,E,P> & m,
                                  const std::vector<uint>     & sources,
-                                       std::vector<double>   & distances)
+                                       std::vector<double>   & dist)
 {
-    distances = std::vector<double>(m.num_polys(), inf_double);
+    dist = std::vector<double>(m.num_polys(), inf_double);
 
-    std::set<std::pair<double,uint>> active_set;
+    std::set<std::pair<double,uint>> q;
 
     for(uint s : sources)
     {
-        distances.at(s) = 0.0;
-        active_set.insert(std::make_pair(0.0,s));
+        dist.at(s) = 0.0;
+        q.insert(std::make_pair(0.0,s));
     }
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         for(uint nbr : m.adj_p2p(vid))
         {
-            double new_dist = distances.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
+            double new_dist = dist.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
 
-            if(distances.at(nbr) > new_dist)
+            if(dist.at(nbr) > new_dist)
             {
-                if(distances.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                 {
-                    auto it = active_set.find(std::make_pair(distances.at(nbr),nbr));
-                    assert(it!=active_set.end());
-                    active_set.erase(it);
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
                 }
-                distances.at(nbr) = new_dist;
-                active_set.insert(std::make_pair(new_dist,nbr));
+                dist.at(nbr) = new_dist;
+                q.insert(std::make_pair(new_dist,nbr));
             }
         }
     }
@@ -516,13 +516,13 @@ double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
     std::vector<double> dist(m.num_polys(), inf_double);
     dist.at(source) = 0.0;
 
-    std::set<std::pair<double,uint>> active_set;
-    active_set.insert(std::make_pair(0.0,source));
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         if(vid==dest)
         {
@@ -538,15 +538,15 @@ double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
 
             if(dist.at(nbr) > new_dist)
             {
-                if(dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                 {
-                    auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
-                    assert(it!=active_set.end());
-                    active_set.erase(it);
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
                 }
                 dist.at(nbr) = new_dist;
                 prev.at(nbr) = vid;
-                active_set.insert(std::make_pair(new_dist,nbr));
+                q.insert(std::make_pair(new_dist,nbr));
             }
         }
     }
@@ -571,13 +571,13 @@ double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
     std::vector<double> dist(m.num_polys(), inf_double);
     dist.at(source) = 0.0;
 
-    std::set<std::pair<double,uint>> active_set;
-    active_set.insert(std::make_pair(0.0,source));
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         if(vid==dest)
         {
@@ -595,15 +595,15 @@ double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
 
             if(dist.at(nbr) > new_dist)
             {
-                if(dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                 {
-                    auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
-                    assert(it!=active_set.end());
-                    active_set.erase(it);
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
                 }
                 dist.at(nbr) = new_dist;
                 prev.at(nbr) = vid;
-                active_set.insert(std::make_pair(new_dist,nbr));
+                q.insert(std::make_pair(new_dist,nbr));
             }
         }
     }
@@ -628,13 +628,13 @@ double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
     std::vector<double> dist(m.num_polys(), inf_double);
     dist.at(source) = 0.0;
 
-    std::set<std::pair<double,uint>> active_set;
-    active_set.insert(std::make_pair(0.0,source));
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
 
-    while(!active_set.empty())
+    while(!q.empty())
     {
-        uint vid = active_set.begin()->second;
-        active_set.erase(active_set.begin());
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
 
         if(CONTAINS(dest,vid))
         {
@@ -652,15 +652,15 @@ double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
 
             if(dist.at(nbr) > new_dist)
             {
-                if(dist.at(nbr) < inf_double) // otherwise it won't be found
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
                 {
-                    auto it = active_set.find(std::make_pair(dist.at(nbr),nbr));
-                    assert(it!=active_set.end());
-                    active_set.erase(it);
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
                 }
                 dist.at(nbr) = new_dist;
                 prev.at(nbr) = vid;
-                active_set.insert(std::make_pair(new_dist,nbr));
+                q.insert(std::make_pair(new_dist,nbr));
             }
         }
     }

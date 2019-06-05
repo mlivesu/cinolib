@@ -54,7 +54,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
                          const uint                    source,
-                               std::vector<double>   & distances);
+                               std::vector<double>   & dist);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -62,7 +62,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_exhaustive(const AbstractMesh<M,V,E,P> & m,
                          const std::vector<uint>     & sources,
-                               std::vector<double>   & distances);
+                               std::vector<double>   & dist);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -70,7 +70,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void dijkstra_exhaustive_srf_only(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                                   const std::vector<uint>                 & sources,
-                                        std::vector<double>               & distances); // unreached verts will have inf_double distance
+                                        std::vector<double>               & dist); // unreached verts will have inf_double distance
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -119,7 +119,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_exhaustive_on_dual(const AbstractMesh<M,V,E,P> & m,
                                  const uint                    source,
-                                       std::vector<double>   & distances);
+                                       std::vector<double>   & dist);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -127,7 +127,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_exhaustive_on_dual(const AbstractMesh<M,V,E,P> & m,
                                  const std::vector<uint>     & sources,
-                                       std::vector<double>   & distances);
+                                       std::vector<double>   & dist);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
