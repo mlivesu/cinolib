@@ -1362,7 +1362,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & vlist)
 {
-    if(poly_id(vlist)==-1)
+    if(poly_id(vlist)!=-1)
     {
         std::cout << ANSI_fg_color_red << "WARNING: adding duplicated poly!" << ANSI_fg_color_default << std::endl;
     }
