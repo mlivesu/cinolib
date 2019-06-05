@@ -112,19 +112,15 @@ Here is a list of the sample programs available in CinoLib.
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
-* Export a cluster from a labeled surface or volumetric mesh
 * Copy/paste points of view from the GL canvas for accurate visual comparisons and fast snapshot reproduction
 * Customize data structures with user defined mesh/vertex/edge/polygon/polyhedron attributes
 * Navigate application history exploiting Cinolib undo/redo facilities
 * Generate, process and visualize scalar fields
 * Generate, process and visualize vector fields
-* Topology editing operators for triangle meshes
 * Topology editing operators for tetrahedral meshes
 * Topology editing operators for general polygonal meshes
 * Topology editing operators for general polyhedral meshes
 * Subdivision schemas for hexahedral meshes
-* Parameterization based hexahedral remeshing
-* Evaluation of mapping distortions (angle/areas distortion popular metrics)
 * Solve multi-labeling problems on surfaces and volumes using the [GraphCuts](http://vision.csd.uwo.ca/code/) wrapper
 * Integral curve computation (and tessellation)
 * Processing of 2D polygons (booleans, thickening), using the [Boost Polygon Library](https://www.boost.org/doc/libs/1_67_0/libs/polygon/doc/index.htm) wrapper
