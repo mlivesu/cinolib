@@ -50,12 +50,13 @@ int main(int argc, char **argv)
     std::vector<std::vector<uint>> basis;
     std::vector<bool> tree, cotree;
 
+    uint root = 152; // best for torus
     profiler.push("Homotopy basis");
-    homotopy_basis(m, 0, basis, tree, cotree);
+    double len = homotopy_basis(m, root, basis, tree, cotree);
     profiler.pop();
+    std::cout << "Shortest homotopy basis centered at vertex " << root << ". Length is " << len << std::endl;
 
     // Visualization part
-
     DrawableSegmentSoup ss_basis;
     ss_basis.set_cheap_rendering(false);
     ss_basis.set_color(Color::BLACK());
