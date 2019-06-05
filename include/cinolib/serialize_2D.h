@@ -43,12 +43,12 @@ namespace cinolib
 {
 
 CINO_INLINE
-int serialize_2D_index(const int r, const int c, const int n_cols);
+uint serialize_2D_index(const uint r, const uint c, const uint n_cols);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-ipair deserialize_2D_index(const int i, const int n_cols);
+ipair deserialize_2D_index(const uint i, const uint n_cols);
 
 }
 
