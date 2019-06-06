@@ -1205,6 +1205,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 int AbstractPolygonMesh<M,V,E,P>::poly_id(const std::vector<uint> & vlist) const
 {
+    assert(!vlist.empty());
     std::vector<uint> query = SORT_VEC(vlist);
 
     uint vid = vlist.front();
