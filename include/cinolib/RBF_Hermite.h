@@ -37,6 +37,7 @@
 #define CINO_RBF_HERMITE_H
 
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/scalar_field.h>
 #include <Eigen/Dense>
 
 namespace cinolib
@@ -71,8 +72,9 @@ class Hermite_RBF
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double eval     (const vec3d & p) const; // evaluate RBF at point p
-        vec3d  eval_grad(const vec3d & p) const; // evaluate nabla RBF at point p
+        ScalarField eval     (const std::vector<vec3d> & plist) const; // evaluate RBF at points plist
+        double      eval     (const vec3d & p) const;                  // evaluate RBF at point p
+        vec3d       eval_grad(const vec3d & p) const;                  // evaluate nabla RBF at point p
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

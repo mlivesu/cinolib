@@ -105,6 +105,17 @@ Hermite_RBF<RBF>::Hermite_RBF(const std::vector<vec3d> & points,
 
 template<class RBF>
 CINO_INLINE
+ScalarField Hermite_RBF<RBF>::eval(const std::vector<vec3d> & plist) const
+{
+    ScalarField f(plist.size());
+    for(uint i=0; i<plist.size(); ++i) f[i] = eval(plist.at(i));
+    return f;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class RBF>
+CINO_INLINE
 double Hermite_RBF<RBF>::eval(const vec3d & p) const
 {
     Eigen::Vector3d pp(p.x(), p.y(), p.z());

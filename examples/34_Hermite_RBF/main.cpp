@@ -43,10 +43,8 @@ int main(int argc, char **argv)
 
     // evaluate the BRBF at each volume point
     profiler.push("Evaluate HRBF at volume sampling");
-    for(uint vid=0; vid<vol_sampling.num_verts(); ++vid)
-    {
-        vol_sampling.vert_data(vid).uvw[0] = HRBF.eval(vol_sampling.vert(vid));
-    }
+    ScalarField f = HRBF.eval(vol_sampling.vector_verts());
+    f.copy_to_mesh(vol_sampling);
     profiler.pop();
 
     GLcanvas gui;
@@ -56,7 +54,7 @@ int main(int argc, char **argv)
 
     // the BRHF interpolant is the zero level set of the so generated field
     DrawableIsosurface<> iso(vol_sampling, 0);
-    //gui.push_obj(&iso);
+    gui.push_obj(&iso);
 
     // slice the volume, hide the target surface (for visualization)
     SlicerState ss;
