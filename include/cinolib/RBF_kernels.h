@@ -33,8 +33,20 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include "RBF_library.h"
+#ifndef CINO_RBF_KERNELS_H
+#define CINO_RBF_KERNELS_H
 
 namespace cinolib
 {
+
+class CubicRBF
+{
+    public:
+    static inline double eval_f  (const double x) { return x*x*x; }
+    static inline double eval_df (const double x) { return 3*x*x; } // first  derivative
+    static inline double eval_ddf(const double x) { return 6*x;   } // second derivative
+};
+
 }
+
+#endif // CINO_RBF_KERNELS_H
