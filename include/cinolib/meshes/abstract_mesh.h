@@ -152,12 +152,14 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<Color> vector_vert_colors() const;
-        std::vector<int>   vector_vert_labels() const;
-        std::vector<Color> vector_edge_colors() const;
-        std::vector<int>   vector_edge_labels() const;
-        std::vector<Color> vector_poly_colors() const;
-        std::vector<int>   vector_poly_labels() const;
+        std::vector<vec3d> vector_vert_normals() const;
+        std::vector<Color> vector_vert_colors()  const;
+        std::vector<int>   vector_vert_labels()  const;
+        std::vector<Color> vector_edge_colors()  const;
+        std::vector<int>   vector_edge_labels()  const;
+        std::vector<vec3d> vector_poly_normals() const;
+        std::vector<Color> vector_poly_colors()  const;
+        std::vector<int>   vector_poly_labels()  const;
         std::vector<Color> vector_poly_unique_colors() const;
         std::vector<int>   vector_poly_unique_labels() const;
 

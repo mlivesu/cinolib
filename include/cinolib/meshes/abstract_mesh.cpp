@@ -183,7 +183,22 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 int AbstractMesh<M,V,E,P>::genus() const
 {
-    return  (2 - Euler_characteristic())*0.5;
+    return (2-Euler_characteristic())*0.5;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<vec3d> AbstractMesh<M,V,E,P>::vector_vert_normals() const
+{
+    std::vector<vec3d> normals;
+    normals.reserve(num_verts());
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        normals.push_back(vert_data(vid).normal);
+    }
+    return normals;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -244,6 +259,21 @@ std::vector<int> AbstractMesh<M,V,E,P>::vector_edge_labels() const
         labels.push_back(edge_data(eid).label);
     }
     return labels;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<vec3d> AbstractMesh<M,V,E,P>::vector_poly_normals() const
+{
+    std::vector<vec3d> normals;
+    normals.reserve(num_polys());
+    for(uint pid=0; pid<num_polys(); ++pid)
+    {
+        normals.push_back(poly_data(pid).normal);
+    }
+    return normals;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
