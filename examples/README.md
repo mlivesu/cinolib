@@ -109,6 +109,9 @@ Here is a list of the sample programs available in CinoLib.
 #### 33 - Progressively collapse all internal edges of a triangle mesh
 [<p align="left"><img src="snapshots/33_edge_collapse.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/33_edge_collapse)
 
+#### 34 - Interpolate an oriented point cloud with Hermite RBF
+[<p align="left"><img src="snapshots/34_Hermite_RBF.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/34_Hermite_RBF)
+
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
