@@ -48,7 +48,7 @@ namespace cinolib
  * This code is almost 1:1 copied from the great tutorial of Rodolphe Vaillant, available at
  * http://rodolphe-vaillant.fr/?e=12
  *
- * Great academic resources for Hermite RBF are:
+ * Reference academic resources for Hermite RBF interpolation are:
  *
  *     Hermite Radial Basis Functions Implicits
  *     I. Macedo, J.P. Gois, L. Velho
