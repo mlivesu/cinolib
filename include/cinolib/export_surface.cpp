@@ -46,7 +46,7 @@ CINO_INLINE
 void export_surface(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                           AbstractPolygonMesh<M,V,E,F>      & srf)
 {
-    std::map<uint,uint> m2srf_vmap, srf2m_vmap;
+    std::unordered_map<uint,uint> m2srf_vmap, srf2m_vmap;
     export_surface(m, srf, m2srf_vmap, srf2m_vmap);
 }
 
