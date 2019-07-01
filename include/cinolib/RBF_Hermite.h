@@ -67,6 +67,7 @@ class Hermite_RBF
 {
     public:
 
+        Hermite_RBF(){}
         Hermite_RBF(const std::vector<vec3d> & points,
                     const std::vector<vec3d> & normals);
 
