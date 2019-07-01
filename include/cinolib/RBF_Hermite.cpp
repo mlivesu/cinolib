@@ -145,7 +145,7 @@ vec3d Hermite_RBF<RBF>::eval_grad(const vec3d &p) const
     for(uint i=0; i<center.cols(); i++)
     {
         Eigen::Vector3d node = center.col(i);
-        Eigen::Vector3d beta = beta.col(i);
+        Eigen::Vector3d beta = this->beta.col(i);
         Eigen::Vector3d diff = pp - node;
 
         float len=diff.norm();
