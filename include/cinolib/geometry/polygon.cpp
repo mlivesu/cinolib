@@ -84,6 +84,10 @@ vec3d polygon_normal(const std::vector<vec3d> & poly)
     vec3d  axis  = best_fit.n.cross(Z);
     double angle = best_fit.n.angle_rad(Z);
 
+    // if the face is degenerate (i.e. does not span a plane),
+    // return the null vector
+    if(best_fit.n.length()==0) return best_fit.n;
+
     std::vector<vec2d> poly2d;
     for(auto p : poly)
     {
@@ -92,7 +96,7 @@ vec3d polygon_normal(const std::vector<vec3d> & poly)
         poly2d.push_back(vec2d(tmp)); // will drop z
     }
 
-    if (polygon_is_CCW(poly2d)) return best_fit.n;
+    if(polygon_is_CCW(poly2d)) return best_fit.n;
     return -best_fit.n;
 }
 
