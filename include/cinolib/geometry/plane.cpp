@@ -102,7 +102,7 @@ Plane::Plane(const std::vector<vec3d> & samples)
     double det_z   = xx*yy - xy*xy;
     double det_max = std::max(det_x, std::max(det_y, det_z));
 
-    if(fabs(det_max) == 1e-5) std::cerr << "WARNING : the samples don't span a plane!" << std::endl;
+    //if(fabs(det_max) <= 1e-5) std::cerr << "WARNING : the samples don't span a plane!" << std::endl;
 
     vec3d n;
     if (det_max == det_x) n = vec3d(1.0, (xz*yz - xy*zz) / det_x, (xy*yz - xz*yy) / det_x); else
@@ -118,9 +118,9 @@ Plane::Plane(const std::vector<vec3d> & samples)
 CINO_INLINE
 void Plane::set_plane(const vec3d & point, const vec3d & normal)
 {
-    if(point.isnan() || normal.isnan())
+    if(point.is_degenerate() || normal.is_degenerate())
     {
-        std::cerr << "WARNING : failed to set degenerate plane!" << std::endl;
+        //std::cout << "WARNING : failed to set degenerate plane!" << std::endl;
         p = vec3d(0,0,0);
         n = vec3d(0,0,0);
         return;
@@ -165,12 +165,12 @@ vec3d Plane::project_onto(const vec3d & p) const
     if (this->operator [](p) > 0)
     {
         res = p - n * point_plane_dist(p);
-        assert(point_plane_dist(res) < 1e-7);
+        assert(point_plane_dist(res) < 1e-10);
     }
     else
     {
         res = p + n * point_plane_dist(p);
-        assert(point_plane_dist(res) < 1e-7);
+        assert(point_plane_dist(res) < 1e-10);
     }
     return res;
 }

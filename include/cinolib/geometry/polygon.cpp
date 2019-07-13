@@ -86,7 +86,7 @@ vec3d polygon_normal(const std::vector<vec3d> & poly)
 
     // if the face is degenerate (i.e. does not span a plane),
     // return the null vector
-    if(best_fit.n.length()==0) return best_fit.n;
+    if(best_fit.n.length()==0) return vec3d(0,0,0);
 
     std::vector<vec2d> poly2d;
     for(auto p : poly)

@@ -290,12 +290,25 @@ template<typename real> class vec3
             return (*this - in).length_squared();
         }
 
-        bool isnan() const
+        bool is_nan() const
         {
             if(std::isnan(m_x)) return true;
             if(std::isnan(m_y)) return true;
             if(std::isnan(m_z)) return true;
             return false;
+        }
+
+        bool is_inf() const
+        {
+            if(std::isinf(m_x)) return true;
+            if(std::isinf(m_y)) return true;
+            if(std::isinf(m_z)) return true;
+            return false;
+        }
+
+        bool is_degenerate() const
+        {
+            return is_nan() || is_inf();
         }
 };
 
