@@ -55,7 +55,7 @@ void Profiler::push(const std::string & key)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Profiler::pop()
+double Profiler::pop(const std::string extra_string)
 {
     using namespace std::chrono;
     tree.node(tree_ptr).item.stop = high_resolution_clock::now();
@@ -69,7 +69,7 @@ double Profiler::pop()
     for(uint i=0; i<tree.node(tree_ptr).depth-1; ++i) s += "----";
     s += tree.node(tree_ptr).item.key + " [" + std::to_string(t) + "s]";
     tree.node(tree_ptr).item.s = s;
-    std::cout << s << std::endl;
+    std::cout << s  << extra_string << std::endl;
 
     tree_ptr = tree.node(tree_ptr).father;
 
