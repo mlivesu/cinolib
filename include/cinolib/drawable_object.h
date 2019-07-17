@@ -63,11 +63,15 @@ class DrawableObject
 {
     public :
 
-        virtual ~DrawableObject(){}
-        virtual ObjectType  object_type()                    const = 0;
-        virtual void        draw(const float scene_size = 1) const = 0;  // do rendering
-        virtual vec3d       scene_center()                   const = 0;  // get position in space
-        virtual float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
+         DrawableObject(){}
+        ~DrawableObject(){}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        virtual  ObjectType  object_type()                    const = 0;
+        virtual  void        draw(const float scene_size = 1) const = 0;  // do rendering
+        virtual  vec3d       scene_center()                   const = 0;  // get position in space
+        virtual  float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
 };
 
 }

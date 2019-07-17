@@ -53,7 +53,8 @@ class DrawableIsocontour : public Isocontour<M,V,E,P>, public DrawableObject
 
         explicit DrawableIsocontour();
         explicit DrawableIsocontour(AbstractPolygonMesh<M,V,E,P> & m, double iso_value);
-        ~DrawableIsocontour() {}
+
+        ~DrawableIsocontour(){}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -68,6 +68,8 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         explicit Tetmesh(const std::vector<vec3d>             & verts,
                          const std::vector<std::vector<uint>> & polys);
 
+        ~Tetmesh() {}
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         MeshType mesh_type() const { return TETMESH; }

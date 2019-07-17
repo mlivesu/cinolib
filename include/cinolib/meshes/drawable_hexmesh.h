@@ -53,6 +53,8 @@ class DrawableHexmesh : public AbstractDrawablePolyhedralMesh<Hexmesh<M,V,E,F,P>
 {
     public:
 
+        ~DrawableHexmesh(){}
+
         explicit DrawableHexmesh() : Hexmesh<M,V,E,F,P>()
         {
             this->init_drawable_stuff();

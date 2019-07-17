@@ -68,6 +68,8 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         explicit Trimesh(const std::vector<double> & coords,
                          const std::vector<uint>   & polys);
 
+        ~Trimesh(){}
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         MeshType mesh_type() const { return TRIMESH; }

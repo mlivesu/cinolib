@@ -64,6 +64,8 @@ class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
         explicit Polygonmesh(const std::vector<double>            & coords,
                              const std::vector<std::vector<uint>> & polys);
 
+        ~Polygonmesh() {}
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         MeshType mesh_type() const { return POLYGONMESH; }

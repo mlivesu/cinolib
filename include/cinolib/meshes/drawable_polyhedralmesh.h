@@ -53,6 +53,8 @@ class DrawablePolyhedralmesh : public AbstractDrawablePolyhedralMesh<Polyhedralm
 {
     public:
 
+        ~DrawablePolyhedralmesh(){}
+
         explicit DrawablePolyhedralmesh() : Polyhedralmesh<M,V,E,F,P>()
         {
             this->init_drawable_stuff();

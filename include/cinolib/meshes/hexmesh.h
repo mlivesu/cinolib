@@ -68,6 +68,8 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         explicit Hexmesh(const std::vector<vec3d>             & verts,
                          const std::vector<std::vector<uint>> & polys);
 
+        ~Hexmesh(){}
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         MeshType mesh_type() const { return HEXMESH; }

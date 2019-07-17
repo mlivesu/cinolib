@@ -61,6 +61,8 @@ class DrawableSegmentSoup: public std::vector<vec3d>, public DrawableObject
 
         explicit DrawableSegmentSoup();
 
+        ~DrawableSegmentSoup(){}
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void draw(const float scene_size=1) const;

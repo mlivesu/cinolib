@@ -54,6 +54,8 @@ class DrawableSphere : public DrawableObject
             color = Color::RED();
         }
 
+        ~DrawableSphere(){}
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         vec3d  center;

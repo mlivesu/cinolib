@@ -62,6 +62,8 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
                                 const std::vector<std::vector<uint>> & polys,
                                 const std::vector<std::vector<bool>> & polys_face_winding);
 
+        ~Polyhedralmesh(){}
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         MeshType mesh_type() const { return POLYHEDRALMESH; }

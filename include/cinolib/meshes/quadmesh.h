@@ -68,6 +68,8 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
         explicit Quadmesh(const std::vector<double>            & coords,
                           const std::vector<std::vector<uint>> & polys);
 
+        ~Quadmesh(){}
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         MeshType mesh_type() const { return QUADMESH; }

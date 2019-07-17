@@ -61,6 +61,8 @@ class DrawableVectorField : public VectorField, public DrawableObject
         explicit DrawableVectorField(const AbstractMesh<M,V,E,P> & m,
                                      const bool field_on_poly = true);
 
+        ~DrawableVectorField(){}
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         ObjectType object_type() const { return DRAWABLE_VECTOR_FIELD; }

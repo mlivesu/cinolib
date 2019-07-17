@@ -56,6 +56,8 @@ class DrawableSlicedObj : public AbstractDrawablePolygonMesh<SlicedObj<M,V,E,P>>
 
         explicit DrawableSlicedObj() : SlicedObj<M,V,E,P>() {}
 
+        ~DrawableSlicedObj(){}
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         explicit DrawableSlicedObj(const char * filename, const double hatch_size = 0.01) : SlicedObj<M,V,E,P>(filename, hatch_size)

@@ -54,6 +54,8 @@ class DrawableArrow : public DrawableObject
             color = Color::RED();
         }
 
+        ~DrawableArrow(){}
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         vec3d  beg, end;

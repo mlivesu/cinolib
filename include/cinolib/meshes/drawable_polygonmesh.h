@@ -52,8 +52,7 @@ class DrawablePolygonmesh : public AbstractDrawablePolygonMesh<Polygonmesh<M,V,E
 {
     public:
 
-        //explicit DrawablePolygonmesh(Polygonmesh<M,V,E,P>) : Polygonmesh<M,V,E,P>()
-        //{}
+        ~DrawablePolygonmesh(){}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

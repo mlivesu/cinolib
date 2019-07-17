@@ -75,7 +75,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         typedef F F_type;
 
         explicit AbstractPolyhedralMesh() : AbstractMesh<M,V,E,P>() {}
-        virtual ~AbstractPolyhedralMesh() {}
+        ~AbstractPolyhedralMesh() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -61,17 +61,25 @@ class DrawableSkel : public Skel, public DrawableObject
             DRAW_SELECTION_COLOR = 0x10000000
         };
 
+        ~DrawableSkel(){}
+
         explicit DrawableSkel();
         explicit DrawableSkel(const Skel & s);
         explicit DrawableSkel(const char * filename);
         explicit DrawableSkel(const std::vector<double> & coords, const std::vector<int> & segs);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void       draw(const float scene_size=1) const;
         vec3d      scene_center() const { return bb.center();       }
         float      scene_radius() const { return bb.diag() * 0.5;   }
         ObjectType object_type()  const { return DRAWABLE_SKELETON; }
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void init();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void set_draw_skel(bool b);
         void set_draw_bones(bool b);
@@ -85,11 +93,17 @@ class DrawableSkel : public Skel, public DrawableObject
         void set_std_bone_color(float r, float g, float b);
         void set_std_joint_color(float r, float g, float b);
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         inline void set_std_leaf_color(float *rgb) { set_std_leaf_color(rgb[0], rgb[1], rgb[2]); }
         inline void set_std_bone_color(float *rgb) { set_std_bone_color(rgb[0], rgb[1], rgb[2]); }
         inline void set_std_joint_color(float *rgb) { set_std_joint_color(rgb[0], rgb[1], rgb[2]); }
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void update_bone_colors();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         inline const float * vertex_color (int vid) const { return &(v_colors[vid*3]); }
         inline const float * segment_color(int sid) const { return &(s_colors[sid*3]); }

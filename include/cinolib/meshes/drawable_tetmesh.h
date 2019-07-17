@@ -53,6 +53,8 @@ class DrawableTetmesh : public AbstractDrawablePolyhedralMesh<Tetmesh<M,V,E,F,P>
 {
     public:
 
+        ~DrawableTetmesh(){}
+
         explicit DrawableTetmesh() : Tetmesh<M,V,E,F,P>()
         {
             this->init_drawable_stuff();
