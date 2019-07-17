@@ -51,6 +51,7 @@ class AbstractUndoRedo
 {
     public:
 
+        explicit AbstractUndoRedo(){}
         explicit AbstractUndoRedo(const State & initial_state);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

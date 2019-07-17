@@ -64,7 +64,7 @@ template<class Object, class State>
 CINO_INLINE
 bool AbstractUndoRedo<Object,State>::undo(Object & obj)
 {
-    if (undo_stack.size()<2)
+    if(undo_stack.size()<2)
     {
         // the undo_stack should always contain at least the initial state
         return false;
@@ -81,7 +81,7 @@ template<class Object, class State>
 CINO_INLINE
 bool AbstractUndoRedo<Object,State>::redo(Object & obj)
 {
-    if (redo_stack.empty()) return false;
+    if(redo_stack.empty()) return false;
     undo_stack.push(redo_stack.top());
     redo_stack.pop();
     set_state(undo_stack.top(), obj);
