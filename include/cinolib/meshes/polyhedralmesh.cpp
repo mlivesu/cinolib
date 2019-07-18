@@ -155,6 +155,27 @@ bool Polyhedralmesh<M,V,E,F,P>::poly_is_hexahedron(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool Polyhedralmesh<M,V,E,F,P>::poly_is_hexable_w_midpoint(const uint pid) const
+{
+    // the only topological condition to be satisfied for a genus
+    // zero polyedron to be hexable, is that each of its vertices
+    // has three incident edges:
+    //
+    // Hexahedral Meshing Using Midpoint Subdivision and Integer Programming
+    // T.S. Li, R.M. McKeag, C.G. Armstrong
+    // Computer Methods in Applied Mechanics and Engineering, 1995
+    //
+    for(uint vid : this->adj_p2v(pid))
+    {        
+        if(this->poly_vert_valence(pid,vid)!=3) return false;
+    }
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool Polyhedralmesh<M,V,E,F,P>::poly_is_prism(const uint pid) const
 {
     // test all possible bases for a prism

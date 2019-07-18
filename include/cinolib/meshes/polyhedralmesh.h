@@ -79,10 +79,11 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double poly_volume       (const uint) const { assert(false && "TODO!"); return 1.0; }
-        bool   poly_is_hexahedron(const uint pid) const;
-        bool   poly_is_prism     (const uint pid) const;
-        bool   poly_is_prism     (const uint pid, const uint fid) const; // check if it is a prism using fid as base
+        double poly_volume               (const uint) const { assert(false && "TODO!"); return 1.0; }
+        bool   poly_is_hexahedron        (const uint pid) const;
+        bool   poly_is_prism             (const uint pid) const;
+        bool   poly_is_prism             (const uint pid, const uint fid) const; // check if it is a prism using fid as base
+        bool   poly_is_hexable_w_midpoint(const uint pid) const; // check if this element can be hexed with midpoint subdivision
 };
 
 }

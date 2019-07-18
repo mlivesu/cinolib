@@ -227,6 +227,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 uint               poly_face_offset            (const uint pid, const uint fid) const;
                 vec3d              poly_face_normal            (const uint pid, const uint fid) const;
                 int                poly_adj_through_face       (const uint pid, const uint fid) const;
+                std::vector<uint>  poly_v2v                    (const uint pid, const uint vid) const;
                 std::vector<uint>  poly_v2f                    (const uint pid, const uint vid) const;
                 std::vector<uint>  poly_e2f                    (const uint pid, const uint eid) const;
                 std::vector<uint>  poly_f2f                    (const uint pid, const uint fid) const;
@@ -239,7 +240,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool               poly_faces_share_orientation(const uint pid, const uint fid0, const uint fid1) const;
                 bool               poly_fix_orientation        (const uint pid, const uint fid);
                 bool               poly_fix_orientation        ();
-                int                poly_euler_characteristic   (const uint pid) const;
+                int                poly_Euler_characteristic   (const uint pid) const;
+                int                poly_genus                  (const uint pid) const;
                 bool               poly_is_spherical           (const uint pid) const;
                 void               poly_export_element         (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const;
                 std::vector<uint>  poly_faces_id               (const uint pid, const bool sort_by_fid = false) const;

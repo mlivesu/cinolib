@@ -633,6 +633,21 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_f2f(const uint pid, co
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_v2v(const uint pid, const uint vid) const
+{
+    assert(this->poly_contains_vert(pid,vid));
+    std::vector<uint> nbrs;
+    for(uint nbr : this->adj_v2v(vid))
+    {
+        if(this->poly_contains_vert(pid,nbr)) nbrs.push_back(nbr);
+    }
+    return nbrs;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_v2f(const uint pid, const uint vid) const
 {
     assert(this->poly_contains_vert(pid,vid));
@@ -2174,7 +2189,16 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_fix_orientation()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-int AbstractPolyhedralMesh<M,V,E,F,P>::poly_euler_characteristic(const uint pid) const
+int AbstractPolyhedralMesh<M,V,E,F,P>::poly_genus(const uint pid) const
+{
+    return (2-this->poly_Euler_characteristic(pid))*0.5;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int AbstractPolyhedralMesh<M,V,E,F,P>::poly_Euler_characteristic(const uint pid) const
 {
     // https://en.wikipedia.org/wiki/Euler_characteristic
     uint nv = verts_per_poly(pid);
@@ -2190,7 +2214,7 @@ CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_spherical(const uint pid) const
 {
     // https://en.wikipedia.org/wiki/Spherical_polyhedron
-    return poly_euler_characteristic(pid)==2;
+    return poly_Euler_characteristic(pid)==2;
 }
 
 
