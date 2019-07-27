@@ -50,6 +50,14 @@ ipair unique_pair(uint v0, uint v1)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+ipair unique_pair(const ipair & p)
+{
+    return unique_pair(p.first, p.second);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const ipair & p)
 {
     in << "(" << p.first << "," << p.second << ") ";
