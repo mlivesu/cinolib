@@ -121,14 +121,22 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid);         }
-                const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid);         }
-                const std::vector<uint> & adj_f2v(const uint fid) const { return this->faces.at(fid); }
-                const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid);         }
-                const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid);         }
-                const std::vector<uint> & adj_f2p(const uint fid) const { return f2p.at(fid);         }
-                const std::vector<uint> & adj_p2f(const uint pid) const { return this->polys.at(pid); }
-        virtual const std::vector<uint> & adj_p2v(const uint pid) const { return p2v.at(pid);         }
+        const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid);         }
+              std::vector<uint> & adj_v2f(const uint vid)       { return v2f.at(vid);         }
+        const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid);         }
+              std::vector<uint> & adj_e2f(const uint eid)       { return e2f.at(eid);         }
+        const std::vector<uint> & adj_f2v(const uint fid) const { return this->faces.at(fid); }
+              std::vector<uint> & adj_f2v(const uint fid)       { return this->faces.at(fid); }
+        const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid);         }
+              std::vector<uint> & adj_f2e(const uint fid)       { return f2e.at(fid);         }
+        const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid);         }
+              std::vector<uint> & adj_f2f(const uint fid)       { return f2f.at(fid);         }
+        const std::vector<uint> & adj_f2p(const uint fid) const { return f2p.at(fid);         }
+              std::vector<uint> & adj_f2p(const uint fid)       { return f2p.at(fid);         }
+        const std::vector<uint> & adj_p2f(const uint pid) const { return this->polys.at(pid); }
+              std::vector<uint> & adj_p2f(const uint pid)       { return this->polys.at(pid); }
+        const std::vector<uint> & adj_p2v(const uint pid) const { return p2v.at(pid);         }
+              std::vector<uint> & adj_p2v(const uint pid)       { return p2v.at(pid);         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

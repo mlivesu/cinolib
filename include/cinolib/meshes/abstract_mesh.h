@@ -174,14 +174,21 @@ class AbstractMesh
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
                 const std::vector<uint> & adj_v2v(const uint vid) const { return v2v.at(vid); }
+                      std::vector<uint> & adj_v2v(const uint vid)       { return v2v.at(vid); }
                 const std::vector<uint> & adj_v2e(const uint vid) const { return v2e.at(vid); }
+                      std::vector<uint> & adj_v2e(const uint vid)       { return v2e.at(vid); }
                 const std::vector<uint> & adj_v2p(const uint vid) const { return v2p.at(vid); }
+                      std::vector<uint> & adj_v2p(const uint vid)       { return v2p.at(vid); }
                       std::vector<uint>   adj_e2v(const uint eid) const;
                       std::vector<uint>   adj_e2e(const uint eid) const;
                 const std::vector<uint> & adj_e2p(const uint eid) const { return e2p.at(eid); }
+                      std::vector<uint> & adj_e2p(const uint eid)       { return e2p.at(eid); }
                 const std::vector<uint> & adj_p2e(const uint pid) const { return p2e.at(pid); }
+                      std::vector<uint> & adj_p2e(const uint pid)       { return p2e.at(pid); }
                 const std::vector<uint> & adj_p2p(const uint pid) const { return p2p.at(pid); }
+                      std::vector<uint> & adj_p2p(const uint pid)       { return p2p.at(pid); }
         virtual const std::vector<uint> & adj_p2v(const uint pid) const = 0;
+        virtual       std::vector<uint> & adj_p2v(const uint pid)       = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

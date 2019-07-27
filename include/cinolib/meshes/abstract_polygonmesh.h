@@ -98,6 +98,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         const std::vector<uint> & adj_p2v(const uint pid) const { return this->polys.at(pid); }
+              std::vector<uint> & adj_p2v(const uint pid)       { return this->polys.at(pid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
