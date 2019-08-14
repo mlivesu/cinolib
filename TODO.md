@@ -2,6 +2,7 @@
 Please consider this to be just development notes and not any real planning.
 
 ### Things to be fixed:
+* provide mechanisms to enable operations between meshes with different template signatures (e.g. export_hexahedra,...)
 * add destructors for all classes (https://www.geeksforgeeks.org/virtual-destructor/)
 * use a less verbose naming for ANSI text colors
 * fix per face winding in midpoint subdivision
