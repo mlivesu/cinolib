@@ -218,6 +218,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 std::vector<uint> face_tessellation       (const uint fid) const;
                 std::vector<uint> face_verts_id           (const uint fid, const bool sort_by_vid = false) const;
                 bool              face_is_visible         (const uint fid, uint & pid_beneath) const;
+                void              face_apply_labels       (const std::vector<int> & labels);
+                void              face_apply_label        (const int label);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

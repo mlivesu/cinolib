@@ -223,6 +223,7 @@ class AbstractMesh
                 double           vert_max_uvw_value   (const int tex_coord = U_param) const;
                 void             vert_unmark_all      ();
                 void             vert_apply_labels    (const std::vector<int> & labels);
+                void             vert_apply_label     (const int label);
         virtual double           vert_mass            (const uint vid) const = 0;
         virtual void             vert_set_color       (const Color & c);
         virtual void             vert_set_alpha       (const float alpha);
@@ -247,6 +248,7 @@ class AbstractMesh
                 double edge_min_length   () const;
                 void   edge_unmark_all   ();
                 void   edge_apply_labels (const std::vector<int> & labels);
+                void   edge_apply_label  (const int label);
         virtual void   edge_set_color    (const Color & c);
         virtual void   edge_set_alpha    (const float alpha);
 
@@ -276,6 +278,7 @@ class AbstractMesh
                 bool               polys_are_colored    () const;
                 bool               polys_are_labeled    () const;
                 void               poly_apply_labels    (const std::vector<int> & labels);
+                void               poly_apply_label     (const int label);
         virtual double             poly_mass            (const uint pid) const = 0;
         virtual void               poly_set_color       (const Color & c);
         virtual void               poly_set_alpha       (const float alpha);

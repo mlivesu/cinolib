@@ -326,6 +326,31 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & p
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::face_apply_labels(const std::vector<int> & labels)
+{
+    assert(labels.size() == this->num_faces());
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        face_data(fid).label = labels.at(fid);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::face_apply_label(const int label)
+{
+    for(uint fid=0; fid<num_faces(); ++fid)
+    {
+        face_data(fid).label = label;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_verts_link(const uint vid) const
 {
     return this->adj_v2v(vid);
