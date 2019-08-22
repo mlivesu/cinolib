@@ -1116,7 +1116,11 @@ void AbstractMesh<M,V,E,P>::poly_color_wrt_label(const bool sorted, const float 
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
         int l = this->poly_data(pid).label;
-        if (DOES_NOT_CONTAIN(l_map,l)) l_map[l] = l_map.size();
+        if(DOES_NOT_CONTAIN(l_map,l))
+        {
+            uint fresh_label = l_map.size();
+            l_map[l] = fresh_label;
+        }
     }
     uint n_labels = l_map.size();
     for(uint pid=0; pid<this->num_polys(); ++pid)
