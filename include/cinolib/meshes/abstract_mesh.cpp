@@ -583,6 +583,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint AbstractMesh<M,V,E,P>::vert_valence(const uint vid) const
 {
+    assert(adj_v2v(vid).size() == adj_v2e(vid).size());
     return adj_v2v(vid).size();
 }
 
