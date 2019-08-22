@@ -162,7 +162,7 @@ CINO_INLINE
 vec3d Plane::project_onto(const vec3d & p) const
 {
     vec3d res;
-    if (this->operator [](p) > 0)
+    if(this->operator [](p) > 0)
     {
         res = p - n * point_plane_dist(p);
         assert(point_plane_dist(res) < 1e-10);
