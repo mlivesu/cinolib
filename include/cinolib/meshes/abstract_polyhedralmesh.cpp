@@ -206,7 +206,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_f_tessellation(const uint fid)
     bool bad_tessellation = false;
     for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_tessellation = true;
 
-    if (bad_tessellation)
+    if(bad_tessellation)
     {
         // NOTE: the triangulation is constructed on a proxy polygon obtained
         // projecting the actual polygon onto the best fitting plane. Bad things
@@ -219,7 +219,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_f_tessellation(const uint fid)
         }
         //
         std::vector<uint> tris;
-        if (polygon_triangulate(vlist, tris))
+        if(polygon_triangulate(vlist, tris))
         {
             face_triangles.at(fid).clear();
             for(uint off : tris) face_triangles.at(fid).push_back(this->face_vert_id(fid,off));
