@@ -80,7 +80,7 @@ vec3d polygon_normal(const std::vector<vec3d> & poly);
 // NOTE: flattening does not preserve winding!
 //
 CINO_INLINE
-void polygon_flatten(const std::vector<vec3d> & poly3d,
+bool polygon_flatten(const std::vector<vec3d> & poly3d,
                            std::vector<vec2d> & poly2d);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

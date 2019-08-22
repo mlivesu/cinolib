@@ -108,13 +108,15 @@ vec3d polygon_normal(const std::vector<vec3d> & poly)
 // NOTE: flattening does not preserve winding!
 //
 CINO_INLINE
-void polygon_flatten(const std::vector<vec3d> & poly3d,
+bool polygon_flatten(const std::vector<vec3d> & poly3d,
                            std::vector<vec2d> & poly2d)
 {
     poly2d.clear();
     poly2d.reserve(poly3d.size());
 
-    Plane  best_fit(poly3d);
+    Plane best_fit(poly3d);
+    if(best_fit.n.is_degenerate() || best_fit.n.length()==0) return false;
+
     vec3d  Z     = vec3d(0,0,1);
     vec3d  axis  = best_fit.n.cross(Z);
     double angle = best_fit.n.angle_rad(Z);
@@ -125,6 +127,7 @@ void polygon_flatten(const std::vector<vec3d> & poly3d,
         rotate(tmp, axis, angle);
         poly2d.push_back(vec2d(tmp)); // will drop z
     }
+    return true;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -222,12 +225,16 @@ bool polygon_triangulate(std::vector<vec2d> & poly,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool polygon_triangulate(std::vector<vec3d> &poly,
-                         std::vector<uint> & tris)
+bool polygon_triangulate(std::vector<vec3d> & poly,
+                         std::vector<uint>  & tris)
 {
     std::vector<vec2d> poly2d;
-    polygon_flatten(poly, poly2d);
-    return polygon_triangulate(poly2d, tris);
+    if(polygon_flatten(poly, poly2d))
+    {
+        return polygon_triangulate(poly2d, tris);
+    }
+    tris.clear();
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
