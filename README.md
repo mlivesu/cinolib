@@ -23,9 +23,10 @@ BibTeX entry:
 @article{cinolib,
   title   = {cinolib: a generic programming header only C++ library for processing polygonal and polyhedral meshes},
   author  = {Livesu, Marco},
-  journal = {Transactions on Computational Science},
+  journal = {Transactions on Computational Science XXXIV},
   series  = {Lecture Notes in Computer Science},
   editor  = {Springer},
   note    = {https://github.com/mlivesu/cinolib/},
-  year    = {2019}}
+  year    = {2019},
+  doi     = {10.1007/978-3-662-59958-7_4}}
 ```
