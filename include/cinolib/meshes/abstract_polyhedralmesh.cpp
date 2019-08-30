@@ -93,6 +93,30 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+double AbstractPolyhedralMesh<M,V,E,F,P>::mesh_srf_area() const
+{
+    double area = 0.0;
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        if(this->face_is_on_srf(fid))
+        {
+            for(uint i=0; i<this->face_tessellation(fid).size()/3; ++i)
+            {
+                uint vid0 = this->face_tessellation(fid).at(3*i+0);
+                uint vid1 = this->face_tessellation(fid).at(3*i+1);
+                uint vid2 = this->face_tessellation(fid).at(3*i+2);
+                area += triangle_area(this->vert(vid0), this->vert(vid1), this->vert(vid2));
+            }
+        }
+    }
+    return area;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::num_srf_verts() const
 {
     uint count = 0;
