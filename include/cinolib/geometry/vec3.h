@@ -265,8 +265,10 @@ template<typename real> class vec3
 
         double angle_rad(const vec3<real> &in) const
         {
-            vec3<real> u = *this; u.normalize();
-            vec3<real> v = in;    v.normalize();
+            vec3<real> u = *this;
+            vec3<real> v = in;
+            if(!u.is_degenerate()) u.normalize(); else return 0;
+            if(!v.is_degenerate()) v.normalize(); else return 0;
             // ensure dot stays srictly in between 0 and 1 (included)
             double dot   = std::min( 1.0, u.dot(v));
                    dot   = std::max(-1.0, dot);
@@ -290,6 +292,12 @@ template<typename real> class vec3
             return (*this - in).length_squared();
         }
 
+        bool is_null() const
+        {
+            if(length_squared()==0) return true;
+            return false;
+        }
+
         bool is_nan() const
         {
             if(std::isnan(m_x)) return true;
@@ -308,7 +316,7 @@ template<typename real> class vec3
 
         bool is_degenerate() const
         {
-            return is_nan() || is_inf();
+            return is_null() || is_nan() || is_inf();
         }
 };
 

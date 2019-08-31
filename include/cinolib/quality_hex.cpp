@@ -65,7 +65,7 @@ void hex_edges(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3d
     L[2] = p3 - p2;    L[6] = p6 - p2;    L[10] = p7 - p6;
     L[3] = p3 - p0;    L[7] = p7 - p3;    L[11] = p7 - p4;
 
-    if(normalized) for(int i=0; i<12; ++i) L[i].normalize();
+    if(normalized) for(int i=0; i<12; ++i) if(!L[i].is_null()) L[i].normalize();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -79,7 +79,7 @@ void hex_principal_axes(const vec3d & p0, const vec3d & p1, const vec3d & p2, co
     X[1] = (p3 - p0) + (p2 - p1) + (p7 - p4) + (p6 - p5);
     X[2] = (p4 - p0) + (p5 - p1) + (p6 - p2) + (p7 - p3);
 
-    if(normalized) for(int i=0; i<3; ++i) X[i].normalize();
+    if(normalized) for(int i=0; i<3; ++i) if(!X[i].is_null()) X[i].normalize();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -93,7 +93,7 @@ void hex_cross_derivatives(const vec3d & p0, const vec3d & p1, const vec3d & p2,
     XX[1] = (p5 - p1) - (p4 - p0) + (p6 - p2) - (p7 - p3); // X_02 and X_20
     XX[2] = (p7 - p4) - (p3 - p0) + (p6 - p5) - (p2 - p1); // X_12 and X_21
 
-    if(normalized) for(int i=0; i<3; ++i) XX[i].normalize();
+    if(normalized) for(int i=0; i<3; ++i) if(!XX[i].is_null()) XX[i].normalize();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -108,7 +108,7 @@ void hex_diagonals(const vec3d & p0, const vec3d & p1, const vec3d & p2, const v
     D[2] = p4 - p2;
     D[3] = p5 - p3;
 
-    if(normalized) for(int i=0; i<4; ++i) D[i].normalize();
+    if(normalized) for(int i=0; i<4; ++i) if(!D[i].is_null()) D[i].normalize();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
