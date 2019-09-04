@@ -11,6 +11,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* improve octree with ray/line traversal 
 * add efficient intersection tests for triangle-triangle and segment-segment (https://github.com/gaoxifeng/robust_hex_dominant_meshing/blob/master/src/tri_tri_intersection.h)
 * transform all std::cerr into std::cout << ANSI_fg_color_red << 
 * add non-manifoldness checks for vertices in srf and vol meshes
