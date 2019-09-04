@@ -487,7 +487,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 int AbstractPolyhedralMesh<M,V,E,F,P>::face_id(const std::vector<uint> & f) const
 {
-    assert(!f.empty());
+    if(f.empty()) return -1;
     std::vector<uint> query = SORT_VEC(f);
 
     uint vid = f.front();
@@ -1045,7 +1045,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 int AbstractPolyhedralMesh<M,V,E,F,P>::poly_id(const std::vector<uint> & flist) const
 {
-    assert(!flist.empty());
+    if(flist.empty()) return -1;
     std::vector<uint> query = SORT_VEC(flist);
 
     uint fid = flist.front();
