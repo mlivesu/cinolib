@@ -296,6 +296,15 @@ int AbstractPolyhedralMesh<M,V,E,F,P>::Euler_characteristic() const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+int AbstractPolyhedralMesh<M,V,E,F,P>::genus() const
+{
+    return 1-Euler_characteristic();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_tessellation(const uint fid) const
 {
     return face_triangles.at(fid);

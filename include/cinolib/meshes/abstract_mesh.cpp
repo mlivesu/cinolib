@@ -181,15 +181,6 @@ void AbstractMesh<M,V,E,P>::update_bbox()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int AbstractMesh<M,V,E,P>::genus() const
-{
-    return (2-Euler_characteristic())*0.5;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 std::vector<vec3d> AbstractMesh<M,V,E,P>::vector_vert_normals() const
 {
     std::vector<vec3d> normals;

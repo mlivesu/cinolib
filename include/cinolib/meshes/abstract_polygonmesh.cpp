@@ -399,6 +399,15 @@ int AbstractPolygonMesh<M,V,E,P>::Euler_characteristic() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+int AbstractPolygonMesh<M,V,E,P>::genus() const
+{
+    return (2-Euler_characteristic())*0.5;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 double AbstractPolygonMesh<M,V,E,P>::mesh_area() const
 {
     double area = 0;

@@ -127,7 +127,7 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                int genus() const;
+        virtual int genus() const = 0;
         virtual int Euler_characteristic() const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
