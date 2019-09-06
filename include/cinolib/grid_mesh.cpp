@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/grid_mesh.h>
-#include <cinolib/serialize_2D.h>
+#include <cinolib/serialize_index.h>
 #include <vector>
 
 namespace cinolib

@@ -46,7 +46,7 @@
 #include <cinolib/textures/texture_hsv_w_isolines.h>
 #include <cinolib/textures/texture_parula.h>
 #include <cinolib/textures/texture_parula_w_isolines.h>
-#include <cinolib/serialize_2D.h>
+#include <cinolib/serialize_index.h>
 #include <stdint.h>
 #include <iterator>
 

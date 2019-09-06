@@ -33,8 +33,8 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SERIALIZE_2D
-#define CINO_SERIALIZE_2D
+#ifndef CINO_SERIALIZE_INDEX
+#define CINO_SERIALIZE_INDEX
 
 #include <cinolib/cino_inline.h>
 #include <cinolib/ipair.h>
@@ -50,10 +50,16 @@ uint serialize_2D_index(const uint r, const uint c, const uint n_cols);
 CINO_INLINE
 ipair deserialize_2D_index(const uint i, const uint n_cols);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint N, class GridPoint>
+CINO_INLINE
+unsigned long int serialize_nD_index(const std::array<uint,N> & dim_extent, const GridPoint & p);
+
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "serialize_2D.cpp"
+#include "serialize_index.cpp"
 #endif
 
-#endif // CINO_SERIALIZE_2D
+#endif // CINO_SERIALIZE_INDEX

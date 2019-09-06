@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/polycube.h>
-#include <cinolib/serialize_2D.h>
+#include <cinolib/serialize_index.h>
 #include <cinolib/extrude_mesh.h>
 
 namespace cinolib
