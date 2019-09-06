@@ -39,7 +39,6 @@
 #include <vector>
 #include <sys/types.h>
 #include <cinolib/meshes/abstract_polygonmesh.h>
-#include <cinolib/meshes/mesh_attributes.h>
 
 namespace cinolib
 {

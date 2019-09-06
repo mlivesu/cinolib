@@ -37,6 +37,7 @@
 #define CINO_ABSTRACT_POLYGON_MESH_H
 
 #include <cinolib/meshes/abstract_mesh.h>
+#include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/ipair.h>
 #include <cinolib/symbols.h>
 
