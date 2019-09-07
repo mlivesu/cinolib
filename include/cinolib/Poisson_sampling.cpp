@@ -51,10 +51,10 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint Dim, class Vec>
-void sample_annulus(const double radius, const Vec & center, uint & seed, Vec & x)
+template<uint Dim, class Point>
+void sample_annulus(const double radius, const Point & center, uint & seed, Point & x)
 {
-    Vec r;
+    Point r;
     for(;;)
     {
         for(uint i=0; i<Dim; ++i)
