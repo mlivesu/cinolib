@@ -67,7 +67,6 @@ int main(int argc, char **argv)
         profiler.pop();
         for(auto p : samples_2d) m_2d.vert_add(vec3d(p.x(),p.y(),0));
         m_2d.vert_set_color(Color::BLACK());
-        m_2d.updateGL();
         gui_2d.push_obj(&m_2d);
 
         std::vector<vec3d> samples_3d;
@@ -76,7 +75,6 @@ int main(int argc, char **argv)
         profiler.pop();
         for(auto p : samples_3d) m_3d.vert_add(p);
         m_3d.vert_set_color(Color::BLACK());
-        m_3d.updateGL();
         gui_3d.push_obj(&m_3d);
     });
 

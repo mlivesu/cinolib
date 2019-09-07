@@ -50,3 +50,4 @@ SUBDIRS += 31_LSCM
 SUBDIRS += 32_homotopy_basis
 SUBDIRS += 33_edge_collapse
 SUBDIRS += 34_Hermite_RBF               # requires Tetgen (http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1)
+SUBDIRS += 35_Poisson_sampling
