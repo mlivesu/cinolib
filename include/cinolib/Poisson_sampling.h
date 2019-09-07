@@ -50,14 +50,14 @@ namespace cinolib
  * SIGGRAPH Technical Sketch, 2007
 */
 
-template<uint Dim, class Vec>
+template<uint Dim, class Point>
 CINO_INLINE
-void Poisson_sampling(const double       radius,
-                      const Vec          min,
-                      const Vec          max,
-                      std::vector<Vec> & samples,
-                      uint               seed=0,
-                      const int          max_attempts=30);
+void Poisson_sampling(const double         radius,
+                      const Point          min,
+                      const Point          max,
+                      std::vector<Point> & samples,
+                      uint                 seed=0,
+                      const int            max_attempts=30);
 
 }
 
