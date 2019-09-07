@@ -69,14 +69,14 @@ void sample_annulus(const double radius, const Vec & center, uint & seed, Vec & 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint Dim, class Vec>
+template<uint Dim, class Point>
 CINO_INLINE
-void Poisson_sampling(const double       radius,
-                      const Vec          min,
-                      const Vec          max,
-                      std::vector<Vec> & samples,
-                      uint               seed,
-                      const int          max_attempts)
+void Poisson_sampling(const double          radius,
+                      const Point           min,
+                      const Point           max,
+                      std::vector<Point> &  samples,
+                      uint                  seed,
+                      const int             max_attempts)
 {
     samples.clear();
     std::vector<uint> active_list;
@@ -84,34 +84,35 @@ void Poisson_sampling(const double       radius,
     // acceleration grid
     double step = 0.999*radius/std::sqrt(static_cast<double>(Dim)); // a grid cell this size can have at most one sample in it
     std::array<uint,Dim> dim_extent;
-    unsigned long int total_array_size = 1;
+    unsigned long int grid_size = 1;
     for(uint i=0; i<Dim; ++i)
     {
         dim_extent[i] = static_cast<uint>(std::ceil((max[i]-min[i])/step));
-        total_array_size *= dim_extent[i];
+        grid_size *= dim_extent[i];
     }
-    std::vector<int> accel(total_array_size, -1); // -1 indicates no sample there; otherwise index of sample point
+    std::vector<int> grid(grid_size, -1); // -1 indicates no sample there; otherwise index of sample point
 
     // first sample
-    Vec x;
+    Point x;
     for(uint i=0; i<Dim; ++i)
     {
         x[i] = (max[i]-min[i])*(random_uint(seed++)/static_cast<double>(max_uint)) + min[i];
     }
     samples.push_back(x);
     active_list.push_back(0);
-    uint k = serialize_nD_index<Dim,Vec>(dim_extent, (x-min)/step);
-    accel[k] = 0;
+    uint index = serialize_nD_index<Dim,Point>(dim_extent, (x-min)/step);
+    grid[index] = 0;
 
     while(!active_list.empty())
     {
         uint r = static_cast<int>(random_float(seed++, 0, active_list.size()-0.0001f));
         int  p = active_list[r];
         bool found_sample = false;
-        Vec j, jmin, jmax;
+        Point j, jmin, jmax;
+
         for(int attempt=0; attempt<max_attempts; ++attempt)
         {
-            sample_annulus<Dim,Vec>(radius, samples[p], seed, x);
+            sample_annulus<Dim,Point>(radius, samples[p], seed, x);
 
             // check this sample is within bounds
             for(uint i=0; i<Dim; ++i)
@@ -123,22 +124,27 @@ void Poisson_sampling(const double       radius,
             for(uint i=0; i<Dim; ++i)
             {
                 int this_min = static_cast<int>((x[i]-radius-min[i])/step);
+
                 if(this_min<0) this_min=0;
                 else if(this_min>=(int)dim_extent[i]) this_min=dim_extent[i]-1;
+
                 jmin[i]=(uint)this_min;
                 int this_max=(int)((x[i]+radius-min[i])/step);
+
                 if(this_max<0) this_max=0;
                 else if(this_max>=(int)dim_extent[i]) this_max=dim_extent[i]-1;
+
                 jmax[i]=(uint)this_max;
             }
+
             for(j=jmin;;)
             {
                 // check if there's a sample at j that's too close to x
-                k = serialize_nD_index<Dim,Vec>(dim_extent, j);
-                if(accel[k]>=0 && accel[k]!=p)
+                index = serialize_nD_index<Dim,Point>(dim_extent, j);
+                if(grid[index]>=0 && grid[index]!=p)
                 {
                     // if there is a sample point different from p
-                    if((x - samples[accel[k]]).length_squared()<radius*radius) goto reject_sample;
+                    if((x - samples[grid[index]]).length_squared()<radius*radius) goto reject_sample;
                 }
 
                 // move on to next j
@@ -165,13 +171,14 @@ void Poisson_sampling(const double       radius,
             reject_sample:
             ; // nothing to do except go to the next iteration in this loop
         }
+
         if(found_sample)
         {
-            size_t q=samples.size(); // the index of the new sample
+            uint id=samples.size(); // the index of the new sample
             samples.push_back(x);
-            active_list.push_back(q);
-            k=serialize_nD_index<Dim,Vec>(dim_extent, (x-min)/step);
-            accel[k]=(int)q;
+            active_list.push_back(id);
+            index=serialize_nD_index<Dim,Point>(dim_extent, (x-min)/step);
+            grid[index]=(int)id;
         }
         else
         {
