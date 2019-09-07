@@ -26,9 +26,12 @@ int main(int argc, char **argv)
 
     QApplication a(argc, argv);
 
+    Profiler profiler;
     QWidget window;
     GLcanvas gui_2d;
     GLcanvas gui_3d;
+    gui_2d.setMinimumSize(400,400);
+    gui_3d.setMinimumSize(400,400);
     QDoubleSpinBox sb_radius(&window);
     QPushButton but_compute_samples("Update samples", &window);
     sb_radius.setMinimum(1e-4);
@@ -44,10 +47,6 @@ int main(int argc, char **argv)
     layout.addWidget(&gui_3d,1,3,1,3);
     window.setLayout(&layout);
     window.show();
-    gui_2d.setMinimumSize(400,400);
-    gui_3d.setMinimumSize(400,400);
-
-    Profiler profiler;
 
     DrawableTrimesh<> m_2d;
     DrawableTrimesh<> m_3d;
