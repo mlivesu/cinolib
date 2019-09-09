@@ -43,6 +43,7 @@
 namespace cinolib
 {
 
+// TODO: make it dimension independent (d as template argument)
 class Bbox
 {
     public:
