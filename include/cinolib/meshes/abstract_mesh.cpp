@@ -113,8 +113,8 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::translate(const vec3d & delta)
 {
     for(uint vid=0; vid<num_verts(); ++vid) vert(vid) += delta;
-    bbox.min += delta;
-    bbox.max += delta;
+    bb.min += delta;
+    bb.max += delta;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
