@@ -48,10 +48,27 @@ CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// AABB that contains all verts in p_list
 CINO_INLINE
-Bbox::Bbox(const std::vector<vec3d> & p_list)
+Bbox::Bbox(const std::vector<vec3d> & p_list, const double scaling_factor)
+{    
+    update(p_list, scaling_factor);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// AABB that contains all AABBs in b_list
+CINO_INLINE
+Bbox::Bbox(const std::vector<Bbox> & b_list, const double scaling_factor)
 {
-    update(p_list);
+    std::vector<vec3d> p_list;
+    p_list.reserve(b_list.size()*2);
+    for(const Bbox & b : b_list)
+    {
+        p_list.push_back(b.min);
+        p_list.push_back(b.max);
+    }
+    update(p_list, scaling_factor);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -66,13 +83,25 @@ void Bbox::reset()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Bbox::update(const std::vector<vec3d> & p_list)
+void Bbox::update(const std::vector<vec3d> & p_list, const double scaling_factor)
 {
     for(const vec3d & p : p_list)
     {
         min = min.min(p);
         max = max.max(p);
     }
+    scale(scaling_factor);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Bbox::scale(const double s)
+{
+    vec3d c = center();
+    min -= c;   max -= c;
+    min *= s;   max *= s;
+    min += c;   max += c;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

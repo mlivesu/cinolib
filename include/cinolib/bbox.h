@@ -52,14 +52,14 @@ class Bbox
                       const vec3d max = vec3d(-inf_double, -inf_double, -inf_double))
         : min(min), max(max) {}
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        explicit Bbox(const std::vector<vec3d> & p_list);
+        explicit Bbox(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0); // AABB that contains all verts in p_list
+        explicit Bbox(const std::vector<Bbox>  & b_list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void               reset();
-        void               update(const std::vector<vec3d> & p_list);
+        void               scale(const double s);
+        void               update(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0);
         vec3d              center()    const;
         double             diag()      const;
         double             delta_x()   const;
