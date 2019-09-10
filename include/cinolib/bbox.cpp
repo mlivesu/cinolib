@@ -49,10 +49,30 @@ CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+Bbox::Bbox(const std::vector<vec3d> & p_list)
+{
+    update(p_list);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void Bbox::reset()
 {
     min = vec3d( inf_double,  inf_double,  inf_double);
     max = vec3d(-inf_double, -inf_double, -inf_double);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Bbox::update(const std::vector<vec3d> & p_list)
+{
+    for(const vec3d & p : p_list)
+    {
+        min = min.min(p);
+        max = max.max(p);
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -118,6 +138,34 @@ CINO_INLINE
 double Bbox::max_entry() const
 {
     return  std::max(min.max_entry(), max.max_entry());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Bbox::contains(const vec3d & p, const bool strictly_contains) const
+{
+    if(strictly_contains)
+    {
+        if(p.x()<min.x() || p.x()>max.x()) return false;
+        if(p.y()<min.y() || p.y()>max.y()) return false;
+        if(p.z()<min.z() || p.z()>max.z()) return false;
+    }
+    else
+    {
+        if(p.x()<=min.x() || p.x()>=max.x()) return false;
+        if(p.y()<=min.y() || p.y()>=max.y()) return false;
+        if(p.z()<=min.z() || p.z()>=max.z()) return false;
+    }
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Bbox::intersects(const Bbox & box) const
+{
+    return (contains(box.min) || contains(box.max));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

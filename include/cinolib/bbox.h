@@ -48,11 +48,18 @@ class Bbox
 {
     public:
 
-        explicit Bbox() { reset(); }
+        explicit Bbox(const vec3d min = vec3d( inf_double,  inf_double,  inf_double),
+                      const vec3d max = vec3d(-inf_double, -inf_double, -inf_double))
+        : min(min), max(max) {}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        explicit Bbox(const std::vector<vec3d> & p_list);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void               reset();
+        void               update(const std::vector<vec3d> & p_list);
         vec3d              center()    const;
         double             diag()      const;
         double             delta_x()   const;
@@ -61,6 +68,8 @@ class Bbox
         vec3d              delta()     const;
         double             min_entry() const;
         double             max_entry() const;
+        bool               contains(const vec3d & p, const bool strictly_contains = true)  const;
+        bool               intersects(const Bbox & box) const;
         std::vector<vec3d> corners(const double scaling_factor = 1.0) const;
         std::vector<uint>  tris()  const;
         std::vector<uint>  quads() const;

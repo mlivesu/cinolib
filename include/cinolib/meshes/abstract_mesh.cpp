@@ -113,7 +113,8 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::translate(const vec3d & delta)
 {
     for(uint vid=0; vid<num_verts(); ++vid) vert(vid) += delta;
-    update_bbox();
+    bbox.min += delta;
+    bbox.max += delta;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -168,13 +169,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractMesh<M,V,E,P>::update_bbox()
 {
-    bb.reset();
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        vec3d v = vert(vid);
-        bb.min = bb.min.min(v);
-        bb.max = bb.max.max(v);
-    }
+    bb.update(this->verts);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1070,7 +1065,6 @@ void AbstractMesh<M,V,E,P>::center_bbox()
     for(uint vid=0; vid<num_verts(); ++vid) vert(vid) -= center;
     bb.min -= center;
     bb.max -= center;
-    update_bbox();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
