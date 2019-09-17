@@ -40,9 +40,7 @@ namespace cinolib
 
 CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb)
 {
-    in << "\n[Bbox Info] MIN: " << bb.min << "\tMAX: " << bb.max <<
-          "\nDiag: " << bb.diag() << "\tDeltaX: " << bb.delta_x() <<
-          "\tDeltaY: " << bb.delta_y() << "\tDeltaZ: " << bb.delta_z() << "\n";
+    in << "\n[Bbox] MIN: " << bb.min << "\tMAX: " << bb.max;
     return in;
 }
 
@@ -172,21 +170,19 @@ double Bbox::max_entry() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Bbox::contains(const vec3d & p, const bool strictly_contains) const
+bool Bbox::contains(const vec3d & p, const bool strict) const
 {
-    if(strictly_contains)
+    if(strict)
     {
-        if(p.x()<min.x() || p.x()>max.x()) return false;
-        if(p.y()<min.y() || p.y()>max.y()) return false;
-        if(p.z()<min.z() || p.z()>max.z()) return false;
+        if(p.x()>min.x() && p.x()<max.x() &&
+           p.y()>min.y() && p.y()<max.y() &&
+           p.z()>min.z() && p.z()>max.z()) return true;
+        return false;
     }
-    else
-    {
-        if(p.x()<=min.x() || p.x()>=max.x()) return false;
-        if(p.y()<=min.y() || p.y()>=max.y()) return false;
-        if(p.z()<=min.z() || p.z()>=max.z()) return false;
-    }
-    return true;
+    if(p.x()>=min.x() && p.x()<=max.x() &&
+       p.y()>=min.y() && p.y()<=max.y() &&
+       p.z()>=min.z() && p.z()<=max.z()) return true;
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

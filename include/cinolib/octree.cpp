@@ -85,7 +85,6 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::init()
 
     tree_depth = 1;
     num_leaves = 1;
-    max_items_per_leaf = items.size();
 
     for(uint id=0; id<items.size(); ++id) add_item(id, root, 0);
 
@@ -94,7 +93,6 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::init()
     std::cout << "Depth             : " << tree_depth              << std::endl;
     std::cout << "#Items            : " << items.size()            << std::endl;
     std::cout << "#Leaves           : " << num_leaves              << std::endl;
-    std::cout << "Max items per leaf: " << max_items_per_leaf << std::endl;
     std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
 }
 
@@ -104,65 +102,78 @@ template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 CINO_INLINE
 void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, Node * node, const uint depth)
 {
-    if(node->bbox.intersects(bboxes.at(id)))
+    assert(node->bbox.intersects(bboxes.at(id)));
+
+    //std::cout << "add " << id << " to node " << node << " level " << depth << std::endl;
+
+    if(node->is_inner)
     {
-        if(node->is_inner)
+        //std::cout << node << " is inner node" << std::endl;
+        for(int i=0; i<8; ++i)
         {
-            for(int i=0; i<8; ++i)
+            assert(node->children[i]!=nullptr);
+            if(node->children[i]->bbox.intersects(bboxes.at(id)))
             {
-                if(node->children[i]!=nullptr) add_item(id, node->children[i], depth+1);
+                //std::cout << "go down through children #" << i << "\t" << node->children[i] << std::endl;
+                add_item(id, node->children[i], depth+1);
             }
         }
-        else // non empty leaf
+    }
+    else // non empty leaf
+    {
+        node->item_ids.push_back(id);
+        //std::cout << "node is leaf (new size is " << node->item_ids.size() << ")" << std::endl;
+
+        // if the node contains more elements than allowed, and the depth
+        // of the tree is lower than max depth: split the node into 8 octants
+        // and move all its items downwards
+        //
+        if(node->item_ids.size()>PrescribedItemsPerLeaf && depth<MaxDepth)
         {
-            node->item_ids.push_back(id);
+            node->is_inner = true;
+            //std::cout << "reached max number of elements per leaf (" << node->item_ids.size() << ")" << std::endl;
 
-            // if the node contains more elements than allowed, and the depth
-            // of the tree is lower than max depth: split the node into 8 octants
-            // and move all its items downwards
-            //
-            if(node->item_ids.size()>PrescribedItemsPerLeaf && depth<MaxDepth)
+            auto items_to_move_down = node->item_ids;
+            items.clear();
+
+            // create children octants
+            vec3d min = node->bbox.min;
+            vec3d max = node->bbox.max;
+            vec3d avg = node->bbox.center();
+            node->children[0] = new Node(node, Bbox(vec3d(min[0], min[1], min[2]), vec3d(avg[0], avg[1], avg[2])));
+            node->children[1] = new Node(node, Bbox(vec3d(avg[0], min[1], min[2]), vec3d(max[0], avg[1], avg[2])));
+            node->children[2] = new Node(node, Bbox(vec3d(avg[0], avg[1], min[2]), vec3d(max[0], max[1], avg[2])));
+            node->children[3] = new Node(node, Bbox(vec3d(min[0], avg[1], min[2]), vec3d(avg[0], max[1], avg[2])));
+            node->children[4] = new Node(node, Bbox(vec3d(min[0], min[1], avg[2]), vec3d(avg[0], avg[1], max[2])));
+            node->children[5] = new Node(node, Bbox(vec3d(avg[0], min[1], avg[2]), vec3d(max[0], avg[1], max[2])));
+            node->children[6] = new Node(node, Bbox(vec3d(avg[0], avg[1], avg[2]), vec3d(max[0], max[1], max[2])));
+            node->children[7] = new Node(node, Bbox(vec3d(min[0], avg[1], avg[2]), vec3d(avg[0], max[1], max[2])));
+
+            //std::cout << "octants created" << std::endl;
+
+            // mode items downwards in the tree
+            // NOTE: items that span across multiple octants will be added to each node they intersect)
+            uint d_plus_one = depth+1;
+            for(uint item : items_to_move_down)
             {
-                node->is_inner = true;
-                std::cout << "reached max number of elements per leaf. split into 8 octants" << std::endl;
-
-                // create children octants
-                vec3d min = node->bbox.min;
-                vec3d max = node->bbox.min;
-                vec3d avg = node->bbox.center();
-                node->children[0] = new Node(node, Bbox(vec3d(min[0], min[1], min[2]), vec3d(avg[0], avg[1], avg[2])));
-                node->children[1] = new Node(node, Bbox(vec3d(avg[0], min[1], min[2]), vec3d(max[0], avg[1], avg[2])));
-                node->children[2] = new Node(node, Bbox(vec3d(avg[0], avg[1], min[2]), vec3d(max[0], max[1], avg[2])));
-                node->children[3] = new Node(node, Bbox(vec3d(min[0], avg[1], min[2]), vec3d(avg[0], max[1], avg[2])));
-                node->children[4] = new Node(node, Bbox(vec3d(min[0], min[1], avg[2]), vec3d(avg[0], avg[1], max[2])));
-                node->children[5] = new Node(node, Bbox(vec3d(avg[0], min[1], avg[2]), vec3d(max[0], avg[1], max[2])));
-                node->children[6] = new Node(node, Bbox(vec3d(avg[0], avg[1], avg[2]), vec3d(max[0], max[1], max[2])));
-                node->children[7] = new Node(node, Bbox(vec3d(min[0], avg[1], avg[2]), vec3d(avg[0], max[1], max[2])));
-
-                // mode items downwards in the tree
-                // NOTE: items that span across multiple octants will be added to each node they intersect)
-                uint d_plus_one = depth+1;
-                for(uint item : items)
+                assert(root->bbox.intersects(bboxes.at(item)));
+                //std::cout << "relocating item " << item << std::endl;
+                bool found_octant = false;
+                for(int i=0; i<8; ++i)
                 {
-                    add_item(item, node->children[0], d_plus_one);
-                    add_item(item, node->children[1], d_plus_one);
-                    add_item(item, node->children[2], d_plus_one);
-                    add_item(item, node->children[3], d_plus_one);
-                    add_item(item, node->children[4], d_plus_one);
-                    add_item(item, node->children[5], d_plus_one);
-                    add_item(item, node->children[6], d_plus_one);
-                    add_item(item, node->children[7], d_plus_one);
+                    if(node->children[i]->bbox.intersects(bboxes.at(item)))
+                    {
+                        //std::cout << "go down through children #" << i << "\t" << node->children[i] << std::endl;
+                        add_item(item, node->children[i], d_plus_one);
+                        found_octant = true;
+                    }
                 }
-                items.clear();
+                assert(found_octant);
+            }
 
-                // remove items from current node
-                num_leaves += 7; // 8 children minus the current node
-                tree_depth = std::max(tree_depth, d_plus_one);
-            }
-            else
-            {
-                max_items_per_leaf = std::max((uint)node->item_ids.size(), max_items_per_leaf);
-            }
+            // remove items from current node
+            num_leaves += 7; // 8 children minus the current node
+            tree_depth = std::max(tree_depth, d_plus_one);
         }
     }
 }
@@ -191,21 +202,30 @@ CINO_INLINE
 void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::get_items(const Node * node, const vec3d & p, std::vector<T> & res) const
 {
     assert(node!=nullptr);
-    if(node->bbox.contains(p))
+    if(node->is_inner) // go down in the tree
     {
-        if(node->is_inner)
+        for(int i=0; i<8; ++i)
+        {
+            assert(node->children[i]!=nullptr);
+            if(node->children[i]->bbox.contains(p)) get_items(node->children[i], p, res);
+        }
+
+        // if the query point doesn't fall inside any non empty leave, return all elements at this level of the tree
+        if(res.empty())
         {
             for(int i=0; i<8; ++i)
             {
-                if(node->children[i]!=nullptr) get_items(node->children[i], p, res);
+                std::copy(node->children[i]->item_ids.begin(), node->children[i]->item_ids.begin(), std::back_inserter(res));
             }
         }
-        else
-        {
-            // WARNING: this will likely duplicate items spanning across multiple nodes!
-            for(uint id : node->item_ids) res.push_back(items.at(id));
-        }
     }
+    else // grab items
+    {
+        assert(!node->item_ids.empty());
+        // WARNING: this will likely duplicate items spanning across multiple nodes!
+        std::copy(node->item_ids.begin(), node->item_ids.begin(), std::back_inserter(res));
+    }
+
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

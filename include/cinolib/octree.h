@@ -48,8 +48,7 @@ class Octree
 {
     struct Node
     {
-        Node(const Node * father = nullptr,
-             const Bbox & bbox   = Bbox()) : father(father), bbox(bbox) {}
+        Node(const Node * father, const Bbox & bbox) : father(father), bbox(bbox) {}
        ~Node();
         const Node       *father;
         Node             *children[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
@@ -86,7 +85,6 @@ class Octree
         // STATISTICAL INFO
         uint tree_depth;
         uint num_leaves;
-        uint max_items_per_leaf;
 };
 
 }
