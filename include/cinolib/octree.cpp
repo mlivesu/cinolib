@@ -81,7 +81,7 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::init()
 {
     assert(items.size() == bboxes.size());
 
-    root = new Node(nullptr, Bbox(bboxes, 2.0));
+    root = new OctreeNode(nullptr, Bbox(bboxes, 1.5));
 
     tree_depth = 1;
     num_leaves = 1;
@@ -100,21 +100,17 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::init()
 
 template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 CINO_INLINE
-void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, Node * node, const uint depth)
+void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, OctreeNode * node, const uint depth)
 {
     assert(node->bbox.intersects(bboxes.at(id)));
 
-    //std::cout << "add " << id << " to node " << node << " level " << depth << std::endl;
-
     if(node->is_inner)
     {
-        //std::cout << node << " is inner node" << std::endl;
         for(int i=0; i<8; ++i)
         {
             assert(node->children[i]!=nullptr);
             if(node->children[i]->bbox.intersects(bboxes.at(id)))
             {
-                //std::cout << "go down through children #" << i << "\t" << node->children[i] << std::endl;
                 add_item(id, node->children[i], depth+1);
             }
         }
@@ -122,7 +118,6 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, Node * n
     else // non empty leaf
     {
         node->item_ids.push_back(id);
-        //std::cout << "node is leaf (new size is " << node->item_ids.size() << ")" << std::endl;
 
         // if the node contains more elements than allowed, and the depth
         // of the tree is lower than max depth: split the node into 8 octants
@@ -131,39 +126,30 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, Node * n
         if(node->item_ids.size()>PrescribedItemsPerLeaf && depth<MaxDepth)
         {
             node->is_inner = true;
-            //std::cout << "reached max number of elements per leaf (" << node->item_ids.size() << ")" << std::endl;
-
-            auto items_to_move_down = node->item_ids;
-            node->item_ids.clear();
 
             // create children octants
             vec3d min = node->bbox.min;
             vec3d max = node->bbox.max;
             vec3d avg = node->bbox.center();
-            node->children[0] = new Node(node, Bbox(vec3d(min[0], min[1], min[2]), vec3d(avg[0], avg[1], avg[2])));
-            node->children[1] = new Node(node, Bbox(vec3d(avg[0], min[1], min[2]), vec3d(max[0], avg[1], avg[2])));
-            node->children[2] = new Node(node, Bbox(vec3d(avg[0], avg[1], min[2]), vec3d(max[0], max[1], avg[2])));
-            node->children[3] = new Node(node, Bbox(vec3d(min[0], avg[1], min[2]), vec3d(avg[0], max[1], avg[2])));
-            node->children[4] = new Node(node, Bbox(vec3d(min[0], min[1], avg[2]), vec3d(avg[0], avg[1], max[2])));
-            node->children[5] = new Node(node, Bbox(vec3d(avg[0], min[1], avg[2]), vec3d(max[0], avg[1], max[2])));
-            node->children[6] = new Node(node, Bbox(vec3d(avg[0], avg[1], avg[2]), vec3d(max[0], max[1], max[2])));
-            node->children[7] = new Node(node, Bbox(vec3d(min[0], avg[1], avg[2]), vec3d(avg[0], max[1], max[2])));
-
-            //std::cout << "octants created" << std::endl;
+            node->children[0] = new OctreeNode(node, Bbox(vec3d(min[0], min[1], min[2]), vec3d(avg[0], avg[1], avg[2])));
+            node->children[1] = new OctreeNode(node, Bbox(vec3d(avg[0], min[1], min[2]), vec3d(max[0], avg[1], avg[2])));
+            node->children[2] = new OctreeNode(node, Bbox(vec3d(avg[0], avg[1], min[2]), vec3d(max[0], max[1], avg[2])));
+            node->children[3] = new OctreeNode(node, Bbox(vec3d(min[0], avg[1], min[2]), vec3d(avg[0], max[1], avg[2])));
+            node->children[4] = new OctreeNode(node, Bbox(vec3d(min[0], min[1], avg[2]), vec3d(avg[0], avg[1], max[2])));
+            node->children[5] = new OctreeNode(node, Bbox(vec3d(avg[0], min[1], avg[2]), vec3d(max[0], avg[1], max[2])));
+            node->children[6] = new OctreeNode(node, Bbox(vec3d(avg[0], avg[1], avg[2]), vec3d(max[0], max[1], max[2])));
+            node->children[7] = new OctreeNode(node, Bbox(vec3d(min[0], avg[1], avg[2]), vec3d(avg[0], max[1], max[2])));
 
             // mode items downwards in the tree
             // NOTE: items that span across multiple octants will be added to each node they intersect)
             uint d_plus_one = depth+1;
-            for(uint item : items_to_move_down)
+            for(uint item : node->item_ids)
             {
-                assert(root->bbox.intersects(bboxes.at(item)));
-                //std::cout << "relocating item " << item << std::endl;
                 bool found_octant = false;
                 for(int i=0; i<8; ++i)
                 {
                     if(node->children[i]->bbox.intersects(bboxes.at(item)))
                     {
-                        //std::cout << "go down through children #" << i << "\t" << node->children[i] << std::endl;
                         add_item(item, node->children[i], d_plus_one);
                         found_octant = true;
                     }
@@ -172,6 +158,7 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, Node * n
             }
 
             // remove items from current node
+            node->item_ids.clear();
             num_leaves += 7; // 8 children minus the current node
             tree_depth = std::max(tree_depth, d_plus_one);
         }
@@ -199,7 +186,7 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::get_items(const vec3d & p, std::
 
 template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 CINO_INLINE
-void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::get_items(const Node * node, const vec3d & p, std::vector<T> & res) const
+void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::get_items(const OctreeNode * node, const vec3d & p, std::vector<T> & res) const
 {
     assert(node!=nullptr);
     if(node->is_inner) // go down in the tree
@@ -230,9 +217,8 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::get_items(const Node * node, con
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 CINO_INLINE
-Octree<T,MaxDepth,PrescribedItemsPerLeaf>::Node::~Node()
+OctreeNode::~OctreeNode()
 {
     // "in a tree's node destructor, you only need to destroy the children pointers that are manually
     //  allocated by you. You don't need to worry about the deallocation of the node itself."

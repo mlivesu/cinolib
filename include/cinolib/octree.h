@@ -43,42 +43,42 @@
 namespace cinolib
 {
 
-template<typename T, uint MaxDepth = 7, uint PrescribedItemsPerLeaf = 1>
-class Octree
+class OctreeNode
 {
-    struct Node
-    {
-        Node(const Node * father, const Bbox & bbox) : father(father), bbox(bbox) {}
-       ~Node();
-        const Node       *father;
-        Node             *children[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+    public:
+        OctreeNode(const OctreeNode * father, const Bbox & bbox) : father(father), bbox(bbox) {}
+       ~OctreeNode();
+        const OctreeNode *father;
+        OctreeNode       *children[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
         bool              is_inner = false;
         Bbox              bbox;
         std::vector<uint> item_ids; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
-    };
+};
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+template<typename T, uint MaxDepth = 7, uint PrescribedItemsPerLeaf = 1>
+class Octree
+{
 
     public:
 
         explicit Octree(const AbstractPolygonMesh<> & m);
         explicit Octree(const std::vector<T> & items, const std::vector<Bbox> & bboxes);
 
-        ~Octree();
+        virtual ~Octree();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void init();
-        void add_item(const uint id, Node *node, const uint depth);
+        void add_item(const uint id, OctreeNode *node, const uint depth);
         void get_items(const vec3d & p, std::vector<T> & res) const;
-        void get_items(const Node * node, const vec3d & p, std::vector<T> & res) const;
+        void get_items(const OctreeNode * node, const vec3d & p, std::vector<T> & res) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    //protected:
+    protected:
 
         // DATA
-        Node             *root = nullptr;
+        OctreeNode       *root = nullptr;
         std::vector<T>    items;
         std::vector<Bbox> bboxes;
 

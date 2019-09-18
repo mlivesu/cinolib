@@ -176,12 +176,14 @@ bool Bbox::contains(const vec3d & p, const bool strict) const
     {
         if(p.x()>min.x() && p.x()<max.x() &&
            p.y()>min.y() && p.y()<max.y() &&
-           p.z()>min.z() && p.z()>max.z()) return true;
-        return false;
+           p.z()>min.z() && p.z()<max.z()) return true;
     }
-    if(p.x()>=min.x() && p.x()<=max.x() &&
-       p.y()>=min.y() && p.y()<=max.y() &&
-       p.z()>=min.z() && p.z()<=max.z()) return true;
+    else
+    {
+        if(p.x()>=min.x() && p.x()<=max.x() &&
+           p.y()>=min.y() && p.y()<=max.y() &&
+           p.z()>=min.z() && p.z()<=max.z()) return true;
+    }
     return false;
 }
 
@@ -189,8 +191,8 @@ bool Bbox::contains(const vec3d & p, const bool strict) const
 
 CINO_INLINE
 bool Bbox::intersects(const Bbox & box) const
-{
-    return (contains(box.min) || contains(box.max));
+{    
+    return (contains(box.min) || contains(box.max) || box.contains(min) || box.contains(max));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -263,4 +265,28 @@ std::vector<uint> Bbox::quads() const
     };
     return q;
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+std::vector<uint> Bbox::edges() const
+{
+    std::vector<uint> e =
+    {
+        0, 1,
+        0, 3,
+        0, 4,
+        1, 2,
+        1, 5,
+        2, 3,
+        2, 6,
+        3, 7,
+        4, 5,
+        4, 7,
+        5, 6,
+        6, 7,
+    };
+    return e;
+}
+
 }
