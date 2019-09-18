@@ -229,7 +229,6 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::get_items(const OctreeNode * nod
         // WARNING: this will likely duplicate items spanning across multiple nodes!
         std::copy(node->item_ids.begin(), node->item_ids.begin(), std::back_inserter(res));
     }
-
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
