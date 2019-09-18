@@ -88,7 +88,7 @@ void Bbox::update(const std::vector<vec3d> & p_list, const double scaling_factor
         min = min.min(p);
         max = max.max(p);
     }
-    scale(scaling_factor);
+    if(scaling_factor!=1) scale(scaling_factor);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -190,9 +190,12 @@ bool Bbox::contains(const vec3d & p, const bool strict) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Bbox::intersects(const Bbox & box) const
+bool Bbox::intersects(const Bbox & box, const bool strict) const
 {    
-    return (contains(box.min) || contains(box.max) || box.contains(min) || box.contains(max));
+    return (contains(box.min, strict) ||
+            contains(box.max, strict) ||
+            box.contains(min, strict) ||
+            box.contains(max, strict));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
