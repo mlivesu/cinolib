@@ -38,6 +38,17 @@
 namespace cinolib
 {
 
+CINO_INLINE
+OctreeNode::~OctreeNode()
+{
+    // "in a tree's node destructor, you only need to destroy the children pointers that are manually
+    //  allocated by you. You don't need to worry about the deallocation of the node itself."
+    //  https://stackoverflow.com/questions/34170164/destructor-for-binary-search-tree
+    for(int i=0; i<8; ++i) delete children[i];
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 CINO_INLINE
 Octree<T,MaxDepth,PrescribedItemsPerLeaf>::Octree(const AbstractPolygonMesh<>  & m)
@@ -45,11 +56,11 @@ Octree<T,MaxDepth,PrescribedItemsPerLeaf>::Octree(const AbstractPolygonMesh<>  &
     // grab item list and bboxes from the mesh
     uint np = m.num_polys();
     items.reserve(np);
-    bboxes.reserve(np);
+    boxes.reserve(np);
     for(uint pid=0; pid<np; ++pid)
     {
         items.push_back(pid);
-        bboxes.push_back(Bbox(m.poly_verts(pid)));
+        boxes.push_back(Bbox(m.poly_verts(pid)));
     }
     init();
 }
@@ -58,8 +69,9 @@ Octree<T,MaxDepth,PrescribedItemsPerLeaf>::Octree(const AbstractPolygonMesh<>  &
 
 template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 CINO_INLINE
-Octree<T,MaxDepth,PrescribedItemsPerLeaf>::Octree(const std::vector<T>    & items,
-                  const std::vector<Bbox> & bboxes) : items(items), bboxes(bboxes)
+Octree<T,MaxDepth,PrescribedItemsPerLeaf>::Octree(const std::vector<T> & items,
+                                                  const std::vector<Bbox> & boxes)
+: items(items), boxes(boxes)
 {
     init();
 }
@@ -79,9 +91,9 @@ template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 CINO_INLINE
 void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::init()
 {
-    assert(items.size() == bboxes.size());
+    assert(items.size() == boxes.size());
 
-    root = new OctreeNode(nullptr, Bbox(bboxes, 1.5));
+    root = new OctreeNode(nullptr, Bbox(boxes, 1.5));
 
     tree_depth = 1;
     num_leaves = 1;
@@ -93,6 +105,7 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::init()
     std::cout << "Depth             : " << tree_depth              << std::endl;
     std::cout << "#Items            : " << items.size()            << std::endl;
     std::cout << "#Leaves           : " << num_leaves              << std::endl;
+    std::cout << "MAX items per leaf: " << max_items_per_leaf()    << std::endl;
     std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
 }
 
@@ -102,20 +115,21 @@ template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 CINO_INLINE
 void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, OctreeNode * node, const uint depth)
 {
-    assert(node->bbox.intersects(bboxes.at(id)));
+    assert(node->bbox.intersects(boxes.at(id)));
 
     if(node->is_inner)
     {
+        assert(node->item_ids.empty());
         for(int i=0; i<8; ++i)
         {
             assert(node->children[i]!=nullptr);
-            if(node->children[i]->bbox.intersects(bboxes.at(id)))
+            if(node->children[i]->bbox.intersects(boxes.at(id)))
             {
                 add_item(id, node->children[i], depth+1);
             }
         }
     }
-    else // non empty leaf
+    else
     {
         node->item_ids.push_back(id);
 
@@ -126,6 +140,9 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, OctreeNo
         if(node->item_ids.size()>PrescribedItemsPerLeaf && depth<MaxDepth)
         {
             node->is_inner = true;
+
+            auto items_to_move_down = node->item_ids;
+            node->item_ids.clear();
 
             // create children octants
             vec3d min = node->bbox.min;
@@ -143,12 +160,13 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, OctreeNo
             // mode items downwards in the tree
             // NOTE: items that span across multiple octants will be added to each node they intersect)
             uint d_plus_one = depth+1;
-            for(uint item : node->item_ids)
+            for(uint item : items_to_move_down)
             {
                 bool found_octant = false;
                 for(int i=0; i<8; ++i)
                 {
-                    if(node->children[i]->bbox.intersects(bboxes.at(item)))
+                    assert(node->children[i]!=nullptr);
+                    if(node->children[i]->bbox.intersects(boxes.at(item)))
                     {
                         add_item(item, node->children[i], d_plus_one);
                         found_octant = true;
@@ -157,8 +175,7 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, OctreeNo
                 assert(found_octant);
             }
 
-            // remove items from current node
-            node->item_ids.clear();
+            // remove items from current node            
             num_leaves += 7; // 8 children minus the current node
             tree_depth = std::max(tree_depth, d_plus_one);
         }
@@ -217,13 +234,32 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::get_items(const OctreeNode * nod
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 CINO_INLINE
-OctreeNode::~OctreeNode()
+uint Octree<T,MaxDepth,PrescribedItemsPerLeaf>::max_items_per_leaf() const
 {
-    // "in a tree's node destructor, you only need to destroy the children pointers that are manually
-    //  allocated by you. You don't need to worry about the deallocation of the node itself."
-    //  https://stackoverflow.com/questions/34170164/destructor-for-binary-search-tree
-    for(int i=0; i<8; ++i) delete children[i];
+    return max_items_per_leaf(root, 0);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+CINO_INLINE
+uint Octree<T,MaxDepth,PrescribedItemsPerLeaf>::max_items_per_leaf(const OctreeNode * node, const uint max) const
+{
+    if(node->is_inner)
+    {
+        uint tmp[8];
+        for(int i=0; i<8; ++i)
+        {
+            tmp[i] = max_items_per_leaf(node->children[i], max);
+        }
+        return *std::max_element(tmp, tmp+8);
+    }
+    else
+    {
+        return std::max((uint)node->item_ids.size(), max);
+    }
 }
 
 }

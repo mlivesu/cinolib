@@ -43,6 +43,8 @@
 namespace cinolib
 {
 
+// NN search: https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
+
 class OctreeNode
 {
     public:
@@ -55,20 +57,29 @@ class OctreeNode
         std::vector<uint> item_ids; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
 };
 
-template<typename T, uint MaxDepth = 7, uint PrescribedItemsPerLeaf = 1>
+template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 class Octree
 {
 
     public:
 
         explicit Octree(const AbstractPolygonMesh<> & m);
-        explicit Octree(const std::vector<T> & items, const std::vector<Bbox> & bboxes);
+        explicit Octree(const std::vector<T> & items, const std::vector<Bbox> & boxes);
 
         virtual ~Octree();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void init();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        // THIS IS BUGGY!!!!! NEED TO DOUBLE CHECK
+        uint max_items_per_leaf() const;
+        uint max_items_per_leaf(const OctreeNode *node, const uint max) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void add_item(const uint id, OctreeNode *node, const uint depth);
         void get_items(const vec3d & p, std::vector<T> & res) const;
         void get_items(const OctreeNode * node, const vec3d & p, std::vector<T> & res) const;
@@ -80,7 +91,7 @@ class Octree
         // DATA
         OctreeNode       *root = nullptr;
         std::vector<T>    items;
-        std::vector<Bbox> bboxes;
+        std::vector<Bbox> boxes;
 
         // STATISTICAL INFO
         uint tree_depth;
