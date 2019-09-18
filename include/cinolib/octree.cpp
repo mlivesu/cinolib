@@ -134,7 +134,7 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, Node * n
             //std::cout << "reached max number of elements per leaf (" << node->item_ids.size() << ")" << std::endl;
 
             auto items_to_move_down = node->item_ids;
-            items.clear();
+            node->item_ids.clear();
 
             // create children octants
             vec3d min = node->bbox.min;
