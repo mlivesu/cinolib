@@ -43,15 +43,13 @@
 namespace cinolib
 {
 
-template<typename T, uint MaxDepth = 7, uint PrescribedItemsPerLeaf = 1>
+template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 class DrawableOctree : public Octree<T,MaxDepth,PrescribedItemsPerLeaf>, public DrawableObject
 {
-    AbstractPolygonMesh<> *ptr;
-
     public:
 
-        explicit DrawableOctree( AbstractPolygonMesh<> & m);
-        explicit DrawableOctree(const std::vector<T> & items, const std::vector<Bbox> & bboxes);
+        explicit DrawableOctree(const AbstractPolygonMesh<> & m);
+        explicit DrawableOctree(const std::vector<T> & items, const std::vector<Bbox> & boxes);
 
         ~DrawableOctree() {}
 
