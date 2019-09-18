@@ -43,7 +43,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint connected_components(const AbstractMesh<M,V,E,P> & m)
 {
-    std::vector<std::set<uint>> ccs;
+    std::vector<std::unordered_set<uint>> ccs;
     return connected_components(m, ccs);
 }
 
@@ -52,7 +52,7 @@ uint connected_components(const AbstractMesh<M,V,E,P> & m)
 template<class M, class V, class E, class P>
 CINO_INLINE
 uint connected_components(const AbstractMesh<M,V,E,P> & m,
-                          std::vector<std::set<uint>> & ccs)
+                          std::vector<std::unordered_set<uint>> & ccs)
 {
     ccs.clear();
     uint seed = 0;
@@ -60,8 +60,8 @@ uint connected_components(const AbstractMesh<M,V,E,P> & m,
 
     do
     {
-        std::set<uint> cc;
-        bfs_exahustive(m, seed, cc);
+        std::unordered_set<uint> cc;
+        bfs(m, seed, cc);
 
         ccs.push_back(cc);
         for(uint vid : cc) visited.at(vid) = true;
