@@ -37,8 +37,8 @@
 #define CINO_DRAWABLE_OCTREE_H
 
 #include <cinolib/drawable_object.h>
+#include <cinolib/drawable_aabb.h>
 #include <cinolib/octree.h>
-#include <cinolib/color.h>
 
 namespace cinolib
 {
@@ -46,9 +46,11 @@ namespace cinolib
 template<typename T, uint MaxDepth = 7, uint PrescribedItemsPerLeaf = 1>
 class DrawableOctree : public Octree<T,MaxDepth,PrescribedItemsPerLeaf>, public DrawableObject
 {
+    AbstractPolygonMesh<> *ptr;
+
     public:
 
-        explicit DrawableOctree(const AbstractPolygonMesh<> & m);
+        explicit DrawableOctree( AbstractPolygonMesh<> & m);
         explicit DrawableOctree(const std::vector<T> & items, const std::vector<Bbox> & bboxes);
 
         ~DrawableOctree() {}
@@ -65,8 +67,8 @@ class DrawableOctree : public Octree<T,MaxDepth,PrescribedItemsPerLeaf>, public 
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_segments();
-        void update_segments(const OctreeNode * node);
+        void update_aabbs();
+        void update_aabbs(const OctreeNode * node);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -75,7 +77,7 @@ class DrawableOctree : public Octree<T,MaxDepth,PrescribedItemsPerLeaf>, public 
 
     private:
 
-        std::vector<vec3d> segs; //serialized segments (as pairs of 3D points)
+        std::vector<DrawableAABB> aabbs;
         Color color = Color::BLACK();
         float thickness = 1.0;
 };
