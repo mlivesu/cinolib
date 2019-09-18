@@ -83,6 +83,9 @@ void Bbox::reset()
 CINO_INLINE
 void Bbox::update(const std::vector<vec3d> & p_list, const double scaling_factor)
 {
+    assert(!p_list.empty());
+    min = p_list.front();
+    max = p_list.front();
     for(const vec3d & p : p_list)
     {
         min = min.min(p);
@@ -203,9 +206,9 @@ bool Bbox::intersects(const Bbox & box, const bool strict) const
 CINO_INLINE
 std::vector<vec3d> Bbox::corners(const double scaling_factor) const
 {
-    double dx = delta_x();
-    double dy = delta_y();
-    double dz = delta_z();
+    double dx = delta_x(); assert(dx>=0);
+    double dy = delta_y(); assert(dy>=0);
+    double dz = delta_z(); assert(dz>=0);
 
     std::vector<vec3d> c =
     {
