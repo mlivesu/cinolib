@@ -63,8 +63,8 @@ class DrawableObject
 {
     public :
 
-         DrawableObject(){}
-        ~DrawableObject(){}
+        explicit  DrawableObject(){}
+        virtual  ~DrawableObject(){}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
