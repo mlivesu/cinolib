@@ -34,6 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/octree.h>
+#include <queue>
 
 namespace cinolib
 {
@@ -186,55 +187,6 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, OctreeNo
 
 template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 CINO_INLINE
-void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::get_items(const vec3d & p, std::vector<T> & res) const
-{
-    assert(root!=nullptr);
-    if(!root->bbox.contains(p))
-    {
-        std::cout << "WARNING: query point falls outside the octree. Return all items" << std::endl;
-        res = items;
-        return;
-    }
-    res.clear();
-    get_items(root, p, res);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
-CINO_INLINE
-void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::get_items(const OctreeNode * node, const vec3d & p, std::vector<T> & res) const
-{
-    assert(node!=nullptr);
-    if(node->is_inner) // go down in the tree
-    {
-        for(int i=0; i<8; ++i)
-        {
-            assert(node->children[i]!=nullptr);
-            if(node->children[i]->bbox.contains(p)) get_items(node->children[i], p, res);
-        }
-
-        // if the query point doesn't fall inside any non empty leave, return all elements at this level of the tree
-        if(res.empty())
-        {
-            for(int i=0; i<8; ++i)
-            {
-                std::copy(node->children[i]->item_ids.begin(), node->children[i]->item_ids.begin(), std::back_inserter(res));
-            }
-        }
-    }
-    else // grab items
-    {
-        assert(!node->item_ids.empty());
-        // WARNING: this will likely duplicate items spanning across multiple nodes!
-        std::copy(node->item_ids.begin(), node->item_ids.begin(), std::back_inserter(res));
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
-CINO_INLINE
 uint Octree<T,MaxDepth,PrescribedItemsPerLeaf>::max_items_per_leaf() const
 {
     return max_items_per_leaf(root, 0);
@@ -259,6 +211,66 @@ uint Octree<T,MaxDepth,PrescribedItemsPerLeaf>::max_items_per_leaf(const OctreeN
     {
         return std::max((uint)node->item_ids.size(), max);
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+CINO_INLINE
+uint Octree<T,MaxDepth,PrescribedItemsPerLeaf>::nearest_neighbor(const vec3d & p) const
+{
+    // https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
+    struct Obj
+    {
+        double      dist = inf_double;
+        OctreeNode *node = nullptr;
+        int         item = -1;
+    };
+    struct Comp { bool operator()(const Obj & obj1, const Obj & obj2) {return obj1.dist > obj2.dist; }};
+    typedef std::priority_queue<Obj,std::vector<Obj>,Comp> Q;
+
+    Q q;
+    Obj obj;
+    obj.node = root;
+    obj.dist = root->bbox.dist_to_point_sqrd(p);
+    q.push(obj);
+
+    while(q.top().node->is_inner)
+    {
+        Obj obj = q.top();
+        q.pop();
+        assert(obj.node->is_inner);
+
+        //std::cout << "pop inner node. dist " << obj.dist << std::endl;
+
+        for(int i=0; i<8; ++i)
+        {
+            OctreeNode *child = obj.node->children[i];
+            if(child->is_inner)
+            {
+                Obj obj;
+                obj.node = child;
+                obj.dist = child->bbox.dist_to_point_sqrd(p);
+                q.push(obj);
+                //std::cout << "push inner node. dist " << obj.dist << std::endl;
+            }
+            else
+            {
+                for(uint id : child->item_ids)
+                {
+                    // TODO: here I should be used distance to the real object (as opposed to distance to its AABB)
+                    Obj obj;
+                    obj.node = child;
+                    obj.dist = boxes.at(id).dist_to_point_sqrd(p);
+                    obj.item = id;
+                    q.push(obj);
+                    //std::cout << "push leaf node. item " << id << ", dist " << obj.dist << std::endl;
+                }
+            }
+        }
+    }
+    assert(q.top().item>=0);
+    return q.top().item;
 }
 
 }

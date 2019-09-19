@@ -34,6 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/bbox.h>
+#include <algorithm>
 
 namespace cinolib
 {
@@ -179,9 +180,9 @@ CINO_INLINE
 double Bbox::dist_to_point_sqrd(const vec3d & p) const
 {
     vec3d  d = p - center();
-    double dx = std::max(std::abs(d.x()) - delta_x()*0.5, 0);
-    double dy = std::max(std::abs(d.y()) - delta_y()*0.5, 0);
-    double dz = std::max(std::abs(d.z()) - delta_z()*0.5, 0);
+    double dx = std::max(fabs(d.x()) - delta_x()*0.5, 0.0);
+    double dy = std::max(fabs(d.y()) - delta_y()*0.5, 0.0);
+    double dz = std::max(fabs(d.z()) - delta_z()*0.5, 0.0);
     return dx*dx + dy*dy + dz*dz;
 }
 
@@ -190,7 +191,7 @@ double Bbox::dist_to_point_sqrd(const vec3d & p) const
 CINO_INLINE
 double Bbox::dist_to_point(const vec3d & p) const
 {
-    return sqrt(dist_to_point_sqrd(p))
+    return sqrt(dist_to_point_sqrd(p));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -43,8 +43,6 @@
 namespace cinolib
 {
 
-// NN search: https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
-
 class OctreeNode
 {
     public:
@@ -56,6 +54,8 @@ class OctreeNode
         Bbox              bbox;
         std::vector<uint> item_ids; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
 class Octree
@@ -71,6 +71,7 @@ class Octree
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void init();
+        void add_item(const uint id, OctreeNode *node, const uint depth);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -79,9 +80,7 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void add_item(const uint id, OctreeNode *node, const uint depth);
-        void get_items(const vec3d & p, std::vector<T> & res) const;
-        void get_items(const OctreeNode * node, const vec3d & p, std::vector<T> & res) const;
+        uint nearest_neighbor(const vec3d & p) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
