@@ -263,10 +263,10 @@ T Octree<T>::nearest_neighbor(const vec3d & p) const
             }
             else for(uint id : child->item_ids)
             {
-                // TODO: here I should be used distance to the real object (as opposed to distance to its AABB)
                 O obj;
                 obj.node = child;
-                obj.dist = boxes.at(id).dist_to_point_sqrd(p);
+                if(item_to_point_dist!=nullptr) obj.dist = item_to_point_dist(p, items.at(id));
+                else                            obj.dist = boxes.at(id).dist_to_point_sqrd(p);
                 obj.id   = id;
                 q.push(obj);
                 //std::cout << "push leaf node. item " << id << ", dist " << obj.dist << std::endl;

@@ -78,15 +78,19 @@ class Octree
 
         void init();
         void add_item(const uint id, OctreeNode *node, const uint depth);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         uint max_items_per_leaf() const;
         uint max_items_per_leaf(const OctreeNode *node, const uint max) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        std::function<double(const vec3d &, const T &)> item_to_point_dist = nullptr;
+
+        //::::::::::::::::::::: QUERIES :::::::::::::::::::::::::::::::::::::::::::::
+
         T nearest_neighbor(const vec3d & p) const;
+        // ray tracing (first hit)
+        // ray tracing (all hits)
+        // all items whose aabbs contain element
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
