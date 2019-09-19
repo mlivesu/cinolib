@@ -267,7 +267,7 @@ T Octree<T>::nearest_neighbor(const vec3d & p) const
                 obj.node = child;
                 if(item_to_point_dist!=nullptr) obj.dist = item_to_point_dist(p, items.at(id));
                 else                            obj.dist = boxes.at(id).dist_to_point_sqrd(p);
-                obj.id   = id;
+                obj.id = id;
                 q.push(obj);
                 //std::cout << "push leaf node. item " << id << ", dist " << obj.dist << std::endl;
             }
