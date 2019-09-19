@@ -46,36 +46,43 @@
 namespace cinolib
 {
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::DrawableOctree(const AbstractPolygonMesh<> &m) : Octree<T,MaxDepth,PrescribedItemsPerLeaf>(m)
+DrawableOctree<T>::DrawableOctree(const AbstractPolygonMesh<> & m,
+                                  const uint                    max_depth,
+                                  const uint                    items_per_leaf)
+: Octree<T>(m, max_depth, items_per_leaf)
 {
     update_aabbs();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::DrawableOctree(const std::vector<T> & items, const std::vector<Bbox> & bboxes) : Octree<T,MaxDepth,PrescribedItemsPerLeaf>(items, bboxes)
+DrawableOctree<T>::DrawableOctree(const std::vector<T>    & items,
+                                  const std::vector<Bbox> & bboxes,
+                                  const uint                max_depth,
+                                  const uint                items_per_leaf)
+: Octree<T>(items, bboxes, max_depth, items_per_leaf)
 {
     update_aabbs();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-void DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::draw(const float ) const
+void DrawableOctree<T>::draw(const float ) const
 {
     for(auto obj : aabbs) obj.draw();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-vec3d DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::scene_center() const
+vec3d DrawableOctree<T>::scene_center() const
 {
     assert(this->root!=nullptr);
     return this->root->bbox.center();
@@ -83,9 +90,9 @@ vec3d DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::scene_center() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-float DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::scene_radius() const
+float DrawableOctree<T>::scene_radius() const
 {
     assert(this->root!=nullptr);
     return this->root->bbox.diag();
@@ -93,9 +100,9 @@ float DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::scene_radius() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-void DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::update_aabbs()
+void DrawableOctree<T>::update_aabbs()
 {
     assert(this->root!=nullptr);
     update_aabbs(this->root);
@@ -103,9 +110,9 @@ void DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::update_aabbs()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-void DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::update_aabbs(const OctreeNode *node)
+void DrawableOctree<T>::update_aabbs(const OctreeNode *node)
 {
     aabbs.push_back(DrawableAABB(node->bbox.min, node->bbox.max));
     if(node->is_inner)
@@ -117,18 +124,18 @@ void DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::update_aabbs(const Octre
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-void DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::set_color(const Color & c)
+void DrawableOctree<T>::set_color(const Color & c)
 {
     for(auto & obj : aabbs) obj.set_color(c);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-void DrawableOctree<T,MaxDepth,PrescribedItemsPerLeaf>::set_thickness(float t)
+void DrawableOctree<T>::set_thickness(float t)
 {
     for(auto & obj : aabbs) obj.set_thickness(t);
 }

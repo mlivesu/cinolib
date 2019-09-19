@@ -50,9 +50,13 @@ OctreeNode::~OctreeNode()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-Octree<T,MaxDepth,PrescribedItemsPerLeaf>::Octree(const AbstractPolygonMesh<>  & m)
+Octree<T>::Octree(const AbstractPolygonMesh<> & m,
+                  const uint                    max_depth,
+                  const uint                    items_per_leaf)
+    : max_depth(max_depth)
+    , items_per_leaf(items_per_leaf)
 {
     // grab item list and bboxes from the mesh
     uint np = m.num_polys();
@@ -68,29 +72,34 @@ Octree<T,MaxDepth,PrescribedItemsPerLeaf>::Octree(const AbstractPolygonMesh<>  &
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-Octree<T,MaxDepth,PrescribedItemsPerLeaf>::Octree(const std::vector<T> & items,
-                                                  const std::vector<Bbox> & boxes)
-: items(items), boxes(boxes)
+Octree<T>::Octree(const std::vector<T>    & items,
+                  const std::vector<Bbox> & boxes,
+                  const uint                max_depth,
+                  const uint                items_per_leaf)
+: items(items)
+, boxes(boxes)
+, max_depth(max_depth)
+, items_per_leaf(items_per_leaf)
 {
     init();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-Octree<T,MaxDepth,PrescribedItemsPerLeaf>::~Octree()
+Octree<T>::~Octree()
 {
     delete root;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::init()
+void Octree<T>::init()
 {
     assert(items.size() == boxes.size());
 
@@ -112,9 +121,9 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::init()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, OctreeNode * node, const uint depth)
+void Octree<T>::add_item(const uint id, OctreeNode * node, const uint depth)
 {
     assert(node->bbox.intersects(boxes.at(id)));
 
@@ -138,7 +147,7 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, OctreeNo
         // of the tree is lower than max depth: split the node into 8 octants
         // and move all its items downwards
         //
-        if(node->item_ids.size()>PrescribedItemsPerLeaf && depth<MaxDepth)
+        if(node->item_ids.size()>items_per_leaf && depth<max_depth)
         {
             node->is_inner = true;
 
@@ -178,25 +187,25 @@ void Octree<T,MaxDepth,PrescribedItemsPerLeaf>::add_item(const uint id, OctreeNo
 
             // remove items from current node            
             num_leaves += 7; // 8 children minus the current node
-            tree_depth = std::max(tree_depth, d_plus_one);
+            tree_depth = std::max(depth, d_plus_one);
         }
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-uint Octree<T,MaxDepth,PrescribedItemsPerLeaf>::max_items_per_leaf() const
+uint Octree<T>::max_items_per_leaf() const
 {
     return max_items_per_leaf(root, 0);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-uint Octree<T,MaxDepth,PrescribedItemsPerLeaf>::max_items_per_leaf(const OctreeNode * node, const uint max) const
+uint Octree<T>::max_items_per_leaf(const OctreeNode * node, const uint max) const
 {
     if(node->is_inner)
     {
@@ -215,32 +224,30 @@ uint Octree<T,MaxDepth,PrescribedItemsPerLeaf>::max_items_per_leaf(const OctreeN
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 CINO_INLINE
-uint Octree<T,MaxDepth,PrescribedItemsPerLeaf>::nearest_neighbor(const vec3d & p) const
+T Octree<T>::nearest_neighbor(const vec3d & p) const
 {
     // https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
-    struct Obj
+    struct O
     {
         double      dist = inf_double;
         OctreeNode *node = nullptr;
-        int         item = -1;
+        int         id   = -1;
     };
-    struct Comp { bool operator()(const Obj & obj1, const Obj & obj2) {return obj1.dist > obj2.dist; }};
-    typedef std::priority_queue<Obj,std::vector<Obj>,Comp> Q;
+    struct Comp { bool operator()(const O & obj1, const O & obj2) {return obj1.dist > obj2.dist; }};
+    typedef std::priority_queue<O,std::vector<O>,Comp> Q;
 
     Q q;
-    Obj obj;
+    O obj;
     obj.node = root;
     obj.dist = root->bbox.dist_to_point_sqrd(p);
     q.push(obj);
 
     while(q.top().node->is_inner)
     {
-        Obj obj = q.top();
+        O obj = q.top();
         q.pop();
-        assert(obj.node->is_inner);
-
         //std::cout << "pop inner node. dist " << obj.dist << std::endl;
 
         for(int i=0; i<8; ++i)
@@ -248,29 +255,26 @@ uint Octree<T,MaxDepth,PrescribedItemsPerLeaf>::nearest_neighbor(const vec3d & p
             OctreeNode *child = obj.node->children[i];
             if(child->is_inner)
             {
-                Obj obj;
+                O obj;
                 obj.node = child;
                 obj.dist = child->bbox.dist_to_point_sqrd(p);
                 q.push(obj);
                 //std::cout << "push inner node. dist " << obj.dist << std::endl;
             }
-            else
+            else for(uint id : child->item_ids)
             {
-                for(uint id : child->item_ids)
-                {
-                    // TODO: here I should be used distance to the real object (as opposed to distance to its AABB)
-                    Obj obj;
-                    obj.node = child;
-                    obj.dist = boxes.at(id).dist_to_point_sqrd(p);
-                    obj.item = id;
-                    q.push(obj);
-                    //std::cout << "push leaf node. item " << id << ", dist " << obj.dist << std::endl;
-                }
+                // TODO: here I should be used distance to the real object (as opposed to distance to its AABB)
+                O obj;
+                obj.node = child;
+                obj.dist = boxes.at(id).dist_to_point_sqrd(p);
+                obj.id   = id;
+                q.push(obj);
+                //std::cout << "push leaf node. item " << id << ", dist " << obj.dist << std::endl;
             }
         }
     }
-    assert(q.top().item>=0);
-    return q.top().item;
+    assert(q.top().id>=0);
+    return items.at(q.top().id);
 }
 
 }

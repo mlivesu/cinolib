@@ -57,14 +57,20 @@ class OctreeNode
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T, uint MaxDepth, uint PrescribedItemsPerLeaf>
+template<typename T>
 class Octree
 {
 
     public:
 
-        explicit Octree(const AbstractPolygonMesh<> & m);
-        explicit Octree(const std::vector<T> & items, const std::vector<Bbox> & boxes);
+        explicit Octree(const AbstractPolygonMesh<> & m,
+                        const uint                    max_depth      = 7,
+                        const uint                    items_per_leaf = 3);
+
+        explicit Octree(const std::vector<T>    & items,
+                        const std::vector<Bbox> & boxes,
+                        const uint                max_depth      = 7,
+                        const uint                items_per_leaf = 3);
 
         virtual ~Octree();
 
@@ -80,7 +86,7 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint nearest_neighbor(const vec3d & p) const;
+        T nearest_neighbor(const vec3d & p) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -90,6 +96,10 @@ class Octree
         OctreeNode       *root = nullptr;
         std::vector<T>    items;
         std::vector<Bbox> boxes;
+
+        // PARAMETERS
+        uint max_depth;
+        uint items_per_leaf;
 
         // STATISTICAL INFO
         uint tree_depth;
