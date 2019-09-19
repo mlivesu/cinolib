@@ -41,13 +41,18 @@ namespace cinolib
 
 CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb)
 {
-    in << "\n[Bbox] MIN: " << bb.min << "\tMAX: " << bb.max;
+    in << "\n[AABB] MIN: " << bb.min << "\tMAX: " << bb.max;
     return in;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// AABB that contains all verts in p_list
+CINO_INLINE
+Bbox::Bbox(const vec3d min, const vec3d max) : min(min), max(max)
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 Bbox::Bbox(const std::vector<vec3d> & p_list, const double scaling_factor)
 {    
@@ -168,7 +173,7 @@ double Bbox::min_entry() const
 CINO_INLINE
 double Bbox::max_entry() const
 {
-    return  std::max(min.max_entry(), max.max_entry());
+    return std::max(min.max_entry(), max.max_entry());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -261,7 +266,7 @@ std::vector<vec3d> Bbox::corners(const double scaling_factor) const
 CINO_INLINE
 std::vector<uint> Bbox::tris() const
 {
-    std::vector<uint> t =
+    static std::vector<uint> t =
     {
         0, 3, 2,
         0, 2, 1,
@@ -284,7 +289,7 @@ std::vector<uint> Bbox::tris() const
 CINO_INLINE
 std::vector<uint> Bbox::quads() const
 {
-    std::vector<uint> q =
+    static std::vector<uint> q =
     {
         0, 3, 2, 1,
         1, 2, 6, 5,
@@ -301,7 +306,7 @@ std::vector<uint> Bbox::quads() const
 CINO_INLINE
 std::vector<uint> Bbox::edges() const
 {
-    std::vector<uint> e =
+    static std::vector<uint> e =
     {
         0, 1,
         0, 3,
