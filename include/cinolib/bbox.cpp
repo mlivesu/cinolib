@@ -172,6 +172,29 @@ double Bbox::max_entry() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// squared AABB to point distance
+// https://gamedev.stackexchange.com/questions/44483/how-do-i-calculate-distance-between-a-point-and-an-axis-aligned-rectangle
+//
+CINO_INLINE
+double Bbox::dist_to_point_sqrd(const vec3d & p) const
+{
+    vec3d  d = p - center();
+    double dx = std::max(std::abs(d.x()) - delta_x()*0.5, 0);
+    double dy = std::max(std::abs(d.y()) - delta_y()*0.5, 0);
+    double dz = std::max(std::abs(d.z()) - delta_z()*0.5, 0);
+    return dx*dx + dy*dy + dz*dz;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Bbox::dist_to_point(const vec3d & p) const
+{
+    return sqrt(dist_to_point_sqrd(p))
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 bool Bbox::contains(const vec3d & p, const bool strict) const
 {

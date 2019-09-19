@@ -70,6 +70,8 @@ class Bbox
         vec3d              delta()     const;
         double             min_entry() const;
         double             max_entry() const;
+        double             dist_to_point_sqrd(const vec3d & p) const;
+        double             dist_to_point(const vec3d & p) const;
         bool               contains(const vec3d & p, const bool strict = false)  const;
         bool               intersects(const Bbox & box, const bool strict = false) const;
         std::vector<vec3d> corners(const double scaling_factor = 1.0) const;
