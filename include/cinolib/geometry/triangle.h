@@ -40,9 +40,34 @@
 #include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/bbox.h>
 
 namespace cinolib
 {
+
+class Triangle
+{
+    public:
+
+        Triangle(const std::vector<vec3d> v) : v0(v.at(0)), v1(v.at(1)), v2(v.at(2)) {}
+        Triangle(const vec3d & v0, const vec3d & v1, const vec3d & v2) : v0(v0), v1(v1), v2(v2) {}
+       ~Triangle() {}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        Bbox aabb() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        double dist     (const vec3d & p) const;
+        double dist_sqrd(const vec3d & p) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d v0, v1, v2;
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C);
@@ -110,6 +135,30 @@ CINO_INLINE
 bool triangle_bary_is_edge(const std::vector<double> & bary,
                            uint                      & eid, // 0,1,2 (see TRI_EDGES)
                            const double              tol = 1e-10);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d triangle_closest_point(const vec3d & P,
+                             const vec3d & A,
+                             const vec3d & B,
+                             const vec3d & C);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double point_to_triangle_dist(const vec3d & P,
+                              const vec3d & A,
+                              const vec3d & B,
+                              const vec3d & C);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double point_to_triangle_dist_sqrd(const vec3d & P,
+                                   const vec3d & A,
+                                   const vec3d & B,
+                                   const vec3d & C);
 }
 
 #ifndef  CINO_STATIC_LIB
