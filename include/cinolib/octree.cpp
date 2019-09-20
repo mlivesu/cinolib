@@ -213,9 +213,23 @@ uint Octree<T>::max_items_per_leaf(const OctreeNode * node, const uint max) cons
 
 template<typename T>
 CINO_INLINE
-T Octree<T>::nearest_neighbor_item(const vec3d & p, const bool print_debug_info) const
+void Octree<T>::print_query_info(const std::string & s,
+                                 const double        t,
+                                 const uint          aabb_dist_queries,
+                                 const uint          item_dist_queries) const
 {
-    return items.at(nearest_neighbor_item_id(p, print_debug_info));
+    std::cout << s << "[" << t << "s, "
+              << aabb_dist_queries << " AABB dist queries, "
+              << item_dist_queries << " item dist queries]" << std::endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+T Octree<T>::nearest_neighbor(const vec3d & p, const bool print_debug_info) const
+{
+    return items.at(nearest_neighbor_id(p, print_debug_info));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -223,7 +237,7 @@ T Octree<T>::nearest_neighbor_item(const vec3d & p, const bool print_debug_info)
 // https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
 template<typename T>
 CINO_INLINE
-uint Octree<T>::nearest_neighbor_item_id(const vec3d & p, const bool print_debug_info) const
+uint Octree<T>::nearest_neighbor_id(const vec3d & p, const bool print_debug_info) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
@@ -269,10 +283,7 @@ uint Octree<T>::nearest_neighbor_item_id(const vec3d & p, const bool print_debug
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        std::cout << how_many_seconds(t0,t1) << "s\n"
-                  << aabb_dist_queries       << " AABB dist queries\n"
-                  << item_dist_queries       << " item dist queries"
-                  << std::endl;
+        print_query_info("NN query", how_many_seconds(t0,t1), aabb_dist_queries, item_dist_queries);
     }
 
     assert(q.top().id>=0);

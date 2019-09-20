@@ -80,14 +80,34 @@ class Octree
         uint max_items_per_leaf() const;
         uint max_items_per_leaf(const OctreeNode *node, const uint max) const;
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void print_query_info(const std::string & s,
+                              const double        t,
+                              const uint          aabb_dist_queries,
+                              const uint          item_dist_queries) const;
+
         // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        T    nearest_neighbor_item   (const vec3d & p, const bool print_debug_info) const;
-        uint nearest_neighbor_item_id(const vec3d & p, const bool print_debug_info) const;
+        // returns the id/item in the octree nearest to point p
+        T    nearest_neighbor   (const vec3d & p, const bool print_debug_info) const;
+        uint nearest_neighbor_id(const vec3d & p, const bool print_debug_info) const;
 
-        // ray tracing (first hit)
-        // ray tracing (all hits)
-        // range queries (spherical, aabb, ...) [useful?]
+        // TODO! returns the id/item in the octree nearest to ball (p,radius)
+        T    nearest_neighbor   (const vec3d & p, const float radius, const bool print_debug_info) const;
+        uint nearest_neighbor_id(const vec3d & p, const float radius, const bool print_debug_info) const;
+
+        // TODO! returns the id/item in the octree containing point p (if there are more, it will return only one of them)
+        T    contains   (const vec3d & p, const bool print_debug_info) const;
+        int  contains_id(const vec3d & p, const bool print_debug_info) const; // -1: no item found
+
+        // TODO! returns the id/item in the octree that firstly intersect ray (p,dir)
+        T    ray_first_hit   (const vec3d & p, const vec3d & dir, const bool print_debug_info) const;
+        int  ray_first_hit_id(const vec3d & p, const vec3d & dir, const bool print_debug_info) const;  // -1: no item found
+
+        // TODO! returns all the id/items in the octree that intersect ray (p,dir)
+        std::vector<T>    ray_hits   (const vec3d & p, const vec3d & dir, const bool print_debug_info) const;
+        std::vector<uint> ray_hits_id(const vec3d & p, const vec3d & dir, const bool print_debug_info) const;  // -1: no item found
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -96,15 +116,11 @@ class Octree
         // DATA
         OctreeNode       *root = nullptr;
         std::vector<T>    items;
-        std::vector<Bbox> aabbs;
-
-        // PARAMETERS
-        uint max_depth;
-        uint items_per_leaf;
-
-        // STATISTICAL INFO
-        uint tree_depth;
-        uint num_leaves;
+        std::vector<Bbox> aabbs;            // per item axis aligned bunding boxes
+        uint              max_depth;        // maximum allowed depth of the tree
+        uint              items_per_leaf;   // prescribed number of items per leaf (can't go deeper than max_depth anyways)
+        uint              tree_depth;       // actual depth of the tree
+        uint              num_leaves;
 
         // SUPPORT STRUCTURES ::::::::::::::::::::::::::::::::::::::::::::::::::::
 
