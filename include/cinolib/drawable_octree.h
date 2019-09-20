@@ -48,14 +48,9 @@ class DrawableOctree : public Octree<T>, public DrawableObject
 {
     public:
 
-        explicit DrawableOctree(const AbstractPolygonMesh<> & m,
-                                const uint                    max_depth      = 7,
-                                const uint                    items_per_leaf = 3);
-
-        explicit DrawableOctree(const std::vector<T>    & items,
-                                const std::vector<Bbox> & boxes,
-                                const uint                max_depth      = 7,
-                                const uint                items_per_leaf = 3);
+        explicit DrawableOctree(const std::vector<T> & items,
+                                const uint             max_depth      = 7,
+                                const uint             items_per_leaf = 3);
 
         ~DrawableOctree() {}
 
@@ -71,8 +66,8 @@ class DrawableOctree : public Octree<T>, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_aabbs();
-        void update_aabbs(const OctreeNode * node);
+        void updateGL();
+        void updateGL(const OctreeNode * node);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -81,7 +76,7 @@ class DrawableOctree : public Octree<T>, public DrawableObject
 
     private:
 
-        std::vector<DrawableAABB> aabbs;
+        std::vector<DrawableAABB> render_list;
         Color color = Color::BLACK();
         float thickness = 1.0;
 };

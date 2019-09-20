@@ -34,6 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/octree.h>
+#include <cinolib/how_many_seconds.h>
 #include <queue>
 
 namespace cinolib
@@ -52,34 +53,10 @@ OctreeNode::~OctreeNode()
 
 template<typename T>
 CINO_INLINE
-Octree<T>::Octree(const AbstractPolygonMesh<> & m,
-                  const uint                    max_depth,
-                  const uint                    items_per_leaf)
-    : max_depth(max_depth)
-    , items_per_leaf(items_per_leaf)
-{
-    // grab item list and bboxes from the mesh
-    uint np = m.num_polys();
-    items.reserve(np);
-    boxes.reserve(np);
-    for(uint pid=0; pid<np; ++pid)
-    {
-        items.push_back(pid);
-        boxes.push_back(Bbox(m.poly_verts(pid)));
-    }
-    init();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<typename T>
-CINO_INLINE
 Octree<T>::Octree(const std::vector<T>    & items,
-                  const std::vector<Bbox> & boxes,
                   const uint                max_depth,
                   const uint                items_per_leaf)
 : items(items)
-, boxes(boxes)
 , max_depth(max_depth)
 , items_per_leaf(items_per_leaf)
 {
@@ -101,22 +78,32 @@ template<typename T>
 CINO_INLINE
 void Octree<T>::init()
 {
-    assert(items.size() == boxes.size());
+    typedef std::chrono::high_resolution_clock Time;
+    Time::time_point t0 = Time::now();
 
-    root = new OctreeNode(nullptr, Bbox(boxes, 1.5));
+    aabbs.reserve(items.size());
+    for(const T & item : items) aabbs.push_back(item.aabb());
+    assert(items.size() == aabbs.size());
+
+    root = new OctreeNode(nullptr, Bbox(aabbs, 1.5)); // enlarge it a bit to make sure queries don't fall outside
 
     tree_depth = 1;
     num_leaves = 1;
 
     for(uint id=0; id<items.size(); ++id) add_item(id, root, 0);
 
-    std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
-    std::cout << "Octree created                                 " << std::endl;
-    std::cout << "Depth             : " << tree_depth              << std::endl;
-    std::cout << "#Items            : " << items.size()            << std::endl;
-    std::cout << "#Leaves           : " << num_leaves              << std::endl;
-    std::cout << "MAX items per leaf: " << max_items_per_leaf()    << std::endl;
-    std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
+    Time::time_point t1 = Time::now();
+    double t = how_many_seconds(t0,t1);
+
+    std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
+    std::cout << "Octree created (" << t << "s)                      " << std::endl;
+    std::cout << "#Items                   : " << items.size()         << std::endl;
+    std::cout << "#Leaves                  : " << num_leaves           << std::endl;
+    std::cout << "Max depth                : " << max_depth            << std::endl;
+    std::cout << "Depth                    : " << tree_depth           << std::endl;
+    std::cout << "Prescribed items per leaf: " << items_per_leaf       << std::endl;
+    std::cout << "Max items per leaf       : " << max_items_per_leaf() << std::endl;
+    std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -125,7 +112,7 @@ template<typename T>
 CINO_INLINE
 void Octree<T>::add_item(const uint id, OctreeNode * node, const uint depth)
 {
-    assert(node->bbox.intersects(boxes.at(id)));
+    assert(node->bbox.intersects(aabbs.at(id)));
 
     if(node->is_inner)
     {
@@ -133,7 +120,7 @@ void Octree<T>::add_item(const uint id, OctreeNode * node, const uint depth)
         for(int i=0; i<8; ++i)
         {
             assert(node->children[i]!=nullptr);
-            if(node->children[i]->bbox.intersects(boxes.at(id)))
+            if(node->children[i]->bbox.intersects(aabbs.at(id)))
             {
                 add_item(id, node->children[i], depth+1);
             }
@@ -176,7 +163,7 @@ void Octree<T>::add_item(const uint id, OctreeNode * node, const uint depth)
                 for(int i=0; i<8; ++i)
                 {
                     assert(node->children[i]!=nullptr);
-                    if(node->children[i]->bbox.intersects(boxes.at(item)))
+                    if(node->children[i]->bbox.intersects(aabbs.at(item)))
                     {
                         add_item(item, node->children[i], d_plus_one);
                         found_octant = true;
@@ -226,55 +213,70 @@ uint Octree<T>::max_items_per_leaf(const OctreeNode * node, const uint max) cons
 
 template<typename T>
 CINO_INLINE
-T Octree<T>::nearest_neighbor(const vec3d & p) const
+T Octree<T>::nearest_neighbor_item(const vec3d & p, const bool print_debug_info) const
 {
-    // https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
-    struct O
-    {
-        double      dist = inf_double;
-        OctreeNode *node = nullptr;
-        int         id   = -1;
-    };
-    struct Comp { bool operator()(const O & obj1, const O & obj2) {return obj1.dist > obj2.dist; }};
-    typedef std::priority_queue<O,std::vector<O>,Comp> Q;
+    return items.at(nearest_neighbor_item_id(p, print_debug_info));
+}
 
-    Q q;
-    O obj;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
+template<typename T>
+CINO_INLINE
+uint Octree<T>::nearest_neighbor_item_id(const vec3d & p, const bool print_debug_info) const
+{
+    typedef std::chrono::high_resolution_clock Time;
+    Time::time_point t0 = Time::now();
+
+    PrioQueueEntry obj;
     obj.node = root;
     obj.dist = root->bbox.dist_to_point_sqrd(p);
+
+    PrioQueue q;
     q.push(obj);
+
+    uint aabb_dist_queries = 1;
+    uint item_dist_queries = 0;
 
     while(q.top().node->is_inner)
     {
-        O obj = q.top();
+        PrioQueueEntry obj = q.top();
         q.pop();
-        //std::cout << "pop inner node. dist " << obj.dist << std::endl;
 
         for(int i=0; i<8; ++i)
         {
             OctreeNode *child = obj.node->children[i];
             if(child->is_inner)
             {
-                O obj;
+                PrioQueueEntry obj;
                 obj.node = child;
                 obj.dist = child->bbox.dist_to_point_sqrd(p);
                 q.push(obj);
-                //std::cout << "push inner node. dist " << obj.dist << std::endl;
+                if(print_debug_info) ++aabb_dist_queries;
             }
             else for(uint id : child->item_ids)
             {
-                O obj;
+                PrioQueueEntry obj;
                 obj.node = child;
-                if(item_to_point_dist!=nullptr) obj.dist = item_to_point_dist(p, items.at(id));
-                else                            obj.dist = boxes.at(id).dist_to_point_sqrd(p);
-                obj.id = id;
+                obj.id   = id;
+                obj.dist = items.at(id).dist_sqrd(p);
                 q.push(obj);
-                //std::cout << "push leaf node. item " << id << ", dist " << obj.dist << std::endl;
+                if(print_debug_info) ++item_dist_queries;
             }
         }
     }
+
+    if(print_debug_info)
+    {
+        Time::time_point t1 = Time::now();
+        std::cout << how_many_seconds(t0,t1) << "s\n"
+                  << aabb_dist_queries       << " AABB dist queries\n"
+                  << item_dist_queries       << " item dist queries"
+                  << std::endl;
+    }
+
     assert(q.top().id>=0);
-    return items.at(q.top().id);
+    return q.top().id;
 }
 
 }

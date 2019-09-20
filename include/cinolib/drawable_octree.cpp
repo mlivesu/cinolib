@@ -48,25 +48,12 @@ namespace cinolib
 
 template<typename T>
 CINO_INLINE
-DrawableOctree<T>::DrawableOctree(const AbstractPolygonMesh<> & m,
-                                  const uint                    max_depth,
-                                  const uint                    items_per_leaf)
-: Octree<T>(m, max_depth, items_per_leaf)
+DrawableOctree<T>::DrawableOctree(const std::vector<T> & items,
+                                  const uint             max_depth,
+                                  const uint             items_per_leaf)
+: Octree<T>(items, max_depth, items_per_leaf)
 {
-    update_aabbs();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<typename T>
-CINO_INLINE
-DrawableOctree<T>::DrawableOctree(const std::vector<T>    & items,
-                                  const std::vector<Bbox> & bboxes,
-                                  const uint                max_depth,
-                                  const uint                items_per_leaf)
-: Octree<T>(items, bboxes, max_depth, items_per_leaf)
-{
-    update_aabbs();
+    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -75,7 +62,7 @@ template<typename T>
 CINO_INLINE
 void DrawableOctree<T>::draw(const float ) const
 {
-    for(auto obj : aabbs) obj.draw();
+    for(auto obj : render_list) obj.draw();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -102,23 +89,23 @@ float DrawableOctree<T>::scene_radius() const
 
 template<typename T>
 CINO_INLINE
-void DrawableOctree<T>::update_aabbs()
+void DrawableOctree<T>::updateGL()
 {
     assert(this->root!=nullptr);
-    update_aabbs(this->root);
+    updateGL(this->root);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<typename T>
 CINO_INLINE
-void DrawableOctree<T>::update_aabbs(const OctreeNode *node)
+void DrawableOctree<T>::updateGL(const OctreeNode *node)
 {
-    aabbs.push_back(DrawableAABB(node->bbox.min, node->bbox.max));
+    render_list.push_back(DrawableAABB(node->bbox.min, node->bbox.max));
     if(node->is_inner)
     {
         assert(node->item_ids.empty());
-        for(int i=0; i<8; ++i) update_aabbs(node->children[i]);
+        for(int i=0; i<8; ++i) updateGL(node->children[i]);
     }
 }
 
@@ -128,7 +115,7 @@ template<typename T>
 CINO_INLINE
 void DrawableOctree<T>::set_color(const Color & c)
 {
-    for(auto & obj : aabbs) obj.set_color(c);
+    for(auto & obj : render_list) obj.set_color(c);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -137,7 +124,7 @@ template<typename T>
 CINO_INLINE
 void DrawableOctree<T>::set_thickness(float t)
 {
-    for(auto & obj : aabbs) obj.set_thickness(t);
+    for(auto & obj : render_list) obj.set_thickness(t);
 }
 
 }

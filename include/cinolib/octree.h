@@ -36,7 +36,7 @@
 #ifndef CINO_OCTREE_H
 #define CINO_OCTREE_H
 
-#include <cinolib/meshes/abstract_polygonmesh.h>
+#include <cinolib/meshes/trimesh.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/bbox.h>
 
@@ -57,20 +57,19 @@ class OctreeNode
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// item type T must implement the following methods:
+//     Bbox   T::aabb() const;
+//     double T::dist_sqrd(const vec3d & p) const;
+//
 template<typename T>
 class Octree
 {
 
     public:
 
-        explicit Octree(const AbstractPolygonMesh<> & m,
-                        const uint                    max_depth      = 7,
-                        const uint                    items_per_leaf = 3);
-
-        explicit Octree(const std::vector<T>    & items,
-                        const std::vector<Bbox> & boxes,
-                        const uint                max_depth      = 7,
-                        const uint                items_per_leaf = 3);
+        explicit Octree(const std::vector<T> & items,
+                        const uint             max_depth      = 7,
+                        const uint             items_per_leaf = 3);
 
         virtual ~Octree();
 
@@ -81,16 +80,14 @@ class Octree
         uint max_items_per_leaf() const;
         uint max_items_per_leaf(const OctreeNode *node, const uint max) const;
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::function<double(const vec3d &, const T &)> item_to_point_dist = nullptr;
+        T    nearest_neighbor_item   (const vec3d & p, const bool print_debug_info) const;
+        uint nearest_neighbor_item_id(const vec3d & p, const bool print_debug_info) const;
 
-        //::::::::::::::::::::: QUERIES :::::::::::::::::::::::::::::::::::::::::::::
-
-        T nearest_neighbor(const vec3d & p) const;
         // ray tracing (first hit)
         // ray tracing (all hits)
-        // all items whose aabbs contain element
+        // range queries (spherical, aabb, ...) [useful?]
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -99,7 +96,7 @@ class Octree
         // DATA
         OctreeNode       *root = nullptr;
         std::vector<T>    items;
-        std::vector<Bbox> boxes;
+        std::vector<Bbox> aabbs;
 
         // PARAMETERS
         uint max_depth;
@@ -108,6 +105,24 @@ class Octree
         // STATISTICAL INFO
         uint tree_depth;
         uint num_leaves;
+
+        // SUPPORT STRUCTURES ::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        struct PrioQueueEntry
+        {
+            double      dist = inf_double;
+            OctreeNode *node = nullptr;
+            int         id   = -1;
+        };
+        struct Greater
+        {
+            bool operator()(const PrioQueueEntry & obj1,
+                            const PrioQueueEntry & obj2)
+            {
+                return obj1.dist > obj2.dist;
+            }
+        };
+        typedef std::priority_queue<PrioQueueEntry,std::vector<PrioQueueEntry>,Greater> PrioQueue;
 };
 
 }
