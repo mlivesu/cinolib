@@ -178,17 +178,22 @@ double Bbox::max_entry() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// squared AABB to point distance
-// https://gamedev.stackexchange.com/questions/44483/how-do-i-calculate-distance-between-a-point-and-an-axis-aligned-rectangle
-//
+CINO_INLINE
+vec3d Bbox::closest_point(const vec3d & p) const
+{
+    // Real Time Collision Detection", Section 5.1.3
+    vec3d res = p;
+    res.max(min);
+    res.min(max);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 double Bbox::dist_to_point_sqrd(const vec3d & p) const
 {
-    vec3d  d = p - center();
-    double dx = std::max(fabs(d.x()) - delta_x()*0.5, 0.0);
-    double dy = std::max(fabs(d.y()) - delta_y()*0.5, 0.0);
-    double dz = std::max(fabs(d.z()) - delta_z()*0.5, 0.0);
-    return dx*dx + dy*dy + dz*dz;
+    return p.dist_squared(closest_point(p));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -196,7 +201,7 @@ double Bbox::dist_to_point_sqrd(const vec3d & p) const
 CINO_INLINE
 double Bbox::dist_to_point(const vec3d & p) const
 {
-    return sqrt(dist_to_point_sqrd(p));
+    return p.dist(closest_point(p));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

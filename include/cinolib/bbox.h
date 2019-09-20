@@ -76,6 +76,7 @@ class Bbox
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        vec3d  closest_point     (const vec3d & p) const;
         double dist_to_point_sqrd(const vec3d & p) const;
         double dist_to_point     (const vec3d & p) const;
 
