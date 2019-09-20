@@ -40,9 +40,39 @@
 #include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/bbox.h>
 
 namespace cinolib
 {
+
+class Tetrahedron
+{
+    public:
+
+        Tetrahedron(const std::vector<vec3d> v) : v0(v.at(0)), v1(v.at(1)), v2(v.at(2)), v3(v.at(3)) {}
+
+        Tetrahedron(const vec3d & v0,
+                    const vec3d & v1,
+                    const vec3d & v2,
+                    const vec3d & v3) : v0(v0), v1(v1), v2(v2), v3(v3) {}
+
+       ~Tetrahedron() {}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        Bbox aabb() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        double dist     (const vec3d & p) const;
+        double dist_sqrd(const vec3d & p) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d v0, v1, v2, v3;
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool tet_barycentric_coords(const vec3d & A,
@@ -53,25 +83,57 @@ bool tet_barycentric_coords(const vec3d & A,
                             std::vector<double> & wgts,
                             const double  tol = 1e-5);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Given a point P and a tetrahedron ABCD, finds the point in ABCD that
+// is closest to P. This code was taken directly from Ericson's seminal
+// book "Real Time Collision Detection", Section 5.1.6
+//
+vec3d tetrahedron_closest_point(const vec3d & P,
+                                const vec3d & A,
+                                const vec3d & B,
+                                const vec3d & C,
+                                const vec3d & D);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void tet_closest_vertex(const vec3d  & A,
-                        const vec3d  & B,
-                        const vec3d  & C,
-                        const vec3d  & D,
-                        const vec3d  & query,
-                              uint   & id,
-                              double & dist);
+double point_to_tetrahedron_dist(const vec3d & P,
+                                 const vec3d & A,
+                                 const vec3d & B,
+                                 const vec3d & C,
+                                 const vec3d & D);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void tet_closest_edge(const vec3d  & A,
-                      const vec3d  & B,
-                      const vec3d  & C,
-                      const vec3d  & D,
-                      const vec3d  & query,
-                            uint   & id,
-                            double & dist);
+double point_to_tetrahedron_dist_sqrd(const vec3d & P,
+                                      const vec3d & A,
+                                      const vec3d & B,
+                                      const vec3d & C,
+                                      const vec3d & D);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//CINO_INLINE
+//void tet_closest_vertex(const vec3d  & A,
+//                        const vec3d  & B,
+//                        const vec3d  & C,
+//                        const vec3d  & D,
+//                        const vec3d  & query,
+//                              uint   & id,
+//                              double & dist);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//CINO_INLINE
+//void tet_closest_edge(const vec3d  & A,
+//                      const vec3d  & B,
+//                      const vec3d  & C,
+//                      const vec3d  & D,
+//                      const vec3d  & query,
+//                            uint   & id,
+//                            double & dist);
 }
 
 #ifndef  CINO_STATIC_LIB

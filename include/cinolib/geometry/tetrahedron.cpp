@@ -37,12 +37,134 @@
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/geometry/segment.h>
-
 #include <Eigen/Dense>
 #include <set>
 
 namespace cinolib
 {
+
+CINO_INLINE
+Bbox Tetrahedron::aabb() const
+{
+    return Bbox({v0, v1, v2, v3});
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Tetrahedron::dist_sqrd(const vec3d & p) const
+{
+    return point_to_tetrahedron_dist_sqrd(p, v0, v1, v2, v3);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Tetrahedron::dist(const vec3d & p) const
+{
+    return point_to_tetrahedron_dist(p, v0, v1, v2, v3);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Given a point P and a tetrahedron ABCD, finds the point in ABCD that
+// is closest to P. This code was taken directly from Ericson's seminal
+// book "Real Time Collision Detection", Section 5.1.6
+//
+vec3d tetrahedron_closest_point(const vec3d & P,
+                                const vec3d & A,
+                                const vec3d & B,
+                                const vec3d & C,
+                                const vec3d & D)
+{
+    // start assuming P is inside the tet, so closest to itself
+    vec3d  best_point = P;
+    double best_dist  = inf_double;
+
+    // if point is outside face ACB, then compute closest point on ACB
+    vec3d n_ACB = (C-A).cross(B-A);
+    //std::cout << "\t" << n_ACB.dot(P-A) << std::endl;
+    if(n_ACB.dot(P-A)>0)
+    {
+        vec3d  q = triangle_closest_point(P,A,C,B);
+        double d = q.dist_squared(P);
+        if(d < best_dist)
+        {
+            best_dist  = d;
+            best_point = q;
+        }
+    }
+
+    // repeat test for face ADC
+    vec3d n_ADC = (D-A).cross(C-A);
+    //std::cout << "\t" << n_ADC.dot(P-A) << std::endl;
+    if(n_ADC.dot(P-A)>0)
+    {
+        vec3d  q = triangle_closest_point(P,A,D,C);
+        double d = q.dist_squared(P);
+        if(d < best_dist)
+        {
+            best_dist  = d;
+            best_point = q;
+        }
+    }
+
+    // Repeat test for face ABD
+    vec3d n_ABD = (B-A).cross(D-A);
+    //std::cout << "\t" << n_ABD.dot(P-A) << std::endl;
+    if(n_ABD.dot(P-A)>0)
+    {
+        vec3d  q = triangle_closest_point(P,A,B,D);
+        double d = q.dist_squared(P);
+        if(d < best_dist)
+        {
+            best_dist  = d;
+            best_point = q;
+        }
+    }
+
+    // Repeat test for face BCD
+    vec3d n_BCD = (C-B).cross(D-B);
+    //std::cout << "\t" << n_BDC.dot(P-A) << std::endl;
+    if(n_BCD.dot(P-B)>0)
+    {
+        vec3d  q = triangle_closest_point(P,B,C,D);
+        double d = q.dist_squared(P);
+        if(d < best_dist)
+        {
+            best_dist  = d;
+            best_point = q;
+        }
+    }
+
+    return best_point;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double point_to_tetrahedron_dist(const vec3d & P,
+                                 const vec3d & A,
+                                 const vec3d & B,
+                                 const vec3d & C,
+                                 const vec3d & D)
+{
+    return P.dist(tetrahedron_closest_point(P,A,B,C,D));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double point_to_tetrahedron_dist_sqrd(const vec3d & P,
+                                      const vec3d & A,
+                                      const vec3d & B,
+                                      const vec3d & C,
+                                      const vec3d & D)
+{
+    return P.dist_squared(tetrahedron_closest_point(P,A,B,C,D));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // http://steve.hollasch.net/cgindex/geometry/ptintet.html
 //
@@ -94,7 +216,7 @@ bool tet_barycentric_coords(const vec3d & A,
     double det_M3 = M3.determinant();
     double sum    = det_M0 + det_M1 + det_M2 + det_M3;
 
-    if (sum==0) return false; // degenerate
+    if(sum==0) return false; // degenerate
 
     wgts[0] = det_M0/sum; assert(!std::isnan(wgts[0]));
     wgts[1] = det_M1/sum; assert(!std::isnan(wgts[1]));
@@ -106,49 +228,49 @@ bool tet_barycentric_coords(const vec3d & A,
 }
 
 
-CINO_INLINE
-void tet_closest_vertex(const vec3d  & A,
-                        const vec3d  & B,
-                        const vec3d  & C,
-                        const vec3d  & D,
-                        const vec3d  & query,
-                              uint   & id,
-                              double & dist)
-{
-    vec3d tet[4] = { A, B, C, D };
+//CINO_INLINE
+//void tet_closest_vertex(const vec3d  & A,
+//                        const vec3d  & B,
+//                        const vec3d  & C,
+//                        const vec3d  & D,
+//                        const vec3d  & query,
+//                              uint   & id,
+//                              double & dist)
+//{
+//    vec3d tet[4] = { A, B, C, D };
 
-    std::set< std::pair<double,int> > sorted_verts;
-    for(uint i=0; i<4; ++i)
-    {
-        sorted_verts.insert(std::make_pair(tet[i].dist(query),i));
-    }
+//    std::set< std::pair<double,int> > sorted_verts;
+//    for(uint i=0; i<4; ++i)
+//    {
+//        sorted_verts.insert(std::make_pair(tet[i].dist(query),i));
+//    }
 
-    dist = (*sorted_verts.begin()).first;
-    id   = (*sorted_verts.begin()).second;
-}
+//    dist = (*sorted_verts.begin()).first;
+//    id   = (*sorted_verts.begin()).second;
+//}
 
 
-CINO_INLINE
-void tet_closest_edge(const vec3d  & A,
-                      const vec3d  & B,
-                      const vec3d  & C,
-                      const vec3d  & D,
-                      const vec3d  & query,
-                            uint   & id,
-                            double & dist)
-{
-    vec3d tet[4] = { A, B, C, D };
+//CINO_INLINE
+//void tet_closest_edge(const vec3d  & A,
+//                      const vec3d  & B,
+//                      const vec3d  & C,
+//                      const vec3d  & D,
+//                      const vec3d  & query,
+//                            uint   & id,
+//                            double & dist)
+//{
+//    vec3d tet[4] = { A, B, C, D };
 
-    std::set< std::pair<double,uint>> sorted_segs;
-    for(uint i=0; i<6; ++i)
-    {
-        Segment s(tet[TET_EDGES[i][0]], tet[TET_EDGES[i][1]]);
-        sorted_segs.insert(std::make_pair(s.dist_to_point(query),i));
-    }
+//    std::set< std::pair<double,uint>> sorted_segs;
+//    for(uint i=0; i<6; ++i)
+//    {
+//        Segment s(tet[TET_EDGES[i][0]], tet[TET_EDGES[i][1]]);
+//        sorted_segs.insert(std::make_pair(s.dist_to_point(query),i));
+//    }
 
-    dist = (*sorted_segs.begin()).first;
-    id   = (*sorted_segs.begin()).second;
-}
+//    dist = (*sorted_segs.begin()).first;
+//    id   = (*sorted_segs.begin()).second;
+//}
 
 }
 
