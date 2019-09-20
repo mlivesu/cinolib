@@ -222,7 +222,7 @@ bool Bbox::contains(const vec3d & p, const bool strict) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Bbox::intersects(const Bbox & box, const bool strict) const
+bool Bbox::contains(const Bbox & box, const bool strict) const
 {    
     return (contains(box.min, strict) ||
             contains(box.max, strict) ||

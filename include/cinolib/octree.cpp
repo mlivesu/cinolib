@@ -112,7 +112,7 @@ template<typename T>
 CINO_INLINE
 void Octree<T>::add_item(const uint id, OctreeNode * node, const uint depth)
 {
-    assert(node->bbox.intersects(aabbs.at(id)));
+    assert(node->bbox.contains(aabbs.at(id)));
 
     if(node->is_inner)
     {
@@ -120,7 +120,7 @@ void Octree<T>::add_item(const uint id, OctreeNode * node, const uint depth)
         for(int i=0; i<8; ++i)
         {
             assert(node->children[i]!=nullptr);
-            if(node->children[i]->bbox.intersects(aabbs.at(id)))
+            if(node->children[i]->bbox.contains(aabbs.at(id)))
             {
                 add_item(id, node->children[i], depth+1);
             }
@@ -163,7 +163,7 @@ void Octree<T>::add_item(const uint id, OctreeNode * node, const uint depth)
                 for(int i=0; i<8; ++i)
                 {
                     assert(node->children[i]!=nullptr);
-                    if(node->children[i]->bbox.intersects(aabbs.at(item)))
+                    if(node->children[i]->bbox.contains(aabbs.at(item)))
                     {
                         add_item(item, node->children[i], d_plus_one);
                         found_octant = true;
@@ -268,14 +268,17 @@ uint Octree<T>::nearest_neighbor_id(const vec3d & p, const bool print_debug_info
                 q.push(obj);
                 if(print_debug_info) ++aabb_dist_queries;
             }
-            else for(uint id : child->item_ids)
+            else
             {
-                PrioQueueEntry obj;
-                obj.node = child;
-                obj.id   = id;
-                obj.dist = items.at(id).dist_sqrd(p);
-                q.push(obj);
-                if(print_debug_info) ++item_dist_queries;
+                for(uint id : child->item_ids)
+                {
+                    PrioQueueEntry obj;
+                    obj.node = child;
+                    obj.id   = id;
+                    obj.dist = items.at(id).dist_sqrd(p);
+                    q.push(obj);
+                    if(print_debug_info) ++item_dist_queries;
+                }
             }
         }
     }

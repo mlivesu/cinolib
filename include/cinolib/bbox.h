@@ -58,19 +58,16 @@ class Bbox
 
         void reset();
         void update(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void  scale(const double s);
-        vec3d center() const;
+        void scale(const double s);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double diag()    const;
+        vec3d  center() const;
+        vec3d  delta()   const;
         double delta_x() const;
         double delta_y() const;
         double delta_z() const;
-        vec3d  delta()   const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -80,12 +77,12 @@ class Bbox
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double dist_to_point_sqrd(const vec3d & p) const;
-        double dist_to_point(const vec3d & p) const;
+        double dist_to_point     (const vec3d & p) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool contains(const vec3d & p, const bool strict = false)  const;
-        bool intersects(const Bbox & box, const bool strict = false) const;
+        bool contains(const vec3d & p,   const bool strict = false) const;
+        bool contains(const Bbox  & box, const bool strict = false) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
