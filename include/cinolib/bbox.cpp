@@ -183,8 +183,8 @@ vec3d Bbox::closest_point(const vec3d & p) const
 {
     // Real Time Collision Detection", Section 5.1.3
     vec3d res = p;
-    res.max(min);
-    res.min(max);
+    res = res.max(min);
+    res = res.min(max);
     return res;
 }
 
