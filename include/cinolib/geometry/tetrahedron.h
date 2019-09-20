@@ -36,10 +36,6 @@
 #ifndef CINO_TETRAHEDRON_H
 #define CINO_TETRAHEDRON_H
 
-#include <vector>
-#include <sys/types.h>
-#include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec3.h>
 #include <cinolib/bbox.h>
 
 namespace cinolib
