@@ -146,14 +146,19 @@ double Plane::operator[](const vec3d & p) const
 // http://mathworld.wolfram.com/Point-PlaneDistance.html (eq. 13)
 //
 CINO_INLINE
-double Plane::point_plane_dist(const vec3d & p) const
+double Plane::point_plane_dist_signed(const vec3d & p) const
 {
     assert(fabs(n.length()-1.0) < 1e-10);
     vec3d u = p - this->p;
-    if (u.length() == 0) return 0;
-    double dist = fabs(u.dot(n));
-    assert(dist >= 0);
-    return dist;
+    return u.dot(n);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Plane::point_plane_dist(const vec3d & p) const
+{
+    return std::fabs(point_plane_dist_signed(p));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -161,17 +166,8 @@ double Plane::point_plane_dist(const vec3d & p) const
 CINO_INLINE
 vec3d Plane::project_onto(const vec3d & p) const
 {
-    vec3d res;
-    if(this->operator [](p) > 0)
-    {
-        res = p - n * point_plane_dist(p);
-        assert(point_plane_dist(res) < 1e-10);
-    }
-    else
-    {
-        res = p + n * point_plane_dist(p);
-        assert(point_plane_dist(res) < 1e-10);
-    }
+    vec3d res = p - n * point_plane_dist_signed(p);
+    assert(point_plane_dist(res) < 1e-10);
     return res;
 }
 

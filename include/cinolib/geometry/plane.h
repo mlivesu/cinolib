@@ -84,8 +84,9 @@ class Plane
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double point_plane_dist(const vec3d & p) const;
-        vec3d  project_onto    (const vec3d & p) const;
+        double point_plane_dist_signed(const vec3d & p) const;
+        double point_plane_dist       (const vec3d & p) const;
+        vec3d  project_onto           (const vec3d & p) const;
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
