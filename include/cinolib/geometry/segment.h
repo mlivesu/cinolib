@@ -36,34 +36,56 @@
 #ifndef CINO_SEGMENT_H
 #define CINO_SEGMENT_H
 
-#include <vector>
 #include <iostream>
 #include <utility>
-#include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/bbox.h>
 #include <cinolib/geometry/plane.h>
 
 namespace cinolib
 {
 
-class Segment : public std::pair<vec3d,vec3d>
+class Segment
 {
     public:
 
-        explicit Segment(const vec3d & P0, const vec3d & P1);
+        Segment(const vec3d & v0,
+                const vec3d & v1) : v0(v0), v1(v1) {}
 
-        std::vector<Plane> to_planes() const;
+       ~Segment() {}
 
-        vec3d dir() const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double operator[](const vec3d & p) const;
+        Bbox aabb() const;
 
-        vec3d project_onto(const vec3d & p) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double dist_to_point(const vec3d & p) const;
+        double dist     (const vec3d & p) const;
+        double dist_sqrd(const vec3d & p) const;
 
-        bool is_in_between(const vec3d & p) const;
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d v0, v1;
 };
+
+
+//class Segment : public std::pair<vec3d,vec3d>
+//{
+//    public:
+
+//        explicit Segment(const vec3d & P0, const vec3d & P1);
+
+//        std::vector<Plane> to_planes() const;
+
+//        vec3d dir() const;
+
+//        double operator[](const vec3d & p) const;
+
+//        vec3d project_onto(const vec3d & p) const;
+
+//        double dist_to_point(const vec3d & p) const;
+
+//        bool is_in_between(const vec3d & p) const;
+//};
 
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const Segment & s);

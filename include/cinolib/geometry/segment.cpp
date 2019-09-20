@@ -41,92 +41,117 @@ namespace cinolib
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const Segment & s)
 {
-    in << s.first << "\t" << s.second << "\n";
+    in << s.v0 << "\t" << s.v1 << "\n";
     return in;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// Real Time Collision Detection", Section 5.1.2
 CINO_INLINE
-Segment::Segment(const vec3d & P0, const vec3d & P1)
+double Segment::dist_sqrd(const vec3d & p) const
 {
-    first  = P0;
-    second = P1;
+    vec3d u = v1 - v0;
+    vec3d v =  p - v0;
+    vec3d w =  p - v1;
+
+    double e = v.dot(u);
+    if(e<=0.0f) return v.dot(v);
+
+    double f = u.dot(u);
+    if(e>=f) return w.dot(w);
+
+    return v.dot(v) - e*e/f;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Segment::operator[](const vec3d & p) const
+Bbox Segment::aabb() const
 {
-    return dist_to_point(p);
+    return Bbox({v0, v1});
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-vec3d Segment::project_onto(const vec3d &p) const
+double Segment::dist(const vec3d & p) const
 {
-    vec3d v = second - first;
-    vec3d w = p  - first;
-
-    float cos_wv = w.dot(v);
-    float cos_vv = v.dot(v);
-
-    if (cos_wv <= 0.0)    return first;
-    if (cos_vv <= cos_wv) return second;
-
-    float b  = cos_wv / cos_vv;
-    vec3d Pb = first + v*b;
-
-    return Pb;
+    return sqrt(dist_sqrd(p));
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-CINO_INLINE
-double Segment::dist_to_point(const vec3d & p) const
-{
-    return p.dist(project_onto(p));
-}
+//CINO_INLINE
+//vec3d Segment::project_onto(const vec3d &p) const
+//{
+//    vec3d v = second - first;
+//    vec3d w = p  - first;
 
+//    float cos_wv = w.dot(v);
+//    float cos_vv = v.dot(v);
 
-CINO_INLINE
-bool Segment::is_in_between(const vec3d &p) const
-{
-    vec3d v = second - first;
-    vec3d w = p  - first;
+//    if (cos_wv <= 0.0)    return first;
+//    if (cos_vv <= cos_wv) return second;
 
-    float cos_wv = w.dot(v);
-    float cos_vv = v.dot(v);
+//    float b  = cos_wv / cos_vv;
+//    vec3d Pb = first + v*b;
 
-    if (cos_wv <= 0.0)    return false;
-    if (cos_vv <= cos_wv) return false;
-    return true;
-}
+//    return Pb;
+//}
 
-CINO_INLINE
-std::vector<Plane> Segment::to_planes() const
-{
-    vec3d d = dir();
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    vec3d n0(-d.y(),  d.x(),     0);
-    vec3d n1(-d.z(),      0, d.x());
-    vec3d n2(     0, -d.z(), d.y());
+//CINO_INLINE
+//double Segment::dist_to_point(const vec3d & p) const
+//{
+//    return p.dist(project_onto(p));
+//}
 
-    std::vector<Plane> planes;
-    if (n0.length() > 0) planes.push_back(Plane(first, n0));
-    if (n1.length() > 0) planes.push_back(Plane(first, n1));
-    if (n2.length() > 0) if (planes.size() < 2) planes.push_back(Plane(first, n2));
-    assert(planes.size() == 2);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    return planes;
-}
+//CINO_INLINE
+//bool Segment::is_in_between(const vec3d &p) const
+//{
+//    vec3d v = second - first;
+//    vec3d w = p  - first;
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//    float cos_wv = w.dot(v);
+//    float cos_vv = v.dot(v);
 
-CINO_INLINE
-vec3d Segment::dir() const
-{
-    vec3d d = first-second;
-    d.normalize();
-    return d;
-}
+//    if (cos_wv <= 0.0)    return false;
+//    if (cos_vv <= cos_wv) return false;
+//    return true;
+//}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//CINO_INLINE
+//std::vector<Plane> Segment::to_planes() const
+//{
+//    vec3d d = dir();
+
+//    vec3d n0(-d.y(),  d.x(),     0);
+//    vec3d n1(-d.z(),      0, d.x());
+//    vec3d n2(     0, -d.z(), d.y());
+
+//    std::vector<Plane> planes;
+//    if(n0.length() > 0) planes.push_back(Plane(first, n0));
+//    if(n1.length() > 0) planes.push_back(Plane(first, n1));
+//    if(n2.length() > 0) if (planes.size() < 2) planes.push_back(Plane(first, n2));
+//    assert(planes.size()==2);
+
+//    return planes;
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//CINO_INLINE
+//vec3d Segment::dir() const
+//{
+//    vec3d d = first-second;
+//    d.normalize();
+//    return d;
+//}
 
 }
