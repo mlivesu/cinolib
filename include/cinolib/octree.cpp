@@ -91,16 +91,19 @@ void Octree<T>::build()
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
+    // make AABBs for each item
     aabbs.reserve(items.size());
     for(const T & item : items) aabbs.push_back(item.aabb());
     assert(items.size() == aabbs.size());
 
+    // build the tree root
     assert(root==nullptr);
     root = new OctreeNode(nullptr, Bbox(aabbs, 1.5)); // enlarge it a bit to make sure queries don't fall outside
 
     tree_depth = 1;
     num_leaves = 1;
 
+    // populate the tree
     for(uint id=0; id<items.size(); ++id) build_item(id, root, 0);
 
     Time::time_point t1 = Time::now();

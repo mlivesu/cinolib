@@ -88,7 +88,7 @@ class Octree
             items.reserve(m.num_polys());
             for(uint pid=0; pid<m.num_polys(); ++pid)
             {
-                // T here is expected to be Triangle for a surface mesh, and Tetrahedron for a volume mesh
+                // T here is expected to be either Triangle (for surface meshes) or Tetrahedron (for volume meshes)
                 items.push_back(T(m.poly_verts(pid)));
             }
             build();
@@ -103,7 +103,7 @@ class Octree
             items.reserve(m.num_edges());
             for(uint eid=0; eid<m.num_edges(); ++eid)
             {
-                // T here is expected to be of type Segment
+                // T here is expected to be Segment
                 items.push_back(T(m.edge_verts(eid)));
             }
             build();
