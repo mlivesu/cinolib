@@ -53,14 +53,24 @@ OctreeNode::~OctreeNode()
 
 template<typename T>
 CINO_INLINE
-Octree<T>::Octree(const std::vector<T>    & items,
-                  const uint                max_depth,
-                  const uint                items_per_leaf)
+Octree<T>::Octree(const uint max_depth,
+                  const uint items_per_leaf)
+: max_depth(max_depth)
+, items_per_leaf(items_per_leaf)
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+Octree<T>::Octree(const std::vector<T> & items,
+                  const uint             max_depth,
+                  const uint             items_per_leaf)
 : items(items)
 , max_depth(max_depth)
 , items_per_leaf(items_per_leaf)
 {
-    init();
+    build();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -76,7 +86,7 @@ Octree<T>::~Octree()
 
 template<typename T>
 CINO_INLINE
-void Octree<T>::init()
+void Octree<T>::build()
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
@@ -85,12 +95,13 @@ void Octree<T>::init()
     for(const T & item : items) aabbs.push_back(item.aabb());
     assert(items.size() == aabbs.size());
 
+    assert(root==nullptr);
     root = new OctreeNode(nullptr, Bbox(aabbs, 1.5)); // enlarge it a bit to make sure queries don't fall outside
 
     tree_depth = 1;
     num_leaves = 1;
 
-    for(uint id=0; id<items.size(); ++id) add_item(id, root, 0);
+    for(uint id=0; id<items.size(); ++id) build_item(id, root, 0);
 
     Time::time_point t1 = Time::now();
     double t = how_many_seconds(t0,t1);
@@ -110,7 +121,7 @@ void Octree<T>::init()
 
 template<typename T>
 CINO_INLINE
-void Octree<T>::add_item(const uint id, OctreeNode * node, const uint depth)
+void Octree<T>::build_item(const uint id, OctreeNode * node, const uint depth)
 {
     assert(node->bbox.contains(aabbs.at(id)));
 
@@ -122,7 +133,7 @@ void Octree<T>::add_item(const uint id, OctreeNode * node, const uint depth)
             assert(node->children[i]!=nullptr);
             if(node->children[i]->bbox.contains(aabbs.at(id)))
             {
-                add_item(id, node->children[i], depth+1);
+                build_item(id, node->children[i], depth+1);
             }
         }
     }
@@ -165,7 +176,7 @@ void Octree<T>::add_item(const uint id, OctreeNode * node, const uint depth)
                     assert(node->children[i]!=nullptr);
                     if(node->children[i]->bbox.contains(aabbs.at(item)))
                     {
-                        add_item(item, node->children[i], d_plus_one);
+                        build_item(item, node->children[i], d_plus_one);
                         found_octant = true;
                     }
                 }
@@ -225,24 +236,18 @@ void Octree<T>::print_query_info(const std::string & s,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
-CINO_INLINE
-T Octree<T>::nearest_neighbor(const vec3d & p, const bool print_debug_info) const
-{
-    return items.at(nearest_neighbor_id(p, print_debug_info));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
 template<typename T>
 CINO_INLINE
-uint Octree<T>::nearest_neighbor_id(const vec3d & p, const bool print_debug_info) const
+const T & Octree<T>::nearest_neighbor(const vec3d  & p,          // query point
+                                            uint   & id,         // id of the item T closest to p
+                                            vec3d  & pos,        // point in T closest to p
+                                            double & dist) const // distance between pos and p
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    PrioQueueEntry obj;
+    Obj obj;
     obj.node = root;
     obj.dist = root->bbox.dist_to_point_sqrd(p);
 
@@ -254,7 +259,7 @@ uint Octree<T>::nearest_neighbor_id(const vec3d & p, const bool print_debug_info
 
     while(q.top().node->is_inner)
     {
-        PrioQueueEntry obj = q.top();
+        Obj obj = q.top();
         q.pop();
 
         for(int i=0; i<8; ++i)
@@ -262,7 +267,7 @@ uint Octree<T>::nearest_neighbor_id(const vec3d & p, const bool print_debug_info
             OctreeNode *child = obj.node->children[i];
             if(child->is_inner)
             {
-                PrioQueueEntry obj;
+                Obj obj;
                 obj.node = child;
                 obj.dist = child->bbox.dist_to_point_sqrd(p);
                 q.push(obj);
@@ -272,10 +277,11 @@ uint Octree<T>::nearest_neighbor_id(const vec3d & p, const bool print_debug_info
             {
                 for(uint id : child->item_ids)
                 {
-                    PrioQueueEntry obj;
+                    Obj obj;
                     obj.node = child;
                     obj.id   = id;
-                    obj.dist = items.at(id).dist_sqrd(p);
+                    obj.pos  = items.at(id).point_closest_to(p);
+                    obj.dist = obj.pos.dist_squared(p);
                     q.push(obj);
                     if(print_debug_info) ++item_dist_queries;
                 }
@@ -290,7 +296,10 @@ uint Octree<T>::nearest_neighbor_id(const vec3d & p, const bool print_debug_info
     }
 
     assert(q.top().id>=0);
-    return q.top().id;
+    id   = q.top().id;
+    pos  = q.top().pos;
+    dist = q.top().dist;
+    return items.at(id);
 }
 
 }

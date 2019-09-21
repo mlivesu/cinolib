@@ -36,9 +36,7 @@
 #ifndef CINO_OCTREE_H
 #define CINO_OCTREE_H
 
-#include <cinolib/meshes/trimesh.h>
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/bbox.h>
+#include <cinolib/meshes/abstract_mesh.h>
 
 namespace cinolib
 {
@@ -57,15 +55,18 @@ class OctreeNode
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// item type T must implement the following methods:
-//     Bbox   T::aabb() const;
-//     double T::dist_sqrd(const vec3d & p) const;
+// item type T must implement the following three methods:
+//     Bbox  T::aabb() const;
+//     vec3d T::point_closest_to(const vec3d & p) const;
 //
 template<typename T>
 class Octree
 {
 
     public:
+
+        explicit Octree(const uint max_depth      = 7,
+                        const uint items_per_leaf = 3);
 
         explicit Octree(const std::vector<T> & items,
                         const uint             max_depth      = 7,
@@ -75,8 +76,41 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void init();
-        void add_item(const uint id, OctreeNode *node, const uint depth);
+        void build();
+        void build_item(const uint id, OctreeNode *node, const uint depth);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        template<class M, class V, class E, class P>
+        void build_from_mesh_polys(const AbstractMesh<M,V,E,P> & m)
+        {
+            assert(items.empty());
+            items.reserve(m.num_polys());
+            for(uint pid=0; pid<m.num_polys(); ++pid)
+            {
+                // T here is expected to be Triangle for a surface mesh, and Tetrahedron for a volume mesh
+                items.push_back(T(m.poly_verts(pid)));
+            }
+            build();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        template<class M, class V, class E, class P>
+        void build_from_mesh_edges(const AbstractMesh<M,V,E,P> & m)
+        {
+            assert(items.empty());
+            items.reserve(m.num_edges());
+            for(uint eid=0; eid<m.num_edges(); ++eid)
+            {
+                // T here is expected to be of type Segment
+                items.push_back(T(m.edge_verts(eid)));
+            }
+            build();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         uint max_items_per_leaf() const;
         uint max_items_per_leaf(const OctreeNode *node, const uint max) const;
 
@@ -89,25 +123,24 @@ class Octree
 
         // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        // returns the id/item in the octree nearest to point p
-        T    nearest_neighbor   (const vec3d & p, const bool print_debug_info) const;
-        uint nearest_neighbor_id(const vec3d & p, const bool print_debug_info) const;
+        // element in the octree nearest to point p
+        const T & nearest_neighbor(const vec3d & p, uint & id, vec3d & pos, double & dist) const;
 
-        // TODO! returns the id/item in the octree nearest to ball (p,radius)
-        T    nearest_neighbor   (const vec3d & p, const float radius, const bool print_debug_info) const;
-        uint nearest_neighbor_id(const vec3d & p, const float radius, const bool print_debug_info) const;
+        // returns the item/id in the octree nearest to ball (p,radius)
+        //T    nearest_neighbor   (const vec3d & p, const float radius) const;
+        //uint nearest_neighbor_id(const vec3d & p, const float radius) const;
 
-        // TODO! returns the id/item in the octree containing point p (if there are more, it will return only one of them)
-        T    contains   (const vec3d & p, const bool print_debug_info) const;
-        int  contains_id(const vec3d & p, const bool print_debug_info) const; // -1: no item found
+        // returns the item/id in the octree containing point p (if there are more, it will return only one of them)
+        //T    contains   (const vec3d & p) const;
+        //int  contains_id(const vec3d & p) const; // -1: no item found
 
-        // TODO! returns the id/item in the octree that firstly intersect ray (p,dir)
-        T    ray_first_hit   (const vec3d & p, const vec3d & dir, const bool print_debug_info) const;
-        int  ray_first_hit_id(const vec3d & p, const vec3d & dir, const bool print_debug_info) const;  // -1: no item found
+        // returns the item/id in the octree that firstly intersect ray (p,dir)
+        //T    ray_first_hit   (const vec3d & p, const vec3d & dir) const;
+        //int  ray_first_hit_id(const vec3d & p, const vec3d & dir) const;  // -1: no item found
 
-        // TODO! returns all the id/items in the octree that intersect ray (p,dir)
-        std::vector<T>    ray_hits   (const vec3d & p, const vec3d & dir, const bool print_debug_info) const;
-        std::vector<uint> ray_hits_id(const vec3d & p, const vec3d & dir, const bool print_debug_info) const;  // -1: no item found
+        // returns all the items/ids in the octree that intersect ray (p,dir)
+        //std::vector<T>    ray_hits   (const vec3d & p, const vec3d & dir) const;
+        //std::vector<uint> ray_hits_id(const vec3d & p, const vec3d & dir) const;  // -1: no item found
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -121,24 +154,26 @@ class Octree
         uint              items_per_leaf;   // prescribed number of items per leaf (can't go deeper than max_depth anyways)
         uint              tree_depth;       // actual depth of the tree
         uint              num_leaves;
+        bool              print_debug_info = true;
 
         // SUPPORT STRUCTURES ::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        struct PrioQueueEntry
+        struct Obj
         {
             double      dist = inf_double;
             OctreeNode *node = nullptr;
             int         id   = -1;
+            vec3d       pos; // closest point
         };
         struct Greater
         {
-            bool operator()(const PrioQueueEntry & obj1,
-                            const PrioQueueEntry & obj2)
+            bool operator()(const Obj & obj1,
+                            const Obj & obj2)
             {
                 return obj1.dist > obj2.dist;
             }
         };
-        typedef std::priority_queue<PrioQueueEntry,std::vector<PrioQueueEntry>,Greater> PrioQueue;
+        typedef std::priority_queue<Obj,std::vector<Obj>,Greater> PrioQueue;
 };
 
 }
