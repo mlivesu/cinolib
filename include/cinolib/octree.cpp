@@ -248,9 +248,9 @@ void Octree<T>::print_query_info(const std::string & s,
 template<typename T>
 CINO_INLINE
 const T & Octree<T>::closest_point(const vec3d  & p,          // query point
-                                            uint   & id,         // id of the item T closest to p
-                                            vec3d  & pos,        // point in T closest to p
-                                            double & dist) const // distance between pos and p
+                                         uint   & id,         // id of the item T closest to p
+                                         vec3d  & pos,        // point in T closest to p
+                                         double & dist) const // distance between pos and p
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
