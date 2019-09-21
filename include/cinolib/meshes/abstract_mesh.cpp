@@ -689,6 +689,16 @@ ipair AbstractMesh<M,V,E,P>::edge_vert_ids(const uint eid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+std::pair<vec3d,vec3d> AbstractMesh<M,V,E,P>::edge_verts(const uint eid) const
+{
+    return std::make_pair(this->edge_vert(eid,0),
+                          this->edge_vert(eid,1));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 int AbstractMesh<M,V,E,P>::edge_id(const uint vid0, const uint vid1) const
 {
     assert(vid0 != vid1);
