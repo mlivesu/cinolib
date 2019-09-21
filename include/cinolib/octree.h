@@ -116,6 +116,10 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void debug_mode(const bool & b);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void print_query_info(const std::string & s,
                               const double        t,
                               const uint          aabb_dist_queries,
@@ -123,8 +127,8 @@ class Octree
 
         // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        // element in the octree nearest to point p
-        const T & nearest_neighbor(const vec3d & p, uint & id, vec3d & pos, double & dist) const;
+        // returns pos, id and distance of the item that is closest to query point p
+        const T & closest_point(const vec3d & p, uint & id, vec3d & pos, double & dist) const;
 
         // returns the item/id in the octree nearest to ball (p,radius)
         //T    nearest_neighbor   (const vec3d & p, const float radius) const;
@@ -154,7 +158,7 @@ class Octree
         uint              items_per_leaf;   // prescribed number of items per leaf (can't go deeper than max_depth anyways)
         uint              tree_depth;       // actual depth of the tree
         uint              num_leaves;
-        bool              print_debug_info = true;
+        bool              print_debug_info = false;
 
         // SUPPORT STRUCTURES ::::::::::::::::::::::::::::::::::::::::::::::::::::
 

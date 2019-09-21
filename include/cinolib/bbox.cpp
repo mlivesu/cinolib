@@ -179,7 +179,7 @@ double Bbox::max_entry() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-vec3d Bbox::closest_point(const vec3d & p) const
+vec3d Bbox::point_closest_to(const vec3d & p) const
 {
     // Real Time Collision Detection", Section 5.1.3
     vec3d res = p;
@@ -191,17 +191,17 @@ vec3d Bbox::closest_point(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Bbox::dist_to_point_sqrd(const vec3d & p) const
+double Bbox::dist_sqrd(const vec3d & p) const
 {
-    return p.dist_squared(closest_point(p));
+    return p.dist_squared(point_closest_to(p));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Bbox::dist_to_point(const vec3d & p) const
+double Bbox::dist(const vec3d & p) const
 {
-    return p.dist(closest_point(p));
+    return p.dist(point_closest_to(p));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

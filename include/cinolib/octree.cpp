@@ -219,6 +219,14 @@ uint Octree<T>::max_items_per_leaf(const OctreeNode * node, const uint max) cons
         return std::max((uint)node->item_ids.size(), max);
     }
 }
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void Octree<T>::debug_mode(const bool & b)
+{
+    print_debug_info = b;
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -229,9 +237,9 @@ void Octree<T>::print_query_info(const std::string & s,
                                  const uint          aabb_dist_queries,
                                  const uint          item_dist_queries) const
 {
-    std::cout << s << "[" << t << "s, "
-              << aabb_dist_queries << " AABB dist queries, "
-              << item_dist_queries << " item dist queries]" << std::endl;
+    std::cout << s << "\n\t" << t  << " seconds\n\t"
+              << aabb_dist_queries << " AABB dist queries\n\t"
+              << item_dist_queries << " item dist queries" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -239,7 +247,7 @@ void Octree<T>::print_query_info(const std::string & s,
 // https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
 template<typename T>
 CINO_INLINE
-const T & Octree<T>::nearest_neighbor(const vec3d  & p,          // query point
+const T & Octree<T>::closest_point(const vec3d  & p,          // query point
                                             uint   & id,         // id of the item T closest to p
                                             vec3d  & pos,        // point in T closest to p
                                             double & dist) const // distance between pos and p
@@ -249,7 +257,7 @@ const T & Octree<T>::nearest_neighbor(const vec3d  & p,          // query point
 
     Obj obj;
     obj.node = root;
-    obj.dist = root->bbox.dist_to_point_sqrd(p);
+    obj.dist = root->bbox.dist_sqrd(p);
 
     PrioQueue q;
     q.push(obj);
@@ -269,7 +277,7 @@ const T & Octree<T>::nearest_neighbor(const vec3d  & p,          // query point
             {
                 Obj obj;
                 obj.node = child;
-                obj.dist = child->bbox.dist_to_point_sqrd(p);
+                obj.dist = child->bbox.dist_sqrd(p);
                 q.push(obj);
                 if(print_debug_info) ++aabb_dist_queries;
             }
@@ -292,7 +300,7 @@ const T & Octree<T>::nearest_neighbor(const vec3d  & p,          // query point
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        print_query_info("NN query", how_many_seconds(t0,t1), aabb_dist_queries, item_dist_queries);
+        print_query_info("Closest point query", how_many_seconds(t0,t1), aabb_dist_queries, item_dist_queries);
     }
 
     assert(q.top().id>=0);

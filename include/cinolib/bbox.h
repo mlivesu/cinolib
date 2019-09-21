@@ -48,11 +48,13 @@ class Bbox
     public:
 
         explicit Bbox(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0); // AABB that contains all verts in p_list
-        explicit Bbox(const std::vector<Bbox>  & b_list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
+
+        explicit Bbox(const std::vector<Bbox> & b_list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
+
         explicit Bbox(const vec3d min = vec3d( inf_double,  inf_double,  inf_double),
                       const vec3d max = vec3d(-inf_double, -inf_double, -inf_double));
 
-        virtual ~Bbox(){}
+        virtual ~Bbox() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -63,7 +65,7 @@ class Bbox
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double diag()    const;
-        vec3d  center() const;
+        vec3d  center()  const;
         vec3d  delta()   const;
         double delta_x() const;
         double delta_y() const;
@@ -76,9 +78,9 @@ class Bbox
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d  closest_point     (const vec3d & p) const;
-        double dist_to_point_sqrd(const vec3d & p) const;
-        double dist_to_point     (const vec3d & p) const;
+        vec3d  point_closest_to(const vec3d & p) const;
+        double dist_sqrd       (const vec3d & p) const;
+        double dist            (const vec3d & p) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
