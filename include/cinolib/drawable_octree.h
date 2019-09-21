@@ -48,6 +48,9 @@ class DrawableOctree : public Octree<T>, public DrawableObject
 {
     public:
 
+        explicit DrawableOctree(const uint max_depth      = 7,
+                                const uint items_per_leaf = 3);
+
         explicit DrawableOctree(const std::vector<T> & items,
                                 const uint             max_depth      = 7,
                                 const uint             items_per_leaf = 3);

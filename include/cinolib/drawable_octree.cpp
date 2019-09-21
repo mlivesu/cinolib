@@ -48,6 +48,17 @@ namespace cinolib
 
 template<typename T>
 CINO_INLINE
+DrawableOctree<T>::DrawableOctree(const uint max_depth,
+                                  const uint items_per_leaf)
+: Octree<T>(max_depth, items_per_leaf)
+{
+    updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
 DrawableOctree<T>::DrawableOctree(const std::vector<T> & items,
                                   const uint             max_depth,
                                   const uint             items_per_leaf)
@@ -71,7 +82,7 @@ template<typename T>
 CINO_INLINE
 vec3d DrawableOctree<T>::scene_center() const
 {
-    assert(this->root!=nullptr);
+    if(this->root==nullptr) return vec3d(0,0,0);
     return this->root->bbox.center();
 }
 
@@ -81,7 +92,7 @@ template<typename T>
 CINO_INLINE
 float DrawableOctree<T>::scene_radius() const
 {
-    assert(this->root!=nullptr);
+    if(this->root==nullptr) return 0.0;
     return this->root->bbox.diag();
 }
 
@@ -91,7 +102,8 @@ template<typename T>
 CINO_INLINE
 void DrawableOctree<T>::updateGL()
 {
-    assert(this->root!=nullptr);
+    render_list.clear();
+    if(this->root==nullptr) return;
     updateGL(this->root);
 }
 
