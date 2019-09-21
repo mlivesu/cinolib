@@ -51,7 +51,9 @@ class Segment
         Segment(const vec3d & v0,
                 const vec3d & v1) : v0(v0), v1(v1) {}
 
-       ~Segment() {}
+        Segment(const std::pair<vec3d,vec3d> & p) : v0(p.first), v1(p.second) {}
+
+        ~Segment() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -59,8 +61,9 @@ class Segment
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double dist     (const vec3d & p) const;
-        double dist_sqrd(const vec3d & p) const;
+        double dist            (const vec3d & p) const;
+        double dist_sqrd       (const vec3d & p) const;
+        vec3d  point_closest_to(const vec3d & p) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

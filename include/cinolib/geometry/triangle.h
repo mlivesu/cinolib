@@ -59,8 +59,9 @@ class Triangle
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double dist     (const vec3d & p) const;
-        double dist_sqrd(const vec3d & p) const;
+        double dist            (const vec3d & p) const;
+        double dist_sqrd       (const vec3d & p) const;
+        vec3d  point_closest_to(const vec3d & p) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

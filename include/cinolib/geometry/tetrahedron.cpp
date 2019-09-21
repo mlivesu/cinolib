@@ -51,6 +51,14 @@ Bbox Tetrahedron::aabb() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+vec3d Tetrahedron::point_closest_to(const vec3d & p) const
+{
+    return tetrahedron_closest_point(p,v0,v1,v2,v3);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 double Tetrahedron::dist_sqrd(const vec3d & p) const
 {
     return point_to_tetrahedron_dist_sqrd(p, v0, v1, v2, v3);

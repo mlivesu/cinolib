@@ -45,6 +45,26 @@ std::ostream & operator<<(std::ostream & in, const Segment & s)
     return in;
 }
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Real Time Collision Detection", Section 5.1.2
+CINO_INLINE
+vec3d Segment::point_closest_to(const vec3d & p) const
+{
+    vec3d u = v1 - v0;
+
+    // project p onto v0v1, but deferring divide by dot(u,u)
+    double t =(p-v0).dot(u);
+    if(t<=0) return v0;
+
+    double den = u.dot(u);
+    if(t>=den) return v1;
+
+    t = t/den;
+    return v0 + t*u;
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // Real Time Collision Detection", Section 5.1.2
