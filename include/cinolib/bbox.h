@@ -84,8 +84,8 @@ class Bbox
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool contains(const vec3d & p,   const bool strict = false) const;
-        bool contains(const Bbox  & box, const bool strict = false) const;
+        bool contains  (const vec3d & p,   const bool strict = false) const;
+        bool intersects(const Bbox  & box, const bool strict = false) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -227,12 +227,21 @@ bool Bbox::contains(const vec3d & p, const bool strict) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Bbox::contains(const Bbox & box, const bool strict) const
+bool Bbox::intersects(const Bbox & box, const bool strict) const
 {    
-    return (contains(box.min, strict) ||
-            contains(box.max, strict) ||
-            box.contains(min, strict) ||
-            box.contains(max, strict));
+    if(strict)
+    {
+        if(max.x() <= box.min.x() || min.x() >= box.max.x()) return false;
+        if(max.y() <= box.min.y() || min.y() >= box.max.y()) return false;
+        if(max.z() <= box.min.z() || min.z() >= box.max.z()) return false;
+    }
+    else
+    {
+        if(max.x() < box.min.x() || min.x() > box.max.x()) return false;
+        if(max.y() < box.min.y() || min.y() > box.max.y()) return false;
+        if(max.z() < box.min.z() || min.z() > box.max.z()) return false;
+    }
+    return true;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
