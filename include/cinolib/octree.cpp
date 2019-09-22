@@ -35,7 +35,7 @@
 *********************************************************************************/
 #include <cinolib/octree.h>
 #include <cinolib/how_many_seconds.h>
-#include <queue>
+#include <stack>
 
 namespace cinolib
 {
@@ -126,7 +126,7 @@ template<typename T>
 CINO_INLINE
 void Octree<T>::build_item(const uint id, OctreeNode * node, const uint depth)
 {
-    assert(node->bbox.contains(aabbs.at(id)));
+    assert(node->bbox.intersects(aabbs.at(id)));
 
     if(node->is_inner)
     {
@@ -134,7 +134,7 @@ void Octree<T>::build_item(const uint id, OctreeNode * node, const uint depth)
         for(int i=0; i<8; ++i)
         {
             assert(node->children[i]!=nullptr);
-            if(node->children[i]->bbox.contains(aabbs.at(id)))
+            if(node->children[i]->bbox.intersects(aabbs.at(id)))
             {
                 build_item(id, node->children[i], depth+1);
             }
@@ -177,7 +177,7 @@ void Octree<T>::build_item(const uint id, OctreeNode * node, const uint depth)
                 for(int i=0; i<8; ++i)
                 {
                     assert(node->children[i]!=nullptr);
-                    if(node->children[i]->bbox.contains(aabbs.at(item)))
+                    if(node->children[i]->bbox.intersects(aabbs.at(item)))
                     {
                         build_item(item, node->children[i], d_plus_one);
                         found_octant = true;
@@ -237,12 +237,12 @@ template<typename T>
 CINO_INLINE
 void Octree<T>::print_query_info(const std::string & s,
                                  const double        t,
-                                 const uint          aabb_dist_queries,
-                                 const uint          item_dist_queries) const
+                                 const uint          aabb_queries,
+                                 const uint          item_queries) const
 {
     std::cout << s << "\n\t" << t  << " seconds\n\t"
-              << aabb_dist_queries << " AABB dist queries\n\t"
-              << item_dist_queries << " item dist queries" << std::endl;
+              << aabb_queries << " AABB queries\n\t"
+              << item_queries << " item queries" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -265,8 +265,8 @@ const T & Octree<T>::closest_point(const vec3d  & p,          // query point
     PrioQueue q;
     q.push(obj);
 
-    uint aabb_dist_queries = 1;
-    uint item_dist_queries = 0;
+    uint aabb_queries = 1;
+    uint item_queries = 0;
 
     while(q.top().node->is_inner)
     {
@@ -282,7 +282,7 @@ const T & Octree<T>::closest_point(const vec3d  & p,          // query point
                 obj.node = child;
                 obj.dist = child->bbox.dist_sqrd(p);
                 q.push(obj);
-                if(print_debug_info) ++aabb_dist_queries;
+                if(print_debug_info) ++aabb_queries;
             }
             else
             {
@@ -294,7 +294,7 @@ const T & Octree<T>::closest_point(const vec3d  & p,          // query point
                     obj.pos  = items.at(id).point_closest_to(p);
                     obj.dist = obj.pos.dist_squared(p);
                     q.push(obj);
-                    if(print_debug_info) ++item_dist_queries;
+                    if(print_debug_info) ++item_queries;
                 }
             }
         }
@@ -303,14 +303,120 @@ const T & Octree<T>::closest_point(const vec3d  & p,          // query point
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        print_query_info("Closest point query", how_many_seconds(t0,t1), aabb_dist_queries, item_dist_queries);
+        print_query_info("Closest point query", how_many_seconds(t0,t1), aabb_queries, item_queries);
     }
 
+    std::cout << "terminal node is " << q.top().node << std::endl;
     assert(q.top().id>=0);
     id   = q.top().id;
     pos  = q.top().pos;
     dist = q.top().dist;
     return items.at(id);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+bool Octree<T>::contains(const vec3d & p, uint & id) const
+{
+    typedef std::chrono::high_resolution_clock Time;
+    Time::time_point t0 = Time::now();
+
+    uint aabb_queries = 0;
+    uint item_queries = 0;
+
+    std::stack<OctreeNode*> lifo;
+    lifo.push(root);
+
+    while(!lifo.empty())
+    {
+        OctreeNode *node = lifo.top();
+        lifo.pop();
+        assert(node->bbox.contains(p));
+
+        if(node->is_inner)
+        {
+            for(int i=0; i<8; ++i)
+            {
+                if(print_debug_info) ++aabb_queries;
+                if(node->children[i]->bbox.contains(p)) lifo.push(node->children[i]);
+            }
+        }
+        else
+        {
+            for(uint it_id : node->item_ids)
+            {
+                if(print_debug_info) ++item_queries;
+                if(items.at(it_id).contains(p))
+                {
+                    id = it_id;
+                    if(print_debug_info)
+                    {
+                        Time::time_point t1 = Time::now();
+                        print_query_info("Contains query (first item)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+                    }
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+bool Octree<T>::contains(const vec3d & p, std::unordered_set<uint> & ids) const
+{
+    typedef std::chrono::high_resolution_clock Time;
+    Time::time_point t0 = Time::now();
+
+    uint aabb_queries = 0;
+    uint item_queries = 0;
+
+    ids.clear();
+
+    std::stack<OctreeNode*> lifo;
+    lifo.push(root);
+
+    while(!lifo.empty())
+    {
+        OctreeNode *node = lifo.top();
+        lifo.pop();
+        assert(node->bbox.contains(p));
+
+        if(node->is_inner)
+        {
+            for(int i=0; i<8; ++i)
+            {
+                if(print_debug_info) ++aabb_queries;
+                if(node->children[i]->bbox.contains(p)) lifo.push(node->children[i]);
+            }
+        }
+        else
+        {
+            for(uint it_id : node->item_ids)
+            {
+                if(print_debug_info) ++item_queries;
+                if(items.at(it_id).contains(p))
+                {
+                    ids.insert(it_id);
+                }
+            }
+        }
+    }
+
+    if(print_debug_info)
+    {
+        Time::time_point t1 = Time::now();
+        print_query_info("Contains query (all items)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+    }
+
+    return !ids.empty();
 }
 
 }

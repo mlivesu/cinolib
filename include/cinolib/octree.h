@@ -37,6 +37,7 @@
 #define CINO_OCTREE_H
 
 #include <cinolib/meshes/abstract_mesh.h>
+#include <queue>
 
 namespace cinolib
 {
@@ -122,13 +123,17 @@ class Octree
 
         void print_query_info(const std::string & s,
                               const double        t,
-                              const uint          aabb_dist_queries,
-                              const uint          item_dist_queries) const;
+                              const uint          aabb_queries,
+                              const uint          item_queries) const;
 
         // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // returns pos, id and distance of the item that is closest to query point p
         const T & closest_point(const vec3d & p, uint & id, vec3d & pos, double & dist) const;
+
+        // returns respectively the first item and the full list of items containing query point p
+        bool contains(const vec3d & p, uint & id) const;
+        bool contains(const vec3d & p, std::unordered_set<uint> & ids) const;
 
         // returns the item/id in the octree nearest to ball (p,radius)
         //T    nearest_neighbor   (const vec3d & p, const float radius) const;
