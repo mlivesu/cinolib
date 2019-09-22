@@ -59,6 +59,14 @@ double Triangle::dist_sqrd(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+double Triangle::dist(const vec3d & p) const
+{
+    return point_to_triangle_dist(p, v0, v1, v2);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 vec3d Triangle::point_closest_to(const vec3d & p) const
 {
     return triangle_closest_point(p,v0,v1,v2);
@@ -67,9 +75,9 @@ vec3d Triangle::point_closest_to(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Triangle::dist(const vec3d & p) const
+bool Triangle::contains(const vec3d & p) const
 {
-    return point_to_triangle_dist(p, v0, v1, v2);
+    return dist_sqrd(p)==0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -87,17 +87,25 @@ double Segment::dist_sqrd(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Bbox Segment::aabb() const
+double Segment::dist(const vec3d & p) const
 {
-    return Bbox({v0, v1});
+    return sqrt(dist_sqrd(p));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Segment::dist(const vec3d & p) const
+bool Segment::contains(const vec3d & p) const
 {
-    return sqrt(dist_sqrd(p));
+    return dist_sqrd(p)==0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+Bbox Segment::aabb() const
+{
+    return Bbox({v0, v1});
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

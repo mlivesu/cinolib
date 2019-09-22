@@ -74,6 +74,14 @@ double Tetrahedron::dist(const vec3d & p) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
+bool Tetrahedron::contains(const vec3d & p) const
+{
+    return dist_sqrd(p)==0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // Given a point P and a tetrahedron ABCD, finds the point in ABCD that
 // is closest to P. This code was taken directly from Ericson's seminal
 // book "Real Time Collision Detection", Section 5.1.6
