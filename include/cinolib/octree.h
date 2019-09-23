@@ -135,14 +135,6 @@ class Octree
         bool contains(const vec3d & p, uint & id) const;
         bool contains(const vec3d & p, std::unordered_set<uint> & ids) const;
 
-        // returns the item/id in the octree nearest to ball (p,radius)
-        //T    nearest_neighbor   (const vec3d & p, const float radius) const;
-        //uint nearest_neighbor_id(const vec3d & p, const float radius) const;
-
-        // returns the item/id in the octree containing point p (if there are more, it will return only one of them)
-        //T    contains   (const vec3d & p) const;
-        //int  contains_id(const vec3d & p) const; // -1: no item found
-
         // returns the item/id in the octree that firstly intersect ray (p,dir)
         //T    ray_first_hit   (const vec3d & p, const vec3d & dir) const;
         //int  ray_first_hit_id(const vec3d & p, const vec3d & dir) const;  // -1: no item found
