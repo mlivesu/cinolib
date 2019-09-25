@@ -126,7 +126,7 @@ template<typename T>
 CINO_INLINE
 void Octree<T>::build_item(const uint id, OctreeNode * node, const uint depth)
 {
-    assert(node->bbox.intersects(aabbs.at(id)));
+    assert(node->bbox.intersects_box(aabbs.at(id)));
 
     if(node->is_inner)
     {
@@ -134,7 +134,7 @@ void Octree<T>::build_item(const uint id, OctreeNode * node, const uint depth)
         for(int i=0; i<8; ++i)
         {
             assert(node->children[i]!=nullptr);
-            if(node->children[i]->bbox.intersects(aabbs.at(id)))
+            if(node->children[i]->bbox.intersects_box(aabbs.at(id)))
             {
                 build_item(id, node->children[i], depth+1);
             }
@@ -177,7 +177,7 @@ void Octree<T>::build_item(const uint id, OctreeNode * node, const uint depth)
                 for(int i=0; i<8; ++i)
                 {
                     assert(node->children[i]!=nullptr);
-                    if(node->children[i]->bbox.intersects(aabbs.at(item)))
+                    if(node->children[i]->bbox.intersects_box(aabbs.at(item)))
                     {
                         build_item(item, node->children[i], d_plus_one);
                         found_octant = true;
