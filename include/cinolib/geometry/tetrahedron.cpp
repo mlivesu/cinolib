@@ -36,6 +36,7 @@
 #include <cinolib/geometry/tetrahedron.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/geometry/segment.h>
+#include <cinolib/Moller_Trumbore_intersection.h>
 #include <Eigen/Dense>
 #include <set>
 
@@ -78,6 +79,29 @@ CINO_INLINE
 bool Tetrahedron::contains(const vec3d & p) const
 {
     return dist_sqrd(p)==0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Tetrahedron::intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const
+{
+    bool   backside;
+    bool   coplanar;
+    vec3d  bary;
+    double face_t[4];
+    if(!Moller_Trumbore_intersection(p, dir, v0, v2, v1, backside, coplanar, face_t[0], bary)) face_t[0] = inf_double;
+    if(!Moller_Trumbore_intersection(p, dir, v0, v1, v3, backside, coplanar, face_t[1], bary)) face_t[1] = inf_double;
+    if(!Moller_Trumbore_intersection(p, dir, v0, v3, v2, backside, coplanar, face_t[2], bary)) face_t[2] = inf_double;
+    if(!Moller_Trumbore_intersection(p, dir, v1, v2, v3, backside, coplanar, face_t[3], bary)) face_t[3] = inf_double;
+    double min_t = *std::min_element(face_t, face_t+4);
+    if(min_t!=inf_double)
+    {
+        t   = min_t;
+        pos = p + t*dir;
+        return true;
+    }
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

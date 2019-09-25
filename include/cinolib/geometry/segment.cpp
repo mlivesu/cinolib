@@ -110,6 +110,15 @@ Bbox Segment::aabb() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
+bool Segment::intersects_ray(const vec3d & /*p*/, const vec3d & /*dir*/, double & /*t*/, vec3d & /*pos*/) const
+{
+    assert(false && "TODO");
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 //CINO_INLINE
 //vec3d Segment::project_onto(const vec3d &p) const
 //{

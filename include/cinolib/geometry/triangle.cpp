@@ -37,6 +37,7 @@
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/geometry/plane.h>
+#include <cinolib/Moller_Trumbore_intersection.h>
 #include <set>
 
 namespace cinolib
@@ -78,6 +79,22 @@ CINO_INLINE
 bool Triangle::contains(const vec3d & p) const
 {
     return dist_sqrd(p)==0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Triangle::intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const
+{
+    bool  hits_backside;
+    bool  coplanar;
+    vec3d bary;
+    if(Moller_Trumbore_intersection(p, dir, v0, v1, v2, hits_backside, coplanar, t, bary))
+    {
+        pos = p + t * dir;
+        return true;
+    }
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
