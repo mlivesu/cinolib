@@ -75,7 +75,7 @@ bool Moller_Trumbore_intersection(const vec3d  & ray_orig,
     // NOTE: this does not mean they do not intersect, but they may not
     // meet at a single point, hence Moller-Trumbore is not the right tool...
     //
-    if (fabs(det) < EPSILON)
+    if(fabs(det) < EPSILON)
     {
         are_coplanar = true;
         return false;
@@ -83,7 +83,7 @@ bool Moller_Trumbore_intersection(const vec3d  & ray_orig,
 
     // if the determinant is negative the triangle is backfacing
     //
-    if (det<-EPSILON) hits_backside = true;
+    if(det<-EPSILON) hits_backside = true;
 
     double invDet = 1.0/det;
 
