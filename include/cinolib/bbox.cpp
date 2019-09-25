@@ -227,7 +227,7 @@ bool Bbox::contains(const vec3d & p, const bool strict) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Bbox::intersects(const Bbox & box, const bool strict) const
+bool Bbox::intersects_box(const Bbox & box, const bool strict) const
 {    
     if(strict)
     {
@@ -240,6 +240,50 @@ bool Bbox::intersects(const Bbox & box, const bool strict) const
         if(max.x() < box.min.x() || min.x() > box.max.x()) return false;
         if(max.y() < box.min.y() || min.y() > box.max.y()) return false;
         if(max.z() < box.min.z() || min.z() > box.max.z()) return false;
+    }
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* Intersection between the AABB and the ray R = P + t * dir
+ * If any intersection occurs, the function returns true, and
+ * pos and t_min refer to the entry point of the ray in the box
+ *
+ * Ref: Real Time Collision Detection, Section 5.3.3
+*/
+CINO_INLINE
+bool Bbox::intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, vec3d & pos) const
+{
+           t_min = 0.0;        // set to -FLT_MAX to get first hit on line
+    double t_max = inf_double; // set to max distance ray can travel (for segment)
+
+    for(int i=0; i<3; ++i)
+    {
+        if(std::fabs(dir[i]) < 1e-10)
+        {
+            // ray is parallel to current axis. No hit if origin not within slab
+            if(p[i]<min[i] || p[i]>max[i]) return false;
+        }
+        else
+        {
+            // Compute intersection t value of ray with near and far plane of slab
+            double ood = 1.0/dir[i];
+            double t1  = (min[i] - p[i]) * ood;
+            double t2  = (max[i] - p[i]) * ood;
+
+            // Make t1 be intersection with near plane, t2 with far plane
+            if(t1>t2) std::swap(t1, t2);
+
+            // Compute the intersection of slab intersection intervals
+            if (t1>t_min) t_min = t1;
+            if (t2>t_max) t_max = t2;
+
+            // Exit with no collision as soon as slab intersection becomes empty
+            if(t_min > t_max) return false;
+        }
+        // Ray intersects all 3 slabs. Return point (q) and intersection t value (tmin)
+        pos = p + dir*t_min;
     }
     return true;
 }

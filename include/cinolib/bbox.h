@@ -42,7 +42,6 @@
 namespace cinolib
 {
 
-// TODO: make it dimension independent (d as template argument)
 class Bbox
 {
     public:
@@ -84,8 +83,9 @@ class Bbox
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool contains  (const vec3d & p,   const bool strict = false) const;
-        bool intersects(const Bbox  & box, const bool strict = false) const;
+        bool contains(const vec3d & p, const bool strict = false) const;
+        bool intersects_box(const Bbox  & box, const bool strict = false) const;
+        bool intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, vec3d & pos) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
