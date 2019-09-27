@@ -54,6 +54,7 @@ typedef enum
     DRAWABLE_ISOSURFACE    ,
     DRAWABLE_SLICED_OBJ    ,
     DRAWABLE_VECTOR_FIELD  ,
+    DRAWABLE_OCTREE        ,
     ARROW                  ,
     SPHERE
 }
