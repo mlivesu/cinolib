@@ -92,7 +92,7 @@ namespace cinolib
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            bool   contains (const vec3<double> & p) const;
+            bool contains(const vec3<double> & p) const;
     };
 }
 

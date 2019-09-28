@@ -57,8 +57,7 @@ double SpatialDataStructureItem::dist_sqrd(const vec3<double> &p) const
 CINO_INLINE
 bool SpatialDataStructureItem::contains(const vec3<double> &p) const
 {
-    // should I use an epsilon thresold here? Will see...
-    return dist_sqrd(p)==0;
+    return dist_sqrd(p)<1e-15;
 }
 
 }
