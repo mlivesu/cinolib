@@ -127,8 +127,8 @@ class Octree
         void closest_point(const vec3d & p, uint & id, vec3d & pos, double & dist) const;
 
         // returns respectively the first item and the full list of items containing query point p
-        bool contains(const vec3d & p, uint & id) const;
-        bool contains(const vec3d & p, std::unordered_set<uint> & ids) const;
+        bool contains(const vec3d & p, uint & id, const double eps = 1e-15) const;
+        bool contains(const vec3d & p, std::unordered_set<uint> & ids, const double eps = 1e-15) const;
 
         // returns respectively the first and the full list of intersections
         // between items in the octree and a ray R := P + t * dir

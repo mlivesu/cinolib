@@ -300,7 +300,7 @@ void Octree::closest_point(const vec3d  & p,          // query point
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Octree::contains(const vec3d & p, uint & id) const
+bool Octree::contains(const vec3d & p, uint & id, const double eps) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
@@ -315,14 +315,14 @@ bool Octree::contains(const vec3d & p, uint & id) const
     {
         OctreeNode *node = lifo.top();
         lifo.pop();
-        assert(node->bbox.contains(p));
+        assert(node->bbox.contains(p,eps));
 
         if(node->is_inner)
         {
             for(int i=0; i<8; ++i)
             {
                 if(print_debug_info) ++aabb_queries;
-                if(node->children[i]->bbox.contains(p)) lifo.push(node->children[i]);
+                if(node->children[i]->bbox.contains(p,eps)) lifo.push(node->children[i]);
             }
         }
         else
@@ -330,7 +330,7 @@ bool Octree::contains(const vec3d & p, uint & id) const
             for(uint it_id : node->item_ids)
             {
                 if(print_debug_info) ++item_queries;
-                if(items.at(it_id)->contains(p))
+                if(items.at(it_id)->contains(p,eps))
                 {
                     id = it_id;
                     if(print_debug_info)
@@ -351,7 +351,7 @@ bool Octree::contains(const vec3d & p, uint & id) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Octree::contains(const vec3d & p, std::unordered_set<uint> & ids) const
+bool Octree::contains(const vec3d & p, std::unordered_set<uint> & ids, const double eps) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
@@ -368,14 +368,14 @@ bool Octree::contains(const vec3d & p, std::unordered_set<uint> & ids) const
     {
         OctreeNode *node = lifo.top();
         lifo.pop();
-        assert(node->bbox.contains(p));
+        assert(node->bbox.contains(p,eps));
 
         if(node->is_inner)
         {
             for(int i=0; i<8; ++i)
             {
                 if(print_debug_info) ++aabb_queries;
-                if(node->children[i]->bbox.contains(p)) lifo.push(node->children[i]);
+                if(node->children[i]->bbox.contains(p,eps)) lifo.push(node->children[i]);
             }
         }
         else
@@ -383,7 +383,7 @@ bool Octree::contains(const vec3d & p, std::unordered_set<uint> & ids) const
             for(uint it_id : node->item_ids)
             {
                 if(print_debug_info) ++item_queries;
-                if(items.at(it_id)->contains(p))
+                if(items.at(it_id)->contains(p,eps))
                 {
                     ids.insert(it_id);
                 }

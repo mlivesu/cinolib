@@ -55,9 +55,9 @@ double SpatialDataStructureItem::dist_sqrd(const vec3<double> &p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool SpatialDataStructureItem::contains(const vec3<double> &p) const
+bool SpatialDataStructureItem::contains(const vec3<double> &p, const double eps) const
 {
-    return dist_sqrd(p)<1e-15;
+    return dist_sqrd(p) < eps;
 }
 
 }
