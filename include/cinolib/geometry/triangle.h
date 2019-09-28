@@ -41,11 +41,12 @@
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/bbox.h>
+#include <cinolib/geometry/spatial_data_structure_item.h>
 
 namespace cinolib
 {
 
-class Triangle
+class Triangle : public SpatialDataStructureItem
 {
     public:
 
@@ -53,20 +54,13 @@ class Triangle
         Triangle(const vec3d & v0, const vec3d & v1, const vec3d & v2) : v0(v0), v1(v1), v2(v2) {}
        ~Triangle() {}
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
 
-        Bbox aabb() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        bool   contains        (const vec3d & p) const;
-        double dist            (const vec3d & p) const;
-        double dist_sqrd       (const vec3d & p) const;
-        vec3d  point_closest_to(const vec3d & p) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        bool intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
+        ItemType item_type() const;
+        Bbox     aabb() const;
+        vec3d    point_closest_to(const vec3d & p) const;
+        bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
+        void     barycentric_coordinates(const vec3d & p, double bc[]) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -67,37 +67,10 @@ vec3d Segment::point_closest_to(const vec3d & p) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// Real Time Collision Detection", Section 5.1.2
 CINO_INLINE
-double Segment::dist_sqrd(const vec3d & p) const
+ItemType Segment::item_type() const
 {
-    vec3d u = v1 - v0;
-    vec3d v =  p - v0;
-    vec3d w =  p - v1;
-
-    double e = v.dot(u);
-    if(e<=0.0f) return v.dot(v);
-
-    double f = u.dot(u);
-    if(e>=f) return w.dot(w);
-
-    return v.dot(v) - e*e/f;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double Segment::dist(const vec3d & p) const
-{
-    return sqrt(dist_sqrd(p));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool Segment::contains(const vec3d & p) const
-{
-    return dist_sqrd(p)==0;
+    return SEGMENT;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -115,6 +88,19 @@ bool Segment::intersects_ray(const vec3d & /*p*/, const vec3d & /*dir*/, double 
 {
     assert(false && "TODO");
     return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Segment::barycentric_coordinates(const vec3d & p, double bc[]) const
+{
+    assert(contains(p));
+
+    vec3d  u = v1 - v0;
+    double t = (p-v0).dot(u);
+    bc[1] = t / u.length();
+    bc[0] = 1.0 - bc[0];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -189,6 +175,25 @@ bool Segment::intersects_ray(const vec3d & /*p*/, const vec3d & /*dir*/, double 
 //    vec3d d = first-second;
 //    d.normalize();
 //    return d;
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//// Real Time Collision Detection", Section 5.1.2
+//CINO_INLINE
+//double Segment::dist_sqrd(const vec3d & p) const
+//{
+//    vec3d u = v1 - v0;
+//    vec3d v =  p - v0;
+//    vec3d w =  p - v1;
+
+//    double e = v.dot(u);
+//    if(e<=0.0f) return v.dot(v);
+
+//    double f = u.dot(u);
+//    if(e>=f) return w.dot(w);
+
+//    return v.dot(v) - e*e/f;
 //}
 
 }

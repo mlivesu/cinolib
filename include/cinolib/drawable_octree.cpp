@@ -46,41 +46,26 @@
 namespace cinolib
 {
 
-template<typename T>
 CINO_INLINE
-DrawableOctree<T>::DrawableOctree(const uint max_depth,
+DrawableOctree::DrawableOctree(const uint max_depth,
                                   const uint items_per_leaf)
-: Octree<T>(max_depth, items_per_leaf)
+: Octree(max_depth, items_per_leaf)
 {
     updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-DrawableOctree<T>::DrawableOctree(const std::vector<T> & items,
-                                  const uint             max_depth,
-                                  const uint             items_per_leaf)
-: Octree<T>(items, max_depth, items_per_leaf)
-{
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<typename T>
-CINO_INLINE
-void DrawableOctree<T>::draw(const float ) const
+void DrawableOctree::draw(const float ) const
 {
     for(auto obj : render_list) obj.draw();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-vec3d DrawableOctree<T>::scene_center() const
+vec3d DrawableOctree::scene_center() const
 {
     if(this->root==nullptr) return vec3d(0,0,0);
     return this->root->bbox.center();
@@ -88,9 +73,8 @@ vec3d DrawableOctree<T>::scene_center() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-float DrawableOctree<T>::scene_radius() const
+float DrawableOctree::scene_radius() const
 {
     if(this->root==nullptr) return 0.0;
     return this->root->bbox.diag();
@@ -98,9 +82,8 @@ float DrawableOctree<T>::scene_radius() const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-void DrawableOctree<T>::updateGL()
+void DrawableOctree::updateGL()
 {
     render_list.clear();
     if(this->root==nullptr) return;
@@ -109,9 +92,8 @@ void DrawableOctree<T>::updateGL()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-void DrawableOctree<T>::updateGL(const OctreeNode *node)
+void DrawableOctree::updateGL(const OctreeNode *node)
 {
     render_list.push_back(DrawableAABB(node->bbox.min, node->bbox.max));
     if(node->is_inner)
@@ -123,18 +105,16 @@ void DrawableOctree<T>::updateGL(const OctreeNode *node)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-void DrawableOctree<T>::set_color(const Color & c)
+void DrawableOctree::set_color(const Color & c)
 {
     for(auto & obj : render_list) obj.set_color(c);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-void DrawableOctree<T>::set_thickness(float t)
+void DrawableOctree::set_thickness(float t)
 {
     for(auto & obj : render_list) obj.set_thickness(t);
 }

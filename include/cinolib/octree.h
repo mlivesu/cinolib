@@ -36,7 +36,8 @@
 #ifndef CINO_OCTREE_H
 #define CINO_OCTREE_H
 
-#include <cinolib/meshes/abstract_mesh.h>
+#include <cinolib/geometry/spatial_data_structure_item.h>
+#include <cinolib/meshes/meshes.h>
 #include <queue>
 
 namespace cinolib
@@ -56,11 +57,6 @@ class OctreeNode
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// item type T must implement the following three methods:
-//     Bbox  T::aabb() const;
-//     vec3d T::point_closest_to(const vec3d & p) const;
-//
-template<typename T>
 class Octree
 {
 
@@ -68,10 +64,6 @@ class Octree
 
         explicit Octree(const uint max_depth      = 7,
                         const uint items_per_leaf = 3);
-
-        explicit Octree(const std::vector<T> & items,
-                        const uint             max_depth      = 7,
-                        const uint             items_per_leaf = 3);
 
         virtual ~Octree();
 
@@ -89,8 +81,12 @@ class Octree
             items.reserve(m.num_polys());
             for(uint pid=0; pid<m.num_polys(); ++pid)
             {
-                // T here is expected to be either Triangle (for surface meshes) or Tetrahedron (for volume meshes)
-                items.push_back(T(m.poly_verts(pid)));
+                switch(m.mesh_type())
+                {
+                    case TRIMESH : items.push_back(new Triangle(m.poly_verts(pid)));    break;
+                    case TETMESH : items.push_back(new Tetrahedron(m.poly_verts(pid))); break;
+                    default: assert(false && "Unsupported element");
+                }
             }
             build();
         }
@@ -104,8 +100,7 @@ class Octree
             items.reserve(m.num_edges());
             for(uint eid=0; eid<m.num_edges(); ++eid)
             {
-                // T here is expected to be Segment
-                items.push_back(T(m.edge_verts(eid)));
+                items.push_back(new Segment(m.edge_verts(eid)));
             }
             build();
         }
@@ -117,7 +112,7 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void debug_mode(const bool & b);
+        void debug_mode(const bool b);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -129,33 +124,33 @@ class Octree
         // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // returns pos, id and distance of the item that is closest to query point p
-        const T & closest_point(const vec3d & p, uint & id, vec3d & pos, double & dist) const;
+        void closest_point(const vec3d & p, uint & id, vec3d & pos, double & dist) const;
 
         // returns respectively the first item and the full list of items containing query point p
         bool contains(const vec3d & p, uint & id) const;
         bool contains(const vec3d & p, std::unordered_set<uint> & ids) const;
 
-        // returns the item/id in the octree that firstly intersect ray (p,dir)
-        //T    ray_first_hit   (const vec3d & p, const vec3d & dir) const;
-        //int  ray_first_hit_id(const vec3d & p, const vec3d & dir) const;  // -1: no item found
-
-        // returns all the items/ids in the octree that intersect ray (p,dir)
-        //std::vector<T>    ray_hits   (const vec3d & p, const vec3d & dir) const;
-        //std::vector<uint> ray_hits_id(const vec3d & p, const vec3d & dir) const;  // -1: no item found
+        // returns respectively the first and the full list of intersections
+        // between items in the octree and a ray R := P + t * dir
+        bool ray_hits(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
+        bool ray_hits(const vec3d & p, const vec3d & dir, std::vector<std::pair<double,uint>> & all_hits) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     protected:
 
-        // DATA
-        OctreeNode       *root = nullptr;
-        std::vector<T>    items;
-        std::vector<Bbox> aabbs;            // per item axis aligned bunding boxes
-        uint              max_depth;        // maximum allowed depth of the tree
-        uint              items_per_leaf;   // prescribed number of items per leaf (can't go deeper than max_depth anyways)
-        uint              tree_depth;       // actual depth of the tree
-        uint              num_leaves;
-        bool              print_debug_info = false;
+        // all items and aabbs live here, and tree leaf nodes only store indices of these vectors
+        std::vector<SpatialDataStructureItem*> items;
+        std::vector<Bbox>                      aabbs;
+        OctreeNode                            *root = nullptr;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        uint max_depth;        // maximum allowed depth of the tree
+        uint items_per_leaf;   // prescribed number of items per leaf (can't go deeper than max_depth anyways)
+        uint tree_depth;       // actual depth of the tree
+        uint num_leaves;
+        bool print_debug_info = false;
 
         // SUPPORT STRUCTURES ::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -168,8 +163,7 @@ class Octree
         };
         struct Greater
         {
-            bool operator()(const Obj & obj1,
-                            const Obj & obj2)
+            bool operator()(const Obj & obj1, const Obj & obj2)
             {
                 return obj1.dist > obj2.dist;
             }

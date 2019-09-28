@@ -44,6 +44,14 @@ namespace cinolib
 {
 
 CINO_INLINE
+ItemType Tetrahedron::item_type() const
+{
+    return TETRAHEDRON;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 Bbox Tetrahedron::aabb() const
 {
     return Bbox({v0, v1, v2, v3});
@@ -55,30 +63,6 @@ CINO_INLINE
 vec3d Tetrahedron::point_closest_to(const vec3d & p) const
 {
     return tetrahedron_closest_point(p,v0,v1,v2,v3);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double Tetrahedron::dist_sqrd(const vec3d & p) const
-{
-    return point_to_tetrahedron_dist_sqrd(p, v0, v1, v2, v3);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double Tetrahedron::dist(const vec3d & p) const
-{
-    return point_to_tetrahedron_dist(p, v0, v1, v2, v3);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool Tetrahedron::contains(const vec3d & p) const
-{
-    return dist_sqrd(p)==0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -102,6 +86,19 @@ bool Tetrahedron::intersects_ray(const vec3d & p, const vec3d & dir, double & t,
         return true;
     }
     return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Tetrahedron::barycentric_coordinates(const vec3d &p, double bc[]) const
+{
+    std::vector<double> wgts;
+    tet_barycentric_coords(v0, v1, v2, v3, p, wgts, 0);
+    bc[0] = wgts[0];
+    bc[1] = wgts[1];
+    bc[2] = wgts[2];
+    bc[3] = wgts[3];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -177,30 +174,6 @@ vec3d tetrahedron_closest_point(const vec3d & P,
     }
 
     return best_point;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double point_to_tetrahedron_dist(const vec3d & P,
-                                 const vec3d & A,
-                                 const vec3d & B,
-                                 const vec3d & C,
-                                 const vec3d & D)
-{
-    return P.dist(tetrahedron_closest_point(P,A,B,C,D));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double point_to_tetrahedron_dist_sqrd(const vec3d & P,
-                                      const vec3d & A,
-                                      const vec3d & B,
-                                      const vec3d & C,
-                                      const vec3d & D)
-{
-    return P.dist_squared(tetrahedron_closest_point(P,A,B,C,D));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

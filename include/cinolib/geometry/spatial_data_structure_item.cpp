@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2019: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,56 +33,32 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_DRAWABLE_OCTREE_H
-#define CINO_DRAWABLE_OCTREE_H
-
-#include <cinolib/drawable_object.h>
-#include <cinolib/drawable_aabb.h>
-#include <cinolib/octree.h>
+#include <cinolib/geometry/spatial_data_structure_item.h>
 
 namespace cinolib
 {
 
-class DrawableOctree : public Octree, public DrawableObject
+CINO_INLINE
+double SpatialDataStructureItem::dist(const vec3<double> &p) const
 {
-    public:
-
-        explicit DrawableOctree(const uint max_depth      = 7,
-                                const uint items_per_leaf = 3);
-
-        ~DrawableOctree() {}
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void  draw(const float scene_size=1) const;
-        vec3d scene_center() const;
-        float scene_radius() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        ObjectType object_type() const { return DRAWABLE_CURVE; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void updateGL();
-        void updateGL(const OctreeNode * node);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void set_color(const Color & c);
-        void set_thickness(float t);
-
-    private:
-
-        std::vector<DrawableAABB> render_list;
-        Color color = Color::BLACK();
-        float thickness = 1.0;
-};
-
+    return p.dist(point_closest_to(p));
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "drawable_octree.cpp"
-#endif
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-#endif // CINO_DRAWABLE_OCTREE_H
+CINO_INLINE
+double SpatialDataStructureItem::dist_sqrd(const vec3<double> &p) const
+{
+    return p.dist_squared(point_closest_to(p));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool SpatialDataStructureItem::contains(const vec3<double> &p) const
+{
+    // should I use an epsilon thresold here? Will see...
+    return dist_sqrd(p)==0;
+}
+
+}

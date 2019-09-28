@@ -44,6 +44,14 @@ namespace cinolib
 {
 
 CINO_INLINE
+ItemType Triangle::item_type() const
+{
+    return TRIANGLE;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 Bbox Triangle::aabb() const
 {
     return Bbox({v0, v1, v2});
@@ -52,33 +60,9 @@ Bbox Triangle::aabb() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Triangle::dist_sqrd(const vec3d & p) const
-{
-    return point_to_triangle_dist_sqrd(p, v0, v1, v2);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double Triangle::dist(const vec3d & p) const
-{
-    return point_to_triangle_dist(p, v0, v1, v2);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
 vec3d Triangle::point_closest_to(const vec3d & p) const
 {
     return triangle_closest_point(p,v0,v1,v2);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool Triangle::contains(const vec3d & p) const
-{
-    return dist_sqrd(p)==0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -94,7 +78,23 @@ bool Triangle::intersects_ray(const vec3d & p, const vec3d & dir, double & t, ve
         pos = p + t * dir;
         return true;
     }
+    else if(coplanar)
+    {
+        // do ray edge intersection with tri edges and pick closest one
+    }
     return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Triangle::barycentric_coordinates(const vec3d & p, double bc[]) const
+{
+    std::vector<double> wgts;
+    triangle_barycentric_coords(v0, v1, v2, p, wgts, 0);
+    bc[0] = wgts[0];
+    bc[1] = wgts[1];
+    bc[2] = wgts[2];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

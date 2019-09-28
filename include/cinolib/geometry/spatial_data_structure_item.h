@@ -36,6 +36,8 @@
 #ifndef CINO_SPATIAL_DATA_STRUCTURE_ITEM_H
 #define CINO_SPATIAL_DATA_STRUCTURE_ITEM_H
 
+#include <cinolib/cino_inline.h>
+
 /* This interface must be implemented by any item that populates a spatial data structure
  * (e.g. Octree, BSP, AABB Tree, ...). These primitives are necessary to implement both the
  * construction of the hierarchical space subdivision, and the various queries the data
@@ -77,25 +79,25 @@ namespace cinolib
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            double dist     (const vec3<double> & p) const { return p.dist(point_closest_to(p));         }
-            double dist_sqrd(const vec3<double> & p) const { return p.dist_squared(point_closest_to(p)); }
+            virtual void barycentric_coordinates(const vec3<double> & p, double bc[]) const = 0;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            void barycentric_coordinates(const vec3<double> & p, double bc[]) const = 0;
+            virtual bool intersects_ray(const vec3<double> & p, const vec3<double> & dir, double & t, vec3<double> & pos) const = 0;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            // should I use an epsilon thresold here? Will see...
-            bool contains(const vec3<double> & p) const { return dist_sqrd(p)==0; }
+            double dist     (const vec3<double> & p) const;
+            double dist_sqrd(const vec3<double> & p) const;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            virtual bool intersects_ray    (const vec3<double> & p, const vec3<double> & dir, double & t, vec3<double> & pos) const = 0;
-            //virtual bool intersects_line   (const vec3<double> & p, const vec3<double> & dir, double & t, vec3<double> & pos) const = 0;
-            //virtual bool intersects_segment(const vec3<double> & a, const vec3<double> & b,   double & t, vec3<double> & pos) const = 0;
-            //virtual bool intersects_sphere (const vec3<double> & p, const double r, vec3<double> & pos) = 0;
+            bool   contains (const vec3<double> & p) const;
     };
 }
+
+#ifndef  CINO_STATIC_LIB
+#include "spatial_data_structure_item.cpp"
+#endif
 
 #endif // CINO_SPATIAL_DATA_STRUCTURE_ITEM_H

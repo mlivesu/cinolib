@@ -51,49 +51,40 @@ OctreeNode::~OctreeNode()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-Octree<T>::Octree(const uint max_depth,
-                  const uint items_per_leaf)
+Octree::Octree(const uint max_depth,
+               const uint items_per_leaf)
 : max_depth(max_depth)
 , items_per_leaf(items_per_leaf)
 {}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-Octree<T>::Octree(const std::vector<T> & items,
-                  const uint             max_depth,
-                  const uint             items_per_leaf)
-: items(items)
-, max_depth(max_depth)
-, items_per_leaf(items_per_leaf)
+Octree::~Octree()
 {
-    build();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<typename T>
-CINO_INLINE
-Octree<T>::~Octree()
-{
+    // delete Octree
     delete root;
+
+    // delete item list
+    while(!items.empty())
+    {
+        delete items.back();
+        items.pop_back();
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-void Octree<T>::build()
+void Octree::build()
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
     // make AABBs for each item
     aabbs.reserve(items.size());
-    for(const T & item : items) aabbs.push_back(item.aabb());
+    for(const auto item : items) aabbs.push_back(item->aabb());
     assert(items.size() == aabbs.size());
 
     // build the tree root
@@ -122,9 +113,8 @@ void Octree<T>::build()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-void Octree<T>::build_item(const uint id, OctreeNode * node, const uint depth)
+void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
 {
     assert(node->bbox.intersects_box(aabbs.at(id)));
 
@@ -195,18 +185,16 @@ void Octree<T>::build_item(const uint id, OctreeNode * node, const uint depth)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-uint Octree<T>::max_items_per_leaf() const
+uint Octree::max_items_per_leaf() const
 {
     return max_items_per_leaf(root, 0);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-uint Octree<T>::max_items_per_leaf(const OctreeNode * node, const uint max) const
+uint Octree::max_items_per_leaf(const OctreeNode * node, const uint max) const
 {
     if(node->is_inner)
     {
@@ -224,18 +212,16 @@ uint Octree<T>::max_items_per_leaf(const OctreeNode * node, const uint max) cons
 }
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-void Octree<T>::debug_mode(const bool & b)
+void Octree::debug_mode(const bool b)
 {
     print_debug_info = b;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-void Octree<T>::print_query_info(const std::string & s,
+void Octree::print_query_info(const std::string & s,
                                  const double        t,
                                  const uint          aabb_queries,
                                  const uint          item_queries) const
@@ -248,12 +234,11 @@ void Octree<T>::print_query_info(const std::string & s,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
-template<typename T>
 CINO_INLINE
-const T & Octree<T>::closest_point(const vec3d  & p,          // query point
-                                         uint   & id,         // id of the item T closest to p
-                                         vec3d  & pos,        // point in T closest to p
-                                         double & dist) const // distance between pos and p
+void Octree::closest_point(const vec3d  & p,          // query point
+                                 uint   & id,         // id of the item T closest to p
+                                 vec3d  & pos,        // point in T closest to p
+                                 double & dist) const // distance between pos and p
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
@@ -291,7 +276,7 @@ const T & Octree<T>::closest_point(const vec3d  & p,          // query point
                     Obj obj;
                     obj.node = child;
                     obj.id   = id;
-                    obj.pos  = items.at(id).point_closest_to(p);
+                    obj.pos  = items.at(id)->point_closest_to(p);
                     obj.dist = obj.pos.dist_squared(p);
                     q.push(obj);
                     if(print_debug_info) ++item_queries;
@@ -311,14 +296,12 @@ const T & Octree<T>::closest_point(const vec3d  & p,          // query point
     id   = q.top().id;
     pos  = q.top().pos;
     dist = q.top().dist;
-    return items.at(id);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-bool Octree<T>::contains(const vec3d & p, uint & id) const
+bool Octree::contains(const vec3d & p, uint & id) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
@@ -348,7 +331,7 @@ bool Octree<T>::contains(const vec3d & p, uint & id) const
             for(uint it_id : node->item_ids)
             {
                 if(print_debug_info) ++item_queries;
-                if(items.at(it_id).contains(p))
+                if(items.at(it_id)->contains(p))
                 {
                     id = it_id;
                     if(print_debug_info)
@@ -368,9 +351,8 @@ bool Octree<T>::contains(const vec3d & p, uint & id) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
 CINO_INLINE
-bool Octree<T>::contains(const vec3d & p, std::unordered_set<uint> & ids) const
+bool Octree::contains(const vec3d & p, std::unordered_set<uint> & ids) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
@@ -402,7 +384,7 @@ bool Octree<T>::contains(const vec3d & p, std::unordered_set<uint> & ids) const
             for(uint it_id : node->item_ids)
             {
                 if(print_debug_info) ++item_queries;
-                if(items.at(it_id).contains(p))
+                if(items.at(it_id)->contains(p))
                 {
                     ids.insert(it_id);
                 }
