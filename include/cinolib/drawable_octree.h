@@ -75,8 +75,6 @@ class DrawableOctree : public Octree, public DrawableObject
     private:
 
         std::vector<DrawableAABB> render_list;
-        Color color = Color::BLACK();
-        float thickness = 1.0;
 };
 
 }

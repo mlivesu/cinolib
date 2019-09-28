@@ -291,7 +291,6 @@ void Octree::closest_point(const vec3d  & p,          // query point
         print_query_info("Closest point query", how_many_seconds(t0,t1), aabb_queries, item_queries);
     }
 
-    std::cout << "terminal node is " << q.top().node << std::endl;
     assert(q.top().id>=0);
     id   = q.top().id;
     pos  = q.top().pos;
