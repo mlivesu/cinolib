@@ -78,10 +78,6 @@ bool Triangle::intersects_ray(const vec3d & p, const vec3d & dir, double & t, ve
         pos = p + t * dir;
         return true;
     }
-    else if(coplanar)
-    {
-        // do ray edge intersection with tri edges and pick closest one
-    }
     return false;
 }
 
