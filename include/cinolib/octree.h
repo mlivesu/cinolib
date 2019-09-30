@@ -131,9 +131,9 @@ class Octree
         bool contains(const vec3d & p, std::unordered_set<uint> & ids, const double eps = 1e-15) const;
 
         // returns respectively the first and the full list of intersections
-        // between items in the octree and a ray R := P + t * dir
-        bool ray_hits(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
-        bool ray_hits(const vec3d & p, const vec3d & dir, std::vector<std::pair<double,uint>> & all_hits) const;
+        // between items in the octree and a ray R(t) := p + t * dir
+        bool intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
+        bool intersects_ray(const vec3d & p, const vec3d & dir, std::vector<std::pair<double,uint>> & all_hits) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
