@@ -472,10 +472,79 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//CINO_INLINE
-//bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::vector<std::pair<double,uint>> & all_hits) const
-//{
-//    assert(false && "TODO");
-//}
+CINO_INLINE
+bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::vector<std::pair<double,uint>> & all_hits) const
+{
+    typedef std::chrono::high_resolution_clock Time;
+    Time::time_point t0 = Time::now();
+
+    vec3d  pos;
+    double t;
+    if(!root->bbox.intersects_ray(p, dir, t, pos)) return false;
+    Obj obj;
+    obj.node = root;
+    obj.dist = t;
+
+    PrioQueue q;
+    q.push(obj);
+
+    uint aabb_queries = 1;
+    uint item_queries = 0;
+
+    while(!q.empty())
+    {
+        Obj obj = q.top();
+        q.pop();
+
+        if(!obj.node->is_inner)
+        {
+            auto pp = std::make_pair(obj.dist, obj.id);
+            //if(all_hits.front().first<=pp.first) assert(CONTAINS_VEC(all_hits,pp));
+            all_hits.push_back(pp);
+        }
+        else
+        {
+            for(int i=0; i<8; ++i)
+            {
+                OctreeNode *child = obj.node->children[i];
+                if(child->is_inner)
+                {
+                    if(child->bbox.intersects_ray(p, dir, t, pos))
+                    {
+                        Obj obj;
+                        obj.node = child;
+                        obj.dist = t;
+                        q.push(obj);
+                    }
+                    if(print_debug_info) ++aabb_queries;
+                }
+                else
+                {
+                    for(uint id : child->item_ids)
+                    {
+                        if(items.at(id)->intersects_ray(p, dir, t, pos))
+                        {
+                            Obj obj;
+                            obj.node = child;
+                            obj.id   = id;
+                            obj.dist = t;
+                            q.push(obj);
+                        }
+                        if(print_debug_info) ++item_queries;
+                    }
+                }
+            }
+        }
+    }
+
+    if(print_debug_info)
+    {
+        Time::time_point t1 = Time::now();
+        print_query_info("Intersects ray query", how_many_seconds(t0,t1), aabb_queries, item_queries);
+    }
+
+    if(all_hits.empty()) return false;
+    return true;
+}
 
 }
