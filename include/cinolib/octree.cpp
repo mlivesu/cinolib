@@ -428,31 +428,31 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
         for(int i=0; i<8; ++i)
         {
             OctreeNode *child = obj.node->children[i];
-            if(child->is_inner)
+            if(child->bbox.intersects_ray(p, dir, t, pos))
             {
-                if(child->bbox.intersects_ray(p, dir, t, pos))
+                if(child->is_inner)
                 {
                     Obj obj;
                     obj.node = child;
                     obj.dist = t;
                     q.push(obj);
                 }
-                if(print_debug_info) ++aabb_queries;
-            }
-            else
-            {
-                for(uint id : child->item_ids)
+                else
                 {
-                    if(items.at(id)->intersects_ray(p, dir, t, pos))
+                    for(uint id : child->item_ids)
                     {
-                        Obj obj;
-                        obj.node = child;
-                        obj.id   = id;
-                        obj.dist = t;
-                        q.push(obj);
+                        if(items.at(id)->intersects_ray(p, dir, t, pos))
+                        {
+                            Obj obj;
+                            obj.node = child;
+                            obj.id   = id;
+                            obj.dist = t;
+                            q.push(obj);
+                        }
+                        if(print_debug_info) ++item_queries;
                     }
-                    if(print_debug_info) ++item_queries;
                 }
+                if(print_debug_info) ++aabb_queries;
             }
         }
     }
@@ -473,7 +473,7 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::vector<std::pair<double,uint>> & all_hits) const
+bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
@@ -496,27 +496,17 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::vector<std:
         Obj obj = q.top();
         q.pop();
 
-        if(!obj.node->is_inner)
+        for(int i=0; i<8; ++i)
         {
-            auto pp = std::make_pair(obj.dist, obj.id);
-            //if(all_hits.front().first<=pp.first) assert(CONTAINS_VEC(all_hits,pp));
-            all_hits.push_back(pp);
-        }
-        else
-        {
-            for(int i=0; i<8; ++i)
+            OctreeNode *child = obj.node->children[i];
+            if(child->bbox.intersects_ray(p, dir, t, pos))
             {
-                OctreeNode *child = obj.node->children[i];
                 if(child->is_inner)
                 {
-                    if(child->bbox.intersects_ray(p, dir, t, pos))
-                    {
-                        Obj obj;
-                        obj.node = child;
-                        obj.dist = t;
-                        q.push(obj);
-                    }
-                    if(print_debug_info) ++aabb_queries;
+                    Obj obj;
+                    obj.node = child;
+                    obj.dist = t;
+                    q.push(obj);
                 }
                 else
                 {
@@ -524,16 +514,14 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::vector<std:
                     {
                         if(items.at(id)->intersects_ray(p, dir, t, pos))
                         {
-                            Obj obj;
-                            obj.node = child;
-                            obj.id   = id;
-                            obj.dist = t;
-                            q.push(obj);
+                            all_hits.insert(std::make_pair(t,id));
                         }
                         if(print_debug_info) ++item_queries;
                     }
                 }
+
             }
+            if(print_debug_info) ++aabb_queries;
         }
     }
 

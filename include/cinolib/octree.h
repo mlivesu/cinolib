@@ -133,7 +133,7 @@ class Octree
         // returns respectively the first and the full list of intersections
         // between items in the octree and a ray R(t) := p + t * dir
         bool intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
-        bool intersects_ray(const vec3d & p, const vec3d & dir, std::vector<std::pair<double,uint>> & all_hits) const;
+        bool intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
