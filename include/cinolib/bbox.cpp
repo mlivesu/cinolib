@@ -251,6 +251,9 @@ bool Bbox::intersects_box(const Bbox & box, const bool strict) const
  * pos and t_min refer to the entry point of the ray in the box
  *
  * Ref: Real Time Collision Detection, Section 5.3.3
+ *
+ * IMPORTANT: there was a bug, see also the Errata Corrige at
+ * http://realtimecollisiondetection.net/books/rtcd/errata/
 */
 CINO_INLINE
 bool Bbox::intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, vec3d & pos) const
@@ -260,7 +263,7 @@ bool Bbox::intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, ve
 
     for(int i=0; i<3; ++i)
     {
-        if(std::fabs(dir[i]) < 1e-10)
+        if(std::fabs(dir[i]) < 1e-15)
         {
             // ray is parallel to current axis. No hit if origin not within slab
             if(p[i]<min[i] || p[i]>max[i]) return false;
@@ -269,22 +272,22 @@ bool Bbox::intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, ve
         {
             // Compute intersection t value of ray with near and far plane of slab
             double ood = 1.0/dir[i];
-            double t1  = (min[i] - p[i]) * ood;
-            double t2  = (max[i] - p[i]) * ood;
+            double t_near = (min[i] - p[i]) * ood;
+            double t_far  = (max[i] - p[i]) * ood;
+            if(t_near > t_far) std::swap(t_near, t_far);
 
-            // Make t1 be intersection with near plane, t2 with far plane
-            if(t1>t2) std::swap(t1, t2);
-
-            // Compute the intersection of slab intersection intervals
-            if (t1>t_min) t_min = t1;
-            if (t2>t_max) t_max = t2;
+            // Incrementally intersects slabs across X,Y and Z coordinates
+            // THIS PART IS WROnG IN THE BOOK!!!
+            // (see http://realtimecollisiondetection.net/books/rtcd/errata/)
+            t_min = std::max(t_min, t_near);
+            t_max = std::min(t_max, t_far);
 
             // Exit with no collision as soon as slab intersection becomes empty
-            if(t_min > t_max) return false;
+            if(t_min>t_max) return false;
         }
-        // Ray intersects all 3 slabs. Return point (q) and intersection t value (tmin)
-        pos = p + dir*t_min;
     }
+    // Ray intersects all 3 slabs. Return point (q) and intersection t value (tmin)
+    pos = p + dir*t_min;
     return true;
 }
 
