@@ -89,12 +89,12 @@ bool Moller_Trumbore_intersection(const vec3d  & ray_orig,
 
     vec3d tvec = ray_orig - v0;
     bary[1] = tvec.dot(pvec) * invDet;
-    if (bary[1] < 0 || bary[1] > 1) return false;
+    if(bary[1] < 0.0 || bary[1] > 1.0) return false;
 
     vec3d qvec = tvec.cross(e0);
     bary[2] = ray_dir.dot(qvec) * invDet;
     bary[0] = bary[2] + bary[1];
-    if (bary[2] < 0 || bary[0] > 1) return false;
+    if(bary[2] < 0.0 || bary[0] > 1.0) return false;
 
     // if t<0 the ray does not intersect the triangle, but its supporting line does...
     //
