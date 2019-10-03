@@ -39,7 +39,7 @@
 #include <sys/types.h>
 #include <vector>
 #include <iostream>
-#include <cinolib/bbox.h>
+#include <cinolib/geometry/bbox.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/ipair.h>
 #include <cinolib/meshes/skel.h>

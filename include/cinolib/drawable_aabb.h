@@ -37,7 +37,7 @@
 #define CINO_DRAWABLE_AABB_H
 
 #include <cinolib/drawable_object.h>
-#include <cinolib/bbox.h>
+#include <cinolib/geometry/bbox.h>
 #include <cinolib/color.h>
 
 namespace cinolib

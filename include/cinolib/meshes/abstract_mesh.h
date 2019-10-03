@@ -40,7 +40,7 @@
 #include <vector>
 #include <sys/types.h>
 
-#include <cinolib/bbox.h>
+#include <cinolib/geometry/bbox.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
 #include <cinolib/symbols.h>

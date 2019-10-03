@@ -37,7 +37,7 @@
 #define CINO_TRIANGLE_H
 
 #include <cinolib/geometry/vec3.h>
-#include <cinolib/bbox.h>
+#include <cinolib/geometry/bbox.h>
 #include <cinolib/geometry/spatial_data_structure_item.h>
 #include <cinolib/geometry/triangle_utils.h>
 

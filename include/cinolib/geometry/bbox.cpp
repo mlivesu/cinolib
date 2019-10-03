@@ -33,7 +33,7 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/bbox.h>
+#include <cinolib/geometry/bbox.h>
 #include <algorithm>
 
 namespace cinolib
