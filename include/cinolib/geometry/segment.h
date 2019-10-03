@@ -56,7 +56,7 @@ class Segment : public SpatialDataStructureItem
         // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
 
         ItemType item_type() const;
-        Bbox     aabb() const;
+        AABB     aabb() const;
         vec3d    point_closest_to(const vec3d & p) const;
         bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
         void     barycentric_coordinates(const vec3d & p, double bc[]) const;

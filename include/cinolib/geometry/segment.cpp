@@ -76,9 +76,9 @@ ItemType Segment::item_type() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Bbox Segment::aabb() const
+AABB Segment::aabb() const
 {
-    return Bbox({v0, v1});
+    return AABB({v0, v1});
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -48,9 +48,9 @@ ItemType Triangle::item_type() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Bbox Triangle::aabb() const
+AABB Triangle::aabb() const
 {
-    return Bbox({v0, v1, v2});
+    return AABB({v0, v1, v2});
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

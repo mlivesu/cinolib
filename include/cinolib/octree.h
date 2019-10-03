@@ -46,12 +46,12 @@ namespace cinolib
 class OctreeNode
 {
     public:
-        OctreeNode(const OctreeNode * father, const Bbox & bbox) : father(father), bbox(bbox) {}
+        OctreeNode(const OctreeNode * father, const AABB & bbox) : father(father), bbox(bbox) {}
        ~OctreeNode();
         const OctreeNode *father;
         OctreeNode       *children[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
         bool              is_inner = false;
-        Bbox              bbox;
+        AABB              bbox;
         std::vector<uint> item_ids; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
 };
 
@@ -141,7 +141,7 @@ class Octree
 
         // all items and aabbs live here, and tree leaf nodes only store indices of these vectors
         std::vector<SpatialDataStructureItem*> items;
-        std::vector<Bbox>                      aabbs;
+        std::vector<AABB>                      aabbs;
         OctreeNode                            *root = nullptr;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

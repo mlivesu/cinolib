@@ -48,9 +48,9 @@ ItemType Tetrahedron::item_type() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Bbox Tetrahedron::aabb() const
+AABB Tetrahedron::aabb() const
 {
-    return Bbox({v0, v1, v2, v3});
+    return AABB({v0, v1, v2, v3});
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

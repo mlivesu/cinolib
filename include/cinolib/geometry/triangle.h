@@ -37,7 +37,7 @@
 #define CINO_TRIANGLE_H
 
 #include <cinolib/geometry/vec3.h>
-#include <cinolib/geometry/bbox.h>
+#include <cinolib/geometry/aabb.h>
 #include <cinolib/geometry/spatial_data_structure_item.h>
 #include <cinolib/geometry/triangle_utils.h>
 
@@ -59,7 +59,7 @@ class Triangle : public SpatialDataStructureItem
         // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
 
         ItemType item_type() const;
-        Bbox     aabb() const;
+        AABB     aabb() const;
         vec3d    point_closest_to(const vec3d & p) const;
         bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
         void     barycentric_coordinates(const vec3d & p, double bc[]) const;

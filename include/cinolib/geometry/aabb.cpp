@@ -33,13 +33,13 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/geometry/bbox.h>
+#include <cinolib/geometry/aabb.h>
 #include <algorithm>
 
 namespace cinolib
 {
 
-CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb)
+CINO_INLINE std::ostream & operator<<(std::ostream & in, const AABB & bb)
 {
     in << "\n[AABB] MIN: " << bb.min << "\tMAX: " << bb.max;
     return in;
@@ -48,13 +48,13 @@ CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Bbox::Bbox(const vec3d min, const vec3d max) : min(min), max(max)
+AABB::AABB(const vec3d min, const vec3d max) : min(min), max(max)
 {}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Bbox::Bbox(const std::vector<vec3d> & p_list, const double scaling_factor)
+AABB::AABB(const std::vector<vec3d> & p_list, const double scaling_factor)
 {    
     update(p_list, scaling_factor);
 }
@@ -63,11 +63,11 @@ Bbox::Bbox(const std::vector<vec3d> & p_list, const double scaling_factor)
 
 // AABB that contains all AABBs in b_list
 CINO_INLINE
-Bbox::Bbox(const std::vector<Bbox> & b_list, const double scaling_factor)
+AABB::AABB(const std::vector<AABB> & b_list, const double scaling_factor)
 {
     std::vector<vec3d> p_list;
     p_list.reserve(b_list.size()*2);
-    for(const Bbox & b : b_list)
+    for(const AABB & b : b_list)
     {
         p_list.push_back(b.min);
         p_list.push_back(b.max);
@@ -78,7 +78,7 @@ Bbox::Bbox(const std::vector<Bbox> & b_list, const double scaling_factor)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Bbox::reset()
+void AABB::reset()
 {
     min = vec3d( inf_double,  inf_double,  inf_double);
     max = vec3d(-inf_double, -inf_double, -inf_double);
@@ -87,7 +87,7 @@ void Bbox::reset()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Bbox::update(const std::vector<vec3d> & p_list, const double scaling_factor)
+void AABB::update(const std::vector<vec3d> & p_list, const double scaling_factor)
 {
     assert(!p_list.empty());
     min = p_list.front();
@@ -103,7 +103,7 @@ void Bbox::update(const std::vector<vec3d> & p_list, const double scaling_factor
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Bbox::scale(const double s)
+void AABB::scale(const double s)
 {
     vec3d c = center();
     min -= c;   max -= c;
@@ -114,7 +114,7 @@ void Bbox::scale(const double s)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-vec3d Bbox::center() const
+vec3d AABB::center() const
 {
     return (min + max) * 0.5;
 }
@@ -122,7 +122,7 @@ vec3d Bbox::center() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Bbox::diag() const
+double AABB::diag() const
 {
     if(min.x()==inf_double) return 0.0;
     return (min - max).length();
@@ -131,7 +131,7 @@ double Bbox::diag() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Bbox::delta_x() const
+double AABB::delta_x() const
 {
     return (max.x() - min.x());
 }
@@ -139,7 +139,7 @@ double Bbox::delta_x() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Bbox::delta_y() const
+double AABB::delta_y() const
 {
     return (max.y() - min.y());
 }
@@ -147,7 +147,7 @@ double Bbox::delta_y() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Bbox::delta_z() const
+double AABB::delta_z() const
 {
     return (max.z() - min.z());
 }
@@ -155,7 +155,7 @@ double Bbox::delta_z() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-vec3d Bbox::delta() const
+vec3d AABB::delta() const
 {
     return (max - min);
 }
@@ -163,7 +163,7 @@ vec3d Bbox::delta() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Bbox::min_entry() const
+double AABB::min_entry() const
 {
     return std::min(min.min_entry(), max.min_entry());
 }
@@ -171,7 +171,7 @@ double Bbox::min_entry() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Bbox::max_entry() const
+double AABB::max_entry() const
 {
     return std::max(min.max_entry(), max.max_entry());
 }
@@ -179,7 +179,7 @@ double Bbox::max_entry() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-vec3d Bbox::point_closest_to(const vec3d & p) const
+vec3d AABB::point_closest_to(const vec3d & p) const
 {
     // Real Time Collision Detection", Section 5.1.3
     vec3d res = p;
@@ -191,7 +191,7 @@ vec3d Bbox::point_closest_to(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Bbox::dist_sqrd(const vec3d & p) const
+double AABB::dist_sqrd(const vec3d & p) const
 {
     return p.dist_squared(point_closest_to(p));
 }
@@ -199,7 +199,7 @@ double Bbox::dist_sqrd(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double Bbox::dist(const vec3d & p) const
+double AABB::dist(const vec3d & p) const
 {
     return p.dist(point_closest_to(p));
 }
@@ -207,7 +207,7 @@ double Bbox::dist(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Bbox::contains(const vec3d & p, const bool strict) const
+bool AABB::contains(const vec3d & p, const bool strict) const
 {
     if(strict)
     {
@@ -227,7 +227,7 @@ bool Bbox::contains(const vec3d & p, const bool strict) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Bbox::intersects_box(const Bbox & box, const bool strict) const
+bool AABB::intersects_box(const AABB & box, const bool strict) const
 {    
     if(strict)
     {
@@ -256,7 +256,7 @@ bool Bbox::intersects_box(const Bbox & box, const bool strict) const
  * http://realtimecollisiondetection.net/books/rtcd/errata/
 */
 CINO_INLINE
-bool Bbox::intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, vec3d & pos) const
+bool AABB::intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, vec3d & pos) const
 {
            t_min = 0.0;        // set to -FLT_MAX to get first hit on line
     double t_max = inf_double; // set to max distance ray can travel (for segment)
@@ -294,7 +294,7 @@ bool Bbox::intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, ve
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<vec3d> Bbox::corners(const double scaling_factor) const
+std::vector<vec3d> AABB::corners(const double scaling_factor) const
 {
     double dx = delta_x(); assert(dx>=0);
     double dy = delta_y(); assert(dy>=0);
@@ -325,7 +325,7 @@ std::vector<vec3d> Bbox::corners(const double scaling_factor) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<uint> Bbox::tris() const
+std::vector<uint> AABB::tris() const
 {
     static std::vector<uint> t =
     {
@@ -348,7 +348,7 @@ std::vector<uint> Bbox::tris() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<uint> Bbox::quads() const
+std::vector<uint> AABB::quads() const
 {
     static std::vector<uint> q =
     {
@@ -365,7 +365,7 @@ std::vector<uint> Bbox::quads() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<uint> Bbox::edges() const
+std::vector<uint> AABB::edges() const
 {
     static std::vector<uint> e =
     {

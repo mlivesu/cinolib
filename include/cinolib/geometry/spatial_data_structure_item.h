@@ -54,7 +54,7 @@ namespace cinolib
     }
     ItemType;
 
-    class Bbox;  // axis aligned bounding box
+    class AABB;  // axis aligned bounding box
     template<typename T> class vec3;
 
     class SpatialDataStructureItem
@@ -70,7 +70,7 @@ namespace cinolib
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            virtual Bbox aabb() const = 0;
+            virtual AABB aabb() const = 0;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

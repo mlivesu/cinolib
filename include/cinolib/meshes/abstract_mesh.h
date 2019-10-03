@@ -40,7 +40,7 @@
 #include <vector>
 #include <sys/types.h>
 
-#include <cinolib/geometry/bbox.h>
+#include <cinolib/geometry/aabb.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
 #include <cinolib/symbols.h>
@@ -69,7 +69,7 @@ class AbstractMesh
 {
     protected:
 
-        Bbox bb;
+        AABB bb;
 
         std::vector<vec3d>             verts;
         std::vector<uint>              edges;
@@ -142,7 +142,7 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const Bbox                           & bbox()          const { return bb;    }
+        const AABB                           & bbox()          const { return bb;    }
         const std::vector<vec3d>             & vector_verts()  const { return verts; }
               std::vector<vec3d>             & vector_verts()        { return verts; }
         const std::vector<uint>              & vector_edges()  const { return edges; }
@@ -280,7 +280,7 @@ class AbstractMesh
                 bool               polys_are_labeled    () const;
                 void               poly_apply_labels    (const std::vector<int> & labels);
                 void               poly_apply_label     (const int label);
-                Bbox               poly_aabb            (const uint pid) const;
+                AABB               poly_aabb            (const uint pid) const;
         virtual double             poly_mass            (const uint pid) const = 0;
         virtual void               poly_set_color       (const Color & c);
         virtual void               poly_set_alpha       (const float alpha);

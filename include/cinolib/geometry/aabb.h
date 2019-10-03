@@ -33,8 +33,8 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_BBOX_H
-#define CINO_BBOX_H
+#ifndef CINO_AABB_H
+#define CINO_AABB_H
 
 #include <cinolib/min_max_inf.h>
 #include <cinolib/geometry/vec3.h>
@@ -42,18 +42,18 @@
 namespace cinolib
 {
 
-class Bbox
+class AABB
 {
     public:
 
-        explicit Bbox(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0); // AABB that contains all verts in p_list
+        explicit AABB(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0); // AABB that contains all verts in p_list
 
-        explicit Bbox(const std::vector<Bbox> & b_list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
+        explicit AABB(const std::vector<AABB> & b_list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
 
-        explicit Bbox(const vec3d min = vec3d( inf_double,  inf_double,  inf_double),
+        explicit AABB(const vec3d min = vec3d( inf_double,  inf_double,  inf_double),
                       const vec3d max = vec3d(-inf_double, -inf_double, -inf_double));
 
-        virtual ~Bbox() {}
+        virtual ~AABB() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -84,7 +84,7 @@ class Bbox
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         bool contains(const vec3d & p, const bool strict = false) const;
-        bool intersects_box(const Bbox  & box, const bool strict = false) const;
+        bool intersects_box(const AABB  & box, const bool strict = false) const;
         bool intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, vec3d & pos) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -99,12 +99,12 @@ class Bbox
         vec3d min, max;
 };
 
-CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb);
+CINO_INLINE std::ostream & operator<<(std::ostream & in, const AABB & bb);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "bbox.cpp"
+#include "aabb.cpp"
 #endif
 
-#endif // CINO_BBOX_H
+#endif // CINO_AABB_H

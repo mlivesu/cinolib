@@ -35,7 +35,7 @@
 *********************************************************************************/
 #include <cinolib/meshes/polyhedralmesh.h>
 #include <cinolib/io/read_write.h>
-#include <cinolib/geometry/bbox.h>
+#include <cinolib/geometry/aabb.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/vector_serialization.h>
 

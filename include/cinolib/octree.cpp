@@ -89,7 +89,7 @@ void Octree::build()
 
     // build the tree root
     assert(root==nullptr);
-    root = new OctreeNode(nullptr, Bbox(aabbs, 1.5)); // enlarge it a bit to make sure queries don't fall outside
+    root = new OctreeNode(nullptr, AABB(aabbs, 1.5)); // enlarge it a bit to make sure queries don't fall outside
 
     tree_depth = 1;
     num_leaves = 1;
@@ -149,14 +149,14 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
             vec3d min = node->bbox.min;
             vec3d max = node->bbox.max;
             vec3d avg = node->bbox.center();
-            node->children[0] = new OctreeNode(node, Bbox(vec3d(min[0], min[1], min[2]), vec3d(avg[0], avg[1], avg[2])));
-            node->children[1] = new OctreeNode(node, Bbox(vec3d(avg[0], min[1], min[2]), vec3d(max[0], avg[1], avg[2])));
-            node->children[2] = new OctreeNode(node, Bbox(vec3d(avg[0], avg[1], min[2]), vec3d(max[0], max[1], avg[2])));
-            node->children[3] = new OctreeNode(node, Bbox(vec3d(min[0], avg[1], min[2]), vec3d(avg[0], max[1], avg[2])));
-            node->children[4] = new OctreeNode(node, Bbox(vec3d(min[0], min[1], avg[2]), vec3d(avg[0], avg[1], max[2])));
-            node->children[5] = new OctreeNode(node, Bbox(vec3d(avg[0], min[1], avg[2]), vec3d(max[0], avg[1], max[2])));
-            node->children[6] = new OctreeNode(node, Bbox(vec3d(avg[0], avg[1], avg[2]), vec3d(max[0], max[1], max[2])));
-            node->children[7] = new OctreeNode(node, Bbox(vec3d(min[0], avg[1], avg[2]), vec3d(avg[0], max[1], max[2])));
+            node->children[0] = new OctreeNode(node, AABB(vec3d(min[0], min[1], min[2]), vec3d(avg[0], avg[1], avg[2])));
+            node->children[1] = new OctreeNode(node, AABB(vec3d(avg[0], min[1], min[2]), vec3d(max[0], avg[1], avg[2])));
+            node->children[2] = new OctreeNode(node, AABB(vec3d(avg[0], avg[1], min[2]), vec3d(max[0], max[1], avg[2])));
+            node->children[3] = new OctreeNode(node, AABB(vec3d(min[0], avg[1], min[2]), vec3d(avg[0], max[1], avg[2])));
+            node->children[4] = new OctreeNode(node, AABB(vec3d(min[0], min[1], avg[2]), vec3d(avg[0], avg[1], max[2])));
+            node->children[5] = new OctreeNode(node, AABB(vec3d(avg[0], min[1], avg[2]), vec3d(max[0], avg[1], max[2])));
+            node->children[6] = new OctreeNode(node, AABB(vec3d(avg[0], avg[1], avg[2]), vec3d(max[0], max[1], max[2])));
+            node->children[7] = new OctreeNode(node, AABB(vec3d(min[0], avg[1], avg[2]), vec3d(avg[0], max[1], max[2])));
 
             // mode items downwards in the tree
             // NOTE: items that span across multiple octants will be added to each node they intersect)

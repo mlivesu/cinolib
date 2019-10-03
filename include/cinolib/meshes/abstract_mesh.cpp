@@ -1230,9 +1230,9 @@ void AbstractMesh<M,V,E,P>::poly_apply_label(const int label)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-Bbox AbstractMesh<M,V,E,P>::poly_aabb(const uint pid) const
+AABB AbstractMesh<M,V,E,P>::poly_aabb(const uint pid) const
 {
-    return Bbox(poly_verts(pid));
+    return AABB(poly_verts(pid));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

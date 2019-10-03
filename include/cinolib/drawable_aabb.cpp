@@ -48,7 +48,7 @@ namespace cinolib
 
 CINO_INLINE
 DrawableAABB::DrawableAABB(const vec3d min, const vec3d max)
-    : Bbox(min, max)
+    : AABB(min, max)
 {
     verts = this->corners();
 }
@@ -57,7 +57,7 @@ DrawableAABB::DrawableAABB(const vec3d min, const vec3d max)
 
 CINO_INLINE
 DrawableAABB::DrawableAABB(const std::vector<vec3d> &p_list, const double scaling_factor)
-    : Bbox(p_list, scaling_factor)
+    : AABB(p_list, scaling_factor)
 {
     verts = this->corners();
 }
@@ -65,8 +65,8 @@ DrawableAABB::DrawableAABB(const std::vector<vec3d> &p_list, const double scalin
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-DrawableAABB::DrawableAABB(const std::vector<Bbox> &b_list, const double scaling_factor)
-    : Bbox(b_list, scaling_factor)
+DrawableAABB::DrawableAABB(const std::vector<AABB> &b_list, const double scaling_factor)
+    : AABB(b_list, scaling_factor)
 {
     verts = this->corners();
 }
