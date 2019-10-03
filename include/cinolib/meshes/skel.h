@@ -41,7 +41,7 @@
 #include <utility>
 #include <assert.h>
 #include <cinolib/cino_inline.h>
-#include <cinolib/bbox.h>
+#include <cinolib/geometry/aabb.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/stl_container_utilities.h>
 
@@ -60,7 +60,7 @@ class Skel
 
     protected:
 
-        Bbox                            bb;
+        AABB                            bb;
         std::vector<double>             coords;
         std::vector<int>                segments;
         std::vector<double>             max_spheres;
@@ -94,7 +94,7 @@ class Skel
         int add_vertex(const vec3d & v);
         int add_segment(int vid0, int vid1);
 
-        const Bbox & bbox() const { return bb; }
+        const AABB & bbox() const { return bb; }
 
         vec3d get_bone_sample   (int bid, float q) const;
         vec3d get_segment_sample(int sid, float q) const;

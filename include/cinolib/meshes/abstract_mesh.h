@@ -40,7 +40,7 @@
 #include <vector>
 #include <sys/types.h>
 
-#include <cinolib/bbox.h>
+#include <cinolib/geometry/aabb.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
 #include <cinolib/symbols.h>
@@ -69,7 +69,7 @@ class AbstractMesh
 {
     protected:
 
-        Bbox bb;
+        AABB bb;
 
         std::vector<vec3d>             verts;
         std::vector<uint>              edges;
@@ -142,7 +142,7 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const Bbox                           & bbox()          const { return bb;    }
+        const AABB                           & bbox()          const { return bb;    }
         const std::vector<vec3d>             & vector_verts()  const { return verts; }
               std::vector<vec3d>             & vector_verts()        { return verts; }
         const std::vector<uint>              & vector_edges()  const { return edges; }
@@ -232,25 +232,26 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                vec3d  edge_vert         (const uint eid, const uint offset) const;
-                uint   edge_vert_id      (const uint eid, const uint offset) const;
-                ipair  edge_vert_ids     (const uint eid) const;
-                int    edge_id           (const uint vid0, const uint vid1) const;
-                int    edge_id           (const ipair & vids) const;
-                vec3d  edge_sample_at    (const uint eid, double lambda) const; // arc-length param
-                uint   edge_valence      (const uint eid) const;
-                bool   edge_contains_vert(const uint eid, const uint vid) const;
-                bool   edges_are_adjacent(const uint eid0, const uint eid1) const;
-                double edge_length       (const uint eid) const;
-                vec3d  edge_vec          (const uint eid, const bool normalized = false) const;
-                double edge_avg_length   () const;
-                double edge_max_length   () const;
-                double edge_min_length   () const;
-                void   edge_unmark_all   ();
-                void   edge_apply_labels (const std::vector<int> & labels);
-                void   edge_apply_label  (const int label);
-        virtual void   edge_set_color    (const Color & c);
-        virtual void   edge_set_alpha    (const float alpha);
+                vec3d                  edge_vert         (const uint eid, const uint offset) const;
+                uint                   edge_vert_id      (const uint eid, const uint offset) const;
+                ipair                  edge_vert_ids     (const uint eid) const;
+                std::pair<vec3d,vec3d> edge_verts        (const uint eid) const;
+                int                    edge_id           (const uint vid0, const uint vid1) const;
+                int                    edge_id           (const ipair & vids) const;
+                vec3d                  edge_sample_at    (const uint eid, double lambda) const; // arc-length param
+                uint                   edge_valence      (const uint eid) const;
+                bool                   edge_contains_vert(const uint eid, const uint vid) const;
+                bool                   edges_are_adjacent(const uint eid0, const uint eid1) const;
+                double                 edge_length       (const uint eid) const;
+                vec3d                  edge_vec          (const uint eid, const bool normalized = false) const;
+                double                 edge_avg_length   () const;
+                double                 edge_max_length   () const;
+                double                 edge_min_length   () const;
+                void                   edge_unmark_all   ();
+                void                   edge_apply_labels (const std::vector<int> & labels);
+                void                   edge_apply_label  (const int label);
+        virtual void                   edge_set_color    (const Color & c);
+        virtual void                   edge_set_alpha    (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -279,6 +280,7 @@ class AbstractMesh
                 bool               polys_are_labeled    () const;
                 void               poly_apply_labels    (const std::vector<int> & labels);
                 void               poly_apply_label     (const int label);
+                AABB               poly_aabb            (const uint pid) const;
         virtual double             poly_mass            (const uint pid) const = 0;
         virtual void               poly_set_color       (const Color & c);
         virtual void               poly_set_alpha       (const float alpha);

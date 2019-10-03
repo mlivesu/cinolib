@@ -143,7 +143,7 @@ void Curve::operator+=(const Curve & c)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-const Bbox & Curve::bbox() const
+const AABB & Curve::bbox() const
 {
     return bb;
 }

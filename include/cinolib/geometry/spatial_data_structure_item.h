@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2019: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,58 +33,71 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_BBOX_H
-#define CINO_BBOX_H
+#ifndef CINO_SPATIAL_DATA_STRUCTURE_ITEM_H
+#define CINO_SPATIAL_DATA_STRUCTURE_ITEM_H
 
-#include <cinolib/min_max_inf.h>
-#include <cinolib/geometry/vec3.h>
-#include <algorithm>
+#include <cinolib/cino_inline.h>
 
+/* This interface must be implemented by any item that populates a spatial data structure
+ * (e.g. Octree, BSP, AABB Tree, ...). These primitives are necessary to implement both the
+ * construction of the hierarchical space subdivision, and the various queries the data
+ * structure may offer (e.g. ray intersection, nearest neighbor, contains, ...)
+*/
 namespace cinolib
 {
+    typedef enum
+    {
+        POINT,
+        SEGMENT,
+        TRIANGLE,
+        TETRAHEDRON,
+    }
+    ItemType;
 
-// TODO: make it dimension independent (d as template argument)
-class Bbox
-{
-    public:
+    class AABB;  // axis aligned bounding box
+    template<typename T> class vec3;
 
-        explicit Bbox(const vec3d min = vec3d( inf_double,  inf_double,  inf_double),
-                      const vec3d max = vec3d(-inf_double, -inf_double, -inf_double))
-        : min(min), max(max) {}
+    class SpatialDataStructureItem
+    {
+        public:
 
-        explicit Bbox(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0); // AABB that contains all verts in p_list
-        explicit Bbox(const std::vector<Bbox>  & b_list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
+            explicit SpatialDataStructureItem() {}
+            virtual ~SpatialDataStructureItem() {}
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void               reset();
-        void               scale(const double s);
-        void               update(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0);
-        vec3d              center()    const;
-        double             diag()      const;
-        double             delta_x()   const;
-        double             delta_y()   const;
-        double             delta_z()   const;
-        vec3d              delta()     const;
-        double             min_entry() const;
-        double             max_entry() const;
-        bool               contains(const vec3d & p, const bool strictly_contains = true)  const;
-        bool               intersects(const Bbox & box) const;
-        std::vector<vec3d> corners(const double scaling_factor = 1.0) const;
-        std::vector<uint>  tris()  const;
-        std::vector<uint>  quads() const;
+            virtual ItemType item_type() const = 0;
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d min, max;
-};
+            virtual AABB aabb() const = 0;
 
-CINO_INLINE std::ostream & operator<<(std::ostream & in, const Bbox & bb);
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+            // given a point in space P, finds the point in the item that is closest to P
+            virtual vec3<double> point_closest_to(const vec3<double> & p) const = 0;
+
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            virtual void barycentric_coordinates(const vec3<double> & p, double bc[]) const = 0;
+
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            virtual bool intersects_ray(const vec3<double> & p, const vec3<double> & dir, double & t, vec3<double> & pos) const = 0;
+
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            double dist     (const vec3<double> & p) const;
+            double dist_sqrd(const vec3<double> & p) const;
+
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            bool contains(const vec3<double> & p, const double eps = 1e-15) const;
+    };
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "bbox.cpp"
+#include "spatial_data_structure_item.cpp"
 #endif
 
-#endif // CINO_BBOX_H
+#endif // CINO_SPATIAL_DATA_STRUCTURE_ITEM_H

@@ -36,80 +36,39 @@
 #ifndef CINO_TRIANGLE_H
 #define CINO_TRIANGLE_H
 
-#include <vector>
-#include <sys/types.h>
-#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/aabb.h>
+#include <cinolib/geometry/spatial_data_structure_item.h>
+#include <cinolib/geometry/triangle_utils.h>
 
 namespace cinolib
 {
 
-CINO_INLINE
-vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C);
+class Triangle : public SpatialDataStructureItem
+{
+    public:
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        Triangle(const std::vector<vec3d> v) : v0(v.at(0)), v1(v.at(1)), v2(v.at(2)) {}
 
-template <class vec>
-CINO_INLINE
-double triangle_area(const vec A, const vec B, const vec C);
+        Triangle(const vec3d & v0,
+                 const vec3d & v1,
+                 const vec3d & v2) : v0(v0), v1(v1), v2(v2) {}
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+       ~Triangle() {}
 
-// Given a triangle t(A,B,C) and a ray r(P,dir) compute both
-// the edge and position where r exits from t
-//
-// NOTE: r is assumed to live "within" t, like in a gradient field for example...
-//
-CINO_INLINE
-void triangle_traverse_with_ray(const vec3d   tri[3],
-                                const vec3d   P,
-                                const vec3d   dir,
-                                      vec3d & exit_pos,
-                                      uint  & exit_edge);
+        // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        ItemType item_type() const;
+        AABB     aabb() const;
+        vec3d    point_closest_to(const vec3d & p) const;
+        bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
+        void     barycentric_coordinates(const vec3d & p, double bc[]) const;
 
-// https://en.wikipedia.org/wiki/Law_of_sines
-//
-CINO_INLINE
-double triangle_law_of_sines(const double angle_0,
-                             const double angle_1,
-                             const double length_0); // returns length_1
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        vec3d v0, v1, v2;
+};
 
-template <class vec>
-CINO_INLINE
-bool triangle_barycentric_coords(const vec & A,
-                                 const vec & B,
-                                 const vec & C,
-                                 const vec & P,
-                                 std::vector<double> & wgts,
-                                 const double   tol = 1e-10);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class vec>
-CINO_INLINE
-bool triangle_point_is_inside(const vec    & A,
-                              const vec    & B,
-                              const vec    & C,
-                              const vec    & P,
-                              const double   tol = 1e-10);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool triangle_bary_is_vertex(const std::vector<double> & bary,
-                             uint                      & vid, // 0,1,2
-                             const double                tol = 1e-10);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool triangle_bary_is_edge(const std::vector<double> & bary,
-                           uint                      & eid, // 0,1,2 (see TRI_EDGES)
-                           const double              tol = 1e-10);
 }
 
 #ifndef  CINO_STATIC_LIB

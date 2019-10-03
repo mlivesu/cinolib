@@ -36,110 +36,145 @@
 #ifndef CINO_OCTREE_H
 #define CINO_OCTREE_H
 
-#include <cinolib/geometry/vec3.h>
-#include <set>
-#include <vector>
-#include <assert.h>
+#include <cinolib/geometry/spatial_data_structure_item.h>
+#include <cinolib/meshes/meshes.h>
+#include <queue>
 
 namespace cinolib
 {
 
-template<typename item_type> class Octree
+class OctreeNode
 {
-    private:
+    public:
+        OctreeNode(const OctreeNode * father, const AABB & bbox) : father(father), bbox(bbox) {}
+       ~OctreeNode();
+        const OctreeNode *father;
+        OctreeNode       *children[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+        bool              is_inner = false;
+        AABB              bbox;
+        std::vector<uint> item_ids; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
+};
 
-        vec3d                  bb_min;
-        vec3d                  bb_max;
-        std::vector<Octree>    children;
-        std::vector<item_type> item_list;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+class Octree
+{
 
     public:
 
-        explicit Octree() {}
+        explicit Octree(const uint max_depth      = 7,
+                        const uint items_per_leaf = 3);
 
-        explicit Octree(const vec3d & minim, const vec3d & maxim)
+        virtual ~Octree();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void build();
+        void build_item(const uint id, OctreeNode *node, const uint depth);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        template<class M, class V, class E, class P>
+        void build_from_mesh_polys(const AbstractMesh<M,V,E,P> & m)
         {
-            set_extents(minim, maxim);
-        }
-
-        void set_extents(const vec3d & minim, const vec3d & maxim )
-        {
-            bb_min = minim;
-            bb_max = maxim;
-        }
-
-        void subdivide()
-        {
-            assert(children.empty());
-
-            vec3d bb_avg = (bb_min + bb_max)/2.0;
-
-            children.resize(8);
-            children[0].set_extents(vec3d(bb_min[0], bb_min[1], bb_min[2]),
-                                    vec3d(bb_avg[0], bb_avg[1], bb_avg[2]));
-            children[1].set_extents(vec3d(bb_avg[0], bb_min[1], bb_min[2]),
-                                    vec3d(bb_max[0], bb_avg[1], bb_avg[2]));
-            children[2].set_extents(vec3d(bb_avg[0], bb_avg[1], bb_min[2]),
-                                    vec3d(bb_max[0], bb_max[1], bb_avg[2]));
-            children[3].set_extents(vec3d(bb_min[0], bb_avg[1], bb_min[2]),
-                                    vec3d(bb_avg[0], bb_max[1], bb_avg[2]));
-            children[4].set_extents(vec3d(bb_min[0], bb_min[1], bb_avg[2]),
-                                    vec3d(bb_avg[0], bb_avg[1], bb_max[2]));
-            children[5].set_extents(vec3d(bb_avg[0], bb_min[1], bb_avg[2]),
-                                    vec3d(bb_max[0], bb_avg[1], bb_max[2]));
-            children[6].set_extents(vec3d(bb_avg[0], bb_avg[1], bb_avg[2]),
-                                    vec3d(bb_max[0], bb_max[1], bb_max[2]));
-            children[7].set_extents(vec3d(bb_min[0], bb_avg[1], bb_avg[2]),
-                                    vec3d(bb_avg[0], bb_max[1], bb_max[2]));
-        }
-
-        void subdivide_n_levels(const uint n)
-        {
-            assert(children.empty());
-
-            subdivide();
-
-            if (n > 1)
+            assert(items.empty());
+            items.reserve(m.num_polys());
+            for(uint pid=0; pid<m.num_polys(); ++pid)
             {
-                for(auto & child : children) child.subdivide_n_levels(n-1);
-            }
-        }
-
-        void get_items(const vec3d & query, std::set<item_type> & items) const
-        {
-            double eps = 1e-3;
-
-            if (query[0] >= bb_min[0] - eps && query[1] >= bb_min[1] - eps && query[2] >= bb_min[2] - eps &&
-                query[0] <= bb_max[0] + eps && query[1] <= bb_max[1] + eps && query[2] <= bb_max[2] + eps)
-            {
-                if(children.empty())
+                switch(m.mesh_type())
                 {
-                    for(auto it : item_list) items.insert(it);
-                }
-                else
-                {
-                    assert(children.size() == 8);
-                    for(const auto & child : children) child.get_items(query, items);
+                    case TRIMESH : items.push_back(new Triangle(m.poly_verts(pid)));    break;
+                    case TETMESH : items.push_back(new Tetrahedron(m.poly_verts(pid))); break;
+                    default: assert(false && "Unsupported element");
                 }
             }
+            build();
         }
 
-        void add_item(const item_type & item, const vec3d & minim, const vec3d & maxim)
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        template<class M, class V, class E, class P>
+        void build_from_mesh_edges(const AbstractMesh<M,V,E,P> & m)
         {
-            if (minim[0] <= bb_max[0] && minim[1] <= bb_max[1] && minim[2] <= bb_max[2] &&
-                maxim[0] >= bb_min[0] && maxim[1] >= bb_min[1] && maxim[2] >= bb_min[2] )
+            assert(items.empty());
+            items.reserve(m.num_edges());
+            for(uint eid=0; eid<m.num_edges(); ++eid)
             {
-                item_list.push_back(item);
-
-                if (!children.empty())
-                {
-                    assert(children.size() == 8);
-                    for(auto & child : children) child.add_item(item, minim, maxim);
-                }
+                items.push_back(new Segment(m.edge_verts(eid)));
             }
+            build();
         }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        uint max_items_per_leaf() const;
+        uint max_items_per_leaf(const OctreeNode *node, const uint max) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void debug_mode(const bool b);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void print_query_info(const std::string & s,
+                              const double        t,
+                              const uint          aabb_queries,
+                              const uint          item_queries) const;
+
+        // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        // returns pos, id and distance of the item that is closest to query point p
+        void closest_point(const vec3d & p, uint & id, vec3d & pos, double & dist) const;
+
+        // returns respectively the first item and the full list of items containing query point p
+        bool contains(const vec3d & p, uint & id, const double eps = 1e-15) const;
+        bool contains(const vec3d & p, std::unordered_set<uint> & ids, const double eps = 1e-15) const;
+
+        // returns respectively the first and the full list of intersections
+        // between items in the octree and a ray R(t) := p + t * dir
+        bool intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
+        bool intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    protected:
+
+        // all items and aabbs live here, and tree leaf nodes only store indices of these vectors
+        std::vector<SpatialDataStructureItem*> items;
+        std::vector<AABB>                      aabbs;
+        OctreeNode                            *root = nullptr;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        uint max_depth;        // maximum allowed depth of the tree
+        uint items_per_leaf;   // prescribed number of items per leaf (can't go deeper than max_depth anyways)
+        uint tree_depth;       // actual depth of the tree
+        uint num_leaves;
+        bool print_debug_info = false;
+
+        // SUPPORT STRUCTURES ::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        struct Obj
+        {
+            double      dist = inf_double;
+            OctreeNode *node = nullptr;
+            int         id   = -1;
+            vec3d       pos; // closest point
+        };
+        struct Greater
+        {
+            bool operator()(const Obj & obj1, const Obj & obj2)
+            {
+                return obj1.dist > obj2.dist;
+            }
+        };
+        typedef std::priority_queue<Obj,std::vector<Obj>,Greater> PrioQueue;
 };
 
 }
+
+#ifndef  CINO_STATIC_LIB
+#include "octree.cpp"
+#endif
 
 #endif // CINO_OCTREE_H

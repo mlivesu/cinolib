@@ -39,7 +39,7 @@
 #include <sys/types.h>
 #include <vector>
 #include <iostream>
-#include <cinolib/bbox.h>
+#include <cinolib/geometry/aabb.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/ipair.h>
 #include <cinolib/meshes/skel.h>
@@ -84,7 +84,7 @@ class Curve
         double                      length()  const;
         const std::vector<Sample> & samples() const;
               std::vector<Sample> & samples();
-        const Bbox                & bbox()    const;
+        const AABB                & bbox()    const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -117,7 +117,7 @@ class Curve
 
     private:
 
-        Bbox bb;
+        AABB bb;
         std::vector<Sample> sample_list;
 };
 

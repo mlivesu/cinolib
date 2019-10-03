@@ -33,59 +33,54 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SEGMENT_H
-#define CINO_SEGMENT_H
+#ifndef CINO_DRAWABLE_OCTREE_H
+#define CINO_DRAWABLE_OCTREE_H
 
-#include <iostream>
-#include <cinolib/geometry/spatial_data_structure_item.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/drawable_aabb.h>
+#include <cinolib/octree.h>
 
 namespace cinolib
 {
 
-class Segment : public SpatialDataStructureItem
+class DrawableOctree : public Octree, public DrawableObject
 {
     public:
 
-        Segment(const vec3d & v0,
-                const vec3d & v1) : v0(v0), v1(v1) {}
+        explicit DrawableOctree(const uint max_depth      = 7,
+                                const uint items_per_leaf = 3);
 
-        Segment(const std::pair<vec3d,vec3d> & p) : v0(p.first), v1(p.second) {}
-
-        ~Segment() {}
-
-        // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
-
-        ItemType item_type() const;
-        AABB     aabb() const;
-        vec3d    point_closest_to(const vec3d & p) const;
-        bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
-        void     barycentric_coordinates(const vec3d & p, double bc[]) const;
+        ~DrawableOctree() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d v0, v1;
+        void  draw(const float scene_size=1) const;
+        vec3d scene_center() const;
+        float scene_radius() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        ObjectType object_type() const { return DRAWABLE_CURVE; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void updateGL();
+        void updateGL(const OctreeNode * node);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void set_color(const Color & c);
+        void set_thickness(float t);
+
+    private:
+
+        std::vector<DrawableAABB> render_list;
 };
-
-CINO_INLINE
-std::ostream & operator<<(std::ostream & in, const Segment & s);
-
-// OLD!!!
-//class Segment : public std::pair<vec3d,vec3d>
-//{
-//    public:
-//        explicit Segment(const vec3d & P0, const vec3d & P1);
-//        std::vector<Plane> to_planes() const;
-//        vec3d dir() const;
-//        double operator[](const vec3d & p) const;
-//        vec3d project_onto(const vec3d & p) const;
-//        double dist_to_point(const vec3d & p) const;
-//        bool is_in_between(const vec3d & p) const;
-//};
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "segment.cpp"
+#include "drawable_octree.cpp"
 #endif
 
-#endif // CINO_SEGMENT_H
+#endif // CINO_DRAWABLE_OCTREE_H

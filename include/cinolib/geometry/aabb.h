@@ -33,59 +33,78 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SEGMENT_H
-#define CINO_SEGMENT_H
+#ifndef CINO_AABB_H
+#define CINO_AABB_H
 
-#include <iostream>
-#include <cinolib/geometry/spatial_data_structure_item.h>
+#include <cinolib/min_max_inf.h>
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
 
-class Segment : public SpatialDataStructureItem
+class AABB
 {
     public:
 
-        Segment(const vec3d & v0,
-                const vec3d & v1) : v0(v0), v1(v1) {}
+        explicit AABB(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0); // AABB that contains all verts in p_list
 
-        Segment(const std::pair<vec3d,vec3d> & p) : v0(p.first), v1(p.second) {}
+        explicit AABB(const std::vector<AABB> & b_list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
 
-        ~Segment() {}
+        explicit AABB(const vec3d min = vec3d( inf_double,  inf_double,  inf_double),
+                      const vec3d max = vec3d(-inf_double, -inf_double, -inf_double));
 
-        // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
-
-        ItemType item_type() const;
-        AABB     aabb() const;
-        vec3d    point_closest_to(const vec3d & p) const;
-        bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
-        void     barycentric_coordinates(const vec3d & p, double bc[]) const;
+        virtual ~AABB() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d v0, v1;
+        void reset();
+        void update(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0);
+        void scale(const double s);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        double diag()    const;
+        vec3d  center()  const;
+        vec3d  delta()   const;
+        double delta_x() const;
+        double delta_y() const;
+        double delta_z() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        double min_entry() const;
+        double max_entry() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d  point_closest_to(const vec3d & p) const;
+        double dist_sqrd       (const vec3d & p) const;
+        double dist            (const vec3d & p) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        bool contains(const vec3d & p, const bool strict = false) const;
+        bool intersects_box(const AABB  & box, const bool strict = false) const;
+        bool intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, vec3d & pos) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        std::vector<vec3d> corners(const double scaling_factor = 1.0) const;
+        std::vector<uint>  tris()  const;
+        std::vector<uint>  quads() const;
+        std::vector<uint>  edges() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d min, max;
 };
 
-CINO_INLINE
-std::ostream & operator<<(std::ostream & in, const Segment & s);
-
-// OLD!!!
-//class Segment : public std::pair<vec3d,vec3d>
-//{
-//    public:
-//        explicit Segment(const vec3d & P0, const vec3d & P1);
-//        std::vector<Plane> to_planes() const;
-//        vec3d dir() const;
-//        double operator[](const vec3d & p) const;
-//        vec3d project_onto(const vec3d & p) const;
-//        double dist_to_point(const vec3d & p) const;
-//        bool is_in_between(const vec3d & p) const;
-//};
+CINO_INLINE std::ostream & operator<<(std::ostream & in, const AABB & bb);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "segment.cpp"
+#include "aabb.cpp"
 #endif
 
-#endif // CINO_SEGMENT_H
+#endif // CINO_AABB_H

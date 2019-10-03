@@ -53,7 +53,7 @@
 #include <QMenu>
 #include <qglviewer.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/bbox.h>
+#include <cinolib/geometry/aabb.h>
 
 
 namespace cinolib

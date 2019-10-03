@@ -223,9 +223,10 @@ void Tetmesh<M,V,E,F,P>::update_f_normal(const uint fid)
     vec3d v1 = this->face_vert(fid,1);
     vec3d v2 = this->face_vert(fid,2);
 
-    vec3d u = v1 - v0;    u.normalize();
-    vec3d v = v2 - v0;    v.normalize();
-    vec3d n = u.cross(v); n.normalize();
+    vec3d u = v1 - v0;
+    vec3d v = v2 - v0;
+    vec3d n = u.cross(v);
+    n.normalize();
 
     this->face_data(fid).normal = n;
 }

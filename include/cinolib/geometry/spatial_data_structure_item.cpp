@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2019: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,36 +33,31 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_POINT_INSIDE_MESH_H
-#define CINO_POINT_INSIDE_MESH_H
-
-#include <sys/types.h>
-#include <vector>
-#include <cinolib/octree.h>
+#include <cinolib/geometry/spatial_data_structure_item.h>
 
 namespace cinolib
 {
 
-template<class Mesh>
-class PointInsideMeshCache
+CINO_INLINE
+double SpatialDataStructureItem::dist(const vec3<double> &p) const
 {
-    private:
-
-        const Mesh *m_ptr;
-        Octree<uint> octree;
-
-    public:
-
-        explicit PointInsideMeshCache(const Mesh & m, const uint octree_depth = 5);
-
-        bool  locate(const vec3d p, uint & pid, std::vector<double> & wgts) const;
-        vec3d locate(const vec3d p, const Mesh & m) const;
-};
-
+    return p.dist(point_closest_to(p));
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "point_inside_mesh.cpp"
-#endif
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-#endif // CINO_POINT_INSIDE_MESH_H
+CINO_INLINE
+double SpatialDataStructureItem::dist_sqrd(const vec3<double> &p) const
+{
+    return p.dist_squared(point_closest_to(p));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool SpatialDataStructureItem::contains(const vec3<double> &p, const double eps) const
+{
+    return dist_sqrd(p) < eps;
+}
+
+}

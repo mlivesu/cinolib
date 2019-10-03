@@ -43,17 +43,17 @@ namespace cinolib
 
 typedef struct
 {
-    float X_thresh =  1;  // X coord \in [0,1] ( relative w.r.t. bbox delta x)
-    float Y_thresh =  1;  // Y coord \in [0,1] ( relative w.r.t. bbox delta y)
-    float Z_thresh =  1;  // Z coord \in [0,1] ( relative w.r.t. bbox delta z)
-    float Q_thresh =  1;  // Quality \in [0,1] ( assumes quality metric is in [0,1] too)
-    int   L_filter = -1;  // Label (-1 : show all labels)
-    int   X_sign   = LEQ; // { LEQ, GEQ   }
-    int   Y_sign   = LEQ; // { LEQ, GEQ   }
-    int   Z_sign   = LEQ; // { LEQ, GEQ   }
-    int   Q_sign   = LEQ; // { LEQ, GEQ   }
-    int   L_mode   = IS;  // { IS, IS_NOT }
-    int   mode     = AND; // { AND, OR    }
+    float X_thresh =  1;      // X coord \in [0,1] ( relative w.r.t. bbox delta x)
+    float Y_thresh =  1;      // Y coord \in [0,1] ( relative w.r.t. bbox delta y)
+    float Z_thresh =  1;      // Z coord \in [0,1] ( relative w.r.t. bbox delta z)
+    float Q_thresh =  1;      // Quality \in [0,1] ( assumes quality metric is in [0,1] too)
+    int   L_filter = -1;      // Label (-1 : show all labels)
+    int   X_sign   = LEQ;     // { LEQ, GEQ   }
+    int   Y_sign   = LEQ;     // { LEQ, GEQ   }
+    int   Z_sign   = LEQ;     // { LEQ, GEQ   }
+    int   Q_sign   = LEQ;     // { LEQ, GEQ   }
+    int   L_mode   = IS_NOT;  // { IS, IS_NOT }
+    int   mode     = AND;     // { AND, OR    }
 }
 SlicerState;
 

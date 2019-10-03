@@ -49,6 +49,8 @@ namespace bg = boost::geometry;
 typedef   bg::model::point<double,3,bg::cs::cartesian> Point;
 typedef   bg::model::segment<Point>                    Segment2D;
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 bool segment2D_intersection(const vec2d        & s0_beg,
                             const vec2d        & s0_end,
@@ -72,6 +74,7 @@ bool segment2D_intersection(const vec2d        & s0_beg,
     return !inters.empty();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool line_triangle_intersection(const Line  & l,
@@ -94,6 +97,8 @@ bool line_triangle_intersection(const Line  & l,
     return false;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 bool ray_triangle_intersection(const Ray   & r,
                                const vec3d & V0,
@@ -112,6 +117,7 @@ bool ray_triangle_intersection(const Ray   & r,
     return false;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool least_squares_intersection(const std::vector<Plane> & planes, vec3d & inters)
@@ -141,6 +147,7 @@ bool least_squares_intersection(const std::vector<Plane> & planes, vec3d & inter
     return true;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool intersection(const Ray & r, const Segment & s, vec3d & inters, const double tol)
@@ -156,7 +163,7 @@ bool intersection(const Ray & r, const Segment & s, vec3d & inters, const double
 
     least_squares_intersection(planes, inters);
 
-    if (s.dist_to_point(inters) < tol && r.dist_to_point(inters) < tol) return true;
+    if (s.dist(inters) < tol && r.dist(inters) < tol) return true;
     return false;
 }
 

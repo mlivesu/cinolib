@@ -33,59 +33,90 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SEGMENT_H
-#define CINO_SEGMENT_H
+#include "drawable_octree.h"
 
-#include <iostream>
-#include <cinolib/geometry/spatial_data_structure_item.h>
+#ifdef __APPLE__
+#include <gl.h>
+#include <glu.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 
 namespace cinolib
 {
 
-class Segment : public SpatialDataStructureItem
-{
-    public:
-
-        Segment(const vec3d & v0,
-                const vec3d & v1) : v0(v0), v1(v1) {}
-
-        Segment(const std::pair<vec3d,vec3d> & p) : v0(p.first), v1(p.second) {}
-
-        ~Segment() {}
-
-        // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
-
-        ItemType item_type() const;
-        AABB     aabb() const;
-        vec3d    point_closest_to(const vec3d & p) const;
-        bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
-        void     barycentric_coordinates(const vec3d & p, double bc[]) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d v0, v1;
-};
-
 CINO_INLINE
-std::ostream & operator<<(std::ostream & in, const Segment & s);
-
-// OLD!!!
-//class Segment : public std::pair<vec3d,vec3d>
-//{
-//    public:
-//        explicit Segment(const vec3d & P0, const vec3d & P1);
-//        std::vector<Plane> to_planes() const;
-//        vec3d dir() const;
-//        double operator[](const vec3d & p) const;
-//        vec3d project_onto(const vec3d & p) const;
-//        double dist_to_point(const vec3d & p) const;
-//        bool is_in_between(const vec3d & p) const;
-//};
-
+DrawableOctree::DrawableOctree(const uint max_depth,
+                                  const uint items_per_leaf)
+: Octree(max_depth, items_per_leaf)
+{
+    updateGL();
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "segment.cpp"
-#endif
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-#endif // CINO_SEGMENT_H
+CINO_INLINE
+void DrawableOctree::draw(const float ) const
+{
+    for(auto obj : render_list) obj.draw();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d DrawableOctree::scene_center() const
+{
+    if(this->root==nullptr) return vec3d(0,0,0);
+    return this->root->bbox.center();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+float DrawableOctree::scene_radius() const
+{
+    if(this->root==nullptr) return 0.0;
+    return this->root->bbox.diag();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableOctree::updateGL()
+{
+    render_list.clear();
+    if(this->root==nullptr) return;
+    updateGL(this->root);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableOctree::updateGL(const OctreeNode *node)
+{
+    render_list.push_back(DrawableAABB(node->bbox.min, node->bbox.max));
+    if(node->is_inner)
+    {
+        assert(node->item_ids.empty());
+        for(int i=0; i<8; ++i) updateGL(node->children[i]);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableOctree::set_color(const Color & c)
+{
+    for(auto & obj : render_list) obj.set_color(c);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableOctree::set_thickness(float t)
+{
+    for(auto & obj : render_list) obj.set_thickness(t);
+}
+
+}

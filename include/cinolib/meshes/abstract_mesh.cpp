@@ -689,6 +689,16 @@ ipair AbstractMesh<M,V,E,P>::edge_vert_ids(const uint eid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+std::pair<vec3d,vec3d> AbstractMesh<M,V,E,P>::edge_verts(const uint eid) const
+{
+    return std::make_pair(this->edge_vert(eid,0),
+                          this->edge_vert(eid,1));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 int AbstractMesh<M,V,E,P>::edge_id(const uint vid0, const uint vid1) const
 {
     assert(vid0 != vid1);
@@ -1220,6 +1230,15 @@ void AbstractMesh<M,V,E,P>::poly_apply_label(const int label)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+AABB AbstractMesh<M,V,E,P>::poly_aabb(const uint pid) const
+{
+    return AABB(poly_verts(pid));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractMesh<M,V,E,P>::edge_apply_labels(const std::vector<int> & labels)
 {
     assert(labels.size() == this->num_edges());
@@ -1297,7 +1316,10 @@ CINO_INLINE
 uint AbstractMesh<M,V,E,P>::pick_poly(const vec3d & p) const
 {
     std::vector<std::pair<double,uint>> closest;
-    for(uint pid=0; pid<this->num_polys(); ++pid) closest.push_back(std::make_pair(this->poly_centroid(pid).dist(p),pid));
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        if(this->poly_data(pid).visible) closest.push_back(std::make_pair(this->poly_centroid(pid).dist(p),pid));
+    }
     std::sort(closest.begin(), closest.end());
     return closest.front().second;
 }

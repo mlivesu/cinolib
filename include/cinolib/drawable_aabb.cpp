@@ -33,59 +33,99 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SEGMENT_H
-#define CINO_SEGMENT_H
+#include "drawable_aabb.h"
 
-#include <iostream>
-#include <cinolib/geometry/spatial_data_structure_item.h>
+#ifdef __APPLE__
+#include <gl.h>
+#include <glu.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 
 namespace cinolib
 {
 
-class Segment : public SpatialDataStructureItem
-{
-    public:
-
-        Segment(const vec3d & v0,
-                const vec3d & v1) : v0(v0), v1(v1) {}
-
-        Segment(const std::pair<vec3d,vec3d> & p) : v0(p.first), v1(p.second) {}
-
-        ~Segment() {}
-
-        // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
-
-        ItemType item_type() const;
-        AABB     aabb() const;
-        vec3d    point_closest_to(const vec3d & p) const;
-        bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
-        void     barycentric_coordinates(const vec3d & p, double bc[]) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d v0, v1;
-};
-
 CINO_INLINE
-std::ostream & operator<<(std::ostream & in, const Segment & s);
-
-// OLD!!!
-//class Segment : public std::pair<vec3d,vec3d>
-//{
-//    public:
-//        explicit Segment(const vec3d & P0, const vec3d & P1);
-//        std::vector<Plane> to_planes() const;
-//        vec3d dir() const;
-//        double operator[](const vec3d & p) const;
-//        vec3d project_onto(const vec3d & p) const;
-//        double dist_to_point(const vec3d & p) const;
-//        bool is_in_between(const vec3d & p) const;
-//};
-
+DrawableAABB::DrawableAABB(const vec3d min, const vec3d max)
+    : AABB(min, max)
+{
+    verts = this->corners();
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "segment.cpp"
-#endif
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-#endif // CINO_SEGMENT_H
+CINO_INLINE
+DrawableAABB::DrawableAABB(const std::vector<vec3d> &p_list, const double scaling_factor)
+    : AABB(p_list, scaling_factor)
+{
+    verts = this->corners();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+DrawableAABB::DrawableAABB(const std::vector<AABB> &b_list, const double scaling_factor)
+    : AABB(b_list, scaling_factor)
+{
+    verts = this->corners();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableAABB::draw(const float ) const
+{
+    glLineWidth(thickness);
+    glDisable(GL_LIGHTING);
+    glColor3fv(color.rgba);
+    glBegin(GL_LINES);
+        glVertex3dv(verts.at(0).ptr()); glVertex3dv(verts.at(1).ptr());
+        glVertex3dv(verts.at(0).ptr()); glVertex3dv(verts.at(3).ptr());
+        glVertex3dv(verts.at(0).ptr()); glVertex3dv(verts.at(4).ptr());
+        glVertex3dv(verts.at(1).ptr()); glVertex3dv(verts.at(2).ptr());
+        glVertex3dv(verts.at(1).ptr()); glVertex3dv(verts.at(5).ptr());
+        glVertex3dv(verts.at(2).ptr()); glVertex3dv(verts.at(3).ptr());
+        glVertex3dv(verts.at(2).ptr()); glVertex3dv(verts.at(6).ptr());
+        glVertex3dv(verts.at(3).ptr()); glVertex3dv(verts.at(7).ptr());
+        glVertex3dv(verts.at(4).ptr()); glVertex3dv(verts.at(5).ptr());
+        glVertex3dv(verts.at(4).ptr()); glVertex3dv(verts.at(7).ptr());
+        glVertex3dv(verts.at(5).ptr()); glVertex3dv(verts.at(6).ptr());
+        glVertex3dv(verts.at(6).ptr()); glVertex3dv(verts.at(7).ptr());
+    glEnd();
+    glEnable(GL_LIGHTING);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d DrawableAABB::scene_center() const
+{
+    return this->center();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+float DrawableAABB::scene_radius() const
+{
+    return this->diag();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableAABB::set_color(const Color & c)
+{
+    color = c;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableAABB::set_thickness(float t)
+{
+    thickness = t;
+}
+
+}

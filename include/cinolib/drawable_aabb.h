@@ -33,59 +33,53 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_INTERSECTION_H
-#define CINO_INTERSECTION_H
+#ifndef CINO_DRAWABLE_AABB_H
+#define CINO_DRAWABLE_AABB_H
 
-#include <vector>
-#include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec2.h>
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/geometry/plane.h>
-#include <cinolib/geometry/line.h>
-#include <cinolib/geometry/ray.h>
-#include <cinolib/geometry/segment.h>
+#include <cinolib/drawable_object.h>
+#include <cinolib/geometry/aabb.h>
+#include <cinolib/color.h>
 
 namespace cinolib
 {
 
-CINO_INLINE
-bool segment2D_intersection(const vec2d        & s0_beg,
-                            const vec2d        & s0_end,
-                            const vec2d        & s1_beg,
-                            const vec2d        & s1_end,
-                            std::vector<vec2d> & inters);
+class DrawableAABB : public AABB, public DrawableObject
+{
+    public:
 
+        explicit DrawableAABB(const vec3d min = vec3d( inf_double,  inf_double,  inf_double),
+                              const vec3d max = vec3d(-inf_double, -inf_double, -inf_double));
+        explicit DrawableAABB(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0);
+        explicit DrawableAABB(const std::vector<AABB>  & b_list, const double scaling_factor = 1.0);
 
-CINO_INLINE
-bool line_triangle_intersection(const Line  & l,
-                                const vec3d & V0,
-                                const vec3d & V1,
-                                const vec3d & V2,
-                                      vec3d & inters,
-                                const double  tol = 1e-5);
+        ~DrawableAABB() {}
 
-CINO_INLINE
-bool ray_triangle_intersection(const Ray   & r,
-                               const vec3d & V0,
-                               const vec3d & V1,
-                               const vec3d & V2,
-                                     vec3d & inters,
-                               const double  tol = 1e-5);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-CINO_INLINE
-bool least_squares_intersection(const std::vector<Plane> & planes,
-                                      vec3d              & inters);
+        void  draw(const float scene_size=1) const;
+        vec3d scene_center() const;
+        float scene_radius() const;
 
-CINO_INLINE
-bool intersection(const Ray     & r,
-                  const Segment & s,
-                        vec3d   & inters,
-                  const double    tol = 1e-7);
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        ObjectType object_type() const { return DRAWABLE_CURVE; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void set_color(const Color & c);
+        void set_thickness(float t);
+
+    private:
+
+        std::vector<vec3d> verts;
+        Color color = Color::BLACK();
+        float thickness = 1.0;
+};
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "intersection.cpp"
+#include "drawable_aabb.cpp"
 #endif
 
-#endif // CINO_INTERSECTION_H
+#endif // CINO_DRAWABLE_AABB_H

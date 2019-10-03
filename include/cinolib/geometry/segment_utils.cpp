@@ -33,80 +33,9 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_POLYGON_H
-#define CINO_POLYGON_H
-
-#include <vector>
-#include <sys/types.h>
-#include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/geometry/vec2.h>
-
-/*
- * Utilities for convex or concave, simply connected, non self-intersecting polygons
-*/
+#include <cinolib/geometry/segment_utils.h>
 
 namespace cinolib
 {
 
-CINO_INLINE
-double polygon_signed_area(const std::vector<vec2d> & poly);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double polygon_unsigned_area(const std::vector<vec2d> & poly);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double polygon_is_CCW(const std::vector<vec2d> & poly);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double polygon_is_convex(const std::vector<vec2d> & poly);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-vec3d polygon_normal(const std::vector<vec3d> & poly);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// project the polygon onto its best fitting plane,
-// align with XY, and drop Z coordinate
-//
-// NOTE: flattening does not preserve winding!
-//
-CINO_INLINE
-bool polygon_flatten(const std::vector<vec3d> & poly3d,
-                           std::vector<vec2d> & poly2d);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// Implementation of the ear-cut triangulation algorithm
-//
-CINO_INLINE
-bool polygon_triangulate(std::vector<vec2d> & poly, std::vector<uint> & tris);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool polygon_triangulate(std::vector<vec3d> & poly, std::vector<uint> & tris);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// This is the fundamental building block of the ear cut algorithm for polygon triangulation
-// http://cgm.cs.mcgill.ca/~godfried/teaching/cg-projects/97/Ian/algorithm1.html
-//
-CINO_INLINE
-int polygon_find_ear(const std::vector<vec2d> & poly);
-
 }
-
-#ifndef  CINO_STATIC_LIB
-#include "polygon.cpp"
-#endif
-
-#endif // CINO_POLYGON_H

@@ -33,59 +33,66 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SEGMENT_H
-#define CINO_SEGMENT_H
+#ifndef CINO_INTERSECTION_H
+#define CINO_INTERSECTION_H
 
-#include <iostream>
-#include <cinolib/geometry/spatial_data_structure_item.h>
+#include <vector>
+#include <cinolib/cino_inline.h>
+#include <cinolib/geometry/vec2.h>
+#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/plane.h>
+#include <cinolib/geometry/line.h>
+#include <cinolib/geometry/ray.h>
+#include <cinolib/geometry/segment.h>
 
 namespace cinolib
 {
 
-class Segment : public SpatialDataStructureItem
-{
-    public:
+CINO_INLINE
+bool segment2D_intersection(const vec2d        & s0_beg,
+                            const vec2d        & s0_end,
+                            const vec2d        & s1_beg,
+                            const vec2d        & s1_end,
+                            std::vector<vec2d> & inters);
 
-        Segment(const vec3d & v0,
-                const vec3d & v1) : v0(v0), v1(v1) {}
-
-        Segment(const std::pair<vec3d,vec3d> & p) : v0(p.first), v1(p.second) {}
-
-        ~Segment() {}
-
-        // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
-
-        ItemType item_type() const;
-        AABB     aabb() const;
-        vec3d    point_closest_to(const vec3d & p) const;
-        bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
-        void     barycentric_coordinates(const vec3d & p, double bc[]) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d v0, v1;
-};
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::ostream & operator<<(std::ostream & in, const Segment & s);
+bool line_triangle_intersection(const Line  & l,
+                                const vec3d & V0,
+                                const vec3d & V1,
+                                const vec3d & V2,
+                                      vec3d & inters,
+                                const double  tol = 1e-5);
 
-// OLD!!!
-//class Segment : public std::pair<vec3d,vec3d>
-//{
-//    public:
-//        explicit Segment(const vec3d & P0, const vec3d & P1);
-//        std::vector<Plane> to_planes() const;
-//        vec3d dir() const;
-//        double operator[](const vec3d & p) const;
-//        vec3d project_onto(const vec3d & p) const;
-//        double dist_to_point(const vec3d & p) const;
-//        bool is_in_between(const vec3d & p) const;
-//};
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool ray_triangle_intersection(const Ray   & r,
+                               const vec3d & V0,
+                               const vec3d & V1,
+                               const vec3d & V2,
+                                     vec3d & inters,
+                               const double  tol = 1e-5);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool least_squares_intersection(const std::vector<Plane> & planes,
+                                      vec3d              & inters);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool intersection(const Ray     & r,
+                  const Segment & s,
+                        vec3d   & inters,
+                  const double    tol = 1e-7);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "segment.cpp"
+#include "intersection.cpp"
 #endif
 
-#endif // CINO_SEGMENT_H
+#endif // CINO_INTERSECTION_H

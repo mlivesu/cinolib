@@ -33,167 +33,110 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/geometry/segment.h>
+#ifndef CINO_TRIANGLE_UTILS_H
+#define CINO_TRIANGLE_UTILS_H
+
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
 
-CINO_INLINE
-std::ostream & operator<<(std::ostream & in, const Segment & s)
-{
-    in << s.v0 << "\t" << s.v1 << "\n";
-    return in;
-}
-
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// Real Time Collision Detection", Section 5.1.2
-CINO_INLINE
-vec3d Segment::point_closest_to(const vec3d & p) const
-{
-    vec3d u = v1 - v0;
-
-    // project p onto v0v1, but deferring divide by dot(u,u)
-    double t =(p-v0).dot(u);
-    if(t<=0) return v0;
-
-    double den = u.dot(u);
-    if(t>=den) return v1;
-
-    t = t/den;
-    return v0 + t*u;
-}
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-ItemType Segment::item_type() const
-{
-    return SEGMENT;
-}
+vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class vec>
+CINO_INLINE
+double triangle_area(const vec A, const vec B, const vec C);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Given a triangle t(A,B,C) and a ray r(P,dir) compute both
+// the edge and position where r exits from t
+//
+// NOTE: r is assumed to live "within" t, like in a gradient field for example...
+//
+CINO_INLINE
+void triangle_traverse_with_ray(const vec3d   tri[3],
+                                const vec3d   P,
+                                const vec3d   dir,
+                                      vec3d & exit_pos,
+                                      uint  & exit_edge);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// https://en.wikipedia.org/wiki/Law_of_sines
+//
+CINO_INLINE
+double triangle_law_of_sines(const double angle_0,
+                             const double angle_1,
+                             const double length_0); // returns length_1
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class vec>
+CINO_INLINE
+bool triangle_barycentric_coords(const vec & A,
+                                 const vec & B,
+                                 const vec & C,
+                                 const vec & P,
+                                 std::vector<double> & wgts,
+                                 const double   tol = 1e-10);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class vec>
+CINO_INLINE
+bool triangle_point_is_inside(const vec    & A,
+                              const vec    & B,
+                              const vec    & C,
+                              const vec    & P,
+                              const double   tol = 1e-10);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-AABB Segment::aabb() const
-{
-    return AABB({v0, v1});
-}
+bool triangle_bary_is_vertex(const std::vector<double> & bary,
+                             uint                      & vid, // 0,1,2
+                             const double                tol = 1e-10);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Segment::intersects_ray(const vec3d & /*p*/, const vec3d & /*dir*/, double & /*t*/, vec3d & /*pos*/) const
-{
-    assert(false && "TODO");
-    return true;
-}
+bool triangle_bary_is_edge(const std::vector<double> & bary,
+                           uint                      & eid, // 0,1,2 (see TRI_EDGES)
+                           const double              tol = 1e-10);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Segment::barycentric_coordinates(const vec3d & p, double bc[]) const
-{
-    assert(contains(p));
+vec3d triangle_closest_point(const vec3d & P,
+                             const vec3d & A,
+                             const vec3d & B,
+                             const vec3d & C);
 
-    vec3d  u = v1 - v0;
-    double t = (p-v0).dot(u);
-    bc[1] = t / u.length();
-    bc[0] = 1.0 - bc[0];
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double point_to_triangle_dist(const vec3d & P,
+                              const vec3d & A,
+                              const vec3d & B,
+                              const vec3d & C);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double point_to_triangle_dist_sqrd(const vec3d & P,
+                                   const vec3d & A,
+                                   const vec3d & B,
+                                   const vec3d & C);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifndef  CINO_STATIC_LIB
+#include "triangle_utils.cpp"
+#endif
 
-//CINO_INLINE
-//vec3d Segment::project_onto(const vec3d &p) const
-//{
-//    vec3d v = second - first;
-//    vec3d w = p  - first;
-
-//    float cos_wv = w.dot(v);
-//    float cos_vv = v.dot(v);
-
-//    if (cos_wv <= 0.0)    return first;
-//    if (cos_vv <= cos_wv) return second;
-
-//    float b  = cos_wv / cos_vv;
-//    vec3d Pb = first + v*b;
-
-//    return Pb;
-//}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-//CINO_INLINE
-//double Segment::dist_to_point(const vec3d & p) const
-//{
-//    return p.dist(project_onto(p));
-//}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-//CINO_INLINE
-//bool Segment::is_in_between(const vec3d &p) const
-//{
-//    vec3d v = second - first;
-//    vec3d w = p  - first;
-
-//    float cos_wv = w.dot(v);
-//    float cos_vv = v.dot(v);
-
-//    if (cos_wv <= 0.0)    return false;
-//    if (cos_vv <= cos_wv) return false;
-//    return true;
-//}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-//CINO_INLINE
-//std::vector<Plane> Segment::to_planes() const
-//{
-//    vec3d d = dir();
-
-//    vec3d n0(-d.y(),  d.x(),     0);
-//    vec3d n1(-d.z(),      0, d.x());
-//    vec3d n2(     0, -d.z(), d.y());
-
-//    std::vector<Plane> planes;
-//    if(n0.length() > 0) planes.push_back(Plane(first, n0));
-//    if(n1.length() > 0) planes.push_back(Plane(first, n1));
-//    if(n2.length() > 0) if (planes.size() < 2) planes.push_back(Plane(first, n2));
-//    assert(planes.size()==2);
-
-//    return planes;
-//}
-
-////::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-//CINO_INLINE
-//vec3d Segment::dir() const
-//{
-//    vec3d d = first-second;
-//    d.normalize();
-//    return d;
-//}
-
-////::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-//// Real Time Collision Detection", Section 5.1.2
-//CINO_INLINE
-//double Segment::dist_sqrd(const vec3d & p) const
-//{
-//    vec3d u = v1 - v0;
-//    vec3d v =  p - v0;
-//    vec3d w =  p - v1;
-
-//    double e = v.dot(u);
-//    if(e<=0.0f) return v.dot(v);
-
-//    double f = u.dot(u);
-//    if(e>=f) return w.dot(w);
-
-//    return v.dot(v) - e*e/f;
-//}
-
-}
+#endif // CINO_TRIANGLE_UTILS_H

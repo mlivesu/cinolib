@@ -33,9 +33,9 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/geometry/polygon.h>
+#include <cinolib/geometry/polygon_utils.h>
 #include <cinolib/geometry/plane.h>
-#include <cinolib/geometry/triangle.h>
+#include <cinolib/geometry/triangle_utils.h>
 #include <cinolib/Shewchuk_predicates.h>
 
 namespace cinolib
@@ -149,7 +149,7 @@ int polygon_find_ear(const std::vector<vec2d> & poly)
         vec2d B = poly.at(curr);
         vec2d C = poly.at(next);
 
-        if (orient2d(A, B, C) > 0) // left turn => convex corner
+        if(orient2d(A, B, C) > 0) // left turn => convex corner
         {
             bool contains_other_point = false;
             for(uint j=0; j<poly.size(); ++j)

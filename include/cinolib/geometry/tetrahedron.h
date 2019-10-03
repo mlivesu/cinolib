@@ -36,42 +36,38 @@
 #ifndef CINO_TETRAHEDRON_H
 #define CINO_TETRAHEDRON_H
 
-#include <vector>
-#include <sys/types.h>
-#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/spatial_data_structure_item.h>
 
 namespace cinolib
 {
 
-CINO_INLINE
-bool tet_barycentric_coords(const vec3d & A,
-                            const vec3d & B,
-                            const vec3d & C,
-                            const vec3d & D,
-                            const vec3d & P,
-                            std::vector<double> & wgts,
-                            const double  tol = 1e-5);
+class Tetrahedron : public SpatialDataStructureItem
+{
+    public:
 
+        Tetrahedron(const std::vector<vec3d> v) : v0(v.at(0)), v1(v.at(1)), v2(v.at(2)), v3(v.at(3)) {}
 
-CINO_INLINE
-void tet_closest_vertex(const vec3d  & A,
-                        const vec3d  & B,
-                        const vec3d  & C,
-                        const vec3d  & D,
-                        const vec3d  & query,
-                              uint   & id,
-                              double & dist);
+        Tetrahedron(const vec3d & v0,
+                    const vec3d & v1,
+                    const vec3d & v2,
+                    const vec3d & v3) : v0(v0), v1(v1), v2(v2), v3(v3) {}
 
+       ~Tetrahedron() {}
 
-CINO_INLINE
-void tet_closest_edge(const vec3d  & A,
-                      const vec3d  & B,
-                      const vec3d  & C,
-                      const vec3d  & D,
-                      const vec3d  & query,
-                            uint   & id,
-                            double & dist);
+        // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
+
+        ItemType item_type() const;
+        AABB     aabb() const;
+        vec3d    point_closest_to(const vec3d & p) const;
+        bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
+        void     barycentric_coordinates(const vec3d & p, double bc[]) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        vec3d v0, v1, v2, v3;
+};
+
 }
 
 #ifndef  CINO_STATIC_LIB
