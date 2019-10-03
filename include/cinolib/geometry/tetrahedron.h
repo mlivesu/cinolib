@@ -84,6 +84,7 @@ bool tet_barycentric_coords(const vec3d & A,
 // is closest to P. This code was taken directly from Ericson's seminal
 // book "Real Time Collision Detection", Section 5.1.6
 //
+CINO_INLINE
 vec3d tetrahedron_closest_point(const vec3d & P,
                                 const vec3d & A,
                                 const vec3d & B,
