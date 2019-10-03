@@ -36,12 +36,10 @@
 #ifndef CINO_TRIANGLE_H
 #define CINO_TRIANGLE_H
 
-#include <vector>
-#include <sys/types.h>
-#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/bbox.h>
 #include <cinolib/geometry/spatial_data_structure_item.h>
+#include <cinolib/geometry/triangle_utils.h>
 
 namespace cinolib
 {
@@ -51,7 +49,11 @@ class Triangle : public SpatialDataStructureItem
     public:
 
         Triangle(const std::vector<vec3d> v) : v0(v.at(0)), v1(v.at(1)), v2(v.at(2)) {}
-        Triangle(const vec3d & v0, const vec3d & v1, const vec3d & v2) : v0(v0), v1(v1), v2(v2) {}
+
+        Triangle(const vec3d & v0,
+                 const vec3d & v1,
+                 const vec3d & v2) : v0(v0), v1(v1), v2(v2) {}
+
        ~Triangle() {}
 
         // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
@@ -67,98 +69,6 @@ class Triangle : public SpatialDataStructureItem
         vec3d v0, v1, v2;
 };
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class vec>
-CINO_INLINE
-double triangle_area(const vec A, const vec B, const vec C);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// Given a triangle t(A,B,C) and a ray r(P,dir) compute both
-// the edge and position where r exits from t
-//
-// NOTE: r is assumed to live "within" t, like in a gradient field for example...
-//
-CINO_INLINE
-void triangle_traverse_with_ray(const vec3d   tri[3],
-                                const vec3d   P,
-                                const vec3d   dir,
-                                      vec3d & exit_pos,
-                                      uint  & exit_edge);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// https://en.wikipedia.org/wiki/Law_of_sines
-//
-CINO_INLINE
-double triangle_law_of_sines(const double angle_0,
-                             const double angle_1,
-                             const double length_0); // returns length_1
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class vec>
-CINO_INLINE
-bool triangle_barycentric_coords(const vec & A,
-                                 const vec & B,
-                                 const vec & C,
-                                 const vec & P,
-                                 std::vector<double> & wgts,
-                                 const double   tol = 1e-10);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class vec>
-CINO_INLINE
-bool triangle_point_is_inside(const vec    & A,
-                              const vec    & B,
-                              const vec    & C,
-                              const vec    & P,
-                              const double   tol = 1e-10);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool triangle_bary_is_vertex(const std::vector<double> & bary,
-                             uint                      & vid, // 0,1,2
-                             const double                tol = 1e-10);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool triangle_bary_is_edge(const std::vector<double> & bary,
-                           uint                      & eid, // 0,1,2 (see TRI_EDGES)
-                           const double              tol = 1e-10);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-vec3d triangle_closest_point(const vec3d & P,
-                             const vec3d & A,
-                             const vec3d & B,
-                             const vec3d & C);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double point_to_triangle_dist(const vec3d & P,
-                              const vec3d & A,
-                              const vec3d & B,
-                              const vec3d & C);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double point_to_triangle_dist_sqrd(const vec3d & P,
-                                   const vec3d & A,
-                                   const vec3d & B,
-                                   const vec3d & C);
 }
 
 #ifndef  CINO_STATIC_LIB

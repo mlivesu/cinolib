@@ -38,7 +38,7 @@
 #include <cinolib/io/read_write.h>
 #include <cinolib/quality.h>
 #include <cinolib/stl_container_utilities.h>
-#include <cinolib/geometry/polygon.h>
+#include <cinolib/geometry/polygon_utils.h>
 #include <cinolib/vector_serialization.h>
 #include <unordered_set>
 #include <queue>

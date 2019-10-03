@@ -55,6 +55,7 @@ bool segment2D_intersection(const vec2d        & s0_beg,
                             const vec2d        & s1_end,
                             std::vector<vec2d> & inters);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool line_triangle_intersection(const Line  & l,
@@ -64,6 +65,8 @@ bool line_triangle_intersection(const Line  & l,
                                       vec3d & inters,
                                 const double  tol = 1e-5);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 bool ray_triangle_intersection(const Ray   & r,
                                const vec3d & V0,
@@ -72,9 +75,13 @@ bool ray_triangle_intersection(const Ray   & r,
                                      vec3d & inters,
                                const double  tol = 1e-5);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 bool least_squares_intersection(const std::vector<Plane> & planes,
                                       vec3d              & inters);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool intersection(const Ray     & r,

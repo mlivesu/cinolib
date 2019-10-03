@@ -33,69 +33,110 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/geometry/tetrahedron.h>
-#include <cinolib/geometry/tetrahedron_utils.h>
+#ifndef CINO_TRIANGLE_UTILS_H
+#define CINO_TRIANGLE_UTILS_H
+
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
-ItemType Tetrahedron::item_type() const
-{
-    return TETRAHEDRON;
-}
+vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class vec>
+CINO_INLINE
+double triangle_area(const vec A, const vec B, const vec C);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Given a triangle t(A,B,C) and a ray r(P,dir) compute both
+// the edge and position where r exits from t
+//
+// NOTE: r is assumed to live "within" t, like in a gradient field for example...
+//
+CINO_INLINE
+void triangle_traverse_with_ray(const vec3d   tri[3],
+                                const vec3d   P,
+                                const vec3d   dir,
+                                      vec3d & exit_pos,
+                                      uint  & exit_edge);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// https://en.wikipedia.org/wiki/Law_of_sines
+//
+CINO_INLINE
+double triangle_law_of_sines(const double angle_0,
+                             const double angle_1,
+                             const double length_0); // returns length_1
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class vec>
+CINO_INLINE
+bool triangle_barycentric_coords(const vec & A,
+                                 const vec & B,
+                                 const vec & C,
+                                 const vec & P,
+                                 std::vector<double> & wgts,
+                                 const double   tol = 1e-10);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class vec>
+CINO_INLINE
+bool triangle_point_is_inside(const vec    & A,
+                              const vec    & B,
+                              const vec    & C,
+                              const vec    & P,
+                              const double   tol = 1e-10);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Bbox Tetrahedron::aabb() const
-{
-    return Bbox({v0, v1, v2, v3});
-}
+bool triangle_bary_is_vertex(const std::vector<double> & bary,
+                             uint                      & vid, // 0,1,2
+                             const double                tol = 1e-10);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-vec3d Tetrahedron::point_closest_to(const vec3d & p) const
-{
-    return tetrahedron_closest_point(p,v0,v1,v2,v3);
-}
+bool triangle_bary_is_edge(const std::vector<double> & bary,
+                           uint                      & eid, // 0,1,2 (see TRI_EDGES)
+                           const double              tol = 1e-10);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Tetrahedron::intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const
-{
-    bool   backside;
-    bool   coplanar;
-    vec3d  bary;
-    double face_t[4];
-    if(!Moller_Trumbore_intersection(p, dir, v0, v2, v1, backside, coplanar, face_t[0], bary)) face_t[0] = inf_double;
-    if(!Moller_Trumbore_intersection(p, dir, v0, v1, v3, backside, coplanar, face_t[1], bary)) face_t[1] = inf_double;
-    if(!Moller_Trumbore_intersection(p, dir, v0, v3, v2, backside, coplanar, face_t[2], bary)) face_t[2] = inf_double;
-    if(!Moller_Trumbore_intersection(p, dir, v1, v2, v3, backside, coplanar, face_t[3], bary)) face_t[3] = inf_double;
-    double min_t = *std::min_element(face_t, face_t+4);
-    if(min_t!=inf_double)
-    {
-        t   = min_t;
-        pos = p + t*dir;
-        return true;
-    }
-    return false;
-}
+vec3d triangle_closest_point(const vec3d & P,
+                             const vec3d & A,
+                             const vec3d & B,
+                             const vec3d & C);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Tetrahedron::barycentric_coordinates(const vec3d &p, double bc[]) const
-{
-    std::vector<double> wgts;
-    tet_barycentric_coords(v0, v1, v2, v3, p, wgts, 0);
-    bc[0] = wgts[0];
-    bc[1] = wgts[1];
-    bc[2] = wgts[2];
-    bc[3] = wgts[3];
+double point_to_triangle_dist(const vec3d & P,
+                              const vec3d & A,
+                              const vec3d & B,
+                              const vec3d & C);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double point_to_triangle_dist_sqrd(const vec3d & P,
+                                   const vec3d & A,
+                                   const vec3d & B,
+                                   const vec3d & C);
 }
 
-}
+#ifndef  CINO_STATIC_LIB
+#include "triangle_utils.cpp"
+#endif
 
+#endif // CINO_TRIANGLE_UTILS_H

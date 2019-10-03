@@ -181,9 +181,9 @@ void polygon_maximum_inscribed_circle(const std::vector<vec2d> & poly,
             vec3d end(s.p1.x, s.p1.y, 0);
             vec3d c3d(v.x(),  v.y(),  0);
             cinolib::Segment tmp(beg,end);
-            double d = tmp.dist_to_point(c3d);
+            double d = tmp.dist(c3d);
 
-            if (d > radius)
+            if(d>radius)
             {
                 radius = d;
                 center = vec2d(c3d); // will automatically drop z

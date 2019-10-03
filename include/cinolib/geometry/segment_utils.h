@@ -33,59 +33,16 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SEGMENT_H
-#define CINO_SEGMENT_H
-
-#include <iostream>
-#include <cinolib/geometry/spatial_data_structure_item.h>
+#ifndef CINO_SEGMENT_UTILS_H
+#define CINO_SEGMENT_UTILS_H
 
 namespace cinolib
 {
 
-class Segment : public SpatialDataStructureItem
-{
-    public:
-
-        Segment(const vec3d & v0,
-                const vec3d & v1) : v0(v0), v1(v1) {}
-
-        Segment(const std::pair<vec3d,vec3d> & p) : v0(p.first), v1(p.second) {}
-
-        ~Segment() {}
-
-        // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
-
-        ItemType item_type() const;
-        Bbox     aabb() const;
-        vec3d    point_closest_to(const vec3d & p) const;
-        bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
-        void     barycentric_coordinates(const vec3d & p, double bc[]) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d v0, v1;
-};
-
-CINO_INLINE
-std::ostream & operator<<(std::ostream & in, const Segment & s);
-
-// OLD!!!
-//class Segment : public std::pair<vec3d,vec3d>
-//{
-//    public:
-//        explicit Segment(const vec3d & P0, const vec3d & P1);
-//        std::vector<Plane> to_planes() const;
-//        vec3d dir() const;
-//        double operator[](const vec3d & p) const;
-//        vec3d project_onto(const vec3d & p) const;
-//        double dist_to_point(const vec3d & p) const;
-//        bool is_in_between(const vec3d & p) const;
-//};
-
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "segment.cpp"
+#include "segment_utils.cpp"
 #endif
 
-#endif // CINO_SEGMENT_H
+#endif // CINO_SEGMENT_UTILS_H

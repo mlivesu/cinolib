@@ -35,7 +35,7 @@
 *********************************************************************************/
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/geometry/triangle.h>
-#include <cinolib/geometry/polygon.h>
+#include <cinolib/geometry/polygon_utils.h>
 #include <unordered_set>
 #include <unordered_map>
 #include <queue>

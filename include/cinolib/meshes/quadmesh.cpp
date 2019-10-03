@@ -36,7 +36,7 @@
 #include <cinolib/meshes/quadmesh.h>
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/geometry/plane.h>
-#include <cinolib/geometry/polygon.h>
+#include <cinolib/geometry/polygon_utils.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/stl_container_utilities.h>
 #include <cinolib/vector_serialization.h>
