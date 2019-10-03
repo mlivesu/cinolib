@@ -1316,7 +1316,10 @@ CINO_INLINE
 uint AbstractMesh<M,V,E,P>::pick_poly(const vec3d & p) const
 {
     std::vector<std::pair<double,uint>> closest;
-    for(uint pid=0; pid<this->num_polys(); ++pid) closest.push_back(std::make_pair(this->poly_centroid(pid).dist(p),pid));
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        if(this->poly_data(pid).visible) closest.push_back(std::make_pair(this->poly_centroid(pid).dist(p),pid));
+    }
     std::sort(closest.begin(), closest.end());
     return closest.front().second;
 }

@@ -150,6 +150,11 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        // useful for GUIs with mouse picking
+        uint pick_face(const vec3d & p) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
                 void               vert_switch_id            (const uint vid0, const uint vid1);
                 void               vert_remove               (const uint vid);
                 void               vert_remove_unreferenced  (const uint vid);

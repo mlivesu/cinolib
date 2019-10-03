@@ -2322,4 +2322,19 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_faces_id(const uint pi
     return this->adj_p2f(pid);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::pick_face(const vec3d & p) const
+{
+    std::vector<std::pair<double,uint>> closest;
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        if(this->face_data(fid).visible) closest.push_back(std::make_pair(this->face_centroid(fid).dist(p),fid));
+    }
+    std::sort(closest.begin(), closest.end());
+    return closest.front().second;
+}
+
 }
