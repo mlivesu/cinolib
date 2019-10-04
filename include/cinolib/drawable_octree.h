@@ -37,7 +37,7 @@
 #define CINO_DRAWABLE_OCTREE_H
 
 #include <cinolib/drawable_object.h>
-#include <cinolib/drawable_aabb.h>
+#include <cinolib/geometry/drawable_aabb.h>
 #include <cinolib/octree.h>
 
 namespace cinolib
