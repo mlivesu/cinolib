@@ -37,6 +37,7 @@
 #define CINO_SPATIAL_DATA_STRUCTURE_ITEM_H
 
 #include <cinolib/cino_inline.h>
+#include <vector>
 
 /* This interface must be implemented by any item that populates a spatial data structure
  * (e.g. Octree, BSP, AABB Tree, ...). These primitives are necessary to implement both the
@@ -79,7 +80,7 @@ namespace cinolib
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            virtual void barycentric_coordinates(const vec3<double> & p, double bc[]) const = 0;
+            virtual void barycentric_coordinates(const vec3<double> & p, std::vector<double> & bc) const = 0;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

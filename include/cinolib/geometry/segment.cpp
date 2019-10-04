@@ -93,12 +93,13 @@ bool Segment::intersects_ray(const vec3d & /*p*/, const vec3d & /*dir*/, double 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Segment::barycentric_coordinates(const vec3d & p, double bc[]) const
+void Segment::barycentric_coordinates(const vec3d & p, std::vector<double> & bc) const
 {
     assert(contains(p));
 
     vec3d  u = v1 - v0;
     double t = (p-v0).dot(u);
+    bc.resize(2);
     bc[1] = t / u.length();
     bc[0] = 1.0 - bc[0];
 }

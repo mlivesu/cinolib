@@ -38,6 +38,7 @@
 
 #include <iostream>
 #include <cinolib/geometry/spatial_data_structure_item.h>
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
@@ -59,7 +60,7 @@ class Segment : public SpatialDataStructureItem
         AABB     aabb() const;
         vec3d    point_closest_to(const vec3d & p) const;
         bool     intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const;
-        void     barycentric_coordinates(const vec3d & p, double bc[]) const;
+        void     barycentric_coordinates(const vec3d & p, std::vector<double> & bc) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

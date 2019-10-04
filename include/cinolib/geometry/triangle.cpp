@@ -80,13 +80,9 @@ bool Triangle::intersects_ray(const vec3d & p, const vec3d & dir, double & t, ve
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Triangle::barycentric_coordinates(const vec3d & p, double bc[]) const
+void Triangle::barycentric_coordinates(const vec3d & p, std::vector<double> & bc) const
 {
-    std::vector<double> wgts;
-    triangle_barycentric_coords(v0, v1, v2, p, wgts, 0);
-    bc[0] = wgts[0];
-    bc[1] = wgts[1];
-    bc[2] = wgts[2];
+    triangle_barycentric_coords(v0, v1, v2, p, bc, 0);
 }
 
 }
