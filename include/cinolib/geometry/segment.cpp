@@ -78,7 +78,7 @@ ItemType Segment::item_type() const
 CINO_INLINE
 AABB Segment::aabb() const
 {
-    return AABB({v0, v1});
+    return AABB(v0, v1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
