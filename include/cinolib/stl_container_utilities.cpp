@@ -36,6 +36,7 @@
 #include <cinolib/stl_container_utilities.h>
 #include <algorithm>
 #include <numeric>
+#include <random>
 
 namespace cinolib
 {
@@ -124,7 +125,7 @@ CINO_INLINE
 void SORT_VEC(std::vector<T> & vec, const bool biggest_first)
 {
     std::sort(vec.begin(), vec.end()); // ascending order (smallest first)
-    if (biggest_first) std::reverse(vec.begin(), vec.end());
+    if(biggest_first) std::reverse(vec.begin(), vec.end());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -208,5 +209,14 @@ void REVERSE_VEC(std::vector<T> & vec)
     std::reverse(vec.begin(), vec.end());
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void SHUFFLE_VEC(std::vector<T> & vec, const unsigned seed)
+{
+    // randomize points (http://www.cplusplus.com/reference/algorithm/shuffle/)
+    std::shuffle(vec.begin(), vec.end(), std::default_random_engine(seed));
+}
 
 }

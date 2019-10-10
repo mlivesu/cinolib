@@ -37,6 +37,7 @@
 #define CINO_STL_CONTAINER_UTILITIES
 
 #include <vector>
+#include <chrono>
 #include <cinolib/cino_inline.h>
 
 namespace cinolib
@@ -131,6 +132,12 @@ void CIRCULAR_SHIFT_VEC(std::vector<T> & vec, const T & new_first_elem);
 template<typename T>
 CINO_INLINE
 void REVERSE_VEC(std::vector<T> & vec);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void SHUFFLE_VEC(std::vector<T> & vec, const unsigned seed = std::chrono::system_clock::now().time_since_epoch().count());
 
 }
 
