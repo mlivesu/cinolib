@@ -227,11 +227,7 @@ void render(const RenderData & data)
 //    initInverseMaterial();
 
     // http://www.bluevoid.com/opengl/sig00/advanced00/notes/node107.html
-#ifdef __linux__
     static const GLclampd EDGE_OFFSET = 0.001;
-#else
-    static const GLclampd EDGE_OFFSET = 0.00001;
-#endif
 
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glEnable(GL_DEPTH_TEST);
