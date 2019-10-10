@@ -56,7 +56,7 @@ DrawableSegmentSoup::DrawableSegmentSoup()
 CINO_INLINE
 void DrawableSegmentSoup::draw(const float scene_size) const
 {
-    if (!use_gl_lines)
+    if(!use_gl_lines)
     {
         float cylind_rad = scene_size * 0.002 * thickness;
 
@@ -70,6 +70,8 @@ void DrawableSegmentSoup::draw(const float scene_size) const
     else
     {
         glLineWidth(thickness);
+        glEnable(GL_LINE_SMOOTH);
+        glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
         glDisable(GL_LIGHTING);
         glColor3fv(color.rgba);
         for(uint i=0; i<size()/2; ++i)
@@ -83,6 +85,7 @@ void DrawableSegmentSoup::draw(const float scene_size) const
         }
         glColor3f(0,0,0);
         glEnable(GL_LIGHTING);
+        glDisable(GL_LINE_SMOOTH);
     }
 }
 
