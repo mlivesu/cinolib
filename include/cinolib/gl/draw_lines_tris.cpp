@@ -195,10 +195,12 @@ void render_segs(const RenderData & data)
 {
     if (data.draw_mode & DRAW_SEGS)
     {
+        glEnable(GL_LINE_SMOOTH);
+        glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
         glDisable(GL_LIGHTING);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
-        glDepthRange(0.0, 1.0);
+        //glDepthRange(0.0, 0.99);
         glDepthFunc(GL_LEQUAL);
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, data.seg_coords.data());
@@ -210,6 +212,7 @@ void render_segs(const RenderData & data)
         glDisableClientState(GL_VERTEX_ARRAY);
         glDepthFunc(GL_LESS);
         glEnable(GL_LIGHTING);
+        glDisable(GL_LINE_SMOOTH);
     }
 }
 
@@ -222,6 +225,9 @@ void render(const RenderData & data)
 //    setMultiLighting();
 //    initMaterial();
 //    initInverseMaterial();
+
+    // http://www.bluevoid.com/opengl/sig00/advanced00/notes/node107.html
+    static const GLclampd EDGE_OFFSET = 0.00001;
 
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -238,20 +244,21 @@ void render(const RenderData & data)
         {
             glEnable(GL_LIGHTING);
             glShadeModel(GL_SMOOTH);
-            glDepthRange(0.01, 1.0);
+            glDepthRange(EDGE_OFFSET, 1.0);
             render_tris(data);
         }
         else // default: FLAT shading
         {
             glEnable(GL_LIGHTING);
             glShadeModel(GL_SMOOTH); // flatness is given by input normals
-            glDepthRange(0.01, 1.0);
+            glDepthRange(EDGE_OFFSET, 1.0);
             render_tris(data);
         }
     }
 
     if (data.draw_mode & DRAW_SEGS)
     {
+        glDepthRange(0.0, 1.0-EDGE_OFFSET);
         render_segs(data);
     }
 }
