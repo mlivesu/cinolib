@@ -511,8 +511,19 @@ bool AbstractPolygonMesh<M,V,E,P>::poly_verts_are_CCW(const uint pid, const uint
 {
     uint prev_offset = this->poly_vert_offset(pid, prev);
     uint curr_offset = this->poly_vert_offset(pid, curr);
-    if (curr_offset == (prev_offset+1)%this->verts_per_poly(pid)) return true;
+    if(curr_offset == (prev_offset+1)%this->verts_per_poly(pid)) return true;
     return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool AbstractPolygonMesh<M,V,E,P>::edge_is_CCW(const uint eid, const uint pid) const
+{
+    uint vid0 = this->edge_vert_id(eid,0);
+    uint vid1 = this->edge_vert_id(eid,1);
+    return this->poly_verts_are_CCW(pid, vid1, vid0);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
