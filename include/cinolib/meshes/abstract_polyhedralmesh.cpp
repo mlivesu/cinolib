@@ -396,6 +396,46 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_verts_are_CCW(const uint fid, const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::face_split_along_new_edge(const uint fid, uint vid0, uint vid1)
+{
+    assert(this->face_contains_vert(fid, vid0));
+    assert(this->face_contains_vert(fid, vid1));
+    assert(!this->verts_are_adjacent(vid0, vid1));
+
+    if(!this->face_verts_are_CCW(fid, vid0, vid1)) std::swap(vid0, vid1);
+    auto f = this->face_verts_id(fid);
+    CIRCULAR_SHIFT_VEC(f, vid0);
+
+    size_t i=0;
+    std::vector<uint> f0,f1;
+    while(f.at(i)!=vid1) f0.push_back(f.at(i++));
+    while(i<f.size())    f1.push_back(f.at(i++));
+    f0.push_back(vid1);
+    f1.push_back(vid0);
+
+    uint fid0 = this->face_add(f0);
+    uint fid1 = this->face_add(f1);
+
+    std::vector<uint> to_remove;
+    for(uint pid : this->adj_f2p(fid))
+    {
+        to_remove.push_back(pid);
+        auto f   = this->poly_faces_id(pid);
+        auto w   = this->poly_faces_winding(pid);
+        uint off = this->poly_face_offset(pid, fid);
+        f.at(off) = fid0;
+        f.push_back(fid1);
+        w.push_back(w.at(off));
+        this->poly_add(f,w);
+    }
+
+    this->polys_remove(to_remove);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_verts_link(const uint vid) const
 {
     return this->adj_v2v(vid);
