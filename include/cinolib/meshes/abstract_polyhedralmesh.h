@@ -192,6 +192,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         std::vector<uint> edge_verts_link         (const uint eid) const;
         std::vector<uint> edge_edges_link         (const uint eid) const;
         std::vector<uint> edge_faces_link         (const uint eid) const;
+        uint               edge_split             (const uint eid, const vec3d & p);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -230,6 +231,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool              face_is_visible         (const uint fid, uint & pid_beneath) const;
                 void              face_apply_labels       (const std::vector<int> & labels);
                 void              face_apply_label        (const int label);
+                bool              face_verts_are_CCW      (const uint fid, const uint curr, const uint prev) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -265,6 +267,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool               poly_is_spherical           (const uint pid) const;
                 void               poly_export_element         (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const;
                 std::vector<uint>  poly_faces_id               (const uint pid, const bool sort_by_fid = false) const;
+                std::vector<bool>  poly_faces_winding          (const uint pid) const;
 
 };
 

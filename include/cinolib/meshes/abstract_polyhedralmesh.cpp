@@ -384,6 +384,18 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::face_apply_label(const int label)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::face_verts_are_CCW(const uint fid, const uint curr, const uint prev) const
+{
+    uint prev_offset = this->face_vert_offset(fid, prev);
+    uint curr_offset = this->face_vert_offset(fid, curr);
+    if(curr_offset == (prev_offset+1)%this->verts_per_face(fid)) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_verts_link(const uint vid) const
 {
     return this->adj_v2v(vid);
@@ -469,6 +481,47 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::edge_faces_link(const uint 
         }
     }
     return std::vector<uint>(f_link.begin(),f_link.end());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
+{
+    uint new_vid = this->vert_add(p);
+    uint v0      = this->edge_vert_id(eid, 0);
+    uint v1      = this->edge_vert_id(eid, 1);
+
+    // update the faces incident to eid
+    std::unordered_map<uint,uint> fmap;
+    for(uint fid : this->adj_e2f(eid))
+    {
+        auto f = this->face_verts_id(fid);
+        if(!this->face_verts_are_CCW(fid, v1, v0)) std::swap(v0,v1);
+        VEC_INSERT_AFTER(f, v1, new_vid);
+        uint new_fid = this->face_add(f);
+        fmap[fid] = new_fid;
+        this->face_data(new_fid) = this->face_data(fid);
+    }
+
+    // update the polys incident to eid
+    for(uint pid : this->adj_e2p(eid))
+    {
+        auto f = this->poly_faces_id(pid);
+        auto w = this->poly_faces_winding(pid);
+        for(auto & fid : f)
+        {
+            if(CONTAINS(fmap,fid)) fid = fmap.at(fid);
+        }
+        uint new_pid = this->poly_add(f,w);
+        this->poly_data(new_pid) = this->poly_data(pid);
+    }
+
+    // remove the old elements
+    this->edge_remove(eid);
+
+    return new_vid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -2320,6 +2373,15 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_faces_id(const uint pi
         return f_list;
     }
     return this->adj_p2f(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<bool> AbstractPolyhedralMesh<M,V,E,F,P>::poly_faces_winding(const uint pid) const
+{
+    return this->polys_face_winding.at(pid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
