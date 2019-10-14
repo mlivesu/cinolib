@@ -219,4 +219,15 @@ void SHUFFLE_VEC(std::vector<T> & vec, const unsigned seed)
     std::shuffle(vec.begin(), vec.end(), std::default_random_engine(seed));
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void VEC_INSERT_AFTER(std::vector<T> & vec, const T & ref_item, const T & new_item)
+{
+    auto pos = std::find(vec.begin(), vec.end(), ref_item);
+    assert(pos!=vec.end());
+    vec.insert(pos, new_item);
+}
+
 }

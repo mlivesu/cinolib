@@ -139,6 +139,12 @@ template<typename T>
 CINO_INLINE
 void SHUFFLE_VEC(std::vector<T> & vec, const unsigned seed = std::chrono::system_clock::now().time_since_epoch().count());
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void VEC_INSERT_AFTER(std::vector<T> & vec, const T & ref_item, const T & new_item);
+
 }
 
 #ifndef  CINO_STATIC_LIB
