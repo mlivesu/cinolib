@@ -386,8 +386,12 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_verts_are_CCW(const uint fid, const uint curr, const uint prev) const
 {
+    assert(face_contains_vert(fid, curr));
+    assert(face_contains_vert(fid, prev));
+
     uint prev_offset = this->face_vert_offset(fid, prev);
     uint curr_offset = this->face_vert_offset(fid, curr);
+
     if(curr_offset == (prev_offset+1)%this->verts_per_face(fid)) return true;
     return false;
 }
@@ -396,7 +400,7 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_verts_are_CCW(const uint fid, const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void AbstractPolyhedralMesh<M,V,E,F,P>::face_split_along_new_edge(const uint fid, uint vid0, uint vid1)
+uint AbstractPolyhedralMesh<M,V,E,F,P>::face_split_along_new_edge(const uint fid, uint vid0, uint vid1)
 {
     assert(this->face_contains_vert(fid, vid0));
     assert(this->face_contains_vert(fid, vid1));
@@ -430,6 +434,94 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::face_split_along_new_edge(const uint fid
     }
 
     this->polys_remove(to_remove);
+
+    return this->edge_id(vid0, vid1);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_split_along_new_face(const uint pid, const std::vector<uint> & f)
+{
+    for(uint vid : f) assert(this->poly_contains_vert(pid,vid));
+    uint new_fid = this->face_add(f);
+
+    // define the edge border
+    std::unordered_set<uint> border;
+    for(auto i=f.begin(),j=i+1; i<f.end(); ++i,++j)
+    {
+        if(j>=f.end()) j=f.begin();
+        int eid = this->edge_id(*i,*j);
+        assert(eid>=0);
+        assert(this->poly_contains_edge(pid,eid));
+        border.insert(eid);
+    }
+
+    // bipartition poly faces using the loop as boundary
+    uint seed = this->adj_p2f(pid).front();
+    std::unordered_set<uint> cluster;
+    cluster.insert(seed);
+    std::queue<uint> q;
+    q.push(seed);
+    while(!q.empty())
+    {
+        uint fid = q.front();
+        q.pop();
+
+        for(uint nbr : this->adj_f2f(fid))
+        {
+            if(!this->poly_contains_face(pid,nbr)) continue;
+
+            uint eid = this->face_shared_edge(fid,nbr);
+            if(CONTAINS(border,eid)) continue;
+
+            if(DOES_NOT_CONTAIN(cluster,nbr))
+            {
+                cluster.insert(nbr);
+                q.push(nbr);
+            }
+        }
+    }
+
+    std::vector<uint> p0, p1;
+    std::vector<bool> w0, w1;
+    for(uint fid : this->adj_p2f(pid))
+    {
+        if(CONTAINS(cluster,fid))
+        {
+            p0.push_back(fid);
+            w0.push_back(this->poly_face_winding(pid,fid));
+        }
+        else
+        {
+            p1.push_back(fid);
+            w1.push_back(this->poly_face_winding(pid,fid));
+        }
+    }
+    p0.push_back(new_fid);
+    w0.push_back(true);
+    p1.push_back(new_fid);
+    w1.push_back(false);
+
+    // fix winding
+    uint vid0 = f.at(0);
+    uint vid1 = f.at(1);
+    int  eid  = this->edge_id(vid0, vid1);
+    auto it   = cluster.begin();
+    while(!this->face_contains_edge(*it,eid)) ++it;
+    assert(this->face_contains_edge(*it,eid));
+    if(this->face_verts_are_CCW(*it, vid1, vid0))
+    {
+        w0.back() = false;
+        w1.back() = true;
+    }
+
+    this->poly_add(p0, w0);
+    this->poly_add(p1, w1);
+    this->poly_remove(pid);
+
+    return new_fid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -673,6 +765,17 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_flip_winding(const uint pid, c
 {
     uint off = poly_face_offset(pid, fid);
     polys_face_winding.at(pid).at(off) = !polys_face_winding.at(pid).at(off);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_winding(const uint pid, const uint fid) const
+{
+    assert(this->poly_contains_face(pid,fid));
+    uint off = poly_face_offset(pid, fid);
+    return polys_face_winding.at(pid).at(off);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

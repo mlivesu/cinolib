@@ -232,7 +232,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 void              face_apply_labels        (const std::vector<int> & labels);
                 void              face_apply_label         (const int label);
                 bool              face_verts_are_CCW       (const uint fid, const uint curr, const uint prev) const;
-                void              face_split_along_new_edge(const uint fid, const uint vid0, const uint vid1);
+                uint              face_split_along_new_edge(const uint fid, const uint vid0, const uint vid1);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -244,6 +244,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 int                poly_shared_face            (const uint pid0, const uint pid1) const;
                 uint               poly_face_id                (const uint pid, const uint off) const;
                 void               poly_face_flip_winding      (const uint pid, const uint fid);
+                bool               poly_face_winding           (const uint pid, const uint fid) const;
                 void               poly_flip_winding           (const uint pid);
                 bool               poly_face_is_CCW            (const uint pid, const uint fid) const;
                 bool               poly_face_is_CW             (const uint pid, const uint fid) const;
@@ -269,6 +270,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 void               poly_export_element         (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const;
                 std::vector<uint>  poly_faces_id               (const uint pid, const bool sort_by_fid = false) const;
                 std::vector<bool>  poly_faces_winding          (const uint pid) const;
+                uint               poly_split_along_new_face   (const uint pid, const std::vector<uint> & f);
 
 };
 
