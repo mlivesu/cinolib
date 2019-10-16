@@ -115,16 +115,15 @@ void Trimesh<M,V,E,P>::update_p_normal(const uint pid)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int Trimesh<M,V,E,P>::edge_opposite_to(const uint pid, const uint vid) const
+uint Trimesh<M,V,E,P>::edge_opposite_to(const uint pid, const uint vid) const
 {
     assert(this->poly_contains_vert(pid, vid));
     for(uint eid : this->adj_p2e(pid))
     {
-        if (this->edge_vert_id(eid,0) != vid &&
-            this->edge_vert_id(eid,1) != vid) return eid;
+        if(!this->edge_contains_vert(eid,vid)) return eid;
     }
     assert(false && "This is not supposed to happen!");
-    return -1;
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -620,6 +619,20 @@ uint Trimesh<M,V,E,P>::vert_opposite_to(const uint pid, const uint vid0, const u
     }
     assert(false);
     return 0; // warning killer
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> Trimesh<M,V,E,P>::vert_link_edges(const uint vid) const
+{
+    std::vector<uint> e_link;
+    for(uint pid : this->adj_v2p(vid))
+    {
+        e_link.push_back(this->edge_opposite_to(pid,vid));
+    }
+    return e_link;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

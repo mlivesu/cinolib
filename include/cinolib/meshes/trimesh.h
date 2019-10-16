@@ -91,13 +91,14 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         void              vert_weights          (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
         void              vert_weights_cotangent(const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
         uint              vert_opposite_to      (const uint pid, const uint vid0, const uint vid1) const;
+        std::vector<uint> vert_link_edges       (const uint vid) const;
         std::vector<uint> verts_opposite_to     (const uint eid) const;
 
         using  AbstractMesh<M,V,E,P>::vert_opposite_to; // avoid hiding vert_opposite_to(eid,vid)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int               edge_opposite_to                 (const uint pid, const uint vid) const;
+        uint              edge_opposite_to                 (const uint pid, const uint vid) const;
         int               edge_collapse                    (const uint eid, const double lambda = 0.5, const bool topologic_check = true, const bool geometric_check = true);
         bool              edge_is_collapsible              (const uint eid, const double lambda) const;
         bool              edge_is_geometrically_collapsible(const uint eid, const double lambda) const;
