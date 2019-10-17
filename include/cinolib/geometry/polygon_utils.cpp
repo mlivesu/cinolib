@@ -37,6 +37,7 @@
 #include <cinolib/geometry/plane.h>
 #include <cinolib/geometry/triangle_utils.h>
 #include <cinolib/Shewchuk_predicates.h>
+#include <map>
 
 namespace cinolib
 {
@@ -181,7 +182,7 @@ bool polygon_triangulate(std::vector<vec2d> & poly,
 
     // If the polygon is not CCW, flip it along X
     //
-    if (!polygon_is_CCW(poly))
+    if(!polygon_is_CCW(poly))
     {
         for(auto & p : poly) p.x() = -p.x();
     }
@@ -193,7 +194,7 @@ bool polygon_triangulate(std::vector<vec2d> & poly,
     while(sub_poly.size() >= 3)
     {
         int curr = polygon_find_ear(sub_poly);
-        if (curr<0)
+        if(curr<0)
         {
             //std::cerr << "WARNING: ear cut algorithm failure (is the polygon degenerate?)" << std::endl;
             tris.clear();
