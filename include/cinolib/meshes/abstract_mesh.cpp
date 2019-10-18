@@ -38,6 +38,7 @@
 #include <cinolib/min_max_inf.h>
 #include <map>
 #include <unordered_set>
+#include <unordered_map>
 
 namespace cinolib
 {
