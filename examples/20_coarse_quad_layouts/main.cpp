@@ -29,7 +29,9 @@ int main(int argc, char **argv)
     compute_coarse_quad_layout(m);
     profiler.pop();
     m.poly_color_wrt_label();
-    m.updateGL();
+    m.show_marked_edge_color(Color::BLACK());
+    m.show_marked_edge_width(3);
+    m.edge_set_alpha(0.5);
 
     GLcanvas gui;
     gui.push_obj(&m);
