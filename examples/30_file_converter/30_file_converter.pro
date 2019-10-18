@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = file_converter
+TARGET          = $$PWD/../30_file_converter_demo
 QT             += core
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

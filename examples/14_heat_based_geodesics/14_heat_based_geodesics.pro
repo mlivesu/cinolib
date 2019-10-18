@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = heat_based_geodesics
+TARGET          = $$PWD/../14_heat_based_geodesics_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

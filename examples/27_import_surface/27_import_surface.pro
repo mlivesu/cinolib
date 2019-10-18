@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = import_surface
+TARGET          = $$PWD/../27_import_surface_demo
 QT             += core
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

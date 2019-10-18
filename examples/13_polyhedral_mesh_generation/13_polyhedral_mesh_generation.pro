@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = polyhedral_mesh_generation
+TARGET          = $$PWD/../13_polyhedral_mesh_generation_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

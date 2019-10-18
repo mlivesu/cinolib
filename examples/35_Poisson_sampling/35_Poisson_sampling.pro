@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = Poisson_sampling
+TARGET          = $$PWD/../35_Poisson_sampling_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

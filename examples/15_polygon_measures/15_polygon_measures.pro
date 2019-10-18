@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = polygon_measures
+TARGET          = $$PWD/../15_polygon_measures_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

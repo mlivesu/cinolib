@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = LSCM
+TARGET          = $$PWD/../31_LSCM_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

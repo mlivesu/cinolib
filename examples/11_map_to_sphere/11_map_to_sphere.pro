@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = map_to_sphere
+TARGET          = $$PWD/../11_map_to_sphere_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

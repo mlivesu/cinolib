@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = ambient_occlusion
+TARGET          = $$PWD/../29_ambient_occlusion_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

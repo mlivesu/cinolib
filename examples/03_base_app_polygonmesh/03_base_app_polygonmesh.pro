@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = base_app_polygonmesh
+TARGET          = $$PWD/../03_base_app_polygonmesh_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

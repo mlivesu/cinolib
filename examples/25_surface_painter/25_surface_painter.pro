@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = surface_painter
+TARGET          = $$PWD/../25_surface_painter_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

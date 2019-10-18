@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = iso_surfaces
+TARGET          = $$PWD/../18_iso_surfaces_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

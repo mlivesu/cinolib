@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = polygon_mesh_generation
+TARGET          = $$PWD/../12_polygon_mesh_generation_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

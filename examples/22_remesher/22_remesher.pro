@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = remesher
+TARGET          = $$PWD/../22_remesher_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

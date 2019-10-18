@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = sphere_sampling
+TARGET          = $$PWD/../16_sphere_sampling_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

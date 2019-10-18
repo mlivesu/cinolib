@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = homotopy_basis
+TARGET          = $$PWD/../32_homotopy_basis_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

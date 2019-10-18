@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = polyharmonic_functions_srf
+TARGET          = $$PWD/../09_polyharmonic_functions_srf_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

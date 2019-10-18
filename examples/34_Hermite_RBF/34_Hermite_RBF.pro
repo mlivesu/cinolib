@@ -1,5 +1,5 @@
-TEMPLATE       = app
-TARGET         = Hermite_RBF
+TEMPLATE        = app
+TARGET          = $$PWD/../34_Hermite_RBF_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

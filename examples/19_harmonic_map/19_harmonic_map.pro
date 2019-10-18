@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = harmonic_map
+TARGET          = $$PWD/../19_harmonic_map_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

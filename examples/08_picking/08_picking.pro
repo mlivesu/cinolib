@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = picking
+TARGET          = $$PWD/../08_picking_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

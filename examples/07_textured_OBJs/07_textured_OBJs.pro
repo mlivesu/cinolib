@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = load_textured_OBJ
+TARGET          = $$PWD/../07_textured_OBJs_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

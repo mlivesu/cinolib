@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = tetrahedralize
+TARGET          = $$PWD/../28_tetrahedralize_demo
 QT             += core
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

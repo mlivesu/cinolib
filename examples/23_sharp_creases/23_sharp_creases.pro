@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = sharp_creases
+TARGET          = $$PWD/../23_sharp_creases_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

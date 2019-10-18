@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = sliced_obj
+TARGET          = $$PWD/../24_sliced_obj_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

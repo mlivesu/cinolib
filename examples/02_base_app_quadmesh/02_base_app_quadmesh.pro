@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = base_app_quadmesh
+TARGET          = $$PWD/../02_base_app_quadmesh_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

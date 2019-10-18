@@ -1,5 +1,5 @@
-TEMPLATE       = app
-TARGET         = edge_collapse
+TEMPLATE        = app
+TARGET          = $$PWD/../33_edge_collapse_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle

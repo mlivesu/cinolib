@@ -1,5 +1,5 @@
 TEMPLATE        = app
-TARGET          = coarse_hex_layouts
+TARGET          = $$PWD/../21_coarse_hex_layouts_demo
 QT             += core opengl
 CONFIG         += c++11 release
 CONFIG         -= app_bundle
