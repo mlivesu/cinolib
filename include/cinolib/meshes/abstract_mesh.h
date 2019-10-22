@@ -284,6 +284,7 @@ class AbstractMesh
         virtual double             poly_mass            (const uint pid) const = 0;
         virtual void               poly_set_color       (const Color & c);
         virtual void               poly_set_alpha       (const float alpha);
+        virtual void               poly_export_element  (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const = 0;
 };
 
 }

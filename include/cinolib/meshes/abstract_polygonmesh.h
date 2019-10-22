@@ -123,30 +123,30 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                bool              vert_is_saddle          (const uint vid, const int tex_coord = U_param) const;
-                bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
-                double            vert_area               (const uint vid) const;
-        virtual double            vert_mass               (const uint vid) const;
-                bool              vert_is_boundary        (const uint vid) const;
-                bool              vert_is_manifold        (const uint vid) const;
-                void              vert_switch_id          (const uint vid0, const uint vid1);
-                void              vert_remove             (const uint vid);
-                void              vert_remove_unreferenced(const uint vid);
-                uint              vert_add                (const vec3d & pos);
-                void              vert_cluster_one_ring   (const uint vid, std::vector<std::vector<uint>> & clusters, const bool marked_edges_are_borders);
-                std::vector<uint> vert_adj_visible_polys  (const uint vid, const vec3d dir, const double ang_thresh = 60.0);
-                std::vector<uint> vert_boundary_edges     (const uint vid) const;
-                std::vector<uint> vert_verts_link         (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
-                std::vector<uint> vert_edges_link         (const uint vid) const;
-                std::vector<uint> vert_ordered_verts_link (const uint vid) const;
-                std::vector<uint> vert_ordered_polys_star (const uint vid) const;
-                std::vector<uint> vert_ordered_edges_star (const uint vid) const;
-                std::vector<uint> vert_ordered_edges_link (const uint vid) const;
-                void              vert_ordered_one_ring   (const uint          vid,
-                                                           std::vector<uint> & v_link,        // sorted list of adjacent vertices
-                                                           std::vector<uint> & f_star,        // sorted list of adjacent triangles
-                                                           std::vector<uint> & e_star,        // sorted list of edges incident to vid
-                                                           std::vector<uint> & e_link) const; // sorted list of edges opposite to vid
+        bool              vert_is_saddle          (const uint vid, const int tex_coord = U_param) const;
+        bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
+        double            vert_area               (const uint vid) const;
+        double            vert_mass               (const uint vid) const;
+        bool              vert_is_boundary        (const uint vid) const;
+        bool              vert_is_manifold        (const uint vid) const;
+        void              vert_switch_id          (const uint vid0, const uint vid1);
+        void              vert_remove             (const uint vid);
+        void              vert_remove_unreferenced(const uint vid);
+        uint              vert_add                (const vec3d & pos);
+        void              vert_cluster_one_ring   (const uint vid, std::vector<std::vector<uint>> & clusters, const bool marked_edges_are_borders);
+        std::vector<uint> vert_adj_visible_polys  (const uint vid, const vec3d dir, const double ang_thresh = 60.0);
+        std::vector<uint> vert_boundary_edges     (const uint vid) const;
+        std::vector<uint> vert_verts_link         (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
+        std::vector<uint> vert_edges_link         (const uint vid) const;
+        std::vector<uint> vert_ordered_verts_link (const uint vid) const;
+        std::vector<uint> vert_ordered_polys_star (const uint vid) const;
+        std::vector<uint> vert_ordered_edges_star (const uint vid) const;
+        std::vector<uint> vert_ordered_edges_link (const uint vid) const;
+        void              vert_ordered_one_ring   (const uint          vid,
+                                                   std::vector<uint> & v_link,        // sorted list of adjacent vertices
+                                                   std::vector<uint> & f_star,        // sorted list of adjacent triangles
+                                                   std::vector<uint> & e_star,        // sorted list of edges incident to vid
+                                                   std::vector<uint> & e_link) const; // sorted list of edges opposite to vid
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -189,6 +189,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
               bool                 poly_verts_are_CCW      (const uint pid, const uint curr, const uint prev) const;
               std::vector<vec3d>   poly_vlist              (const uint pid) const;
         const std::vector<uint>  & poly_tessellation       (const uint pid) const;
+              void                 poly_export_element     (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const;
 };
 
 }

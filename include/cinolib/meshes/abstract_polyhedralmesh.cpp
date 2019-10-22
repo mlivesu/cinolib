@@ -402,6 +402,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::face_split_along_new_edge(const uint fid, uint vid0, uint vid1)
 {
+    assert(this->verts_per_face(fid)>3);
     assert(this->face_contains_vert(fid, vid0));
     assert(this->face_contains_vert(fid, vid1));
     assert(!this->verts_are_adjacent(vid0, vid1));
@@ -416,6 +417,9 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_split_along_new_edge(const uint fid
     while(i<f.size())    f1.push_back(f.at(i++));
     f0.push_back(vid1);
     f1.push_back(vid0);
+
+    assert(f0.size()>=3);
+    assert(f1.size()>=3);
 
     uint fid0 = this->face_add(f0);
     uint fid1 = this->face_add(f1);
@@ -435,7 +439,9 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_split_along_new_edge(const uint fid
 
     this->polys_remove(to_remove);
 
-    return this->edge_id(vid0, vid1);
+    uint new_id = this->edge_id(vid0, vid1);
+    assert(this->adj_e2f(new_id).size()==2);
+    return new_id;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1162,6 +1168,22 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_v2e(const uint fid, co
     }
     assert(edges.size()==2);
     return edges;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_v2v(const uint fid, const uint vid) const
+{
+    assert(this->face_contains_vert(fid,vid));
+    std::vector<uint> verts;
+    for(uint eid : this->adj_v2e(vid))
+    {
+        if (this->face_contains_edge(fid,eid)) verts.push_back(this->vert_opposite_to(eid,vid));
+    }
+    assert(verts.size()==2);
+    return verts;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -2477,12 +2499,10 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_spherical(const uint pid) const
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::poly_export_element(const uint                       pid,
-                                                            std::vector<vec3d>             & verts,
-                                                            std::vector<std::vector<uint>> & faces) const
+                                                             std::vector<vec3d>             & verts,
+                                                             std::vector<std::vector<uint>> & faces) const
 {
     std::unordered_map<uint,uint> v_map;
-    verts.clear();
-    faces.clear();
     for(uint fid : this->adj_p2f(pid))
     {
         std::vector<uint> f;
@@ -2491,7 +2511,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_export_element(const uint          
             auto it = v_map.find(vid);
             if(it==v_map.end())
             {
-                uint fresh_id = v_map.size();
+                uint fresh_id = verts.size();
                 v_map[vid] = fresh_id;
                 verts.push_back(this->vert(vid));
                 f.push_back(fresh_id);

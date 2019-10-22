@@ -1718,4 +1718,16 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::get_ordered_boundary_vertices() 
     return b_verts;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::poly_export_element(const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const
+{
+    std::vector<uint> f(this->verts_per_poly(pid));
+    std::iota(f.begin(), f.end(), verts.size());
+    for(uint vid : adj_p2v(pid)) verts.push_back(this->vert(vid));
+    faces.push_back(f);
+}
+
 }

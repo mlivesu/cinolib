@@ -155,28 +155,28 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                void               vert_switch_id            (const uint vid0, const uint vid1);
-                void               vert_remove               (const uint vid);
-                void               vert_remove_unreferenced  (const uint vid);
-                uint               vert_add                  (const vec3d & pos);
-                bool               vert_is_on_srf            (const uint vid) const;
-        virtual double             vert_mass                 (const uint vid) const;
-                double             vert_volume               (const uint vid) const;
-                bool               vert_is_manifold          (const uint vid) const;
-                std::vector<uint>  vert_verts_link           (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
-                std::vector<uint>  vert_edges_link           (const uint vid) const;
-                std::vector<uint>  vert_faces_link           (const uint vid) const;
-                std::vector<ipair> vert_adj_visible_faces    (const uint vid, const vec3d dir, const double ang_thresh = 60.0);
-                std::vector<uint>  vert_adj_srf_verts        (const uint vid) const;
-                std::vector<uint>  vert_adj_srf_edges        (const uint vid) const;
-                std::vector<uint>  vert_adj_srf_faces        (const uint vid) const;
-                std::vector<uint>  vert_ordered_srf_vert_ring(const uint vid) const;
-                std::vector<uint>  vert_ordered_srf_edge_ring(const uint vid) const;
-                std::vector<uint>  vert_ordered_srf_face_ring(const uint vid) const;
-                void               vert_ordered_srf_one_ring (const uint vid,
-                                                              std::vector<uint> & v_ring,
-                                                              std::vector<uint> & e_ring,
-                                                              std::vector<uint> & f_ring) const;
+        void               vert_switch_id            (const uint vid0, const uint vid1);
+        void               vert_remove               (const uint vid);
+        void               vert_remove_unreferenced  (const uint vid);
+        uint               vert_add                  (const vec3d & pos);
+        bool               vert_is_on_srf            (const uint vid) const;
+        double             vert_mass                 (const uint vid) const;
+        double             vert_volume               (const uint vid) const;
+        bool               vert_is_manifold          (const uint vid) const;
+        std::vector<uint>  vert_verts_link           (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
+        std::vector<uint>  vert_edges_link           (const uint vid) const;
+        std::vector<uint>  vert_faces_link           (const uint vid) const;
+        std::vector<ipair> vert_adj_visible_faces    (const uint vid, const vec3d dir, const double ang_thresh = 60.0);
+        std::vector<uint>  vert_adj_srf_verts        (const uint vid) const;
+        std::vector<uint>  vert_adj_srf_edges        (const uint vid) const;
+        std::vector<uint>  vert_adj_srf_faces        (const uint vid) const;
+        std::vector<uint>  vert_ordered_srf_vert_ring(const uint vid) const;
+        std::vector<uint>  vert_ordered_srf_edge_ring(const uint vid) const;
+        std::vector<uint>  vert_ordered_srf_face_ring(const uint vid) const;
+        void               vert_ordered_srf_one_ring (const uint vid,
+                                                      std::vector<uint> & v_ring,
+                                                      std::vector<uint> & e_ring,
+                                                      std::vector<uint> & f_ring) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -202,12 +202,13 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 uint              face_edge_id             (const uint fid, const uint vid0, const uint vid1) const;
                 uint              face_edge_id             (const uint fid, const uint off) const;
                 std::vector<uint> face_v2e                 (const uint fid, const uint vid) const;
+                std::vector<uint> face_v2v                 (const uint fid, const uint vid) const;
                 bool              face_is_on_srf           (const uint fid) const;
                 bool              face_contains_vert       (const uint fid, const uint vid) const;
                 bool              face_contains_edge       (const uint fid, const uint eid) const;
                 bool              face_winding_agrees_with (const uint fid, const uint vid0, const uint vid1) const;
                 ipair             face_edges_from_vert     (const uint fid, const uint vid) const;
-                uint              face_adj_srf_edge        (const uint fid, const uint eid, const uint vid) const;
+                uint              face_adj_srf_edge        (const uint fid, const uint eid, const uint vid) const;                
                 uint              face_opp_to_srf_edge     (const uint fid, const uint eid) const;
                 uint              face_shared_edge         (const uint fid0, const uint fid1) const;
                 vec3d             face_centroid            (const uint fid) const;
@@ -237,7 +238,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual double             poly_volume                 (const uint pid) const = 0;
-        virtual double             poly_mass                   (const uint pid) const;
+                double             poly_mass                   (const uint pid) const;
                 bool               poly_contains_face          (const uint pid, const uint fid) const;
                 bool               poly_is_on_surf             (const uint pid) const;
                 int                poly_id                     (const std::vector<uint> & flist) const;
