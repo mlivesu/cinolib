@@ -413,7 +413,7 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_has_no_duplicate_verts(const uint f
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint AbstractPolyhedralMesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
+uint AbstractPolyhedralMesh<M,V,E,F,P>::face_split_in_triangles(const uint fid, const vec3d & p)
 {
     assert(this->face_has_no_duplicate_verts(fid));
 

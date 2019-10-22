@@ -234,7 +234,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 void              face_apply_label           (const int label);
                 bool              face_verts_are_CCW         (const uint fid, const uint curr, const uint prev) const;
                 uint              face_split_along_new_edge  (const uint fid, const uint vid0, const uint vid1);
-                uint              face_split                 (const uint fid, const vec3d & p);
+                uint              face_split_in_triangles    (const uint fid, const vec3d & p);
                 bool              face_has_no_duplicate_verts(const uint fid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
