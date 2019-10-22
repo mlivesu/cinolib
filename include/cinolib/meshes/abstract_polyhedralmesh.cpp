@@ -400,6 +400,58 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_verts_are_CCW(const uint fid, const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::face_has_no_duplicate_verts(const uint fid) const
+{
+    auto vlist  = this->face_verts_id(fid);
+    uint before = vlist.size();
+    REMOVE_DUPLICATES_FROM_VEC(vlist);
+    uint after = vlist.size();
+    return (before==after);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
+{
+    assert(this->face_has_no_duplicate_verts(fid));
+
+    uint new_vid = this->vert_add(p);
+    auto vlist   = this->face_verts_id(fid);
+
+    // add new faces
+    for(auto i=vlist.begin(),j=i+1; i<vlist.end(); ++i,++j)
+    {
+        if(j>=vlist.end()) j=vlist.begin();
+        this->face_add({*i,*j,new_vid});
+    }
+
+    std::vector<uint> to_remove = this->adj_f2p(fid);
+    for(uint pid : to_remove)
+    {
+        auto f    = this->poly_faces_id(pid);
+        auto w    = this->poly_faces_winding(pid);
+        uint off  = this->poly_face_offset(pid, fid);
+        bool b    = w.at(off);
+        f.erase(f.begin()+off);
+        w.erase(w.begin()+off);
+        for(uint fid : this->adj_v2f(new_vid))
+        {
+            f.push_back(fid);
+            w.push_back(b);
+        }
+        this->poly_add(f,w);
+    }
+
+    this->face_remove(fid);
+    return new_vid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::face_split_along_new_edge(const uint fid, uint vid0, uint vid1)
 {
     assert(this->verts_per_face(fid)>3);
