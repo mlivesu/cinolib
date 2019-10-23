@@ -254,7 +254,6 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 uint               poly_face_offset            (const uint pid, const uint fid) const;
                 vec3d              poly_face_normal            (const uint pid, const uint fid) const;
                 int                poly_adj_through_face       (const uint pid, const uint fid) const;
-                std::vector<uint>  poly_v2v                    (const uint pid, const uint vid) const;
                 std::vector<uint>  poly_v2f                    (const uint pid, const uint vid) const;
                 std::vector<uint>  poly_e2f                    (const uint pid, const uint eid) const;
                 std::vector<uint>  poly_f2f                    (const uint pid, const uint fid) const;

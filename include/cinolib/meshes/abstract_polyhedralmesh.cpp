@@ -942,21 +942,6 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_f2f(const uint pid, co
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_v2v(const uint pid, const uint vid) const
-{
-    assert(this->poly_contains_vert(pid,vid));
-    std::vector<uint> nbrs;
-    for(uint nbr : this->adj_v2v(vid))
-    {
-        if(this->poly_contains_vert(pid,nbr)) nbrs.push_back(nbr);
-    }
-    return nbrs;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_v2f(const uint pid, const uint vid) const
 {
     assert(this->poly_contains_vert(pid,vid));
