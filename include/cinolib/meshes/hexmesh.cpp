@@ -156,6 +156,11 @@ void Hexmesh<M,V,E,F,P>::save(const char * filename) const
     {
         write_VTK(filename, this->verts, this->p2v);
     }
+    else if (filetype.compare(".hedra") == 0 ||
+             filetype.compare(".HEDRA") == 0)
+    {
+        write_HEDRA(filename, this->verts, this->faces, this->polys, this->polys_face_winding);
+    }
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
