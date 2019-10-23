@@ -469,17 +469,14 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_split_along_new_edge(const uint fid
     while(i<f.size())    f1.push_back(f.at(i++));
     f0.push_back(vid1);
     f1.push_back(vid0);
-
     assert(f0.size()>=3);
     assert(f1.size()>=3);
 
     uint fid0 = this->face_add(f0);
     uint fid1 = this->face_add(f1);
 
-    std::vector<uint> to_remove;
     for(uint pid : this->adj_f2p(fid))
     {
-        to_remove.push_back(pid);
         auto f   = this->poly_faces_id(pid);
         auto w   = this->poly_faces_winding(pid);
         uint off = this->poly_face_offset(pid, fid);
@@ -489,7 +486,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_split_along_new_edge(const uint fid
         this->poly_add(f,w);
     }
 
-    this->polys_remove(to_remove);
+    this->polys_remove(this->adj_f2p(fid));
 
     uint new_id = this->edge_id(vid0, vid1);
     assert(this->adj_e2f(new_id).size()==2);
