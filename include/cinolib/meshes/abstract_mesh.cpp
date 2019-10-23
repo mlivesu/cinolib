@@ -978,9 +978,9 @@ std::vector<uint> AbstractMesh<M,V,E,P>::poly_v2v(const uint pid, const uint vid
 {
     assert(this->poly_contains_vert(pid,vid));
     std::vector<uint> verts;
-    for(uint nbr : this->adj_v2v(vid))
+    for(uint eid : this->adj_v2e(vid))
     {
-        if(this->poly_contains_vert(pid,nbr)) verts.push_back(nbr);
+        if(this->poly_contains_edge(pid,eid)) verts.push_back(this->vert_opposite_to(eid,vid));
     }
     return verts;
 }
