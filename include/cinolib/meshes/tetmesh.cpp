@@ -41,6 +41,7 @@
 #include <cinolib/quality.h>
 #include <cinolib/cot.h>
 #include <cinolib/symbols.h>
+#include <cinolib/io/io_utilities.h>
 
 namespace cinolib
 {
@@ -131,7 +132,7 @@ CINO_INLINE
 void Tetmesh<M,V,E,F,P>::save(const char * filename) const
 {
     std::string str(filename);
-    std::string filetype = str.substr(str.size()-4,4);
+    std::string filetype = "." + get_file_extension(str);
 
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)

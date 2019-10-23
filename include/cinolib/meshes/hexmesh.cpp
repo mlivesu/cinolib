@@ -40,6 +40,7 @@
 #include <cinolib/min_max_inf.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/vector_serialization.h>
+#include <cinolib/io/io_utilities.h>
 
 #include <queue>
 #include <float.h>
@@ -135,7 +136,7 @@ CINO_INLINE
 void Hexmesh<M,V,E,F,P>::save(const char * filename) const
 {
     std::string str(filename);
-    std::string filetype = str.substr(str.size()-4,4);
+    std::string filetype = "." + get_file_extension(str);
 
     if (filetype.compare("mesh") == 0 ||
         filetype.compare("MESH") == 0)
