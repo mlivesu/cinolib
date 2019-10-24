@@ -1988,7 +1988,11 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::face_add(const std::vector<uint> & f)
 {
-    //assert(face_id(f)==-1); // make sure it doesn't exist already
+    if(face_id(f)!=-1)
+    {
+        std::cout << ANSI_fg_color_red << "WARNING: adding duplicated face!" << ANSI_fg_color_default << std::endl;
+        return face_id(f);
+    }
     for(uint vid : f) assert(vid < this->num_verts());
 
     uint fid = this->num_faces();
@@ -2153,7 +2157,11 @@ CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & flist,
                                                  const std::vector<bool> & fwinding)
 {
-    assert(poly_id(flist)==-1); // make sure it doesn't exist already
+    if(poly_id(flist)!=-1)
+    {
+        std::cout << ANSI_fg_color_red << "WARNING: adding duplicated poly!" << ANSI_fg_color_default << std::endl;
+        return poly_id(flist);
+    }
     for(uint fid : flist) assert(fid < this->num_faces());
     assert(flist.size() == fwinding.size());
 

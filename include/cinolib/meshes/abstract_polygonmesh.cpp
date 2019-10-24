@@ -1386,6 +1386,7 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & vlist)
     if(poly_id(vlist)!=-1)
     {
         std::cout << ANSI_fg_color_red << "WARNING: adding duplicated poly!" << ANSI_fg_color_default << std::endl;
+        return poly_id(vlist);
     }
     for(uint vid : vlist) assert(vid < this->num_verts());
 
