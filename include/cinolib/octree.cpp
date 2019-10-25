@@ -186,6 +186,30 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void Octree::add_segment(const std::pair<vec3d,vec3d> & v)
+{
+    items.push_back(new Segment(v));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Octree::add_triangle(const std::vector<vec3d> & v)
+{
+    items.push_back(new Triangle(v));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Octree::add_tetrahedron(const std::vector<vec3d> & v)
+{
+    items.push_back(new Tetrahedron(v));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 uint Octree::max_items_per_leaf() const
 {
     return max_items_per_leaf(root, 0);

@@ -57,6 +57,13 @@ class OctreeNode
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+/* Usage:
+ *
+ *  i)   Create an empty octree
+ *  ii)  Use the add_segment/triangle/tetrahedron facilities to populate it
+ *  iii) Call build to make the tree
+*/
+
 class Octree
 {
 
@@ -66,6 +73,12 @@ class Octree
                         const uint items_per_leaf = 3);
 
         virtual ~Octree();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void add_segment    (const std::pair<vec3d,vec3d> & v);
+        void add_triangle   (const std::vector<vec3d> & v);
+        void add_tetrahedron(const std::vector<vec3d> & v);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -83,8 +96,8 @@ class Octree
             {
                 switch(m.mesh_type())
                 {
-                    case TRIMESH : items.push_back(new Triangle(m.poly_verts(pid)));    break;
-                    case TETMESH : items.push_back(new Tetrahedron(m.poly_verts(pid))); break;
+                    case TRIMESH : add_triangle(m.poly_verts(pid));    break;
+                    case TETMESH : add_tetrahedron(m.poly_verts(pid)); break;
                     default: assert(false && "Unsupported element");
                 }
             }
@@ -100,7 +113,7 @@ class Octree
             items.reserve(m.num_edges());
             for(uint eid=0; eid<m.num_edges(); ++eid)
             {
-                items.push_back(new Segment(m.edge_verts(eid)));
+                add_segment(m.edge_verts(eid));
             }
             build();
         }
