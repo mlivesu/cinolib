@@ -952,15 +952,15 @@ bool AbstractPolygonMesh<M,V,E,P>::edge_is_manifold(const uint eid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-double AbstractPolygonMesh<M,V,E,P>::edge_crease_angle(const uint eid) const
+double AbstractPolygonMesh<M,V,E,P>::edge_dihedral_angle(const uint eid) const
 {
     if(!this->edge_is_manifold(eid)) return 0;
     if( this->edge_is_boundary(eid)) return 0;
 
-    uint   pid0  = this->adj_e2p(eid).front();
-    uint   pid1  = this->adj_e2p(eid).back();
-    vec3d  n0    = this->poly_data(pid0).normal;
-    vec3d  n1    = this->poly_data(pid1).normal;
+    uint   pid0 = this->adj_e2p(eid).front();
+    uint   pid1 = this->adj_e2p(eid).back();
+    vec3d  n0   = this->poly_data(pid0).normal;
+    vec3d  n1   = this->poly_data(pid1).normal;
 
     return n0.angle_rad(n1);
 }
@@ -1164,7 +1164,7 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_sharp_creases(const float thresh)
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        this->edge_data(eid).marked = (edge_crease_angle(eid) >= thresh);
+        this->edge_data(eid).marked = (edge_dihedral_angle(eid) >= thresh);
     }
 }
 

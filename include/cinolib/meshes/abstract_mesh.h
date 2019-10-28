@@ -232,26 +232,28 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                vec3d                  edge_vert         (const uint eid, const uint offset) const;
-                uint                   edge_vert_id      (const uint eid, const uint offset) const;
-                ipair                  edge_vert_ids     (const uint eid) const;
-                std::pair<vec3d,vec3d> edge_verts        (const uint eid) const;
-                int                    edge_id           (const uint vid0, const uint vid1) const;
-                int                    edge_id           (const ipair & vids) const;
-                vec3d                  edge_sample_at    (const uint eid, double lambda) const; // arc-length param
-                uint                   edge_valence      (const uint eid) const;
-                bool                   edge_contains_vert(const uint eid, const uint vid) const;
-                bool                   edges_are_adjacent(const uint eid0, const uint eid1) const;
-                double                 edge_length       (const uint eid) const;
-                vec3d                  edge_vec          (const uint eid, const bool normalized = false) const;
-                double                 edge_avg_length   () const;
-                double                 edge_max_length   () const;
-                double                 edge_min_length   () const;
-                void                   edge_unmark_all   ();
-                void                   edge_apply_labels (const std::vector<int> & labels);
-                void                   edge_apply_label  (const int label);
-        virtual void                   edge_set_color    (const Color & c);
-        virtual void                   edge_set_alpha    (const float alpha);
+                vec3d                  edge_vert              (const uint eid, const uint offset) const;
+                uint                   edge_vert_id           (const uint eid, const uint offset) const;
+                ipair                  edge_vert_ids          (const uint eid) const;
+                std::pair<vec3d,vec3d> edge_verts             (const uint eid) const;
+                int                    edge_id                (const uint vid0, const uint vid1) const;
+                int                    edge_id                (const ipair & vids) const;
+                vec3d                  edge_sample_at         (const uint eid, double lambda) const; // arc-length param
+                uint                   edge_valence           (const uint eid) const;
+                bool                   edge_contains_vert     (const uint eid, const uint vid) const;
+                bool                   edges_are_adjacent     (const uint eid0, const uint eid1) const;
+                double                 edge_length            (const uint eid) const;
+                vec3d                  edge_vec               (const uint eid, const bool normalized = false) const;
+                double                 edge_avg_length        () const;
+                double                 edge_max_length        () const;
+                double                 edge_min_length        () const;
+                void                   edge_unmark_all        ();
+                void                   edge_apply_labels      (const std::vector<int> & labels);
+                void                   edge_apply_label       (const int label);
+        virtual void                   edge_mark_sharp_creases(const float thresh) = 0;
+        virtual double                 edge_dihedral_angle    (const uint eid) const = 0;
+        virtual void                   edge_set_color         (const Color & c);
+        virtual void                   edge_set_alpha         (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

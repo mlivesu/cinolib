@@ -674,6 +674,34 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::edge_faces_link(const uint 
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+double AbstractPolyhedralMesh<M,V,E,F,P>::edge_dihedral_angle(const uint eid) const
+{
+    auto f_nbrs = this->edge_adj_srf_faces(eid);
+    assert(this->edge_is_on_srf(eid));
+    assert(f_nbrs.size()==2);
+
+    vec3d n0 = this->poly_face_normal(this->adj_f2p(f_nbrs.front()).front(), f_nbrs.front());
+    vec3d n1 = this->poly_face_normal(this->adj_f2p(f_nbrs.back()).front(), f_nbrs.back());
+
+    return n0.angle_rad(n1);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::edge_mark_sharp_creases(const float thresh)
+{
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        this->edge_data(eid).marked = (this->edge_is_on_srf(eid) && edge_dihedral_angle(eid)>=thresh);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
 {
     uint new_vid = this->vert_add(p);
