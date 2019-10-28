@@ -48,11 +48,18 @@ class Triangle : public SpatialDataStructureItem
 {
     public:
 
-        Triangle(const std::vector<vec3d> v) : v0(v.at(0)), v1(v.at(1)), v2(v.at(2)) {}
+        Triangle(const uint id, const std::vector<vec3d> v) : v0(v.at(0)), v1(v.at(1)), v2(v.at(2))
+        {
+            this->id = id;
+        }
 
-        Triangle(const vec3d & v0,
+        Triangle(const uint    id,
+                 const vec3d & v0,
                  const vec3d & v1,
-                 const vec3d & v2) : v0(v0), v1(v1), v2(v2) {}
+                 const vec3d & v2) : v0(v0), v1(v1), v2(v2)
+        {
+            this->id = id;
+        }
 
        ~Triangle() {}
 

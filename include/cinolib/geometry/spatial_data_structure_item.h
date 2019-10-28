@@ -38,6 +38,7 @@
 
 #include <cinolib/cino_inline.h>
 #include <vector>
+#include <sys/types.h>
 
 /* This interface must be implemented by any item that populates a spatial data structure
  * (e.g. Octree, BSP, AABB Tree, ...). These primitives are necessary to implement both the
@@ -64,6 +65,10 @@ namespace cinolib
 
             explicit SpatialDataStructureItem() {}
             virtual ~SpatialDataStructureItem() {}
+
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            uint id;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

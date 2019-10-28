@@ -46,12 +46,19 @@ class Tetrahedron : public SpatialDataStructureItem
 {
     public:
 
-        Tetrahedron(const std::vector<vec3d> v) : v0(v.at(0)), v1(v.at(1)), v2(v.at(2)), v3(v.at(3)) {}
+        Tetrahedron(const uint id, const std::vector<vec3d> v) : v0(v.at(0)), v1(v.at(1)), v2(v.at(2)), v3(v.at(3))
+        {
+            this->id = id;
+        }
 
-        Tetrahedron(const vec3d & v0,
+        Tetrahedron(const uint    id,
+                    const vec3d & v0,
                     const vec3d & v1,
                     const vec3d & v2,
-                    const vec3d & v3) : v0(v0), v1(v1), v2(v2), v3(v3) {}
+                    const vec3d & v3) : v0(v0), v1(v1), v2(v2), v3(v3)
+        {
+            this->id = id;
+        }
 
        ~Tetrahedron() {}
 

@@ -98,7 +98,7 @@ void DrawableOctree::updateGL(const OctreeNode *node)
     render_list.push_back(DrawableAABB(node->bbox.min, node->bbox.max));
     if(node->is_inner)
     {
-        assert(node->item_ids.empty());
+        assert(node->item_indices.empty());
         for(int i=0; i<8; ++i) updateGL(node->children[i]);
     }
 }

@@ -47,10 +47,17 @@ class Segment : public SpatialDataStructureItem
 {
     public:
 
-        Segment(const vec3d & v0,
-                const vec3d & v1) : v0(v0), v1(v1) {}
+        Segment(const uint    id,
+                const vec3d & v0,
+                const vec3d & v1) : v0(v0), v1(v1)
+        {
+            this->id = id;
+        }
 
-        Segment(const std::pair<vec3d,vec3d> & p) : v0(p.first), v1(p.second) {}
+        Segment(const uint id, const std::pair<vec3d,vec3d> & p) : v0(p.first), v1(p.second)
+        {
+            this->id = id;
+        }
 
         ~Segment() {}
 

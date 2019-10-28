@@ -82,20 +82,23 @@ void Octree::build()
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    // make AABBs for each item
-    aabbs.reserve(items.size());
-    for(const auto item : items) aabbs.push_back(item->aabb());
-    assert(items.size() == aabbs.size());
+    if(!items.empty())
+    {
+        // make AABBs for each item
+        aabbs.reserve(items.size());
+        for(const auto item : items) aabbs.push_back(item->aabb());
+        assert(items.size() == aabbs.size());
 
-    // build the tree root
-    assert(root==nullptr);
-    root = new OctreeNode(nullptr, AABB(aabbs, 1.5)); // enlarge it a bit to make sure queries don't fall outside
+        // build the tree root
+        assert(root==nullptr);
+        root = new OctreeNode(nullptr, AABB(aabbs, 1.5)); // enlarge it a bit to make sure queries don't fall outside
 
-    tree_depth = 1;
-    num_leaves = 1;
+        tree_depth = 1;
+        num_leaves = 1;
 
-    // populate the tree
-    for(uint id=0; id<items.size(); ++id) build_item(id, root, 0);
+        // populate the tree
+        for(uint id=0; id<items.size(); ++id) build_item(id, root, 0);
+    }
 
     Time::time_point t1 = Time::now();
     double t = how_many_seconds(t0,t1);
@@ -120,7 +123,7 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
 
     if(node->is_inner)
     {
-        assert(node->item_ids.empty());
+        assert(node->item_indices.empty());
         for(int i=0; i<8; ++i)
         {
             assert(node->children[i]!=nullptr);
@@ -132,18 +135,18 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
     }
     else
     {
-        node->item_ids.push_back(id);
+        node->item_indices.push_back(id);
 
         // if the node contains more elements than allowed, and the depth
         // of the tree is lower than max depth: split the node into 8 octants
         // and move all its items downwards
         //
-        if(node->item_ids.size()>items_per_leaf && depth<max_depth)
+        if(node->item_indices.size()>items_per_leaf && depth<max_depth)
         {
             node->is_inner = true;
 
-            auto items_to_move_down = node->item_ids;
-            node->item_ids.clear();
+            auto items_to_move_down = node->item_indices;
+            node->item_indices.clear();
 
             // create children octants
             vec3d min = node->bbox.min;
@@ -186,25 +189,25 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Octree::add_segment(const std::pair<vec3d,vec3d> & v)
+void Octree::add_segment(const uint id, const std::pair<vec3d,vec3d> & v)
 {
-    items.push_back(new Segment(v));
+    items.push_back(new Segment(id,v));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Octree::add_triangle(const std::vector<vec3d> & v)
+void Octree::add_triangle(const uint id, const std::vector<vec3d> & v)
 {
-    items.push_back(new Triangle(v));
+    items.push_back(new Triangle(id,v));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Octree::add_tetrahedron(const std::vector<vec3d> & v)
+void Octree::add_tetrahedron(const uint id, const std::vector<vec3d> & v)
 {
-    items.push_back(new Tetrahedron(v));
+    items.push_back(new Tetrahedron(id,v));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -220,7 +223,11 @@ uint Octree::max_items_per_leaf() const
 CINO_INLINE
 uint Octree::max_items_per_leaf(const OctreeNode * node, const uint max) const
 {
-    if(node->is_inner)
+    if(node==nullptr)
+    {
+        return 0;
+    }
+    else if(node->is_inner)
     {
         uint tmp[8];
         for(int i=0; i<8; ++i)
@@ -231,7 +238,7 @@ uint Octree::max_items_per_leaf(const OctreeNode * node, const uint max) const
     }
     else
     {
-        return std::max((uint)node->item_ids.size(), max);
+        return std::max((uint)node->item_indices.size(), max);
     }
 }
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -307,13 +314,13 @@ void Octree::closest_point(const vec3d  & p,          // query point
             }
             else
             {
-                for(uint id : child->item_ids)
+                for(uint index : child->item_indices)
                 {
                     Obj obj;
-                    obj.node = child;
-                    obj.id   = id;
-                    obj.pos  = items.at(id)->point_closest_to(p);
-                    obj.dist = obj.pos.dist_squared(p);
+                    obj.node  = child;
+                    obj.index = index;
+                    obj.pos   = items.at(index)->point_closest_to(p);
+                    obj.dist  = obj.pos.dist_squared(p);
                     q.push(obj);
                     if(print_debug_info) ++item_queries;
                 }
@@ -327,8 +334,8 @@ void Octree::closest_point(const vec3d  & p,          // query point
         print_query_info("Closest point query", how_many_seconds(t0,t1), aabb_queries, item_queries);
     }
 
-    assert(q.top().id>=0);
-    id   = q.top().id;
+    assert(q.top().index>=0);
+    id   = items.at(q.top().index)->id;
     pos  = q.top().pos;
     dist = q.top().dist;
 }
@@ -363,12 +370,12 @@ bool Octree::contains(const vec3d & p, uint & id, const double eps) const
         }
         else
         {
-            for(uint it_id : node->item_ids)
+            for(uint i : node->item_indices)
             {
                 if(print_debug_info) ++item_queries;
-                if(items.at(it_id)->contains(p,eps))
+                if(items.at(i)->contains(p,eps))
                 {
-                    id = it_id;
+                    id = items.at(i)->id;
                     if(print_debug_info)
                     {
                         Time::time_point t1 = Time::now();
@@ -415,12 +422,12 @@ bool Octree::contains(const vec3d & p, std::unordered_set<uint> & ids, const dou
         }
         else
         {
-            for(uint it_id : node->item_ids)
+            for(uint i : node->item_indices)
             {
                 if(print_debug_info) ++item_queries;
-                if(items.at(it_id)->contains(p,eps))
+                if(items.at(i)->contains(p,eps))
                 {
-                    ids.insert(it_id);
+                    ids.insert(items.at(i)->id);
                 }
             }
         }
@@ -475,14 +482,14 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
                 }
                 else
                 {
-                    for(uint id : child->item_ids)
+                    for(uint i : child->item_indices)
                     {
-                        if(items.at(id)->intersects_ray(p, dir, t, pos))
+                        if(items.at(i)->intersects_ray(p, dir, t, pos))
                         {
                             Obj obj;
-                            obj.node = child;
-                            obj.id   = id;
-                            obj.dist = t;
+                            obj.node  = child;
+                            obj.index = items.at(i)->id;
+                            obj.dist  = t;
                             q.push(obj);
                         }
                         if(print_debug_info) ++item_queries;
@@ -500,8 +507,8 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
     }
 
     if(q.empty()) return false;
-    assert(q.top().id>=0);
-    id    = q.top().id;
+    assert(q.top().index>=0);
+    id    = items.at(q.top().index)->id;
     min_t = q.top().dist;
     return true;
 }
@@ -546,11 +553,11 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pa
                 }
                 else
                 {
-                    for(uint id : child->item_ids)
+                    for(uint i : child->item_indices)
                     {
-                        if(items.at(id)->intersects_ray(p, dir, t, pos))
+                        if(items.at(i)->intersects_ray(p, dir, t, pos))
                         {
-                            all_hits.insert(std::make_pair(t,id));
+                            all_hits.insert(std::make_pair(t,items.at(i)->id));
                         }
                         if(print_debug_info) ++item_queries;
                     }

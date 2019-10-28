@@ -52,7 +52,7 @@ class OctreeNode
         OctreeNode       *children[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
         bool              is_inner = false;
         AABB              bbox;
-        std::vector<uint> item_ids; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
+        std::vector<uint> item_indices; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -76,9 +76,9 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void add_segment    (const std::pair<vec3d,vec3d> & v);
-        void add_triangle   (const std::vector<vec3d> & v);
-        void add_tetrahedron(const std::vector<vec3d> & v);
+        void add_segment    (const uint id, const std::pair<vec3d,vec3d> & v);
+        void add_triangle   (const uint id, const std::vector<vec3d> & v);
+        void add_tetrahedron(const uint id, const std::vector<vec3d> & v);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -88,7 +88,27 @@ class Octree
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         template<class M, class V, class E, class P>
-        void build_from_mesh_polys(const AbstractMesh<M,V,E,P> & m)
+        void build_from_mesh_polys(const AbstractPolygonMesh<M,V,E,P> & m)
+        {
+            assert(items.empty());
+            items.reserve(m.num_polys());
+            for(uint pid=0; pid<m.num_polys(); ++pid)
+            {
+                for(uint i=0; i<m.poly_tessellation(pid).size()/3; ++i)
+                {
+                    vec3d v0 = m.vert(m.poly_tessellation(pid).at(3*i+0));
+                    vec3d v1 = m.vert(m.poly_tessellation(pid).at(3*i+1));
+                    vec3d v2 = m.vert(m.poly_tessellation(pid).at(3*i+2));
+                    add_triangle(pid, {v0,v1,v2});
+                }
+            }
+            build();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        template<class M, class V, class E, class P>
+        void build_from_mesh_polys(const AbstractPolyhedralMesh<M,V,E,P> & m)
         {
             assert(items.empty());
             items.reserve(m.num_polys());
@@ -96,8 +116,7 @@ class Octree
             {
                 switch(m.mesh_type())
                 {
-                    case TRIMESH : add_triangle(m.poly_verts(pid));    break;
-                    case TETMESH : add_tetrahedron(m.poly_verts(pid)); break;
+                    case TETMESH : add_tetrahedron(pid, m.poly_verts(pid)); break;
                     default: assert(false && "Unsupported element");
                 }
             }
@@ -113,7 +132,7 @@ class Octree
             items.reserve(m.num_edges());
             for(uint eid=0; eid<m.num_edges(); ++eid)
             {
-                add_segment(m.edge_verts(eid));
+                add_segment(eid, m.edge_verts(eid));
             }
             build();
         }
@@ -170,10 +189,10 @@ class Octree
 
         struct Obj
         {
-            double      dist = inf_double;
-            OctreeNode *node = nullptr;
-            int         id   = -1;
-            vec3d       pos; // closest point
+            double      dist  = inf_double;
+            OctreeNode *node  = nullptr;
+            int         index = -1; // note: this is the item ID, NOT necessarily the index of vector items!!
+            vec3d       pos;        // closest point
         };
         struct Greater
         {
