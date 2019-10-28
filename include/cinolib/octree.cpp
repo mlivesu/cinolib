@@ -257,6 +257,18 @@ void Octree::print_query_info(const std::string & s,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
+vec3d Octree::closest_point(const vec3d & p) const
+{
+    uint   id;
+    vec3d  pos;
+    double dist;
+    closest_point(p, id, pos, dist);
+    return pos;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
 CINO_INLINE
 void Octree::closest_point(const vec3d  & p,          // query point
