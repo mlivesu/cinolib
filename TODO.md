@@ -15,6 +15,8 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* add line queries to Octree 
+* add sharp crease detection to action list in volume mesh control panel
 * consider adding a BVH with SAH policy for efficient NN and Ray intersection queries (see http://www.sci.utah.edu/~wald/Publications/2007/ParallelBVHBuild/fastbuild.pdf for theory and https://github.com/wjakob/instant-meshes/blob/master/src/bvh.h for a great implementation)
 * consider moving to C++17 to exploit parallel STL functionalities (https://www.bfilipek.com/2018/11/parallel-alg-perf.html)
 * add efficient intersection tests for triangle-triangle and segment-segment (https://github.com/gaoxifeng/robust_hex_dominant_meshing/blob/master/src/tri_tri_intersection.h)
