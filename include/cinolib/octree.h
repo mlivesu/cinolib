@@ -179,10 +179,10 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint max_depth;        // maximum allowed depth of the tree
-        uint items_per_leaf;   // prescribed number of items per leaf (can't go deeper than max_depth anyways)
-        uint tree_depth;       // actual depth of the tree
-        uint num_leaves;
+        uint max_depth;      // maximum allowed depth of the tree
+        uint items_per_leaf; // prescribed number of items per leaf (can't go deeper than max_depth anyways)
+        uint tree_depth = 0; // actual depth of the tree
+        uint num_leaves = 0; // actual number of leaves
         bool print_debug_info = false;
 
         // SUPPORT STRUCTURES ::::::::::::::::::::::::::::::::::::::::::::::::::::
