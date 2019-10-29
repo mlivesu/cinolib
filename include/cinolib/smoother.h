@@ -96,11 +96,12 @@ SmootherOptions;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class P>
+template<class M1, class V1, class E1, class P1,
+         class M2, class V2, class E2, class P2>
 CINO_INLINE
-void mesh_smoother(      AbstractPolygonMesh<M,V,E,P> & m,
-                   const AbstractPolygonMesh<M,V,E,P> & target,
-                   const SmootherOptions              & opt);
+void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
+                   const AbstractPolygonMesh<M2,V2,E2,P2> & target,
+                   const SmootherOptions                  & opt = SmootherOptions());
 }
 
 #ifndef  CINO_STATIC_LIB
