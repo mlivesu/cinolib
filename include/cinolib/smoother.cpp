@@ -98,7 +98,8 @@ void smooth_on_tangent_space(const AbstractPolygonMesh<M,V,E,P> & m,
         vec3d n = m.poly_data(pid).normal;
         if(n.length_squared()==0)
         {
-            std::cout << "WARNING: zero length face normal!" << std::endl;
+            std::cout << "WARNING: zero length face normal! Skip it" << std::endl;
+            continue;
         }
         entries.push_back(Entry(row, col_x, n.x()));
         entries.push_back(Entry(row, col_y, n.y()));
@@ -135,7 +136,8 @@ void smooth_on_tangent_line(const AbstractPolygonMesh<M,V,E,P>                  
 
     if(dir.length_squared()==0)
     {
-        std::cout << "WARNING: zero length tangent curve!" << std::endl;
+        std::cout << "WARNING: zero length tangent curve! Skip it" << std::endl;
+        return;
     }
 
     // better to update feaature tangent space at each iteration?
@@ -218,6 +220,7 @@ void label_features(AbstractPolygonMesh<M,V,E,P> & m)
         uint count = 0;
         for(uint eid : m.adj_v2e(vid))
         {
+            // marked => flagged as a sharp feature
             if(m.edge_data(eid).marked) ++count;
         }
         switch(count)
@@ -231,11 +234,12 @@ void label_features(AbstractPolygonMesh<M,V,E,P> & m)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class P>
+template<class M1, class V1, class E1, class P1,
+         class M2, class V2, class E2, class P2>
 CINO_INLINE
-void mesh_smoother(      AbstractPolygonMesh<M,V,E,P> & m,
-                   const AbstractPolygonMesh<M,V,E,P> & target,
-                   const SmootherOptions              & opt)
+void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
+                   const AbstractPolygonMesh<M2,V2,E2,P2> & target,
+                   const SmootherOptions                  & opt)
 {
     Octree ref_srf, ref_feat;
 
@@ -243,9 +247,12 @@ void mesh_smoother(      AbstractPolygonMesh<M,V,E,P> & m,
     if(opt.reproject_on_target)
     {
         ref_srf.build_from_mesh_polys(target);
-        for(uint eid=0; eid<m.num_edges(); ++eid)
+        for(uint eid=0; eid<target.num_edges(); ++eid)
         {
-            if(m.edge_data(eid).marked) ref_feat.add_segment(eid, m.edge_verts(eid));
+            if(target.edge_data(eid).marked) // marked => flagged as a sharp feature
+            {
+                ref_feat.add_segment(eid, target.edge_verts(eid));
+            }
         }
         ref_feat.build();
     }
@@ -254,7 +261,7 @@ void mesh_smoother(      AbstractPolygonMesh<M,V,E,P> & m,
 
     for(uint i=0; i<opt.n_iters; ++i)
     {
-        std::cout << "smooth iter #" << i << std::endl;
+        //std::cout << "smooth iter #" << i << std::endl;
 
         std::vector<Entry>  entries; // coeff matrix
         std::vector<double> w;       // weights matrix
