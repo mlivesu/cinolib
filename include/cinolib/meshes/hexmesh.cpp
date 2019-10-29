@@ -138,8 +138,8 @@ void Hexmesh<M,V,E,F,P>::save(const char * filename) const
     std::string str(filename);
     std::string filetype = "." + get_file_extension(str);
 
-    if (filetype.compare("mesh") == 0 ||
-        filetype.compare("MESH") == 0)
+    if (filetype.compare(".mesh") == 0 ||
+        filetype.compare(".MESH") == 0)
     {
         if(this->polys_are_labeled())
         {
