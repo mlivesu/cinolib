@@ -2,7 +2,6 @@
 Please consider this to be just development notes and not any real planning.
 
 ### Things to be fixed:
-* consider moving to NanoGUI for the visual part (https://github.com/mitsuba-renderer/nanogui)
 * make all base destructors virtual (https://codeyarns.com/2016/12/28/always-make-base-class-destructor-as-virtual-in-c/)
 * transform all NULL into nullptr
 * merge vec2<T> vec3<T> (and colors!) into a unified vec<D,T>. This will make much easier write algorithms that scale across multiple dimensions (e.g. Poisson sampling). For the same reason vertex types should become template parameters for meshes
@@ -15,6 +14,8 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* use [HapPly](https://github.com/nmwsharp/happly) for .ply IO operations
+* consider moving to NanoGUI for the visual part (https://github.com/mitsuba-renderer/nanogui)
 * add line queries to Octree 
 * add sharp crease detection to action list in volume mesh control panel
 * consider adding a BVH with SAH policy for efficient NN and Ray intersection queries (see http://www.sci.utah.edu/~wald/Publications/2007/ParallelBVHBuild/fastbuild.pdf for theory and https://github.com/wjakob/instant-meshes/blob/master/src/bvh.h for a great implementation)
