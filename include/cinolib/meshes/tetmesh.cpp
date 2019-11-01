@@ -291,7 +291,7 @@ uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
     // create sub faces and propagate attributes
     for(uint fid : this->adj_e2f(eid))
     {
-        if(!this->face_verts_are_CCW(fid,vid0,vid1)) std::swap(vid1,vid0);
+        if(!this->face_verts_are_CCW(fid,vid1,vid0)) std::swap(vid1,vid0);
         uint vid2 = this->face_vert_opposite_to(fid,eid);
         uint fid0 = this->face_add({new_vid, vid1, vid2});
         uint fid1 = this->face_add({new_vid, vid2, vid0});
