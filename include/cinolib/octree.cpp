@@ -283,6 +283,8 @@ void Octree::closest_point(const vec3d  & p,          // query point
                                  vec3d  & pos,        // point in T closest to p
                                  double & dist) const // distance between pos and p
 {
+    assert(root != nullptr);
+
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
