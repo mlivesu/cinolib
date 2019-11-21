@@ -52,45 +52,46 @@ namespace cinolib
  *   Greedy optimal homotopy and homology generators
  *   Jeff Erickson and Kim Whittlesey
  *   ACM-SIAM symposium on Discrete algorithms, 2005
-*/
+ */
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Mesh refinement strategies
+enum
+{
+    EDGE_SPLIT_STRATEGY,  // Extact (no deviation from surface), but the mesh may grow a lot
+    VERT_SPLIT_STRATEGY,  // Approximated (deviates from surface), but the mesh grows less
+    MIXED_SPLIT_STRATEGY  // Uses the apprxomated when possible (i.e. tiny surface deviation), and the exact otherwise
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+typedef struct
+{
+    // BASIS INFO/DATA
+    bool  globally_shortest  = false;               // cost for globally shortest is O(n^2 log n). When this is set to true, root will contain the root of the globally shortest basis
+    uint  root               = 0;                   // cost for a base centered at root is O(n log n)
+    float length             = 0.0;                 // length of the basis
+
+    // MESH REFINEMENT OPTIONS
+    bool  detach_loops       = false;               // refine mesh topology to detach loops traversing the same edges
+    int   split_strategy     = EDGE_SPLIT_STRATEGY; // sets the splitting strategy
+    float coplanarity_thresh = 5;                   // sets the colpanarity threshold for the MIXED_SPLIT_STRATEGY. Faces with dihedral angles lower than 5 degrees will be deemed coplanar
+
+    // AUXILIARY DATA (may be useful for visual inspection/debugging)
+    std::vector<bool> tree;                         // one element per edge. True if it is part of the tree, false otherwise
+    std::vector<bool> cotree;                       // one element per edge. True if it is part of the cotree, false otherwise
+}
+HomotopyBasisData;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::pair<uint,double> homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
-                                      std::vector<std::vector<uint>> & basis,
-                                      std::vector<bool>              & tree,
-                                      std::vector<bool>              & cotree);
+void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
+                    std::vector<std::vector<uint>> & basis,
+                    HomotopyBasisData              & data);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-std::pair<uint,double> homotopy_basis(Trimesh<M,V,E,P>               & m,
-                                      std::vector<std::vector<uint>> & basis,
-                                      const bool                       detach_loops,    // refine the mesh to make sure each edge is contained in at most one basis loop
-                                      const bool                       by_edge_splits); // true: use the edge_split strategy; false: use the vert_split strategy
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-double homotopy_basis(Trimesh<M,V,E,P>               & m,
-                      const uint                       root,
-                      std::vector<std::vector<uint>> & basis,
-                      const bool                       detach_loops,    // refine the mesh to make sure each edge is contained in at most one basis loop
-                      const bool                       by_edge_splits); // true: use the edge_split strategy; false: use the vert_split strategy
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-double homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
-                      const uint                      root,
-                      std::vector<std::vector<uint>> & basis,
-                      std::vector<bool>              & tree,
-                      std::vector<bool>              & cotree);
 }
 
 #ifndef  CINO_STATIC_LIB

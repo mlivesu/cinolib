@@ -45,81 +45,8 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::pair<uint,double> homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
-                                      std::vector<std::vector<uint>> & basis,
-                                      std::vector<bool>              & tree,
-                                      std::vector<bool>              & cotree)
-{
-    double ref_length = inf_double;
-    uint   root;
-    std::vector<std::vector<uint>> best_basis;
-    std::vector<bool>              best_tree;
-    std::vector<bool>              best_cotree;
-
-    for(uint vid=0; vid<m.num_verts(); ++vid)
-    {
-        double length = homotopy_basis(m, vid, basis, tree, cotree);
-
-        if(length < ref_length)
-        {
-            root        = vid;
-            ref_length  = length;
-            best_basis  = basis;
-            best_tree   = tree;
-            best_cotree = cotree;
-        }
-    }
-    basis  = best_basis;
-    tree   = best_tree;
-    cotree = best_cotree;
-    return std::make_pair(root,ref_length);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-std::pair<uint,double> homotopy_basis(Trimesh<M,V,E,P>               & m,
-                                      std::vector<std::vector<uint>> & basis,
-                                      const bool                       detach_loops,   // refine the mesh to make sure each edge is contained in at most one basis loop
-                                      const bool                       by_edge_splits) // true: use the edge_split strategy; false: use the vert_split strategy
-{
-    std::vector<bool> tree, cotree;
-    std::pair<uint,double> root_length = homotopy_basis(m, basis, tree, cotree);
-    if(detach_loops)
-    {
-        if(by_edge_splits) homotopy_basis_detach_loops_by_edge_split(m, root_length.first, basis);
-        else               homotopy_basis_detach_loops_by_vert_split(m, root_length.first, basis);
-    }
-    return root_length;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-double homotopy_basis(Trimesh<M,V,E,P>               & m,
-                      const uint                       root,
-                      std::vector<std::vector<uint>> & basis,
-                      const bool                       detach_loops,   // refine the mesh to make sure each edge is contained in at most one basis loop
-                      const bool                       by_edge_splits) // true: use the edge_split strategy; false: use the vert_split strategy
-{
-    std::vector<bool> tree, cotree;
-    double length = homotopy_basis(m, root, basis, tree, cotree);
-    if(detach_loops)
-    {
-        if(by_edge_splits) homotopy_basis_detach_loops_by_edge_split(m, root, basis);
-        else               homotopy_basis_detach_loops_by_vert_split(m, root, basis);
-    }
-    return length;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 double homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
-                      const uint                      root,
+                      const uint                       root,
                       std::vector<std::vector<uint>> & basis,
                       std::vector<bool>              & tree,
                       std::vector<bool>              & cotree)
@@ -168,6 +95,95 @@ double homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
         basis.push_back(e0_to_root);
     }
     return length;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
+                    std::vector<std::vector<uint>> & basis,
+                    HomotopyBasisData              & data)
+{
+    // BASIS COMPUTATION: either run tree-cotree once on a given root O(n log n), or try
+    // computing a homotopy basis for each mesh vertex, keeping the shortest O(n^2 log n)
+    if(data.globally_shortest)
+    {
+        double best_length = inf_double;
+        uint   best_root;
+        std::vector<std::vector<uint>> best_basis;
+        std::vector<bool>              best_tree;
+        std::vector<bool>              best_cotree;
+
+        for(uint vid=0; vid<m.num_verts(); ++vid)
+        {
+            double length = homotopy_basis(m, vid, basis, data.tree, data.cotree);
+
+            if(length < best_length)
+            {
+                best_root   = vid;
+                best_length = length;
+                best_basis  = basis;
+                best_tree   = data.tree;
+                best_cotree = data.cotree;
+            }
+        }
+        basis       = best_basis;
+        data.root   = best_root;
+        data.length = best_length;
+        data.tree   = best_tree;
+        data.cotree = best_cotree;
+    }
+    else
+    {
+        data.length = homotopy_basis(m, data.root, basis, data.tree, data.cotree);
+    }
+
+    // MESH REFINEMENT (this part assume the mesh is a Triangle Mesh!)
+    if(data.detach_loops)
+    {
+        Trimesh<M,V,E,P> & m_tri = dynamic_cast<Trimesh<M,V,E,P>&>(m);
+
+        homotopy_basis_detach_loops_preproc(m_tri, basis);
+
+        // enque vertices with more than 2 incident loop edges
+        std::queue<uint> q;
+        for(uint vid=0; vid<m_tri.num_verts(); ++vid)
+        {
+            if(vid == data.root) continue;
+            uint count = 0;
+            for(uint eid : m_tri.adj_v2e(vid)) if(m_tri.edge_data(eid).label>0) ++count;
+            if(count>2) q.push(vid);
+        }
+
+        while(!q.empty())
+        {
+            uint vid = q.front();
+            q.pop();
+
+            switch(data.split_strategy)
+            {
+                case EDGE_SPLIT_STRATEGY:
+                {
+                    int next = refine_umbrella_by_edge_split(m_tri, vid);
+                    if(next>=0 && next!=(int)data.root) q.push(next);
+                    break;
+                }
+
+                case VERT_SPLIT_STRATEGY:
+                {
+                    auto vids = refine_umbrella_by_vert_split(m_tri, vid, data.root);
+                    for(uint vid : vids) q.push(vid);
+                    break;
+                }
+
+                case MIXED_SPLIT_STRATEGY: break;
+                default: assert(false && "Homotopy Basis: unknown split strategy");
+            }
+        }
+
+        homotopy_basis_detach_loops_postproc(m_tri, data.root, basis);
+    }
 }
 
 }

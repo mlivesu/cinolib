@@ -38,9 +38,6 @@
 namespace cinolib
 {
 
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
 void homotopy_basis_detach_loops_preproc(Trimesh<M,V,E,P>               & m,
@@ -124,98 +121,147 @@ void extend_loop_through_umbrella(Trimesh<M,V,E,P> & m, const uint v_in, const u
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void homotopy_basis_detach_loops_by_vert_split(Trimesh<M,V,E,P>               & m,
-                                               const uint                       root,
-                                               std::vector<std::vector<uint>> & basis)
+std::vector<uint> refine_umbrella_by_vert_split(Trimesh<M,V,E,P> & m, const uint vid, const uint root)
 {
-    homotopy_basis_detach_loops_preproc(m, basis);
-
-    // enque vertices with more than 2 incident loop edges
-    std::queue<uint> q;
-    for(uint vid=0; vid<m.num_verts(); ++vid)
+    std::vector<uint>  vids_to_enqueue;
+    std::vector<ipair> edges_on_loop;
+    for(uint eid : m.adj_v2e(vid))
     {
-        if(vid == root) continue;
-        uint count = 0;
-        for(uint eid : m.adj_v2e(vid)) if(m.edge_data(eid).label>0) ++count;
-        if(count>2) q.push(vid);
+        int val = m.edge_data(eid).label;
+        if (val>0) edges_on_loop.push_back(std::make_pair(val, m.vert_opposite_to(eid, vid)));
+    }
+    SORT_VEC(edges_on_loop, false); // the last one is the "outgoing edge" (the one that takes to the root)
+    // sanity check: the outgoing edge should condensate all the loops coming into the umbrella
+    uint sum = 0;
+    for(uint i=0; i<edges_on_loop.size()-1; ++i) sum += edges_on_loop.at(i).first;
+    assert(sum == edges_on_loop.back().first);
+
+    if(edges_on_loop.size()>2)
+    {
+        uint v_in  = edges_on_loop.front().second;
+        uint v_out = edges_on_loop.back().second;
+        uint v_new = m.vert_split(m.edge_id(vid,v_in), m.edge_id(vid,v_out));
+
+        for(uint eid : m.adj_v2e( vid )) m.edge_data(eid).label = 0;
+        for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).label = 0;
+
+        // connect the ones for which there is only one way possible first
+        std::vector<ipair> to_redo;
+        uint count[2] = {0,0};
+        for(uint i=0; i<edges_on_loop.size()-1; ++i)
+        {
+            uint v_in = edges_on_loop.at(i).second;
+            uint val  = edges_on_loop.at(i).first;
+            int  e0   = m.edge_id(v_in, v_new);
+            int  e1   = m.edge_id(v_in, vid);
+            if(e0==-1 && e1>=0)
+            {
+                count[0]++;
+                extend_loop_through_umbrella(m, v_in, vid, v_out, val);
+            }
+            else if(e0>=0  && e1==-1)
+            {
+                count[1]++;
+                extend_loop_through_umbrella(m, v_in, v_new, v_out, val);
+            }
+            else
+            {
+                to_redo.push_back(std::make_pair(v_in,val));
+            }
+        }
+        // then connect the others (in order to chose the right path within the umbrella)
+        for(auto v : to_redo)
+        {
+            uint v_mid = (count[0] < count[1]) ? vid : v_new;
+            extend_loop_through_umbrella(m, v.first, v_mid, v_out, v.second);
+        }
+
+        if(v_out!=root) vids_to_enqueue.push_back(v_out);
+        bool add_vid  = false;
+        bool add_vnew = false;
+        for(uint eid : m.adj_v2e( vid )) if(m.edge_data(eid).label>1) add_vid  = true;
+        for(uint eid : m.adj_v2e(v_new)) if(m.edge_data(eid).label>1) add_vnew = true;
+        if(add_vid)  vids_to_enqueue.push_back(vid);
+        if(add_vnew) vids_to_enqueue.push_back(v_new);
     }
 
-    // iteratively duplicate edges traversed by more than one loop
-    while(!q.empty())
+    return vids_to_enqueue;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> refine_umbrella_by_vert_split(Trimesh<M,V,E,P> & m,
+                                                const uint vid,
+                                                const uint root,
+                                                const uint eid0,
+                                                const uint eid1)
+{
+    std::vector<uint>  vids_to_enqueue;
+
+    assert(m.edge_contains_vert(eid0, vid));
+    assert(m.edge_contains_vert(eid1, vid));
+
+    uint e_in  = (m.edge_data(eid0).label<m.edge_data(eid1).label) ? eid0 : eid1;
+    uint e_out = (e_in==eid0) ? eid1 : eid0;
+    assert(e_in!=e_out);
+
+    uint v_in  = m.vert_opposite_to(e_in,  vid);
+    uint v_out = m.vert_opposite_to(e_out, vid);
+    uint v_new = m.vert_split(m.edge_id(vid,v_in), m.edge_id(vid,v_out));
+
+    for(uint eid : m.adj_v2e( vid )) m.edge_data(eid).label = 0;
+    for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).label = 0;
+
+    // connect the ones for which there is only one way possible first
+    std::vector<ipair> to_redo;
+    uint count[2] = {0,0};
+    for(uint i=0; i<edges_on_loop.size()-1; ++i)
     {
-        uint vid = q.front();
-        q.pop();
-
-        std::vector<ipair> edges_on_loop;
-        for(uint eid : m.adj_v2e(vid))
+        uint v_in = edges_on_loop.at(i).second;
+        uint val  = edges_on_loop.at(i).first;
+        int  e0   = m.edge_id(v_in, v_new);
+        int  e1   = m.edge_id(v_in, vid);
+        if(e0==-1 && e1>=0)
         {
-            int val = m.edge_data(eid).label;
-            if (val>0) edges_on_loop.push_back(std::make_pair(val, m.vert_opposite_to(eid, vid)));
+            count[0]++;
+            extend_loop_through_umbrella(m, v_in, vid, v_out, val);
         }
-        SORT_VEC(edges_on_loop, false); // the last one is the "outgoing edge" (the one that takes to the root)
-        // sanity check: the outgoing edge should condensate all the loops coming into the umbrella
-        uint sum = 0;
-        for(uint i=0; i<edges_on_loop.size()-1; ++i) sum += edges_on_loop.at(i).first;
-        assert(sum == edges_on_loop.back().first);
-
-        if(edges_on_loop.size()>2)
+        else if(e0>=0  && e1==-1)
         {
-            uint v_in  = edges_on_loop.front().second;
-            uint v_out = edges_on_loop.back().second;
-            uint v_new = m.vert_split(m.edge_id(vid,v_in), m.edge_id(vid,v_out));
-
-            for(uint eid : m.adj_v2e( vid )) m.edge_data(eid).label = 0;
-            for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).label = 0;
-
-            // connect the ones for which there is only one way possible first
-            std::vector<ipair> to_redo;
-            uint count[2] = {0,0};
-            for(uint i=0; i<edges_on_loop.size()-1; ++i)
-            {
-                uint v_in = edges_on_loop.at(i).second;
-                uint val  = edges_on_loop.at(i).first;
-                int  e0   = m.edge_id(v_in, v_new);
-                int  e1   = m.edge_id(v_in, vid);
-                if(e0==-1 && e1>=0)
-                {
-                    count[0]++;
-                    extend_loop_through_umbrella(m, v_in, vid, v_out, val);
-                }
-                else if(e0>=0  && e1==-1)
-                {
-                    count[1]++;
-                    extend_loop_through_umbrella(m, v_in, v_new, v_out, val);
-                }
-                else
-                {
-                    to_redo.push_back(std::make_pair(v_in,val));
-                }
-            }
-            // then connect the others (in order to chose the right path within the umbrella)
-            for(auto v : to_redo)
-            {
-                uint v_mid = (count[0] < count[1]) ? vid : v_new;
-                extend_loop_through_umbrella(m, v.first, v_mid, v_out, v.second);
-            }
-
-            if(v_out!=root) q.push(v_out);
-            bool add_vid  = false;
-            bool add_vnew = false;
-            for(uint eid : m.adj_v2e( vid )) if(m.edge_data(eid).label>1) add_vid  = true;
-            for(uint eid : m.adj_v2e(v_new)) if(m.edge_data(eid).label>1) add_vnew = true;
-            if(add_vid)  q.push(vid);
-            if(add_vnew) q.push(v_new);
+            count[1]++;
+            extend_loop_through_umbrella(m, v_in, v_new, v_out, val);
+        }
+        else
+        {
+            to_redo.push_back(std::make_pair(v_in,val));
         }
     }
+    // then connect the others (in order to chose the right path within the umbrella)
+    for(auto v : to_redo)
+    {
+        uint v_mid = (count[0] < count[1]) ? vid : v_new;
+        extend_loop_through_umbrella(m, v.first, v_mid, v_out, v.second);
+    }
 
-    homotopy_basis_detach_loops_postproc(m, root, basis);
+    if(v_out!=root) vids_to_enqueue.push_back(v_out);
+    bool add_vid  = false;
+    bool add_vnew = false;
+    for(uint eid : m.adj_v2e( vid )) if(m.edge_data(eid).label>1) add_vid  = true;
+    for(uint eid : m.adj_v2e(v_new)) if(m.edge_data(eid).label>1) add_vnew = true;
+    if(add_vid)  vids_to_enqueue.push_back(vid);
+    if(add_vnew) vids_to_enqueue.push_back(v_new);
+
+    return vids_to_enqueue;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int refine_umbrella(Trimesh<M,V,E,P> & m, const uint vid)
+int refine_umbrella_by_edge_split(Trimesh<M,V,E,P> & m, const uint vid)
 {
     auto  e_star  = m.vert_ordered_edges_star(vid); assert(!e_star.empty());
     uint  e_out   = e_star.front(); // will contain the ID of the edge pointing towards the root of the homotopy basis
@@ -322,39 +368,6 @@ int refine_umbrella(Trimesh<M,V,E,P> & m, const uint vid)
     for(uint eid : m.adj_v2e(vid)) if(m.edge_data(eid).label>0) ++count;
     if(count>2) return vid;
     return v_out;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void homotopy_basis_detach_loops_by_edge_split(Trimesh<M,V,E,P>               & m,
-                                               const uint                       root,
-                                               std::vector<std::vector<uint>> & basis)
-{
-    homotopy_basis_detach_loops_preproc(m, basis);
-
-    // enque vertices with more than 2 incident loop edges
-    std::queue<uint> q;
-    for(uint vid=0; vid<m.num_verts(); ++vid)
-    {
-        if(vid == root) continue;
-        uint count = 0;
-        for(uint eid : m.adj_v2e(vid)) if(m.edge_data(eid).label>0) ++count;
-        if(count>2) q.push(vid);
-    }
-
-    // mesh refinement
-    while(!q.empty())
-    {
-        uint vid = q.front();
-        q.pop();
-
-        int next = refine_umbrella(m, vid);
-        if(next>=0 && next!=(int)root) q.push(next);
-    }
-
-    homotopy_basis_detach_loops_postproc(m, root, basis);
 }
 
 }

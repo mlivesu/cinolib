@@ -74,19 +74,33 @@ namespace cinolib
  *    IEEE Transactions on Visualization and Computer Graphics, 2008
 */
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class P>
 CINO_INLINE
-void homotopy_basis_detach_loops_by_vert_split(Trimesh<M,V,E,P>               & m,
-                                               const uint                       root,
-                                               std::vector<std::vector<uint>> & basis);
+void homotopy_basis_detach_loops_preproc(Trimesh<M,V,E,P>               & m,
+                                         std::vector<std::vector<uint>> & basis);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void homotopy_basis_detach_loops_by_edge_split(Trimesh<M,V,E,P>               & m,
-                                               const uint                       root,
-                                               std::vector<std::vector<uint>> & basis);
+void homotopy_basis_detach_loops_postproc(Trimesh<M,V,E,P>               & m,
+                                          const uint                       root,
+                                          std::vector<std::vector<uint>> & basis);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> refine_umbrella_by_vert_split(Trimesh<M,V,E,P> & m, const uint vid, const uint root);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+int refine_umbrella_by_edge_split(Trimesh<M,V,E,P> & m, const uint vid);
+
 }
 
 #ifndef  CINO_STATIC_LIB
