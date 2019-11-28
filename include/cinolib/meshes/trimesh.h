@@ -112,6 +112,7 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        int                 poly_id            (const uint eid0, const uint eid1) const;
         double              poly_area          (const uint pid) const;
         bool                poly_is_cap        (const uint pid, const double angle_thresh_deg = 177.0) const;
         bool                poly_is_needle     (const uint pid, const double angle_thresh_deg = 3.0) const;

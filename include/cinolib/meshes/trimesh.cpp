@@ -594,6 +594,19 @@ uint Trimesh<M,V,E,P>::poly_add(const uint vid0, const uint vid1, const uint vid
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+int Trimesh<M,V,E,P>::poly_id(const uint eid0, const uint eid1) const
+{
+    for(uint pid : this->adj_e2p(eid0))
+    {
+        if(this->poly_contains_edge(pid, eid1)) return pid;
+    }
+    return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 double Trimesh<M,V,E,P>::poly_area(const uint pid) const
 {
     vec3d p = this->poly_vert(pid,0);
