@@ -180,7 +180,7 @@ void polygon_maximum_inscribed_circle(const std::vector<vec2d> & poly,
             vec3d beg(s.p0.x, s.p0.y, 0);
             vec3d end(s.p1.x, s.p1.y, 0);
             vec3d c3d(v.x(),  v.y(),  0);
-            cinolib::Segment tmp(beg,end);
+            cinolib::Segment tmp(0, beg,end);
             double d = tmp.dist(c3d);
 
             if(d>radius)
