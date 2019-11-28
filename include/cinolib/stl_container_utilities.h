@@ -81,6 +81,18 @@ void PRINT(const C & container, const std::string & name = "");
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<typename C, typename C_iterator>
+CINO_INLINE
+int INDEX_OF(const C & container, const C_iterator & it);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename Iterator>
+CINO_INLINE
+int INDEX_OF(const Iterator & base_addr, const Iterator & it);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<typename T>
 CINO_INLINE
 void REMOVE_FROM_VEC(std::vector<T> & vec, const T & elem);
