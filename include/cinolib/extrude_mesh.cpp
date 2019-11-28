@@ -56,7 +56,7 @@ void extrude_mesh(AbstractPolygonMesh<M,V,E,P> & m, const vec3d & dir) // encode
     {
         std::vector<uint> p;
         for(uint vid : m.adj_p2v(pid)) p.push_back(v_map.at(vid));
-        if(dir.dot(m.poly_data(pid).normal)>0)
+        if(dir.dot(m.poly_data(pid).normal)<0)
         {
             m.poly_flip_winding_order(pid);   // if extruding along the normal direction, flip winding order
         }
