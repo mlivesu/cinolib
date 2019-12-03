@@ -15,6 +15,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* consider using SSE instructions (https://felix.abecassis.me/2011/09/cpp-getting-started-with-sse/)
 * use [HapPly](https://github.com/nmwsharp/happly) for .ply IO operations
 * consider moving to NanoGUI for the visual part (https://github.com/mitsuba-renderer/nanogui)
 * add line queries to Octree 
