@@ -44,10 +44,8 @@ void homotopy_basis_detach_loops_preproc(Trimesh<M,V,E,P>               & m,
                                          std::vector<std::vector<uint>> & basis)
 {
     // mark edges on basis loops, and count loops per edge (using edge labels)
-    for(uint eid=0; eid<m.num_edges(); ++eid)
-    {
-        m.edge_data(eid).label = 0;
-    }
+    m.edge_unmark_all();
+    m.edge_apply_label(0);
     for(auto loop : basis)
     {
         for(uint i=0; i<loop.size(); ++i)
@@ -56,6 +54,7 @@ void homotopy_basis_detach_loops_preproc(Trimesh<M,V,E,P>               & m,
             uint v1  = loop.at((i+1)%loop.size());
              int eid = m.edge_id(v0, v1);
             m.edge_data(eid).label++;
+            m.edge_data(eid).marked = true;
         }
     }
 }
