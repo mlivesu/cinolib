@@ -102,8 +102,8 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
 
-    if (filetype.compare("mesh") == 0 ||
-        filetype.compare("MESH") == 0)
+    if (filetype.compare(".mesh") == 0 ||
+        filetype.compare(".MESH") == 0)
     {
         read_MESH(filename, tmp_verts, tmp_polys, vert_labels, poly_labels);
     }
