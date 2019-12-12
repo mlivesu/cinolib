@@ -100,7 +100,7 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
     std::vector<int>               poly_labels;
 
     std::string str(filename);
-    std::string filetype = str.substr(str.size()-4,4);
+    std::string filetype = "." + get_file_extension(str);
 
     if (filetype.compare(".mesh") == 0 ||
         filetype.compare(".MESH") == 0)
