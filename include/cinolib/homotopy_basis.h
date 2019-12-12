@@ -160,23 +160,17 @@ uint detach_loops(Trimesh<M,V,E,P>  & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// locally detaches loops in the homotopy basis around vertex vid using a vertex split
 template<class M, class V, class E, class P>
 CINO_INLINE
-uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
-                                HomotopyBasisData & data,
-                                const uint          e_in,
-                                const uint          e_out,
-                                const vec3d         new_pos = vec3d(inf_double, inf_double, inf_double));
+void detach_loops_preproc(Trimesh<M,V,E,P>  & m,
+                          HomotopyBasisData & data);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// locally detaches loops in the homotopy basis around vertex vid using a sequence of edge splits
 template<class M, class V, class E, class P>
 CINO_INLINE
-uint detach_loops_by_edge_split(Trimesh<M,V,E,P>        & m,
-                                HomotopyBasisData       & data,
-                                const std::vector<uint> & edge_fan);
+void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
+                           HomotopyBasisData & data);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -190,17 +184,23 @@ uint detach_loops_by_poly_split(Trimesh<M,V,E,P>  & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// locally detaches loops in the homotopy basis around vertex vid using a sequence of edge splits
 template<class M, class V, class E, class P>
 CINO_INLINE
-void detach_loops_preproc(Trimesh<M,V,E,P>  & m,
-                          HomotopyBasisData & data);
+uint detach_loops_by_edge_split(Trimesh<M,V,E,P>        & m,
+                                HomotopyBasisData       & data,
+                                const std::vector<uint> & edge_fan);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// locally detaches loops in the homotopy basis around vertex vid using a vertex split
 template<class M, class V, class E, class P>
 CINO_INLINE
-void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
-                           HomotopyBasisData & data);
+uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
+                                HomotopyBasisData & data,
+                                const uint          e_in,
+                                const uint          e_out,
+                                const vec3d         new_pos = vec3d(inf_double, inf_double, inf_double));
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -283,13 +283,13 @@ uint detach_loops(Trimesh<M,V,E,P>  & m,
 
             // otherwise try vert split
             vec3d new_pos;
-            if(polys_are_planar(m, edges_cw, data.coplanarity_thresh) /*&& find_position_within_fan(m, edges_cw, vid, new_pos)*/)
+            if(polys_are_planar(m, edges_cw, data.coplanarity_thresh) && find_position_within_fan(m, edges_cw, vid, new_pos))
             {
-                return detach_loops_by_vert_split(m, data, *k, *i/*, new_pos*/);
+                return detach_loops_by_vert_split(m, data, *k, *i, new_pos);
             }
-            if(polys_are_planar(m, edges_ccw, data.coplanarity_thresh) /*&& find_position_within_fan(m, edges_ccw, vid, new_pos)*/)
+            if(polys_are_planar(m, edges_ccw, data.coplanarity_thresh) && find_position_within_fan(m, edges_ccw, vid, new_pos))
             {
-                return detach_loops_by_vert_split(m, data, *j, *i/*, new_pos*/);
+                return detach_loops_by_vert_split(m, data, *j, *i, new_pos);
             }
 
             // at the very least, do edge split along the smallest triangle fan
