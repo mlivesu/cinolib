@@ -189,6 +189,8 @@ void detach_loops(Trimesh<M,V,E,P>  & m,
         }
         if(val_1>=2 && val_2==1) q.push(vid);
     }
+
+    // REMOVE ME, eventually
     std::cout << q.size() << " points enqueued" << std::endl;
 
     m.vert_unmark_all();
@@ -404,9 +406,6 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
     // update flags
     for(uint eid : m.adj_v2e(v_mid)) m.edge_data(eid).marked = m.edge_data(eid).label>0;
     for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).marked = m.edge_data(eid).label>0;
-
-    //debug(m, v_mid, "output vmid");
-    //debug(m, v_new, "output vnew");
 
     // next one ring to process...
     // next one ring to process...
