@@ -262,20 +262,20 @@ uint detach_loops(Trimesh<M,V,E,P>  & m,
 
     switch(data.split_strategy)
     {
-        case EDGE_SPLIT_STRATEGY  :
-        {
-            // always chose the size with the smallest triangle fan
-            if(edges_ccw.size()>edges_cw.size()) return detach_loops_by_edge_split(m, data, edges_cw);
-            else                                 return detach_loops_by_edge_split(m, data, edges_ccw);
-        }
+//        case EDGE_SPLIT_STRATEGY  :
+//        {
+//            // always chose the size with the smallest triangle fan
+//            if(edges_ccw.size()>edges_cw.size()) return detach_loops_by_edge_split(m, data, edges_cw);
+//            else                                 return detach_loops_by_edge_split(m, data, edges_ccw);
+//        }
 
-        case VERT_SPLIT_STRATEGY  :
-        {
-            vec3d new_pos;
-            if(find_position_within_fan(m, edges_ccw, vid, new_pos)) return detach_loops_by_vert_split(m, data, *j, *i, new_pos);
-            if(find_position_within_fan(m, edges_cw,  vid, new_pos)) return detach_loops_by_vert_split(m, data, *k, *i, new_pos);
-            return detach_loops_by_vert_split(m, data, *j, *i); // this uses cinolib's default vert relocation for the vertex split operator
-        }
+//        case VERT_SPLIT_STRATEGY  :
+//        {
+//            vec3d new_pos;
+//            if(find_position_within_fan(m, edges_ccw, vid, new_pos)) return detach_loops_by_vert_split(m, data, *j, *i, edges_ccw, new_pos);
+//            if(find_position_within_fan(m, edges_cw,  vid, new_pos)) return detach_loops_by_vert_split(m, data, *k, *i, edges_cw, new_pos);
+//            return detach_loops_by_vert_split(m, data, *j, *i, edges_ccw); // this uses cinolib's default vert relocation for the vertex split operator
+//        }
 
         case HYBRID_SPLIT_STRATEGY :
         {
@@ -287,12 +287,12 @@ uint detach_loops(Trimesh<M,V,E,P>  & m,
             vec3d new_pos;
             if(polys_are_planar(m, edges_cw, data.coplanarity_thresh) && find_position_within_fan(m, edges_cw, vid, new_pos))
             {
-                return detach_loops_by_vert_split(m, data, *k, *i, new_pos);
+                return detach_loops_by_vert_split(m, data, *k, *i, edges_cw, new_pos);
             }
-            if(polys_are_planar(m, edges_ccw, data.coplanarity_thresh) && find_position_within_fan(m, edges_ccw, vid, new_pos))
-            {
-                return detach_loops_by_vert_split(m, data, *j, *i, new_pos);
-            }
+//            if(polys_are_planar(m, edges_ccw, data.coplanarity_thresh) && find_position_within_fan(m, edges_ccw, vid, new_pos))
+//            {
+//                return detach_loops_by_vert_split(m, data, *j, *i, edges_ccw, new_pos);
+//            }
 
             // at the very least, do edge split along the smallest triangle fan
             if(edges_ccw.size()>edges_cw.size())  return detach_loops_by_edge_split(m, data, edges_cw);
@@ -312,6 +312,7 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
                                 HomotopyBasisData & data,
                                 const uint          e_in,
                                 const uint          e_out,
+                                const std::vector<uint> & edge_fan, // just for debug
                                 const vec3d         new_pos)
 {
     ++data.refinement_stats.splits_tot;
@@ -321,6 +322,16 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
     uint v_in   = m.vert_opposite_to(e_in, v_mid);
     uint v_out  = m.vert_opposite_to(e_out, v_mid);
     int  val_in = m.edge_data(e_in).label;
+
+    // DEBUG!!!!!
+    std::vector<ipair> poly_fan;
+    for(auto i=edge_fan.begin(),j=i+1; j<edge_fan.end(); ++i,++j)
+    {
+         int pid = m.poly_id(*i,*j);
+        uint eid = m.edge_opposite_to(pid, v_mid);
+        assert(pid>=0);
+        poly_fan.push_back(m.edge_vert_ids(eid));
+    }
 
     uint star_size = m.vert_valence(v_mid);
     data.refinement_stats.vert_val_max  = std::max(data.refinement_stats.vert_val_max, star_size);
@@ -335,14 +346,35 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
         if(val>0) others.push_back(std::make_pair(m.vert_opposite_to(eid,v_mid),val));
     }
 
+    assert(edge_fan.size()>2);
+    uint testvid = m.vert_opposite_to(edge_fan.at(1), v_mid);
+
+
     vec3d og_pos = m.vert(v_mid);
-    int v_new = m.vert_split(e_in, e_out);
+    uint v_new = m.vert_split(e_in, e_out);
     assert(v_new>=0);
-    if(!new_pos.is_degenerate())
+
+
+    if(m.edge_id(testvid, v_mid) == -1)
     {
+        std::cout << "v_new on the same side as edge fan" << std::endl;
         m.vert(v_mid) = og_pos;
         m.vert(v_new) = new_pos;
     }
+    else
+    {
+        std::cout << "v_new on the OPPOSITE side as edge fan" << std::endl;
+        m.vert(v_new) = og_pos;
+        m.vert(v_mid) = new_pos;
+    }
+
+    //if(!new_pos.is_degenerate())
+    //{
+    //    // maybe it is better to do this once I know at what side of the edge fan the new vertex is...
+    //    // I could do it by checking the existence of edge_id(v_new, voppto(edge_fan.at(1),v_mid))!
+    //    m.vert(v_mid) = og_pos;
+    //    m.vert(v_new) = new_pos;
+    //}
 
     // reset loop topology inside the refined umbrella
     for(uint eid : m.adj_v2e(v_mid)) m.edge_data(eid).label = 0;
@@ -381,6 +413,24 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
     {
         m.edge_data(e_in_new).label  = val_in;
         m.edge_data(e_out_new).label = val_in;
+        std::cout << "CW" << std::endl;
+
+        ////if(!new_pos.is_degenerate())
+        //for(auto e : poly_fan)
+        //{
+        //    std::vector<uint> p_old = { e.first, e.second, v_mid };
+        //    std::vector<uint> p_new = { e.first, e.second, (uint)v_new };
+        //    vec3d n_old = triangle_normal(m.vert(p_old.at(0)), m.vert(p_old.at(1)), m.vert(p_old.at(2)));
+        //    vec3d n_new = triangle_normal(m.vert(p_new.at(0)), m.vert(p_new.at(1)), m.vert(p_new.at(2)));
+        //    std::cout << "CW: " << n_old.dot(n_new) << "\t" << n_old << "\t" << n_new << std::endl;
+        //    assert(n_old.dot(n_new)>0.9);
+        //}
+        //// maybe are the two new triangles that flip?
+        //std::vector<uint> p_old = { v_mid, v_new, v_out };
+        //std::vector<uint> p_new = { v_new, v_mid, v_in  };
+
+        //vec3d n_1 = triangle_normal(m.vert(v_mid), m.vert(v_new), m.vert(v_out));
+        //vec3d n_2 = triangle_normal(m.vert(v_mid), m.vert(v_new), m.vert(v_out));
     }
     else
     {
@@ -396,12 +446,59 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
         assert(m.edge_data(e_out).label==0);
         m.edge_data(e_in).label  = val_in;
         m.edge_data(e_out).label = val_in;
-        std::swap(m.vert(v_mid), m.vert(v_new));
+        std::cout << "CCW" << std::endl;
+
+        // THIS MUST BE THE CULPRIT:
+        //std::swap(m.vert(v_mid), m.vert(v_new));
+        // vert_split has assigned the old vertex to the side of the triangle fan.
+        // need to destroy all old triangles and reconstruct them swapping v_mid and v_new
+        //std::vector<uint> pids_to_redo;
+        //for(uint pid : m.adj_v2p(v_mid))
+        //{
+        //    if(m.poly_contains_vert(pid,v_mid) && m.poly_contains_vert(pid,v_new)) continue;
+        //    else pids_to_redo.push_back(pid);
+        //}
+        //for(uint pid : m.adj_v2p(v_new))
+        //{
+        //    if(m.poly_contains_vert(pid,v_mid) && m.poly_contains_vert(pid, v_new)) continue;
+        //    pids_to_redo.push_back(pid);
+        //}
+        //for(uint pid : pids_to_redo)
+        //{
+        //    if(m.poly_contains_vert(pid, v_mid))
+        //    {
+        //        assert(!m.poly_contains_vert(pid, v_new));
+        //        uint off  = m.poly_vert_offset(pid, v_mid);
+        //        auto vids = m.poly_verts_id(pid);
+        //        vids.at(off) = v_new;
+        //        m.poly_add(vids);
+        //    }
+        //    else
+        //    {
+        //        assert(m.poly_contains_vert(pid, v_new));
+        //        uint off  = m.poly_vert_offset(pid, v_new);
+        //        auto vids = m.poly_verts_id(pid);
+        //        vids.at(off) = v_mid;
+        //        m.poly_add(vids);
+        //    }
+        //}
+        //m.polys_remove(pids_to_redo);
+
+        ////if(!new_pos.is_degenerate())
+        //for(auto e : poly_fan)
+        //{
+        //    std::vector<uint> p_old = { e.first, e.second, v_mid };
+        //    std::vector<uint> p_new = { e.first, e.second, (uint)v_new };
+        //    vec3d n_old = triangle_normal(m.vert(p_old.at(0)), m.vert(p_old.at(1)), m.vert(p_old.at(2)));
+        //    vec3d n_new = triangle_normal(m.vert(p_new.at(0)), m.vert(p_new.at(1)), m.vert(p_new.at(2)));
+        //    std::cout << "CCW: " << n_old.dot(n_new) << "\t" << n_old << "\t" << n_new << std::endl;
+        //    assert(n_old.dot(n_new)>0.9);
+        //}
     }
 
     // update normals
-    for(uint pid : m.adj_v2p(v_mid)) { m.update_p_normal(pid); /*std::cout << m.poly_data(pid).normal << std::endl; */}
-    for(uint pid : m.adj_v2p(v_new)) { m.update_p_normal(pid); /*std::cout << m.poly_data(pid).normal << std::endl; */}
+    for(uint pid : m.adj_v2p(v_mid)) m.update_p_normal(pid);
+    for(uint pid : m.adj_v2p(v_new)) m.update_p_normal(pid);
 
     // update flags
     for(uint eid : m.adj_v2e(v_mid)) m.edge_data(eid).marked = m.edge_data(eid).label>0;
@@ -695,7 +792,7 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
             }
         }
         if(!reject) return true;
-        if(++i>10)  return false; // stop after 10 attempts
+        if(++i>5)   return false; // stop after 5 attempts
         t *= 0.5;
         pos  = t*A + (1-t)*B;
     }
