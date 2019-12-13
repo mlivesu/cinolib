@@ -367,7 +367,7 @@ bool Octree::contains(const vec3d & p, uint & id, const double eps) const
             for(int i=0; i<8; ++i)
             {
                 if(print_debug_info) ++aabb_queries;
-                if(node->children[i]->bbox.contains(p,true)) lifo.push(node->children[i]);
+                if(node->children[i]->bbox.contains(p,false)) lifo.push(node->children[i]);
             }
         }
         else
