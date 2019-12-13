@@ -360,7 +360,7 @@ bool Octree::contains(const vec3d & p, uint & id, const double eps) const
     {
         OctreeNode *node = lifo.top();
         lifo.pop();
-        assert(node->bbox.contains(p));
+        assert(node->bbox.contains(p, false));
 
         if(node->is_inner)
         {
