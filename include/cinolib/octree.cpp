@@ -360,14 +360,14 @@ bool Octree::contains(const vec3d & p, uint & id, const double eps) const
     {
         OctreeNode *node = lifo.top();
         lifo.pop();
-        assert(node->bbox.contains(p,eps));
+        assert(node->bbox.contains(p));
 
         if(node->is_inner)
         {
             for(int i=0; i<8; ++i)
             {
                 if(print_debug_info) ++aabb_queries;
-                if(node->children[i]->bbox.contains(p,eps)) lifo.push(node->children[i]);
+                if(node->children[i]->bbox.contains(p,true)) lifo.push(node->children[i]);
             }
         }
         else
@@ -412,14 +412,14 @@ bool Octree::contains(const vec3d & p, std::unordered_set<uint> & ids, const dou
     {
         OctreeNode *node = lifo.top();
         lifo.pop();
-        assert(node->bbox.contains(p,eps));
+        assert(node->bbox.contains(p,true));
 
         if(node->is_inner)
         {
             for(int i=0; i<8; ++i)
             {
                 if(print_debug_info) ++aabb_queries;
-                if(node->children[i]->bbox.contains(p,eps)) lifo.push(node->children[i]);
+                if(node->children[i]->bbox.contains(p,true)) lifo.push(node->children[i]);
             }
         }
         else
