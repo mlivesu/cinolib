@@ -212,7 +212,7 @@ bool Trimesh<M,V,E,P>::edge_is_geometrically_collapsible(const uint eid, const d
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
+uint Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
 {    
     uint v0 = this->vert_shared(eid0, eid1);
     uint v1 = this->vert_add(vec3d(0,0,0));
