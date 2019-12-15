@@ -693,6 +693,7 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
             }
         }
         // test first newly generated triangle
+        if(!reject)
         {
             uint v_tmp = m.vert_opposite_to(*(edge_fan.begin()+1), v_mid);
             uint pid = poly_fan.front();
@@ -701,15 +702,12 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
             if(m.poly_vert_id(pid,1)==v_tmp) v.at(1) = pos; else
             if(m.poly_vert_id(pid,2)==v_tmp) v.at(2) = pos; else
             assert(false);
-            std::swap(v.at(0),v.at(1)); // flip winding
             vec3d n1 = m.poly_data(pid).normal;
             vec3d n2 = triangle_normal(v.at(0), v.at(1), v.at(2));
-            if(n2.is_degenerate() || n1.dot(n2) <= 0)
-            {
-                reject = true;
-            }
+            if(n2.is_degenerate() || n1.dot(n2) <= 0) reject = true;
         }
         // test second newly generated triangle
+        if(!reject)
         {
             uint v_tmp = m.vert_opposite_to(*(edge_fan.rbegin()+1), v_mid);
             uint pid = poly_fan.back();
@@ -718,13 +716,9 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
             if(m.poly_vert_id(pid,1)==v_tmp) v.at(1) = pos; else
             if(m.poly_vert_id(pid,2)==v_tmp) v.at(2) = pos; else
             assert(false);
-            std::swap(v.at(0),v.at(1)); // flip winding
             vec3d n1 = m.poly_data(pid).normal;
             vec3d n2 = triangle_normal(v.at(0), v.at(1), v.at(2));
-            if(n2.is_degenerate() || n1.dot(n2) <= 0)
-            {
-                reject = true;
-            }
+            if(n2.is_degenerate() || n1.dot(n2) <= 0) reject = true;
         }
         if(!reject) return true;
         if(++i>5)   return false; // stop after 5 attempts
