@@ -37,6 +37,7 @@
 #include <algorithm>
 #include <numeric>
 #include <random>
+#include <iterator>
 
 namespace cinolib
 {
@@ -101,6 +102,24 @@ void PRINT(const C & container, const std::string & name)
     std::cout << name << ": ";
     for(auto item : container) std::cout << item << " ";
     std::cout << std::endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename C, typename C_iterator>
+CINO_INLINE
+int INDEX_OF(const C & container, const C_iterator & it)
+{
+    return std::distance(container.begin(), it);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename Iterator>
+CINO_INLINE
+int INDEX_OF(const Iterator & base_addr, Iterator & it)
+{
+    return std::distance(base_addr, it);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

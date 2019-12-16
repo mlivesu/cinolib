@@ -212,7 +212,7 @@ bool Trimesh<M,V,E,P>::edge_is_geometrically_collapsible(const uint eid, const d
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
+uint Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
 {    
     uint v0 = this->vert_shared(eid0, eid1);
     uint v1 = this->vert_add(vec3d(0,0,0));
@@ -588,6 +588,19 @@ uint Trimesh<M,V,E,P>::poly_add(const uint vid0, const uint vid1, const uint vid
 {
     std::vector<uint> p = { vid0, vid1, vid2 };
     return this->poly_add(p);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+int Trimesh<M,V,E,P>::poly_id(const uint eid0, const uint eid1) const
+{
+    for(uint pid : this->adj_e2p(eid0))
+    {
+        if(this->poly_contains_edge(pid, eid1)) return pid;
+    }
+    return -1;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

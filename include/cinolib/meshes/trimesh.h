@@ -87,7 +87,7 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int               vert_split            (const uint eid0, const uint eid1);
+        uint              vert_split            (const uint eid0, const uint eid1);
         void              vert_weights          (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
         void              vert_weights_cotangent(const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
         uint              vert_opposite_to      (const uint pid, const uint vid0, const uint vid1) const;
@@ -112,6 +112,7 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        int                 poly_id            (const uint eid0, const uint eid1) const;
         double              poly_area          (const uint pid) const;
         bool                poly_is_cap        (const uint pid, const double angle_thresh_deg = 177.0) const;
         bool                poly_is_needle     (const uint pid, const double angle_thresh_deg = 3.0) const;
