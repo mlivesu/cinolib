@@ -79,6 +79,13 @@ enum
     HYBRID_SPLIT_STRATEGY  // Uses the approximated when possible (i.e. tiny surface deviation), and the exact otherwise
 };
 
+static const std::string ref_txt[3] =
+{
+    "EDGE_SPLIT_STRATEGY"  ,
+    "VERT_SPLIT_STRATEGY"  ,
+    "HYBRID_SPLIT_STRATEGY",
+};
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 typedef struct
@@ -123,6 +130,9 @@ typedef struct
     std::vector<bool> cotree; // one element per edge. True if it is part of the cotree, false otherwise
 }
 HomotopyBasisData;
+
+CINO_INLINE
+std::ostream & operator<<(std::ostream & in, const HomotopyBasisData & data);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

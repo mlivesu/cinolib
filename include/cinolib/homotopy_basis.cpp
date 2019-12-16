@@ -36,6 +36,7 @@
 #include <cinolib/homotopy_basis.h>
 #include <cinolib/shortest_path_tree.h>
 #include <cinolib/mst.h>
+#include <cinolib/stl_container_utilities.h>
 
 namespace cinolib
 {
@@ -43,16 +44,36 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+std::ostream & operator<<(std::ostream & in, const HomotopyBasisData & data)
+{
+    in << ":::::::::::::::::::: HOMOTOPY BASIS INFO ::::::::::::::::;::\n";
+    in << "Root              : " << data.root                      << "\n";
+    in << "Globally shortest : " << data.globally_shortest         << "\n";
+    in << "Length            : " << data.length                    << "\n";
+    in << "Detach basis loops: " << data.detach_loops              << "\n";
+    if(data.detach_loops)
+    {
+        in << "Split Strategy    : " << ref_txt[data.split_strategy]   << "\n";
+        in << "Coplanarity Thresh: " << data.coplanarity_thresh    << " deg\n";
+        in << data.refinement_stats;
+    }
+    in << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n";
+    return in;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const RefinementStats & stats)
 {
-    in << ":::::::::::::::::::::::: STATISTICS ::::::::::::::::::::::::\n";
+    in << "::::::::::::::::::: REFINEMENT STATISTICS ::::::::::::::::::\n";
     in << "Total splits: " << stats.splits_tot << "\n";
     in << "Vert  splits: " << stats.splits_vert << " (" << 100.0*stats.splits_vert/stats.splits_tot << "%)\n";
     in << "Edge  splits: " << stats.splits_edge << " (" << 100.0*stats.splits_edge/stats.splits_tot << "%)\n";
     in << "Poly  splits: " << stats.splits_poly << " (" << 100.0*stats.splits_poly/stats.splits_tot << "%)\n";
     in << "Vert valence: " << stats.vert_val_max << "(max), " << stats.vert_val_avg/stats.splits_tot << "(avg)\n";
-    in << "Vert   count: " << stats.num_verts_now  << " (" << 100.0*stats.num_verts_now/stats.num_verts_bef << "% more than in the input mesh)\n";
-    in << "Poly   count: " << stats.num_polys_now  << " (" << 100.0*stats.num_polys_now/stats.num_polys_bef << "% more than in the input mesh)\n";
+    in << "Vert   count: " << stats.num_verts_now  << " (" << 100.0*(stats.num_verts_now-stats.num_verts_bef)/stats.num_verts_bef << "% more than in the input mesh)\n";
+    in << "Poly   count: " << stats.num_polys_now  << " (" << 100.0*(stats.num_polys_now-stats.num_polys_bef)/stats.num_polys_bef << "% more than in the input mesh)\n";
     in << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n";
     return in;
 }
@@ -189,9 +210,6 @@ void detach_loops(Trimesh<M,V,E,P>  & m,
         }
         if(val_1>=2 && val_2==1) q.push(vid);
     }
-
-    // REMOVE ME, eventually
-    std::cout << q.size() << " points enqueued" << std::endl;
 
     m.vert_unmark_all();
     m.vert_data(data.root).marked = true;
@@ -406,7 +424,6 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
     for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).marked = m.edge_data(eid).label>0;
 
     // next one ring to process...
-    // next one ring to process...
     uint count = 0;
     for(uint eid : m.adj_v2e(v_mid)) if(m.edge_data(eid).label>0) ++count;
     if(count>2) return v_mid;
@@ -437,19 +454,12 @@ uint detach_loops_by_edge_split(Trimesh<M,V,E,P>        & m,
     uint v_out   = m.vert_opposite_to(e_out, v_mid);
     int  val_in  = m.edge_data(e_in).label;
     int  val_out = m.edge_data(e_out).label;
-
-    //std::cout << "edge split " << v_mid << std::endl;
+    assert(val_in>0);
+    assert(val_out > val_in);
 
     uint star_size = m.vert_valence(v_mid);
     data.refinement_stats.vert_val_max  = std::max(data.refinement_stats.vert_val_max, star_size);
     data.refinement_stats.vert_val_avg += star_size;
-
-    assert(val_in>0);
-    if(val_out <= val_in)
-    {
-        std::cout << val_out << " " << val_in << std::endl;
-        assert(val_out > val_in);
-    }
 
     std::vector<uint> new_chain = { v_out };
     for(uint i=1; i<edge_fan.size()-1; ++i)
