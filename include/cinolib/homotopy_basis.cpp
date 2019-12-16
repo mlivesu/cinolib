@@ -154,18 +154,18 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P> & m,
 
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
-            double length = homotopy_basis(m, vid, data.basis, data.tree, data.cotree);
+            double length = homotopy_basis(m, vid, data.loops, data.tree, data.cotree);
 
             if(length < best_length)
             {
                 best_root   = vid;
                 best_length = length;
-                best_basis  = data.basis;
+                best_basis  = data.loops;
                 best_tree   = data.tree;
                 best_cotree = data.cotree;
             }
         }
-        data.basis  = best_basis;
+        data.loops  = best_basis;
         data.root   = best_root;
         data.length = best_length;
         data.tree   = best_tree;
@@ -173,7 +173,7 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P> & m,
     }
     else
     {
-        data.length = homotopy_basis(m, data.root, data.basis, data.tree, data.cotree);
+        data.length = homotopy_basis(m, data.root, data.loops, data.tree, data.cotree);
     }
 
     if(data.detach_loops) detach_loops(dynamic_cast<Trimesh<M,V,E,P>&>(m), data);
@@ -569,7 +569,7 @@ void detach_loops_preproc(Trimesh<M,V,E,P>  & m,
     // mark edges on basis loops, and count loops per edge (using edge labels)
     m.edge_unmark_all();
     m.edge_apply_label(0);
-    for(auto loop : data.basis)
+    for(auto loop : data.loops)
     {
         for(uint i=0; i<loop.size(); ++i)
         {
@@ -590,7 +590,7 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
                            HomotopyBasisData & data)
 {
     // recompute basis
-    data.basis.clear();
+    data.loops.clear();
     m.edge_unmark_all();
     for(uint eid: m.adj_v2e(data.root))
     {
@@ -620,10 +620,10 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
                 curr = next;
             }
             while(curr != data.root);
-            data.basis.push_back(loop);
+            data.loops.push_back(loop);
         }
     }
-    assert((int)data.basis.size() == m.genus()*2);
+    assert((int)data.loops.size() == m.genus()*2);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

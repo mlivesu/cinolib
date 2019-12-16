@@ -110,21 +110,21 @@ std::ostream & operator<<(std::ostream & in, const RefinementStats & stats);
 
 typedef struct
 {
-    // SETTINGS
+    // INPUT: SETTINGS
     bool  globally_shortest  = false; // cost for globally shortest is O(n^2 log n). When this is set to true, root will contain the root of the globally shortest basis
     uint  root               = 0;     // cost for a base centered at root is O(n log n)
 
-    // REFINEMENT OPTIONS AND STATISTICS
-    bool  detach_loops       = false;               // refine mesh topology to detach loops traversing the same edges
-    int   split_strategy     = EDGE_SPLIT_STRATEGY; // sets the splitting strategy
-    float coplanarity_thresh = 5;                   // sets the colpanarity threshold for the HYBRID_SPLIT_STRATEGY. Faces with dihedral angles lower than 5 degrees will be deemed coplanar and used as local support for vertex splitting
+    // INPUT: REFINEMENT OPTIONS AND STATISTICS
+    bool  detach_loops       = false;                 // refine mesh topology to detach loops traversing the same edges
+    int   split_strategy     = HYBRID_SPLIT_STRATEGY; // sets the splitting strategy
+    float coplanarity_thresh = 1;                     // sets the colpanarity threshold for the HYBRID_SPLIT_STRATEGY. Faces with dihedral angles lower than 5 degrees will be deemed coplanar and used as local support for vertex splitting
     RefinementStats refinement_stats;
 
-    // OUTPUT DATA
-    std::vector<std::vector<uint>> basis;
+    // OUTPUT: BASIS AND LENGTH
+    std::vector<std::vector<uint>> loops;
     float length = 0.0; // length of the basis
 
-    // AUXILIARY OUTPUT DATA (may be useful for visual inspection/debugging)
+    // OUTPUT: AUXILIARY DATA (may be useful for visual inspection/debugging)
     // note: tree and cotree reference the input mesh. If loops are detached they are useless
     std::vector<bool> tree;   // one element per edge. True if it is part of the tree, false otherwise
     std::vector<bool> cotree; // one element per edge. True if it is part of the cotree, false otherwise
