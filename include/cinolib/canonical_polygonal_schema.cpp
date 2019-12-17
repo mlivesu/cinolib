@@ -129,13 +129,6 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     m_out.vector_verts() = harmonic_map_3d(m_in, dirichlet_bcs, 1, laplacian_mode);
     m_out.update_bbox();
     m_out.update_normals();
-
-    // set uv coordinates
-    m_out.copy_xyz_to_uvw(UV_param);
-    for(uint vid=0; vid<m_in.num_verts(); ++vid)
-    {
-        m_in.vert_data(vid).uvw = m_out.vert(vid);
-    }
 }
 
 }
