@@ -49,6 +49,8 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
                                       Trimesh<M,V,E,P>  & m_out,
                                 const int                 laplacian_mode)
 {
+    std::cout << "Canonical Polygonal Schema" << std::endl;
+
     // In order to Basis loop
     assert(basis.detach_loops);
 
@@ -128,7 +130,7 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     m_out = m_in;
     m_out.vector_verts() = harmonic_map_3d(m_in, dirichlet_bcs, 1, laplacian_mode);
     m_out.update_bbox();
-    m_out.update_normals();
+    m_out.update_normals();    
 }
 
 }
