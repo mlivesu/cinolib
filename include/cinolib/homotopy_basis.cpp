@@ -418,6 +418,8 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
     // update normals
     for(uint pid : m.adj_v2p(v_mid)) m.update_p_normal(pid);
     for(uint pid : m.adj_v2p(v_new)) m.update_p_normal(pid);
+    m.update_v_normal(v_mid);
+    m.update_v_normal(v_new);
 
     // update flags
     for(uint eid : m.adj_v2e(v_mid)) m.edge_data(eid).marked = m.edge_data(eid).label>0;
