@@ -70,16 +70,7 @@ namespace cinolib
 //    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 //}
 
-//static void initMaterial()
-//{
-//    GLfloat material_color[4] = {1,1,1,1.0f};
-//    GLfloat material_specular[4] = {0.85,0.85,0.85,1.0};
-//    GLfloat material_ambient[4] = {0.0,0.0,0.0,0.0};
-//    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, material_specular);
-//    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, material_color);
-//    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, material_ambient);
-//    glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 128.0f);
-//}
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //static void initInverseMaterial()
 //{
@@ -92,6 +83,8 @@ namespace cinolib
 //    glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 0);
 //}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 //static void setSingleLighting()
 //{
 //    glEnable (GL_LIGHT0);
@@ -99,6 +92,8 @@ namespace cinolib
 //    glDisable (GL_LIGHT2);
 //    glDisable (GL_LIGHT3);
 //}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //static void setMultiLighting()
 //{
@@ -108,6 +103,21 @@ namespace cinolib
 //    glEnable (GL_LIGHT3);
 //}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static void init_material()
+{
+    GLfloat material_color[4]    = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat material_specular[4] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat material_ambient[4]  = { 0.0, 0.0, 0.0, 0.0 };
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  material_specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   material_color);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   material_ambient);
+    glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 128.0f);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void render_tris(const RenderData & data)
@@ -136,7 +146,7 @@ void render_tris(const RenderData & data)
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(1, GL_FLOAT, 0, data.tri_text.data());
             glColor3f(1,1,1);
-            glDisable(GL_COLOR_MATERIAL);
+            glEnable(GL_COLOR_MATERIAL);
             glEnable(GL_TEXTURE_1D);
         }
         else if (data.draw_mode & DRAW_TRI_TEXTURE2D)
@@ -152,7 +162,7 @@ void render_tris(const RenderData & data)
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(2, GL_FLOAT, 0, data.tri_text.data());
             glColor3f(1,1,1);
-            glDisable(GL_COLOR_MATERIAL);
+            glEnable(GL_COLOR_MATERIAL);
             glEnable(GL_TEXTURE_2D);
         }
         else
@@ -221,10 +231,7 @@ void render_segs(const RenderData & data)
 CINO_INLINE
 void render(const RenderData & data)
 {
-//    initLighting();
-//    setMultiLighting();
-//    initMaterial();
-//    initInverseMaterial();
+    init_material();
 
     // http://www.bluevoid.com/opengl/sig00/advanced00/notes/node107.html
     static const GLclampd EDGE_OFFSET = 0.001;
