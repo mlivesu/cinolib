@@ -140,7 +140,7 @@ void smooth_on_tangent_line(const AbstractPolygonMesh<M,V,E,P>                  
         return;
     }
 
-    // better to update feaature tangent space at each iteration?
+    // better to update feature tangent space at each iteration?
     assert(DOES_NOT_CONTAIN(feature_data,vid));
 
     vec3d p     = m.vert(vid);
@@ -307,7 +307,11 @@ void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
 
                 case FEATURE:
                 {
-                    vec3d p = m.vert(vid) + feature_data.at(vid).first*res[feature_data.at(vid).second];
+                    vec3d p = m.vert(vid);
+                    if(CONTAINS(feature_data, vid)) // degenerate features are removed, I need this check
+                    {
+                        p += feature_data.at(vid).first*res[feature_data.at(vid).second];
+                    }
                     m.vert(vid) = (opt.reproject_on_target) ? ref_feat.closest_point(p) : p;
                     break;
                 }
