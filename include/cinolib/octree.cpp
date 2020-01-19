@@ -141,7 +141,9 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
         // of the tree is lower than max depth: split the node into 8 octants
         // and move all its items downwards
         //
-        if(node->item_indices.size()>items_per_leaf && depth<max_depth)
+        // BUGFIX Jan 19, 2020: always split the root node (queries assume so)
+        //
+        if(node==root || (node->item_indices.size()>items_per_leaf && depth<max_depth))
         {
             node->is_inner = true;
 
