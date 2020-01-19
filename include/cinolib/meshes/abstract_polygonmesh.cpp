@@ -1712,7 +1712,7 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::get_ordered_boundary_vertices() 
             }
         }
         assert(found_next);
-        assert(b_verts.size()<this->num_verts());
+        assert(b_verts.size()<=this->num_verts()+1);
     }
     while(b_verts.front()!=b_verts.back());
     b_verts.pop_back();
