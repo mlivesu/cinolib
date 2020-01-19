@@ -45,6 +45,26 @@ CINO_INLINE
 void subdivision_midpoint(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
                                 AbstractPolyhedralMesh<M,V,E,F,P> & m_out)
 {
+    std::unordered_map<uint,uint> edge_verts;
+    std::unordered_map<uint,uint> face_verts;
+    std::unordered_map<uint,uint> poly_verts;
+    subdivision_midpoint(m_in, m_out, edge_verts, face_verts, poly_verts);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void subdivision_midpoint(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
+                                AbstractPolyhedralMesh<M,V,E,F,P> & m_out,
+                                std::unordered_map<uint,uint>     & edge_verts,
+                                std::unordered_map<uint,uint>     & face_verts,
+                                std::unordered_map<uint,uint>     & poly_verts)
+{
+    edge_verts.clear();
+    face_verts.clear();
+    poly_verts.clear();
+
     std::vector<vec3d>             verts = m_in.vector_verts();
     std::vector<std::vector<uint>> faces;
     std::vector<std::vector<uint>> polys;
@@ -52,9 +72,6 @@ void subdivision_midpoint(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
 
     // 1) add one new vert for each edge/face/poly
     //
-    std::map<uint,uint> edge_verts;
-    std::map<uint,uint> face_verts;
-    std::map<uint,uint> poly_verts;
     for(uint eid=0; eid<m_in.num_edges(); ++eid) { edge_verts[eid] = verts.size(); verts.push_back(m_in.edge_sample_at(eid,0.5)); }
     for(uint fid=0; fid<m_in.num_faces(); ++fid) { face_verts[fid] = verts.size(); verts.push_back(m_in.face_centroid(fid)); }
     for(uint pid=0; pid<m_in.num_polys(); ++pid) { poly_verts[pid] = verts.size(); verts.push_back(m_in.poly_centroid(pid)); }
