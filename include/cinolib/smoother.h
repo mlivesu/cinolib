@@ -60,10 +60,14 @@ namespace cinolib
  *
  * The energy being minimized is the following :
  *
- * E_smooth = w_laplacian * E_laplacian +
+ * E_smooth = w_curr_pos  * E_curr_pos  +
+ *            w_laplacian * E_laplacian +
  *            w_regular   * E_regular   +
  *            w_feature   * E_feature   +
  *            w_corner    * E_corner
+ *
+ * E_curr_pos = \sum_{\forall i} (v_i - v_i*)^2,
+ * where v_i* is the current position of v_i
  *
  * E_laplacian = \sum_{\forall i} \sum_{\forall j \in N(i)} (v_i - v_j)^2
  *
@@ -84,6 +88,7 @@ enum { REGULAR, CORNER, FEATURE };
 typedef struct
 {
     uint   n_iters             = 10;      // # of smoothing iterations
+    double w_curr_pos          = 10.0;    // attraction to current position
     double w_regular           = 10.0;    // attraction to tangent space for regular vertices
     double w_feature           = 100.0;   // attraction to tangent curve for feature vertices
     double w_corner            = 100.0;   // attraction to current pos for features corner

@@ -84,15 +84,13 @@ void smooth_on_tangent_space(const AbstractPolygonMesh<M,V,E,P> & m,
     uint  col_z = nv + nv + vid;
     vec3d p     = m.vert(vid);
 
-    // since the orientation of the faces is not globally consistent,
-    // rather than using the vertex normal to define the tangent space
-    // I define one equation for each incident face
+    // to make this piece of code robust against inconsistent
+    // per face winding, rather than using (possibly wrong) per
+    // vertex normals, I define as many tangent space as the
+    // number of incident faces. The gobal weight is distributed
+    // across all incident faces
     //
-    // WARNING: having multiple equations for each vertex gives more
-    // strenght to the tangent space component of the energy. Also
-    // note that for irregular meshes with great variance in per vertex
-    // valence, higher valence vertices will be more constrained than
-    // low valence vertices
+    double norm_factor = m.adj_v2p(vid).size();
     for(uint pid : m.adj_v2p(vid))
     {
         vec3d n = m.poly_data(pid).normal;
@@ -105,7 +103,7 @@ void smooth_on_tangent_space(const AbstractPolygonMesh<M,V,E,P> & m,
         entries.push_back(Entry(row, col_y, n.y()));
         entries.push_back(Entry(row, col_z, n.z()));
         rhs.push_back(n.dot(p));
-        w.push_back(weight);
+        w.push_back(weight/norm_factor);
         ++row;
     }
 }
@@ -179,7 +177,7 @@ void smooth_on_tangent_line(const AbstractPolygonMesh<M,V,E,P>                  
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void hold_corner(const AbstractPolygonMesh<M,V,E,P> & m,
+void hold_in_curr_pos(const AbstractPolygonMesh<M,V,E,P> & m,
                  const uint                           vid,
                  const double                         weight,
                        uint                         & row,
@@ -276,11 +274,13 @@ void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
 
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
+            hold_in_curr_pos(m, vid, opt.w_curr_pos, row, w, entries, rhs);
+
             switch(m.vert_data(vid).label)
             {
                 case REGULAR: smooth_on_tangent_space(m, vid, opt.w_regular, row, w, entries, rhs); break;
                 case FEATURE: smooth_on_tangent_line(m, vid, opt.w_feature, row, w, entries, rhs, feature_data); break;
-                case CORNER:  hold_corner(m, vid, opt.w_corner, row, w, entries, rhs); break;
+                case CORNER:  hold_in_curr_pos(m, vid, opt.w_corner, row, w, entries, rhs); break;
                 default: assert(false && "unknown vertex type");
             }
         }
