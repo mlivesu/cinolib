@@ -106,7 +106,7 @@ void read_OFF(const char                     * filename,
             std::vector<uint> p;
             for(uint j=0; j<n_corners; ++j)
             {
-                assert(ss >> vid);
+                ss >> vid;
                 p.push_back(vid);
             }
             polys.push_back(p);
