@@ -153,7 +153,25 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & verts,
                                         const std::vector<std::vector<uint>> & polys)
-{
+{    
+    // pre-allocate memory
+    uint nv = verts.size();
+    uint np = polys.size();
+    uint ne = 1.5*np;
+    this->verts.reserve(nv);
+    this->edges.reserve(ne*2);
+    this->polys.reserve(np);
+    this->poly_triangles.resize(np);
+    this->v2v.reserve(nv);
+    this->v2e.reserve(nv);
+    this->v2p.reserve(nv);
+    this->e2p.reserve(ne);
+    this->p2e.reserve(np);
+    this->p2p.reserve(np);
+    this->v_data.reserve(nv);
+    this->e_data.reserve(ne);
+    this->p_data.reserve(np);
+
     // initialize mesh connectivity (and normals)
     for(auto v : verts) this->vert_add(v);
     for(auto p : polys) this->poly_add(p);

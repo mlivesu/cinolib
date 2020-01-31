@@ -76,6 +76,38 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
                                              const std::vector<std::vector<uint>> & polys,
                                              const std::vector<std::vector<bool>> & polys_face_winding)
 {
+    // pre-allocate memory
+    uint nv = verts.size();
+    uint nf = faces.size();
+    uint np = polys.size();
+    uint ne = 1.5*nf;
+    this->verts.reserve(nv);
+    this->edges.reserve(ne*2);
+    this->faces.reserve(nf);
+    this->polys.reserve(np);
+    this->v2v.reserve(nv);
+    this->v2e.reserve(nv);
+    this->v2f.reserve(nv);
+    this->v2p.reserve(nv);
+    this->e2f.reserve(ne);
+    this->e2p.reserve(ne);
+    this->f2e.reserve(nf);
+    this->f2f.reserve(nf);
+    this->f2p.reserve(nf);
+    this->p2v.reserve(np);
+    this->p2e.reserve(np);
+    this->p2p.reserve(np);
+    this->v_on_srf.reserve(nv);
+    this->e_on_srf.reserve(ne);
+    this->f_on_srf.reserve(nf);
+    this->v_data.reserve(nv);
+    this->e_data.reserve(ne);
+    this->f_data.reserve(nf);
+    this->p_data.reserve(np);
+    this->face_triangles.resize(nf);
+    this->polys_face_winding.resize(np);
+
+
     for(auto v : verts) this->vert_add(v);
     for(auto f : faces) this->face_add(f);
     for(uint pid=0; pid<polys.size(); ++pid) this->poly_add(polys.at(pid), polys_face_winding.at(pid));
