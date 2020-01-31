@@ -68,22 +68,22 @@ void read_MESH(const char                     * filename,
 
     // read header
     int ver, dim, nv, nc;
-    assert(seek_keyword(f, "MeshVersionFormatted"));
+    if(!seek_keyword(f, "MeshVersionFormatted")) assert(false && "could not find keyword MESHVERSIONFORMATTED");
     eat_int(f, ver);
-    assert(seek_keyword(f, "Dimension"));
+    if(!seek_keyword(f, "Dimension")) assert(false && "could not find keyword DIMENSION");
     eat_int(f, dim);
 
     // read verts
-    assert(seek_keyword(f, "Vertices"));
+    if(!seek_keyword(f, "Vertices")) assert(false && "could not find keyword VERTICES");
     eat_int(f, nv);
     for(int i=0; i<nv; ++i)
     {
-        double x,y,z;
+        double x=0,y=0,z=0;
         int l;
-        assert(eat_double(f, x));
-        assert(eat_double(f, y));
-        assert(eat_double(f, z));
-        assert(eat_int(f, l));
+        if(!eat_double(f, x) ||
+           !eat_double(f, y) ||
+           !eat_double(f, z) ||
+           !eat_int(f, l)) assert(false && "failed reading vert");
         verts.push_back(vec3d(x,y,z));
         vert_labels.push_back(l);
         v_unique_labels.insert(l);
@@ -108,16 +108,16 @@ void read_MESH(const char                     * filename,
         }
         else if(strcmp(cell_type, "Tetrahedra")==0)
         {
-            assert(eat_int(f, nc));
+            if(!eat_int(f, nc)) assert(false && "failed reading num tets");
             for(int i=0; i<nc; ++i)
             {
                 int l;
                 std::vector<uint> tet(4);
-                assert(eat_uint(f, tet[0]));
-                assert(eat_uint(f, tet[1]));
-                assert(eat_uint(f, tet[2]));
-                assert(eat_uint(f, tet[3]));
-                assert(eat_int(f, l));
+                if(!eat_uint(f, tet[0]) ||
+                   !eat_uint(f, tet[1]) ||
+                   !eat_uint(f, tet[2]) ||
+                   !eat_uint(f, tet[3]) ||
+                   !eat_int(f, l)) assert(false && "failed reading tet");
 
                 for(uint & vid : tet) vid -= 1;
                 polys.push_back(tet);
@@ -127,20 +127,20 @@ void read_MESH(const char                     * filename,
         }
         else if(strcmp(cell_type, "Hexahedra")==0)
         {
-            assert(eat_int(f, nc));
+            if(!eat_int(f, nc)) assert(false && "failed reading num hexa");
             for(int i=0; i<nc; ++i)
             {
                 int l;
-                std::vector<uint> hex(8);
-                assert(eat_uint(f, hex[0]));
-                assert(eat_uint(f, hex[1]));
-                assert(eat_uint(f, hex[2]));
-                assert(eat_uint(f, hex[3]));
-                assert(eat_uint(f, hex[4]));
-                assert(eat_uint(f, hex[5]));
-                assert(eat_uint(f, hex[6]));
-                assert(eat_uint(f, hex[7]));
-                assert(eat_int(f, l));
+                std::vector<uint> hex(8);                
+                if(!eat_uint(f, hex[0]) ||
+                   !eat_uint(f, hex[1]) ||
+                   !eat_uint(f, hex[2]) ||
+                   !eat_uint(f, hex[3]) ||
+                   !eat_uint(f, hex[4]) ||
+                   !eat_uint(f, hex[5]) ||
+                   !eat_uint(f, hex[6]) ||
+                   !eat_uint(f, hex[7]) ||
+                   !eat_int(f, l)) assert(false && "failed reading hexa");
 
                 for(uint & vid : hex) vid -= 1;
                 polys.push_back(hex);
@@ -150,53 +150,53 @@ void read_MESH(const char                     * filename,
         }
         else if(strcmp(cell_type, "Triangles")==0)
         {
-            assert(eat_int(f, nc));
+            if(!eat_int(f, nc))  assert(false && "failed reading num tris");
             for(int i=0; i<nc; ++i)
             {
                 int l;
                 std::vector<uint> tri(4);
-                assert(eat_uint(f, tri[0]));
-                assert(eat_uint(f, tri[1]));
-                assert(eat_uint(f, tri[2]));
-                assert(eat_int(f, l));
+                if(!eat_uint(f, tri[0]) ||
+                   !eat_uint(f, tri[1]) ||
+                   !eat_uint(f, tri[2]) ||
+                   !eat_int(f, l)) assert(false && "failed reading tri");
                 // discard these elements
             }
         }
         else if(strcmp(cell_type, "Quadrilaterals")==0)
         {
-            assert(eat_int(f, nc));
+            if(!eat_int(f, nc))  assert(false && "failed reading num quads");
             for(int i=0; i<nc; ++i)
             {
                 int l;
                 std::vector<uint> quad(4);
-                assert(eat_uint(f, quad[0]));
-                assert(eat_uint(f, quad[1]));
-                assert(eat_uint(f, quad[2]));
-                assert(eat_uint(f, quad[3]));
-                assert(eat_int(f, l));
+                if(!eat_uint(f, quad[0]) ||
+                   !eat_uint(f, quad[1]) ||
+                   !eat_uint(f, quad[2]) ||
+                   !eat_uint(f, quad[3]) ||
+                   !eat_int(f, l)) assert(false && "failed reading quad");
                 // discard these elements
             }
         }
         else if(strcmp(cell_type, "Edges")==0)
         {
-            assert(eat_int(f, nc));
+            if(!eat_int(f, nc)) assert(false && "failed reading num edges");
             for(int i=0; i<nc; ++i)
             {
                 int l;
                 std::vector<uint> edge(4);
-                assert(eat_uint(f, edge[0]));
-                assert(eat_uint(f, edge[1]));
-                assert(eat_int(f, l));
+                if(!eat_uint(f, edge[0]) ||
+                   !eat_uint(f, edge[1]) ||
+                   !eat_int(f, l)) assert(false && "failed reading edge");
                 // discard these elements
             }
         }
         else if(strcmp(cell_type, "Corners")==0)
         {
-            assert(eat_int(f, nc));
+            if(!eat_int(f, nc)) assert(false && "failed reading corners");
             for(int i=0; i<nc; ++i)
             {
                 std::vector<uint> corner(4);
-                assert(eat_uint(f, corner[0]));
+                if(!eat_uint(f, corner[0])) assert(false && "failed reading corner");
                 // discard these elements
             }
         }
