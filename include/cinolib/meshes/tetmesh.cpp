@@ -176,6 +176,37 @@ CINO_INLINE
 void Tetmesh<M,V,E,F,P>::init_tetmesh(const std::vector<vec3d>             & verts,
                                       const std::vector<std::vector<uint>> & polys)
 {
+    // pre-allocate memory
+    uint nv = this->verts.size();
+    uint nf = this->faces.size();
+    uint np = this->polys.size();
+    uint ne = 1.5*nf;
+    this->verts.reserve(nv);
+    this->edges.reserve(ne*2);
+    this->faces.reserve(nf);
+    this->polys.reserve(np);
+    this->v2v.reserve(nv);
+    this->v2e.reserve(nv);
+    this->v2f.reserve(nv);
+    this->v2p.reserve(nv);
+    this->e2f.reserve(ne);
+    this->e2p.reserve(ne);
+    this->f2e.reserve(nf);
+    this->f2f.reserve(nf);
+    this->f2p.reserve(nf);
+    this->p2v.reserve(np);
+    this->p2e.reserve(np);
+    this->p2p.reserve(np);
+    this->v_on_srf.reserve(nv);
+    this->e_on_srf.reserve(ne);
+    this->f_on_srf.reserve(nf);
+    this->v_data.reserve(nv);
+    this->e_data.reserve(ne);
+    this->f_data.reserve(nf);
+    this->p_data.reserve(np);
+    this->face_triangles.resize(nf);
+    this->polys_face_winding.resize(np);
+
     for(auto v : verts) this->vert_add(v);
     for(auto p : polys) this->poly_add(p);
 
