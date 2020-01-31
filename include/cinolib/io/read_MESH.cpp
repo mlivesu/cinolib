@@ -96,6 +96,8 @@ void read_MESH(const char                     * filename,
         if(strcmp(cell_type, "End")==0)
         {
             fclose(f);
+            if(v_unique_labels.size()<2) vert_labels.clear();
+            if(p_unique_labels.size()<2) poly_labels.clear();
             return;
         }
         else if(strcmp(cell_type, "#")==0)
@@ -199,9 +201,6 @@ void read_MESH(const char                     * filename,
             }
         }
     }
-
-    if(v_unique_labels.size()<2) vert_labels.clear();
-    if(p_unique_labels.size()<2) poly_labels.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
