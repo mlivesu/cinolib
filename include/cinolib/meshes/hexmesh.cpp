@@ -468,6 +468,7 @@ uint Hexmesh<M,V,E,F,P>::poly_face_opposite_to(const uint pid, const uint fid) c
         if(this->faces_are_disjoint(fid,f)) return f;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
