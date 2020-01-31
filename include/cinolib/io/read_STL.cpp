@@ -87,21 +87,21 @@ void read_STL(const char         * filename,
         while(seek_keyword(fp, "facet"))
         {
             vec3d n;
-            assert(seek_keyword(fp, "normal"));
-            assert(eat_double(fp, n.x()));
-            assert(eat_double(fp, n.y()));
-            assert(eat_double(fp, n.z()));
+            if(!seek_keyword(fp, "normal")) assert(false && "could not find keyword NORMAL");
+            if(!eat_double(fp, n.x())) assert(false && "could not parse x coord");
+            if(!eat_double(fp, n.y())) assert(false && "could not parse y coord");
+            if(!eat_double(fp, n.z())) assert(false && "could not parse z coord");
             normals.push_back(n);
 
-            assert(seek_keyword(fp, "outer"));
-            assert(seek_keyword(fp, "loop"));
+            if(!seek_keyword(fp, "outer")) assert(false && "could not find keyword OUTER");
+            if(!seek_keyword(fp, "loop"))  assert(false && "could not find keyword LOOP");
             for(int i=0; i<3; ++i)
             {
                 vec3d v;
-                assert(seek_keyword(fp, "vertex"));
-                assert(eat_double(fp, v.x()));
-                assert(eat_double(fp, v.y()));
-                assert(eat_double(fp, v.z()));
+                if(!seek_keyword(fp, "vertex")) assert(false && "could not find keyword VERTEX");
+                if(!eat_double(fp, v.x())) assert(false && "could not parse x coord");
+                if(!eat_double(fp, v.y())) assert(false && "could not parse y coord");
+                if(!eat_double(fp, v.z())) assert(false && "could not parse z coord");
 
                 auto it = vmap.find(v);
                 if(it == vmap.end())
@@ -113,8 +113,8 @@ void read_STL(const char         * filename,
                 }
                 else tris.push_back(it->second);
             }
-            assert(seek_keyword(fp, "endloop"));
-            assert(seek_keyword(fp, "endfacet"));
+            if(!seek_keyword(fp, "endloop"))  assert(false && "could not find keyword ENDLOOP");
+            if(!seek_keyword(fp, "endfacet")) assert(false && "could not find keyword ENDFACET");
         }
         fclose(fp);
     }
@@ -127,16 +127,16 @@ void read_STL(const char         * filename,
 
         // read header
         char header[80];
-        assert(fread(header, 1, 80, fp)==80);
+        if(fread(header, 1, 80, fp)!=80) assert(false && "error reading STL binary header");
 
         // read triangles
         unsigned int nt;
-        assert(fread(&nt, sizeof(unsigned int), 1, fp)==1);
+        if(fread(&nt, sizeof(unsigned int), 1, fp)!=1) assert(false && "error reading number of triangles");
         for(unsigned int i=0; i<nt; ++i)
         {
             // read normal
             float nf[3];
-            assert(fread(&nf, sizeof(float), 3, fp)==3);
+            if(fread(&nf, sizeof(float), 3, fp)!=3) assert(false && "error reading normal");
             vec3d n(nf[0], nf[1], nf[2]);
             normals.push_back(n);
 
@@ -144,7 +144,7 @@ void read_STL(const char         * filename,
             for(int j=0; j<3; ++j)
             {
                 float vf[3];
-                assert(fread(&vf, sizeof(float), 3, fp)==3);
+                if(fread(&vf, sizeof(float), 3, fp)!=3) assert(false && "error reading vertex");
 
                 vec3d v(vf[0], vf[1], vf[2]);
                 auto it = vmap.find(v);
@@ -160,7 +160,7 @@ void read_STL(const char         * filename,
 
             // read (and discard) attribute
             unsigned short attribute;
-            assert(fread(&attribute, sizeof(unsigned short), 1, fp)==1);
+            if(fread(&attribute, sizeof(unsigned short), 1, fp)!=1) assert(false && "error reading attribute");
         }
         fclose(fp);
     }
