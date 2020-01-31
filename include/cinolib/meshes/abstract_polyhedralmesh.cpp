@@ -938,6 +938,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_offset(const uint pid, const u
         if (poly_face_id(pid,off) == fid) return off;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1112,6 +1113,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_vert_offset(const uint fid, const u
         if (face_vert_id(fid,off) == vid) return off;
     }
     assert(false); // something went wrong
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

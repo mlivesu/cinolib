@@ -800,6 +800,7 @@ uint Tetmesh<M,V,E,F,P>::poly_vert_opposite_to(const uint pid, const uint fid) c
         if (!this->face_contains_vert(fid, vid)) return vid;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -830,6 +831,7 @@ uint Tetmesh<M,V,E,F,P>::poly_edge_opposite_to(const uint pid, const uint vid0, 
         }
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -845,6 +847,7 @@ uint Tetmesh<M,V,E,F,P>::poly_face_opposite_to(const uint pid, const uint vid) c
         if (!this->face_contains_vert(fid,vid)) return fid;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
