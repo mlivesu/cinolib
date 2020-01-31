@@ -283,7 +283,9 @@ int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const b
     if(topologic_check && !edge_is_topologically_collapsible(eid))         return -1;
     if(geometric_check && !edge_is_geometrically_collapsible(eid, lambda)) return -1;
 
+#ifndef NDEBUG
     int euler_before = this->Euler_characteristic();
+#endif
 
     uint vert_to_keep   = this->edge_vert_id(eid,0);
     uint vert_to_remove = this->edge_vert_id(eid,1);
@@ -307,7 +309,12 @@ int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const b
 
     this->vert_remove(vert_to_remove);
 
-    if(topologic_check) assert(euler_before == this->Euler_characteristic());
+    if(topologic_check)
+    {
+#ifndef NDEBUG
+        assert(euler_before == this->Euler_characteristic());
+#endif
+    }
 
     return vert_to_keep;
 }

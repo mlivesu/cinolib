@@ -531,7 +531,9 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_split_along_new_face(const uint pid, const std::vector<uint> & f)
 {
+#ifndef NDEBUG
     for(uint vid : f) assert(this->poly_contains_vert(pid,vid));
+#endif
     uint new_fid = this->face_add(f);
 
     // define the edge border
@@ -2053,7 +2055,9 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_add(const std::vector<uint> & f)
         std::cout << ANSI_fg_color_red << "WARNING: adding duplicated face!" << ANSI_fg_color_default << std::endl;
         return face_id(f);
     }
+#ifndef NDEBUG
     for(uint vid : f) assert(vid < this->num_verts());
+#endif
 
     uint fid = this->num_faces();
     this->faces.push_back(f);
@@ -2222,8 +2226,10 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & flist
         std::cout << ANSI_fg_color_red << "WARNING: adding duplicated poly!" << ANSI_fg_color_default << std::endl;
         return poly_id(flist);
     }
+#ifndef NDEBUG
     for(uint fid : flist) assert(fid < this->num_faces());
     assert(flist.size() == fwinding.size());
+#endif
 
     uint pid = this->num_polys();
     this->polys.push_back(flist);
