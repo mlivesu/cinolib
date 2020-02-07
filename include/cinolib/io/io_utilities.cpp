@@ -46,7 +46,8 @@ bool seek_keyword(FILE * f, const char * keyword)
     s[0]='\0';
     do
     {
-        fscanf(f, "%255s", s);
+        int unused;
+        unused = fscanf(f, "%255s", s);
     }
     while(strcmp(s, keyword) && !feof(f));
 
@@ -62,7 +63,8 @@ bool next_is_keyword(FILE * f, const char * keyword)
     if(feof(f)) return false;
     static char s[256];
     s[0]='\0';
-    fscanf(f, "%255s", s);
+    int unused;
+    unused = fscanf(f, "%255s", s);
     if(strcmp(s, keyword)) return true;
     return false;
 }
@@ -74,7 +76,8 @@ bool eat_word(FILE * f, char *word)
 {
     word[0]='\0';
     if(feof(f)) return false;
-    fscanf(f, "%s", word);
+    int unused;
+    unused = fscanf(f, "%s", word);
     return true;
 }
 
@@ -84,7 +87,8 @@ CINO_INLINE
 bool eat_double(FILE * f, double & d)
 {
     if(feof(f)) return false;
-    fscanf(f, "%lf", &d);
+    int unused;
+    unused = fscanf(f, "%lf", &d);
     return true;
 }
 
@@ -94,7 +98,8 @@ CINO_INLINE
 bool eat_int(FILE * f, int & i)
 {
     if(feof(f)) return false;
-    fscanf(f, "%d", &i);
+    int unused;
+    unused = fscanf(f, "%d", &i);
     return true;
 }
 
@@ -104,7 +109,8 @@ CINO_INLINE
 bool eat_uint(FILE * f, uint & i)
 {
     if(feof(f)) return false;
-    fscanf(f, "%d", &i);
+    int unused;
+    unused = fscanf(f, "%d", &i);
     return true;
 }
 
