@@ -104,7 +104,8 @@ void read_MESH(const char                     * filename,
         {
             // comment, ignore whole line up to next \n
             char line[1024];
-            auto dummy = fgets(line, 1024, f);
+            char *unused;
+            unused = fgets(line, 1024, f);
         }
         else if(strcmp(cell_type, "Tetrahedra")==0)
         {
