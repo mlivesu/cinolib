@@ -158,6 +158,15 @@ double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
                         const std::vector<bool>     & mask, // if mask[p] = true, path cannot pass through it
                               std::vector<uint>     & path);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
+                        const uint                    source,
+                        const std::set<uint>        & dest,
+                              std::vector<uint>     & path);
+
 }
 
 #ifndef  CINO_STATIC_LIB

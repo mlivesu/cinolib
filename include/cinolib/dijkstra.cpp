@@ -668,4 +668,58 @@ double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
     return 0.0;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
+                        const uint                    source,
+                        const std::set<uint>        & dest,
+                              std::vector<uint>     & path)
+{
+    path.clear();
+
+    std::vector<int> prev(m.num_polys(), -1);
+
+    std::vector<double> dist(m.num_polys(), inf_double);
+    dist.at(source) = 0.0;
+
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
+
+    while(!q.empty())
+    {
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
+
+        if(CONTAINS(dest,vid))
+        {
+            int tmp = vid;
+            do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
+            std::reverse(path.begin(), path.end());
+            return dist.at(vid);
+        }
+
+        for(uint nbr : m.adj_p2p(vid))
+        {
+            double new_dist = dist.at(vid) + m.poly_centroid(vid).dist(m.poly_centroid(nbr));
+
+            if(dist.at(nbr) > new_dist)
+            {
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
+                {
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
+                }
+                dist.at(nbr) = new_dist;
+                prev.at(nbr) = vid;
+                q.insert(std::make_pair(new_dist,nbr));
+            }
+        }
+    }
+    assert(false && "Dijkstra did not converge!");
+    return 0.0;
+}
+
 }
