@@ -39,11 +39,18 @@ int main(int argc, char **argv)
     data.globally_shortest = false;
     data.root = 152; // best for torus
     data.detach_loops = true;
-    data.split_strategy = HYBRID_SPLIT_STRATEGY;
+    data.split_strategy = EDGE_SPLIT_STRATEGY;
     homotopy_basis(m_xyz, data);
     std::cout << data << std::endl;
     DrawableTrimesh<> m_uvw;
     canonical_polygonal_schema(m_xyz, data, m_uvw);
+
+    // set UV coordinates
+    auto xyz = m_xyz.vector_verts();
+    m_xyz.vector_verts() = m_uvw.vector_verts();
+    m_xyz.copy_xyz_to_uvw(UV_param);
+    m_uvw.copy_xyz_to_uvw(UV_param);
+    m_xyz.vector_verts() = xyz;
 
     QWidget window;
     GLcanvas gui_xyz;
@@ -54,12 +61,12 @@ int main(int argc, char **argv)
     window.setLayout(&layout);
     m_xyz.show_wireframe(false);
     m_xyz.edge_mark_boundaries();
-    m_xyz.show_texture2D(TEXTURE_2D_CHECKERBOARD, 4);
+    m_xyz.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
     m_xyz.updateGL();
     gui_xyz.push_obj(&m_xyz);
     m_uvw.show_wireframe(false);
     m_uvw.edge_mark_boundaries();
-    m_uvw.show_texture2D(TEXTURE_2D_CHECKERBOARD, 4);
+    m_uvw.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
     m_uvw.updateGL();
     gui_uvw.push_obj(&m_uvw);
     window.resize(800,600);
