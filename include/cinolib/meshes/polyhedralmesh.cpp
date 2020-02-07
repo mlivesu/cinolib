@@ -82,26 +82,46 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
     std::vector<std::vector<uint>> tmp_faces;
     std::vector<std::vector<uint>> tmp_polys;
     std::vector<std::vector<bool>> tmp_polys_face_winding;
+    std::vector<int>               vert_labels;
+    std::vector<int>               poly_labels;
 
     std::string str(filename);
-    std::string filetype = str.substr(str.size()-6,6);
+    std::string filetype = "." + get_file_extension(str);
 
-    if (filetype.compare("hybrid") == 0 ||
-        filetype.compare("HYBRID") == 0)
+    if (filetype.compare(".hybrid") == 0 ||
+        filetype.compare(".HYBRID") == 0)
     {
         read_HYBDRID(filename, tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
+        this->init(tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
     }
     else if (filetype.compare(".hedra") == 0 ||
              filetype.compare(".HEDRA") == 0)
     {
         read_HEDRA(filename, tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
+        this->init(tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
+    }
+    else if (filetype.compare(".mesh") == 0 ||
+             filetype.compare(".MESH") == 0)
+    {
+        read_MESH(filename, tmp_verts, tmp_polys, vert_labels, poly_labels);
+        this->init(tmp_verts, tmp_polys, vert_labels, poly_labels);
+    }
+    else if (filetype.compare(".vtu") == 0 ||
+             filetype.compare(".VTU") == 0)
+    {
+        read_VTU(filename, tmp_verts, tmp_polys);
+        this->init(tmp_verts, tmp_polys, vert_labels, poly_labels);
+    }
+    else if (filetype.compare(".vtk") == 0 ||
+             filetype.compare(".VTK") == 0)
+    {
+        read_VTK(filename, tmp_verts, tmp_polys);
+        this->init(tmp_verts, tmp_polys, vert_labels, poly_labels);
     }
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
-    }
-
-    this->init(tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
+    }    
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

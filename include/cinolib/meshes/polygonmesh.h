@@ -67,7 +67,7 @@ class Polygonmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        MeshType mesh_type() const { return POLYGONMESH; }
+        MeshType mesh_type() const override { return POLYGONMESH; }
 };
 
 }

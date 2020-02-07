@@ -53,7 +53,7 @@ CINO_INLINE
 Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d> & verts,
                             const std::vector<uint>  & polys)
 {
-    init_tetmesh(verts, polys_from_serialized_vids(polys,4));
+    this->init(verts, polys_from_serialized_vids(polys,4));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -63,7 +63,7 @@ CINO_INLINE
 Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<double> & coords,
                             const std::vector<uint>   & polys)
 {
-    init_tetmesh(vec3d_from_serialized_xyz(coords), polys_from_serialized_vids(polys,4));
+    this->init(vec3d_from_serialized_xyz(coords), polys_from_serialized_vids(polys,4));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -73,7 +73,7 @@ CINO_INLINE
 Tetmesh<M,V,E,F,P>::Tetmesh(const std::vector<vec3d>             & verts,
                             const std::vector<std::vector<uint>> & polys)
 {
-    init_tetmesh(verts, polys);
+    this->init(verts, polys);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -122,7 +122,7 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
     }
 
-    init_tetmesh(tmp_verts, tmp_polys, vert_labels, poly_labels);
+    this->init(tmp_verts, tmp_polys, vert_labels, poly_labels);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -166,87 +166,6 @@ void Tetmesh<M,V,E,F,P>::save(const char * filename) const
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Tetmesh<M,V,E,F,P>::init_tetmesh(const std::vector<vec3d>             & verts,
-                                      const std::vector<std::vector<uint>> & polys)
-{
-    // pre-allocate memory
-    uint nv = this->verts.size();
-    uint nf = this->faces.size();
-    uint np = this->polys.size();
-    uint ne = 1.5*nf;
-    this->verts.reserve(nv);
-    this->edges.reserve(ne*2);
-    this->faces.reserve(nf);
-    this->polys.reserve(np);
-    this->v2v.reserve(nv);
-    this->v2e.reserve(nv);
-    this->v2f.reserve(nv);
-    this->v2p.reserve(nv);
-    this->e2f.reserve(ne);
-    this->e2p.reserve(ne);
-    this->f2e.reserve(nf);
-    this->f2f.reserve(nf);
-    this->f2p.reserve(nf);
-    this->p2v.reserve(np);
-    this->p2e.reserve(np);
-    this->p2p.reserve(np);
-    this->v_on_srf.reserve(nv);
-    this->e_on_srf.reserve(ne);
-    this->f_on_srf.reserve(nf);
-    this->v_data.reserve(nv);
-    this->e_data.reserve(ne);
-    this->f_data.reserve(nf);
-    this->p_data.reserve(np);
-    this->face_triangles.resize(nf);
-    this->polys_face_winding.resize(np);
-
-    for(auto v : verts) this->vert_add(v);
-    for(auto p : polys) this->poly_add(p);
-
-    this->copy_xyz_to_uvw(UVW_param);
-
-    std::cout << "new mesh\t"      <<
-                 this->num_verts() << "V / " <<
-                 this->num_edges() << "E / " <<
-                 this->num_faces() << "F / " <<
-                 this->num_polys() << "P   " << std::endl;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Tetmesh<M,V,E,F,P>::init_tetmesh(const std::vector<vec3d>             & verts,
-                                      const std::vector<std::vector<uint>> & polys,
-                                      const std::vector<int>               & vert_labels,
-                                      const std::vector<int>               & poly_labels)
-{
-    init_tetmesh(verts, polys);
-
-    if(vert_labels.size()==this->num_verts())
-    {
-        std::cout << "set vert labels" << std::endl;
-        for(uint vid=0; vid<this->num_verts(); ++vid)
-        {
-            this->vert_data(vid).label = vert_labels.at(vid);
-        }
-    }
-
-    if(poly_labels.size()==this->num_polys())
-    {
-        std::cout << "set poly labels" << std::endl;
-        for(uint pid=0; pid<this->num_polys(); ++pid)
-        {
-            this->poly_data(pid).label = poly_labels.at(pid);
-        }
-        this->poly_color_wrt_label();
     }
 }
 
@@ -690,36 +609,7 @@ CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex list
 {
     assert(vlist.size()==4);
-
-    // detect faces
-    std::vector<uint> f0 = { vlist.at(TET_FACES[0][0]), vlist.at(TET_FACES[0][1]), vlist.at(TET_FACES[0][2]) };
-    std::vector<uint> f1 = { vlist.at(TET_FACES[1][0]), vlist.at(TET_FACES[1][1]), vlist.at(TET_FACES[1][2]) };
-    std::vector<uint> f2 = { vlist.at(TET_FACES[2][0]), vlist.at(TET_FACES[2][1]), vlist.at(TET_FACES[2][2]) };
-    std::vector<uint> f3 = { vlist.at(TET_FACES[3][0]), vlist.at(TET_FACES[3][1]), vlist.at(TET_FACES[3][2]) };
-
-    // detect face ids
-    int fid0 = this->face_id(f0);
-    int fid1 = this->face_id(f1);
-    int fid2 = this->face_id(f2);
-    int fid3 = this->face_id(f3);
-
-    // add missing faces (with vertices CCW)
-    if(fid0 == -1) fid0 = this->face_add(f0);
-    if(fid1 == -1) fid1 = this->face_add(f1);
-    if(fid2 == -1) fid2 = this->face_add(f2);
-    if(fid3 == -1) fid3 = this->face_add(f3);
-
-    std::vector<bool> w(4,false); // assume CW for each face w.r.t. new poly
-    if(this->face_winding_agrees_with(fid0, f0.at(0), f0.at(1))) w[0] = true; // set CCW
-    if(this->face_winding_agrees_with(fid1, f1.at(0), f1.at(1))) w[1] = true; // set CCW
-    if(this->face_winding_agrees_with(fid2, f2.at(0), f2.at(1))) w[2] = true; // set CCW
-    if(this->face_winding_agrees_with(fid3, f3.at(0), f3.at(1))) w[3] = true; // set CCW
-
-    uint pid = poly_add({static_cast<uint>(fid0),
-                         static_cast<uint>(fid1),
-                         static_cast<uint>(fid2),
-                         static_cast<uint>(fid3)},w);
-
+    uint pid = AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(vlist);
     reorder_p2v(pid); // make sure p2v stores tet vertices in the standard way
     update_tet_quality(pid);
     return pid;

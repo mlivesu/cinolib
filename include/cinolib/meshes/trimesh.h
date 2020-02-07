@@ -72,23 +72,23 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        MeshType mesh_type() const { return TRIMESH; }
+        MeshType mesh_type() const override { return TRIMESH; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_p_normal(const uint pid);
+        void update_p_normal(const uint pid) override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_poly(const uint) const { return 3; }
-        uint verts_per_poly()           const { return 3; }
-        uint edges_per_poly(const uint) const { return 3; }
-        uint edges_per_poly()           const { return 3; }
+        uint verts_per_poly(const uint) const override { return 3; }
+        uint verts_per_poly()           const          { return 3; }
+        uint edges_per_poly(const uint) const override { return 3; }
+        uint edges_per_poly()           const          { return 3; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint              vert_split            (const uint eid0, const uint eid1);
-        void              vert_weights          (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
+        void              vert_weights          (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const override;
         void              vert_weights_cotangent(const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
         uint              vert_opposite_to      (const uint pid, const uint vid0, const uint vid1) const;
         std::vector<uint> vert_link_edges       (const uint vid) const;

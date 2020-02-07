@@ -96,6 +96,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual uint verts_per_poly(const uint pid) const { return this->polys.at(pid).size(); }
+        virtual uint edges_per_poly(const uint pid) const { return this->p2e.at(pid).size();   }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

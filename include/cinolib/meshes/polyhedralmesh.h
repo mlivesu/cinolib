@@ -66,20 +66,20 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        MeshType mesh_type() const { return POLYHEDRALMESH; }
+        MeshType mesh_type() const override { return POLYHEDRALMESH; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void load(const char * filename);
-        void save(const char * filename) const;
+        void load(const char * filename) override;
+        void save(const char * filename) const override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_f_normal(const uint fid);
+        void update_f_normal(const uint fid) override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double poly_volume               (const uint) const { assert(false && "TODO!"); return 1.0; }
+        double poly_volume               (const uint) const override { assert(false && "TODO!"); return 1.0; }
         bool   poly_is_hexahedron        (const uint pid) const;
         bool   poly_is_prism             (const uint pid) const;
         bool   poly_is_prism             (const uint pid, const uint fid) const; // check if it is a prism using fid as base

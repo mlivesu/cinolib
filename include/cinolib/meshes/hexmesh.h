@@ -76,35 +76,26 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void load(const char * filename);
-        void save(const char * filename) const;
+        void load(const char * filename) override;
+        void save(const char * filename) const override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void init_hexmesh(const std::vector<vec3d>             & verts,
-                          const std::vector<std::vector<uint>> & polys);
-        void init_hexmesh(const std::vector<vec3d>             & verts,
-                          const std::vector<std::vector<uint>> & polys,
-                          const std::vector<int>               & vert_labels,
-                          const std::vector<int>               & poly_labels);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void update_f_normal(const uint fid);
+        void update_f_normal(const uint fid) override;
         void update_hex_quality(const uint pid);
         void update_hex_quality();
         void print_quality(const bool list_folded_elements = false);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_poly(const uint) const { return  8; }
-        uint verts_per_poly()           const { return  8; }
-        uint edges_per_poly(const uint) const { return 12; }
-        uint edges_per_poly()           const { return 12; }
-        uint faces_per_poly(const uint) const { return  6; }
-        uint faces_per_poly()           const { return  6; }
-        uint verts_per_face(const uint) const { return  4; }
-        uint verts_per_face()           const { return  4; }
+        uint verts_per_poly(const uint) const override { return  8; }
+        uint verts_per_poly()           const          { return  8; }
+        uint edges_per_poly(const uint) const override { return 12; }
+        uint edges_per_poly()           const          { return 12; }
+        uint faces_per_poly(const uint) const override { return  6; }
+        uint faces_per_poly()           const          { return  6; }
+        uint verts_per_face(const uint) const override { return  4; }
+        uint verts_per_face()           const          { return  4; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -125,9 +116,9 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         uint   poly_face_opposite_to(const uint pid, const uint fid) const;
         void   poly_subdivide       (const std::vector<std::vector<std::vector<uint>>> & split_scheme);
-        double poly_volume          (const uint pid) const;
+        double poly_volume          (const uint pid) const override;
         bool   poly_fix_orientation ();
-        uint   poly_add             (const std::vector<uint> & vlist); // vertex list
+        uint   poly_add             (const std::vector<uint> & vlist) override; // vertex list
 
         using  AbstractPolyhedralMesh<M,V,E,F,P>::poly_add; // avoid hiding poly_add(flist,fwinding);
 

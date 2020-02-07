@@ -72,42 +72,33 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        MeshType mesh_type() const { return TETMESH; }
+        MeshType mesh_type() const override { return TETMESH; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void load(const char * filename);
-        void save(const char * filename) const;
+        void load(const char * filename) override;
+        void save(const char * filename) const override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void init_tetmesh(const std::vector<vec3d>             & verts,
-                          const std::vector<std::vector<uint>> & polys);
-        void init_tetmesh(const std::vector<vec3d>             & verts,
-                          const std::vector<std::vector<uint>> & polys,
-                          const std::vector<int>               & vert_labels,
-                          const std::vector<int>               & poly_labels);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void update_f_normal(const uint fid);
+        void update_f_normal(const uint fid)  override;
         void update_tet_quality(const uint pid);
         void update_tet_quality();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_poly(const uint) const { return  4; }
-        uint verts_per_poly()           const { return  4; }
-        uint edges_per_poly(const uint) const { return  6; }
-        uint edges_per_poly()           const { return  6; }
-        uint faces_per_poly(const uint) const { return  4; }
-        uint faces_per_poly()           const { return  4; }
-        uint verts_per_face(const uint) const { return  3; }
-        uint verts_per_face()           const { return  3; }
+        uint verts_per_poly(const uint) const override { return  4; }
+        uint verts_per_poly()           const          { return  4; }
+        uint edges_per_poly(const uint) const override { return  6; }
+        uint edges_per_poly()           const          { return  6; }
+        uint faces_per_poly(const uint) const override { return  4; }
+        uint faces_per_poly()           const          { return  4; }
+        uint verts_per_face(const uint) const override { return  3; }
+        uint verts_per_face()           const          { return  3; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void vert_weights          (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
+        void vert_weights          (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const override;
         void vert_weights_cotangent(const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -139,11 +130,11 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         std::vector<uint> poly_faces_opposite_to(const uint pid, const uint eid) const;
         int               poly_shared_vert      (const uint pid, const std::vector<uint> & incident_edges) const; // TODO: move to global ids!!!!!!
         bool              poly_bary_coords      (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
-        double            poly_volume           (const uint pid) const;
+        double            poly_volume           (const uint pid) const override;
         uint              poly_split            (const uint pid, const vec3d & p);
         uint              poly_split            (const uint pid, const std::vector<double> & bary = { 0.25, 0.25, 0.25, 0.25 });
         void              polys_split           (const std::vector<uint> & pids);
-        uint              poly_add              (const std::vector<uint> & vlist); // vertex list
+        uint              poly_add              (const std::vector<uint> & vlist) override; // vertex list
 
         using  AbstractPolyhedralMesh<M,V,E,F,P>::poly_add; // avoid hiding poly_add(flist,fwinding);
 

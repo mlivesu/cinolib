@@ -72,14 +72,14 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        MeshType mesh_type() const { return QUADMESH; }
+        MeshType mesh_type() const override { return QUADMESH; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint verts_per_poly(const uint) const { return 4; }
-        uint verts_per_poly()           const { return 4; }
-        uint edges_per_poly(const uint) const { return 4; }
-        uint edges_per_poly()           const { return 4; }
+        uint verts_per_poly(const uint) const override { return 4; }
+        uint verts_per_poly()           const          { return 4; }
+        uint edges_per_poly(const uint) const override { return 4; }
+        uint edges_per_poly()           const          { return 4; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -104,12 +104,11 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
     this->e_data.reserve(ne);
     this->f_data.reserve(nf);
     this->p_data.reserve(np);
-    this->face_triangles.resize(nf);
-    this->polys_face_winding.resize(np);
+    this->face_triangles.reserve(nf);
+    this->polys_face_winding.reserve(np);
 
-
-    for(auto v : verts) this->vert_add(v);
-    for(auto f : faces) this->face_add(f);
+    for(auto v : verts) vert_add(v);
+    for(auto f : faces) face_add(f);
     for(uint pid=0; pid<polys.size(); ++pid) this->poly_add(polys.at(pid), polys_face_winding.at(pid));
 
     this->copy_xyz_to_uvw(UVW_param);
@@ -119,6 +118,73 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
                  this->num_edges() << "E / " <<
                  this->num_faces() << "F / " <<
                  this->num_polys() << "P   " << std::endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>             & verts,
+                                             const std::vector<std::vector<uint>> & polys)
+{
+    // pre-allocate memory
+    uint nv = verts.size();
+    uint np = polys.size();
+    this->verts.reserve(nv);
+    this->polys.reserve(np);
+    this->v2v.reserve(nv);
+    this->v2e.reserve(nv);
+    this->v2f.reserve(nv);
+    this->v2p.reserve(nv);
+    this->p2v.reserve(np);
+    this->p2e.reserve(np);
+    this->p2p.reserve(np);
+    this->v_on_srf.reserve(nv);
+    this->v_data.reserve(nv);
+    this->p_data.reserve(np);
+    this->polys_face_winding.reserve(np);
+
+    for(auto v : verts) vert_add(v);
+    for(auto p : polys) poly_add(p);
+
+    this->copy_xyz_to_uvw(UVW_param);
+
+    std::cout << "new mesh\t"      <<
+                 this->num_verts() << "V / " <<
+                 this->num_edges() << "E / " <<
+                 this->num_faces() << "F / " <<
+                 this->num_polys() << "P   " << std::endl;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>             & verts,
+                                             const std::vector<std::vector<uint>> & polys,
+                                             const std::vector<int>               & vert_labels,
+                                             const std::vector<int>               & poly_labels)
+{
+    init(verts, polys);
+
+    if(vert_labels.size()==this->num_verts())
+    {
+        std::cout << "set vert labels" << std::endl;
+        for(uint vid=0; vid<this->num_verts(); ++vid)
+        {
+            this->vert_data(vid).label = vert_labels.at(vid);
+        }
+    }
+
+    if(poly_labels.size()==this->num_polys())
+    {
+        std::cout << "set poly labels" << std::endl;
+        for(uint pid=0; pid<this->num_polys(); ++pid)
+        {
+            this->poly_data(pid).label = poly_labels.at(pid);
+        }
+        this->poly_color_wrt_label();
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -2308,6 +2374,78 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & flist
     }
 
     return pid;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist)
+{
+    if(vlist.size()==4) // tetrahedron
+    {
+        // detect faces
+        std::vector<uint> f0 = { vlist.at(TET_FACES[0][0]), vlist.at(TET_FACES[0][1]), vlist.at(TET_FACES[0][2]) };
+        std::vector<uint> f1 = { vlist.at(TET_FACES[1][0]), vlist.at(TET_FACES[1][1]), vlist.at(TET_FACES[1][2]) };
+        std::vector<uint> f2 = { vlist.at(TET_FACES[2][0]), vlist.at(TET_FACES[2][1]), vlist.at(TET_FACES[2][2]) };
+        std::vector<uint> f3 = { vlist.at(TET_FACES[3][0]), vlist.at(TET_FACES[3][1]), vlist.at(TET_FACES[3][2]) };
+
+        // detect face ids
+        int fid0 = this->face_id(f0);
+        int fid1 = this->face_id(f1);
+        int fid2 = this->face_id(f2);
+        int fid3 = this->face_id(f3);
+
+        // either add a missing face and assign CCW winding, or assign CW winding to existing faces
+        std::vector<bool> w(4,false);
+        if(fid0 == -1) { fid0 = this->face_add(f0); w.at(0) = true; }
+        if(fid1 == -1) { fid1 = this->face_add(f1); w.at(1) = true; }
+        if(fid2 == -1) { fid2 = this->face_add(f2); w.at(2) = true; }
+        if(fid3 == -1) { fid3 = this->face_add(f3); w.at(3) = true; }
+
+        return poly_add({static_cast<uint>(fid0),
+                         static_cast<uint>(fid1),
+                         static_cast<uint>(fid2),
+                         static_cast<uint>(fid3)},w);
+    }
+    else if(vlist.size()==8) // hexahedron
+    {
+        // detect faces
+        std::vector<uint> f0 = { vlist.at(HEXA_FACES[0][0]), vlist.at(HEXA_FACES[0][1]), vlist.at(HEXA_FACES[0][2]), vlist.at(HEXA_FACES[0][3]) };
+        std::vector<uint> f1 = { vlist.at(HEXA_FACES[1][0]), vlist.at(HEXA_FACES[1][1]), vlist.at(HEXA_FACES[1][2]), vlist.at(HEXA_FACES[1][3]) };
+        std::vector<uint> f2 = { vlist.at(HEXA_FACES[2][0]), vlist.at(HEXA_FACES[2][1]), vlist.at(HEXA_FACES[2][2]), vlist.at(HEXA_FACES[2][3]) };
+        std::vector<uint> f3 = { vlist.at(HEXA_FACES[3][0]), vlist.at(HEXA_FACES[3][1]), vlist.at(HEXA_FACES[3][2]), vlist.at(HEXA_FACES[3][3]) };
+        std::vector<uint> f4 = { vlist.at(HEXA_FACES[4][0]), vlist.at(HEXA_FACES[4][1]), vlist.at(HEXA_FACES[4][2]), vlist.at(HEXA_FACES[4][3]) };
+        std::vector<uint> f5 = { vlist.at(HEXA_FACES[5][0]), vlist.at(HEXA_FACES[5][1]), vlist.at(HEXA_FACES[5][2]), vlist.at(HEXA_FACES[5][3]) };
+
+        // detect face ids
+        int fid0 = this->face_id(f0);
+        int fid1 = this->face_id(f1);
+        int fid2 = this->face_id(f2);
+        int fid3 = this->face_id(f3);
+        int fid4 = this->face_id(f4);
+        int fid5 = this->face_id(f5);
+
+        // either add a missing face and assign CCW winding, or assign CW winding to existing faces
+        std::vector<bool> w(6,false);
+        if(fid0 == -1) { fid0 = this->face_add(f0); w.at(0) = true; }
+        if(fid1 == -1) { fid1 = this->face_add(f1); w.at(1) = true; }
+        if(fid2 == -1) { fid2 = this->face_add(f2); w.at(2) = true; }
+        if(fid3 == -1) { fid3 = this->face_add(f3); w.at(3) = true; }
+        if(fid4 == -1) { fid4 = this->face_add(f4); w.at(4) = true; }
+        if(fid5 == -1) { fid5 = this->face_add(f5); w.at(5) = true; }
+
+        // add hexa
+        return poly_add({static_cast<uint>(fid0),
+                         static_cast<uint>(fid1),
+                         static_cast<uint>(fid2),
+                         static_cast<uint>(fid3),
+                         static_cast<uint>(fid4),
+                         static_cast<uint>(fid5)},w);
+    }
+    else assert(false && "Unknown polyhedral element!");
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

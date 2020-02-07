@@ -80,10 +80,19 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void clear();
-        void init (const std::vector<vec3d>             & verts,
-                   const std::vector<std::vector<uint>> & faces,
-                   const std::vector<std::vector<uint>> & polys,
-                   const std::vector<std::vector<bool>> & polys_face_winding);
+
+        void init(const std::vector<vec3d>             & verts,
+                  const std::vector<std::vector<uint>> & faces,
+                  const std::vector<std::vector<uint>> & polys,
+                  const std::vector<std::vector<bool>> & polys_face_winding);
+
+        void init(const std::vector<vec3d>             & verts,
+                  const std::vector<std::vector<uint>> & polys);
+
+        void init(const std::vector<vec3d>             & verts,
+                  const std::vector<std::vector<uint>> & polys,
+                  const std::vector<int>               & vert_labels,
+                  const std::vector<int>               & poly_labels);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -261,6 +270,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 std::vector<uint>  poly_f2f                    (const uint pid, const uint fid) const;
                 void               poly_switch_id              (const uint pid0, const uint pid1);
                 uint               poly_add                    (const std::vector<uint> & flist, const std::vector<bool> & fwinding);
+        virtual uint               poly_add                    (const std::vector<uint> & vlist);
                 void               poly_remove_unreferenced    (const uint pid);
                 void               poly_remove                 (const uint pid);
                 void               polys_remove                (const std::vector<uint> & pids);

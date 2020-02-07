@@ -57,7 +57,7 @@ CINO_INLINE
 Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d> & verts,
                             const std::vector<uint>  & polys)
 {
-    init_hexmesh(verts, polys_from_serialized_vids(polys,8));
+    this->init(verts, polys_from_serialized_vids(polys,8));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -67,7 +67,7 @@ CINO_INLINE
 Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<double> & coords,
                             const std::vector<uint>   & polys)
 {
-    init_hexmesh(vec3d_from_serialized_xyz(coords), polys_from_serialized_vids(polys,8));
+    this->init(vec3d_from_serialized_xyz(coords), polys_from_serialized_vids(polys,8));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -77,7 +77,7 @@ CINO_INLINE
 Hexmesh<M,V,E,F,P>::Hexmesh(const std::vector<vec3d>             & verts,
                             const std::vector<std::vector<uint>> & polys)
 {
-    init_hexmesh(verts, polys);
+    this->init(verts, polys);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -104,10 +104,10 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
     std::vector<int>               poly_labels;
 
     std::string str(filename);
-    std::string filetype = str.substr(str.size()-4,4);
+    std::string filetype = "." + get_file_extension(str);
 
-    if (filetype.compare("mesh") == 0 ||
-        filetype.compare("MESH") == 0)
+    if (filetype.compare(".mesh") == 0 ||
+        filetype.compare(".MESH") == 0)
     {
         read_MESH(filename, tmp_verts, tmp_polys, vert_labels, poly_labels);
     }
@@ -126,7 +126,7 @@ void Hexmesh<M,V,E,F,P>::load(const char * filename)
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
     }
 
-    init_hexmesh(tmp_verts, tmp_polys, vert_labels, poly_labels);
+    this->init(tmp_verts, tmp_polys, vert_labels, poly_labels);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -165,89 +165,6 @@ void Hexmesh<M,V,E,F,P>::save(const char * filename) const
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write() : file format not supported yet " << std::endl;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Hexmesh<M,V,E,F,P>::init_hexmesh(const std::vector<vec3d>             & verts,
-                                      const std::vector<std::vector<uint>> & polys)
-{
-    // pre-allocate memory
-    uint nv = this->verts.size();
-    uint nf = this->faces.size();
-    uint np = this->polys.size();
-    uint ne = 1.5*nf;
-    this->verts.reserve(nv);
-    this->edges.reserve(ne*2);
-    this->faces.reserve(nf);
-    this->polys.reserve(np);
-    this->v2v.reserve(nv);
-    this->v2e.reserve(nv);
-    this->v2f.reserve(nv);
-    this->v2p.reserve(nv);
-    this->e2f.reserve(ne);
-    this->e2p.reserve(ne);
-    this->f2e.reserve(nf);
-    this->f2f.reserve(nf);
-    this->f2p.reserve(nf);
-    this->p2v.reserve(np);
-    this->p2e.reserve(np);
-    this->p2p.reserve(np);
-    this->v_on_srf.reserve(nv);
-    this->e_on_srf.reserve(ne);
-    this->f_on_srf.reserve(nf);
-    this->v_data.reserve(nv);
-    this->e_data.reserve(ne);
-    this->f_data.reserve(nf);
-    this->p_data.reserve(np);
-    this->face_triangles.resize(nf);
-    this->polys_face_winding.resize(np);
-
-    for(auto v : verts) this->vert_add(v);
-    for(auto p : polys) this->poly_add(p);
-
-    this->copy_xyz_to_uvw(UVW_param);
-
-    std::cout << "new mesh\t"      <<
-                 this->num_verts() << "V / " <<
-                 this->num_edges() << "E / " <<
-                 this->num_faces() << "F / " <<
-                 this->num_polys() << "P   " << std::endl;
-
-    print_quality();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Hexmesh<M,V,E,F,P>::init_hexmesh(const std::vector<vec3d>             & verts,
-                                      const std::vector<std::vector<uint>> & polys,
-                                      const std::vector<int>               & vert_labels,
-                                      const std::vector<int>               & poly_labels)
-{
-    init_hexmesh(verts, polys);
-
-    if(vert_labels.size()==this->num_verts())
-    {
-        std::cout << "set vert labels" << std::endl;
-        for(uint vid=0; vid<this->num_verts(); ++vid)
-        {
-            this->vert_data(vid).label = vert_labels.at(vid);
-        }
-    }
-
-    if(poly_labels.size()==this->num_polys())
-    {
-        std::cout << "set poly labels" << std::endl;
-        for(uint pid=0; pid<this->num_polys(); ++pid)
-        {
-            this->poly_data(pid).label = poly_labels.at(pid);
-        }
-        this->poly_color_wrt_label();
     }
 }
 
@@ -533,42 +450,7 @@ CINO_INLINE
 uint Hexmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex list
 {
     assert(vlist.size()==8);
-
-    // detect faces
-    std::vector<uint> f0 = { vlist.at(HEXA_FACES[0][0]), vlist.at(HEXA_FACES[0][1]), vlist.at(HEXA_FACES[0][2]), vlist.at(HEXA_FACES[0][3]) };
-    std::vector<uint> f1 = { vlist.at(HEXA_FACES[1][0]), vlist.at(HEXA_FACES[1][1]), vlist.at(HEXA_FACES[1][2]), vlist.at(HEXA_FACES[1][3]) };
-    std::vector<uint> f2 = { vlist.at(HEXA_FACES[2][0]), vlist.at(HEXA_FACES[2][1]), vlist.at(HEXA_FACES[2][2]), vlist.at(HEXA_FACES[2][3]) };
-    std::vector<uint> f3 = { vlist.at(HEXA_FACES[3][0]), vlist.at(HEXA_FACES[3][1]), vlist.at(HEXA_FACES[3][2]), vlist.at(HEXA_FACES[3][3]) };
-    std::vector<uint> f4 = { vlist.at(HEXA_FACES[4][0]), vlist.at(HEXA_FACES[4][1]), vlist.at(HEXA_FACES[4][2]), vlist.at(HEXA_FACES[4][3]) };
-    std::vector<uint> f5 = { vlist.at(HEXA_FACES[5][0]), vlist.at(HEXA_FACES[5][1]), vlist.at(HEXA_FACES[5][2]), vlist.at(HEXA_FACES[5][3]) };
-
-    // assume faces already exist and they will be seen CW for the new element)
-    std::vector<bool> w = { false, false, false, false, false, false };
-
-    // detect face ids
-    int fid0 = this->face_id(f0);
-    int fid1 = this->face_id(f1);
-    int fid2 = this->face_id(f2);
-    int fid3 = this->face_id(f3);
-    int fid4 = this->face_id(f4);
-    int fid5 = this->face_id(f5);
-
-    // add missing faces (with vertices CCW)
-    if(fid0 == -1) { fid0 = this->face_add(f0); w.at(0) = true; }
-    if(fid1 == -1) { fid1 = this->face_add(f1); w.at(1) = true; }
-    if(fid2 == -1) { fid2 = this->face_add(f2); w.at(2) = true; }
-    if(fid3 == -1) { fid3 = this->face_add(f3); w.at(3) = true; }
-    if(fid4 == -1) { fid4 = this->face_add(f4); w.at(4) = true; }
-    if(fid5 == -1) { fid5 = this->face_add(f5); w.at(5) = true; }
-
-    // add hexa
-    uint pid = poly_add({static_cast<uint>(fid0),
-                         static_cast<uint>(fid1),
-                         static_cast<uint>(fid2),
-                         static_cast<uint>(fid3),
-                         static_cast<uint>(fid4),
-                         static_cast<uint>(fid5),},w);
-
+    uint pid = AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(vlist);
     reorder_p2v(pid); // make sure p2v stores hex vertices in the standard way
     update_hex_quality(pid);
     return pid;
