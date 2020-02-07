@@ -967,6 +967,7 @@ int AbstractPolyhedralMesh<M,V,E,F,P>::poly_adj_through_face(const uint pid, con
         if (nbr!=pid) return nbr;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
