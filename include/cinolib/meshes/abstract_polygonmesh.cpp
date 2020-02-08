@@ -40,6 +40,7 @@
 #include <cinolib/stl_container_utilities.h>
 #include <cinolib/geometry/polygon_utils.h>
 #include <cinolib/vector_serialization.h>
+#include <cinolib/how_many_seconds.h>
 #include <unordered_set>
 #include <queue>
 
@@ -154,6 +155,8 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & verts,
                                         const std::vector<std::vector<uint>> & polys)
 {    
+    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+
     // pre-allocate memory
     uint nv = verts.size();
     uint np = polys.size();
@@ -183,10 +186,13 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
         this->edge_data(eid).marked = (this->edge_is_boundary(eid) || !this->edge_is_manifold(eid));
     }
 
-    std::cout << "new mesh\t"      <<
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+    std::cout << "load mesh\t"     <<
                  this->num_verts() << "V / " <<
                  this->num_edges() << "E / " <<
-                 this->num_polys() << "P   " << std::endl;
+                 this->num_polys() << "P  [" <<
+                 how_many_seconds(t0,t1) << "s]" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -235,12 +241,10 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
         poly_pos = tmp_poly;
     }
 
-    // initialize mesh connectivity (and normals)
-    for(auto v : pos     ) this->vert_add(v);
-    for(auto p : poly_pos) this->poly_add(p);
+    init(pos, poly_pos);
 
     // customize uv(w) coordinates
-    if (pos.size()==tex.size())
+    if(pos.size()==tex.size())
     {
         std::cout << "load textures" << std::endl;
         for(uint vid=0; vid<this->num_verts(); ++vid)
@@ -251,7 +255,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
     else this->copy_xyz_to_uvw(UVW_param);
 
     // customize normals
-    if (pos.size()==nor.size())
+    if(pos.size()==nor.size())
     {
         std::cout << "load normals" << std::endl;
         for(uint vid=0; vid<this->num_verts(); ++vid)
@@ -261,7 +265,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
     }
 
     // customize colors
-    if (poly_col.size()==this->num_polys())
+    if(poly_col.size()==this->num_polys())
     {
         std::cout << "load per polygon colors" << std::endl;
         for(uint pid=0; pid<this->num_polys(); ++pid)
@@ -270,15 +274,10 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
         }
     }
 
-    for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
-        this->edge_data(eid).marked = (this->edge_is_boundary(eid) || !this->edge_is_manifold(eid));
-    }
-
-    std::cout << "new mesh\t"      <<
-                 this->num_verts() << "V / " <<
-                 this->num_edges() << "E / " <<
-                 this->num_polys() << "P   " << std::endl;
+//    for(uint eid=0; eid<this->num_edges(); ++eid)
+//    {
+//        this->edge_data(eid).marked = (this->edge_is_boundary(eid) || !this->edge_is_manifold(eid));
+//    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

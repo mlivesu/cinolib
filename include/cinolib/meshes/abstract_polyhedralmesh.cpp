@@ -36,6 +36,7 @@
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/geometry/polygon_utils.h>
+#include <cinolib/how_many_seconds.h>
 #include <unordered_set>
 #include <unordered_map>
 #include <queue>
@@ -76,6 +77,8 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
                                              const std::vector<std::vector<uint>> & polys,
                                              const std::vector<std::vector<bool>> & polys_face_winding)
 {
+    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+
     // pre-allocate memory
     uint nv = verts.size();
     uint nf = faces.size();
@@ -113,11 +116,14 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
 
     this->copy_xyz_to_uvw(UVW_param);
 
-    std::cout << "new mesh\t"      <<
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+    std::cout << "load mesh\t"     <<
                  this->num_verts() << "V / " <<
                  this->num_edges() << "E / " <<
                  this->num_faces() << "F / " <<
-                 this->num_polys() << "P   " << std::endl;
+                 this->num_polys() << "P  [" <<
+                 how_many_seconds(t0,t1) << "s]" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -127,6 +133,8 @@ CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>             & verts,
                                              const std::vector<std::vector<uint>> & polys)
 {
+    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+
     // pre-allocate memory
     uint nv = verts.size();
     uint np = polys.size();
@@ -149,11 +157,14 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
 
     this->copy_xyz_to_uvw(UVW_param);
 
-    std::cout << "new mesh\t"      <<
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+    std::cout << "load mesh\t"     <<
                  this->num_verts() << "V / " <<
                  this->num_edges() << "E / " <<
                  this->num_faces() << "F / " <<
-                 this->num_polys() << "P   " << std::endl;
+                 this->num_polys() << "P  [" <<
+                 how_many_seconds(t0,t1) << "s]" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
