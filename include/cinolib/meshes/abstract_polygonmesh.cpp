@@ -154,7 +154,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & verts,
                                         const std::vector<std::vector<uint>> & polys)
-{    
+{
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
     // pre-allocate memory
@@ -164,7 +164,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
     this->verts.reserve(nv);
     this->edges.reserve(ne*2);
     this->polys.reserve(np);
-    this->poly_triangles.resize(np);
+    this->poly_triangles.reserve(np);
     this->v2v.reserve(nv);
     this->v2e.reserve(nv);
     this->v2p.reserve(nv);
@@ -273,11 +273,6 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
             this->poly_data(pid).color = poly_col.at(pid);
         }
     }
-
-//    for(uint eid=0; eid<this->num_edges(); ++eid)
-//    {
-//        this->edge_data(eid).marked = (this->edge_is_boundary(eid) || !this->edge_is_manifold(eid));
-//    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
