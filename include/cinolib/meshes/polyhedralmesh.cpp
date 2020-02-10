@@ -175,6 +175,21 @@ bool Polyhedralmesh<M,V,E,F,P>::poly_is_hexahedron(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool Polyhedralmesh<M,V,E,F,P>::poly_is_tetrahedron(const uint pid) const
+{
+    if(this->verts_per_poly(pid)!=4) return false;
+    if(this->faces_per_poly(pid)!=4) return false;
+    for(uint fid : this->adj_p2f(pid))
+    {
+        if(!this->face_is_tri(fid)) return false;
+    }
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool Polyhedralmesh<M,V,E,F,P>::poly_is_hexable_w_midpoint(const uint pid) const
 {
     // the only topological condition to be satisfied for a genus
