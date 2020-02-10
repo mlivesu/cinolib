@@ -210,6 +210,44 @@ void SET_INTERSECTION(C & set1, C & set2, std::vector<E> & inters, const bool pr
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<typename C, typename E>
+CINO_INLINE
+void SET_DIFFERENCE(C & set1, C & set2, std::vector<E> & inters, const bool pre_sort_sets)
+{
+    // std::set_difference requires the sets to be pre-ordered from smaller to bigger,
+    // so if the input sets are not (i.e. they are vectors) use true to ask ordering or
+    // order them yourself
+
+    if(pre_sort_sets)
+    {
+        SORT_VEC(set1, false);
+        SORT_VEC(set2, false);
+    }
+    inters.clear();
+    std::set_difference(set1.begin(), set1.end(), set2.begin(), set2.end(), std::back_inserter(inters));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename C, typename E>
+CINO_INLINE
+void SET_SYMMETRIC_DIFFERENCE(C & set1, C & set2, std::vector<E> & inters, const bool pre_sort_sets)
+{
+    // std::set_symmetric_difference requires the sets to be pre-ordered from smaller to bigger,
+    // so if the input sets are not (i.e. they are vectors) use true to ask ordering or
+    // order them yourself
+
+    if(pre_sort_sets)
+    {
+        SORT_VEC(set1, false);
+        SORT_VEC(set2, false);
+    }
+    inters.clear();
+    std::set_symmetric_difference(set1.begin(), set1.end(), set2.begin(), set2.end(), std::back_inserter(inters));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<typename T>
 CINO_INLINE
 void CIRCULAR_SHIFT_VEC(std::vector<T> & vec, const T & new_first_elem)

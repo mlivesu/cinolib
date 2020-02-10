@@ -135,6 +135,18 @@ void SET_INTERSECTION(C & set1, C & set2, std::vector<E> & inters, const bool pr
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<typename C, typename E>
+CINO_INLINE
+void SET_DIFFERENCE(C & set1, C & set2, std::vector<E> & inters, const bool pre_sort_sets = false);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename C, typename E>
+CINO_INLINE
+void SET_SYMMETRIC_DIFFERENCE(C & set1, C & set2, std::vector<E> & inters, const bool pre_sort_sets = false);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<typename T>
 CINO_INLINE
 void CIRCULAR_SHIFT_VEC(std::vector<T> & vec, const T & new_first_elem);
