@@ -42,9 +42,6 @@ int main(int argc, char **argv)
     m.show_in_texture1D (TEXTURE_1D_HSV_W_ISOLINES);
     gui.push_obj(&m);
 
-    VolumeMeshControlPanel<DrawableTetmesh<>> m_controls(&m, &gui);
-    m_controls.show();
-
     // use the spin box to increase the harmonicity index
     Profiler profiler;
     QSpinBox::connect(&n_harmonicity, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), [&]()
