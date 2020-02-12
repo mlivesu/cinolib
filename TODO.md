@@ -2,6 +2,7 @@
 Please consider this to be just development notes and not any real planning.
 
 ### Things to be fixed:
+* in DrawableSegmentSoup, edge rendering is orientation dependend when cheap mode is not active (cylinders are defined as points + dir!)
 * find ways to speedup updateGL(). For big meshes it's overly slow...
 * fix mesh dualization of clipped cells (cluster planar faces, preserve sharp crases in the dual)
 * parameters with variable length like barycentric coordinates ecc should be double* and not std::vector<double>, so that one can choose to use C arrays, std::arrays or std::vectors
