@@ -62,6 +62,7 @@ Please consider this to be just development notes and not any real planning.
 * linear blend skinning and dual quaternions
 
 ### Documentation:
+* make animated GIFs to illustrate examples
 * create a mirror repo for eigen (and kill that annoying warning)
 * add a description of all the non standard files used in cinolib (.hedra, scalar and vector fields, sharp features)
 
