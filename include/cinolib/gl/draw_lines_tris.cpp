@@ -206,12 +206,8 @@ void render_segs(const RenderData & data)
     if (data.draw_mode & DRAW_SEGS)
     {
         glEnable(GL_LINE_SMOOTH);
-        glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);        
         glDisable(GL_LIGHTING);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-        //glDepthRange(0.0, 0.99);
-        glDepthFunc(GL_LEQUAL);
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, data.seg_coords.data());
         glLineWidth(data.seg_width);
@@ -220,7 +216,6 @@ void render_segs(const RenderData & data)
         glDrawElements(GL_LINES, data.segs.size(), GL_UNSIGNED_INT, data.segs.data());
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
-        glDepthFunc(GL_LESS);
         glEnable(GL_LIGHTING);
         glDisable(GL_LINE_SMOOTH);
     }
@@ -233,12 +228,12 @@ void render(const RenderData & data)
 {
     init_material();
 
-    // http://www.bluevoid.com/opengl/sig00/advanced00/notes/node107.html
-    static const GLclampd EDGE_OFFSET = 0.001;
-
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glPolygonOffset(1.0, 1);
 
     if (data.draw_mode & DRAW_TRIS)
     {
@@ -251,22 +246,24 @@ void render(const RenderData & data)
         {
             glEnable(GL_LIGHTING);
             glShadeModel(GL_SMOOTH);
-            glDepthRange(EDGE_OFFSET, 1.0);
             render_tris(data);
         }
         else // default: FLAT shading
         {
             glEnable(GL_LIGHTING);
             glShadeModel(GL_SMOOTH); // flatness is given by input normals
-            glDepthRange(EDGE_OFFSET, 1.0);
             render_tris(data);
         }
     }
 
     if (data.draw_mode & DRAW_SEGS)
     {
-        glDepthRange(0.0, 1.0-EDGE_OFFSET);
+        glDisable(GL_POLYGON_OFFSET_FILL);
+        glPushAttrib(GL_POLYGON_BIT);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         render_segs(data);
+        glPopAttrib();
+        glEnable(GL_POLYGON_OFFSET_FILL);
     }
 }
 
