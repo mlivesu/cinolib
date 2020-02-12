@@ -77,9 +77,9 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::updateGL()
 {
-    updateGL_out();
-    updateGL_in();
     updateGL_marked();
+    updateGL_in();
+    updateGL_out();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
