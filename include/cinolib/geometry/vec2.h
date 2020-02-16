@@ -45,6 +45,8 @@
 namespace cinolib
 {
 
+enum { DROP_X, DROP_Y, DROP_Z };
+
 template<typename real> class vec2
 {
     private:
@@ -61,8 +63,6 @@ template<typename real> class vec2
 
     public:
 
-        enum { DROP_X, DROP_Y, DROP_Z };
-
         explicit vec2()
         {
             set( 0.0, 0.0 );
@@ -77,9 +77,9 @@ template<typename real> class vec2
         {
             switch (mode)
             {
-                case DROP_X : set(p.y(), p.z()); break;
-                case DROP_Y : set(p.x(), p.z()); break;
                 case DROP_Z : set(p.x(), p.y()); break;
+                case DROP_Y : set(p.x(), p.z()); break;
+                case DROP_X : set(p.y(), p.z()); break;
                 default : assert(false);
             }
         }
