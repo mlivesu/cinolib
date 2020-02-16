@@ -34,8 +34,71 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/geometry/segment_utils.h>
+#include <cinolib/geometry/point_utils.h>
 
 namespace cinolib
 {
+
+// returns true if point p lies inside segment v0-v1
+// (segment endpoints count only if strict is set to false)
+CINO_INLINE
+bool segment_contains_point_exact(const vec2d & v0,
+                                  const vec2d & v1,
+                                  const vec2d & p,
+                                  const bool    strict)
+{
+    if(!points_are_colinear_exact(v0, v1, p)) return false;
+
+    if(strict)
+    {
+        if(v0.x() < v1.x() && v0.x() < p.x() && p.x() < v1.x()) return true;
+        if(v0.y() < v1.y() && v0.y() < p.y() && p.y() < v1.y()) return true;
+        if(v0.x() > v1.x() && v0.x() > p.x() && p.x() > v1.x()) return true;
+        if(v0.y() > v1.y() && v0.y() > p.y() && p.y() > v1.y()) return true;
+    }
+    else
+    {
+        if(v0.x() <= v1.x() && v0.x() <= p.x() && p.x() <= v1.x()) return true;
+        if(v0.y() <= v1.y() && v0.y() <= p.y() && p.y() <= v1.y()) return true;
+        if(v0.x() >= v1.x() && v0.x() >= p.x() && p.x() >= v1.x()) return true;
+        if(v0.y() >= v1.y() && v0.y() >= p.y() && p.y() >= v1.y()) return true;
+    }
+
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns true if point p lies inside segment v0-v1
+// (segment endpoints count only if strict is set to false)
+CINO_INLINE
+bool segment_contains_point_exact(const vec3d & v0,
+                                  const vec3d & v1,
+                                  const vec3d & p,
+                                  const bool    strict)
+{
+    if(!points_are_colinear_exact(v0, v1, p)) return false;
+
+    if(strict)
+    {
+        if(v0.x() < v1.x() && v0.x() < p.x() && p.x() < v1.x()) return true;
+        if(v0.y() < v1.y() && v0.y() < p.y() && p.y() < v1.y()) return true;
+        if(v0.z() < v1.z() && v0.z() < p.z() && p.z() < v1.z()) return true;
+        if(v0.x() > v1.x() && v0.x() > p.x() && p.x() > v1.x()) return true;
+        if(v0.y() > v1.y() && v0.y() > p.y() && p.y() > v1.y()) return true;
+        if(v0.z() > v1.z() && v0.z() > p.z() && p.z() > v1.z()) return true;
+    }
+    else
+    {
+        if(v0.x() <= v1.x() && v0.x() <= p.x() && p.x() <= v1.x()) return true;
+        if(v0.y() <= v1.y() && v0.y() <= p.y() && p.y() <= v1.y()) return true;
+        if(v0.z() <= v1.z() && v0.z() <= p.z() && p.z() <= v1.z()) return true;
+        if(v0.x() >= v1.x() && v0.x() >= p.x() && p.x() >= v1.x()) return true;
+        if(v0.y() >= v1.y() && v0.y() >= p.y() && p.y() >= v1.y()) return true;
+        if(v0.z() >= v1.z() && v0.z() >= p.z() && p.z() >= v1.z()) return true;
+    }
+
+    return false;
+}
 
 }
