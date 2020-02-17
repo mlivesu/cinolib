@@ -287,7 +287,7 @@ void GLcanvas::mouseDoubleClickEvent(QMouseEvent *event)
     if (unproject(click, new_pivot))
     {
         set_rotation_pivot(new_pivot);
-        show_pivot = true;
+        //show_pivot = true;
     }
     updateGL();
 }
