@@ -449,6 +449,58 @@ bool Octree::contains(const vec3d & p, std::unordered_set<uint> & ids, const dou
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+bool Octree::contains_exact(const vec3d & p, std::unordered_set<uint> & ids, const bool strict) const
+{
+    typedef std::chrono::high_resolution_clock Time;
+    Time::time_point t0 = Time::now();
+
+    uint aabb_queries = 0;
+    uint item_queries = 0;
+
+    ids.clear();
+
+    std::stack<OctreeNode*> lifo;
+    lifo.push(root);
+
+    while(!lifo.empty())
+    {
+        OctreeNode *node = lifo.top();
+        lifo.pop();
+        assert(node->bbox.contains(p,strict));
+
+        if(node->is_inner)
+        {
+            for(int i=0; i<8; ++i)
+            {
+                if(print_debug_info) ++aabb_queries;
+                if(node->children[i]->bbox.contains(p,strict)) lifo.push(node->children[i]);
+            }
+        }
+        else
+        {
+            for(uint i : node->item_indices)
+            {
+                if(print_debug_info) ++item_queries;
+                if(items.at(i)->contains_exact(p,strict))
+                {
+                    ids.insert(items.at(i)->id);
+                }
+            }
+        }
+    }
+
+    if(print_debug_info)
+    {
+        Time::time_point t1 = Time::now();
+        print_query_info("Contains query (all items)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+    }
+
+    return !ids.empty();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const
 {
     typedef std::chrono::high_resolution_clock Time;
