@@ -55,22 +55,9 @@ bool points_are_colinear_exact(const vec3d & p0,
                                const vec3d & p2)
 {
     // check if all the 2d orthogonal projections of p0-p1-p2 are colinear
-
-    vec2d p0_XY(p0, DROP_X);
-    vec2d p1_XY(p1, DROP_X);
-    vec2d p2_XY(p2, DROP_X);
-
-    vec2d p0_XZ(p0, DROP_Y);
-    vec2d p1_XZ(p1, DROP_Y);
-    vec2d p2_XZ(p2, DROP_Y);
-
-    vec2d p0_YZ(p0, DROP_Z);
-    vec2d p1_YZ(p1, DROP_Z);
-    vec2d p2_YZ(p2, DROP_Z);
-
-    if(points_are_colinear_exact(p0_XY, p1_XY, p2_XY) &&
-       points_are_colinear_exact(p0_XZ, p1_XZ, p2_XZ) &&
-       points_are_colinear_exact(p0_YZ, p1_YZ, p2_YZ)) return true;
+    if(points_are_colinear_exact(vec2d(p0,DROP_X), vec2d(p1,DROP_X), vec2d(p2,DROP_X)) &&
+       points_are_colinear_exact(vec2d(p0,DROP_Y), vec2d(p1,DROP_Y), vec2d(p2,DROP_Y)) &&
+       points_are_colinear_exact(vec2d(p0,DROP_Z), vec2d(p1,DROP_Z), vec2d(p2,DROP_Z))) return true;
 
     return false;
 }

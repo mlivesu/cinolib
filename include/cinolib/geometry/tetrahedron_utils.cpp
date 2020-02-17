@@ -37,11 +37,38 @@
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/geometry/segment.h>
 #include <cinolib/Moller_Trumbore_intersection.h>
+#include <cinolib/geometry/triangle_utils.h>
 #include <Eigen/Dense>
 #include <set>
 
 namespace cinolib
 {
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// true if point p lies (strictly) inside tet abcd
+CINO_INLINE
+bool tet_contains_point_exact(const vec3d & a,
+                              const vec3d & b,
+                              const vec3d & c,
+                              const vec3d & d,
+                              const vec3d & p,
+                              const bool    strict)
+{
+    if(!strict && triangle_contains_point_exact(a,c,b,p,false)) return true;
+    if(!strict && triangle_contains_point_exact(a,b,d,p,false)) return true;
+    if(!strict && triangle_contains_point_exact(a,d,c,p,false)) return true;
+    if(!strict && triangle_contains_point_exact(b,c,d,p,false)) return true;
+
+    double acb = orient3d(a,c,b,p);
+    double abd = orient3d(a,b,d,p);
+    double adc = orient3d(a,d,c,p);
+    double bcd = orient3d(b,c,d,p);
+
+    if(acb>0 && abd>0 && adc>0 && bcd>0) return true;
+    if(acb<0 && abd<0 && adc<0 && bcd<0) return true;
+    return false;
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

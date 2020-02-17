@@ -42,8 +42,7 @@
 namespace cinolib
 {
 
-// returns true if point p lies inside segment v0-v1
-// (segment endpoints count only if strict is set to false)
+// true if point p lies (strictly) inside segment v0-v1
 CINO_INLINE
 bool segment_contains_point_exact(const vec2d & v0,
                                   const vec2d & v1,
@@ -52,8 +51,7 @@ bool segment_contains_point_exact(const vec2d & v0,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if point p lies inside segment v0-v1
-// (segment endpoints count only if strict is set to false)
+// true if point p lies (strictly) inside segment v0-v1
 CINO_INLINE
 bool segment_contains_point_exact(const vec3d & v0,
                                   const vec3d & v1,

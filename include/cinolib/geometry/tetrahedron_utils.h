@@ -43,6 +43,17 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// true if point p lies (strictly) inside tet abcd
+CINO_INLINE
+bool tet_contains_point_exact(const vec3d & a,
+                              const vec3d & b,
+                              const vec3d & c,
+                              const vec3d & d,
+                              const vec3d & p,
+                              const bool    strict);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 bool tet_barycentric_coords(const vec3d & A,
                             const vec3d & B,

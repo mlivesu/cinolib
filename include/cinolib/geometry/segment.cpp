@@ -34,6 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/geometry/segment.h>
+#include <cinolib/geometry/segment_utils.h>
 
 namespace cinolib
 {
@@ -103,6 +104,14 @@ void Segment::barycentric_coordinates(const vec3d & p, std::vector<double> & bc)
     bc.resize(2);
     bc[1] = t / u.length();
     bc[0] = 1.0 - bc[0];
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Segment::contains_exact(const vec3d & p, bool strict) const
+{
+    return segment_contains_point_exact(v0, v1, p, strict);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

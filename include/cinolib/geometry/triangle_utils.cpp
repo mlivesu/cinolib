@@ -36,9 +36,79 @@
 #include <cinolib/geometry/triangle_utils.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/Moller_Trumbore_intersection.h>
+#include <cinolib/geometry/segment_utils.h>
 
 namespace cinolib
 {
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// true if point p lies (strictly) inside triangle abc
+CINO_INLINE
+bool triangle_contains_point_exact(const vec2d & a,
+                                   const vec2d & b,
+                                   const vec2d & c,
+                                   const vec2d & p,
+                                   const bool    strict)
+{
+    if(!strict && segment_contains_point_exact(a,b,p,false)) return true;
+    if(!strict && segment_contains_point_exact(b,c,p,false)) return true;
+    if(!strict && segment_contains_point_exact(c,a,p,false)) return true;
+
+    double abp = orient2d(a,b,p);
+    double bcp = orient2d(b,c,p);
+    double cap = orient2d(c,a,p);
+
+    if(abp>0 && bcp>0 && cap>0) return true; // CCW winding
+    if(abp<0 && bcp<0 && cap<0) return true; // CW  winding
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// true if point p lies (strictly) inside triangle abc
+CINO_INLINE
+bool triangle_contains_point_exact(const vec3d & a,
+                                   const vec3d & b,
+                                   const vec3d & c,
+                                   const vec3d & p,
+                                   const bool    strict)
+{
+    if(!points_are_coplanar_exact(a,b,c,p)) return false;
+
+    if(points_are_colinear_exact(a,b,c)) // degenerate triangle
+    {
+        if(strict) return false; // p cannot be strictly inside abc (due to zero area)
+
+        return segment_contains_point_exact(a,b,p,false) ||
+               segment_contains_point_exact(b,c,p,false) ||
+               segment_contains_point_exact(c,a,p,false);
+    }
+
+    // project on X,Y,Z and, if the projection is good (i.e. the projected
+    // triangle does not become a segment), do a 2D pont in triangle
+
+    vec2d ax(a,DROP_X);
+    vec2d bx(b,DROP_X);
+    vec2d cx(c,DROP_X);
+    vec2d px(p,DROP_X);
+    if(!points_are_colinear_exact(ax,bx,cx) && triangle_contains_point_exact(ax,bx,cx,px,strict)) return true;
+
+    vec2d ay(a,DROP_Y);
+    vec2d by(b,DROP_Y);
+    vec2d cy(c,DROP_Y);
+    vec2d py(p,DROP_Y);
+    if(!points_are_colinear_exact(ay,by,cy) && triangle_contains_point_exact(ay,by,cy,py,strict)) return true;
+
+    vec2d az(a,DROP_Z);
+    vec2d bz(b,DROP_Z);
+    vec2d cz(c,DROP_Z);
+    vec2d pz(p,DROP_Z);
+    if(!points_are_colinear_exact(az,bz,cz) && triangle_contains_point_exact(az,bz,cz,pz,strict)) return true;
+
+    assert(false && "This should never happen");
+    return false; // warning killer
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -46,7 +116,7 @@ CINO_INLINE
 vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C)
 {
     vec3d n = (B-A).cross(C-A);
-    n.normalize();
+    if(n.is_null()) n.normalize();
     return n;
 }
 

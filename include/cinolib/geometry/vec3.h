@@ -225,6 +225,12 @@ template<typename real> class vec3
             return tmp;
         }
 
+        bool operator==(const vec3<real> & b) const
+        {
+            if(m_x==b.x() && m_y==b.y() && m_z==b.z()) return true;
+            return false;
+        }
+
         bool operator<(const vec3<real> in) const
         {
             for(uint i=0; i<3; ++i)
@@ -294,7 +300,7 @@ template<typename real> class vec3
 
         bool is_null() const
         {
-            if(length_squared()==0) return true;
+            if (m_x!=0 || m_y!=0 || m_z!=0) return true;
             return false;
         }
 

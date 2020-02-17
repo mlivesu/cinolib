@@ -64,6 +64,14 @@ vec3d Tetrahedron::point_closest_to(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+bool Tetrahedron::contains_exact(const vec3d & p, bool strict) const
+{
+    return tet_contains_point_exact(v0, v1, v2, v3, p, strict);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 bool Tetrahedron::intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const
 {
     bool   backside;

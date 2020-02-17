@@ -45,7 +45,12 @@
 namespace cinolib
 {
 
-enum { DROP_X, DROP_Y, DROP_Z };
+enum
+{
+    DROP_X = 0,
+    DROP_Y = 1,
+    DROP_Z = 2
+};
 
 template<typename real> class vec2
 {
@@ -210,6 +215,12 @@ template<typename real> class vec2
                            m_y / b);
             *this = tmp;
             return tmp;
+        }
+
+        bool operator==(const vec2<real> & b) const
+        {
+            if(m_x==b.x() && m_y==b.y()) return true;
+            return false;
         }
 
         inline bool operator<(const vec2<real> in) const

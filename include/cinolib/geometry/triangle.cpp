@@ -64,6 +64,14 @@ vec3d Triangle::point_closest_to(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+bool Triangle::contains_exact(const vec3d & p, bool strict) const
+{
+    return triangle_contains_point_exact(v0, v1, v2, p, strict);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 bool Triangle::intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const
 {
     bool  hits_backside;

@@ -37,9 +37,30 @@
 #define CINO_TRIANGLE_UTILS_H
 
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec2.h>
 
 namespace cinolib
 {
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// true if point p lies (strictly) inside triangle abc
+CINO_INLINE
+bool triangle_contains_point_exact(const vec2d & a,
+                                   const vec2d & b,
+                                   const vec2d & c,
+                                   const vec2d & p,
+                                   const bool    strict);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// true if point p lies (strictly) inside triangle abc
+CINO_INLINE
+bool triangle_contains_point_exact(const vec3d & a,
+                                   const vec3d & b,
+                                   const vec3d & c,
+                                   const vec3d & p,
+                                   const bool    strict);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

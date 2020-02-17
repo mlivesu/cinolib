@@ -98,7 +98,8 @@ namespace cinolib
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            bool contains(const vec3<double> & p, const double eps = 1e-15) const;
+                    bool contains      (const vec3<double> & p, const double eps = 1e-15) const;
+            virtual bool contains_exact(const vec3<double> & p, bool strict) const = 0;
     };
 }
 
