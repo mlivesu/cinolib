@@ -88,23 +88,23 @@ bool triangle_contains_point_exact(const vec3d & a,
     // project on X,Y,Z and, if the projection is good (i.e. the projected
     // triangle does not become a segment), do a 2D pont in triangle
 
-    vec2d ax(a,DROP_X);
-    vec2d bx(b,DROP_X);
-    vec2d cx(c,DROP_X);
-    vec2d px(p,DROP_X);
-    if(!points_are_colinear_exact(ax,bx,cx) && triangle_contains_point_exact(ax,bx,cx,px,strict)) return true;
+    vec2d a_x(a,DROP_X);
+    vec2d b_x(b,DROP_X);
+    vec2d c_x(c,DROP_X);
+    vec2d p_x(p,DROP_X);
+    if(!points_are_colinear_exact(a_x,b_x,c_x) && triangle_contains_point_exact(a_x,b_x,c_x,p_x,strict)) return true;
 
-    vec2d ay(a,DROP_Y);
-    vec2d by(b,DROP_Y);
-    vec2d cy(c,DROP_Y);
-    vec2d py(p,DROP_Y);
-    if(!points_are_colinear_exact(ay,by,cy) && triangle_contains_point_exact(ay,by,cy,py,strict)) return true;
+    vec2d a_y(a,DROP_Y);
+    vec2d b_y(b,DROP_Y);
+    vec2d c_y(c,DROP_Y);
+    vec2d p_y(p,DROP_Y);
+    if(!points_are_colinear_exact(a_y,b_y,c_y) && triangle_contains_point_exact(a_y,b_y,c_y,p_y,strict)) return true;
 
-    vec2d az(a,DROP_Z);
-    vec2d bz(b,DROP_Z);
-    vec2d cz(c,DROP_Z);
-    vec2d pz(p,DROP_Z);
-    if(!points_are_colinear_exact(az,bz,cz) && triangle_contains_point_exact(az,bz,cz,pz,strict)) return true;
+    vec2d a_z(a,DROP_Z);
+    vec2d b_z(b,DROP_Z);
+    vec2d c_z(c,DROP_Z);
+    vec2d p_z(p,DROP_Z);
+    if(!points_are_colinear_exact(a_z,b_z,c_z) && triangle_contains_point_exact(a_z,b_z,c_z,p_z,strict)) return true;
 
     assert(false && "This should never happen");
     return false; // warning killer

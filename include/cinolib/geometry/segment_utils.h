@@ -47,7 +47,8 @@ CINO_INLINE
 bool segment_contains_point_exact(const vec2d & v0,
                                   const vec2d & v1,
                                   const vec2d & p,
-                                  const bool    strict);
+                                  const bool    strict,
+                                  const bool    skip_colinearity_test = false);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -56,7 +57,32 @@ CINO_INLINE
 bool segment_contains_point_exact(const vec3d & v0,
                                   const vec3d & v1,
                                   const vec3d & p,
-                                  const bool    strict);
+                                  const bool    strict,
+                                  const bool    skip_colinearity_test = false);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// true if point segments u and v intersect. Shared endpoints are not
+// counted as intersections if allow_shared_endpoints is true
+CINO_INLINE
+bool segments_intersect_exact(const vec2d & u0,
+                              const vec2d & u1,
+                              const vec2d & v0,
+                              const vec2d & v1,
+                              const bool    allow_shared_endpoints);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// true if point segments u and v intersect. Shared endpoints are not
+// counted as intersections if allow_shared_endpoints is true
+CINO_INLINE
+bool segments_intersect_exact(const vec3d & u0,
+                              const vec3d & u1,
+                              const vec3d & v0,
+                              const vec3d & v1,
+                              const bool    allow_shared_endpoints);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 }
 
 #ifndef  CINO_STATIC_LIB
