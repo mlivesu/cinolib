@@ -85,6 +85,8 @@ enum
     ON_FACE_1        = 13, // used for tets
     ON_FACE_2        = 14, // used for tets
     ON_FACE_3        = 15, // used for tets
+    COINCIDENT       = 16, // used for segs, tris, tets
+    OVERLAP          = 16, // used for segs (when they are colinear and intersect)
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -160,6 +162,7 @@ bool segment_segment_intersect_exact(const vec2d   s0[],
 CINO_INLINE
 bool segment_segment_intersect_exact(const vec3d   s0[],
                                      const vec3d   s1[],
+                                     const bool    strict,
                                            int   & where_on_s0,
                                            int   & where_on_s1);
 

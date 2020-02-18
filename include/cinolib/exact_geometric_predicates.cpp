@@ -95,8 +95,12 @@ bool point_in_segment_exact(const vec2d & p,
 
     if(!points_are_colinear_exact(s[0],s[1],p)) return false;
 
-    if(p.x() > std::min(s[0].x(),s[1].x()) && p.x() < std::max(s[0].x(),s[1].x())) { where = STRICTLY_INSIDE; return true; }
-    if(p.y() > std::min(s[0].y(),s[1].y()) && p.y() < std::max(s[0].y(),s[1].y())) { where = STRICTLY_INSIDE; return true; }
+    if((p.x()>std::min(s[0].x(),s[1].x()) && p.x()<std::max(s[0].x(),s[1].x())) ||
+       (p.y()>std::min(s[0].y(),s[1].y()) && p.y()<std::max(s[0].y(),s[1].y())))
+    {
+        where = STRICTLY_INSIDE;
+        return true;
+    }
 
     return false;
 }
@@ -119,9 +123,13 @@ bool point_in_segment_exact(const vec3d & p,
 
     if(!points_are_colinear_exact(s[0],s[1],p)) return false;
 
-    if(p.x() > std::min(s[0].x(),s[1].x()) && p.x() < std::max(s[0].x(),s[1].x())) { where = STRICTLY_INSIDE; return true; }
-    if(p.y() > std::min(s[0].y(),s[1].y()) && p.y() < std::max(s[0].y(),s[1].y())) { where = STRICTLY_INSIDE; return true; }
-    if(p.z() > std::min(s[0].z(),s[1].z()) && p.z() < std::max(s[0].z(),s[1].z())) { where = STRICTLY_INSIDE; return true; }
+    if((p.x()>std::min(s[0].x(),s[1].x()) && p.x()<std::max(s[0].x(),s[1].x())) ||
+       (p.y()>std::min(s[0].y(),s[1].y()) && p.y()<std::max(s[0].y(),s[1].y())) ||
+       (p.z()>std::min(s[0].z(),s[1].z()) && p.z()<std::max(s[0].z(),s[1].z())))
+    {
+        where = STRICTLY_INSIDE;
+        return true;
+    }
 
     return false;
 }
@@ -270,113 +278,205 @@ bool point_in_tet_exact(const vec3d & p,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//CINO_INLINE
-//bool segment_segment_intersect_exact(const vec2d   s0[],
-//                                     const vec2d   s1[],
-//                                           int   & where_on_s0,
-//                                           int   & where_on_s1)
-//{
-///*
-//    // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
-//    double det_u_v0 = orient2d(u0,u1,v0);
-//    double det_u_v1 = orient2d(u0,u1,v1);
-//    double det_v_u0 = orient2d(v0,v1,u0);
-//    double det_v_u1 = orient2d(v0,v1,u1);
+CINO_INLINE
+bool segment_segment_intersect_exact(const vec2d   s0[],
+                                     const vec2d   s1[],
+                                     const bool    strict,
+                                           int   & where_on_s0,
+                                           int   & where_on_s1)
+{
+    where_on_s0 = STRICTLY_OUTSIDE;
+    where_on_s1 = STRICTLY_OUTSIDE;
 
-//    // Shewchuck's orient predicates return a rough approximation of the determinant.
-//    // I am converting values to { -1, 0, 1 } for a simpler check of intersection cases
-//    int v0_wrt_u = (det_u_v0>0) ? 1 : ((det_u_v0<0) ? -1 : 0);
-//    int v1_wrt_u = (det_u_v1>0) ? 1 : ((det_u_v1<0) ? -1 : 0);
-//    int u0_wrt_v = (det_v_u0>0) ? 1 : ((det_v_u0<0) ? -1 : 0);
-//    int u1_wrt_v = (det_v_u1>0) ? 1 : ((det_v_u1<0) ? -1 : 0);
+    // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
+    double det_s00 = orient2d(s1[0],s1[1],s0[0]);
+    double det_s01 = orient2d(s1[0],s1[1],s0[1]);
+    double det_s10 = orient2d(s0[0],s0[1],s1[0]);
+    double det_s11 = orient2d(s0[0],s0[1],s1[1]);
 
-//    if(v0_wrt_u!=v1_wrt_u && u0_wrt_v!=u1_wrt_v) // segments intersect
-//    {
-//        if(allow_shared_endpoints && (u0==v0 || u0==v1 || u1==v0 || u1==v1)) return false;
-//        return true;
-//    }
+    // Shewchuck's orient predicates return a rough approximation of the determinant.
+    // I am converting values to { -1, 0, 1 } for a simpler check of intersection cases
+    int s00_wrt_s1 = (det_s00>0) ? 1 : ((det_s00<0) ? -1 : 0);
+    int s01_wrt_s1 = (det_s01>0) ? 1 : ((det_s01<0) ? -1 : 0);
+    int s10_wrt_s0 = (det_s10>0) ? 1 : ((det_s10<0) ? -1 : 0);
+    int s11_wrt_s0 = (det_s11>0) ? 1 : ((det_s11<0) ? -1 : 0);
 
-//    if(v0_wrt_u==0 && v1_wrt_u==0 && u0_wrt_v==0 && u1_wrt_v==0) // colinear
-//    {
-//        if(allow_shared_endpoints)
-//        {
-//            if(u0==v0 && u1==v1) return false;
-//            if(u0==v1 && u1==v0) return false;
-//        }
-//        if(u0.x() > std::min(v0.x(),v1.x()) && u0.x() < std::max(v0.x(),v1.x())) return true;
-//        if(u0.y() > std::min(v0.y(),v1.y()) && u0.y() < std::max(v0.y(),v1.y())) return true;
-//        if(u1.x() > std::min(v0.x(),v1.x()) && u1.x() < std::max(v0.x(),v1.x())) return true;
-//        if(u1.y() > std::min(v0.y(),v1.y()) && u1.y() < std::max(v0.y(),v1.y())) return true;
-//    }
+    if(s00_wrt_s1!=s01_wrt_s1 && s10_wrt_s0!=s11_wrt_s0) // segments intersect
+    {
+        // check for coincident endpoints first...
+        if(s0[0]==s1[0])
+        {
+            where_on_s0 = ON_VERT_0;
+            where_on_s1 = ON_VERT_0;
+            if(strict) return false;
+            return true;
+        }
+        if(s0[0]==s1[1])
+        {
+            where_on_s0 = ON_VERT_0;
+            where_on_s1 = ON_VERT_1;
+            if(strict) return false;
+            return true;
+        }
+        if(s0[1]==s1[0])
+        {
+            where_on_s0 = ON_VERT_1;
+            where_on_s1 = ON_VERT_0;
+            if(strict) return false;
+            return true;
+        }
+        if(s0[1]==s1[1])
+        {
+            where_on_s0 = ON_VERT_1;
+            where_on_s1 = ON_VERT_1;
+            if(strict) return false;
+            return true;
+        }
+        // then check for endpoints of one segment strictly inside the other...
+        if(s00_wrt_s1==0)
+        {
+            where_on_s0 = ON_VERT_0;
+            where_on_s1 = STRICTLY_INSIDE;
+            return true;
+        }
+        if(s01_wrt_s1==0)
+        {
+            where_on_s0 = ON_VERT_1;
+            where_on_s1 = STRICTLY_INSIDE;
+            return true;
+        }
+        if(s10_wrt_s0==0)
+        {
+            where_on_s0 = STRICTLY_INSIDE;
+            where_on_s1 = ON_VERT_0;
+            return true;
+        }
+        if(s11_wrt_s0==0)
+        {
+            where_on_s0 = STRICTLY_INSIDE;
+            where_on_s1 = ON_VERT_1;
+            return true;
+        }
+        // if none of the above, the intersection is striclty inside both segments
+        where_on_s0 = STRICTLY_INSIDE;
+        where_on_s1 = STRICTLY_INSIDE;
+        return true;
+    }
 
-//    return false;
-//*/
-//}
+    if(s00_wrt_s1==0 && s01_wrt_s1==0 && s10_wrt_s0==0 && s11_wrt_s0==0) // colinear
+    {
+        if((s0[0]==s1[0] && s0[1]==s1[1]) ||
+           (s0[0]==s1[1] && s0[1]==s1[0]))
+        {
+            where_on_s0 = COINCIDENT;
+            where_on_s1 = COINCIDENT;
+            return true;
+        }
 
-////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        if(// test s0 endpoints against s1 range
+           (s0[0].x()>std::min(s1[0].x(),s1[1].x()) && s0[0].x()<std::max(s1[0].x(),s1[1].x())) ||
+           (s0[0].y()>std::min(s1[0].y(),s1[1].y()) && s0[0].y()<std::max(s1[0].y(),s1[1].y())) ||
+           (s0[1].x()>std::min(s1[0].x(),s1[1].x()) && s0[1].x()<std::max(s1[0].x(),s1[1].x())) ||
+           (s0[1].y()>std::min(s1[0].y(),s1[1].y()) && s0[1].y()<std::max(s1[0].y(),s1[1].y())) ||
+           // test s1 endpoints against s0 range
+           (s1[0].x()>std::min(s0[0].x(),s0[1].x()) && s1[0].x()<std::max(s0[0].x(),s0[1].x())) ||
+           (s1[0].y()>std::min(s0[0].y(),s0[1].y()) && s1[0].y()<std::max(s0[0].y(),s0[1].y())) ||
+           (s1[1].x()>std::min(s0[0].x(),s0[1].x()) && s1[1].x()<std::max(s0[0].x(),s0[1].x())) ||
+           (s1[1].y()>std::min(s0[0].y(),s0[1].y()) && s1[1].y()<std::max(s0[0].y(),s0[1].y())))
+        {
+            where_on_s0 = OVERLAP;
+            where_on_s1 = OVERLAP;
+            return true;
+        }
+    }
 
-//CINO_INLINE
-//bool segment_segment_intersect_exact(const vec3d   s0[],
-//                                     const vec3d   s1[],
-//                                           int   & where_on_s0,
-//                                           int   & where_on_s1)
-//{
-///*
-//    // project on X,Y,Z and, if the check is never false in any of the
-//    // projections, then it must be true
+    return false;
+}
 
-//    vec2d u0_x(u0,DROP_X);
-//    vec2d u1_x(u1,DROP_X);
-//    vec2d v0_x(v0,DROP_X);
-//    vec2d v1_x(v1,DROP_X);
-//    if(!segments_intersect_exact(u0_x, u1_x, v0_x, v1_x, allow_shared_endpoints)) return false;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//    vec2d u0_y(u0,DROP_Y);
-//    vec2d u1_y(u1,DROP_Y);
-//    vec2d v0_y(v0,DROP_Y);
-//    vec2d v1_y(v1,DROP_Y);
-//    if(!segments_intersect_exact(u0_y, u1_y, v0_y, v1_y, allow_shared_endpoints)) return false;
+CINO_INLINE
+bool segment_segment_intersect_exact(const vec3d   s0[],
+                                     const vec3d   s1[],
+                                     const bool    strict,
+                                           int   & where_on_s0,
+                                           int   & where_on_s1)
+{
+    where_on_s0 = STRICTLY_OUTSIDE;
+    where_on_s1 = STRICTLY_OUTSIDE;
 
-//    vec2d u0_z(u0,DROP_Z);
-//    vec2d u1_z(u1,DROP_Z);
-//    vec2d v0_z(v0,DROP_Z);
-//    vec2d v1_z(v1,DROP_Z);
-//    if(!segments_intersect_exact(u0_z, u1_z, v0_z, v1_z, allow_shared_endpoints)) return false;
+    // project on X,Y,Z and, if the check is never false in any of the
+    // projections, then it must be true
 
-//    return true;
-//*/
-//}
+    vec2d s0_x[2] = { vec2d(s0[0],DROP_X), vec2d(s0[1],DROP_X) };
+    vec2d s1_x[2] = { vec2d(s1[0],DROP_X), vec2d(s1[1],DROP_X) };
+    int w_s0_x, w_s1_x;
+    if(!segment_segment_intersect_exact(s0_x, s1_x, strict, w_s0_x, w_s1_x)) return false;
 
-////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    vec2d s0_y[2] = { vec2d(s0[0],DROP_Y), vec2d(s0[1],DROP_Y) };
+    vec2d s1_y[2] = { vec2d(s1[0],DROP_Y), vec2d(s1[1],DROP_Y) };
+    int w_s0_y, w_s1_y;
+    if(!segment_segment_intersect_exact(s0_y, s1_y, strict, w_s0_y, w_s1_y)) return false;
 
-//CINO_INLINE
-//bool segment_triangle_intersect_exact(const vec2d   s[],
-//                                      const vec2d   t[],
-//                                            int   & where_on_s,
-//                                            int   & where_on_t);
+    vec2d s0_z[2] = { vec2d(s0[0],DROP_Z), vec2d(s0[1],DROP_Z) };
+    vec2d s1_z[2] = { vec2d(s1[0],DROP_Z), vec2d(s1[1],DROP_Z) };
+    int w_s0_z, w_s1_z;
+    if(!segment_segment_intersect_exact(s0_z, s1_z, strict, w_s0_z, w_s1_z)) return false;
 
-////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    // classify intersections based on 3D projections
+    if(w_s0_x==OVERLAP && w_s0_y==OVERLAP && w_s0_z==OVERLAP)
+    {
+        where_on_s0 = OVERLAP;
+        where_on_s1 = OVERLAP;
+    }
+    else if(w_s0_x!=OVERLAP)
+    {
+        where_on_s0 = w_s0_x;
+        where_on_s1 = w_s1_x;
+    }
+    else if(w_s0_y!=OVERLAP)
+    {
+        where_on_s0 = w_s0_y;
+        where_on_s1 = w_s1_y;
+    }
+    else if(w_s0_z!=OVERLAP)
+    {
+        where_on_s0 = w_s0_z;
+        where_on_s1 = w_s1_z;
+    }
+    return true;
+}
 
-//CINO_INLINE
-//bool segment_triangle_intersect_exact(const vec3d   s[],
-//                                      const vec3d   t[],
-//                                            int   & where_on_s,
-//                                            int   & where_on_t);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+CINO_INLINE
+bool segment_triangle_intersect_exact(const vec2d   s[],
+                                      const vec2d   t[],
+                                            int   & where_on_s,
+                                            int   & where_on_t);
 
-//CINO_INLINE
-//bool triangle_triangle_intersect_exact(const vec2d   t0[],
-//                                       const vec2d   t1[],
-//                                             int   & where_on_t0,
-//                                             int   & where_on_t1);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+CINO_INLINE
+bool segment_triangle_intersect_exact(const vec3d   s[],
+                                      const vec3d   t[],
+                                            int   & where_on_s,
+                                            int   & where_on_t);
 
-//CINO_INLINE
-//bool triangle_triangle_intersect_exact(const vec3d   t0[],
-//                                       const vec3d   t1[],
-//                                             int   & where_on_t0,
-//                                             int   & where_on_t1);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool triangle_triangle_intersect_exact(const vec2d   t0[],
+                                       const vec2d   t1[],
+                                             int   & where_on_t0,
+                                             int   & where_on_t1);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool triangle_triangle_intersect_exact(const vec3d   t0[],
+                                       const vec3d   t1[],
+                                             int   & where_on_t0,
+                                             int   & where_on_t1);
 
 }
