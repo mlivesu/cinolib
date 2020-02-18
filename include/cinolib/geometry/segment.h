@@ -47,15 +47,10 @@ class Segment : public SpatialDataStructureItem
 {
     public:
 
-        Segment(const uint    id,
-                const vec3d & v0,
-                const vec3d & v1) : v0(v0), v1(v1)
+        Segment(const uint id, const vec3d v[2])
         {
-            this->id = id;
-        }
-
-        Segment(const uint id, const std::pair<vec3d,vec3d> & p) : v0(p.first), v1(p.second)
-        {
+            this->v[0] = v[0];
+            this->v[1] = v[1];
             this->id = id;
         }
 
@@ -72,7 +67,7 @@ class Segment : public SpatialDataStructureItem
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d v0, v1;
+        vec3d v[2];
 };
 
 CINO_INLINE

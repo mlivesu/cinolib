@@ -34,43 +34,8 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/geometry/point_utils.h>
-#include <cinolib/Shewchuk_predicates.h>
 
 namespace cinolib
 {
-
-CINO_INLINE
-bool points_are_colinear_exact(const vec2d & p0,
-                               const vec2d & p1,
-                               const vec2d & p2)
-{
-    return orient2d(p0, p1, p2) == 0;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool points_are_colinear_exact(const vec3d & p0,
-                               const vec3d & p1,
-                               const vec3d & p2)
-{
-    // check if all the 2d orthogonal projections of p0-p1-p2 are colinear
-    if(points_are_colinear_exact(vec2d(p0,DROP_X), vec2d(p1,DROP_X), vec2d(p2,DROP_X)) &&
-       points_are_colinear_exact(vec2d(p0,DROP_Y), vec2d(p1,DROP_Y), vec2d(p2,DROP_Y)) &&
-       points_are_colinear_exact(vec2d(p0,DROP_Z), vec2d(p1,DROP_Z), vec2d(p2,DROP_Z))) return true;
-
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool points_are_coplanar_exact(const vec3d & p0,
-                               const vec3d & p1,
-                               const vec3d & p2,
-                               const vec3d & p3)
-{
-    return orient3d(p0, p1, p2, p3) == 0;
-}
 
 }

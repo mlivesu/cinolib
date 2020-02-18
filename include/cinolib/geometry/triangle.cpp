@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/Moller_Trumbore_intersection.h>
+#include <cinolib/exact_geometric_predicates.h>
 
 namespace cinolib
 {
@@ -50,7 +51,8 @@ ItemType Triangle::item_type() const
 CINO_INLINE
 AABB Triangle::aabb() const
 {
-    return AABB({v0, v1, v2});
+    std::vector<vec3d> tmp = {v[0], v[1], v[2]};
+    return AABB(tmp);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -58,7 +60,7 @@ AABB Triangle::aabb() const
 CINO_INLINE
 vec3d Triangle::point_closest_to(const vec3d & p) const
 {
-    return triangle_closest_point(p,v0,v1,v2);
+    return triangle_closest_point(p,v[0],v[1],v[2]);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -66,7 +68,13 @@ vec3d Triangle::point_closest_to(const vec3d & p) const
 CINO_INLINE
 bool Triangle::contains_exact(const vec3d & p, bool strict) const
 {
-    return triangle_contains_point_exact(v0, v1, v2, p, strict);
+    int where;
+    if(point_in_triangle_exact(p, v, where))
+    {
+        if(strict) return (where==STRICTLY_INSIDE);
+        return true;
+    }
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -77,7 +85,7 @@ bool Triangle::intersects_ray(const vec3d & p, const vec3d & dir, double & t, ve
     bool  hits_backside;
     bool  coplanar;
     vec3d bary;
-    if(Moller_Trumbore_intersection(p, dir, v0, v1, v2, hits_backside, coplanar, t, bary))
+    if(Moller_Trumbore_intersection(p, dir, v[0], v[1], v[2], hits_backside, coplanar, t, bary))
     {
         pos = p + t * dir;
         return true;
@@ -90,7 +98,7 @@ bool Triangle::intersects_ray(const vec3d & p, const vec3d & dir, double & t, ve
 CINO_INLINE
 void Triangle::barycentric_coordinates(const vec3d & p, std::vector<double> & bc) const
 {
-    triangle_barycentric_coords(v0, v1, v2, p, bc, 0);
+    triangle_barycentric_coords(v[0], v[1], v[2], p, bc, 0);
 }
 
 }

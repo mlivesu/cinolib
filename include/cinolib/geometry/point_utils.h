@@ -36,31 +36,9 @@
 #ifndef CINO_POINT_UTILS_H
 #define CINO_POINT_UTILS_H
 
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/geometry/vec2.h>
-
 namespace cinolib
 {
 
-CINO_INLINE
-bool points_are_colinear_exact(const vec2d & p0,
-                               const vec2d & p1,
-                               const vec2d & p2);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool points_are_colinear_exact(const vec3d & p0,
-                               const vec3d & p1,
-                               const vec3d & p2);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool points_are_coplanar_exact(const vec3d & p0,
-                               const vec3d & p1,
-                               const vec3d & p2,
-                               const vec3d & p3);
 }
 
 #ifndef  CINO_STATIC_LIB

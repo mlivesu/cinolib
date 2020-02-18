@@ -36,78 +36,9 @@
 #include <cinolib/geometry/triangle_utils.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/Moller_Trumbore_intersection.h>
-#include <cinolib/geometry/segment_utils.h>
 
 namespace cinolib
 {
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// true if point p lies (strictly) inside triangle abc
-CINO_INLINE
-bool triangle_contains_point_exact(const vec2d & a,
-                                   const vec2d & b,
-                                   const vec2d & c,
-                                   const vec2d & p,
-                                   const bool    strict)
-{
-    if(!strict && segment_contains_point_exact(a,b,p,false)) return true;
-    if(!strict && segment_contains_point_exact(b,c,p,false)) return true;
-    if(!strict && segment_contains_point_exact(c,a,p,false)) return true;
-
-    double abp = orient2d(a,b,p);
-    double bcp = orient2d(b,c,p);
-    double cap = orient2d(c,a,p);
-
-    if(abp>0 && bcp>0 && cap>0) return true; // CCW winding
-    if(abp<0 && bcp<0 && cap<0) return true; // CW  winding
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// true if point p lies (strictly) inside triangle abc
-CINO_INLINE
-bool triangle_contains_point_exact(const vec3d & a,
-                                   const vec3d & b,
-                                   const vec3d & c,
-                                   const vec3d & p,
-                                   const bool    strict)
-{
-    if(!points_are_coplanar_exact(a,b,c,p)) return false;
-
-    if(points_are_colinear_exact(a,b,c)) // degenerate triangle
-    {
-        if(strict) return false; // p cannot be strictly inside abc (due to zero area)
-
-        return segment_contains_point_exact(a,b,p,false) ||
-               segment_contains_point_exact(b,c,p,false) ||
-               segment_contains_point_exact(c,a,p,false);
-    }
-
-    // project on X,Y,Z and, if the check is never false in any of the
-    // projections, then it must be true
-
-    vec2d a_x(a,DROP_X);
-    vec2d b_x(b,DROP_X);
-    vec2d c_x(c,DROP_X);
-    vec2d p_x(p,DROP_X);
-    if(!triangle_contains_point_exact(a_x,b_x,c_x,p_x,strict)) return false;
-
-    vec2d a_y(a,DROP_Y);
-    vec2d b_y(b,DROP_Y);
-    vec2d c_y(c,DROP_Y);
-    vec2d p_y(p,DROP_Y);
-    if(!triangle_contains_point_exact(a_y,b_y,c_y,p_y,strict)) return false;
-
-    vec2d a_z(a,DROP_Z);
-    vec2d b_z(b,DROP_Z);
-    vec2d c_z(c,DROP_Z);
-    vec2d p_z(p,DROP_Z);
-    if(!triangle_contains_point_exact(a_z,b_z,c_z,p_z,strict)) return false;
-
-    return true;
-}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

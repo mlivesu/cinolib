@@ -33,48 +33,66 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_TETRAHEDRON_H
-#define CINO_TETRAHEDRON_H
-
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/geometry/spatial_data_structure_item.h>
+#include <cinolib/intersection_exact_predicates.h>
+#include <cinolib/geometry/point_utils.h>
 
 namespace cinolib
 {
 
-class Tetrahedron : public SpatialDataStructureItem
+/* Exact predicates to test intersection between edges/triangles in 2d and 3D.
+ * These are all based on the popular Shewchuk's exact orient predicates
+ *
+ * The flag "strict" controls element's boundary. If it is true, intersections are
+ * accounted for only if they occur inside the element. If it is false, also the
+ * boundary counts.
+*/
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool segment_segment_intersection_exact(const vec2d s0[2], const vec2d s1[2], const bool strict)
 {
-    public:
-
-        Tetrahedron(const uint id, const vec3d v[4])
-        {
-            this->v[0] = v[0];
-            this->v[1] = v[1];
-            this->v[2] = v[2];
-            this->v[3] = v[3];
-            this->id = id;
-        }
-
-       ~Tetrahedron() {}
-
-        // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
-
-        ItemType item_type              () const override;
-        AABB     aabb                   () const override;
-        vec3d    point_closest_to       (const vec3d & p) const override;
-        bool     intersects_ray         (const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const override;
-        void     barycentric_coordinates(const vec3d & p, std::vector<double> & bc) const override;
-        bool     contains_exact         (const vec3d & p, bool strict) const override;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        vec3d v[4];
-};
 
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "tetrahedron.cpp"
-#endif
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-#endif // CINO_TETRAHEDRON_H
+CINO_INLINE
+bool segment_segment_intersection_exact(const vec3d s0[2], const vec3d s1[2], const bool strict)
+{
+
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool segment_triangle_intersection_exact(const vec2d t[3], const vec2d t[3], const bool strict)
+{
+
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool segment_triangle_intersection_exact(const vec3d t[3], const vec3d t[3], const bool strict)
+{
+
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool triangle_triangle_intersection_exact(const vec2d t[3], const vec2d t[3], const bool strict)
+{
+
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool triangle_triangle_intersection_exact(const vec3d t[3], const vec3d t[3], const bool strict)
+{
+
+}
+
+}

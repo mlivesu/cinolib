@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include <cinolib/geometry/tetrahedron.h>
 #include <cinolib/geometry/tetrahedron_utils.h>
+#include <cinolib/exact_geometric_predicates.h>
 
 namespace cinolib
 {
@@ -50,7 +51,7 @@ ItemType Tetrahedron::item_type() const
 CINO_INLINE
 AABB Tetrahedron::aabb() const
 {
-    return AABB({v0, v1, v2, v3});
+    return AABB({v[0], v[1], v[2], v[3]});
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -58,7 +59,7 @@ AABB Tetrahedron::aabb() const
 CINO_INLINE
 vec3d Tetrahedron::point_closest_to(const vec3d & p) const
 {
-    return tetrahedron_closest_point(p,v0,v1,v2,v3);
+    return tetrahedron_closest_point(p,v[0],v[1],v[2],v[3]);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -66,7 +67,13 @@ vec3d Tetrahedron::point_closest_to(const vec3d & p) const
 CINO_INLINE
 bool Tetrahedron::contains_exact(const vec3d & p, bool strict) const
 {
-    return tet_contains_point_exact(v0, v1, v2, v3, p, strict);
+    int where;
+    if(point_in_tet_exact(p, v, where))
+    {
+        if(strict) return (where==STRICTLY_INSIDE);
+        return true;
+    }
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -78,10 +85,10 @@ bool Tetrahedron::intersects_ray(const vec3d & p, const vec3d & dir, double & t,
     bool   coplanar;
     vec3d  bary;
     double face_t[4];
-    if(!Moller_Trumbore_intersection(p, dir, v0, v2, v1, backside, coplanar, face_t[0], bary)) face_t[0] = inf_double;
-    if(!Moller_Trumbore_intersection(p, dir, v0, v1, v3, backside, coplanar, face_t[1], bary)) face_t[1] = inf_double;
-    if(!Moller_Trumbore_intersection(p, dir, v0, v3, v2, backside, coplanar, face_t[2], bary)) face_t[2] = inf_double;
-    if(!Moller_Trumbore_intersection(p, dir, v1, v2, v3, backside, coplanar, face_t[3], bary)) face_t[3] = inf_double;
+    if(!Moller_Trumbore_intersection(p, dir, v[0], v[2], v[1], backside, coplanar, face_t[0], bary)) face_t[0] = inf_double;
+    if(!Moller_Trumbore_intersection(p, dir, v[0], v[1], v[3], backside, coplanar, face_t[1], bary)) face_t[1] = inf_double;
+    if(!Moller_Trumbore_intersection(p, dir, v[0], v[3], v[2], backside, coplanar, face_t[2], bary)) face_t[2] = inf_double;
+    if(!Moller_Trumbore_intersection(p, dir, v[1], v[2], v[3], backside, coplanar, face_t[3], bary)) face_t[3] = inf_double;
     double min_t = *std::min_element(face_t, face_t+4);
     if(min_t!=inf_double)
     {
@@ -97,7 +104,7 @@ bool Tetrahedron::intersects_ray(const vec3d & p, const vec3d & dir, double & t,
 CINO_INLINE
 void Tetrahedron::barycentric_coordinates(const vec3d &p, std::vector<double> & bc) const
 {
-    tet_barycentric_coords(v0, v1, v2, v3, p, bc, 0);
+    tet_barycentric_coords(v[0], v[1], v[2], v[3], p, bc, 0);
 }
 
 }

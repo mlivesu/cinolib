@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/geometry/segment.h>
-#include <cinolib/geometry/segment_utils.h>
+#include <cinolib/exact_geometric_predicates.h>
 
 namespace cinolib
 {
@@ -42,7 +42,7 @@ namespace cinolib
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const Segment & s)
 {
-    in << s.v0 << "\t" << s.v1 << "\n";
+    in << s.v[0] << "\t" << s.v[1] << "\n";
     return in;
 }
 
@@ -53,17 +53,17 @@ std::ostream & operator<<(std::ostream & in, const Segment & s)
 CINO_INLINE
 vec3d Segment::point_closest_to(const vec3d & p) const
 {
-    vec3d u = v1 - v0;
+    vec3d u = v[1] - v[0];
 
-    // project p onto v0v1, but deferring divide by dot(u,u)
-    double t =(p-v0).dot(u);
-    if(t<=0) return v0;
+    // project p onto v[0]v[1], but deferring divide by dot(u,u)
+    double t =(p-v[0]).dot(u);
+    if(t<=0) return v[0];
 
     double den = u.dot(u);
-    if(t>=den) return v1;
+    if(t>=den) return v[1];
 
     t = t/den;
-    return v0 + t*u;
+    return v[0] + t*u;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -79,8 +79,8 @@ ItemType Segment::item_type() const
 CINO_INLINE
 AABB Segment::aabb() const
 {
-    std::vector<vec3d> v = {v0, v1};
-    return AABB(v);
+    std::vector<vec3d> tmp = {v[0], v[1]};
+    return AABB(tmp);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -99,8 +99,8 @@ void Segment::barycentric_coordinates(const vec3d & p, std::vector<double> & bc)
 {
     assert(contains(p));
 
-    vec3d  u = v1 - v0;
-    double t = (p-v0).dot(u);
+    vec3d  u = v[1] - v[0];
+    double t = (p-v[0]).dot(u);
     bc.resize(2);
     bc[1] = t / u.length();
     bc[0] = 1.0 - bc[0];
@@ -111,7 +111,8 @@ void Segment::barycentric_coordinates(const vec3d & p, std::vector<double> & bc)
 CINO_INLINE
 bool Segment::contains_exact(const vec3d & p, bool strict) const
 {
-    return segment_contains_point_exact(v0, v1, p, strict);
+    int where;
+    return point_in_segment_exact(p, v, strict, where);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -194,9 +195,9 @@ bool Segment::contains_exact(const vec3d & p, bool strict) const
 //CINO_INLINE
 //double Segment::dist_sqrd(const vec3d & p) const
 //{
-//    vec3d u = v1 - v0;
-//    vec3d v =  p - v0;
-//    vec3d w =  p - v1;
+//    vec3d u = v[1] - v[0];
+//    vec3d v =  p - v[0];
+//    vec3d w =  p - v[1];
 
 //    double e = v.dot(u);
 //    if(e<=0.0f) return v.dot(v);

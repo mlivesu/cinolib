@@ -48,20 +48,15 @@ class Triangle : public SpatialDataStructureItem
 {
     public:
 
-        Triangle(const uint id, const std::vector<vec3d> v) : v0(v.at(0)), v1(v.at(1)), v2(v.at(2))
+        Triangle(const uint id, const vec3d v[3])
         {
+            this->v[0] = v[0];
+            this->v[1] = v[1];
+            this->v[2] = v[2];
             this->id = id;
         }
 
-        Triangle(const uint    id,
-                 const vec3d & v0,
-                 const vec3d & v1,
-                 const vec3d & v2) : v0(v0), v1(v1), v2(v2)
-        {
-            this->id = id;
-        }
-
-       ~Triangle() {}
+       ~Triangle(){}
 
         // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
 
@@ -74,7 +69,7 @@ class Triangle : public SpatialDataStructureItem
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        vec3d v0, v1, v2;
+        vec3d v[3];
 };
 
 }
