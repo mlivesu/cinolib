@@ -76,7 +76,7 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void add_segment    (const uint id, const std::pair<vec3d,vec3d> & v);
+        void add_segment    (const uint id, const std::vector<vec3d> & v);
         void add_triangle   (const uint id, const std::vector<vec3d> & v);
         void add_tetrahedron(const uint id, const std::vector<vec3d> & v);
 

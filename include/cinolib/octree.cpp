@@ -191,9 +191,9 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Octree::add_segment(const uint id, const std::pair<vec3d,vec3d> & v)
+void Octree::add_segment(const uint id, const std::vector<vec3d> & v)
 {
-    items.push_back(new Segment(id,v));
+    items.push_back(new Segment(id,v.data()));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -201,7 +201,7 @@ void Octree::add_segment(const uint id, const std::pair<vec3d,vec3d> & v)
 CINO_INLINE
 void Octree::add_triangle(const uint id, const std::vector<vec3d> & v)
 {
-    items.push_back(new Triangle(id,v));
+    items.push_back(new Triangle(id,v.data()));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -209,7 +209,7 @@ void Octree::add_triangle(const uint id, const std::vector<vec3d> & v)
 CINO_INLINE
 void Octree::add_tetrahedron(const uint id, const std::vector<vec3d> & v)
 {
-    items.push_back(new Tetrahedron(id,v));
+    items.push_back(new Tetrahedron(id,v.data()));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
