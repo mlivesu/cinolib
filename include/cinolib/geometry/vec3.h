@@ -300,7 +300,7 @@ template<typename real> class vec3
 
         bool is_null() const
         {
-            if (m_x!=0 || m_y!=0 || m_z!=0) return true;
+            if(m_x==0 && m_y==0 && m_z==0) return true;
             return false;
         }
 
