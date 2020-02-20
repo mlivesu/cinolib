@@ -65,16 +65,11 @@ class DrawableSegmentSoup: public std::vector<vec3d>, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        ObjectType object_type() const { return DRAWABLE_CURVE; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void draw(const float scene_size=1) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void set_cheap_rendering(const bool b);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void push_seg(const vec3d v0, const vec3d v1);
-        void pop_seg();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -83,16 +78,22 @@ class DrawableSegmentSoup: public std::vector<vec3d>, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        ObjectType object_type()  const { return DRAWABLE_CURVE; }
+        void push_seg(const vec3d v0, const vec3d v1);
+        void pop_seg();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void set_color(const Color & c);
-        void set_thickness(float t);
+        void set_color          (const Color & c);
+        void set_thickness      (float t);
+        void set_cheap_rendering(const bool b);
+        void set_always_in_front(const bool b);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     private:
 
-        bool  use_gl_lines; // to speedup rendering (when lots of segments are to be rendered)
+        bool  no_depth_test; // render segments always in front, regardless of what's in the GL scene
+        bool  use_gl_lines;  // to speedup rendering (when lots of segments are to be rendered)
         Color color;
         float thickness;
 };

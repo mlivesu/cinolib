@@ -46,9 +46,10 @@ namespace cinolib
 CINO_INLINE
 DrawableSegmentSoup::DrawableSegmentSoup()
 {
-    color        = Color::RED();
-    thickness    = 1.0;
-    use_gl_lines = false;
+    color         = Color::RED();
+    thickness     = 1.0;
+    use_gl_lines  = false;
+    no_depth_test = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -56,11 +57,16 @@ DrawableSegmentSoup::DrawableSegmentSoup()
 CINO_INLINE
 void DrawableSegmentSoup::draw(const float scene_size) const
 {
+    if(no_depth_test) glDisable(GL_DEPTH_TEST);
+
     if(!use_gl_lines)
     {
-        float cylind_rad = scene_size * 0.002 * thickness;
+        float cylind_rad = scene_size*0.002*thickness;
 
-        for(vec3d p : *this) sphere<vec3d>(p, cylind_rad, color.rgba);
+        for(vec3d p : *this)
+        {
+            sphere<vec3d>(p, cylind_rad, color.rgba);
+        }
 
         for(uint i=0; i<size()/2; ++i)
         {
@@ -87,6 +93,8 @@ void DrawableSegmentSoup::draw(const float scene_size) const
         glEnable(GL_LIGHTING);
         glDisable(GL_LINE_SMOOTH);
     }
+
+    if(no_depth_test) glEnable(GL_DEPTH_TEST);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -114,6 +122,14 @@ CINO_INLINE
 void DrawableSegmentSoup::set_cheap_rendering(const bool b)
 {
     use_gl_lines = b;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableSegmentSoup::set_always_in_front(const bool b)
+{
+    no_depth_test = b;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
