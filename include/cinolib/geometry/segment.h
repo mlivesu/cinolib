@@ -47,6 +47,13 @@ class Segment : public SpatialDataStructureItem
 {
     public:
 
+        Segment(const uint id, const vec3d & v0, const vec3d & v1)
+        {
+            this->v[0] = v0;
+            this->v[1] = v1;
+            this->id = id;
+        }
+
         Segment(const uint id, const vec3d v[2])
         {
             this->v[0] = v[0];
