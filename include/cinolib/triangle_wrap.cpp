@@ -64,6 +64,8 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#ifdef CINOLIB_USES_TRIANGLE
+
 CINO_INLINE
 void triangle_wrap(const std::vector<double> & coords_in,
                    const std::vector<uint>   & segs_in,
@@ -74,8 +76,6 @@ void triangle_wrap(const std::vector<double> & coords_in,
 {
     coords_out.clear();
     tris_out.clear();
-
-#ifdef CINOLIB_USES_TRIANGLE
 
     triangulateio in, out;
 
@@ -148,12 +148,20 @@ void triangle_wrap(const std::vector<double> & coords_in,
     free(out.pointlist);
     free(out.trianglelist);
     free(out.segmentlist);
-
+}
 #else
+CINO_INLINE
+void triangle_wrap(const std::vector<double> & /*coords_in*/,
+                   const std::vector<uint>   & /*segs_in*/,
+                   const std::vector<double> & /*holes_in*/,
+                   const std::string         & /*flags*/,
+                         std::vector<double> & /*coords_out*/,
+                         std::vector<uint>   & /*tris_out*/)
+{
     std::cerr << "ERROR : Triangle missing. Install Triangle and recompile defining symbol CINOLIB_USES_TRIANGLE" << std::endl;
     exit(-1);
-#endif
 }
+#endif
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
