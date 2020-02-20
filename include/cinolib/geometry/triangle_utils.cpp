@@ -46,7 +46,7 @@ CINO_INLINE
 vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C)
 {
     vec3d n = (B-A).cross(C-A);
-    if(n.is_null()) n.normalize();
+    if(!n.is_null()) n.normalize();
     return n;
 }
 
