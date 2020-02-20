@@ -43,6 +43,7 @@
 namespace cinolib
 {
 
+#ifdef CINOLIB_USES_TETGEN
 CINO_INLINE
 void tetgen_wrap(const std::vector<double>            & coords_in,
                  const std::vector<std::vector<uint>> & polys_in,
@@ -51,8 +52,6 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
                        std::vector<double>            & coords_out,
                        std::vector<uint>              & tets_out)
 {
-#ifdef CINOLIB_USES_TETGEN
-
     assert(!coords_in.empty());
     coords_out.clear();
     tets_out.clear();
@@ -126,12 +125,20 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
         tets_out.push_back(out.tetrahedronlist[tid_ptr + 2]);
         tets_out.push_back(out.tetrahedronlist[tid_ptr + 3]);
     }
-
+}
 #else
+CINO_INLINE
+void tetgen_wrap(const std::vector<double>            & /*coords_in*/,
+                 const std::vector<std::vector<uint>> & /*polys_in*/,
+                 const std::vector<uint>              & /*edges_in*/,
+                 const std::string                    & /*flags*/, // options
+                       std::vector<double>            & /*coords_out*/,
+                       std::vector<uint>              & /*tets_out*/)
+{
     std::cerr << "ERROR : Tetgen missing. Install Tetgen and recompile defining symbol CINOLIB_USES_TETGEN" << std::endl;
     exit(-1);
-#endif
 }
+#endif
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
