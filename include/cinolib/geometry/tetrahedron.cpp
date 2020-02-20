@@ -70,7 +70,7 @@ bool Tetrahedron::contains_exact(const vec3d & p, bool strict) const
     int where;
     if(point_in_tet_exact(p, v, where))
     {
-        if(strict) return (where==STRICTLY_INSIDE);
+        if(strict) return (where==INSIDE_TET_0);
         return true;
     }
     return false;

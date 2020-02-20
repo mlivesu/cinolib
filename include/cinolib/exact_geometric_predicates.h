@@ -44,49 +44,82 @@ namespace cinolib
 
 /* Exact predicates to test point in segment/triangle/tetrahedron, and
  * also to test intersections between segments/triangles/tets in 2D and
- * 3D. All test based on the popular Shewchuk's exact orient predicates.
+ * 3D. All test are based on the popular Shewchuk's exact orient predicates.
  *
  * When present, the "strict" variable allows to restrict the search only
  * to the interior of the simplex, ignoring the sub-simplices that define
  * its boundary.
  *
  * Additionally to the boolean return type, each predicate returns a "where"
- * variable which indicates exactly where, in the input simplex, the intersection
- * occurred. Note that a point may belong to multiple subsimplices. For
- * example, a point coincident to a triangle vertex belongs to a 0-dimensional
- * simplex (the vertex), at least two 2-dimensional simplices (its incident edges),
- * and one 2-dimensional simplex (the triangle). The where indicator will always
- * point to the smallest dimensional simplex that contains it.
+ * variable that indicates exactly where, in the input simplex, the point
+ * is located (or the intersection occurred). For intersection queries, each
+ * simplex involved in the test has its own "where" variable, which locates
+ * the intersection inside it.
+ *
+ * Note that a point may belong to multiple sub-simplices. For example, a
+ * point coincident to a triangle vertex belongs to a 0-dimensional simplex
+ * (the vertex), at least two 2-dimensional simplices (its incident edges),
+ * and one 2-dimensional simplex (the triangle).
+ *
+ * For conforming intersections (i.e. when the two input simplices form a
+ * valid simplicial complex), the where variable points to the highest
+ * dimensional (sub) simplex that fully contains the other simplex.
+ *
+ * For non conforming intersections, the where variable returns the lowest
+ * dimensional simplex that must be split in order to achieve conformity
+ * and realize a valid simplicial complex.
  *
  * WARNING: for degenerate elements such as zero length segments, zero area
- * triangles and zero volume tets, the smallest dimesional simplex that contains
- * a given point may not be unique!
+ * triangles and zero volume tets, and for simplices that do not intersect
+ * at a unique point, the lowest dimensional simplex to be split may not be
+ * unique. In these cases, only one of them will be returned, and multiple
+ * checks must be done to split the original simplices at all the necessary
+ * points to realize a valid simplicial complex.
  */
 
-// location of intersection points for exact predicates.
-// Vert, edge, and face orderings are compliant with the
-// tables in cinolib/standard_elements_tables.h
-//
+/*
+ * location of intersection points for exact predicates. Vert,
+ * edge, and face orderings are compliant with the tables in:
+ * #include <cinolib/standard_elements_tables.h>
+ *
+ * EQUALS_  prefix denotes (sub) simplices that intersect the
+ *          other simplex in a conforming way (i.e. they make
+ *          a valid simplicial complex)
+ *
+ * INSIDE_ suffix denotes (sub) simplices that are intersected
+ *         by the other simplex at an inner point/area, therefore
+ *         they must be split to achieve conformity and make a
+ *         valid simplicial complex
+ */
 enum
 {
-    STRICTLY_OUTSIDE = 0,  // used for segs, tris, tets
-    STRICTLY_INSIDE  = 1,  // used for segs, tris, tets
-    ON_VERT_0        = 2,  // used for segs, tris, tets
-    ON_VERT_1        = 3,  // used for segs, tris, tets
-    ON_VERT_2        = 4,  // used for tris, tets
-    ON_VERT_3        = 5,  // used for tets
-    ON_EDGE_0        = 6,  // used for tris, tets
-    ON_EDGE_1        = 7,  // used for tris, tets
-    ON_EDGE_2        = 8,  // used for tris, tets
-    ON_EDGE_3        = 9,  // used for tets
-    ON_EDGE_4        = 10, // used for tets
-    ON_EDGE_5        = 11, // used for tets
-    ON_FACE_0        = 12, // used for tets
-    ON_FACE_1        = 13, // used for tets
-    ON_FACE_2        = 14, // used for tets
-    ON_FACE_3        = 15, // used for tets
-    COINCIDENT       = 16, // used for segs, tris, tets
-    OVERLAP          = 16, // used for segs (when they are colinear and intersect)
+    OUTSIDE,       // no intersection
+    EQUALS_VERT_0, // 1st vertex of an edge, triangle, tet
+    EQUALS_VERT_1, // 2nd vertex of an edge, triangle, tet
+    EQUALS_VERT_2, // 3rd vertex of a triangle, tet
+    EQUALS_VERT_3, // 4th vertex of a tet
+    INSIDE_SEG_0,  // input edge, or 1st edge of a triangle, tet
+    EQUALS_SEG_0,  //
+    INSIDE_SEG_1,  // 2nd edge of a triangle, tet
+    EQUALS_SEG_1,  //
+    INSIDE_SEG_2,  // 3rd edge of a triangle, tet
+    EQUALS_SEG_2,  //
+    INSIDE_SEG_3,  // 4th edge of a tet
+    EQUALS_SEG_3,  //
+    INSIDE_SEG_4,  // 5th edge of a tet
+    EQUALS_SEG_4,  //
+    INSIDE_SEG_5,  // 6th edge of a tet
+    EQUALS_SEG_5,  //
+    INSIDE_TRI_0,  // input triangle, or 1st face of a tet
+    EQUALS_TRI_0,  //
+    INSIDE_TRI_1,  // 2nd face of a tet,
+    EQUALS_TRI_1,  //
+    INSIDE_TRI_2,  // 3rd face of a tet,
+    EQUALS_TRI_2,  //
+    INSIDE_TRI_3,  // 4th face of a tet,
+    EQUALS_TRI_3,  //
+    INSIDE_TET_0,  // input tet
+    EQUALS_TET_0,  //
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
