@@ -111,8 +111,9 @@ void Segment::barycentric_coordinates(const vec3d & p, std::vector<double> & bc)
 CINO_INLINE
 bool Segment::contains_exact(const vec3d & p, bool strict) const
 {
-    int where;
-    return point_in_segment_exact(p, v, strict, where);
+    int where = point_in_segment_exact(p,v);
+    if(strict) return (where==STRICTLY_INSIDE);
+               return (where>=STRICTLY_INSIDE);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

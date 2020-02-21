@@ -57,7 +57,7 @@ namespace cinolib
  * whether the input simplices have at least one point in common (borders are
  * ignored if strict is set to true).
  *
- * Point location indicators: a point may belong to multiple sub-simplices.
+ * Point location indicators: a point tipically belongs to multiple sub-simplices.
  * For example, a point coincident to a triangle vertex belongs to a 0-dimensional
  * simplex (the vertex), at least two 2-dimensional simplices (its incident
  * edges), and one 2-dimensional simplex (the triangle). The integer flag points
@@ -119,9 +119,9 @@ bool points_are_coplanar_exact(const vec3d & p0,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// ON_VERT0         if p coincides with s[0]
-// ON_VERT1         if p coincides with s[1]
-// STRICTLY_INSIDE  if p lies in between s[0] and s[1] (not included)
+// returns:
+// ON_VERTi         if p coincides with the i-th vertex of s
+// STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
 CINO_INLINE
 int point_in_segment_exact(const vec2d & p,
@@ -129,9 +129,9 @@ int point_in_segment_exact(const vec2d & p,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// ON_VERT0         if p coincides with s[0]
-// ON_VERT1         if p coincides with s[1]
-// STRICTLY_INSIDE  if p lies in between s[0] and s[1] (not included)
+// returns:
+// ON_VERTi         if p coincides with the i-th vertex of s
+// STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
 CINO_INLINE
 int point_in_segment_exact(const vec3d & p,
@@ -139,13 +139,10 @@ int point_in_segment_exact(const vec3d & p,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// ON_VERT0         if p coincides with t[0]
-// ON_VERT1         if p coincides with t[1]
-// ON_VERT2         if p coincides with t[2]
-// ON_EDGE0         if p lies in between t[0] and t[1] (not included)
-// ON_EDGE1         if p lies in between t[1] and t[2] (not included)
-// ON_EDGE2         if p lies in between t[2] and t[0] (not included)
-// STRICTLY_INSIDE  if p lies inside triangle t (borders not included)
+// returns:
+// ON_VERTi         if p coincides with the i-th vertex of t
+// ON_EDGEj         if p lies inside the j-th edge of t (endpoints excluded)
+// STRICTLY_INSIDE  if p lies inside triangle t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
 CINO_INLINE
 int point_in_triangle_exact(const vec2d & p,
@@ -153,18 +150,32 @@ int point_in_triangle_exact(const vec2d & p,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns:
+// ON_VERTi         if p coincides with the i-th vertex of t
+// ON_EDGEj         if p lies inside the j-th edge of t (endpoints excluded)
+// STRICTLY_INSIDE  if p lies inside triangle t (borders excluded)
+// STRICTLY_OUTSIDE otherwise
 CINO_INLINE
 int point_in_triangle_exact(const vec3d & p,
                             const vec3d   t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns:
+// ON_VERTi         if p coincides with the i-th vertex of t
+// ON_EDGEj         if p lies inside the j-th edge of t (endpoints excluded)
+// ON_FACEk         if p lies inside the k-th face of t (borders excluded)
+// STRICTLY_INSIDE  if p lies inside tetrahedron t (borders excluded)
+// STRICTLY_OUTSIDE otherwise
 CINO_INLINE
 int point_in_tet_exact(const vec3d & p,
                        const vec3d   t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// if strict is enabled,  returns true if s0 and s1 intersect at an inner point (for both)
+// if strict is disabled, returns true if s0 and s1 intersect at any point (extrema included)
+// coincident segments are not considered intersecting at all
 CINO_INLINE
 bool segment_segment_intersect_exact(const vec2d  s0[],
                                      const vec2d  s1[],
@@ -172,6 +183,9 @@ bool segment_segment_intersect_exact(const vec2d  s0[],
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// if strict is enabled,  returns true if s0 and s1 intersect at an inner point (for both)
+// if strict is disabled, returns true if s0 and s1 intersect at any point (extrema included)
+// coincident segments are not considered intersecting at all
 CINO_INLINE
 bool segment_segment_intersect_exact(const vec3d  s0[],
                                      const vec3d  s1[],
@@ -179,24 +193,32 @@ bool segment_segment_intersect_exact(const vec3d  s0[],
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns true if s and t intersect at any point (borders included)
+// returns false if s is a subsimplex of t
 CINO_INLINE
 bool segment_triangle_intersect_exact(const vec2d s[],
                                       const vec2d t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns true if s and t intersect at any point (borders included)
+// returns false if s is a subsimplex of t
 CINO_INLINE
 bool segment_triangle_intersect_exact(const vec3d s[],
                                       const vec3d t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns true if t0 and t1 intersect at any point (borders included)
+// coincident triangles are not considered intersecting at all
 CINO_INLINE
 bool triangle_triangle_intersect_exact(const vec2d t0[],
                                        const vec2d t1[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns true if t0 and t1 intersect at any point (borders included)
+// coincident triangles are not considered intersecting at all
 CINO_INLINE
 bool triangle_triangle_intersect_exact(const vec3d t0[],
                                        const vec3d t1[]);
