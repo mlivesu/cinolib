@@ -40,14 +40,23 @@
 namespace cinolib
 {
 
+// Subdivides a prism with triangular base into 3 tets.
+// Prism vertices are assumed in the following order:
+//
+//      v2             v5
+//    /    \         /    \
+//  v0 --- v1      v3 --- v4
+//
+//   bot base       top base
+//
 CINO_INLINE
-void tetrahedralize_prism(uint prism[], std::vector<uint> & tets)
+void prism_to_tets(const std::vector<uint> & prism,
+                         std::vector<uint> & tets)
 {
     std::set<ipair> ordered_vids;
     for(uint i=0; i<6; ++i) ordered_vids.insert(ipair(prism[i],i));
 
     // see Table 2 in "How to Subdivide Pyramids, Prisms and Hexahedra into Tetrahedra"
-    //
     uint ref_prism[6];
     switch ((*ordered_vids.begin()).second)
     {
@@ -103,18 +112,37 @@ void tetrahedralize_prism(uint prism[], std::vector<uint> & tets)
     }
 
     // see Table 3 in "How to Subdivide Pyramids, Prisms and Hexahedra into Tetrahedra"
-    //
-    if (std::min(ref_prism[1],ref_prism[5]) < std::min(ref_prism[2],ref_prism[4]))
+    if(std::min(ref_prism[1],ref_prism[5]) < std::min(ref_prism[2],ref_prism[4]))
     {
-        tets.push_back(ref_prism[0]); tets.push_back(ref_prism[1]); tets.push_back(ref_prism[2]); tets.push_back(ref_prism[5]);
-        tets.push_back(ref_prism[0]); tets.push_back(ref_prism[1]); tets.push_back(ref_prism[5]); tets.push_back(ref_prism[4]);
+        // t0
+        tets.push_back(ref_prism[0]);
+        tets.push_back(ref_prism[1]);
+        tets.push_back(ref_prism[2]);
+        tets.push_back(ref_prism[5]);
+        // t1
+        tets.push_back(ref_prism[0]);
+        tets.push_back(ref_prism[1]);
+        tets.push_back(ref_prism[5]);
+        tets.push_back(ref_prism[4]);
     }
     else
     {
-        tets.push_back(ref_prism[0]); tets.push_back(ref_prism[1]); tets.push_back(ref_prism[2]); tets.push_back(ref_prism[4]);
-        tets.push_back(ref_prism[0]); tets.push_back(ref_prism[4]); tets.push_back(ref_prism[2]); tets.push_back(ref_prism[5]);
+        // t0
+        tets.push_back(ref_prism[0]);
+        tets.push_back(ref_prism[1]);
+        tets.push_back(ref_prism[2]);
+        tets.push_back(ref_prism[4]);
+        // t1
+        tets.push_back(ref_prism[0]);
+        tets.push_back(ref_prism[4]);
+        tets.push_back(ref_prism[2]);
+        tets.push_back(ref_prism[5]);
     }
-    tets.push_back(ref_prism[0]); tets.push_back(ref_prism[4]); tets.push_back(ref_prism[5]); tets.push_back(ref_prism[3]);
+    // t2
+    tets.push_back(ref_prism[0]);
+    tets.push_back(ref_prism[4]);
+    tets.push_back(ref_prism[5]);
+    tets.push_back(ref_prism[3]);
 }
 
 }

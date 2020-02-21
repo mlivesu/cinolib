@@ -50,18 +50,21 @@
 namespace cinolib
 {
 
-/* This assumes the prism has a triangular cross-section.
- * The vertices are ordered as follows:
- *
- *      v2             v5
- *    /    \         /    \
- *  v0 --- v1      v3 --- v4
- *
- *   bot base       top base
-*/
+// Subdivides a prism with triangular base into 3 tets.
+// Prism vertices are assumed in the following order:
+//
+//      v2             v5
+//    /    \         /    \
+//  v0 --- v1      v3 --- v4
+//
+//   bot base       top base
+//
 CINO_INLINE
-void tetrahedralize_prism(uint prism[], std::vector<uint> & tets);
+void prism_to_tets(const std::vector<uint> & prism,
+                         std::vector<uint> & tets);
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 }
 
