@@ -67,13 +67,9 @@ vec3d Tetrahedron::point_closest_to(const vec3d & p) const
 CINO_INLINE
 bool Tetrahedron::contains_exact(const vec3d & p, bool strict) const
 {
-    int where;
-    if(point_in_tet_exact(p, v, where))
-    {
-        if(strict) return (where==STRICTLY_INSIDE);
-        return true;
-    }
-    return false;
+    int where = point_in_tet_exact(p,v);
+    if(strict) return (where==STRICTLY_INSIDE);
+               return (where>=STRICTLY_INSIDE);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
