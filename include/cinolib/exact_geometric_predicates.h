@@ -47,102 +47,54 @@ namespace cinolib
  * 3D. All test are based on the popular Shewchuk's exact orient predicates.
  *
  * When present, the "strict" variable allows to restrict the search only
- * to the interior of the simplex, ignoring the sub-simplices that define
- * its boundary.
+ * to the interior, ignoring simplices that touch at their boundary, even
+ * in non conforming ways (i.e. when they do not define a valid simplicial
+ * complex).
  *
- * Additionally to the boolean return type, each predicate returns a "where"
- * variable that indicates exactly where, in the input simplex, the point
- * is located (or the intersection occurred). For intersection queries, each
- * simplex involved in the test has its own "where" variable, which locates
- * the intersection inside it.
+ * Return values: the point_in_{segment | triangle | tet} predicates return
+ * an integer flag which indicates exactly where, in the input simplex, the
+ * point is located. Intersection queries return a boolean flag which indicates
+ * whether the input simplices have at least one point in common (borders are
+ * ignored if strict is set to true).
  *
- * Note that a point may belong to multiple sub-simplices. For example, a
- * point coincident to a triangle vertex belongs to a 0-dimensional simplex
- * (the vertex), at least two 2-dimensional simplices (its incident edges),
- * and one 2-dimensional simplex (the triangle).
- *
- * For conforming intersections (i.e. when the two input simplices form a
- * valid simplicial complex), the where variable points to the highest
- * dimensional (sub) simplex that fully contains the other simplex.
- *
- * For non conforming intersections, the where variable returns the lowest
- * dimensional simplex that must be split in order to achieve conformity
- * and realize a valid simplicial complex.
+ * Point location indicators: a point may belong to multiple sub-simplices.
+ * For example, a point coincident to a triangle vertex belongs to a 0-dimensional
+ * simplex (the vertex), at least two 2-dimensional simplices (its incident
+ * edges), and one 2-dimensional simplex (the triangle). The integer flag points
+ * to the lowest dimensional (sub) simplex that fully contains the point.
  *
  * WARNING: for degenerate elements such as zero length segments, zero area
- * triangles and zero volume tets, and for simplices that do not intersect
- * at a unique point, the lowest dimensional simplex to be split may not be
- * unique. In these cases, only one of them will be returned, and multiple
- * checks must be done to split the original simplices at all the necessary
- * points to realize a valid simplicial complex.
+ * triangles and zero volume tets, the lowest dimensional simplex containing
+ * a point may not be unique. In these cases, only one of them will be returned.
  */
 
-/*
- * location of intersection points for exact predicates. Vert,
- * edge, and face orderings are compliant with the tables in:
- * #include <cinolib/standard_elements_tables.h>
- *
- * EQUALS_  prefix denotes (sub) simplices that intersect the
- *          other simplex in a conforming way (i.e. they make
- *          a valid simplicial complex)
- *
- * INSIDE_ suffix denotes (sub) simplices that are intersected
- *         by the other simplex at an inner point/area, therefore
- *         they must be split to achieve conformity and make a
- *         valid simplicial complex
- */
+// location of intersection points for point_in_{segment | triangle | tet}
+// predicates. Elements' orders are compliant with the tables in:
+//
+//   #include <cinolib/standard_elements_tables.h>
 enum
 {
-    STRICTLY_OUTSIDE = 0,
-    STRICTLY_INSIDE  = 1,
-    ON_VERT0         = 2,
-    ON_VERT1         = 3,
-    ON_VERT2         = 4,
-    ON_VERT3         = 5,
-    ON_EDGE0         = 6,
-    ON_EDGE1         = 7,
-    ON_EDGE2         = 8,
-    ON_EDGE3         = 9,
-    ON_EDGE4         = 10,
-    ON_EDGE5         = 11,
-    ON_FACE0         = 12,
-    ON_FACE1         = 12,
-    ON_FACE2         = 12,
-    ON_FACE3         = 12,
-}
-    OUTSIDE,       // no intersection
-    EQUALS_VERT_0, // 1st vertex of an edge, triangle, tet
-    EQUALS_VERT_1, // 2nd vertex of an edge, triangle, tet
-    EQUALS_VERT_2, // 3rd vertex of a triangle, tet
-    EQUALS_VERT_3, // 4th vertex of a tet
-    INSIDE_SEG_0,  // input edge, or 1st edge of a triangle, tet
-    EQUALS_SEG_0,  //
-    INSIDE_SEG_1,  // 2nd edge of a triangle, tet
-    EQUALS_SEG_1,  //
-    INSIDE_SEG_2,  // 3rd edge of a triangle, tet
-    EQUALS_SEG_2,  //
-    INSIDE_SEG_3,  // 4th edge of a tet
-    EQUALS_SEG_3,  //
-    INSIDE_SEG_4,  // 5th edge of a tet
-    EQUALS_SEG_4,  //
-    INSIDE_SEG_5,  // 6th edge of a tet
-    EQUALS_SEG_5,  //
-    INSIDE_TRI_0,  // input triangle, or 1st face of a tet
-    EQUALS_TRI_0,  //
-    INSIDE_TRI_1,  // 2nd face of a tet,
-    EQUALS_TRI_1,  //
-    INSIDE_TRI_2,  // 3rd face of a tet,
-    EQUALS_TRI_2,  //
-    INSIDE_TRI_3,  // 4th face of a tet,
-    EQUALS_TRI_3,  //
-    INSIDE_TET_0,  // input tet
-    EQUALS_TET_0,  //
+    STRICTLY_OUTSIDE = 0,  // strictly outside the input simplex
+    STRICTLY_INSIDE  = 1,  // strictly inside  the input simplex
+    ON_VERT0         = 2,  // used for segs, tris and tets
+    ON_VERT1         = 3,  // used for segs, tris and tets
+    ON_VERT2         = 4,  // used for tris and tets
+    ON_VERT3         = 5,  // used for tets
+    ON_EDGE0         = 6,  // used for tris and tets
+    ON_EDGE1         = 7,  // used for tris and tets
+    ON_EDGE2         = 8,  // used for tris and tets
+    ON_EDGE3         = 9,  // used for tets
+    ON_EDGE4         = 10, // used for tets
+    ON_EDGE5         = 11, // used for tets
+    ON_FACE0         = 12, // used for tets
+    ON_FACE1         = 13, // used for tets
+    ON_FACE2         = 14, // used for tets
+    ON_FACE3         = 15, // used for tets
 };
-
-/* forse meglio rinunciare al where per le intersezioni. è ben definito solo per i punti.... */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// true if the area of the triangle p0-p1-p2 is zero
 CINO_INLINE
 bool points_are_colinear_exact(const vec2d & p0,
                                const vec2d & p1,
@@ -150,6 +102,7 @@ bool points_are_colinear_exact(const vec2d & p0,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// true if the area of all the orthogonal 2d projections of the triangle p0-p1-p2 is zero
 CINO_INLINE
 bool points_are_colinear_exact(const vec3d & p0,
                                const vec3d & p1,
@@ -157,6 +110,7 @@ bool points_are_colinear_exact(const vec3d & p0,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// true if the volume of the tetrahedron p0-p1-p2-p3 is zero
 CINO_INLINE
 bool points_are_coplanar_exact(const vec3d & p0,
                                const vec3d & p1,
@@ -165,91 +119,88 @@ bool points_are_coplanar_exact(const vec3d & p0,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// ON_VERT0         if p coincides with s[0]
+// ON_VERT1         if p coincides with s[1]
+// STRICTLY_INSIDE  if p lies in between s[0] and s[1] (not included)
+// STRICTLY_OUTSIDE otherwise
 CINO_INLINE
-bool point_in_segment_exact(const vec2d & p,
-                            const vec2d   s[],
-                            const bool    strict,
-                                  int   & where);
+int point_in_segment_exact(const vec2d & p,
+                           const vec2d  s[]);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// ON_VERT0         if p coincides with s[0]
+// ON_VERT1         if p coincides with s[1]
+// STRICTLY_INSIDE  if p lies in between s[0] and s[1] (not included)
+// STRICTLY_OUTSIDE otherwise
+CINO_INLINE
+int point_in_segment_exact(const vec3d & p,
+                           const vec3d   s[]);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// ON_VERT0         if p coincides with t[0]
+// ON_VERT1         if p coincides with t[1]
+// ON_VERT2         if p coincides with t[2]
+// ON_EDGE0         if p lies in between t[0] and t[1] (not included)
+// ON_EDGE1         if p lies in between t[1] and t[2] (not included)
+// ON_EDGE2         if p lies in between t[2] and t[0] (not included)
+// STRICTLY_INSIDE  if p lies inside triangle t (borders not included)
+// STRICTLY_OUTSIDE otherwise
+CINO_INLINE
+int point_in_triangle_exact(const vec2d & p,
+                            const vec2d   t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool point_in_segment_exact(const vec3d & p,
-                            const vec3d   s[],
-                            const bool    strict,
-                                  int   & where);
+int point_in_triangle_exact(const vec3d & p,
+                            const vec3d   t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool point_in_triangle_exact(const vec2d & p,
-                             const vec2d   t[],
-                             const bool    strict,
-                                   int   & where);
+int point_in_tet_exact(const vec3d & p,
+                       const vec3d   t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool point_in_triangle_exact(const vec3d & p,
-                             const vec3d   t[],
-                                   int   & where);
+bool segment_segment_intersect_exact(const vec2d  s0[],
+                                     const vec2d  s1[],
+                                     const bool & strict);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool point_in_tet_exact(const vec3d & p,
-                        const vec3d   t[],
-                              int   & where);
+bool segment_segment_intersect_exact(const vec3d  s0[],
+                                     const vec3d  s1[],
+                                     const bool & strict);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool segment_segment_intersect_exact(const vec2d   s0[],
-                                     const vec2d   s1[],
-                                           int   & where_on_s0,
-                                           int   & where_on_s1);
+bool segment_triangle_intersect_exact(const vec2d s[],
+                                      const vec2d t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool segment_segment_intersect_exact(const vec3d   s0[],
-                                     const vec3d   s1[],
-                                     const bool    strict,
-                                           int   & where_on_s0,
-                                           int   & where_on_s1);
+bool segment_triangle_intersect_exact(const vec3d s[],
+                                      const vec3d t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool segment_triangle_intersect_exact(const vec2d   s[],
-                                      const vec2d   t[],
-                                      const bool    strict,
-                                            int   & where_on_s,
-                                            int   & where_on_t);
+bool triangle_triangle_intersect_exact(const vec2d t0[],
+                                       const vec2d t1[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool segment_triangle_intersect_exact(const vec3d   s[],
-                                      const vec3d   t[],
-                                            int   & where_on_s,
-                                            int   & where_on_t);
+bool triangle_triangle_intersect_exact(const vec3d t0[],
+                                       const vec3d t1[]);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool triangle_triangle_intersect_exact(const vec2d   t0[],
-                                       const vec2d   t1[],
-                                             int   & where_on_t0,
-                                             int   & where_on_t1);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool triangle_triangle_intersect_exact(const vec3d   t0[],
-                                       const vec3d   t1[],
-                                             int   & where_on_t0,
-                                             int   & where_on_t1);
 }
 
 #ifndef  CINO_STATIC_LIB
