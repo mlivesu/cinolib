@@ -469,8 +469,73 @@ bool segment_segment_intersect_exact(const vec3d   s0[],
 CINO_INLINE
 bool segment_triangle_intersect_exact(const vec2d   s[],
                                       const vec2d   t[],
+                                      const bool    strict,
                                             int   & where_on_s,
-                                            int   & where_on_t);
+                                            int   & where_on_t)
+{
+    where_on_s0 = OUTSIDE;
+    where_on_s1 = OUTSIDE;
+
+    bool s0_is_t0 = s[0]==t[0];
+    bool s0_is_t1 = s[0]==t[1];
+    bool s0_is_t2 = s[0]==t[2];
+    bool s1_is_t0 = s[1]==t[0];
+    bool s1_is_t1 = s[1]==t[1];
+    bool s1_is_t2 = s[1]==t[2];
+
+    if((s0_is_t0 && s1_is_t1) || (s1_is_t0 && s0_is_t1)) // s coincides with edge t0-t1
+    {
+        where_on_s = EQUALS_SEG_0;
+        where_on_t = EQUALS_SEG_0;
+    }
+    if((s0_is_t1 && s1_is_t2) || (s1_is_t1 && s0_is_t2)) // s coincides with edge t0-t1
+    {
+        where_on_s = EQUALS_SEG_0;
+        where_on_t = EQUALS_SEG_1;
+    }
+    if((s0_is_t2 && s1_is_t0) || (s1_is_t2 && s0_is_t0)) // s coincides with edge t0-t1
+    {
+        where_on_s = EQUALS_SEG_0;
+        where_on_t = EQUALS_SEG_2;
+    }
+
+    vec2d t01[2] = { t[0], t[1] };
+    vec2d t12[2] = { t[1], t[2] };
+    vec2d t20[2] = { t[2], t[0] };
+    int  w_s0_t01, w_s0_t12, w_s0_t20, w_s1_t01, w_s1_t12, w_s1_t20;
+    bool s0_inside_t01 = point_in_segment_exact(s[0], t01, true, w_s0_t01);
+    bool s0_inside_t12 = point_in_segment_exact(s[0], t12, true, w_s0_t12);
+    bool s0_inside_t20 = point_in_segment_exact(s[0], t20, true, w_s0_t20);
+    bool s1_inside_t01 = point_in_segment_exact(s[1], t01, true, w_s1_t01);
+    bool s1_inside_t12 = point_in_segment_exact(s[1], t12, true, w_s1_t12);
+    bool s1_inside_t20 = point_in_segment_exact(s[1], t20, true, w_s1_t20);
+
+    if(s0_inside_t01 && s1_inside_t01) // s
+    {
+        where_on_s = EQUALS_SEG_0;
+        where_on_t = INSIDE_SEG_0;
+    }
+    if(s0_inside_t01 && s1_inside_t01)
+    {
+        where_on_s = EQUALS_SEG_0;
+        where_on_t = INSIDE_SEG_0;
+    }
+    if(s0_inside_t01 && s1_inside_t01)
+    {
+        where_on_s = EQUALS_SEG_0;
+        where_on_t = INSIDE_SEG_0;
+    }
+
+    bool s0_crosses_t10 = (w_s0_t01==INSIDE_SEG_0);
+    bool s0_crosses_t12 = (w_s0_t12==INSIDE_SEG_0);
+    bool s0_crosses_t20 = (w_s0_t20==INSIDE_SEG_0);
+    bool s1_crosses_t10 = (w_s1_t01==INSIDE_SEG_0);
+    bool s1_crosses_t12 = (w_s1_t12==INSIDE_SEG_0);
+    bool s1_crosses_t20 = (w_s1_t20==INSIDE_SEG_0);
+
+    bool s0_inside_t = point_in_triangle_exact(p, t, true, w);
+    bool s1_inside_t = point_in_triangle_exact(p, t, true, w);
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

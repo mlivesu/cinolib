@@ -93,6 +93,23 @@ namespace cinolib
  */
 enum
 {
+    STRICTLY_OUTSIDE = 0,
+    STRICTLY_INSIDE  = 1,
+    ON_VERT0         = 2,
+    ON_VERT1         = 3,
+    ON_VERT2         = 4,
+    ON_VERT3         = 5,
+    ON_EDGE0         = 6,
+    ON_EDGE1         = 7,
+    ON_EDGE2         = 8,
+    ON_EDGE3         = 9,
+    ON_EDGE4         = 10,
+    ON_EDGE5         = 11,
+    ON_FACE0         = 12,
+    ON_FACE1         = 12,
+    ON_FACE2         = 12,
+    ON_FACE3         = 12,
+}
     OUTSIDE,       // no intersection
     EQUALS_VERT_0, // 1st vertex of an edge, triangle, tet
     EQUALS_VERT_1, // 2nd vertex of an edge, triangle, tet
@@ -121,6 +138,8 @@ enum
     INSIDE_TET_0,  // input tet
     EQUALS_TET_0,  //
 };
+
+/* forse meglio rinunciare al where per le intersezioni. è ben definito solo per i punti.... */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -204,6 +223,7 @@ bool segment_segment_intersect_exact(const vec3d   s0[],
 CINO_INLINE
 bool segment_triangle_intersect_exact(const vec2d   s[],
                                       const vec2d   t[],
+                                      const bool    strict,
                                             int   & where_on_s,
                                             int   & where_on_t);
 
