@@ -36,9 +36,7 @@
 #ifndef CINO_TETRAHEDRALIZATION_H
 #define CINO_TETRAHEDRALIZATION_H
 
-#include <vector>
-#include <sys/types.h>
-#include <cinolib/cino_inline.h>
+#include <cinolib/meshes/meshes.h>
 
 /* The split schemes implemented here are largely based on:
  *
@@ -49,6 +47,28 @@
 
 namespace cinolib
 {
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Transforms a hexahedral mesh into a conforming tetrahedral
+// mesh, splitting all hexahedra into five or six tetrahedra.
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void hex_to_tets(const Hexmesh<M,V,E,F,P> & hm,
+                       Tetmesh<M,V,E,F,P> & tm);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Subdivides a hexahedron either into 5 tets or into 6 tets
+// (according to four poossible schemes). Split schemes are
+// chosen in order to grant a global conforming tetrahedral
+// mesh, where diagonals of quad faces are compatible across
+// face-adjacent hexahedra.
+CINO_INLINE
+void hex_to_tets(const std::vector<uint> & hex,
+                       std::vector<uint> & tets);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // Subdivides a prism with triangular base into 3 tets.
 // Prism vertices are assumed in the following order:
@@ -62,10 +82,6 @@ namespace cinolib
 CINO_INLINE
 void prism_to_tets(const std::vector<uint> & prism,
                          std::vector<uint> & tets);
-
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 }
 
 #ifndef  CINO_STATIC_LIB

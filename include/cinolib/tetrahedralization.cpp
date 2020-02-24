@@ -40,6 +40,300 @@
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Transforms a hexahedral mesh into a conforming tetrahedral
+// mesh, splitting all hexahedra into five or six tetrahedra
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void hex_to_tets(const Hexmesh<M,V,E,F,P> & hm,
+                       Tetmesh<M,V,E,F,P> & tm)
+{
+    for(uint vid=0; vid<hm.num_verts(); ++vid)
+    {
+        tm.vert_add(hm.vert(vid));
+    }
+
+    for(uint pid=0; pid<hm.num_polys(); ++pid)
+    {
+        std::vector<uint> tets;
+        hex_to_tets(hm.poly_verts_id(pid),tets);
+
+        auto t = polys_from_serialized_vids(tets,4);
+        for(auto tet : t) tm.poly_add(tet);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Subdivides a hexahedron either into 5 tets or into 6 tets
+// (according to four poossible schemes). Split schemes are
+// chosen in order to grant a global conforming tetrahedral
+// mesh, where diagonals of quad faces are compatible across
+// face-adjacent hexahedra
+CINO_INLINE
+void hex_to_tets(const std::vector<uint> & hex,
+                       std::vector<uint> & tets)
+{
+    assert(hex.size()==8);
+    tets.clear();
+
+    // see Table 4 in "How to Subdivide Pyramids, Prisms and Hexahedra into Tetrahedra"
+    uint ref_h[8];
+    switch(INDEX_OF(hex, std::min_element(hex.begin(),hex.end())))
+    {
+        case 0: ref_h[0] = hex[0];
+                ref_h[1] = hex[1];
+                ref_h[2] = hex[2];
+                ref_h[3] = hex[3];
+                ref_h[4] = hex[4];
+                ref_h[5] = hex[5];
+                ref_h[6] = hex[6];
+                ref_h[7] = hex[7];
+                break;
+
+        case 1: ref_h[0] = hex[1];
+                ref_h[1] = hex[0];
+                ref_h[2] = hex[4];
+                ref_h[3] = hex[5];
+                ref_h[4] = hex[2];
+                ref_h[5] = hex[3];
+                ref_h[6] = hex[7];
+                ref_h[7] = hex[6];
+                break;
+
+        case 2: ref_h[0] = hex[2];
+                ref_h[1] = hex[1];
+                ref_h[2] = hex[5];
+                ref_h[3] = hex[6];
+                ref_h[4] = hex[3];
+                ref_h[5] = hex[0];
+                ref_h[6] = hex[4];
+                ref_h[7] = hex[7];
+                break;
+
+        case 3: ref_h[0] = hex[3];
+                ref_h[1] = hex[0];
+                ref_h[2] = hex[1];
+                ref_h[3] = hex[2];
+                ref_h[4] = hex[7];
+                ref_h[5] = hex[4];
+                ref_h[6] = hex[5];
+                ref_h[7] = hex[6];
+                break;
+
+        case 4: ref_h[0] = hex[4];
+                ref_h[1] = hex[0];
+                ref_h[2] = hex[3];
+                ref_h[3] = hex[7];
+                ref_h[4] = hex[5];
+                ref_h[5] = hex[1];
+                ref_h[6] = hex[2];
+                ref_h[7] = hex[6];
+                break;
+
+        case 5: ref_h[0] = hex[5];
+                ref_h[1] = hex[1];
+                ref_h[2] = hex[0];
+                ref_h[3] = hex[4];
+                ref_h[4] = hex[6];
+                ref_h[5] = hex[2];
+                ref_h[6] = hex[3];
+                ref_h[7] = hex[7];
+                break;
+
+        case 6: ref_h[0] = hex[6];
+                ref_h[1] = hex[2];
+                ref_h[2] = hex[1];
+                ref_h[3] = hex[5];
+                ref_h[4] = hex[7];
+                ref_h[5] = hex[3];
+                ref_h[6] = hex[0];
+                ref_h[7] = hex[4];
+                break;
+
+        case 7: ref_h[0] = hex[7];
+                ref_h[1] = hex[3];
+                ref_h[2] = hex[2];
+                ref_h[3] = hex[6];
+                ref_h[4] = hex[4];
+                ref_h[5] = hex[0];
+                ref_h[6] = hex[1];
+                ref_h[7] = hex[5];
+                break;
+
+        default: assert(false);
+    }
+
+    // putting the min vertex in ref_h[0] fixes the diagonal for the three faces incident to it.
+    // there are still three quad faces not incident to ref_h[0] that can be diagonalized in two
+    // alternative ways, for a total of 8 alternative configurations. The code below applies a
+    // topological rotation of the vertices in ref_h[], reducing the configurations to 4
+
+    uint n = 0; // # of quad diagonals incident at v6
+    std::bitset<3> bits = { 0b000 };
+    if(std::min(ref_h[1],ref_h[6]) < std::min(ref_h[2],ref_h[5])) { ++n; bits.set(2); }
+    if(std::min(ref_h[3],ref_h[6]) < std::min(ref_h[2],ref_h[7])) { ++n; bits.set(1); }
+    if(std::min(ref_h[4],ref_h[6]) < std::min(ref_h[5],ref_h[7])) { ++n; bits.set(0); }
+
+    if(bits==0b001 || bits==0b110) // rotate 120° around v0-v6
+    {
+        auto tmp = ref_h[1];
+        ref_h[1] = ref_h[4];
+        ref_h[4] = ref_h[3];
+        ref_h[3] = tmp;
+
+             tmp = ref_h[5];
+        ref_h[5] = ref_h[7];
+        ref_h[7] = ref_h[2];
+        ref_h[2] = tmp;
+    }
+
+    if(bits==0b010 || bits==0b101) // rotate 240° around v0-v6
+    {
+        auto tmp = ref_h[1];
+        ref_h[1] = ref_h[3];
+        ref_h[3] = ref_h[4];
+        ref_h[4] = tmp;
+
+             tmp = ref_h[5];
+        ref_h[5] = ref_h[2];
+        ref_h[2] = ref_h[7];
+        ref_h[7] = tmp;
+    }
+
+    // see Table 6 in "How to Subdivide Pyramids, Prisms and Hexahedra into Tetrahedra"
+    switch(n)
+    {
+        case 0: // t0
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[1]);
+                tets.push_back(ref_h[2]);
+                tets.push_back(ref_h[5]);
+                // t1
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[2]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[5]);
+                // t2
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[2]);
+                tets.push_back(ref_h[3]);
+                tets.push_back(ref_h[7]);
+                // t3
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[5]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[4]);
+                // t4
+                tets.push_back(ref_h[2]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[5]);
+                tets.push_back(ref_h[6]);
+                break;
+
+        case 1: // t0
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[5]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[4]);
+                // t1
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[1]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[5]);
+                // t2
+                tets.push_back(ref_h[1]);
+                tets.push_back(ref_h[6]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[5]);
+                // t3
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[2]);
+                tets.push_back(ref_h[3]);
+                // t4
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[1]);
+                tets.push_back(ref_h[2]);
+                // t5
+                tets.push_back(ref_h[1]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[6]);
+                tets.push_back(ref_h[2]);
+                break;
+
+        case 2: // t0
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[4]);
+                tets.push_back(ref_h[5]);
+                tets.push_back(ref_h[6]);
+                // t1
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[3]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[6]);
+                // t2
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[4]);
+                tets.push_back(ref_h[6]);
+                // t3
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[1]);
+                tets.push_back(ref_h[2]);
+                tets.push_back(ref_h[5]);
+                // t4
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[3]);
+                tets.push_back(ref_h[6]);
+                tets.push_back(ref_h[2]);
+                // t5
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[6]);
+                tets.push_back(ref_h[5]);
+                tets.push_back(ref_h[2]);
+                break;
+
+        case 3: // t0
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[2]);
+                tets.push_back(ref_h[3]);
+                tets.push_back(ref_h[6]);
+                // t1
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[3]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[6]);
+                // t2
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[7]);
+                tets.push_back(ref_h[4]);
+                tets.push_back(ref_h[6]);
+                // t3
+                tets.push_back(ref_h[0]);
+                tets.push_back(ref_h[5]);
+                tets.push_back(ref_h[6]);
+                tets.push_back(ref_h[4]);
+                // t4
+                tets.push_back(ref_h[1]);
+                tets.push_back(ref_h[5]);
+                tets.push_back(ref_h[6]);
+                tets.push_back(ref_h[0]);
+                // t5
+                tets.push_back(ref_h[1]);
+                tets.push_back(ref_h[6]);
+                tets.push_back(ref_h[2]);
+                tets.push_back(ref_h[0]);
+                break;
+
+        default: assert(false);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // Subdivides a prism with triangular base into 3 tets.
 // Prism vertices are assumed in the following order:
 //
@@ -53,96 +347,96 @@ CINO_INLINE
 void prism_to_tets(const std::vector<uint> & prism,
                          std::vector<uint> & tets)
 {
-    std::set<ipair> ordered_vids;
-    for(uint i=0; i<6; ++i) ordered_vids.insert(ipair(prism[i],i));
+    assert(prism.size()==6);
+    tets.clear();
 
     // see Table 2 in "How to Subdivide Pyramids, Prisms and Hexahedra into Tetrahedra"
-    uint ref_prism[6];
-    switch ((*ordered_vids.begin()).second)
+    uint ref_p[6];
+    switch(INDEX_OF(prism, std::min_element(prism.begin(),prism.end())))
     {
-        case 0: ref_prism[0] = prism[0];
-                ref_prism[1] = prism[1];
-                ref_prism[2] = prism[2];
-                ref_prism[3] = prism[3];
-                ref_prism[4] = prism[4];
-                ref_prism[5] = prism[5];
+        case 0: ref_p[0] = prism[0];
+                ref_p[1] = prism[1];
+                ref_p[2] = prism[2];
+                ref_p[3] = prism[3];
+                ref_p[4] = prism[4];
+                ref_p[5] = prism[5];
                 break;
 
-        case 1: ref_prism[0] = prism[1];
-                ref_prism[1] = prism[2];
-                ref_prism[2] = prism[0];
-                ref_prism[3] = prism[4];
-                ref_prism[4] = prism[5];
-                ref_prism[5] = prism[3];
+        case 1: ref_p[0] = prism[1];
+                ref_p[1] = prism[2];
+                ref_p[2] = prism[0];
+                ref_p[3] = prism[4];
+                ref_p[4] = prism[5];
+                ref_p[5] = prism[3];
                 break;
 
-        case 2: ref_prism[0] = prism[2];
-                ref_prism[1] = prism[0];
-                ref_prism[2] = prism[1];
-                ref_prism[3] = prism[5];
-                ref_prism[4] = prism[3];
-                ref_prism[5] = prism[4];
+        case 2: ref_p[0] = prism[2];
+                ref_p[1] = prism[0];
+                ref_p[2] = prism[1];
+                ref_p[3] = prism[5];
+                ref_p[4] = prism[3];
+                ref_p[5] = prism[4];
                 break;
 
-        case 3: ref_prism[0] = prism[3];
-                ref_prism[1] = prism[5];
-                ref_prism[2] = prism[4];
-                ref_prism[3] = prism[0];
-                ref_prism[4] = prism[2];
-                ref_prism[5] = prism[1];
+        case 3: ref_p[0] = prism[3];
+                ref_p[1] = prism[5];
+                ref_p[2] = prism[4];
+                ref_p[3] = prism[0];
+                ref_p[4] = prism[2];
+                ref_p[5] = prism[1];
                 break;
 
-        case 4: ref_prism[0] = prism[4];
-                ref_prism[1] = prism[3];
-                ref_prism[2] = prism[5];
-                ref_prism[3] = prism[1];
-                ref_prism[4] = prism[0];
-                ref_prism[5] = prism[2];
+        case 4: ref_p[0] = prism[4];
+                ref_p[1] = prism[3];
+                ref_p[2] = prism[5];
+                ref_p[3] = prism[1];
+                ref_p[4] = prism[0];
+                ref_p[5] = prism[2];
                 break;
 
-        case 5: ref_prism[0] = prism[5];
-                ref_prism[1] = prism[4];
-                ref_prism[2] = prism[3];
-                ref_prism[3] = prism[2];
-                ref_prism[4] = prism[1];
-                ref_prism[5] = prism[0];
+        case 5: ref_p[0] = prism[5];
+                ref_p[1] = prism[4];
+                ref_p[2] = prism[3];
+                ref_p[3] = prism[2];
+                ref_p[4] = prism[1];
+                ref_p[5] = prism[0];
                 break;
 
         default: assert(false);
     }
 
     // see Table 3 in "How to Subdivide Pyramids, Prisms and Hexahedra into Tetrahedra"
-    if(std::min(ref_prism[1],ref_prism[5]) < std::min(ref_prism[2],ref_prism[4]))
+    if(std::min(ref_p[1],ref_p[5]) < std::min(ref_p[2],ref_p[4]))
     {
         // t0
-        tets.push_back(ref_prism[0]);
-        tets.push_back(ref_prism[1]);
-        tets.push_back(ref_prism[2]);
-        tets.push_back(ref_prism[5]);
+        tets.push_back(ref_p[0]);
+        tets.push_back(ref_p[1]);
+        tets.push_back(ref_p[2]);
+        tets.push_back(ref_p[5]);
         // t1
-        tets.push_back(ref_prism[0]);
-        tets.push_back(ref_prism[1]);
-        tets.push_back(ref_prism[5]);
-        tets.push_back(ref_prism[4]);
+        tets.push_back(ref_p[0]);
+        tets.push_back(ref_p[1]);
+        tets.push_back(ref_p[5]);
+        tets.push_back(ref_p[4]);
     }
     else
     {
         // t0
-        tets.push_back(ref_prism[0]);
-        tets.push_back(ref_prism[1]);
-        tets.push_back(ref_prism[2]);
-        tets.push_back(ref_prism[4]);
+        tets.push_back(ref_p[0]);
+        tets.push_back(ref_p[1]);
+        tets.push_back(ref_p[2]);
+        tets.push_back(ref_p[4]);
         // t1
-        tets.push_back(ref_prism[0]);
-        tets.push_back(ref_prism[4]);
-        tets.push_back(ref_prism[2]);
-        tets.push_back(ref_prism[5]);
+        tets.push_back(ref_p[0]);
+        tets.push_back(ref_p[4]);
+        tets.push_back(ref_p[2]);
+        tets.push_back(ref_p[5]);
     }
     // t2
-    tets.push_back(ref_prism[0]);
-    tets.push_back(ref_prism[4]);
-    tets.push_back(ref_prism[5]);
-    tets.push_back(ref_prism[3]);
+    tets.push_back(ref_p[0]);
+    tets.push_back(ref_p[4]);
+    tets.push_back(ref_p[5]);
+    tets.push_back(ref_p[3]);
 }
 
 }
