@@ -75,6 +75,24 @@ bool Tetrahedron::contains_exact(const vec3d & p, bool strict) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+bool Tetrahedron::intersects_segment_exact(const vec3d []) const
+{
+    assert(false && "TODO!");
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Tetrahedron::intersects_triangle_exact(const vec3d []) const
+{
+    assert(false && "TODO!");
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 bool Tetrahedron::intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const
 {
     bool   backside;

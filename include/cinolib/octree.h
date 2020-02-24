@@ -162,13 +162,16 @@ class Octree
         // returns respectively the first item and the full list of items containing query point p
         bool contains(const vec3d & p, uint & id, const double eps = 1e-15) const;
         bool contains(const vec3d & p, std::unordered_set<uint> & ids, const double eps = 1e-15) const;
-        // like contains, but uses exact predicates for point in element queries
-        bool contains_exact(const vec3d & p, std::unordered_set<uint> & ids, const bool strict) const;
 
         // returns respectively the first and the full list of intersections
         // between items in the octree and a ray R(t) := p + t * dir
         bool intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
         bool intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const;
+
+        // EXACT QUERIES: based on exact geometric predicates //
+        bool contains_exact           (const vec3d & p,   std::unordered_set<uint> & ids, const bool strict) const;
+        bool intersects_segment_exact (const vec3d   s[], std::unordered_set<uint> & ids) const;
+        bool intersects_triangle_exact(const vec3d   t[], std::unordered_set<uint> & ids) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

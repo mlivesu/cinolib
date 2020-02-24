@@ -210,7 +210,8 @@ bool segment_triangle_intersect_exact(const vec3d s[],
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t0 and t1 intersect at any point (borders included)
-// coincident triangles are not considered intersecting at all
+// coincident triangles, and triangles that are both incident at a shared
+// subsimplex are not considered intersecting
 CINO_INLINE
 bool triangle_triangle_intersect_exact(const vec2d t0[],
                                        const vec2d t1[]);
@@ -218,7 +219,8 @@ bool triangle_triangle_intersect_exact(const vec2d t0[],
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t0 and t1 intersect at any point (borders included)
-// coincident triangles are not considered intersecting at all
+// coincident triangles, and triangles that are both incident at a shared
+// subsimplex are not considered intersecting
 CINO_INLINE
 bool triangle_triangle_intersect_exact(const vec3d t0[],
                                        const vec3d t1[]);

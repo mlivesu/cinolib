@@ -60,12 +60,14 @@ class Triangle : public SpatialDataStructureItem
 
         // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
 
-        ItemType item_type              () const override;
-        AABB     aabb                   () const override;
-        vec3d    point_closest_to       (const vec3d & p) const override;
-        bool     intersects_ray         (const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const override;
-        void     barycentric_coordinates(const vec3d & p, std::vector<double> & bc) const override;
-        bool     contains_exact         (const vec3d & p, bool strict) const override;
+        ItemType item_type                () const override;
+        AABB     aabb                     () const override;
+        vec3d    point_closest_to         (const vec3d & p) const override;
+        bool     intersects_ray           (const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const override;
+        void     barycentric_coordinates  (const vec3d & p, std::vector<double> & bc) const override;
+        bool     contains_exact           (const vec3d & p, bool strict) const override;
+        bool     intersects_segment_exact (const vec3d   s[]) const override;
+        bool     intersects_triangle_exact(const vec3d   t[]) const override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -450,7 +450,8 @@ bool segment_triangle_intersect_exact(const vec3d s[],
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t0 and t1 intersect at any point (borders included)
-// coincident triangles are not considered intersecting at all
+// coincident triangles, and triangles that are both incident at a shared
+// subsimplex are not considered intersecting
 CINO_INLINE
 bool triangle_triangle_intersect_exact(const vec2d t0[],
                                        const vec2d t1[])
@@ -466,23 +467,19 @@ bool triangle_triangle_intersect_exact(const vec2d t0[],
         return false;
     }
 
-    if((t0[0]==t1[0] && t0[1]==t1[1]) || (t0[1]==t1[0] && t0[0]==t1[1]) ||
-       (t0[0]==t1[1] && t0[1]==t1[2]) || (t0[1]==t1[1] && t0[0]==t1[2]) ||
-       (t0[0]==t1[2] && t0[1]==t1[0]) || (t0[1]==t1[2] && t0[0]==t1[0]))
-    {
-        return false;
-    }
-
-    // test for point inside tris
-    if(point_in_triangle_exact(t0[0],t1) >= STRICTLY_INSIDE ||
-       point_in_triangle_exact(t1[0],t0) >= STRICTLY_INSIDE ||
-       point_in_triangle_exact(t0[1],t1) >= STRICTLY_INSIDE ||
-       point_in_triangle_exact(t1[1],t0) >= STRICTLY_INSIDE ||
-       point_in_triangle_exact(t0[2],t1) >= STRICTLY_INSIDE ||
-       point_in_triangle_exact(t1[2],t0) >= STRICTLY_INSIDE)
-    {
-        return true;
-    }
+    // test for point inside tris or along edges
+    int t00_wrt_t1 = point_in_triangle_exact(t0[0],t1);
+    if (t00_wrt_t1 == STRICTLY_INSIDE || t00_wrt_t1 >= ON_EDGE0) return true;
+    int t01_wrt_t1 = point_in_triangle_exact(t0[1],t1);
+    if (t01_wrt_t1 == STRICTLY_INSIDE || t01_wrt_t1 >= ON_EDGE0) return true;
+    int t02_wrt_t1 = point_in_triangle_exact(t0[2],t1);
+    if (t02_wrt_t1 == STRICTLY_INSIDE || t02_wrt_t1 >= ON_EDGE0) return true;
+    int t10_wrt_t0 = point_in_triangle_exact(t1[0],t0);
+    if (t10_wrt_t0 == STRICTLY_INSIDE || t10_wrt_t0 >= ON_EDGE0) return true;
+    int t11_wrt_t0 = point_in_triangle_exact(t1[1],t0);
+    if (t11_wrt_t0 == STRICTLY_INSIDE || t11_wrt_t0 >= ON_EDGE0) return true;
+    int t12_wrt_t0 = point_in_triangle_exact(t1[2],t0);
+    if (t12_wrt_t0 == STRICTLY_INSIDE || t12_wrt_t0 >= ON_EDGE0) return true;
 
     vec2d s00[2] = { t0[0], t0[1] };
     vec2d s01[2] = { t0[1], t0[2] };
@@ -492,15 +489,15 @@ bool triangle_triangle_intersect_exact(const vec2d t0[],
     vec2d s12[2] = { t1[2], t1[0] };
 
     // test for segment intersections
-    if(segment_segment_intersect_exact(s00,s10,false) ||
-       segment_segment_intersect_exact(s00,s11,false) ||
-       segment_segment_intersect_exact(s00,s12,false) ||
-       segment_segment_intersect_exact(s01,s10,false) ||
-       segment_segment_intersect_exact(s01,s11,false) ||
-       segment_segment_intersect_exact(s01,s12,false) ||
-       segment_segment_intersect_exact(s02,s10,false) ||
-       segment_segment_intersect_exact(s02,s11,false) ||
-       segment_segment_intersect_exact(s02,s12,false))
+    if(segment_segment_intersect_exact(s00,s10,true) ||
+       segment_segment_intersect_exact(s00,s11,true) ||
+       segment_segment_intersect_exact(s00,s12,true) ||
+       segment_segment_intersect_exact(s01,s10,true) ||
+       segment_segment_intersect_exact(s01,s11,true) ||
+       segment_segment_intersect_exact(s01,s12,true) ||
+       segment_segment_intersect_exact(s02,s10,true) ||
+       segment_segment_intersect_exact(s02,s11,true) ||
+       segment_segment_intersect_exact(s02,s12,true))
     {
         return true;
     }
@@ -511,7 +508,8 @@ bool triangle_triangle_intersect_exact(const vec2d t0[],
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t0 and t1 intersect at any point (borders included)
-// coincident triangles are not considered intersecting at all
+// coincident triangles, and triangles that are both incident at a shared
+// subsimplex are not considered intersecting
 CINO_INLINE
 bool triangle_triangle_intersect_exact(const vec3d t0[],
                                        const vec3d t1[])
@@ -527,16 +525,19 @@ bool triangle_triangle_intersect_exact(const vec3d t0[],
         return false;
     }
 
-    // test for point inside tris
-    if(point_in_triangle_exact(t0[0],t1) >= STRICTLY_INSIDE ||
-       point_in_triangle_exact(t1[0],t0) >= STRICTLY_INSIDE ||
-       point_in_triangle_exact(t0[1],t1) >= STRICTLY_INSIDE ||
-       point_in_triangle_exact(t1[1],t0) >= STRICTLY_INSIDE ||
-       point_in_triangle_exact(t0[2],t1) >= STRICTLY_INSIDE ||
-       point_in_triangle_exact(t1[2],t0) >= STRICTLY_INSIDE)
-    {
-        return true;
-    }
+    // test for point inside tris or along edges
+    int t00_wrt_t1 = point_in_triangle_exact(t0[0],t1);
+    if (t00_wrt_t1 == STRICTLY_INSIDE || t00_wrt_t1 >= ON_EDGE0) return true;
+    int t01_wrt_t1 = point_in_triangle_exact(t0[1],t1);
+    if (t01_wrt_t1 == STRICTLY_INSIDE || t01_wrt_t1 >= ON_EDGE0) return true;
+    int t02_wrt_t1 = point_in_triangle_exact(t0[2],t1);
+    if (t02_wrt_t1 == STRICTLY_INSIDE || t02_wrt_t1 >= ON_EDGE0) return true;
+    int t10_wrt_t0 = point_in_triangle_exact(t1[0],t0);
+    if (t10_wrt_t0 == STRICTLY_INSIDE || t10_wrt_t0 >= ON_EDGE0) return true;
+    int t11_wrt_t0 = point_in_triangle_exact(t1[1],t0);
+    if (t11_wrt_t0 == STRICTLY_INSIDE || t11_wrt_t0 >= ON_EDGE0) return true;
+    int t12_wrt_t0 = point_in_triangle_exact(t1[2],t0);
+    if (t12_wrt_t0 == STRICTLY_INSIDE || t12_wrt_t0 >= ON_EDGE0) return true;
 
     vec3d s00[2] = { t0[0], t0[1] };
     vec3d s01[2] = { t0[1], t0[2] };
@@ -546,15 +547,15 @@ bool triangle_triangle_intersect_exact(const vec3d t0[],
     vec3d s12[2] = { t1[2], t1[0] };
 
     // test for segment intersections
-    if(segment_segment_intersect_exact(s00,s10,false) ||
-       segment_segment_intersect_exact(s00,s11,false) ||
-       segment_segment_intersect_exact(s00,s12,false) ||
-       segment_segment_intersect_exact(s01,s10,false) ||
-       segment_segment_intersect_exact(s01,s11,false) ||
-       segment_segment_intersect_exact(s01,s12,false) ||
-       segment_segment_intersect_exact(s02,s10,false) ||
-       segment_segment_intersect_exact(s02,s11,false) ||
-       segment_segment_intersect_exact(s02,s12,false))
+    if(segment_segment_intersect_exact(s00,s10,true) ||
+       segment_segment_intersect_exact(s00,s11,true) ||
+       segment_segment_intersect_exact(s00,s12,true) ||
+       segment_segment_intersect_exact(s01,s10,true) ||
+       segment_segment_intersect_exact(s01,s11,true) ||
+       segment_segment_intersect_exact(s01,s12,true) ||
+       segment_segment_intersect_exact(s02,s10,true) ||
+       segment_segment_intersect_exact(s02,s11,true) ||
+       segment_segment_intersect_exact(s02,s12,true))
     {
         return true;
     }

@@ -98,8 +98,14 @@ namespace cinolib
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                    bool contains      (const vec3<double> & p, const double eps = 1e-15) const;
-            virtual bool contains_exact(const vec3<double> & p, bool strict) const = 0;
+            bool contains(const vec3<double> & p, const double eps = 1e-15) const;
+
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+            // Exact queries
+            virtual bool contains_exact           (const vec3<double> & p, bool strict) const = 0;
+            virtual bool intersects_segment_exact (const vec3<double> s[]) const = 0;
+            virtual bool intersects_triangle_exact(const vec3<double> t[]) const = 0;
     };
 }
 

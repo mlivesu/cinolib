@@ -492,7 +492,123 @@ bool Octree::contains_exact(const vec3d & p, std::unordered_set<uint> & ids, con
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        print_query_info("Contains query (all items)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+        print_query_info("Contains query (all items, exact)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+    }
+
+    return !ids.empty();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Octree::intersects_triangle_exact(const vec3d t[], std::unordered_set<uint> & ids) const
+{
+    typedef std::chrono::high_resolution_clock Time;
+    Time::time_point t0 = Time::now();
+
+    uint aabb_queries = 0;
+    uint item_queries = 0;
+
+    ids.clear();
+
+    std::stack<OctreeNode*> lifo;
+    lifo.push(root);
+
+    while(!lifo.empty())
+    {
+        OctreeNode *node = lifo.top();
+        lifo.pop();
+        assert(node->bbox.contains(t[0]) ||
+               node->bbox.contains(t[1]) ||
+               node->bbox.contains(t[2]));
+
+        if(node->is_inner)
+        {
+            for(int i=0; i<8; ++i)
+            {
+                if(print_debug_info) ++aabb_queries;
+                if(node->children[i]->bbox.contains(t[0]) ||
+                   node->children[i]->bbox.contains(t[1]) ||
+                   node->children[i]->bbox.contains(t[2]))
+                {
+                    lifo.push(node->children[i]);
+                }
+            }
+        }
+        else
+        {
+            for(uint i : node->item_indices)
+            {
+                if(print_debug_info) ++item_queries;
+                if(items.at(i)->intersects_triangle_exact(t))
+                {
+                    ids.insert(items.at(i)->id);
+                }
+            }
+        }
+    }
+
+    if(print_debug_info)
+    {
+        Time::time_point t1 = Time::now();
+        print_query_info("Intersects Triangle (exact)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+    }
+
+    return !ids.empty();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Octree::intersects_segment_exact(const vec3d s[], std::unordered_set<uint> & ids) const
+{
+    typedef std::chrono::high_resolution_clock Time;
+    Time::time_point t0 = Time::now();
+
+    uint aabb_queries = 0;
+    uint item_queries = 0;
+
+    ids.clear();
+
+    std::stack<OctreeNode*> lifo;
+    lifo.push(root);
+
+    while(!lifo.empty())
+    {
+        OctreeNode *node = lifo.top();
+        lifo.pop();
+        assert(node->bbox.contains(s[0]));
+        assert(node->bbox.contains(s[1]));
+
+        if(node->is_inner)
+        {
+            for(int i=0; i<8; ++i)
+            {
+                if(print_debug_info) ++aabb_queries;
+                if(node->children[i]->bbox.contains(s[0]) ||
+                   node->children[i]->bbox.contains(s[1]))
+                {
+                    lifo.push(node->children[i]);
+                }
+            }
+        }
+        else
+        {
+            for(uint i : node->item_indices)
+            {
+                if(print_debug_info) ++item_queries;
+                if(items.at(i)->intersects_segment_exact(s))
+                {
+                    ids.insert(items.at(i)->id);
+                }
+            }
+        }
+    }
+
+    if(print_debug_info)
+    {
+        Time::time_point t1 = Time::now();
+        print_query_info("Intersects Segment (exact)", how_many_seconds(t0,t1), aabb_queries, item_queries);
     }
 
     return !ids.empty();

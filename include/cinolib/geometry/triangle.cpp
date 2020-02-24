@@ -76,6 +76,22 @@ bool Triangle::contains_exact(const vec3d & p, bool strict) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+bool Triangle::intersects_segment_exact(const vec3d s[]) const
+{
+    return segment_triangle_intersect_exact(v,s);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Triangle::intersects_triangle_exact(const vec3d t[]) const
+{
+    return triangle_triangle_intersect_exact(v,t);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 bool Triangle::intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const
 {
     bool  hits_backside;
