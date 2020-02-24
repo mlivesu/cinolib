@@ -121,7 +121,7 @@ bool Segment::contains_exact(const vec3d & p, bool strict) const
 CINO_INLINE
 bool Segment::intersects_segment_exact(const vec3d s[]) const
 {
-    return segment_segment_intersect_exact(v,s,false);
+    return segment_segment_intersect_exact(v,s);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

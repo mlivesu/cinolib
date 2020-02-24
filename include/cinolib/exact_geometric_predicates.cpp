@@ -275,13 +275,12 @@ int point_in_tet_exact(const vec3d & p,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// if strict is enabled,  returns true if s0 and s1 intersect at an inner point (for both)
-// if strict is disabled, returns true if s0 and s1 intersect at any point (extrema included)
-// coincident segments are not considered intersecting at all
+// returns true if s0 and s1 intersect at any point (borders included).
+// Coincident segments, or segments that meet at a shared sub-simplex
+// forming a valid simplicial complex are not considered intersecting
 CINO_INLINE
 bool segment_segment_intersect_exact(const vec2d  s0[],
-                                     const vec2d  s1[],
-                                     const bool & strict)
+                                     const vec2d  s1[])
 {
     // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
     double det_s00 = orient2d(s1[0],s1[1],s0[0]);
@@ -299,8 +298,11 @@ bool segment_segment_intersect_exact(const vec2d  s0[],
     // segments intersect at a single point
     if(s00_wrt_s1!=s01_wrt_s1 && s10_wrt_s0!=s11_wrt_s0)
     {
-        // at least one segment endpoint is involved in the intersection
-        if(s00_wrt_s1==0 || s01_wrt_s1==0 || s10_wrt_s0==0 || s11_wrt_s0==0) return !strict;
+        // edges share an endpoint
+        if(s0[0]==s1[0] || s0[0]==s1[1] || s0[1]==s1[0] || s0[1]==s1[1]) return false;
+
+        // at least one segment endpoint is involved in the intersection        
+        //if(s00_wrt_s1==0 || s01_wrt_s1==0 || s10_wrt_s0==0 || s11_wrt_s0==0) return !strict;
         return true;
     }
 
@@ -338,36 +340,36 @@ bool segment_segment_intersect_exact(const vec2d  s0[],
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// if strict is enabled,  returns true if s0 and s1 intersect at an inner point (for both)
-// if strict is disabled, returns true if s0 and s1 intersect at any point (extrema included)
-// coincident segments are not considered intersecting at all
+// returns true if s0 and s1 intersect at any point (borders included).
+// Coincident segments, or segments that meet at a shared sub-simplex
+// forming a valid simplicial complex are not considered intersecting
 CINO_INLINE
 bool segment_segment_intersect_exact(const vec3d  s0[],
-                                     const vec3d  s1[],
-                                     const bool & strict)
+                                     const vec3d  s1[])
 {
     // project on X,Y,Z and, if the check is never false in any of the
     // projections, then it must be true
 
     vec2d s0_x[2] = { vec2d(s0[0],DROP_X), vec2d(s0[1],DROP_X) };
     vec2d s1_x[2] = { vec2d(s1[0],DROP_X), vec2d(s1[1],DROP_X) };
-    if(!segment_segment_intersect_exact(s0_x, s1_x, strict)) return false;
+    if(!segment_segment_intersect_exact(s0_x, s1_x)) return false;
 
     vec2d s0_y[2] = { vec2d(s0[0],DROP_Y), vec2d(s0[1],DROP_Y) };
     vec2d s1_y[2] = { vec2d(s1[0],DROP_Y), vec2d(s1[1],DROP_Y) };
-    if(!segment_segment_intersect_exact(s0_y, s1_y, strict)) return false;
+    if(!segment_segment_intersect_exact(s0_y, s1_y)) return false;
 
     vec2d s0_z[2] = { vec2d(s0[0],DROP_Z), vec2d(s0[1],DROP_Z) };
     vec2d s1_z[2] = { vec2d(s1[0],DROP_Z), vec2d(s1[1],DROP_Z) };
-    if(!segment_segment_intersect_exact(s0_z, s1_z, strict)) return false;
+    if(!segment_segment_intersect_exact(s0_z, s1_z)) return false;
 
     return true;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if s and t intersect at any point (borders included)
-// returns false if s is a subsimplex of t
+// returns true if s and t intersect at any point (borders included).
+// If s is a sub-simplex of t, or s and t meet at shared sub-simplex
+// forming a valid simplicial complex, they are not considered intersecting
 CINO_INLINE
 bool segment_triangle_intersect_exact(const vec2d s[],
                                       const vec2d t[])
@@ -381,13 +383,13 @@ bool segment_triangle_intersect_exact(const vec2d s[],
     }
 
     vec2d t01[2] = {t[0],t[1]};
-    if(segment_segment_intersect_exact(s,t01,false)) return true;
+    if(segment_segment_intersect_exact(s,t01)) return true;
 
     vec2d t12[2] = {t[1],t[2]};
-    if(segment_segment_intersect_exact(s,t12,false)) return true;
+    if(segment_segment_intersect_exact(s,t12)) return true;
 
     vec2d t20[2] = {t[2],t[0]};
-    if(segment_segment_intersect_exact(s,t20,false)) return true;
+    if(segment_segment_intersect_exact(s,t20)) return true;
 
     bool s0_wrt_t = point_in_triangle_exact(s[0],t);
     bool s1_wrt_t = point_in_triangle_exact(s[1],t);
@@ -398,8 +400,9 @@ bool segment_triangle_intersect_exact(const vec2d s[],
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if s and t intersect at any point (borders included)
-// returns false if s is a subsimplex of t
+// returns true if s and t intersect at any point (borders included).
+// If s is a sub-simplex of t, or s and t meet at shared sub-simplex
+// forming a valid simplicial complex, they are not considered intersecting
 CINO_INLINE
 bool segment_triangle_intersect_exact(const vec3d s[],
                                       const vec3d t[])
@@ -449,9 +452,9 @@ bool segment_triangle_intersect_exact(const vec3d s[],
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if t0 and t1 intersect at any point (borders included)
-// coincident triangles, and triangles that are both incident at a shared
-// subsimplex are not considered intersecting
+// returns true if t0 and t1 intersect at any point (borders included).
+// Coincident triangles, or triangles that meet at meet at shared sub-simplex
+// forming a valid simplicial complex are not considered intersecting
 CINO_INLINE
 bool triangle_triangle_intersect_exact(const vec2d t0[],
                                        const vec2d t1[])
@@ -489,15 +492,15 @@ bool triangle_triangle_intersect_exact(const vec2d t0[],
     vec2d s12[2] = { t1[2], t1[0] };
 
     // test for segment intersections
-    if(segment_segment_intersect_exact(s00,s10,true) ||
-       segment_segment_intersect_exact(s00,s11,true) ||
-       segment_segment_intersect_exact(s00,s12,true) ||
-       segment_segment_intersect_exact(s01,s10,true) ||
-       segment_segment_intersect_exact(s01,s11,true) ||
-       segment_segment_intersect_exact(s01,s12,true) ||
-       segment_segment_intersect_exact(s02,s10,true) ||
-       segment_segment_intersect_exact(s02,s11,true) ||
-       segment_segment_intersect_exact(s02,s12,true))
+    if(segment_segment_intersect_exact(s00,s10) ||
+       segment_segment_intersect_exact(s00,s11) ||
+       segment_segment_intersect_exact(s00,s12) ||
+       segment_segment_intersect_exact(s01,s10) ||
+       segment_segment_intersect_exact(s01,s11) ||
+       segment_segment_intersect_exact(s01,s12) ||
+       segment_segment_intersect_exact(s02,s10) ||
+       segment_segment_intersect_exact(s02,s11) ||
+       segment_segment_intersect_exact(s02,s12))
     {
         return true;
     }
@@ -507,9 +510,9 @@ bool triangle_triangle_intersect_exact(const vec2d t0[],
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if t0 and t1 intersect at any point (borders included)
-// coincident triangles, and triangles that are both incident at a shared
-// subsimplex are not considered intersecting
+// returns true if t0 and t1 intersect at any point (borders included).
+// Coincident triangles, or triangles that meet at meet at shared sub-simplex
+// forming a valid simplicial complex are not considered intersecting
 CINO_INLINE
 bool triangle_triangle_intersect_exact(const vec3d t0[],
                                        const vec3d t1[])
@@ -547,15 +550,15 @@ bool triangle_triangle_intersect_exact(const vec3d t0[],
     vec3d s12[2] = { t1[2], t1[0] };
 
     // test for segment intersections
-    if(segment_segment_intersect_exact(s00,s10,true) ||
-       segment_segment_intersect_exact(s00,s11,true) ||
-       segment_segment_intersect_exact(s00,s12,true) ||
-       segment_segment_intersect_exact(s01,s10,true) ||
-       segment_segment_intersect_exact(s01,s11,true) ||
-       segment_segment_intersect_exact(s01,s12,true) ||
-       segment_segment_intersect_exact(s02,s10,true) ||
-       segment_segment_intersect_exact(s02,s11,true) ||
-       segment_segment_intersect_exact(s02,s12,true))
+    if(segment_segment_intersect_exact(s00,s10) ||
+       segment_segment_intersect_exact(s00,s11) ||
+       segment_segment_intersect_exact(s00,s12) ||
+       segment_segment_intersect_exact(s01,s10) ||
+       segment_segment_intersect_exact(s01,s11) ||
+       segment_segment_intersect_exact(s01,s12) ||
+       segment_segment_intersect_exact(s02,s10) ||
+       segment_segment_intersect_exact(s02,s11) ||
+       segment_segment_intersect_exact(s02,s12))
     {
         return true;
     }

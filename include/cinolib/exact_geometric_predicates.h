@@ -44,18 +44,15 @@ namespace cinolib
 
 /* Exact predicates to test point in segment/triangle/tetrahedron, and
  * also to test intersections between segments/triangles/tets in 2D and
- * 3D. All test are based on the popular Shewchuk's exact orient predicates.
- *
- * When present, the "strict" variable allows to restrict the search only
- * to the interior, ignoring simplices that touch at their boundary, even
- * in non conforming ways (i.e. when they do not define a valid simplicial
- * complex).
+ * 3D. All tests are based on the popular Shewchuk's orient predicates.
  *
  * Return values: the point_in_{segment | triangle | tet} predicates return
  * an integer flag which indicates exactly where, in the input simplex, the
  * point is located. Intersection queries return a boolean flag which indicates
- * whether the input simplices have at least one point in common (borders are
- * ignored if strict is set to true).
+ * whether the input simplices have at least one point in common. Simplices
+ * that meet at a shared sub-simplex forming a valid simplicial complex (e.g.
+ * two edges sharing a commong endpoint, or a triangle and a segment sharing
+ * a common vertex) are not considered intersecting.
  *
  * Point location indicators: a point tipically belongs to multiple sub-simplices.
  * For example, a point coincident to a triangle vertex belongs to a 0-dimensional
@@ -173,54 +170,54 @@ int point_in_tet_exact(const vec3d & p,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// if strict is enabled,  returns true if s0 and s1 intersect at an inner point (for both)
-// if strict is disabled, returns true if s0 and s1 intersect at any point (extrema included)
-// coincident segments are not considered intersecting at all
+// returns true if s0 and s1 intersect at any point (borders included).
+// Coincident segments, or segments that meet at a shared sub-simplex
+// forming a valid simplicial complex are not considered intersecting
 CINO_INLINE
 bool segment_segment_intersect_exact(const vec2d  s0[],
-                                     const vec2d  s1[],
-                                     const bool & strict);
+                                     const vec2d  s1[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// if strict is enabled,  returns true if s0 and s1 intersect at an inner point (for both)
-// if strict is disabled, returns true if s0 and s1 intersect at any point (extrema included)
-// coincident segments are not considered intersecting at all
+// returns true if s0 and s1 intersect at any point (borders included).
+// Coincident segments, or segments that meet at a shared sub-simplex
+// forming a valid simplicial complex are not considered intersecting
 CINO_INLINE
 bool segment_segment_intersect_exact(const vec3d  s0[],
-                                     const vec3d  s1[],
-                                     const bool & strict);
+                                     const vec3d  s1[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if s and t intersect at any point (borders included)
-// returns false if s is a subsimplex of t
+// returns true if s and t intersect at any point (borders included).
+// If s is a sub-simplex of t, or s and t meet at shared sub-simplex
+// forming a valid simplicial complex, they are not considered intersecting
 CINO_INLINE
 bool segment_triangle_intersect_exact(const vec2d s[],
                                       const vec2d t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if s and t intersect at any point (borders included)
-// returns false if s is a subsimplex of t
+// returns true if s and t intersect at any point (borders included).
+// If s is a sub-simplex of t, or s and t meet at shared sub-simplex
+// forming a valid simplicial complex, they are not considered intersecting
 CINO_INLINE
 bool segment_triangle_intersect_exact(const vec3d s[],
                                       const vec3d t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if t0 and t1 intersect at any point (borders included)
-// coincident triangles, and triangles that are both incident at a shared
-// subsimplex are not considered intersecting
+// returns true if t0 and t1 intersect at any point (borders included).
+// Coincident triangles, or triangles that meet at meet at shared sub-simplex
+// forming a valid simplicial complex are not considered intersecting
 CINO_INLINE
 bool triangle_triangle_intersect_exact(const vec2d t0[],
                                        const vec2d t1[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if t0 and t1 intersect at any point (borders included)
-// coincident triangles, and triangles that are both incident at a shared
-// subsimplex are not considered intersecting
+// returns true if t0 and t1 intersect at any point (borders included).
+// Coincident triangles, or triangles that meet at meet at shared sub-simplex
+// forming a valid simplicial complex are not considered intersecting
 CINO_INLINE
 bool triangle_triangle_intersect_exact(const vec3d t0[],
                                        const vec3d t1[]);
