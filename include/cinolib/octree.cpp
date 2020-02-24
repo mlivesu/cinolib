@@ -577,8 +577,8 @@ bool Octree::intersects_segment_exact(const vec3d s[], std::unordered_set<uint> 
     {
         OctreeNode *node = lifo.top();
         lifo.pop();
-        assert(node->bbox.contains(s[0]));
-        assert(node->bbox.contains(s[1]));
+        assert(node->bbox.contains(s[0]) ||
+               node->bbox.contains(s[1]));
 
         if(node->is_inner)
         {
