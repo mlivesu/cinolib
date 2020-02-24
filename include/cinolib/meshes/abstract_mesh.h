@@ -238,6 +238,7 @@ class AbstractMesh
                 std::vector<vec3d>     edge_verts             (const uint eid) const;
                 int                    edge_id                (const uint vid0, const uint vid1) const;
                 int                    edge_id                (const ipair & vids) const;
+                int                    edge_id                (const std::vector<uint> & vids) const;
                 vec3d                  edge_sample_at         (const uint eid, double lambda) const; // arc-length param
                 uint                   edge_valence           (const uint eid) const;
                 bool                   edge_contains_vert     (const uint eid, const uint vid) const;
