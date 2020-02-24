@@ -61,7 +61,7 @@ static void cylinder(const vec3  & a,
                      const float * color)
 {
     vec3   dir     = b - a; dir.normalize();
-    vec3   axis    = (dir[0]!=0 || dir[1]!=0) ? vec3(0,0,1) : vec3(1,0,0);
+    vec3   axis    = vec3(0,0,1);
     vec3   normal  = dir.cross(axis);
     double angle   = acos(dir.dot(axis)) * 180 / M_PI;
 
