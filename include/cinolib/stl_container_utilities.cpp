@@ -117,7 +117,7 @@ int INDEX_OF(const C & container, const C_iterator & it)
 
 template<typename Iterator>
 CINO_INLINE
-int INDEX_OF(const Iterator & base_addr, Iterator & it)
+int INDEX_OF(const Iterator & base_addr, const Iterator & it)
 {
     return std::distance(base_addr, it);
 }
