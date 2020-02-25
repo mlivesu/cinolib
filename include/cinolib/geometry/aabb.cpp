@@ -304,10 +304,10 @@ std::vector<vec3d> AABB::corners(const double scaling_factor) const
     {
         min,
         min + vec3d(dx,  0,  0),
-        min + vec3d(dx,  0, dz),
-        min + vec3d( 0,  0, dz),
-        min + vec3d( 0, dy,  0),
         min + vec3d(dx, dy,  0),
+        min + vec3d( 0, dy,  0),
+        min + vec3d( 0,  0, dz),
+        min + vec3d(dx,  0, dz),
         min + vec3d(dx, dy, dz),
         min + vec3d( 0, dy, dz),
     };
