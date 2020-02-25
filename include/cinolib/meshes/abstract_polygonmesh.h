@@ -62,12 +62,12 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void load(const char * filename);
-        void save(const char * filename) const;
+        void load(const char * filename) override;
+        void save(const char * filename) const override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void clear();
+        void clear() override;
         void init(const std::vector<vec3d>             & verts,
                   const std::vector<std::vector<uint>> & polys);
         void init(      std::vector<vec3d>             & pos,       // vertex xyz positions
@@ -80,28 +80,27 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+                void update_normals() override;
                 void update_p_tessellation(const uint pid);
         virtual void update_p_normal(const uint pid);
                 void update_v_normal(const uint vid);
                 void update_p_tessellations();
                 void update_p_normals();
                 void update_v_normals();
-                void update_normals();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int Euler_characteristic() const;
-        int genus() const;
+        int Euler_characteristic() const override;
+        int genus() const override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual uint verts_per_poly(const uint pid) const { return this->polys.at(pid).size(); }
-        virtual uint edges_per_poly(const uint pid) const { return this->p2e.at(pid).size();   }
+        uint verts_per_poly(const uint pid) const override { return this->polys.at(pid).size(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const std::vector<uint> & adj_p2v(const uint pid) const { return this->polys.at(pid); }
-              std::vector<uint> & adj_p2v(const uint pid)       { return this->polys.at(pid); }
+        const std::vector<uint> & adj_p2v(const uint pid) const override { return this->polys.at(pid); }
+              std::vector<uint> & adj_p2v(const uint pid)       override { return this->polys.at(pid); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -127,7 +126,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         bool              vert_is_saddle          (const uint vid, const int tex_coord = U_param) const;
         bool              vert_is_critical_p      (const uint vid, const int tex_coord = U_param) const;
         double            vert_area               (const uint vid) const;
-        double            vert_mass               (const uint vid) const;
+        double            vert_mass               (const uint vid) const override;
         bool              vert_is_boundary        (const uint vid) const;
         bool              vert_is_manifold        (const uint vid) const;
         void              vert_switch_id          (const uint vid0, const uint vid1);
@@ -154,7 +153,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         bool   edge_is_manifold               (const uint eid) const;
         bool   edge_is_boundary               (const uint eid) const;
         bool   edge_is_incident_to_boundary   (const uint eid) const;
-        double edge_dihedral_angle              (const uint eid) const;
+        double edge_dihedral_angle              (const uint eid) const override;
         bool   edges_share_poly               (const uint eid1, const uint eid2) const;
         uint   edge_shared                    (const uint pid0, const uint pid1) const;
         void   edge_switch_id                 (const uint eid0, const uint eid1);
@@ -164,7 +163,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         void   edge_mark_labeling_boundaries  ();
         void   edge_mark_color_discontinuities();
         void   edge_mark_boundaries           ();
-        void   edge_mark_sharp_creases        (const float thresh_rad = 1.0472); // 60 degrees
+        void   edge_mark_sharp_creases        (const float thresh_rad = 1.0472) override; // 60 degrees
         bool   edge_is_CCW                    (const uint eid, const uint pid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -173,7 +172,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
               double               poly_angle_at_vert      (const uint pid, const uint vid, const int unit = RAD) const;
               double               poly_area               (const uint pid) const;
               double               poly_perimeter          (const uint pid) const;
-              double               poly_mass               (const uint pid) const;
+              double               poly_mass               (const uint pid) const override;
               int                  poly_id                 (const std::vector<uint> & vlist) const;
               int                  poly_shared             (const uint eid0, const uint eid1) const;
               bool                 polys_are_adjacent      (const uint pid0, const uint pid1) const;

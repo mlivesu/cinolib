@@ -126,7 +126,7 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
 
         using AbstractMesh<M,V,E,P>::poly_edge_id;    // avoid hiding poly_ege_id(pid,vid0,vid1)
         using AbstractPolygonMesh<M,V,E,P>::poly_add; // avoid hiding poly_add(p)
-        using AbstractPolygonMesh<M,V,E,P>::poly_id;   // avoid hiding poly_add({verts})
+        using AbstractPolygonMesh<M,V,E,P>::poly_id;  // avoid hiding poly_add({v0,v1,v2});
 };
 
 }

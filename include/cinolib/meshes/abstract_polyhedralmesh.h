@@ -79,7 +79,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void clear();
+        void clear() override;
 
         void init(const std::vector<vec3d>             & verts,
                   const std::vector<std::vector<uint>> & faces,
@@ -100,12 +100,12 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int Euler_characteristic() const;
-        int genus() const;
+        int Euler_characteristic() const override;
+        int genus() const override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                void update_normals();
+                void update_normals() override;
                 void update_f_normals();
         virtual void update_f_normal(const uint fid) = 0;
                 void update_f_tessellation();
@@ -115,11 +115,10 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual uint verts_per_poly(const uint pid) const { return this->p2v.at(pid).size();   }
-        virtual uint edges_per_poly(const uint pid) const { return this->p2e.at(pid).size();   }
-        virtual uint faces_per_poly(const uint pid) const { return this->polys.at(pid).size(); }
-        virtual uint verts_per_face(const uint fid) const { return this->faces.at(fid).size(); }
-        virtual uint edges_per_face(const uint fid) const { return this->faces.at(fid).size(); }
+        virtual uint verts_per_poly(const uint pid) const override { return this->p2v.at(pid).size();   }
+        virtual uint faces_per_poly(const uint pid) const          { return this->polys.at(pid).size(); }
+        virtual uint verts_per_face(const uint fid) const          { return this->faces.at(fid).size(); }
+        virtual uint edges_per_face(const uint fid) const          { return this->faces.at(fid).size(); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -135,22 +134,22 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const std::vector<uint> & adj_v2f(const uint vid) const { return v2f.at(vid);         }
-              std::vector<uint> & adj_v2f(const uint vid)       { return v2f.at(vid);         }
-        const std::vector<uint> & adj_e2f(const uint eid) const { return e2f.at(eid);         }
-              std::vector<uint> & adj_e2f(const uint eid)       { return e2f.at(eid);         }
-        const std::vector<uint> & adj_f2v(const uint fid) const { return this->faces.at(fid); }
-              std::vector<uint> & adj_f2v(const uint fid)       { return this->faces.at(fid); }
-        const std::vector<uint> & adj_f2e(const uint fid) const { return f2e.at(fid);         }
-              std::vector<uint> & adj_f2e(const uint fid)       { return f2e.at(fid);         }
-        const std::vector<uint> & adj_f2f(const uint fid) const { return f2f.at(fid);         }
-              std::vector<uint> & adj_f2f(const uint fid)       { return f2f.at(fid);         }
-        const std::vector<uint> & adj_f2p(const uint fid) const { return f2p.at(fid);         }
-              std::vector<uint> & adj_f2p(const uint fid)       { return f2p.at(fid);         }
-        const std::vector<uint> & adj_p2f(const uint pid) const { return this->polys.at(pid); }
-              std::vector<uint> & adj_p2f(const uint pid)       { return this->polys.at(pid); }
-        const std::vector<uint> & adj_p2v(const uint pid) const { return p2v.at(pid);         }
-              std::vector<uint> & adj_p2v(const uint pid)       { return p2v.at(pid);         }
+        const std::vector<uint> & adj_v2f(const uint vid) const          { return v2f.at(vid);         }
+              std::vector<uint> & adj_v2f(const uint vid)                { return v2f.at(vid);         }
+        const std::vector<uint> & adj_e2f(const uint eid) const          { return e2f.at(eid);         }
+              std::vector<uint> & adj_e2f(const uint eid)                { return e2f.at(eid);         }
+        const std::vector<uint> & adj_f2v(const uint fid) const          { return this->faces.at(fid); }
+              std::vector<uint> & adj_f2v(const uint fid)                { return this->faces.at(fid); }
+        const std::vector<uint> & adj_f2e(const uint fid) const          { return f2e.at(fid);         }
+              std::vector<uint> & adj_f2e(const uint fid)                { return f2e.at(fid);         }
+        const std::vector<uint> & adj_f2f(const uint fid) const          { return f2f.at(fid);         }
+              std::vector<uint> & adj_f2f(const uint fid)                { return f2f.at(fid);         }
+        const std::vector<uint> & adj_f2p(const uint fid) const          { return f2p.at(fid);         }
+              std::vector<uint> & adj_f2p(const uint fid)                { return f2p.at(fid);         }
+        const std::vector<uint> & adj_p2f(const uint pid) const          { return this->polys.at(pid); }
+              std::vector<uint> & adj_p2f(const uint pid)                { return this->polys.at(pid); }
+        const std::vector<uint> & adj_p2v(const uint pid) const override { return p2v.at(pid);         }
+              std::vector<uint> & adj_p2v(const uint pid)       override { return p2v.at(pid);         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -169,7 +168,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         void               vert_remove_unreferenced  (const uint vid);
         uint               vert_add                  (const vec3d & pos);
         bool               vert_is_on_srf            (const uint vid) const;
-        double             vert_mass                 (const uint vid) const;
+        double             vert_mass                 (const uint vid) const override;
         double             vert_volume               (const uint vid) const;
         bool               vert_is_manifold          (const uint vid) const;
         std::vector<uint>  vert_verts_link           (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
@@ -202,8 +201,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         std::vector<uint> edge_edges_link         (const uint eid) const;
         std::vector<uint> edge_faces_link         (const uint eid) const;
         uint              edge_split              (const uint eid, const vec3d & p);
-        void              edge_mark_sharp_creases (const float thresh_rad = 1.0472); // 60 degrees
-        double            edge_dihedral_angle     (const uint eid) const;
+        void              edge_mark_sharp_creases (const float thresh_rad = 1.0472) override; // 60 degrees
+        double            edge_dihedral_angle     (const uint eid) const override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -251,7 +250,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         virtual double             poly_volume                 (const uint pid) const = 0;
-                double             poly_mass                   (const uint pid) const;
+                double             poly_mass                   (const uint pid) const override;
                 bool               poly_contains_face          (const uint pid, const uint fid) const;
                 bool               poly_is_on_surf             (const uint pid) const;
                 int                poly_id                     (const std::vector<uint> & flist) const;

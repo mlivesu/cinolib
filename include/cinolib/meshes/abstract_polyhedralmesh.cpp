@@ -2737,9 +2737,9 @@ CINO_INLINE
 int AbstractPolyhedralMesh<M,V,E,F,P>::poly_Euler_characteristic(const uint pid) const
 {
     // https://en.wikipedia.org/wiki/Euler_characteristic
-    uint nv = verts_per_poly(pid);
-    uint ne = edges_per_poly(pid);
-    uint nf = faces_per_poly(pid);
+    uint nv = this->verts_per_poly(pid);
+    uint ne = this->edges_per_poly(pid);
+    uint nf = this->faces_per_poly(pid);
     return nv - ne + nf;
 }
 
