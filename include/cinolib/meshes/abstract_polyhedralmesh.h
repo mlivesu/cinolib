@@ -281,7 +281,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 int                poly_Euler_characteristic   (const uint pid) const;
                 int                poly_genus                  (const uint pid) const;
                 bool               poly_is_spherical           (const uint pid) const;
-                void               poly_export_element         (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const;
+                void               poly_export_element         (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const override;
                 std::vector<uint>  poly_faces_id               (const uint pid, const bool sort_by_fid = false) const;
                 std::vector<bool>  poly_faces_winding          (const uint pid) const;
                 uint               poly_split_along_new_face   (const uint pid, const std::vector<uint> & f);
