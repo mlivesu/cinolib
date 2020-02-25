@@ -932,6 +932,43 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::face_unmark_all()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,C>::face_unmark_around_vert(const uint vid)
+{
+    for(uint fid : this->adj_v2f(vid)) this->face_data(fid).marked = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,C>::face_unmark_around_edge(const uint eid)
+{
+    for(uint fid : this->adj_e2f(eid)) this->face_data(fid).marked = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,C>::face_unmark_around_face(const uint fid)
+{
+    this->face_data(fid).marked = false;
+    for(uint nbr : this->adj_f2f(fid)) this->face_data(nbr).marked = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,C>::face_unmark_around_poly(const uint pid)
+{
+    for(uint fid : this->adj_p2f(pid)) this->face_data(fid).marked = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::face_set_alpha(const float alpha)
@@ -992,6 +1029,15 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_face_is_CW(const uint pid, const ui
 {
     uint off = poly_face_offset(pid, fid);
     return (polys_face_winding.at(pid).at(off) == false);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,C>::poly_unmark_around_face(const uint fid)
+{
+    for(uint pid : this->adj_f2p(fid)) this->poly_data(pid).marked = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1510,6 +1556,15 @@ double AbstractPolyhedralMesh<M,V,E,F,C>::vert_volume(const uint vid) const
     for(uint pid : this->adj_v2p(vid)) vol += this->poly_volume(pid);
     vol /= static_cast<double>(this->adj_v2p(vid).size());
     return vol;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,C>::vert_unmark_around_face(const uint fid)
+{
+    for(uint vid : this->adj_f2v(fid)) this->vert_data(vid).marked = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -2051,6 +2106,15 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::edge_remove_unreferenced(const uint eid)
     this->e2f.pop_back();
     this->e2p.pop_back();
     this->e_on_srf.pop_back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,C>::edge_unmark_around_face(const uint fid)
+{
+    for(uint eid : this->adj_f2e(fid)) this->edge_data(eid).marked = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

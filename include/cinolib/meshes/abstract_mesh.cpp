@@ -670,6 +670,35 @@ void AbstractMesh<M,V,E,P>::vert_unmark_all()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractMesh<M,V,E,P>::vert_unmark_around_vert(const uint vid)
+{
+    vert_data(vid).marked = false;
+    for(uint nbr : adj_v2v(vid)) vert_data(nbr).marked = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::vert_unmark_around_edge(const uint eid)
+{
+    vert_data(edge_vert_id(eid,0)).marked = false;
+    vert_data(edge_vert_id(eid,1)).marked = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::vert_unmark_around_poly(const uint pid)
+{
+    for(uint vid : adj_p2v(pid)) vert_data(vid).marked = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 uint AbstractMesh<M,V,E,P>::edge_vert_id(const uint eid, const uint offset) const
 {
     uint   eid_ptr = eid * 2;
@@ -857,6 +886,34 @@ void AbstractMesh<M,V,E,P>::edge_unmark_all()
     {
         edge_data(eid).marked = false;
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::edge_unmark_around_vert(const uint vid)
+{
+    for(uint eid : adj_v2e(vid)) edge_data(eid).marked = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::edge_unmark_around_edge(const uint eid)
+{
+    edge_data(eid).marked = false;
+    for(uint nbr : adj_e2e(eid)) edge_data(nbr).marked = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::edge_unmark_around_poly(const uint pid)
+{
+    for(uint eid : adj_p2e(pid)) edge_data(eid).marked = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1172,6 +1229,34 @@ void AbstractMesh<M,V,E,P>::poly_unmark_all()
     {
         poly_data(pid).marked = false;
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_unmark_around_vert(const uint vid)
+{
+    for(uint pid : adj_v2p(vid)) poly_data(pid).marked = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_unmark_around_edge(const uint eid)
+{
+    for(uint pid : adj_e2p(eid)) poly_data(pid).marked = false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_unmark_around_poly(const uint pid)
+{
+    poly_data(pid).marked = false;
+    for(uint nbr : adj_p2p(pid)) poly_data(nbr).marked = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

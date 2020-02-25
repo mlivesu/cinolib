@@ -171,6 +171,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         double             vert_mass                 (const uint vid) const override;
         double             vert_volume               (const uint vid) const;
         bool               vert_is_manifold          (const uint vid) const;
+        void               vert_unmark_around_face   (const uint fid);
         std::vector<uint>  vert_verts_link           (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
         std::vector<uint>  vert_edges_link           (const uint vid) const;
         std::vector<uint>  vert_faces_link           (const uint vid) const;
@@ -193,6 +194,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         bool              edge_is_manifold        (const uint eid) const;
         void              edge_remove             (const uint eid);
         void              edge_remove_unreferenced(const uint eid);
+        void              edge_unmark_around_face (const uint fid);
         bool              edge_is_on_srf          (const uint eid) const;
         bool              edge_is_incident_to_srf (const uint eid) const;
         std::vector<uint> edge_ordered_poly_ring  (const uint eid) const;
@@ -228,6 +230,10 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool              faces_are_adjacent         (const uint fid0, const uint fid1) const;
                 bool              faces_share_poly           (const uint fid0, const uint fid1) const;
                 void              face_unmark_all            ();
+                void              face_unmark_around_vert    (const uint vid);
+                void              face_unmark_around_edge    (const uint eid);
+                void              face_unmark_around_face    (const uint fid);
+                void              face_unmark_around_poly    (const uint pid);
                 int               face_id                    (const std::vector<uint> & f) const;
                 bool              face_is_tri                (const uint fid) const;
                 bool              face_is_quad               (const uint fid) const;
@@ -261,6 +267,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 void               poly_flip_winding           (const uint pid);
                 bool               poly_face_is_CCW            (const uint pid, const uint fid) const;
                 bool               poly_face_is_CW             (const uint pid, const uint fid) const;
+                void               poly_unmark_around_face     (const uint fid);
                 uint               poly_face_offset            (const uint pid, const uint fid) const;
                 vec3d              poly_face_normal            (const uint pid, const uint fid) const;
                 int                poly_adj_through_face       (const uint pid, const uint fid) const;
