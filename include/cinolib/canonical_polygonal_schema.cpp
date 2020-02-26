@@ -79,7 +79,7 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     for(uint vid : copies_of_root)
     {
         assert(m_in.vert_is_boundary(vid));
-        m_in.vert_data(vid).marked = true;
+        m_in.vert_data(vid).flags[MARKED] = true;
     }
 
     // topological checks: make sure no element has all its vertices on the border,
@@ -102,14 +102,14 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     std::vector<uint> border = m_in.get_ordered_boundary_vertices();
     // rotate the list so as to have a polygon corner at the beginning of it
     CIRCULAR_SHIFT_VEC(border, copies_of_root.front());
-    assert(m_in.vert_data(border.front()).marked);
+    assert(m_in.vert_data(border.front()).flags[MARKED]);
 
     // split the boundary into 4g edges
     std::vector<std::vector<uint>> edges;
     for(uint i=0; i<border.size(); ++i)
     {
         std::vector<uint> e = { border.at(i) };
-        for(uint j=i+1; j<border.size() && !m_in.vert_data(border.at(j)).marked; ++j,++i)
+        for(uint j=i+1; j<border.size() && !m_in.vert_data(border.at(j)).flags[MARKED]; ++j,++i)
         {
             e.push_back(border.at(j));
         }

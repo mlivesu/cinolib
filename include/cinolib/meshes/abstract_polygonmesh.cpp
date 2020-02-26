@@ -183,7 +183,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
 
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        this->edge_data(eid).marked = (this->edge_is_boundary(eid) || !this->edge_is_manifold(eid));
+        this->edge_data(eid).flags[MARKED] = (this->edge_is_boundary(eid) || !this->edge_is_manifold(eid));
     }
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
@@ -807,7 +807,7 @@ void AbstractPolygonMesh<M,V,E,P>::vert_cluster_one_ring(const uint             
 
                 uint eid   = this->edge_shared(pid,nbr);
                 bool flood = true;
-                if(marked_edges_are_borders && this->edge_data(eid).marked) flood = false;
+                if(marked_edges_are_borders && this->edge_data(eid).flags[MARKED]) flood = false;
 
                 if(flood)
                 {
@@ -830,7 +830,7 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_adj_visible_polys(const uin
     std::vector<uint> nbrs;
     for(uint pid : this->adj_v2p(vid))
     {
-        if(this->poly_data(pid).visible)
+        if(!this->poly_data(pid).flags[HIDDEN])
         {
             vec3d n = this->poly_data(pid).normal;
             if(dir.angle_deg(n) < ang_thresh) nbrs.push_back(pid);
@@ -1137,7 +1137,7 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_labeling_boundaries()
     {
         std::unordered_set<int> unique_labels;
         for(uint pid : this->adj_e2p(eid)) unique_labels.insert(this->poly_data(pid).label);
-        this->edge_data(eid).marked = (unique_labels.size()>=2);
+        this->edge_data(eid).flags[MARKED] = (unique_labels.size()>=2);
     }
 }
 
@@ -1152,7 +1152,7 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_color_discontinuities()
         std::set<Color> unique_colors;
         for(uint pid : this->adj_e2p(eid)) unique_colors.insert(this->poly_data(pid).color);
 
-        this->edge_data(eid).marked = (unique_colors.size()>=2);
+        this->edge_data(eid).flags[MARKED] = (unique_colors.size()>=2);
     }
 }
 
@@ -1164,19 +1164,7 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_boundaries()
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        this->edge_data(eid).marked = edge_is_boundary(eid);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractPolygonMesh<M,V,E,P>::edge_mark_sharp_creases(const float thresh)
-{
-    for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
-        this->edge_data(eid).marked = (edge_dihedral_angle(eid) >= thresh);
+        this->edge_data(eid).flags[MARKED] = edge_is_boundary(eid);
     }
 }
 

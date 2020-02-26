@@ -59,8 +59,8 @@ void cut_mesh_along_marked_edges(AbstractPolygonMesh<M,V,E,P>               & m,
     uint nv = m.num_verts();
     for(uint vid=0; vid<nv; ++vid)
     {
-        if(m.vert_data(vid).marked) continue;
-        m.vert_data(vid).marked = true;
+        if(m.vert_data(vid).flags[MARKED]) continue;
+        m.vert_data(vid).flags[MARKED] = true;
 
         std::vector<std::vector<uint>> clusters;
         m.vert_cluster_one_ring(vid, clusters, true);

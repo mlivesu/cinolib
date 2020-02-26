@@ -71,6 +71,48 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// Bit-wise boolean flags for marking/unmarking mesh elements according to
+// various needs. Each mesh element endows a copy of these flags inside its
+// properties. Default is zero for everyone. Flags can be accessed as if they
+// were booleans with the classical operator[], or with the following methods:
+//
+//    flags(pos).set()    => sets bit at poistion pos to true (1)
+//    flags(pos).reset()  => sets bit at poistion pos to false (0)
+//    flags(pos).test()   => returns bit at poistion pos
+//    flags(pos).flip()   => inverts the bit at position pos
+//    ...
+enum
+{
+    MARKED,       // general flag for global marking. Can be used to mark visited
+                  // elements, creases, mesh borders,...). Marked elements can also
+                  // be highlighted at rendering time, with dedicated colors/lines.
+                  // By default, booundary and non manifold elements are marked at
+                  // loading time. The following methods allow to easily unmark all
+                  // mesh elements: vert_unmark_all(), edge_unmark_all(), face_unmark_all(), poly_unmark_all()
+
+    MARKED_LOCAL, // general flag for local marking: useful for local methods that
+                  // need a temporary flag to operate on mesh elements.
+                  // The following methods allow to easily unmark all mesh elements:
+                  // vert_local_unmark_near_vert(), vert_local_unmark_near_edge(),
+                  // vert_local_unmark_near_face(), vert_local_unmark_near_poly()
+                  // Similar methods also exist for edges, faces and polys.
+
+    HIDDEN,       // used by the slicer to show/hide mesh elements when rendering
+                  // (this flag is actually used only for poly mesh elements)
+
+    CREASE,       // can be used to mark sharp creases
+
+    UNUSED_0,     // unused flags that can be exploited by various algorithms. For code
+    UNUSED_1,     // clarity, I suggest to overload the symbols one wants to use, e.g.:
+    UNUSED_2,     //
+    UNUSED_3      //    enum { MY_FLAG = UNUSED_0 };
+                  //
+                  //    my_mesh.vert_data(vid).flags[MY_FLAG] = true;
+                  //    my_mesh.vert_data(vid).flags(MY_FLAG).set();
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 typedef struct
 {
     std::string filename;
@@ -81,12 +123,12 @@ Mesh_std_attributes;
 
 typedef struct
 {
-    vec3d  normal  = vec3d(0,0,0);
-    Color  color   = Color::WHITE();
-    vec3d  uvw     = vec3d(0,0,0);
-    int    label   = -1;
-    float  quality = 0.0;
-    bool   marked  = false;
+    vec3d          normal  = vec3d(0,0,0);
+    Color          color   = Color::WHITE();
+    vec3d          uvw     = vec3d(0,0,0);
+    int            label   = -1;
+    float          quality = 0.0;
+    std::bitset<8> flags;
 }
 Vert_std_attributes;
 
@@ -94,9 +136,9 @@ Vert_std_attributes;
 
 typedef struct
 {
-    Color color  = Color::BLACK();
-    bool  marked = false;
-    int   label  = -1;
+    Color          color = Color::BLACK();
+    int            label = -1;
+    std::bitset<8> flags;
 }
 Edge_std_attributes;
 
@@ -104,13 +146,12 @@ Edge_std_attributes;
 
 typedef struct
 {
-    vec3d  normal   = vec3d(0,0,0);
-    Color  color    = Color::WHITE();
-    int    label    = -1;
-    bool   visible  = true;
-    float  quality  = 0.0;
-    bool   marked   = false;
-    float  AO       = 1.0;
+    vec3d          normal  = vec3d(0,0,0);
+    Color          color   = Color::WHITE();
+    int            label   = -1;
+    float          quality = 0.0;
+    float          AO      = 1.0;
+    std::bitset<8> flags;
 }
 Polygon_std_attributes;
 
@@ -118,11 +159,10 @@ Polygon_std_attributes;
 
 typedef struct
 {
-    Color  color   = Color::WHITE();
-    int    label   = -1;
-    bool   visible = true;
-    float  quality = 0.0;
-    bool   marked  = false;
+    Color          color   = Color::WHITE();
+    int            label   = -1;
+    float          quality = 0.0;
+    std::bitset<8> flags;
 }
 Polyhedron_std_attributes;
 

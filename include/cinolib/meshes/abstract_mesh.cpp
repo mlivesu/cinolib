@@ -34,6 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/meshes/abstract_mesh.h>
+#include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/stl_container_utilities.h>
 #include <cinolib/min_max_inf.h>
 #include <map>
@@ -662,7 +663,7 @@ void AbstractMesh<M,V,E,P>::vert_unmark_all()
 {
     for(uint vid=0; vid<num_verts(); ++vid)
     {
-        vert_data(vid).marked = false;
+        vert_data(vid).flags[MARKED] = false;
     }
 }
 
@@ -670,29 +671,29 @@ void AbstractMesh<M,V,E,P>::vert_unmark_all()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::vert_unmark_around_vert(const uint vid)
+void AbstractMesh<M,V,E,P>::vert_local_unmark_near_vert(const uint vid)
 {
-    vert_data(vid).marked = false;
-    for(uint nbr : adj_v2v(vid)) vert_data(nbr).marked = false;
+    vert_data(vid).flags[MARKED_LOCAL] = false;
+    for(uint nbr : adj_v2v(vid)) vert_data(nbr).flags[MARKED_LOCAL] = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::vert_unmark_around_edge(const uint eid)
+void AbstractMesh<M,V,E,P>::vert_local_unmark_near_edge(const uint eid)
 {
-    vert_data(edge_vert_id(eid,0)).marked = false;
-    vert_data(edge_vert_id(eid,1)).marked = false;
+    vert_data(edge_vert_id(eid,0)).flags[MARKED_LOCAL] = false;
+    vert_data(edge_vert_id(eid,1)).flags[MARKED_LOCAL] = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::vert_unmark_around_poly(const uint pid)
+void AbstractMesh<M,V,E,P>::vert_local_unmark_near_poly(const uint pid)
 {
-    for(uint vid : adj_p2v(pid)) vert_data(vid).marked = false;
+    for(uint vid : adj_p2v(pid)) vert_data(vid).flags[MARKED_LOCAL] = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -884,7 +885,7 @@ void AbstractMesh<M,V,E,P>::edge_unmark_all()
 {
     for(uint eid=0; eid<num_edges(); ++eid)
     {
-        edge_data(eid).marked = false;
+        edge_data(eid).flags[MARKED] = false;
     }
 }
 
@@ -892,28 +893,28 @@ void AbstractMesh<M,V,E,P>::edge_unmark_all()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::edge_unmark_around_vert(const uint vid)
+void AbstractMesh<M,V,E,P>::edge_local_unmark_near_vert(const uint vid)
 {
-    for(uint eid : adj_v2e(vid)) edge_data(eid).marked = false;
+    for(uint eid : adj_v2e(vid)) edge_data(eid).flags[MARKED_LOCAL] = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::edge_unmark_around_edge(const uint eid)
+void AbstractMesh<M,V,E,P>::edge_local_unmark_near_edge(const uint eid)
 {
-    edge_data(eid).marked = false;
-    for(uint nbr : adj_e2e(eid)) edge_data(nbr).marked = false;
+    edge_data(eid).flags[MARKED_LOCAL] = false;
+    for(uint nbr : adj_e2e(eid)) edge_data(nbr).flags[MARKED_LOCAL] = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::edge_unmark_around_poly(const uint pid)
+void AbstractMesh<M,V,E,P>::edge_local_unmark_near_poly(const uint pid)
 {
-    for(uint eid : adj_p2e(pid)) edge_data(eid).marked = false;
+    for(uint eid : adj_p2e(pid)) edge_data(eid).flags[MARKED_LOCAL] = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1127,7 +1128,7 @@ void AbstractMesh<M,V,E,P>::poly_show_all()
 {
     for(uint pid=0; pid<num_polys(); ++pid)
     {
-        poly_data(pid).visible = true;
+        poly_data(pid).flags[HIDDEN] = false;
     }
 }
 
@@ -1227,7 +1228,7 @@ void AbstractMesh<M,V,E,P>::poly_unmark_all()
 {
     for(uint pid=0; pid<num_polys(); ++pid)
     {
-        poly_data(pid).marked = false;
+        poly_data(pid).flags[MARKED] = false;
     }
 }
 
@@ -1235,28 +1236,28 @@ void AbstractMesh<M,V,E,P>::poly_unmark_all()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::poly_unmark_around_vert(const uint vid)
+void AbstractMesh<M,V,E,P>::poly_local_unmark_near_vert(const uint vid)
 {
-    for(uint pid : adj_v2p(vid)) poly_data(pid).marked = false;
+    for(uint pid : adj_v2p(vid)) poly_data(pid).flags[MARKED_LOCAL] = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::poly_unmark_around_edge(const uint eid)
+void AbstractMesh<M,V,E,P>::poly_local_unmark_near_edge(const uint eid)
 {
-    for(uint pid : adj_e2p(eid)) poly_data(pid).marked = false;
+    for(uint pid : adj_e2p(eid)) poly_data(pid).flags[MARKED_LOCAL] = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::poly_unmark_around_poly(const uint pid)
+void AbstractMesh<M,V,E,P>::poly_local_unmark_near_poly(const uint pid)
 {
-    poly_data(pid).marked = false;
-    for(uint nbr : adj_p2p(pid)) poly_data(nbr).marked = false;
+    poly_data(pid).flags[MARKED_LOCAL] = false;
+    for(uint nbr : adj_p2p(pid)) poly_data(nbr).flags[MARKED_LOCAL] = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1383,6 +1384,22 @@ void AbstractMesh<M,V,E,P>::vert_apply_label(const int label)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractMesh<M,V,E,P>::edge_mark_sharp_creases(const float thresh)
+{
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if(edge_dihedral_angle(eid) >= thresh)
+        {
+            this->edge_data(eid).flags[CREASE] = true;
+            this->edge_data(eid).flags[MARKED] = true;
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 uint AbstractMesh<M,V,E,P>::pick_vert(const vec3d & p) const
 {
     std::vector<std::pair<double,uint>> closest;
@@ -1412,7 +1429,7 @@ uint AbstractMesh<M,V,E,P>::pick_poly(const vec3d & p) const
     std::vector<std::pair<double,uint>> closest;
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        if(this->poly_data(pid).visible) closest.push_back(std::make_pair(this->poly_centroid(pid).dist(p),pid));
+        if(!this->poly_data(pid).flags[HIDDEN]) closest.push_back(std::make_pair(this->poly_centroid(pid).dist(p),pid));
     }
     std::sort(closest.begin(), closest.end());
     return closest.front().second;

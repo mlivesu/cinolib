@@ -82,7 +82,7 @@ void MeshSlicer<Mesh>::update(Mesh & m, const SlicerState & s)
         bool b = (s.mode == AND) ? ( pass_X &&  pass_Y &&  pass_Z &&  pass_L &&  pass_Q)
                                  : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
 
-        m.poly_data(pid).visible = b;
+        m.poly_data(pid).flags[HIDDEN] = !b;
 
         //std::cout << pass_X << " " << pass_Y << " " << pass_Z << " " << pass_Q << " " << pass_L << std::endl;
     }

@@ -84,7 +84,7 @@ int main(int argc, char **argv)
         for(uint pid=0; pid<m.num_polys(); ++pid)
         {
             uint count=0;
-            for(uint eid : m.adj_p2e(pid)) if(m.edge_data(eid).marked) ++count;
+            for(uint eid : m.adj_p2e(pid)) if(m.edge_data(eid).flags[MARKED]) ++count;
             if(count>1) to_split.push_back(pid);
         }
         SORT_VEC(to_split, true);
@@ -107,7 +107,7 @@ int main(int argc, char **argv)
             assert(f.is_open());
             for(uint eid=0; eid<m.num_edges(); ++eid)
             {
-                if(m.edge_data(eid).marked) f << m.edge_vert_id(eid,0) << " " << m.edge_vert_id(eid,1) << "\n";
+                if(m.edge_data(eid).flags[MARKED]) f << m.edge_vert_id(eid,0) << " " << m.edge_vert_id(eid,1) << "\n";
             }
             f.close();
         }
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
             if (c->unproject(click, p)) // transform click in a 3d point
             {
                 uint eid = m.pick_edge(p);
-                m.edge_data(eid).marked = !m.edge_data(eid).marked;
+                m.edge_data(eid).flags[MARKED] = !m.edge_data(eid).flags[MARKED];
                 m.updateGL();
                 c->updateGL();
             }

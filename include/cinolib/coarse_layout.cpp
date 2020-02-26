@@ -63,16 +63,16 @@ void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
         uint vid = sing_verts.front();
         sing_verts.pop();
 
-        m.vert_data(vid).marked = true;
+        m.vert_data(vid).flags[MARKED] = true;
 
         for(uint eid : m.adj_v2e(vid))
         {
-            if(m.edge_data(eid).marked) continue; // this path was already visited
-            m.edge_data(eid).marked = true;
+            if(m.edge_data(eid).flags[MARKED]) continue; // this path was already visited
+            m.edge_data(eid).flags[MARKED] = true;
 
             for(uint curr : m.edge_chain(eid, m.vert_opposite_to(eid,vid)))
             {
-                m.edge_data(curr).marked = true;
+                m.edge_data(curr).flags[MARKED] = true;
                 on_domain_border.at(curr) = true;
             }
         }
@@ -82,13 +82,13 @@ void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
     int patch_id = 0;
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        if (m.poly_data(pid).marked) continue; // already visited
+        if (m.poly_data(pid).flags[MARKED]) continue; // already visited
         std::unordered_set<uint> patch;
         bfs_on_dual_w_edge_barriers(m, pid, on_domain_border, patch);
         for(uint p : patch)
         {
             m.poly_data(p).label  = patch_id;
-            m.poly_data(p).marked = true;
+            m.poly_data(p).flags[MARKED] = true;
         }
         ++patch_id;
     }
@@ -127,16 +127,16 @@ void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
         uint eid = sing_edges.front();
         sing_edges.pop();
 
-        m.edge_data(eid).marked = true;
+        m.edge_data(eid).flags[MARKED] = true;
 
         for(uint fid : m.adj_e2f(eid))
         {
-            if(m.face_data(fid).marked) continue; // this interfaces was already created
-            m.face_data(fid).marked = true;
+            if(m.face_data(fid).flags[MARKED]) continue; // this interfaces was already created
+            m.face_data(fid).flags[MARKED] = true;
 
             for(uint curr : m.face_sheet(fid))
             {
-                m.face_data(curr).marked = true;
+                m.face_data(curr).flags[MARKED] = true;
                 on_domain_border.at(curr) = true;
             }
         }
@@ -146,13 +146,13 @@ void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
     int patch_id = 0;
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        if (m.poly_data(pid).marked) continue; // already visited
+        if (m.poly_data(pid).flags[MARKED]) continue; // already visited
         std::unordered_set<uint> patch;
         bfs_on_dual_w_face_barriers(m, pid, on_domain_border, patch);
         for(uint p : patch)
         {
             m.poly_data(p).label  = patch_id;
-            m.poly_data(p).marked = true;
+            m.poly_data(p).flags[MARKED] = true;
         }
         ++patch_id;
     }
