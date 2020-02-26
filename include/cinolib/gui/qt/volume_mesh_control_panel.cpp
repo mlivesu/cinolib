@@ -587,6 +587,8 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         cb_actions->insertItem(2,"Unmark all faces");
         cb_actions->insertItem(3,"Color wrt label");
         cb_actions->insertItem(4,"Label wrt color");
+        cb_actions->insertItem(5,"Mark sharp creases (>60deg)");
+        cb_actions->insertItem(6,"Mark sharp creases (>30deg)");
         cb_actions->setFont(global_font);
         QVBoxLayout *layout = new QVBoxLayout();
         layout->addWidget(cb_actions);
@@ -1388,6 +1390,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
             case 2: m->face_unmark_all(); break;
             case 3: m->poly_color_wrt_label(); break;
             case 4: m->poly_label_wrt_color(); break;
+            case 5: m->edge_mark_sharp_creases(to_rad(60.0)); break;
+            case 6: m->edge_mark_sharp_creases(to_rad(30.0)); break;
         }
         m->updateGL();
         canvas->updateGL();
