@@ -63,15 +63,16 @@ template<typename real> class vec3
 
     public:
 
-        explicit vec3()
+        explicit vec3(const real val = 0)
         {
-            set( 0.0, 0.0, 0.0 );
+            set(val,val,val);
         }
 
-        explicit vec3(const real x, const real y=0.0, const real z=0.0 )
+        explicit vec3(const real val_x, const real val_y, const real val_z)
         {
-            set(x, y, z);
+            set(val_x, val_y, val_z);
         }
+
 
         const real *ptr() const
         {
