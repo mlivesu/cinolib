@@ -830,7 +830,7 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_adj_visible_polys(const uin
     std::vector<uint> nbrs;
     for(uint pid : this->adj_v2p(vid))
     {
-        if(!this->poly_data(pid).hidden)
+        if(!this->poly_data(pid).flags[HIDDEN])
         {
             vec3d n = this->poly_data(pid).normal;
             if(dir.angle_deg(n) < ang_thresh) nbrs.push_back(pid);

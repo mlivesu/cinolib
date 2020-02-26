@@ -95,7 +95,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_marked()
         bool hidden = true;
         for(uint pid : this->adj_e2p(eid))
         {
-            if(!this->poly_data(pid).hidden)
+            if(!this->poly_data(pid).flags[HIDDEN])
             {
                 hidden = false;
                 break;
@@ -163,7 +163,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
     {
         for(uint pid=0; pid<this->num_polys(); ++pid)
         {
-            if (this->poly_data(pid).hidden) continue;
+            if (this->poly_data(pid).flags[HIDDEN]) continue;
 
             vec3d n = this->poly_data(pid).normal;
 
@@ -310,7 +310,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
             bool hidden = true;
             for(uint pid : this->adj_e2p(eid))
             {
-                if(!this->poly_data(pid).hidden)
+                if(!this->poly_data(pid).flags[HIDDEN])
                 {
                     hidden = false;
                     break;

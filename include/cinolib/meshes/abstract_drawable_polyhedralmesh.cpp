@@ -348,7 +348,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             bool hidden = true;
             for(uint pid : this->adj_e2p(eid))
             {
-                if(!this->poly_data(pid).hidden)
+                if(!this->poly_data(pid).flags[HIDDEN])
                 {
                     hidden = false;
                     break;

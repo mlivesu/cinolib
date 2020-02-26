@@ -151,7 +151,6 @@ typedef struct
     int            label   = -1;
     float          quality = 0.0;
     float          AO      = 1.0;
-    bool           hidden  = false;
     std::bitset<8> flags;
 }
 Polygon_std_attributes;
@@ -163,7 +162,6 @@ typedef struct
     Color          color   = Color::WHITE();
     int            label   = -1;
     float          quality = 0.0;
-    bool           hidden  = false;
     std::bitset<8> flags;
 }
 Polyhedron_std_attributes;
