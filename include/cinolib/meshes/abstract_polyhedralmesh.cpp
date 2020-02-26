@@ -779,12 +779,17 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 double AbstractPolyhedralMesh<M,V,E,F,P>::edge_dihedral_angle(const uint eid) const
 {
-    auto f_nbrs = this->edge_adj_srf_faces(eid);
-    assert(this->edge_is_on_srf(eid));
-    assert(f_nbrs.size()==2);
+    if(!this->edge_is_on_srf(eid)) return 0;
 
-    vec3d n0 = this->poly_face_normal(this->adj_f2p(f_nbrs.front()).front(), f_nbrs.front());
-    vec3d n1 = this->poly_face_normal(this->adj_f2p(f_nbrs.back()).front(), f_nbrs.back());
+    auto f_nbrs = this->edge_adj_srf_faces(eid);
+    if(f_nbrs.size()!=2) return 0;
+
+    uint  fid0 = f_nbrs.front();
+    uint  fid1 = f_nbrs.back();
+    uint  pid0 = this->adj_f2p(fid0).front();
+    uint  pid1 = this->adj_f2p(fid1).front();
+    vec3d n0   = this->poly_face_normal(pid0, fid0);
+    vec3d n1   = this->poly_face_normal(pid1, fid1);
 
     return n0.angle_rad(n1);
 }
