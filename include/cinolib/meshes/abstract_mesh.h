@@ -258,7 +258,7 @@ class AbstractMesh
                 void                   edge_local_unmark_near_poly(const uint pid);
                 void                   edge_apply_labels          (const std::vector<int> & labels);
                 void                   edge_apply_label           (const int label);
-        virtual void                   edge_mark_sharp_creases    (const float thresh) = 0;
+                void                   edge_mark_sharp_creases    (const float thresh_rad = 1.0472); // 60 degrees
         virtual double                 edge_dihedral_angle        (const uint eid) const = 0;
         virtual void                   edge_set_color             (const Color & c);
         virtual void                   edge_set_alpha             (const float alpha);

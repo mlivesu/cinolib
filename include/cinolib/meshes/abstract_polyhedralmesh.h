@@ -199,7 +199,6 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         std::vector<uint> edge_edges_link            (const uint eid) const;
         std::vector<uint> edge_faces_link            (const uint eid) const;
         uint              edge_split                 (const uint eid, const vec3d & p);
-        void              edge_mark_sharp_creases    (const float thresh_rad = 1.0472) override; // 60 degrees
         double            edge_dihedral_angle        (const uint eid) const override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

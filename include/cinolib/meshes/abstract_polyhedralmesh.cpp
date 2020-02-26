@@ -793,18 +793,6 @@ double AbstractPolyhedralMesh<M,V,E,F,P>::edge_dihedral_angle(const uint eid) co
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void AbstractPolyhedralMesh<M,V,E,F,P>::edge_mark_sharp_creases(const float thresh)
-{
-    for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
-        this->edge_data(eid).flags[MARKED] = (this->edge_is_on_srf(eid) && edge_dihedral_angle(eid)>=thresh);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
 {
     uint new_vid = this->vert_add(p);

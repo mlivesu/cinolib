@@ -1384,6 +1384,22 @@ void AbstractMesh<M,V,E,P>::vert_apply_label(const int label)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractMesh<M,V,E,P>::edge_mark_sharp_creases(const float thresh)
+{
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if(edge_dihedral_angle(eid) >= thresh)
+        {
+            this->edge_data(eid).flags[CREASE] = true;
+            this->edge_data(eid).flags[MARKED] = true;
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 uint AbstractMesh<M,V,E,P>::pick_vert(const vec3d & p) const
 {
     std::vector<std::pair<double,uint>> closest;

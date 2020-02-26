@@ -1172,18 +1172,6 @@ void AbstractPolygonMesh<M,V,E,P>::edge_mark_boundaries()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractPolygonMesh<M,V,E,P>::edge_mark_sharp_creases(const float thresh)
-{
-    for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
-        this->edge_data(eid).flags[MARKED] = (edge_dihedral_angle(eid) >= thresh);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 uint AbstractPolygonMesh<M,V,E,P>::poly_vert_offset(const uint pid, const uint vid) const
 {
     for(uint offset=0; offset<verts_per_poly(pid); ++offset)
