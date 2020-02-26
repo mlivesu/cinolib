@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     window.resize(600,600);
 
     std::vector<vec3d> samples;
-    sphere_coverage(100, samples);
+    sphere_coverage(1000, samples);
 
     std::vector<uint> no_polys = {};
     DrawableTrimesh<> m(samples, no_polys);

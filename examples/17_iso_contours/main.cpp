@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     gui.push_obj(&m);
 
     DrawableIsocontour<> iso(m, 0.5);
-    iso.thickness = 2.0;
+    iso.thickness = 3.0;
     gui.push_obj(&iso, false);
 
     Profiler profiler;
