@@ -90,7 +90,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_marked()
 
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        if (!this->edge_data(eid).marked) continue;
+        if (!this->edge_data(eid).flags[MARKED]) continue;
 
         bool invisible = true;
         for(uint fid : this->adj_e2p(eid))

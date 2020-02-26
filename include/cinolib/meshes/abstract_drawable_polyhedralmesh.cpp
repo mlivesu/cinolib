@@ -98,7 +98,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        if (!this->face_data(fid).marked) continue;
+        if (!this->face_data(fid).flags[MARKED]) continue;
 
         //assert(this->adj_f2p(fid).size()==1);
         //uint pid = this->adj_f2p(fid).front();
@@ -153,7 +153,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
 
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        if (!this->edge_data(eid).marked) continue;
+        if (!this->edge_data(eid).flags[MARKED]) continue;
 
         //bool invisible = true;
         //for(uint pid : this->adj_e2p(eid))
@@ -384,7 +384,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             drawlist_out.seg_colors.push_back(this->edge_data(eid).color.a);
         }
 
-        if (this->edge_data(eid).marked)
+        if (this->edge_data(eid).flags[MARKED])
         {
             int base_addr = drawlist_marked.seg_coords.size()/3;
             drawlist_marked.segs.push_back(base_addr    );
@@ -607,18 +607,18 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
         drawlist_in.seg_colors.push_back(this->edge_data(eid).color.b);
         drawlist_in.seg_colors.push_back(this->edge_data(eid).color.a);
 
-//        if (this->edge_data(eid).marked && drawlist_in.draw_mode & DRAW_MARKED_SEGS)
+//        if (this->edge_data(eid).flags[MARKED] && drawlist_in.draw_mode & DRAW_MARKED_SEGS)
 //        {
-//            int base_addr = drawlist_in.marked_seg_coords.size()/3;
-//            drawlist_in.marked_segs.push_back(base_addr    );
-//            drawlist_in.marked_segs.push_back(base_addr + 1);
+//            int base_addr = drawlist_in.flags[MARKED]_seg_coords.size()/3;
+//            drawlist_in.flags[MARKED]_segs.push_back(base_addr    );
+//            drawlist_in.flags[MARKED]_segs.push_back(base_addr + 1);
 
-//            drawlist_in.marked_seg_coords.push_back(vid0.x());
-//            drawlist_in.marked_seg_coords.push_back(vid0.y());
-//            drawlist_in.marked_seg_coords.push_back(vid0.z());
-//            drawlist_in.marked_seg_coords.push_back(vid1.x());
-//            drawlist_in.marked_seg_coords.push_back(vid1.y());
-//            drawlist_in.marked_seg_coords.push_back(vid1.z());
+//            drawlist_in.flags[MARKED]_seg_coords.push_back(vid0.x());
+//            drawlist_in.flags[MARKED]_seg_coords.push_back(vid0.y());
+//            drawlist_in.flags[MARKED]_seg_coords.push_back(vid0.z());
+//            drawlist_in.flags[MARKED]_seg_coords.push_back(vid1.x());
+//            drawlist_in.flags[MARKED]_seg_coords.push_back(vid1.y());
+//            drawlist_in.flags[MARKED]_seg_coords.push_back(vid1.z());
 //        }
     }
 }

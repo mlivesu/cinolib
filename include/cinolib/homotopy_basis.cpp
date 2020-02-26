@@ -212,19 +212,19 @@ void detach_loops(Trimesh<M,V,E,P>  & m,
     }
 
     m.vert_unmark_all();
-    m.vert_data(data.root).marked = true;
+    m.vert_data(data.root).flags[MARKED] = true;
     while(!q.empty())
     {
         uint vid = q.front();
         q.pop();
 
-        m.vert_data(vid).marked = false;
+        m.vert_data(vid).flags[MARKED] = false;
         uint next = detach_loops(m, data, vid);
 
-        if(!m.vert_data(next).marked)
+        if(!m.vert_data(next).flags[MARKED])
         {
             q.push(next);
-            m.vert_data(next).marked = true;
+            m.vert_data(next).flags[MARKED] = true;
         }
     }
 
@@ -264,7 +264,7 @@ uint detach_loops(Trimesh<M,V,E,P>  & m,
     for(; j!=e_star.end(); ++j)
     {
         edges_ccw.push_back(*j);
-        if(m.edge_data(*j).marked) break;
+        if(m.edge_data(*j).flags[MARKED]) break;
     }
     assert(j!=e_star.end());
 
@@ -274,7 +274,7 @@ uint detach_loops(Trimesh<M,V,E,P>  & m,
     for(; k!=e_star.rend(); ++k)
     {
         edges_cw.push_back(*k);
-        if(m.edge_data(*k).marked) break;
+        if(m.edge_data(*k).flags[MARKED]) break;
     }
     assert(k!=e_star.rend());
 
@@ -422,8 +422,8 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
     m.update_v_normal(v_new);
 
     // update flags
-    for(uint eid : m.adj_v2e(v_mid)) m.edge_data(eid).marked = m.edge_data(eid).label>0;
-    for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).marked = m.edge_data(eid).label>0;
+    for(uint eid : m.adj_v2e(v_mid)) m.edge_data(eid).flags[MARKED] = m.edge_data(eid).label>0;
+    for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).flags[MARKED] = m.edge_data(eid).label>0;
 
     // next one ring to process...
     uint count = 0;
@@ -494,8 +494,8 @@ uint detach_loops_by_edge_split(Trimesh<M,V,E,P>        & m,
     assert(m.edge_data(e_out).label>0);
 
     // update flags
-    for(uint eid : m.adj_v2e(v_mid)) m.edge_data(eid).marked = m.edge_data(eid).label>0;
-    for(uint v_new : new_chain) for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).marked = m.edge_data(eid).label>0;
+    for(uint eid : m.adj_v2e(v_mid)) m.edge_data(eid).flags[MARKED] = m.edge_data(eid).label>0;
+    for(uint v_new : new_chain) for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).flags[MARKED] = m.edge_data(eid).label>0;
 
     // next one ring to process...
     uint count = 0;
@@ -555,8 +555,8 @@ uint detach_loops_by_poly_split(Trimesh<M,V,E,P>  & /*m*/,
     //m.edge_data(e_dummy).label   = 0;
 
     //// update flags
-    //for(uint eid : m.adj_v2e(v_mid)) m.edge_data(eid).marked = m.edge_data(eid).label>0;
-    //for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).marked = m.edge_data(eid).label>0;
+    //for(uint eid : m.adj_v2e(v_mid)) m.edge_data(eid).flags[MARKED] = m.edge_data(eid).label>0;
+    //for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).flags[MARKED] = m.edge_data(eid).label>0;
 
     //return v_out;
 }
@@ -579,7 +579,7 @@ void detach_loops_preproc(Trimesh<M,V,E,P>  & m,
             uint v1  = loop.at((i+1)%loop.size());
              int eid = m.edge_id(v0, v1);
             m.edge_data(eid).label++;
-            m.edge_data(eid).marked = true;
+            m.edge_data(eid).flags[MARKED] = true;
         }
     }
 }
@@ -596,13 +596,13 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
     m.edge_unmark_all();
     for(uint eid: m.adj_v2e(data.root))
     {
-        if(m.edge_data(eid).marked) continue;
+        if(m.edge_data(eid).flags[MARKED]) continue;
         if(m.edge_data(eid).label>0)
         {
             std::vector<uint> loop;
             loop.push_back(data.root);
             loop.push_back(m.vert_opposite_to(eid, data.root));
-            m.edge_data(eid).marked = true;
+            m.edge_data(eid).flags[MARKED] = true;
 
             uint curr = loop.back();
             do
@@ -610,11 +610,11 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
                 int next = -1;
                 for(uint eid : m.adj_v2e(curr))
                 {
-                    if(m.edge_data(eid).label>0 && !m.edge_data(eid).marked)
+                    if(m.edge_data(eid).label>0 && !m.edge_data(eid).flags[MARKED])
                     {
                         assert(next==-1);
                         next = m.vert_opposite_to(eid, curr);
-                        m.edge_data(eid).marked = true;
+                        m.edge_data(eid).flags[MARKED] = true;
                     }
                 }
                 assert(next>=0);

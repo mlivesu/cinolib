@@ -126,7 +126,7 @@ void smooth_on_tangent_line(const AbstractPolygonMesh<M,V,E,P>                  
     std::vector<vec3d> nbrs;
     for(uint eid : m.adj_v2e(vid))
     {
-        if(m.edge_data(eid).marked) nbrs.push_back(m.vert(m.vert_opposite_to(eid,vid)));
+        if(m.edge_data(eid).flags[MARKED]) nbrs.push_back(m.vert(m.vert_opposite_to(eid,vid)));
     }
     assert(nbrs.size()==2);
     vec3d dir = nbrs.front() - nbrs.back();
@@ -219,7 +219,7 @@ void label_features(AbstractPolygonMesh<M,V,E,P> & m)
         for(uint eid : m.adj_v2e(vid))
         {
             // marked => flagged as a sharp feature
-            if(m.edge_data(eid).marked) ++count;
+            if(m.edge_data(eid).flags[MARKED]) ++count;
         }
         switch(count)
         {
@@ -247,7 +247,7 @@ void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
         ref_srf.build_from_mesh_polys(target);
         for(uint eid=0; eid<target.num_edges(); ++eid)
         {
-            if(target.edge_data(eid).marked) // marked => flagged as a sharp feature
+            if(target.edge_data(eid).flags[MARKED]) // marked => flagged as a sharp feature
             {
                 ref_feat.add_segment(eid, target.edge_verts(eid));
             }

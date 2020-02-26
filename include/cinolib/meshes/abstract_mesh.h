@@ -211,93 +211,93 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-          const vec3d          & vert                   (const uint vid) const { return verts.at(vid); }
-                vec3d          & vert                   (const uint vid)       { return verts.at(vid); }
-                void             vert_weights_uniform   (const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
-                std::set<uint>   vert_n_ring            (const uint vid, const uint n) const;
-                bool             verts_are_adjacent     (const uint vid0, const uint vid1) const;
-                bool             vert_is_local_min      (const uint vid, const int tex_coord = U_param) const;
-                bool             vert_is_local_max      (const uint vid, const int tex_coord = U_param) const;
-                uint             vert_valence           (const uint vid) const;
-                uint             vert_shared            (const uint eid0, const uint eid1) const;
-                double           vert_min_uvw_value     (const int tex_coord = U_param) const;
-                double           vert_max_uvw_value     (const int tex_coord = U_param) const;
-                void             vert_unmark_all        ();
-                void             vert_unmark_around_vert(const uint vid);
-                void             vert_unmark_around_edge(const uint eid);
-                void             vert_unmark_around_poly(const uint pid);
-                void             vert_apply_labels      (const std::vector<int> & labels);
-                void             vert_apply_label       (const int label);
-        virtual double           vert_mass              (const uint vid) const = 0;
-        virtual void             vert_set_color         (const Color & c);
-        virtual void             vert_set_alpha         (const float alpha);
-        virtual uint             vert_opposite_to       (const uint eid, const uint vid) const;
-        virtual void             vert_weights           (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
+          const vec3d          & vert                       (const uint vid) const { return verts.at(vid); }
+                vec3d          & vert                       (const uint vid)       { return verts.at(vid); }
+                void             vert_weights_uniform       (const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
+                std::set<uint>   vert_n_ring                (const uint vid, const uint n) const;
+                bool             verts_are_adjacent         (const uint vid0, const uint vid1) const;
+                bool             vert_is_local_min          (const uint vid, const int tex_coord = U_param) const;
+                bool             vert_is_local_max          (const uint vid, const int tex_coord = U_param) const;
+                uint             vert_valence               (const uint vid) const;
+                uint             vert_shared                (const uint eid0, const uint eid1) const;
+                double           vert_min_uvw_value         (const int tex_coord = U_param) const;
+                double           vert_max_uvw_value         (const int tex_coord = U_param) const;
+                void             vert_unmark_all            ();
+                void             vert_local_unmark_near_vert(const uint vid);
+                void             vert_local_unmark_near_edge(const uint eid);
+                void             vert_local_unmark_near_poly(const uint pid);
+                void             vert_apply_labels          (const std::vector<int> & labels);
+                void             vert_apply_label           (const int label);
+        virtual double           vert_mass                  (const uint vid) const = 0;
+        virtual void             vert_set_color             (const Color & c);
+        virtual void             vert_set_alpha             (const float alpha);
+        virtual uint             vert_opposite_to           (const uint eid, const uint vid) const;
+        virtual void             vert_weights               (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                vec3d                  edge_vert              (const uint eid, const uint offset) const;
-                uint                   edge_vert_id           (const uint eid, const uint offset) const;
-                std::vector<uint>      edge_vert_ids          (const uint eid) const;
-                std::vector<vec3d>     edge_verts             (const uint eid) const;
-                int                    edge_id                (const uint vid0, const uint vid1) const;
-                int                    edge_id                (const ipair & vids) const;
-                int                    edge_id                (const std::vector<uint> & vids) const;
-                vec3d                  edge_sample_at         (const uint eid, double lambda) const; // arc-length param
-                uint                   edge_valence           (const uint eid) const;
-                bool                   edge_contains_vert     (const uint eid, const uint vid) const;
-                bool                   edges_are_adjacent     (const uint eid0, const uint eid1) const;
-                double                 edge_length            (const uint eid) const;
-                vec3d                  edge_vec               (const uint eid, const bool normalized = false) const;
-                double                 edge_avg_length        () const;
-                double                 edge_max_length        () const;
-                double                 edge_min_length        () const;
-                void                   edge_unmark_all        ();
-                void                   edge_unmark_around_vert(const uint vid);
-                void                   edge_unmark_around_edge(const uint eid);
-                void                   edge_unmark_around_poly(const uint pid);
-                void                   edge_apply_labels      (const std::vector<int> & labels);
-                void                   edge_apply_label       (const int label);
-        virtual void                   edge_mark_sharp_creases(const float thresh) = 0;
-        virtual double                 edge_dihedral_angle    (const uint eid) const = 0;
-        virtual void                   edge_set_color         (const Color & c);
-        virtual void                   edge_set_alpha         (const float alpha);
+                vec3d                  edge_vert                  (const uint eid, const uint offset) const;
+                uint                   edge_vert_id               (const uint eid, const uint offset) const;
+                std::vector<uint>      edge_vert_ids              (const uint eid) const;
+                std::vector<vec3d>     edge_verts                 (const uint eid) const;
+                int                    edge_id                    (const uint vid0, const uint vid1) const;
+                int                    edge_id                    (const ipair & vids) const;
+                int                    edge_id                    (const std::vector<uint> & vids) const;
+                vec3d                  edge_sample_at             (const uint eid, double lambda) const; // arc-length param
+                uint                   edge_valence               (const uint eid) const;
+                bool                   edge_contains_vert         (const uint eid, const uint vid) const;
+                bool                   edges_are_adjacent         (const uint eid0, const uint eid1) const;
+                double                 edge_length                (const uint eid) const;
+                vec3d                  edge_vec                   (const uint eid, const bool normalized = false) const;
+                double                 edge_avg_length            () const;
+                double                 edge_max_length            () const;
+                double                 edge_min_length            () const;
+                void                   edge_unmark_all            ();
+                void                   edge_local_unmark_near_vert(const uint vid);
+                void                   edge_local_unmark_near_edge(const uint eid);
+                void                   edge_local_unmark_near_poly(const uint pid);
+                void                   edge_apply_labels          (const std::vector<int> & labels);
+                void                   edge_apply_label           (const int label);
+        virtual void                   edge_mark_sharp_creases    (const float thresh) = 0;
+        virtual double                 edge_dihedral_angle        (const uint eid) const = 0;
+        virtual void                   edge_set_color             (const Color & c);
+        virtual void                   edge_set_alpha             (const float alpha);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-                vec3d              poly_vert              (const uint pid, const uint offset) const;
-                std::vector<vec3d> poly_verts             (const uint pid) const;
-                std::vector<uint>  poly_verts_id          (const uint pid, const bool sort_by_vid = false) const;
-                std::vector<uint>  poly_v2v               (const uint pid, const uint vid) const;
-                std::vector<uint>  poly_v2e               (const uint pid, const uint vid) const;
-                uint               poly_vert_valence      (const uint pid, const uint vid) const;
-                uint               poly_vert_id           (const uint pid, const uint offset) const;
-                uint               poly_vert_offset       (const uint pid, const uint vid) const;
-                vec3d              poly_centroid          (const uint pid) const;
-                vec3d              poly_sample_at         (const uint pid, const std::vector<double> & bary) const;
-                double             poly_sample_param_at   (const uint pid, const std::vector<double> & bary, const int tex_coord = U_param) const;
-                uint               poly_edge_id           (const uint pid, const uint vid0, const uint vid1) const;
-                bool               poly_contains_vert     (const uint pid, const uint vid) const;
-                bool               poly_contains_edge     (const uint pid, const uint eid) const;
-                bool               poly_contains_edge     (const uint pid, const uint vid0, const uint vid1) const;
-                void               poly_show_all          ();
-                void               poly_color_wrt_label   (const bool sorted=false, const float s=.5f, float v=.85f); // s => saturation, v => value in HSV color space
-                void               poly_label_wrt_color   ();
-                void               poly_unmark_all        ();
-                void               poly_unmark_around_vert(const uint vid);
-                void               poly_unmark_around_edge(const uint eid);
-                void               poly_unmark_around_poly(const uint pid);
-                uint               polys_n_unique_colors  () const;
-                uint               polys_n_unique_labels  () const;
-                bool               polys_are_colored      () const;
-                bool               polys_are_labeled      () const;
-                void               poly_apply_labels      (const std::vector<int> & labels);
-                void               poly_apply_label       (const int label);
-                AABB               poly_aabb              (const uint pid) const;
-        virtual double             poly_mass              (const uint pid) const = 0;
-        virtual void               poly_set_color         (const Color & c);
-        virtual void               poly_set_alpha         (const float alpha);
-        virtual void               poly_export_element    (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const = 0;
+                vec3d              poly_vert                  (const uint pid, const uint offset) const;
+                std::vector<vec3d> poly_verts                 (const uint pid) const;
+                std::vector<uint>  poly_verts_id              (const uint pid, const bool sort_by_vid = false) const;
+                std::vector<uint>  poly_v2v                   (const uint pid, const uint vid) const;
+                std::vector<uint>  poly_v2e                   (const uint pid, const uint vid) const;
+                uint               poly_vert_valence          (const uint pid, const uint vid) const;
+                uint               poly_vert_id               (const uint pid, const uint offset) const;
+                uint               poly_vert_offset           (const uint pid, const uint vid) const;
+                vec3d              poly_centroid              (const uint pid) const;
+                vec3d              poly_sample_at             (const uint pid, const std::vector<double> & bary) const;
+                double             poly_sample_param_at       (const uint pid, const std::vector<double> & bary, const int tex_coord = U_param) const;
+                uint               poly_edge_id               (const uint pid, const uint vid0, const uint vid1) const;
+                bool               poly_contains_vert         (const uint pid, const uint vid) const;
+                bool               poly_contains_edge         (const uint pid, const uint eid) const;
+                bool               poly_contains_edge         (const uint pid, const uint vid0, const uint vid1) const;
+                void               poly_show_all              ();
+                void               poly_color_wrt_label       (const bool sorted=false, const float s=.5f, float v=.85f); // s => saturation, v => value in HSV color space
+                void               poly_label_wrt_color       ();
+                void               poly_unmark_all            ();
+                void               poly_local_unmark_near_vert(const uint vid);
+                void               poly_local_unmark_near_edge(const uint eid);
+                void               poly_local_unmark_near_poly(const uint pid);
+                uint               polys_n_unique_colors      () const;
+                uint               polys_n_unique_labels      () const;
+                bool               polys_are_colored          () const;
+                bool               polys_are_labeled          () const;
+                void               poly_apply_labels          (const std::vector<int> & labels);
+                void               poly_apply_label           (const int label);
+                AABB               poly_aabb                  (const uint pid) const;
+        virtual double             poly_mass                  (const uint pid) const = 0;
+        virtual void               poly_set_color             (const Color & c);
+        virtual void               poly_set_alpha             (const float alpha);
+        virtual void               poly_export_element        (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const = 0;
 };
 
 }

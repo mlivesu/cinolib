@@ -98,7 +98,7 @@ int main(int argc, char **argv)
         {
             if(m.edge_dihedral_angle(eid) > thresh_rad)
             {
-                m.edge_data(eid).marked = true;
+                m.edge_data(eid).flags[MARKED] = true;
             }
         }
         m.updateGL();
