@@ -101,7 +101,7 @@ AO_srf<Mesh>::AO_srf(const Mesh & m,
         // local surface normal and ray direction
         for(uint pid=0; pid<m.num_polys(); ++pid)
         {
-            if(!m.poly_data(pid).visible) continue;
+            if(m.poly_data(pid).hidden) continue;
 
             vec3d  p = m.poly_centroid(pid);
             double x, y, depth;
@@ -132,7 +132,7 @@ void AO_srf<Mesh>::copy_to_mesh(Mesh & m)
 {
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        m.poly_data(pid).AO = (m.poly_data(pid).visible) ? ao[pid] : 1.0;
+        m.poly_data(pid).AO = (m.poly_data(pid).hidden) ? 1.0 : ao[pid];
     }
 }
 

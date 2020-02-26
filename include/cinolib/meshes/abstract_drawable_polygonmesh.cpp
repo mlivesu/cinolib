@@ -90,14 +90,18 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_marked()
 
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        if (!this->edge_data(eid).flags[MARKED]) continue;
+        if(!this->edge_data(eid).flags[MARKED]) continue;
 
-        bool invisible = true;
-        for(uint fid : this->adj_e2p(eid))
+        bool hidden = true;
+        for(uint pid : this->adj_e2p(eid))
         {
-            if (this->poly_data(fid).visible) invisible = false;
+            if(!this->poly_data(pid).hidden)
+            {
+                hidden = false;
+                break;
+            }
         }
-        if (invisible) continue;
+        if(hidden) continue;
 
         vec3d vid0 = this->edge_vert(eid,0);
         vec3d vid1 = this->edge_vert(eid,1);
@@ -159,7 +163,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
     {
         for(uint pid=0; pid<this->num_polys(); ++pid)
         {
-            if (!(this->poly_data(pid).visible)) continue;
+            if (this->poly_data(pid).hidden) continue;
 
             vec3d n = this->poly_data(pid).normal;
 
@@ -303,12 +307,16 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
 
         for(uint eid=0; eid<this->num_edges(); ++eid)
         {
-            bool invisible = true;
-            for(uint fid : this->adj_e2p(eid))
+            bool hidden = true;
+            for(uint pid : this->adj_e2p(eid))
             {
-                if (this->poly_data(fid).visible) invisible = false;
+                if(!this->poly_data(pid).hidden)
+                {
+                    hidden = false;
+                    break;
+                }
             }
-            if (invisible) continue;
+            if(hidden) continue;
 
             int base_addr = drawlist.seg_coords.size()/3;
             drawlist.segs.push_back(base_addr    );

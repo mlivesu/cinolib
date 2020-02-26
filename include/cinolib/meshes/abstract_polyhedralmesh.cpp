@@ -438,14 +438,14 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & p
     {
         assert(this->adj_f2p(fid).size()==1);
         pid_beneath = this->adj_f2p(fid).front();
-        return this->poly_data(pid_beneath).visible;
+        return !this->poly_data(pid_beneath).hidden;
     }
     else
     {
         std::vector<uint> pids;
         for(uint pid : this->adj_f2p(fid))
         {
-            if(this->poly_data(pid).visible) pids.push_back(pid);
+            if(!this->poly_data(pid).hidden) pids.push_back(pid);
         }
         if(pids.size()==1)
         {
@@ -2825,7 +2825,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::pick_face(const vec3d & p) const
     std::vector<std::pair<double,uint>> closest;
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
-        if(this->face_data(fid).visible) closest.push_back(std::make_pair(this->face_centroid(fid).dist(p),fid));
+        if(!this->face_data(fid).hidden) closest.push_back(std::make_pair(this->face_centroid(fid).dist(p),fid));
     }
     std::sort(closest.begin(), closest.end());
     return closest.front().second;
