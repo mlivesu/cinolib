@@ -136,8 +136,8 @@ Vert_std_attributes;
 
 typedef struct
 {
-    Color          color  = Color::BLACK();
-    int            label  = -1;
+    Color          color = Color::BLACK();
+    int            label = -1;
     std::bitset<8> flags;
 }
 Edge_std_attributes;
@@ -146,12 +146,12 @@ Edge_std_attributes;
 
 typedef struct
 {
-    vec3d          normal   = vec3d(0,0,0);
-    Color          color    = Color::WHITE();
-    int            label    = -1;
-    float          quality  = 0.0;
-    float          AO       = 1.0;
-    bool           visible  = true;
+    vec3d          normal  = vec3d(0,0,0);
+    Color          color   = Color::WHITE();
+    int            label   = -1;
+    float          quality = 0.0;
+    float          AO      = 1.0;
+    bool           visible = true;
     std::bitset<8> flags;
 }
 Polygon_std_attributes;
