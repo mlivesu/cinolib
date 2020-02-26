@@ -86,40 +86,29 @@ enum
     MARKED,       // general flag for global marking. Can be used to mark visited
                   // elements, creases, mesh borders,...). Marked elements can also
                   // be highlighted at rendering time, with dedicated colors/lines.
-                  // By default, BOUNDARY elements are marked at loading time.
-                  // The following methods allow to easily unmark all mesh elements:
-                  // vert_unmark_all(), edge_unmark_all(), face_unmark_all(), poly_unmark_all()
+                  // By default, booundary and non manifold elements are marked at
+                  // loading time. The following methods allow to easily unmark all
+                  // mesh elements: vert_unmark_all(), edge_unmark_all(), face_unmark_all(), poly_unmark_all()
 
     MARKED_LOCAL, // general flag for local marking: useful for local methods that
                   // need a temporary flag to operate on mesh elements.
                   // The following methods allow to easily unmark all mesh elements:
                   // vert_local_unmark_near_vert(), vert_local_unmark_near_edge(),
                   // vert_local_unmark_near_face(), vert_local_unmark_near_poly()
-                  // Similar methods also exit for edges, faces and polys.
+                  // Similar methods also exist for edges, faces and polys.
 
     HIDDEN,       // used by the slicer to show/hide mesh elements when rendering
                   // (this flag is actually used only for poly mesh elements)
 
-    AO,           // if enabled, the ambient occlusion info is used by the rendering
-                  // engine to make colors brigther/darker according to local visibility
-
-    BOUNDARY,     // used by surface meshes to mark boundary elements, and by
-                  // volumetric meshes to mark surface elements
-
     CREASE,       // can be used to mark sharp creases
-
-    NON_MANIFOLD, // can be used to mark non manifold mesh elements
-
-    DEGENERATE,   // can be used to mark degenerate mesh elements, such as zero
-                  // length edge or zero area polygon or zero volume polyhedra
 
     UNUSED_0,     // unused flags that can be exploited by various algorithms. For code
     UNUSED_1,     // clarity, I suggest to overload the symbols one wants to use, e.g.:
     UNUSED_2,     //
-    UNUSED_3,     //    enum { MY_FLAG = UNUSED_0 };
-    UNUSED_5,     //
-    UNUSED_6,     //    my_mesh.vert_data(vid).flags[MY_FLAG] = true;
-    UNUSED_7,     //    my_mesh.vert_data(vid).flags(MY_FLAG).set();
+    UNUSED_3      //    enum { MY_FLAG = UNUSED_0 };
+                  //
+                  //    my_mesh.vert_data(vid).flags[MY_FLAG] = true;
+                  //    my_mesh.vert_data(vid).flags(MY_FLAG).set();
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -139,7 +128,7 @@ typedef struct
     vec3d           uvw     = vec3d(0,0,0);
     int             label   = -1;
     float           quality = 0.0;
-    std::bitset<16> flags;
+    std::bitset<8>  flags;
 }
 Vert_std_attributes;
 
@@ -149,7 +138,7 @@ typedef struct
 {
     Color           color  = Color::BLACK();
     int             label  = -1;
-    std::bitset<16> flags;
+    std::bitset<8>  flags;
 }
 Edge_std_attributes;
 
@@ -163,7 +152,7 @@ typedef struct
     float           quality  = 0.0;
     float           AO       = 1.0;
     bool            visible  = true;
-    std::bitset<16> flags;
+    std::bitset<8>  flags;
 }
 Polygon_std_attributes;
 
@@ -175,7 +164,7 @@ typedef struct
     int             label   = -1;
     float           quality = 0.0;
     bool            visible = true;
-    std::bitset<16> flags;
+    std::bitset<8>  flags;
 }
 Polyhedron_std_attributes;
 

@@ -55,10 +55,6 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         std::vector<std::vector<uint>> faces;              // list of faces (assumed CCW)
         std::vector<std::vector<bool>> polys_face_winding; // true if the face is CCW, false if it is CW
 
-        std::vector<bool> v_on_srf; // true if a vertex is exposed on the surface
-        std::vector<bool> e_on_srf; // true if an edge is exposed on the surface
-        std::vector<bool> f_on_srf; // true if a face is exposed on the surface
-
         std::vector<F> f_data;
 
         std::vector<std::vector<uint>> v2f; // vert to face adjacency
