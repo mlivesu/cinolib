@@ -118,7 +118,8 @@ void read_STL(const char         * filename,
         }
         fclose(fp);
     }
-    else // BINARY file
+
+    if(tris.empty()) // BINARY file
     {
         // close file in ASCII mode and reopen it in binary mode
         fclose(fp);
