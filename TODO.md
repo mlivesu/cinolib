@@ -11,7 +11,6 @@ Please consider this to be just development notes and not any real planning.
 * transform all NULL into nullptr
 * merge vec2<T> vec3<T> (and colors!) into a unified vec<D,T>. This will make much easier write algorithms that scale across multiple dimensions (e.g. Poisson sampling). For the same reason vertex types should become template parameters for meshes
 * provide mechanisms to enable operations between meshes with different template signatures (e.g. export_hexahedra,...)
-* add destructors for all classes (https://www.geeksforgeeks.org/virtual-destructor/)
 * use a less verbose naming for ANSI text colors
 * fix per face winding in midpoint subdivision
 * fix marching tets: degenerate triangles will be generated in some cases (see comments inside cpp file)
