@@ -430,6 +430,18 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::face_verts_id(const uint fi
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+std::vector<vec3d> AbstractPolyhedralMesh<M,V,E,F,P>::face_verts(const uint fid) const
+{
+    uint nv = this->verts_per_face(fid);
+    std::vector<vec3d> f_list(nv);
+    for(uint off=0; off<nv; ++off) f_list.at(off) = this->face_vert(fid,off);
+    return f_list;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & pid_beneath) const
 {
     // note: returns also the ID of the poy that makes the face visible
