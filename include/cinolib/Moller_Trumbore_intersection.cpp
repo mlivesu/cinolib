@@ -33,7 +33,7 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/line_triangle_intersection.h>
+#include <cinolib/Moller_Trumbore_intersection.h>
 
 namespace cinolib
 {
