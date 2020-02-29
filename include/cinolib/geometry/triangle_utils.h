@@ -100,20 +100,6 @@ bool triangle_point_is_inside(const vec    & A,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool triangle_bary_is_vertex(const std::vector<double> & bary,
-                             uint                      & vid, // 0,1,2
-                             const double                tol = 1e-10);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool triangle_bary_is_edge(const std::vector<double> & bary,
-                           uint                      & eid, // 0,1,2 (see TRI_EDGES)
-                           const double              tol = 1e-10);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
 vec3d triangle_closest_point(const vec3d & P,
                              const vec3d & A,
                              const vec3d & B,

@@ -466,36 +466,6 @@ bool Trimesh<M,V,E,P>::poly_bary_coords(const uint pid, const vec3d & p, std::ve
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,P>::poly_bary_is_vert(const uint pid, const std::vector<double> & wgts, uint & vid, const double tol) const
-{
-    uint off;
-    if (triangle_bary_is_vertex(wgts, off, tol))
-    {
-        vid = this->poly_vert_id(pid, off);
-        return true;
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-bool Trimesh<M,V,E,P>::poly_bary_is_edge(const uint pid, const std::vector<double> & wgts, uint & eid, const double tol) const
-{
-    uint off;
-    if (triangle_bary_is_edge(wgts, off, tol))
-    {
-        eid = poly_edge_id(pid, off);
-        return true;
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 uint Trimesh<M,V,E,P>::poly_edge_id(const uint pid, const uint offset) const
 {
     uint vid0 = this->poly_vert_id(pid, TRI_EDGES[offset][0]);

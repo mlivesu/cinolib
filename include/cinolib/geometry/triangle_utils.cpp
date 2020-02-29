@@ -182,34 +182,6 @@ bool triangle_point_is_inside(const vec    & A,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-CINO_INLINE
-bool triangle_bary_is_vertex(const std::vector<double> & bary,
-                             uint                      & vid,
-                             const double                tol)
-{
-    assert(bary.size()==3);
-    if (bary[0]>tol && bary[1]<=tol && bary[2]<=tol) { vid = 0; return true; }
-    if (bary[1]>tol && bary[0]<=tol && bary[2]<=tol) { vid = 1; return true; }
-    if (bary[2]>tol && bary[0]<=tol && bary[1]<=tol) { vid = 2; return true; }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool triangle_bary_is_edge(const std::vector<double> & bary,
-                           uint                      & eid,
-                           const double                tol)
-{
-    assert(bary.size()==3);
-    if (bary[0]>tol && bary[1]>tol && bary[2]<=tol) { eid = 0; return true; }
-    if (bary[1]>tol && bary[2]>tol && bary[0]<=tol) { eid = 1; return true; }
-    if (bary[2]>tol && bary[0]>tol && bary[1]<=tol) { eid = 2; return true; }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // Given a point P and a triangle ABC, finds the point in ABC that
 // is closest to P. This code was taken directly from Ericson's
 // seminal book "Real Time Collision Detection", Section 5.1.5
