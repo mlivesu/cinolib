@@ -80,22 +80,11 @@ double triangle_law_of_sines(const double angle_0,
 
 template <class vec>
 CINO_INLINE
-bool triangle_barycentric_coords(const vec & A,
+void triangle_barycentric_coords(const vec & A,
                                  const vec & B,
                                  const vec & C,
                                  const vec & P,
-                                 std::vector<double> & wgts,
-                                 const double   tol = 1e-10);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class vec>
-CINO_INLINE
-bool triangle_point_is_inside(const vec    & A,
-                              const vec    & B,
-                              const vec    & C,
-                              const vec    & P,
-                              const double   tol = 1e-10);
+                                 double wgts[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

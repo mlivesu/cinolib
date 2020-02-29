@@ -35,7 +35,7 @@
 *********************************************************************************/
 #include <cinolib/geometry/triangle_utils.h>
 #include <cinolib/standard_elements_tables.h>
-#include <cinolib/Moller_Trumbore_intersection.h>
+#include <cinolib/min_max_inf.h>
 
 namespace cinolib
 {
@@ -136,15 +136,12 @@ double triangle_law_of_sines(const double angle_0, const double angle_1, const d
 //
 template <class vec>
 CINO_INLINE
-bool triangle_barycentric_coords(const vec & A,
+void triangle_barycentric_coords(const vec & A,
                                  const vec & B,
                                  const vec & C,
                                  const vec & P,
-                                 std::vector<double> & wgts,
-                                 const double   tol)
+                                 double wgts[])
 {
-    wgts = std::vector<double>(3, 0.0);
-
     vec    u    = B - A;
     vec    v    = C - A;
     vec    w    = P - A;
@@ -155,29 +152,17 @@ bool triangle_barycentric_coords(const vec & A,
     double d21  = w.dot(v);
     double den  = d00 * d11 - d01 * d01;
 
-    if (den==0) return false; // degenerate
+    if(den==0) // degenerate
+    {
+        wgts[0] = inf_double;
+        wgts[1] = inf_double;
+        wgts[2] = inf_double;
+        return;
+    }
 
     wgts[2] = (d00 * d21 - d01 * d20) / den; assert(!std::isnan(wgts[2]));
     wgts[1] = (d11 * d20 - d01 * d21) / den; assert(!std::isnan(wgts[1]));
     wgts[0] = 1.0f - wgts[1] - wgts[2];      assert(!std::isnan(wgts[0]));
-
-    for(double w : wgts) if (w < -tol || w > 1.0 + tol) return false; // outside
-    return true; // inside
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class vec>
-CINO_INLINE
-bool triangle_point_is_inside(const vec    & A,
-                              const vec    & B,
-                              const vec    & C,
-                              const vec    & P,
-                              const double   tol)
-{
-    // NOTE : it assumes the four points are coplanar!
-    std::vector<double> wgts;
-    return triangle_barycentric_coords(A, B, C, P, wgts, tol);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

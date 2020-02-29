@@ -454,12 +454,12 @@ int Trimesh<M,V,E,P>::edge_flip(const uint eid)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool Trimesh<M,V,E,P>::poly_bary_coords(const uint pid, const vec3d & p, std::vector<double> & wgts) const
+void Trimesh<M,V,E,P>::poly_bary_coords(const uint pid, const vec3d & p, double bc[]) const
 {
-    return triangle_barycentric_coords(this->poly_vert(pid,0),
-                                       this->poly_vert(pid,1),
-                                       this->poly_vert(pid,2),
-                                       p, wgts);
+    triangle_barycentric_coords(this->poly_vert(pid,0),
+                                this->poly_vert(pid,1),
+                                this->poly_vert(pid,2),
+                                p, bc);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

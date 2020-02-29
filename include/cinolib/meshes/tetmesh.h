@@ -118,7 +118,7 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         uint   face_edge_opposite_to(const uint fid, const uint vid) const;
         uint   face_vert_opposite_to(const uint fid, const uint eid) const;
         uint   face_split           (const uint fid, const vec3d & p);
-        uint   face_split           (const uint fid, const std::vector<double> & bary = { 1./3., 1./3., 1./3. });
+        uint   face_split           (const uint fid, const std::vector<double> & bc = { 1./3., 1./3., 1./3. });
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -129,10 +129,10 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         uint              poly_face_opposite_to(const uint pid, const uint vid) const;
         std::vector<uint> poly_faces_opposite_to(const uint pid, const uint eid) const;
         int               poly_shared_vert      (const uint pid, const std::vector<uint> & incident_edges) const; // TODO: move to global ids!!!!!!
-        bool              poly_bary_coords      (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
+        void              poly_bary_coords      (const uint pid, const vec3d & p, double bc[]) const;
         double            poly_volume           (const uint pid) const override;
         uint              poly_split            (const uint pid, const vec3d & p);
-        uint              poly_split            (const uint pid, const std::vector<double> & bary = { 0.25, 0.25, 0.25, 0.25 });
+        uint              poly_split            (const uint pid, const std::vector<double> & bc = { 0.25, 0.25, 0.25, 0.25 });
         void              polys_split           (const std::vector<uint> & pids);
         uint              poly_add              (const std::vector<uint> & vlist) override; // vertex list
 

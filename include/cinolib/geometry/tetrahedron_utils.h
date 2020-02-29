@@ -44,13 +44,12 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool tet_barycentric_coords(const vec3d & A,
+void tet_barycentric_coords(const vec3d & A,
                             const vec3d & B,
                             const vec3d & C,
                             const vec3d & D,
                             const vec3d & P,
-                            std::vector<double> & wgts,
-                            const double  tol = 1e-5);
+                            double wgts[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -64,46 +63,6 @@ vec3d tetrahedron_closest_point(const vec3d & P,
                                 const vec3d & B,
                                 const vec3d & C,
                                 const vec3d & D);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double point_to_tetrahedron_dist(const vec3d & P,
-                                 const vec3d & A,
-                                 const vec3d & B,
-                                 const vec3d & C,
-                                 const vec3d & D);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double point_to_tetrahedron_dist_sqrd(const vec3d & P,
-                                      const vec3d & A,
-                                      const vec3d & B,
-                                      const vec3d & C,
-                                      const vec3d & D);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-//CINO_INLINE
-//void tet_closest_vertex(const vec3d  & A,
-//                        const vec3d  & B,
-//                        const vec3d  & C,
-//                        const vec3d  & D,
-//                        const vec3d  & query,
-//                              uint   & id,
-//                              double & dist);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-//CINO_INLINE
-//void tet_closest_edge(const vec3d  & A,
-//                      const vec3d  & B,
-//                      const vec3d  & C,
-//                      const vec3d  & D,
-//                      const vec3d  & query,
-//                            uint   & id,
-//                            double & dist);
 }
 
 #ifndef  CINO_STATIC_LIB

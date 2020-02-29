@@ -85,7 +85,7 @@ namespace cinolib
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            virtual void barycentric_coordinates(const vec3<double> & p, std::vector<double> & bc) const = 0;
+            virtual void barycentric_coordinates(const vec3<double> & p, double bc[]) const = 0;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -124,108 +124,58 @@ vec3d tetrahedron_closest_point(const vec3d & P,
 // http://steve.hollasch.net/cgindex/geometry/ptintet.html
 //
 CINO_INLINE
-bool tet_barycentric_coords(const vec3d & A,
-                            const vec3d & B,
-                            const vec3d & C,
-                            const vec3d & D,
-                            const vec3d & P,
-                            std::vector<double> & wgts,
-                            const double  tol)
+void tet_barycentric_coords(const vec3d & t0,
+                            const vec3d & t1,
+                            const vec3d & t2,
+                            const vec3d & t3,
+                            const vec3d & p,
+                            double wgts[])
 {
-    wgts = std::vector<double>(4, 0.0);
+    Eigen::Matrix<double,4,4> m0;
+    m0(0,0) = p[0];  m0(0,1) = p[1];  m0(0,2) = p[2];  m0(0,3) = 1;
+    m0(1,0) = t1[0]; m0(1,1) = t1[1]; m0(1,2) = t1[2]; m0(1,3) = 1;
+    m0(2,0) = t2[0]; m0(2,1) = t2[1]; m0(2,2) = t2[2]; m0(2,3) = 1;
+    m0(3,0) = t3[0]; m0(3,1) = t3[1]; m0(3,2) = t3[2]; m0(3,3) = 1;
 
-    //Eigen::Matrix<double,4,4> M;
-    //M(0,0) = A[0]; M(0,1) = A[1]; M(0,2) = A[2]; M(0,3) = 1;
-    //M(1,0) = B[0]; M(1,1) = B[1]; M(1,2) = B[2]; M(1,3) = 1;
-    //M(2,0) = C[0]; M(2,1) = C[1]; M(2,2) = C[2]; M(2,3) = 1;
-    //M(3,0) = D[0]; M(3,1) = D[1]; M(3,2) = D[2]; M(3,3) = 1;
+    Eigen::Matrix<double,4,4> m1;
+    m1(0,0) = t0[0]; m1(0,1) = t0[1]; m1(0,2) = t0[2]; m1(0,3) = 1;
+    m1(1,0) = p[0];  m1(1,1) = p[1];  m1(1,2) = p[2];  m1(1,3) = 1;
+    m1(2,0) = t2[0]; m1(2,1) = t2[1]; m1(2,2) = t2[2]; m1(2,3) = 1;
+    m1(3,0) = t3[0]; m1(3,1) = t3[1]; m1(3,2) = t3[2]; m1(3,3) = 1;
 
-    Eigen::Matrix<double,4,4> M0;
-    M0(0,0) = P[0]; M0(0,1) = P[1]; M0(0,2) = P[2]; M0(0,3) = 1;
-    M0(1,0) = B[0]; M0(1,1) = B[1]; M0(1,2) = B[2]; M0(1,3) = 1;
-    M0(2,0) = C[0]; M0(2,1) = C[1]; M0(2,2) = C[2]; M0(2,3) = 1;
-    M0(3,0) = D[0]; M0(3,1) = D[1]; M0(3,2) = D[2]; M0(3,3) = 1;
+    Eigen::Matrix<double,4,4> m2;
+    m2(0,0) = t0[0]; m2(0,1) = t0[1]; m2(0,2) = t0[2]; m2(0,3) = 1;
+    m2(1,0) = t1[0]; m2(1,1) = t1[1]; m2(1,2) = t1[2]; m2(1,3) = 1;
+    m2(2,0) = p[0];  m2(2,1) = p[1];  m2(2,2) = p[2];  m2(2,3) = 1;
+    m2(3,0) = t3[0]; m2(3,1) = t3[1]; m2(3,2) = t3[2]; m2(3,3) = 1;
 
-    Eigen::Matrix<double,4,4> M1;
-    M1(0,0) = A[0]; M1(0,1) = A[1]; M1(0,2) = A[2]; M1(0,3) = 1;
-    M1(1,0) = P[0]; M1(1,1) = P[1]; M1(1,2) = P[2]; M1(1,3) = 1;
-    M1(2,0) = C[0]; M1(2,1) = C[1]; M1(2,2) = C[2]; M1(2,3) = 1;
-    M1(3,0) = D[0]; M1(3,1) = D[1]; M1(3,2) = D[2]; M1(3,3) = 1;
-
-    Eigen::Matrix<double,4,4> M2;
-    M2(0,0) = A[0]; M2(0,1) = A[1]; M2(0,2) = A[2]; M2(0,3) = 1;
-    M2(1,0) = B[0]; M2(1,1) = B[1]; M2(1,2) = B[2]; M2(1,3) = 1;
-    M2(2,0) = P[0]; M2(2,1) = P[1]; M2(2,2) = P[2]; M2(2,3) = 1;
-    M2(3,0) = D[0]; M2(3,1) = D[1]; M2(3,2) = D[2]; M2(3,3) = 1;
-
-    Eigen::Matrix<double,4,4> M3;
-    M3(0,0) = A[0]; M3(0,1) = A[1]; M3(0,2) = A[2]; M3(0,3) = 1;
-    M3(1,0) = B[0]; M3(1,1) = B[1]; M3(1,2) = B[2]; M3(1,3) = 1;
-    M3(2,0) = C[0]; M3(2,1) = C[1]; M3(2,2) = C[2]; M3(2,3) = 1;
-    M3(3,0) = P[0]; M3(3,1) = P[1]; M3(3,2) = P[2]; M3(3,3) = 1;
+    Eigen::Matrix<double,4,4> m3;
+    m3(0,0) = t0[0]; m3(0,1) = t0[1]; m3(0,2) = t0[2]; m3(0,3) = 1;
+    m3(1,0) = t1[0]; m3(1,1) = t1[1]; m3(1,2) = t1[2]; m3(1,3) = 1;
+    m3(2,0) = t2[0]; m3(2,1) = t2[1]; m3(2,2) = t2[2]; m3(2,3) = 1;
+    m3(3,0) = p[0];  m3(3,1) = p[1];  m3(3,2) = p[2];  m3(3,3) = 1;
 
     //double det_M  = M.determinant();
-    double det_M0 = M0.determinant();
-    double det_M1 = M1.determinant();
-    double det_M2 = M2.determinant();
-    double det_M3 = M3.determinant();
-    double sum    = det_M0 + det_M1 + det_M2 + det_M3;
+    double det_m0 = m0.determinant();
+    double det_m1 = m1.determinant();
+    double det_m2 = m2.determinant();
+    double det_m3 = m3.determinant();
+    double sum    = det_m0 + det_m1 + det_m2 + det_m3;
 
-    if(sum==0) return false; // degenerate
+    if(sum==0) // degenerate
+    {
+        wgts[0] = inf_double;
+        wgts[1] = inf_double;
+        wgts[2] = inf_double;
+        wgts[3] = inf_double;
+        return;
+    }
 
-    wgts[0] = det_M0/sum; assert(!std::isnan(wgts[0]));
-    wgts[1] = det_M1/sum; assert(!std::isnan(wgts[1]));
-    wgts[2] = det_M2/sum; assert(!std::isnan(wgts[2]));
-    wgts[3] = det_M3/sum; assert(!std::isnan(wgts[3]));
-
-    for(double w : wgts) if (w < -tol || w > 1.0+tol) return false; // outside
-    return true; // inside
+    wgts[0] = det_m0/sum; assert(!std::isnan(wgts[0]));
+    wgts[1] = det_m1/sum; assert(!std::isnan(wgts[1]));
+    wgts[2] = det_m2/sum; assert(!std::isnan(wgts[2]));
+    wgts[3] = det_m3/sum; assert(!std::isnan(wgts[3]));
 }
-
-
-//CINO_INLINE
-//void tet_closest_vertex(const vec3d  & A,
-//                        const vec3d  & B,
-//                        const vec3d  & C,
-//                        const vec3d  & D,
-//                        const vec3d  & query,
-//                              uint   & id,
-//                              double & dist)
-//{
-//    vec3d tet[4] = { A, B, C, D };
-
-//    std::set< std::pair<double,int> > sorted_verts;
-//    for(uint i=0; i<4; ++i)
-//    {
-//        sorted_verts.insert(std::make_pair(tet[i].dist(query),i));
-//    }
-
-//    dist = (*sorted_verts.begin()).first;
-//    id   = (*sorted_verts.begin()).second;
-//}
-
-
-//CINO_INLINE
-//void tet_closest_edge(const vec3d  & A,
-//                      const vec3d  & B,
-//                      const vec3d  & C,
-//                      const vec3d  & D,
-//                      const vec3d  & query,
-//                            uint   & id,
-//                            double & dist)
-//{
-//    vec3d tet[4] = { A, B, C, D };
-
-//    std::set< std::pair<double,uint>> sorted_segs;
-//    for(uint i=0; i<6; ++i)
-//    {
-//        Segment s(tet[TET_EDGES[i][0]], tet[TET_EDGES[i][1]]);
-//        sorted_segs.insert(std::make_pair(s.dist(query),i));
-//    }
-
-//    dist = (*sorted_segs.begin()).first;
-//    id   = (*sorted_segs.begin()).second;
-//}
 
 }
 

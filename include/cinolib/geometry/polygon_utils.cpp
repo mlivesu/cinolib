@@ -37,6 +37,7 @@
 #include <cinolib/geometry/plane.h>
 #include <cinolib/geometry/triangle_utils.h>
 #include <cinolib/Shewchuk_predicates.h>
+#include <cinolib/exact_geometric_predicates.h>
 #include <map>
 
 namespace cinolib
@@ -143,29 +144,30 @@ int polygon_find_ear(const std::vector<vec2d> & poly)
     bool ear_not_found = true;
     while(ear_not_found)
     {
-        uint prev = (curr+poly.size()-1)%poly.size();
-        uint next = (curr+1)%poly.size();
-
-        vec2d A = poly.at(prev);
-        vec2d B = poly.at(curr);
-        vec2d C = poly.at(next);
-
-        if(orient2d(A, B, C) > 0) // left turn => convex corner
+        uint  prev   = (curr+poly.size()-1)%poly.size();
+        uint  next   = (curr+1)%poly.size();
+        vec2d ear[3] =
+        {
+            poly.at(prev),
+            poly.at(curr),
+            poly.at(next)
+        };
+        if(orient2d(ear[0], ear[1], ear[2])>0) // left turn => convex corner
         {
             bool contains_other_point = false;
             for(uint j=0; j<poly.size(); ++j)
             {
-                if (j == curr || j == prev || j == next) continue;
-                if (triangle_point_is_inside(A, B, C, poly.at(j)))
+                if(j == curr || j == prev || j == next) continue;
+                if(point_in_triangle_exact(poly.at(j),ear)>=STRICTLY_INSIDE)
                 {
                     contains_other_point = true;
                 }
             }
-            if (!contains_other_point) ear_not_found = false;
+            if(!contains_other_point) ear_not_found = false;
         }
 
-        if (ear_not_found) ++curr;
-        if (curr >= poly.size()) return -1; // no ear could be found (usually means the polygon is degenerate)
+        if(ear_not_found) ++curr;
+        if(curr >= poly.size()) return -1; // no ear could be found (usually means the polygon is degenerate)
     }
     return curr;
 }

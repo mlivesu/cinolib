@@ -116,7 +116,7 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         double              poly_area          (const uint pid) const;
         bool                poly_is_cap        (const uint pid, const double angle_thresh_deg = 177.0) const;
         bool                poly_is_needle     (const uint pid, const double angle_thresh_deg = 3.0) const;
-        bool                poly_bary_coords   (const uint pid, const vec3d & p, std::vector<double> & wgts) const;
+        void                poly_bary_coords   (const uint pid, const vec3d & p, double bc[]) const;
         uint                poly_add           (const uint vid0, const uint vid1, const uint vid2);
         uint                poly_edge_id       (const uint pid, const uint offset) const;
         uint                poly_split         (const uint pid); // uses centroid as default split point

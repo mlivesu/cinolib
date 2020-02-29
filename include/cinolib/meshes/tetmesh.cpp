@@ -471,13 +471,13 @@ uint Tetmesh<M,V,E,F,P>::face_vert_opposite_to(const uint fid, const uint eid) c
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const std::vector<double> & bary)
+uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const std::vector<double> & bc)
 {
-    assert(bary.size()==3);
+    assert(bc.size()==3);
 
-    vec3d p = this->face_vert(fid,0) * bary.at(0) +
-              this->face_vert(fid,1) * bary.at(1) +
-              this->face_vert(fid,2) * bary.at(2);
+    vec3d p = this->face_vert(fid,0) * bc.at(0) +
+              this->face_vert(fid,1) * bc.at(1) +
+              this->face_vert(fid,2) * bc.at(2);
 
     return face_split(fid, p);
 }
@@ -581,13 +581,13 @@ int Tetmesh<M,V,E,F,P>::poly_shared_vert(const uint pid, const std::vector<uint>
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,P>::poly_bary_coords(const uint pid, const vec3d & p, std::vector<double> & wgts) const
+void Tetmesh<M,V,E,F,P>::poly_bary_coords(const uint pid, const vec3d & p, double bc[]) const
 {
-    return tet_barycentric_coords(this->poly_vert(pid,0),
-                                  this->poly_vert(pid,1),
-                                  this->poly_vert(pid,2),
-                                  this->poly_vert(pid,3),
-                                  p, wgts);
+    tet_barycentric_coords(this->poly_vert(pid,0),
+                           this->poly_vert(pid,1),
+                           this->poly_vert(pid,2),
+                           this->poly_vert(pid,3),
+                           p, bc);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -619,14 +619,14 @@ uint Tetmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex lis
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const std::vector<double> & bary)
+uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const std::vector<double> & bc)
 {
-    assert(bary.size()==4);
+    assert(bc.size()==4);
 
-    vec3d p = this->poly_vert(pid,0) * bary.at(0) +
-              this->poly_vert(pid,1) * bary.at(1) +
-              this->poly_vert(pid,2) * bary.at(2) +
-              this->poly_vert(pid,3) * bary.at(3);
+    vec3d p = this->poly_vert(pid,0) * bc.at(0) +
+              this->poly_vert(pid,1) * bc.at(1) +
+              this->poly_vert(pid,2) * bc.at(2) +
+              this->poly_vert(pid,3) * bc.at(3);
 
     return poly_split(pid, p);
 }

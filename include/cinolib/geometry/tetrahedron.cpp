@@ -116,9 +116,9 @@ bool Tetrahedron::intersects_ray(const vec3d & p, const vec3d & dir, double & t,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Tetrahedron::barycentric_coordinates(const vec3d &p, std::vector<double> & bc) const
+void Tetrahedron::barycentric_coordinates(const vec3d &p, double bc[]) const
 {
-    tet_barycentric_coords(v[0], v[1], v[2], v[3], p, bc, 0);
+    tet_barycentric_coords(v[0], v[1], v[2], v[3], p, bc);
 }
 
 }
