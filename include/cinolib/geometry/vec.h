@@ -37,8 +37,7 @@
 #define CINO_VEC_H
 
 #include <cinolib/cino_inline.h>
-#include <cinolib/min_max_inf.h>
-#include <array>
+#include <initializer_list>
 
 /* Base class for n dimensional points and vectors in R^d.
  * Useful also for colors, quaternions ecc..
@@ -82,14 +81,13 @@ class vec                 // d => dimension (2,3,...)
         const T        & operator[] (const uint pos)      const;
               vec<T,d>   operator+  (const vec<T,d> & v)  const;
               vec<T,d>   operator-  (const vec<T,d> & v)  const;
-              vec<T,d>   operator*  (const vec<T,d> & v)  const;
-              vec<T,d>   operator+= (const vec<T,d> & v);
-              vec<T,d>   operator-= (const vec<T,d> & v);
               vec<T,d>   operator-  ()                    const;
               vec<T,d>   operator*  (const T s)           const;
               vec<T,d>   operator/  (const T s)           const;
-              vec<T,d>   operator*= (const T s);
-              vec<T,d>   operator/= (const T s);
+              vec<T,d> & operator+= (const vec<T,d> & v);
+              vec<T,d> & operator-= (const vec<T,d> & v);
+              vec<T,d> & operator*= (const T s);
+              vec<T,d> & operator/= (const T s);
               bool       operator== (const vec<T,d> & v) const;
               bool       operator<  (const vec<T,d> & v) const;
 
@@ -150,7 +148,7 @@ class vec                 // d => dimension (2,3,...)
         bool is_null()       const;
         bool is_nan()        const;
         bool is_inf()        const;
-        bool is_degenerate() const;
+        bool is_degenerate() const; // either null, nan or inf
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
