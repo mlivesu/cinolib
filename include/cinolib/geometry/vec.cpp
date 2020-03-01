@@ -34,8 +34,6 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/geometry/vec.h>
-#include <cinolib/pi.h>
-#include <cmath>
 #include <iostream>
 #include <assert.h>
 
@@ -99,20 +97,20 @@ vec<double,3>::vec(const double v0, const double v1, const double v2)
 
 template<class T, uint d>
 CINO_INLINE
-const T & vec<T,d>::at(const uint off) const
+const T & vec<T,d>::at(const uint pos) const
 {
-    assert(off<d);
-    return val[off];
+    assert(pos<d);
+    return val[pos];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T, uint d>
 CINO_INLINE
-T & vec<T,d>::at(const uint off)
+T & vec<T,d>::at(const uint pos)
 {
-    assert(off<d);
-    return val[off];
+    assert(pos<d);
+    return val[pos];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -190,18 +188,18 @@ vec<T,d> vec<T,d>::cross(const vec<T,d> & v) const
 
 template<class T, uint d>
 CINO_INLINE
-T & vec<T,d>::operator[](const uint off)
+T & vec<T,d>::operator[](const uint pos)
 {
-    return val[off];
+    return val[pos];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T, uint d>
 CINO_INLINE
-const T & vec<T,d>::operator[](const uint off) const
+const T & vec<T,d>::operator[](const uint pos) const
 {
-    return val[off];
+    return val[pos];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

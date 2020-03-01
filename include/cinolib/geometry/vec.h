@@ -40,8 +40,8 @@
 #include <cinolib/min_max_inf.h>
 #include <array>
 
-/* Base class for n dimensional points and vectors in R^d,
- * as well as for colors, quaternions ecc.
+/* Base class for n dimensional points and vectors in R^d.
+ * Useful also for colors, quaternions ecc..
 */
 
 namespace cinolib
@@ -73,13 +73,13 @@ class vec                 // d => dimension (2,3,...)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-              T & at(const uint off);
-        const T & at(const uint off) const;
+              T & at(const uint pos);
+        const T & at(const uint pos) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-              T        & operator[] (const uint off);
-        const T        & operator[] (const uint off)      const;
+              T        & operator[] (const uint pos);
+        const T        & operator[] (const uint pos)      const;
               vec<T,d>   operator+  (const vec<T,d> & v)  const;
               vec<T,d>   operator-  (const vec<T,d> & v)  const;
               vec<T,d>   operator*  (const vec<T,d> & v)  const;
@@ -102,7 +102,7 @@ class vec                 // d => dimension (2,3,...)
         T        dot  (const vec<T,d> & v) const;
         vec<T,d> cross(const vec<T,d> & v) const;
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        // Static members for dot and cross products (whatchout the overhead!) :::
 
         static T        dot  (const vec<T,d> & v0, const vec<T,d> & v1) { return v0.dot(v1);   }
         static vec<T,d> cross(const vec<T,d> & v0, const vec<T,d> & v1) { return v0.cross(v1); }
@@ -135,15 +135,15 @@ class vec                 // d => dimension (2,3,...)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double   min_entry()                   const;
-        double   max_entry()                   const;
+        T        min_entry()                   const;
+        T        max_entry()                   const;
         vec<T,d> min      (const vec<T,d> & v) const;
         vec<T,d> max      (const vec<T,d> & v) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double angle_rad(const vec<T,d> & v) const;
-        double angle_deg(const vec<T,d> & v) const;
+        T angle_rad(const vec<T,d> & v) const;
+        T angle_deg(const vec<T,d> & v) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
