@@ -34,13 +34,10 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/geometry/vec.h>
-
-#include <cinolib/ANSI_color_codes.h>
 #include <cinolib/pi.h>
 #include <cmath>
 #include <iostream>
 #include <assert.h>
-#include <cstdarg>
 
 namespace cinolib
 {
@@ -77,6 +74,7 @@ vec<T,d>::vec(const std::initializer_list<T> & il)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// template specialization for performance speedup for ubiquitous types
 template<>
 CINO_INLINE
 vec<double,2>::vec(const double v0, const double v1)
@@ -87,6 +85,7 @@ vec<double,2>::vec(const double v0, const double v1)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// template specialization for performance speedup for ubiquitous types
 template<>
 CINO_INLINE
 vec<double,3>::vec(const double v0, const double v1, const double v2)
@@ -141,6 +140,7 @@ T vec<T,d>::dot(const vec<T,d> & v) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// template specialization for performance speedup for ubiquitous types
 template<>
 CINO_INLINE
 double vec<double,2>::dot(const vec<double,2> & v) const
@@ -151,6 +151,7 @@ double vec<double,2>::dot(const vec<double,2> & v) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// template specialization for performance speedup for ubiquitous types
 template<>
 CINO_INLINE
 double vec<double,3>::dot(const vec<double,3> & v) const
@@ -162,6 +163,7 @@ double vec<double,3>::dot(const vec<double,3> & v) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// template specialization for performance speedup for ubiquitous types
 template<>
 CINO_INLINE
 vec<double,3> vec<double,3>::cross(const vec<double,3> & v) const
