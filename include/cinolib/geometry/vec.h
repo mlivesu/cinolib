@@ -58,7 +58,7 @@ class vec                 // d => dimension (2,3,...)
         explicit vec(const T s = 0);
         explicit vec(const std::initializer_list<T> & il);
 
-        // Specialized for R^2 and R^3 :::::::::::::::::::::::::::::::::::::::::::
+        // Specialized (faster) for R^2 and R^3 ::::::::::::::::::::::::::::::::::
 
         explicit vec(const double v0, const double v1);
         explicit vec(const double v0, const double v1, const double v2);
@@ -74,6 +74,24 @@ class vec                 // d => dimension (2,3,...)
 
               T & at(const uint pos);
         const T & at(const uint pos) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        // Cartesian XYZ access
+        const T & x() const { return val.at(0); }
+              T & x()       { return val.at(0); }
+        const T & y() const { return val.at(1); }
+              T & y()       { return val.at(1); }
+        const T & z() const { return val.at(2); }
+              T & z()       { return val.at(2); }
+
+        // Parametric UVW access
+        const T & u() const { return val.at(0); }
+              T & u()       { return val.at(0); }
+        const T & v() const { return val.at(1); }
+              T & v()       { return val.at(1); }
+        const T & w() const { return val.at(2); }
+              T & w()       { return val.at(2); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -100,7 +118,7 @@ class vec                 // d => dimension (2,3,...)
         T        dot  (const vec<T,d> & v) const;
         vec<T,d> cross(const vec<T,d> & v) const;
 
-        // Static members for dot and cross products (whatchout the overhead!) :::
+        // Static members for dot and cross products (watchout the overhead!) ::::
 
         static T        dot  (const vec<T,d> & v0, const vec<T,d> & v1) { return v0.dot(v1);   }
         static vec<T,d> cross(const vec<T,d> & v0, const vec<T,d> & v1) { return v0.cross(v1); }
@@ -112,24 +130,6 @@ class vec                 // d => dimension (2,3,...)
         T dist          (const vec<T,d> & v) const;
         T dist_squared  (const vec<T,d> & v) const;
         T normalize     ();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        // Cartesian XYZ access
-        const T & x() const { return val.at(0); }
-              T & x()       { return val.at(0); }
-        const T & y() const { return val.at(1); }
-              T & y()       { return val.at(1); }
-        const T & z() const { return val.at(2); }
-              T & z()       { return val.at(2); }
-
-        // Parametric UVW access
-        const T & u() const { return val.at(0); }
-              T & u()       { return val.at(0); }
-        const T & v() const { return val.at(1); }
-              T & v()       { return val.at(1); }
-        const T & w() const { return val.at(2); }
-              T & w()       { return val.at(2); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -155,9 +155,14 @@ class vec                 // d => dimension (2,3,...)
 
 // useful types to have
 typedef vec<double,2> Vec2d;
-typedef vec<double,3> Vec3d;
+typedef vec<float,2>  Vec2f;
 typedef vec<int,2>    Vec2i;
+typedef vec<double,3> Vec3d;
+typedef vec<float,3>  Vec3f;
 typedef vec<int,3>    Vec3i;
+typedef vec<double,4> Vec4d;
+typedef vec<float,4>  Vec4f;
+typedef vec<int,4>    Vec4i;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
