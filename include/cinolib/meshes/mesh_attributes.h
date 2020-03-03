@@ -39,6 +39,7 @@
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/color.h>
 #include <string>
+#include <bitset>
 
 namespace cinolib
 {
