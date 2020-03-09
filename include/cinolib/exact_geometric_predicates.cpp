@@ -399,34 +399,35 @@ CINO_INLINE
 SimplexIntersect segment_triangle_intersect_exact(const vec2d s[],
                                                   const vec2d t[])
 {    
-    // check whether s is a sub-simplex of t
-    if((s[0]==t[0] && s[1]==t[1]) || // s coincides with t0-t1
-       (s[1]==t[0] && s[0]==t[1]) || //
-       (s[0]==t[1] && s[1]==t[2]) || // s coincides with t1-t2
-       (s[1]==t[1] && s[0]==t[2]) || //
-       (s[0]==t[2] && s[1]==t[0]) || // s coincides with t2-t0
-       (s[1]==t[2] && s[0]==t[0]) || //
-       (s[0]==s[1] && s[0]==t[0]) || // s is zero length and coincides with t0
-       (s[0]==s[1] && s[0]==t[1]) || // s is zero length and coincides with t1
-       (s[0]==s[1] && s[0]==t[2]))   // s is zero length and coincides with t2
+    if(point_in_triangle_exact(s[0],t) || point_in_triangle_exact(s[1],t)) return INTERSECT;
+
+    bool simpl_complex = false;
+
+    vec2d t01 = { t[0], t[1] };
+    switch(segment_segment_intersect_exact(s,t01))
     {
-        return SIMPLICIAL_COMPLEX;
+        case SIMPLICIAL_COMPLEX : simpl_complex = true; break;
+        case INTERSECT          : return INTERSECT;
+        case OVERLAP            : return INTERSECT;
     }
 
-    // check segment intersection
-    vec2d t01[2] = {t[0],t[1]};
-    if(segment_segment_intersect_exact(s,t01)) return INTERSECT;
-    vec2d t12[2] = {t[1],t[2]};
-    if(segment_segment_intersect_exact(s,t12)) return INTERSECT;
-    vec2d t20[2] = {t[2],t[0]};
-    if(segment_segment_intersect_exact(s,t20)) return INTERSECT;
-
-    // check for segments inside
-    if(point_in_triangle_exact(s[0],t)>=STRICTLY_INSIDE &&
-       point_in_triangle_exact(s[1],t)>=STRICTLY_INSIDE)
+    vec2d t12 = { t[1], t[2] };
+    switch(segment_segment_intersect_exact(s,t12))
     {
-        return INTERSECT;
+        case SIMPLICIAL_COMPLEX : simpl_complex = true; break;
+        case INTERSECT          : return INTERSECT;
+        case OVERLAP            : return INTERSECT;
     }
+
+    vec2d t20 = { t[2], t[0] };
+    switch(segment_segment_intersect_exact(s,t20))
+    {
+        case SIMPLICIAL_COMPLEX : simpl_complex = true; break;
+        case INTERSECT          : return INTERSECT;
+        case OVERLAP            : return INTERSECT;
+    }
+
+    if(simpl_complex) return SIMPLICIAL_COMPLEX;
     return DO_NOT_INTERSECT;
 }
 
@@ -440,54 +441,74 @@ CINO_INLINE
 SimplexIntersect segment_triangle_intersect_exact(const vec3d s[],
                                                   const vec3d t[])
 {
+    bool s0_is_t0 = s[0]==t[0];
+    bool s0_is_t1 = s[0]==t[1];
+    bool s0_is_t2 = s[0]==t[2];
+    bool s1_is_t0 = s[1]==t[0];
+    bool s1_is_t1 = s[1]==t[1];
+    bool s1_is_t2 = s[1]==t[2];
+
     // check whether s is a sub-simplex of t
-    if((s[0]==t[0] && s[1]==t[1]) || // s coincides with t0-t1
-       (s[1]==t[0] && s[0]==t[1]) || //
-       (s[0]==t[1] && s[1]==t[2]) || // s coincides with t1-t2
-       (s[1]==t[1] && s[0]==t[2]) || //
-       (s[0]==t[2] && s[1]==t[0]) || // s coincides with t2-t0
-       (s[1]==t[2] && s[0]==t[0]) || //
-       (s[0]==s[1] && s[0]==t[0]) || // s is zero length and coincides with t0
-       (s[0]==s[1] && s[0]==t[1]) || // s is zero length and coincides with t1
-       (s[0]==s[1] && s[0]==t[2]))   // s is zero length and coincides with t2
+    if((  s0_is_t0 && s1_is_t1) || // s coincides with t0-t1
+       (  s1_is_t0 && s0_is_t1) || //
+       (  s0_is_t1 && s1_is_t2) || // s coincides with t1-t2
+       (  s1_is_t1 && s0_is_t2) || //
+       (  s0_is_t2 && s1_is_t0) || // s coincides with t2-t0
+       (  s1_is_t2 && s0_is_t0) || //
+       (s[0]==s[1] && s0_is_t0) || // s is zero length and coincides with t0
+       (s[0]==s[1] && s0_is_t1) || // s is zero length and coincides with t1
+       (s[0]==s[1] && s0_is_t2))   // s is zero length and coincides with t2
     {
         return SIMPLICIAL_COMPLEX;
     }
 
-    double s0_wrt_t = orient3d(s[0],t[0],t[1],t[2]);
-    double s1_wrt_t = orient3d(s[1],t[0],t[1],t[2]);
+    // handle the cases where s and t share a common vertex
+    // s_ptr identifies the shared vertex in s (-1 : none)
+    // t_ptr identifies the edge opposite to s_ptr in t (-1: none)
+    int s_ptr = -1;
+    int t_ptr = -1;
 
-    // coplanar: s does not intersect t if they are fully disjoint in at least one 2D projection
-    if(s0_wrt_t==0 && s1_wrt_t==0)
+    if(s0_is_t0)
     {
-        vec2d s_x[2] = { vec2d(s[0],DROP_X), vec2d(s[1],DROP_X) };
-        vec2d t_x[3] = { vec2d(t[0],DROP_X), vec2d(t[1],DROP_X), vec2d(t[2],DROP_X) };
-        if(segment_triangle_intersect_exact(s_x, t_x)==DO_NOT_INTERSECT) return DO_NOT_INTERSECT;
-
-        vec2d s_y[2] = { vec2d(s[0],DROP_Y), vec2d(s[1],DROP_Y) };
-        vec2d t_y[3] = { vec2d(t[0],DROP_Y), vec2d(t[1],DROP_Y), vec2d(t[2],DROP_Y) };
-        if(segment_triangle_intersect_exact(s_y, t_y)==DO_NOT_INTERSECT) return DO_NOT_INTERSECT;
-
-        vec2d s_z[2] = { vec2d(s[0],DROP_Z), vec2d(s[1],DROP_Z) };
-        vec2d t_z[3] = { vec2d(t[0],DROP_Z), vec2d(t[1],DROP_Z), vec2d(t[2],DROP_Z) };
-        if(segment_triangle_intersect_exact(s_z, t_z)==DO_NOT_INTERSECT) return DO_NOT_INTERSECT;
-
-        return INTERSECT;
+        s_ptr = 0;
+        t_ptr = 1;
+    }
+    else if(s0_is_t1)
+    {
+        s_ptr = 0;
+        t_ptr = 2;
+    }
+    else if(s0_is_t2)
+    {
+        s_ptr = 0;
+        t_ptr = 0;
+    }
+    else if(s0_is_t0)
+    {
+        s_ptr = 1;
+        t_ptr = 1;
+    }
+    else if(s0_is_t1)
+    {
+        s_ptr = 1;
+        t_ptr = 2;
+    }
+    else if(s0_is_t2)
+    {
+        s_ptr = 1;
+        t_ptr = 0;
     }
 
-    // s strictly above/below t
-    if((s0_wrt_t>0 && s1_wrt_t>0) || (s0_wrt_t<0 && s1_wrt_t<0)) return DO_NOT_INTERSECT;
-
-    // s intersects t (border included), if the signs of the three tetrahedra
-    // obtained combining s with the three edges of t are all equal
-    double vol_s_t01 = orient3d(s[0], s[1], t[0], t[1]);
-    double vol_s_t12 = orient3d(s[0], s[1], t[1], t[2]);
-    if((vol_s_t01>0 && vol_s_t12<0) || (vol_s_t01<0 && vol_s_t12>0)) return DO_NOT_INTERSECT;
-    double vol_s_t20 = orient3d(s[0], s[1], t[2], t[0]);
-    if((vol_s_t12>0 && vol_s_t20<0) || (vol_s_t12<0 && vol_s_t20>0)) return DO_NOT_INTERSECT;
-    if((vol_s_t20>0 && vol_s_t01<0) || (vol_s_t20<0 && vol_s_t01>0)) return DO_NOT_INTERSECT;
-
-    return INTERSECT;
+    if(s_ptr>=0)
+    {
+        if(point_in_triangle_exact(s[(s_ptr+1)%2],t)>=STRICTLY_INSIDE) return INTERSECT;
+        vec3d e[2] = { t[t_ptr], t[(t_ptr+1)%3] };
+        return (segment_segment_intersect_exact(s,e)>=INTERSECT);
+    }
+    else
+    {
+        return segment_triangle_intersect_exact(s,t)==INTERSECT;
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -501,6 +522,93 @@ CINO_INLINE
 SimplexIntersect triangle_triangle_intersect_exact(const vec2d t0[],
                                                    const vec2d t1[])
 {
+    // if a point of a triangle is inside the other, the triangles overlap
+    if(point_in_triangle_exact(t0[0],t1)==STRICTLY_INSIDE ||
+       point_in_triangle_exact(t0[1],t1)==STRICTLY_INSIDE ||
+       point_in_triangle_exact(t0[2],t1)==STRICTLY_INSIDE ||
+       point_in_triangle_exact(t1[0],t0)==STRICTLY_INSIDE ||
+       point_in_triangle_exact(t1[1],t0)==STRICTLY_INSIDE ||
+       point_in_triangle_exact(t1[2],t0)==STRICTLY_INSIDE)
+    {
+        return OVERLAP;
+    }
+
+    vec2d t0e0[2] = { t0[0], t0[1] };
+    vec2d t0e1[2] = { t0[1], t0[2] };
+    vec2d t0e2[2] = { t0[2], t0[0] };
+    vec2d t1e0[2] = { t1[0], t1[1] };
+    vec2d t1e1[2] = { t1[1], t1[2] };
+    vec2d t1e2[2] = { t1[2], t1[0] };
+
+    auto t0e0_vs_t1 = segment_triangle_intersect_exact(t0e0, t1);
+    if(t0e0_vs_t1==SIMPLICIAL_COMPLEX)
+    {
+        if(segment_triangle_intersect_exact())
+    }
+
+    auto t0e1_vs_t1 = segment_triangle_intersect_exact(t0e1, t1);
+    auto t0e2_vs_t1 = segment_triangle_intersect_exact(t0e2, t1);
+
+
+    auto t0_e0_vs_t1_e0 = segment_segment_intersect_exact(t0e0,t1e0);
+    if(t0_e0_vs_t1_e0==INTERSECT) return INTERSECT;
+
+    auto t0_e0_vs_t1_e1 = segment_segment_intersect_exact(t0e0,t1e1);
+    if(t0_e0_vs_t1_e1==INTERSECT) return INTERSECT;
+
+    auto t0_e0_vs_t1_e2 = segment_segment_intersect_exact(t0e0,t1e2);
+    if(t0_e0_vs_t1_e2==INTERSECT) return INTERSECT;
+
+    auto t0_e1_vs_t1_e0 = segment_segment_intersect_exact(t0e1,t1e0);
+    if(t0_e1_vs_t1_e0==INTERSECT) return INTERSECT;
+
+    auto t0_e1_vs_t1_e1 = segment_segment_intersect_exact(t0e1,t1e1);
+    if(t0_e1_vs_t1_e1==INTERSECT) return INTERSECT;
+
+    auto t0_e1_vs_t1_e2 = segment_segment_intersect_exact(t0e1,t1e2);
+    if(t0_e1_vs_t1_e2==INTERSECT) return INTERSECT;
+
+    auto t0_e2_vs_t1_e0 = segment_segment_intersect_exact(t0e2,t1e0);
+    if(t0_e2_vs_t1_e0==INTERSECT) return INTERSECT;
+
+    auto t0_e2_vs_t1_e1 = segment_segment_intersect_exact(t0e2,t1e1);
+    if(t0_e2_vs_t1_e1==INTERSECT) return INTERSECT;
+
+    auto t0_e2_vs_t1_e2 = segment_segment_intersect_exact(t0e2,t1e2);
+    if(t0_e2_vs_t1_e2==INTERSECT) return INTERSECT;
+
+    if(t0_e0_vs_t1_e0==SIMPLICIAL_COMPLEX && ())
+
+
+    // test for point inside tris or along edges
+    int t00_wrt_t1 = point_in_triangle_exact(t0[0],t1);
+    if (t00_wrt_t1 == STRICTLY_INSIDE || t00_wrt_t1 >= ON_EDGE0) return true;
+    int t01_wrt_t1 = point_in_triangle_exact(t0[1],t1);
+    if (t01_wrt_t1 == STRICTLY_INSIDE || t01_wrt_t1 >= ON_EDGE0) return true;
+    int t02_wrt_t1 = point_in_triangle_exact(t0[2],t1);
+    if (t02_wrt_t1 == STRICTLY_INSIDE || t02_wrt_t1 >= ON_EDGE0) return true;
+    int t10_wrt_t0 = point_in_triangle_exact(t1[0],t0);
+    if (t10_wrt_t0 == STRICTLY_INSIDE || t10_wrt_t0 >= ON_EDGE0) return true;
+    int t11_wrt_t0 = point_in_triangle_exact(t1[1],t0);
+    if (t11_wrt_t0 == STRICTLY_INSIDE || t11_wrt_t0 >= ON_EDGE0) return true;
+    int t12_wrt_t0 = point_in_triangle_exact(t1[2],t0);
+    if (t12_wrt_t0 == STRICTLY_INSIDE || t12_wrt_t0 >= ON_EDGE0) return true;
+
+    // test for segment intersections
+    if(segment_segment_intersect_exact(t0e0,t1e0) ||
+       segment_segment_intersect_exact(t0e0,t1e1) ||
+       segment_segment_intersect_exact(t0e0,t1e2) ||
+       segment_segment_intersect_exact(t0e1,t1e0) ||
+       segment_segment_intersect_exact(t0e1,t1e1) ||
+       segment_segment_intersect_exact(t0e1,t1e2) ||
+       segment_segment_intersect_exact(t0e2,t1e0) ||
+       segment_segment_intersect_exact(t0e2,t1e1) ||
+       segment_segment_intersect_exact(t0e2,t1e2))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -514,6 +622,74 @@ CINO_INLINE
 SimplexIntersect triangle_triangle_intersect_exact(const vec3d t0[],
                                                    const vec3d t1[])
 {
+    // if a point of a triangle is inside the other, the triangles intersect
+    if(point_in_triangle_exact(t0[0],t1)==STRICTLY_INSIDE ||
+       point_in_triangle_exact(t0[1],t1)==STRICTLY_INSIDE ||
+       point_in_triangle_exact(t0[2],t1)==STRICTLY_INSIDE ||
+       point_in_triangle_exact(t1[0],t0)==STRICTLY_INSIDE ||
+       point_in_triangle_exact(t1[1],t0)==STRICTLY_INSIDE ||
+       point_in_triangle_exact(t1[2],t0)==STRICTLY_INSIDE)
+    {
+        // if they are coplanar, they overlap at some shared polygon
+        if(points_are_coplanar_exact(t0[0], t0[1], t0[2], t1[0]) &&
+           points_are_coplanar_exact(t0[0], t0[1], t0[2], t1[1]) &&
+           points_are_coplanar_exact(t0[0], t0[1], t0[2], t1[2]))
+        {
+            return OVERLAP;
+        }
+        return INTERSECT;
+    }
+
+
+
+
+    // check if t0 and t1 are coincident
+    if((t0[0]==t1[0] && t0[1]==t1[1] && t0[2]==t1[2]) ||
+       (t0[1]==t1[1] && t0[2]==t1[2] && t0[0]==t1[0]) ||
+       (t0[2]==t1[2] && t0[0]==t1[0] && t0[1]==t1[1]) ||
+       (t0[2]==t1[2] && t0[1]==t1[1] && t0[0]==t1[0]) ||
+       (t0[0]==t1[0] && t0[2]==t1[2] && t0[1]==t1[1]) ||
+       (t0[1]==t1[1] && t0[0]==t1[0] && t0[2]==t1[2]))
+    {
+        return false;
+    }
+
+    // test for point inside tris or along edges
+    int t00_wrt_t1 = point_in_triangle_exact(t0[0],t1);
+    if (t00_wrt_t1 == STRICTLY_INSIDE || t00_wrt_t1 >= ON_EDGE0) return true;
+    int t01_wrt_t1 = point_in_triangle_exact(t0[1],t1);
+    if (t01_wrt_t1 == STRICTLY_INSIDE || t01_wrt_t1 >= ON_EDGE0) return true;
+    int t02_wrt_t1 = point_in_triangle_exact(t0[2],t1);
+    if (t02_wrt_t1 == STRICTLY_INSIDE || t02_wrt_t1 >= ON_EDGE0) return true;
+    int t10_wrt_t0 = point_in_triangle_exact(t1[0],t0);
+    if (t10_wrt_t0 == STRICTLY_INSIDE || t10_wrt_t0 >= ON_EDGE0) return true;
+    int t11_wrt_t0 = point_in_triangle_exact(t1[1],t0);
+    if (t11_wrt_t0 == STRICTLY_INSIDE || t11_wrt_t0 >= ON_EDGE0) return true;
+    int t12_wrt_t0 = point_in_triangle_exact(t1[2],t0);
+    if (t12_wrt_t0 == STRICTLY_INSIDE || t12_wrt_t0 >= ON_EDGE0) return true;
+
+    vec3d s00[2] = { t0[0], t0[1] };
+    vec3d s01[2] = { t0[1], t0[2] };
+    vec3d s02[2] = { t0[2], t0[0] };
+    vec3d s10[2] = { t1[0], t1[1] };
+    vec3d s11[2] = { t1[1], t1[2] };
+    vec3d s12[2] = { t1[2], t1[0] };
+
+    // test for segment intersections
+    if(segment_segment_intersect_exact(s00,s10) ||
+       segment_segment_intersect_exact(s00,s11) ||
+       segment_segment_intersect_exact(s00,s12) ||
+       segment_segment_intersect_exact(s01,s10) ||
+       segment_segment_intersect_exact(s01,s11) ||
+       segment_segment_intersect_exact(s01,s12) ||
+       segment_segment_intersect_exact(s02,s10) ||
+       segment_segment_intersect_exact(s02,s11) ||
+       segment_segment_intersect_exact(s02,s12))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 }
