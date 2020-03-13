@@ -513,53 +513,105 @@ CINO_INLINE
 SimplexIntersect triangle_triangle_intersect_exact(const vec2d t0[],
                                                    const vec2d t1[])
 {
-    // check if t0 and t1 are coincident
-    if((t0[0]==t1[0] && t0[1]==t1[1] && t0[2]==t1[2]) ||
-       (t0[1]==t1[1] && t0[2]==t1[2] && t0[0]==t1[0]) ||
-       (t0[2]==t1[2] && t0[0]==t1[0] && t0[1]==t1[1]) ||
-       (t0[2]==t1[2] && t0[1]==t1[1] && t0[0]==t1[0]) ||
-       (t0[0]==t1[0] && t0[2]==t1[2] && t0[1]==t1[1]) ||
-       (t0[1]==t1[1] && t0[0]==t1[0] && t0[2]==t1[2]))
+    // binary flags to mark coincident vertices in t0 and t1
+    std::bitset<3> t0_shared = { false, false, false };
+    std::bitset<3> t1_shared = { false, false, false };
+
+    // find vert correspondences
+    if(t0[0]==t1[0]) { t0_shared[0] = true; t1_shared[0] = true; }
+    if(t0[0]==t1[1]) { t0_shared[0] = true; t1_shared[1] = true; }
+    if(t0[0]==t1[2]) { t0_shared[0] = true; t1_shared[2] = true; }
+    if(t0[1]==t1[0]) { t0_shared[1] = true; t1_shared[0] = true; }
+    if(t0[1]==t1[1]) { t0_shared[1] = true; t1_shared[1] = true; }
+    if(t0[1]==t1[2]) { t0_shared[1] = true; t1_shared[2] = true; }
+    if(t0[2]==t1[0]) { t0_shared[2] = true; t1_shared[0] = true; }
+    if(t0[2]==t1[1]) { t0_shared[2] = true; t1_shared[1] = true; }
+    if(t0[2]==t1[2]) { t0_shared[2] = true; t1_shared[2] = true; }
+
+    // count number of coincident vertices in t0 and t1
+    uint t0_count = t0_shared.count();
+    uint t1_count = t1_shared.count();
+
+    // either t0 and t1 are coincident or one of the two triangles
+    // is degenerate and is an edge/vertex of the other
+    if(t0_count==3 || t1_count==3) return SIMPLICIAL_COMPLEX;
+
+    // t0 and t1 share an edge. Let e be the shared edge and { opp0, opp1 } be the two vertices opposite to
+    // e in t0 and t1, respectively. If opp0 and opp1 lie at the same side of e, the two triangles overlap.
+    // Otherwise they are edge-adjacent and form a valid simplicial complex
+    //
+    if(t0_count==2 && t1_count==2)
     {
-        return false;
+        uint e[2];      // indices of the shared vertices (in t0)
+        uint count = 0; // index for e (to fill it)
+        uint opp0  = 0; // index of the vertex opposite to e in t0
+        uint opp1  = 0; // index of the vertex opposite to e in t1
+        for(uint i=0; i<3; ++i)
+        {
+            if(!t0_shared[i]) opp0 = i; else e[count++] = i;
+            if(!t1_shared[i]) opp1 = i;
+        }
+
+        double opp0_wrt_e = orient2d(t0[e[0]], t0[e[1]], t0[opp0]);
+        double opp1_wrt_e = orient2d(t0[e[0]], t0[e[1]], t1[opp1]);
+
+        if((opp0_wrt_e>0 && opp1_wrt_e<0) ||
+           (opp0_wrt_e<0 && opp1_wrt_e>0))
+        {
+            return SIMPLICIAL_COMPLEX;
+        }
+        return OVERLAP;
+    }
+    /* TODO: if only one count is 2, then one triangle may be an edge, and segment triangle intersection must be checked... */
+
+
+    // t0 and t1 share a vertex. Let v be the shared vertex and { opp0 , opp1 } be the two edges opposite to
+    // v in t0 and t1, respectively. If v-opp0 intersects t1, or v-opp1 interects t0, the two triangles overlap.
+    // Otherwise they are verte-adjacent and form a valid simplicial complex
+    if(t0_count==1 && t1_count==1)
+    {
+        uint v0; // index of the shared vertex in t0
+        uint v1; // index of the shared vertex in t1
+        for(uint i=0; i<3; ++i)
+        {
+            if(t0_shared[i]) v0 = i;
+            if(t1_shared[i]) v1 = i;
+        }
+
+        // check for intersection with t0 and t1 edges emanating from v1 and v0, respectively
+        vec2d e_v0_0[] = { t0[v0], t0[(v0+1)%3] };
+        vec2d e_v0_1[] = { t0[v0], t0[(v0+1)%3] };
+        vec2d e_v1_0[] = { t1[v1], t1[(v1+1)%3] };
+        vec2d e_v1_1[] = { t1[v1], t1[(v1+1)%3] };
+        if(segment_triangle_intersect_exact(e_v0_0, t1)==INTERSECT ||
+           segment_triangle_intersect_exact(e_v0_1, t1)==INTERSECT ||
+           segment_triangle_intersect_exact(e_v1_0, t0)==INTERSECT ||
+           segment_triangle_intersect_exact(e_v1_1, t0)==INTERSECT)
+        {
+            return OVERLAP;
+        }
+        return SIMPLICIAL_COMPLEX;
     }
 
-    // test for point inside tris or along edges
-    int t00_wrt_t1 = point_in_triangle_exact(t0[0],t1);
-    if (t00_wrt_t1 == STRICTLY_INSIDE || t00_wrt_t1 >= ON_EDGE0) return true;
-    int t01_wrt_t1 = point_in_triangle_exact(t0[1],t1);
-    if (t01_wrt_t1 == STRICTLY_INSIDE || t01_wrt_t1 >= ON_EDGE0) return true;
-    int t02_wrt_t1 = point_in_triangle_exact(t0[2],t1);
-    if (t02_wrt_t1 == STRICTLY_INSIDE || t02_wrt_t1 >= ON_EDGE0) return true;
-    int t10_wrt_t0 = point_in_triangle_exact(t1[0],t0);
-    if (t10_wrt_t0 == STRICTLY_INSIDE || t10_wrt_t0 >= ON_EDGE0) return true;
-    int t11_wrt_t0 = point_in_triangle_exact(t1[1],t0);
-    if (t11_wrt_t0 == STRICTLY_INSIDE || t11_wrt_t0 >= ON_EDGE0) return true;
-    int t12_wrt_t0 = point_in_triangle_exact(t1[2],t0);
-    if (t12_wrt_t0 == STRICTLY_INSIDE || t12_wrt_t0 >= ON_EDGE0) return true;
-
-    vec2d s00[2] = { t0[0], t0[1] };
-    vec2d s01[2] = { t0[1], t0[2] };
-    vec2d s02[2] = { t0[2], t0[0] };
-    vec2d s10[2] = { t1[0], t1[1] };
-    vec2d s11[2] = { t1[1], t1[2] };
-    vec2d s12[2] = { t1[2], t1[0] };
-
-    // test for segment intersections
-    if(segment_segment_intersect_exact(s00,s10) ||
-       segment_segment_intersect_exact(s00,s11) ||
-       segment_segment_intersect_exact(s00,s12) ||
-       segment_segment_intersect_exact(s01,s10) ||
-       segment_segment_intersect_exact(s01,s11) ||
-       segment_segment_intersect_exact(s01,s12) ||
-       segment_segment_intersect_exact(s02,s10) ||
-       segment_segment_intersect_exact(s02,s11) ||
-       segment_segment_intersect_exact(s02,s12))
+    // t0 and t1 do not share sub-simplices. They can be fully disjoint, intersecting at a single point, or overlapping
+    vec2d t00[2] = { t0[0], t0[1] };
+    vec2d t01[2] = { t0[1], t0[2] };
+    vec2d t02[2] = { t0[2], t0[0] };
+    vec2d t10[2] = { t1[0], t1[1] };
+    vec2d t11[2] = { t1[1], t1[2] };
+    vec2d t12[2] = { t1[2], t1[0] };
+    if(segment_segment_intersect_exact(t00,t10) ||
+       segment_segment_intersect_exact(t00,t11) ||
+       segment_segment_intersect_exact(t00,t12) ||
+       segment_segment_intersect_exact(t01,t10) ||
+       segment_segment_intersect_exact(t01,t11) ||
+       segment_segment_intersect_exact(t01,t12) ||
+       segment_segment_intersect_exact(t02,t10) ||
+       segment_segment_intersect_exact(t02,t11) ||
+       segment_segment_intersect_exact(t02,t12))
     {
-        return true;
+        return OVERLAP;
     }
-
-    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -573,53 +625,53 @@ CINO_INLINE
 SimplexIntersect triangle_triangle_intersect_exact(const vec3d t0[],
                                                    const vec3d t1[])
 {
-    // check if t0 and t1 are coincident
-    if((t0[0]==t1[0] && t0[1]==t1[1] && t0[2]==t1[2]) ||
-       (t0[1]==t1[1] && t0[2]==t1[2] && t0[0]==t1[0]) ||
-       (t0[2]==t1[2] && t0[0]==t1[0] && t0[1]==t1[1]) ||
-       (t0[2]==t1[2] && t0[1]==t1[1] && t0[0]==t1[0]) ||
-       (t0[0]==t1[0] && t0[2]==t1[2] && t0[1]==t1[1]) ||
-       (t0[1]==t1[1] && t0[0]==t1[0] && t0[2]==t1[2]))
-    {
-        return false;
-    }
+//    // check if t0 and t1 are coincident
+//    if((t0[0]==t1[0] && t0[1]==t1[1] && t0[2]==t1[2]) ||
+//       (t0[1]==t1[1] && t0[2]==t1[2] && t0[0]==t1[0]) ||
+//       (t0[2]==t1[2] && t0[0]==t1[0] && t0[1]==t1[1]) ||
+//       (t0[2]==t1[2] && t0[1]==t1[1] && t0[0]==t1[0]) ||
+//       (t0[0]==t1[0] && t0[2]==t1[2] && t0[1]==t1[1]) ||
+//       (t0[1]==t1[1] && t0[0]==t1[0] && t0[2]==t1[2]))
+//    {
+//        return false;
+//    }
 
-    // test for point inside tris or along edges
-    int t00_wrt_t1 = point_in_triangle_exact(t0[0],t1);
-    if (t00_wrt_t1 == STRICTLY_INSIDE || t00_wrt_t1 >= ON_EDGE0) return true;
-    int t01_wrt_t1 = point_in_triangle_exact(t0[1],t1);
-    if (t01_wrt_t1 == STRICTLY_INSIDE || t01_wrt_t1 >= ON_EDGE0) return true;
-    int t02_wrt_t1 = point_in_triangle_exact(t0[2],t1);
-    if (t02_wrt_t1 == STRICTLY_INSIDE || t02_wrt_t1 >= ON_EDGE0) return true;
-    int t10_wrt_t0 = point_in_triangle_exact(t1[0],t0);
-    if (t10_wrt_t0 == STRICTLY_INSIDE || t10_wrt_t0 >= ON_EDGE0) return true;
-    int t11_wrt_t0 = point_in_triangle_exact(t1[1],t0);
-    if (t11_wrt_t0 == STRICTLY_INSIDE || t11_wrt_t0 >= ON_EDGE0) return true;
-    int t12_wrt_t0 = point_in_triangle_exact(t1[2],t0);
-    if (t12_wrt_t0 == STRICTLY_INSIDE || t12_wrt_t0 >= ON_EDGE0) return true;
+//    // test for point inside tris or along edges
+//    int t00_wrt_t1 = point_in_triangle_exact(t0[0],t1);
+//    if (t00_wrt_t1 == STRICTLY_INSIDE || t00_wrt_t1 >= ON_EDGE0) return true;
+//    int t01_wrt_t1 = point_in_triangle_exact(t0[1],t1);
+//    if (t01_wrt_t1 == STRICTLY_INSIDE || t01_wrt_t1 >= ON_EDGE0) return true;
+//    int t02_wrt_t1 = point_in_triangle_exact(t0[2],t1);
+//    if (t02_wrt_t1 == STRICTLY_INSIDE || t02_wrt_t1 >= ON_EDGE0) return true;
+//    int t10_wrt_t0 = point_in_triangle_exact(t1[0],t0);
+//    if (t10_wrt_t0 == STRICTLY_INSIDE || t10_wrt_t0 >= ON_EDGE0) return true;
+//    int t11_wrt_t0 = point_in_triangle_exact(t1[1],t0);
+//    if (t11_wrt_t0 == STRICTLY_INSIDE || t11_wrt_t0 >= ON_EDGE0) return true;
+//    int t12_wrt_t0 = point_in_triangle_exact(t1[2],t0);
+//    if (t12_wrt_t0 == STRICTLY_INSIDE || t12_wrt_t0 >= ON_EDGE0) return true;
 
-    vec3d s00[2] = { t0[0], t0[1] };
-    vec3d s01[2] = { t0[1], t0[2] };
-    vec3d s02[2] = { t0[2], t0[0] };
-    vec3d s10[2] = { t1[0], t1[1] };
-    vec3d s11[2] = { t1[1], t1[2] };
-    vec3d s12[2] = { t1[2], t1[0] };
+//    vec3d s00[2] = { t0[0], t0[1] };
+//    vec3d s01[2] = { t0[1], t0[2] };
+//    vec3d s02[2] = { t0[2], t0[0] };
+//    vec3d s10[2] = { t1[0], t1[1] };
+//    vec3d s11[2] = { t1[1], t1[2] };
+//    vec3d s12[2] = { t1[2], t1[0] };
 
-    // test for segment intersections
-    if(segment_segment_intersect_exact(s00,s10) ||
-       segment_segment_intersect_exact(s00,s11) ||
-       segment_segment_intersect_exact(s00,s12) ||
-       segment_segment_intersect_exact(s01,s10) ||
-       segment_segment_intersect_exact(s01,s11) ||
-       segment_segment_intersect_exact(s01,s12) ||
-       segment_segment_intersect_exact(s02,s10) ||
-       segment_segment_intersect_exact(s02,s11) ||
-       segment_segment_intersect_exact(s02,s12))
-    {
-        return true;
-    }
+//    // test for segment intersections
+//    if(segment_segment_intersect_exact(s00,s10) ||
+//       segment_segment_intersect_exact(s00,s11) ||
+//       segment_segment_intersect_exact(s00,s12) ||
+//       segment_segment_intersect_exact(s01,s10) ||
+//       segment_segment_intersect_exact(s01,s11) ||
+//       segment_segment_intersect_exact(s01,s12) ||
+//       segment_segment_intersect_exact(s02,s10) ||
+//       segment_segment_intersect_exact(s02,s11) ||
+//       segment_segment_intersect_exact(s02,s12))
+//    {
+//        return true;
+//    }
 
-    return false;
+//    return false;
 }
 
 }

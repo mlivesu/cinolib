@@ -249,6 +249,26 @@ CINO_INLINE
 SimplexIntersect triangle_triangle_intersect_exact(const vec3d t0[],
                                                    const vec3d t1[]);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns true if s[0]==s[1]
+template<typename vec>
+CINO_INLINE
+bool segment_is_degenerate_exact(const vec s[]);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns true if t[0], t[1] and t[2] are colinear
+template<typename vec>
+CINO_INLINE
+bool triangle_is_degenerate_exact(const vec t[]);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns true if t[0], t[1], t[2] and t32] are coplanar
+CINO_INLINE
+bool tet_is_degenerate_exact(const vec3d t[]);
+
 }
 
 #ifndef  CINO_STATIC_LIB
