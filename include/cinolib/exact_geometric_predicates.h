@@ -233,7 +233,6 @@ SimplexIntersect segment_triangle_intersect_exact(const vec3d s[],
 // DO_NOT_INTERSECT     if triangles are fully disjoint
 // SIMPLICIAL_COMPLEX   if triangles coincide or intersect at a shared sub-simplex
 // INTERSECT            if triangles intersect without making a valid simplcial complex
-// OVERLAP              if triangles partially overlap
 CINO_INLINE
 SimplexIntersect triangle_triangle_intersect_exact(const vec2d t0[],
                                                    const vec2d t1[]);
@@ -244,7 +243,6 @@ SimplexIntersect triangle_triangle_intersect_exact(const vec2d t0[],
 // DO_NOT_INTERSECT     if triangles are fully disjoint
 // SIMPLICIAL_COMPLEX   if triangles coincide or intersect at a shared sub-simplex
 // INTERSECT            if triangles intersect without making a valid simplcial complex
-// OVERLAP              if triangles partially overlap
 CINO_INLINE
 SimplexIntersect triangle_triangle_intersect_exact(const vec3d t0[],
                                                    const vec3d t1[]);
