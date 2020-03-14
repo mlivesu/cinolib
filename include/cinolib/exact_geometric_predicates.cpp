@@ -513,8 +513,8 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec2d t0[],
                                                       const vec2d t1[])
 {
     // binary flags to mark coincident vertices in t0 and t1
-    std::bitset<3> t0_shared = { false, false, false };
-    std::bitset<3> t1_shared = { false, false, false };
+    std::bitset<3> t0_shared = { 0b000 };
+    std::bitset<3> t1_shared = { 0b000 };
 
     // find vert correspondences
     if(t0[0]==t1[0]) { t0_shared[0] = true; t1_shared[0] = true; }
@@ -631,8 +631,8 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
                                                       const vec3d t1[])
 {
     // binary flags to mark coincident vertices in t0 and t1
-    std::bitset<3> t0_shared = { false, false, false };
-    std::bitset<3> t1_shared = { false, false, false };
+    std::bitset<3> t0_shared = { 0b000 };
+    std::bitset<3> t1_shared = { 0b000 };
 
     // find vert correspondences
     if(t0[0]==t1[0]) { t0_shared[0] = true; t1_shared[0] = true; }
@@ -668,10 +668,30 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
             if(!t1_shared[i]) opp1 = i;
         }
 
-        double opp0_wrt_e = orient2d(t0[e[0]], t0[e[1]], t0[opp0]);
-        double opp1_wrt_e = orient2d(t0[e[0]], t0[e[1]], t1[opp1]);
-
+        vec2d e0_x   = vec2d(t0[e[0]],DROP_X);
+        vec2d e1_x   = vec2d(t0[e[1]],DROP_X);
+        vec2d opp0_x = vec2d(t0[opp0],DROP_X);
+        vec2d opp1_x = vec2d(t0[opp1],DROP_X);
+        double opp0_wrt_e = orient2d(e0_x, e1_x, opp0_x);
+        double opp1_wrt_e = orient2d(e0_x, e1_x, opp1_x);
         if((opp0_wrt_e>0 && opp1_wrt_e<0) || (opp0_wrt_e<0 && opp1_wrt_e>0)) return SIMPLICIAL_COMPLEX;
+
+        vec2d e0_y   = vec2d(t0[e[0]],DROP_Y);
+        vec2d e1_y   = vec2d(t0[e[1]],DROP_Y);
+        vec2d opp0_y = vec2d(t0[opp0],DROP_Y);
+        vec2d opp1_y = vec2d(t0[opp1],DROP_Y);
+        opp0_wrt_e = orient2d(e0_y, e1_y, opp0_y);
+        opp1_wrt_e = orient2d(e0_y, e1_y, opp1_y);
+        if((opp0_wrt_e>0 && opp1_wrt_e<0) || (opp0_wrt_e<0 && opp1_wrt_e>0)) return SIMPLICIAL_COMPLEX;
+
+        vec2d e0_z   = vec2d(t0[e[0]],DROP_Z);
+        vec2d e1_z   = vec2d(t0[e[1]],DROP_Z);
+        vec2d opp0_z = vec2d(t0[opp0],DROP_Z);
+        vec2d opp1_z = vec2d(t0[opp1],DROP_Z);
+        opp0_wrt_e = orient2d(e0_z, e1_z, opp0_z);
+        opp1_wrt_e = orient2d(e0_z, e1_z, opp1_z);
+        if((opp0_wrt_e>0 && opp1_wrt_e<0) || (opp0_wrt_e<0 && opp1_wrt_e>0)) return SIMPLICIAL_COMPLEX;
+
         return INTERSECT;
     }
 
@@ -689,10 +709,10 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
         }
 
         // check for intersection with t0 and t1 edges emanating from v1 and v0, respectively
-        vec2d e_v0_0[] = { t0[v0], t0[(v0+1)%3] };
-        vec2d e_v0_1[] = { t0[v0], t0[(v0+1)%3] };
-        vec2d e_v1_0[] = { t1[v1], t1[(v1+1)%3] };
-        vec2d e_v1_1[] = { t1[v1], t1[(v1+1)%3] };
+        vec3d e_v0_0[] = { t0[v0], t0[(v0+1)%3] };
+        vec3d e_v0_1[] = { t0[v0], t0[(v0+1)%3] };
+        vec3d e_v1_0[] = { t1[v1], t1[(v1+1)%3] };
+        vec3d e_v1_1[] = { t1[v1], t1[(v1+1)%3] };
         if(segment_triangle_intersect_exact(e_v0_0, t1)==INTERSECT ||
            segment_triangle_intersect_exact(e_v0_1, t1)==INTERSECT ||
            segment_triangle_intersect_exact(e_v1_0, t0)==INTERSECT ||
@@ -705,12 +725,12 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
 
     // t0 and t1 do not share sub-simplices. They can be fully disjoint, intersecting at a single point, or overlapping
 
-    vec2d t00[2] = { t0[0], t0[1] };
-    vec2d t01[2] = { t0[1], t0[2] };
-    vec2d t02[2] = { t0[2], t0[0] };
-    vec2d t10[2] = { t1[0], t1[1] };
-    vec2d t11[2] = { t1[1], t1[2] };
-    vec2d t12[2] = { t1[2], t1[0] };
+    vec3d t00[2] = { t0[0], t0[1] };
+    vec3d t01[2] = { t0[1], t0[2] };
+    vec3d t02[2] = { t0[2], t0[0] };
+    vec3d t10[2] = { t1[0], t1[1] };
+    vec3d t11[2] = { t1[1], t1[2] };
+    vec3d t12[2] = { t1[2], t1[0] };
 
     if(segment_segment_intersect_exact(t00,t10)>=INTERSECT ||
        segment_segment_intersect_exact(t00,t11)>=INTERSECT ||

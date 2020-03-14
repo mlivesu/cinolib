@@ -170,8 +170,8 @@ class Octree
 
         // EXACT QUERIES: based on exact geometric predicates //
         bool contains_exact           (const vec3d & p,   std::unordered_set<uint> & ids, const bool strict) const;
-        bool intersects_segment_exact (const vec3d   s[], std::unordered_set<uint> & ids) const;
-        bool intersects_triangle_exact(const vec3d   t[], std::unordered_set<uint> & ids) const;
+        bool intersects_segment_exact (const vec3d   s[], std::unordered_set<uint> & ids, const bool ignore_if_valid_complex) const;
+        bool intersects_triangle_exact(const vec3d   t[], std::unordered_set<uint> & ids, const bool ignore_if_valid_complex) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

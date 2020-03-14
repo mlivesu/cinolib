@@ -66,7 +66,7 @@ vec3d Triangle::point_closest_to(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Triangle::contains_exact(const vec3d & p, bool strict) const
+bool Triangle::contains_exact(const vec3d & p, const bool strict) const
 {
     int where = point_in_triangle_exact(p,v);
     if(strict) return (where==STRICTLY_INSIDE);
@@ -76,17 +76,21 @@ bool Triangle::contains_exact(const vec3d & p, bool strict) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Triangle::intersects_segment_exact(const vec3d s[]) const
+bool Triangle::intersects_segment_exact(const vec3d s[], const bool ignore_if_valid_complex) const
 {
-    return segment_triangle_intersect_exact(v,s);
+    auto res = segment_triangle_intersect_exact(v,s);
+    if(ignore_if_valid_complex) return (res > SIMPLICIAL_COMPLEX);
+    return (res>=SIMPLICIAL_COMPLEX);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Triangle::intersects_triangle_exact(const vec3d t[]) const
+bool Triangle::intersects_triangle_exact(const vec3d t[], const bool ignore_if_valid_complex) const
 {
-    return triangle_triangle_intersect_exact(v,t);
+    auto res = triangle_triangle_intersect_exact(v,t);
+    if(ignore_if_valid_complex) return (res > SIMPLICIAL_COMPLEX);
+    return (res>=SIMPLICIAL_COMPLEX);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

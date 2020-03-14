@@ -64,9 +64,9 @@ class Tetrahedron : public SpatialDataStructureItem
         vec3d    point_closest_to         (const vec3d & p) const override;
         bool     intersects_ray           (const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const override;
         void     barycentric_coordinates  (const vec3d & p, double bc[]) const override;
-        bool     contains_exact           (const vec3d & p, bool strict) const override;
-        bool     intersects_segment_exact (const vec3d   s[]) const override;
-        bool     intersects_triangle_exact(const vec3d   t[]) const override;
+        bool     contains_exact           (const vec3d & p, const bool strict) const override;
+        bool     intersects_segment_exact (const vec3d   s[], const bool ignore_if_valid_complex) const override;
+        bool     intersects_triangle_exact(const vec3d   t[], const bool ignore_if_valid_complex) const override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

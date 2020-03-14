@@ -501,7 +501,7 @@ bool Octree::contains_exact(const vec3d & p, std::unordered_set<uint> & ids, con
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Octree::intersects_triangle_exact(const vec3d t[], std::unordered_set<uint> & ids) const
+bool Octree::intersects_triangle_exact(const vec3d t[], std::unordered_set<uint> & ids, const bool ignore_if_valid_complex) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
@@ -540,7 +540,7 @@ bool Octree::intersects_triangle_exact(const vec3d t[], std::unordered_set<uint>
             for(uint i : node->item_indices)
             {
                 if(print_debug_info) ++item_queries;
-                if(items.at(i)->intersects_triangle_exact(t))
+                if(items.at(i)->intersects_triangle_exact(t, ignore_if_valid_complex))
                 {
                     ids.insert(items.at(i)->id);
                 }
@@ -560,7 +560,7 @@ bool Octree::intersects_triangle_exact(const vec3d t[], std::unordered_set<uint>
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Octree::intersects_segment_exact(const vec3d s[], std::unordered_set<uint> & ids) const
+bool Octree::intersects_segment_exact(const vec3d s[], std::unordered_set<uint> & ids, const bool ignore_if_valid_complex) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
@@ -597,7 +597,7 @@ bool Octree::intersects_segment_exact(const vec3d s[], std::unordered_set<uint> 
             for(uint i : node->item_indices)
             {
                 if(print_debug_info) ++item_queries;
-                if(items.at(i)->intersects_segment_exact(s))
+                if(items.at(i)->intersects_segment_exact(s, ignore_if_valid_complex))
                 {
                     ids.insert(items.at(i)->id);
                 }

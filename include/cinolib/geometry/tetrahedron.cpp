@@ -65,7 +65,7 @@ vec3d Tetrahedron::point_closest_to(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Tetrahedron::contains_exact(const vec3d & p, bool strict) const
+bool Tetrahedron::contains_exact(const vec3d & p, const bool strict) const
 {
     int where = point_in_tet_exact(p,v);
     if(strict) return (where==STRICTLY_INSIDE);
@@ -75,7 +75,7 @@ bool Tetrahedron::contains_exact(const vec3d & p, bool strict) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Tetrahedron::intersects_segment_exact(const vec3d []) const
+bool Tetrahedron::intersects_segment_exact(const vec3d [], const bool) const
 {
     assert(false && "TODO!");
     return false;
@@ -84,7 +84,7 @@ bool Tetrahedron::intersects_segment_exact(const vec3d []) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Tetrahedron::intersects_triangle_exact(const vec3d []) const
+bool Tetrahedron::intersects_triangle_exact(const vec3d [], const bool) const
 {
     assert(false && "TODO!");
     return false;
