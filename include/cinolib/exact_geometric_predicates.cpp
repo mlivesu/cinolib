@@ -399,7 +399,11 @@ CINO_INLINE
 SimplexIntersection segment_triangle_intersect_exact(const vec2d s[],
                                                      const vec2d t[])
 {    
-    if(point_in_triangle_exact(s[0],t) || point_in_triangle_exact(s[1],t)) return INTERSECT;
+    if(point_in_triangle_exact(s[0],t)>=STRICTLY_INSIDE ||
+       point_in_triangle_exact(s[1],t)>=STRICTLY_INSIDE)
+    {
+        return INTERSECT;
+    }
 
     bool simpl_complex = false;
 
@@ -572,9 +576,9 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec2d t0[],
 
         // check for intersection with t0 and t1 edges emanating from v1 and v0, respectively
         vec2d e_v0_0[] = { t0[v0], t0[(v0+1)%3] };
-        vec2d e_v0_1[] = { t0[v0], t0[(v0+1)%3] };
+        vec2d e_v0_1[] = { t0[v0], t0[(v0+2)%3] };
         vec2d e_v1_0[] = { t1[v1], t1[(v1+1)%3] };
-        vec2d e_v1_1[] = { t1[v1], t1[(v1+1)%3] };
+        vec2d e_v1_1[] = { t1[v1], t1[(v1+2)%3] };
         if(segment_triangle_intersect_exact(e_v0_0, t1)==INTERSECT ||
            segment_triangle_intersect_exact(e_v0_1, t1)==INTERSECT ||
            segment_triangle_intersect_exact(e_v1_0, t0)==INTERSECT ||
@@ -671,7 +675,7 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
         vec2d e0_x   = vec2d(t0[e[0]],DROP_X);
         vec2d e1_x   = vec2d(t0[e[1]],DROP_X);
         vec2d opp0_x = vec2d(t0[opp0],DROP_X);
-        vec2d opp1_x = vec2d(t0[opp1],DROP_X);
+        vec2d opp1_x = vec2d(t1[opp1],DROP_X);
         double opp0_wrt_e = orient2d(e0_x, e1_x, opp0_x);
         double opp1_wrt_e = orient2d(e0_x, e1_x, opp1_x);
         if((opp0_wrt_e>0 && opp1_wrt_e<0) || (opp0_wrt_e<0 && opp1_wrt_e>0)) return SIMPLICIAL_COMPLEX;
@@ -679,7 +683,7 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
         vec2d e0_y   = vec2d(t0[e[0]],DROP_Y);
         vec2d e1_y   = vec2d(t0[e[1]],DROP_Y);
         vec2d opp0_y = vec2d(t0[opp0],DROP_Y);
-        vec2d opp1_y = vec2d(t0[opp1],DROP_Y);
+        vec2d opp1_y = vec2d(t1[opp1],DROP_Y);
         opp0_wrt_e = orient2d(e0_y, e1_y, opp0_y);
         opp1_wrt_e = orient2d(e0_y, e1_y, opp1_y);
         if((opp0_wrt_e>0 && opp1_wrt_e<0) || (opp0_wrt_e<0 && opp1_wrt_e>0)) return SIMPLICIAL_COMPLEX;
@@ -687,7 +691,7 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
         vec2d e0_z   = vec2d(t0[e[0]],DROP_Z);
         vec2d e1_z   = vec2d(t0[e[1]],DROP_Z);
         vec2d opp0_z = vec2d(t0[opp0],DROP_Z);
-        vec2d opp1_z = vec2d(t0[opp1],DROP_Z);
+        vec2d opp1_z = vec2d(t1[opp1],DROP_Z);
         opp0_wrt_e = orient2d(e0_z, e1_z, opp0_z);
         opp1_wrt_e = orient2d(e0_z, e1_z, opp1_z);
         if((opp0_wrt_e>0 && opp1_wrt_e<0) || (opp0_wrt_e<0 && opp1_wrt_e>0)) return SIMPLICIAL_COMPLEX;
@@ -710,9 +714,9 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
 
         // check for intersection with t0 and t1 edges emanating from v1 and v0, respectively
         vec3d e_v0_0[] = { t0[v0], t0[(v0+1)%3] };
-        vec3d e_v0_1[] = { t0[v0], t0[(v0+1)%3] };
+        vec3d e_v0_1[] = { t0[v0], t0[(v0+2)%3] };
         vec3d e_v1_0[] = { t1[v1], t1[(v1+1)%3] };
-        vec3d e_v1_1[] = { t1[v1], t1[(v1+1)%3] };
+        vec3d e_v1_1[] = { t1[v1], t1[(v1+2)%3] };
         if(segment_triangle_intersect_exact(e_v0_0, t1)==INTERSECT ||
            segment_triangle_intersect_exact(e_v0_1, t1)==INTERSECT ||
            segment_triangle_intersect_exact(e_v1_0, t0)==INTERSECT ||
