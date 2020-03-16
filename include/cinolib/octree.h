@@ -168,7 +168,9 @@ class Octree
         bool intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
         bool intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const;
 
-        // EXACT QUERIES: based on exact geometric predicates //
+        // EXACT QUERIES: based on exact geometric predicates
+        // strict                 : restricts the query to the interior of the simplices that populate the octree (e.g. no endpoints for edges, no outer verts/edges for triangles...)
+        // ignore_if_valid_complex: restricts the query to the octree items that intersect the triangle and do not form a valid simplicial complex with it
         bool contains_exact           (const vec3d & p,   std::unordered_set<uint> & ids, const bool strict) const;
         bool intersects_segment_exact (const vec3d   s[], std::unordered_set<uint> & ids, const bool ignore_if_valid_complex) const;
         bool intersects_triangle_exact(const vec3d   t[], std::unordered_set<uint> & ids, const bool ignore_if_valid_complex) const;
