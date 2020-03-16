@@ -950,6 +950,7 @@ uint AbstractMesh<M,V,E,P>::poly_vert_offset(const uint pid, const uint vid) con
         if(poly_vert_id(pid,off) == vid) return off;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

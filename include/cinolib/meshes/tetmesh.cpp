@@ -451,6 +451,7 @@ uint Tetmesh<M,V,E,F,P>::face_edge_opposite_to(const uint fid, const uint vid) c
         if(!this->edge_contains_vert(eid,vid)) return eid;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -465,6 +466,7 @@ uint Tetmesh<M,V,E,F,P>::face_vert_opposite_to(const uint fid, const uint eid) c
         if(!this->edge_contains_vert(eid,vid)) return vid;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
