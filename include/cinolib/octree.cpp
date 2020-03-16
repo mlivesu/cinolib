@@ -326,8 +326,8 @@ void Octree::closest_point(const vec3d  & p,          // query point
                     obj.pos   = items.at(index)->point_closest_to(p);
                     obj.dist  = obj.pos.dist_squared(p);
                     q.push(obj);
-                    if(print_debug_info) ++item_queries;
                 }
+                if(print_debug_info) item_queries+=child->item_indices.size();
             }
         }
     }
@@ -368,9 +368,9 @@ bool Octree::contains(const vec3d & p, uint & id, const double eps) const
         {
             for(int i=0; i<8; ++i)
             {
-                if(print_debug_info) ++aabb_queries;
                 if(node->children[i]->bbox.contains(p,false)) lifo.push(node->children[i]);
             }
+            if(print_debug_info) aabb_queries+=8;
         }
         else
         {
@@ -420,20 +420,20 @@ bool Octree::contains(const vec3d & p, std::unordered_set<uint> & ids, const dou
         {
             for(int i=0; i<8; ++i)
             {
-                if(print_debug_info) ++aabb_queries;
                 if(node->children[i]->bbox.contains(p,false)) lifo.push(node->children[i]);
             }
+            if(print_debug_info) aabb_queries+=8;
         }
         else
         {
             for(uint i : node->item_indices)
             {
-                if(print_debug_info) ++item_queries;
                 if(items.at(i)->contains(p,eps))
                 {
                     ids.insert(items.at(i)->id);
                 }
             }
+            if(print_debug_info) item_queries+=node->item_indices.size();
         }
     }
 
@@ -472,20 +472,20 @@ bool Octree::contains_exact(const vec3d & p, std::unordered_set<uint> & ids, con
         {
             for(int i=0; i<8; ++i)
             {
-                if(print_debug_info) ++aabb_queries;
                 if(node->children[i]->bbox.contains(p,strict)) lifo.push(node->children[i]);
             }
+            if(print_debug_info) aabb_queries+=8;
         }
         else
         {
             for(uint i : node->item_indices)
             {
-                if(print_debug_info) ++item_queries;
                 if(items.at(i)->contains_exact(p,strict))
                 {
                     ids.insert(items.at(i)->id);
                 }
             }
+            if(print_debug_info) item_queries+=node->item_indices.size();
         }
     }
 
@@ -511,6 +511,8 @@ bool Octree::intersects_triangle_exact(const vec3d t[], std::unordered_set<uint>
 
     ids.clear();
 
+    AABB t_box({t[0], t[1], t[2]});
+
     std::stack<OctreeNode*> lifo;
     lifo.push(root);
 
@@ -518,33 +520,29 @@ bool Octree::intersects_triangle_exact(const vec3d t[], std::unordered_set<uint>
     {
         OctreeNode *node = lifo.top();
         lifo.pop();
-        assert(node->bbox.contains(t[0]) ||
-               node->bbox.contains(t[1]) ||
-               node->bbox.contains(t[2]));
+        assert(node->bbox.intersects_box(t_box));
 
         if(node->is_inner)
         {
             for(int i=0; i<8; ++i)
             {
-                if(print_debug_info) ++aabb_queries;
-                if(node->children[i]->bbox.contains(t[0]) ||
-                   node->children[i]->bbox.contains(t[1]) ||
-                   node->children[i]->bbox.contains(t[2]))
+                if(node->children[i]->bbox.intersects_box(t_box))
                 {
                     lifo.push(node->children[i]);
                 }
             }
+            if(print_debug_info) aabb_queries+=8;
         }
         else
         {
             for(uint i : node->item_indices)
             {
-                if(print_debug_info) ++item_queries;
                 if(items.at(i)->intersects_triangle_exact(t, ignore_if_valid_complex))
                 {
                     ids.insert(items.at(i)->id);
                 }
             }
+            if(print_debug_info) item_queries+=node->item_indices.size();
         }
     }
 
@@ -570,6 +568,8 @@ bool Octree::intersects_segment_exact(const vec3d s[], std::unordered_set<uint> 
 
     ids.clear();
 
+    AABB s_box({s[0], s[1]});
+
     std::stack<OctreeNode*> lifo;
     lifo.push(root);
 
@@ -577,31 +577,29 @@ bool Octree::intersects_segment_exact(const vec3d s[], std::unordered_set<uint> 
     {
         OctreeNode *node = lifo.top();
         lifo.pop();
-        assert(node->bbox.contains(s[0]) ||
-               node->bbox.contains(s[1]));
+        assert(node->bbox.intersects_box(s_box));
 
         if(node->is_inner)
         {
             for(int i=0; i<8; ++i)
             {
-                if(print_debug_info) ++aabb_queries;
-                if(node->children[i]->bbox.contains(s[0]) ||
-                   node->children[i]->bbox.contains(s[1]))
+                if(node->children[i]->bbox.intersects_box(s_box))
                 {
                     lifo.push(node->children[i]);
                 }
             }
+            if(print_debug_info) aabb_queries+=8;
         }
         else
         {
             for(uint i : node->item_indices)
             {
-                if(print_debug_info) ++item_queries;
                 if(items.at(i)->intersects_segment_exact(s, ignore_if_valid_complex))
                 {
                     ids.insert(items.at(i)->id);
                 }
             }
+            if(print_debug_info) item_queries+=node->item_indices.size();
         }
     }
 
