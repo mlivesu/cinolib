@@ -100,15 +100,9 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void Trimesh<M,V,E,P>::update_p_normal(const uint pid)
 {
-    vec3d v0 = this->poly_vert(pid,0);
-    vec3d v1 = this->poly_vert(pid,1);
-    vec3d v2 = this->poly_vert(pid,2);
-
-    vec3d u = v1 - v0;    u.normalize();
-    vec3d v = v2 - v0;    v.normalize();
-    vec3d n = u.cross(v); n.normalize();
-
-    this->poly_data(pid).normal = n;
+    this->poly_data(pid).normal = triangle_normal(this->poly_vert(pid,0),
+                                                  this->poly_vert(pid,1),
+                                                  this->poly_vert(pid,2));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
