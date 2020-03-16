@@ -519,6 +519,10 @@ SimplexIntersection segment_triangle_intersect_exact(const vec3d s[],
     double vol_s_t12 = orient3d(s[0], s[1], t[1], t[2]);
     double vol_s_t20 = orient3d(s[0], s[1], t[2], t[0]);
 
+    assert(vol_s_t01!=0);
+    assert(vol_s_t12!=0);
+    assert(vol_s_t20!=0);
+
     if((vol_s_t01>0 && vol_s_t12<0) || (vol_s_t01<0 && vol_s_t12>0)) return DO_NOT_INTERSECT;
     if((vol_s_t12>0 && vol_s_t20<0) || (vol_s_t12<0 && vol_s_t20>0)) return DO_NOT_INTERSECT;
     if((vol_s_t20>0 && vol_s_t01<0) || (vol_s_t20<0 && vol_s_t01>0)) return DO_NOT_INTERSECT;
@@ -679,15 +683,16 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
     uint t0_count = t0_shared.count();
     uint t1_count = t1_shared.count();
 
-    // either t0 and t1 are coincident or one of the two triangles
-    // is degenerate and is an edge/vertex of the other
-    if(t0_count==3 || t1_count==3) return SIMPLICIAL_COMPLEX;
+    // either t0 and t1 are coincident
+    if(t0_count==3) { assert(t1_count==3); return SIMPLICIAL_COMPLEX; }
 
     // t0 and t1 share an edge. Let e be the shared edge and { opp0, opp1 } be the two vertices opposite to
     // e in t0 and t1, respectively. If opp0 and opp1 lie at the same side of e, the two triangles overlap.
     // Otherwise they are edge-adjacent and form a valid simplicial complex
-    if(t0_count==2 && t1_count==2)
+    if(t0_count==2)
     {
+        assert(t1_count==2);
+
         uint e[2];      // indices of the shared vertices (in t0)
         uint count = 0; // index for e (to fill it)
         uint opp0  = 0; // index of the vertex opposite to e in t0
@@ -726,10 +731,12 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
     }
 
     // t0 and t1 share a vertex. Let v be the shared vertex and { opp0 , opp1 } be the two edges opposite to
-    // v in t0 and t1, respectively. If v-opp0 intersects t1, or v-opp1 interects t0, the two triangles overlap.
+    // v in t0 and t1, respectively. If opp0 intersects t1, or opp1 interects t0, the two triangles overlap.
     // Otherwise they are vertex-adjacent and form a valid simplicial complex
-    if(t0_count==1 && t1_count==1)
+    if(t0_count==1)
     {
+        assert(t1_count==1);
+
         uint v0; // index of the shared vertex in t0
         uint v1; // index of the shared vertex in t1
         for(uint i=0; i<3; ++i)
@@ -737,16 +744,10 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
             if(t0_shared[i]) v0 = i;
             if(t1_shared[i]) v1 = i;
         }
-
-        // check for intersection with t0 and t1 edges emanating from v1 and v0, respectively
-        vec3d e_v0_0[] = { t0[v0], t0[(v0+1)%3] };
-        vec3d e_v0_1[] = { t0[v0], t0[(v0+2)%3] };
-        vec3d e_v1_0[] = { t1[v1], t1[(v1+1)%3] };
-        vec3d e_v1_1[] = { t1[v1], t1[(v1+2)%3] };
-        if(segment_triangle_intersect_exact(e_v0_0, t1)==INTERSECT ||
-           segment_triangle_intersect_exact(e_v0_1, t1)==INTERSECT ||
-           segment_triangle_intersect_exact(e_v1_0, t0)==INTERSECT ||
-           segment_triangle_intersect_exact(e_v1_1, t0)==INTERSECT)
+        vec3d opp0[] = { t0[(v0+1)%3], t0[(v0+2)%3] };
+        vec3d opp1[] = { t1[(v1+1)%3], t1[(v1+2)%3] };
+        if(segment_triangle_intersect_exact(opp0,t1)>=INTERSECT ||
+           segment_triangle_intersect_exact(opp1,t0)>=INTERSECT)
         {
             return INTERSECT;
         }
