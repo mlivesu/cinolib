@@ -284,6 +284,9 @@ CINO_INLINE
 SimplexIntersection segment_segment_intersect_exact(const vec2d s0[],
                                                     const vec2d s1[])
 {
+    assert(!segment_is_degenerate_exact(s0) &&
+           !segment_is_degenerate_exact(s1));
+
     // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
     double det_s00 = orient2d(s1[0],s1[1],s0[0]);
     double det_s01 = orient2d(s1[0],s1[1],s0[1]);
@@ -351,6 +354,9 @@ CINO_INLINE
 SimplexIntersection segment_segment_intersect_exact(const vec3d s0[],
                                                     const vec3d s1[])
 {
+    assert(!segment_is_degenerate_exact(s0) &&
+           !segment_is_degenerate_exact(s1));
+
     // check for coincident segments
     bool s00_is_shared = (s0[0]==s1[0] || s0[0]==s1[1]);
     bool s01_is_shared = (s0[1]==s1[0] || s0[1]==s1[1]);
@@ -399,6 +405,9 @@ CINO_INLINE
 SimplexIntersection segment_triangle_intersect_exact(const vec2d s[],
                                                      const vec2d t[])
 {    
+    assert(!segment_is_degenerate_exact(s) &&
+           !triangle_is_degenerate_exact(t));
+
     if(point_in_triangle_exact(s[0],t)>=STRICTLY_INSIDE ||
        point_in_triangle_exact(s[1],t)>=STRICTLY_INSIDE)
     {
@@ -448,6 +457,9 @@ CINO_INLINE
 SimplexIntersection segment_triangle_intersect_exact(const vec3d s[],
                                                      const vec3d t[])
 {
+    assert(!segment_is_degenerate_exact(s) &&
+           !triangle_is_degenerate_exact(t));
+
     auto vol_s0_t = orient3d(s[0], t[0], t[1], t[2]);
     auto vol_s1_t = orient3d(s[1], t[0], t[1], t[2]);
 
@@ -459,12 +471,12 @@ SimplexIntersection segment_triangle_intersect_exact(const vec3d s[],
 
         if(point_in_triangle_exact(s[0],t) || point_in_triangle_exact(s[1],t)) return INTERSECT;
 
-        bool simpl_complex = false;
+        uint simpl_complex = 0;
 
         vec3d t01[] = { t[0], t[1] };
         switch(segment_segment_intersect_exact(s,t01))
         {
-            case SIMPLICIAL_COMPLEX : simpl_complex = true; break;
+            case SIMPLICIAL_COMPLEX : ++simpl_complex; break;
             case INTERSECT          : return INTERSECT;
             case OVERLAP            : return INTERSECT;
             case DO_NOT_INTERSECT   : break;
@@ -473,7 +485,7 @@ SimplexIntersection segment_triangle_intersect_exact(const vec3d s[],
         vec3d t12[] = { t[1], t[2] };
         switch(segment_segment_intersect_exact(s,t12))
         {
-            case SIMPLICIAL_COMPLEX : simpl_complex = true; break;
+            case SIMPLICIAL_COMPLEX : ++simpl_complex; break;
             case INTERSECT          : return INTERSECT;
             case OVERLAP            : return INTERSECT;
             case DO_NOT_INTERSECT   : break;
@@ -482,18 +494,26 @@ SimplexIntersection segment_triangle_intersect_exact(const vec3d s[],
         vec3d t20[] = { t[2], t[0] };
         switch(segment_segment_intersect_exact(s,t20))
         {
-            case SIMPLICIAL_COMPLEX : simpl_complex = true; break;
+            case SIMPLICIAL_COMPLEX : ++simpl_complex; break;
             case INTERSECT          : return INTERSECT;
             case OVERLAP            : return INTERSECT;
             case DO_NOT_INTERSECT   : break;
         }
 
-        if(simpl_complex) return SIMPLICIAL_COMPLEX;
+        // if it is a simplicial complex from any view, then it really is...
+        if(simpl_complex==3) return SIMPLICIAL_COMPLEX;
         return DO_NOT_INTERSECT;
     }
 
-    // s intersects t (border included), if the signs of the three tetrahedra
+    // s intersects t (borders included), if the signs of the three tetrahedra
     // obtained combining s with the three edges of t are all equal
+
+    // if one point is coplanar and coincides with a triangle vertex, then they form a valid complex
+    if(s[0]==t[0] || s[0]==t[1] || s[0]==t[2] ||
+       s[1]==t[0] || s[1]==t[1] || s[1]==t[2])
+    {
+        return SIMPLICIAL_COMPLEX;
+    }
 
     double vol_s_t01 = orient3d(s[0], s[1], t[0], t[1]);
     double vol_s_t12 = orient3d(s[0], s[1], t[1], t[2]);
@@ -516,6 +536,9 @@ CINO_INLINE
 SimplexIntersection triangle_triangle_intersect_exact(const vec2d t0[],
                                                       const vec2d t1[])
 {
+    assert(!triangle_is_degenerate_exact(t0) &&
+           !triangle_is_degenerate_exact(t1));
+
     // binary flags to mark coincident vertices in t0 and t1
     std::bitset<3> t0_shared = { 0b000 };
     std::bitset<3> t1_shared = { 0b000 };
@@ -634,6 +657,9 @@ CINO_INLINE
 SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
                                                       const vec3d t1[])
 {
+    assert(!triangle_is_degenerate_exact(t0) &&
+           !triangle_is_degenerate_exact(t1));
+
     // binary flags to mark coincident vertices in t0 and t1
     std::bitset<3> t0_shared = { 0b000 };
     std::bitset<3> t1_shared = { 0b000 };

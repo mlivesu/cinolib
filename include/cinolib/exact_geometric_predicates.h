@@ -48,7 +48,7 @@ namespace cinolib
  *
  * Return values for the point_in_{segment | triangle | tet} predicates:
  * an integer flag which indicates exactly where, in the input simplex, the
- * point is located is returned.  Note that a point tipically belongs to
+ * point is located is returned. Note that a point tipically belongs to
  * multiple sub-simplices. For example, a point coincident to a triangle
  * vertex belongs to a 0-dimensional simplex (the vertex), at least two
  * 2-dimensional simplices (its incident edges), and one 2-dimensional
@@ -67,6 +67,11 @@ namespace cinolib
  * that does not define a valid simplicial complex; (iii) the simplices
  * intersect in some pathological way (e.g. two colinear triangles that
  * partially overlap, or two coplanar triangles that overlap).
+ *
+ * WARNING: intersections tests all assume that simplices are non degenerate.
+ * If the code is compiled without defining the NDEBUG symbol, dedicated assertions
+ * will make the program stop in case of zero length edges, zero area triangles,
+ * or zero volume tets.
  */
 
 // location of intersection points for point_in_{segment | triangle | tet}
