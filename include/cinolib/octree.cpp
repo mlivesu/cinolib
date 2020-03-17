@@ -537,7 +537,9 @@ bool Octree::intersects_triangle_exact(const vec3d t[], std::unordered_set<uint>
         {
             for(uint i : node->item_indices)
             {
-                if(items.at(i)->intersects_triangle_exact(t, ignore_if_valid_complex))
+                // test the AABBs first, it's cheaper
+                if(items.at(i)->aabb().intersects_box(t_box) &&
+                   items.at(i)->intersects_triangle_exact(t, ignore_if_valid_complex))
                 {
                     ids.insert(items.at(i)->id);
                 }
@@ -594,7 +596,9 @@ bool Octree::intersects_segment_exact(const vec3d s[], std::unordered_set<uint> 
         {
             for(uint i : node->item_indices)
             {
-                if(items.at(i)->intersects_segment_exact(s, ignore_if_valid_complex))
+                // test the AABBs first, it's cheaper
+                if(items.at(i)->aabb().intersects_box(s_box) &&
+                   items.at(i)->intersects_segment_exact(s, ignore_if_valid_complex))
                 {
                     ids.insert(items.at(i)->id);
                 }
