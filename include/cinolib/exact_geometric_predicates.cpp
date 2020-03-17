@@ -529,6 +529,55 @@ SimplexIntersection segment_triangle_intersect_exact(const vec3d s[],
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns:
+// DO_NOT_INTERSECT     if s and t are fully disjoint
+// SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
+// INTERSECT            if s and t intersect and do not forma a valid simplex
+CINO_INLINE
+SimplexIntersection segment_tet_intersect_exact(const vec3d s[],
+                                                const vec3d t[])
+{
+    assert(!segment_is_degenerate_exact(s) && !tet_is_degenerate_exact(t));
+
+    // check if s is an edge of t
+    if((s[0]==t[0] && s[1]==t[2]) || (s[1]==t[0] && s[0]==t[2])) return SIMPLICIAL_COMPLEX;
+    if((s[0]==t[2] && s[1]==t[1]) || (s[1]==t[2] && s[0]==t[1])) return SIMPLICIAL_COMPLEX;
+    if((s[0]==t[1] && s[1]==t[0]) || (s[1]==t[1] && s[0]==t[0])) return SIMPLICIAL_COMPLEX;
+    if((s[0]==t[1] && s[1]==t[3]) || (s[1]==t[1] && s[0]==t[3])) return SIMPLICIAL_COMPLEX;
+    if((s[0]==t[3] && s[1]==t[0]) || (s[1]==t[3] && s[0]==t[0])) return SIMPLICIAL_COMPLEX;
+    if((s[0]==t[3] && s[1]==t[2]) || (s[1]==t[3] && s[0]==t[2])) return SIMPLICIAL_COMPLEX;
+
+    // check if s intersects any of the faces of t
+    vec3d f0[] = { t[0], t[2], t[1] };
+    vec3d f1[] = { t[0], t[1], t[3] };
+    vec3d f2[] = { t[0], t[3], t[2] };
+    vec3d f3[] = { t[1], t[2], t[3] };
+    if(segment_triangle_intersect_exact(s,f0)>=INTERSECT ||
+       segment_triangle_intersect_exact(s,f1)>=INTERSECT ||
+       segment_triangle_intersect_exact(s,f2)>=INTERSECT ||
+       segment_triangle_intersect_exact(s,f3)>=INTERSECT)
+    {
+        return INTERSECT;
+    }
+
+    // locate s endpoints wrt t
+    auto s0_wrt_t = point_in_tet_exact(s[0],t);
+    auto s1_wrt_t = point_in_tet_exact(s[1],t);
+
+    // if one veertex of s is a vertex of t, and the other is outside then s touches t only at that vertex
+    // (otherwise there would be an intersection between s and any of the faces of t, which I already tested)
+    if(s0_wrt_t>=ON_VERT0 && s0_wrt_t<=ON_VERT3 && s1_wrt_t==STRICTLY_OUTSIDE) return SIMPLICIAL_COMPLEX;
+    if(s1_wrt_t>=ON_VERT0 && s1_wrt_t<=ON_VERT3 && s0_wrt_t==STRICTLY_OUTSIDE) return SIMPLICIAL_COMPLEX;
+
+    // if a point of s is either inside, or on some edge or on some face of t, then they intersect
+    if(s0_wrt_t==STRICTLY_INSIDE || s0_wrt_t>=ON_EDGE0) return INTERSECT;
+    if(s1_wrt_t==STRICTLY_INSIDE || s1_wrt_t>=ON_EDGE0) return INTERSECT;
+
+    return DO_NOT_INTERSECT;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns:
 // DO_NOT_INTERSECT     if triangles are fully disjoint
 // SIMPLICIAL_COMPLEX   if triangles coincide or intersect at a shared sub-simplex
 // INTERSECT            if triangles intersect without making a valid simplcial complex
