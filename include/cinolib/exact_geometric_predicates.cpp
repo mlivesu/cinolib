@@ -519,10 +519,6 @@ SimplexIntersection segment_triangle_intersect_exact(const vec3d s[],
     double vol_s_t12 = orient3d(s[0], s[1], t[1], t[2]);
     double vol_s_t20 = orient3d(s[0], s[1], t[2], t[0]);
 
-    assert(vol_s_t01!=0);
-    assert(vol_s_t12!=0);
-    assert(vol_s_t20!=0);
-
     if((vol_s_t01>0 && vol_s_t12<0) || (vol_s_t01<0 && vol_s_t12>0)) return DO_NOT_INTERSECT;
     if((vol_s_t12>0 && vol_s_t20<0) || (vol_s_t12<0 && vol_s_t20>0)) return DO_NOT_INTERSECT;
     if((vol_s_t20>0 && vol_s_t01<0) || (vol_s_t20<0 && vol_s_t01>0)) return DO_NOT_INTERSECT;
