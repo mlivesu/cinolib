@@ -43,6 +43,10 @@
 namespace cinolib
 {
 
+CINO_INLINE void exactinit();
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE double orient2d    (double const * pa, double const * pb, double const * pc);
 CINO_INLINE double orient2d    (const  vec2d & pa, const  vec2d & pb, const  vec2d & pc);
 CINO_INLINE double orient2dfast(double const * pa, double const * pb, double const * pc);
