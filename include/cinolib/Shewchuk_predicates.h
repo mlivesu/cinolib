@@ -36,12 +36,20 @@
 #ifndef CINO_SHEWCHUK_PREDICATES
 #define CINO_SHEWCHUK_PREDICATES
 
-#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
+
+/* Wrap of the popular Shewchuk's:
+ *
+ * Routines for Arbitrary Precision Floating-point
+ * Arithmetic and Fast Robust Geometric Predicates
+ *
+ * IMPORTANT: remember to call exactinit() once in
+ * your application before any use of the predicates
+*/
 
 CINO_INLINE void exactinit();
 
