@@ -346,6 +346,7 @@ void Octree::closest_point(const vec3d  & p,          // query point
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
 CINO_INLINE
 bool Octree::contains(const vec3d & p, const bool strict, uint & id) const
 {
@@ -396,6 +397,7 @@ bool Octree::contains(const vec3d & p, const bool strict, uint & id) const
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
 CINO_INLINE
 bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uint> & ids) const
 {
@@ -584,6 +586,7 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pa
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
 CINO_INLINE
 bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const
 {
@@ -643,6 +646,7 @@ bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_com
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
 CINO_INLINE
 bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const
 {
