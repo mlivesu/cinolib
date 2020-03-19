@@ -41,6 +41,7 @@
 #include <cinolib/geometry/polygon_utils.h>
 #include <cinolib/vector_serialization.h>
 #include <cinolib/how_many_seconds.h>
+#include <cinolib/deg_rad.h>
 #include <unordered_set>
 #include <queue>
 
@@ -1190,17 +1191,24 @@ double AbstractPolygonMesh<M,V,E,P>::poly_angle_at_vert(const uint pid, const ui
 {
     assert(this->poly_contains_vert(pid,vid));
 
-    uint  curr = this->poly_vert_offset(pid, vid);
-    uint  next = (curr+1)%this->verts_per_poly(pid);
-    uint  prev = (curr+this->verts_per_poly(pid)-1)%this->verts_per_poly(pid);
-    vec3d p    = this->poly_vert(pid, curr);
-    vec3d u    = this->poly_vert(pid, prev) - p;
-    vec3d v    = this->poly_vert(pid, next) - p;
+    uint   curr   = this->poly_vert_offset(pid, vid);
+    uint   nv     = this->verts_per_poly(pid);
+    uint   next   = (curr+1   )%nv;
+    uint   prev   = (curr-1+nv)%nv;
+    vec3d  p      = this->poly_vert(pid, curr);
+    vec3d  u      = this->poly_vert(pid, prev) - p;
+    vec3d  v      = this->poly_vert(pid, next) - p;
+    double angle  = u.angle_rad(v);
 
-    switch (unit)
+    if((-u).cross(v).dot(this->poly_data(pid).normal)<0)
     {
-        case RAD : return u.angle_rad(v);
-        case DEG : return u.angle_deg(v);
+        angle = 2*M_PI - angle;
+    }
+
+    switch(unit)
+    {
+        case RAD : return angle;
+        case DEG : return to_deg(angle);
         default  : assert(false); return 0; // warning killer
     }
 }
