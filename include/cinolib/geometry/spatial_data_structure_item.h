@@ -89,23 +89,15 @@ namespace cinolib
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            virtual bool intersects_ray(const vec3<double> & p, const vec3<double> & dir, double & t, vec3<double> & pos) const = 0;
-
-            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
             double dist     (const vec3<double> & p) const;
             double dist_sqrd(const vec3<double> & p) const;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            bool contains(const vec3<double> & p, const double eps = 1e-15) const;
-
-            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-            // Exact queries
-            virtual bool contains_exact           (const vec3<double> & p, const bool strict) const = 0;
-            virtual bool intersects_segment_exact (const vec3<double> s[], const bool ignore_if_valid_complex) const = 0;
-            virtual bool intersects_triangle_exact(const vec3<double> t[], const bool ignore_if_valid_complex) const = 0;
+            virtual bool contains           (const vec3<double> & p, const bool strict) const = 0;
+            virtual bool intersects_segment (const vec3<double> s[], const bool ignore_if_valid_complex) const = 0;
+            virtual bool intersects_triangle(const vec3<double> t[], const bool ignore_if_valid_complex) const = 0;
+            virtual bool intersects_ray     (const vec3<double> & p, const vec3<double> & dir, double & t, vec3<double> & pos) const = 0;
     };
 }
 

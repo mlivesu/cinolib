@@ -160,20 +160,16 @@ class Octree
         vec3d closest_point(const vec3d & p) const;
 
         // returns respectively the first item and the full list of items containing query point p
-        bool contains(const vec3d & p, uint & id, const double eps = 1e-15) const;
-        bool contains(const vec3d & p, std::unordered_set<uint> & ids, const double eps = 1e-15) const;
+        bool contains(const vec3d & p, const bool strict, uint & id) const;
+        bool contains(const vec3d & p, const bool strict, std::unordered_set<uint> & ids) const;
 
         // returns respectively the first and the full list of intersections
         // between items in the octree and a ray R(t) := p + t * dir
         bool intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
         bool intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const;
 
-        // EXACT QUERIES: based on exact geometric predicates
-        // strict                 : restricts the query to the interior of the simplices that populate the octree (e.g. no endpoints for edges, no outer verts/edges for triangles...)
-        // ignore_if_valid_complex: restricts the query to the octree items that intersect the triangle and do not form a valid simplicial complex with it
-        bool contains_exact           (const vec3d & p,   std::unordered_set<uint> & ids, const bool strict) const;
-        bool intersects_segment_exact (const vec3d   s[], std::unordered_set<uint> & ids, const bool ignore_if_valid_complex) const;
-        bool intersects_triangle_exact(const vec3d   t[], std::unordered_set<uint> & ids, const bool ignore_if_valid_complex) const;
+        bool intersects_segment (const vec3d s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
+        bool intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

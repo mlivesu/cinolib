@@ -36,8 +36,7 @@
 #include <cinolib/geometry/polygon_utils.h>
 #include <cinolib/geometry/plane.h>
 #include <cinolib/geometry/triangle_utils.h>
-#include <cinolib/Shewchuk_predicates_wrap.h>
-#include <cinolib/exact_geometric_predicates.h>
+#include <cinolib/predicates.h>
 #include <map>
 
 namespace cinolib
@@ -158,7 +157,7 @@ int polygon_find_ear(const std::vector<vec2d> & poly)
             for(uint j=0; j<poly.size(); ++j)
             {
                 if(j == curr || j == prev || j == next) continue;
-                if(point_in_triangle_exact(poly.at(j),ear)>=STRICTLY_INSIDE)
+                if(point_in_triangle(poly.at(j),ear)>=STRICTLY_INSIDE)
                 {
                     contains_other_point = true;
                 }

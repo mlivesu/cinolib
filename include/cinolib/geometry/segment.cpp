@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/geometry/segment.h>
-#include <cinolib/exact_geometric_predicates.h>
+#include <cinolib/predicates.h>
 
 namespace cinolib
 {
@@ -97,7 +97,7 @@ bool Segment::intersects_ray(const vec3d & /*p*/, const vec3d & /*dir*/, double 
 CINO_INLINE
 void Segment::barycentric_coordinates(const vec3d & p, double bc[]) const
 {
-    assert(contains(p));
+    assert(contains(p,false));
 
     vec3d  u = v[1] - v[0];
     double t = (p-v[0]).dot(u);
@@ -108,9 +108,9 @@ void Segment::barycentric_coordinates(const vec3d & p, double bc[]) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Segment::contains_exact(const vec3d & p, const bool strict) const
+bool Segment::contains(const vec3d & p, const bool strict) const
 {
-    int where = point_in_segment_exact(p,v);
+    int where = point_in_segment(p,v);
     if(strict) return (where==STRICTLY_INSIDE);
                return (where>=STRICTLY_INSIDE);
 }
@@ -118,9 +118,9 @@ bool Segment::contains_exact(const vec3d & p, const bool strict) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Segment::intersects_segment_exact(const vec3d s[], const bool ignore_if_valid_complex) const
+bool Segment::intersects_segment(const vec3d s[], const bool ignore_if_valid_complex) const
 {
-    auto res = segment_segment_intersect_exact(v,s);
+    auto res = segment_segment_intersect(v,s);
     if(ignore_if_valid_complex) return (res > SIMPLICIAL_COMPLEX);
     return (res>=SIMPLICIAL_COMPLEX);
 }
@@ -128,9 +128,9 @@ bool Segment::intersects_segment_exact(const vec3d s[], const bool ignore_if_val
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Segment::intersects_triangle_exact(const vec3d t[], const bool ignore_if_valid_complex) const
+bool Segment::intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex) const
 {
-    auto res = segment_triangle_intersect_exact(v,t);
+    auto res = segment_triangle_intersect(v,t);
     if(ignore_if_valid_complex) return (res > SIMPLICIAL_COMPLEX);
     return (res>=SIMPLICIAL_COMPLEX);
 }

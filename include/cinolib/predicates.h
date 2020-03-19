@@ -33,18 +33,27 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_EXACT_GEOMETRIC_PREDICATES
-#define CINO_EXACT_GEOMETRIC_PREDICATES
+#ifndef CINO_PREDICATES
+#define CINO_PREDICATES
 
 #include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
-
-/* Exact predicates to test point in segment/triangle/tetrahedron, and
- * also to test intersections between segments/triangles/tets in 2D and
- * 3D. All tests are based on the popular Shewchuk's orient predicates.
+/* This file provides orient, incircle and in sphere predicates,
+ * as well as additional predicates that build on top of them
+ * to test point in segments/triangles/tetrahedra, and also to
+ * test intersections between these entities in 2D and 3D. In the
+ * default configuration, all these predicates are INEXACT, and the
+ * basic orient, incircle and in sphere are basically equivalent to
+ * the "fast" version of the Shewchuk predicates.
+ *
+ * *********************************************************************
+ * IMPORTANT: to switch to EXACT PREDICATES, you must define the symbol
+ * CINOLIB_USES_EXACT_PREDICATES at compilation time, and also add the
+ * file <CINOLIB_HOME>/external/predicates/shewchuk.c in your project.
+ * *********************************************************************
  *
  * Return values for the point_in_{segment | triangle | tet} predicates:
  * an integer flag which indicates exactly where, in the input simplex, the
@@ -113,28 +122,154 @@ SimplexIntersection;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#ifdef CINOLIB_USES_EXACT_PREDICATES
+
+/* Wrap of the popular geometric predicates described by Shewchuk in:
+ *
+ * Routines for Arbitrary Precision Floating-point Arithmetic and
+ * Fast Robust Geometric Predicates
+ *
+ * WARNING #1: if you use these predicates, you should include in your
+ * project <CINOLIB_HOME>/external/predicates/shewchuk.c and compile it,
+ * otherwise the linker will not find an implementation for the methods
+ * below.
+ *
+ * WARNING #2: if you use these predicates, remember to call exactinit()
+ * at the beginning of your application, otherwise machine epsilon and
+ * error constants will not be set properly, and precision will be limited
+ * by the standard floating point system, as if CINOLIB_USES_EXACT_PREDICATES
+ * was not even defined
+*/
+extern "C"
+{
+
+void exactinit();
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+double orient2d(const double * pa,
+                const double * pb,
+                const double * pc);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+double orient3d(const double * pa,
+                const double * pb,
+                const double * pc,
+                const double * pd);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+double incircle(const double * pa,
+                const double * pb,
+                const double * pc,
+                const double * pd);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+double insphere(const double * pa,
+                const double * pb,
+                const double * pc,
+                const double * pd,
+                const double * pe);
+}
+
+#else
+
+// These are equivalent to the "fast" version of Shewchuk's predicates. Hence are INEXACT
+// geometric predicates solely based on the accuracy of the floating point system
+
+CINO_INLINE
+double orient2d(const double * pa,
+                const double * pb,
+                const double * pc);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double orient3d(const double * pa,
+                const double * pb,
+                const double * pc,
+                const double * pd);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double incircle(const double * pa,
+                const double * pb,
+                const double * pc,
+                const double * pd);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double insphere(const double * pa,
+                const double * pb,
+                const double * pc,
+                const double * pd,
+                const double * pe);
+#endif
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// wrap of orient2d for cinolib points. Either exact or not depending on CINOLIB_USES_EXACT_PREDICATES
+CINO_INLINE
+double orient2d(const vec2d & pa,
+                const vec2d & pb,
+                const vec2d & pc);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// wrap of orient3d for cinolib points. Either exact or not depending on CINOLIB_USES_EXACT_PREDICATES
+CINO_INLINE
+double orient3d(const vec3d & pa,
+                const vec3d & pb,
+                const vec3d & pc,
+                const vec3d & pd);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// wrap of incircle for cinolib points. Either exact or not depending on CINOLIB_USES_EXACT_PREDICATES
+CINO_INLINE
+double incircle(const vec2d & pa,
+                const vec2d & pb,
+                const vec2d & pc,
+                const vec2d & pd);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// wrap of insphere for cinolib points. Either exact or not depending on CINOLIB_USES_EXACT_PREDICATES
+CINO_INLINE
+double insphere(const vec3d & pa,
+                const vec3d & pb,
+                const vec3d & pc,
+                const vec3d & pd,
+                const vec3d & pe);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // true if the area of the triangle p0-p1-p2 is zero
 CINO_INLINE
-bool points_are_colinear_exact(const vec2d & p0,
-                               const vec2d & p1,
-                               const vec2d & p2);
+bool points_are_colinear(const vec2d & p0,
+                         const vec2d & p1,
+                         const vec2d & p2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // true if the area of all the orthogonal 2d projections of the triangle p0-p1-p2 is zero
 CINO_INLINE
-bool points_are_colinear_exact(const vec3d & p0,
-                               const vec3d & p1,
-                               const vec3d & p2);
+bool points_are_colinear(const vec3d & p0,
+                         const vec3d & p1,
+                         const vec3d & p2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // true if the volume of the tetrahedron p0-p1-p2-p3 is zero
 CINO_INLINE
-bool points_are_coplanar_exact(const vec3d & p0,
-                               const vec3d & p1,
-                               const vec3d & p2,
-                               const vec3d & p3);
+bool points_are_coplanar(const vec3d & p0,
+                         const vec3d & p1,
+                         const vec3d & p2,
+                         const vec3d & p3);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -143,8 +278,8 @@ bool points_are_coplanar_exact(const vec3d & p0,
 // STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
 CINO_INLINE
-PointInSimplex point_in_segment_exact(const vec2d & p,
-                                      const vec2d  s[]);
+PointInSimplex point_in_segment(const vec2d & p,
+                                const vec2d  s[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -153,8 +288,8 @@ PointInSimplex point_in_segment_exact(const vec2d & p,
 // STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
 CINO_INLINE
-PointInSimplex point_in_segment_exact(const vec3d & p,
-                                      const vec3d   s[]);
+PointInSimplex point_in_segment(const vec3d & p,
+                                const vec3d   s[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -164,8 +299,8 @@ PointInSimplex point_in_segment_exact(const vec3d & p,
 // STRICTLY_INSIDE  if p lies inside triangle t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
 CINO_INLINE
-PointInSimplex point_in_triangle_exact(const vec2d & p,
-                                       const vec2d   t[]);
+PointInSimplex point_in_triangle(const vec2d & p,
+                                 const vec2d   t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -175,8 +310,8 @@ PointInSimplex point_in_triangle_exact(const vec2d & p,
 // STRICTLY_INSIDE  if p lies inside triangle t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
 CINO_INLINE
-PointInSimplex point_in_triangle_exact(const vec3d & p,
-                                       const vec3d   t[]);
+PointInSimplex point_in_triangle(const vec3d & p,
+                                 const vec3d   t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -187,8 +322,8 @@ PointInSimplex point_in_triangle_exact(const vec3d & p,
 // STRICTLY_INSIDE  if p lies inside tetrahedron t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
 CINO_INLINE
-PointInSimplex point_in_tet_exact(const vec3d & p,
-                                  const vec3d   t[]);
+PointInSimplex point_in_tet(const vec3d & p,
+                            const vec3d   t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -198,8 +333,8 @@ PointInSimplex point_in_tet_exact(const vec3d & p,
 // INTERSECT            if segments intersect at an inner point (for s0, s1, or both)
 // OVERLAP              if segments are colinear and partially overlapped
 CINO_INLINE
-SimplexIntersection segment_segment_intersect_exact(const vec2d s0[],
-                                                    const vec2d s1[]);
+SimplexIntersection segment_segment_intersect(const vec2d s0[],
+                                              const vec2d s1[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -209,8 +344,8 @@ SimplexIntersection segment_segment_intersect_exact(const vec2d s0[],
 // INTERSECT            if segments intersect at an inner point (for s0, s1, or both)
 // OVERLAP              if segments are colinear and partially overlapped
 CINO_INLINE
-SimplexIntersection segment_segment_intersect_exact(const vec3d s0[],
-                                                    const vec3d s1[]);
+SimplexIntersection segment_segment_intersect(const vec3d s0[],
+                                              const vec3d s1[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -219,8 +354,8 @@ SimplexIntersection segment_segment_intersect_exact(const vec3d s0[],
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
 // INTERSECT            if s and t intersect and do not forma a valid simplex
 CINO_INLINE
-SimplexIntersection segment_triangle_intersect_exact(const vec2d s[],
-                                                     const vec2d t[]);
+SimplexIntersection segment_triangle_intersect(const vec2d s[],
+                                               const vec2d t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -229,8 +364,8 @@ SimplexIntersection segment_triangle_intersect_exact(const vec2d s[],
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
 // INTERSECT            if s and t intersect and do not forma a valid simplex
 CINO_INLINE
-SimplexIntersection segment_triangle_intersect_exact(const vec3d s[],
-                                                     const vec3d t[]);
+SimplexIntersection segment_triangle_intersect(const vec3d s[],
+                                               const vec3d t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -239,8 +374,8 @@ SimplexIntersection segment_triangle_intersect_exact(const vec3d s[],
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
 // INTERSECT            if s and t intersect and do not forma a valid simplex
 CINO_INLINE
-SimplexIntersection segment_tet_intersect_exact(const vec3d s[],
-                                                const vec3d t[]);
+SimplexIntersection segment_tet_intersect(const vec3d s[],
+                                          const vec3d t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -249,8 +384,8 @@ SimplexIntersection segment_tet_intersect_exact(const vec3d s[],
 // SIMPLICIAL_COMPLEX   if triangles coincide or intersect at a shared sub-simplex
 // INTERSECT            if triangles intersect without making a valid simplcial complex
 CINO_INLINE
-SimplexIntersection triangle_triangle_intersect_exact(const vec2d t0[],
-                                                      const vec2d t1[]);
+SimplexIntersection triangle_triangle_intersect(const vec2d t0[],
+                                                const vec2d t1[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -259,33 +394,33 @@ SimplexIntersection triangle_triangle_intersect_exact(const vec2d t0[],
 // SIMPLICIAL_COMPLEX   if triangles coincide or intersect at a shared sub-simplex
 // INTERSECT            if triangles intersect without making a valid simplcial complex
 CINO_INLINE
-SimplexIntersection triangle_triangle_intersect_exact(const vec3d t0[],
-                                                      const vec3d t1[]);
+SimplexIntersection triangle_triangle_intersect(const vec3d t0[],
+                                                const vec3d t1[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if s[0]==s[1]
 template<typename vec>
 CINO_INLINE
-bool segment_is_degenerate_exact(const vec s[]);
+bool segment_is_degenerate(const vec s[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t[0], t[1] and t[2] are colinear
 template<typename vec>
 CINO_INLINE
-bool triangle_is_degenerate_exact(const vec t[]);
+bool triangle_is_degenerate(const vec t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t[0], t[1], t[2] and t32] are coplanar
 CINO_INLINE
-bool tet_is_degenerate_exact(const vec3d t[]);
+bool tet_is_degenerate(const vec3d t[]);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "exact_geometric_predicates.cpp"
+#include "predicates.cpp"
 #endif
 
-#endif // CINO_INTERSECTION_EXACT_PREDICATES
+#endif // CINO_PREDICATES
