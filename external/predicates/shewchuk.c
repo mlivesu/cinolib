@@ -1,8 +1,3 @@
-#include <cinolib/Shewchuk_predicates.h>
-
-namespace cinolib
-{
-
 /*****************************************************************************/
 /*                                                                           */
 /*  Routines for Arbitrary Precision Floating-point Arithmetic               */
@@ -118,12 +113,10 @@ namespace cinolib
 /*                                                                           */
 /*****************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
-// #include <stdio.h>
-// #include <math.h>
-// #include <sys/time.h>
-
-// #include "Predicates.h"
+#include <math.h>
+#include <sys/time.h>
 
 /* On some machines, the exact arithmetic routines might be defeated by the  */
 /*   use of internal extended precision floating-point registers.  Sometimes */
@@ -139,14 +132,9 @@ namespace cinolib
 
 #define REAL double                      /* float or double */
 #define REALPRINT doubleprint
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-/* Cino edit: I am commenting out all the stuff that uses C random() function */
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//#define REALRAND doublerand
-//#define NARROWRAND narrowdoublerand
-//#define UNIFORMRAND uniformdoublerand
+#define REALRAND doublerand
+#define NARROWRAND narrowdoublerand
+#define UNIFORMRAND uniformdoublerand
 
 /* Which of the following two methods of finding the absolute values is      */
 /*   fastest is compiler-dependent.  A few compilers can inline and optimize */
@@ -370,19 +358,14 @@ namespace cinolib
   Square(a1, _j, _1); \
   Two_Two_Sum(_j, _1, _l, _2, x5, x4, x3, x2)
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-/* Cino edit: I am making everythng static to make it compile with header only CINOLIB */
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-static REAL splitter;     /* = 2^ceiling(p / 2) + 1.  Used to split floats in half. */
-static REAL epsilon;                /* = 2^(-p).  Used to estimate roundoff errors. */
+REAL splitter;     /* = 2^ceiling(p / 2) + 1.  Used to split floats in half. */
+REAL epsilon;                /* = 2^(-p).  Used to estimate roundoff errors. */
 /* A set of coefficients used to calculate maximum roundoff errors.          */
-static REAL resulterrbound;
-static REAL ccwerrboundA, ccwerrboundB, ccwerrboundC;
-static REAL o3derrboundA, o3derrboundB, o3derrboundC;
-static REAL iccerrboundA, iccerrboundB, iccerrboundC;
-static REAL isperrboundA, isperrboundB, isperrboundC;
+REAL resulterrbound;
+REAL ccwerrboundA, ccwerrboundB, ccwerrboundC;
+REAL o3derrboundA, o3derrboundB, o3derrboundC;
+REAL iccerrboundA, iccerrboundB, iccerrboundC;
+REAL isperrboundA, isperrboundB, isperrboundC;
 
 /*****************************************************************************/
 /*                                                                           */
@@ -503,153 +486,140 @@ REAL *e;
 }
 */
 
+/*****************************************************************************/
+/*                                                                           */
+/*  doublerand()   Generate a double with random 53-bit significand and a    */
+/*                 random exponent in [0, 511].                              */
+/*                                                                           */
+/*****************************************************************************/
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-/* Cino edit: I am commenting out all the stuff that uses C random() function */
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+double doublerand()
+{
+  double result;
+  double expo;
+  long a, b, c;
+  long i;
 
-///*****************************************************************************/
-///*                                                                           */
-///*  doublerand()   Generate a double with random 53-bit significand and a    */
-///*                 random exponent in [0, 511].                              */
-///*                                                                           */
-///*****************************************************************************/
+  a = random();
+  b = random();
+  c = random();
+  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
+  for (i = 512, expo = 2; i <= 131072; i *= 2, expo = expo * expo) {
+    if (c & i) {
+      result *= expo;
+    }
+  }
+  return result;
+}
 
-//CINO_INLINE
-//double doublerand()
-//{
-//  double result;
-//  double expo;
-//  long a, b, c;
-//  long i;
+/*****************************************************************************/
+/*                                                                           */
+/*  narrowdoublerand()   Generate a double with random 53-bit significand    */
+/*                       and a random exponent in [0, 7].                    */
+/*                                                                           */
+/*****************************************************************************/
 
-//  a = random();
-//  b = random();
-//  c = random();
-//  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-//  for (i = 512, expo = 2; i <= 131072; i *= 2, expo = expo * expo) {
-//    if (c & i) {
-//      result *= expo;
-//    }
-//  }
-//  return result;
-//}
+double narrowdoublerand()
+{
+  double result;
+  double expo;
+  long a, b, c;
+  long i;
 
-///*****************************************************************************/
-///*                                                                           */
-///*  narrowdoublerand()   Generate a double with random 53-bit significand    */
-///*                       and a random exponent in [0, 7].                    */
-///*                                                                           */
-///*****************************************************************************/
+  a = random();
+  b = random();
+  c = random();
+  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
+  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
+    if (c & i) {
+      result *= expo;
+    }
+  }
+  return result;
+}
 
-//CINO_INLINE
-//double narrowdoublerand()
-//{
-//  double result;
-//  double expo;
-//  long a, b, c;
-//  long i;
+/*****************************************************************************/
+/*                                                                           */
+/*  uniformdoublerand()   Generate a double with random 53-bit significand.  */
+/*                                                                           */
+/*****************************************************************************/
 
-//  a = random();
-//  b = random();
-//  c = random();
-//  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-//  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
-//    if (c & i) {
-//      result *= expo;
-//    }
-//  }
-//  return result;
-//}
+double uniformdoublerand()
+{
+  double result;
+  long a, b;
 
-///*****************************************************************************/
-///*                                                                           */
-///*  uniformdoublerand()   Generate a double with random 53-bit significand.  */
-///*                                                                           */
-///*****************************************************************************/
+  a = random();
+  b = random();
+  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
+  return result;
+}
 
-//CINO_INLINE
-//double uniformdoublerand()
-//{
-//  double result;
-//  long a, b;
+/*****************************************************************************/
+/*                                                                           */
+/*  floatrand()   Generate a float with random 24-bit significand and a      */
+/*                random exponent in [0, 63].                                */
+/*                                                                           */
+/*****************************************************************************/
 
-//  a = random();
-//  b = random();
-//  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-//  return result;
-//}
+float floatrand()
+{
+  float result;
+  float expo;
+  long a, c;
+  long i;
 
-///*****************************************************************************/
-///*                                                                           */
-///*  floatrand()   Generate a float with random 24-bit significand and a      */
-///*                random exponent in [0, 63].                                */
-///*                                                                           */
-///*****************************************************************************/
+  a = random();
+  c = random();
+  result = (float) ((a - 1073741824) >> 6);
+  for (i = 512, expo = 2; i <= 16384; i *= 2, expo = expo * expo) {
+    if (c & i) {
+      result *= expo;
+    }
+  }
+  return result;
+}
 
-//CINO_INLINE
-//float floatrand()
-//{
-//  float result;
-//  float expo;
-//  long a, c;
-//  long i;
+/*****************************************************************************/
+/*                                                                           */
+/*  narrowfloatrand()   Generate a float with random 24-bit significand and  */
+/*                      a random exponent in [0, 7].                         */
+/*                                                                           */
+/*****************************************************************************/
 
-//  a = random();
-//  c = random();
-//  result = (float) ((a - 1073741824) >> 6);
-//  for (i = 512, expo = 2; i <= 16384; i *= 2, expo = expo * expo) {
-//    if (c & i) {
-//      result *= expo;
-//    }
-//  }
-//  return result;
-//}
+float narrowfloatrand()
+{
+  float result;
+  float expo;
+  long a, c;
+  long i;
 
-///*****************************************************************************/
-///*                                                                           */
-///*  narrowfloatrand()   Generate a float with random 24-bit significand and  */
-///*                      a random exponent in [0, 7].                         */
-///*                                                                           */
-///*****************************************************************************/
+  a = random();
+  c = random();
+  result = (float) ((a - 1073741824) >> 6);
+  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
+    if (c & i) {
+      result *= expo;
+    }
+  }
+  return result;
+}
 
-//CINO_INLINE
-//float narrowfloatrand()
-//{
-//  float result;
-//  float expo;
-//  long a, c;
-//  long i;
+/*****************************************************************************/
+/*                                                                           */
+/*  uniformfloatrand()   Generate a float with random 24-bit significand.    */
+/*                                                                           */
+/*****************************************************************************/
 
-//  a = random();
-//  c = random();
-//  result = (float) ((a - 1073741824) >> 6);
-//  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
-//    if (c & i) {
-//      result *= expo;
-//    }
-//  }
-//  return result;
-//}
+float uniformfloatrand()
+{
+  float result;
+  long a;
 
-///*****************************************************************************/
-///*                                                                           */
-///*  uniformfloatrand()   Generate a float with random 24-bit significand.    */
-///*                                                                           */
-///*****************************************************************************/
-
-//CINO_INLINE
-//float uniformfloatrand()
-//{
-//  float result;
-//  long a;
-
-//  a = random();
-//  result = (float) ((a - 1073741824) >> 6);
-//  return result;
-//}
+  a = random();
+  result = (float) ((a - 1073741824) >> 6);
+  return result;
+}
 
 /*****************************************************************************/
 /*                                                                           */
@@ -670,8 +640,7 @@ REAL *e;
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-void exactinit(void)
+void exactinit()
 {
   REAL half;
   REAL check, lastcheck;
@@ -726,8 +695,11 @@ void exactinit(void)
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int grow_expansion(int elen, REAL *e, REAL b, REAL *h)                /* e and h can be the same. */
+int grow_expansion(elen, e, b, h)                /* e and h can be the same. */
+int elen;
+REAL *e;
+REAL b;
+REAL *h;
 {
   REAL Q;
   INEXACT REAL Qnew;
@@ -760,8 +732,11 @@ int grow_expansion(int elen, REAL *e, REAL b, REAL *h)                /* e and h
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int grow_expansion_zeroelim(int elen, REAL *e, REAL b, REAL *h)       /* e and h can be the same. */
+int grow_expansion_zeroelim(elen, e, b, h)       /* e and h can be the same. */
+int elen;
+REAL *e;
+REAL b;
+REAL *h;
 {
   REAL Q, hh;
   INEXACT REAL Qnew;
@@ -799,9 +774,13 @@ int grow_expansion_zeroelim(int elen, REAL *e, REAL b, REAL *h)       /* e and h
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)
+int expansion_sum(elen, e, flen, f, h)
 /* e and h can be the same, but f and h cannot. */
+int elen;
+REAL *e;
+int flen;
+REAL *f;
+REAL *h;
 {
   REAL Q;
   INEXACT REAL Qnew;
@@ -844,9 +823,13 @@ int expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int expansion_sum_zeroelim1(int elen, REAL *e, int flen, REAL *f, REAL *h)
+int expansion_sum_zeroelim1(elen, e, flen, f, h)
 /* e and h can be the same, but f and h cannot. */
+int elen;
+REAL *e;
+int flen;
+REAL *f;
+REAL *h;
 {
   REAL Q;
   INEXACT REAL Qnew;
@@ -900,9 +883,13 @@ int expansion_sum_zeroelim1(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int expansion_sum_zeroelim2(int elen, REAL *e, int flen, REAL *f, REAL *h)
+int expansion_sum_zeroelim2(elen, e, flen, f, h)
 /* e and h can be the same, but f and h cannot. */
+int elen;
+REAL *e;
+int flen;
+REAL *f;
+REAL *h;
 {
   REAL Q, hh;
   INEXACT REAL Qnew;
@@ -953,8 +940,12 @@ int expansion_sum_zeroelim2(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int fast_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)           /* h cannot be e or f. */
+int fast_expansion_sum(elen, e, flen, f, h)           /* h cannot be e or f. */
+int elen;
+REAL *e;
+int flen;
+REAL *f;
+REAL *h;
 {
   REAL Q;
   INEXACT REAL Qnew;
@@ -1026,8 +1017,12 @@ int fast_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)           
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int fast_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)  /* h cannot be e or f. */
+int fast_expansion_sum_zeroelim(elen, e, flen, f, h)  /* h cannot be e or f. */
+int elen;
+REAL *e;
+int flen;
+REAL *f;
+REAL *h;
 {
   REAL Q;
   INEXACT REAL Qnew;
@@ -1107,8 +1102,12 @@ int fast_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)  
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int linear_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)         /* h cannot be e or f. */
+int linear_expansion_sum(elen, e, flen, f, h)         /* h cannot be e or f. */
+int elen;
+REAL *e;
+int flen;
+REAL *f;
+REAL *h;
 {
   REAL Q, q;
   INEXACT REAL Qnew;
@@ -1167,8 +1166,12 @@ int linear_expansion_sum(int elen, REAL *e, int flen, REAL *f, REAL *h)         
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int linear_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)/* h cannot be e or f. */
+int linear_expansion_sum_zeroelim(elen, e, flen, f, h)/* h cannot be e or f. */
+int elen;
+REAL *e;
+int flen;
+REAL *f;
+REAL *h;
 {
   REAL Q, q, hh;
   INEXACT REAL Qnew;
@@ -1237,8 +1240,11 @@ int linear_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int scale_expansion(int elen, REAL *e, REAL b, REAL *h)            /* e and h cannot be the same. */
+int scale_expansion(elen, e, b, h)            /* e and h cannot be the same. */
+int elen;
+REAL *e;
+REAL b;
+REAL *h;
 {
   INEXACT REAL Q;
   INEXACT REAL sum;
@@ -1283,8 +1289,11 @@ int scale_expansion(int elen, REAL *e, REAL b, REAL *h)            /* e and h ca
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int scale_expansion_zeroelim(int elen, REAL *e, REAL b, REAL *h)   /* e and h cannot be the same. */
+int scale_expansion_zeroelim(elen, e, b, h)   /* e and h cannot be the same. */
+int elen;
+REAL *e;
+REAL b;
+REAL *h;
 {
   INEXACT REAL Q, sum;
   REAL hh;
@@ -1335,8 +1344,10 @@ int scale_expansion_zeroelim(int elen, REAL *e, REAL b, REAL *h)   /* e and h ca
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-int compress(int elen, REAL *e, REAL *h)                         /* e and h may be the same. */
+int compress(elen, e, h)                         /* e and h may be the same. */
+int elen;
+REAL *e;
+REAL *h;
 {
   REAL Q, q;
   INEXACT REAL Qnew;
@@ -1378,8 +1389,9 @@ int compress(int elen, REAL *e, REAL *h)                         /* e and h may 
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-REAL estimate(int elen, REAL *e)
+REAL estimate(elen, e)
+int elen;
+REAL *e;
 {
   REAL Q;
   int eindex;
@@ -1417,8 +1429,10 @@ REAL estimate(int elen, REAL *e)
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-REAL orient2dfast(REAL const* pa, REAL const* pb, REAL const* pc)
+REAL orient2dfast(pa, pb, pc)
+REAL *pa;
+REAL *pb;
+REAL *pc;
 {
   REAL acx, bcx, acy, bcy;
 
@@ -1429,8 +1443,10 @@ REAL orient2dfast(REAL const* pa, REAL const* pb, REAL const* pc)
   return acx * bcy - acy * bcx;
 }
 
-CINO_INLINE
-REAL orient2dexact(REAL const* pa, REAL const* pb, REAL const* pc)
+REAL orient2dexact(pa, pb, pc)
+REAL *pa;
+REAL *pb;
+REAL *pc;
 {
   INEXACT REAL axby1, axcy1, bxcy1, bxay1, cxay1, cxby1;
   REAL axby0, axcy0, bxcy0, bxay0, cxay0, cxby0;
@@ -1472,8 +1488,10 @@ REAL orient2dexact(REAL const* pa, REAL const* pb, REAL const* pc)
   return w[wlength - 1];
 }
 
-CINO_INLINE
-REAL orient2dslow(REAL const* pa, REAL const* pb, REAL const* pc)
+REAL orient2dslow(pa, pb, pc)
+REAL *pa;
+REAL *pb;
+REAL *pc;
 {
   INEXACT REAL acx, acy, bcx, bcy;
   REAL acxtail, acytail;
@@ -1514,8 +1532,11 @@ REAL orient2dslow(REAL const* pa, REAL const* pb, REAL const* pc)
   return deter[deterlen - 1];
 }
 
-CINO_INLINE
-REAL orient2dadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL detsum)
+REAL orient2dadapt(pa, pb, pc, detsum)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL detsum;
 {
   INEXACT REAL acx, acy, bcx, bcy;
   REAL acxtail, acytail, bcxtail, bcytail;
@@ -1595,8 +1616,10 @@ REAL orient2dadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL detsum)
   return(D[Dlength - 1]);
 }
 
-CINO_INLINE
-REAL orient2d(REAL const* pa, REAL const* pb, REAL const* pc)
+REAL orient2d(pa, pb, pc)
+REAL *pa;
+REAL *pb;
+REAL *pc;
 {
   REAL detleft, detright, det;
   REAL detsum, errbound;
@@ -1658,8 +1681,11 @@ REAL orient2d(REAL const* pa, REAL const* pb, REAL const* pc)
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-REAL orient3dfast(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
+REAL orient3dfast(pa, pb, pc, pd)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
 {
   REAL adx, bdx, cdx;
   REAL ady, bdy, cdy;
@@ -1680,8 +1706,11 @@ REAL orient3dfast(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd
        + cdx * (ady * bdz - adz * bdy);
 }
 
-CINO_INLINE
-REAL orient3dexact(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
+REAL orient3dexact(pa, pb, pc, pd)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
 {
   INEXACT REAL axby1, bxcy1, cxdy1, dxay1, axcy1, bxdy1;
   INEXACT REAL bxay1, cxby1, dxcy1, axdy1, cxay1, dxby1;
@@ -1758,8 +1787,11 @@ REAL orient3dexact(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* p
   return deter[deterlen - 1];
 }
 
-CINO_INLINE
-REAL orient3dslow(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
+REAL orient3dslow(pa, pb, pc, pd)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
 {
   INEXACT REAL adx, ady, adz, bdx, bdy, bdz, cdx, cdy, cdz;
   REAL adxtail, adytail, adztail;
@@ -1851,8 +1883,12 @@ REAL orient3dslow(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd
   return deter[deterlen - 1];
 }
 
-CINO_INLINE
-REAL orient3dadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL permanent)
+REAL orient3dadapt(pa, pb, pc, pd, permanent)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
+REAL permanent;
 {
   INEXACT REAL adx, bdx, cdx, ady, bdy, cdy, adz, bdz, cdz;
   REAL det, errbound;
@@ -2252,8 +2288,11 @@ REAL orient3dadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* p
   return finnow[finlength - 1];
 }
 
-CINO_INLINE
-REAL orient3d(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
+REAL orient3d(pa, pb, pc, pd)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
 {
   REAL adx, bdx, cdx, ady, bdy, cdy, adz, bdz, cdz;
   REAL bdxcdy, cdxbdy, cdxady, adxcdy, adxbdy, bdxady;
@@ -2320,8 +2359,11 @@ REAL orient3d(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-REAL incirclefast(REAL const*pa, REAL const* pb, REAL const* pc, REAL const* pd)
+REAL incirclefast(pa, pb, pc, pd)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
 {
   REAL adx, ady, bdx, bdy, cdx, cdy;
   REAL abdet, bcdet, cadet;
@@ -2344,8 +2386,11 @@ REAL incirclefast(REAL const*pa, REAL const* pb, REAL const* pc, REAL const* pd)
   return alift * bcdet + blift * cadet + clift * abdet;
 }
 
-CINO_INLINE
-REAL incircleexact(REAL const*pa, REAL const*pb, REAL const*pc, REAL const*pd)
+REAL incircleexact(pa, pb, pc, pd)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
 {
   INEXACT REAL axby1, bxcy1, cxdy1, dxay1, axcy1, bxdy1;
   INEXACT REAL bxay1, cxby1, dxcy1, axdy1, cxay1, dxby1;
@@ -2443,8 +2488,11 @@ REAL incircleexact(REAL const*pa, REAL const*pb, REAL const*pc, REAL const*pd)
   return deter[deterlen - 1];
 }
 
-CINO_INLINE
-REAL incircleslow(REAL const*pa, REAL const*pb, REAL const*pc, REAL const*pd)
+REAL incircleslow(pa, pb, pc, pd)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
 {
   INEXACT REAL adx, bdx, cdx, ady, bdy, cdy;
   REAL adxtail, bdxtail, cdxtail;
@@ -2600,8 +2648,12 @@ REAL incircleslow(REAL const*pa, REAL const*pb, REAL const*pc, REAL const*pd)
   return deter[deterlen - 1];
 }
 
-CINO_INLINE
-REAL incircleadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL permanent)
+REAL incircleadapt(pa, pb, pc, pd, permanent)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
+REAL permanent;
 {
   INEXACT REAL adx, bdx, cdx, ady, bdy, cdy;
   REAL det, errbound;
@@ -3170,8 +3222,11 @@ REAL incircleadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* p
   return finnow[finlength - 1];
 }
 
-CINO_INLINE
-REAL incircle(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
+REAL incircle(pa, pb, pc, pd)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
 {
   REAL adx, bdx, cdx, ady, bdy, cdy;
   REAL bdxcdy, cdxbdy, cdxady, adxcdy, adxbdy, bdxady;
@@ -3240,8 +3295,12 @@ REAL incircle(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd)
 /*                                                                           */
 /*****************************************************************************/
 
-CINO_INLINE
-REAL inspherefast(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL const* pe)
+REAL inspherefast(pa, pb, pc, pd, pe)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
+REAL *pe;
 {
   REAL aex, bex, cex, dex;
   REAL aey, bey, cey, dey;
@@ -3284,8 +3343,12 @@ REAL inspherefast(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd
   return (dlift * abc - clift * dab) + (blift * cda - alift * bcd);
 }
 
-CINO_INLINE
-REAL insphereexact(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL const* pe)
+REAL insphereexact(pa, pb, pc, pd, pe)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
+REAL *pe;
 {
   INEXACT REAL axby1, bxcy1, cxdy1, dxey1, exay1;
   INEXACT REAL bxay1, cxby1, dxcy1, exdy1, axey1;
@@ -3537,8 +3600,12 @@ REAL insphereexact(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* p
   return deter[deterlen - 1];
 }
 
-CINO_INLINE
-REAL insphereslow(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL const* pe)
+REAL insphereslow(pa, pb, pc, pd, pe)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
+REAL *pe;
 {
   INEXACT REAL aex, bex, cex, dex, aey, bey, cey, dey, aez, bez, cez, dez;
   REAL aextail, bextail, cextail, dextail;
@@ -3867,8 +3934,13 @@ REAL insphereslow(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd
   return deter[deterlen - 1];
 }
 
-CINO_INLINE
-REAL insphereadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL const* pe, REAL permanent)
+REAL insphereadapt(pa, pb, pc, pd, pe, permanent)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
+REAL *pe;
+REAL permanent;
 {
   INEXACT REAL aex, bex, cex, dex, aey, bey, cey, dey, aez, bez, cez, dez;
   REAL det, errbound;
@@ -4082,8 +4154,12 @@ REAL insphereadapt(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* p
   return insphereexact(pa, pb, pc, pd, pe);
 }
 
-CINO_INLINE
-REAL insphere(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, REAL const* pe)
+REAL insphere(pa, pb, pc, pd, pe)
+REAL *pa;
+REAL *pb;
+REAL *pc;
+REAL *pd;
+REAL *pe;
 {
   REAL aex, bex, cex, dex;
   REAL aey, bey, cey, dey;
@@ -4184,75 +4260,3 @@ REAL insphere(REAL const* pa, REAL const* pb, REAL const* pc, REAL const* pd, RE
 
   return insphereadapt(pa, pb, pc, pd, pe, permanent);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//:::::::::::::::::::: WRAPS FOR CINOLIB TYPES :::::::::::::::::::::::::::
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double orient2d(const vec2d & pa, const vec2d & pb, const vec2d & pc)
-{
-    return orient2d(pa.ptr(), pb.ptr(), pc.ptr());
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double orient2dfast(const vec2d & pa, const vec2d & pb, const vec2d & pc)
-{
-    return orient2dfast(pa.ptr(), pb.ptr(), pc.ptr());
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double orient3d(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd)
-{
-    return orient3d(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr());
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double orient3dfast(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd)
-{
-    return orient3dfast(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr());
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-
-CINO_INLINE
-double incircle(const vec2d & pa, const vec2d & pb, const vec2d & pc, const vec2d & pd)
-{
-    return incircle(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr());
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double incirclefast(const vec2d & pa, const vec2d & pb, const vec2d & pc, const vec2d & pd)
-{
-    return incirclefast(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr());
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double insphere(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd, const vec3d & pe)
-{
-    return insphere(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr(), pe.ptr());
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-double inspherefast(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd, const vec3d & pe)
-{
-    return inspherefast(pa.ptr(), pb.ptr(), pc.ptr(), pd.ptr(), pe.ptr());
-}
-
-}
-

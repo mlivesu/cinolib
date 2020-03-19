@@ -36,7 +36,7 @@
 #include <cinolib/geometry/polygon_utils.h>
 #include <cinolib/geometry/plane.h>
 #include <cinolib/geometry/triangle_utils.h>
-#include <cinolib/Shewchuk_predicates.h>
+#include <cinolib/Shewchuk_predicates_wrap.h>
 #include <cinolib/exact_geometric_predicates.h>
 #include <map>
 

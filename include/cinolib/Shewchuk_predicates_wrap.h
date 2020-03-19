@@ -33,8 +33,8 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SHEWCHUK_PREDICATES
-#define CINO_SHEWCHUK_PREDICATES
+#ifndef CINO_SHEWCHUK_PREDICATES_WRAP
+#define CINO_SHEWCHUK_PREDICATES_WRAP
 
 #include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>
@@ -42,49 +42,54 @@
 namespace cinolib
 {
 
-/* Wrap of the popular Shewchuk's:
+/* Wrap of the popular geometric predicates described by Shewchuk in:
  *
- * Routines for Arbitrary Precision Floating-point
- * Arithmetic and Fast Robust Geometric Predicates
+ * Routines for Arbitrary Precision Floating-point Arithmetic and
+ * Fast Robust Geometric Predicates
  *
- * IMPORTANT: remember to call exactinit() once in
- * your application before any use of the predicates
+ * WARNING: remember to call exactinit() once in your application
+ * prior using any of these predicates, otherwise machine epsilon
+ * and error constants will not be set properly, and precision will
+ * be as bad as the standard floating point system!
 */
 
-CINO_INLINE void exactinit();
+extern "C"
+{
+    void   exactinit();
+    double orient2d    (const double * pa, const double * pb, const double * pc);
+    double orient2dfast(const double * pa, const double * pb, const double * pc);
+    double orient3d    (const double * pa, const double * pb, const double * pc, const double * pd);
+    double orient3dfast(const double * pa, const double * pb, const double * pc, const double * pd);
+    double incircle    (const double * pa, const double * pb, const double * pc, const double * pd);
+    double incirclefast(const double * pa, const double * pb, const double * pc, const double * pd);
+    double insphere    (const double * pa, const double * pb, const double * pc, const double * pd, const double * pe);
+    double inspherefast(const double * pa, const double * pb, const double * pc, const double * pd, const double * pe);
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-CINO_INLINE double orient2d    (double const * pa, double const * pb, double const * pc);
-CINO_INLINE double orient2d    (const  vec2d & pa, const  vec2d & pb, const  vec2d & pc);
-CINO_INLINE double orient2dfast(double const * pa, double const * pb, double const * pc);
-CINO_INLINE double orient2dfast(const  vec2d & pa, const  vec2d & pb, const  vec2d & pc);
+CINO_INLINE double orient2d    (const vec2d & pa, const vec2d & pb, const vec2d & pc);
+CINO_INLINE double orient2dfast(const vec2d & pa, const vec2d & pb, const vec2d & pc);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-CINO_INLINE double orient3d    (double const * pa, double const * pb, double const * pc, double const * pd);
-CINO_INLINE double orient3d    (const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd);
-CINO_INLINE double orient3dfast(double const * pa, double const * pb, double const * pc, double const * pd);
-CINO_INLINE double orient3dfast(const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd);
+CINO_INLINE double orient3d    (const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd);
+CINO_INLINE double orient3dfast(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-CINO_INLINE double incircle    (double const * pa, double const * pb, double const * pc, double const * pd);
-CINO_INLINE double incircle    (const  vec2d & pa, const  vec2d & pb, const  vec2d & pc, const  vec2d & pd);
-CINO_INLINE double incirclefast(double const * pa, double const * pb, double const * pc, double const * pd);
-CINO_INLINE double incirclefast(const  vec2d & pa, const  vec2d & pb, const  vec2d & pc, const  vec2d & pd);
+CINO_INLINE double incircle    (const vec2d & pa, const vec2d & pb, const vec2d & pc, const vec2d & pd);
+CINO_INLINE double incirclefast(const vec2d & pa, const vec2d & pb, const vec2d & pc, const vec2d & pd);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-CINO_INLINE double insphere    (double const * pa, double const * pb, double const * pc, double const * pd, double const * pe);
-CINO_INLINE double insphere    (const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd, const  vec3d & pe);
-CINO_INLINE double inspherefast(double const * pa, double const * pb, double const * pc, double const * pd, double const * pe);
-CINO_INLINE double inspherefast(const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd, const  vec3d & pe);
+CINO_INLINE double insphere    (const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd, const vec3d & pe);
+CINO_INLINE double inspherefast(const vec3d & pa, const vec3d & pb, const vec3d & pc, const vec3d & pd, const vec3d & pe);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "Shewchuk_predicates.cpp"
+#include "Shewchuk_predicates_wrap.cpp"
 #endif
 
-#endif // CINO_SHEWCHUK_PREDICATES
+#endif // CINO_SHEWCHUK_PREDICATES_WRAP

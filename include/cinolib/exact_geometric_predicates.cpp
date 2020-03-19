@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/exact_geometric_predicates.h>
-#include <cinolib/Shewchuk_predicates.h>
+#include <cinolib/Shewchuk_predicates_wrap.h>
 
 namespace cinolib
 {
