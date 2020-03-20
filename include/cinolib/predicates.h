@@ -38,7 +38,6 @@
 
 #include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>
-#include <float.h>
 
 namespace cinolib
 {
@@ -130,13 +129,21 @@ SimplexIntersection;
  * Routines for Arbitrary Precision Floating-point Arithmetic and
  * Fast Robust Geometric Predicates
  *
- * If you use these predicates, you should include in your project
- * <CINOLIB_HOME>/external/predicates/shewchuk.c and compile it,
- * otherwise the linker will not find an implementation for the
- * methods below.
+ * WARNING #1: if you use these predicates, you should include in your
+ * project <CINOLIB_HOME>/external/predicates/shewchuk.c and compile it,
+ * otherwise the linker will not find an implementation for the methods
+ * below.
+ *
+ * WARNING #2: if you use these predicates, remember to call exactinit()
+ * at the beginning of your application, otherwise machine epsilon and
+ * error constants will not be set properly, and precision will be limited
+ * by the standard floating point system, as if CINOLIB_USES_EXACT_PREDICATES
+ * was not even defined
 */
 extern "C"
 {
+
+void exactinit();
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -165,51 +172,6 @@ double insphere(const double * pa,
                 const double * pc,
                 const double * pd,
                 const double * pe);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-/* This piece of code substitutes the exactinit() routine defined in the
- * original Shewchuk's predicates, and serves to define machine epsilon
- * and the error bounds for the orient and incircle predicates.
- * There are two alternative definitions of machine epsilon: the header
- * float.h defines DBL_EPSILON such that 1.0 + DBL_EPSILON > 1.0 in
- * double-precision arithmetic, but  1.0 + z = 1.0 for any `z < DBL_EPSILON`.
- * Other sources (included Shewchuk's predicates) define the machine epsilon
- * as the largest floating-point number such that 1.0 + epsilon = 1.0.
- * The two definitions are related by epsilon = DBL_EPSILON / 2.
- */
-extern const double epsilon;
-extern const double splitter;
-extern const double resulterrbound;
-extern const double ccwerrboundA;
-extern const double ccwerrboundB;
-extern const double ccwerrboundC;
-extern const double o3derrboundA;
-extern const double o3derrboundB;
-extern const double o3derrboundC;
-extern const double iccerrboundA;
-extern const double iccerrboundB;
-extern const double iccerrboundC;
-extern const double isperrboundA;
-extern const double isperrboundB;
-extern const double isperrboundC;
-
-const double epsilon        = DBL_EPSILON / 2;
-const double splitter       = ((DBL_MANT_DIG + 1) >> 1) + 1.0;
-const double resulterrbound = ( 3.0 +    8.0 * epsilon) * epsilon;
-const double ccwerrboundA   = ( 3.0 +   16.0 * epsilon) * epsilon;
-const double ccwerrboundB   = ( 2.0 +   12.0 * epsilon) * epsilon;
-const double ccwerrboundC   = ( 9.0 +   64.0 * epsilon) * epsilon * epsilon;
-const double o3derrboundA   = ( 7.0 +   56.0 * epsilon) * epsilon;
-const double o3derrboundB   = ( 3.0 +   28.0 * epsilon) * epsilon;
-const double o3derrboundC   = (26.0 +  288.0 * epsilon) * epsilon * epsilon;
-const double iccerrboundA   = (10.0 +   96.0 * epsilon) * epsilon;
-const double iccerrboundB   = ( 4.0 +   48.0 * epsilon) * epsilon;
-const double iccerrboundC   = (44.0 +  576.0 * epsilon) * epsilon * epsilon;
-const double isperrboundA   = (16.0 +  224.0 * epsilon) * epsilon;
-const double isperrboundB   = ( 5.0 +   72.0 * epsilon) * epsilon;
-const double isperrboundC   = (71.0 + 1408.0 * epsilon) * epsilon * epsilon;
-
 }
 
 #else
