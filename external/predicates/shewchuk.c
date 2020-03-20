@@ -1,3 +1,15 @@
+/* WARNING: these are NOT the original Shewchuk's predicates,
+ * but rather a modified version that I use in Cinolib.
+ *
+ * Edits:
+ *   line      130: included float.h to import machine epsilon directly from the standard C library
+ *   lines 374-408: initialize machine epsilon and coefficients for roundoff errors at compile time.
+ *                  With this edit it is no longer necessary to call exactinit() prior using the exact
+ *                  predicates. They should go out of the box without any explicit initialization!
+ *   lines 683-723: commented exactinit()
+*/
+
+
 /*****************************************************************************/
 /*                                                                           */
 /*  Routines for Arbitrary Precision Floating-point Arithmetic               */
@@ -116,7 +128,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <sys/time.h>
+#include <float.h>
+//#include <sys/time.h>
 
 /* On some machines, the exact arithmetic routines might be defeated by the  */
 /*   use of internal extended precision floating-point registers.  Sometimes */
@@ -130,7 +143,7 @@
 #define INEXACT                          /* Nothing */
 /* #define INEXACT volatile */
 
-#define REAL double                      /* float or double */
+#define REAL double             // Cino edit: if you change to float remember to update epsilon ad splitter!!!
 #define REALPRINT doubleprint
 #define REALRAND doublerand
 #define NARROWRAND narrowdoublerand
@@ -358,14 +371,41 @@
   Square(a1, _j, _1); \
   Two_Two_Sum(_j, _1, _l, _2, x5, x4, x3, x2)
 
-REAL splitter;     /* = 2^ceiling(p / 2) + 1.  Used to split floats in half. */
-REAL epsilon;                /* = 2^(-p).  Used to estimate roundoff errors. */
-/* A set of coefficients used to calculate maximum roundoff errors.          */
-REAL resulterrbound;
-REAL ccwerrboundA, ccwerrboundB, ccwerrboundC;
-REAL o3derrboundA, o3derrboundB, o3derrboundC;
-REAL iccerrboundA, iccerrboundB, iccerrboundC;
-REAL isperrboundA, isperrboundB, isperrboundC;
+/* Cino edit:
+ * this piece of code substitutes the exactinit() routine defined in the
+ * original Shewchuk's predicates, and serves to define machine epsilon
+ * and the error bounds for the orient and incircle predicates.
+ * There are two alternative definitions of machine epsilon: the header
+ * float.h defines DBL_EPSILON such that 1.0 + DBL_EPSILON > 1.0 in
+ * double-precision arithmetic, but  1.0 + z = 1.0 for any `z < DBL_EPSILON`.
+ * Other sources (included Shewchuk's predicates) define the machine epsilon
+ * as the largest floating-point number such that 1.0 + epsilon = 1.0.
+ * The two definitions are related by epsilon = DBL_EPSILON / 2.
+ */
+const REAL epsilon        = DBL_EPSILON / 2;
+const REAL splitter       = ((DBL_MANT_DIG + 1) >> 1) + 1.0;
+const REAL resulterrbound = ( 3.0 +    8.0 * epsilon) * epsilon;
+const REAL ccwerrboundA   = ( 3.0 +   16.0 * epsilon) * epsilon;
+const REAL ccwerrboundB   = ( 2.0 +   12.0 * epsilon) * epsilon;
+const REAL ccwerrboundC   = ( 9.0 +   64.0 * epsilon) * epsilon * epsilon;
+const REAL o3derrboundA   = ( 7.0 +   56.0 * epsilon) * epsilon;
+const REAL o3derrboundB   = ( 3.0 +   28.0 * epsilon) * epsilon;
+const REAL o3derrboundC   = (26.0 +  288.0 * epsilon) * epsilon * epsilon;
+const REAL iccerrboundA   = (10.0 +   96.0 * epsilon) * epsilon;
+const REAL iccerrboundB   = ( 4.0 +   48.0 * epsilon) * epsilon;
+const REAL iccerrboundC   = (44.0 +  576.0 * epsilon) * epsilon * epsilon;
+const REAL isperrboundA   = (16.0 +  224.0 * epsilon) * epsilon;
+const REAL isperrboundB   = ( 5.0 +   72.0 * epsilon) * epsilon;
+const REAL isperrboundC   = (71.0 + 1408.0 * epsilon) * epsilon * epsilon;
+
+//REAL splitter;     /* = 2^ceiling(p / 2) + 1.  Used to split floats in half. */
+//REAL epsilon;                /* = 2^(-p).  Used to estimate roundoff errors. */
+///* A set of coefficients used to calculate maximum roundoff errors.          */
+//REAL resulterrbound;
+//REAL ccwerrboundA, ccwerrboundB, ccwerrboundC;
+//REAL o3derrboundA, o3derrboundB, o3derrboundC;
+//REAL iccerrboundA, iccerrboundB, iccerrboundC;
+//REAL isperrboundA, isperrboundB, isperrboundC;
 
 /*****************************************************************************/
 /*                                                                           */
@@ -640,47 +680,47 @@ float uniformfloatrand()
 /*                                                                           */
 /*****************************************************************************/
 
-void exactinit()
-{
-  REAL half;
-  REAL check, lastcheck;
-  int every_other;
+//void exactinit()
+//{
+//  REAL half;
+//  REAL check, lastcheck;
+//  int every_other;
 
-  every_other = 1;
-  half = 0.5;
-  epsilon = 1.0;
-  splitter = 1.0;
-  check = 1.0;
-  /* Repeatedly divide `epsilon' by two until it is too small to add to    */
-  /*   one without causing roundoff.  (Also check if the sum is equal to   */
-  /*   the previous sum, for machines that round up instead of using exact */
-  /*   rounding.  Not that this library will work on such machines anyway. */
-  do {
-    lastcheck = check;
-    epsilon *= half;
-    if (every_other) {
-      splitter *= 2.0;
-    }
-    every_other = !every_other;
-    check = 1.0 + epsilon;
-  } while ((check != 1.0) && (check != lastcheck));
-  splitter += 1.0;
+//  every_other = 1;
+//  half = 0.5;
+//  epsilon = 1.0;
+//  splitter = 1.0;
+//  check = 1.0;
+//  /* Repeatedly divide `epsilon' by two until it is too small to add to    */
+//  /*   one without causing roundoff.  (Also check if the sum is equal to   */
+//  /*   the previous sum, for machines that round up instead of using exact */
+//  /*   rounding.  Not that this library will work on such machines anyway. */
+//  do {
+//    lastcheck = check;
+//    epsilon *= half;
+//    if (every_other) {
+//      splitter *= 2.0;
+//    }
+//    every_other = !every_other;
+//    check = 1.0 + epsilon;
+//  } while ((check != 1.0) && (check != lastcheck));
+//  splitter += 1.0;
 
-  /* Error bounds for orientation and incircle tests. */
-  resulterrbound = (3.0 + 8.0 * epsilon) * epsilon;
-  ccwerrboundA = (3.0 + 16.0 * epsilon) * epsilon;
-  ccwerrboundB = (2.0 + 12.0 * epsilon) * epsilon;
-  ccwerrboundC = (9.0 + 64.0 * epsilon) * epsilon * epsilon;
-  o3derrboundA = (7.0 + 56.0 * epsilon) * epsilon;
-  o3derrboundB = (3.0 + 28.0 * epsilon) * epsilon;
-  o3derrboundC = (26.0 + 288.0 * epsilon) * epsilon * epsilon;
-  iccerrboundA = (10.0 + 96.0 * epsilon) * epsilon;
-  iccerrboundB = (4.0 + 48.0 * epsilon) * epsilon;
-  iccerrboundC = (44.0 + 576.0 * epsilon) * epsilon * epsilon;
-  isperrboundA = (16.0 + 224.0 * epsilon) * epsilon;
-  isperrboundB = (5.0 + 72.0 * epsilon) * epsilon;
-  isperrboundC = (71.0 + 1408.0 * epsilon) * epsilon * epsilon;
-}
+//  /* Error bounds for orientation and incircle tests. */
+//  resulterrbound = (3.0 + 8.0 * epsilon) * epsilon;
+//  ccwerrboundA = (3.0 + 16.0 * epsilon) * epsilon;
+//  ccwerrboundB = (2.0 + 12.0 * epsilon) * epsilon;
+//  ccwerrboundC = (9.0 + 64.0 * epsilon) * epsilon * epsilon;
+//  o3derrboundA = (7.0 + 56.0 * epsilon) * epsilon;
+//  o3derrboundB = (3.0 + 28.0 * epsilon) * epsilon;
+//  o3derrboundC = (26.0 + 288.0 * epsilon) * epsilon * epsilon;
+//  iccerrboundA = (10.0 + 96.0 * epsilon) * epsilon;
+//  iccerrboundB = (4.0 + 48.0 * epsilon) * epsilon;
+//  iccerrboundC = (44.0 + 576.0 * epsilon) * epsilon * epsilon;
+//  isperrboundA = (16.0 + 224.0 * epsilon) * epsilon;
+//  isperrboundB = (5.0 + 72.0 * epsilon) * epsilon;
+//  isperrboundC = (71.0 + 1408.0 * epsilon) * epsilon * epsilon;
+//}
 
 /*****************************************************************************/
 /*                                                                           */
