@@ -129,13 +129,21 @@ SimplexIntersection;
  * Routines for Arbitrary Precision Floating-point Arithmetic and
  * Fast Robust Geometric Predicates
  *
- * WARNING: if you use these predicates, you should include in your
+ * WARNING #1: if you use these predicates, you should include in your
  * project <CINOLIB_HOME>/external/predicates/shewchuk.c and compile it,
  * otherwise the linker will not find an implementation for the methods
- * below
- */
+ * below.
+ *
+ * WARNING #2: if you use these predicates, remember to call exactinit()
+ * at the beginning of your application, otherwise machine epsilon and
+ * error constants will not be set properly, and precision will be limited
+ * by the standard floating point system, as if CINOLIB_USES_EXACT_PREDICATES
+ * was not even defined
+*/
 extern "C"
 {
+
+void exactinit();
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
