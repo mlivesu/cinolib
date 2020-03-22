@@ -373,14 +373,14 @@
 
 /* Cino edit:
  * this piece of code substitutes the exactinit() routine defined in the
- * original Shewchuk's predicates, and serves to define machine epsilon
- * and the error bounds for the orient and incircle predicates.
+ * original Shewchuk's predicates, and serves to define the machine epsilon
+ * and the error bounds for the orient, incircle and insphere predicates.
  * There are two alternative definitions of machine epsilon: the header
- * float.h defines DBLepsilon such that 1.0 + DBLepsilon > 1.0 in
- * double-precision arithmetic, but  1.0 + z = 1.0 for any `z < DBLepsilon`.
- * Other sources (included Shewchuk's predicates) define the machine epsilon
- * as the largest floating-point number such that 1.0 + epsilon = 1.0.
- * The two definitions are related by epsilon = DBLepsilon / 2.
+ * float.h defines DBL_EPSILON such that 1.0 + DBL_EPSILON > 1.0 in
+ * double-precision arithmetic, but  1.0 + z = 1.0 for any `z < DBL_EPSILON`.
+ * Shewchuk defines the machine epsilon as the largest floating-point number 
+ * such that 1.0 + epsilon = 1.0. The two definitions are related by 
+ * epsilon = DBL_EPSILON / 2.
  */
 const REAL epsilon        = DBL_EPSILON / 2;
 const REAL splitter       = (1 << (DBL_MANT_DIG/2+1)) + 1.0; // this matches the value produced by exactinit(). However, 1 << (DBL_MANT_DIG/2)) + 1.0 is more correct IMHO
