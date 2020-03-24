@@ -3,10 +3,10 @@
  *
  * Edits:
  *   line      130: included float.h to import machine epsilon directly from the standard C library
- *   lines 374-408: initialize machine epsilon and coefficients for roundoff errors at compile time.
+ *   lines 374-418: initialize machine epsilon and coefficients for roundoff errors at compile time.
  *                  With this edit it is no longer necessary to call exactinit() prior using the exact
  *                  predicates. They should go out of the box without any explicit initialization!
- *   lines 683-723: commented exactinit()
+ *   lines 693-733: commented exactinit()
 */
 
 
@@ -373,31 +373,41 @@
 
 /* Cino edit:
  * this piece of code substitutes the exactinit() routine defined in the
- * original Shewchuk's predicates, and serves to define the machine epsilon
- * and the error bounds for the orient, incircle and insphere predicates.
- * There are two alternative definitions of machine epsilon: the header
- * float.h defines DBL_EPSILON such that 1.0 + DBL_EPSILON > 1.0 in
+ * original Shewchuk's predicates, and serves to define machine epsilon
+ * and the error bounds for the orient and incircle predicates.
+ * The header float.h defines DBL_EPSILON such that 1.0 + DBL_EPSILON > 1.0 in
  * double-precision arithmetic, but  1.0 + z = 1.0 for any `z < DBL_EPSILON`.
- * Shewchuk defines the machine epsilon as the largest floating-point number 
- * such that 1.0 + epsilon = 1.0. The two definitions are related by 
- * epsilon = DBL_EPSILON / 2.
+ * Shewchuk defines the machine epsilon as the largest floating-point number
+ * such that 1.0 + epsilon = 1.0. The two definitions are related by
+ * SHEWCHUK_EPSILON = DBL_EPSILON / 2
+ *
+ * In this modified version of the predicates SHEWCHUK_EPSILON is initialized
+ * with #define, and not as a global variable like in the original code. This
+ * is because GCC complains if I make it const REAL and I use it to inizialize
+ * the error bounds below...
  */
-const REAL epsilon        = DBL_EPSILON / 2;
-const REAL splitter       = (1 << (DBL_MANT_DIG/2+1)) + 1.0; // this matches the value produced by exactinit(). However, 1 << (DBL_MANT_DIG/2)) + 1.0 is more correct IMHO
-const REAL resulterrbound = ( 3.0 +    8.0 * epsilon) * epsilon;
-const REAL ccwerrboundA   = ( 3.0 +   16.0 * epsilon) * epsilon;
-const REAL ccwerrboundB   = ( 2.0 +   12.0 * epsilon) * epsilon;
-const REAL ccwerrboundC   = ( 9.0 +   64.0 * epsilon) * epsilon * epsilon;
-const REAL o3derrboundA   = ( 7.0 +   56.0 * epsilon) * epsilon;
-const REAL o3derrboundB   = ( 3.0 +   28.0 * epsilon) * epsilon;
-const REAL o3derrboundC   = (26.0 +  288.0 * epsilon) * epsilon * epsilon;
-const REAL iccerrboundA   = (10.0 +   96.0 * epsilon) * epsilon;
-const REAL iccerrboundB   = ( 4.0 +   48.0 * epsilon) * epsilon;
-const REAL iccerrboundC   = (44.0 +  576.0 * epsilon) * epsilon * epsilon;
-const REAL isperrboundA   = (16.0 +  224.0 * epsilon) * epsilon;
-const REAL isperrboundB   = ( 5.0 +   72.0 * epsilon) * epsilon;
-const REAL isperrboundC   = (71.0 + 1408.0 * epsilon) * epsilon * epsilon;
+#define SHEWCHUK_EPSILON  DBL_EPSILON/2
 
+const REAL resulterrbound = ( 3.0 +    8.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON;
+const REAL ccwerrboundA   = ( 3.0 +   16.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON;
+const REAL ccwerrboundB   = ( 2.0 +   12.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON;
+const REAL ccwerrboundC   = ( 9.0 +   64.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON * SHEWCHUK_EPSILON;
+const REAL o3derrboundA   = ( 7.0 +   56.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON;
+const REAL o3derrboundB   = ( 3.0 +   28.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON;
+const REAL o3derrboundC   = (26.0 +  288.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON * SHEWCHUK_EPSILON;
+const REAL iccerrboundA   = (10.0 +   96.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON;
+const REAL iccerrboundB   = ( 4.0 +   48.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON;
+const REAL iccerrboundC   = (44.0 +  576.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON * SHEWCHUK_EPSILON;
+const REAL isperrboundA   = (16.0 +  224.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON;
+const REAL isperrboundB   = ( 5.0 +   72.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON;
+const REAL isperrboundC   = (71.0 + 1408.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON * SHEWCHUK_EPSILON;
+
+// this matches the value produced by exactinit().
+// However, 1 << (DBL_MANT_DIG/2)) + 1.0 is more correct IMHO
+const REAL splitter = (1 << (DBL_MANT_DIG/2+1)) + 1.0;
+
+// Original code from Shewchuk:
+//
 //REAL splitter;     /* = 2^ceiling(p / 2) + 1.  Used to split floats in half. */
 //REAL epsilon;                /* = 2^(-p).  Used to estimate roundoff errors. */
 ///* A set of coefficients used to calculate maximum roundoff errors.          */
