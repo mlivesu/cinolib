@@ -18,6 +18,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* try to adhere more to data flow principles, keeping as few classes as possible with minimal access to inner data, moving methods that do non trivial processing outside
 * use [STB](https://github.com/nothings/stb/blob/master/stb_image.h) for image texture loading
 * make a struct material, and create an instance of it inside a drawable object, so that any object has its own appearance
 * consider using SSE instructions (http://www.cs.uu.nl/docs/vakken/magr/2017-2018/files/SIMD%20Tutorial.pdf)
