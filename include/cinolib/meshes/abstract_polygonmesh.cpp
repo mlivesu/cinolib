@@ -867,6 +867,30 @@ uint AbstractPolygonMesh<M,V,E,P>::vert_add(const vec3d & pos)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+bool AbstractPolygonMesh<M,V,E,P>::vert_merge(const uint vid0, const uint vid1)
+{
+    std::vector<uint> old_polys = this->adj_v2p(vid1);
+    std::vector<std::vector<uint>> new_polys;
+    for(uint pid : old_polys)
+    {
+        // if there is a polygon containing both vid0 and vid1 abort the operation
+        if(poly_contains_vert(pid,vid0)) return false;
+
+        std::vector<uint> p = poly_verts_id(pid);
+        std::replace(p.begin(), p.end(), vid1, vid0);
+        new_polys.push_back(p);
+    }
+
+    for(auto p : new_polys) poly_add(p);
+    vert_remove(vid1);
+
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::vert_switch_id(const uint vid0, const uint vid1)
 {
     // [28 Aug 2017] Tested on 10K random id switches : PASSED
