@@ -874,9 +874,9 @@ bool AbstractPolygonMesh<M,V,E,P>::vert_merge(const uint vid0, const uint vid1)
     for(uint pid : old_polys)
     {
         // if there is a polygon containing both vid0 and vid1 abort the operation
-        if(poly_contains_vert(pid,vid0)) return false;
+        if(this->poly_contains_vert(pid,vid0)) return false;
 
-        std::vector<uint> p = poly_verts_id(pid);
+        std::vector<uint> p = this->poly_verts_id(pid);
         std::replace(p.begin(), p.end(), vid1, vid0);
         new_polys.push_back(p);
     }
