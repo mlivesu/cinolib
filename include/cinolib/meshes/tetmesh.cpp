@@ -654,15 +654,22 @@ uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
 {
     uint new_vid = this->vert_add(p);
 
-    for(uint i=0; i<4; ++i)
-    {
+    for(uint fid : this->adj_p2f(pid))
+    {        
         std::vector<uint> tet(4, new_vid);
-        tet[TET_FACES[i][0]] = this->poly_vert_id(pid,TET_FACES[i][0]);
-        tet[TET_FACES[i][1]] = this->poly_vert_id(pid,TET_FACES[i][1]);
-        tet[TET_FACES[i][2]] = this->poly_vert_id(pid,TET_FACES[i][2]);
+        tet[0] = this->face_vert_id(fid,0);
+        tet[1] = this->face_vert_id(fid,1);
+        tet[2] = this->face_vert_id(fid,2);
+        if(this->poly_face_is_CW(pid,fid)) std::swap(tet[1],tet[2]);
         uint new_pid = this->poly_add(tet);
+        if(this->poly_face_is_CW(pid,fid) != this->poly_face_is_CW(new_pid,fid))
+        {
+            this->poly_face_flip_winding(new_pid,fid);
+            this->reorder_p2v(new_pid);
+        }
         this->poly_data(new_pid) = this->poly_data(pid);
     }
+
     this->poly_remove(pid);
 
     return new_vid;
