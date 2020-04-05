@@ -656,18 +656,21 @@ uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
 
     for(uint fid : this->adj_p2f(pid))
     {        
-        std::vector<uint> tet(4, new_vid);
-        tet[0] = this->face_vert_id(fid,0);
-        tet[1] = this->face_vert_id(fid,1);
-        tet[2] = this->face_vert_id(fid,2);
-        if(this->poly_face_is_CW(pid,fid)) std::swap(tet[1],tet[2]);
+        std::vector<uint> tet =
+        {
+            this->face_vert_id(fid,0),
+            this->face_vert_id(fid,1),
+            this->face_vert_id(fid,2),
+            new_vid
+        };
         uint new_pid = this->poly_add(tet);
+        this->poly_data(new_pid) = this->poly_data(pid);
+        // adjust winding and reorder verts, in case poly_add screwed it
         if(this->poly_face_is_CW(pid,fid) != this->poly_face_is_CW(new_pid,fid))
         {
             this->poly_face_flip_winding(new_pid,fid);
             this->reorder_p2v(new_pid);
         }
-        this->poly_data(new_pid) = this->poly_data(pid);
     }
 
     this->poly_remove(pid);
