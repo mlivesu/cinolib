@@ -2426,6 +2426,14 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist)
 {
+    /* NOTE TO MYSELF: never use this method inside topology editing operators that
+     * have temporary inconsistent states (e.g. faces that are temporarily incident
+     * to both new elements and elements that must be destroyed). Ths is because per
+     * face winding is assigned based on the number of elements already incident to
+     * the face, therefore also elements that are going to disappear count, poisoning
+     * the orientation of new elements....
+    */
+
     if(vlist.size()==4) // tetrahedron
     {
         // detect faces
