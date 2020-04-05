@@ -229,42 +229,45 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
 {
-    // create sub edges and propagate attributes
-    uint vid0    = this->edge_vert_id(eid, 0);
-    uint vid1    = this->edge_vert_id(eid, 1);
     uint new_vid = this->vert_add(p);
-    uint eid0    = this->edge_add(vid0, new_vid);
-    uint eid1    = this->edge_add(vid1, new_vid);
-    this->edge_data(eid0) = this->edge_data(eid);
-    this->edge_data(eid1) = this->edge_data(eid);
 
-    // create sub faces and propagate attributes
-    for(uint fid : this->adj_e2f(eid))
-    {
-        if(!this->face_verts_are_CCW(fid,vid1,vid0)) std::swap(vid1,vid0);
-        uint vid2 = this->face_vert_opposite_to(fid,eid);
-        uint fid0 = this->face_add({new_vid, vid1, vid2});
-        uint fid1 = this->face_add({new_vid, vid2, vid0});
-        this->face_data(fid0) = this->face_data(fid);
-        this->face_data(fid1) = this->face_data(fid);
-        this->update_f_normal(fid0);
-        this->update_f_normal(fid1);
-    }
-
-    // create sub polys and propagate attributes
+    // create sub-elements
     for(uint pid : this->adj_e2p(eid))
     {
         for(uint fid : this->poly_faces_opposite_to(pid,eid))
         {
-            std::vector<uint> tet(4);
-            tet[0] = this->face_vert_id(fid,TET_FACES[0][0]);
-            tet[1] = this->face_vert_id(fid,TET_FACES[0][1]);
-            tet[2] = this->face_vert_id(fid,TET_FACES[0][2]);
-            tet[3] = new_vid;
-            if (this->poly_face_is_CW(pid,fid)) std::swap(tet[1],tet[2]);
+            std::vector<uint> tet =
+            {
+                this->face_vert_id(fid,0),
+                this->face_vert_id(fid,1),
+                this->face_vert_id(fid,2),
+                new_vid
+            };
             uint new_pid = this->poly_add(tet);
             this->poly_data(new_pid) = this->poly_data(pid);
+            // adjust winding and reorder verts, in case poly_add screwed it
+            if(this->poly_face_is_CW(pid,fid) != this->poly_face_is_CW(new_pid,fid))
+            {
+                this->poly_face_flip_winding(new_pid,fid);
+                this->reorder_p2v(new_pid);
+            }
         }
+    }
+
+    // propagate attributes to sub-elements
+    uint vid0 = this->edge_vert_id(eid,0);
+    uint vid1 = this->edge_vert_id(eid,1);
+    int  e0   = this->edge_id(vid0, new_vid); assert(e0>=0);
+    int  e1   = this->edge_id(vid1, new_vid); assert(e1>=0);
+    this->edge_data(e0) = this->edge_data(eid);
+    this->edge_data(e1) = this->edge_data(eid);
+    for(uint fid : this->adj_e2f(eid))
+    {
+        uint vopp = this->face_vert_opposite_to(fid,eid);
+         int f0   = this->face_id({vid0,new_vid,vopp}); assert(f0>=0);
+         int f1   = this->face_id({vid1,new_vid,vopp}); assert(f1>=0);
+         this->face_data(f0) = this->face_data(fid);
+         this->face_data(f1) = this->face_data(fid);
     }
 
     // remove old edge and all elements attached to it
