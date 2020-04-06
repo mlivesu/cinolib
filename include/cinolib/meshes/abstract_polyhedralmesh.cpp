@@ -452,27 +452,21 @@ CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & pid_beneath) const
 {
     // note: returns also the ID of the poy that makes the face visible
-
-    if(this->face_is_on_srf(fid))
+    int id=-1;
+    for(uint pid : this->adj_f2p(fid))
     {
-        assert(this->adj_f2p(fid).size()==1);
-        pid_beneath = this->adj_f2p(fid).front();
-        return !this->poly_data(pid_beneath).flags[HIDDEN];
+        if(!this->poly_data(pid).flags[HIDDEN])
+        {
+            if(id>=0) return false; // second visible poly for fid: it's not exposed on the surface...
+            id=pid;
+        }
     }
-    else
+    if(id>=0)
     {
-        std::vector<uint> pids;
-        for(uint pid : this->adj_f2p(fid))
-        {
-            if(!this->poly_data(pid).flags[HIDDEN]) pids.push_back(pid);
-        }
-        if(pids.size()==1)
-        {
-            pid_beneath = pids.front();
-            return true;
-        }
-        return false;
+        pid_beneath = id;
+        return true;
     }
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1581,7 +1575,7 @@ template<class M, class V, class E, class F, class C>
 CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,C>::vert_is_visible(const uint vid) const
 {
-    for(uint fid : adj_v2f(vid))
+    for(uint fid : this->adj_v2f(vid))
     {
         uint pid;
         if(this->face_is_visible(fid,pid)) return true;
