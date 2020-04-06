@@ -500,14 +500,21 @@ uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
         uint opp_vid = this->poly_vert_opposite_to(pid, fid);
         for(uint off=0; off<3; ++off)
         {
-            std::vector<uint> tet(4);
-            tet[0] = this->face_vert_id(fid,off);
-            tet[1] = new_vid;
-            tet[2] = this->face_vert_id(fid,(off+1)%3);
-            tet[3] = opp_vid;
-            if (this->poly_face_is_CW(pid,fid)) std::swap(tet[1],tet[2]);
+            std::vector<uint> tet =
+            {
+                this->face_vert_id(fid,off),
+                new_vid,
+                this->face_vert_id(fid,(off+1)%3),
+                opp_vid
+            };
             uint new_pid = this->poly_add(tet);
             this->poly_data(new_pid) = this->poly_data(pid);
+            // adjust winding and reorder verts, in case poly_add screwed it
+            if(this->poly_face_is_CW(pid,fid) != this->poly_face_is_CW(new_pid,fid))
+            {
+                this->poly_face_flip_winding(new_pid,fid);
+                this->reorder_p2v(new_pid);
+            }
         }
     }
 
