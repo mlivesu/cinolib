@@ -510,9 +510,10 @@ uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
             uint new_pid = this->poly_add(tet);
             this->poly_data(new_pid) = this->poly_data(pid);
             // adjust winding and reorder verts, in case poly_add screwed it
-            if(this->poly_face_is_CW(pid,fid) != this->poly_face_is_CW(new_pid,fid))
+            int id = this->face_id({tet[0],tet[2],opp_vid}); assert(id>=0);
+            if(this->poly_face_is_CW(pid,id) != this->poly_face_is_CW(new_pid,id))
             {
-                this->poly_face_flip_winding(new_pid,fid);
+                this->poly_face_flip_winding(new_pid,id);
                 this->reorder_p2v(new_pid);
             }
         }
