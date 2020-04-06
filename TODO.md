@@ -18,6 +18,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* consider computing element quality and normals (at least for faces) on the fly, without precomputing and storing them
 * try to adhere more to data flow/functional programming principles, keeping as few classes as possible with only access to inner data, moving methods that do data processing outside the class
 * use [STB](https://github.com/nothings/stb/blob/master/stb_image.h) for image texture loading
 * make a struct material, and create an instance of it inside a drawable object, so that any object has its own appearance
