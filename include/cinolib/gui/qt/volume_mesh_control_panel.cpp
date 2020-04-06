@@ -596,6 +596,16 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         middle_col->addWidget(gbox);
     }
 
+    // normals
+    {
+        cb_normals = new QCheckBox("Show Normals", widget);
+        cb_normals->setFont(global_font);
+        cb_normals->setChecked(false);
+        normals.set_cheap_rendering(true);
+        normals.set_color(Color::BLUE());
+        right_col->addWidget(cb_normals);
+    }
+
     global_layout->addStretch();
     left_col->addStretch();
     middle_col->addStretch();
@@ -1394,6 +1404,32 @@ void VolumeMeshControlPanel<Mesh>::connect()
             case 6: m->edge_mark_sharp_creases(to_rad(30.0)); break;
         }
         m->updateGL();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_normals, &QCheckBox::stateChanged, [&]()
+    {
+        if(m == NULL || canvas == NULL) return;
+
+        if(cb_normals->isChecked())
+        {
+            normals.clear();
+            double l = canvas->scene_size()/5.0;
+            for(uint fid=0; fid<m->num_faces(); ++fid)
+            {
+                uint pid_beneath;
+                if(m->face_is_visible(fid, pid_beneath))
+                {
+                    vec3d  n = m->poly_face_normal(pid_beneath,fid);
+                    vec3d  c = m->face_centroid(fid);
+                    normals.push_seg(c, c+(n*l));
+                }
+            }
+            canvas->push_obj(&normals,false);
+        }
+        else canvas->pop(&normals);
         canvas->updateGL();
     });
 }
