@@ -97,7 +97,8 @@ class VolumeMeshControlPanel
         Mesh                          *m;
         DrawableIsosurface<M,V,E,F,P>  isosurface;
         DrawableVectorField            gradient;
-        DrawableSegmentSoup            normals;
+        DrawableSegmentSoup            face_normals;
+        DrawableSegmentSoup            vert_normals;
         GLcanvas                      *canvas;
         QWidget                       *widget;
         QHBoxLayout                   *global_layout;
@@ -187,7 +188,9 @@ class VolumeMeshControlPanel
         QPushButton                   *but_compute_AO;
         //
         QComboBox                     *cb_actions;
-        QCheckBox                     *cb_normals;
+        //
+        QCheckBox                     *cb_face_normals;
+        QCheckBox                     *cb_vert_normals;
 };
 
 }

@@ -227,8 +227,7 @@ class AbstractMesh
                 void             vert_local_unmark_near_edge(const uint eid);
                 void             vert_local_unmark_near_poly(const uint pid);
                 void             vert_apply_labels          (const std::vector<int> & labels);
-                void             vert_apply_label           (const int label);
-                bool             vert_is_visible            (const uint vid) const;
+                void             vert_apply_label           (const int label);                
         virtual double           vert_mass                  (const uint vid) const = 0;
         virtual void             vert_set_color             (const Color & c);
         virtual void             vert_set_alpha             (const float alpha);

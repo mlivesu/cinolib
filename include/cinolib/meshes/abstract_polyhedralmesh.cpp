@@ -1572,6 +1572,20 @@ void AbstractPolyhedralMesh<M,V,E,F,C>::vert_local_unmark_near_face(const uint f
 
 template<class M, class V, class E, class F, class C>
 CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,C>::vert_is_visible(const uint vid) const
+{
+    for(uint fid : adj_v2f(vid))
+    {
+        uint pid;
+        if(this->face_is_visible(fid,pid)) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class C>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,C>::vert_is_manifold(const uint vid) const
 {
     // for each edge in the link, count how many faces in the link are incident to it

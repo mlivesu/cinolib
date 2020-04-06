@@ -135,6 +135,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         uint              vert_add                (const vec3d & pos);
         bool              vert_merge              (const uint vid0, const uint vid1);
         void              vert_cluster_one_ring   (const uint vid, std::vector<std::vector<uint>> & clusters, const bool marked_edges_are_borders);
+        bool              vert_is_visible         (const uint vid) const;
         std::vector<uint> vert_adj_visible_polys  (const uint vid, const vec3d dir, const double ang_thresh = 60.0);
         std::vector<uint> vert_boundary_edges     (const uint vid) const;
         std::vector<uint> vert_verts_link         (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star

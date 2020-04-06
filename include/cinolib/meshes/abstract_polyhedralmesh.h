@@ -167,6 +167,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         double             vert_mass                  (const uint vid) const override;
         double             vert_volume                (const uint vid) const;
         bool               vert_is_manifold           (const uint vid) const;
+        bool               vert_is_visible            (const uint vid) const;
         void               vert_local_unmark_near_face(const uint fid);
         std::vector<uint>  vert_verts_link            (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
         std::vector<uint>  vert_edges_link            (const uint vid) const;

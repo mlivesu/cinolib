@@ -775,6 +775,19 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_boundary_edges(const uint v
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+bool AbstractPolygonMesh<M,V,E,P>::vert_is_visible(const uint vid) const
+{
+    for(uint pid : this->adj_v2p(vid))
+    {
+        if(!this->poly_data(pid).flags[HIDDEN]) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::vert_cluster_one_ring(const uint                       vid,
                                                          std::vector<std::vector<uint>> & clusters,
                                                          const bool                       marked_edges_are_borders)
