@@ -1385,6 +1385,19 @@ void AbstractMesh<M,V,E,P>::vert_apply_label(const int label)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+bool AbstractMesh<M,V,E,P>::vert_is_visible(const uint vid) const
+{
+    for(uint pid : adj_v2p(vid))
+    {
+        if(!poly_data(pid).flags[HIDDEN]) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractMesh<M,V,E,P>::edge_mark_sharp_creases(const float thresh)
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)

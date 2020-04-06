@@ -42,6 +42,7 @@
 #include <cinolib/drawable_isocontour.h>
 #include <cinolib/drawable_vector_field.h>
 #include <cinolib/gui/qt/glcanvas.h>
+#include <cinolib/drawable_segment_soup.h>
 
 #include <iostream>
 #include <QWidget>
@@ -91,6 +92,8 @@ class SurfaceMeshControlPanel
         Mesh                        *m;
         DrawableIsocontour<M,V,E,P>  isocontour;
         DrawableVectorField          gradient;
+        DrawableSegmentSoup          face_normals;
+        DrawableSegmentSoup          vert_normals;
         GLcanvas                    *canvas;
         QWidget                     *widget;
         QHBoxLayout                 *global_layout;
@@ -155,6 +158,8 @@ class SurfaceMeshControlPanel
         QPushButton                 *but_compute_AO;
         //
         QComboBox                   *cb_actions;
+        QCheckBox                   *cb_face_normals;
+        QCheckBox                   *cb_vert_normals;
 };
 
 }
