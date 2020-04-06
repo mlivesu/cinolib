@@ -180,6 +180,8 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
     for(auto v : verts) this->vert_add(v);
     for(auto p : polys) this->poly_add(p);
 
+    this->update_v_normals();
+
     this->copy_xyz_to_uvw(UVW_param);
 
     for(uint eid=0; eid<this->num_edges(); ++eid)
@@ -1482,8 +1484,6 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & vlist)
     }
 
     this->update_p_normal(pid);
-    for(uint vid : vlist) this->update_v_normal(vid);
-
     this->poly_triangles.push_back(std::vector<uint>());
     update_p_tessellation(pid);
 
