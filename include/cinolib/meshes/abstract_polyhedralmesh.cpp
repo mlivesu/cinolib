@@ -106,6 +106,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
     for(auto v : verts) vert_add(v);
     for(auto f : faces) face_add(f);
     for(uint pid=0; pid<polys.size(); ++pid) this->poly_add(polys.at(pid), polys_face_winding.at(pid));
+    this->update_v_normals();
 
     this->copy_xyz_to_uvw(UVW_param);
 
@@ -146,6 +147,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
 
     for(auto v : verts) vert_add(v);
     for(auto p : polys) poly_add(p);
+    this->update_v_normals();
 
     this->copy_xyz_to_uvw(UVW_param);
 
@@ -372,8 +374,13 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_v_normal(const uint vid)
 {
     vec3d n(0,0,0);
     for(uint fid : adj_v2f(vid))
-    {
-        if (face_is_on_srf(fid)) n += face_data(fid).normal;
+    {        
+        if(face_is_on_srf(fid))
+        {
+            assert(this->adj_f2p(fid).size()==1);
+            uint pid = this->adj_f2p(fid).front();
+            n += this->poly_face_normal(pid,fid);
+        }
     }
     if (n.length()>0) n.normalize();
     this->vert_data(vid).normal = n;
@@ -1370,7 +1377,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_on_srf(const uint fid) const
 {
-    return (this->adj_f2p(fid).size()<2);
+    return (this->adj_f2p(fid).size()==1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -2259,8 +2266,6 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_add(const std::vector<uint> & f)
     }
 
     this->update_f_normal(fid);
-    for(uint vid : f) this->update_v_normal(vid);
-
     this->face_triangles.push_back(std::vector<uint>());
     update_f_tessellation(fid);
 
