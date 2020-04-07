@@ -243,6 +243,7 @@ uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
                 this->face_vert_id(fid,2),
                 new_vid
             };
+            if(this->poly_face_is_CCW(pid,fid)) std::swap(tet[1],tet[2]);
             uint new_pid = this->poly_add(tet);
             this->poly_data(new_pid) = this->poly_data(pid);
             // adjust winding and reorder verts, in case poly_add screwed it
@@ -269,6 +270,8 @@ uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
          this->face_data(f0) = this->face_data(fid);
          this->face_data(f1) = this->face_data(fid);
     }
+
+    if(this->vert_is_on_srf(new_vid)) this->update_v_normal(new_vid);
 
     // remove old edge and all elements attached to it
     this->edge_remove(eid);
@@ -507,10 +510,12 @@ uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
                 this->face_vert_id(fid,(off+1)%3),
                 opp_vid
             };
+            bool flip_face = this->poly_face_is_CW(pid,fid);
+            if(flip_face) std::swap(tet[1],tet[2]);
             uint new_pid = this->poly_add(tet);
             this->poly_data(new_pid) = this->poly_data(pid);
             // adjust winding and reorder verts, in case poly_add screwed it
-            int id = this->face_id({tet[0],tet[2],opp_vid}); assert(id>=0);
+            int id = this->face_id({tet[0],(flip_face)?tet[1]:tet[2],opp_vid}); assert(id>=0);
             if(this->poly_face_is_CW(pid,id) != this->poly_face_is_CW(new_pid,id))
             {
                 this->poly_face_flip_winding(new_pid,id);
@@ -518,6 +523,8 @@ uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
             }
         }
     }
+
+    if(this->vert_is_on_srf(new_vid)) this->update_v_normal(new_vid);
 
     this->face_remove(fid);
     return new_vid;
@@ -674,6 +681,7 @@ uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
             this->face_vert_id(fid,2),
             new_vid
         };
+        if(this->poly_face_is_CCW(pid,fid)) std::swap(tet[1],tet[2]);
         uint new_pid = this->poly_add(tet);
         this->poly_data(new_pid) = this->poly_data(pid);
         // adjust winding and reorder verts, in case poly_add screwed it
