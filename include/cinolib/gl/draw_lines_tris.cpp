@@ -105,17 +105,17 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-static void init_material()
-{
-    GLfloat material_color[4]    = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat material_specular[4] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat material_ambient[4]  = { 0.0, 0.0, 0.0, 0.0 };
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  material_specular);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   material_color);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   material_ambient);
-    glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 128.0f);
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-}
+//static void init_material()
+//{
+//    GLfloat material_color[4]    = { 1.0, 1.0, 1.0, 1.0 };
+//    GLfloat material_specular[4] = { 1.0, 1.0, 1.0, 1.0 };
+//    GLfloat material_ambient[4]  = { 0.0, 0.0, 0.0, 0.0 };
+//    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  material_specular);
+//    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   material_color);
+//    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   material_ambient);
+//    glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 128.0f);
+//    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+//}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -226,7 +226,7 @@ void render_segs(const RenderData & data)
 CINO_INLINE
 void render(const RenderData & data)
 {
-    init_material();
+    //init_material();
 
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glEnable(GL_DEPTH_TEST);
