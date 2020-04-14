@@ -52,7 +52,7 @@ namespace cinolib
  *    Obtaining a Canonical Polygonal Schema from a
  *    Greedy Homotopy Basis with Minimal Mesh Refinement
  *    Marco Livesu
- *    (submitted)
+ *    IEEE Transactions on Visualization and Computer Graphics, 2020
  *
  * and
  *
