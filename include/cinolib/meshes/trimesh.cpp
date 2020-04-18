@@ -418,9 +418,9 @@ double Trimesh<M,V,E,P>::edge_cotangent_weight(const uint eid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int Trimesh<M,V,E,P>::edge_flip(const uint eid)
+int Trimesh<M,V,E,P>::edge_flip(const uint eid, const bool geometric_check)
 {
-    if(!edge_is_flippable(eid)) return -1;
+    if(geometric_check && !edge_is_flippable(eid)) return -1;
 
     assert(this->adj_e2p(eid).size()==2);
     uint pid0 = this->adj_e2p(eid).front();

@@ -107,7 +107,7 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         uint              edge_split                       (const uint eid, const vec3d & p);
         bool              edge_is_flippable                (const uint eid);
         double            edge_cotangent_weight            (const uint eid) const;
-        int               edge_flip                        (const uint eid);
+        int               edge_flip                        (const uint eid, const bool geometric_check = true);
         std::vector<uint> edge_verts_link                  (const uint eid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
