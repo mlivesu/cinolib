@@ -58,9 +58,9 @@ class DrawableSphere : public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        double size;
         vec3d  center;
         Color  color;
-        double size;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
