@@ -48,11 +48,11 @@ class DrawableSphere : public DrawableObject
 {
     public :
 
-        DrawableSphere(const vec3d & center) : center(center)
-        {
-            size  = 1.0;
-            color = Color::RED();
-        }
+        DrawableSphere(const vec3d & center, const double size = 1.0, const Color & c = Color::RED())
+            : center(center)
+            , size(size)
+            , color(c)
+        {}
 
         ~DrawableSphere(){}
 
