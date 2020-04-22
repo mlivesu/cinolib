@@ -230,6 +230,7 @@ void detach_loops(Trimesh<M,V,E,P>  & m,
 
     data.refinement_stats.num_verts_now = m.num_verts();
     data.refinement_stats.num_polys_now = m.num_polys();
+    data.refinement_stats.vert_val_avg /= static_cast<double>(data.refinement_stats.splits_tot);
 
     detach_loops_postproc(m, data);
 }
