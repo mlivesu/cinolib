@@ -1,3 +1,4 @@
 examples/build*
 examples/build_all_examples.pro.user
 examples/*_demo
+*.DS_Store
