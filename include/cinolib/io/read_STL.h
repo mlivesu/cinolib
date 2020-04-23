@@ -45,7 +45,8 @@ namespace cinolib
 CINO_INLINE
 void read_STL(const char         * filename,
               std::vector<vec3d> & verts,
-              std::vector<uint>  & tris);
+              std::vector<uint>  & tris,
+              const bool           merge_duplicated_verts = true);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -53,7 +54,8 @@ CINO_INLINE
 void read_STL(const char         * filename,
               std::vector<vec3d> & verts,
               std::vector<vec3d> & normals,
-              std::vector<uint>  & tris);
+              std::vector<uint>  & tris,
+              const bool           merge_duplicated_verts = true);
 }
 
 #ifndef  CINO_STATIC_LIB

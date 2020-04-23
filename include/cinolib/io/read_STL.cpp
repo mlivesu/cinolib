@@ -51,10 +51,11 @@ namespace cinolib
 CINO_INLINE
 void read_STL(const char         * filename,
               std::vector<vec3d> & verts,
-              std::vector<uint>  & tris)
+              std::vector<uint>  & tris,
+              const bool           merge_duplicated_verts)
 {
     std::vector<vec3d> normals;
-    read_STL(filename, verts, normals, tris);
+    read_STL(filename, verts, normals, tris, merge_duplicated_verts);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -63,7 +64,8 @@ CINO_INLINE
 void read_STL(const char         * filename,
               std::vector<vec3d> & verts,
               std::vector<vec3d> & normals,
-              std::vector<uint>  & tris)
+              std::vector<uint>  & tris,
+              const bool           merge_duplicated_verts)
 {
     // https://en.wikipedia.org/wiki/STL_(file_format)
 
@@ -103,15 +105,23 @@ void read_STL(const char         * filename,
                 if(!eat_double(fp, v.y())) assert(false && "could not parse y coord");
                 if(!eat_double(fp, v.z())) assert(false && "could not parse z coord");
 
-                auto it = vmap.find(v);
-                if(it == vmap.end())
+                if(merge_duplicated_verts)
                 {
-                    uint fresh_id = vmap.size();
-                    vmap[v] = fresh_id;
-                    verts.push_back(v);
-                    tris.push_back(fresh_id);
+                    auto it = vmap.find(v);
+                    if(it == vmap.end())
+                    {
+                        uint fresh_id = vmap.size();
+                        vmap[v] = fresh_id;
+                        verts.push_back(v);
+                        tris.push_back(fresh_id);
+                    }
+                    else tris.push_back(it->second);
                 }
-                else tris.push_back(it->second);
+                else
+                {
+                    tris.push_back(verts.size());
+                    verts.push_back(v);
+                }
             }
             if(!seek_keyword(fp, "endloop"))  assert(false && "could not find keyword ENDLOOP");
             if(!seek_keyword(fp, "endfacet")) assert(false && "could not find keyword ENDFACET");
