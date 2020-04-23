@@ -157,16 +157,24 @@ void read_STL(const char         * filename,
                 float vf[3];
                 if(fread(&vf, sizeof(float), 3, fp)!=3) assert(false && "error reading vertex");
 
-                vec3d v(vf[0], vf[1], vf[2]);
-                auto it = vmap.find(v);
-                if(it == vmap.end())
+                vec3d v(vf[0], vf[1], vf[2]);                
+                if(merge_duplicated_verts)
                 {
-                    uint fresh_id = vmap.size();
-                    vmap[v] = fresh_id;
-                    verts.push_back(v);
-                    tris.push_back(fresh_id);
+                    auto it = vmap.find(v);
+                    if(it == vmap.end())
+                    {
+                        uint fresh_id = vmap.size();
+                        vmap[v] = fresh_id;
+                        verts.push_back(v);
+                        tris.push_back(fresh_id);
+                    }
+                    else tris.push_back(it->second);
                 }
-                else tris.push_back(it->second);
+                else
+                {
+                    tris.push_back(verts.size());
+                    verts.push_back(v);
+                }
             }
 
             // read (and discard) attribute
