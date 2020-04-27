@@ -205,6 +205,35 @@ void GLcanvas::translate(const vec3d & t)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void GLcanvas::scale(const double x, const double y, const double z)
+{
+    if(trackball.mode_2d) return; // disable scaling in 2D mode
+
+    vec3d t(trackball.modelview[ 0]*trackball.pivot[0] +
+            trackball.modelview[ 4]*trackball.pivot[1] +
+            trackball.modelview[ 8]*trackball.pivot[2] +
+            trackball.modelview[12],
+            trackball.modelview[ 1]*trackball.pivot[0] +
+            trackball.modelview[ 5]*trackball.pivot[1] +
+            trackball.modelview[ 9]*trackball.pivot[2] +
+            trackball.modelview[13],
+            trackball.modelview[ 2]*trackball.pivot[0] +
+            trackball.modelview[ 6]*trackball.pivot[1] +
+            trackball.modelview[10]*trackball.pivot[2] +
+            trackball.modelview[14]);
+
+    makeCurrent();
+    glLoadIdentity();
+    glTranslatef(t[0], t[1], t[2]);
+    glScaled(x, y, z);
+    glTranslatef(-t[0], -t[1], -t[2]);
+    glMultMatrixd(trackball.modelview);
+    glGetDoublev(GL_MODELVIEW_MATRIX, trackball.modelview);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::zoom(const double angle)
 {   
     trackball.zoom_persp += angle;

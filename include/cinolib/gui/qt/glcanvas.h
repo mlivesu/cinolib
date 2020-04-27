@@ -207,6 +207,7 @@ class GLcanvas : public QGLWidget
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void rotate(const vec3d & axis, const double angle);
+        void scale(const double x, const double y, const double z);
         void translate(const vec3d & trans);
         void zoom(const double angle);
 
