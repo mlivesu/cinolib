@@ -45,8 +45,9 @@
 #include <cinolib/to_openGL_unified_verts.h>
 #include <cinolib/string_utilities.h>
 #include <sstream>
-#include <string.h>
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <assert.h>
 
 namespace cinolib
@@ -126,9 +127,8 @@ void read_OBJ(const char                     * filename,
     specular_path.clear();
     normal_path.clear();
 
-    FILE *f = fopen(filename, "r");
-
-    if(!f)
+    std::ifstream f(filename);
+    if(!f.is_open())
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_OBJ() : couldn't open input file " << filename << std::endl;
         exit(-1);
@@ -138,8 +138,8 @@ void read_OBJ(const char                     * filename,
     Color curr_color = Color::WHITE();     // set WHITE as default color
     bool has_per_face_color = false;       // true if a mtllib is found. If "has_per_face_color" stays
                                            // false the "poly_color" vector will be emptied before returning.
-    char line[1024];
-    while(fgets(line, 1024, f))
+    std::string line;
+    while(std::getline(f,line))
     {
         switch(line[0])
         {
@@ -148,18 +148,17 @@ void read_OBJ(const char                     * filename,
                 // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
                 //
                 double a, b, c;
-                     if(sscanf(line, "v  %lf %lf %lf", &a, &b, &c) == 3) pos.push_back(vec3d(a,b,c));
-                else if(sscanf(line, "vt %lf %lf %lf", &a, &b, &c) == 3) tex.push_back(vec3d(a,b,c));
-                else if(sscanf(line, "vt %lf %lf %lf", &a, &b, &c) == 2) tex.push_back(vec3d(a,b,0));
-                else if(sscanf(line, "vn %lf %lf %lf", &a, &b, &c) == 3) nor.push_back(vec3d(a,b,c));
+                     if(sscanf(line.data(), "v  %lf %lf %lf", &a, &b, &c) == 3) pos.push_back(vec3d(a,b,c));
+                else if(sscanf(line.data(), "vt %lf %lf %lf", &a, &b, &c) == 3) tex.push_back(vec3d(a,b,c));
+                else if(sscanf(line.data(), "vt %lf %lf %lf", &a, &b, &c) == 2) tex.push_back(vec3d(a,b,0));
+                else if(sscanf(line.data(), "vn %lf %lf %lf", &a, &b, &c) == 3) nor.push_back(vec3d(a,b,c));
                 break;
             }
 
             case 'f':
             {
-                std::string s(line);
-                s = s.substr(1,s.size()-1); // discard the 'f' letter
-                std::istringstream ss(s);
+                line = line.substr(1,line.size()-1); // discard the 'f' letter
+                std::istringstream ss(line);
                 std::vector<uint> p_pos, p_tex, p_nor;
                 for(std::string sub_str; ss >> sub_str;)
                 {
@@ -182,7 +181,7 @@ void read_OBJ(const char                     * filename,
             case 'u':
             {
                 char mat_c[1024];
-                if (sscanf(line, "usemtl %s", mat_c) == 1)
+                if (sscanf(line.data(), "usemtl %s", mat_c) == 1)
                 {
                     auto query = color_map.find(std::string(mat_c));
                     if (query != color_map.end())
@@ -197,7 +196,7 @@ void read_OBJ(const char                     * filename,
             case 'm':
             {
                 char mtu_c[1024];
-                if (sscanf(line, "mtllib %[^\n]s", mtu_c) == 1)
+                if(sscanf(line.data(), "mtllib %[^\n]s", mtu_c) == 1)
                 {
                     std::string s0(filename);
                     std::string s1(mtu_c);
@@ -209,7 +208,7 @@ void read_OBJ(const char                     * filename,
             }
         }
     }
-    fclose(f);
+    f.close();
     if (!has_per_face_color) poly_col.clear();
 }
 
