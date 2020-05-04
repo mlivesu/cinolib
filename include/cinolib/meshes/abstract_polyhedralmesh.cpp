@@ -286,6 +286,48 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_normals()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::get_surface_verts() const
+{
+    std::vector<uint> res;
+    for(uint vid=0; vid<this->num_verts(); ++vid)
+    {
+        if(this->vert_is_on_srf(vid)) res.push_back(vid);
+    }
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::get_surface_edges() const
+{
+    std::vector<uint> res;
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        if(this->edge_is_on_srf(eid)) res.push_back(eid);
+    }
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::get_surface_faces() const
+{
+    std::vector<uint> res;
+    for(uint fid=0; fid<this->num_faces(); ++fid)
+    {
+        if(this->face_is_on_srf(fid)) res.push_back(fid);
+    }
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::update_f_normals()
 {
     for(uint fid=0; fid<num_faces(); ++fid)

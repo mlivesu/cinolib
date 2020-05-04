@@ -130,6 +130,12 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        std::vector<uint> get_surface_verts() const;
+        std::vector<uint> get_surface_edges() const;
+        std::vector<uint> get_surface_faces() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         const std::vector<uint> & adj_v2f(const uint vid) const          { return v2f.at(vid);         }
               std::vector<uint> & adj_v2f(const uint vid)                { return v2f.at(vid);         }
         const std::vector<uint> & adj_e2f(const uint eid) const          { return e2f.at(eid);         }
