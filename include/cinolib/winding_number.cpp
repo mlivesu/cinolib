@@ -52,7 +52,7 @@ int winding_number(const std::vector<vec3d> & verts,
                          verts.at(tris.at(i+2)),
                          p);
     }
-    return static_cast<int>(w);
+    return static_cast<int>(round(w));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -74,7 +74,7 @@ int winding_number(const AbstractPolygonMesh<M,V,E,P> & m,
                              p);
         }
     }
-    return static_cast<int>(w);
+    return static_cast<int>(round(w));
 }
 
 }
