@@ -287,8 +287,9 @@ void AbstractPolygonMesh<M,V,E,P>::update_p_tessellation(const uint pid)
     // Assume convexity and try trivial tessellation first. If something flips
     // apply earcut algorithm to get a valid triangulation
 
+    poly_triangles.at(pid).clear();
     std::vector<vec3d> n;
-    for (uint i=2; i<this->verts_per_poly(pid); ++i)
+    for(uint i=2; i<this->verts_per_poly(pid); ++i)
     {
         uint vid0 = this->polys.at(pid).at( 0 );
         uint vid1 = this->polys.at(pid).at(i-1);
@@ -304,7 +305,7 @@ void AbstractPolygonMesh<M,V,E,P>::update_p_tessellation(const uint pid)
     bool bad_tessellation = false;
     for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_tessellation = true;
 
-    if (bad_tessellation)
+    if(bad_tessellation)
     {
         // NOTE: the triangulation is constructed on a proxy polygon obtained
         // projecting the actual polygon onto the best fitting plane. Bad things
@@ -316,8 +317,9 @@ void AbstractPolygonMesh<M,V,E,P>::update_p_tessellation(const uint pid)
             vlist.at(i) = this->poly_vert(pid,i);
         }
         //
+        poly_triangles.at(pid).clear();
         std::vector<uint> tris;
-        if (polygon_triangulate(vlist, tris))
+        if(polygon_triangulate(vlist, tris))
         {
             poly_triangles.at(pid).clear();
             for(uint off : tris) poly_triangles.at(pid).push_back(this->poly_vert_id(pid,off));
