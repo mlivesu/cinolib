@@ -887,18 +887,15 @@ SimplexIntersection triangle_triangle_intersect(const vec3d t0[],
 
     // count number of coincident vertices in t0 and t1
     uint t0_count = t0_shared.count();
-    uint t1_count = t1_shared.count();
 
     // either t0 and t1 are coincident
-    if(t0_count==3) { assert(t1_count==3); return SIMPLICIAL_COMPLEX; }
+    if(t0_count==3) return SIMPLICIAL_COMPLEX;
 
     // t0 and t1 share an edge. Let e be the shared edge and { opp0, opp1 } be the two vertices opposite to
     // e in t0 and t1, respectively. If opp0 and opp1 lie at the same side of e, the two triangles overlap.
     // Otherwise they are edge-adjacent and form a valid simplicial complex
     if(t0_count==2)
     {
-        assert(t1_count==2);
-
         uint e[2];      // indices of the shared vertices (in t0)
         uint count = 0; // index for e (to fill it)
         uint opp0  = 0; // index of the vertex opposite to e in t0
@@ -941,8 +938,6 @@ SimplexIntersection triangle_triangle_intersect(const vec3d t0[],
     // Otherwise they are vertex-adjacent and form a valid simplicial complex
     if(t0_count==1)
     {
-        assert(t1_count==1);
-
         uint v0; // index of the shared vertex in t0
         uint v1; // index of the shared vertex in t1
         for(uint i=0; i<3; ++i)
