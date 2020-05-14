@@ -103,6 +103,7 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        bool edge_swap                        (const uint eid); // 2-to-3 flip
         uint edge_split                       (const uint eid, const vec3d & p);
         uint edge_split                       (const uint eid, const double lambda = 0.5); // use linear interpolation: e0*(1-lambda) + e1*lambda
         int  edge_collapse                    (const uint eid, const double lambda = 0.5, const double topologic_check = true, const double geometric_check = true);
@@ -114,6 +115,7 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        bool   face_swap            (const uint fid, const bool geometric_check = true); // 3-to-2 flip
         double face_area            (const uint fid) const;
         uint   face_edge_opposite_to(const uint fid, const uint vid) const;
         uint   face_vert_opposite_to(const uint fid, const uint eid) const;
