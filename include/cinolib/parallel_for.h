@@ -47,11 +47,11 @@ namespace cinolib
  *
  * PARALLEL_FOR has three arguments
  *
- *     beg,end : define a range of indices
- *     func    : is the function that implements the body of the loop.
- *               It takes as unique argument the loop index. This will
- *               typically be a lambda function inlined in the call
- *
+ *     beg,end             : define a range of indices
+ *     serial_if_less_than : avoid paying the overhead if the range is smaller than...
+ *     func                : is the function that implements the body of the loop.
+ *                           It takes as unique argument the loop index. This will
+ *                           typically be a lambda function inlined in the call
  *
  * Example of usage: update normals on a mesh.
  * Given a polygonmesh m, the classical serial loop would be like:
@@ -64,19 +64,21 @@ namespace cinolib
  * Normal computation is indeed local to each polygon,
  * therefore this code can be parallelized with the call:
  *
- * PARALLEL_FOR(0, m.num_polys(), [&m](int pid)
+ * PARALLEL_FOR(0, m.num_polys(), 1000, [&m](int pid)
  * {
  *    m.update_p_normal(pid);
  * });
  *
- * NOTE: if symbol SERIALIZE_PARALLEL_FOR is defined, the loop
- * will be executed in standard serial mode. Useful for debugging/profiling
+ * NOTE: if symbol SERIALIZE_PARALLEL_FOR is defined at compilation time,
+ * the loop will be executed in standard serial mode.
 */
 
-template<typename Function>
+template<typename Func>
 CINO_INLINE
-static void PARALLEL_FOR(uint beg, uint end, const Function & func);
-
+static void PARALLEL_FOR(      uint   beg,
+                               uint   end,
+                         const uint   serial_if_less_than,
+                         const Func & func);
 }
 
 #ifndef  CINO_STATIC_LIB

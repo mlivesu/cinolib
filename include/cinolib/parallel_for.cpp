@@ -41,47 +41,58 @@
 namespace cinolib
 {
 
-template<typename Function>
+template<typename Func>
 CINO_INLINE
-static void PARALLEL_FOR(uint beg, uint end, const Function & func)
+static void PARALLEL_FOR(      uint   beg,
+                               uint   end,
+                         const uint   serial_if_less_than,
+                         const Func & func)
 {
 #ifndef SERIALIZE_PARALLEL_FOR
 
-    // estimate number of threads in the pool
-    const static unsigned n_threads_hint = std::thread::hardware_concurrency();
-    const static unsigned n_threads      = (n_threads_hint==0u) ? 8u : n_threads_hint;
+    uint n = end - beg + 1;
 
-    // split the full range into sub ranges of equal size
-    uint n     = end - beg + 1;
-    uint slice = (uint)std::round(n/static_cast<double>(n_threads));
-    slice = std::max(slice,uint(1));
-
-    // helper function that handles a sub range
-    auto subrange_helper = [&func](uint k1, uint k2)
+    if(n<serial_if_less_than)
     {
-        for(uint k=k1; k<k2; ++k) func(k);
-    };
-
-    // create pool and launch jobs
-    std::vector<std::thread> pool;
-    pool.reserve(n_threads);
-    uint i1 = beg;
-    uint i2 = std::min(beg + slice, end);
-    for(uint i=0; i+1<n_threads && i1<end; ++i)
-    {
-        pool.emplace_back(subrange_helper, i1, i2);
-        i1 = i2;
-        i2 = std::min(i2+slice, end);
+        for(uint i=beg; i<end; ++i) func(i);
     }
-    if(i1<end) pool.emplace_back(subrange_helper, i1, end);
-
-    // Wait for jobs to finish
-    for(std::thread & t : pool)
+    else
     {
-        if(t.joinable()) t.join();
+        // estimate number of threads in the pool
+        const static unsigned n_threads_hint = std::thread::hardware_concurrency();
+        const static unsigned n_threads      = (n_threads_hint==0u) ? 8u : n_threads_hint;
+
+        // split the full range into sub ranges of equal size
+        uint slice = (uint)std::round(n/static_cast<double>(n_threads));
+        slice = std::max(slice,uint(1));
+
+        // helper function that handles a sub range
+        auto subrange_helper = [&func](uint k1, uint k2)
+        {
+            for(uint k=k1; k<k2; ++k) func(k);
+        };
+
+        // create pool and launch jobs
+        std::vector<std::thread> pool;
+        pool.reserve(n_threads);
+        uint i1 = beg;
+        uint i2 = std::min(beg + slice, end);
+        for(uint i=0; i+1<n_threads && i1<end; ++i)
+        {
+            pool.emplace_back(subrange_helper, i1, i2);
+            i1 = i2;
+            i2 = std::min(i2+slice, end);
+        }
+        if(i1<end) pool.emplace_back(subrange_helper, i1, end);
+
+        // Wait for jobs to finish
+        for(std::thread & t : pool)
+        {
+            if(t.joinable()) t.join();
+        }
     }
 #else
-    for(uint i=start; i<end; ++i) func(i);
+    for(uint i=beg; i<end; ++i) func(i);
 #endif
 }
 
