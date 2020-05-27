@@ -116,6 +116,7 @@ namespace cinolib
 
 #ifdef CINOLIB_USES_BOOST
 
+CINO_INLINE
 BoostPolygon make_boost_poly(const std::vector<vec2d> & poly)
 {
     BoostPolygon boost_poly;
