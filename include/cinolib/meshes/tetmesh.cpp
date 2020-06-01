@@ -876,6 +876,19 @@ uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+int Tetmesh<M,V,E,F,P>::poly_id(const uint fid, const uint vid) const
+{
+    for(uint pid : this->adj_f2p(fid))
+    {
+        if(this->poly_contains_vert(pid,vid)) return pid;
+    }
+    return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 double Tetmesh<M,V,E,F,P>::poly_dihedral_angle(const uint pid, const uint fid0, const uint fid1) const
 {
     vec3d n0 =  this->poly_face_normal(pid,fid0);
