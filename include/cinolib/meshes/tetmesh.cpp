@@ -191,22 +191,6 @@ void Tetmesh<M,V,E,F,P>::update_f_normal(const uint fid)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
-{
-    uint fid = this->poly_face_id(pid,0);
-    std::vector<uint> vlist(4);
-    vlist[0] = this->face_vert_id(fid,TET_FACES[0][0]);
-    vlist[1] = this->face_vert_id(fid,TET_FACES[0][1]);
-    vlist[2] = this->face_vert_id(fid,TET_FACES[0][2]);
-    vlist[3] = this->poly_vert_opposite_to(pid,fid);
-    if (this->poly_face_is_CW(pid,fid)) std::swap(vlist[1],vlist[2]);
-    this->p2v.at(pid) = vlist;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 double Tetmesh<M,V,E,F,P>::face_area(const uint fid) const
 {
     return triangle_area(this->face_vert(fid,0),
@@ -246,12 +230,6 @@ uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
             if(this->poly_face_is_CCW(pid,fid)) std::swap(tet[1],tet[2]);
             uint new_pid = this->poly_add(tet);
             this->poly_data(new_pid) = this->poly_data(pid);
-            // adjust winding and reorder verts, in case poly_add screwed it
-            if(this->poly_face_is_CW(pid,fid) != this->poly_face_is_CW(new_pid,fid))
-            {
-                this->poly_face_flip_winding(new_pid,fid);
-                this->reorder_p2v(new_pid);
-            }
         }
     }
 
@@ -492,47 +470,6 @@ bool Tetmesh<M,V,E,F,P>::face_swap(const uint fid, bool geometric_check)
             return false;
     }
 
-    uint t0_id = this->poly_add(t0);
-    uint t1_id = this->poly_add(t1);
-    uint t2_id = this->poly_add(t2);
-
-    // this is super annoying to do, but Tetmesh::poly_add assigns wrong winding
-    // if the boundary of the ROI is exposed on the surface, hence its faces seem
-    // to have two incident polys just because I haven't removed the old tets yet...
-    for(uint fid : this->adj_p2f(pid0))
-    {
-        if(this->poly_contains_face(t0_id,fid) && this->poly_face_is_CW(pid0,fid)!=this->poly_face_is_CW(t0_id,fid))
-        {
-            this->poly_face_flip_winding(t0_id,fid);
-        }
-        if(this->poly_contains_face(t1_id,fid) && this->poly_face_is_CW(pid0,fid)!=this->poly_face_is_CW(t1_id,fid))
-        {
-            this->poly_face_flip_winding(t1_id,fid);
-        }
-        if(this->poly_contains_face(t2_id,fid) && this->poly_face_is_CW(pid0,fid)!=this->poly_face_is_CW(t2_id,fid))
-        {
-            this->poly_face_flip_winding(t2_id,fid);
-        }
-    }
-    for(uint fid : this->adj_p2f(pid1))
-    {
-        if(this->poly_contains_face(t0_id,fid) && this->poly_face_is_CW(pid1,fid)!=this->poly_face_is_CW(t0_id,fid))
-        {
-            this->poly_face_flip_winding(t0_id,fid);
-        }
-        if(this->poly_contains_face(t1_id,fid) && this->poly_face_is_CW(pid1,fid)!=this->poly_face_is_CW(t1_id,fid))
-        {
-            this->poly_face_flip_winding(t1_id,fid);
-        }
-        if(this->poly_contains_face(t2_id,fid) && this->poly_face_is_CW(pid1,fid)!=this->poly_face_is_CW(t2_id,fid))
-        {
-            this->poly_face_flip_winding(t2_id,fid);
-        }
-    }
-    this->reorder_p2v(t0_id);
-    this->reorder_p2v(t1_id);
-    this->reorder_p2v(t2_id);
-
     // remove the tet with higher id first
     if(pid0<pid1) std::swap(pid0,pid1);
     this->poly_remove(pid0);
@@ -551,7 +488,6 @@ bool Tetmesh<M,V,E,F,P>::edge_swap(const uint eid)
 
     uint pid0 = this->adj_e2p(eid).at(0);
     uint pid1 = this->adj_e2p(eid).at(1);
-    uint pid2 = this->adj_e2p(eid).at(2);
     uint opp0 = this->edge_vert_id(eid,0);
     uint opp1 = this->edge_vert_id(eid,1);
 
@@ -572,48 +508,6 @@ bool Tetmesh<M,V,E,F,P>::edge_swap(const uint eid)
     if(f1==-1) this->face_id({v0, v2, opp1}); assert(f1>=0);
     if(this->poly_face_is_CCW(pid0,f0)) std::swap(t0[0],t0[3]);
     if(this->poly_face_is_CCW(pid1,f1)) std::swap(t1[0],t1[3]);
-
-    uint t0_id = this->poly_add(t0);
-    uint t1_id = this->poly_add(t1);
-
-    // this is super annoying to do, but Tetmesh::poly_add assigns wrong winding
-    // if the boundary of the ROI is exposed on the surface, hence its faces seem
-    // to have two incident polys just because I haven't removed the old tets yet...
-    for(uint fid : this->adj_p2f(pid0))
-    {
-        if(this->poly_contains_face(t0_id,fid) && this->poly_face_is_CW(pid0,fid)!=this->poly_face_is_CW(t0_id,fid))
-        {
-            this->poly_face_flip_winding(t0_id,fid);
-        }
-        if(this->poly_contains_face(t1_id,fid) && this->poly_face_is_CW(pid0,fid)!=this->poly_face_is_CW(t1_id,fid))
-        {
-            this->poly_face_flip_winding(t1_id,fid);
-        }
-    }
-    for(uint fid : this->adj_p2f(pid1))
-    {
-        if(this->poly_contains_face(t0_id,fid) && this->poly_face_is_CW(pid1,fid)!=this->poly_face_is_CW(t0_id,fid))
-        {
-            this->poly_face_flip_winding(t0_id,fid);
-        }
-        if(this->poly_contains_face(t1_id,fid) && this->poly_face_is_CW(pid1,fid)!=this->poly_face_is_CW(t1_id,fid))
-        {
-            this->poly_face_flip_winding(t1_id,fid);
-        }
-    }
-    for(uint fid : this->adj_p2f(pid2))
-    {
-        if(this->poly_contains_face(t0_id,fid) && this->poly_face_is_CW(pid2,fid)!=this->poly_face_is_CW(t0_id,fid))
-        {
-            this->poly_face_flip_winding(t0_id,fid);
-        }
-        if(this->poly_contains_face(t1_id,fid) && this->poly_face_is_CW(pid2,fid)!=this->poly_face_is_CW(t1_id,fid))
-        {
-            this->poly_face_flip_winding(t1_id,fid);
-        }
-    }
-    this->reorder_p2v(t0_id);
-    this->reorder_p2v(t1_id);
 
     this->edge_remove(eid);
 
@@ -689,13 +583,6 @@ uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
             if(flip_face) std::swap(tet[1],tet[2]);
             uint new_pid = this->poly_add(tet);
             this->poly_data(new_pid) = this->poly_data(pid);
-            // adjust winding and reorder verts, in case poly_add screwed it
-            int id = this->face_id({tet[0],(flip_face)?tet[1]:tet[2],opp_vid}); assert(id>=0);
-            if(this->poly_face_is_CW(pid,id) != this->poly_face_is_CW(new_pid,id))
-            {
-                this->poly_face_flip_winding(new_pid,id);
-                this->reorder_p2v(new_pid);
-            }
         }
     }
 
@@ -801,19 +688,6 @@ double Tetmesh<M,V,E,F,P>::poly_volume(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex list
-{
-    assert(vlist.size()==4);
-    uint pid = AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(vlist);
-    reorder_p2v(pid); // make sure p2v stores tet vertices in the standard way
-    update_tet_quality(pid);
-    return pid;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const std::vector<double> & bc)
 {
     assert(bc.size()==4);
@@ -859,12 +733,6 @@ uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
         if(this->poly_face_is_CCW(pid,fid)) std::swap(tet[1],tet[2]);
         uint new_pid = this->poly_add(tet);
         this->poly_data(new_pid) = this->poly_data(pid);
-        // adjust winding and reorder verts, in case poly_add screwed it
-        if(this->poly_face_is_CW(pid,fid) != this->poly_face_is_CW(new_pid,fid))
-        {
-            this->poly_face_flip_winding(new_pid,fid);
-            this->reorder_p2v(new_pid);
-        }
     }
 
     this->poly_remove(pid);
@@ -967,30 +835,6 @@ std::vector<uint> Tetmesh<M,V,E,F,P>::poly_faces_opposite_to(const uint pid, con
 {
     assert(this->poly_contains_edge(pid, eid));
     return this->poly_e2f(pid, this->poly_edge_opposite_to(pid,eid));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Tetmesh<M,V,E,F,P>::update_tet_quality(const uint pid)
-{
-    this->poly_data(pid).quality = tet_scaled_jacobian(this->poly_vert(pid,0),
-                                                       this->poly_vert(pid,1),
-                                                       this->poly_vert(pid,2),
-                                                       this->poly_vert(pid,3));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Tetmesh<M,V,E,F,P>::update_tet_quality()
-{
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        update_tet_quality(pid);
-    }
 }
 
 }

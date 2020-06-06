@@ -108,6 +108,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 void update_f_tessellation(const uint fid);
                 void update_v_normals();
                 void update_v_normal(const uint vid);
+                void update_quality();
+                void update_p_quality(const uint pid);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -279,7 +281,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 std::vector<uint>  poly_f2f                    (const uint pid, const uint fid) const;
                 void               poly_switch_id              (const uint pid0, const uint pid1);
                 uint               poly_add                    (const std::vector<uint> & flist, const std::vector<bool> & fwinding);
-        virtual uint               poly_add                    (const std::vector<uint> & vlist);
+                uint               poly_add                    (const std::vector<uint> & vlist);
                 void               poly_remove_unreferenced    (const uint pid);
                 void               poly_remove                 (const uint pid);
                 void               polys_remove                (const std::vector<uint> & pids);
@@ -294,6 +296,12 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 std::vector<uint>  poly_faces_id               (const uint pid, const bool sort_by_fid = false) const;
                 std::vector<bool>  poly_faces_winding          (const uint pid) const;
                 uint               poly_split_along_new_face   (const uint pid, const std::vector<uint> & f);
+                void               poly_reorder_p2v            (const uint pid);
+                bool               poly_is_hexahedron          (const uint pid) const;
+                bool               poly_is_tetrahedron         (const uint pid) const;
+                bool               poly_is_prism               (const uint pid) const;
+                bool               poly_is_prism               (const uint pid, const uint fid) const; // check if it is a prism using fid as base
+                bool               poly_is_hexable_w_midpoint  (const uint pid) const; // check if this element can be hexed with midpoint subdivision
 
 };
 
