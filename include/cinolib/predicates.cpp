@@ -912,6 +912,9 @@ SimplexIntersection triangle_triangle_intersect(const vec3d t0[],
             if(!t1_shared[i]) opp1 = i;
         }
 
+        // if they are not coplanar, then they form a valid complex
+        if(orient3d(t0[0], t0[1], t0[2], t1[opp1]) != 0) return SIMPLICIAL_COMPLEX;
+
         vec2d e0_x   = vec2d(t0[e[0]],DROP_X);
         vec2d e1_x   = vec2d(t0[e[1]],DROP_X);
         vec2d opp0_x = vec2d(t0[opp0],DROP_X);
