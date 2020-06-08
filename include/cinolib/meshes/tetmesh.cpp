@@ -427,47 +427,45 @@ int Tetmesh<M,V,E,F,P>::edge_collapse(const uint eid, const vec3d & p, const dou
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,P>::face_swap(const uint fid, bool geometric_check)
+bool Tetmesh<M,V,E,F,P>::face_swap(const uint fid, bool geometric_check) // 2-to-3 flip
 {
     if(this->adj_f2p(fid).size()!=2) return false;
 
-    uint v0   = this->face_vert_id(fid,0);
-    uint v1   = this->face_vert_id(fid,1);
-    uint v2   = this->face_vert_id(fid,2);
     uint pid0 = this->adj_f2p(fid).front();
     uint pid1 = this->adj_f2p(fid).back();
-    uint opp0 = this->poly_vert_opposite_to(pid0, fid);
-    uint opp1 = this->poly_vert_opposite_to(pid1, fid);
+    uint opp = this->poly_vert_opposite_to(pid1, fid);
 
-    // initialize the sub tets
-    std::vector<uint> t0 = {v0, v1, opp1, opp0};
-    std::vector<uint> t1 = {v1, v2, opp1, opp0};
-    std::vector<uint> t2 = {v2, v0, opp1, opp0};
-
-    // adjust winding
-    int f0 = this->face_id({v0, v1, opp0}); assert(f0>=0);
-    int f1 = this->face_id({v1, v2, opp0}); assert(f1>=0);
-    int f2 = this->face_id({v2, v0, opp0}); assert(f2>=0);
-    if(this->poly_face_is_CCW(pid0,f0)) std::swap(t0[0],t0[1]);
-    if(this->poly_face_is_CCW(pid0,f1)) std::swap(t1[0],t1[1]);
-    if(this->poly_face_is_CCW(pid0,f2)) std::swap(t2[0],t2[1]);
-
-    if(geometric_check)
+    // construct all new elements
+    uint tets[3][4];
+    uint i=0;
+    for(uint id : this->adj_p2f(pid0))
     {
+        if(id==fid) continue;
+        tets[i][0] = this->face_vert_id(id,0);
+        tets[i][1] = this->face_vert_id(id,1);
+        tets[i][2] = this->face_vert_id(id,2);
+        tets[i][3] = opp;
+        if(this->poly_face_is_CCW(pid0,id)) std::swap(tets[i][0],tets[i][1]);
+
         // this check is exact only if symbol CINOLIB_USES_EXACT_PREDICATES is defined
-        if(orient3d(this->vert(t0[0]),
-                    this->vert(t0[1]),
-                    this->vert(t0[2]),
-                    this->vert(t0[3])) <= 0 ||
-           orient3d(this->vert(t1[0]),
-                    this->vert(t1[1]),
-                    this->vert(t1[2]),
-                    this->vert(t1[3])) <= 0 ||
-           orient3d(this->vert(t2[0]),
-                    this->vert(t2[1]),
-                    this->vert(t2[2]),
-                    this->vert(t2[3])) <= 0)
+        if(geometric_check && orient3d(this->vert(tets[i][0]),
+                                       this->vert(tets[i][1]),
+                                       this->vert(tets[i][2]),
+                                       this->vert(tets[i][3]))<=0)
+        {
             return false;
+        }
+        ++i;
+    }
+
+    // add new elements to the mesh
+    for(uint i=0; i<3; ++i)
+    {
+        uint new_pid = this->poly_add({tets[i][0],
+                                       tets[i][1],
+                                       tets[i][2],
+                                       tets[i][3]});
+        this->update_p_quality(new_pid);
     }
 
     // remove the tet with higher id first
@@ -482,32 +480,34 @@ bool Tetmesh<M,V,E,F,P>::face_swap(const uint fid, bool geometric_check)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,P>::edge_swap(const uint eid)
+bool Tetmesh<M,V,E,F,P>::edge_swap(const uint eid) // 3-to-2 flip
 {
     if(this->adj_e2p(eid).size()!=3) return false;
 
-    uint pid0 = this->adj_e2p(eid).at(0);
-    uint pid1 = this->adj_e2p(eid).at(1);
-    uint opp0 = this->edge_vert_id(eid,0);
-    uint opp1 = this->edge_vert_id(eid,1);
+    uint pid = this->adj_e2p(eid).front();
+    uint opp = this->num_verts();
+    for(uint fid : this->adj_e2f(eid))
+    {
+        uint vid = this->face_vert_opposite_to(fid,eid);
+        if(!this->poly_contains_vert(pid,vid)) opp = vid;
+    }
+    assert(opp < this->num_verts());
 
-    uint e0 = this->poly_edge_opposite_to(pid0, eid);
-    uint e1 = this->poly_edge_opposite_to(pid1, eid);
-    uint v0 = this->edge_vert_id(e0,0);
-    uint v1 = this->edge_vert_id(e0,1);
-    uint v2 = this->edge_vert_id(e1,0);
-    if(v2==v0||v2==v1) v2 = this->edge_vert_id(e1,1);
+    auto f = this->poly_faces_opposite_to(pid,eid);
+    for(uint fid : f)
+    {
+        std::vector<uint> p =
+        {
+            this->face_vert_id(fid,0),
+            this->face_vert_id(fid,1),
+            this->face_vert_id(fid,2),
+            opp
+        };
+        if(this->poly_face_is_CCW(pid,fid)) std::swap(p[0],p[1]);
 
-    // initialize the sub tets
-    std::vector<uint> t0 = {v0, v1, v2, opp0};
-    std::vector<uint> t1 = {v0, v1, v2, opp1};
-
-    // adjust winding
-    int f0 = this->face_id({v0, v1, opp0}); assert(f0>=0);
-    int f1 = this->face_id({v1, v2, opp1});
-    if(f1==-1) this->face_id({v0, v2, opp1}); assert(f1>=0);
-    if(this->poly_face_is_CCW(pid0,f0)) std::swap(t0[0],t0[3]);
-    if(this->poly_face_is_CCW(pid1,f1)) std::swap(t1[0],t1[3]);
+        uint new_pid = this->poly_add(p);
+        this->update_p_quality(new_pid);
+    }
 
     this->edge_remove(eid);
 
@@ -822,7 +822,7 @@ uint Tetmesh<M,V,E,F,P>::poly_face_opposite_to(const uint pid, const uint vid) c
 
     for(uint fid : this->adj_p2f(pid))
     {
-        if (!this->face_contains_vert(fid,vid)) return fid;
+        if(!this->face_contains_vert(fid,vid)) return fid;
     }
     assert(false);
     return 0; // warning killer
