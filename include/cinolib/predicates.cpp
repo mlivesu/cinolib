@@ -621,6 +621,12 @@ SimplexIntersection segment_triangle_intersect(const vec3d s[],
     assert(!segment_is_degenerate(s) &&
            !triangle_is_degenerate(t));
 
+    if((s[0]==t[0] || s[0]==t[1] || s[0]==t[2]) &&
+       (s[1]==t[0] || s[1]==t[1] || s[1]==t[2]))
+    {
+        return SIMPLICIAL_COMPLEX;
+    }
+
     auto vol_s0_t = orient3d(s[0], t[0], t[1], t[2]);
     auto vol_s1_t = orient3d(s[1], t[0], t[1], t[2]);
 
