@@ -733,6 +733,7 @@ uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
         if(this->poly_face_is_CCW(pid,fid)) std::swap(tet[1],tet[2]);
         uint new_pid = this->poly_add(tet);
         this->poly_data(new_pid) = this->poly_data(pid);
+        this->update_p_quality(new_pid);
     }
 
     this->poly_remove(pid);
