@@ -494,19 +494,32 @@ bool Tetmesh<M,V,E,F,P>::edge_swap(const uint eid) // 3-to-2 flip
     }
     assert(opp < this->num_verts());
 
-    auto f = this->poly_faces_opposite_to(pid,eid);
-    for(uint fid : f)
-    {
-        std::vector<uint> p =
-        {
-            this->face_vert_id(fid,0),
-            this->face_vert_id(fid,1),
-            this->face_vert_id(fid,2),
-            opp
-        };
-        if(this->poly_face_is_CCW(pid,fid)) std::swap(p[0],p[1]);
 
-        uint new_pid = this->poly_add(p);
+    // construct all new elements
+    uint tets[2][4];
+    uint i=0;
+    for(uint fid : this->poly_faces_opposite_to(pid,eid))
+    {
+        tets[i][0] = this->face_vert_id(fid,0),
+        tets[i][1] = this->face_vert_id(fid,1),
+        tets[i][2] = this->face_vert_id(fid,2),
+        tets[i][3] = opp;
+        if(this->poly_face_is_CCW(pid,fid)) std::swap(tets[i][0],tets[i][1]);
+
+        // make sure thet tet does not exist already
+        if(this->poly_id(fid,opp)!=-1) return false;
+
+        ++i;
+    }
+    assert(i==2);
+
+    // add new elements to the mesh
+    for(i=0; i<2; ++i)
+    {
+        uint new_pid = this->poly_add({tets[i][0],
+                                       tets[i][1],
+                                       tets[i][2],
+                                       tets[i][3]});
         this->update_p_quality(new_pid);
     }
 
