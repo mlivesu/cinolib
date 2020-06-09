@@ -448,13 +448,17 @@ bool Tetmesh<M,V,E,F,P>::face_swap(const uint fid, bool geometric_check) // 2-to
         if(this->poly_face_is_CCW(pid0,id)) std::swap(tets[i][0],tets[i][1]);
 
         // this check is exact only if symbol CINOLIB_USES_EXACT_PREDICATES is defined
-        if(geometric_check && orient3d(this->vert(tets[i][0]),
-                                       this->vert(tets[i][1]),
-                                       this->vert(tets[i][2]),
-                                       this->vert(tets[i][3]))<=0)
+        if(geometric_check)
         {
-            return false;
+            if(orient3d(this->vert(tets[i][0]),
+                        this->vert(tets[i][1]),
+                        this->vert(tets[i][2]),
+                        this->vert(tets[i][3]))<=0) return false;
         }
+        // make sure thet tet does not exist already
+        // (this may happen if signed volume is not checked)
+        else if(this->poly_id(id,opp)!=-1) return false;
+
         ++i;
     }
     assert(i==3);
