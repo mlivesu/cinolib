@@ -457,9 +457,10 @@ bool Tetmesh<M,V,E,F,P>::face_swap(const uint fid, bool geometric_check) // 2-to
         }
         ++i;
     }
+    assert(i==3);
 
     // add new elements to the mesh
-    for(uint i=0; i<3; ++i)
+    for(i=0; i<3; ++i)
     {
         uint new_pid = this->poly_add({tets[i][0],
                                        tets[i][1],
@@ -468,11 +469,7 @@ bool Tetmesh<M,V,E,F,P>::face_swap(const uint fid, bool geometric_check) // 2-to
         this->update_p_quality(new_pid);
     }
 
-    // remove the tet with higher id first
-    if(pid0<pid1) std::swap(pid0,pid1);
-    this->poly_remove(pid0);
-    this->poly_remove(pid1);
-
+    this->face_remove(fid);
     return true;
 }
 
@@ -510,7 +507,6 @@ bool Tetmesh<M,V,E,F,P>::edge_swap(const uint eid) // 3-to-2 flip
     }
 
     this->edge_remove(eid);
-
     return true;
 }
 
