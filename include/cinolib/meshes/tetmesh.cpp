@@ -427,13 +427,22 @@ int Tetmesh<M,V,E,F,P>::edge_collapse(const uint eid, const vec3d & p, const dou
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,P>::face_swap(const uint fid, bool geometric_check) // 2-to-3 flip
+bool Tetmesh<M,V,E,F,P>::face_flip(const uint fid, bool geometric_check) // 2-to-3 flip
 {
     if(this->adj_f2p(fid).size()!=2) return false;
 
     uint pid0 = this->adj_f2p(fid).front();
     uint pid1 = this->adj_f2p(fid).back();
-    uint opp = this->poly_vert_opposite_to(pid1, fid);
+    uint opp0 = this->poly_vert_opposite_to(pid0, fid);
+    uint opp1 = this->poly_vert_opposite_to(pid1, fid);
+
+    // "A face is topologically unflippable if the edge
+    //  that would replace it is already in the complex"
+    //
+    // Unflippable Tetrahedral Complexes
+    // Randall Dougherty, Vance Faber, and Michael Murphy
+    // Discrete Computational Geometry 2004
+    if(this->edge_id(opp1, opp0)!=-1) return false;
 
     // construct all new elements
     uint tets[3][4];
@@ -444,7 +453,7 @@ bool Tetmesh<M,V,E,F,P>::face_swap(const uint fid, bool geometric_check) // 2-to
         tets[i][0] = this->face_vert_id(id,0);
         tets[i][1] = this->face_vert_id(id,1);
         tets[i][2] = this->face_vert_id(id,2);
-        tets[i][3] = opp;
+        tets[i][3] = opp1;
         if(this->poly_face_is_CCW(pid0,id)) std::swap(tets[i][0],tets[i][1]);
 
         // this check is exact only if symbol CINOLIB_USES_EXACT_PREDICATES is defined
@@ -455,10 +464,6 @@ bool Tetmesh<M,V,E,F,P>::face_swap(const uint fid, bool geometric_check) // 2-to
                         this->vert(tets[i][2]),
                         this->vert(tets[i][3]))<=0) return false;
         }
-        // make sure thet tet does not exist already
-        // (this may happen if signed volume is not checked)
-        else if(this->poly_id(id,opp)!=-1) return false;
-
         ++i;
     }
     assert(i==3);
@@ -481,9 +486,18 @@ bool Tetmesh<M,V,E,F,P>::face_swap(const uint fid, bool geometric_check) // 2-to
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,P>::edge_swap(const uint eid) // 3-to-2 flip
+bool Tetmesh<M,V,E,F,P>::edge_flip(const uint eid) // 3-to-2 flip
 {
+    // "An edge is topologically unflippable if does not
+    //  have exactly three incident faces or the face that
+    //  would replace it is already in the complex"
+    //
+    // Unflippable Tetrahedral Complexes
+    // Randall Dougherty, Vance Faber, and Michael Murphy
+    // Discrete Computational Geometry 2004
     if(this->adj_e2p(eid).size()!=3) return false;
+    auto e_link = this->edge_verts_link(eid);
+    if(this->face_id(e_link)!=-1) return false;
 
     uint pid = this->adj_e2p(eid).front();
     uint opp = this->num_verts();
@@ -493,7 +507,6 @@ bool Tetmesh<M,V,E,F,P>::edge_swap(const uint eid) // 3-to-2 flip
         if(!this->poly_contains_vert(pid,vid)) opp = vid;
     }
     assert(opp < this->num_verts());
-
 
     // construct all new elements
     uint tets[2][4];
@@ -505,10 +518,6 @@ bool Tetmesh<M,V,E,F,P>::edge_swap(const uint eid) // 3-to-2 flip
         tets[i][2] = this->face_vert_id(fid,2),
         tets[i][3] = opp;
         if(this->poly_face_is_CCW(pid,fid)) std::swap(tets[i][0],tets[i][1]);
-
-        // make sure thet tet does not exist already
-        if(this->poly_id(fid,opp)!=-1) return false;
-
         ++i;
     }
     assert(i==2);
