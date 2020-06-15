@@ -51,6 +51,7 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
     protected:
 
         MeshSlicer<Mesh> slicer;
+        Material         material_;
         RenderData       drawlist_in;
         RenderData       drawlist_out;
         RenderData       drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces/poly too)
@@ -86,6 +87,11 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         void updateGL_in();      // regenerates rendering data for mesh inside
         void updateGL_out();     // regenerates rendering data for mesh outside
         void updateGL_marked();  // regenerates rendering data for mesh marked elements
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const Material & material() const { return material_; }
+              Material & material()       { return material_; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

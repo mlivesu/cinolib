@@ -134,6 +134,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
 {
+    drawlist.material = material_;
     drawlist.tri_coords.clear();
     drawlist.tris.clear();
     drawlist.tri_v_norms.clear();
