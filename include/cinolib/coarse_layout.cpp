@@ -44,9 +44,9 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
 {
-    m.vert_unmark_all();
-    m.edge_unmark_all();
-    m.poly_unmark_all();
+    m.vert_set_flag(MARKED,false);
+    m.edge_set_flag(MARKED,false);
+    m.poly_set_flag(MARKED,false);
 
     // find singular vertices
     std::queue<uint> sing_verts;
@@ -104,10 +104,10 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
 {
-    m.vert_unmark_all();
-    m.edge_unmark_all();
-    m.face_unmark_all();
-    m.poly_unmark_all();
+    m.vert_set_flag(MARKED,false);
+    m.edge_set_flag(MARKED,false);
+    m.face_set_flag(MARKED,false);
+    m.poly_set_flag(MARKED,false);
 
     // find singular vertices
     std::queue<uint> sing_edges;

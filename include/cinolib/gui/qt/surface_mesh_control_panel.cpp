@@ -1032,7 +1032,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     {
         switch(cb_actions->currentIndex())
         {
-            case 1: m->edge_unmark_all(); break;
+            case 1: m->edge_set_flag(MARKED,false); break;
             case 2: m->poly_color_wrt_label(); break;
             case 3: m->poly_label_wrt_color(); break;
             case 4: m->edge_mark_color_discontinuities(); break;

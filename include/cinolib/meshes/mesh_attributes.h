@@ -82,21 +82,29 @@ namespace cinolib
 //    flags(pos).test()   => returns bit at poistion pos
 //    flags(pos).flip()   => inverts the bit at position pos
 //    ...
+//
+// All mesh classes expose the following methods to set flags:
+//
+// m.vert_set_flag(F,B) => assigns value B to flag F for all vertices in the mesh
+// m.edge_set_flag(F,B) => assigns value B to flag F for all edges in the mesh
+// m.face_set_flag(F,B) => assigns value B to flag F for all faces in the mesh (only for volume meshes!)
+// m.poly_set_flag(F,B) => assigns value B to flag F for all polygons/polyhedra in the mesh
+//
+// m.vert_set_flag(F,B,IDs) => assigns value B to flag F for all vertices in IDs
+// m.edge_set_flag(F,B,IDs) => assigns value B to flag F for all edges in IDs
+// m.face_set_flag(F,B,IDs) => assigns value B to flag F for all faces in IDs (only for volume meshes!)
+// m.poly_set_flag(F,B,IDs) => assigns value B to flag F for all polygons/polyhedra in IDs
+//
 enum
 {
     MARKED,       // general flag for global marking. Can be used to mark visited
                   // elements, creases, mesh borders,...). Marked elements can also
                   // be highlighted at rendering time, with dedicated colors/lines.
                   // By default, booundary and non manifold elements are marked at
-                  // loading time. The following methods allow to easily unmark all
-                  // mesh elements: vert_unmark_all(), edge_unmark_all(), face_unmark_all(), poly_unmark_all()
+                  // loading time.
 
     MARKED_LOCAL, // general flag for local marking: useful for local methods that
                   // need a temporary flag to operate on mesh elements.
-                  // The following methods allow to easily unmark all mesh elements:
-                  // vert_local_unmark_near_vert(), vert_local_unmark_near_edge(),
-                  // vert_local_unmark_near_face(), vert_local_unmark_near_poly()
-                  // Similar methods also exist for edges, faces and polys.
 
     HIDDEN,       // used by the slicer to show/hide mesh elements when rendering
                   // (this flag is actually used only for poly mesh elements)
@@ -129,7 +137,7 @@ typedef struct
     vec3d          uvw     = vec3d(0,0,0);
     int            label   = -1;
     float          quality = 0.0;
-    std::bitset<8> flags;
+    std::bitset<8> flags   = 0x00;
 }
 Vert_std_attributes;
 
@@ -139,7 +147,7 @@ typedef struct
 {
     Color          color = Color::BLACK();
     int            label = -1;
-    std::bitset<8> flags;
+    std::bitset<8> flags = 0x00;
 }
 Edge_std_attributes;
 
@@ -152,7 +160,7 @@ typedef struct
     int            label   = -1;
     float          quality = 0.0;
     float          AO      = 1.0;
-    std::bitset<8> flags;
+    std::bitset<8> flags   = 0x00;
 }
 Polygon_std_attributes;
 
@@ -163,7 +171,7 @@ typedef struct
     Color          color   = Color::WHITE();
     int            label   = -1;
     float          quality = 0.0;
-    std::bitset<8> flags;
+    std::bitset<8> flags   = 0x00;
 }
 Polyhedron_std_attributes;
 

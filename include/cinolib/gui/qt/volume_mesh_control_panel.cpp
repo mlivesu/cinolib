@@ -1404,8 +1404,8 @@ void VolumeMeshControlPanel<Mesh>::connect()
     {
         switch(cb_actions->currentIndex())
         {
-            case 1: m->edge_unmark_all(); break;
-            case 2: m->face_unmark_all(); break;
+            case 1: m->edge_set_flag(MARKED,false); break;
+            case 2: m->face_set_flag(MARKED,false); break;
             case 3: m->poly_color_wrt_label(); break;
             case 4: m->poly_label_wrt_color(); break;
             case 5: m->edge_mark_sharp_creases(to_rad(60.0)); break;

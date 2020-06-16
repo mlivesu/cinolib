@@ -75,7 +75,7 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     std::vector<uint> copies_of_root = v_map.at(basis.root);
     copies_of_root.push_back(basis.root);
     assert(!copies_of_root.empty());
-    m_in.vert_unmark_all();
+    m_in.vert_set_flag(MARKED,false);
     for(uint vid : copies_of_root)
     {
         assert(m_in.vert_is_boundary(vid));

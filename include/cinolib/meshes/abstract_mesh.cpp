@@ -659,47 +659,6 @@ void AbstractMesh<M,V,E,P>::vert_set_alpha(const float alpha)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::vert_unmark_all()
-{
-    for(uint vid=0; vid<num_verts(); ++vid)
-    {
-        vert_data(vid).flags[MARKED] = false;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractMesh<M,V,E,P>::vert_local_unmark_near_vert(const uint vid)
-{
-    vert_data(vid).flags[MARKED_LOCAL] = false;
-    for(uint nbr : adj_v2v(vid)) vert_data(nbr).flags[MARKED_LOCAL] = false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractMesh<M,V,E,P>::vert_local_unmark_near_edge(const uint eid)
-{
-    vert_data(edge_vert_id(eid,0)).flags[MARKED_LOCAL] = false;
-    vert_data(edge_vert_id(eid,1)).flags[MARKED_LOCAL] = false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractMesh<M,V,E,P>::vert_local_unmark_near_poly(const uint pid)
-{
-    for(uint vid : adj_p2v(pid)) vert_data(vid).flags[MARKED_LOCAL] = false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 uint AbstractMesh<M,V,E,P>::edge_vert_id(const uint eid, const uint offset) const
 {
     uint   eid_ptr = eid * 2;
@@ -875,46 +834,6 @@ void AbstractMesh<M,V,E,P>::edge_set_color(const Color & c)
     {
         edge_data(eid).color = c;
     }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractMesh<M,V,E,P>::edge_unmark_all()
-{
-    for(uint eid=0; eid<num_edges(); ++eid)
-    {
-        edge_data(eid).flags[MARKED] = false;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractMesh<M,V,E,P>::edge_local_unmark_near_vert(const uint vid)
-{
-    for(uint eid : adj_v2e(vid)) edge_data(eid).flags[MARKED_LOCAL] = false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractMesh<M,V,E,P>::edge_local_unmark_near_edge(const uint eid)
-{
-    edge_data(eid).flags[MARKED_LOCAL] = false;
-    for(uint nbr : adj_e2e(eid)) edge_data(nbr).flags[MARKED_LOCAL] = false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractMesh<M,V,E,P>::edge_local_unmark_near_poly(const uint pid)
-{
-    for(uint eid : adj_p2e(pid)) edge_data(eid).flags[MARKED_LOCAL] = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1123,18 +1042,6 @@ bool AbstractMesh<M,V,E,P>::poly_contains_edge(const uint pid, const uint vid0, 
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void AbstractMesh<M,V,E,P>::poly_show_all()
-{
-    for(uint pid=0; pid<num_polys(); ++pid)
-    {
-        poly_data(pid).flags[HIDDEN] = false;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 void AbstractMesh<M,V,E,P>::center_bbox()
 {
     vec3d center = bb.center();
@@ -1217,46 +1124,6 @@ bool AbstractMesh<M,V,E,P>::poly_contains_vert(const uint pid, const uint vid) c
 {
     for(uint v : adj_p2v(pid)) if(v == vid) return true;
     return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractMesh<M,V,E,P>::poly_unmark_all()
-{
-    for(uint pid=0; pid<num_polys(); ++pid)
-    {
-        poly_data(pid).flags[MARKED] = false;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractMesh<M,V,E,P>::poly_local_unmark_near_vert(const uint vid)
-{
-    for(uint pid : adj_v2p(vid)) poly_data(pid).flags[MARKED_LOCAL] = false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractMesh<M,V,E,P>::poly_local_unmark_near_edge(const uint eid)
-{
-    for(uint pid : adj_e2p(eid)) poly_data(pid).flags[MARKED_LOCAL] = false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void AbstractMesh<M,V,E,P>::poly_local_unmark_near_poly(const uint pid)
-{
-    poly_data(pid).flags[MARKED_LOCAL] = false;
-    for(uint nbr : adj_p2p(pid)) poly_data(nbr).flags[MARKED_LOCAL] = false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1434,4 +1301,75 @@ uint AbstractMesh<M,V,E,P>::pick_poly(const vec3d & p) const
     return closest.front().second;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::vert_set_flag(const int flag, const bool b)
+{
+    for(uint vid=0; vid<this->num_verts(); ++vid)
+    {
+        this->vert_data(vid).flags[flag] = b;
+    }
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::vert_set_flag(const int flag, const bool b, const std::vector<uint> & vids)
+{
+    for(uint vid : vids)
+    {
+        this->vert_data(vid).flags[flag] = b;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::edge_set_flag(const int flag, const bool b)
+{
+    for(uint eid=0; eid<this->num_edges(); ++eid)
+    {
+        this->edge_data(eid).flags[flag] = b;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::edge_set_flag(const int flag, const bool b, const std::vector<uint> & eids)
+{
+    for(uint eid : eids)
+    {
+        this->edge_data(eid).flags[flag] = b;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_set_flag(const int flag, const bool b)
+{
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        this->poly_data(pid).flags[flag] = b;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractMesh<M,V,E,P>::poly_set_flag(const int flag, const bool b, const std::vector<uint> & pids)
+{
+    for(uint pid : pids)
+    {
+        this->poly_data(pid).flags[flag] = b;
+    }
+}
+ }

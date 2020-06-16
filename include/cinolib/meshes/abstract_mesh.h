@@ -222,10 +222,6 @@ class AbstractMesh
                 uint             vert_shared                (const uint eid0, const uint eid1) const;
                 double           vert_min_uvw_value         (const int tex_coord = U_param) const;
                 double           vert_max_uvw_value         (const int tex_coord = U_param) const;
-                void             vert_unmark_all            ();
-                void             vert_local_unmark_near_vert(const uint vid);
-                void             vert_local_unmark_near_edge(const uint eid);
-                void             vert_local_unmark_near_poly(const uint pid);
                 void             vert_apply_labels          (const std::vector<int> & labels);
                 void             vert_apply_label           (const int label);                
         virtual double           vert_mass                  (const uint vid) const = 0;
@@ -233,6 +229,8 @@ class AbstractMesh
         virtual void             vert_set_alpha             (const float alpha);
         virtual uint             vert_opposite_to           (const uint eid, const uint vid) const;
         virtual void             vert_weights               (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
+                void             vert_set_flag              (const int flag, const bool b);
+                void             vert_set_flag              (const int flag, const bool b, const std::vector<uint> & vids);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -252,16 +250,14 @@ class AbstractMesh
                 double                 edge_avg_length            () const;
                 double                 edge_max_length            () const;
                 double                 edge_min_length            () const;
-                void                   edge_unmark_all            ();
-                void                   edge_local_unmark_near_vert(const uint vid);
-                void                   edge_local_unmark_near_edge(const uint eid);
-                void                   edge_local_unmark_near_poly(const uint pid);
                 void                   edge_apply_labels          (const std::vector<int> & labels);
                 void                   edge_apply_label           (const int label);
                 void                   edge_mark_sharp_creases    (const float thresh_rad = 1.0472); // 60 degrees
         virtual double                 edge_dihedral_angle        (const uint eid) const = 0;
         virtual void                   edge_set_color             (const Color & c);
         virtual void                   edge_set_alpha             (const float alpha);
+                void                   edge_set_flag              (const int flag, const bool b);
+                void                   edge_set_flag              (const int flag, const bool b, const std::vector<uint> & eids);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -280,13 +276,10 @@ class AbstractMesh
                 bool               poly_contains_vert         (const uint pid, const uint vid) const;
                 bool               poly_contains_edge         (const uint pid, const uint eid) const;
                 bool               poly_contains_edge         (const uint pid, const uint vid0, const uint vid1) const;
-                void               poly_show_all              ();
                 void               poly_color_wrt_label       (const bool sorted=false, const float s=.5f, float v=.85f); // s => saturation, v => value in HSV color space
                 void               poly_label_wrt_color       ();
-                void               poly_unmark_all            ();
-                void               poly_local_unmark_near_vert(const uint vid);
-                void               poly_local_unmark_near_edge(const uint eid);
-                void               poly_local_unmark_near_poly(const uint pid);
+                void               poly_set_flag              (const int flag, const bool b);
+                void               poly_set_flag              (const int flag, const bool b, const std::vector<uint> & pids);
                 uint               polys_n_unique_colors      () const;
                 uint               polys_n_unique_labels      () const;
                 bool               polys_are_colored          () const;

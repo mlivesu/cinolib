@@ -53,7 +53,7 @@ CINO_INLINE
 void cut_mesh_along_marked_edges(AbstractPolygonMesh<M,V,E,P>               & m,
                                  std::unordered_map<uint,std::vector<uint>> & v_map)
 {
-    m.vert_unmark_all();
+    m.vert_set_flag(MARKED,false);
     v_map.clear();
 
     uint nv = m.num_verts();

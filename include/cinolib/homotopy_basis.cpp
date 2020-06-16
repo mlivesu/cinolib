@@ -211,7 +211,7 @@ void detach_loops(Trimesh<M,V,E,P>  & m,
         if(val_1>=2 && val_2==1) q.push(vid);
     }
 
-    m.vert_unmark_all();
+    m.vert_set_flag(MARKED,false);
     m.vert_data(data.root).flags[MARKED] = true;
     while(!q.empty())
     {
@@ -570,7 +570,7 @@ void detach_loops_preproc(Trimesh<M,V,E,P>  & m,
                           HomotopyBasisData & data)
 {
     // mark edges on basis loops, and count loops per edge (using edge labels)
-    m.edge_unmark_all();
+    m.edge_set_flag(MARKED,false);
     m.edge_apply_label(0);
     for(auto loop : data.loops)
     {
@@ -594,7 +594,7 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
 {
     // recompute basis
     data.loops.clear();
-    m.edge_unmark_all();
+    m.edge_set_flag(MARKED,false);
     for(uint eid: m.adj_v2e(data.root))
     {
         if(m.edge_data(eid).flags[MARKED]) continue;
