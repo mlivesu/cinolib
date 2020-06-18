@@ -18,6 +18,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* write a quadratic version of earcut for polygon tessellation (the current one is cubic!)
 * use PARALLEL_FOR as much as possible inside the library to boost performances
 * consider computing element quality and normals (at least for faces) on the fly, without precomputing and storing them
 * try to adhere more to data flow/functional programming principles, keeping as few classes as possible with only access to inner data, moving methods that do data processing outside the class
