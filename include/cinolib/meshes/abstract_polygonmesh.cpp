@@ -317,12 +317,15 @@ void AbstractPolygonMesh<M,V,E,P>::update_p_tessellation(const uint pid)
             vlist.at(i) = this->poly_vert(pid,i);
         }
         //
-        poly_triangles.at(pid).clear();
         std::vector<uint> tris;
+        poly_triangles.at(pid).clear();
         if(polygon_triangulate(vlist, tris))
         {
-            poly_triangles.at(pid).clear();
             for(uint off : tris) poly_triangles.at(pid).push_back(this->poly_vert_id(pid,off));
+        }
+        else
+        {
+            std::cout << "WARNING: could not triangulate a polygon. Is it degenerate?" << std::endl;
         }
     }
 }
