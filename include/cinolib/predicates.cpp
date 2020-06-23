@@ -278,6 +278,7 @@ PointInSimplex point_in_segment(const vec3d & p,
     if(p==s[0]) return ON_VERT0;
     if(p==s[1]) return ON_VERT1;
 
+    bool tmp_res = points_are_colinear(s[0],s[1],p);
     if(!points_are_colinear(s[0],s[1],p)) return STRICTLY_OUTSIDE;
 
     if((p.x()>std::min(s[0].x(),s[1].x()) && p.x()<std::max(s[0].x(),s[1].x())) ||
@@ -344,9 +345,9 @@ PointInSimplex point_in_triangle(const vec3d & p,
     vec3d e0[2] = {t[0],t[1]};
     vec3d e1[2] = {t[1],t[2]};
     vec3d e2[2] = {t[2],t[0]};
-    if(point_in_segment(p,e0)==ON_EDGE0) return ON_EDGE0;
-    if(point_in_segment(p,e1)==ON_EDGE1) return ON_EDGE1;
-    if(point_in_segment(p,e2)==ON_EDGE2) return ON_EDGE2;
+    if(point_in_segment(p,e0)==STRICTLY_INSIDE) return ON_EDGE0;
+    if(point_in_segment(p,e1)==STRICTLY_INSIDE) return ON_EDGE1;
+    if(point_in_segment(p,e2)==STRICTLY_INSIDE) return ON_EDGE2;
 
     // test for the interior: project t on XYZ and, if the check is never false in
     // any of the projections, then p must be inside t
@@ -516,6 +517,8 @@ SimplexIntersection segment_segment_intersect(const vec3d s0[],
 {
     assert(!segment_is_degenerate(s0) &&
            !segment_is_degenerate(s1));
+
+    if(!points_are_coplanar(s0[0], s0[1], s1[0], s1[1])) return DO_NOT_INTERSECT;
 
     // check for coincident segments
     bool s00_is_shared = (s0[0]==s1[0] || s0[0]==s1[1]);
