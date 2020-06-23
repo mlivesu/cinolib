@@ -244,6 +244,11 @@ bool points_are_colinear(const vec2d & p0,
                          const vec2d & p1,
                          const vec2d & p2);
 
+CINO_INLINE
+bool points_are_colinear2d(const double * p0,
+                           const double * p1,
+                           const double * p2);
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // true if the area of all the orthogonal 2d projections of the triangle p0-p1-p2 is zero
@@ -251,6 +256,11 @@ CINO_INLINE
 bool points_are_colinear(const vec3d & p0,
                          const vec3d & p1,
                          const vec3d & p2);
+
+CINO_INLINE
+bool points_are_colinear3d(const double * p0,
+                           const double * p1,
+                           const double * p2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -260,6 +270,12 @@ bool points_are_coplanar(const vec3d & p0,
                          const vec3d & p1,
                          const vec3d & p2,
                          const vec3d & p3);
+
+CINO_INLINE
+bool points_are_coplanar(const double * p0,
+                         const double * p1,
+                         const double * p2,
+                         const double * p3);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

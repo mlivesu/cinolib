@@ -166,6 +166,7 @@ double orient2d(const vec2d & pa,
     return orient2d(pa.ptr(), pb.ptr(), pc.ptr());
 }
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
@@ -208,8 +209,18 @@ bool points_are_colinear(const vec2d & p0,
                          const vec2d & p1,
                          const vec2d & p2)
 {
-    return orient2d(p0,p1,p2) == 0;
+    //return orient2d(p0,p1,p2) == 0;
+    return points_are_colinear2d(p0.ptr(), p1.ptr(), p2.ptr());
 }
+
+CINO_INLINE
+bool points_are_colinear2d(const double *p0,
+                           const double *p1,
+                           const double *p2)
+{
+    return orient2d(p0, p1, p2) == 0;
+}
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -219,10 +230,23 @@ bool points_are_colinear(const vec3d & p0,
                          const vec3d & p1,
                          const vec3d & p2)
 {
+    return points_are_colinear3d(p0.ptr(), p1.ptr(), p2.ptr());
+}
+
+
+CINO_INLINE
+bool points_are_colinear3d(const double * p0,
+                           const double * p1,
+                           const double * p2)
+{
+    double p0_dropX[2] = {p0[1], p0[2]}, p0_dropY[2] = {p0[0], p0[2]}, p0_dropZ[2] = {p0[0], p0[1]};
+    double p1_dropX[2] = {p1[1], p1[2]}, p1_dropY[2] = {p1[0], p1[2]}, p1_dropZ[2] = {p1[0], p1[1]};
+    double p2_dropX[2] = {p2[1], p2[2]}, p2_dropY[2] = {p2[0], p2[2]}, p2_dropZ[2] = {p2[0], p2[1]};
+
     // check if all the 2d orthogonal projections of p are colinear
-    if(points_are_colinear(vec2d(p0,DROP_X), vec2d(p1,DROP_X), vec2d(p2,DROP_X)) &&
-       points_are_colinear(vec2d(p0,DROP_Y), vec2d(p1,DROP_Y), vec2d(p2,DROP_Y)) &&
-       points_are_colinear(vec2d(p0,DROP_Z), vec2d(p1,DROP_Z), vec2d(p2,DROP_Z)))
+    if(points_are_colinear2d(p0_dropX, p1_dropX, p2_dropX) &&
+       points_are_colinear2d(p0_dropY, p1_dropY, p2_dropY) &&
+       points_are_colinear2d(p0_dropZ, p1_dropZ, p2_dropZ))
     {
         return true;
     }
@@ -238,7 +262,16 @@ bool points_are_coplanar(const vec3d & p0,
                          const vec3d & p2,
                          const vec3d & p3)
 {
-    return orient3d(p0,p1,p2,p3) == 0;
+    return points_are_coplanar(p0.ptr(), p1.ptr(), p2.ptr(), p3.ptr());
+}
+
+CINO_INLINE
+bool points_are_coplanar(const double *p0,
+                         const double *p1,
+                         const double *p2,
+                         const double *p3)
+{
+    return orient3d(p0, p1, p2, p3) == 0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1015,5 +1048,7 @@ bool tet_is_degenerate(const vec3d t[])
 {
     return points_are_coplanar(t[0], t[1], t[2], t[3]);
 }
+
+
 
 }
