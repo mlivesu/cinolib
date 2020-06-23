@@ -283,9 +283,18 @@ bool points_are_coplanar(const double * p0,
 // ON_VERTi         if p coincides with the i-th vertex of s
 // STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
+
 CINO_INLINE
 PointInSimplex point_in_segment(const vec2d & p,
-                                const vec2d  s[]);
+                                const vec2d s[]);
+
+CINO_INLINE
+PointInSimplex point_in_segment(const vec2d & p,
+                                const vec2d & s0, const vec2d & s1);
+
+CINO_INLINE
+PointInSimplex point_in_segment2d(const double * p,
+                                  const double * s0, const double * s1);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -293,9 +302,17 @@ PointInSimplex point_in_segment(const vec2d & p,
 // ON_VERTi         if p coincides with the i-th vertex of s
 // STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
+
 CINO_INLINE
 PointInSimplex point_in_segment(const vec3d & p,
-                                const vec3d   s[]);
+                                const vec3d s[]);
+CINO_INLINE
+PointInSimplex point_in_segment(const vec3d & p,
+                                const vec3d & s0, const vec3d & s1);
+
+CINO_INLINE
+PointInSimplex point_in_segment3d(const double * p,
+                                  const double * s0, const double * s1);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

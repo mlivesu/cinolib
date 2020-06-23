@@ -280,18 +280,32 @@ bool points_are_coplanar(const double *p0,
 // ON_VERTi         if p coincides with the i-th vertex of s
 // STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
+
 CINO_INLINE
 PointInSimplex point_in_segment(const vec2d & p,
-                                const vec2d   s[])
+                                const vec2d s[])
 {
-    if(p==s[0]) return ON_VERT0;
-    if(p==s[1]) return ON_VERT1;
+    return point_in_segment2d(p.ptr(), s[0].ptr(), s[1].ptr());
+}
 
-    if(!points_are_colinear(s[0],s[1],p)) return STRICTLY_OUTSIDE;
+CINO_INLINE
+PointInSimplex point_in_segment(const vec2d & p,
+                                const vec2d & s0, const vec2d & s1)
+{
+    return point_in_segment2d(p.ptr(), s0.ptr(), s1.ptr());
+}
 
-    if((p.x()>std::min(s[0].x(),s[1].x()) && p.x()<std::max(s[0].x(),s[1].x())) ||
-       (p.y()>std::min(s[0].y(),s[1].y()) && p.y()<std::max(s[0].y(),s[1].y())))
-    {        
+CINO_INLINE
+PointInSimplex point_in_segment2d(const double *p, const double *s0, const double *s1)
+{
+    if(p[0] == s0[0] && p[1] == s0[1]) return ON_VERT0;
+    if(p[0] == s1[0] && p[1] == s1[1]) return ON_VERT1;
+
+    if(!points_are_colinear2d(s0, s1, p)) return STRICTLY_OUTSIDE;
+
+    if((p[0] > std::min(s0[0], s1[0]) && p[0] < std::max(s0[0], s1[0])) ||
+       (p[1] > std::min(s0[1], s1[1]) && p[1] < std::max(s0[1], s1[1])))
+    {
         return STRICTLY_INSIDE;
     }
 
@@ -304,19 +318,33 @@ PointInSimplex point_in_segment(const vec2d & p,
 // ON_VERTi         if p coincides with the i-th vertex of s
 // STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
+
 CINO_INLINE
 PointInSimplex point_in_segment(const vec3d & p,
-                                const vec3d   s[])
+                                const vec3d s[])
 {
-    if(p==s[0]) return ON_VERT0;
-    if(p==s[1]) return ON_VERT1;
+    return point_in_segment3d(p.ptr(), s[0].ptr(), s[1].ptr());
+}
 
-    bool tmp_res = points_are_colinear(s[0],s[1],p);
-    if(!points_are_colinear(s[0],s[1],p)) return STRICTLY_OUTSIDE;
+CINO_INLINE
+PointInSimplex point_in_segment(const vec3d & p,
+                                const vec3d & s0, const vec3d & s1)
+{
+    return point_in_segment3d(p.ptr(), s0.ptr(), s1.ptr());
+}
 
-    if((p.x()>std::min(s[0].x(),s[1].x()) && p.x()<std::max(s[0].x(),s[1].x())) ||
-       (p.y()>std::min(s[0].y(),s[1].y()) && p.y()<std::max(s[0].y(),s[1].y())) ||
-       (p.z()>std::min(s[0].z(),s[1].z()) && p.z()<std::max(s[0].z(),s[1].z())))
+CINO_INLINE
+PointInSimplex point_in_segment3d(const double * p,
+                                  const double * s0, const double * s1)
+{
+    if(p[0] == s0[0] && p[1] == s0[1] && p[2] == s0[2]) return ON_VERT0;
+    if(p[0] == s1[0] && p[1] == s1[1] && p[2] == s1[2]) return ON_VERT1;
+
+    if(!points_are_colinear3d(s0,s1,p)) return STRICTLY_OUTSIDE;
+
+    if((p[0] > std::min(s0[0], s1[0]) && p[0] < std::max(s0[0], s1[0])) ||
+       (p[1] > std::min(s0[1], s1[1]) && p[1] < std::max(s0[1], s1[1])) ||
+       (p[2] > std::min(s0[2], s1[2]) && p[2] < std::max(s0[2], s1[2])))
     {
         return STRICTLY_INSIDE;
     }
@@ -378,9 +406,9 @@ PointInSimplex point_in_triangle(const vec3d & p,
     vec3d e0[2] = {t[0],t[1]};
     vec3d e1[2] = {t[1],t[2]};
     vec3d e2[2] = {t[2],t[0]};
-    if(point_in_segment(p,e0)==STRICTLY_INSIDE) return ON_EDGE0;
-    if(point_in_segment(p,e1)==STRICTLY_INSIDE) return ON_EDGE1;
-    if(point_in_segment(p,e2)==STRICTLY_INSIDE) return ON_EDGE2;
+    if(point_in_segment(p,t[0],t[1])==STRICTLY_INSIDE) return ON_EDGE0;
+    if(point_in_segment(p,t[1],t[2])==STRICTLY_INSIDE) return ON_EDGE1;
+    if(point_in_segment(p,t[2],t[0])==STRICTLY_INSIDE) return ON_EDGE2;
 
     // test for the interior: project t on XYZ and, if the check is never false in
     // any of the projections, then p must be inside t
@@ -1048,6 +1076,8 @@ bool tet_is_degenerate(const vec3d t[])
 {
     return points_are_coplanar(t[0], t[1], t[2], t[3]);
 }
+
+
 
 
 
