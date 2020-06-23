@@ -445,8 +445,7 @@ CINO_INLINE
 SimplexIntersection segment_segment_intersect(const vec2d s0[],
                                               const vec2d s1[])
 {
-    assert(!segment_is_degenerate(s0) &&
-           !segment_is_degenerate(s1));
+    //assert(!segment_is_degenerate(s0) && !segment_is_degenerate(s1));
 
     // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
     double det_s00 = orient2d(s1[0],s1[1],s0[0]);
