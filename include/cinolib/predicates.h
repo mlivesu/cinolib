@@ -321,9 +321,18 @@ PointInSimplex point_in_segment3d(const double * p,
 // ON_EDGEj         if p lies inside the j-th edge of t (endpoints excluded)
 // STRICTLY_INSIDE  if p lies inside triangle t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
+
 CINO_INLINE
 PointInSimplex point_in_triangle(const vec2d & p,
                                  const vec2d   t[]);
+
+CINO_INLINE
+PointInSimplex point_in_triangle(const vec2d & p,
+                                 const vec2d & t0, const vec2d & t1, const vec2d & t2);
+
+CINO_INLINE
+PointInSimplex point_in_triangle2d(const double * p,
+                                   const double * t0, const double * t1, const double * t2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -332,9 +341,18 @@ PointInSimplex point_in_triangle(const vec2d & p,
 // ON_EDGEj         if p lies inside the j-th edge of t (endpoints excluded)
 // STRICTLY_INSIDE  if p lies inside triangle t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
+
 CINO_INLINE
 PointInSimplex point_in_triangle(const vec3d & p,
                                  const vec3d   t[]);
+
+CINO_INLINE
+PointInSimplex point_in_triangle(const vec3d & p,
+                                 const vec3d & t0, const vec3d & t1, const vec3d & t2);
+
+CINO_INLINE
+PointInSimplex point_in_triangle3d(const double * p,
+                                   const double * t0, const double * t1, const double * t2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

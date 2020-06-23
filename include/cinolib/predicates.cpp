@@ -363,22 +363,36 @@ CINO_INLINE
 PointInSimplex point_in_triangle(const vec2d & p,
                                  const vec2d   t[])
 {
-    if(p==t[0]) return ON_VERT0;
-    if(p==t[1]) return ON_VERT1;
-    if(p==t[2]) return ON_VERT2;
+    return point_in_triangle2d(p.ptr(), t[0].ptr(), t[1].ptr(), t[2].ptr());
+}
 
-    double e0p_area = orient2d(t[0],t[1],p);
-    double e1p_area = orient2d(t[1],t[2],p);
-    double e2p_area = orient2d(t[2],t[0],p);
+CINO_INLINE
+PointInSimplex point_in_triangle(const vec2d & p,
+                                 const vec2d & t0, const vec2d & t1, const vec2d & t2)
+{
+    return point_in_triangle2d(p.ptr(), t0.ptr(), t1.ptr(), t2.ptr());
+}
 
-    bool hit = (e0p_area>=0 && e1p_area>=0 && e2p_area>=0) ||
-               (e0p_area<=0 && e1p_area<=0 && e2p_area<=0);
+CINO_INLINE
+PointInSimplex point_in_triangle2d(const double * p,
+                                   const double * t0, const double * t1, const double * t2)
+{
+    if(p[0] == t0[0] && p[1] == t0[1] && p[2] == t0[2]) return ON_VERT0;
+    if(p[0] == t1[0] && p[1] == t1[1] && p[2] == t1[2]) return ON_VERT1;
+    if(p[0] == t2[0] && p[1] == t2[1] && p[2] == t2[2]) return ON_VERT2;
+
+    double e0p_area = orient2d(t0,t1,p);
+    double e1p_area = orient2d(t1,t2,p);
+    double e2p_area = orient2d(t2,t0,p);
+
+    bool hit = (e0p_area >= 0 && e1p_area >= 0 && e2p_area >= 0) ||
+               (e0p_area <= 0 && e1p_area <= 0 && e2p_area <= 0);
 
     if(hit)
     {
-        if(e0p_area==0) return ON_EDGE0;
-        if(e1p_area==0) return ON_EDGE1;
-        if(e2p_area==0) return ON_EDGE2;
+        if(e0p_area == 0) return ON_EDGE0;
+        if(e1p_area == 0) return ON_EDGE1;
+        if(e2p_area == 0) return ON_EDGE2;
 
         return STRICTLY_INSIDE;
     }
@@ -393,52 +407,58 @@ PointInSimplex point_in_triangle(const vec2d & p,
 // ON_EDGEj         if p lies inside the j-th edge of t (endpoints excluded)
 // STRICTLY_INSIDE  if p lies inside triangle t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
+
 CINO_INLINE
 PointInSimplex point_in_triangle(const vec3d & p,
                                  const vec3d   t[])
 {
+    return point_in_triangle3d(p.ptr(), t[0].ptr(), t[1].ptr(), t[2].ptr());
+}
+
+CINO_INLINE
+PointInSimplex point_in_triangle(const vec3d & p,
+                                 const vec3d & t0, const vec3d & t1, const vec3d & t2)
+{
+    return point_in_triangle3d(p.ptr(), t0.ptr(), t1.ptr(), t2.ptr());
+}
+
+CINO_INLINE
+PointInSimplex point_in_triangle3d(const double * p,
+                                   const double * t0, const double * t1, const double * t2)
+{
     // test for point in vert
-    if(p==t[0]) return ON_VERT0;
-    if(p==t[1]) return ON_VERT1;
-    if(p==t[2]) return ON_VERT2;
+    if(p[0] == t0[0] && p[1] == t0[1] && p[2] == t0[2]) return ON_VERT0;
+    if(p[0] == t1[0] && p[1] == t1[1] && p[2] == t1[2]) return ON_VERT1;
+    if(p[0] == t2[0] && p[1] == t2[1] && p[2] == t2[2]) return ON_VERT2;
 
     // test for point in edge in 3D
-    vec3d e0[2] = {t[0],t[1]};
-    vec3d e1[2] = {t[1],t[2]};
-    vec3d e2[2] = {t[2],t[0]};
-    if(point_in_segment(p,t[0],t[1])==STRICTLY_INSIDE) return ON_EDGE0;
-    if(point_in_segment(p,t[1],t[2])==STRICTLY_INSIDE) return ON_EDGE1;
-    if(point_in_segment(p,t[2],t[0])==STRICTLY_INSIDE) return ON_EDGE2;
+    if(point_in_segment3d(p, t0, t1) == STRICTLY_INSIDE) return ON_EDGE0;
+    if(point_in_segment3d(p, t1, t2) == STRICTLY_INSIDE) return ON_EDGE1;
+    if(point_in_segment3d(p, t2, t0) == STRICTLY_INSIDE) return ON_EDGE2;
 
     // test for the interior: project t on XYZ and, if the check is never false in
     // any of the projections, then p must be inside t
 
-    vec2d p_x(p,DROP_X);
-    vec2d t_x[3] =
-    {
-        vec2d(t[0],DROP_X),
-        vec2d(t[1],DROP_X),
-        vec2d(t[2],DROP_X)
-    };
-    if(point_in_triangle(p_x,t_x)==STRICTLY_OUTSIDE) return STRICTLY_OUTSIDE;
+    double p_dropX[2]  = { p[1],  p[2]};
+    double t0_dropX[2] = {t0[1], t0[2]};
+    double t1_dropX[2] = {t1[1], t1[2]};
+    double t2_dropX[2] = {t2[1], t2[2]};
 
-    vec2d p_y(p,DROP_Y);
-    vec2d t_y[3] =
-    {
-        vec2d(t[0],DROP_Y),
-        vec2d(t[1],DROP_Y),
-        vec2d(t[2],DROP_Y)
-    };
-    if(point_in_triangle(p_y,t_y)==STRICTLY_OUTSIDE) return STRICTLY_OUTSIDE;
+    if(point_in_triangle2d(p_dropX, t0_dropX, t1_dropX, t2_dropX) == STRICTLY_OUTSIDE) return STRICTLY_OUTSIDE;
 
-    vec2d p_z(p,DROP_Z);
-    vec2d t_z[3] =
-    {
-        vec2d(t[0],DROP_Z),
-        vec2d(t[1],DROP_Z),
-        vec2d(t[2],DROP_Z)
-    };
-    if(point_in_triangle(p_z,t_z)==STRICTLY_OUTSIDE) return STRICTLY_OUTSIDE;
+    double p_dropY[2]  = { p[0],  p[2]};
+    double t0_dropY[2] = {t0[0], t0[2]};
+    double t1_dropY[2] = {t1[0], t1[2]};
+    double t2_dropY[2] = {t2[0], t2[2]};
+
+    if(point_in_triangle2d(p_dropY, t0_dropY, t1_dropY, t2_dropY) == STRICTLY_OUTSIDE) return STRICTLY_OUTSIDE;
+
+    double p_dropZ[2]  = { p[0],  p[1]};
+    double t0_dropZ[2] = {t0[0], t0[1]};
+    double t1_dropZ[2] = {t1[0], t1[1]};
+    double t2_dropZ[2] = {t2[0], t2[1]};
+
+    if(point_in_triangle2d(p_dropZ, t0_dropZ, t1_dropZ, t2_dropZ) == STRICTLY_OUTSIDE) return STRICTLY_OUTSIDE;
 
     return STRICTLY_INSIDE;
 }
