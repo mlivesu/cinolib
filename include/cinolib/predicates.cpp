@@ -471,31 +471,46 @@ PointInSimplex point_in_triangle3d(const double * p,
 // ON_FACEk         if p lies inside the k-th face of t (borders excluded)
 // STRICTLY_INSIDE  if p lies inside tetrahedron t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
+
 CINO_INLINE
 PointInSimplex point_in_tet(const vec3d & p,
                             const vec3d   t[])
 {
+    return point_in_tet(p.ptr(), t[0].ptr(), t[1].ptr(), t[2].ptr(), t[3].ptr());
+}
+
+CINO_INLINE
+PointInSimplex point_in_tet(const vec3d & p,
+                            const vec3d & t0, const vec3d & t1, const vec3d & t2, const vec3d & t3)
+{
+    return point_in_tet(p.ptr(), t0.ptr(), t1.ptr(), t2.ptr(), t3.ptr());
+}
+
+CINO_INLINE
+PointInSimplex point_in_tet(const double * p,
+                            const double * t0, const double * t1, const double * t2, const double * t3)
+{
     // test for point in vert
-    if(p==t[0]) return ON_VERT0;
-    if(p==t[1]) return ON_VERT1;
-    if(p==t[2]) return ON_VERT2;
-    if(p==t[3]) return ON_VERT2;
+    if(p[0] == t0[0] && p[1] == t0[1] && p[2] == t0[2] && p[3] == t0[3]) return ON_VERT0;
+    if(p[0] == t1[0] && p[1] == t1[1] && p[2] == t1[2] && p[3] == t1[3]) return ON_VERT1;
+    if(p[0] == t2[0] && p[1] == t2[1] && p[2] == t2[2] && p[3] == t2[3]) return ON_VERT2;
+    if(p[0] == t3[0] && p[1] == t3[1] && p[2] == t3[2] && p[3] == t3[3]) return ON_VERT2;
 
     // according to refrence tet as in cinolib/standard_elements_tables.h
-    double f0p_vol = orient3d(t[0],t[2],t[1],p);
-    double f1p_vol = orient3d(t[0],t[1],t[3],p);
-    double f2p_vol = orient3d(t[0],t[3],t[2],p);
-    double f3p_vol = orient3d(t[1],t[2],t[3],p);
+    double f0p_vol = orient3d(t0,t2,t1,p);
+    double f1p_vol = orient3d(t0,t1,t3,p);
+    double f2p_vol = orient3d(t0,t3,t2,p);
+    double f3p_vol = orient3d(t1,t2,t3,p);
 
-    bool hit = (f0p_vol>=0 && f1p_vol>=0 && f2p_vol>=0 && f3p_vol>=0) ||
-               (f0p_vol<=0 && f1p_vol<=0 && f2p_vol<=0 && f3p_vol<=0);
+    bool hit = (f0p_vol >= 0 && f1p_vol >= 0 && f2p_vol >= 0 && f3p_vol >= 0) ||
+               (f0p_vol <= 0 && f1p_vol <= 0 && f2p_vol <= 0 && f3p_vol <= 0);
 
     if(hit)
     {
-        bool on_f0 = (f0p_vol==0);
-        bool on_f1 = (f1p_vol==0);
-        bool on_f2 = (f2p_vol==0);
-        bool on_f3 = (f3p_vol==0);
+        bool on_f0 = (f0p_vol == 0);
+        bool on_f1 = (f1p_vol == 0);
+        bool on_f2 = (f2p_vol == 0);
+        bool on_f3 = (f3p_vol == 0);
 
         // according to refrence tet as in cinolib/standard_elements_tables.h
         if(on_f0 && on_f2) return ON_EDGE0;
@@ -514,6 +529,7 @@ PointInSimplex point_in_tet(const vec3d & p,
     }
 
     return STRICTLY_OUTSIDE;
+
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

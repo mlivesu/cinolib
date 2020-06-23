@@ -362,9 +362,17 @@ PointInSimplex point_in_triangle3d(const double * p,
 // ON_FACEk         if p lies inside the k-th face of t (borders excluded)
 // STRICTLY_INSIDE  if p lies inside tetrahedron t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
+
 CINO_INLINE
 PointInSimplex point_in_tet(const vec3d & p,
                             const vec3d   t[]);
+CINO_INLINE
+PointInSimplex point_in_tet(const vec3d & p,
+                            const vec3d & t0, const vec3d & t1, const vec3d & t2, const vec3d & t3);
+
+CINO_INLINE
+PointInSimplex point_in_tet(const double * p,
+                            const double * t0, const double * t1, const double * t2, const double * t3);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
