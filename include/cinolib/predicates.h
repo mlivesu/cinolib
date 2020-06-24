@@ -381,9 +381,18 @@ PointInSimplex point_in_tet(const double * p,
 // SIMPLICIAL_COMPLEX   if segments coincide or intersect at a shared vertex
 // INTERSECT            if segments intersect at an inner point (for s0, s1, or both)
 // OVERLAP              if segments are colinear and partially overlapped
+
 CINO_INLINE
 SimplexIntersection segment_segment_intersect(const vec2d s0[],
                                               const vec2d s1[]);
+
+CINO_INLINE
+SimplexIntersection segment_segment_intersect(const vec2d & s00, const vec2d & s01,
+                                              const vec2d & s10, const vec2d & s11);
+
+CINO_INLINE
+SimplexIntersection segment_segment_intersect2d(const double * s00, const double * s01,
+                                                const double * s10, const double * s11);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -465,6 +474,10 @@ bool triangle_is_degenerate(const vec t[]);
 // returns true if t[0], t[1], t[2] and t32] are coplanar
 CINO_INLINE
 bool tet_is_degenerate(const vec3d t[]);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
 
 }
 

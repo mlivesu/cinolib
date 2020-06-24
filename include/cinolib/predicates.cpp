@@ -539,67 +539,86 @@ PointInSimplex point_in_tet(const double * p,
 // SIMPLICIAL_COMPLEX   if segments coincide or intersect at a shared vertex
 // INTERSECT            if segments intersect at an inner point (for s0, s1, or both)
 // OVERLAP              if segments are colinear and partially overlapped
+
 CINO_INLINE
 SimplexIntersection segment_segment_intersect(const vec2d s0[],
                                               const vec2d s1[])
 {
-    //assert(!segment_is_degenerate(s0) && !segment_is_degenerate(s1));
+    return segment_segment_intersect2d(s0[0].ptr(), s0[1].ptr(), s1[0].ptr(), s1[1].ptr());
+}
 
+CINO_INLINE
+SimplexIntersection segment_segment_intersect(const vec2d & s00, const vec2d & s01,
+                                              const vec2d & s10, const vec2d & s11)
+{
+    return segment_segment_intersect2d(s00.ptr(), s01.ptr(), s10.ptr(), s11.ptr());
+}
+
+CINO_INLINE
+SimplexIntersection segment_segment_intersect2d(const double * s00, const double * s01,
+                                                const double * s10, const double * s11)
+{
     // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
-    double det_s00 = orient2d(s1[0],s1[1],s0[0]);
-    double det_s01 = orient2d(s1[0],s1[1],s0[1]);
-    double det_s10 = orient2d(s0[0],s0[1],s1[0]);
-    double det_s11 = orient2d(s0[0],s0[1],s1[1]);
+    double det_s00 = orient2d(s10, s11, s00);
+    double det_s01 = orient2d(s10, s11, s01);
+    double det_s10 = orient2d(s00, s01, s10);
+    double det_s11 = orient2d(s00, s01, s11);
 
     // Shewchuk's orient predicates return a rough approximation of the determinant.
     // I am converting values to { -1, 0, 1 } for a simpler check of intersection cases
-    int s00_wrt_s1 = (det_s00>0) ? 1 : ((det_s00<0) ? -1 : 0);
-    int s01_wrt_s1 = (det_s01>0) ? 1 : ((det_s01<0) ? -1 : 0);
-    int s10_wrt_s0 = (det_s10>0) ? 1 : ((det_s10<0) ? -1 : 0);
-    int s11_wrt_s0 = (det_s11>0) ? 1 : ((det_s11<0) ? -1 : 0);
+    int s00_wrt_s1 = (det_s00 > 0) ? 1 : ((det_s00 < 0) ? -1 : 0);
+    int s01_wrt_s1 = (det_s01 > 0) ? 1 : ((det_s01 < 0) ? -1 : 0);
+    int s10_wrt_s0 = (det_s10 > 0) ? 1 : ((det_s10 < 0) ? -1 : 0);
+    int s11_wrt_s0 = (det_s11 > 0) ? 1 : ((det_s11 < 0) ? -1 : 0);
 
     // segments intersect at a single point
-    if(s00_wrt_s1!=s01_wrt_s1 && s10_wrt_s0!=s11_wrt_s0)
+    if(s00_wrt_s1 != s01_wrt_s1 && s10_wrt_s0 != s11_wrt_s0)
     {
         // edges share an endpoint
-        if(s0[0]==s1[0] || s0[0]==s1[1] || s0[1]==s1[0] || s0[1]==s1[1]) return SIMPLICIAL_COMPLEX;
+        if((s00[0] == s10[0] && s00[1] == s10[1]) ||
+           (s00[0] == s11[0] && s00[1] == s11[1]) ||
+           (s01[0] == s10[0] && s01[1] == s10[1]) ||
+           (s01[0] == s11[0] && s01[1] == s11[1]))
+            return SIMPLICIAL_COMPLEX;
 
         // at least one segment endpoint is involved in the intersection
-        //if(s00_wrt_s1==0 || s01_wrt_s1==0 || s10_wrt_s0==0 || s11_wrt_s0==0) return !strict;
         return INTERSECT;
     }
 
     // degenerate case: colinear segments
-    if(s00_wrt_s1==0 && s01_wrt_s1==0 && s10_wrt_s0==0 && s11_wrt_s0==0)
+    if(s00_wrt_s1 == 0 && s01_wrt_s1 == 0 && s10_wrt_s0 == 0 && s11_wrt_s0 == 0)
     {
         // coincident segments
-        if((s0[0]==s1[0] && s0[1]==s1[1]) || (s0[0]==s1[1] && s0[1]==s1[0])) return SIMPLICIAL_COMPLEX;
+        if(((s00[0] == s10[0] && s00[1] == s10[1]) && (s01[0] == s11[0] && s01[1] == s11[1])) ||
+           ((s00[0] == s11[0] && s00[1] == s11[1]) && (s01[0] == s10[0] && s01[1] == s10[1])))
+            return SIMPLICIAL_COMPLEX;
 
-        double Xmin_s1 = std::min(s1[0].x(),s1[1].x());
-        double Xmax_s1 = std::max(s1[0].x(),s1[1].x());
-        double Ymin_s1 = std::min(s1[0].y(),s1[1].y());
-        double Ymax_s1 = std::max(s1[0].y(),s1[1].y());
-        double Xmin_s0 = std::min(s0[0].x(),s0[1].x());
-        double Xmax_s0 = std::max(s0[0].x(),s0[1].x());
-        double Ymin_s0 = std::min(s0[0].y(),s0[1].y());
-        double Ymax_s0 = std::max(s0[0].y(),s0[1].y());
+        double Xmin_s1 = std::min(s10[0], s11[0]);
+        double Xmax_s1 = std::max(s10[0], s11[0]);
+        double Ymin_s1 = std::min(s10[1], s11[1]);
+        double Ymax_s1 = std::max(s10[1], s11[1]);
+        double Xmin_s0 = std::min(s00[0], s01[0]);
+        double Xmax_s0 = std::max(s00[0], s01[0]);
+        double Ymin_s0 = std::min(s00[1], s01[1]);
+        double Ymax_s0 = std::max(s00[1], s01[1]);
 
         if(// test s0 endpoints against s1 range
-           (s0[0].x() > Xmin_s1 && s0[0].x() < Xmax_s1) ||
-           (s0[0].y() > Ymin_s1 && s0[0].y() < Ymax_s1) ||
-           (s0[1].x() > Xmin_s1 && s0[1].x() < Xmax_s1) ||
-           (s0[1].y() > Ymin_s1 && s0[1].y() < Ymax_s1) ||
+           (s00[0] > Xmin_s1 && s00[0] < Xmax_s1) ||
+           (s00[1] > Ymin_s1 && s00[1] < Ymax_s1) ||
+           (s01[0] > Xmin_s1 && s01[0] < Xmax_s1) ||
+           (s01[1] > Ymin_s1 && s01[1] < Ymax_s1) ||
            // test s1 endpoints against s0 range
-           (s1[0].x() > Xmin_s0 && s1[0].x() < Xmax_s0) ||
-           (s1[0].y() > Ymin_s0 && s1[0].y() < Ymax_s0) ||
-           (s1[1].x() > Xmin_s0 && s1[1].x() < Xmax_s0) ||
-           (s1[1].y() > Ymin_s0 && s1[1].y() < Ymax_s0))
+           (s10[0] > Xmin_s0 && s10[0] < Xmax_s0) ||
+           (s10[1] > Ymin_s0 && s10[1] < Ymax_s0) ||
+           (s11[0] > Xmin_s0 && s11[0] < Xmax_s0) ||
+           (s11[1] > Ymin_s0 && s11[1] < Ymax_s0))
         {
             return INTERSECT;
         }
     }
     return DO_NOT_INTERSECT;
 }
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -1112,7 +1131,6 @@ bool tet_is_degenerate(const vec3d t[])
 {
     return points_are_coplanar(t[0], t[1], t[2], t[3]);
 }
-
 
 
 
