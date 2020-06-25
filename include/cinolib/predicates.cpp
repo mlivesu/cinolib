@@ -753,30 +753,45 @@ CINO_INLINE
 SimplexIntersection segment_triangle_intersect(const vec3d s[],
                                                const vec3d t[])
 {
-    assert(!segment_is_degenerate(s) &&
-           !triangle_is_degenerate(t));
+    return segment_triangle_intersect3d(s[0].ptr(), s[1].ptr(),
+                                        t[0].ptr(), t[1].ptr(), t[2].ptr());
+}
 
-    if((s[0]==t[0] || s[0]==t[1] || s[0]==t[2]) &&
-       (s[1]==t[0] || s[1]==t[1] || s[1]==t[2]))
+CINO_INLINE
+SimplexIntersection segment_triangle_intersect(const vec3d & s0, const vec3d & s1,
+                                               const vec3d & t0, const vec3d & t1, const vec3d & t2)
+{
+    return segment_triangle_intersect3d(s0.ptr(), s1.ptr(),
+                                        t0.ptr(), t1.ptr(), t2.ptr());
+}
+
+CINO_INLINE
+SimplexIntersection segment_triangle_intersect3d(const double * s0, const double * s1,
+                                                 const double * t0, const double * t1, const double * t2)
+{
+    assert(!segment_is_degenerate3d(s0, s1) &&
+           !triangle_is_degenerate3d(t0, t1, t2));
+
+    if((vec_eq3d(s0, t0) || vec_eq3d(s0, t1) || vec_eq3d(s0, t2)) &&
+       (vec_eq3d(s1, t0) || vec_eq3d(s1, t1) || vec_eq3d(s1, t2)))
     {
         return SIMPLICIAL_COMPLEX;
     }
 
-    auto vol_s0_t = orient3d(s[0], t[0], t[1], t[2]);
-    auto vol_s1_t = orient3d(s[1], t[0], t[1], t[2]);
+    auto vol_s0_t = orient3d(s0, t0, t1, t2);
+    auto vol_s1_t = orient3d(s1, t0, t1, t2);
 
-    if(vol_s0_t >0 && vol_s1_t >0) return DO_NOT_INTERSECT; // s is above t
-    if(vol_s0_t <0 && vol_s1_t <0) return DO_NOT_INTERSECT; // s is below t
-    if(vol_s0_t==0 && vol_s1_t==0)                          // s and t are coplanar
+    if(vol_s0_t > 0 && vol_s1_t > 0) return DO_NOT_INTERSECT; // s is above t
+    if(vol_s0_t < 0 && vol_s1_t < 0) return DO_NOT_INTERSECT; // s is below t
+    if(vol_s0_t == 0 && vol_s1_t == 0)                        // s and t are coplanar
     {
         // same code as the 2D version, I just copied it here....
 
-        if(point_in_triangle(s[0],t) || point_in_triangle(s[1],t)) return INTERSECT;
+        if(point_in_triangle3d(s0, t0, t1, t2) || point_in_triangle3d(s1, t0, t1, t2)) return INTERSECT;
 
         uint simpl_complex = 0;
 
-        vec3d t01[] = { t[0], t[1] };
-        switch(segment_segment_intersect(s,t01))
+        switch(segment_segment_intersect3d(s0, s1, t0, t1))
         {
             case SIMPLICIAL_COMPLEX : ++simpl_complex; break;
             case INTERSECT          : return INTERSECT;
@@ -784,8 +799,7 @@ SimplexIntersection segment_triangle_intersect(const vec3d s[],
             case DO_NOT_INTERSECT   : break;
         }
 
-        vec3d t12[] = { t[1], t[2] };
-        switch(segment_segment_intersect(s,t12))
+        switch(segment_segment_intersect3d(s0, s1, t1, t2))
         {
             case SIMPLICIAL_COMPLEX : ++simpl_complex; break;
             case INTERSECT          : return INTERSECT;
@@ -793,8 +807,7 @@ SimplexIntersection segment_triangle_intersect(const vec3d s[],
             case DO_NOT_INTERSECT   : break;
         }
 
-        vec3d t20[] = { t[2], t[0] };
-        switch(segment_segment_intersect(s,t20))
+        switch(segment_segment_intersect3d(s0, s1, t2, t0))
         {
             case SIMPLICIAL_COMPLEX : ++simpl_complex; break;
             case INTERSECT          : return INTERSECT;
@@ -803,7 +816,7 @@ SimplexIntersection segment_triangle_intersect(const vec3d s[],
         }
 
         // if it is a simplicial complex from any view, then it really is...
-        if(simpl_complex==3) return SIMPLICIAL_COMPLEX;
+        if(simpl_complex == 3) return SIMPLICIAL_COMPLEX;
         return DO_NOT_INTERSECT;
     }
 
@@ -811,19 +824,19 @@ SimplexIntersection segment_triangle_intersect(const vec3d s[],
     // obtained combining s with the three edges of t are all equal
 
     // if one point is coplanar and coincides with a triangle vertex, then they form a valid complex
-    if(s[0]==t[0] || s[0]==t[1] || s[0]==t[2] ||
-       s[1]==t[0] || s[1]==t[1] || s[1]==t[2])
+    if(vec_eq3d(s0, t0) || vec_eq3d(s0, t1) || vec_eq3d(s0, t2) ||
+       vec_eq3d(s1, t0) || vec_eq3d(s1, t1) || vec_eq3d(s1, t2))
     {
         return SIMPLICIAL_COMPLEX;
     }
 
-    double vol_s_t01 = orient3d(s[0], s[1], t[0], t[1]);
-    double vol_s_t12 = orient3d(s[0], s[1], t[1], t[2]);
-    double vol_s_t20 = orient3d(s[0], s[1], t[2], t[0]);
+    double vol_s_t01 = orient3d(s0, s1, t0, t1);
+    double vol_s_t12 = orient3d(s0, s1, t1, t2);
+    double vol_s_t20 = orient3d(s0, s1, t2, t0);
 
-    if((vol_s_t01>0 && vol_s_t12<0) || (vol_s_t01<0 && vol_s_t12>0)) return DO_NOT_INTERSECT;
-    if((vol_s_t12>0 && vol_s_t20<0) || (vol_s_t12<0 && vol_s_t20>0)) return DO_NOT_INTERSECT;
-    if((vol_s_t20>0 && vol_s_t01<0) || (vol_s_t20<0 && vol_s_t01>0)) return DO_NOT_INTERSECT;
+    if((vol_s_t01 > 0 && vol_s_t12 < 0) || (vol_s_t01 < 0 && vol_s_t12 > 0)) return DO_NOT_INTERSECT;
+    if((vol_s_t12 > 0 && vol_s_t20 < 0) || (vol_s_t12 < 0 && vol_s_t20 > 0)) return DO_NOT_INTERSECT;
+    if((vol_s_t20 > 0 && vol_s_t01 < 0) || (vol_s_t20 < 0 && vol_s_t01 > 0)) return DO_NOT_INTERSECT;
 
     return INTERSECT;
 }

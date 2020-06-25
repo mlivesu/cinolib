@@ -439,9 +439,18 @@ SimplexIntersection segment_triangle_intersect2d(const double * s0, const double
 // DO_NOT_INTERSECT     if s and t are fully disjoint
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
 // INTERSECT            if s and t intersect and do not forma a valid simplex
+
 CINO_INLINE
 SimplexIntersection segment_triangle_intersect(const vec3d s[],
                                                const vec3d t[]);
+
+CINO_INLINE
+SimplexIntersection segment_triangle_intersect(const vec3d & s0, const vec3d & s1,
+                                               const vec3d & t0, const vec3d & t1, const vec3d & t2);
+
+CINO_INLINE
+SimplexIntersection segment_triangle_intersect3d(const double * s0, const double * s1,
+                                                 const double * t0, const double * t1, const double * t2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
