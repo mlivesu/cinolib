@@ -687,20 +687,35 @@ SimplexIntersection segment_segment_intersect3d(const double * s00, const double
 CINO_INLINE
 SimplexIntersection segment_triangle_intersect(const vec2d s[],
                                                const vec2d t[])
-{    
-    assert(!segment_is_degenerate(s) &&
-           !triangle_is_degenerate(t));
+{
+    return segment_triangle_intersect2d(s[0].ptr(), s[1].ptr(),
+                                        t[0].ptr(), t[1].ptr(), t[2].ptr());
+}
 
-    if(point_in_triangle(s[0],t)>=STRICTLY_INSIDE ||
-       point_in_triangle(s[1],t)>=STRICTLY_INSIDE)
+CINO_INLINE
+SimplexIntersection segment_triangle_intersect(const vec2d & s0, const vec2d & s1,
+                                               const vec2d & t0, const vec2d & t1, const vec2d & t2)
+{
+    return segment_triangle_intersect2d(s0.ptr(), s1.ptr(),
+                                        t0.ptr(), t1.ptr(), t2.ptr());
+
+}
+
+CINO_INLINE
+SimplexIntersection segment_triangle_intersect2d(const double * s0, const double * s1,
+                                                 const double * t0, const double * t1, const double * t2)
+{
+    assert(!segment_is_degenerate2d(s0, s1) && !triangle_is_degenerate2d(t0, t1, t2));
+
+    if(point_in_triangle2d(s0, t0, t1, t2) >= STRICTLY_INSIDE ||
+       point_in_triangle2d(s1, t0, t1, t2) >= STRICTLY_INSIDE)
     {
         return INTERSECT;
     }
 
     bool simpl_complex = false;
 
-    vec2d t01[] = { t[0], t[1] };
-    switch(segment_segment_intersect(s,t01))
+    switch(segment_segment_intersect2d(s0, s1, t0, t1))
     {
         case SIMPLICIAL_COMPLEX : simpl_complex = true; break;
         case INTERSECT          : return INTERSECT;
@@ -708,8 +723,7 @@ SimplexIntersection segment_triangle_intersect(const vec2d s[],
         case DO_NOT_INTERSECT   : break;
     }
 
-    vec2d t12[] = { t[1], t[2] };
-    switch(segment_segment_intersect(s,t12))
+    switch(segment_segment_intersect2d(s0, s1, t1, t2))
     {
         case SIMPLICIAL_COMPLEX : simpl_complex = true; break;
         case INTERSECT          : return INTERSECT;
@@ -717,8 +731,7 @@ SimplexIntersection segment_triangle_intersect(const vec2d s[],
         case DO_NOT_INTERSECT   : break;
     }
 
-    vec2d t20[] = { t[2], t[0] };
-    switch(segment_segment_intersect(s,t20))
+    switch(segment_segment_intersect2d(s0, s1, t2, t0))
     {
         case SIMPLICIAL_COMPLEX : simpl_complex = true; break;
         case INTERSECT          : return INTERSECT;
@@ -728,13 +741,6 @@ SimplexIntersection segment_triangle_intersect(const vec2d s[],
 
     if(simpl_complex) return SIMPLICIAL_COMPLEX;
     return DO_NOT_INTERSECT;
-}
-
-CINO_INLINE
-SimplexIntersection segment_triangle_intersect(const vec2d & s0, const vec2d & s1,
-                                               const vec2d & t0, const vec2d & t1, const vec2d & t2)
-{
-
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

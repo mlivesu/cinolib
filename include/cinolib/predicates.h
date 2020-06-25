@@ -429,6 +429,10 @@ CINO_INLINE
 SimplexIntersection segment_triangle_intersect(const vec2d & s0, const vec2d & s1,
                                                const vec2d & t0, const vec2d & t1, const vec2d & t2);
 
+CINO_INLINE
+SimplexIntersection segment_triangle_intersect2d(const double * s0, const double * s1,
+                                                 const double * t0, const double * t1, const double * t2);
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns:
