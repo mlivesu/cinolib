@@ -477,9 +477,18 @@ SimplexIntersection segment_tet_intersect(const double * s0, const double * s1,
 // DO_NOT_INTERSECT     if triangles are fully disjoint
 // SIMPLICIAL_COMPLEX   if triangles coincide or intersect at a shared sub-simplex
 // INTERSECT            if triangles intersect without making a valid simplcial complex
+
 CINO_INLINE
 SimplexIntersection triangle_triangle_intersect(const vec2d t0[],
                                                 const vec2d t1[]);
+
+CINO_INLINE
+SimplexIntersection triangle_triangle_intersect(const vec2d & t00, const vec2d & t01, const vec2d & t02,
+                                                const vec2d & t10, const vec2d & t11, const vec2d & t12);
+
+CINO_INLINE
+SimplexIntersection triangle_triangle_intersect2d(const double * t00, const double * t01, const double * t02,
+                                                  const double * t10, const double * t11, const double * t12);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

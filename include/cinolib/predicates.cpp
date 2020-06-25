@@ -912,23 +912,39 @@ CINO_INLINE
 SimplexIntersection triangle_triangle_intersect(const vec2d t0[],
                                                 const vec2d t1[])
 {
-    assert(!triangle_is_degenerate(t0) &&
-           !triangle_is_degenerate(t1));
+    return triangle_triangle_intersect2d(t0[0].ptr(), t0[1].ptr(), t0[2].ptr(),
+                                         t1[0].ptr(), t1[1].ptr(), t1[2].ptr());
+}
+
+CINO_INLINE
+SimplexIntersection triangle_triangle_intersect(const vec2d & t00, const vec2d & t01, const vec2d & t02,
+                                                const vec2d & t10, const vec2d & t11, const vec2d & t12)
+{
+    return triangle_triangle_intersect2d(t00.ptr(), t01.ptr(), t02.ptr(),
+                                         t10.ptr(), t11.ptr(), t12.ptr());
+}
+
+CINO_INLINE
+SimplexIntersection triangle_triangle_intersect2d(const double * t00, const double * t01, const double * t02,
+                                                  const double * t10, const double * t11, const double * t12)
+{
+    assert(!triangle_is_degenerate2d(t00, t01, t02) &&
+           !triangle_is_degenerate2d(t10, t11, t12));
 
     // binary flags to mark coincident vertices in t0 and t1
     std::bitset<3> t0_shared = { 0b000 };
     std::bitset<3> t1_shared = { 0b000 };
 
     // find vert correspondences
-    if(t0[0]==t1[0]) { t0_shared[0] = true; t1_shared[0] = true; }
-    if(t0[0]==t1[1]) { t0_shared[0] = true; t1_shared[1] = true; }
-    if(t0[0]==t1[2]) { t0_shared[0] = true; t1_shared[2] = true; }
-    if(t0[1]==t1[0]) { t0_shared[1] = true; t1_shared[0] = true; }
-    if(t0[1]==t1[1]) { t0_shared[1] = true; t1_shared[1] = true; }
-    if(t0[1]==t1[2]) { t0_shared[1] = true; t1_shared[2] = true; }
-    if(t0[2]==t1[0]) { t0_shared[2] = true; t1_shared[0] = true; }
-    if(t0[2]==t1[1]) { t0_shared[2] = true; t1_shared[1] = true; }
-    if(t0[2]==t1[2]) { t0_shared[2] = true; t1_shared[2] = true; }
+    if(vec_eq2d(t00, t10)) { t0_shared[0] = true; t1_shared[0] = true; }
+    if(vec_eq2d(t00, t11)) { t0_shared[0] = true; t1_shared[1] = true; }
+    if(vec_eq2d(t00, t12)) { t0_shared[0] = true; t1_shared[2] = true; }
+    if(vec_eq2d(t01, t10)) { t0_shared[1] = true; t1_shared[0] = true; }
+    if(vec_eq2d(t01, t11)) { t0_shared[1] = true; t1_shared[1] = true; }
+    if(vec_eq2d(t01, t12)) { t0_shared[1] = true; t1_shared[2] = true; }
+    if(vec_eq2d(t02, t10)) { t0_shared[2] = true; t1_shared[0] = true; }
+    if(vec_eq2d(t02, t11)) { t0_shared[2] = true; t1_shared[1] = true; }
+    if(vec_eq2d(t02, t12)) { t0_shared[2] = true; t1_shared[2] = true; }
 
     // count number of coincident vertices in t0 and t1
     uint t0_count = t0_shared.count();
@@ -936,12 +952,12 @@ SimplexIntersection triangle_triangle_intersect(const vec2d t0[],
 
     // either t0 and t1 are coincident or one of the two triangles
     // is degenerate and is an edge/vertex of the other
-    if(t0_count==3 || t1_count==3) return SIMPLICIAL_COMPLEX;
+    if(t0_count == 3 || t1_count == 3) return SIMPLICIAL_COMPLEX;
 
     // t0 and t1 share an edge. Let e be the shared edge and { opp0, opp1 } be the two vertices opposite to
     // e in t0 and t1, respectively. If opp0 and opp1 lie at the same side of e, the two triangles overlap.
     // Otherwise they are edge-adjacent and form a valid simplicial complex
-    if(t0_count==2 && t1_count==2)
+    if(t0_count == 2 && t1_count == 2)
     {
         uint e[2];      // indices of the shared vertices (in t0)
         uint count = 0; // index for e (to fill it)
@@ -953,6 +969,9 @@ SimplexIntersection triangle_triangle_intersect(const vec2d t0[],
             if(!t1_shared[i]) opp1 = i;
         }
 
+        const double* t0[3] = {t00, t01, t02};
+        const double* t1[3] = {t10, t11, t12};
+
         double opp0_wrt_e = orient2d(t0[e[0]], t0[e[1]], t0[opp0]);
         double opp1_wrt_e = orient2d(t0[e[0]], t0[e[1]], t1[opp1]);
 
@@ -963,25 +982,28 @@ SimplexIntersection triangle_triangle_intersect(const vec2d t0[],
     // t0 and t1 share a vertex. Let v be the shared vertex and { opp0 , opp1 } be the two edges opposite to
     // v in t0 and t1, respectively. If v-opp0 intersects t1, or v-opp1 interects t0, the two triangles overlap.
     // Otherwise they are verte-adjacent and form a valid simplicial complex
-    if(t0_count==1 && t1_count==1)
+    if(t0_count == 1 && t1_count == 1)
     {
         uint v0; // index of the shared vertex in t0
         uint v1; // index of the shared vertex in t1
-        for(uint i=0; i<3; ++i)
+        for(uint i = 0; i < 3; ++i)
         {
             if(t0_shared[i]) v0 = i;
             if(t1_shared[i]) v1 = i;
         }
 
+        const double* t0[3] = {t00, t01, t02};
+        const double* t1[3] = {t10, t11, t12};
+
         // check for intersection with t0 and t1 edges emanating from v1 and v0, respectively
-        vec2d e_v0_0[] = { t0[v0], t0[(v0+1)%3] };
-        vec2d e_v0_1[] = { t0[v0], t0[(v0+2)%3] };
-        vec2d e_v1_0[] = { t1[v1], t1[(v1+1)%3] };
-        vec2d e_v1_1[] = { t1[v1], t1[(v1+2)%3] };
-        if(segment_triangle_intersect(e_v0_0, t1)==INTERSECT ||
-           segment_triangle_intersect(e_v0_1, t1)==INTERSECT ||
-           segment_triangle_intersect(e_v1_0, t0)==INTERSECT ||
-           segment_triangle_intersect(e_v1_1, t0)==INTERSECT)
+        const double* e_v0_0[] = { t0[v0], t0[(v0 +1) %3] };
+        const double* e_v0_1[] = { t0[v0], t0[(v0 +2) %3] };
+        const double* e_v1_0[] = { t1[v1], t1[(v1 +1) %3] };
+        const double* e_v1_1[] = { t1[v1], t1[(v1 +2) %3] };
+        if(segment_triangle_intersect2d(e_v0_0[0], e_v0_0[1], t10, t11, t12) == INTERSECT ||
+           segment_triangle_intersect2d(e_v0_1[0], e_v0_1[1], t10, t11, t12) == INTERSECT ||
+           segment_triangle_intersect2d(e_v1_0[0], e_v1_0[1], t00, t01, t02) == INTERSECT ||
+           segment_triangle_intersect2d(e_v1_1[0], e_v1_1[1], t00, t01, t02) == INTERSECT)
         {
             return INTERSECT;
         }
@@ -990,32 +1012,25 @@ SimplexIntersection triangle_triangle_intersect(const vec2d t0[],
 
     // t0 and t1 do not share sub-simplices. They can be fully disjoint, intersecting at a single point, or overlapping
 
-    vec2d t00[2] = { t0[0], t0[1] };
-    vec2d t01[2] = { t0[1], t0[2] };
-    vec2d t02[2] = { t0[2], t0[0] };
-    vec2d t10[2] = { t1[0], t1[1] };
-    vec2d t11[2] = { t1[1], t1[2] };
-    vec2d t12[2] = { t1[2], t1[0] };
-
-    if(segment_segment_intersect(t00,t10)>=INTERSECT ||
-       segment_segment_intersect(t00,t11)>=INTERSECT ||
-       segment_segment_intersect(t00,t12)>=INTERSECT ||
-       segment_segment_intersect(t01,t10)>=INTERSECT ||
-       segment_segment_intersect(t01,t11)>=INTERSECT ||
-       segment_segment_intersect(t01,t12)>=INTERSECT ||
-       segment_segment_intersect(t02,t10)>=INTERSECT ||
-       segment_segment_intersect(t02,t11)>=INTERSECT ||
-       segment_segment_intersect(t02,t12)>=INTERSECT )
+    if(segment_segment_intersect2d(t00, t01, t10, t11) >= INTERSECT ||
+       segment_segment_intersect2d(t00, t01, t11, t12) >= INTERSECT ||
+       segment_segment_intersect2d(t00, t01, t12, t10) >= INTERSECT ||
+       segment_segment_intersect2d(t01, t02, t10, t11) >= INTERSECT ||
+       segment_segment_intersect2d(t01, t02, t11, t12) >= INTERSECT ||
+       segment_segment_intersect2d(t01, t02, t12, t10) >= INTERSECT ||
+       segment_segment_intersect2d(t02, t00, t10, t11) >= INTERSECT ||
+       segment_segment_intersect2d(t02, t00, t11, t12) >= INTERSECT ||
+       segment_segment_intersect2d(t02, t00, t12, t10) >= INTERSECT )
     {
         return INTERSECT;
     }
 
-    if(point_in_triangle(t0[0],t1)>=STRICTLY_INSIDE ||
-       point_in_triangle(t0[1],t1)>=STRICTLY_INSIDE ||
-       point_in_triangle(t0[2],t1)>=STRICTLY_INSIDE ||
-       point_in_triangle(t1[0],t0)>=STRICTLY_INSIDE ||
-       point_in_triangle(t1[1],t0)>=STRICTLY_INSIDE ||
-       point_in_triangle(t1[2],t0)>=STRICTLY_INSIDE )
+    if(point_in_triangle2d(t00, t10, t11, t12) >= STRICTLY_INSIDE ||
+       point_in_triangle2d(t01, t10, t11, t12) >= STRICTLY_INSIDE ||
+       point_in_triangle2d(t02, t10, t11, t12) >= STRICTLY_INSIDE ||
+       point_in_triangle2d(t10, t00, t01, t02) >= STRICTLY_INSIDE ||
+       point_in_triangle2d(t11, t00, t01, t02) >= STRICTLY_INSIDE ||
+       point_in_triangle2d(t12, t00, t01, t02) >= STRICTLY_INSIDE )
     {
         return INTERSECT;
     }
