@@ -730,6 +730,13 @@ SimplexIntersection segment_triangle_intersect(const vec2d s[],
     return DO_NOT_INTERSECT;
 }
 
+CINO_INLINE
+SimplexIntersection segment_triangle_intersect(const vec2d & s0, const vec2d & s1,
+                                               const vec2d & t0, const vec2d & t1, const vec2d & t2)
+{
+
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns:
@@ -1118,9 +1125,21 @@ bool segment_is_degenerate(const vec s[])
 }
 
 CINO_INLINE
+bool segment_is_degenerate(const vec2d & s00, const vec2d & s01)
+{
+    return segment_is_degenerate2d(s00.ptr(), s01.ptr());
+}
+
+CINO_INLINE
 bool segment_is_degenerate(const vec3d & s00, const vec3d & s01)
 {
-    return (s00 == s01);
+    return segment_is_degenerate3d(s00.ptr(), s01.ptr());
+}
+
+CINO_INLINE
+bool segment_is_degenerate2d(const double * s00, const double * s01)
+{
+    return vec_eq2d(s00, s01);
 }
 
 CINO_INLINE
@@ -1137,6 +1156,30 @@ CINO_INLINE
 bool triangle_is_degenerate(const vec t[])
 {
     return points_are_colinear(t[0], t[1], t[2]);
+}
+
+CINO_INLINE
+bool triangle_is_degenerate(const vec2d & t0, const vec2d & t1, const vec2d & t2)
+{
+    return triangle_is_degenerate2d(t0.ptr(), t1.ptr(), t2.ptr());
+}
+
+CINO_INLINE
+bool triangle_is_degenerate(const vec3d & t0, const vec3d & t1, const vec3d & t2)
+{
+    return triangle_is_degenerate3d(t0.ptr(), t1.ptr(), t2.ptr());
+}
+
+CINO_INLINE
+bool triangle_is_degenerate2d(const double * t0, const double * t1, const double * t2)
+{
+    return points_are_colinear2d(t0, t1, t2);
+}
+
+CINO_INLINE
+bool triangle_is_degenerate3d(const double * t0, const double * t1, const double * t2)
+{
+    return points_are_colinear3d(t0, t1, t2);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

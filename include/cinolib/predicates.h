@@ -420,9 +420,14 @@ SimplexIntersection segment_segment_intersect3d(const double * s00, const double
 // DO_NOT_INTERSECT     if s and t are fully disjoint
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
 // INTERSECT            if s and t intersect and do not forma a valid simplex
+
 CINO_INLINE
 SimplexIntersection segment_triangle_intersect(const vec2d s[],
                                                const vec2d t[]);
+
+CINO_INLINE
+SimplexIntersection segment_triangle_intersect(const vec2d & s0, const vec2d & s1,
+                                               const vec2d & t0, const vec2d & t1, const vec2d & t2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -472,7 +477,13 @@ CINO_INLINE
 bool segment_is_degenerate(const vec s[]);
 
 CINO_INLINE
+bool segment_is_degenerate(const vec2d & s00, const vec2d & s01);
+
+CINO_INLINE
 bool segment_is_degenerate(const vec3d & s00, const vec3d & s01);
+
+CINO_INLINE
+bool segment_is_degenerate2d(const double * s00, const double * s01);
 
 CINO_INLINE
 bool segment_is_degenerate3d(const double * s00, const double * s01);
@@ -483,6 +494,18 @@ bool segment_is_degenerate3d(const double * s00, const double * s01);
 template<typename vec>
 CINO_INLINE
 bool triangle_is_degenerate(const vec t[]);
+
+CINO_INLINE
+bool triangle_is_degenerate(const vec2d & t0, const vec2d & t1, const vec2d & t2);
+
+CINO_INLINE
+bool triangle_is_degenerate(const vec3d & t0, const vec3d & t1, const vec3d & t2);
+
+CINO_INLINE
+bool triangle_is_degenerate2d(const double * t0, const double * t1, const double * t2);
+
+CINO_INLINE
+bool triangle_is_degenerate3d(const double * t0, const double * t1, const double * t2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
