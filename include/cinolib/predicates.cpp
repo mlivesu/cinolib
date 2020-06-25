@@ -1048,8 +1048,8 @@ CINO_INLINE
 SimplexIntersection triangle_triangle_intersect(const vec3d t0[],
                                                 const vec3d t1[])
 {
-    assert(!triangle_is_degenerate(t0) &&
-           !triangle_is_degenerate(t1));
+    assert(!triangle_is_degenerate(t0[0], t0[1], t0[2]) &&
+           !triangle_is_degenerate(t1[0], t1[1], t1[2]));
 
     // binary flags to mark coincident vertices in t0 and t1
     std::bitset<3> t0_shared = { 0b000 };
@@ -1162,14 +1162,7 @@ SimplexIntersection triangle_triangle_intersect(const vec3d t0[],
 }
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if s[0]==s[1]
-template<typename vec>
-CINO_INLINE
-bool segment_is_degenerate(const vec s[])
-{
-    return (s[0] == s[1]);
-}
-
+// returns true if s0==s1
 CINO_INLINE
 bool segment_is_degenerate(const vec2d & s00, const vec2d & s01)
 {
@@ -1196,14 +1189,7 @@ bool segment_is_degenerate3d(const double * s00, const double * s01)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if t[0], t[1] and t[2] are colinear
-template<typename vec>
-CINO_INLINE
-bool triangle_is_degenerate(const vec t[])
-{
-    return points_are_colinear(t[0], t[1], t[2]);
-}
-
+// returns true if t0, t1 and t2 are colinear
 CINO_INLINE
 bool triangle_is_degenerate(const vec2d & t0, const vec2d & t1, const vec2d & t2)
 {

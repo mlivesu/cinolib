@@ -502,11 +502,7 @@ SimplexIntersection triangle_triangle_intersect(const vec3d t0[],
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if s[0]==s[1]
-template<typename vec>
-CINO_INLINE
-bool segment_is_degenerate(const vec s[]);
-
+// returns true if s0==s1
 CINO_INLINE
 bool segment_is_degenerate(const vec2d & s00, const vec2d & s01);
 
@@ -521,10 +517,7 @@ bool segment_is_degenerate3d(const double * s00, const double * s01);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if t[0], t[1] and t[2] are colinear
-template<typename vec>
-CINO_INLINE
-bool triangle_is_degenerate(const vec t[]);
+// returns true if t0, t1 and t2 are colinear
 
 CINO_INLINE
 bool triangle_is_degenerate(const vec2d & t0, const vec2d & t1, const vec2d & t2);
