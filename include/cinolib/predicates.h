@@ -493,6 +493,9 @@ bool tet_is_degenerate(const vec3d t[]);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+bool vec_eq2d(const double * v0, const double * v1);
+
+CINO_INLINE
 bool vec_eq3d(const double * v0, const double * v1);
 
 }

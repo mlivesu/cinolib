@@ -298,8 +298,8 @@ PointInSimplex point_in_segment(const vec2d & p,
 CINO_INLINE
 PointInSimplex point_in_segment2d(const double *p, const double *s0, const double *s1)
 {
-    if(p[0] == s0[0] && p[1] == s0[1]) return ON_VERT0;
-    if(p[0] == s1[0] && p[1] == s1[1]) return ON_VERT1;
+    if(vec_eq2d(p, s0)) return ON_VERT0;
+    if(vec_eq2d(p, s1)) return ON_VERT1;
 
     if(!points_are_colinear2d(s0, s1, p)) return STRICTLY_OUTSIDE;
 
@@ -337,10 +337,10 @@ CINO_INLINE
 PointInSimplex point_in_segment3d(const double * p,
                                   const double * s0, const double * s1)
 {
-    if(p[0] == s0[0] && p[1] == s0[1] && p[2] == s0[2]) return ON_VERT0;
-    if(p[0] == s1[0] && p[1] == s1[1] && p[2] == s1[2]) return ON_VERT1;
+    if(vec_eq3d(p, s0)) return ON_VERT0;
+    if(vec_eq3d(p, s1)) return ON_VERT1;
 
-    if(!points_are_colinear3d(s0,s1,p)) return STRICTLY_OUTSIDE;
+    if(!points_are_colinear3d(s0, s1, p)) return STRICTLY_OUTSIDE;
 
     if((p[0] > std::min(s0[0], s1[0]) && p[0] < std::max(s0[0], s1[0])) ||
        (p[1] > std::min(s0[1], s1[1]) && p[1] < std::max(s0[1], s1[1])) ||
@@ -377,13 +377,13 @@ CINO_INLINE
 PointInSimplex point_in_triangle2d(const double * p,
                                    const double * t0, const double * t1, const double * t2)
 {
-    if(p[0] == t0[0] && p[1] == t0[1] && p[2] == t0[2]) return ON_VERT0;
-    if(p[0] == t1[0] && p[1] == t1[1] && p[2] == t1[2]) return ON_VERT1;
-    if(p[0] == t2[0] && p[1] == t2[1] && p[2] == t2[2]) return ON_VERT2;
+    if(vec_eq2d(p, t0)) return ON_VERT0;
+    if(vec_eq2d(p, t1)) return ON_VERT1;
+    if(vec_eq2d(p, t2)) return ON_VERT2;
 
-    double e0p_area = orient2d(t0,t1,p);
-    double e1p_area = orient2d(t1,t2,p);
-    double e2p_area = orient2d(t2,t0,p);
+    double e0p_area = orient2d(t0, t1, p);
+    double e1p_area = orient2d(t1, t2, p);
+    double e2p_area = orient2d(t2, t0, p);
 
     bool hit = (e0p_area >= 0 && e1p_area >= 0 && e2p_area >= 0) ||
                (e0p_area <= 0 && e1p_area <= 0 && e2p_area <= 0);
@@ -427,9 +427,9 @@ PointInSimplex point_in_triangle3d(const double * p,
                                    const double * t0, const double * t1, const double * t2)
 {
     // test for point in vert
-    if(p[0] == t0[0] && p[1] == t0[1] && p[2] == t0[2]) return ON_VERT0;
-    if(p[0] == t1[0] && p[1] == t1[1] && p[2] == t1[2]) return ON_VERT1;
-    if(p[0] == t2[0] && p[1] == t2[1] && p[2] == t2[2]) return ON_VERT2;
+    if(vec_eq3d(p, t0)) return ON_VERT0;
+    if(vec_eq3d(p, t1)) return ON_VERT1;
+    if(vec_eq3d(p, t2)) return ON_VERT2;
 
     // test for point in edge in 3D
     if(point_in_segment3d(p, t0, t1) == STRICTLY_INSIDE) return ON_EDGE0;
@@ -440,23 +440,17 @@ PointInSimplex point_in_triangle3d(const double * p,
     // any of the projections, then p must be inside t
 
     double p_dropX[2]  = { p[1],  p[2]};
-    double t0_dropX[2] = {t0[1], t0[2]};
-    double t1_dropX[2] = {t1[1], t1[2]};
-    double t2_dropX[2] = {t2[1], t2[2]};
+    double t0_dropX[2] = {t0[1], t0[2]}, t1_dropX[2] = {t1[1], t1[2]}, t2_dropX[2] = {t2[1], t2[2]};
 
     if(point_in_triangle2d(p_dropX, t0_dropX, t1_dropX, t2_dropX) == STRICTLY_OUTSIDE) return STRICTLY_OUTSIDE;
 
     double p_dropY[2]  = { p[0],  p[2]};
-    double t0_dropY[2] = {t0[0], t0[2]};
-    double t1_dropY[2] = {t1[0], t1[2]};
-    double t2_dropY[2] = {t2[0], t2[2]};
+    double t0_dropY[2] = {t0[0], t0[2]}, t1_dropY[2] = {t1[0], t1[2]}, t2_dropY[2] = {t2[0], t2[2]};
 
     if(point_in_triangle2d(p_dropY, t0_dropY, t1_dropY, t2_dropY) == STRICTLY_OUTSIDE) return STRICTLY_OUTSIDE;
 
     double p_dropZ[2]  = { p[0],  p[1]};
-    double t0_dropZ[2] = {t0[0], t0[1]};
-    double t1_dropZ[2] = {t1[0], t1[1]};
-    double t2_dropZ[2] = {t2[0], t2[1]};
+    double t0_dropZ[2] = {t0[0], t0[1]}, t1_dropZ[2] = {t1[0], t1[1]}, t2_dropZ[2] = {t2[0], t2[1]};
 
     if(point_in_triangle2d(p_dropZ, t0_dropZ, t1_dropZ, t2_dropZ) == STRICTLY_OUTSIDE) return STRICTLY_OUTSIDE;
 
@@ -491,10 +485,10 @@ PointInSimplex point_in_tet(const double * p,
                             const double * t0, const double * t1, const double * t2, const double * t3)
 {
     // test for point in vert
-    if(p[0] == t0[0] && p[1] == t0[1] && p[2] == t0[2] && p[3] == t0[3]) return ON_VERT0;
-    if(p[0] == t1[0] && p[1] == t1[1] && p[2] == t1[2] && p[3] == t1[3]) return ON_VERT1;
-    if(p[0] == t2[0] && p[1] == t2[1] && p[2] == t2[2] && p[3] == t2[3]) return ON_VERT2;
-    if(p[0] == t3[0] && p[1] == t3[1] && p[2] == t3[2] && p[3] == t3[3]) return ON_VERT2;
+    if(vec_eq3d(p, t0)) return ON_VERT0;
+    if(vec_eq3d(p, t1)) return ON_VERT1;
+    if(vec_eq3d(p, t2)) return ON_VERT2;
+    if(vec_eq3d(p, t3)) return ON_VERT2;
 
     // according to refrence tet as in cinolib/standard_elements_tables.h
     double f0p_vol = orient3d(t0,t2,t1,p);
@@ -575,10 +569,7 @@ SimplexIntersection segment_segment_intersect2d(const double * s00, const double
     if(s00_wrt_s1 != s01_wrt_s1 && s10_wrt_s0 != s11_wrt_s0)
     {
         // edges share an endpoint
-        if((s00[0] == s10[0] && s00[1] == s10[1]) ||
-           (s00[0] == s11[0] && s00[1] == s11[1]) ||
-           (s01[0] == s10[0] && s01[1] == s10[1]) ||
-           (s01[0] == s11[0] && s01[1] == s11[1]))
+        if(vec_eq2d(s00, s10) || vec_eq2d(s00, s11) || vec_eq2d(s01, s10) || vec_eq2d(s01, s11))
             return SIMPLICIAL_COMPLEX;
 
         // at least one segment endpoint is involved in the intersection
@@ -589,8 +580,7 @@ SimplexIntersection segment_segment_intersect2d(const double * s00, const double
     if(s00_wrt_s1 == 0 && s01_wrt_s1 == 0 && s10_wrt_s0 == 0 && s11_wrt_s0 == 0)
     {
         // coincident segments
-        if(((s00[0] == s10[0] && s00[1] == s10[1]) && (s01[0] == s11[0] && s01[1] == s11[1])) ||
-           ((s00[0] == s11[0] && s00[1] == s11[1]) && (s01[0] == s10[0] && s01[1] == s10[1])))
+        if((vec_eq2d(s00, s10) && vec_eq2d(s01, s11)) || (vec_eq2d(s00, s11) && vec_eq2d(s01, s10)))
             return SIMPLICIAL_COMPLEX;
 
         double Xmin_s1 = std::min(s10[0], s11[0]);
@@ -660,24 +650,18 @@ SimplexIntersection segment_segment_intersect3d(const double * s00, const double
 
     // check 2D projections of the segments
 
-    double s00_dropX[2] = {s00[1], s00[2]};
-    double s01_dropX[2] = {s01[1], s01[2]};
-    double s10_dropX[2] = {s10[1], s10[2]};
-    double s11_dropX[2] = {s11[1], s11[2]};
+    double s00_dropX[2] = {s00[1], s00[2]}, s01_dropX[2] = {s01[1], s01[2]};
+    double s10_dropX[2] = {s10[1], s10[2]}, s11_dropX[2] = {s11[1], s11[2]};
     int x_res = segment_segment_intersect2d(s00_dropX, s01_dropX, s10_dropX, s11_dropX);
     if (x_res == DO_NOT_INTERSECT) return DO_NOT_INTERSECT;
 
-    double s00_dropY[2] = {s00[0], s00[2]};
-    double s01_dropY[2] = {s01[0], s01[2]};
-    double s10_dropY[2] = {s10[0], s10[2]};
-    double s11_dropY[2] = {s11[0], s11[2]};
+    double s00_dropY[2] = {s00[0], s00[2]}, s01_dropY[2] = {s01[0], s01[2]};
+    double s10_dropY[2] = {s10[0], s10[2]}, s11_dropY[2] = {s11[0], s11[2]};
     int y_res = segment_segment_intersect2d(s00_dropY, s01_dropY, s10_dropY, s11_dropY);
     if (y_res == DO_NOT_INTERSECT) return DO_NOT_INTERSECT;
 
-    double s00_dropZ[2] = {s00[0], s00[1]};
-    double s01_dropZ[2] = {s01[0], s01[1]};
-    double s10_dropZ[2] = {s10[0], s10[1]};
-    double s11_dropZ[2] = {s11[0], s11[1]};
+    double s00_dropZ[2] = {s00[0], s00[1]}, s01_dropZ[2] = {s01[0], s01[1]};
+    double s10_dropZ[2] = {s10[0], s10[1]}, s11_dropZ[2] = {s11[0], s11[1]};
     int z_res = segment_segment_intersect2d(s00_dropZ, s01_dropZ, s10_dropZ, s11_dropZ);
     if (z_res == DO_NOT_INTERSECT) return DO_NOT_INTERSECT;
 
@@ -1167,6 +1151,13 @@ bool tet_is_degenerate(const vec3d t[])
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if v0 and v1 are equals
+CINO_INLINE
+bool vec_eq2d(const double * v0, const double * v1)
+{
+    return ((v0[0] == v1[0]) &&
+            (v0[1] == v1[1]));
+}
+
 CINO_INLINE
 bool vec_eq3d(const double *v0, const double *v1)
 {
