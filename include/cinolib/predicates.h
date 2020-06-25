@@ -401,9 +401,18 @@ SimplexIntersection segment_segment_intersect2d(const double * s00, const double
 // SIMPLICIAL_COMPLEX   if segments coincide or intersect at a shared vertex
 // INTERSECT            if segments intersect at an inner point (for s0, s1, or both)
 // OVERLAP              if segments are colinear and partially overlapped
+
 CINO_INLINE
 SimplexIntersection segment_segment_intersect(const vec3d s0[],
                                               const vec3d s1[]);
+
+CINO_INLINE
+SimplexIntersection segment_segment_intersect(const vec3d & s00, const vec3d & s01,
+                                              const vec3d & s10, const vec3d & s11);
+
+CINO_INLINE
+SimplexIntersection segment_segment_intersect3d(const double * s00, const double * s01,
+                                                const double * s10, const double * s11);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -462,6 +471,12 @@ template<typename vec>
 CINO_INLINE
 bool segment_is_degenerate(const vec s[]);
 
+CINO_INLINE
+bool segment_is_degenerate(const vec3d & s00, const vec3d & s01);
+
+CINO_INLINE
+bool segment_is_degenerate3d(const double * s00, const double * s01);
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t[0], t[1] and t[2] are colinear
@@ -477,7 +492,8 @@ bool tet_is_degenerate(const vec3d t[]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
+CINO_INLINE
+bool vec_eq3d(const double * v0, const double * v1);
 
 }
 

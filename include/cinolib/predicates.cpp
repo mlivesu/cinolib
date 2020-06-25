@@ -631,47 +631,67 @@ CINO_INLINE
 SimplexIntersection segment_segment_intersect(const vec3d s0[],
                                               const vec3d s1[])
 {
-    assert(!segment_is_degenerate(s0) &&
-           !segment_is_degenerate(s1));
+    return segment_segment_intersect3d(s0[0].ptr(), s0[1].ptr(), s1[0].ptr(), s1[1].ptr());
+}
 
-    if(!points_are_coplanar(s0[0], s0[1], s1[0], s1[1])) return DO_NOT_INTERSECT;
+CINO_INLINE
+SimplexIntersection segment_segment_intersect(const vec3d & s00, const vec3d & s01,
+                                              const vec3d & s10, const vec3d & s11)
+{
+    return segment_segment_intersect3d(s00.ptr(), s01.ptr(), s10.ptr(), s11.ptr());
+}
+
+CINO_INLINE
+SimplexIntersection segment_segment_intersect3d(const double * s00, const double * s01,
+                                                const double * s10, const double * s11)
+{
+    assert(!segment_is_degenerate3d(s00, s01) && !segment_is_degenerate3d(s10, s11));
+
+    if(!points_are_coplanar(s00, s01, s10, s11)) return DO_NOT_INTERSECT;
 
     // check for coincident segments
-    bool s00_is_shared = (s0[0]==s1[0] || s0[0]==s1[1]);
-    bool s01_is_shared = (s0[1]==s1[0] || s0[1]==s1[1]);
-    bool s10_is_shared = (s1[0]==s0[0] || s1[0]==s0[1]);
-    bool s11_is_shared = (s1[1]==s0[0] || s1[1]==s0[1]);
+    bool s00_is_shared = (vec_eq3d(s00, s10) || vec_eq3d(s00, s11));
+    bool s01_is_shared = (vec_eq3d(s01, s10) || vec_eq3d(s01, s11));
+    bool s10_is_shared = (vec_eq3d(s10, s00) || vec_eq3d(s10, s01));
+    bool s11_is_shared = (vec_eq3d(s11, s00) || vec_eq3d(s11, s01));
 
     // s0 and s1 are coincident or one edge is degenerate and coincides with one vertex of the other
     if(s00_is_shared && s01_is_shared && s10_is_shared && s11_is_shared) return SIMPLICIAL_COMPLEX;
 
     // check 2D projections of the segments
 
-    vec2d s0_x[2] = { vec2d(s0[0],DROP_X), vec2d(s0[1],DROP_X) };
-    vec2d s1_x[2] = { vec2d(s1[0],DROP_X), vec2d(s1[1],DROP_X) };
-    int x_res = segment_segment_intersect(s0_x, s1_x);
+    double s00_dropX[2] = {s00[1], s00[2]};
+    double s01_dropX[2] = {s01[1], s01[2]};
+    double s10_dropX[2] = {s10[1], s10[2]};
+    double s11_dropX[2] = {s11[1], s11[2]};
+    int x_res = segment_segment_intersect2d(s00_dropX, s01_dropX, s10_dropX, s11_dropX);
     if (x_res == DO_NOT_INTERSECT) return DO_NOT_INTERSECT;
 
-    vec2d s0_y[2] = { vec2d(s0[0],DROP_Y), vec2d(s0[1],DROP_Y) };
-    vec2d s1_y[2] = { vec2d(s1[0],DROP_Y), vec2d(s1[1],DROP_Y) };
-    int y_res = segment_segment_intersect(s0_y, s1_y);
+    double s00_dropY[2] = {s00[0], s00[2]};
+    double s01_dropY[2] = {s01[0], s01[2]};
+    double s10_dropY[2] = {s10[0], s10[2]};
+    double s11_dropY[2] = {s11[0], s11[2]};
+    int y_res = segment_segment_intersect2d(s00_dropY, s01_dropY, s10_dropY, s11_dropY);
     if (y_res == DO_NOT_INTERSECT) return DO_NOT_INTERSECT;
 
-    vec2d s0_z[2] = { vec2d(s0[0],DROP_Z), vec2d(s0[1],DROP_Z) };
-    vec2d s1_z[2] = { vec2d(s1[0],DROP_Z), vec2d(s1[1],DROP_Z) };
-    int z_res = segment_segment_intersect(s0_z, s1_z);
+    double s00_dropZ[2] = {s00[0], s00[1]};
+    double s01_dropZ[2] = {s01[0], s01[1]};
+    double s10_dropZ[2] = {s10[0], s10[1]};
+    double s11_dropZ[2] = {s11[0], s11[1]};
+    int z_res = segment_segment_intersect2d(s00_dropZ, s01_dropZ, s10_dropZ, s11_dropZ);
     if (z_res == DO_NOT_INTERSECT) return DO_NOT_INTERSECT;
 
     // segments are deemed overlapping if they are so in at least two projections our of three
     // (overlapping axis aligned segments will look like a valid simplcial complex in one projection)
-    if((x_res==OVERLAP && y_res==OVERLAP) ||
-       (x_res==OVERLAP && z_res==OVERLAP) ||
-       (y_res==OVERLAP && z_res==OVERLAP))
+    if((x_res == OVERLAP && y_res == OVERLAP) ||
+       (x_res == OVERLAP && z_res == OVERLAP) ||
+       (y_res == OVERLAP && z_res == OVERLAP))
     {
         return OVERLAP;
     }
 
     return INTERSECT;
+
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1110,7 +1130,19 @@ template<typename vec>
 CINO_INLINE
 bool segment_is_degenerate(const vec s[])
 {
-    return (s[0]==s[1]);
+    return (s[0] == s[1]);
+}
+
+CINO_INLINE
+bool segment_is_degenerate(const vec3d & s00, const vec3d & s01)
+{
+    return (s00 == s01);
+}
+
+CINO_INLINE
+bool segment_is_degenerate3d(const double * s00, const double * s01)
+{
+    return vec_eq3d(s00, s01);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1130,6 +1162,17 @@ CINO_INLINE
 bool tet_is_degenerate(const vec3d t[])
 {
     return points_are_coplanar(t[0], t[1], t[2], t[3]);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns true if v0 and v1 are equals
+CINO_INLINE
+bool vec_eq3d(const double *v0, const double *v1)
+{
+    return ((v0[0] == v1[0]) &&
+            (v0[1] == v1[1]) &&
+            (v0[2] == v1[2]));
 }
 
 
