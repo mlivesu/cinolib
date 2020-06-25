@@ -1048,71 +1048,90 @@ CINO_INLINE
 SimplexIntersection triangle_triangle_intersect(const vec3d t0[],
                                                 const vec3d t1[])
 {
-    assert(!triangle_is_degenerate(t0[0], t0[1], t0[2]) &&
-           !triangle_is_degenerate(t1[0], t1[1], t1[2]));
+    return triangle_triangle_intersect3d(t0[0].ptr(), t0[1].ptr(), t0[2].ptr(),
+                                         t1[0].ptr(), t1[1].ptr(), t1[2].ptr());
+}
+
+CINO_INLINE
+SimplexIntersection triangle_triangle_intersect(const vec3d & t00, const vec3d & t01, const vec3d & t02,
+                                                const vec3d & t10, const vec3d & t11, const vec3d & t12)
+{
+    return triangle_triangle_intersect3d(t00.ptr(), t01.ptr(), t02.ptr(),
+                                         t10.ptr(), t11.ptr(), t12.ptr());
+}
+
+CINO_INLINE
+SimplexIntersection triangle_triangle_intersect3d(const double * t00, const double * t01, const double * t02,
+                                                  const double * t10, const double * t11, const double * t12)
+{
+    assert(!triangle_is_degenerate3d(t00, t01, t02) &&
+           !triangle_is_degenerate3d(t10, t11, t12));
 
     // binary flags to mark coincident vertices in t0 and t1
     std::bitset<3> t0_shared = { 0b000 };
     std::bitset<3> t1_shared = { 0b000 };
 
     // find vert correspondences
-    if(t0[0]==t1[0]) { t0_shared[0] = true; t1_shared[0] = true; }
-    if(t0[0]==t1[1]) { t0_shared[0] = true; t1_shared[1] = true; }
-    if(t0[0]==t1[2]) { t0_shared[0] = true; t1_shared[2] = true; }
-    if(t0[1]==t1[0]) { t0_shared[1] = true; t1_shared[0] = true; }
-    if(t0[1]==t1[1]) { t0_shared[1] = true; t1_shared[1] = true; }
-    if(t0[1]==t1[2]) { t0_shared[1] = true; t1_shared[2] = true; }
-    if(t0[2]==t1[0]) { t0_shared[2] = true; t1_shared[0] = true; }
-    if(t0[2]==t1[1]) { t0_shared[2] = true; t1_shared[1] = true; }
-    if(t0[2]==t1[2]) { t0_shared[2] = true; t1_shared[2] = true; }
+    if(vec_eq3d(t00, t10)) { t0_shared[0] = true; t1_shared[0] = true; }
+    if(vec_eq3d(t00, t11)) { t0_shared[0] = true; t1_shared[1] = true; }
+    if(vec_eq3d(t00, t12)) { t0_shared[0] = true; t1_shared[2] = true; }
+    if(vec_eq3d(t01, t10)) { t0_shared[1] = true; t1_shared[0] = true; }
+    if(vec_eq3d(t01, t11)) { t0_shared[1] = true; t1_shared[1] = true; }
+    if(vec_eq3d(t01, t12)) { t0_shared[1] = true; t1_shared[2] = true; }
+    if(vec_eq3d(t02, t10)) { t0_shared[2] = true; t1_shared[0] = true; }
+    if(vec_eq3d(t02, t11)) { t0_shared[2] = true; t1_shared[1] = true; }
+    if(vec_eq3d(t02, t12)) { t0_shared[2] = true; t1_shared[2] = true; }
 
     // count number of coincident vertices in t0 and t1
     uint t0_count = t0_shared.count();
 
     // either t0 and t1 are coincident
-    if(t0_count==3) return SIMPLICIAL_COMPLEX;
+    if(t0_count == 3) return SIMPLICIAL_COMPLEX;
 
     // t0 and t1 share an edge. Let e be the shared edge and { opp0, opp1 } be the two vertices opposite to
     // e in t0 and t1, respectively. If opp0 and opp1 lie at the same side of e, the two triangles overlap.
     // Otherwise they are edge-adjacent and form a valid simplicial complex
-    if(t0_count==2)
+    if(t0_count == 2)
     {
         uint e[2];      // indices of the shared vertices (in t0)
         uint count = 0; // index for e (to fill it)
         uint opp0  = 0; // index of the vertex opposite to e in t0
         uint opp1  = 0; // index of the vertex opposite to e in t1
-        for(uint i=0; i<3; ++i)
+        for(uint i = 0; i < 3; ++i)
         {
             if(!t0_shared[i]) opp0 = i; else e[count++] = i;
             if(!t1_shared[i]) opp1 = i;
         }
 
+        const double* t0[3] = {t00, t01, t02};
+        const double* t1[3] = {t10, t11, t12};
+
         // if they are not coplanar, then they form a valid complex
-        if(orient3d(t0[0], t0[1], t0[2], t1[opp1]) != 0) return SIMPLICIAL_COMPLEX;
+        if(orient3d(t00, t01, t02, t1[opp1]) != 0) return SIMPLICIAL_COMPLEX;
 
-        vec2d e0_x   = vec2d(t0[e[0]],DROP_X);
-        vec2d e1_x   = vec2d(t0[e[1]],DROP_X);
-        vec2d opp0_x = vec2d(t0[opp0],DROP_X);
-        vec2d opp1_x = vec2d(t1[opp1],DROP_X);
-        double opp0_wrt_e = orient2d(e0_x, e1_x, opp0_x);
-        double opp1_wrt_e = orient2d(e0_x, e1_x, opp1_x);
-        if((opp0_wrt_e>0 && opp1_wrt_e<0) || (opp0_wrt_e<0 && opp1_wrt_e>0)) return SIMPLICIAL_COMPLEX;
+        double e0_dropX[2]   = {t0[e[0]][1], t0[e[0]][2]};
+        double e1_dropX[2]   = {t0[e[1]][1], t0[e[1]][2]};
+        double opp0_dropX[2] = {t0[opp0][1], t0[opp0][2]};
+        double opp1_dropX[2] = {t1[opp1][1], t1[opp1][2]};
+        double opp0_wrt_e = orient2d(e0_dropX, e1_dropX, opp0_dropX);
+        double opp1_wrt_e = orient2d(e0_dropX, e1_dropX, opp1_dropX);
+        if((opp0_wrt_e > 0 && opp1_wrt_e < 0) || (opp0_wrt_e < 0 && opp1_wrt_e > 0)) return SIMPLICIAL_COMPLEX;
 
-        vec2d e0_y   = vec2d(t0[e[0]],DROP_Y);
-        vec2d e1_y   = vec2d(t0[e[1]],DROP_Y);
-        vec2d opp0_y = vec2d(t0[opp0],DROP_Y);
-        vec2d opp1_y = vec2d(t1[opp1],DROP_Y);
-        opp0_wrt_e = orient2d(e0_y, e1_y, opp0_y);
-        opp1_wrt_e = orient2d(e0_y, e1_y, opp1_y);
-        if((opp0_wrt_e>0 && opp1_wrt_e<0) || (opp0_wrt_e<0 && opp1_wrt_e>0)) return SIMPLICIAL_COMPLEX;
+        double e0_dropY[2]   = {t0[e[0]][0], t0[e[0]][2]};
+        double e1_dropY[2]   = {t0[e[1]][0], t0[e[1]][2]};
+        double opp0_dropY[2] = {t0[opp0][0], t0[opp0][2]};
+        double opp1_dropY[2] = {t1[opp1][0], t1[opp1][2]};
+        opp0_wrt_e = orient2d(e0_dropY, e1_dropY, opp0_dropY);
+        opp1_wrt_e = orient2d(e0_dropY, e1_dropY, opp1_dropY);
+        if((opp0_wrt_e > 0 && opp1_wrt_e < 0) || (opp0_wrt_e < 0 && opp1_wrt_e > 0)) return SIMPLICIAL_COMPLEX;
 
-        vec2d e0_z   = vec2d(t0[e[0]],DROP_Z);
-        vec2d e1_z   = vec2d(t0[e[1]],DROP_Z);
-        vec2d opp0_z = vec2d(t0[opp0],DROP_Z);
-        vec2d opp1_z = vec2d(t1[opp1],DROP_Z);
-        opp0_wrt_e = orient2d(e0_z, e1_z, opp0_z);
-        opp1_wrt_e = orient2d(e0_z, e1_z, opp1_z);
-        if((opp0_wrt_e>0 && opp1_wrt_e<0) || (opp0_wrt_e<0 && opp1_wrt_e>0)) return SIMPLICIAL_COMPLEX;
+        double e0_dropZ[2]   = {t0[e[0]][0], t0[e[0]][1]};
+        double e1_dropZ[2]   = {t0[e[1]][0], t0[e[1]][1]};
+        double opp0_dropZ[2] = {t0[opp0][0], t0[opp0][1]};
+        double opp1_dropZ[2] = {t1[opp1][0], t1[opp1][1]};
+        opp0_wrt_e = orient2d(e0_dropZ, e1_dropZ, opp0_dropZ);
+        opp1_wrt_e = orient2d(e0_dropZ, e1_dropZ, opp1_dropZ);
+        if((opp0_wrt_e > 0 && opp1_wrt_e < 0) || (opp0_wrt_e < 0 && opp1_wrt_e > 0)) return SIMPLICIAL_COMPLEX;
 
         return INTERSECT;
     }
@@ -1120,19 +1139,24 @@ SimplexIntersection triangle_triangle_intersect(const vec3d t0[],
     // t0 and t1 share a vertex. Let v be the shared vertex and { opp0 , opp1 } be the two edges opposite to
     // v in t0 and t1, respectively. If opp0 intersects t1, or opp1 interects t0, the two triangles overlap.
     // Otherwise they are vertex-adjacent and form a valid simplicial complex
-    if(t0_count==1)
+    if(t0_count == 1)
     {
         uint v0; // index of the shared vertex in t0
         uint v1; // index of the shared vertex in t1
-        for(uint i=0; i<3; ++i)
+        for(uint i = 0; i < 3; ++i)
         {
             if(t0_shared[i]) v0 = i;
             if(t1_shared[i]) v1 = i;
         }
-        vec3d opp0[] = { t0[(v0+1)%3], t0[(v0+2)%3] };
-        vec3d opp1[] = { t1[(v1+1)%3], t1[(v1+2)%3] };
-        if(segment_triangle_intersect(opp0,t1)>=INTERSECT ||
-           segment_triangle_intersect(opp1,t0)>=INTERSECT)
+
+        const double* t0[3] = {t00, t01, t02};
+        const double* t1[3] = {t10, t11, t12};
+
+        const double* opp0[2] = { t0[(v0 +1) %3], t0[(v0 +2) %3] };
+        const double* opp1[2] = { t1[(v1 +1) %3], t1[(v1 +2) %3] };
+
+        if(segment_triangle_intersect3d(opp0[0], opp0[1], t10, t11, t12) >= INTERSECT ||
+           segment_triangle_intersect3d(opp1[0], opp1[1], t00, t01, t02) >= INTERSECT)
         {
             return INTERSECT;
         }
@@ -1141,25 +1165,20 @@ SimplexIntersection triangle_triangle_intersect(const vec3d t0[],
 
     // t0 and t1 do not share sub-simplices. They can be fully disjoint, intersecting at a single point, or overlapping
 
-    vec3d t00[2] = { t0[0], t0[1] };
-    vec3d t01[2] = { t0[1], t0[2] };
-    vec3d t02[2] = { t0[2], t0[0] };
-    vec3d t10[2] = { t1[0], t1[1] };
-    vec3d t11[2] = { t1[1], t1[2] };
-    vec3d t12[2] = { t1[2], t1[0] };
-
-    if(segment_triangle_intersect(t00,t1)>=INTERSECT ||
-       segment_triangle_intersect(t01,t1)>=INTERSECT ||
-       segment_triangle_intersect(t02,t1)>=INTERSECT ||
-       segment_triangle_intersect(t10,t0)>=INTERSECT ||
-       segment_triangle_intersect(t11,t0)>=INTERSECT ||
-       segment_triangle_intersect(t12,t0)>=INTERSECT)
+    if(segment_triangle_intersect3d(t00, t01, t10, t11, t12) >= INTERSECT ||
+       segment_triangle_intersect3d(t01, t02, t10, t11, t12) >= INTERSECT ||
+       segment_triangle_intersect3d(t02, t00, t10, t11, t12) >= INTERSECT ||
+       segment_triangle_intersect3d(t10, t11, t00, t01, t02) >= INTERSECT ||
+       segment_triangle_intersect3d(t11, t12, t00, t01, t02) >= INTERSECT ||
+       segment_triangle_intersect3d(t12, t10, t00, t01, t02) >= INTERSECT)
     {
         return INTERSECT;
     }
 
     return DO_NOT_INTERSECT;
 }
+
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if s0==s1
@@ -1216,13 +1235,7 @@ bool triangle_is_degenerate3d(const double * t0, const double * t1, const double
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// returns true if t[0], t[1], t[2] and t32] are coplanar
-CINO_INLINE
-bool tet_is_degenerate(const vec3d t[])
-{
-    return points_are_coplanar(t[0].ptr(), t[1].ptr(), t[2].ptr(), t[3].ptr());
-}
-
+// returns true if t0, t1, t2 and t3 are coplanar
 CINO_INLINE
 bool tet_is_degenerate(const vec3d & t0, const vec3d & t1, const vec3d & t2, const vec3d & t3)
 {
