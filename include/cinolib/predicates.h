@@ -458,9 +458,18 @@ SimplexIntersection segment_triangle_intersect3d(const double * s0, const double
 // DO_NOT_INTERSECT     if s and t are fully disjoint
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
 // INTERSECT            if s and t intersect and do not forma a valid simplex
+
 CINO_INLINE
 SimplexIntersection segment_tet_intersect(const vec3d s[],
                                           const vec3d t[]);
+
+CINO_INLINE
+SimplexIntersection segment_tet_intersect(const vec3d & s0, const vec3d & s1,
+                                          const vec3d & t0, const vec3d & t1, const vec3d & t2, const vec3d & t3);
+
+CINO_INLINE
+SimplexIntersection segment_tet_intersect(const double * s0, const double * s1,
+                                          const double * t0, const double * t1, const double * t2, const double * t3);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -525,6 +534,12 @@ bool triangle_is_degenerate3d(const double * t0, const double * t1, const double
 // returns true if t[0], t[1], t[2] and t32] are coplanar
 CINO_INLINE
 bool tet_is_degenerate(const vec3d t[]);
+
+CINO_INLINE
+bool tet_is_degenerate(const vec3d & t0, const vec3d & t1, const vec3d & t2, const vec3d & t3);
+
+CINO_INLINE
+bool tet_is_degenerate(const double * t0, const double * t1, const double * t2, const double * t3);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

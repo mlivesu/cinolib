@@ -851,41 +851,53 @@ CINO_INLINE
 SimplexIntersection segment_tet_intersect(const vec3d s[],
                                           const vec3d t[])
 {
-    assert(!segment_is_degenerate(s) && !tet_is_degenerate(t));
+    return segment_tet_intersect(s[0].ptr(), s[1].ptr(),
+                                 t[0].ptr(), t[1].ptr(), t[2].ptr(), t[3].ptr());
+}
+
+CINO_INLINE
+SimplexIntersection segment_tet_intersect(const vec3d & s0, const vec3d & s1,
+                                          const vec3d & t0, const vec3d & t1, const vec3d & t2, const vec3d & t3)
+{
+    return segment_tet_intersect(s0.ptr(), s1.ptr(),
+                                 t0.ptr(), t1.ptr(), t2.ptr(), t3.ptr());
+}
+
+CINO_INLINE
+SimplexIntersection segment_tet_intersect(const double * s0, const double * s1,
+                                          const double * t0, const double * t1, const double * t2, const double * t3)
+{
+    assert(!segment_is_degenerate3d(s0, s1) && !tet_is_degenerate(t0, t1, t2, t3));
 
     // check if s is an edge of t
-    if((s[0]==t[0] && s[1]==t[2]) || (s[1]==t[0] && s[0]==t[2])) return SIMPLICIAL_COMPLEX;
-    if((s[0]==t[2] && s[1]==t[1]) || (s[1]==t[2] && s[0]==t[1])) return SIMPLICIAL_COMPLEX;
-    if((s[0]==t[1] && s[1]==t[0]) || (s[1]==t[1] && s[0]==t[0])) return SIMPLICIAL_COMPLEX;
-    if((s[0]==t[1] && s[1]==t[3]) || (s[1]==t[1] && s[0]==t[3])) return SIMPLICIAL_COMPLEX;
-    if((s[0]==t[3] && s[1]==t[0]) || (s[1]==t[3] && s[0]==t[0])) return SIMPLICIAL_COMPLEX;
-    if((s[0]==t[3] && s[1]==t[2]) || (s[1]==t[3] && s[0]==t[2])) return SIMPLICIAL_COMPLEX;
+    if((vec_eq3d(s0, t0) && vec_eq3d(s1, t2)) || (vec_eq3d(s1, t0) && vec_eq3d(s0, t2))) return SIMPLICIAL_COMPLEX;
+    if((vec_eq3d(s0, t2) && vec_eq3d(s1, t1)) || (vec_eq3d(s1, t2) && vec_eq3d(s0, t1))) return SIMPLICIAL_COMPLEX;
+    if((vec_eq3d(s0, t1) && vec_eq3d(s1, t0)) || (vec_eq3d(s1, t1) && vec_eq3d(s0, t0))) return SIMPLICIAL_COMPLEX;
+    if((vec_eq3d(s0, t1) && vec_eq3d(s1, t3)) || (vec_eq3d(s1, t1) && vec_eq3d(s0, t3))) return SIMPLICIAL_COMPLEX;
+    if((vec_eq3d(s0, t3) && vec_eq3d(s1, t0)) || (vec_eq3d(s1, t3) && vec_eq3d(s0, t0))) return SIMPLICIAL_COMPLEX;
+    if((vec_eq3d(s0, t3) && vec_eq3d(s1, t2)) || (vec_eq3d(s1, t3) && vec_eq3d(s0, t2))) return SIMPLICIAL_COMPLEX;
 
     // check if s intersects any of the faces of t
-    vec3d f0[] = { t[0], t[2], t[1] };
-    vec3d f1[] = { t[0], t[1], t[3] };
-    vec3d f2[] = { t[0], t[3], t[2] };
-    vec3d f3[] = { t[1], t[2], t[3] };
-    if(segment_triangle_intersect(s,f0)>=INTERSECT ||
-       segment_triangle_intersect(s,f1)>=INTERSECT ||
-       segment_triangle_intersect(s,f2)>=INTERSECT ||
-       segment_triangle_intersect(s,f3)>=INTERSECT)
+    if(segment_triangle_intersect3d(s0, s1, t0, t2, t1) >= INTERSECT ||
+       segment_triangle_intersect3d(s0, s1, t0, t1, t3) >= INTERSECT ||
+       segment_triangle_intersect3d(s0, s1, t0, t3, t2) >= INTERSECT ||
+       segment_triangle_intersect3d(s0, s1, t1, t2, t3) >= INTERSECT)
     {
         return INTERSECT;
     }
 
     // locate s endpoints wrt t
-    auto s0_wrt_t = point_in_tet(s[0],t);
-    auto s1_wrt_t = point_in_tet(s[1],t);
+    auto s0_wrt_t = point_in_tet(s0, t0, t1, t2, t3);
+    auto s1_wrt_t = point_in_tet(s1, t0, t1, t2, t3);
 
     // if one veertex of s is a vertex of t, and the other is outside then s touches t only at that vertex
     // (otherwise there would be an intersection between s and any of the faces of t, which I already tested)
-    if(s0_wrt_t>=ON_VERT0 && s0_wrt_t<=ON_VERT3 && s1_wrt_t==STRICTLY_OUTSIDE) return SIMPLICIAL_COMPLEX;
-    if(s1_wrt_t>=ON_VERT0 && s1_wrt_t<=ON_VERT3 && s0_wrt_t==STRICTLY_OUTSIDE) return SIMPLICIAL_COMPLEX;
+    if(s0_wrt_t >= ON_VERT0 && s0_wrt_t <= ON_VERT3 && s1_wrt_t == STRICTLY_OUTSIDE) return SIMPLICIAL_COMPLEX;
+    if(s1_wrt_t >= ON_VERT0 && s1_wrt_t <= ON_VERT3 && s0_wrt_t == STRICTLY_OUTSIDE) return SIMPLICIAL_COMPLEX;
 
     // if a point of s is either inside, or on some edge or on some face of t, then they intersect
-    if(s0_wrt_t==STRICTLY_INSIDE || s0_wrt_t>=ON_EDGE0) return INTERSECT;
-    if(s1_wrt_t==STRICTLY_INSIDE || s1_wrt_t>=ON_EDGE0) return INTERSECT;
+    if(s0_wrt_t == STRICTLY_INSIDE || s0_wrt_t >= ON_EDGE0) return INTERSECT;
+    if(s1_wrt_t == STRICTLY_INSIDE || s1_wrt_t >= ON_EDGE0) return INTERSECT;
 
     return DO_NOT_INTERSECT;
 }
@@ -1207,7 +1219,19 @@ bool triangle_is_degenerate3d(const double * t0, const double * t1, const double
 CINO_INLINE
 bool tet_is_degenerate(const vec3d t[])
 {
-    return points_are_coplanar(t[0], t[1], t[2], t[3]);
+    return points_are_coplanar(t[0].ptr(), t[1].ptr(), t[2].ptr(), t[3].ptr());
+}
+
+CINO_INLINE
+bool tet_is_degenerate(const vec3d & t0, const vec3d & t1, const vec3d & t2, const vec3d & t3)
+{
+    return tet_is_degenerate(t0.ptr(), t1.ptr(), t2.ptr(), t3.ptr());
+}
+
+CINO_INLINE
+bool tet_is_degenerate(const double * t0, const double * t1, const double * t2, const double * t3)
+{
+    return points_are_coplanar(t0, t1, t2, t3);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
