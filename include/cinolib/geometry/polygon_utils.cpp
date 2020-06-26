@@ -157,7 +157,7 @@ int polygon_find_ear(const std::vector<vec2d> & poly)
             for(uint j=0; j<poly.size(); ++j)
             {
                 if(j == curr || j == prev || j == next) continue;
-                if(point_in_triangle(poly.at(j),ear)>=STRICTLY_INSIDE)
+                if(point_in_triangle_2d(poly.at(j), ear[0], ear[1], ear[2])>=STRICTLY_INSIDE)
                 {
                     contains_other_point = true;
                 }

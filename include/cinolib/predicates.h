@@ -240,42 +240,51 @@ double insphere(const vec3d & pa,
 
 // true if the area of the triangle p0-p1-p2 is zero
 CINO_INLINE
-bool points_are_colinear(const vec2d & p0,
-                         const vec2d & p1,
-                         const vec2d & p2);
+bool points_are_colinear_2d(const vec2d & p0,
+                            const vec2d & p1,
+                            const vec2d & p2);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// true if the area of the triangle p0-p1-p2 is zero
 CINO_INLINE
-bool points_are_colinear2d(const double * p0,
-                           const double * p1,
-                           const double * p2);
+bool points_are_colinear_2d(const double * p0,
+                            const double * p1,
+                            const double * p2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // true if the area of all the orthogonal 2d projections of the triangle p0-p1-p2 is zero
 CINO_INLINE
-bool points_are_colinear(const vec3d & p0,
-                         const vec3d & p1,
-                         const vec3d & p2);
+bool points_are_colinear_3d(const vec3d & p0,
+                           const vec3d & p1,
+                           const vec3d & p2);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// true if the area of all the orthogonal 2d projections of the triangle p0-p1-p2 is zero
 CINO_INLINE
-bool points_are_colinear3d(const double * p0,
-                           const double * p1,
-                           const double * p2);
+bool points_are_colinear_3d(const double * p0,
+                            const double * p1,
+                            const double * p2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // true if the volume of the tetrahedron p0-p1-p2-p3 is zero
 CINO_INLINE
-bool points_are_coplanar(const vec3d & p0,
-                         const vec3d & p1,
-                         const vec3d & p2,
-                         const vec3d & p3);
+bool points_are_coplanar_3d(const vec3d & p0,
+                            const vec3d & p1,
+                            const vec3d & p2,
+                            const vec3d & p3);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// true if the volume of the tetrahedron p0-p1-p2-p3 is zero
 CINO_INLINE
-bool points_are_coplanar(const double * p0,
-                         const double * p1,
-                         const double * p2,
-                         const double * p3);
+bool points_are_coplanar_3d(const double * p0,
+                            const double * p1,
+                            const double * p2,
+                            const double * p3);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -283,18 +292,10 @@ bool points_are_coplanar(const double * p0,
 // ON_VERTi         if p coincides with the i-th vertex of s
 // STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
-
 CINO_INLINE
-PointInSimplex point_in_segment(const vec2d & p,
-                                const vec2d s[]);
-
-CINO_INLINE
-PointInSimplex point_in_segment(const vec2d & p,
-                                const vec2d & s0, const vec2d & s1);
-
-CINO_INLINE
-PointInSimplex point_in_segment2d(const double * p,
-                                  const double * s0, const double * s1);
+PointInSimplex point_in_segment_2d(const vec2d & p,
+                                   const vec2d & s0,
+                                   const vec2d & s1);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -302,17 +303,32 @@ PointInSimplex point_in_segment2d(const double * p,
 // ON_VERTi         if p coincides with the i-th vertex of s
 // STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
+CINO_INLINE
+PointInSimplex point_in_segment_2d(const double * p,
+                                   const double * s0,
+                                   const double * s1);
 
-CINO_INLINE
-PointInSimplex point_in_segment(const vec3d & p,
-                                const vec3d s[]);
-CINO_INLINE
-PointInSimplex point_in_segment(const vec3d & p,
-                                const vec3d & s0, const vec3d & s1);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns:
+// ON_VERTi         if p coincides with the i-th vertex of s
+// STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
+// STRICTLY_OUTSIDE otherwise
 CINO_INLINE
-PointInSimplex point_in_segment3d(const double * p,
-                                  const double * s0, const double * s1);
+PointInSimplex point_in_segment_3d(const vec3d & p,
+                                   const vec3d & s0,
+                                   const vec3d & s1);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns:
+// ON_VERTi         if p coincides with the i-th vertex of s
+// STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
+// STRICTLY_OUTSIDE otherwise
+CINO_INLINE
+PointInSimplex point_in_segment_3d(const double * p,
+                                   const double * s0,
+                                   const double * s1);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -321,18 +337,11 @@ PointInSimplex point_in_segment3d(const double * p,
 // ON_EDGEj         if p lies inside the j-th edge of t (endpoints excluded)
 // STRICTLY_INSIDE  if p lies inside triangle t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
-
 CINO_INLINE
-PointInSimplex point_in_triangle(const vec2d & p,
-                                 const vec2d   t[]);
-
-CINO_INLINE
-PointInSimplex point_in_triangle(const vec2d & p,
-                                 const vec2d & t0, const vec2d & t1, const vec2d & t2);
-
-CINO_INLINE
-PointInSimplex point_in_triangle2d(const double * p,
-                                   const double * t0, const double * t1, const double * t2);
+PointInSimplex point_in_triangle_2d(const vec2d & p,
+                                    const vec2d & t0,
+                                    const vec2d & t1,
+                                    const vec2d & t2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -341,18 +350,37 @@ PointInSimplex point_in_triangle2d(const double * p,
 // ON_EDGEj         if p lies inside the j-th edge of t (endpoints excluded)
 // STRICTLY_INSIDE  if p lies inside triangle t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
-
 CINO_INLINE
-PointInSimplex point_in_triangle(const vec3d & p,
-                                 const vec3d   t[]);
+PointInSimplex point_in_triangle_2d(const double * p,
+                                    const double * t0,
+                                    const double * t1,
+                                    const double * t2);
 
-CINO_INLINE
-PointInSimplex point_in_triangle(const vec3d & p,
-                                 const vec3d & t0, const vec3d & t1, const vec3d & t2);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns:
+// ON_VERTi         if p coincides with the i-th vertex of t
+// ON_EDGEj         if p lies inside the j-th edge of t (endpoints excluded)
+// STRICTLY_INSIDE  if p lies inside triangle t (borders excluded)
+// STRICTLY_OUTSIDE otherwise
 CINO_INLINE
-PointInSimplex point_in_triangle3d(const double * p,
-                                   const double * t0, const double * t1, const double * t2);
+PointInSimplex point_in_triangle_3d(const vec3d & p,
+                                    const vec3d & t0,
+                                    const vec3d & t1,
+                                    const vec3d & t2);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns:
+// ON_VERTi         if p coincides with the i-th vertex of t
+// ON_EDGEj         if p lies inside the j-th edge of t (endpoints excluded)
+// STRICTLY_INSIDE  if p lies inside triangle t (borders excluded)
+// STRICTLY_OUTSIDE otherwise
+CINO_INLINE
+PointInSimplex point_in_triangle_3d(const double * p,
+                                    const double * t0,
+                                    const double * t1,
+                                    const double * t2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -362,17 +390,27 @@ PointInSimplex point_in_triangle3d(const double * p,
 // ON_FACEk         if p lies inside the k-th face of t (borders excluded)
 // STRICTLY_INSIDE  if p lies inside tetrahedron t (borders excluded)
 // STRICTLY_OUTSIDE otherwise
-
 CINO_INLINE
 PointInSimplex point_in_tet(const vec3d & p,
-                            const vec3d   t[]);
-CINO_INLINE
-PointInSimplex point_in_tet(const vec3d & p,
-                            const vec3d & t0, const vec3d & t1, const vec3d & t2, const vec3d & t3);
+                            const vec3d & t0,
+                            const vec3d & t1,
+                            const vec3d & t2,
+                            const vec3d & t3);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns:
+// ON_VERTi         if p coincides with the i-th vertex of t
+// ON_EDGEj         if p lies inside the j-th edge of t (endpoints excluded)
+// ON_FACEk         if p lies inside the k-th face of t (borders excluded)
+// STRICTLY_INSIDE  if p lies inside tetrahedron t (borders excluded)
+// STRICTLY_OUTSIDE otherwise
 CINO_INLINE
 PointInSimplex point_in_tet(const double * p,
-                            const double * t0, const double * t1, const double * t2, const double * t3);
+                            const double * t0,
+                            const double * t1,
+                            const double * t2,
+                            const double * t3);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -381,18 +419,11 @@ PointInSimplex point_in_tet(const double * p,
 // SIMPLICIAL_COMPLEX   if segments coincide or intersect at a shared vertex
 // INTERSECT            if segments intersect at an inner point (for s0, s1, or both)
 // OVERLAP              if segments are colinear and partially overlapped
-
 CINO_INLINE
-SimplexIntersection segment_segment_intersect(const vec2d s0[],
-                                              const vec2d s1[]);
-
-CINO_INLINE
-SimplexIntersection segment_segment_intersect(const vec2d & s00, const vec2d & s01,
-                                              const vec2d & s10, const vec2d & s11);
-
-CINO_INLINE
-SimplexIntersection segment_segment_intersect2d(const double * s00, const double * s01,
-                                                const double * s10, const double * s11);
+SimplexIntersection segment_segment_intersect_2d(const vec2d & s00,
+                                                 const vec2d & s01,
+                                                 const vec2d & s10,
+                                                 const vec2d & s11);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -401,18 +432,37 @@ SimplexIntersection segment_segment_intersect2d(const double * s00, const double
 // SIMPLICIAL_COMPLEX   if segments coincide or intersect at a shared vertex
 // INTERSECT            if segments intersect at an inner point (for s0, s1, or both)
 // OVERLAP              if segments are colinear and partially overlapped
-
 CINO_INLINE
-SimplexIntersection segment_segment_intersect(const vec3d s0[],
-                                              const vec3d s1[]);
+SimplexIntersection segment_segment_intersect_2d(const double * s00,
+                                                 const double * s01,
+                                                 const double * s10,
+                                                 const double * s11);
 
-CINO_INLINE
-SimplexIntersection segment_segment_intersect(const vec3d & s00, const vec3d & s01,
-                                              const vec3d & s10, const vec3d & s11);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns:
+// DO_NOT_INTERSECT     if segments are fully disjoint
+// SIMPLICIAL_COMPLEX   if segments coincide or intersect at a shared vertex
+// INTERSECT            if segments intersect at an inner point (for s0, s1, or both)
+// OVERLAP              if segments are colinear and partially overlapped
 CINO_INLINE
-SimplexIntersection segment_segment_intersect3d(const double * s00, const double * s01,
-                                                const double * s10, const double * s11);
+SimplexIntersection segment_segment_intersect_3d(const vec3d & s00,
+                                                 const vec3d & s01,
+                                                 const vec3d & s10,
+                                                 const vec3d & s11);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns:
+// DO_NOT_INTERSECT     if segments are fully disjoint
+// SIMPLICIAL_COMPLEX   if segments coincide or intersect at a shared vertex
+// INTERSECT            if segments intersect at an inner point (for s0, s1, or both)
+// OVERLAP              if segments are colinear and partially overlapped
+CINO_INLINE
+SimplexIntersection segment_segment_intersect_3d(const double * s00,
+                                                 const double * s01,
+                                                 const double * s10,
+                                                 const double * s11);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -420,18 +470,12 @@ SimplexIntersection segment_segment_intersect3d(const double * s00, const double
 // DO_NOT_INTERSECT     if s and t are fully disjoint
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
 // INTERSECT            if s and t intersect and do not forma a valid simplex
-
 CINO_INLINE
-SimplexIntersection segment_triangle_intersect(const vec2d s[],
-                                               const vec2d t[]);
-
-CINO_INLINE
-SimplexIntersection segment_triangle_intersect(const vec2d & s0, const vec2d & s1,
-                                               const vec2d & t0, const vec2d & t1, const vec2d & t2);
-
-CINO_INLINE
-SimplexIntersection segment_triangle_intersect2d(const double * s0, const double * s1,
-                                                 const double * t0, const double * t1, const double * t2);
+SimplexIntersection segment_triangle_intersect_2d(const vec2d & s0,
+                                                  const vec2d & s1,
+                                                  const vec2d & t0,
+                                                  const vec2d & t1,
+                                                  const vec2d & t2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -439,18 +483,12 @@ SimplexIntersection segment_triangle_intersect2d(const double * s0, const double
 // DO_NOT_INTERSECT     if s and t are fully disjoint
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
 // INTERSECT            if s and t intersect and do not forma a valid simplex
-
 CINO_INLINE
-SimplexIntersection segment_triangle_intersect(const vec3d s[],
-                                               const vec3d t[]);
-
-CINO_INLINE
-SimplexIntersection segment_triangle_intersect(const vec3d & s0, const vec3d & s1,
-                                               const vec3d & t0, const vec3d & t1, const vec3d & t2);
-
-CINO_INLINE
-SimplexIntersection segment_triangle_intersect3d(const double * s0, const double * s1,
-                                                 const double * t0, const double * t1, const double * t2);
+SimplexIntersection segment_triangle_intersect_2d(const double * s0,
+                                                  const double * s1,
+                                                  const double * t0,
+                                                  const double * t1,
+                                                  const double * t2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -458,18 +496,53 @@ SimplexIntersection segment_triangle_intersect3d(const double * s0, const double
 // DO_NOT_INTERSECT     if s and t are fully disjoint
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
 // INTERSECT            if s and t intersect and do not forma a valid simplex
-
 CINO_INLINE
-SimplexIntersection segment_tet_intersect(const vec3d s[],
-                                          const vec3d t[]);
+SimplexIntersection segment_triangle_intersect_3d(const vec3d & s0,
+                                                  const vec3d & s1,
+                                                  const vec3d & t0,
+                                                  const vec3d & t1,
+                                                  const vec3d & t2);
 
-CINO_INLINE
-SimplexIntersection segment_tet_intersect(const vec3d & s0, const vec3d & s1,
-                                          const vec3d & t0, const vec3d & t1, const vec3d & t2, const vec3d & t3);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns:
+// DO_NOT_INTERSECT     if s and t are fully disjoint
+// SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
+// INTERSECT            if s and t intersect and do not forma a valid simplex
 CINO_INLINE
-SimplexIntersection segment_tet_intersect(const double * s0, const double * s1,
-                                          const double * t0, const double * t1, const double * t2, const double * t3);
+SimplexIntersection segment_triangle_intersect_3d(const double * s0,
+                                                  const double * s1,
+                                                  const double * t0,
+                                                  const double * t1,
+                                                  const double * t2);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns:
+// DO_NOT_INTERSECT     if s and t are fully disjoint
+// SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
+// INTERSECT            if s and t intersect and do not forma a valid simplex
+CINO_INLINE
+SimplexIntersection segment_tet_intersect_3d(const vec3d & s0,
+                                             const vec3d & s1,
+                                             const vec3d & t0,
+                                             const vec3d & t1,
+                                             const vec3d & t2,
+                                             const vec3d & t3);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns:
+// DO_NOT_INTERSECT     if s and t are fully disjoint
+// SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
+// INTERSECT            if s and t intersect and do not forma a valid simplex
+CINO_INLINE
+SimplexIntersection segment_tet_intersect_3d(const double * s0,
+                                             const double * s1,
+                                             const double * t0,
+                                             const double * t1,
+                                             const double * t2,
+                                             const double * t3);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -477,18 +550,13 @@ SimplexIntersection segment_tet_intersect(const double * s0, const double * s1,
 // DO_NOT_INTERSECT     if triangles are fully disjoint
 // SIMPLICIAL_COMPLEX   if triangles coincide or intersect at a shared sub-simplex
 // INTERSECT            if triangles intersect without making a valid simplcial complex
-
 CINO_INLINE
-SimplexIntersection triangle_triangle_intersect(const vec2d t0[],
-                                                const vec2d t1[]);
-
-CINO_INLINE
-SimplexIntersection triangle_triangle_intersect(const vec2d & t00, const vec2d & t01, const vec2d & t02,
-                                                const vec2d & t10, const vec2d & t11, const vec2d & t12);
-
-CINO_INLINE
-SimplexIntersection triangle_triangle_intersect2d(const double * t00, const double * t01, const double * t02,
-                                                  const double * t10, const double * t11, const double * t12);
+SimplexIntersection triangle_triangle_intersect_2d(const vec2d & t00,
+                                                   const vec2d & t01,
+                                                   const vec2d & t02,
+                                                   const vec2d & t10,
+                                                   const vec2d & t11,
+                                                   const vec2d & t12);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -496,66 +564,133 @@ SimplexIntersection triangle_triangle_intersect2d(const double * t00, const doub
 // DO_NOT_INTERSECT     if triangles are fully disjoint
 // SIMPLICIAL_COMPLEX   if triangles coincide or intersect at a shared sub-simplex
 // INTERSECT            if triangles intersect without making a valid simplcial complex
-
 CINO_INLINE
-SimplexIntersection triangle_triangle_intersect(const vec3d t0[],
-                                                const vec3d t1[]);
+SimplexIntersection triangle_triangle_intersect_2d(const double * t00,
+                                                   const double * t01,
+                                                   const double * t02,
+                                                   const double * t10,
+                                                   const double * t11,
+                                                   const double * t12);
 
-CINO_INLINE
-SimplexIntersection triangle_triangle_intersect(const vec3d & t00, const vec3d & t01, const vec3d & t02,
-                                                const vec3d & t10, const vec3d & t11, const vec3d & t12);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns:
+// DO_NOT_INTERSECT     if triangles are fully disjoint
+// SIMPLICIAL_COMPLEX   if triangles coincide or intersect at a shared sub-simplex
+// INTERSECT            if triangles intersect without making a valid simplcial complex
 CINO_INLINE
-SimplexIntersection triangle_triangle_intersect3d(const double * t00, const double * t01, const double * t02,
-                                                  const double * t10, const double * t11, const double * t12);
+SimplexIntersection triangle_triangle_intersect_3d(const vec3d & t00,
+                                                   const vec3d & t01,
+                                                   const vec3d & t02,
+                                                   const vec3d & t10,
+                                                   const vec3d & t11,
+                                                   const vec3d & t12);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns:
+// DO_NOT_INTERSECT     if triangles are fully disjoint
+// SIMPLICIAL_COMPLEX   if triangles coincide or intersect at a shared sub-simplex
+// INTERSECT            if triangles intersect without making a valid simplcial complex
+CINO_INLINE
+SimplexIntersection triangle_triangle_intersect_3d(const double * t00,
+                                                   const double * t01,
+                                                   const double * t02,
+                                                   const double * t10,
+                                                   const double * t11,
+                                                   const double * t12);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if s0==s1
 CINO_INLINE
-bool segment_is_degenerate(const vec2d & s00, const vec2d & s01);
+bool segment_is_degenerate_2d(const vec2d & s0,
+                              const vec2d & s1);
 
-CINO_INLINE
-bool segment_is_degenerate(const vec3d & s00, const vec3d & s01);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns true if s0==s1
 CINO_INLINE
-bool segment_is_degenerate2d(const double * s00, const double * s01);
+bool segment_is_degenerate_2d(const double * s0,
+                              const double * s1);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns true if s0==s1
 CINO_INLINE
-bool segment_is_degenerate3d(const double * s00, const double * s01);
+bool segment_is_degenerate_3d(const vec3d & s0,
+                              const vec3d & s1);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns true if s0==s1
+CINO_INLINE
+bool segment_is_degenerate_3d(const double * s0,
+                              const double * s1);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t0, t1 and t2 are colinear
 CINO_INLINE
-bool triangle_is_degenerate(const vec2d & t0, const vec2d & t1, const vec2d & t2);
+bool triangle_is_degenerate_2d(const vec2d & t0,
+                               const vec2d & t1,
+                               const vec2d & t2);
 
-CINO_INLINE
-bool triangle_is_degenerate(const vec3d & t0, const vec3d & t1, const vec3d & t2);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns true if t0, t1 and t2 are colinear
 CINO_INLINE
-bool triangle_is_degenerate2d(const double * t0, const double * t1, const double * t2);
+bool triangle_is_degenerate_2d(const double * t0,
+                               const double * t1,
+                               const double * t2);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns true if t0, t1 and t2 are colinear
 CINO_INLINE
-bool triangle_is_degenerate3d(const double * t0, const double * t1, const double * t2);
+bool triangle_is_degenerate_3d(const vec3d & t0,
+                               const vec3d & t1,
+                               const vec3d & t2);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns true if t0, t1 and t2 are colinear
+CINO_INLINE
+bool triangle_is_degenerate_3d(const double * t0,
+                               const double * t1,
+                               const double * t2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t0, t1, t2 and t3 are coplanar
 CINO_INLINE
-bool tet_is_degenerate(const vec3d & t0, const vec3d & t1, const vec3d & t2, const vec3d & t3);
-
-CINO_INLINE
-bool tet_is_degenerate(const double * t0, const double * t1, const double * t2, const double * t3);
+bool tet_is_degenerate(const vec3d & t0,
+                       const vec3d & t1,
+                       const vec3d & t2,
+                       const vec3d & t3);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// returns true if t0, t1, t2 and t3 are coplanar
 CINO_INLINE
-bool vec_eq2d(const double * v0, const double * v1);
+bool tet_is_degenerate(const double * t0,
+                       const double * t1,
+                       const double * t2,
+                       const double * t3);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns true if v0 and v1 are equal
 CINO_INLINE
-bool vec_eq3d(const double * v0, const double * v1);
+bool vec_equals_2d(const double * v0,
+                   const double * v1);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// returns true if v0 and v1 are equal
+CINO_INLINE
+bool vec_equals_3d(const double * v0,
+                   const double * v1);
 }
 
 #ifndef  CINO_STATIC_LIB

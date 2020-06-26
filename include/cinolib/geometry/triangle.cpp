@@ -92,7 +92,7 @@ void Triangle::barycentric_coordinates(const vec3d & p, double bc[]) const
 CINO_INLINE
 bool Triangle::contains(const vec3d & p, const bool strict) const
 {
-    int where = point_in_triangle(p,v);
+    int where = point_in_triangle_3d(p,v[0], v[1], v[2]);
     if(strict) return (where==STRICTLY_INSIDE);
                return (where>=STRICTLY_INSIDE);
 }
@@ -102,7 +102,7 @@ bool Triangle::contains(const vec3d & p, const bool strict) const
 CINO_INLINE
 bool Triangle::intersects_segment(const vec3d s[], const bool ignore_if_valid_complex) const
 {
-    auto res = segment_triangle_intersect(v,s);
+    auto res = segment_triangle_intersect_3d(s[0],s[1], v[0], v[1], v[2]);
     if(ignore_if_valid_complex) return (res > SIMPLICIAL_COMPLEX);
     return (res>=SIMPLICIAL_COMPLEX);
 }
@@ -112,7 +112,7 @@ bool Triangle::intersects_segment(const vec3d s[], const bool ignore_if_valid_co
 CINO_INLINE
 bool Triangle::intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex) const
 {
-    auto res = triangle_triangle_intersect(v,t);
+    auto res = triangle_triangle_intersect_3d(v[0], v[1], v[2], t[0], t[1], t[2]);
     if(ignore_if_valid_complex) return (res > SIMPLICIAL_COMPLEX);
     return (res>=SIMPLICIAL_COMPLEX);
 }

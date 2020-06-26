@@ -98,7 +98,7 @@ void Tetrahedron::barycentric_coordinates(const vec3d &p, double bc[]) const
 CINO_INLINE
 bool Tetrahedron::contains(const vec3d & p, const bool strict) const
 {
-    int where = point_in_tet(p,v);
+    int where = point_in_tet(p, v[0], v[1], v[2], v[3]);
     if(strict) return (where==STRICTLY_INSIDE);
                return (where>=STRICTLY_INSIDE);
 }
