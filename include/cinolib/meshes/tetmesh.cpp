@@ -213,6 +213,8 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
 {
+    assert(this->edge_valence(eid)>0);
+
     uint new_vid = this->vert_add(p);
 
     // create sub-elements
@@ -710,6 +712,19 @@ double Tetmesh<M,V,E,F,P>::poly_volume(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void Tetmesh<M,V,E,F,P>::polys_split(const std::vector<uint> & pids)
+{
+    // in order to avoid id conflicts split all the
+    // polys starting from the one with highest id
+    //
+    std::vector<uint> tmp = SORT_VEC(pids, true);
+    for(uint pid : tmp) poly_split(pid);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const std::vector<double> & bc)
 {
     assert(bc.size()==4);
@@ -726,23 +741,18 @@ uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const std::vector<double> & 
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::polys_split(const std::vector<uint> & pids)
+uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
 {
-    // in order to avoid id conflicts split all the
-    // polys starting from the one with highest id
-    //
-    std::vector<uint> tmp = SORT_VEC(pids, true);
-    for(uint pid : tmp) poly_split(pid);
+    uint vid = this->vert_add(p);
+    return this->poly_split(pid,vid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
+uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const uint vid)
 {
-    uint new_vid = this->vert_add(p);
-
     for(uint fid : this->adj_p2f(pid))
     {        
         std::vector<uint> tet =
@@ -750,7 +760,7 @@ uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
             this->face_vert_id(fid,0),
             this->face_vert_id(fid,1),
             this->face_vert_id(fid,2),
-            new_vid
+            vid
         };
         if(this->poly_face_is_CCW(pid,fid)) std::swap(tet[1],tet[2]);
         uint new_pid = this->poly_add(tet);
@@ -759,8 +769,7 @@ uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
     }
 
     this->poly_remove(pid);
-
-    return new_vid;
+    return vid;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -772,6 +781,23 @@ int Tetmesh<M,V,E,F,P>::poly_id(const uint fid, const uint vid) const
     for(uint pid : this->adj_f2p(fid))
     {
         if(this->poly_contains_vert(pid,vid)) return pid;
+    }
+    return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int Tetmesh<M,V,E,F,P>::poly_id_from_vids(const std::vector<uint> & vlist) const
+{
+    if(vlist.empty()) return -1;
+    std::vector<uint> query = SORT_VEC(vlist);
+
+    uint vid = vlist.front();
+    for(uint pid : this->adj_v2p(vid))
+    {
+        if(this->poly_verts_id(pid,true)==query) return pid;
     }
     return -1;
 }

@@ -1624,6 +1624,28 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::vert_is_visible(const uint vid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+int AbstractPolyhedralMesh<M,V,E,F,P>::vert_shared_between_faces(const std::vector<uint> & fids) const
+{
+    for(uint vid : this->adj_f2v(fids.front()))
+    {
+        bool shared = true;
+        for(uint i=1; i<fids.size(); ++i)
+        {
+            if(!this->face_contains_vert(fids.at(i),vid))
+            {
+                shared = false;
+                break;
+            }
+        }
+        if(shared) return vid;
+    }
+    return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::vert_is_manifold(const uint vid) const
 {
     // for each edge in the link, count how many faces in the link are incident to it
@@ -1856,6 +1878,30 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::edge_is_on_srf(const uint eid) const
         if(this->face_is_on_srf(fid)) return true;
     }
     return false;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::edge_has_border_on_srf(const uint eid) const
+{
+    return (!this->edge_is_on_srf(eid)                       &&
+             this->vert_is_on_srf(this->edge_vert_id(eid,0)) &&
+             this->vert_is_on_srf(this->edge_vert_id(eid,1)));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::face_has_border_on_srf(const uint fid) const
+{
+    return (!this->face_is_on_srf(fid)                       &&
+             this->vert_is_on_srf(this->face_vert_id(fid,0)) &&
+             this->vert_is_on_srf(this->face_vert_id(fid,1)) &&
+             this->vert_is_on_srf(this->face_vert_id(fid,2)));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -2646,7 +2692,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove_unreferenced(const uint pid)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove(const uint pid)
+void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove(const uint pid, const bool delete_dangling_elements)
 {
     std::set<uint,std::greater<uint>> dangling_verts; // higher ids first
     std::set<uint,std::greater<uint>> dangling_edges; // higher ids first
@@ -2715,9 +2761,12 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_remove(const uint pid)
     }
 
     // remove dangling elements
-    for(uint fid : dangling_faces) face_remove_unreferenced(fid);
-    for(uint eid : dangling_edges) edge_remove_unreferenced(eid);
-    for(uint vid : dangling_verts) vert_remove_unreferenced(vid);
+    if(delete_dangling_elements)
+    {
+        for(uint fid : dangling_faces) face_remove_unreferenced(fid);
+        for(uint eid : dangling_edges) edge_remove_unreferenced(eid);
+        for(uint vid : dangling_verts) vert_remove_unreferenced(vid);
+    }
     poly_remove_unreferenced(pid);
 }
 
