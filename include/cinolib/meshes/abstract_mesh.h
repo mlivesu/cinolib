@@ -220,6 +220,7 @@ class AbstractMesh
                 bool             vert_is_local_max          (const uint vid, const int tex_coord = U_param) const;
                 uint             vert_valence               (const uint vid) const;
                 uint             vert_shared                (const uint eid0, const uint eid1) const;
+                int              vert_shared_between_polys  (const std::vector<uint> & pids) const;
                 double           vert_min_uvw_value         (const int tex_coord = U_param) const;
                 double           vert_max_uvw_value         (const int tex_coord = U_param) const;
                 void             vert_apply_labels          (const std::vector<int> & labels);

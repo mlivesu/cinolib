@@ -595,6 +595,28 @@ uint AbstractMesh<M,V,E,P>::vert_shared(const uint eid0, const uint eid1) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+int AbstractMesh<M,V,E,P>::vert_shared_between_polys(const std::vector<uint> & pids) const
+{
+    for(uint vid : this->adj_p2v(pids.front()))
+    {
+        bool shared = true;
+        for(uint i=1; i<pids.size(); ++i)
+        {
+            if(!this->poly_contains_vert(pids.at(i),vid))
+            {
+                shared = false;
+                break;
+            }
+        }
+        if(shared) return vid;
+    }
+    return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 double AbstractMesh<M,V,E,P>::vert_min_uvw_value(const int tex_coord) const
 {
     double min = inf_double;
