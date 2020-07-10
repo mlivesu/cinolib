@@ -1,6 +1,12 @@
 # Future improvements of Cinolib
 Please consider this to be just development notes and not any real planning.
 
+### Papers I'd like to implement:
+* Properties of Laplace Operators for Tetrahedral Meshes (SGP2020)
+* A Laplacian for Nonmanifold Triangle Meshes (SGP2020)
+* Polygon Laplacian Made Simple (EG2020)
+* Fast and Robust Triangle-Triangle Overlap Test Using Orientation Predicates
+
 ### Things to be fixed:
 * in DrawableSegmentSoup, edge rendering is orientation dependend when cheap mode is not active (cylinders are defined as points + dir!)
 * find ways to speedup updateGL(). For big meshes it's overly slow...
