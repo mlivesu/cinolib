@@ -658,7 +658,7 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
 
     ids.clear();
 
-    AABB s_box({s[0], s[1]});
+    AABB s_box(s[0], s[1]);
 
     std::stack<OctreeNode*> lifo;
     lifo.push(root);
