@@ -36,6 +36,7 @@
 #include <cinolib/map_to_tetrahedron.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/harmonic_map.h>
+#include <cinolib/predicates.h>
 
 namespace cinolib
 {
@@ -64,10 +65,18 @@ void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
     while(m.vert_valence(v0)<4 && v0<m.num_verts()) ++v0;
     assert(v0<m.num_verts());
     assert(m.vert_valence(v0)>=4);
-    auto v_link = m.vert_ordered_verts_link(v0);
+    std::vector<uint> v_link = m.vert_ordered_verts_link(v0);
     uint v1 = v_link.at(0);
     uint v2 = v_link.at(1);
     uint v3 = v_link.at(2);
+    std::vector<uint> v1v3_chain(v_link.begin()+3, v_link.end());
+
+    // make sure you don't flip elements in the map
+    if(orient3d(m.vert(v0), m.vert(v1), m.vert(v2), m.vert(v3))>0)
+    {
+        std::swap(v1,v3);
+        std::reverse(v1v3_chain.begin(), v1v3_chain.end());
+    }
 
     // assign tet corners
     std::map<uint,vec3d> bcs;
@@ -76,12 +85,12 @@ void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
     bcs[v2] = REFERENCE_TET_VERTS[2];
     bcs[v3] = REFERENCE_TET_VERTS[3];
 
-    // linearly interpolate the rest of verts in the link along edge v1-v3
+    // linearly interpolate the rest of verts in the link along chain connecting v1 to v3
     double step = (REFERENCE_TET_VERTS[1].dist(REFERENCE_TET_VERTS[3]))/(v_link.size()-2.0);
-    vec3d  dir  = REFERENCE_TET_VERTS[3] - REFERENCE_TET_VERTS[1]; dir.normalize();
-    for(uint i=3; i<v_link.size(); ++i)
+    vec3d  dir  = REFERENCE_TET_VERTS[1] - REFERENCE_TET_VERTS[3]; dir.normalize();
+    for(uint i=0; i<v1v3_chain.size(); ++i)
     {
-        bcs[v_link.at(i)] = REFERENCE_TET_VERTS[3] - (i-2)*step*dir;
+        bcs[v1v3_chain.at(i)] = REFERENCE_TET_VERTS[3] + (i+1)*step*dir;
     }
 
     // map the other vertices inside face v1-v0-v3
