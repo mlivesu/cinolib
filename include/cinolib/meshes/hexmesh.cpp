@@ -402,7 +402,7 @@ bool Hexmesh<M,V,E,F,P>::poly_fix_orientation()
         for(uint pid=0; pid<this->num_polys(); ++pid)
         {
             this->poly_reorder_p2v(pid);
-            this->update_hex_quality(pid);
+            this->update_p_quality(pid);
             if(this->poly_data(pid).quality < 0.0) ++bad;
         }
         if(bad > 0.5*this->num_polys())
@@ -412,7 +412,7 @@ bool Hexmesh<M,V,E,F,P>::poly_fix_orientation()
                 this->poly_flip_winding(pid);
                 this->poly_reorder_p2v(pid);
             }
-            this->update_hex_quality();
+            this->update_quality();
         }
         return true;
     }
