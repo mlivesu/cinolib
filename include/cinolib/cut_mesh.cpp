@@ -59,6 +59,8 @@ void cut_mesh_along_marked_edges(AbstractPolygonMesh<M,V,E,P>               & m,
     uint nv = m.num_verts();
     for(uint vid=0; vid<nv; ++vid)
     {
+        assert(nv<=m.num_verts());
+
         if(m.vert_data(vid).flags[MARKED]) continue;
         m.vert_data(vid).flags[MARKED] = true;
 
@@ -80,7 +82,7 @@ void cut_mesh_along_marked_edges(AbstractPolygonMesh<M,V,E,P>               & m,
                 to_remove.push_back(pid);
             }
         }
-        m.polys_remove(to_remove);
+        if(!to_remove.empty()) m.polys_remove(to_remove);
     }
 }
 
