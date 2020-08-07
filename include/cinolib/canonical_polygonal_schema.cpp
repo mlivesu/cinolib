@@ -96,8 +96,11 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
             split_list.push_back(eid);
         }
     }
-    std::cout << "splitting " << split_list.size() << " edges to avoid degenerate elements along the boundary" << std::endl;
-    for(uint eid : split_list) m_in.edge_split(eid);
+    if(!split_list.empty())
+    {
+        std::cout << "splitting " << split_list.size() << " edges to avoid degenerate elements along the boundary" << std::endl;
+        for(uint eid : split_list) m_in.edge_split(eid);
+    }
 
     std::vector<uint> border = m_in.get_ordered_boundary_vertices();
     // rotate the list so as to have a polygon corner at the beginning of it
