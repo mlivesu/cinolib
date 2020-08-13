@@ -32,5 +32,5 @@ BibTeX entry:
 ```
 
 ## Acknowldegment
-The software collected in CinoLib spans across a large period of time, starting from the beginning of my PhD to today. Especially in the last few years, this work has been partly supported by research projects such as [CAxMan](https://cordis.europa.eu/project/id/680448), and [CHANGE](https://cordis.europa.eu/project/rcn/204834/en).
+The software collected in CinoLib spans across a large period of time, starting from the beginning of my PhD to today. Since 2015, this work has been partly supported by research projects such as [CAxMan](https://cordis.europa.eu/project/id/680448), and [CHANGE](https://cordis.europa.eu/project/rcn/204834/en).
 
