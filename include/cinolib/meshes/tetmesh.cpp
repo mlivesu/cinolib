@@ -251,7 +251,7 @@ uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
          this->face_data(f1) = this->face_data(fid);
     }
 
-    if(this->vert_is_on_srf(new_vid)) this->update_v_normal(new_vid);
+    if(this->mesh_data().update_normals && this->vert_is_on_srf(new_vid)) this->update_v_normal(new_vid);
 
     // remove old edge and all elements attached to it
     this->edge_remove(eid);
@@ -406,12 +406,18 @@ int Tetmesh<M,V,E,F,P>::edge_collapse(const uint eid, const vec3d & p, const dou
         uint new_pid = this->poly_add(vlist);
         this->poly_data(new_pid) = this->poly_data(pid);
 
-        for(uint fid: this->adj_p2f(pid))
+        if(this->mesh_data().update_normals)
         {
-            if(this->face_is_on_srf(fid)) this->update_f_normal(fid);
+            for(uint fid: this->adj_p2f(pid))
+            {
+                if(this->face_is_on_srf(fid)) this->update_f_normal(fid);
+            }
         }
     }
-    if(this->vert_is_on_srf(vert_to_keep)) this->update_v_normal(vert_to_keep);
+    if(this->mesh_data().update_normals && this->vert_is_on_srf(vert_to_keep))
+    {
+        this->update_v_normal(vert_to_keep);
+    }
 
     this->vert_remove(vert_to_remove);
 
@@ -610,7 +616,7 @@ uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
         }
     }
 
-    if(this->vert_is_on_srf(new_vid)) this->update_v_normal(new_vid);
+    if(this->mesh_data().update_normals && this->vert_is_on_srf(new_vid)) this->update_v_normal(new_vid);
 
     this->face_remove(fid);
     return new_vid;
