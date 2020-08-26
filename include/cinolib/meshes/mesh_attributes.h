@@ -125,6 +125,8 @@ enum
 typedef struct
 {
     std::string filename;
+    bool        update_normals = true;
+    bool        update_bbox    = true;
 }
 Mesh_std_attributes;
 
