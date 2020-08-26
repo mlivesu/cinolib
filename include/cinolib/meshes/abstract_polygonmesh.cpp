@@ -180,7 +180,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
     for(auto v : verts) this->vert_add(v);
     for(auto p : polys) this->poly_add(p);
 
-    this->update_v_normals();
+    if(this->mesh_data().update_normals) this->update_v_normals();
 
     this->copy_xyz_to_uvw(UVW_param);
 
@@ -446,7 +446,7 @@ void AbstractPolygonMesh<M,V,E,P>::normalize_area()
 {
     this->scale(1.0/sqrt(this->mesh_area()));
     assert(std::fabs(this->mesh_area()-1)<1e-5);
-    this->update_bbox();
+    if(this->mesh_data().update_bbox) this->update_bbox();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -877,8 +877,11 @@ uint AbstractPolygonMesh<M,V,E,P>::vert_add(const vec3d & pos)
     this->v2e.push_back(std::vector<uint>());
     this->v2p.push_back(std::vector<uint>());
     //
-    this->bb.min = this->bb.min.min(pos);
-    this->bb.max = this->bb.max.max(pos);
+    if(this->mesh_data().update_bbox)
+    {
+        this->bb.min = this->bb.min.min(pos);
+        this->bb.max = this->bb.max.max(pos);
+    }
     //
     return vid;
 }
@@ -1488,7 +1491,7 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & vlist)
         this->p2e.at(pid).push_back(eid);
     }
 
-    this->update_p_normal(pid);
+    if(this->mesh_data().update_normals) this->update_p_normal(pid);
     this->poly_triangles.push_back(std::vector<uint>());
     update_p_tessellation(pid);
 
@@ -1655,8 +1658,11 @@ void AbstractPolygonMesh<M,V,E,P>::poly_flip_winding_order(const uint pid)
 {
     std::reverse(this->polys.at(pid).begin(), this->polys.at(pid).end());
 
-    update_p_normal(pid);
-    for(uint off=0; off<this->verts_per_poly(pid); ++off) update_v_normal(this->poly_vert_id(pid,off));
+    if(this->mesh_data().update_normals)
+    {
+        update_p_normal(pid);
+        for(uint off=0; off<this->verts_per_poly(pid); ++off) update_v_normal(this->poly_vert_id(pid,off));
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1719,7 +1725,7 @@ void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P>
         this->v2v.push_back(tmp);
     }
 
-    this->update_bbox();
+    if(this->mesh_data().update_bbox) this->update_bbox();
 
     std::cout << "Appended " << m.mesh_data().filename << " to mesh " << this->mesh_data().filename << std::endl;
     std::cout << this->num_verts() << " verts" << std::endl;
