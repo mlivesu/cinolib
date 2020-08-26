@@ -137,8 +137,8 @@ void AbstractMesh<M,V,E,P>::rotate(const vec3d & axis, const double angle)
         vert(vid) += c;
     }
     //
-    update_bbox();
-    update_normals();
+    if(m_data.update_bbox)    update_bbox();
+    if(m_data.update_normals) update_normals();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -151,7 +151,7 @@ void AbstractMesh<M,V,E,P>::scale(const double scale_factor)
     translate(-c);
     for(uint vid=0; vid<num_verts(); ++vid) vert(vid) *= scale_factor;
     translate(c);
-    update_bbox();
+    if(m_data.update_bbox) update_bbox();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -162,7 +162,7 @@ void AbstractMesh<M,V,E,P>::normalize_bbox()
 {
     double s = 1.0/bbox().diag();
     for(uint vid=0; vid<num_verts(); ++vid) vert(vid) *= s;
-    update_bbox();
+    if(m_data.update_bbox) update_bbox();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -411,7 +411,7 @@ void AbstractMesh<M,V,E,P>::copy_uvw_to_xyz(const int mode)
             default: assert(false);
         }
     }
-    update_bbox();
+    if(m_data.update_bbox) update_bbox();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -424,8 +424,8 @@ void AbstractMesh<M,V,E,P>::swap_xyz_uvw(const bool normals, const bool bbox)
     {
         std::swap(vert(vid),vert_data(vid).uvw);
     }
-    if (normals) update_normals();
-    if (bbox)    update_bbox();
+    if(normals) update_normals();
+    if(bbox)    update_bbox();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
