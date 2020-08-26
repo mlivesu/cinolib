@@ -106,7 +106,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
     for(auto v : verts) vert_add(v);
     for(auto f : faces) face_add(f);
     for(uint pid=0; pid<polys.size(); ++pid) this->poly_add(polys.at(pid), polys_face_winding.at(pid));
-    this->update_v_normals();
+    if(this->mesh_data().update_normals) this->update_v_normals();
 
     this->copy_xyz_to_uvw(UVW_param);
 
@@ -147,7 +147,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
 
     for(auto v : verts) vert_add(v);
     for(auto p : polys) poly_add(p);
-    this->update_v_normals();
+    if(this->mesh_data().update_normals) this->update_v_normals();
 
     this->copy_xyz_to_uvw(UVW_param);
 
