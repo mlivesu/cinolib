@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include <cinolib/map_to_tetrahedron.h>
 #include <cinolib/standard_elements_tables.h>
+#include <cinolib/dijkstra.h>
 #include <cinolib/harmonic_map.h>
 #include <cinolib/predicates.h>
 
@@ -61,40 +62,56 @@ CINO_INLINE
 void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
                               std::vector<vec3d> & verts) // verts mapped to tet
 {
-    uint v0 = 0;
-    while(m.vert_valence(v0)<4 && v0<m.num_verts()) ++v0;
-    assert(v0<m.num_verts());
-    assert(m.vert_valence(v0)>=4);
-    std::vector<uint> v_link = m.vert_ordered_verts_link(v0);
-    uint v1 = v_link.at(0);
-    uint v2 = v_link.at(1);
-    uint v3 = v_link.at(2);
-    std::vector<uint> v1v3_chain(v_link.begin()+3, v_link.end());
-
-    // make sure you don't flip elements in the map
-    if(orient3d(m.vert(v0), m.vert(v1), m.vert(v2), m.vert(v3))>0)
+    assert(m.genus()==0);
+    // try all triangles until you find a suitable one....
+    for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        std::swap(v1,v3);
-        std::reverse(v1v3_chain.begin(), v1v3_chain.end());
+        // try all tri edges until you find a suitable one....
+        for(uint eid : m.adj_p2e(pid))
+        {
+            uint e0   = m.edge_vert_id(eid,0);
+            uint e1   = m.edge_vert_id(eid,1);
+             int topp = m.poly_opposite_to(eid,pid);
+            uint opp0 = m.vert_opposite_to(pid,e0,e1);
+            uint opp1 = m.vert_opposite_to(topp,e0,e1);
+
+            // if they form a tet with positive volume, use them to initialize the map
+            if(orient3d(m.poly_vert(pid,0), m.poly_vert(pid,2), m.poly_vert(pid,1), m.vert(opp1))>0)
+            {
+                // find the path connecting opp0 and opp1 not passing through e0 and e1
+                std::vector<uint> path;
+                std::vector<bool> mask(m.num_verts(),false);
+                mask.at(e0) = true;
+                mask.at(e1) = true;
+                dijkstra(m, opp0, opp1, mask, path);
+
+                // assign canonical tet corners
+                std::map<uint,vec3d> bcs;
+                bcs[m.poly_vert_id(pid,0)] = REFERENCE_TET_VERTS[0];
+                bcs[m.poly_vert_id(pid,2)] = REFERENCE_TET_VERTS[1];
+                bcs[m.poly_vert_id(pid,1)] = REFERENCE_TET_VERTS[2];
+                bcs[opp1]                  = REFERENCE_TET_VERTS[3];
+
+                if(path.size()>2)
+                {
+                    // linearly interpolate the points along the path connecting opp0 and opp1
+                    vec3d  dir  = bcs.at(opp1) - bcs.at(opp0);
+                    double step = dir.length()/(path.size()-1.0);
+                    dir.normalize();
+                    dir *= step;
+                    for(uint i=1; i<path.size()-1; ++i)
+                    {
+                        bcs[path.at(i)] = bcs.at(opp0) + i*dir;
+                    }
+                }
+
+                // map the rest of the vertices
+                verts = harmonic_map_3d(m, bcs, 1, UNIFORM);
+                return;
+            }
+        }
     }
-
-    // assign tet corners
-    std::map<uint,vec3d> bcs;
-    bcs[v0] = REFERENCE_TET_VERTS[0];
-    bcs[v1] = REFERENCE_TET_VERTS[1];
-    bcs[v2] = REFERENCE_TET_VERTS[2];
-    bcs[v3] = REFERENCE_TET_VERTS[3];
-
-    // linearly interpolate the rest of verts in the link along chain connecting v1 to v3
-    double step = (REFERENCE_TET_VERTS[1].dist(REFERENCE_TET_VERTS[3]))/(v_link.size()-2.0);
-    vec3d  dir  = REFERENCE_TET_VERTS[1] - REFERENCE_TET_VERTS[3]; dir.normalize();
-    for(uint i=0; i<v1v3_chain.size(); ++i)
-    {
-        bcs[v1v3_chain.at(i)] = REFERENCE_TET_VERTS[3] + (i+1)*step*dir;
-    }
-
-    // map the other vertices inside face v1-v0-v3
-    verts = harmonic_map_3d(m, bcs, 1, UNIFORM);
+    assert(false && "This is not supposed to happen!");
 }
 
 }

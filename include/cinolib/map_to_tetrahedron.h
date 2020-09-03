@@ -44,12 +44,6 @@ namespace cinolib
 /* These routines map a genus zero mesh into the canonical tetrahedron.
  * This is useful to initialize a surface or volumetric map (likely with
  * very high distortion).
- *
- * Considering a vertex v, one of its incident edges e, and the two triangles
- * t0,t1 incident to e, the map is constructed by
- *  - mapping t0 and t1 to one tet facet each
- *  - the rest of the triangles incident to v to the third tet face
- *  - the rest of the mesh vertices to the fourth tet face
 */
 
 template<class M, class V, class E, class P>
