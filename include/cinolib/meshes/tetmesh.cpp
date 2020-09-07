@@ -759,6 +759,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const uint vid)
 {
+    assert(this->vert_valence(vid)==0);
     for(uint fid : this->adj_p2f(pid))
     {        
         std::vector<uint> tet =
