@@ -1,7 +1,7 @@
 TEMPLATE        = app
 TARGET          = $$PWD/../04_base_app_tetmesh_demo
 QT             += core opengl
-CONFIG         += c++11 release
+CONFIG         += c++14 release
 CONFIG         -= app_bundle
 INCLUDEPATH    += $$PWD/../../external/eigen
 INCLUDEPATH    += $$PWD/../../include
