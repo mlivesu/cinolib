@@ -1,7 +1,8 @@
 TEMPLATE        = app
 TARGET          = $$PWD/../02_base_app_quadmesh_demo
 QT             += core opengl
-CONFIG         += c++11 release
+#latest C++ stable standard:
+CONFIG         += C++17 release 
 CONFIG         -= app_bundle
 INCLUDEPATH    += $$PWD/../../external/eigen
 INCLUDEPATH    += $$PWD/../../include
