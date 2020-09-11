@@ -1,5 +1,4 @@
 /* This sample program computes n-harmonic functions on a surface mesh.
- *
  * The harmonicity index is initially set to 1, and can be controlled
  * via the spin box placed on top of the GL canvas.
  *
@@ -21,12 +20,16 @@
 #include <cinolib/gui/qt/qt_gui_tools.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+using namespace cinolib;
+using namespace std;
 
-uint closest_vertex(const cinolib::vec3d & p, const cinolib::Trimesh<> & m)
+#define INITIAL_HARMONICITY_INDEX 1.0
+
+uint closest_vertex(const vec3d & p, const Trimesh<> & m)
 {
-    std::vector<std::pair<double,uint>> closest;
-    for(uint vid=0; vid<m.num_verts(); ++vid) closest.push_back(std::make_pair(m.vert(vid).dist(p),vid));
-    std::sort(closest.begin(), closest.end());
+    vector<pair<float,uint>> closest;
+    for(uint vid=0; vid<m.num_verts(); ++vid) closest.push_back(make_pair(m.vert(vid).dist(p),vid));
+    sort(closest.begin(), closest.end());
     return closest.front().second;
 }
 
@@ -34,8 +37,6 @@ uint closest_vertex(const cinolib::vec3d & p, const cinolib::Trimesh<> & m)
 
 int main(int argc, char **argv)
 {
-    using namespace cinolib;
-
     QApplication a(argc, argv);
 
     QWidget window;
@@ -57,26 +58,27 @@ int main(int argc, char **argv)
     gui.push_marker(vec2i(10, gui.height()-20), "CMD + click to add a maximum", Color::BLACK(), 12, 0);
     gui.push_marker(vec2i(10, gui.height()-40), "SHIFT + click to add a minimum", Color::BLACK(), 12, 0);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.obj";
+    string s = (argc==2) ? string(argv[1]) : string(DATA_PATH) + "/bunny.obj";
+    
     DrawableTrimesh<> m(s.c_str());
     m.show_wireframe(false);
     gui.push_obj(&m);
 
     Profiler profiler;
-    std::map<uint,double> dirichlet_bcs;
+    map<uint,float> dirichlet_bcs;
     bool has_at_least_one_min = false;
     bool has_at_least_one_max = false;
 
     gui.callback_mouse_press = [&](GLcanvas *c, QMouseEvent *e)
     {
+        vec3d p;
+        vec2i click(e->x(), e->y());
         if (e->modifiers() == Qt::ControlModifier)  // add maximum
         {
-            vec3d p;
-            vec2i click(e->x(), e->y());
             if (c->unproject(click, p))
             {
                 uint vid = closest_vertex(p,m);
-                dirichlet_bcs[vid] = 1.0;
+                dirichlet_bcs[vid] = INITIAL_HARMONICITY_INDEX;
                 has_at_least_one_max = true;
                 c->push_marker(m.vert(vid), "", Color::RED());
                 c->updateGL();
@@ -84,8 +86,6 @@ int main(int argc, char **argv)
         }
         else if (e->modifiers() == Qt::ShiftModifier) // add minimum
         {
-            vec3d p;
-            vec2i click(e->x(), e->y());
             if (c->unproject(click, p))
             {
                 uint vid = closest_vertex(p,m);
