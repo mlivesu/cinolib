@@ -16,19 +16,27 @@
 #include <cinolib/profiler.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#define LARGE_MESH_PROC TRUE
+
+using namespace cinolib;
+using namespace std;
 
 int main(int argc, char **argv)
 {
-    using namespace cinolib;
-
     QApplication app(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/E.obj";
+    string s = (argc==2) ? string(argv[1]) : string(DATA_PATH) + "/E.obj";
     DrawablePolygonmesh<> m_in(s.c_str());
 
     // make trimesh
+    #ifdef LARGE_MESH_PROC
     double area_thresh = 0.01 * m_in.bbox().diag(); // force triangles to be smaller than 5% of bbox diag
     char opt[100];
+    #else
+    float area_thresh = 0.01 * m_in.bbox().diag(); // force triangles to be smaller than 5% of bbox diag
+    char opt[60];
+    #endif
+    
     sprintf(opt, "Qqa%f", area_thresh);
     DrawableTrimesh<> m_tri;
     triangle_wrap(m_in.vector_verts(), m_in.vector_edges(), {}, 0, opt, m_tri);
