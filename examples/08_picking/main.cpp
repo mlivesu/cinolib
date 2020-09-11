@@ -1,16 +1,14 @@
 /* This sample program performs vertex picking on a triangular mesh.
- *
  * Picking is performed by transforming a mouse click on the canvas
  * into a point in space. The mesh point that minimizes the distance
  * from it is then selected and colored in RED for visual feedback.
- *
  * Notice that despite this implementation of picking is sub-optimal
  * (its complexity is O(n), with n being the number of mesh vertices)
  * it is fast enough to work in real time with meshes of moderate size.
  *
  * For huge meshes, better performances can be achieved by using a spatial
  * data structure, such as Octrees or AABB trees.
- *
+ 
  * Enjoy!
 */
 
@@ -21,14 +19,15 @@
 #include <algorithm>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+using namespace cinolib;
+using namespace std;
 
 int main(int argc, char **argv)
 {
-    using namespace cinolib;
-
+  
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/maxFace.obj";
+    string s = (argc==2) ? string(argv[1]) : string(DATA_PATH) + "/maxFace.obj";
     DrawableTrimesh<> m(s.c_str());
     m.show_wireframe(true);
     m.show_vert_color();
@@ -49,9 +48,9 @@ int main(int argc, char **argv)
             if (c->unproject(click, p)) // transform click in a 3d point
             {
                 profiler.push("Pick Vertex");
-                uint vid = m.pick_vert(p);
+                //uint vid = m.pick_vert(p);
                 profiler.pop();
-                m.vert_data(vid).color = Color::RED();
+                m.vert_data(m.pick_vert(p)).color = Color::RED();
                 m.updateGL();
                 c->updateGL();
             }
