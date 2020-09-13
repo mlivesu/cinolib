@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     k.poly_set_color(Color::PASTEL_RED());
 
     vec3d  sec_c, mic_c;
-    double sec_r, mic_r;
+    float sec_r, mic_r;
     smallest_enclosing_disk(m.vector_verts(), sec_c, sec_r);
     polygon_maximum_inscribed_circle(m.vector_verts(), mic_c, mic_r);
     DrawablePolygonmesh<> sec(n_sided_polygon(sec_c, 50, sec_r, Z));
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
         m.updateGL();
 
         profiler.push("Compute polygon kernel");
-        double area = polygon_kernel(m.vector_verts(), kernel);
+        float area = polygon_kernel(m.vector_verts(), kernel);
         profiler.pop();
         k = DrawablePolygonmesh<>(kernel);
         k.poly_set_color(Color::PASTEL_RED());
