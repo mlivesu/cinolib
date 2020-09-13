@@ -20,12 +20,16 @@
 #include <algorithm>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+using namespace std;
+using namespace cinolib;
 
-uint closest_vertex(const cinolib::vec3d & p, const cinolib::Trimesh<> & m)
+//this particular procedure implemented and used in a few examples here, what if to lifе(refactor) it to 1 implementation in <cinolib/meshes/meshes.h>
+//or <cinolib/geodesics.h>
+uint closest_vertex(const vec3d & p, const Trimesh<> & m)
 {
-    std::vector<std::pair<double,uint>> closest;
-    for(uint vid=0; vid<m.num_verts(); ++vid) closest.push_back(std::make_pair(m.vert(vid).dist(p),vid));
-    std::sort(closest.begin(), closest.end());
+    vector<pair<float,uint>> closest;
+    for(uint vid=0; vid<m.num_verts(); ++vid) closest.push_back(make_pair(m.vert(vid).dist(p),vid));
+    sort(closest.begin(), closest.end());
     return closest.front().second;
 }
 
@@ -33,8 +37,6 @@ uint closest_vertex(const cinolib::vec3d & p, const cinolib::Trimesh<> & m)
 
 int main(int argc, char **argv)
 {
-    using namespace cinolib;
-
     QApplication a(argc, argv);
 
     QWidget window;
@@ -48,13 +50,13 @@ int main(int argc, char **argv)
     window.show();
     window.resize(600,600);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.obj";
+    string s = (argc==2) ? string(argv[1]) : string(DATA_PATH) + "/bunny.obj";
     DrawableTrimesh<> m(s.c_str());
     m.show_wireframe(false);
     gui.push_obj(&m);
 
     Profiler profiler;
-    std::vector<uint> sources;
+    vector<uint> sources;
     GeodesicsCache prefactored_matrices;
 
     gui.callback_mouse_press = [&](GLcanvas *c, QMouseEvent *e)
@@ -66,8 +68,8 @@ int main(int argc, char **argv)
             if (c->unproject(click, p)) // transform click in a 3d point
             {
                 // add selected vertex to source list and re-compute heat geodesics
-                uint vid = closest_vertex(p,m);
-                sources.push_back(vid);
+                //uint vid = closest_vertex(p,m);
+                sources.push_back(closest_vertex(p,m));
                 profiler.push("compute_geodesics");
                 compute_geodesics_amortized(m, prefactored_matrices, sources).copy_to_mesh(m);
                 profiler.pop();
