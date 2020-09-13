@@ -15,20 +15,23 @@
 #include <cinolib/gui/qt/qt_gui_tools.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+using namespace cinolib;
+using namespace std;
+#define SPHERE_COVERAGE 1000
 
 int main(int argc, char **argv)
 {
-    using namespace cinolib;
-
     QApplication a(argc, argv);
 
     QWidget window;
     GLcanvas gui(&window);
     QSpinBox sb_num_samples(&window);
     QPushButton but_compute_samples("Update samples", &window);
+    
     sb_num_samples.setMinimum(10);
-    sb_num_samples.setMaximum(1000000);
+    sb_num_samples.setMaximum(SPHERE_COVERAGE*SPHERE_COVERAGE);
     sb_num_samples.setValue(100);
+    
     QLabel label("Num samples:", &window);
     QGridLayout layout;
     layout.addWidget(&label,0,0);
@@ -39,10 +42,10 @@ int main(int argc, char **argv)
     window.show();
     window.resize(600,600);
 
-    std::vector<vec3d> samples;
-    sphere_coverage(1000, samples);
+    vector<vec3d> samples;
+    sphere_coverage(SPHERE_COVERAGE, samples);
 
-    std::vector<uint> no_polys = {};
+    vector<uint> no_polys = {};
     DrawableTrimesh<> m(samples, no_polys);
     m.vert_set_color(Color::BLACK());
     m.show_wireframe_width(3);
