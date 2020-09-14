@@ -69,27 +69,32 @@ void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
         // try all tri edges until you find a suitable one....
         for(uint eid : m.adj_p2e(pid))
         {
-            uint e0   = m.edge_vert_id(eid,0);
-            uint e1   = m.edge_vert_id(eid,1);
+            uint vid0 = m.edge_vert_id(eid,0);
+            uint vid1 = m.edge_vert_id(eid,1);
              int topp = m.poly_opposite_to(eid,pid);
-            uint opp0 = m.vert_opposite_to(pid,e0,e1);
-            uint opp1 = m.vert_opposite_to(topp,e0,e1);
+            uint opp0 = m.vert_opposite_to(pid,vid0,vid1);
+            uint opp1 = m.vert_opposite_to(topp,vid0,vid1);
 
-            // if they form a tet with positive volume, use them to initialize the map
-            if(orient3d(m.poly_vert(pid,0), m.poly_vert(pid,2), m.poly_vert(pid,1), m.vert(opp1))>0)
+            // if they form a tet with negative volume, use them to initialize the map
+            // (note: the sign of orient3d is opposite to the volume and the jacobian)
+            if(orient3d(m.poly_vert(pid,0),
+                        m.poly_vert(pid,1),
+                        m.poly_vert(pid,2),
+                        m.vert(opp1))<0)
             {
-                // find the path connecting opp0 and opp1 not passing through e0 and e1
+                // find the path connecting opp0 and opp1 not passing through vid0 and vid1
                 std::vector<uint> path;
                 std::vector<bool> mask(m.num_verts(),false);
-                mask.at(e0) = true;
-                mask.at(e1) = true;
+                mask.at(vid0) = true;
+                mask.at(vid1) = true;
                 dijkstra(m, opp0, opp1, mask, path);
 
                 // assign canonical tet corners
+                // v2 and v1 are flipped because in this case I want to map with a tet with negative volume!
                 std::map<uint,vec3d> bcs;
                 bcs[m.poly_vert_id(pid,0)] = REFERENCE_TET_VERTS[0];
-                bcs[m.poly_vert_id(pid,2)] = REFERENCE_TET_VERTS[1];
                 bcs[m.poly_vert_id(pid,1)] = REFERENCE_TET_VERTS[2];
+                bcs[m.poly_vert_id(pid,2)] = REFERENCE_TET_VERTS[1];
                 bcs[opp1]                  = REFERENCE_TET_VERTS[3];
 
                 if(path.size()>2)
@@ -111,7 +116,7 @@ void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
             }
         }
     }
-    assert(false && "This is not supposed to happen!");
+    assert(false && "This is not supposed to happen! Perhaps normals point inwards?");
 }
 
 }
