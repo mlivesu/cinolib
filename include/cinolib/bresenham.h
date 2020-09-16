@@ -44,12 +44,12 @@ namespace cinolib
 {
 
 CINO_INLINE
-std::vector<std::pair<int,int>> bresenham_line(int x0, int y0, int x1, int y1);
+std::vector<std::pair<short,short>> bresenham_line(short x0, short y0, short x1, short y1);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<std::pair<int,int>> bresenham_circle(int cx, int cy, int radius);
+std::vector<std::pair<short,short>> bresenham_circle(short cx, short cy, short radius);
 
 }
 
