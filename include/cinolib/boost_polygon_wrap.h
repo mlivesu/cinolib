@@ -46,7 +46,7 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
 
-typedef boost::geometry::model::d2::point_xy<double>        BoostPoint;
+typedef boost::geometry::model::d2::point_xy<float>        BoostPoint;
 typedef boost::geometry::model::polygon<BoostPoint>         BoostPolygon;
 typedef boost::geometry::model::multi_polygon<BoostPolygon> BoostMultiPolygon;
 typedef boost::geometry::model::linestring<BoostPoint>      BoostLinestring;
@@ -59,82 +59,57 @@ namespace cinolib
     CINO_INLINE
     BoostPolygon make_polygon(const std::vector<Point> & outer_ring);
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     template<typename Point>
     CINO_INLINE
     BoostPolygon make_polygon(const std::vector<Point>              & outer_ring,
                               const std::vector<std::vector<Point>> & inner_rings);
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     template<typename Point>
     CINO_INLINE
     BoostPolygon make_polygon(const std::vector<Point> & polyline,
-                              const double             thickening_radius);
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                              const float             thickening_radius);
 
     template<typename Poly>
     CINO_INLINE
-    Poly polygon_simplify(const Poly & p, const double max_dist);
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    Poly polygon_simplify(const Poly & p, const float max_dist);
 
     template<typename Poly>
     CINO_INLINE
-    double polygon_area(const Poly & p);
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    float polygon_area(const Poly & p);
 
     template<typename Poly, typename Point>
     CINO_INLINE
     bool polygon_contains(const Poly & poly, const Point & point, const bool border_counts);
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     template<typename Poly0, typename Poly1>
     CINO_INLINE
     BoostMultiPolygon polygon_union(const Poly0 & p0, const Poly1 & p1);
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     template<typename Poly0, typename Poly1>
     CINO_INLINE
     BoostMultiPolygon polygon_difference(const Poly0 & p0, const Poly1 & p1);
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     template<typename Poly0, typename Poly1>
     CINO_INLINE
     BoostMultiPolygon polygon_intersection(const Poly0 & p0, const Poly1 & p1);
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     CINO_INLINE
     void polygon_get_edges(const std::vector<BoostPoint> & poly,
                                  std::vector<vec2d>      & verts,
                                  std::vector<uint>       & edges);
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     CINO_INLINE
     void polygon_get_edges(const BoostPolygon       & poly,
                                  std::vector<vec2d> & verts,
                                  std::vector<uint>  & edges);
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     CINO_INLINE
     void polygon_get_edges(const BoostMultiPolygon  & poly,
                                  std::vector<vec2d> & verts,
                                  std::vector<uint>  & edges);
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     CINO_INLINE
     void polygon_get_edges(const BoostPolygon       & poly,
-                           const double             & z, // adds third coordinate
+                           const float             & z, // adds third coordinate
                                  std::vector<vec3d> & verts,
                                  std::vector<uint>  & edges);
 
@@ -142,7 +117,7 @@ namespace cinolib
 
     CINO_INLINE
     void polygon_get_edges(const BoostMultiPolygon  & poly,
-                           const double             & z, // adds third coordinate
+                           const float             & z, // adds third coordinate
                                  std::vector<vec3d> & verts,
                                  std::vector<uint>  & edges);
 
@@ -175,7 +150,7 @@ namespace cinolib
     CINO_INLINE
     void triangulate_polygon(const std::vector<BoostPoint> & poly,
                              const std::string               flags,
-                             const double                  & z, // adds third coordinate
+                             const float                  & z, // adds third coordinate
                                    std::vector<vec3d>      & verts,
                                    std::vector<uint>       & tris);
 
@@ -184,7 +159,7 @@ namespace cinolib
     CINO_INLINE
     void triangulate_polygon(const BoostPolygon            & poly,
                              const std::string               flags,
-                             const double                  & z, // adds third coordinate
+                             const float                  & z, // adds third coordinate
                                    std::vector<vec3d>      & verts,
                                    std::vector<uint>       & tris);
 
@@ -193,7 +168,7 @@ namespace cinolib
     CINO_INLINE
     void triangulate_polygon(const BoostMultiPolygon       & poly,
                              const std::string               flags,
-                             const double                  & z, // adds third coordinate
+                             const float                  & z, // adds third coordinate
                                    std::vector<vec3d>      & verts,
                                    std::vector<uint>       & tris);
 }
