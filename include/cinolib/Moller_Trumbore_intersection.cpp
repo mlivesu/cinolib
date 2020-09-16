@@ -58,7 +58,7 @@ bool Moller_Trumbore_intersection(const vec3d  & ray_orig,
                                   const vec3d  & v2,
                                         bool   & hits_backside, // true if ray intersects triangle from the back (according to winding order)
                                         bool   & are_coplanar,  // true if ray and triangle are coplanar (no intersection will be computed)
-                                        double & t,
+                                        float & t,
                                         vec3d  & bary)
 {
     const double EPSILON = 0.0000001;
@@ -69,7 +69,7 @@ bool Moller_Trumbore_intersection(const vec3d  & ray_orig,
     vec3d e0   = v1 - v0;
     vec3d e1   = v2 - v0;
     vec3d pvec = ray_dir.cross(e1);
-    double det = e0.dot(pvec);
+    float det = e0.dot(pvec);
 
     // if the determinant is close to 0 ray and triangle are coplanar.
     // NOTE: this does not mean they do not intersect, but they may not
@@ -85,7 +85,7 @@ bool Moller_Trumbore_intersection(const vec3d  & ray_orig,
     //
     if(det<-EPSILON) hits_backside = true;
 
-    double invDet = 1.0/det;
+    float invDet = 1.0/det;
 
     vec3d tvec = ray_orig - v0;
     bary[1] = tvec.dot(pvec) * invDet;
