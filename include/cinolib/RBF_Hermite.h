@@ -74,7 +74,7 @@ class Hermite_RBF
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         ScalarField eval     (const std::vector<vec3d> & plist) const; // evaluate RBF at points plist
-        double      eval     (const vec3d & p) const;                  // evaluate RBF at point p
+        float      eval     (const vec3d & p) const;                  // evaluate RBF at point p
         vec3d       eval_grad(const vec3d & p) const;                  // evaluate nabla RBF at point p
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
