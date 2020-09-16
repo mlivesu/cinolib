@@ -52,7 +52,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 ScalarField divergence(const AbstractPolygonMesh<M,V,E,P> & m, ScalarField & f)
 {
-    Eigen::SparseMatrix<double> G    = gradient_matrix(m);
+    Eigen::SparseMatrix<float> G    = gradient_matrix(m);
     VectorField                 grad = G * f;
     ScalarField                 div  = G.transpose() * grad;
     return div;
@@ -64,7 +64,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 ScalarField divergence(const AbstractPolyhedralMesh<M,V,E,F,P> & m, ScalarField & f)
 {
-    Eigen::SparseMatrix<double> G    = gradient_matrix(m);
+    Eigen::SparseMatrix<float> G    = gradient_matrix(m);
     VectorField                 grad = G * f;
     ScalarField                 div  = G.transpose() * grad;
     return div;
