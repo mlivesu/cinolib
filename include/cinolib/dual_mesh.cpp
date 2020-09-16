@@ -45,8 +45,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                const bool                                with_clipped_cells)
 {
     std::vector<vec3d>             dual_verts;
-    std::vector<std::vector<uint>> dual_faces;
-    std::vector<std::vector<uint>> dual_polys;
+    std::vector<std::vector<uint>> dual_faces,dual_polys;
     std::vector<std::vector<bool>> dual_polys_winding;
     dual_mesh(primal, dual_verts, dual_faces, dual_polys, dual_polys_winding, with_clipped_cells);
     dual = Polyhedralmesh<M,V,E,F,P>(dual_verts, dual_faces, dual_polys, dual_polys_winding);
@@ -124,10 +123,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
             if (primal.edge_is_on_srf(eid))
             {
                 assert(primal.edge_adj_srf_faces(eid).size()==2);
-                uint srf_beg = primal.edge_adj_srf_faces(eid).front();
-                uint srf_end = primal.edge_adj_srf_faces(eid).back();
-                uint p_beg   = f.front();
-                uint p_end   = f.back();
+                uint srf_beg = primal.edge_adj_srf_faces(eid).front(),srf_end = primal.edge_adj_srf_faces(eid).back(),f.front(),f.back();
                 if (!primal.poly_contains_face(p_beg, srf_beg)) std::swap(srf_beg, srf_end);
                 assert(primal.poly_contains_face(p_beg, srf_beg));
                 assert(primal.poly_contains_face(p_end, srf_end));
@@ -224,8 +220,8 @@ void dual_mesh(const AbstractPolygonMesh<M,V,E,P>   & primal,
     // For clipped dual cells: add boundary vertices
     // and boundary edges midpoints
     //
-    std::map<uint,uint> e2verts;
-    std::map<uint,uint> v2verts;
+    std::map<uint,uint> e2verts,v2verts;
+ 
     for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
         if (primal.vert_is_boundary(vid))
@@ -262,6 +258,5 @@ void dual_mesh(const AbstractPolygonMesh<M,V,E,P>   & primal,
         dual_polys.push_back(poly);
     }
 }
-
 }
 
