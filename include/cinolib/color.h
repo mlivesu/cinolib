@@ -48,8 +48,6 @@ class Color
 {
     public:
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         static Color BLACK() { return Color( 0, 0, 0); }
         static Color WHITE() { return Color( 1, 1, 1); }
         //
@@ -70,14 +68,10 @@ class Color
         static Color PASTEL_RED()     { return Color(253.f/255.f, 104.f/255.f, 118.f/255.f); }
         static Color PASTEL_ORANGE()  { return Color(253.f/255.f, 135.f/255.f,  86.f/255.f); }
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         explicit Color(const float r=1.0,
                        const float g=1.0,
                        const float b=1.0,
                        const float a=1.0) : r(r), g(g), b(b), a(a) {}
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
               bool    operator==(const Color & c) const;
               bool    operator!=(const Color & c) const;
@@ -85,16 +79,12 @@ class Color
               bool    operator<=(const Color & c) const;
               float & operator[](const uint    i);
         const float & operator[](const uint    i) const;
-              Color & operator*=(const double  d);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+              Color & operator*=(const float  d);
 
         uint8_t r_uchar() const { return static_cast<uint8_t>(r*255.0); }
         uint8_t g_uchar() const { return static_cast<uint8_t>(g*255.0); }
         uint8_t b_uchar() const { return static_cast<uint8_t>(b*255.0); }
         uint8_t a_uchar() const { return static_cast<uint8_t>(a*255.0); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         static Color scatter(uint range, uint value, float sat=.5f, float val=.85f);
         static Color hsv_ramp(uint range, uint value);
@@ -103,8 +93,6 @@ class Color
         static Color red_ramp_01(float val);
         static Color normal2rgb(const vec3d & n, bool flip_neg_z);
         static Color hsv2rgb(float h, float s, float v);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         union
         {
@@ -117,7 +105,6 @@ class Color
 };
 
 CINO_INLINE std::ostream & operator<<(std::ostream & in, const Color & c);
-
 }
 
 #ifndef  CINO_STATIC_LIB
