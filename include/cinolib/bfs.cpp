@@ -63,9 +63,7 @@ void bfs(const std::vector<std::vector<uint>> & nodes_adjacency,
         for(uint nbr : nodes_adjacency.at(vid))
         {
             if (DOES_NOT_CONTAIN(visited,nbr))
-            {
                 q.push(nbr);
-            }
         }
     }
 }
@@ -255,7 +253,7 @@ void bfs_on_dual_w_face_barriers(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 
         for(uint fid : m.adj_p2f(pid))
         {
-            int nbr = (m.poly_adj_through_face(pid,fid));
+            short nbr = (m.poly_adj_through_face(pid,fid));
             if (nbr>=0 && !mask_faces.at(fid) && DOES_NOT_CONTAIN(visited,nbr))
             {
                 visited.insert(nbr);
