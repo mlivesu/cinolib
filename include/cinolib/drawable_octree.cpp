@@ -99,7 +99,7 @@ void DrawableOctree::updateGL(const OctreeNode *node)
     if(node->is_inner)
     {
         assert(node->item_indices.empty());
-        for(int i=0; i<8; ++i) updateGL(node->children[i]);
+        for(short i=0; i<8; ++i) updateGL(node->children[i]);
     }
 }
 
