@@ -55,7 +55,7 @@ class DrawableIsosurface : public Isosurface<M,V,E,F,P>, public DrawableObject
     public:
 
         explicit DrawableIsosurface();
-        explicit DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const double iso_value);
+        explicit DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value);
 
         ~DrawableIsosurface(){}
 
