@@ -63,7 +63,7 @@ const float & Color::operator[](const uint i) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Color & Color::operator*=(const double d)
+Color & Color::operator*=(const float d)
 {
     r*=d;
     g*=d;
@@ -85,9 +85,8 @@ CINO_INLINE
 bool Color::operator==(const Color & c) const
 {
     for(uint i=0; i<4; ++i)
-    {
         if (this->operator[](i) != c[i]) return false;
-    }
+   
     return true;
 }
 
@@ -97,9 +96,8 @@ CINO_INLINE
 bool Color::operator!=(const Color & c) const
 {
     for(uint i=0; i<4; ++i)
-    {
         if (this->operator[](i) != c[i]) return true;
-    }
+    
     return false;
 }
 
@@ -172,7 +170,7 @@ Color Color::red_ramp_01(float val)
 CINO_INLINE
 Color Color::normal2rgb(const vec3d & n, bool flip_neg_z)
 {
-    double dir[3] =
+    float dir[3] =
     {
         n.x(),
         n.y(),
@@ -180,7 +178,7 @@ Color Color::normal2rgb(const vec3d & n, bool flip_neg_z)
     };
 
     float c[3];
-    for(int i=0; i<3; ++i)
+    for(short i=0; i<3; ++i)
     {
         c[i] = (1.0 + dir[i])*0.5;
         if(c[i]<0) c[i]=0;
@@ -198,7 +196,7 @@ Color Color::hsv2rgb(float h, float s, float v)
     if(s==0.0) return Color(v,v,v); // gray color
     if(h==1.0) h = 0.0;
 
-    int i   = int( floor(h*6.0) );
+    short i   = short(floor(h*6.0));
     float f = float(h*6.0f - floor(h*6.0f));
 
     float p = v*(1.0f-s);
@@ -229,9 +227,8 @@ Color Color::scatter(uint n_colors, uint pos, float sat, float val)
 
     // Magic stolen from VCG :P
 
-    uint b, k, m = n_colors;
-    uint r = n_colors;
-
+    uint b, k, m = n_colors,r = n_colors;
+    
     for (b=0, k=1; k<n_colors; k<<=1)
     {
         if (pos<<1>=m)
@@ -255,12 +252,10 @@ Color Color::hsv_ramp(uint n_colors, uint pos)
 {
     assert(pos<n_colors);
 
-    uint i = std::round(255 * static_cast<float>(pos)/static_cast<float>(n_colors));
+    uint i = std::round(255*static_cast<float>(pos)/static_cast<float>(n_colors));
 
-    float r = hsv_texture1D[3*i+0]/255.0;
-    float g = hsv_texture1D[3*i+1]/255.0;
-    float b = hsv_texture1D[3*i+2]/255.0;
-
+    float r = hsv_texture1D[3*i+0]/255.0,g = hsv_texture1D[3*i+1]/255.0,b = hsv_texture1D[3*i+2]/255.0;
+    
     return Color(r,g,b);
 }
 
@@ -273,11 +268,8 @@ Color Color::parula_ramp(uint n_colors, uint pos)
 
     uint i = std::round(64 * static_cast<float>(pos)/static_cast<float>(n_colors));
 
-    float r = parula_texture1D[3*i+0]/255.0;
-    float g = parula_texture1D[3*i+1]/255.0;
-    float b = parula_texture1D[3*i+2]/255.0;
-
+    float r = parula_texture1D[3*i+0]/255.0,g = parula_texture1D[3*i+1]/255.0,b = parula_texture1D[3*i+2]/255.0;
+    
     return Color(r,g,b);
 }
-
 }
