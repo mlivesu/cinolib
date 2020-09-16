@@ -43,8 +43,8 @@ namespace cinolib
 {
 
 /* Given a mesh with genus g and its homotopy basis, it realizes a
- * canonical polygonal schema, which consists in cutting the mesh
- * along the basis loops, and flatten it to the plane in a regular
+ * canonical polygonal schema, which consists of cutting the mesh
+ * along the basis loops and flatten it to the plane in a regular
  * polygon with 4g sides. Interior vertices are mapped with Tutte.
  *
  * For further details, refer to:
@@ -66,7 +66,7 @@ CINO_INLINE
 void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
                                 const HomotopyBasisData & basis,
                                       Trimesh<M,V,E,P>  & m_out,
-                                const int                 laplacian_mode = COTANGENT);
+                                const short                 laplacian_mode = COTANGENT);
 }
 
 #ifndef  CINO_STATIC_LIB
