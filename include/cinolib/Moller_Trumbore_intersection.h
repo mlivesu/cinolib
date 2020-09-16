@@ -62,7 +62,7 @@ bool Moller_Trumbore_intersection(const vec3d  & ray_orig,
                                   const vec3d  & v2,
                                         bool   & hits_backside, // true if ray intersects triangle from the back (according to winding order)
                                         bool   & are_coplanar,  // true if ray and triangle are coplanar (no intersection will be computed)
-                                        double & t,
+                                        float & t,
                                         vec3d  & bary);
 }
 
