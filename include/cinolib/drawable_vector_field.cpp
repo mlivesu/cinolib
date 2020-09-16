@@ -78,18 +78,14 @@ DrawableVectorField::DrawableVectorField(const AbstractMesh<M,V,E,P> &m, const b
         setZero(3*m.num_polys());
         pos.resize(m.num_polys());
         for(uint pid=0; pid<m.num_polys(); ++pid)
-        {
             pos.at(pid) = m.poly_centroid(pid);
-        }
     }
     else
     {
         setZero(3*m.num_verts());
         pos.resize(m.num_verts());
         for(uint vid=0; vid<m.num_verts(); ++vid)
-        {
             pos.at(vid) = m.vert(vid);
-        }
     }
     arrow_color = Color::RED();
     arrow_size  = 0.5 * m.edge_avg_length();
