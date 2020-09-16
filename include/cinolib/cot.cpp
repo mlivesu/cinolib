@@ -42,9 +42,6 @@ namespace cinolib
 // http://stackoverflow.com/questions/3738384/stable-cotangent
 //
 CINO_INLINE
-double cot(double x)
-{
+float cot(float x)
     return tan(M_PI_2 - x);
-}
-
 }
