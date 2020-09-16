@@ -42,9 +42,9 @@ namespace cinolib
 class CubicRBF
 {
     public:
-    static inline double eval_f  (const double x) { return x*x*x; }
-    static inline double eval_df (const double x) { return 3*x*x; } // first  derivative
-    static inline double eval_ddf(const double x) { return 6*x;   } // second derivative
+    static inline float eval_f  (const float x) { return x*x*x; }
+    static inline float eval_df (const float x) { return 3*x*x; } // 1st  derivative
+    static inline float eval_ddf(const float x) { return 6*x;   } // 2nd  derivative
 };
 
 }
