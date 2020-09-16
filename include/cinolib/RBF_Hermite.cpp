@@ -57,10 +57,8 @@ Hermite_RBF<RBF>::Hermite_RBF(const std::vector<vec3d> & points,
 
     // copy the node centers
     for(uint i=0; i<np; ++i)
-    {
         center.col(i) = Eigen::Vector3d(points.at(i).x(), points.at(i).y(), points.at(i).z());
-    }
-
+   
     for(uint i=0; i<np; ++i)
     {
         Eigen::Vector3d p = Eigen::Vector3d(points.at(i).x(),  points.at(i).y(),  points.at(i).z());
@@ -74,16 +72,14 @@ Hermite_RBF<RBF>::Hermite_RBF(const std::vector<vec3d> & points,
         {
             uint jj = 4*j;
             Eigen::Vector3d diff = p-center.col(j);
-            double len=diff.norm();
+            float len=diff.norm();
             if(len==0)
-            {
                 A.template block<4,4>(ii,jj).setZero();
-            }
             else
             {
-                double w    = RBF::eval_f(len);
-                double dw_l = RBF::eval_df(len)/len;
-                double ddw  = RBF::eval_ddf(len);
+                float w    = RBF::eval_f(len);
+                float dw_l = RBF::eval_df(len)/len;
+                float ddw  = RBF::eval_ddf(len);
                 Eigen::Vector3d g = diff*dw_l;
                 A(ii,jj) = w;
                 A.row(ii).template segment<3>(jj+1) = g.transpose();
@@ -101,8 +97,6 @@ Hermite_RBF<RBF>::Hermite_RBF(const std::vector<vec3d> & points,
     beta  = mx.template bottomRows<3>();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class RBF>
 CINO_INLINE
 ScalarField Hermite_RBF<RBF>::eval(const std::vector<vec3d> & plist) const
@@ -112,28 +106,21 @@ ScalarField Hermite_RBF<RBF>::eval(const std::vector<vec3d> & plist) const
     return f;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class RBF>
 CINO_INLINE
-double Hermite_RBF<RBF>::eval(const vec3d & p) const
+float Hermite_RBF<RBF>::eval(const vec3d & p) const
 {
     Eigen::Vector3d pp(p.x(), p.y(), p.z());
-    double val = 0;
+    float val = 0;
     for(uint i=0; i<center.cols(); ++i)
     {
         Eigen::Vector3d diff = pp-center.col(i);
-        double l = diff.norm();
+        float l = diff.norm();
         if(l>0)
-        {
-            val += alpha(i) * RBF::eval_f(l);
-            val += beta.col(i).dot(diff)*RBF::eval_df(l)/l;
-        }
+            val += (alpha(i)*RBF::eval_f(l)+beta.col(i).dot(diff)*RBF::eval_df(l)/l);    
     }
     return val;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class RBF>
 CINO_INLINE
@@ -164,8 +151,6 @@ vec3d Hermite_RBF<RBF>::eval_grad(const vec3d &p) const
             grad += bDotd_l * (ddphi*diffNormalized - diff*dphi/squared_l) + beta*dphi/len ;
         }
     }
-
     return vec3d(grad[0], grad[1], grad[2]);
 }
-
 }
