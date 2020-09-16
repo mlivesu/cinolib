@@ -51,9 +51,8 @@ void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
     // find singular vertices
     std::queue<uint> sing_verts;
     for(uint vid=0; vid<m.num_verts(); ++vid)
-    {
         if (m.vert_is_singular(vid)) sing_verts.push(vid);
-    }
+    
     uint nv = sing_verts.size();
 
     // trace separatrices
@@ -79,7 +78,7 @@ void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
     }
 
     // flood polys
-    int patch_id = 0;
+    short patch_id = 0;
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
         if (m.poly_data(pid).flags[MARKED]) continue; // already visited
@@ -112,10 +111,8 @@ void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
     // find singular vertices
     std::queue<uint> sing_edges;
     for(uint eid=0; eid<m.num_edges(); ++eid)
-    {        
         if (m.edge_is_singular(eid)) sing_edges.push(eid);
-    }
-
+    
     uint ne = sing_edges.size();
     uint nv = 0;
     for(uint vid=0; vid<m.num_verts(); ++vid) if(m.vert_is_singular(vid)) ++nv;
@@ -143,7 +140,7 @@ void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
     }
 
     // flood polys
-    int patch_id = 0;
+    short patch_id = 0;
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
         if (m.poly_data(pid).flags[MARKED]) continue; // already visited
