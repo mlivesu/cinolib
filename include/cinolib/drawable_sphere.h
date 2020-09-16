@@ -48,7 +48,7 @@ class DrawableSphere : public DrawableObject
 {
     public :
 
-        DrawableSphere(const vec3d & center, const double size = 1.0, const Color & c = Color::RED())
+        DrawableSphere(const vec3d & center, const float size = 1.0, const Color & c = Color::RED())
             : center(center)
             , size(size)
             , color(c)
@@ -59,7 +59,7 @@ class DrawableSphere : public DrawableObject
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         vec3d  center;
-        double size;
+        float size;
         Color  color;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
