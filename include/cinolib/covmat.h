@@ -42,7 +42,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-void covariance_matrix(const std::vector<vec3d> & points, double cov[3][3], const bool centered = false);
+void covariance_matrix(const std::vector<vec3d> & points, float cov[3][3], const bool centered = false);
 
 }
 
