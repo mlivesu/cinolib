@@ -42,12 +42,10 @@ namespace cinolib
 {
 
 CINO_INLINE
-double to_rad(double deg);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+float to_rad(float deg);
 
 CINO_INLINE
-double to_deg(double rad);
+float to_deg(float rad);
 
 }
 
