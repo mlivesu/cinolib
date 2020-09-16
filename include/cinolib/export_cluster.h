@@ -53,7 +53,7 @@ namespace cinolib
 template<class M, class V, class E, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolygonMesh<M,V,E,P> & m,
-                    const std::unordered_set<int>      & labels,
+                    const std::unordered_set<short>      & labels,
                           AbstractPolygonMesh<M,V,E,P> & subm);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -61,7 +61,7 @@ void export_cluster(const AbstractPolygonMesh<M,V,E,P> & m,
 template<class M, class V, class E, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
-                    const std::unordered_set<int>       & labels,
+                    const std::unordered_set<short>       & labels,
                           AbstractPolygonMesh<M,V,E,P>  & subm,
                           std::unordered_map<uint,uint> & m2subm_vmap,
                           std::unordered_map<uint,uint> & subm2m_vmap);
@@ -71,7 +71,7 @@ void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
 template<class M, class V, class E, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolygonMesh<M,V,E,P> & m,
-                    const int                            label,
+                    const short                            label,
                           AbstractPolygonMesh<M,V,E,P> & subm);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -79,7 +79,7 @@ void export_cluster(const AbstractPolygonMesh<M,V,E,P> & m,
 template<class M, class V, class E, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
-                    const int                             label,
+                    const short                             label,
                           AbstractPolygonMesh<M,V,E,P>  & subm,
                           std::unordered_map<uint,uint> & m2subm_vmap,
                           std::unordered_map<uint,uint> & subm2m_vmap);
@@ -89,7 +89,7 @@ void export_cluster(const AbstractPolygonMesh<M,V,E,P>  & m,
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
-                    const std::unordered_set<int>           & labels,
+                    const std::unordered_set<short>           & labels,
                           AbstractPolyhedralMesh<M,V,E,F,P> & subm);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -97,7 +97,7 @@ void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P>  & m,
-                    const std::unordered_set<int>            & labels,
+                    const std::unordered_set<short>            & labels,
                           AbstractPolyhedralMesh<M,V,E,F,P>  & subm,
                           std::unordered_map<uint,uint>      & m2subm_vmap,
                           std::unordered_map<uint,uint>      & subm2m_vmap);
@@ -107,7 +107,7 @@ void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P>  & m,
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
-                    const int                                 label,
+                    const short                                 label,
                           AbstractPolyhedralMesh<M,V,E,F,P> & subm);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -115,7 +115,7 @@ void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void export_cluster(const AbstractPolyhedralMesh<M,V,E,F,P>  & m,
-                    const int                                  label,
+                    const short                                  label,
                           AbstractPolyhedralMesh<M,V,E,F,P>  & subm,
                           std::unordered_map<uint,uint>      & m2subm_vmap,
                           std::unordered_map<uint,uint>      & subm2m_vmap);
