@@ -59,7 +59,7 @@ class AO_srf : public QGLPixelBuffer
 
     public:
 
-        AO_srf(const Mesh & m, const int buffer_size = 500, const int n_dirs = 256);
+        AO_srf(const Mesh & m, const short buffer_size = 500, const short n_dirs = 256);
         void copy_to_mesh(Mesh & m);
 };
 
@@ -73,7 +73,7 @@ class AO_vol : public QGLPixelBuffer
 
     public:
 
-        AO_vol(const Mesh & m, const int buffer_size = 500, const int n_dirs = 256);
+        AO_vol(const Mesh & m, const short buffer_size = 500, const short n_dirs = 256);
         void copy_to_mesh(Mesh & m);
 };
 
