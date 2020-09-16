@@ -60,7 +60,7 @@ class DrawableArrow : public DrawableObject
 
         vec3d  beg, end;
         Color  color;
-        double size;
+        float size;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -71,9 +71,7 @@ class DrawableArrow : public DrawableObject
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void draw(const float) const
-        {
             arrow<vec3d>(beg, end, size, color.rgba);
-        }
 };
 
 }
