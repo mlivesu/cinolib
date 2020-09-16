@@ -85,7 +85,7 @@ class Color
               bool    operator<=(const Color & c) const;
               float & operator[](const uint    i);
         const float & operator[](const uint    i) const;
-              Color & operator*=(const double  d);
+              Color & operator*=(const float  d);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
