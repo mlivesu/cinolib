@@ -39,28 +39,21 @@ namespace cinolib
 {
 
 CINO_INLINE
-std::vector<std::pair<int,int>> bresenham_line(int x0, int y0, int x1, int y1)
+std::vector<std::pair<short,short>> bresenham_line(short x0, short y0, short x1, short y1)
 {
-    std::vector<std::pair<int,int>> line;
+    std::vector<std::pair<short,short>> line;
 
-    bool steep = std::abs(y1 - y0) > std::abs(x1 - x0);
+    bool steep = std::abs(y1 - y0) > std::abs(x1 - x0),reverse = (x0 > x1);
     if (steep) { std::swap(x0,y0); std::swap(x1,y1); }
-
-    bool reverse = (x0 > x1);
     if (reverse) { std::swap(x0,x1); std::swap(y0,y1); }
 
-    int delta_x = x1 - x0;
-    int delta_y = std::abs(y1 - y0);
-    int error   = delta_x / 2;
-    int y_step  = (y0 < y1) ? 1 : -1;
-    int y       = y0;
-
-    for(int x=x0; x<=x1; ++x)
+    short delta_x = x1 - x0,delta_y=std::abs(y1 - y0),error=delta_x/2,y_step=(y0 < y1)?1:-1,y=y0;
+    
+    for(short x=x0; x<=x1; ++x)
     {
         line.push_back(steep ? std::make_pair(y,x) : std::make_pair(x,y));
 
-        error -= delta_y;
-        if (error < 0)
+        if ((error -= delta_y) < 0)
         {
             y += y_step;
             error += delta_x;
@@ -74,15 +67,12 @@ std::vector<std::pair<int,int>> bresenham_line(int x0, int y0, int x1, int y1)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<std::pair<int,int>> bresenham_circle(int cx, int cy, int radius)
+std::vector<std::pair<short,short>> bresenham_circle(short cx, short cy, short radius)
 {
-    std::vector<std::pair<int,int>> circle;
+    std::vector<std::pair<short,short>> circle;
 
-    int x        = 0;
-    int y        = radius;
-    int g        = 3 - 2*radius;
-    int diag_inc = 10 - 4*radius;
-    int right_inc = 6;
+    short x=0,y=radius,g=3-2*radius,diag_inc=10-4*radius,right_inc=6;
+    
 
     while(x <= y)
     {
