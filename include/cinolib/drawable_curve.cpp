@@ -59,7 +59,7 @@ DrawableCurve::DrawableCurve(const std::vector<vec3d> & samples) : Curve(samples
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-DrawableCurve::DrawableCurve(const Skel & skel, const int bone) : Curve(skel, bone)
+DrawableCurve::DrawableCurve(const Skel & skel, const short bone) : Curve(skel, bone)
 {
     thickness = 1.0;
     color = Color::RED();
@@ -70,7 +70,7 @@ DrawableCurve::DrawableCurve(const Skel & skel, const int bone) : Curve(skel, bo
 CINO_INLINE
 void DrawableCurve::draw(const float scene_size) const
 {
-    double cylind_rad = scene_size * 0.001 * thickness;
+    float cylind_rad = scene_size * 0.001 * thickness;
 
     for(uint i=1; i<samples().size(); ++i)
     {
