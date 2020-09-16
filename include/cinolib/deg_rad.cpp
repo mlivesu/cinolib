@@ -40,7 +40,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-double to_rad(double deg)
+float to_rad(float deg)
 {
     return deg*(M_PI/180.0);
 }
@@ -48,7 +48,7 @@ double to_rad(double deg)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double to_deg(double rad)
+float to_deg(float rad)
 {
     return rad*(180.0/M_PI);
 }
