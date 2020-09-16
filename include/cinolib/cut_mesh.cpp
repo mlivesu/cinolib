@@ -85,5 +85,4 @@ void cut_mesh_along_marked_edges(AbstractPolygonMesh<M,V,E,P>               & m,
         if(!to_remove.empty()) m.polys_remove(to_remove);
     }
 }
-
 }
