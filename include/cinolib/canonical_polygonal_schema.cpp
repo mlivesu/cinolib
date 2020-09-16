@@ -47,14 +47,14 @@ CINO_INLINE
 void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
                                 const HomotopyBasisData & basis,
                                       Trimesh<M,V,E,P>  & m_out,
-                                const int                 laplacian_mode)
+                                const short                 laplacian_mode)
 {
     std::cout << "Canonical Polygonal Schema" << std::endl;
 
     // In order to Basis loop
     assert(basis.detach_loops);
 
-    int genus = m_in.genus();
+    short genus = m_in.genus();
     assert(genus>0);
     std::cout << "genus: " << genus << std::endl;
 
@@ -64,9 +64,7 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     for(uint lid=0; lid<basis.loops.size(); ++lid)
     {
         for(uint vid : basis.loops.at(lid))
-        {
             m_in.vert_data(vid).label = lid;
-        }
     }
     std::unordered_map<uint,std::vector<uint>> v_map;
     cut_mesh_along_marked_edges(m_in, v_map);
@@ -88,13 +86,10 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     for(uint eid=0; eid<m_in.num_edges(); ++eid)
     {
         if(m_in.edge_is_boundary(eid)) continue;
-        uint v0 = m_in.edge_vert_id(eid,0);
-        uint v1 = m_in.edge_vert_id(eid,1);
+        uint v0 = m_in.edge_vert_id(eid,0),v1 = m_in.edge_vert_id(eid,1);
         if(m_in.vert_is_boundary(v0) && m_in.vert_is_boundary(v1) &&
           (m_in.vert_data(v0).label==m_in.vert_data(v1).label))
-        {
             split_list.push_back(eid);
-        }
     }
     if(!split_list.empty())
     {
@@ -113,11 +108,9 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     {
         std::vector<uint> e = { border.at(i) };
         for(uint j=i+1; j<border.size() && !m_in.vert_data(border.at(j)).flags[MARKED]; ++j,++i)
-        {
             e.push_back(border.at(j));
-        }
-        e.push_back(border.at((i+1)%border.size()));
-        edges.push_back(e);
+   
+        edges.push_back(e.push_back(border.at((i+1)%border.size())));
     }
 
     std::vector<vec3d> poly = n_sided_polygon(vec3d(0,0,0), genus*4, 1.0);
@@ -135,5 +128,4 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     m_out.update_bbox();
     m_out.update_normals();    
 }
-
 }
