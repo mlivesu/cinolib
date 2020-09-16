@@ -41,8 +41,8 @@ namespace cinolib
 
 template<class Mesh>
 AO_srf<Mesh>::AO_srf(const Mesh & m,
-                     const int    buffer_size,
-                     const int    n_dirs) : QGLPixelBuffer(buffer_size,buffer_size)
+                     const short    buffer_size,
+                     const short    n_dirs) : QGLPixelBuffer(buffer_size,buffer_size)
 {
     ao = ScalarField(m.num_polys());
 
@@ -69,7 +69,7 @@ AO_srf<Mesh>::AO_srf(const Mesh & m,
         vec3d w(1,0,0), v;
         v = u.cross(w); v.normalize();
         w = v.cross(u); w.normalize();
-        double mat[16]=
+        float mat[16]=
         {
             w[0], v[0], u[0], 0,
             w[1], v[1], u[1], 0,
@@ -82,16 +82,16 @@ AO_srf<Mesh>::AO_srf(const Mesh & m,
         vec3d s =  m.bbox().delta();
         glScaled(1.0/s.x(), 1.0/s.y(), 1.0/s.z());
         glTranslated(c.x(), c.y(), c.z());
-        double modelview[16];
+        float modelview[16];
         glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-        double projection[16] =
+        float projection[16] =
         {
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
             0, 0, 0, 1
         };
-        int viewport[4] = { 0, 0, buffer_size, buffer_size };
+        short viewport[4] = { 0, 0, buffer_size, buffer_size };
         glViewport(0, 0, buffer_size, buffer_size);
 
         m.draw();
@@ -104,14 +104,11 @@ AO_srf<Mesh>::AO_srf(const Mesh & m,
             if(m.poly_data(pid).flags[HIDDEN]) continue;
 
             vec3d  p = m.poly_centroid(pid);
-            double x, y, depth;
+            float x, y, depth;
             gluProject(p.x(), p.y(), p.z(), modelview, projection, viewport, &x, &y, &depth);
 
             if(depth_buffer[buffer_size*int(y)+int(x)]+0.0025 > depth)
-            {
-                double diff = std::max(-u.dot(m.poly_data(pid).normal), 0.0);
-                ao[pid] += diff;
-            }
+                ao[pid] += std::max(-u.dot(m.poly_data(pid).normal), 0.0);
         }
     }
     delete[] depth_buffer;
@@ -131,16 +128,14 @@ CINO_INLINE
 void AO_srf<Mesh>::copy_to_mesh(Mesh & m)
 {
     for(uint pid=0; pid<m.num_polys(); ++pid)
-    {
         m.poly_data(pid).AO = (m.poly_data(pid).flags[HIDDEN]) ? 1.0 : ao[pid];
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
-AO_vol<Mesh>::AO_vol(const Mesh &m, const int buffer_size, const int n_dirs) : QGLPixelBuffer(buffer_size,buffer_size)
+AO_vol<Mesh>::AO_vol(const Mesh &m, const uint buffer_size, const uint n_dirs) : QGLPixelBuffer(buffer_size,buffer_size)
 {
     ao = ScalarField(m.num_faces());
 
@@ -166,7 +161,7 @@ AO_vol<Mesh>::AO_vol(const Mesh &m, const int buffer_size, const int n_dirs) : Q
         vec3d w(1,0,0), v;
         v = u.cross(w); v.normalize();
         w = v.cross(u); w.normalize();
-        double mat[16]=
+        float mat[16]=
         {
             w[0], v[0], u[0], 0,
             w[1], v[1], u[1], 0,
@@ -179,16 +174,16 @@ AO_vol<Mesh>::AO_vol(const Mesh &m, const int buffer_size, const int n_dirs) : Q
         vec3d s =  m.bbox().delta();
         glScaled(1.0/s.x(), 1.0/s.y(), 1.0/s.z());
         glTranslated(c.x(), c.y(), c.z());
-        double modelview[16];
+        float modelview[16];
         glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-        double projection[16] =
+        float projection[16] =
         {
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
             0, 0, 0, 1
         };
-        int viewport[4] = { 0, 0, buffer_size, buffer_size };
+        short viewport[4] = { 0, 0, buffer_size, buffer_size };
         glViewport(0, 0, buffer_size, buffer_size);
 
         m.draw();
@@ -206,14 +201,11 @@ AO_vol<Mesh>::AO_vol(const Mesh &m, const int buffer_size, const int n_dirs) : Q
             {
                 visible.at(fid) = true;
                 vec3d  c = m.face_centroid(fid);
-                double x, y, depth;
+                float x, y, depth;
                 gluProject(c.x(), c.y(), c.z(), modelview, projection, viewport, &x, &y, &depth);
 
                 if(depth_buffer[buffer_size*int(y)+int(x)]+0.0025 > depth)
-                {
-                    double diff = std::max(-u.dot(m.poly_face_normal(pid_beneath,fid)), 0.0);
-                    ao[fid] += diff;
-                }
+                    ao[fid] += std::max(-u.dot(m.poly_face_normal(pid_beneath,fid)), 0.0);
             }
         }
     }
@@ -225,16 +217,12 @@ AO_vol<Mesh>::AO_vol(const Mesh &m, const int buffer_size, const int n_dirs) : Q
     ao.normalize_in_01();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AO_vol<Mesh>::copy_to_mesh(Mesh &m)
 {
     for(uint fid=0; fid<m.num_faces(); ++fid)
-    {
         m.face_data(fid).AO = (visible.at(fid)) ? ao[fid] : 1.0;
-    }
 }
 
 }
