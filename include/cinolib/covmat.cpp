@@ -40,9 +40,9 @@ namespace cinolib
 {
 
 CINO_INLINE
-void covariance_matrix(const std::vector<vec3d> & points, double cov[3][3], const bool centered)
+void covariance_matrix(const std::vector<vec3d> & points, float cov[3][3], const bool centered)
 {
-    double norm_fact = static_cast<double>(points.size());
+    float norm_fact = static_cast<float>(points.size());
 
     // mean
     vec3d avg(0,0,0);
@@ -71,5 +71,4 @@ void covariance_matrix(const std::vector<vec3d> & points, double cov[3][3], cons
     cov[Y][X]=cov[X][Y];
     cov[Z][X]=cov[X][Z]; cov[Z][Y]=cov[Y][Z];
 }
-
 }
