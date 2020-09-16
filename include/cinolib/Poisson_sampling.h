@@ -52,12 +52,12 @@ namespace cinolib
 
 template<uint Dim, class Point>
 CINO_INLINE
-void Poisson_sampling(const double         radius,
+void Poisson_sampling(const float         radius,
                       const Point          min,
                       const Point          max,
                       std::vector<Point> & samples,
                       uint                 seed=0,
-                      const int            max_attempts=30);
+                      const short          max_attempts=30);
 
 }
 
