@@ -57,7 +57,7 @@ DrawableIsocontour<M,V,E,P>::DrawableIsocontour()
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-DrawableIsocontour<M,V,E,P>::DrawableIsocontour(AbstractPolygonMesh<M,V,E,P> & m, double iso_value)
+DrawableIsocontour<M,V,E,P>::DrawableIsocontour(AbstractPolygonMesh<M,V,E,P> & m, float iso_value)
 : Isocontour<M,V,E,P>(m, iso_value)
 {
     color     = Color::RED();
