@@ -63,8 +63,8 @@ class Curve
             // important for some algorithm, for example to embed the curve
             // mesh tessellation..
             //
-            int                 pid  = -1;
-            std::vector<double> bary = std::vector<double>();            
+            short                 pid  = -1;
+            std::vector<float> bary = std::vector<float>();            
         }
         Sample;
 
@@ -81,7 +81,7 @@ class Curve
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint                        size()    const;
-        double                      length()  const;
+        float                      length()  const;
         const std::vector<Sample> & samples() const;
               std::vector<Sample> & samples();
         const AABB                & bbox()    const;
@@ -99,17 +99,17 @@ class Curve
         //
         void              update_arc_length_param(); // recomputes parameter t for each sample
         uint              last_sample_lower_equal_than(const float t) const; // returns index
-        uint              sample_closest_to(const float t) const; // reteurns index
+        uint              sample_closest_to(const float t) const; // returns index
         vec3d             sample_curve_at(const float t) const;
-        vec3d             sample_curve_at(const float t, const double tot_length) const;
+        vec3d             sample_curve_at(const float t, const float tot_length) const;
         void              resample_curve(const uint n_samples);
         std::vector<uint> select_n_samples(const uint n_samples) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         Skel                export_as_skeleton() const;
-        std::vector<double> vector_coords()      const;
-        std::vector<int>    vector_segments()    const;
+        std::vector<float> vector_coords()      const;
+        std::vector<short>    vector_segments()    const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
