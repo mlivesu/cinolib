@@ -3,10 +3,10 @@
  *
  * Edits:
  *   line      130: included float.h to import machine epsilon directly from the standard C library
- *   lines 374-418: initialize machine epsilon and coefficients for roundoff errors at compile time.
+ *   lines 374-443: initialize machine epsilon and coefficients for roundoff errors at compile time.
  *                  With this edit it is no longer necessary to call exactinit() prior using the exact
  *                  predicates. They should go out of the box without any explicit initialization!
- *   lines 693-733: commented exactinit()
+ *   lines 571-758: commented unused random number generation functions and exactinit()
 */
 
 
@@ -386,6 +386,8 @@
  * is because GCC complains if I make it const REAL and I use it to inizialize
  * the error bounds below...
  */
+
+/*
 #define SHEWCHUK_EPSILON  DBL_EPSILON/2
 
 const REAL resulterrbound = ( 3.0 +    8.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILON;
@@ -405,6 +407,29 @@ const REAL isperrboundC   = (71.0 + 1408.0 * SHEWCHUK_EPSILON) * SHEWCHUK_EPSILO
 // this matches the value produced by exactinit().
 // However, 1 << (DBL_MANT_DIG/2)) + 1.0 is more correct IMHO
 const REAL splitter = (1 << (DBL_MANT_DIG/2+1)) + 1.0;
+*/
+
+/* Marco edit:
+ * the previous (now commented) code is semantically correct only in C++, and some compilers
+ * issue an error if one attempts to consider it as C code. This happens e.g. in MSVC
+ * (https://docs.microsoft.com/it-it/cpp/error-messages/compiler-errors-1/compiler-error-c2099).
+ * As a workaround, I precalculated all the values as constants here below.
+ * These values should be fine for any IEEE 754 compliant system.
+*/
+const double resulterrbound = 3.3306690738754706e-16;
+const double ccwerrboundA   = 3.3306690738754716e-16;
+const double ccwerrboundB   = 2.2204460492503146e-16;
+const double ccwerrboundC   = 1.1093356479670487e-31;
+const double o3derrboundA   = 7.7715611723761027e-16;
+const double o3derrboundB   = 3.3306690738754731e-16;
+const double o3derrboundC   = 3.2047474274603644e-31;
+const double iccerrboundA   = 1.1102230246251577e-15;
+const double iccerrboundB   = 4.4408920985006321e-16;
+const double iccerrboundC   = 5.4234187233944640e-31;
+const double isperrboundA   = 1.7763568394002532e-15;
+const double isperrboundB   = 5.5511151231257916e-16;
+const double isperrboundC   = 8.7514256672956190e-31;
+const double splitter       = 1.34217729e+08;
 
 // Original code from Shewchuk:
 //
@@ -543,24 +568,24 @@ REAL *e;
 /*                                                                           */
 /*****************************************************************************/
 
-double doublerand()
-{
-  double result;
-  double expo;
-  long a, b, c;
-  long i;
-
-  a = random();
-  b = random();
-  c = random();
-  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-  for (i = 512, expo = 2; i <= 131072; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
+//double doublerand()
+//{
+//  double result;
+//  double expo;
+//  long a, b, c;
+//  long i;
+//
+//  a = random();
+//  b = random();
+//  c = random();
+//  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
+//  for (i = 512, expo = 2; i <= 131072; i *= 2, expo = expo * expo) {
+//    if (c & i) {
+//      result *= expo;
+//    }
+//  }
+//  return result;
+//}
 
 /*****************************************************************************/
 /*                                                                           */
@@ -569,24 +594,24 @@ double doublerand()
 /*                                                                           */
 /*****************************************************************************/
 
-double narrowdoublerand()
-{
-  double result;
-  double expo;
-  long a, b, c;
-  long i;
-
-  a = random();
-  b = random();
-  c = random();
-  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
+//double narrowdoublerand()
+//{
+//  double result;
+//  double expo;
+//  long a, b, c;
+//  long i;
+//
+//  a = random();
+//  b = random();
+//  c = random();
+//  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
+//  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
+//    if (c & i) {
+//      result *= expo;
+//    }
+//  }
+//  return result;
+//}
 
 /*****************************************************************************/
 /*                                                                           */
@@ -594,16 +619,16 @@ double narrowdoublerand()
 /*                                                                           */
 /*****************************************************************************/
 
-double uniformdoublerand()
-{
-  double result;
-  long a, b;
-
-  a = random();
-  b = random();
-  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
-  return result;
-}
+//double uniformdoublerand()
+//{
+//  double result;
+//  long a, b;
+//
+//  a = random();
+//  b = random();
+//  result = (double) (a - 1073741824) * 8388608.0 + (double) (b >> 8);
+//  return result;
+//}
 
 /*****************************************************************************/
 /*                                                                           */
@@ -612,23 +637,23 @@ double uniformdoublerand()
 /*                                                                           */
 /*****************************************************************************/
 
-float floatrand()
-{
-  float result;
-  float expo;
-  long a, c;
-  long i;
-
-  a = random();
-  c = random();
-  result = (float) ((a - 1073741824) >> 6);
-  for (i = 512, expo = 2; i <= 16384; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
+//float floatrand()
+//{
+//  float result;
+//  float expo;
+//  long a, c;
+//  long i;
+//
+//  a = random();
+//  c = random();
+//  result = (float) ((a - 1073741824) >> 6);
+//  for (i = 512, expo = 2; i <= 16384; i *= 2, expo = expo * expo) {
+//    if (c & i) {
+//      result *= expo;
+//    }
+//  }
+//  return result;
+//}
 
 /*****************************************************************************/
 /*                                                                           */
@@ -636,24 +661,24 @@ float floatrand()
 /*                      a random exponent in [0, 7].                         */
 /*                                                                           */
 /*****************************************************************************/
-
-float narrowfloatrand()
-{
-  float result;
-  float expo;
-  long a, c;
-  long i;
-
-  a = random();
-  c = random();
-  result = (float) ((a - 1073741824) >> 6);
-  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
-    if (c & i) {
-      result *= expo;
-    }
-  }
-  return result;
-}
+//
+//float narrowfloatrand()
+//{
+//  float result;
+//  float expo;
+//  long a, c;
+//  long i;
+//
+//  a = random();
+//  c = random();
+//  result = (float) ((a - 1073741824) >> 6);
+//  for (i = 512, expo = 2; i <= 2048; i *= 2, expo = expo * expo) {
+//    if (c & i) {
+//      result *= expo;
+//    }
+//  }
+//  return result;
+//}
 
 /*****************************************************************************/
 /*                                                                           */
@@ -661,15 +686,15 @@ float narrowfloatrand()
 /*                                                                           */
 /*****************************************************************************/
 
-float uniformfloatrand()
-{
-  float result;
-  long a;
-
-  a = random();
-  result = (float) ((a - 1073741824) >> 6);
-  return result;
-}
+//float uniformfloatrand()
+//{
+//  float result;
+//  long a;
+//
+//  a = random();
+//  result = (float) ((a - 1073741824) >> 6);
+//  return result;
+//}
 
 /*****************************************************************************/
 /*                                                                           */
