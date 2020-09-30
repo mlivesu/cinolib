@@ -156,4 +156,34 @@ void Polyhedralmesh<M,V,E,F,P>::update_f_normal(const uint fid)
     this->face_data(fid).normal = polygon_normal(points);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double Polyhedralmesh::poly_volume(const uint pid) const
+{
+    if(this->poly_is_tetrahedron(pid))
+    {
+        return tet_unsigned_volume(this->poly_vert(pid,0),
+                                   this->poly_vert(pid,1),
+                                   this->poly_vert(pid,2),
+                                   this->poly_vert(pid,3));
+    }
+
+    if(this->poly_is_hexahedron(pid))
+    {
+        return hex_unsigned_volume(this->poly_vert(pid,0),
+                                   this->poly_vert(pid,1),
+                                   this->poly_vert(pid,2),
+                                   this->poly_vert(pid,3),
+                                   this->poly_vert(pid,4),
+                                   this->poly_vert(pid,5),
+                                   this->poly_vert(pid,6),
+                                   this->poly_vert(pid,7));
+    }
+
+    assert(false && "TODO!");
+    return 0.0;
+}
+
 }

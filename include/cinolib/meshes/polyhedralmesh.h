@@ -79,7 +79,7 @@ class Polyhedralmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double poly_volume(const uint) const override { assert(false && "TODO!"); return 1.0; }
+        double poly_volume(const uint pid) const override;
 };
 
 }
