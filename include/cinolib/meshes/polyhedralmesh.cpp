@@ -160,7 +160,7 @@ void Polyhedralmesh<M,V,E,F,P>::update_f_normal(const uint fid)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-double Polyhedralmesh::poly_volume(const uint pid) const
+double Polyhedralmesh<M,V,E,F,P>::poly_volume(const uint pid) const
 {
     if(this->poly_is_tetrahedron(pid))
     {
