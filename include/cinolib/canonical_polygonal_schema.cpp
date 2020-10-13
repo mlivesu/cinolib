@@ -120,7 +120,7 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
         edges.push_back(e);
     }
 
-    std::vector<vec3d> poly = n_sided_polygon(vec3d(0,0,0), genus*4, 1.0);
+    std::vector<vec3d> poly = n_sided_polygon(genus*4, CIRCLE);
     for(auto & p : poly) rotate(p, vec3d(0,0,1), M_PI*0.25); // if g=1, align square with uv frame
     std::map<uint,vec3d> dirichlet_bcs;
     for(uint i=0; i<poly.size(); ++i)

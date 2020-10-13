@@ -47,11 +47,25 @@
 namespace cinolib
 {
 
+/* Initializes a 2D polygon with n sides, which can be either a CIRCLE,
+ * a SQUARE or a STAR. The ouput polygon will be centered at the origin
+ * of the coordinate reference system, and will have unit size.
+ *
+ * For the circle, n must greater or equal to 3
+ * For the square, n must greater or equal to 4
+ * For the star,   n must greater or equal to 4 and must be an even number
+*/
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+enum { CIRCLE, SQUARE, STAR };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
-std::vector<vec3d> n_sided_polygon(const vec3d & center,
-                                   const uint    n_sides,
-                                   const double  radius,
-                                   const int     axis = Z);
+std::vector<vec3d> n_sided_polygon(const uint n,
+                                   const uint type);
+
 }
 
 #ifndef  CINO_STATIC_LIB
