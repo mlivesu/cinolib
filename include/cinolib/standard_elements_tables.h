@@ -107,6 +107,20 @@ static const vec3d REFERENCE_TET_VERTS[4] =
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+static const vec3d REFERENCE_HEX_VERTS[8] =
+{
+    vec3d( 0, 0, 0), // v0
+    vec3d( 1, 0, 0), // v1
+    vec3d( 1, 1, 0), // v2
+    vec3d( 0, 1, 0), // v3
+    vec3d( 0, 0, 1), // v4
+    vec3d( 1, 0, 1), // v5
+    vec3d( 1, 1, 1), // v6
+    vec3d( 0, 1, 1)  // v7
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 static const uint TET_INCIDENT_EDEGES[4][3] =
 {
     { 0, 2, 4 }, // edges incident to v0
