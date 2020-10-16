@@ -66,10 +66,10 @@ std::vector<vec3d> n_sided_polygon(const uint n,
             uint b = n/4;   assert(a<b);
             uint c = 2*n/4; assert(b<c);
             uint d = 3*n/4; assert(c<d);
-            verts.at(a) = vec3d( 0.5, 0.5, 0);
-            verts.at(b) = vec3d(-0.5, 0.5, 0);
-            verts.at(c) = vec3d(-0.5,-0.5, 0);
-            verts.at(d) = vec3d( 0.5,-0.5, 0);
+            verts.at(a) = vec3d( 1, 1, 0);
+            verts.at(b) = vec3d(-1, 1, 0);
+            verts.at(c) = vec3d(-1,-1, 0);
+            verts.at(d) = vec3d( 1,-1, 0);
             for(uint i=a+1; i<b; ++i)
             {
                 float t = (float)(i-a)/(float)(b-a);
