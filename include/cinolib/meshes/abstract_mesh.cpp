@@ -841,7 +841,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 double AbstractMesh<M,V,E,P>::edge_min_length() const
 {
-    double min = 0;
+    double min = inf_double;
     for(uint eid=0; eid<num_edges(); ++eid) min = std::min(min,edge_length(eid));
     return min;
 }
