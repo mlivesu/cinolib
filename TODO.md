@@ -25,7 +25,6 @@ Please consider this to be just development notes and not any real planning.
 * remove vectors of vectors and use serialized indices (with end of list markers, and pointers to base addr for each element). Measure gains before!
 * parsers should return vectors of doubles, not vec3ds
 * it would be better to have vectors of doubles inside the meshes too, and have a vec3d "view" on data to do math
-* write a quadratic version of earcut for polygon tessellation (the current one is cubic!)
 * use PARALLEL_FOR as much as possible inside the library to boost performances
 * consider computing element quality and normals (at least for faces) on the fly, without precomputing and storing them
 * try to adhere more to data flow/functional programming principles, keeping as few classes as possible with only access to inner data, moving methods that do data processing outside the class
