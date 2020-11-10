@@ -37,7 +37,7 @@
 #include <cinolib/geometry/plane.h>
 #include <cinolib/geometry/triangle_utils.h>
 #include <cinolib/predicates.h>
-#include <map>
+#include <cinolib/earcut.h>
 
 namespace cinolib
 {
@@ -133,94 +133,16 @@ bool polygon_flatten(const std::vector<vec3d> & poly3d,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// This is the fundamental building block of the ear cut algorithm for polygon triangulation
-// http://cgm.cs.mcgill.ca/~godfried/teaching/cg-projects/97/Ian/algorithm1.html
-//
-CINO_INLINE
-int polygon_find_ear(const std::vector<vec2d> & poly)
-{
-    uint curr = 0;
-    bool ear_not_found = true;
-    while(ear_not_found)
-    {
-        uint  prev   = (curr+poly.size()-1)%poly.size();
-        uint  next   = (curr+1)%poly.size();
-        vec2d ear[3] =
-        {
-            poly.at(prev),
-            poly.at(curr),
-            poly.at(next)
-        };
-        if(orient2d(ear[0], ear[1], ear[2])>0) // left turn => convex corner
-        {
-            bool contains_other_point = false;
-            for(uint j=0; j<poly.size(); ++j)
-            {
-                if(j == curr || j == prev || j == next) continue;
-                if(point_in_triangle_2d(poly.at(j), ear[0], ear[1], ear[2])>=STRICTLY_INSIDE)
-                {
-                    contains_other_point = true;
-                }
-            }
-            if(!contains_other_point) ear_not_found = false;
-        }
-
-        if(ear_not_found) ++curr;
-        if(curr >= poly.size()) return -1; // no ear could be found (usually means the polygon is degenerate)
-    }
-    return curr;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// Implementation of the ear-cut triangulation algorithm
-//
 CINO_INLINE
 bool polygon_triangulate(std::vector<vec2d> & poly,
                          std::vector<uint>  & tris)
 {
-    tris.clear();
-
-    // If the polygon is not CCW, flip it along X
-    //
+    // if the polygon is not CCW, flip it along X
     if(!polygon_is_CCW(poly))
     {
         for(auto & p : poly) p.x() = -p.x();
     }
-
-    std::map<uint,uint> v_map;
-    for(uint vid=0; vid<poly.size(); ++vid) v_map[vid] = vid;
-
-    std::vector<vec2d> sub_poly = poly;
-    while(sub_poly.size() >= 3)
-    {
-        int curr = polygon_find_ear(sub_poly);
-        if(curr<0)
-        {
-            //std::cerr << "WARNING: ear cut algorithm failure (is the polygon degenerate?)" << std::endl;
-            tris.clear();
-            return false;
-        }
-        uint prev = (curr+sub_poly.size()-1)%sub_poly.size();
-        uint next = (curr+1)%sub_poly.size();
-
-        tris.push_back(v_map.at(prev));
-        tris.push_back(v_map.at(curr));
-        tris.push_back(v_map.at(next));
-
-        // update poly and v_map
-        std::map<uint,uint> tmp_v_map;
-        std::vector<vec2d>  tmp_poly;
-        for(uint vid=0; vid<sub_poly.size(); ++vid)
-        {
-            if ((int)vid==curr) continue;
-            tmp_poly.push_back(sub_poly.at(vid));
-            tmp_v_map[tmp_poly.size()-1] = v_map.at(vid);
-        }
-        sub_poly = tmp_poly;
-        v_map    = tmp_v_map;
-    }
-
+    earcut(poly,tris);
     return true;
 }
 
