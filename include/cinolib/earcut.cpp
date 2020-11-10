@@ -87,6 +87,7 @@ void earcut(const std::vector<point> & poly,
         if(orient2d(t0,t1,t2)<=0) return false;
 
         // does the ear contain any other front vertex?
+        // NOTE: this could be made faster by storing (and checking) only concave vertices
         uint beg  = next[v_curr];
         uint end  = prev[v_curr];
         uint test = next[beg];
