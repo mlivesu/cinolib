@@ -87,7 +87,7 @@ std::vector<vec3d> n_sided_polygon(const uint n,
             }
             for(uint i=d+1; i<n; ++i)
             {
-                float t = (float)(i-d)/(float)(d-n);
+                float t = (float)(i-d)/(float)(n-d);
                 verts.at(i) = (1-t)*verts.at(d) + t*verts.at(a);
             }
             break;
