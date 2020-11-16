@@ -43,15 +43,20 @@ namespace cinolib
 
 /* Topological offsetting reads a simple polygon in the form of a circular chain
  * of vertices, and outputs a thickened polygon made of two nested simple curves
- * (the outer one being the input chain), tessellated with triangles.
+ * (the outer one being the input chain), with the space in between tessellated
+ * with triangles.
  *
  * The number of vertices in the inner chain is typically bigger than the number
  * of vertices in the outer, and both chains are ordered starting from the same
- * position.
+ * position. The output vector vmap stores how many vertices in the inner chain
+ * correspond to each vertex in the input outer chain.
  *
- * The algorithm works by first triangulating the input polygon, refining the so
- * generated mesh such that each boundary vertex has at least three incident edges,
- * and then splitting such edges to poisition vertices in the nested offsetted curve.
+ * The algorithm works as follows:
+ *
+ *  - triangulate the input polygon
+ *  - refine the so generated mesh such that each boundary vertex has at least three incident edges
+ *  - split such edges to poisition vertices in the nested offsetted curve
+ *
  * This guarantees that the nested chain of vertices is completely inside the input
  * shape, and that it still forms a simple polygon homotopic to the input one.
  *
@@ -64,7 +69,8 @@ namespace cinolib
 
 CINO_INLINE
 void polygon_topological_offsetting(std::vector<vec3d> & poly,
-                                    std::vector<uint>  & tris);
+                                    std::vector<uint>  & tris,
+                                    std::vector<uint>  & vmap);
 
 }
 

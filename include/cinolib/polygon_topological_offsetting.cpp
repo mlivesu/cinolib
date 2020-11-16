@@ -42,7 +42,8 @@ namespace cinolib
 
 CINO_INLINE
 void polygon_topological_offsetting(std::vector<vec3d> & poly,
-                                    std::vector<uint>  & tris)
+                                    std::vector<uint>  & tris,
+                                    std::vector<uint>  & vmap)
 {
     // step 0: triangulate the polygon and make a mesh out of it
     earcut(poly,tris);
@@ -65,6 +66,7 @@ void polygon_topological_offsetting(std::vector<vec3d> & poly,
     // step 2: walk along the boundary, visiting the ordered set of incident edges
     // and adding offset points along them
     std::vector<std::vector<uint>> inner_verts(nv);
+    vmap.resize(nv);
     for(uint vid=0; vid<nv; ++vid)
     {
         // pick the ordered list of incoming edges
@@ -82,6 +84,7 @@ void polygon_topological_offsetting(std::vector<vec3d> & poly,
             inner_verts.at(vid).push_back(poly.size());
             poly.push_back(p);
         }
+        vmap.at(vid) = inner_verts.at(vid).size();
     }
 
     // step 3: triangulate offsetted polygon
@@ -99,21 +102,21 @@ void polygon_topological_offsetting(std::vector<vec3d> & poly,
         {
             tris.push_back(vid-1);
             tris.push_back(vid);
-            tris.push_back(inner_verts.at(vid).front());
+            tris.push_back(inner_verts.at(vid-1).back());
             //
             tris.push_back(inner_verts.at(vid).front());
             tris.push_back(inner_verts.at(vid-1).back());
-            tris.push_back(vid-1);
+            tris.push_back(vid);
         }
         else
         {
             tris.push_back(nv-1);
-            tris.push_back(0);
-            tris.push_back(inner_verts.at(0).front());
+            tris.push_back(vid);
+            tris.push_back(inner_verts.at(nv-1).back());
             //
             tris.push_back(inner_verts.at(vid).front());
             tris.push_back(inner_verts.at(nv-1).back());
-            tris.push_back(nv-1);
+            tris.push_back(vid);
         }
     }
 }
