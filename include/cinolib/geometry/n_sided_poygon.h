@@ -36,12 +36,7 @@
 #ifndef CINO_N_SIDED_POLYGON_H
 #define CINO_N_SIDED_POLYGON_H
 
-#include <vector>
-#include <sys/types.h>
-#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
-#include <cinolib/meshes/trimesh.h>
-#include <cinolib/meshes/polygonmesh.h>
 #include <cinolib/symbols.h>
 
 namespace cinolib
@@ -51,20 +46,16 @@ namespace cinolib
  * a SQUARE or a STAR. The ouput polygon will be centered at the origin
  * of the coordinate reference system, and will have unit size.
  *
- * For the circle, n must greater or equal to 3
- * For the square, n must greater or equal to 4
- * For the star,   n must greater or equal to 4 and must be an even number
+ * For the CIRCLE, n must greater or equal to 3
+ * For the SQUARE, n must greater or equal to 4
+ * For the STAR,   n must greater or equal to 4 and must be an even number
 */
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-enum { CIRCLE, SQUARE, STAR };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 std::vector<vec3d> n_sided_polygon(const uint n,
-                                   const uint type);
+                                   const uint type); // CIRCLE, SQUARE, STAR
 
 }
 
