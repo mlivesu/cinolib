@@ -21,6 +21,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* double check vertex non manifoldness checks, they can probably be made much faster exploiting Euler to check the topology of the link....
 * split vec class into a pure interface with all the math, and a real class that stores data and implements the interface. This will allow to store and pass coordinates as vectors of doubles/floats, while still being able to math with them
 * remove vectors of vectors and use serialized indices (with end of list markers, and pointers to base addr for each element). Measure gains before!
 * parsers should return vectors of doubles, not vec3ds
