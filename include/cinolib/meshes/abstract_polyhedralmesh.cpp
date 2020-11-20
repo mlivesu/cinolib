@@ -1699,55 +1699,19 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::vert_is_manifold(const uint vid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool AbstractPolyhedralMesh<M,V,E,F,P>::edge_is_manifold(const uint /*eid*/) const
+bool AbstractPolyhedralMesh<M,V,E,F,P>::edge_is_manifold(const uint eid) const
 {
-    assert(false);
+    if(this->edge_is_on_srf(eid))
+    {
+        uint count = 0;
+        for(uint fid : this->adj_e2f(eid))
+        {
+            if(this->face_is_on_srf(fid)) ++count;
+        }
+        if(count==0 || count==2) return true;
+        return false;
+    }
     return true;
-//    // for each edge in the link, count how many faces in the link are incident to it
-//    std::unordered_map<uint,uint> e_count;
-//    for(uint fid : this->edge_faces_link(eid))
-//    for(uint id  : this->adj_f2e(fid))
-//    {
-//        e_count[id]++;
-//    }
-
-//    bool on_srf = this->edge_is_on_srf(eid);
-//    std::unordered_set<uint> boundary;
-//    for(auto e : e_count)
-//    {
-//        if(e.second==2) continue;     // regular edge in the link. so far so good
-//        if(e.second!=1) return false; // non manifold edge in the link
-//        assert(e.second==1);
-//        // boundary edge in the link, ok only if on srf
-//        // (srf neighborhood must be homotopic to a halph sphere)
-//        if(on_srf) boundary.insert(e.first);
-//        else return false;
-//    }
-
-//    if(on_srf)
-//    {
-//        if(boundary.empty()) return false; // srf elements must have a link with exactly one boundary
-//        // count connected components in boundary edges
-//        std::unordered_set<uint> visited;
-//        std::queue<uint> q;
-//        q.push(*boundary.begin());
-//        visited.insert(*boundary.begin());
-//        while(!q.empty())
-//        {
-//            uint id = q.front();
-//            q.pop();
-//            for(uint nbr : this->adj_e2e(id))
-//            {
-//                if(CONTAINS(boundary,nbr) && DOES_NOT_CONTAIN(visited,nbr))
-//                {
-//                    visited.insert(nbr);
-//                    q.push(nbr);
-//                }
-//            }
-//        }
-//        return (visited.size() == boundary.size());
-//    }
-//    else return boundary.empty(); // inner vertices mush have a closed sphere as link
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
