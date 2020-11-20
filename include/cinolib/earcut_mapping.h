@@ -60,7 +60,7 @@ namespace cinolib
  *
  * Technical details and ideas for both methods can be found in:
  *
- *     Earcut Mapping: a Mesh Generation Perspective on Robust Parameterizations
+ *     Earcut Mapping: Compatible Meshing for Robust 2D Parameterizations
  *     M. Livesu
  *     (submitted)
  *
