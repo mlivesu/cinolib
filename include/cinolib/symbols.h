@@ -86,7 +86,6 @@ enum
     CIRCLE,
     SQUARE,
     STAR,
-    CUSTOM
 };
 
 }
