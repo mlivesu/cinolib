@@ -198,7 +198,6 @@ class Octree
 
         // all items and aabbs live here, and tree leaf nodes only store indices of these vectors
         std::vector<SpatialDataStructureItem*> items;
-        std::vector<AABB>                      aabbs;
         OctreeNode                            *root = nullptr;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

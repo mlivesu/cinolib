@@ -85,6 +85,7 @@ void Octree::build()
     if(!items.empty())
     {
         // make AABBs for each item
+        std::vector<AABB> aabbs;
         aabbs.reserve(items.size());
         for(const auto item : items) aabbs.push_back(item->aabb());
         assert(items.size() == aabbs.size());
@@ -121,7 +122,7 @@ void Octree::build()
 CINO_INLINE
 void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
 {
-    assert(node->bbox.intersects_box(aabbs.at(id)));
+    assert(node->bbox.intersects_box(items.at(id)->aabb()));
 
     if(node->is_inner)
     {
@@ -129,7 +130,7 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
         for(int i=0; i<8; ++i)
         {
             assert(node->children[i]!=nullptr);
-            if(node->children[i]->bbox.intersects_box(aabbs.at(id)))
+            if(node->children[i]->bbox.intersects_box(items.at(id)->aabb()))
             {
                 build_item(id, node->children[i], depth+1);
             }
@@ -174,7 +175,7 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
                 for(int i=0; i<8; ++i)
                 {
                     assert(node->children[i]!=nullptr);
-                    if(node->children[i]->bbox.intersects_box(aabbs.at(item)))
+                    if(node->children[i]->bbox.intersects_box(items.at(item)->aabb()))
                     {
                         build_item(item, node->children[i], d_plus_one);
                         found_octant = true;
