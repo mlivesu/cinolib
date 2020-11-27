@@ -100,18 +100,20 @@ void Octree::build()
         for(uint id=0; id<items.size(); ++id) build_item(id, root, 0);
     }
 
-    Time::time_point t1 = Time::now();
-    double t = how_many_seconds(t0,t1);
-
-    std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
-    std::cout << "Octree created (" << t << "s)                      " << std::endl;
-    std::cout << "#Items                   : " << items.size()         << std::endl;
-    std::cout << "#Leaves                  : " << num_leaves           << std::endl;
-    std::cout << "Max depth                : " << max_depth            << std::endl;
-    std::cout << "Depth                    : " << tree_depth           << std::endl;
-    std::cout << "Prescribed items per leaf: " << items_per_leaf       << std::endl;
-    std::cout << "Max items per leaf       : " << max_items_per_leaf() << std::endl;
-    std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
+    if(print_debug_info)
+    {
+        Time::time_point t1 = Time::now();
+        double t = how_many_seconds(t0,t1);
+        std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
+        std::cout << "Octree created (" << t << "s)                      " << std::endl;
+        std::cout << "#Items                   : " << items.size()         << std::endl;
+        std::cout << "#Leaves                  : " << num_leaves           << std::endl;
+        std::cout << "Max depth                : " << max_depth            << std::endl;
+        std::cout << "Depth                    : " << tree_depth           << std::endl;
+        std::cout << "Prescribed items per leaf: " << items_per_leaf       << std::endl;
+        std::cout << "Max items per leaf       : " << max_items_per_leaf() << std::endl;
+        std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
