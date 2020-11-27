@@ -153,6 +153,11 @@ class Octree
                               const uint          aabb_queries,
                               const uint          item_queries) const;
 
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void leaves(std::vector<const OctreeNode*> & leaves, const bool discard_empty) const;
+        void leaves(const OctreeNode * node, std::vector<const OctreeNode*> & leaves, const bool discard_empty) const;
+
         // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // returns pos, id and distance of the item that is closest to query point p

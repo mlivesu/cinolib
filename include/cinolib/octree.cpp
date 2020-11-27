@@ -704,4 +704,31 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
     return !ids.empty();
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Octree::leaves(std::vector<const OctreeNode *> & l, const bool discard_empty) const
+{
+    leaves(root, l, discard_empty);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Octree::leaves(const OctreeNode *node, std::vector<const OctreeNode*> & l, const bool discard_empty) const
+{
+    if(node->is_inner)
+    {
+        for(int i=0; i<8; ++i)
+        {
+            leaves(node->children[i], l, discard_empty);
+        }
+    }
+    else
+    {
+        if(discard_empty && node->item_indices.empty()) return;
+        l.push_back(node);
+    }
+}
+
 }
