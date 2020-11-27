@@ -125,6 +125,22 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void build_from_vectors(const std::vector<vec3d> & verts,
+                                const std::vector<uint>  & tris)
+        {
+            assert(items.empty());
+            items.reserve(tris.size()/3);
+            for(uint i=0; i<tris.size(); i+=3)
+            {
+                add_triangle(i/3, { verts.at(tris.at(i  )),
+                                    verts.at(tris.at(i+1)),
+                                    verts.at(tris.at(i+2))});
+            }
+            build();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         template<class M, class V, class E, class P>
         void build_from_mesh_edges(const AbstractMesh<M,V,E,P> & m)
         {
@@ -180,14 +196,14 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    protected:
-
         // all items and aabbs live here, and tree leaf nodes only store indices of these vectors
         std::vector<SpatialDataStructureItem*> items;
         std::vector<AABB>                      aabbs;
         OctreeNode                            *root = nullptr;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        protected:
 
         uint max_depth;      // maximum allowed depth of the tree
         uint items_per_leaf; // prescribed number of items per leaf (can't go deeper than max_depth anyways)
