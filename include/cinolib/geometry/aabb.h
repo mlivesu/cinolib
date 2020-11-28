@@ -46,9 +46,9 @@ class AABB
 {
     public:
 
-        explicit AABB(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0); // AABB that contains all verts in p_list
+        explicit AABB(const std::vector<vec3d> & list, const double scaling_factor = 1.0); // AABB that contains all verts in p_list
 
-        explicit AABB(const std::vector<AABB> & b_list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
+        explicit AABB(const std::vector<AABB> & list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
 
         explicit AABB(const vec3d min = vec3d( inf_double,  inf_double,  inf_double),
                       const vec3d max = vec3d(-inf_double, -inf_double, -inf_double));
@@ -57,8 +57,15 @@ class AABB
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        // updates AABB size so as to accommodate the new elements
+        void push(const vec3d              & point);
+        void push(const AABB               & aabb);
+        void push(const std::vector<vec3d> & list);
+        void push(const std::vector<AABB>  & list);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void reset();
-        void update(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0);
         void scale(const double s);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

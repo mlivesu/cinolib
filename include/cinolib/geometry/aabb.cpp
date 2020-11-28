@@ -54,25 +54,22 @@ AABB::AABB(const vec3d min, const vec3d max) : min(min), max(max)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-AABB::AABB(const std::vector<vec3d> & p_list, const double scaling_factor)
+AABB::AABB(const std::vector<vec3d> & list, const double scaling_factor)
 {    
-    update(p_list, scaling_factor);
+    reset();
+    push(list);
+    if(scaling_factor!=1) scale(scaling_factor);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // AABB that contains all AABBs in b_list
 CINO_INLINE
-AABB::AABB(const std::vector<AABB> & b_list, const double scaling_factor)
+AABB::AABB(const std::vector<AABB> & list, const double scaling_factor)
 {
-    std::vector<vec3d> p_list;
-    p_list.reserve(b_list.size()*2);
-    for(const AABB & b : b_list)
-    {
-        p_list.push_back(b.min);
-        p_list.push_back(b.max);
-    }
-    update(p_list, scaling_factor);
+    reset();
+    push(list);
+    if(scaling_factor!=1) scale(scaling_factor);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -87,17 +84,35 @@ void AABB::reset()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void AABB::update(const std::vector<vec3d> & p_list, const double scaling_factor)
+void AABB::push(const vec3d & point)
 {
-    assert(!p_list.empty());
-    min = p_list.front();
-    max = p_list.front();
-    for(const vec3d & p : p_list)
-    {
-        min = min.min(p);
-        max = max.max(p);
-    }
-    if(scaling_factor!=1) scale(scaling_factor);
+    min = min.min(point);
+    max = max.max(point);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void AABB::push(const AABB & aabb)
+{
+    push(aabb.min);
+    push(aabb.max);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void AABB::push(const std::vector<vec3d> & list)
+{
+    for(auto p : list) push(p);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void AABB::push(const std::vector<AABB> & list)
+{
+    for(auto b : list) push(b);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
