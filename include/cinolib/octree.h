@@ -87,6 +87,10 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void subdivide(OctreeNode *node);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         template<class M, class V, class E, class P>
         void build_from_mesh_polys(const AbstractPolygonMesh<M,V,E,P> & m)
         {

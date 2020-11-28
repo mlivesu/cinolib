@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include <cinolib/octree.h>
 #include <cinolib/how_many_seconds.h>
+#include <cinolib/parallel_for.h>
 #include <stack>
 
 namespace cinolib
@@ -84,21 +85,77 @@ void Octree::build()
 
     if(!items.empty())
     {
-        // make AABBs for each item
-        std::vector<AABB> aabbs;
-        aabbs.reserve(items.size());
-        for(const auto item : items) aabbs.push_back(item->aabb());
-        assert(items.size() == aabbs.size());
+        std::vector<const OctreeNode*> leaves;
 
-        // build the tree root
+        // initialize root with all items, also updating its AABB
         assert(root==nullptr);
-        root = new OctreeNode(nullptr, AABB(aabbs, 1.5)); // enlarge it a bit to make sure queries don't fall outside
+        root = new OctreeNode(nullptr, AABB());
+        root->item_indices.resize(items.size());
+        std::iota(root->item_indices.begin(),root->item_indices.end(),0);
+        for(uint i=0; i<items.size(); ++i) root->bbox.push(items.at(i)->aabb());
 
-        tree_depth = 1;
-        num_leaves = 1;
+        root->bbox.scale(1.5); // enlarge bbox to account for queries outside legal area.
+                               // this should disappear eventually....
 
-        // populate the tree
-        for(uint id=0; id<items.size(); ++id) build_item(id, root, 0);
+        if(root->item_indices.size()<items_per_leaf || max_depth==1)
+        {
+            leaves.push_back(root);
+            ++num_leaves;
+        }
+        else
+        {
+            subdivide(root);
+
+            if(max_depth>2)
+            {
+                // initialize a separate todo split list for each octant
+                std::queue<std::pair<OctreeNode*,uint>> to_split[8]; // (node, depth)
+                for(int i=0; i<8; ++i)
+                {
+                    assert(root->children[i]!=nullptr);
+                    if(root->children[i]->item_indices.size()>items_per_leaf)
+                    {
+                        to_split[i].push(std::make_pair(root->children[i],2));
+                    }
+                    else
+                    {
+                        leaves.push_back(root->children[i]);
+                        ++num_leaves;
+                    }
+                }
+                // and refine them in parallel...
+                PARALLEL_FOR(0,8,0,[&](uint i)
+                {
+                    while(!to_split[i].empty())
+                    {
+                        auto pair  = to_split[i].front();
+                        auto node  = pair.first;
+                        uint depth = pair.second + 1;
+                        to_split[i].pop();
+
+                        subdivide(node);
+                        assert(node->item_indices.empty());
+
+                        for(int j=0; j<8; ++j)
+                        {
+                            assert(node->children[j]!=nullptr);
+
+                            if(depth<max_depth && node->children[j]->item_indices.size()>items_per_leaf)
+                            {
+                                to_split[i].push(std::make_pair(node->children[j], depth));
+                            }
+                            else
+                            {
+                                //leaves.push_back(node->children[j]);
+                                //++num_leaves;
+                            }
+                        }
+
+                        //tree_depth = std::max(tree_depth, depth);
+                    }
+                });
+            }
+        }
     }
 
     if(print_debug_info)
@@ -115,6 +172,43 @@ void Octree::build()
         std::cout << "Max items per leaf       : " << max_items_per_leaf() << std::endl;
         std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Octree::subdivide(OctreeNode * node)
+{
+    // create children octants
+    vec3d min = node->bbox.min;
+    vec3d max = node->bbox.max;
+    vec3d avg = node->bbox.center();
+    node->children[0] = new OctreeNode(node, AABB(vec3d(min[0], min[1], min[2]), vec3d(avg[0], avg[1], avg[2])));
+    node->children[1] = new OctreeNode(node, AABB(vec3d(avg[0], min[1], min[2]), vec3d(max[0], avg[1], avg[2])));
+    node->children[2] = new OctreeNode(node, AABB(vec3d(avg[0], avg[1], min[2]), vec3d(max[0], max[1], avg[2])));
+    node->children[3] = new OctreeNode(node, AABB(vec3d(min[0], avg[1], min[2]), vec3d(avg[0], max[1], avg[2])));
+    node->children[4] = new OctreeNode(node, AABB(vec3d(min[0], min[1], avg[2]), vec3d(avg[0], avg[1], max[2])));
+    node->children[5] = new OctreeNode(node, AABB(vec3d(avg[0], min[1], avg[2]), vec3d(max[0], avg[1], max[2])));
+    node->children[6] = new OctreeNode(node, AABB(vec3d(avg[0], avg[1], avg[2]), vec3d(max[0], max[1], max[2])));
+    node->children[7] = new OctreeNode(node, AABB(vec3d(min[0], avg[1], avg[2]), vec3d(avg[0], max[1], max[2])));
+
+    for(uint it : node->item_indices)
+    {
+        bool orphan = true;
+        for(int i=0; i<8; ++i)
+        {
+            assert(node->children[i]!=nullptr);
+            if(node->children[i]->bbox.intersects_box(items.at(it)->aabb()))
+            {
+                node->children[i]->item_indices.push_back(it);
+                orphan = false;
+            }
+        }
+        assert(!orphan);
+    }
+
+    node->item_indices.clear();
+    node->is_inner = true;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -184,7 +278,7 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
                 assert(found_octant);
             }
 
-            // remove items from current node            
+            // remove items from current node
             num_leaves += 7; // 8 children minus the current node
             tree_depth = std::max(depth, d_plus_one);
         }
