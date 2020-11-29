@@ -61,10 +61,8 @@ void find_intersections(const std::vector<vec3d> & verts,
     uint nt    = tris.size()/3;
     uint depth = 1;
     while(nt/std::pow(8,depth) > 3) ++depth;
-    //std::cout << "optimal depth is " << depth << std::endl;
 
     Octree o(depth,100); // max 100 elements per leaf, depth permitting
-    o.debug_mode(true);
     o.build_from_vectors(verts, tris);
 
     std::mutex mutex;
