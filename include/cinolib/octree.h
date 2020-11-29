@@ -83,7 +83,6 @@ class Octree
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void build();
-        void build_item(const uint id, OctreeNode *node, const uint depth);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -160,7 +159,6 @@ class Octree
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint max_items_per_leaf() const;
-        uint max_items_per_leaf(const OctreeNode *node, const uint max) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -172,11 +170,6 @@ class Octree
                               const double        t,
                               const uint          aabb_queries,
                               const uint          item_queries) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void leaves(std::vector<const OctreeNode*> & leaves, const bool discard_empty) const;
-        void leaves(const OctreeNode * node, std::vector<const OctreeNode*> & leaves, const bool discard_empty) const;
 
         // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -203,6 +196,7 @@ class Octree
         // all items and aabbs live here, and tree leaf nodes only store indices of these vectors
         std::vector<SpatialDataStructureItem*> items;
         OctreeNode                            *root = nullptr;
+        std::vector<const OctreeNode*>         leaves;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -211,7 +205,6 @@ class Octree
         uint max_depth;      // maximum allowed depth of the tree
         uint items_per_leaf; // prescribed number of items per leaf (can't go deeper than max_depth anyways)
         uint tree_depth = 0; // actual depth of the tree
-        uint num_leaves = 0; // actual number of leaves
         bool print_debug_info = false;
 
         // SUPPORT STRUCTURES ::::::::::::::::::::::::::::::::::::::::::::::::::::
