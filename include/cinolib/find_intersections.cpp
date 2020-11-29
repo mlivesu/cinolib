@@ -62,11 +62,12 @@ void find_intersections(const std::vector<vec3d> & verts,
     uint depth = 1;
     while(nt/std::pow(8,depth) > 3) ++depth;
 
-    Octree o(depth,100); // max 100 elements per leaf, depth permitting
+    Octree o(depth,1000); // max 1000 elements per leaf, depth permitting
+    //o.debug_mode(true);
     o.build_from_vectors(verts, tris);
 
     std::mutex mutex;
-    PARALLEL_FOR(0, o.leaves.size(), 1000, [&](uint i)
+    PARALLEL_FOR(0, o.leaves.size(), 1, [&](uint i)
     {        
         auto & leaf = o.leaves.at(i);
         if(leaf->item_indices.empty()) return;
@@ -77,7 +78,7 @@ void find_intersections(const std::vector<vec3d> & verts,
             uint tid1 = leaf->item_indices.at(k);
             auto T0 = o.items.at(tid0);
             auto T1 = o.items.at(tid1);
-            if(T0->aabb().intersects_box(T1->aabb())) // early reject based on AABB intersection
+            if(T0->aabb.intersects_box(T1->aabb)) // early reject based on AABB intersection
             {
                 const Triangle *t0 = dynamic_cast<Triangle*>(T0);
                 const Triangle *t1 = dynamic_cast<Triangle*>(T1);

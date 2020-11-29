@@ -90,7 +90,7 @@ void Octree::build()
     root = new OctreeNode(nullptr, AABB());
     root->item_indices.resize(items.size());
     std::iota(root->item_indices.begin(),root->item_indices.end(),0);
-    for(uint i=0; i<items.size(); ++i) root->bbox.push(items.at(i)->aabb());
+    for(uint i=0; i<items.size(); ++i) root->bbox.push(items.at(i)->aabb);
 
     root->bbox.scale(1.5); // enlarge bbox to account for queries outside legal area.
                            // this should disappear eventually....
@@ -202,7 +202,7 @@ void Octree::subdivide(OctreeNode * node)
         for(int i=0; i<8; ++i)
         {
             assert(node->children[i]!=nullptr);
-            if(node->children[i]->bbox.intersects_box(items.at(it)->aabb()))
+            if(node->children[i]->bbox.intersects_box(items.at(it)->aabb))
             {
                 node->children[i]->item_indices.push_back(it);
                 orphan = false;
@@ -218,7 +218,7 @@ void Octree::subdivide(OctreeNode * node)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Octree::add_segment(const uint id, const std::vector<vec3d> & v)
+void Octree::push_segment(const uint id, const std::vector<vec3d> & v)
 {
     items.push_back(new Segment(id,v.data()));
 }
@@ -226,7 +226,7 @@ void Octree::add_segment(const uint id, const std::vector<vec3d> & v)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Octree::add_triangle(const uint id, const std::vector<vec3d> & v)
+void Octree::push_triangle(const uint id, const std::vector<vec3d> & v)
 {
     items.push_back(new Triangle(id,v.data()));
 }
@@ -234,7 +234,7 @@ void Octree::add_triangle(const uint id, const std::vector<vec3d> & v)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Octree::add_tetrahedron(const uint id, const std::vector<vec3d> & v)
+void Octree::push_tetrahedron(const uint id, const std::vector<vec3d> & v)
 {
     items.push_back(new Tetrahedron(id,v.data()));
 }
@@ -631,7 +631,7 @@ bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_com
             for(uint i : node->item_indices)
             {
                 // test the AABBs first, it's cheaper
-                if(items.at(i)->aabb().intersects_box(t_box) &&
+                if(items.at(i)->aabb.intersects_box(t_box) &&
                    items.at(i)->intersects_triangle(t, ignore_if_valid_complex))
                 {
                     ids.insert(items.at(i)->id);
@@ -691,7 +691,7 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
             for(uint i : node->item_indices)
             {
                 // test the AABBs first, it's cheaper
-                if(items.at(i)->aabb().intersects_box(s_box) &&
+                if(items.at(i)->aabb.intersects_box(s_box) &&
                    items.at(i)->intersects_segment(s, ignore_if_valid_complex))
                 {
                     ids.insert(items.at(i)->id);

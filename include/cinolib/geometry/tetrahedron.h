@@ -52,15 +52,18 @@ class Tetrahedron : public SpatialDataStructureItem
             this->v[1] = v[1];
             this->v[2] = v[2];
             this->v[3] = v[3];
-            this->id = id;
+            this->id   = id;
+            item_type  = TETRAHEDRON;
+            aabb.push(v[0]);
+            aabb.push(v[1]);
+            aabb.push(v[2]);
+            aabb.push(v[3]);
         }
 
        ~Tetrahedron() {}
 
         // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
 
-        ItemType item_type              () const override;
-        AABB     aabb                   () const override;
         vec3d    point_closest_to       (const vec3d & p) const override;
         bool     intersects_ray         (const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const override;
         void     barycentric_coordinates(const vec3d & p, double bc[]) const override;

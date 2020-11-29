@@ -40,21 +40,6 @@
 namespace cinolib
 {
 
-CINO_INLINE
-ItemType Triangle::item_type() const
-{
-    return TRIANGLE;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-AABB Triangle::aabb() const
-{
-    std::vector<vec3d> tmp = {v[0], v[1], v[2]};
-    return AABB(tmp);
-}
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE

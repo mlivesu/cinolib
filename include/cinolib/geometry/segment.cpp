@@ -69,23 +69,6 @@ vec3d Segment::point_closest_to(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-ItemType Segment::item_type() const
-{
-    return SEGMENT;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-AABB Segment::aabb() const
-{
-    std::vector<vec3d> tmp = {v[0], v[1]};
-    return AABB(tmp);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
 bool Segment::intersects_ray(const vec3d & /*p*/, const vec3d & /*dir*/, double & /*t*/, vec3d & /*pos*/) const
 {
     assert(false && "TODO");

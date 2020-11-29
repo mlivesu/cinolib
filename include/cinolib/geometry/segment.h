@@ -51,22 +51,26 @@ class Segment : public SpatialDataStructureItem
         {
             this->v[0] = v0;
             this->v[1] = v1;
-            this->id = id;
+            this->id   = id;
+            item_type  = SEGMENT;
+            aabb.push(v0);
+            aabb.push(v1);
         }
 
         Segment(const uint id, const vec3d v[2])
         {
             this->v[0] = v[0];
             this->v[1] = v[1];
-            this->id = id;
+            this->id   = id;
+            item_type  = SEGMENT;
+            aabb.push(v[0]);
+            aabb.push(v[1]);
         }
 
         ~Segment() {}
 
         // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
 
-        ItemType item_type              () const override;
-        AABB     aabb                   () const override;
         vec3d    point_closest_to       (const vec3d & p) const override;
         bool     intersects_ray         (const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const override;
         void     barycentric_coordinates(const vec3d & p, double bc[]) const override;

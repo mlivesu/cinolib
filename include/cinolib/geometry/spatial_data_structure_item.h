@@ -49,6 +49,7 @@ namespace cinolib
 {
     typedef enum
     {
+        ABSTRACT,
         POINT,
         SEGMENT,
         TRIANGLE,
@@ -68,15 +69,9 @@ namespace cinolib
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            uint id;
-
-            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-            virtual ItemType item_type() const = 0;
-
-            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-            virtual AABB aabb() const = 0;
+            uint     id;
+            AABB     aabb;
+            ItemType item_type = ABSTRACT;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

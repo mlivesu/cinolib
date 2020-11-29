@@ -40,20 +40,6 @@
 namespace cinolib
 {
 
-CINO_INLINE
-ItemType Tetrahedron::item_type() const
-{
-    return TETRAHEDRON;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-AABB Tetrahedron::aabb() const
-{
-    return AABB({v[0], v[1], v[2], v[3]});
-}
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
