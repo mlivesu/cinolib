@@ -54,6 +54,9 @@ class OctreeNode
         AABB              bbox;
         std::vector<uint> item_indices; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
 };
+// NOTE: father is not necessary and could be removed. However, it acts also as a padding
+// layer for node size in memory and secures better caching. Removing it actually degrades
+// performances
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
