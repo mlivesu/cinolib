@@ -57,13 +57,8 @@ void find_intersections(const std::vector<vec3d> & verts,
                         const std::vector<uint>  & tris,
                               std::set<ipair>    & intersections)
 {
-    // heuristically determine a good depth for the tree
-    uint nt    = tris.size()/3;
-    uint depth = 1;
-    while(nt/std::pow(8,depth) > 3) ++depth;
-
-    Octree o(depth,1000); // max 1000 elements per leaf, depth permitting
-    //o.debug_mode(true);
+    Octree o(8,1000); // max 1000 elements per leaf, depth permitting
+    o.debug_mode(true);
     o.build_from_vectors(verts, tris);
 
     std::mutex mutex;
