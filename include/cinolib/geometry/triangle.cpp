@@ -80,7 +80,7 @@ bool Triangle::contains(const vec3d & p, const bool strict) const
 {
     int where = point_in_triangle_3d(p,v[0], v[1], v[2]);
     if(strict) return (where==STRICTLY_INSIDE);
-               return (where>=STRICTLY_INSIDE);
+    return (where>=STRICTLY_INSIDE);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

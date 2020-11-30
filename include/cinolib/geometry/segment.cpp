@@ -95,7 +95,7 @@ bool Segment::contains(const vec3d & p, const bool strict) const
 {
     int where = point_in_segment_3d(p, v[0], v[1]);
     if(strict) return (where==STRICTLY_INSIDE);
-               return (where>=STRICTLY_INSIDE);
+    return (where>=STRICTLY_INSIDE);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
