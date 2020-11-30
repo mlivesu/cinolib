@@ -84,15 +84,25 @@ void read_STL(const char         * filename,
 
     std::map<vec3d,uint> vmap;
 
+    /* This is a horrible trick to cope with the fact that in Thingi10K
+     * binary files start with the header of ASCII files even if they shouldn't.
+     * As a result it becomes messy to figure out whether a file is binary or not.
+     * I assume it is, then I try to parse it as if it was ASCII first, and if I fail
+     * then I know that is indeed binary.
+    */
+    bool is_binary = true;
+
     if(seek_keyword(fp, "solid")) // ASCII file
     {
         while(seek_keyword(fp, "facet"))
         {
+            is_binary = false;
+
             vec3d n;
             if(!seek_keyword(fp, "normal")) assert(false && "could not find keyword NORMAL");
-            if(!eat_double(fp, n.x())) assert(false && "could not parse x coord");
-            if(!eat_double(fp, n.y())) assert(false && "could not parse y coord");
-            if(!eat_double(fp, n.z())) assert(false && "could not parse z coord");
+            if(!eat_double(fp, n.x()))      assert(false && "could not parse x coord");
+            if(!eat_double(fp, n.y()))      assert(false && "could not parse y coord");
+            if(!eat_double(fp, n.z()))      assert(false && "could not parse z coord");
             normals.push_back(n);
 
             if(!seek_keyword(fp, "outer")) assert(false && "could not find keyword OUTER");
@@ -101,9 +111,9 @@ void read_STL(const char         * filename,
             {
                 vec3d v;
                 if(!seek_keyword(fp, "vertex")) assert(false && "could not find keyword VERTEX");
-                if(!eat_double(fp, v.x())) assert(false && "could not parse x coord");
-                if(!eat_double(fp, v.y())) assert(false && "could not parse y coord");
-                if(!eat_double(fp, v.z())) assert(false && "could not parse z coord");
+                if(!eat_double(fp, v.x()))      assert(false && "could not parse x coord");
+                if(!eat_double(fp, v.y()))      assert(false && "could not parse y coord");
+                if(!eat_double(fp, v.z()))      assert(false && "could not parse z coord");
 
                 if(merge_duplicated_verts)
                 {
@@ -126,15 +136,18 @@ void read_STL(const char         * filename,
             if(!seek_keyword(fp, "endloop"))  assert(false && "could not find keyword ENDLOOP");
             if(!seek_keyword(fp, "endfacet")) assert(false && "could not find keyword ENDFACET");
         }
-        fclose(fp);
     }
+    fclose(fp);
 
-    if(tris.empty()) // BINARY file
+    if(is_binary)
     {
-        // close file in ASCII mode and reopen it in binary mode
-        fclose(fp);
+        // open the file in binary mode
         FILE *fp = fopen(filename, "rb");
-        assert(fp!=NULL);
+        if(!fp)
+        {
+            std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load_STL() : couldn't open input file " << filename << std::endl;
+            exit(-1);
+        }
 
         // read header
         char header[80];
