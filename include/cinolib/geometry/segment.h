@@ -38,7 +38,6 @@
 
 #include <iostream>
 #include <cinolib/geometry/spatial_data_structure_item.h>
-#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {

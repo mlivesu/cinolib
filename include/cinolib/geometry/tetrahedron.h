@@ -36,7 +36,6 @@
 #ifndef CINO_TETRAHEDRON_H
 #define CINO_TETRAHEDRON_H
 
-#include <cinolib/geometry/vec3.h>
 #include <cinolib/geometry/spatial_data_structure_item.h>
 
 namespace cinolib

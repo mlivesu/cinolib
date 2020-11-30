@@ -36,10 +36,7 @@
 #ifndef CINO_TRIANGLE_H
 #define CINO_TRIANGLE_H
 
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/geometry/aabb.h>
 #include <cinolib/geometry/spatial_data_structure_item.h>
-#include <cinolib/geometry/triangle_utils.h>
 
 namespace cinolib
 {

@@ -36,6 +36,7 @@
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/Moller_Trumbore_intersection.h>
 #include <cinolib/predicates.h>
+#include <cinolib/geometry/triangle_utils.h>
 
 namespace cinolib
 {
