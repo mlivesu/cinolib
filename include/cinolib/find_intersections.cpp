@@ -58,7 +58,6 @@ void find_intersections(const std::vector<vec3d> & verts,
                               std::set<ipair>    & intersections)
 {
     Octree o(8,1000); // max 1000 elements per leaf, depth permitting
-    o.debug_mode(true);
     o.build_from_vectors(verts, tris);
 
     std::mutex mutex;
