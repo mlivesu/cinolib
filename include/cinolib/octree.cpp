@@ -97,7 +97,7 @@ void Octree::build()
     root = new OctreeNode(nullptr, AABB());
     root->item_indices.resize(items.size());
     std::iota(root->item_indices.begin(),root->item_indices.end(),0);
-    for(uint i=0; i<items.size(); ++i) root->bbox.push(items.at(i)->aabb);
+    for(auto it : items) root->bbox.push(it->aabb);
 
     root->bbox.scale(1.5); // enlarge bbox to account for queries outside legal area.
                            // this should disappear eventually....
@@ -268,9 +268,9 @@ void Octree::debug_mode(const bool b)
 
 CINO_INLINE
 void Octree::print_query_info(const std::string & s,
-                                 const double        t,
-                                 const uint          aabb_queries,
-                                 const uint          item_queries) const
+                              const double        t,
+                              const uint          aabb_queries,
+                              const uint          item_queries) const
 {
     std::cout << s << "\n\t" << t  << " seconds\n\t"
               << aabb_queries << " AABB queries\n\t"
