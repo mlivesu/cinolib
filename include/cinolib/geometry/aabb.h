@@ -38,6 +38,7 @@
 
 #include <cinolib/min_max_inf.h>
 #include <cinolib/geometry/vec3.h>
+#include <vector>
 
 namespace cinolib
 {
