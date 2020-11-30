@@ -69,7 +69,6 @@ class OctreeNode
 
 class Octree
 {
-
     public:
 
         explicit Octree(const uint max_depth      = 7,

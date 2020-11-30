@@ -44,10 +44,17 @@ namespace cinolib
 CINO_INLINE
 OctreeNode::~OctreeNode()
 {
+
     // "in a tree's node destructor, you only need to destroy the children pointers that are manually
     //  allocated by you. You don't need to worry about the deallocation of the node itself."
     //  https://stackoverflow.com/questions/34170164/destructor-for-binary-search-tree
-    for(int i=0; i<8; ++i) delete children[i];
+    for(int i=0; i<8; ++i)
+    {
+        if(children[i]!=nullptr)
+        {
+            delete children[i];
+        }
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -65,7 +72,7 @@ CINO_INLINE
 Octree::~Octree()
 {
     // delete Octree
-    delete root;
+    if(root!=nullptr) delete root;
 
     // delete item list
     while(!items.empty())
