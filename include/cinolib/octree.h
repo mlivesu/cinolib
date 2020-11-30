@@ -63,7 +63,7 @@ class OctreeNode
 /* Usage:
  *
  *  i)   Create an empty octree
- *  ii)  Use the add_segment/triangle/tetrahedron facilities to populate it
+ *  ii)  Use the push_segment/triangle/tetrahedron facilities to populate it
  *  iii) Call build to make the tree
 */
 
@@ -195,7 +195,7 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        // all items and aabbs live here, and tree leaf nodes only store indices of these vectors
+        // all items live here, and leaf nodes only store indices to items
         std::vector<SpatialDataStructureItem*> items;
         OctreeNode                            *root = nullptr;
         std::vector<const OctreeNode*>         leaves;
