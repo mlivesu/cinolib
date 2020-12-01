@@ -696,8 +696,7 @@ bool Octree::intersects_box(const AABB & b, std::unordered_set<uint> & ids) cons
             for(uint i : node->item_indices)
             {
                 // test the AABBs first, it's cheaper
-                if(items.at(i)->aabb.intersects_box(b) &&
-                   items.at(i)->intersects_box(b,true))
+                if(items.at(i)->aabb.intersects_box(b))
                 {
                     ids.insert(items.at(i)->id);
                 }
