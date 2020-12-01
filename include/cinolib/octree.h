@@ -192,7 +192,6 @@ class Octree
         // note: these queries becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
         bool intersects_segment (const vec3d s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
         bool intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
-        bool intersects_box     (const AABB  &b,  std::unordered_set<uint> & ids) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
