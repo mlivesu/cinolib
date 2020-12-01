@@ -651,7 +651,65 @@ bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_com
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        print_query_info("Intersects Triangle (exact)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+        print_query_info("Intersects Triangle", how_many_seconds(t0,t1), aabb_queries, item_queries);
+    }
+
+    return !ids.empty();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
+CINO_INLINE
+bool Octree::intersects_box(const AABB & b, std::unordered_set<uint> & ids) const
+{
+    typedef std::chrono::high_resolution_clock Time;
+    Time::time_point t0 = Time::now();
+
+    uint aabb_queries = 0;
+    uint item_queries = 0;
+
+    ids.clear();
+
+    std::stack<OctreeNode*> lifo;
+    lifo.push(root);
+
+    while(!lifo.empty())
+    {
+        OctreeNode *node = lifo.top();
+        lifo.pop();
+        assert(node->bbox.intersects_box(b));
+
+        if(node->is_inner)
+        {
+            for(int i=0; i<8; ++i)
+            {
+                if(node->children[i]->bbox.intersects_box(b))
+                {
+                    lifo.push(node->children[i]);
+                }
+            }
+            if(print_debug_info) aabb_queries+=8;
+        }
+        else
+        {
+            for(uint i : node->item_indices)
+            {
+                // test the AABBs first, it's cheaper
+                if(items.at(i)->aabb.intersects_box(b) &&
+                   items.at(i)->intersects_box(b,true))
+                {
+                    ids.insert(items.at(i)->id);
+                }
+            }
+            if(print_debug_info) item_queries+=node->item_indices.size();
+        }
+    }
+
+    if(print_debug_info)
+    {
+        Time::time_point t1 = Time::now();
+        print_query_info("Intersects AABB", how_many_seconds(t0,t1), aabb_queries, item_queries);
     }
 
     return !ids.empty();
@@ -711,7 +769,7 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        print_query_info("Intersects Segment (exact)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+        print_query_info("Intersects Segment", how_many_seconds(t0,t1), aabb_queries, item_queries);
     }
 
     return !ids.empty();
