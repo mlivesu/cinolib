@@ -349,16 +349,19 @@ bool AABB::intersects_triangle(const vec3d t[3]) const
     vec3d e = max - c; // half of the box extents
 
     // center the box at the origin
-    vec3d v0 = t[0] - c;
-    vec3d v1 = t[1] - c;
-    vec3d v2 = t[2] - c;
+    vec3d v[3] =
+    {
+       t[0] - c,
+       t[1] - c,
+       t[2] - c
+    };
 
     // edge vectors for triangle
     vec3d f[3] =
     {
-        v1 - v0,
-        v2 - v1,
-        v0 - v2
+        v[1] - v[0],
+        v[2] - v[1],
+        v[0] - v[2]
     };
 
     vec3d XYZ[3] =
@@ -376,9 +379,9 @@ bool AABB::intersects_triangle(const vec3d t[3]) const
     for(uint j=0; j<3; ++j)
     {
         vec3d  a   = XYZ[i].cross(f[j]);
-        double p0  = a.dot(v0);
-        double p1  = a.dot(v1);
-        double p2  = a.dot(v2);
+        double p0  = a.dot(v[0]);
+        double p1  = a.dot(v[1]);
+        double p2  = a.dot(v[2]);
         double min = std::min(p0,std::min(p1,p2));
         double max = std::max(p0,std::max(p1,p2));
         double r   = e[0]*std::fabs(a[0]) + e[1]*std::fabs(a[1]) + e[2]*std::fabs(a[2]);
