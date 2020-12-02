@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include <cinolib/geometry/aabb.h>
 #include <algorithm>
+#include <cmath>
 
 namespace cinolib
 {
@@ -304,6 +305,92 @@ bool AABB::intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, ve
     // Ray intersects all 3 slabs. Return point (q) and intersection t value (tmin)
     pos = p + dir*t_min;
     return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* Intersection between the AABB and the plane n*X=d
+ * If any intersection occurs, the function returns true
+ *
+ * Ref: Real Time Collision Detection, Section 5.2.3
+*/
+CINO_INLINE
+bool AABB::intersects_plane(const vec3d & n, const double d) const
+{
+    vec3d c = center();
+    vec3d e = max - c; // box extents
+
+    double r = e[0]*std::abs(n[0]) + e[1]*std::abs(n[1]) + e[2]*std::abs(n[2]);
+    double s = n.dot(c) - d;
+
+    if(s>=-r && s<=r) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* Intersection between the AABB and the triangle t[0],t[1],t[2]
+ * If any intersection occurs, the function returns true
+ *
+ * References:
+ *
+ *       Fast 3D Triangle-Box Overlap Testing
+ *       Tomas Akenine-Moller
+ *       2001
+ *
+ *       Real Time Collision Detection, Section 5.2.9
+ *
+ *       https://www.gamedev.net/forums/topic/534655-aabb-triangleplane-intersection--distance-to-plane-is-incorrect-i-have-solved-it/
+*/
+CINO_INLINE
+bool AABB::intersects_triangle(const vec3d t[3]) const
+{
+    vec3d c = center();
+    vec3d e = max - c; // half of the box extents
+
+    // center the box at the origin
+    vec3d v0 = t[0] - c;
+    vec3d v1 = t[1] - c;
+    vec3d v2 = t[2] - c;
+
+    // edge vectors for triangle
+    vec3d f[3] =
+    {
+        v1 - v0,
+        v2 - v1,
+        v0 - v2
+    };
+
+    // global axes
+    vec3d XYZ[3] =
+    {
+        vec3d(1,0,0),
+        vec3d(0,1,0),
+        vec3d(0,0,1)
+    };
+
+    for(uint i=0; i<3; ++i)
+    for(uint j=0; j<3; ++j)
+    {
+        vec3d  a   = XYZ[i].cross(f[j]);
+        double p0  = a.dot(v0);
+        double p1  = a.dot(v1);
+        double p2  = a.dot(v2);
+        double min = std::min(p0,std::min(p1,p2));
+        double max = std::max(p0,std::max(p1,p2));
+        double r   = e[0]*std::fabs(a[0]) + e[1]*std::fabs(a[1]) + e[2]*std::fabs(a[2]);
+
+        if(r<min || -r>max) return false;
+    }
+
+    // Test the three axes corresponding to the face normals of AABB b (category 1).
+    AABB tb({t[0],t[1],t[2]});
+    if(!intersects_box(tb)) return false;
+
+    // Test separating axis corresponding to triangle face normal (category 2)
+    vec3d  n = f[0].cross(f[1]);
+    double d = n.dot(t[0]);
+    return intersects_plane(n,d);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

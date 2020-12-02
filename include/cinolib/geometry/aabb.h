@@ -91,9 +91,11 @@ class AABB
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool contains(const vec3d & p, const bool strict = false) const;
-        bool intersects_box(const AABB  & box, const bool strict = false) const;
-        bool intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, vec3d & pos) const;
+        bool contains           (const vec3d & p, const bool strict = false) const;
+        bool intersects_box     (const AABB  & box, const bool strict = false) const;
+        bool intersects_ray     (const vec3d & p, const vec3d & dir, double & t_min, vec3d & pos) const;
+        bool intersects_triangle(const vec3d t[3]) const;
+        bool intersects_plane   (const vec3d & n, const double d) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
