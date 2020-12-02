@@ -44,7 +44,6 @@ namespace cinolib
 CINO_INLINE
 OctreeNode::~OctreeNode()
 {
-
     // "in a tree's node destructor, you only need to destroy the children pointers that are manually
     //  allocated by you. You don't need to worry about the deallocation of the node itself."
     //  https://stackoverflow.com/questions/34170164/destructor-for-binary-search-tree
@@ -267,19 +266,6 @@ void Octree::debug_mode(const bool b)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Octree::print_query_info(const std::string & s,
-                              const double        t,
-                              const uint          aabb_queries,
-                              const uint          item_queries) const
-{
-    std::cout << s << "\n\t" << t  << " seconds\n\t"
-              << aabb_queries << " AABB queries\n\t"
-              << item_queries << " item queries" << std::endl;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
 vec3d Octree::closest_point(const vec3d & p) const
 {
     uint   id;
@@ -310,9 +296,6 @@ void Octree::closest_point(const vec3d  & p,          // query point
     PrioQueue q;
     q.push(obj);
 
-    uint aabb_queries = 1;
-    uint item_queries = 0;
-
     while(q.top().node->is_inner)
     {
         Obj obj = q.top();
@@ -327,7 +310,6 @@ void Octree::closest_point(const vec3d  & p,          // query point
                 obj.node = child;
                 obj.dist = child->bbox.dist_sqrd(p);
                 q.push(obj);
-                if(print_debug_info) ++aabb_queries;
             }
             else
             {
@@ -340,7 +322,6 @@ void Octree::closest_point(const vec3d  & p,          // query point
                     obj.dist  = obj.pos.dist_squared(p);
                     q.push(obj);
                 }
-                if(print_debug_info) item_queries+=child->item_indices.size();
             }
         }
     }
@@ -348,7 +329,7 @@ void Octree::closest_point(const vec3d  & p,          // query point
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        print_query_info("Closest point query", how_many_seconds(t0,t1), aabb_queries, item_queries);
+        std::cout << "Closest point\t" << how_many_seconds(t0,t1) << " seconds" << std::endl;
     }
 
     assert(q.top().index>=0);
@@ -366,11 +347,11 @@ bool Octree::contains(const vec3d & p, const bool strict, uint & id) const
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    uint aabb_queries = 0;
-    uint item_queries = 0;
-
     std::stack<OctreeNode*> lifo;
-    lifo.push(root);
+    if(root && root->bbox.contains(p,strict))
+    {
+        lifo.push(root);
+    }
 
     while(!lifo.empty())
     {
@@ -384,20 +365,18 @@ bool Octree::contains(const vec3d & p, const bool strict, uint & id) const
             {
                 if(node->children[i]->bbox.contains(p,strict)) lifo.push(node->children[i]);
             }
-            if(print_debug_info) aabb_queries+=8;
         }
         else
         {
             for(uint i : node->item_indices)
             {
-                if(print_debug_info) ++item_queries;
                 if(items.at(i)->contains(p,strict))
                 {
                     id = items.at(i)->id;
                     if(print_debug_info)
                     {
                         Time::time_point t1 = Time::now();
-                        print_query_info("Contains query (first item)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+                        std::cout << "Contains query (first item)\t" << how_many_seconds(t0,t1) << " seconds" << std::endl;
                     }
                     return true;
                 }
@@ -417,13 +396,13 @@ bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uin
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    uint aabb_queries = 0;
-    uint item_queries = 0;
-
     ids.clear();
 
     std::stack<OctreeNode*> lifo;
-    lifo.push(root);
+    if(root && root->bbox.contains(p,strict))
+    {
+        lifo.push(root);
+    }
 
     while(!lifo.empty())
     {
@@ -437,7 +416,6 @@ bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uin
             {
                 if(node->children[i]->bbox.contains(p,strict)) lifo.push(node->children[i]);
             }
-            if(print_debug_info) aabb_queries+=8;
         }
         else
         {
@@ -448,14 +426,13 @@ bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uin
                     ids.insert(items.at(i)->id);
                 }
             }
-            if(print_debug_info) item_queries+=node->item_indices.size();
         }
     }
 
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        print_query_info("Contains query (all items)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+        std::cout << "Contains query (all items)\t" << how_many_seconds(t0,t1) << " seconds" << std::endl;
     }
 
     return !ids.empty();
@@ -470,17 +447,14 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
     Time::time_point t0 = Time::now();
 
     vec3d  pos;
-    double t;
-    if(!root->bbox.intersects_ray(p, dir, t, pos)) return false;
+    double t=0.0;
+    if(root && !root->bbox.intersects_ray(p, dir, t, pos)) return false;
     Obj obj;
     obj.node = root;
     obj.dist = t;
 
     PrioQueue q;
     q.push(obj);
-
-    uint aabb_queries = 1;
-    uint item_queries = 0;
 
     while(!q.empty() && q.top().node->is_inner)
     {
@@ -511,10 +485,8 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
                             obj.dist  = t;
                             q.push(obj);
                         }
-                        if(print_debug_info) ++item_queries;
                     }
                 }
-                if(print_debug_info) ++aabb_queries;
             }
         }
     }
@@ -522,7 +494,7 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        print_query_info("Intersects ray query", how_many_seconds(t0,t1), aabb_queries, item_queries);
+        std::cout << "Intersects ray\t" << how_many_seconds(t0,t1) << " seconds" << std::endl;
     }
 
     if(q.empty()) return false;
@@ -541,17 +513,14 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pa
     Time::time_point t0 = Time::now();
 
     vec3d  pos;
-    double t;
-    if(!root->bbox.intersects_ray(p, dir, t, pos)) return false;
+    double t=0.0;
+    if(root && !root->bbox.intersects_ray(p, dir, t, pos)) return false;
     Obj obj;
     obj.node = root;
     obj.dist = t;
 
     PrioQueue q;
     q.push(obj);
-
-    uint aabb_queries = 1;
-    uint item_queries = 0;
 
     while(!q.empty())
     {
@@ -578,19 +547,17 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pa
                         {
                             all_hits.insert(std::make_pair(t,items.at(i)->id));
                         }
-                        if(print_debug_info) ++item_queries;
                     }
                 }
 
             }
-            if(print_debug_info) ++aabb_queries;
         }
     }
 
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        print_query_info("Intersects ray query", how_many_seconds(t0,t1), aabb_queries, item_queries);
+        std::cout << "Intersects ray\t" << how_many_seconds(t0,t1) << " seconds" << std::endl;
     }
 
     if(all_hits.empty()) return false;
@@ -606,52 +573,22 @@ bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_com
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    uint aabb_queries = 0;
-    uint item_queries = 0;
+    std::unordered_set<uint> tmp;
+    intersects_box(AABB({t[0],t[1],t[2]}), tmp);
 
     ids.clear();
-
-    AABB t_box({t[0], t[1], t[2]});
-
-    std::stack<OctreeNode*> lifo;
-    lifo.push(root);
-
-    while(!lifo.empty())
+    for(uint i : tmp)
     {
-        OctreeNode *node = lifo.top();
-        lifo.pop();
-        assert(node->bbox.intersects_box(t_box));
-
-        if(node->is_inner)
+        if(items.at(i)->intersects_triangle(t, ignore_if_valid_complex))
         {
-            for(int i=0; i<8; ++i)
-            {
-                if(node->children[i]->bbox.intersects_box(t_box))
-                {
-                    lifo.push(node->children[i]);
-                }
-            }
-            if(print_debug_info) aabb_queries+=8;
-        }
-        else
-        {
-            for(uint i : node->item_indices)
-            {
-                // test the AABBs first, it's cheaper
-                if(items.at(i)->aabb.intersects_box(t_box) &&
-                   items.at(i)->intersects_triangle(t, ignore_if_valid_complex))
-                {
-                    ids.insert(items.at(i)->id);
-                }
-            }
-            if(print_debug_info) item_queries+=node->item_indices.size();
+            ids.insert(items.at(i)->id);
         }
     }
 
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        print_query_info("Intersects Triangle (exact)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+        std::cout << "Intersects triangle\t" << how_many_seconds(t0,t1) << " seconds" << std::endl;
     }
 
     return !ids.empty();
@@ -666,52 +603,76 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    uint aabb_queries = 0;
-    uint item_queries = 0;
+    std::unordered_set<uint> tmp;
+    intersects_box(AABB(s[0],s[1]), tmp);
 
     ids.clear();
-
-    AABB s_box(s[0], s[1]);
-
-    std::stack<OctreeNode*> lifo;
-    lifo.push(root);
-
-    while(!lifo.empty())
+    for(uint i : tmp)
     {
-        OctreeNode *node = lifo.top();
-        lifo.pop();
-        assert(node->bbox.intersects_box(s_box));
-
-        if(node->is_inner)
+        if(items.at(i)->intersects_segment(s, ignore_if_valid_complex))
         {
-            for(int i=0; i<8; ++i)
-            {
-                if(node->children[i]->bbox.intersects_box(s_box))
-                {
-                    lifo.push(node->children[i]);
-                }
-            }
-            if(print_debug_info) aabb_queries+=8;
-        }
-        else
-        {
-            for(uint i : node->item_indices)
-            {
-                // test the AABBs first, it's cheaper
-                if(items.at(i)->aabb.intersects_box(s_box) &&
-                   items.at(i)->intersects_segment(s, ignore_if_valid_complex))
-                {
-                    ids.insert(items.at(i)->id);
-                }
-            }
-            if(print_debug_info) item_queries+=node->item_indices.size();
+            ids.insert(items.at(i)->id);
         }
     }
 
     if(print_debug_info)
     {
         Time::time_point t1 = Time::now();
-        print_query_info("Intersects Segment (exact)", how_many_seconds(t0,t1), aabb_queries, item_queries);
+        std::cout << "Intersects segment\t" << how_many_seconds(t0,t1) << " seconds" << std::endl;
+    }
+
+    return !ids.empty();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// this query DOES NOT BECOME exact if CINOLIB_USES_EXACT_PREDICATES is defined
+CINO_INLINE
+bool Octree::intersects_box(const AABB & b, std::unordered_set<uint> & ids) const
+{
+    typedef std::chrono::high_resolution_clock Time;
+    Time::time_point t0 = Time::now();
+
+    ids.clear();
+
+    std::stack<OctreeNode*> lifo;
+    if(root && root->bbox.intersects_box(b))
+    {
+        lifo.push(root);
+    }
+
+    while(!lifo.empty())
+    {
+        OctreeNode *node = lifo.top();
+        lifo.pop();
+        assert(node->bbox.intersects_box(b));
+
+        if(node->is_inner)
+        {
+            for(int i=0; i<8; ++i)
+            {
+                if(node->children[i]->bbox.intersects_box(b))
+                {
+                    lifo.push(node->children[i]);
+                }
+            }
+        }
+        else
+        {
+            for(uint i : node->item_indices)
+            {
+                if(items.at(i)->aabb.intersects_box(b))
+                {
+                    ids.insert(items.at(i)->id);
+                }
+            }
+        }
+    }
+
+    if(print_debug_info)
+    {
+        Time::time_point t1 = Time::now();
+        std::cout << "Intersects box\t" << how_many_seconds(t0,t1) << " seconds" << std::endl;
     }
 
     return !ids.empty();

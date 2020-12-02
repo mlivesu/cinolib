@@ -166,13 +166,6 @@ class Octree
 
         void debug_mode(const bool b);
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void print_query_info(const std::string & s,
-                              const double        t,
-                              const uint          aabb_queries,
-                              const uint          item_queries) const;
-
         // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // returns pos, id and distance of the item that is closest to query point p
@@ -189,9 +182,11 @@ class Octree
         bool intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
         bool intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const;
 
-        // note: these queries becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
+        // note: the first two queries become exact if CINOLIB_USES_EXACT_PREDICATES is defined
+        // (intersect_box DOES NOT BECOME exact)
         bool intersects_segment (const vec3d s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
         bool intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
+        bool intersects_box     (const AABB  & b, std::unordered_set<uint> & ids) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
