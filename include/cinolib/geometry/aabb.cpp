@@ -361,7 +361,6 @@ bool AABB::intersects_triangle(const vec3d t[3]) const
         v0 - v2
     };
 
-    // global axes
     vec3d XYZ[3] =
     {
         vec3d(1,0,0),
@@ -369,6 +368,10 @@ bool AABB::intersects_triangle(const vec3d t[3]) const
         vec3d(0,0,1)
     };
 
+    // known issues:
+    // (i)  this can be optimized!
+    // (ii) this is not safe, XYZ[i] and f[j] may be parallel
+    // see Real Time Collision Detection for hints on how to address both
     for(uint i=0; i<3; ++i)
     for(uint j=0; j<3; ++j)
     {
@@ -383,11 +386,11 @@ bool AABB::intersects_triangle(const vec3d t[3]) const
         if(r<min || -r>max) return false;
     }
 
-    // Test the three axes corresponding to the face normals of AABB b (category 1).
+    // check intersection between aabbs
     AABB tb({t[0],t[1],t[2]});
     if(!intersects_box(tb)) return false;
 
-    // Test separating axis corresponding to triangle face normal (category 2)
+    // lastly, check intersection with triangle's supporting plane
     vec3d  n = f[0].cross(f[1]);
     double d = n.dot(t[0]);
     return intersects_plane(n,d);
