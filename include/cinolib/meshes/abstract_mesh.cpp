@@ -171,6 +171,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractMesh<M,V,E,P>::update_bbox()
 {
+    bb.reset();
     bb.push(this->verts);
 }
 
