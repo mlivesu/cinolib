@@ -141,9 +141,8 @@ bool polygon_triangulate(std::vector<vec2d> & poly,
     if(!polygon_is_CCW(poly))
     {
         for(auto & p : poly) p.x() = -p.x();
-    }
-    earcut(poly,tris);
-    return true;
+    }    
+    return earcut(poly,tris);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

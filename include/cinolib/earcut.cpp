@@ -50,7 +50,7 @@ namespace cinolib
 // 3d points and use just the XY component without performing any cast
 template<class point>
 CINO_INLINE
-void earcut(const std::vector<point> & poly,
+bool earcut(const std::vector<point> & poly,
                   std::vector<uint>  & tris)
 {
     tris.clear();
@@ -116,6 +116,9 @@ void earcut(const std::vector<point> & poly,
     // (a simple polygon with n vertices can be meshed with n-2 triangles)
     for(uint i=0; i<size-2; ++i)
     {
+        // something went wrong.... degenerate polygon?
+        if(ears.empty()) return false;
+
         uint curr = ears.back();
         ears.pop_back();
 
@@ -164,6 +167,7 @@ void earcut(const std::vector<point> & poly,
             is_ear.at(next[curr]) = false;
         }
     }
+    return true;
 }
 
 }

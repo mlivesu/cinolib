@@ -53,7 +53,7 @@ namespace cinolib
 // 3d points and use just the XY component without performing any cast
 template<class point>
 CINO_INLINE
-void earcut(const std::vector<point> & poly,
+bool earcut(const std::vector<point> & poly,
                   std::vector<uint>  & tris);
 
 }
