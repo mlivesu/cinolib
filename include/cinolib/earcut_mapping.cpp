@@ -46,7 +46,7 @@ void earcut_mapping(EarcutMapping_data & data)
     if(data.strictly_convex)
     {
         // due to convexity, the triangulation of poly_A will automatically apply to poly_B as well
-        earcut(data.poly_A, data.tris);
+        earcut(data.poly_A, data.tris, EarSorting::PRIORITIZED);
     }
     else
     {
