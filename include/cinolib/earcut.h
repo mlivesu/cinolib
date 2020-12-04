@@ -42,20 +42,44 @@
 namespace cinolib
 {
 
-// Implementation of the classical earcut algorithm, following the guidelines
+// Implementation of the earcut algorithm, following the guidelines
 // contained in:
 //
 //      Triangulation by ear clipping
 //      Geometric Tools (2008)
 //      D.Eberly
 //
+//      FIST: Fast Industrial-Strength Triangulation of Polygons
+//      Algorithmica (2001)
+//      M.Held
+//
 // NOTE: using the templated class point, I can feed this routine with
 // 3d points and use just the XY component without performing any cast
+
+// Three alternative schemes are proposed for ear processing
+enum class EarSorting
+{
+    // processes ears in the order they are found.
+    // May produce numerous badly shaped triangles
+    SEQUENTIAL,
+
+    // processes ears in random order. Tends to produce
+    // slightly better triangulations than SEQUENTIAL,
+    // with substancially no computational overhead
+    RANDOMIZED,
+
+    // sorts ears by increasing inner angle.
+    // Produces the best triangulations but
+    // is introduces a tiny overhead to handle
+    // the priority queue
+    PRIORITIZED
+};
+
 template<class point>
 CINO_INLINE
 bool earcut(const std::vector<point> & poly,
-                  std::vector<uint>  & tris);
-
+                  std::vector<uint>  & tris,
+            const EarSorting           sort = EarSorting::SEQUENTIAL);
 }
 
 #ifndef  CINO_STATIC_LIB

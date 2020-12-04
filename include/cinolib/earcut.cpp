@@ -35,25 +35,20 @@
 *********************************************************************************/
 #include <cinolib/earcut.h>
 #include <cinolib/predicates.h>
+#include <queue>
 
 namespace cinolib
 {
 
-// Implementation of the classical earcut algorithm, following the guidelines
-// contained in:
-//
-//      Triangulation by ear clipping
-//      Geometric Tools (2008)
-//      D.Eberly
-//
-// NOTE: using the templated class point, I can feed this routine with
-// 3d points and use just the XY component without performing any cast
 template<class point>
 CINO_INLINE
 bool earcut(const std::vector<point> & poly,
-                  std::vector<uint>  & tris)
+                  std::vector<uint>  & tris,
+            const EarSorting           sort) // { SEQUENTIAL, RANDOMIZED, PRIORITIZED }
 {
     tris.clear();
+
+    if(sort==EarSorting::RANDOMIZED) srand(1234567);
 
     // doubly linked list for O(1) polygon update
     uint size = poly.size();
@@ -66,15 +61,19 @@ bool earcut(const std::vector<point> & poly,
     next.back()  = 0;
 
     // list of the ears to be cut
+    // (SEQUENTIAL and RANDOMIZED use ears, PRIORITIZED uses ears_prio)
     std::vector<uint> ears;
+    std::priority_queue<std::pair<double,uint>> ears_prio;
     ears.reserve(size);
 
-    // this always has size |poly|, and keeps track of ears
-    // (corners that were not ears at the beginning may become so later on)
-    std::vector<bool> is_ear(size,false);
+    // these always have size |poly|, and keep track of ears and concave vertices
+    //  - corners that were not ears at the beginning may become so later on...
+    //  - corners that were concave at the beginning may become convex/ears so later on....
+    std::vector<bool> is_ear(size,false);   
+    std::vector<bool> is_concave(size,false);
 
-    // boolean function that performs a local ear test around vertex v_curr
-    auto ear_test = [&](const uint v_curr)
+    // boolean function that performs a local concavity test around vertex v_curr
+    auto concave_test = [&](const uint v_curr)
     {
         uint v_prev = prev[v_curr];
         uint v_next = next[v_curr];
@@ -83,17 +82,29 @@ bool earcut(const std::vector<point> & poly,
         const double *t1 = poly.at(v_curr).ptr();
         const double *t2 = poly.at(v_next).ptr();
 
-        // is the vertex convex?
-        if(orient2d(t0,t1,t2)<=0) return false;
+        return (orient2d(t0,t1,t2)<=0);
+    };
+
+    // boolean function that performs a local ear test around vertex v_curr
+    auto ear_test = [&](const uint v_curr)
+    {
+        if(is_concave[v_curr]) return false;
+
+        uint v_prev = prev[v_curr];
+        uint v_next = next[v_curr];
+
+        const double *t0 = poly.at(v_prev).ptr();
+        const double *t1 = poly.at(v_curr).ptr();
+        const double *t2 = poly.at(v_next).ptr();
 
         // does the ear contain any other front vertex?
-        // NOTE: this could be made faster by storing (and checking) only concave vertices
         uint beg  = next[v_curr];
         uint end  = prev[v_curr];
         uint test = next[beg];
         while(test!=end)
         {
-            if(point_in_triangle_2d(poly.at(test).ptr(),t0,t1,t2)!=STRICTLY_OUTSIDE)
+            // check only concave vertices....
+            if(is_concave[test] && point_in_triangle_2d(poly.at(test).ptr(),t0,t1,t2)!=STRICTLY_OUTSIDE)
             {
                 return false;
             }
@@ -102,25 +113,60 @@ bool earcut(const std::vector<point> & poly,
         return true;
     };
 
-    // detect all initial ears in O(n)
-    for(uint curr=0; curr<size; ++curr)
+    // inserts an ear into the ear list. uses the vector for SEQUENTIAL and
+    // RANDOMIZED mode, and a prio queue for PRIORITIZED mode
+    auto push_ear = [&](const uint v_curr)
     {
-        if(ear_test(curr))
+        is_ear.at(v_curr) = true;
+        if(sort==EarSorting::PRIORITIZED)
         {
-            ears.emplace_back(curr);
-            is_ear.at(curr) = true;
+            uint  v_prev = prev[v_curr];
+            uint  v_next = next[v_curr];
+            point u      = poly.at(v_prev) - poly.at(v_curr);
+            point v      = poly.at(v_next) - poly.at(v_curr);
+            double ang   = u.angle_rad(v);
+            ears_prio.push(std::make_pair(-ang,v_curr));
         }
-    }
+        else ears.emplace_back(v_curr);
+    };
+
+    // detect all concave vertices and valid ears in O(n)
+    for(uint curr=0; curr<size; ++curr) is_concave[curr] = concave_test(curr);
+    for(uint curr=0; curr<size; ++curr) if(ear_test(curr)) push_ear(curr);
 
     // iteratively triangulate the polygon, also updating the list of ears
     // (a simple polygon with n vertices can be meshed with n-2 triangles)
     for(uint i=0; i<size-2; ++i)
     {
         // something went wrong.... degenerate polygon?
-        if(ears.empty()) return false;
+        if(ears.empty() && ears_prio.empty()) return false;
 
-        uint curr = ears.back();
-        ears.pop_back();
+        uint curr;
+        if(sort==EarSorting::PRIORITIZED)
+        {
+            curr = ears_prio.top().second;
+            ears_prio.pop();
+        }
+        else
+        {
+            if(sort==EarSorting::RANDOMIZED)
+            {
+                uint off = rand()%ears.size();
+                std::swap(ears.at(off),ears.back());
+            }
+            curr = ears.back();
+            ears.pop_back();
+        }
+
+        // the ear has already been processed
+        if(!is_ear.at(curr))
+        {
+            --i;
+            continue;
+        }
+
+        // useful to mark the current ear as already processed
+        is_ear.at(curr) = false;
 
         // make new tri
         tris.push_back(prev[curr]);
@@ -131,39 +177,29 @@ bool earcut(const std::vector<point> & poly,
         next[prev[curr]] = next[curr];
         prev[next[curr]] = prev[curr];
 
-        // update prev ear
+        // update concavity info
+        is_concave[prev[curr]] = concave_test(prev[curr]);
+        is_concave[next[curr]] = concave_test(next[curr]);
+
+        // update prev ear info
         if(ear_test(prev[curr]))
-        {
-            // if it was not an ear before, append it
-            if(!is_ear.at(prev[curr]))
-            {
-                ears.emplace_back(prev[curr]);
-                is_ear.at(prev[curr]) = true;
-            }
+        {            
+            push_ear(prev[curr]);
         }
         else if(is_ear.at(prev[curr]))
         {
-            // if it was an ear before, remove it
-            // NOTE: this is linear in the size of vector ears. is it worth optimizing?
-            REMOVE_FROM_VEC(ears, prev[curr]);
+            // if it was an ear before, mark it as non ear
             is_ear.at(prev[curr]) = false;
         }
 
         // update next ear
         if(ear_test(next[curr]))
         {
-            // if it was not an ear before, append it
-            if(!is_ear.at(next[curr]))
-            {
-                ears.emplace_back(next[curr]);
-                is_ear.at(next[curr]) = true;
-            }
+            push_ear(next[curr]);
         }
         else if(is_ear.at(next[curr]))
         {
-            // if it was an ear before, remove it
-            // NOTE: this is linear in the size of vector ears. is it worth optimizing?
-            REMOVE_FROM_VEC(ears, next[curr]);
+            // if it was an ear before, mark it as non ear
             is_ear.at(next[curr]) = false;
         }
     }
