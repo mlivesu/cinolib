@@ -8,6 +8,7 @@ Please consider this to be just development notes and not any real planning.
 * Fast and Robust Triangle-Triangle Overlap Test Using Orientation Predicates
 
 ### Things to be fixed:
+* Dijkstra is faster with std::priority_queue than with std::set (double check this)
 * use enum classes instead of enums for strong typing and easier code/parameter handling
 * in DrawableSegmentSoup, edge rendering is orientation dependend when cheap mode is not active (cylinders are defined as points + dir!)
 * find ways to speedup updateGL(). For big meshes it's overly slow...
