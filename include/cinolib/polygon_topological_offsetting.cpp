@@ -46,7 +46,8 @@ void polygon_topological_offsetting(std::vector<vec3d> & poly,
                                     std::vector<uint>  & vmap)
 {
     // step 0: triangulate the polygon and make a mesh out of it
-    earcut(poly,tris);
+    // (the better the triangulation the more numerically stable...)
+    earcut(poly,tris, EarSorting::PRIORITIZED);
     Trimesh<> m(poly,tris);
 
     // step 1: refine the mesh so that each boundary
