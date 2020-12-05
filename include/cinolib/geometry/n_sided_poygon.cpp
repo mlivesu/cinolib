@@ -95,7 +95,7 @@ std::vector<vec3d> n_sided_polygon(const uint n,
 
         case STAR:
         {
-            assert(n>=4 && n%2==0);
+            assert(n>=4);// && n%2==0);
             verts[0] = vec3d(1,0,0);
             for(uint i=1; i<n; ++i)
             {
