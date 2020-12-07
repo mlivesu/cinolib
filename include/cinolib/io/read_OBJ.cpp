@@ -202,8 +202,10 @@ void read_OBJ(const char                     * filename,
                     std::string s0(filename);
                     std::string s1(mtu_c);
                     std::string s2 = get_file_path(s0) + get_file_name(s1);
-                    read_MTU(s2.c_str(), color_map, diffuse_path, specular_path, normal_path);
-                    has_per_face_color = true;
+                    if(read_MTU(s2.c_str(), color_map, diffuse_path, specular_path, normal_path))
+                    {
+                        has_per_face_color = true;
+                    }
                 }
                 break;
             }
@@ -234,7 +236,7 @@ void read_OBJ(const char                     * filename,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void read_MTU(const char                  * filename,
+bool read_MTU(const char                  * filename,
               std::map<std::string,Color> & color_map,
               std::string                 & diffuse_path,  // path of the image encoding the diffuse  texture component
               std::string                 & specular_path, // path of the image encoding the specular texture component
@@ -250,7 +252,7 @@ void read_MTU(const char                  * filename,
     if(!f)
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : read_MTU() : couldn't open color file " << filename << std::endl;
-        exit(-1);
+        return false;
     }
 
     char curr_material[1024];
@@ -286,18 +288,19 @@ void read_MTU(const char                  * filename,
         }
     }
     fclose(f);
+    return true;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void read_MTU(const char                  * filename,
+bool read_MTU(const char                  * filename,
               std::map<std::string,Color> & color_map)
 {
     std::string  diffuse_path;
     std::string  specular_path;
     std::string  normal_path;
-    read_MTU(filename, color_map, diffuse_path, specular_path, normal_path);
+    return read_MTU(filename, color_map, diffuse_path, specular_path, normal_path);
 }
 
 }
