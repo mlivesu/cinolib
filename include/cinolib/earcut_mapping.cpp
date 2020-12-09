@@ -102,7 +102,7 @@ void earcut_mapping(EarcutMapping_data & data)
         // the so generated triangles in the output triangle list
         std::vector<uint>  tmp_tris;
         std::vector<vec3d> tmp_poly(data.poly_A.begin()+size, data.poly_A.end());
-        earcut(tmp_poly, tmp_tris);
+        earcut(tmp_poly, tmp_tris, EarSorting::PRIORITIZED);
         for(uint vid : tmp_tris) data.tris.push_back(size+vid);
     }
 }
