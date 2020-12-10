@@ -45,18 +45,13 @@ bool tangent_frame(const vec3d & p0, // 3D coordinates of triangle <p0,p1,p2>
                          vec3d & u,  // axes of a 2D orthonormal frame in the supporting
                          vec3d & v)  // plane of triangle <p0,p1,p2>
 {
-    bool degenerate = false;
     u  = p1-p0;
-    if (u.normalize() < 1e-8) degenerate = true;
     v  = p2-p0;
     v -= u*u.dot(v);
-    if (v.normalize() < 1e-8) degenerate = true;
-    if (degenerate)
-    {
-        u = v = vec3d(0,0,0);
-        std::cerr << "WARNING: degenerate triangle. Undefined tangent space!" << std::endl;
-        return false;
-    }
+    u.normalize();
+    v.normalize();
+    if(u.length_squared()==0) return false;
+    if(v.length_squared()==0) return false;
     return true;
 }
 
@@ -71,7 +66,7 @@ bool tangent_space_2d_coords(const vec3d & p0,  // 3D coordinates of triangle <p
                                    vec2d & P2)
 {
     vec3d u,v;
-    if (tangent_frame(p0, p1, p2, u, v))
+    if(tangent_frame(p0,p1,p2,u,v))
     {
         P0 = vec2d(0,0);
         P1 = vec2d((p1-p0).dot(u), (p1-p0).dot(v));
