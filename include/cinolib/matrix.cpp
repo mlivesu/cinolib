@@ -125,6 +125,30 @@ double determinant_2x2(const vec2d a0, const vec2d a1)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+bool inverse_2x2(const double   a00,
+                 const double   a01,
+                 const double   a10,
+                 const double   a11,
+                       double & A00,
+                       double & A01,
+                       double & A10,
+                       double & A11)
+{
+    // https://www.mathsisfun.com/algebra/matrix-inverse.html
+
+    double one_over_det = 1.0 / determinant_2x2(a00,a01,a10,a11);
+
+    A00 =  a11 * one_over_det;
+    A01 = -a01 * one_over_det;
+    A10 = -a10 * one_over_det;
+    A11 =  a00 * one_over_det;
+
+    return one_over_det!=0; // false if the matrix is singular
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void eigen_decomposition_3x3(const double   a[3][3],
                                    vec3d  & v_min, // eigenvectors
                                    vec3d  & v_mid,
