@@ -160,11 +160,20 @@ Color Color::red_white_blue_ramp_01(float val)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Color Color::red_ramp_01(float val)
+Color Color::red_ramp_01(const float val, const bool zero_is_white)
 {
-    if(val<0) return RED();
-    if(val>1) return WHITE();
-    return Color(1,val,val);
+    if(zero_is_white)
+    {
+        if(val<0) return WHITE();
+        if(val>1) return RED();
+        return Color(1,1-val,1-val);
+    }
+    else
+    {
+        if(val<0) return RED();
+        if(val>1) return WHITE();
+        return Color(1,val,val);
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
