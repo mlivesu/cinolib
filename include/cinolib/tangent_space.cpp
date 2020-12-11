@@ -50,6 +50,7 @@ bool tangent_frame(const vec3d & p0, // 3D coordinates of triangle <p0,p1,p2>
     v = p2-p0;
     if(v.length_squared()==0) return false;
     vec3d n = u.cross(v);
+    if(n.length_squared()==0) return false;
     v = u.cross(n);
     u.normalize();
     v.normalize();
