@@ -45,11 +45,10 @@ bool tangent_frame(const vec3d & p0, // 3D coordinates of triangle <p0,p1,p2>
                          vec3d & u,  // axes of a 2D orthonormal frame in the supporting
                          vec3d & v)  // plane of triangle <p0,p1,p2>
 {
+    vec3d n;
     u = p1-p0;
-    if(u.length_squared()==0) return false;
     v = p2-p0;
-    if(v.length_squared()==0) return false;
-    vec3d n = u.cross(v);
+    n = u.cross(v);
     if(n.length_squared()==0) return false;
     v = u.cross(n);
     u.normalize();
