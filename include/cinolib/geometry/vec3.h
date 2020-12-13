@@ -119,8 +119,8 @@ template<typename real> class vec3
             real len = length();
             if (len == 0)
             {
-                len = 1e-10;
                 std::cout << ANSI_fg_color_red << "WARNING: normalization of zero length vector!" << ANSI_fg_color_default << std::endl;
+                return 0;
             }
             m_x /= len;
             m_y /= len;

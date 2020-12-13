@@ -190,34 +190,9 @@ void Hexmesh<M,V,E,F,P>::update_f_normal(const uint fid)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Hexmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
-{
-    uint fid_bot = this->poly_face_id(pid,0);
-    uint fid_top = this->poly_face_opposite_to(pid, fid_bot);
-    std::vector<uint> vlist(8);
-    vlist[0] = this->face_vert_id(fid_bot,HEXA_FACES[0][0]);
-    vlist[1] = this->face_vert_id(fid_bot,HEXA_FACES[0][1]);
-    vlist[2] = this->face_vert_id(fid_bot,HEXA_FACES[0][2]);
-    vlist[3] = this->face_vert_id(fid_bot,HEXA_FACES[0][3]);
-    if (this->poly_face_is_CW(pid,fid_bot)) std::swap(vlist[1],vlist[3]);
-    for(uint vid : this->face_verts_id(fid_top))
-    {
-        if(this->verts_are_adjacent(vid,vlist[0])) vlist[4] = vid; else
-        if(this->verts_are_adjacent(vid,vlist[1])) vlist[5] = vid; else
-        if(this->verts_are_adjacent(vid,vlist[2])) vlist[6] = vid; else
-        if(this->verts_are_adjacent(vid,vlist[3])) vlist[7] = vid; else
-        assert(false);
-    }
-    this->p2v.at(pid) = vlist;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 void Hexmesh<M,V,E,F,P>::print_quality(const bool list_folded_elements)
 {
-    if (list_folded_elements) std::cout << "Folded Hexa: ";
+    if(list_folded_elements) std::cout << "Folded Hexa: ";
 
     double asj = 0.0;
     double msj = inf_double;
@@ -349,34 +324,6 @@ vec3d Hexmesh<M,V,E,F,P>::verts_average(const std::vector<uint> & vids) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Hexmesh<M,V,E,F,P>::update_hex_quality(const uint pid)
-{
-    this->poly_data(pid).quality = hex_scaled_jacobian(this->poly_vert(pid,0),
-                                                       this->poly_vert(pid,1),
-                                                       this->poly_vert(pid,2),
-                                                       this->poly_vert(pid,3),
-                                                       this->poly_vert(pid,4),
-                                                       this->poly_vert(pid,5),
-                                                       this->poly_vert(pid,6),
-                                                       this->poly_vert(pid,7));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Hexmesh<M,V,E,F,P>::update_hex_quality()
-{
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        update_hex_quality(pid);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 uint Hexmesh<M,V,E,F,P>::poly_face_opposite_to(const uint pid, const uint fid) const
 {
     assert(this->poly_contains_face(pid, fid));
@@ -447,19 +394,6 @@ double Hexmesh<M,V,E,F,P>::poly_volume(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Hexmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex list
-{
-    assert(vlist.size()==8);
-    uint pid = AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(vlist);
-    reorder_p2v(pid); // make sure p2v stores hex vertices in the standard way
-    update_hex_quality(pid);
-    return pid;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 bool Hexmesh<M,V,E,F,P>::poly_fix_orientation()
 {
     if(AbstractPolyhedralMesh<M,V,E,F,P>::poly_fix_orientation())
@@ -467,8 +401,8 @@ bool Hexmesh<M,V,E,F,P>::poly_fix_orientation()
         uint bad = 0;
         for(uint pid=0; pid<this->num_polys(); ++pid)
         {
-            this->reorder_p2v(pid);
-            this->update_hex_quality(pid);
+            this->poly_reorder_p2v(pid);
+            this->update_p_quality(pid);
             if(this->poly_data(pid).quality < 0.0) ++bad;
         }
         if(bad > 0.5*this->num_polys())
@@ -476,9 +410,9 @@ bool Hexmesh<M,V,E,F,P>::poly_fix_orientation()
             for(uint pid=0; pid<this->num_polys(); ++pid)
             {
                 this->poly_flip_winding(pid);
-                this->reorder_p2v(pid);
+                this->poly_reorder_p2v(pid);
             }
-            this->update_hex_quality();
+            this->update_quality();
         }
         return true;
     }

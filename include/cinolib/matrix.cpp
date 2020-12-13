@@ -75,8 +75,7 @@ void eigen_decomposition_2x2(const double   a00,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
-//
+// https://lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
 CINO_INLINE
 void eigenvalues_2x2(const double   a00,
                      const double   a01,
@@ -85,11 +84,18 @@ void eigenvalues_2x2(const double   a00,
                            double & min,
                            double & max)
 {
-    double T = a00 + a11; // trace
-    double D = determinant_2x2(a00,a01,a10,a11);
+    double s1 = a00*a00 + a01*a01 + a10*a10 + a11*a11;
+    double s2 = sqrt(pow(a00*a00 + a01*a01 - a10*a10 - a11*a11,2) + 4*pow(a00*a10 + a01*a11,2));
 
-    min = T/2.0 - sqrt(T*T/4.0-D);
-    max = T/2.0 + sqrt(T*T/4.0-D);
+    max = sqrt((s1+s2)*0.5);
+    min = sqrt((s1-s2)*0.5);
+
+//    OLD (NUMERICALLY LESS STABLE) VERSION WAS BASED ON:
+//    http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
+//    double T = a00 + a11; // trace
+//    double D = determinant_2x2(a00,a01,a10,a11);
+//    min = T/2.0 - sqrt(T*T/4.0-D);
+//    max = T/2.0 + sqrt(T*T/4.0-D);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -120,6 +126,30 @@ CINO_INLINE
 double determinant_2x2(const vec2d a0, const vec2d a1)
 {
     return determinant_2x2(a0[0], a0[1], a1[0], a1[1]);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool inverse_2x2(const double   a00,
+                 const double   a01,
+                 const double   a10,
+                 const double   a11,
+                       double & A00,
+                       double & A01,
+                       double & A10,
+                       double & A11)
+{
+    // https://www.mathsisfun.com/algebra/matrix-inverse.html
+
+    double one_over_det = 1.0 / determinant_2x2(a00,a01,a10,a11);
+
+    A00 =  a11 * one_over_det;
+    A01 = -a01 * one_over_det;
+    A10 = -a10 * one_over_det;
+    A11 =  a00 * one_over_det;
+
+    return one_over_det!=0; // false if the matrix is singular
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -35,25 +35,11 @@
 *********************************************************************************/
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/Moller_Trumbore_intersection.h>
-#include <cinolib/exact_geometric_predicates.h>
+#include <cinolib/predicates.h>
+#include <cinolib/geometry/triangle_utils.h>
 
 namespace cinolib
 {
-
-CINO_INLINE
-ItemType Triangle::item_type() const
-{
-    return TRIANGLE;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-AABB Triangle::aabb() const
-{
-    std::vector<vec3d> tmp = {v[0], v[1], v[2]};
-    return AABB(tmp);
-}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -61,32 +47,6 @@ CINO_INLINE
 vec3d Triangle::point_closest_to(const vec3d & p) const
 {
     return triangle_closest_point(p,v[0],v[1],v[2]);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool Triangle::contains_exact(const vec3d & p, bool strict) const
-{
-    int where = point_in_triangle_exact(p,v);
-    if(strict) return (where==STRICTLY_INSIDE);
-               return (where>=STRICTLY_INSIDE);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool Triangle::intersects_segment_exact(const vec3d s[]) const
-{
-    return segment_triangle_intersect_exact(v,s);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool Triangle::intersects_triangle_exact(const vec3d t[]) const
-{
-    return triangle_triangle_intersect_exact(v,t);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -111,6 +71,36 @@ CINO_INLINE
 void Triangle::barycentric_coordinates(const vec3d & p, double bc[]) const
 {
     triangle_barycentric_coords(v[0], v[1], v[2], p, bc);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Triangle::contains(const vec3d & p, const bool strict) const
+{
+    int where = point_in_triangle_3d(p,v[0], v[1], v[2]);
+    if(strict) return (where==STRICTLY_INSIDE);
+    return (where>=STRICTLY_INSIDE);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Triangle::intersects_segment(const vec3d s[], const bool ignore_if_valid_complex) const
+{
+    auto res = segment_triangle_intersect_3d(s[0],s[1], v[0], v[1], v[2]);
+    if(ignore_if_valid_complex) return (res > SIMPLICIAL_COMPLEX);
+    return (res>=SIMPLICIAL_COMPLEX);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Triangle::intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex) const
+{
+    auto res = triangle_triangle_intersect_3d(v[0], v[1], v[2], t[0], t[1], t[2]);
+    if(ignore_if_valid_complex) return (res > SIMPLICIAL_COMPLEX);
+    return (res>=SIMPLICIAL_COMPLEX);
 }
 
 }

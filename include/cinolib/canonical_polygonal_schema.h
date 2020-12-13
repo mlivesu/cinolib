@@ -49,10 +49,10 @@ namespace cinolib
  *
  * For further details, refer to:
  *
- *    Obtaining a Canonical Polygonal Schema from a
- *    Greedy Homotopy Basis with Minimal Mesh Refinement
+ *    Scalable Mesh Refinement for Canonical Polygonal Schemas
+ *    of Extremely High Genus Shapes
  *    Marco Livesu
- *    (submitted)
+ *    IEEE Transactions on Visualization and Computer Graphics, 2020
  *
  * and
  *

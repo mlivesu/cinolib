@@ -160,99 +160,30 @@ void Polyhedralmesh<M,V,E,F,P>::update_f_normal(const uint fid)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Polyhedralmesh<M,V,E,F,P>::poly_is_hexahedron(const uint pid) const
+double Polyhedralmesh<M,V,E,F,P>::poly_volume(const uint pid) const
 {
-    if(this->verts_per_poly(pid)!=8) return false;
-    if(this->faces_per_poly(pid)!=6) return false;
-    for(uint fid : this->adj_p2f(pid))
+    if(this->poly_is_tetrahedron(pid))
     {
-        if(!this->face_is_quad(fid)) return false;
+        return tet_unsigned_volume(this->poly_vert(pid,0),
+                                   this->poly_vert(pid,1),
+                                   this->poly_vert(pid,2),
+                                   this->poly_vert(pid,3));
     }
-    return true;
-}
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-bool Polyhedralmesh<M,V,E,F,P>::poly_is_tetrahedron(const uint pid) const
-{
-    if(this->verts_per_poly(pid)!=4) return false;
-    if(this->faces_per_poly(pid)!=4) return false;
-    for(uint fid : this->adj_p2f(pid))
+    if(this->poly_is_hexahedron(pid))
     {
-        if(!this->face_is_tri(fid)) return false;
+        return hex_unsigned_volume(this->poly_vert(pid,0),
+                                   this->poly_vert(pid,1),
+                                   this->poly_vert(pid,2),
+                                   this->poly_vert(pid,3),
+                                   this->poly_vert(pid,4),
+                                   this->poly_vert(pid,5),
+                                   this->poly_vert(pid,6),
+                                   this->poly_vert(pid,7));
     }
-    return true;
-}
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-bool Polyhedralmesh<M,V,E,F,P>::poly_is_hexable_w_midpoint(const uint pid) const
-{
-    // the only topological condition to be satisfied for a genus
-    // zero polyedron to be hexable, is that each of its vertices
-    // has three incident edges:
-    //
-    // Hexahedral Meshing Using Midpoint Subdivision and Integer Programming
-    // T.S. Li, R.M. McKeag, C.G. Armstrong
-    // Computer Methods in Applied Mechanics and Engineering, 1995
-    //
-    for(uint vid : this->adj_p2v(pid))
-    {        
-        if(this->poly_vert_valence(pid,vid)!=3) return false;
-    }
-    return true;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-bool Polyhedralmesh<M,V,E,F,P>::poly_is_prism(const uint pid) const
-{
-    // test all possible bases for a prism
-    //
-    for(uint fid : this->adj_p2f(pid))
-    {
-        if(this->poly_is_prism(pid,fid)) return true;
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-bool Polyhedralmesh<M,V,E,F,P>::poly_is_prism(const uint pid, const uint fid) const
-{
-    assert(this->poly_contains_face(pid,fid));
-
-    // a prism base has one incident quad per edge and
-    // an a twin n-gon at the opposite base
-
-    int nf = this->faces_per_poly(pid);
-
-    if((int)this->edges_per_face(fid)!=nf-2) return false;
-
-    std::set<uint> f_visited;
-    f_visited.insert(fid);
-    for(uint eid : this->adj_f2e(fid))
-    {
-        uint nbr = this->poly_face_adj_through_edge(pid, fid, eid);
-        if (!this->face_is_quad(nbr)) return false;
-        f_visited.insert(nbr);
-    }
-    //assert((int)f_visited.size()==nf-1);
-
-    for(uint nbr : this->adj_p2f(pid))
-    {
-        if(CONTAINS(f_visited,nbr)) continue;
-        if(this->verts_per_face(nbr)==this->verts_per_face(fid)) return true;
-    }
-    return false;
+    assert(false && "TODO!");
+    return 0.0;
 }
 
 }

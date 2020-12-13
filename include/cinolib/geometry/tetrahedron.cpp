@@ -35,24 +35,10 @@
 *********************************************************************************/
 #include <cinolib/geometry/tetrahedron.h>
 #include <cinolib/geometry/tetrahedron_utils.h>
-#include <cinolib/exact_geometric_predicates.h>
+#include <cinolib/predicates.h>
 
 namespace cinolib
 {
-
-CINO_INLINE
-ItemType Tetrahedron::item_type() const
-{
-    return TETRAHEDRON;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-AABB Tetrahedron::aabb() const
-{
-    return AABB({v[0], v[1], v[2], v[3]});
-}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -60,34 +46,6 @@ CINO_INLINE
 vec3d Tetrahedron::point_closest_to(const vec3d & p) const
 {
     return tetrahedron_closest_point(p,v[0],v[1],v[2],v[3]);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool Tetrahedron::contains_exact(const vec3d & p, bool strict) const
-{
-    int where = point_in_tet_exact(p,v);
-    if(strict) return (where==STRICTLY_INSIDE);
-               return (where>=STRICTLY_INSIDE);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool Tetrahedron::intersects_segment_exact(const vec3d []) const
-{
-    assert(false && "TODO!");
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool Tetrahedron::intersects_triangle_exact(const vec3d []) const
-{
-    assert(false && "TODO!");
-    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -119,6 +77,34 @@ CINO_INLINE
 void Tetrahedron::barycentric_coordinates(const vec3d &p, double bc[]) const
 {
     tet_barycentric_coords(v[0], v[1], v[2], v[3], p, bc);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Tetrahedron::contains(const vec3d & p, const bool strict) const
+{
+    int where = point_in_tet(p, v[0], v[1], v[2], v[3]);
+    if(strict) return (where==STRICTLY_INSIDE);
+    return (where>=STRICTLY_INSIDE);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Tetrahedron::intersects_segment(const vec3d [], const bool) const
+{
+    assert(false && "TODO!");
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Tetrahedron::intersects_triangle(const vec3d [], const bool) const
+{
+    assert(false && "TODO!");
+    return false;
 }
 
 }

@@ -45,13 +45,13 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C);
+vec3d triangle_normal(const vec3d & A, const vec3d & B, const vec3d & C);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template <class vec>
 CINO_INLINE
-double triangle_area(const vec A, const vec B, const vec C);
+double triangle_area(const vec & A, const vec & B, const vec & C);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -62,8 +62,8 @@ double triangle_area(const vec A, const vec B, const vec C);
 //
 CINO_INLINE
 void triangle_traverse_with_ray(const vec3d   tri[3],
-                                const vec3d   P,
-                                const vec3d   dir,
+                                const vec3d & P,
+                                const vec3d & dir,
                                       vec3d & exit_pos,
                                       uint  & exit_edge);
 

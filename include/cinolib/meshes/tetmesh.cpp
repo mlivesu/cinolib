@@ -191,22 +191,6 @@ void Tetmesh<M,V,E,F,P>::update_f_normal(const uint fid)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::reorder_p2v(const uint pid)
-{
-    uint fid = this->poly_face_id(pid,0);
-    std::vector<uint> vlist(4);
-    vlist[0] = this->face_vert_id(fid,TET_FACES[0][0]);
-    vlist[1] = this->face_vert_id(fid,TET_FACES[0][1]);
-    vlist[2] = this->face_vert_id(fid,TET_FACES[0][2]);
-    vlist[3] = this->poly_vert_opposite_to(pid,fid);
-    if (this->poly_face_is_CW(pid,fid)) std::swap(vlist[1],vlist[2]);
-    this->p2v.at(pid) = vlist;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 double Tetmesh<M,V,E,F,P>::face_area(const uint fid) const
 {
     return triangle_area(this->face_vert(fid,0),
@@ -229,43 +213,45 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
 {
-    // create sub edges and propagate attributes
-    uint vid0    = this->edge_vert_id(eid, 0);
-    uint vid1    = this->edge_vert_id(eid, 1);
+    assert(this->edge_valence(eid)>0);
+
     uint new_vid = this->vert_add(p);
-    uint eid0    = this->edge_add(vid0, new_vid);
-    uint eid1    = this->edge_add(vid1, new_vid);
-    this->edge_data(eid0) = this->edge_data(eid);
-    this->edge_data(eid1) = this->edge_data(eid);
 
-    // create sub faces and propagate attributes
-    for(uint fid : this->adj_e2f(eid))
-    {
-        if(!this->face_verts_are_CCW(fid,vid1,vid0)) std::swap(vid1,vid0);
-        uint vid2 = this->face_vert_opposite_to(fid,eid);
-        uint fid0 = this->face_add({new_vid, vid1, vid2});
-        uint fid1 = this->face_add({new_vid, vid2, vid0});
-        this->face_data(fid0) = this->face_data(fid);
-        this->face_data(fid1) = this->face_data(fid);
-        this->update_f_normal(fid0);
-        this->update_f_normal(fid1);
-    }
-
-    // create sub polys and propagate attributes
+    // create sub-elements
     for(uint pid : this->adj_e2p(eid))
     {
         for(uint fid : this->poly_faces_opposite_to(pid,eid))
         {
-            std::vector<uint> tet(4);
-            tet[0] = this->face_vert_id(fid,TET_FACES[0][0]);
-            tet[1] = this->face_vert_id(fid,TET_FACES[0][1]);
-            tet[2] = this->face_vert_id(fid,TET_FACES[0][2]);
-            tet[3] = new_vid;
-            if (this->poly_face_is_CW(pid,fid)) std::swap(tet[1],tet[2]);
+            std::vector<uint> tet =
+            {
+                this->face_vert_id(fid,0),
+                this->face_vert_id(fid,1),
+                this->face_vert_id(fid,2),
+                new_vid
+            };
+            if(this->poly_face_is_CCW(pid,fid)) std::swap(tet[1],tet[2]);
             uint new_pid = this->poly_add(tet);
             this->poly_data(new_pid) = this->poly_data(pid);
         }
     }
+
+    // propagate attributes to sub-elements
+    uint vid0 = this->edge_vert_id(eid,0);
+    uint vid1 = this->edge_vert_id(eid,1);
+    int  e0   = this->edge_id(vid0, new_vid); assert(e0>=0);
+    int  e1   = this->edge_id(vid1, new_vid); assert(e1>=0);
+    this->edge_data(e0) = this->edge_data(eid);
+    this->edge_data(e1) = this->edge_data(eid);
+    for(uint fid : this->adj_e2f(eid))
+    {
+        uint vopp = this->face_vert_opposite_to(fid,eid);
+         int f0   = this->face_id({vid0,new_vid,vopp}); assert(f0>=0);
+         int f1   = this->face_id({vid1,new_vid,vopp}); assert(f1>=0);
+         this->face_data(f0) = this->face_data(fid);
+         this->face_data(f1) = this->face_data(fid);
+    }
+
+    if(this->mesh_data().update_normals && this->vert_is_on_srf(new_vid)) this->update_v_normal(new_vid);
 
     // remove old edge and all elements attached to it
     this->edge_remove(eid);
@@ -420,12 +406,18 @@ int Tetmesh<M,V,E,F,P>::edge_collapse(const uint eid, const vec3d & p, const dou
         uint new_pid = this->poly_add(vlist);
         this->poly_data(new_pid) = this->poly_data(pid);
 
-        for(uint fid: this->adj_p2f(pid))
+        if(this->mesh_data().update_normals)
         {
-            if(this->face_is_on_srf(fid)) this->update_f_normal(fid);
+            for(uint fid: this->adj_p2f(pid))
+            {
+                if(this->face_is_on_srf(fid)) this->update_f_normal(fid);
+            }
         }
     }
-    if(this->vert_is_on_srf(vert_to_keep)) this->update_v_normal(vert_to_keep);
+    if(this->mesh_data().update_normals && this->vert_is_on_srf(vert_to_keep))
+    {
+        this->update_v_normal(vert_to_keep);
+    }
 
     this->vert_remove(vert_to_remove);
 
@@ -443,6 +435,119 @@ int Tetmesh<M,V,E,F,P>::edge_collapse(const uint eid, const vec3d & p, const dou
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool Tetmesh<M,V,E,F,P>::face_flip(const uint fid, bool geometric_check) // 2-to-3 flip
+{
+    if(this->adj_f2p(fid).size()!=2) return false;
+
+    uint pid0 = this->adj_f2p(fid).front();
+    uint pid1 = this->adj_f2p(fid).back();
+    uint opp0 = this->poly_vert_opposite_to(pid0, fid);
+    uint opp1 = this->poly_vert_opposite_to(pid1, fid);
+
+    // "A face is topologically unflippable if the edge
+    //  that would replace it is already in the complex"
+    //
+    // Unflippable Tetrahedral Complexes
+    // Randall Dougherty, Vance Faber, and Michael Murphy
+    // Discrete Computational Geometry 2004
+    if(this->edge_id(opp1, opp0)!=-1) return false;
+
+    // construct all new elements
+    uint tets[3][4];
+    uint i=0;
+    for(uint id : this->adj_p2f(pid0))
+    {
+        if(id==fid) continue;
+        tets[i][0] = this->face_vert_id(id,0);
+        tets[i][1] = this->face_vert_id(id,1);
+        tets[i][2] = this->face_vert_id(id,2);
+        tets[i][3] = opp1;
+        if(this->poly_face_is_CCW(pid0,id)) std::swap(tets[i][0],tets[i][1]);
+
+        // this check is exact only if symbol CINOLIB_USES_EXACT_PREDICATES is defined
+        if(geometric_check)
+        {
+            if(orient3d(this->vert(tets[i][0]),
+                        this->vert(tets[i][1]),
+                        this->vert(tets[i][2]),
+                        this->vert(tets[i][3]))<=0) return false;
+        }
+        ++i;
+    }
+    assert(i==3);
+
+    // add new elements to the mesh
+    for(i=0; i<3; ++i)
+    {
+        uint new_pid = this->poly_add({tets[i][0],
+                                       tets[i][1],
+                                       tets[i][2],
+                                       tets[i][3]});
+        this->update_p_quality(new_pid);
+    }
+
+    this->face_remove(fid);
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool Tetmesh<M,V,E,F,P>::edge_flip(const uint eid) // 3-to-2 flip
+{
+    // "An edge is topologically unflippable if does not
+    //  have exactly three incident faces or the face that
+    //  would replace it is already in the complex"
+    //
+    // Unflippable Tetrahedral Complexes
+    // Randall Dougherty, Vance Faber, and Michael Murphy
+    // Discrete Computational Geometry 2004
+    if(this->adj_e2p(eid).size()!=3) return false;
+    auto e_link = this->edge_verts_link(eid);
+    if(this->face_id(e_link)!=-1) return false;
+
+    uint pid = this->adj_e2p(eid).front();
+    uint opp = this->num_verts();
+    for(uint fid : this->adj_e2f(eid))
+    {
+        uint vid = this->face_vert_opposite_to(fid,eid);
+        if(!this->poly_contains_vert(pid,vid)) opp = vid;
+    }
+    assert(opp < this->num_verts());
+
+    // construct all new elements
+    uint tets[2][4];
+    uint i=0;
+    for(uint fid : this->poly_faces_opposite_to(pid,eid))
+    {
+        tets[i][0] = this->face_vert_id(fid,0),
+        tets[i][1] = this->face_vert_id(fid,1),
+        tets[i][2] = this->face_vert_id(fid,2),
+        tets[i][3] = opp;
+        if(this->poly_face_is_CCW(pid,fid)) std::swap(tets[i][0],tets[i][1]);
+        ++i;
+    }
+    assert(i==2);
+
+    // add new elements to the mesh
+    for(i=0; i<2; ++i)
+    {
+        uint new_pid = this->poly_add({tets[i][0],
+                                       tets[i][1],
+                                       tets[i][2],
+                                       tets[i][3]});
+        this->update_p_quality(new_pid);
+    }
+
+    this->edge_remove(eid);
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint Tetmesh<M,V,E,F,P>::face_edge_opposite_to(const uint fid, const uint vid) const
 {
     assert(this->face_contains_vert(fid,vid));
@@ -451,6 +556,7 @@ uint Tetmesh<M,V,E,F,P>::face_edge_opposite_to(const uint fid, const uint vid) c
         if(!this->edge_contains_vert(eid,vid)) return eid;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -465,6 +571,7 @@ uint Tetmesh<M,V,E,F,P>::face_vert_opposite_to(const uint fid, const uint eid) c
         if(!this->edge_contains_vert(eid,vid)) return vid;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -495,16 +602,21 @@ uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
         uint opp_vid = this->poly_vert_opposite_to(pid, fid);
         for(uint off=0; off<3; ++off)
         {
-            std::vector<uint> tet(4);
-            tet[0] = this->face_vert_id(fid,off);
-            tet[1] = new_vid;
-            tet[2] = this->face_vert_id(fid,(off+1)%3);
-            tet[3] = opp_vid;
-            if (this->poly_face_is_CW(pid,fid)) std::swap(tet[1],tet[2]);
+            std::vector<uint> tet =
+            {
+                this->face_vert_id(fid,off),
+                new_vid,
+                this->face_vert_id(fid,(off+1)%3),
+                opp_vid
+            };
+            bool flip_face = this->poly_face_is_CW(pid,fid);
+            if(flip_face) std::swap(tet[1],tet[2]);
             uint new_pid = this->poly_add(tet);
             this->poly_data(new_pid) = this->poly_data(pid);
         }
     }
+
+    if(this->mesh_data().update_normals && this->vert_is_on_srf(new_vid)) this->update_v_normal(new_vid);
 
     this->face_remove(fid);
     return new_vid;
@@ -606,13 +718,13 @@ double Tetmesh<M,V,E,F,P>::poly_volume(const uint pid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist) // vertex list
+void Tetmesh<M,V,E,F,P>::polys_split(const std::vector<uint> & pids)
 {
-    assert(vlist.size()==4);
-    uint pid = AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(vlist);
-    reorder_p2v(pid); // make sure p2v stores tet vertices in the standard way
-    update_tet_quality(pid);
-    return pid;
+    // in order to avoid id conflicts split all the
+    // polys starting from the one with highest id
+    //
+    std::vector<uint> tmp = SORT_VEC(pids, true);
+    for(uint pid : tmp) poly_split(pid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -635,35 +747,66 @@ uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const std::vector<double> & 
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void Tetmesh<M,V,E,F,P>::polys_split(const std::vector<uint> & pids)
+uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
 {
-    // in order to avoid id conflicts split all the
-    // polys starting from the one with highest id
-    //
-    std::vector<uint> tmp = SORT_VEC(pids, true);
-    for(uint pid : tmp) poly_split(pid);
+    uint vid = this->vert_add(p);
+    return this->poly_split(pid,vid);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const vec3d & p)
+uint Tetmesh<M,V,E,F,P>::poly_split(const uint pid, const uint vid)
 {
-    uint new_vid = this->vert_add(p);
-
-    for(uint i=0; i<4; ++i)
-    {
-        std::vector<uint> tet(4, new_vid);
-        tet[TET_FACES[i][0]] = this->poly_vert_id(pid,TET_FACES[i][0]);
-        tet[TET_FACES[i][1]] = this->poly_vert_id(pid,TET_FACES[i][1]);
-        tet[TET_FACES[i][2]] = this->poly_vert_id(pid,TET_FACES[i][2]);
+    assert(this->vert_valence(vid)==0);
+    for(uint fid : this->adj_p2f(pid))
+    {        
+        std::vector<uint> tet =
+        {
+            this->face_vert_id(fid,0),
+            this->face_vert_id(fid,1),
+            this->face_vert_id(fid,2),
+            vid
+        };
+        if(this->poly_face_is_CCW(pid,fid)) std::swap(tet[1],tet[2]);
         uint new_pid = this->poly_add(tet);
         this->poly_data(new_pid) = this->poly_data(pid);
+        this->update_p_quality(new_pid);
     }
-    this->poly_remove(pid);
 
-    return new_vid;
+    this->poly_remove(pid);
+    return vid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int Tetmesh<M,V,E,F,P>::poly_id(const uint fid, const uint vid) const
+{
+    for(uint pid : this->adj_f2p(fid))
+    {
+        if(this->poly_contains_vert(pid,vid)) return pid;
+    }
+    return -1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+int Tetmesh<M,V,E,F,P>::poly_id_from_vids(const std::vector<uint> & vlist) const
+{
+    if(vlist.empty()) return -1;
+    std::vector<uint> query = SORT_VEC(vlist);
+
+    uint vid = vlist.front();
+    for(uint pid : this->adj_v2p(vid))
+    {
+        if(this->poly_verts_id(pid,true)==query) return pid;
+    }
+    return -1;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -734,7 +877,7 @@ uint Tetmesh<M,V,E,F,P>::poly_face_opposite_to(const uint pid, const uint vid) c
 
     for(uint fid : this->adj_p2f(pid))
     {
-        if (!this->face_contains_vert(fid,vid)) return fid;
+        if(!this->face_contains_vert(fid,vid)) return fid;
     }
     assert(false);
     return 0; // warning killer
@@ -748,30 +891,6 @@ std::vector<uint> Tetmesh<M,V,E,F,P>::poly_faces_opposite_to(const uint pid, con
 {
     assert(this->poly_contains_edge(pid, eid));
     return this->poly_e2f(pid, this->poly_edge_opposite_to(pid,eid));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Tetmesh<M,V,E,F,P>::update_tet_quality(const uint pid)
-{
-    this->poly_data(pid).quality = tet_scaled_jacobian(this->poly_vert(pid,0),
-                                                       this->poly_vert(pid,1),
-                                                       this->poly_vert(pid,2),
-                                                       this->poly_vert(pid,3));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void Tetmesh<M,V,E,F,P>::update_tet_quality()
-{
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
-        update_tet_quality(pid);
-    }
 }
 
 }

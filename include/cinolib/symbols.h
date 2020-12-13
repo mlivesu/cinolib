@@ -81,6 +81,11 @@ enum
 
     IS,
     IS_NOT,
+
+    // n sided polygon types
+    CIRCLE,
+    SQUARE,
+    STAR,
 };
 
 }

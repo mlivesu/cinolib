@@ -449,6 +449,23 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         right_col->addWidget(gbox);
     }
 
+    // normals
+    {
+        cb_face_normals = new QCheckBox("Show Face Normals", widget);
+        cb_face_normals->setFont(global_font);
+        cb_face_normals->setChecked(false);
+        face_normals.set_cheap_rendering(true);
+        face_normals.set_color(Color::BLUE());
+        left_col->addWidget(cb_face_normals);
+
+        cb_vert_normals = new QCheckBox("Show Vert Normals", widget);
+        cb_vert_normals->setFont(global_font);
+        cb_vert_normals->setChecked(false);
+        vert_normals.set_cheap_rendering(true);
+        vert_normals.set_color(Color::RED());
+        left_col->addWidget(cb_vert_normals);
+    }
+
     global_layout->addStretch();
     left_col->addStretch();
     right_col->addStretch();
@@ -1015,7 +1032,7 @@ void SurfaceMeshControlPanel<Mesh>::connect()
     {
         switch(cb_actions->currentIndex())
         {
-            case 1: m->edge_unmark_all(); break;
+            case 1: m->edge_set_flag(MARKED,false); break;
             case 2: m->poly_color_wrt_label(); break;
             case 3: m->poly_label_wrt_color(); break;
             case 4: m->edge_mark_color_discontinuities(); break;
@@ -1024,6 +1041,56 @@ void SurfaceMeshControlPanel<Mesh>::connect()
             case 7: m->edge_mark_boundaries(); break;
         }
         m->updateGL();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_face_normals, &QCheckBox::stateChanged, [&]()
+    {
+        if(m == NULL || canvas == NULL) return;
+
+        if(cb_face_normals->isChecked())
+        {
+            face_normals.clear();
+            double l = canvas->scene_size()/5.0;
+            for(uint pid=0; pid<m->num_polys(); ++pid)
+            {
+                if(!m->poly_data(pid).flags[HIDDEN])
+                {
+                    vec3d  n = m->poly_data(pid).normal;
+                    vec3d  c = m->poly_centroid(pid);
+                    face_normals.push_seg(c, c+(n*l));
+                }
+            }
+            canvas->push_obj(&face_normals,false);
+        }
+        else canvas->pop(&face_normals);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_vert_normals, &QCheckBox::stateChanged, [&]()
+    {
+        if(m == NULL || canvas == NULL) return;
+
+        if(cb_vert_normals->isChecked())
+        {
+            vert_normals.clear();
+            double l = canvas->scene_size()/5.0;
+            for(uint vid=0; vid<m->num_verts(); ++vid)
+            {
+                if(m->vert_is_visible(vid))
+                {
+                    vec3d  n = m->vert_data(vid).normal;
+                    vec3d  p = m->vert(vid);
+                    vert_normals.push_seg(p, p+(n*l));
+                }
+            }
+            canvas->push_obj(&vert_normals,false);
+        }
+        else canvas->pop(&vert_normals);
         canvas->updateGL();
     });
 }

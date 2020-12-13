@@ -82,8 +82,6 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void update_f_normal(const uint fid)  override;
-        void update_tet_quality(const uint pid);
-        void update_tet_quality();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -103,6 +101,7 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        bool edge_flip                        (const uint eid); // 3-to-2 flip
         uint edge_split                       (const uint eid, const vec3d & p);
         uint edge_split                       (const uint eid, const double lambda = 0.5); // use linear interpolation: e0*(1-lambda) + e1*lambda
         int  edge_collapse                    (const uint eid, const double lambda = 0.5, const double topologic_check = true, const double geometric_check = true);
@@ -114,6 +113,7 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        bool   face_flip            (const uint fid, const bool geometric_check = true); // 2-to-3 flip
         double face_area            (const uint fid) const;
         uint   face_edge_opposite_to(const uint fid, const uint vid) const;
         uint   face_vert_opposite_to(const uint fid, const uint eid) const;
@@ -122,6 +122,8 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        int               poly_id              (const uint fid, const uint vid) const;
+        int               poly_id_from_vids    (const std::vector<uint> & vids) const;
         double            poly_dihedral_angle  (const uint pid, const uint fid0, const uint fid1) const;
         uint              poly_vert_opposite_to(const uint pid, const uint fid) const;
         uint              poly_edge_opposite_to(const uint pid, const uint eid) const;
@@ -133,26 +135,12 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         double            poly_volume           (const uint pid) const override;
         uint              poly_split            (const uint pid, const vec3d & p);
         uint              poly_split            (const uint pid, const std::vector<double> & bc = { 0.25, 0.25, 0.25, 0.25 });
+        uint              poly_split            (const uint pid, const uint vid);
         void              polys_split           (const std::vector<uint> & pids);
-        uint              poly_add              (const std::vector<uint> & vlist) override; // vertex list
 
-        using  AbstractPolyhedralMesh<M,V,E,F,P>::poly_add; // avoid hiding poly_add(flist,fwinding);
+        using AbstractPolyhedralMesh<M,V,E,F,P>::poly_id;  // avoid hiding poly_id(flist)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void reorder_p2v(const uint pid);
-
-        /* reorder_p2v() makes sure the p2v adjacency stores vertices
-           in a way that uniquely defines per element connectivity:
-
-                    v2
-                   /| \
-                 /  |   \
-               v0---|----v3
-                \   |   /
-                  \ | /
-                   v1
-        */
 };
 
 }

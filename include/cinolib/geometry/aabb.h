@@ -38,6 +38,7 @@
 
 #include <cinolib/min_max_inf.h>
 #include <cinolib/geometry/vec3.h>
+#include <vector>
 
 namespace cinolib
 {
@@ -46,9 +47,9 @@ class AABB
 {
     public:
 
-        explicit AABB(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0); // AABB that contains all verts in p_list
+        explicit AABB(const std::vector<vec3d> & list, const double scaling_factor = 1.0); // AABB that contains all verts in p_list
 
-        explicit AABB(const std::vector<AABB> & b_list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
+        explicit AABB(const std::vector<AABB> & list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
 
         explicit AABB(const vec3d min = vec3d( inf_double,  inf_double,  inf_double),
                       const vec3d max = vec3d(-inf_double, -inf_double, -inf_double));
@@ -57,8 +58,15 @@ class AABB
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        // updates AABB size so as to accommodate the new elements
+        void push(const vec3d              & point);
+        void push(const AABB               & aabb);
+        void push(const std::vector<vec3d> & list);
+        void push(const std::vector<AABB>  & list);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void reset();
-        void update(const std::vector<vec3d> & p_list, const double scaling_factor = 1.0);
         void scale(const double s);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -83,9 +91,11 @@ class AABB
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool contains(const vec3d & p, const bool strict = false) const;
-        bool intersects_box(const AABB  & box, const bool strict = false) const;
-        bool intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, vec3d & pos) const;
+        bool contains           (const vec3d & p, const bool strict = false) const;
+        bool intersects_box     (const AABB  & box, const bool strict = false) const;
+        bool intersects_ray     (const vec3d & p, const vec3d & dir, double & t_min, vec3d & pos) const;
+        bool intersects_triangle(const vec3d t[3]) const;
+        bool intersects_plane   (const vec3d & n, const double d) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

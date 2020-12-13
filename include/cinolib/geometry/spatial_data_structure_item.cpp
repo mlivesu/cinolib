@@ -52,12 +52,4 @@ double SpatialDataStructureItem::dist_sqrd(const vec3<double> &p) const
     return p.dist_squared(point_closest_to(p));
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-bool SpatialDataStructureItem::contains(const vec3<double> &p, const double eps) const
-{
-    return dist_sqrd(p) < eps;
-}
-
 }

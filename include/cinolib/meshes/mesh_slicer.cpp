@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include <cinolib/meshes/mesh_slicer.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/meshes/mesh_attributes.h>
 
 namespace cinolib
 {
@@ -54,7 +55,7 @@ template<class Mesh>
 CINO_INLINE
 void MeshSlicer<Mesh>::reset(Mesh & m)
 {    
-    m.poly_show_all();
+    m.poly_set_flag(HIDDEN,false); // show all
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

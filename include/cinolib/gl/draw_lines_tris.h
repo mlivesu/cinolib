@@ -72,8 +72,33 @@ enum
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// https://www.khronos.org/registry/OpenGL-Refpages/es1.1/xhtml/glMaterial.xml
 typedef struct
 {
+    GLfloat ambient [4] = {0.2, 0.2, 0.2, 1.0};
+    GLfloat diffuse [4] = {0.8, 0.8, 0.8, 1.0};
+    GLfloat specular[4] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat emission[4] = {0.0, 0.0, 0.0, 1.0};
+    GLint   shininess   = 0; // if you use this, you might want to set the specular component to white
+
+    void apply() const
+    {
+        glMaterialfv   (GL_FRONT_AND_BACK, GL_SPECULAR,  specular);
+        glMaterialfv   (GL_FRONT_AND_BACK, GL_DIFFUSE,   diffuse);
+        glMaterialfv   (GL_FRONT_AND_BACK, GL_AMBIENT,   ambient);
+        glMaterialfv   (GL_FRONT_AND_BACK, GL_EMISSION,  emission);
+        glMaterialf    (GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    }
+}
+Material;
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+typedef struct
+{
+    Material           material;
+    //
     int                draw_mode;
     //
     std::vector<uint>  tris;

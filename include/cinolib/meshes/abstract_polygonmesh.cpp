@@ -41,6 +41,7 @@
 #include <cinolib/geometry/polygon_utils.h>
 #include <cinolib/vector_serialization.h>
 #include <cinolib/how_many_seconds.h>
+#include <cinolib/deg_rad.h>
 #include <unordered_set>
 #include <queue>
 
@@ -179,6 +180,8 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
     for(auto v : verts) this->vert_add(v);
     for(auto p : polys) this->poly_add(p);
 
+    if(this->mesh_data().update_normals) this->update_v_normals();
+
     this->copy_xyz_to_uvw(UVW_param);
 
     for(uint eid=0; eid<this->num_edges(); ++eid)
@@ -284,8 +287,9 @@ void AbstractPolygonMesh<M,V,E,P>::update_p_tessellation(const uint pid)
     // Assume convexity and try trivial tessellation first. If something flips
     // apply earcut algorithm to get a valid triangulation
 
+    poly_triangles.at(pid).clear();
     std::vector<vec3d> n;
-    for (uint i=2; i<this->verts_per_poly(pid); ++i)
+    for(uint i=2; i<this->verts_per_poly(pid); ++i)
     {
         uint vid0 = this->polys.at(pid).at( 0 );
         uint vid1 = this->polys.at(pid).at(i-1);
@@ -301,7 +305,7 @@ void AbstractPolygonMesh<M,V,E,P>::update_p_tessellation(const uint pid)
     bool bad_tessellation = false;
     for(uint i=0; i<n.size()-1; ++i) if (n.at(i).dot(n.at(i+1))<0) bad_tessellation = true;
 
-    if (bad_tessellation)
+    if(bad_tessellation)
     {
         // NOTE: the triangulation is constructed on a proxy polygon obtained
         // projecting the actual polygon onto the best fitting plane. Bad things
@@ -314,10 +318,14 @@ void AbstractPolygonMesh<M,V,E,P>::update_p_tessellation(const uint pid)
         }
         //
         std::vector<uint> tris;
-        if (polygon_triangulate(vlist, tris))
+        poly_triangles.at(pid).clear();
+        if(polygon_triangulate(vlist, tris))
         {
-            poly_triangles.at(pid).clear();
             for(uint off : tris) poly_triangles.at(pid).push_back(this->poly_vert_id(pid,off));
+        }
+        else
+        {
+            std::cout << "WARNING: could not triangulate a polygon. Is it degenerate?" << std::endl;
         }
     }
 }
@@ -438,7 +446,7 @@ void AbstractPolygonMesh<M,V,E,P>::normalize_area()
 {
     this->scale(1.0/sqrt(this->mesh_area()));
     assert(std::fabs(this->mesh_area()-1)<1e-5);
-    this->update_bbox();
+    if(this->mesh_data().update_bbox) this->update_bbox();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -774,6 +782,19 @@ std::vector<uint> AbstractPolygonMesh<M,V,E,P>::vert_boundary_edges(const uint v
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+bool AbstractPolygonMesh<M,V,E,P>::vert_is_visible(const uint vid) const
+{
+    for(uint pid : this->adj_v2p(vid))
+    {
+        if(!this->poly_data(pid).flags[HIDDEN]) return true;
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::vert_cluster_one_ring(const uint                       vid,
                                                          std::vector<std::vector<uint>> & clusters,
                                                          const bool                       marked_edges_are_borders)
@@ -856,10 +877,37 @@ uint AbstractPolygonMesh<M,V,E,P>::vert_add(const vec3d & pos)
     this->v2e.push_back(std::vector<uint>());
     this->v2p.push_back(std::vector<uint>());
     //
-    this->bb.min = this->bb.min.min(pos);
-    this->bb.max = this->bb.max.max(pos);
+    if(this->mesh_data().update_bbox)
+    {
+        this->bb.min = this->bb.min.min(pos);
+        this->bb.max = this->bb.max.max(pos);
+    }
     //
     return vid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool AbstractPolygonMesh<M,V,E,P>::vert_merge(const uint vid0, const uint vid1)
+{
+    std::vector<uint> old_polys = this->adj_v2p(vid1);
+    std::vector<std::vector<uint>> new_polys;
+    for(uint pid : old_polys)
+    {
+        // if there is a polygon containing both vid0 and vid1 abort the operation
+        if(this->poly_contains_vert(pid,vid0)) return false;
+
+        std::vector<uint> p = this->poly_verts_id(pid);
+        std::replace(p.begin(), p.end(), vid1, vid0);
+        new_polys.push_back(p);
+    }
+
+    for(auto p : new_polys) poly_add(p);
+    vert_remove(vid1);
+
+    return true;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1190,17 +1238,24 @@ double AbstractPolygonMesh<M,V,E,P>::poly_angle_at_vert(const uint pid, const ui
 {
     assert(this->poly_contains_vert(pid,vid));
 
-    uint  curr = this->poly_vert_offset(pid, vid);
-    uint  next = (curr+1)%this->verts_per_poly(pid);
-    uint  prev = (curr+this->verts_per_poly(pid)-1)%this->verts_per_poly(pid);
-    vec3d p    = this->poly_vert(pid, curr);
-    vec3d u    = this->poly_vert(pid, prev) - p;
-    vec3d v    = this->poly_vert(pid, next) - p;
+    uint   curr   = this->poly_vert_offset(pid, vid);
+    uint   nv     = this->verts_per_poly(pid);
+    uint   next   = (curr+1   )%nv;
+    uint   prev   = (curr-1+nv)%nv;
+    vec3d  p      = this->poly_vert(pid, curr);
+    vec3d  u      = this->poly_vert(pid, prev) - p;
+    vec3d  v      = this->poly_vert(pid, next) - p;
+    double angle  = u.angle_rad(v);
 
-    switch (unit)
+    if((-u).cross(v).dot(this->poly_data(pid).normal)<0)
     {
-        case RAD : return u.angle_rad(v);
-        case DEG : return u.angle_deg(v);
+        angle = 2*M_PI - angle;
+    }
+
+    switch(unit)
+    {
+        case RAD : return angle;
+        case DEG : return to_deg(angle);
         default  : assert(false); return 0; // warning killer
     }
 }
@@ -1436,9 +1491,7 @@ uint AbstractPolygonMesh<M,V,E,P>::poly_add(const std::vector<uint> & vlist)
         this->p2e.at(pid).push_back(eid);
     }
 
-    this->update_p_normal(pid);
-    for(uint vid : vlist) this->update_v_normal(vid);
-
+    if(this->mesh_data().update_normals) this->update_p_normal(pid);
     this->poly_triangles.push_back(std::vector<uint>());
     update_p_tessellation(pid);
 
@@ -1605,8 +1658,11 @@ void AbstractPolygonMesh<M,V,E,P>::poly_flip_winding_order(const uint pid)
 {
     std::reverse(this->polys.at(pid).begin(), this->polys.at(pid).end());
 
-    update_p_normal(pid);
-    for(uint off=0; off<this->verts_per_poly(pid); ++off) update_v_normal(this->poly_vert_id(pid,off));
+    if(this->mesh_data().update_normals)
+    {
+        update_p_normal(pid);
+        for(uint off=0; off<this->verts_per_poly(pid); ++off) update_v_normal(this->poly_vert_id(pid,off));
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1669,7 +1725,7 @@ void AbstractPolygonMesh<M,V,E,P>::operator+=(const AbstractPolygonMesh<M,V,E,P>
         this->v2v.push_back(tmp);
     }
 
-    this->update_bbox();
+    if(this->mesh_data().update_bbox) this->update_bbox();
 
     std::cout << "Appended " << m.mesh_data().filename << " to mesh " << this->mesh_data().filename << std::endl;
     std::cout << this->num_verts() << " verts" << std::endl;

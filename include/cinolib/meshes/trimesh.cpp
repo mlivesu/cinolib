@@ -100,15 +100,9 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void Trimesh<M,V,E,P>::update_p_normal(const uint pid)
 {
-    vec3d v0 = this->poly_vert(pid,0);
-    vec3d v1 = this->poly_vert(pid,1);
-    vec3d v2 = this->poly_vert(pid,2);
-
-    vec3d u = v1 - v0;    u.normalize();
-    vec3d v = v2 - v0;    v.normalize();
-    vec3d n = u.cross(v); n.normalize();
-
-    this->poly_data(pid).normal = n;
+    this->poly_data(pid).normal = triangle_normal(this->poly_vert(pid,0),
+                                                  this->poly_vert(pid,1),
+                                                  this->poly_vert(pid,2));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -247,17 +241,20 @@ uint Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
     this->vert(v0) = xyz0;
     this->vert(v1) = xyz1;
 
-    for(uint pid : pids0) this->update_p_normal(pid);
+    if(this->mesh_data().update_normals)
+    {
+        for(uint pid : pids0) this->update_p_normal(pid);
+    }
     for(uint pid : pids1)
     {
         auto v_list = this->poly_verts_id(pid);
         for(uint & v : v_list) if(v==v0) v = v1;
         uint new_pid = this->poly_add(v_list);
         this->poly_data(new_pid) = this->poly_data(pid);
-        this->update_p_normal(new_pid);
+        if(this->mesh_data().update_normals) this->update_p_normal(new_pid);
     }
-    this->update_v_normal(v0);
-    this->update_v_normal(v1);
+    if(this->mesh_data().update_normals) this->update_v_normal(v0);
+    if(this->mesh_data().update_normals) this->update_v_normal(v1);
     this->polys_remove(pids1);
 
     // tessellate the quad-like hole
@@ -303,9 +300,9 @@ int Trimesh<M,V,E,P>::edge_collapse(const uint eid, const double lambda, const b
         uint new_pid = this->poly_add(vlist);
 
         this->poly_data(new_pid) = this->poly_data(pid);
-        this->update_p_normal(new_pid);
+        if(this->mesh_data().update_normals) this->update_p_normal(new_pid);
     }
-    this->update_v_normal(vert_to_keep);
+    if(this->mesh_data().update_normals) this->update_v_normal(vert_to_keep);
 
     this->vert_remove(vert_to_remove);
 
@@ -346,10 +343,10 @@ uint Trimesh<M,V,E,P>::edge_split(const uint eid, const vec3d & p)
         uint new_pid2 = this->poly_add(v_opp, new_vid, vid1);
         this->poly_data(new_pid1) = this->poly_data(pid);
         this->poly_data(new_pid2) = this->poly_data(pid);
-        this->update_p_normal(new_pid1);
-        this->update_p_normal(new_pid2);
+        if(this->mesh_data().update_normals) this->update_p_normal(new_pid1);
+        if(this->mesh_data().update_normals) this->update_p_normal(new_pid2);
     }
-    this->update_v_normal(new_vid);
+    if(this->mesh_data().update_normals) this->update_v_normal(new_vid);
 
     // copy edge data
     int eid0 = this->edge_id(vid0,new_vid); assert(eid0>=0);
@@ -424,9 +421,9 @@ double Trimesh<M,V,E,P>::edge_cotangent_weight(const uint eid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-int Trimesh<M,V,E,P>::edge_flip(const uint eid)
+int Trimesh<M,V,E,P>::edge_flip(const uint eid, const bool geometric_check)
 {
-    if(!edge_is_flippable(eid)) return -1;
+    if(geometric_check && !edge_is_flippable(eid)) return -1;
 
     assert(this->adj_e2p(eid).size()==2);
     uint pid0 = this->adj_e2p(eid).front();

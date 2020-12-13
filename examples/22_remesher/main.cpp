@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 
     QPushButton::connect(&but_unmark_all, &QPushButton::clicked, [&]()
     {
-        m.edge_unmark_all();
+        m.edge_set_flag(MARKED,false);
         m.updateGL();
         gui.updateGL();
     });

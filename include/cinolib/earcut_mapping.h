@@ -33,46 +33,85 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SHEWCHUK_PREDICATES
-#define CINO_SHEWCHUK_PREDICATES
+#ifndef CINO_EARCUT_MAPPING_H
+#define CINO_EARCUT_MAPPING_H
 
-#include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec2.h>
 #include <cinolib/geometry/vec3.h>
+#include <cinolib/symbols.h>
 
 namespace cinolib
 {
 
-CINO_INLINE double orient2d    (double const * pa, double const * pb, double const * pc);
-CINO_INLINE double orient2d    (const  vec2d & pa, const  vec2d & pb, const  vec2d & pc);
-CINO_INLINE double orient2dfast(double const * pa, double const * pb, double const * pc);
-CINO_INLINE double orient2dfast(const  vec2d & pa, const  vec2d & pb, const  vec2d & pc);
+/* The earcut mapping algorithm generates a provably bijective map between
+ * two simple polygons (poly_A and poly_B). Th algorithm puts no restrictions
+ * on the geometry of poly_A, whereas poly_B can be either a strictly convex
+ * polygon, or a star-shaped polygon with non degenerate (i.e. pointwise) kernel.
+ *
+ * In case poly_B is strictly convex, the mapping is obtained by simply running
+ * the arcut algorithm on poly_A. Due to convexity, the so generated triangles
+ * will be valid also for poly_B, generating to meshes with same connectivity,
+ * hance a mapping between them.
+ *
+ * In case poly_B is not strictly convex, the algorith will firstly generate
+ * an inner padding layer inside both polygons, triangulating the space in
+ * between. In poly_B, the inner layer will sample the perimeter of a disk
+ * lying inside the kernel of the polygon. The mapping will then be completed
+ * by applying the earcut mapping to the polygon obtained with the inner offsetting.
+ *
+ * Technical details and ideas for both methods can be found in:
+ *
+ *     Earcut Mapping: Compatible Meshing for Robust 2D Parameterizations
+ *     M. Livesu
+ *     (submitted)
+ *
+ *     and
+ *
+ *     A Mesh Generation Perspective on Robust Mappings
+ *     M. Livesu
+ *     Smart Tools and Apps for Graphics (STAG, 2020)
+ *
+ *
+ * INPUT DATA:
+ *  - circular list of vertice of poly_A
+ *  - circular list of vertice of poly_B (ordering consistent with poly_A)
+ *  - strictly_convex (true/false)
+ *  - disk_center (only if strictly_convex is false)
+ *  - disk_radius (only if strictly_convex is false)
+ *
+ * OUTPUT DATA:
+ *  - list of triangles (vector tris, indexing both poly_A and poly_B)
+ *  - updated list of vertices poly_A, poly_B (only if strictly_convex was set to false)
+ *
+ *
+ * NOTE: due to some annoying code flaw, even though the method is fully 2D
+ * the code inputs 3D data. The z coordinate will be ignored, but the padding
+ * code generates a 3D triangle mesh to exploit some of its topological operators,
+ * that's why (fake) 3D points are needed. I will eventually fix this...
+*/
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-CINO_INLINE double orient3d    (double const * pa, double const * pb, double const * pc, double const * pd);
-CINO_INLINE double orient3d    (const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd);
-CINO_INLINE double orient3dfast(double const * pa, double const * pb, double const * pc, double const * pd);
-CINO_INLINE double orient3dfast(const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd);
+typedef struct
+{
+    std::vector<vec3d> poly_A; // circular list of vertices for polygon A
+    std::vector<vec3d> poly_B; // circular list of vertices for polygon A
+    std::vector<uint>  tris;   // serialized triangles (for both A and B)
+
+    bool   strictly_convex = true;     // true if polygon B is strictly convex, false otherwise
+    vec3d  disk_center = vec3d(0,0,0); // center of a disk inside polygon B (used when strictly_convex is false)
+    float  disk_radius = 0.4;          // radius of a disk inside polygon B (used when strictly_convex is false)
+}
+EarcutMapping_data;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-CINO_INLINE double incircle    (double const * pa, double const * pb, double const * pc, double const * pd);
-CINO_INLINE double incircle    (const  vec2d & pa, const  vec2d & pb, const  vec2d & pc, const  vec2d & pd);
-CINO_INLINE double incirclefast(double const * pa, double const * pb, double const * pc, double const * pd);
-CINO_INLINE double incirclefast(const  vec2d & pa, const  vec2d & pb, const  vec2d & pc, const  vec2d & pd);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE double insphere    (double const * pa, double const * pb, double const * pc, double const * pd, double const * pe);
-CINO_INLINE double insphere    (const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd, const  vec3d & pe);
-CINO_INLINE double inspherefast(double const * pa, double const * pb, double const * pc, double const * pd, double const * pe);
-CINO_INLINE double inspherefast(const  vec3d & pa, const  vec3d & pb, const  vec3d & pc, const  vec3d & pd, const  vec3d & pe);
+CINO_INLINE
+void earcut_mapping(EarcutMapping_data & data);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "Shewchuk_predicates.cpp"
+#include "earcut_mapping.cpp"
 #endif
 
-#endif // CINO_SHEWCHUK_PREDICATES
+#endif // CINO_EARCUT_MAPPING_H

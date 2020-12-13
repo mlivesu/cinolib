@@ -108,6 +108,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 void update_f_tessellation(const uint fid);
                 void update_v_normals();
                 void update_v_normal(const uint vid);
+                void update_quality();
+                void update_p_quality(const uint pid);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -127,6 +129,12 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         const std::vector<std::vector<uint>> & vector_faces() const { return faces; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        std::vector<uint> get_surface_verts() const;
+        std::vector<uint> get_surface_edges() const;
+        std::vector<uint> get_surface_faces() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -167,7 +175,8 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         double             vert_mass                  (const uint vid) const override;
         double             vert_volume                (const uint vid) const;
         bool               vert_is_manifold           (const uint vid) const;
-        void               vert_local_unmark_near_face(const uint fid);
+        bool               vert_is_visible            (const uint vid) const;
+        int                vert_shared_between_faces  (const std::vector<uint> & fids) const;
         std::vector<uint>  vert_verts_link            (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star
         std::vector<uint>  vert_edges_link            (const uint vid) const;
         std::vector<uint>  vert_faces_link            (const uint vid) const;
@@ -190,9 +199,9 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         bool              edge_is_manifold           (const uint eid) const;
         void              edge_remove                (const uint eid);
         void              edge_remove_unreferenced   (const uint eid);
-        void              edge_local_unmark_near_face(const uint fid);
         bool              edge_is_on_srf             (const uint eid) const;
         bool              edge_is_incident_to_srf    (const uint eid) const;
+        bool              edge_has_border_on_srf     (const uint eid) const;
         std::vector<uint> edge_ordered_poly_ring     (const uint eid) const;
         std::vector<uint> edge_adj_srf_faces         (const uint eid) const;
         std::vector<uint> edge_verts_link            (const uint eid) const;
@@ -226,11 +235,6 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool               faces_are_disjoint         (const uint fid0, const uint fid1) const;
                 bool               faces_are_adjacent         (const uint fid0, const uint fid1) const;
                 bool               faces_share_poly           (const uint fid0, const uint fid1) const;
-                void               face_unmark_all            ();
-                void               face_local_unmark_near_vert(const uint vid);
-                void               face_local_unmark_near_edge(const uint eid);
-                void               face_local_unmark_near_face(const uint fid);
-                void               face_local_unmark_near_poly(const uint pid);
                 int                face_id                    (const std::vector<uint> & f) const;
                 bool               face_is_tri                (const uint fid) const;
                 bool               face_is_quad               (const uint fid) const;
@@ -248,6 +252,9 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 uint               face_split_along_new_edge  (const uint fid, const uint vid0, const uint vid1);
                 uint               face_split_in_triangles    (const uint fid, const vec3d & p);
                 bool               face_has_no_duplicate_verts(const uint fid) const;
+                void               face_set_flag              (const int flag, const bool b);
+                void               face_set_flag              (const int flag, const bool b, const std::vector<uint> & fids);
+                bool               face_has_border_on_srf     (const uint fid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -263,7 +270,6 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 void               poly_flip_winding           (const uint pid);
                 bool               poly_face_is_CCW            (const uint pid, const uint fid) const;
                 bool               poly_face_is_CW             (const uint pid, const uint fid) const;
-                void               poly_local_unmark_near_face (const uint fid);
                 uint               poly_face_offset            (const uint pid, const uint fid) const;
                 vec3d              poly_face_normal            (const uint pid, const uint fid) const;
                 int                poly_adj_through_face       (const uint pid, const uint fid) const;
@@ -272,9 +278,9 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 std::vector<uint>  poly_f2f                    (const uint pid, const uint fid) const;
                 void               poly_switch_id              (const uint pid0, const uint pid1);
                 uint               poly_add                    (const std::vector<uint> & flist, const std::vector<bool> & fwinding);
-        virtual uint               poly_add                    (const std::vector<uint> & vlist);
+                uint               poly_add                    (const std::vector<uint> & vlist);
                 void               poly_remove_unreferenced    (const uint pid);
-                void               poly_remove                 (const uint pid);
+                void               poly_remove                 (const uint pid, const bool delete_dangling_elements = true);
                 void               polys_remove                (const std::vector<uint> & pids);
                 uint               poly_face_adj_through_edge  (const uint pid, const uint fid, const uint eid) const;
                 bool               poly_faces_share_orientation(const uint pid, const uint fid0, const uint fid1) const;
@@ -287,6 +293,12 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 std::vector<uint>  poly_faces_id               (const uint pid, const bool sort_by_fid = false) const;
                 std::vector<bool>  poly_faces_winding          (const uint pid) const;
                 uint               poly_split_along_new_face   (const uint pid, const std::vector<uint> & f);
+                void               poly_reorder_p2v            (const uint pid);
+                bool               poly_is_hexahedron          (const uint pid) const;
+                bool               poly_is_tetrahedron         (const uint pid) const;
+                bool               poly_is_prism               (const uint pid) const;
+                bool               poly_is_prism               (const uint pid, const uint fid) const; // check if it is a prism using fid as base
+                bool               poly_is_hexable_w_midpoint  (const uint pid) const; // check if this element can be hexed with midpoint subdivision
 
 };
 

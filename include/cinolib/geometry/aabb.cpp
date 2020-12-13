@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include <cinolib/geometry/aabb.h>
 #include <algorithm>
+#include <cmath>
 
 namespace cinolib
 {
@@ -54,25 +55,22 @@ AABB::AABB(const vec3d min, const vec3d max) : min(min), max(max)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-AABB::AABB(const std::vector<vec3d> & p_list, const double scaling_factor)
+AABB::AABB(const std::vector<vec3d> & list, const double scaling_factor)
 {    
-    update(p_list, scaling_factor);
+    reset();
+    push(list);
+    if(scaling_factor!=1) scale(scaling_factor);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // AABB that contains all AABBs in b_list
 CINO_INLINE
-AABB::AABB(const std::vector<AABB> & b_list, const double scaling_factor)
+AABB::AABB(const std::vector<AABB> & list, const double scaling_factor)
 {
-    std::vector<vec3d> p_list;
-    p_list.reserve(b_list.size()*2);
-    for(const AABB & b : b_list)
-    {
-        p_list.push_back(b.min);
-        p_list.push_back(b.max);
-    }
-    update(p_list, scaling_factor);
+    reset();
+    push(list);
+    if(scaling_factor!=1) scale(scaling_factor);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -87,17 +85,35 @@ void AABB::reset()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void AABB::update(const std::vector<vec3d> & p_list, const double scaling_factor)
+void AABB::push(const vec3d & point)
 {
-    assert(!p_list.empty());
-    min = p_list.front();
-    max = p_list.front();
-    for(const vec3d & p : p_list)
-    {
-        min = min.min(p);
-        max = max.max(p);
-    }
-    if(scaling_factor!=1) scale(scaling_factor);
+    min = min.min(point);
+    max = max.max(point);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void AABB::push(const AABB & aabb)
+{
+    push(aabb.min);
+    push(aabb.max);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void AABB::push(const std::vector<vec3d> & list)
+{
+    for(auto p : list) push(p);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void AABB::push(const std::vector<AABB> & list)
+{
+    for(auto b : list) push(b);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -289,6 +305,98 @@ bool AABB::intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, ve
     // Ray intersects all 3 slabs. Return point (q) and intersection t value (tmin)
     pos = p + dir*t_min;
     return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* Intersection between the AABB and the plane n*X=d
+ * If any intersection occurs, the function returns true
+ *
+ * Ref: Real Time Collision Detection, Section 5.2.3
+*/
+CINO_INLINE
+bool AABB::intersects_plane(const vec3d & n, const double d) const
+{
+    vec3d c = center();
+    vec3d e = max - c; // box extents
+
+    double r = e[0]*std::abs(n[0]) + e[1]*std::abs(n[1]) + e[2]*std::abs(n[2]);
+    double s = n.dot(c) - d;
+
+    if(s>=-r && s<=r) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* Intersection between the AABB and the triangle t[0],t[1],t[2]
+ * If any intersection occurs, the function returns true
+ *
+ * References:
+ *
+ *       Fast 3D Triangle-Box Overlap Testing
+ *       Tomas Akenine-Moller
+ *       2001
+ *
+ *       Real Time Collision Detection, Section 5.2.9
+ *
+ *       https://www.gamedev.net/forums/topic/534655-aabb-triangleplane-intersection--distance-to-plane-is-incorrect-i-have-solved-it/
+*/
+CINO_INLINE
+bool AABB::intersects_triangle(const vec3d t[3]) const
+{
+    vec3d c = center();
+    vec3d e = max - c; // half of the box extents
+
+    // center the box at the origin
+    vec3d v[3] =
+    {
+       t[0] - c,
+       t[1] - c,
+       t[2] - c
+    };
+
+    // edge vectors for triangle
+    vec3d f[3] =
+    {
+        v[1] - v[0],
+        v[2] - v[1],
+        v[0] - v[2]
+    };
+
+    vec3d XYZ[3] =
+    {
+        vec3d(1,0,0),
+        vec3d(0,1,0),
+        vec3d(0,0,1)
+    };
+
+    // known issues:
+    // (i)  this can be optimized!
+    // (ii) this is not safe, XYZ[i] and f[j] may be parallel
+    // see Real Time Collision Detection for hints on how to address both
+    for(uint i=0; i<3; ++i)
+    for(uint j=0; j<3; ++j)
+    {
+        vec3d  a   = XYZ[i].cross(f[j]);
+        double p0  = a.dot(v[0]);
+        double p1  = a.dot(v[1]);
+        double p2  = a.dot(v[2]);
+        double min = std::min(p0,std::min(p1,p2));
+        double max = std::max(p0,std::max(p1,p2));
+        double r   = e[0]*std::fabs(a[0]) + e[1]*std::fabs(a[1]) + e[2]*std::fabs(a[2]);
+
+        if(r<min || -r>max) return false;
+    }
+
+    // check intersection between aabbs
+    AABB tb({t[0],t[1],t[2]});
+    if(!intersects_box(tb)) return false;
+
+    // lastly, check intersection with triangle's supporting plane
+    vec3d  n = f[0].cross(f[1]);
+    double d = n.dot(t[0]);
+    return intersects_plane(n,d);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -36,6 +36,12 @@ int main(int argc, char **argv)
     {
         read_OFF(argv[1], verts, polys);
     }
+    else if(ext.compare("STL")==0 || ext.compare("stl")==0)
+    {
+        std::vector<uint> tris;
+        read_STL(argv[1], verts, tris);
+        polys = polys_from_serialized_vids(tris,3);
+    }
     else if(ext.compare("HEDRA")==0 || ext.compare("hedra")==0)
     {
         read_HEDRA(argv[1], verts, faces, polys, winding);

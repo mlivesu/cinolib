@@ -15,7 +15,7 @@ and include in your C++ application the header files you need. A tutorial with d
 * Claudio Mancinelli (University of Genoa), Daniela Cabiddu (CNR IMATI), Chrystiano Araújo (UBC), Thomas Alderighi (CNR ISTI), Fabrizio Corda (University of Cagliari), Gianmarco Cherchi (University of Cagliari)
 
 
-## Acknowldegment
+## Citing us
 If you use CinoLib in your academic projects, please consider citing the library using the following 
 BibTeX entry:
 
@@ -30,3 +30,7 @@ BibTeX entry:
   year    = {2019},
   doi     = {10.1007/978-3-662-59958-7_4}}
 ```
+
+## Acknowldegment
+The software collected in CinoLib spans across a large period of time, starting from the beginning of my PhD to today. Since 2015, this work has been partly supported by research projects such as [CAxMan](https://cordis.europa.eu/project/id/680448), and [CHANGE](https://cordis.europa.eu/project/rcn/204834/en).
+

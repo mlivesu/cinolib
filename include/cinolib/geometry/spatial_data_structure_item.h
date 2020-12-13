@@ -36,9 +36,7 @@
 #ifndef CINO_SPATIAL_DATA_STRUCTURE_ITEM_H
 #define CINO_SPATIAL_DATA_STRUCTURE_ITEM_H
 
-#include <cinolib/cino_inline.h>
-#include <vector>
-#include <sys/types.h>
+#include <cinolib/geometry/aabb.h>
 
 /* This interface must be implemented by any item that populates a spatial data structure
  * (e.g. Octree, BSP, AABB Tree, ...). These primitives are necessary to implement both the
@@ -49,15 +47,13 @@ namespace cinolib
 {
     typedef enum
     {
+        ABSTRACT,
         POINT,
         SEGMENT,
         TRIANGLE,
         TETRAHEDRON,
     }
     ItemType;
-
-    class AABB;  // axis aligned bounding box
-    template<typename T> class vec3;
 
     class SpatialDataStructureItem
     {
@@ -68,44 +64,30 @@ namespace cinolib
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            uint id;
-
-            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-            virtual ItemType item_type() const = 0;
-
-            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-            virtual AABB aabb() const = 0;
+            uint     id;
+            AABB     aabb;
+            ItemType item_type = ABSTRACT;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
             // given a point in space P, finds the point in the item that is closest to P
-            virtual vec3<double> point_closest_to(const vec3<double> & p) const = 0;
+            virtual vec3d point_closest_to(const vec3d & p) const = 0;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            virtual void barycentric_coordinates(const vec3<double> & p, double bc[]) const = 0;
+            virtual void barycentric_coordinates(const vec3d & p, double bc[]) const = 0;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            virtual bool intersects_ray(const vec3<double> & p, const vec3<double> & dir, double & t, vec3<double> & pos) const = 0;
+            double dist     (const vec3d & p) const;
+            double dist_sqrd(const vec3d & p) const;
 
             //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-            double dist     (const vec3<double> & p) const;
-            double dist_sqrd(const vec3<double> & p) const;
-
-            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-            bool contains(const vec3<double> & p, const double eps = 1e-15) const;
-
-            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-            // Exact queries
-            virtual bool contains_exact           (const vec3<double> & p, bool strict) const = 0;
-            virtual bool intersects_segment_exact (const vec3<double> s[]) const = 0;
-            virtual bool intersects_triangle_exact(const vec3<double> t[]) const = 0;
+            virtual bool contains           (const vec3d & p, const bool strict) const = 0;
+            virtual bool intersects_segment (const vec3d s[], const bool ignore_if_valid_complex) const = 0;
+            virtual bool intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex) const = 0;
+            virtual bool intersects_ray     (const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const = 0;
     };
 }
 

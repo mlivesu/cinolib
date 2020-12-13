@@ -12,6 +12,7 @@
 #include <cinolib/profiler.h>
 #include <cinolib/gui/qt/qt_gui_tools.h>
 #include <cinolib/coarse_layout.h>
+#include <cinolib/drawable_sphere.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -36,6 +37,11 @@ int main(int argc, char **argv)
     GLcanvas gui;
     gui.push_obj(&m);
     gui.show();
+
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        if(m.vert_is_singular(vid)) gui.push_obj(new DrawableSphere(m.vert(vid), 0.5));
+    }
 
     // CMD+1 to show mesh controls.
     SurfaceMeshControlPanel<DrawableQuadmesh<>> panel(&m, &gui);

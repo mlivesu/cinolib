@@ -36,6 +36,7 @@
 #include <cinolib/geometry/triangle_utils.h>
 #include <cinolib/standard_elements_tables.h>
 #include <cinolib/min_max_inf.h>
+#include <set>
 
 namespace cinolib
 {
@@ -43,7 +44,7 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C)
+vec3d triangle_normal(const vec3d & A, const vec3d & B, const vec3d & C)
 {
     vec3d n = (B-A).cross(C-A);
     if(!n.is_null()) n.normalize();
@@ -54,7 +55,7 @@ vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C)
 
 template <class vec>
 CINO_INLINE
-double triangle_area(const vec A, const vec B, const vec C)
+double triangle_area(const vec & A, const vec & B, const vec & C)
 {
     return (0.5 * (B-A).cross(C-A).length());
 }
@@ -68,17 +69,17 @@ double triangle_area(const vec A, const vec B, const vec C)
 //
 CINO_INLINE
 void triangle_traverse_with_ray(const vec3d   tri[3],
-                                const vec3d   P,
-                                const vec3d   dir,
+                                const vec3d & P,
+                                const vec3d & dir,
                                       vec3d & exit_pos,
-                                      uint   & exit_edge)
+                                      uint  & exit_edge)
 {
     // 1) Find the exit edge
     //
 
     vec3d uvw[3] = { tri[0]-P, tri[1]-P, tri[2]-P };
 
-    std::set< std::pair<double,int> > sorted_by_angle;
+    std::set<std::pair<double,int>> sorted_by_angle;
     for(uint i=0; i<3; ++i)
     {
         sorted_by_angle.insert(std::make_pair(dir.angle_rad(uvw[i]),i));

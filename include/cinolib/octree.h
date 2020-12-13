@@ -54,19 +54,21 @@ class OctreeNode
         AABB              bbox;
         std::vector<uint> item_indices; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
 };
+// NOTE: father is not necessary and could be removed. However, it acts also as a padding
+// layer for node size in memory and secures better caching. Removing it actually degrades
+// performances
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 /* Usage:
  *
  *  i)   Create an empty octree
- *  ii)  Use the add_segment/triangle/tetrahedron facilities to populate it
+ *  ii)  Use the push_segment/triangle/tetrahedron facilities to populate it
  *  iii) Call build to make the tree
 */
 
 class Octree
 {
-
     public:
 
         explicit Octree(const uint max_depth      = 7,
@@ -76,14 +78,17 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void add_segment    (const uint id, const std::vector<vec3d> & v);
-        void add_triangle   (const uint id, const std::vector<vec3d> & v);
-        void add_tetrahedron(const uint id, const std::vector<vec3d> & v);
+        void push_segment    (const uint id, const std::vector<vec3d> & v);
+        void push_triangle   (const uint id, const std::vector<vec3d> & v);
+        void push_tetrahedron(const uint id, const std::vector<vec3d> & v);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void build();
-        void build_item(const uint id, OctreeNode *node, const uint depth);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void subdivide(OctreeNode *node);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -99,7 +104,7 @@ class Octree
                     vec3d v0 = m.vert(m.poly_tessellation(pid).at(3*i+0));
                     vec3d v1 = m.vert(m.poly_tessellation(pid).at(3*i+1));
                     vec3d v2 = m.vert(m.poly_tessellation(pid).at(3*i+2));
-                    add_triangle(pid, {v0,v1,v2});
+                    push_triangle(pid, {v0,v1,v2});
                 }
             }
             build();
@@ -116,9 +121,25 @@ class Octree
             {
                 switch(m.mesh_type())
                 {
-                    case TETMESH : add_tetrahedron(pid, m.poly_verts(pid)); break;
+                    case TETMESH : push_tetrahedron(pid, m.poly_verts(pid)); break;
                     default: assert(false && "Unsupported element");
                 }
+            }
+            build();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void build_from_vectors(const std::vector<vec3d> & verts,
+                                const std::vector<uint>  & tris)
+        {
+            assert(items.empty());
+            items.reserve(tris.size()/3);
+            for(uint i=0; i<tris.size(); i+=3)
+            {
+                push_triangle(i/3, { verts.at(tris.at(i  )),
+                                    verts.at(tris.at(i+1)),
+                                    verts.at(tris.at(i+2))});
             }
             build();
         }
@@ -132,7 +153,7 @@ class Octree
             items.reserve(m.num_edges());
             for(uint eid=0; eid<m.num_edges(); ++eid)
             {
-                add_segment(eid, m.edge_verts(eid));
+                push_segment(eid, m.edge_verts(eid));
             }
             build();
         }
@@ -140,18 +161,10 @@ class Octree
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint max_items_per_leaf() const;
-        uint max_items_per_leaf(const OctreeNode *node, const uint max) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void debug_mode(const bool b);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void print_query_info(const std::string & s,
-                              const double        t,
-                              const uint          aabb_queries,
-                              const uint          item_queries) const;
 
         // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -160,34 +173,35 @@ class Octree
         vec3d closest_point(const vec3d & p) const;
 
         // returns respectively the first item and the full list of items containing query point p
-        bool contains(const vec3d & p, uint & id, const double eps = 1e-15) const;
-        bool contains(const vec3d & p, std::unordered_set<uint> & ids, const double eps = 1e-15) const;
+        // note: this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
+        bool contains(const vec3d & p, const bool strict, uint & id) const;
+        bool contains(const vec3d & p, const bool strict, std::unordered_set<uint> & ids) const;
 
         // returns respectively the first and the full list of intersections
         // between items in the octree and a ray R(t) := p + t * dir
         bool intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
         bool intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const;
 
-        // EXACT QUERIES: based on exact geometric predicates //
-        bool contains_exact           (const vec3d & p,   std::unordered_set<uint> & ids, const bool strict) const;
-        bool intersects_segment_exact (const vec3d   s[], std::unordered_set<uint> & ids) const;
-        bool intersects_triangle_exact(const vec3d   t[], std::unordered_set<uint> & ids) const;
+        // note: the first two queries become exact if CINOLIB_USES_EXACT_PREDICATES is defined
+        // (intersect_box DOES NOT BECOME exact)
+        bool intersects_segment (const vec3d s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
+        bool intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
+        bool intersects_box     (const AABB  & b, std::unordered_set<uint> & ids) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    protected:
-
-        // all items and aabbs live here, and tree leaf nodes only store indices of these vectors
+        // all items live here, and leaf nodes only store indices to items
         std::vector<SpatialDataStructureItem*> items;
-        std::vector<AABB>                      aabbs;
         OctreeNode                            *root = nullptr;
+        std::vector<const OctreeNode*>         leaves;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        protected:
 
         uint max_depth;      // maximum allowed depth of the tree
         uint items_per_leaf; // prescribed number of items per leaf (can't go deeper than max_depth anyways)
         uint tree_depth = 0; // actual depth of the tree
-        uint num_leaves = 0; // actual number of leaves
         bool print_debug_info = false;
 
         // SUPPORT STRUCTURES ::::::::::::::::::::::::::::::::::::::::::::::::::::

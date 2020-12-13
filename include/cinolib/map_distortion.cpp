@@ -56,3 +56,5 @@ double aspect_ratio_distortion(const double m[3][3])
 
     return s.diagonal()[0] / std::fabs(s.diagonal()[2]);
 }
+
+}

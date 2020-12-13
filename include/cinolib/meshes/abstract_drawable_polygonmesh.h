@@ -51,6 +51,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
     protected:
 
         MeshSlicer<Mesh> slicer;
+        Material         material_;
         RenderData       drawlist;
         RenderData       drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces too)
         Color            marked_edge_color;
@@ -85,6 +86,11 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         void updateGL();        // regenerates rendering data for both mesh and marked elements
         void updateGL_mesh();   // regenerates rendering data for mesh elements
         void updateGL_marked(); // regenerates rendering data for marked mesh elements
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const Material & material() const { return material_; }
+              Material & material()       { return material_; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

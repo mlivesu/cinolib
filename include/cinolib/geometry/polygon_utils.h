@@ -82,23 +82,15 @@ bool polygon_flatten(const std::vector<vec3d> & poly3d,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// Implementation of the ear-cut triangulation algorithm
-//
 CINO_INLINE
-bool polygon_triangulate(std::vector<vec2d> & poly, std::vector<uint> & tris);
+bool polygon_triangulate(std::vector<vec2d> & poly,
+                         std::vector<uint>  & tris);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool polygon_triangulate(std::vector<vec3d> & poly, std::vector<uint> & tris);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// This is the fundamental building block of the ear cut algorithm for polygon triangulation
-// http://cgm.cs.mcgill.ca/~godfried/teaching/cg-projects/97/Ian/algorithm1.html
-//
-CINO_INLINE
-int polygon_find_ear(const std::vector<vec2d> & poly);
+bool polygon_triangulate(std::vector<vec3d> & poly,
+                         std::vector<uint>  & tris);
 
 }
 

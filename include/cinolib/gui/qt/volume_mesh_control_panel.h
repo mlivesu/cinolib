@@ -41,6 +41,7 @@
 #include <cinolib/scalar_field.h>
 #include <cinolib/drawable_vector_field.h>
 #include <cinolib/drawable_isosurface.h>
+#include <cinolib/drawable_segment_soup.h>
 #include <cinolib/gui/qt/glcanvas.h>
 
 #include <QWidget>
@@ -96,6 +97,8 @@ class VolumeMeshControlPanel
         Mesh                          *m;
         DrawableIsosurface<M,V,E,F,P>  isosurface;
         DrawableVectorField            gradient;
+        DrawableSegmentSoup            face_normals;
+        DrawableSegmentSoup            vert_normals;
         GLcanvas                      *canvas;
         QWidget                       *widget;
         QHBoxLayout                   *global_layout;
@@ -181,10 +184,13 @@ class VolumeMeshControlPanel
         QCheckBox                     *cb_marked_faces;
         QPushButton                   *but_marked_faces_color;
         //
-        QSlider                     *sl_ambient_occlusion;
-        QPushButton                 *but_compute_AO;
+        QSlider                       *sl_ambient_occlusion;
+        QPushButton                   *but_compute_AO;
         //
-        QComboBox                   *cb_actions;
+        QComboBox                     *cb_actions;
+        //
+        QCheckBox                     *cb_face_normals;
+        QCheckBox                     *cb_vert_normals;
 };
 
 }

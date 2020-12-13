@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     std::vector<uint> boundary = m_xyz.get_ordered_boundary_vertices();
 
     // create parametric space (discrete unit circle with as many point as the boundary vertices)
-    std::vector<vec3d> uv_boundary = n_sided_polygon(vec3d(0,0,0), boundary.size(), 1.0);
+    std::vector<vec3d> uv_boundary = n_sided_polygon(boundary.size(), CIRCLE);
 
     // set potitional constraints for boundary vertices (map mesh boundary to the unit circle)
     std::map<uint,vec3d> dirichlet_bcs;

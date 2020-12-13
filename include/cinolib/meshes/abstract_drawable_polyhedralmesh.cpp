@@ -182,6 +182,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
 {
+    drawlist_out.material = material_;
     drawlist_out.tris.clear();
     drawlist_out.tri_coords.clear();
     drawlist_out.tri_v_norms.clear();
@@ -408,6 +409,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
 {
+    drawlist_in.material = material_;
     drawlist_in.tris.clear();
     drawlist_in.tri_coords.clear();
     drawlist_in.tri_v_norms.clear();

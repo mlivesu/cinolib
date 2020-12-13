@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/geometry/segment.h>
-#include <cinolib/exact_geometric_predicates.h>
+#include <cinolib/predicates.h>
 
 namespace cinolib
 {
@@ -69,23 +69,6 @@ vec3d Segment::point_closest_to(const vec3d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-ItemType Segment::item_type() const
-{
-    return SEGMENT;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-AABB Segment::aabb() const
-{
-    std::vector<vec3d> tmp = {v[0], v[1]};
-    return AABB(tmp);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
 bool Segment::intersects_ray(const vec3d & /*p*/, const vec3d & /*dir*/, double & /*t*/, vec3d & /*pos*/) const
 {
     assert(false && "TODO");
@@ -97,7 +80,7 @@ bool Segment::intersects_ray(const vec3d & /*p*/, const vec3d & /*dir*/, double 
 CINO_INLINE
 void Segment::barycentric_coordinates(const vec3d & p, double bc[]) const
 {
-    assert(contains(p));
+    assert(contains(p,false));
 
     vec3d  u = v[1] - v[0];
     double t = (p-v[0]).dot(u);
@@ -108,27 +91,31 @@ void Segment::barycentric_coordinates(const vec3d & p, double bc[]) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Segment::contains_exact(const vec3d & p, bool strict) const
+bool Segment::contains(const vec3d & p, const bool strict) const
 {
-    int where = point_in_segment_exact(p,v);
+    int where = point_in_segment_3d(p, v[0], v[1]);
     if(strict) return (where==STRICTLY_INSIDE);
-               return (where>=STRICTLY_INSIDE);
+    return (where>=STRICTLY_INSIDE);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Segment::intersects_segment_exact(const vec3d s[]) const
+bool Segment::intersects_segment(const vec3d s[], const bool ignore_if_valid_complex) const
 {
-    return segment_segment_intersect_exact(v,s);
+    auto res = segment_segment_intersect_3d(v[0], v[1], s[0], s[1]);
+    if(ignore_if_valid_complex) return (res > SIMPLICIAL_COMPLEX);
+    return (res>=SIMPLICIAL_COMPLEX);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool Segment::intersects_triangle_exact(const vec3d t[]) const
+bool Segment::intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex) const
 {
-    return segment_triangle_intersect_exact(v,t);
+    auto res = segment_triangle_intersect_3d(v[0], v[1], t[0], t[1], t[2]);
+    if(ignore_if_valid_complex) return (res > SIMPLICIAL_COMPLEX);
+    return (res>=SIMPLICIAL_COMPLEX);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

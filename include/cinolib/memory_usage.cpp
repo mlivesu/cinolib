@@ -46,10 +46,12 @@
 
 #ifdef __linux__
 #include <sys/resource.h>
+#include <unistd.h>
 #endif
 
 #ifdef __APPLE__
 #include <mach/mach.h>
+#include <iostream>
 #endif
 
 namespace cinolib
@@ -67,23 +69,22 @@ size_t memory_usage_in_bytes()
 #endif
 
 #ifdef __linux__
-    assert(false && "THIS CODE HASN'T BEEN TESTED YET!");
-    return 0;
-    //long rss = 0L;
-    //FILE* fp = NULL;
-    //if((fp = fopen("/proc/self/statm","r")) == NULL)
-    //{
-    //    std::cout << "Cinolib::memory_usage_in_bytes() => Failed to query LinuxOS!" << std::endl;
-    //    return (size_t)0L;
-    //}
-    //if(fscanf(fp,"%*s%ld",&rss)!=1)
-    //{
-    //    fclose(fp);
-    //    std::cout << "Cinolib::memory_usage_in_bytes() => Failed to query LinuxOS!" << std::endl;
-    //    return (size_t)0L;
-    //}
-    //fclose(fp);
-    //return (size_t)rss * (size_t)sysconf( _SC_PAGESIZE);
+
+    long rss = 0L;
+    FILE* fp = NULL;
+    if((fp = fopen("/proc/self/statm","r")) == NULL)
+    {
+        std::cout << "Cinolib::memory_usage_in_bytes() => Failed to query LinuxOS!" << std::endl;
+        return (size_t)0L;
+    }
+    if(fscanf(fp,"%*s%ld",&rss)!=1)
+    {
+        fclose(fp);
+        std::cout << "Cinolib::memory_usage_in_bytes() => Failed to query LinuxOS!" << std::endl;
+        return (size_t)0L;
+    }
+    fclose(fp);
+    return (size_t)rss * (size_t)sysconf( _SC_PAGESIZE);
 #endif
 
 #ifdef __APPLE__

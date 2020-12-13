@@ -92,7 +92,7 @@ void read_OBJ(const char                     * filename,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void read_MTU(const char                  * filename,
+bool read_MTU(const char                  * filename,
               std::map<std::string,Color> & color_map,
               std::string                 & diffuse_path,  // path of the image encoding the diffuse  texture component
               std::string                 & specular_path, // path of the image encoding the specular texture component
@@ -101,7 +101,7 @@ void read_MTU(const char                  * filename,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void read_MTU(const char                  * filename,
+bool read_MTU(const char                  * filename,
               std::map<std::string,Color> & color_map);
 
 }

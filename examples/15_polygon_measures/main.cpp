@@ -44,8 +44,12 @@ int main(int argc, char **argv)
     double sec_r, mic_r;
     smallest_enclosing_disk(m.vector_verts(), sec_c, sec_r);
     polygon_maximum_inscribed_circle(m.vector_verts(), mic_c, mic_r);
-    DrawablePolygonmesh<> sec(n_sided_polygon(sec_c, 50, sec_r, Z));
-    DrawablePolygonmesh<> mic(n_sided_polygon(mic_c, 50, mic_r, Z));
+    DrawablePolygonmesh<> sec(n_sided_polygon(50, CIRCLE));
+    DrawablePolygonmesh<> mic(n_sided_polygon(50, CIRCLE));
+    sec.translate(sec_c);
+    mic.translate(mic_c);
+    sec.scale(sec_r);
+    mic.scale(mic_r);
     sec.show_mesh_points();
     mic.show_mesh_points();
     sec.show_wireframe(true);
@@ -95,8 +99,12 @@ int main(int argc, char **argv)
         profiler.push("Compute maximum inscribed circle");
         polygon_maximum_inscribed_circle(m.vector_verts(), mic_c, mic_r);
         profiler.pop();
-        sec.vector_verts() = n_sided_polygon(sec_c, 50, sec_r, Z);
-        mic.vector_verts() = n_sided_polygon(mic_c, 50, mic_r, Z);
+        sec.vector_verts() = n_sided_polygon(50, CIRCLE);
+        mic.vector_verts() = n_sided_polygon(50, CIRCLE);
+        sec.translate(sec_c);
+        mic.translate(mic_c);
+        sec.scale(sec_r);
+        mic.scale(mic_r);
         sec.updateGL();
         mic.updateGL();
 

@@ -75,7 +75,7 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     std::vector<uint> copies_of_root = v_map.at(basis.root);
     copies_of_root.push_back(basis.root);
     assert(!copies_of_root.empty());
-    m_in.vert_unmark_all();
+    m_in.vert_set_flag(MARKED,false);
     for(uint vid : copies_of_root)
     {
         assert(m_in.vert_is_boundary(vid));
@@ -96,8 +96,11 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
             split_list.push_back(eid);
         }
     }
-    std::cout << "splitting " << split_list.size() << " edges to avoid degenerate elements along the boundary" << std::endl;
-    for(uint eid : split_list) m_in.edge_split(eid);
+    if(!split_list.empty())
+    {
+        std::cout << "splitting " << split_list.size() << " edges to avoid degenerate elements along the boundary" << std::endl;
+        for(uint eid : split_list) m_in.edge_split(eid);
+    }
 
     std::vector<uint> border = m_in.get_ordered_boundary_vertices();
     // rotate the list so as to have a polygon corner at the beginning of it
@@ -117,7 +120,7 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
         edges.push_back(e);
     }
 
-    std::vector<vec3d> poly = n_sided_polygon(vec3d(0,0,0), genus*4, 1.0);
+    std::vector<vec3d> poly = n_sided_polygon(genus*4, CIRCLE);
     for(auto & p : poly) rotate(p, vec3d(0,0,1), M_PI*0.25); // if g=1, align square with uv frame
     std::map<uint,vec3d> dirichlet_bcs;
     for(uint i=0; i<poly.size(); ++i)

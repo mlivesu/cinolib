@@ -249,7 +249,7 @@ void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
         {
             if(target.edge_data(eid).flags[MARKED]) // marked => flagged as a sharp feature
             {
-                ref_feat.add_segment(eid, target.edge_verts(eid));
+                ref_feat.push_segment(eid, target.edge_verts(eid));
             }
         }
         ref_feat.build();
