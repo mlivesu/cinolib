@@ -78,6 +78,7 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void push_point      (const uint id, const vec3d & v);
         void push_segment    (const uint id, const std::vector<vec3d> & v);
         void push_triangle   (const uint id, const std::vector<vec3d> & v);
         void push_tetrahedron(const uint id, const std::vector<vec3d> & v);
