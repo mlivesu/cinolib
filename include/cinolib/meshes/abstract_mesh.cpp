@@ -829,6 +829,18 @@ double AbstractMesh<M,V,E,P>::edge_avg_length() const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+double AbstractMesh<M,V,E,P>::edge_avg_length(const uint vid) const
+{
+    double avg = 0;
+    for(uint eid : this->adj_v2e(vid)) avg += edge_length(eid);
+    if(num_edges() > 0) avg/=static_cast<double>(this->adj_v2e(vid).size());
+    return avg;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 double AbstractMesh<M,V,E,P>::edge_max_length() const
 {
     double max = 0;
