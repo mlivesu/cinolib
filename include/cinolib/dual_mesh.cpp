@@ -68,7 +68,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     dual_polys.clear();
     dual_polys_winding.clear();
 
-    // Initialize vertices with face centroids
+    // initialize vertices with face centroids
     dual_verts.resize(primal.num_polys());
     for(uint pid=0; pid<primal.num_polys(); ++pid)
     {
@@ -84,42 +84,42 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     std::map<uint, uint> e2verts;
     std::map<uint, uint> f2verts;
 
-  for (uint vid = 0; vid < primal.num_verts(); ++vid)
-  {
-    if (primal.vert_is_on_srf(vid))
+    for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
-      std::vector<uint> edges = primal.vert_adj_srf_edges(vid);
-      uint count = 0;
-      for (uint eid : edges)
-        if (primal.edge_data(eid).flags[MARKED])
-          count++;
-      if (count == 2)
-        vnot2verts[vid] = dual_verts.size();
-      if (count > 2)
-      {
-        v2verts[vid] = dual_verts.size();
-        dual_verts.push_back(primal.vert(vid));
-      }
+        if(primal.vert_is_on_srf(vid))
+        {
+            std::vector<uint> edges = primal.vert_adj_srf_edges(vid);
+            uint count = 0;
+            for(uint eid : edges)
+            {
+                if(primal.edge_data(eid).flags[MARKED]) count++;
+            }
+            if(count==2) vnot2verts[vid] = dual_verts.size(); else
+            if(count> 2)
+            {
+                v2verts[vid] = dual_verts.size();
+                dual_verts.push_back(primal.vert(vid));
+            }
+        }
     }
-  }
-  for (uint eid = 0; eid < primal.num_edges(); ++eid)
-  {
-    if (primal.edge_data(eid).flags[MARKED])
+    for(uint eid=0; eid<primal.num_edges(); ++eid)
     {
-        assert(primal.edge_is_on_srf(eid));
-      e2verts[eid] = dual_verts.size();
-      dual_verts.push_back(primal.edge_sample_at(eid, 0.5));
+        if(primal.edge_data(eid).flags[MARKED])
+        {
+            assert(primal.edge_is_on_srf(eid));
+            e2verts[eid] = dual_verts.size();
+            dual_verts.push_back(primal.edge_sample_at(eid, 0.5));
+        }
     }
-  }
 
-  for (uint fid = 0; fid < primal.num_faces(); ++fid)
-  {
-    if (primal.face_is_on_srf(fid))
+    for(uint fid=0; fid<primal.num_faces(); ++fid)
     {
-      f2verts[fid] = dual_verts.size();
-      dual_verts.push_back(primal.face_centroid(fid));
+        if(primal.face_is_on_srf(fid))
+        {
+            f2verts[fid] = dual_verts.size();
+            dual_verts.push_back(primal.face_centroid(fid));
+        }
     }
-  }
 
   // Make dual polyhedral cells
   for (uint vid = 0; vid < primal.num_verts(); ++vid)
