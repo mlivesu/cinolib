@@ -249,6 +249,7 @@ class AbstractMesh
                 double                 edge_length                (const uint eid) const;
                 vec3d                  edge_vec                   (const uint eid, const bool normalized = false) const;
                 double                 edge_avg_length            () const;
+                double                 edge_avg_length            (const uint vid) const;
                 double                 edge_max_length            () const;
                 double                 edge_min_length            () const;
                 void                   edge_apply_labels          (const std::vector<int> & labels);
