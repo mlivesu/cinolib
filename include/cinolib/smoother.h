@@ -95,7 +95,7 @@ typedef struct
     double w_laplace           = 0.001;   // weight of laplacian energy terms
     int    laplacian_mode      = UNIFORM; // laplacian mode (UNIFORM or COTANGENT)
     bool   reproject_on_target = true;    // reproject to target surface after each smoothing iteration
-    //bool   with_ray_casting    = false;   // reproject via aray casting if true, via closest point if false
+    //bool   with_ray_casting    = false;   // reproject via ray casting if true, via closest point if false
 }
 SmootherOptions;
 
