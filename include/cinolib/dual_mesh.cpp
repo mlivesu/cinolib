@@ -27,6 +27,10 @@
 *     Marco Livesu (marco.livesu@gmail.com)                                     *
 *     http://pers.ge.imati.cnr.it/livesu/                                       *
 *                                                                               *
+*     and                                                                       *
+*                                                                               *
+*     Tommaso Sorgente (tommaso.sorgente@ge.imati.cnr.it)                       *
+*                                                                               *
 *     Italian National Research Council (CNR)                                   *
 *     Institute for Applied Mathematics and Information Technologies (IMATI)    *
 *     Via de Marini, 6                                                          *
@@ -61,130 +65,173 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                      std::vector<std::vector<uint>>    & dual_faces,
                      std::vector<std::vector<uint>>    & dual_polys,
                      std::vector<std::vector<bool>>    & dual_polys_winding,
-               const bool                                with_clipped_cells)
+                     const bool                          with_clipped_cells)
 {
     dual_verts.clear();
     dual_faces.clear();
     dual_polys.clear();
     dual_polys_winding.clear();
 
-    // Initialize vertices with face centroids
+    // add one dual vertex for each primal poly
     dual_verts.resize(primal.num_polys());
     for(uint pid=0; pid<primal.num_polys(); ++pid)
     {
         dual_verts.at(pid) = primal.poly_centroid(pid);
     }
 
-    std::map<std::vector<uint>,uint> f_map;
-
-    // For clipped dual cells: add boundary vertices,
-    // boundary edges midpoints and surface face midpoints
-    //
-    //std::map<uint,uint> v2verts;
-    //std::map<uint,uint> e2verts;
-    std::map<uint,uint> f2verts;
-    //for(uint vid=0; vid<primal.num_verts(); ++vid)
-    //{
-    //    if (primal.vert_is_on_srf(vid))
-    //    {
-    //        v2verts[vid] = dual_verts.size();
-    //        dual_verts.push_back(primal.vert(vid));
-    //    }
-    //}
-    //for(uint eid=0; eid<primal.num_edges(); ++eid)
-    //{
-    //    if (primal.edge_is_on_srf(eid))
-    //    {
-    //        e2verts[eid] = dual_verts.size();
-    //        dual_verts.push_back(primal.edge_sample_at(eid, 0.5));
-    //    }
-    //}
+    // vertex maps for clipped dual cells
+    std::vector<bool> crease_corner(primal.num_verts(),false);
+    std::unordered_map<uint,uint> pv2dv; // primal vert to dual vert : for crease corners
+    std::unordered_map<uint,uint> pe2dv; // primal edge to dual vert : for crease lines
+    std::unordered_map<uint,uint> pf2dv; // primal face to dual vert : for surface faces
+    // verts
+    for(uint vid=0; vid<primal.num_verts(); ++vid)
+    {
+        if(!primal.vert_is_on_srf(vid)) continue;
+        uint n_creases = 0;
+        for(uint eid : primal.vert_adj_srf_edges(vid))
+        {
+            if(primal.edge_data(eid).flags[MARKED]) ++n_creases;
+        }
+        if(n_creases> 2)
+        {
+            crease_corner.at(vid) = true;
+            pv2dv[vid] = dual_verts.size();
+            dual_verts.push_back(primal.vert(vid));
+        }
+    }
+    // edges
+    for(uint eid=0; eid<primal.num_edges(); ++eid)
+    {
+        if(primal.edge_is_on_srf(eid) && primal.edge_data(eid).flags[MARKED])
+        {
+            pe2dv[eid] = dual_verts.size();
+            dual_verts.push_back(primal.edge_sample_at(eid, 0.5));
+        }
+    }
+    // faces
     for(uint fid=0; fid<primal.num_faces(); ++fid)
     {
-        if (primal.face_is_on_srf(fid))
+        if(primal.face_is_on_srf(fid))
         {
-            f2verts[fid] = dual_verts.size();
+            pf2dv[fid] = dual_verts.size();
             dual_verts.push_back(primal.face_centroid(fid));
         }
     }
 
-    // Make dual polyhedral cells
+    // build polyhedral cells
+    std::map<std::vector<uint>,uint> f_map;
     for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
-        bool clipped_cell = primal.vert_is_on_srf(vid);
-        if (clipped_cell && !with_clipped_cells) continue;
+        bool clipped = primal.vert_is_on_srf(vid);
+        if(clipped && !with_clipped_cells) continue;
 
-        std::vector<uint> p;
-        std::vector<bool> p_winding;
+        std::vector<std::vector<uint>> faces;
 
+        // build the faces for the interior part
         for(uint eid : primal.adj_v2e(vid))
         {
-            std::vector<uint> f = primal.edge_ordered_poly_ring(eid);
-
-            if (primal.edge_is_on_srf(eid))
+            std::vector<uint> face = primal.edge_ordered_poly_ring(eid);
+            // for surface edges, add the centroid of the two faces incident at it, in the right order
+            if(primal.edge_is_on_srf(eid))
             {
-                assert(primal.edge_adj_srf_faces(eid).size()==2);
+                assert(primal.edge_adj_srf_faces(eid).size() == 2);
                 uint srf_beg = primal.edge_adj_srf_faces(eid).front();
                 uint srf_end = primal.edge_adj_srf_faces(eid).back();
-                uint p_beg   = f.front();
-                uint p_end   = f.back();
-                if (!primal.poly_contains_face(p_beg, srf_beg)) std::swap(srf_beg, srf_end);
+                uint p_beg = face.front();
+                uint p_end = face.back();
+                if(!primal.poly_contains_face(p_beg, srf_beg)) std::swap(srf_beg, srf_end);
                 assert(primal.poly_contains_face(p_beg, srf_beg));
                 assert(primal.poly_contains_face(p_end, srf_end));
-                f.push_back(f2verts.at(srf_end));
-                //f.push_back(e2verts.at(eid));
-                f.push_back(f2verts.at(srf_beg));
+                face.push_back(pf2dv.at(srf_end));
+                face.push_back(pf2dv.at(srf_beg));
             }
-
-            std::vector<uint> sorted_f = f;
-            sort(sorted_f.begin(), sorted_f.end());
-            auto query = f_map.find(sorted_f);
-
-            if (query == f_map.end())
-            {
-                uint fresh_id = dual_faces.size();
-                f_map[sorted_f] = fresh_id;
-                dual_faces.push_back(f);
-
-                p.push_back(fresh_id);
-                p_winding.push_back(true);
-            }
-            else
-            {
-                p.push_back(query->second);
-                p_winding.push_back(false);
-            }
+            faces.push_back(face);
         }
 
-        if (clipped_cell)
+        // build faces for the clipped part
+        if(clipped)
         {
-            std::vector<uint> f;
-            for(uint fid : primal.vert_ordered_srf_face_ring(vid))
-            {
-                f.push_back(f2verts.at(fid));
-            }
-            std::vector<uint> sorted_f = f;
-            sort(sorted_f.begin(), sorted_f.end());
-            auto query = f_map.find(sorted_f);
+            std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
+            std::vector<uint> e_ring; // sorted list of surface edges incident to vid
+            std::vector<uint> f_ring; // sorted list of adjacent surface faces
+            primal.vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring, true);
 
-            if (query == f_map.end())
+            // make sure you start tracing the face from a crease (if any)
+            for(uint i=0; i<e_ring.size(); ++i)
+            {
+                if(primal.edge_data(e_ring.at(i)).flags[MARKED])
+                {
+                    if(i==0) break;
+                    std::rotate(e_ring.begin(), e_ring.begin()+i, e_ring.end());
+                    std::rotate(f_ring.begin(), f_ring.begin()+i, f_ring.end());
+                    break;
+                }
+            }
+
+            // rotate around the ring, and close a face, splitting each time you hit a crease edge
+            int  corner = (crease_corner.at(vid)) ? pv2dv.at(vid) : -1;
+            auto e_it   = e_ring.begin();
+            auto f_it   = f_ring.begin();
+            do
+            {
+                std::vector<uint> new_face;
+
+                // if vid is a feature corner, add it to the dual
+                if(corner>=0) new_face.push_back(corner);
+
+                // if the face starts from a crease, add a vertex for primal edge
+                if(primal.edge_data(*e_it).flags[MARKED]) new_face.push_back(pe2dv.at(*e_it));
+
+                do
+                {
+                    new_face.push_back(pf2dv.at(*f_it));
+                    ++e_it;
+                    ++f_it;
+                }
+                while(e_it!=e_ring.end() && !primal.edge_data(*e_it).flags[MARKED]);
+
+                // if the previous loop stopped at a crease, add a vertex for primal edge
+                if(e_it!=e_ring.end())
+                {
+                    new_face.push_back(pe2dv.at(*e_it));
+                }
+                else if(primal.edge_data(*e_ring.begin()).flags[MARKED])
+                {
+                    new_face.push_back(pe2dv.at(*e_ring.begin()));
+                    // happens when only one crease edge is incident to the vertex
+                    if(new_face.front()==new_face.back()) new_face.pop_back();
+                }
+
+                faces.push_back(new_face);
+            }
+            while(e_it!=e_ring.end());
+        }
+
+        // build the cell
+        std::vector<uint> poly;
+        std::vector<bool> poly_winding;
+        for(const auto & face : faces)
+        {
+            auto key = face;
+            SORT_VEC(key);
+            auto query = f_map.find(key);
+            if(query == f_map.end())
             {
                 uint fresh_id = dual_faces.size();
-                f_map[sorted_f] = fresh_id;
-                dual_faces.push_back(f);
-
-                p.push_back(fresh_id);
-                p_winding.push_back(true);
+                f_map[key] = fresh_id;
+                dual_faces.push_back(face);
+                poly.push_back(fresh_id);
+                poly_winding.push_back(true);
             }
             else
             {
-                p.push_back(query->second);
-                p_winding.push_back(false);
+                poly.push_back(query->second);
+                poly_winding.push_back(false);
             }
         }
-
-        dual_polys.push_back(p);
-        dual_polys_winding.push_back(p_winding);
+        dual_polys.push_back(poly);
+        dual_polys_winding.push_back(poly_winding);
     }
 }
 
