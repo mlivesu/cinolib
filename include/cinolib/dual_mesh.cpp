@@ -63,6 +63,7 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                std::vector<std::vector<bool>>    & dual_polys_winding,
                const bool                          with_clipped_cells)
 {
+    // convenient renaming of standard flags
     enum
     {
         CREASE        = MARKED,
@@ -86,38 +87,36 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     std::unordered_map<uint,uint> pv2dv; // primal vert to dual vert : for crease corners
     std::unordered_map<uint,uint> pe2dv; // primal edge to dual vert : for crease lines
     std::unordered_map<uint,uint> pf2dv; // primal face to dual vert : for surface faces
-
+    // verts
     for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
-        if(primal.vert_is_on_srf(vid))
+        if(!primal.vert_is_on_srf(vid)) continue;
+        uint n_creases = 0;
+        for(uint eid : primal.vert_adj_srf_edges(vid))
         {
-            uint n_creases = 0;
-            for(uint eid : primal.vert_adj_srf_edges(vid))
-            {
-                if(primal.edge_data(eid).flags[CREASE]) ++n_creases;
-            }
-            if(n_creases==2)
-            {
-                primal.vert_data(vid).flags[LINE_CREASE] = true;
-            }
-            else if(n_creases> 2)
-            {
-                primal.vert_data(vid).flags[CORNER_CREASE] = true;
-                pv2dv[vid] = dual_verts.size();
-                dual_verts.push_back(primal.vert(vid));
-            }
+            if(primal.edge_data(eid).flags[CREASE]) ++n_creases;
+        }
+        if(n_creases==2)
+        {
+            primal.vert_data(vid).flags[LINE_CREASE] = true;
+        }
+        else if(n_creases> 2)
+        {
+            primal.vert_data(vid).flags[CORNER_CREASE] = true;
+            pv2dv[vid] = dual_verts.size();
+            dual_verts.push_back(primal.vert(vid));
         }
     }
+    // edges
     for(uint eid=0; eid<primal.num_edges(); ++eid)
     {
-        if(primal.edge_data(eid).flags[CREASE])
+        if(primal.edge_is_on_srf(eid) && primal.edge_data(eid).flags[CREASE])
         {
-            assert(primal.edge_is_on_srf(eid));
             pe2dv[eid] = dual_verts.size();
             dual_verts.push_back(primal.edge_sample_at(eid, 0.5));
         }
     }
-
+    // faces
     for(uint fid=0; fid<primal.num_faces(); ++fid)
     {
         if(primal.face_is_on_srf(fid))
@@ -127,20 +126,22 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
         }
     }
 
-    // Make dual polyhedral cells
+    // build polyhedral cells
     std::map<std::vector<uint>,uint> f_map;
     for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
-        bool clipped_cell = primal.vert_is_on_srf(vid);
-        if(clipped_cell && !with_clipped_cells) continue;
+        bool clipped = primal.vert_is_on_srf(vid);
+        if(clipped && !with_clipped_cells) continue;
 
-        std::vector<uint> poly;
-        std::vector<bool> poly_winding;
+        std::vector<uint>              poly;
+        std::vector<bool>              poly_winding;
         std::vector<std::vector<uint>> faces;
 
+        // each edge defines a dual face...
         for(uint eid : primal.adj_v2e(vid))
         {
             std::vector<uint> face = primal.edge_ordered_poly_ring(eid);
+            // for surface edges, add the centroid of the two faces incident at it, in the right order
             if(primal.edge_is_on_srf(eid))
             {
                 assert(primal.edge_adj_srf_faces(eid).size() == 2);
@@ -151,28 +152,24 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 if(!primal.poly_contains_face(p_beg, srf_beg)) std::swap(srf_beg, srf_end);
                 assert(primal.poly_contains_face(p_beg, srf_beg));
                 assert(primal.poly_contains_face(p_end, srf_end));
-
                 face.push_back(pf2dv.at(srf_end));
                 face.push_back(pf2dv.at(srf_beg));
             }
             faces.push_back(face);
         }
 
-        if(clipped_cell)
+        // clipped cells need extra faces
+        if(clipped)
         {
-            std::vector<uint> face;
-
             if(!primal.vert_data(vid).flags[LINE_CREASE]   &&
                !primal.vert_data(vid).flags[CORNER_CREASE])
             {
-                for(uint fid : primal.vert_ordered_srf_face_ring(vid))
-                {
-                    face.push_back(pf2dv.at(fid));
-                }
+                auto face = primal.vert_ordered_srf_face_ring(vid);
+                for(uint & id : face) id = pf2dv.at(id);
                 faces.push_back(face);
             }
             else
-            {
+            {                
                 std::vector<uint> vid_faces = primal.vert_ordered_srf_face_ring(vid);
                 std::vector<uint> vid_faces_double = vid_faces;
                 for(uint f : vid_faces) vid_faces_double.push_back(f);
@@ -192,6 +189,7 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 }
                 assert(found == 1);
 
+                std::vector<uint> face;
                 face.push_back(pe2dv.at(e12));
                 for(uint ii=i+1; ii<i+1+vid_faces.size(); ++ii)
                 {
