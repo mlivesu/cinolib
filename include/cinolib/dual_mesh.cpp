@@ -170,7 +170,8 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 for(uint & id : face) id = pf2dv.at(id);
                 faces.push_back(face);
             }
-            // for crease vertices you such a face must be split along crease lines...
+            // for crease vertices such a face must be split along crease lines
+            // and if the vertex is a corner it also must be included in the dual
             else
             {                
                 std::vector<uint> vid_faces = primal.vert_ordered_srf_face_ring(vid);
