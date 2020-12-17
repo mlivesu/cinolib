@@ -40,9 +40,9 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
-               Polyhedralmesh<M,V,E,F,P>         & dual,
-               const bool                          with_clipped_cells)
+void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
+                     Polyhedralmesh<M,V,E,F,P>         & dual,
+               const bool                                with_clipped_cells)
 {
     std::vector<vec3d>             dual_verts;
     std::vector<std::vector<uint>> dual_faces;
@@ -56,21 +56,13 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
-               std::vector<vec3d>                & dual_verts,
-               std::vector<std::vector<uint>>    & dual_faces,
-               std::vector<std::vector<uint>>    & dual_polys,
-               std::vector<std::vector<bool>>    & dual_polys_winding,
-               const bool                          with_clipped_cells)
+void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
+                     std::vector<vec3d>                & dual_verts,
+                     std::vector<std::vector<uint>>    & dual_faces,
+                     std::vector<std::vector<uint>>    & dual_polys,
+                     std::vector<std::vector<bool>>    & dual_polys_winding,
+                     const bool                          with_clipped_cells)
 {
-    // convenient renaming of standard flags
-    enum
-    {
-        CREASE        = MARKED,
-        LINE_CREASE   = UNUSED_0,
-        CORNER_CREASE = UNUSED_1,
-    };
-
     dual_verts.clear();
     dual_faces.clear();
     dual_polys.clear();
@@ -84,6 +76,7 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     }
 
     // vertex maps for clipped dual cells
+    std::vector<bool> crease_corner(primal.num_verts(),false);
     std::unordered_map<uint,uint> pv2dv; // primal vert to dual vert : for crease corners
     std::unordered_map<uint,uint> pe2dv; // primal edge to dual vert : for crease lines
     std::unordered_map<uint,uint> pf2dv; // primal face to dual vert : for surface faces
@@ -94,15 +87,11 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
         uint n_creases = 0;
         for(uint eid : primal.vert_adj_srf_edges(vid))
         {
-            if(primal.edge_data(eid).flags[CREASE]) ++n_creases;
+            if(primal.edge_data(eid).flags[MARKED]) ++n_creases;
         }
-        if(n_creases==2)
+        if(n_creases> 2)
         {
-            primal.vert_data(vid).flags[LINE_CREASE] = true;
-        }
-        else if(n_creases> 2)
-        {
-            primal.vert_data(vid).flags[CORNER_CREASE] = true;
+            crease_corner.at(vid) = true;
             pv2dv[vid] = dual_verts.size();
             dual_verts.push_back(primal.vert(vid));
         }
@@ -110,7 +99,7 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     // edges
     for(uint eid=0; eid<primal.num_edges(); ++eid)
     {
-        if(primal.edge_is_on_srf(eid) && primal.edge_data(eid).flags[CREASE])
+        if(primal.edge_is_on_srf(eid) && primal.edge_data(eid).flags[MARKED])
         {
             pe2dv[eid] = dual_verts.size();
             dual_verts.push_back(primal.edge_sample_at(eid, 0.5));
@@ -133,11 +122,9 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
         bool clipped = primal.vert_is_on_srf(vid);
         if(clipped && !with_clipped_cells) continue;
 
-        std::vector<uint>              poly;
-        std::vector<bool>              poly_winding;
         std::vector<std::vector<uint>> faces;
 
-        // each edge defines a dual face...
+        // build the faces for the interior part
         for(uint eid : primal.adj_v2e(vid))
         {
             std::vector<uint> face = primal.edge_ordered_poly_ring(eid);
@@ -158,56 +145,28 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
             faces.push_back(face);
         }
 
-        // clipped cells need extra faces
+        // build faces for the clipped part
         if(clipped)
         {
             std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
             std::vector<uint> e_ring; // sorted list of surface edges incident to vid
             std::vector<uint> f_ring; // sorted list of adjacent surface faces
-            primal.vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+            primal.vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring, true);
 
-            // make sure surface rings are CCW ordered
-//            uint e0 = e_ring.at(0);
-//            uint e1 = e_ring.at(1);
-//            uint f0 = f_ring.at(0);
-//            assert(primal.face_contains_edge(f0,e0) && primal.face_contains_edge(f0,e1));
-//            uint v0 = primal.vert_opposite_to(e0,vid);
-//            uint v1 = primal.vert_opposite_to(e1,vid);
-//            if(!primal.face_verts_are_CCW(f0,v1,v0))
-//            {
-//                REVERSE_VEC(e_ring);
-//                REVERSE_VEC(f_ring);
-//            }
-
-            bool has_crease = false;
             // make sure you start tracing the face from a crease (if any)
             for(uint i=0; i<e_ring.size(); ++i)
             {
-                if(primal.edge_data(e_ring.at(i)).flags[CREASE])
+                if(primal.edge_data(e_ring.at(i)).flags[MARKED])
                 {
-                    has_crease = true;
                     if(i==0) break;
-                    assert(primal.face_contains_edge(*f_ring.begin(), *e_ring.begin()));
-                    assert(primal.face_contains_edge(*f_ring.begin(), *(e_ring.begin()+1)));
                     std::rotate(e_ring.begin(), e_ring.begin()+i, e_ring.end());
                     std::rotate(f_ring.begin(), f_ring.begin()+i, f_ring.end());
-                    assert(primal.face_contains_edge(*f_ring.begin(), *e_ring.begin()));
-                    assert(primal.face_contains_edge(*f_ring.begin(), *(e_ring.begin()+1)));
                     break;
                 }
             }
 
-            if(has_crease)
-            {
-                std::cout << "\n\nring around v" << vid << "(" << primal.vert_data(vid).flags[CORNER_CREASE] << ")" << std::endl;
-                for(uint i=0; i<e_ring.size(); ++i)
-                {
-                    std::cout << "e" << e_ring[i] << "(" << primal.edge_data(e_ring[i]).flags[CREASE] << ")   f" << f_ring[i] << std::endl;
-                }
-            }
-
             // rotate around the ring, and close a face, splitting each time you hit a crease edge
-            int  corner = (primal.vert_data(vid).flags[CORNER_CREASE]) ? pv2dv.at(vid) : -1;
+            int  corner = (crease_corner.at(vid)) ? pv2dv.at(vid) : -1;
             auto e_it   = e_ring.begin();
             auto f_it   = f_ring.begin();
             do
@@ -215,38 +174,29 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 std::vector<uint> new_face;
 
                 // if vid is a feature corner, add it to the dual
-                if(corner>=0)
-                {
-                    new_face.push_back(corner);
-                    if(has_crease)std::cout << "v" << vid << std::endl;
-                }
+                if(corner>=0) new_face.push_back(corner);
 
                 // if the face starts from a crease, add a vertex for primal edge
-                if(primal.edge_data(*e_it).flags[CREASE])
-                {
-                    new_face.push_back(pe2dv.at(*e_it));
-                    if(has_crease)std::cout << "e" << *e_it << std::endl;
-                }
+                if(primal.edge_data(*e_it).flags[MARKED]) new_face.push_back(pe2dv.at(*e_it));
 
                 do
                 {
                     new_face.push_back(pf2dv.at(*f_it));
-                    if(has_crease)std::cout << "f" << *f_it << std::endl;
                     ++e_it;
                     ++f_it;
                 }
-                while(e_it!=e_ring.end() && !primal.edge_data(*e_it).flags[CREASE]);
+                while(e_it!=e_ring.end() && !primal.edge_data(*e_it).flags[MARKED]);
 
                 // if the previous loop stopped at a crease, add a vertex for primal edge
                 if(e_it!=e_ring.end())
                 {
                     new_face.push_back(pe2dv.at(*e_it));
-                    if(has_crease)std::cout << "e" << *e_it << std::endl;
                 }
-                else if(primal.edge_data(*e_ring.begin()).flags[CREASE])
+                else if(primal.edge_data(*e_ring.begin()).flags[MARKED])
                 {
                     new_face.push_back(pe2dv.at(*e_ring.begin()));
-                    if(has_crease)std::cout << "e" << *e_ring.begin() << std::endl;
+                    // happens when only one crease edge is incident to the vertex
+                    if(new_face.front()==new_face.back()) new_face.pop_back();
                 }
 
                 faces.push_back(new_face);
@@ -254,17 +204,19 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
             while(e_it!=e_ring.end());
         }
 
-        for(std::vector<uint> & face : faces)
+        // build the cell
+        std::vector<uint> poly;
+        std::vector<bool> poly_winding;
+        for(const auto & face : faces)
         {
-            std::vector<uint> sorted_f = face;
-            sort(sorted_f.begin(), sorted_f.end());
-            auto query = f_map.find(sorted_f);
+            auto key = face;
+            SORT_VEC(key);
+            auto query = f_map.find(key);
             if(query == f_map.end())
             {
                 uint fresh_id = dual_faces.size();
-                f_map[sorted_f] = fresh_id;
+                f_map[key] = fresh_id;
                 dual_faces.push_back(face);
-
                 poly.push_back(fresh_id);
                 poly_winding.push_back(true);
             }
@@ -274,7 +226,6 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 poly_winding.push_back(false);
             }
         }
-
         dual_polys.push_back(poly);
         dual_polys_winding.push_back(poly_winding);
     }
