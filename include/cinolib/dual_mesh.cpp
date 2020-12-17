@@ -161,6 +161,8 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
         // clipped cells need extra faces
         if(clipped)
         {
+            // for regular surface vertices just add a face with all the
+            // centroids of the surface faces incident to the vertex
             if(!primal.vert_data(vid).flags[LINE_CREASE]   &&
                !primal.vert_data(vid).flags[CORNER_CREASE])
             {
@@ -168,6 +170,7 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 for(uint & id : face) id = pf2dv.at(id);
                 faces.push_back(face);
             }
+            // for crease vertices you such a face must be split along crease lines...
             else
             {                
                 std::vector<uint> vid_faces = primal.vert_ordered_srf_face_ring(vid);
@@ -179,9 +182,9 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 for(i=0; i<vid_faces.size(); ++i)
                 {
                     f1 = vid_faces.at(i);
-                    f2 = vid_faces.at((i + 1) % vid_faces.size());
-                    e12 = primal.face_shared_edge(f1, f2);
-                    if(pe2dv.find(e12) != pe2dv.end())
+                    f2 = vid_faces.at((i+1)%vid_faces.size());
+                    e12 = primal.face_shared_edge(f1,f2);
+                    if(primal.edge_data(e12).flags[CREASE])
                     {
                         found++;
                         break;
