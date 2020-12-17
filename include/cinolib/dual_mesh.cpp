@@ -82,11 +82,10 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
         dual_verts.at(pid) = primal.poly_centroid(pid);
     }
 
-    // For clipped dual cells: add boundary vertices, boundary edges midpoints and
-    // surface face midpoints
-    std::unordered_map<uint,uint> v2verts;
-    std::unordered_map<uint,uint> e2verts;
-    std::unordered_map<uint,uint> f2verts;
+    // vertex maps for clipped dual cells
+    std::unordered_map<uint,uint> pv2dv; // primal vert to dual vert : for crease corners
+    std::unordered_map<uint,uint> pe2dv; // primal edge to dual vert : for crease lines
+    std::unordered_map<uint,uint> pf2dv; // primal face to dual vert : for surface faces
 
     for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
@@ -104,7 +103,7 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
             else if(n_creases> 2)
             {
                 primal.vert_data(vid).flags[CORNER_CREASE] = true;
-                v2verts[vid] = dual_verts.size();
+                pv2dv[vid] = dual_verts.size();
                 dual_verts.push_back(primal.vert(vid));
             }
         }
@@ -114,7 +113,7 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
         if(primal.edge_data(eid).flags[CREASE])
         {
             assert(primal.edge_is_on_srf(eid));
-            e2verts[eid] = dual_verts.size();
+            pe2dv[eid] = dual_verts.size();
             dual_verts.push_back(primal.edge_sample_at(eid, 0.5));
         }
     }
@@ -123,7 +122,7 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     {
         if(primal.face_is_on_srf(fid))
         {
-            f2verts[fid] = dual_verts.size();
+            pf2dv[fid] = dual_verts.size();
             dual_verts.push_back(primal.face_centroid(fid));
         }
     }
@@ -153,8 +152,8 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 assert(primal.poly_contains_face(p_beg, srf_beg));
                 assert(primal.poly_contains_face(p_end, srf_end));
 
-                face.push_back(f2verts.at(srf_end));
-                face.push_back(f2verts.at(srf_beg));
+                face.push_back(pf2dv.at(srf_end));
+                face.push_back(pf2dv.at(srf_beg));
             }
             faces.push_back(face);
         }
@@ -168,7 +167,7 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
             {
                 for(uint fid : primal.vert_ordered_srf_face_ring(vid))
                 {
-                    face.push_back(f2verts.at(fid));
+                    face.push_back(pf2dv.at(fid));
                 }
                 faces.push_back(face);
             }
@@ -185,7 +184,7 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                     f1 = vid_faces.at(i);
                     f2 = vid_faces.at((i + 1) % vid_faces.size());
                     e12 = primal.face_shared_edge(f1, f2);
-                    if(e2verts.find(e12) != e2verts.end())
+                    if(pe2dv.find(e12) != pe2dv.end())
                     {
                         found++;
                         break;
@@ -193,22 +192,22 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 }
                 assert(found == 1);
 
-                face.push_back(e2verts.at(e12));
+                face.push_back(pe2dv.at(e12));
                 for(uint ii=i+1; ii<i+1+vid_faces.size(); ++ii)
                 {
                     f1 = vid_faces_double.at(ii);
                     f2 = vid_faces_double.at((ii + 1) % vid_faces_double.size());
                     e12 = primal.face_shared_edge(f1, f2);
-                    face.push_back(f2verts.at(f1));
-                    if(e2verts.find(e12) != e2verts.end())
+                    face.push_back(pf2dv.at(f1));
+                    if(pe2dv.find(e12) != pe2dv.end())
                     {
                         found++;
-                        face.push_back(e2verts.at(e12));
+                        face.push_back(pe2dv.at(e12));
                         // if I am a corner, add the vertex as well
-                        if(CONTAINS(v2verts,vid)) face.push_back(v2verts.at(vid));
+                        if(CONTAINS(pv2dv,vid)) face.push_back(pv2dv.at(vid));
                         faces.push_back(face);
                         face.clear();
-                        face.push_back(e2verts.at(e12));
+                        face.push_back(pe2dv.at(e12));
                     }
                 }
                 assert(found > 2);
