@@ -91,7 +91,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
         uint n_creases = 0;
         for(uint eid : primal.vert_adj_srf_edges(vid))
         {
-            if(primal.edge_data(eid).flags[MARKED]) ++n_creases;
+            if(primal.edge_data(eid).flags[CREASE]) ++n_creases;
         }
         if(n_creases> 2)
         {
@@ -103,7 +103,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     // edges
     for(uint eid=0; eid<primal.num_edges(); ++eid)
     {
-        if(primal.edge_is_on_srf(eid) && primal.edge_data(eid).flags[MARKED])
+        if(primal.edge_is_on_srf(eid) && primal.edge_data(eid).flags[CREASE])
         {
             pe2dv[eid] = dual_verts.size();
             dual_verts.push_back(primal.edge_sample_at(eid, 0.5));
@@ -153,17 +153,17 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
         if(clipped)
         {
             std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
-            std::vector<uint> e_ring; // sorted list of surface edges incident to vid
+            std::vector<uint> e_star; // sorted list of surface edges incident to vid
             std::vector<uint> f_ring; // sorted list of adjacent surface faces
-            primal.vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring, true);
+            primal.vert_ordered_srf_one_ring(vid, v_ring, e_star, f_ring, true);
 
             // make sure you start tracing the face from a crease (if any)
-            for(uint i=0; i<e_ring.size(); ++i)
+            for(uint i=0; i<e_star.size(); ++i)
             {
-                if(primal.edge_data(e_ring.at(i)).flags[MARKED])
+                if(primal.edge_data(e_star.at(i)).flags[CREASE])
                 {
                     if(i==0) break;
-                    std::rotate(e_ring.begin(), e_ring.begin()+i, e_ring.end());
+                    std::rotate(e_star.begin(), e_star.begin()+i, e_star.end());
                     std::rotate(f_ring.begin(), f_ring.begin()+i, f_ring.end());
                     break;
                 }
@@ -171,7 +171,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
 
             // rotate around the ring, and close a face, splitting each time you hit a crease edge
             int  corner = (crease_corner.at(vid)) ? pv2dv.at(vid) : -1;
-            auto e_it   = e_ring.begin();
+            auto e_it   = e_star.begin();
             auto f_it   = f_ring.begin();
             do
             {
@@ -181,7 +181,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 if(corner>=0) new_face.push_back(corner);
 
                 // if the face starts from a crease, add a vertex for primal edge
-                if(primal.edge_data(*e_it).flags[MARKED]) new_face.push_back(pe2dv.at(*e_it));
+                if(primal.edge_data(*e_it).flags[CREASE]) new_face.push_back(pe2dv.at(*e_it));
 
                 do
                 {
@@ -189,23 +189,23 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                     ++e_it;
                     ++f_it;
                 }
-                while(e_it!=e_ring.end() && !primal.edge_data(*e_it).flags[MARKED]);
+                while(e_it!=e_star.end() && !primal.edge_data(*e_it).flags[CREASE]);
 
                 // if the previous loop stopped at a crease, add a vertex for primal edge
-                if(e_it!=e_ring.end())
+                if(e_it!=e_star.end())
                 {
                     new_face.push_back(pe2dv.at(*e_it));
                 }
-                else if(primal.edge_data(*e_ring.begin()).flags[MARKED])
+                else if(primal.edge_data(*e_star.begin()).flags[CREASE])
                 {
-                    new_face.push_back(pe2dv.at(*e_ring.begin()));
+                    new_face.push_back(pe2dv.at(*e_star.begin()));
                     // happens when only one crease edge is incident to the vertex
                     if(new_face.front()==new_face.back()) new_face.pop_back();
                 }
 
                 faces.push_back(new_face);
             }
-            while(e_it!=e_ring.end());
+            while(e_it!=e_star.end());
         }
 
         // build the cell
@@ -261,52 +261,106 @@ void dual_mesh(const AbstractPolygonMesh<M,V,E,P>   & primal,
     dual_verts.clear();
     dual_polys.clear();
 
-    // Initialize vertices with face centroids
+    // add one dual vertex for each primal poly
     dual_verts.resize(primal.num_polys());
     for(uint pid=0; pid<primal.num_polys(); ++pid)
     {
         dual_verts.at(pid) = primal.poly_centroid(pid);
     }
 
-    // For clipped dual cells: add boundary vertices
-    // and boundary edges midpoints
-    //
-    std::map<uint,uint> e2verts;
-    std::map<uint,uint> v2verts;
+    // vertex maps for clipped dual cells
+    std::vector<bool> crease_corner(primal.num_verts(),false);
+    std::unordered_map<uint,uint> pv2dv; // primal vert to dual vert : for crease corners
+    std::unordered_map<uint,uint> pe2dv; // primal edge to dual vert : for crease lines
+    // verts
     for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
-        if (primal.vert_is_boundary(vid))
+        uint n_creases = 0;
+        for(uint eid : primal.adj_v2e(vid))
         {
-            v2verts[vid] = dual_verts.size();
+            if(primal.edge_data(eid).flags[CREASE]) ++n_creases;
+        }
+        if(n_creases> 2)
+        {
+            crease_corner.at(vid) = true;
+            pv2dv[vid] = dual_verts.size();
             dual_verts.push_back(primal.vert(vid));
         }
     }
+    // edges
     for(uint eid=0; eid<primal.num_edges(); ++eid)
     {
-        if (primal.edge_is_boundary(eid))
+        if(primal.edge_data(eid).flags[CREASE])
         {
-            e2verts[eid] = dual_verts.size();
+            pe2dv[eid] = dual_verts.size();
             dual_verts.push_back(primal.edge_sample_at(eid, 0.5));
         }
     }
 
-    // Make dual polygonal cells
+    // build polygonal cells
     for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
-        bool clipped_cell = primal.vert_is_boundary(vid);
-        if (clipped_cell && !with_clipped_cells) continue;
+        bool clipped = primal.vert_is_boundary(vid);
+        if(clipped && !with_clipped_cells) continue;
 
-        std::vector<uint> poly = primal.vert_ordered_polys_star(vid);
+        std::vector<uint> v_link;
+        std::vector<uint> e_link;
+        std::vector<uint> p_star;
+        std::vector<uint> e_star;
+        primal.vert_ordered_one_ring(vid, v_link, p_star, e_star, e_link);
 
-        if (clipped_cell) // add boundary portion (vertex vid + boundary edges' midpoints)
+        if(!clipped)
         {
-            std::vector<uint> e_star = primal.vert_ordered_edges_star(vid);
-            poly.push_back(e2verts.at(e_star.back()));
-            poly.push_back(v2verts.at(vid));
-            poly.push_back(e2verts.at(e_star.front()));
+            // make sure you start tracing the face from a crease (if any)
+            for(uint i=0; i<e_star.size(); ++i)
+            {
+                if(primal.edge_data(e_star.at(i)).flags[CREASE])
+                {
+                    if(i==0) break;
+                    std::rotate(e_star.begin(), e_star.begin()+i, e_star.end());
+                    std::rotate(p_star.begin(), p_star.begin()+i, p_star.end());
+                    break;
+                }
+            }
         }
 
-        dual_polys.push_back(poly);
+        // rotate around the ring, and close a face, splitting each time you hit a crease edge
+        int  corner = (crease_corner.at(vid)) ? pv2dv.at(vid) : -1;
+        auto e_it   = e_star.begin();
+        auto f_it   = p_star.begin();
+        do
+        {
+            std::vector<uint> new_poly;
+
+            // if vid is a feature corner, add it to the dual
+            if(corner>=0) new_poly.push_back(corner);
+
+            // if the face starts from a crease, add a vertex for primal edge
+            if(primal.edge_data(*e_it).flags[CREASE]) new_poly.push_back(pe2dv.at(*e_it));
+
+            do
+            {
+                new_poly.push_back(*f_it);
+                ++e_it;
+                ++f_it;
+            }
+            while(e_it!=e_star.end() && !primal.edge_data(*e_it).flags[CREASE]);
+
+            // if the previous loop stopped at a crease, add a vertex for primal edge
+            if(e_it!=e_star.end())
+            {
+                new_poly.push_back(pe2dv.at(*e_it));
+            }
+            else if(primal.edge_data(*e_star.begin()).flags[CREASE])
+            {
+                new_poly.push_back(pe2dv.at(*e_star.begin()));
+                // happens when only one crease edge is incident to the vertex
+                if(new_poly.front()==new_poly.back()) new_poly.pop_back();
+            }
+
+            dual_polys.push_back(new_poly);
+        }
+        while(e_it!=e_star.end());
     }
 }
 
