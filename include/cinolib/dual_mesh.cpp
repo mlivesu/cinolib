@@ -161,59 +161,68 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
         // clipped cells need extra faces
         if(clipped)
         {
-            // for regular surface vertices just add a face with all the
-            // centroids of the surface faces incident to the vertex
-            if(!primal.vert_data(vid).flags[LINE_CREASE]   &&
-               !primal.vert_data(vid).flags[CORNER_CREASE])
-            {
-                auto face = primal.vert_ordered_srf_face_ring(vid);
-                for(uint & id : face) id = pf2dv.at(id);
-                faces.push_back(face);
-            }
-            // for crease vertices such a face must be split along crease lines
-            // and if the vertex is a corner it also must be included in the dual
-            else
-            {                
-                std::vector<uint> vid_faces = primal.vert_ordered_srf_face_ring(vid);
-                std::vector<uint> vid_faces_double = vid_faces;
-                for(uint f : vid_faces) vid_faces_double.push_back(f);
-                uint f1, f2, e12;
-                uint i;
-                uint found = 0;
-                for(i=0; i<vid_faces.size(); ++i)
-                {
-                    f1 = vid_faces.at(i);
-                    f2 = vid_faces.at((i+1)%vid_faces.size());
-                    e12 = primal.face_shared_edge(f1,f2);
-                    if(primal.edge_data(e12).flags[CREASE])
-                    {
-                        found++;
-                        break;
-                    }
-                }
-                assert(found == 1);
+            std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
+            std::vector<uint> e_ring; // sorted list of surface edges incident to vid
+            std::vector<uint> f_ring; // sorted list of adjacent surface faces
+            primal.vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
 
-                std::vector<uint> face;
-                face.push_back(pe2dv.at(e12));
-                for(uint ii=i+1; ii<i+1+vid_faces.size(); ++ii)
+            // make sure surface rings are CCW ordered
+//            uint e0 = e_ring.at(0);
+//            uint e1 = e_ring.at(1);
+//            uint f0 = f_ring.at(0);
+//            assert(primal.face_contains_edge(f0,e0) && primal.face_contains_edge(f0,e1));
+//            uint v0 = primal.vert_opposite_to(e0,vid);
+//            uint v1 = primal.vert_opposite_to(e1,vid);
+//            if(!primal.face_verts_are_CCW(f0,v1,v0))
+//            {
+//                REVERSE_VEC(e_ring);
+//                REVERSE_VEC(f_ring);
+//            }
+
+            // make sure you start tracing the face from a crease (if any)
+            for(uint i=0; i<e_ring.size(); ++i)
+            {
+                if(primal.edge_data(e_ring.at(i)).flags[CREASE])
                 {
-                    f1 = vid_faces_double.at(ii);
-                    f2 = vid_faces_double.at((ii + 1) % vid_faces_double.size());
-                    e12 = primal.face_shared_edge(f1, f2);
-                    face.push_back(pf2dv.at(f1));
-                    if(pe2dv.find(e12) != pe2dv.end())
-                    {
-                        found++;
-                        face.push_back(pe2dv.at(e12));
-                        // if I am a corner, add the vertex as well
-                        if(CONTAINS(pv2dv,vid)) face.push_back(pv2dv.at(vid));
-                        faces.push_back(face);
-                        face.clear();
-                        face.push_back(pe2dv.at(e12));
-                    }
+                    if(i==0) break;
+                    assert(primal.face_contains_edge(*f_ring.begin(), *e_ring.begin()));
+                    assert(primal.face_contains_edge(*f_ring.begin(), *(e_ring.begin()+1)));
+                    std::rotate(e_ring.begin(), e_ring.begin()+i, e_ring.end());
+                    std::rotate(f_ring.begin(), f_ring.begin()+i, f_ring.end());
+                    assert(primal.face_contains_edge(*f_ring.begin(), *e_ring.begin()));
+                    assert(primal.face_contains_edge(*f_ring.begin(), *(e_ring.begin()+1)));
+                    break;
                 }
-                assert(found > 2);
             }
+
+            // rotate around the ring, and close a face, splitting each time you hit a crease edge
+            int  corner = (primal.vert_data(vid).flags[CORNER_CREASE]) ? pv2dv.at(vid) : -1;
+            auto e_it   = e_ring.begin();
+            auto f_it   = f_ring.begin();
+            do
+            {
+                std::vector<uint> new_face;
+
+                // if vid is a feature corner, add it to the dual
+                if(corner>=0) new_face.push_back(corner);
+
+                // if the face starts from a crease, add a vertex for primal edge
+                if(primal.edge_data(*e_it).flags[CREASE]) new_face.push_back(pe2dv.at(*e_it));
+
+                do
+                {
+                    new_face.push_back(pf2dv.at(*f_it));
+                    ++e_it;
+                    ++f_it;
+                }
+                while(e_it!=e_ring.end() && !primal.edge_data(*e_it).flags[CREASE]);
+
+                // if the previous loop stopped at a crease, add a vertex for primal edge
+                if(e_it!=e_ring.end()) new_face.push_back(pe2dv.at(*e_it));
+
+                faces.push_back(new_face);
+            }
+            while(e_it!=e_ring.end());
         }
 
         for(std::vector<uint> & face : faces)
