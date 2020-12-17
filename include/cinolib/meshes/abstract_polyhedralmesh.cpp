@@ -1764,12 +1764,12 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_srf_verts(const ui
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_vert_ring(const uint vid) const
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_vert_ring(const uint vid, const bool CCW) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
     std::vector<uint> e_ring; // sorted list of surface edges incident to vid
     std::vector<uint> f_ring; // sorted list of adjacent surface faces
-    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring, CCW);
     return v_ring;
 }
 
@@ -1777,12 +1777,12 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_vert_ring(
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_edge_ring(const uint vid) const
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_edge_ring(const uint vid, const bool CCW) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
     std::vector<uint> e_ring; // sorted list of surface edges incident to vid
     std::vector<uint> f_ring; // sorted list of adjacent surface faces
-    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring, CCW);
     return e_ring;
 }
 
@@ -1790,12 +1790,12 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_edge_ring(
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_face_ring(const uint vid) const
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_face_ring(const uint vid, const bool CCW) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
     std::vector<uint> e_ring; // sorted list of surface edges incident to vid
     std::vector<uint> f_ring; // sorted list of adjacent surface faces
-    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring, CCW);
     return f_ring;
 }
 
@@ -1806,7 +1806,8 @@ CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_one_ring(const uint          vid,
                                                                   std::vector<uint> & v_ring,
                                                                   std::vector<uint> & e_ring,
-                                                                  std::vector<uint> & f_ring) const
+                                                                  std::vector<uint> & f_ring,
+                                                                  const bool          CCW) const
 {
     assert(vert_is_on_srf(vid));
 
@@ -1829,6 +1830,24 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_one_ring(const uint    
         curr_v = this->vert_opposite_to(curr_e, vid);
     }
     while(e_ring.size() < this->vert_adj_srf_edges(vid).size());
+
+    if(CCW) // make sure surface rings are CCW ordered
+    {
+        uint e0 = e_ring.at(0);
+        uint e1 = e_ring.at(1);
+        uint f0 = f_ring.at(0);
+        assert(this->face_contains_edge(f0,e0) && this->face_contains_edge(f0,e1));
+        uint v0 = this->vert_opposite_to(e0,vid);
+        uint v1 = this->vert_opposite_to(e1,vid);
+        if(!this->face_verts_are_CCW(f0,v1,v0))
+        {
+            uint last = e_ring.size()-1;
+            REVERSE_VEC(e_ring);
+            REVERSE_VEC(f_ring);
+            std::rotate(e_ring.begin(), e_ring.begin()+last, e_ring.end());
+            std::rotate(v_ring.begin(), v_ring.begin()+last, v_ring.end());
+        }
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
