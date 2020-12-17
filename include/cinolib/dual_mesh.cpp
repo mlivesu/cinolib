@@ -40,9 +40,9 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
-                     Polyhedralmesh<M,V,E,F,P>         & dual,
-               const bool                                with_clipped_cells)
+void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
+               Polyhedralmesh<M,V,E,F,P>         & dual,
+               const bool                          with_clipped_cells)
 {
     std::vector<vec3d>             dual_verts;
     std::vector<std::vector<uint>> dual_faces;
@@ -56,46 +56,54 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
-                     std::vector<vec3d>                & dual_verts,
-                     std::vector<std::vector<uint>>    & dual_faces,
-                     std::vector<std::vector<uint>>    & dual_polys,
-                     std::vector<std::vector<bool>>    & dual_polys_winding,
-               const bool                                with_clipped_cells)
+void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
+               std::vector<vec3d>                & dual_verts,
+               std::vector<std::vector<uint>>    & dual_faces,
+               std::vector<std::vector<uint>>    & dual_polys,
+               std::vector<std::vector<bool>>    & dual_polys_winding,
+               const bool                          with_clipped_cells)
 {
+    enum
+    {
+        CREASE        = MARKED,
+        LINE_CREASE   = UNUSED_0,
+        CORNER_CREASE = UNUSED_1,
+    };
+
     dual_verts.clear();
     dual_faces.clear();
     dual_polys.clear();
     dual_polys_winding.clear();
 
-    // initialize vertices with face centroids
+    // add one dual vertex for each primal poly
     dual_verts.resize(primal.num_polys());
     for(uint pid=0; pid<primal.num_polys(); ++pid)
     {
         dual_verts.at(pid) = primal.poly_centroid(pid);
     }
 
-    std::map<std::vector<uint>,uint> f_map;
-
     // For clipped dual cells: add boundary vertices, boundary edges midpoints and
     // surface face midpoints
-    std::map<uint,uint> v2verts;
-    std::set<uint>      vnot2verts;
-    std::map<uint,uint> e2verts;
-    std::map<uint,uint> f2verts;
+    std::unordered_map<uint,uint> v2verts;
+    std::unordered_map<uint,uint> e2verts;
+    std::unordered_map<uint,uint> f2verts;
 
     for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
         if(primal.vert_is_on_srf(vid))
         {
-            uint creases = 0;
+            uint n_creases = 0;
             for(uint eid : primal.vert_adj_srf_edges(vid))
             {
-                if(primal.edge_data(eid).flags[MARKED]) creases++;
+                if(primal.edge_data(eid).flags[CREASE]) ++n_creases;
             }
-            if(creases==2) vnot2verts.insert(vid); else
-            if(creases> 2)
+            if(n_creases==2)
             {
+                primal.vert_data(vid).flags[LINE_CREASE] = true;
+            }
+            else if(n_creases> 2)
+            {
+                primal.vert_data(vid).flags[CORNER_CREASE] = true;
                 v2verts[vid] = dual_verts.size();
                 dual_verts.push_back(primal.vert(vid));
             }
@@ -103,7 +111,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     }
     for(uint eid=0; eid<primal.num_edges(); ++eid)
     {
-        if(primal.edge_data(eid).flags[MARKED])
+        if(primal.edge_data(eid).flags[CREASE])
         {
             assert(primal.edge_is_on_srf(eid));
             e2verts[eid] = dual_verts.size();
@@ -121,6 +129,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     }
 
     // Make dual polyhedral cells
+    std::map<std::vector<uint>,uint> f_map;
     for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
         bool clipped_cell = primal.vert_is_on_srf(vid);
@@ -154,7 +163,8 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
         {
             std::vector<uint> face;
 
-            if(DOES_NOT_CONTAIN(v2verts,vid) && DOES_NOT_CONTAIN(vnot2verts,vid))
+            if(!primal.vert_data(vid).flags[LINE_CREASE]   &&
+               !primal.vert_data(vid).flags[CORNER_CREASE])
             {
                 for(uint fid : primal.vert_ordered_srf_face_ring(vid))
                 {
@@ -194,8 +204,8 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                     {
                         found++;
                         face.push_back(e2verts.at(e12));
-                        // se sono su un corner, aggiungo anche il vertice
-                        if(v2verts.find(vid) != v2verts.end()) face.push_back(v2verts.at(vid));
+                        // if I am a corner, add the vertex as well
+                        if(CONTAINS(v2verts,vid)) face.push_back(v2verts.at(vid));
                         faces.push_back(face);
                         face.clear();
                         face.push_back(e2verts.at(e12));
