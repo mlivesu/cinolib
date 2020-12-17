@@ -27,6 +27,10 @@
 *     Marco Livesu (marco.livesu@gmail.com)                                     *
 *     http://pers.ge.imati.cnr.it/livesu/                                       *
 *                                                                               *
+*     and                                                                       *
+*                                                                               *
+*     Tommaso Sorgente (tommaso.sorgente@ge.imati.cnr.it)                       *
+*                                                                               *
 *     Italian National Research Council (CNR)                                   *
 *     Institute for Applied Mathematics and Information Technologies (IMATI)    *
 *     Via de Marini, 6                                                          *
