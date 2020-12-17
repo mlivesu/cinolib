@@ -79,23 +79,22 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
 
     // For clipped dual cells: add boundary vertices, boundary edges midpoints and
     // surface face midpoints
-    std::map<uint, uint> v2verts;
-    std::map<uint, uint> vnot2verts;
-    std::map<uint, uint> e2verts;
-    std::map<uint, uint> f2verts;
+    std::map<uint,uint> v2verts;
+    std::set<uint>      vnot2verts;
+    std::map<uint,uint> e2verts;
+    std::map<uint,uint> f2verts;
 
     for(uint vid=0; vid<primal.num_verts(); ++vid)
     {
         if(primal.vert_is_on_srf(vid))
         {
-            std::vector<uint> edges = primal.vert_adj_srf_edges(vid);
-            uint count = 0;
-            for(uint eid : edges)
+            uint creases = 0;
+            for(uint eid : primal.vert_adj_srf_edges(vid))
             {
-                if(primal.edge_data(eid).flags[MARKED]) count++;
+                if(primal.edge_data(eid).flags[MARKED]) creases++;
             }
-            if(count==2) vnot2verts[vid] = dual_verts.size(); else
-            if(count> 2)
+            if(creases==2) vnot2verts.insert(vid); else
+            if(creases> 2)
             {
                 v2verts[vid] = dual_verts.size();
                 dual_verts.push_back(primal.vert(vid));
@@ -155,9 +154,12 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
         {
             std::vector<uint> face;
 
-            if(v2verts.find(vid) == v2verts.end() && vnot2verts.find(vid) == vnot2verts.end())
+            if(DOES_NOT_CONTAIN(v2verts,vid) && DOES_NOT_CONTAIN(vnot2verts,vid))
             {
-                for(uint fid : primal.vert_ordered_srf_face_ring(vid)) face.push_back(f2verts.at(fid));
+                for(uint fid : primal.vert_ordered_srf_face_ring(vid))
+                {
+                    face.push_back(f2verts.at(fid));
+                }
                 faces.push_back(face);
             }
             else
@@ -168,7 +170,6 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 uint f1, f2, e12;
                 uint i;
                 uint found = 0;
-                // scorri fino a un edge di e2verts
                 for(i=0; i<vid_faces.size(); ++i)
                 {
                     f1 = vid_faces.at(i);
@@ -183,7 +184,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 assert(found == 1);
 
                 face.push_back(e2verts.at(e12));
-                for(uint ii = i + 1; ii < i + 1 + vid_faces.size(); ii++)
+                for(uint ii=i+1; ii<i+1+vid_faces.size(); ++ii)
                 {
                     f1 = vid_faces_double.at(ii);
                     f2 = vid_faces_double.at((ii + 1) % vid_faces_double.size());
@@ -204,7 +205,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
             }
         }
 
-        for(std::vector<uint> face : faces)
+        for(std::vector<uint> & face : faces)
         {
             std::vector<uint> sorted_f = face;
             sort(sorted_f.begin(), sorted_f.end());
