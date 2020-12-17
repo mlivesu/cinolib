@@ -179,11 +179,13 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
 //                REVERSE_VEC(f_ring);
 //            }
 
+            bool has_crease = false;
             // make sure you start tracing the face from a crease (if any)
             for(uint i=0; i<e_ring.size(); ++i)
             {
                 if(primal.edge_data(e_ring.at(i)).flags[CREASE])
                 {
+                    has_crease = true;
                     if(i==0) break;
                     assert(primal.face_contains_edge(*f_ring.begin(), *e_ring.begin()));
                     assert(primal.face_contains_edge(*f_ring.begin(), *(e_ring.begin()+1)));
@@ -192,6 +194,15 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                     assert(primal.face_contains_edge(*f_ring.begin(), *e_ring.begin()));
                     assert(primal.face_contains_edge(*f_ring.begin(), *(e_ring.begin()+1)));
                     break;
+                }
+            }
+
+            if(has_crease)
+            {
+                std::cout << "\n\nring around v" << vid << "(" << primal.vert_data(vid).flags[CORNER_CREASE] << ")" << std::endl;
+                for(uint i=0; i<e_ring.size(); ++i)
+                {
+                    std::cout << "e" << e_ring[i] << "(" << primal.edge_data(e_ring[i]).flags[CREASE] << ")   f" << f_ring[i] << std::endl;
                 }
             }
 
@@ -204,21 +215,39 @@ void dual_mesh(AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 std::vector<uint> new_face;
 
                 // if vid is a feature corner, add it to the dual
-                if(corner>=0) new_face.push_back(corner);
+                if(corner>=0)
+                {
+                    new_face.push_back(corner);
+                    if(has_crease)std::cout << "v" << vid << std::endl;
+                }
 
                 // if the face starts from a crease, add a vertex for primal edge
-                if(primal.edge_data(*e_it).flags[CREASE]) new_face.push_back(pe2dv.at(*e_it));
+                if(primal.edge_data(*e_it).flags[CREASE])
+                {
+                    new_face.push_back(pe2dv.at(*e_it));
+                    if(has_crease)std::cout << "e" << *e_it << std::endl;
+                }
 
                 do
                 {
                     new_face.push_back(pf2dv.at(*f_it));
+                    if(has_crease)std::cout << "f" << *f_it << std::endl;
                     ++e_it;
                     ++f_it;
                 }
                 while(e_it!=e_ring.end() && !primal.edge_data(*e_it).flags[CREASE]);
 
                 // if the previous loop stopped at a crease, add a vertex for primal edge
-                if(e_it!=e_ring.end()) new_face.push_back(pe2dv.at(*e_it));
+                if(e_it!=e_ring.end())
+                {
+                    new_face.push_back(pe2dv.at(*e_it));
+                    if(has_crease)std::cout << "e" << *e_it << std::endl;
+                }
+                else if(primal.edge_data(*e_ring.begin()).flags[CREASE])
+                {
+                    new_face.push_back(pe2dv.at(*e_ring.begin()));
+                    if(has_crease)std::cout << "e" << *e_ring.begin() << std::endl;
+                }
 
                 faces.push_back(new_face);
             }
