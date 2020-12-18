@@ -54,6 +54,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     std::vector<std::vector<bool>> dual_polys_winding;
     dual_mesh(primal, dual_verts, dual_faces, dual_polys, dual_polys_winding, with_clipped_cells);
     dual = Polyhedralmesh<M,V,E,F,P>(dual_verts, dual_faces, dual_polys, dual_polys_winding);
+    dual.poly_fix_orientation();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
