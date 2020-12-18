@@ -1165,7 +1165,8 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_f2f(const uint pid, co
     {
         if(this->poly_contains_face(pid,nbr)) faces.push_back(nbr);
     }
-    assert(faces.size()==this->edges_per_face(fid));
+    // this is false if two faces share more than one edge
+    //assert(faces.size()==this->edges_per_face(fid));
     return faces;
 }
 
