@@ -58,9 +58,9 @@ GridProjectorOptions;
 template<class M1, class V1, class E1, class F1, class P1,
          class M2, class V2, class E2, class P2>
 CINO_INLINE
-bool grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
-                    const Trimesh<M2,V2,E2,P2>    & srf,
-                    const GridProjectorOptions & opt);
+double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
+                      const Trimesh<M2,V2,E2,P2>    & srf,
+                      const GridProjectorOptions & opt);
 
 }
 
