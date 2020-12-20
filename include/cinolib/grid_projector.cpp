@@ -58,6 +58,10 @@ bool grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     Octree o;
     o.build_from_mesh_polys(srf);
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //:::::::::::::::::::::::::   LAMBDA UTILITIES   :::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     // for each surface point, find the closest point on srf
     auto update_targets = [&]()
     {
@@ -117,7 +121,7 @@ bool grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
         return m.vert(vid);
     };
 
-    // utility to compute average/Hausodrff distance
+    // compute average/Hausodrff distance
     auto distance = [&](const bool hausdorff) -> double
     {
         double d = (hausdorff) ? -inf_double : 0.0;
@@ -126,6 +130,8 @@ bool grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
         return d/m.bbox().diag();
     };
 
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::   BEGIN OF ACTUAL METHOD   ::::::::::::::::::::::
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     if(opt.add_padding) padding(m);
@@ -146,10 +152,6 @@ bool grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
 
         converged = distance(opt.use_H_dist) <= opt.conv_thresh;
     }
-
-    // colorize
-    double max_d = distance(true);
-    for(auto & t : targets) m.vert_data(t.vid).color = Color::red_ramp_01(t.dist/max_d);
 
     return converged;
 }
