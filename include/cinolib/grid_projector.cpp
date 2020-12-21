@@ -130,6 +130,26 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
         return d/m.bbox().diag();
     };
 
+    // scaled jacobian
+    auto smooth = [&](const uint n_iter)
+    {
+        for(uint i=0; i<n_iter; ++i)
+        {
+            for(uint vid=0; vid<m.num_verts(); ++vid)
+            {
+                //if(m.vert_is_on_srf(vid)) continue;
+                //bool next_2_srf = false;
+                //for(uint nbr : m.adj_v2v(vid)) if(m.vert_is_on_srf(nbr)) next_2_srf = true;
+                //if(!next_2_srf) continue;
+
+                vec3d p = m.vert(vid);
+                for(uint nbr : m.adj_v2v(vid)) p += m.vert(nbr);
+                p /= static_cast<double>(m.adj_v2v(vid).size()+1);
+                binary_search(vid,p);
+            }
+        }
+    };
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //::::::::::::::::::::::   BEGIN OF ACTUAL METHOD   ::::::::::::::::::::::
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -138,7 +158,8 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     bool converged = false;
     for(uint i=0; i<opt.max_iter && !converged; ++i)
     {
-        if(i<3) update_targets();
+        smooth(3);
+        update_targets();
 
         // process points from furthest from target to closest
         // and store the new distance to target for next iteration
