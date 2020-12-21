@@ -63,20 +63,34 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     // for each surface point, find the closest point on srf
-    auto update_targets = [&]()
+    auto update_targets = [&](const uint smooth_iters, const bool sort_by_dist)
     {
+        // pre smooth the surface
+        std::vector<vec3d> verts = m.vector_verts();
+        for(uint i=0; i<smooth_iters; ++i)
+        {
+            PARALLEL_FOR(0, m.num_verts(), 1000,[&](const uint vid)
+            {
+                vec3d p = verts.at(vid);
+                for(uint nbr : m.adj_v2v(vid)) p += verts.at(nbr);
+                p /= static_cast<double>(m.adj_v2v(vid).size()+1);
+                verts.at(vid) = p;
+            });
+        }
+
         targets.clear();
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
-            if(!m.vert_is_on_srf(vid)) continue;
-            vec3d p = m.vert(vid);
-            for(uint nbr : m.vert_adj_srf_verts(vid)) p += m.vert(nbr);
-            p /= (m.vert_adj_srf_verts(vid).size()+1.0);
             Proj proj;
             proj.vid    = vid;
-            proj.target = o.closest_point(p);
-            proj.dist   = m.vert(vid).dist(proj.target);
+            proj.target = (m.vert_is_on_srf(vid)) ? o.closest_point(verts.at(vid)) : verts.at(vid);
+            proj.dist   = (m.vert_is_on_srf(vid)) ? 1/verts.at(vid).dist(proj.target) : -verts.at(vid).dist(proj.target);
             targets.push_back(proj);
+        }
+
+        if(sort_by_dist)
+        {
+            std::sort(targets.begin(), targets.end(), [](const Proj & p1,const Proj & p2) -> bool { return p1.dist>p2.dist; } );
         }
     };
 
@@ -95,8 +109,8 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     // project a point on target, reverting with binary search if some element becomes degenerate
     auto binary_search = [&](const uint vid, const vec3d & target) -> vec3d // returns dist to target
     {
-        uint  i       = 0;
         float t       = 1.0;
+        uint  i       = 0;
         vec3d new_pos = target;
         bool  all_good;
         do
@@ -130,26 +144,6 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
         return d/m.bbox().diag();
     };
 
-    // scaled jacobian
-    auto smooth = [&](const uint n_iter)
-    {
-        for(uint i=0; i<n_iter; ++i)
-        {
-            for(uint vid=0; vid<m.num_verts(); ++vid)
-            {
-                //if(m.vert_is_on_srf(vid)) continue;
-                //bool next_2_srf = false;
-                //for(uint nbr : m.adj_v2v(vid)) if(m.vert_is_on_srf(nbr)) next_2_srf = true;
-                //if(!next_2_srf) continue;
-
-                vec3d p = m.vert(vid);
-                for(uint nbr : m.adj_v2v(vid)) p += m.vert(nbr);
-                p /= static_cast<double>(m.adj_v2v(vid).size()+1);
-                binary_search(vid,p);
-            }
-        }
-    };
-
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //::::::::::::::::::::::   BEGIN OF ACTUAL METHOD   ::::::::::::::::::::::
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -158,12 +152,9 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     bool converged = false;
     for(uint i=0; i<opt.max_iter && !converged; ++i)
     {
-        smooth(3);
-        update_targets();
+        update_targets(3,true);
 
-        // process points from furthest from target to closest
-        // and store the new distance to target for next iteration
-        std::sort(targets.begin(), targets.end(), [](const Proj & p1,const Proj & p2) -> bool { return p1.dist>p2.dist; } );
+        // process points  and store the new distance to target for next iteration
         for(auto & t : targets)
         {
             vec3d p = binary_search(t.vid, t.target);
