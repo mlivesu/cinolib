@@ -41,6 +41,10 @@
 namespace cinolib
 {
 
+/* Extracts a list of feature lines from an input mesh with previously flagged crease edges.
+ * Each feature line is a list of mesh vertices, ordered starting from one of the endpoints.
+ * For closed loops, the first and last items coincide.
+*/
 template<class M, class V, class E, class P>
 CINO_INLINE
 void feature_network(const AbstractPolygonMesh<M,V,E,P>   & m,
