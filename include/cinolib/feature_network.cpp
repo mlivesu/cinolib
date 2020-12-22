@@ -43,40 +43,67 @@ CINO_INLINE
 void feature_network(const AbstractPolygonMesh<M,V,E,P>   & m,
                            std::vector<std::vector<uint>> & network)
 {
-    std::vector<bool> visited(m.num_edges(),false);
+    std::vector<bool> visited(m.num_edges(),false);    
 
-    // utility to flood a feature curve (stops at feature corners)
-    auto flood_feature = [&](const uint source) -> std::vector<uint>
+    // utility to flood a feature curve (stops at feature corners/endpoints or when a loop is closed)
+    auto flood_feature = [&](const uint start, const uint eid) -> std::vector<uint>
     {
         std::vector<uint> feat_line;
+        feat_line.push_back(start);
+        assert(eid>=0);
+        visited.at(eid) = true;
         std::queue<uint> q;
-        q.push(source);
-        visited.at(source) = true;
+        q.push(m.vert_opposite_to(eid,start));
         while(!q.empty())
         {
-            uint eid = q.front();
-            feat_line.push_back(eid);
+            uint vid = q.front();
+            feat_line.push_back(vid);
             q.pop();
-            for(uint vid : m.adj_e2v(eid))
+
+            std::vector<uint> next_pool;
+            for(uint nbr : m.adj_v2v(vid))
             {
-                std::vector<uint> next;
-                for(uint nbr : m.adj_v2e(vid)) if(nbr!=eid && m.edge_data(nbr).flags[CREASE]) next.push_back(nbr);
-                // flood only if it's not a corner
-                if(next.size()==1 && !visited.at(next.front()))
+                int eid = m.edge_id(vid,nbr);
+                assert(eid>=0);
+                if(m.edge_data(eid).flags[CREASE]) next_pool.push_back(eid);
+            }
+            if(next_pool.size()==2)
+            {
+                for(uint eid : next_pool)
                 {
-                    visited.at(next.front()) = true;
-                    q.push(next.front());
+                    if(visited.at(eid)) continue;
+                    visited.at(eid) = true;
+                    q.push(m.vert_opposite_to(eid,feat_line.back()));
                 }
             }
         }
         return feat_line;
     };
 
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        // find all incoming creases, if any
+        std::vector<uint> incoming_creases;
+        for(uint eid : m.adj_v2e(vid))
+        {
+            if(m.edge_data(eid).flags[CREASE]) incoming_creases.push_back(eid);
+        }
+
+        // if it's a corner or a feature endpint start tracing
+        if(!incoming_creases.empty() && incoming_creases.size()!=2)
+        {
+            for(uint eid : incoming_creases)
+            {
+                if(!visited.at(eid)) network.emplace_back(flood_feature(vid,eid));
+            }
+        }
+    }
+    // closed loops are not caught by the previous cycle
     for(uint eid=0; eid<m.num_edges(); ++eid)
     {
-        if(m.edge_data(eid).flags[CREASE] && !visited.at(eid))
+        if(!visited.at(eid) && m.edge_data(eid).flags[CREASE])
         {
-            network.emplace_back(flood_feature(eid));
+            network.emplace_back(flood_feature(m.edge_vert_id(eid,0),eid));
         }
     }
 }
