@@ -96,6 +96,10 @@ class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
         std::vector<uint>              edge_chain(const uint eid, const uint vid) const; // chain of ADJACENT edges
         std::vector<uint>              edge_parallel_chain(const uint eid) const;        // chain of PARALLEL edges
         std::vector<std::vector<uint>> edge_parallel_chains() const;                     // chain of PARALLEL edges
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        uint poly_vert_opposite_to(const uint pid, const uint vid) const;
 };
 
 }

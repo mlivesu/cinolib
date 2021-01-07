@@ -288,4 +288,15 @@ std::vector<std::vector<uint>> Quadmesh<M,V,E,P>::edge_parallel_chains() const
     return chains;
 }
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint Quadmesh<M,V,E,P>::poly_vert_opposite_to(const uint pid, const uint vid) const
+{
+    uint off = this->poly_vert_offset(pid,vid);
+    return this->poly_vert_id(pid, (off+2)%4);
+}
+
 }
