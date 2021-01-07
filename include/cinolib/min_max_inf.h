@@ -56,8 +56,7 @@ namespace cinolib
 
     const double inf_double = std::numeric_limits<double>::infinity();
     const float  inf_float  = std::numeric_limits<float>::infinity();
-    const int    inf_int    = std::numeric_limits<int>::infinity();
-    const uint   inf_uint   = std::numeric_limits<uint>::infinity();
+    // NOTE: std::numeric_limits<T>::has_infinity is false for T=int,uint
 }
 
 #endif // CINO_MIN_MAX_INF
