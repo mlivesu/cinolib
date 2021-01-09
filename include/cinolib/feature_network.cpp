@@ -41,9 +41,39 @@ namespace cinolib
 template<class M, class V, class E, class P>
 CINO_INLINE
 void feature_network(const AbstractPolygonMesh<M,V,E,P>   & m,
-                           std::vector<std::vector<uint>> & network)
+                           std::vector<std::vector<uint>> & network,
+                     const FeatureNetworkOptions          & opt)
 {
-    std::vector<bool> visited(m.num_edges(),false);    
+    std::vector<bool> visited(m.num_edges(),false);
+
+    // find start points first
+    std::unordered_set<uint> seeds;
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        std::vector<uint> incoming_creases;
+        for(uint eid : m.adj_v2e(vid))
+        {
+            if(m.edge_data(eid).flags[CREASE]) incoming_creases.push_back(eid);
+        }
+
+        if(!incoming_creases.empty() && incoming_creases.size()!=2)
+        {
+            seeds.insert(vid);
+        }
+        else if(opt.split_lines_at_high_curvature_points && incoming_creases.size()==2)
+        {
+            uint  e0 = incoming_creases.front();
+            uint  e1 = incoming_creases.back();
+            vec3d u  = m.vert(vid) - m.vert(m.vert_opposite_to(e0,vid));
+            vec3d v  = m.vert(m.vert_opposite_to(e1,vid)) - m.vert(vid);
+            if(u.angle_deg(v)>opt.ang_thresh_deg)
+            {
+                seeds.insert(vid);
+            }
+        }
+    }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     // utility to flood a feature curve (stops at feature corners/endpoints or when a loop is closed)
     auto flood_feature = [&](const uint start, const uint eid) -> std::vector<uint>
@@ -59,6 +89,9 @@ void feature_network(const AbstractPolygonMesh<M,V,E,P>   & m,
             uint vid = q.front();
             feat_line.push_back(vid);
             q.pop();
+
+            // stop if you hit a splitpoint along a curve
+            if(CONTAINS(seeds,vid)) break;
 
             std::vector<uint> next_pool;
             for(uint nbr : m.adj_v2v(vid))
@@ -80,21 +113,15 @@ void feature_network(const AbstractPolygonMesh<M,V,E,P>   & m,
         return feat_line;
     };
 
-    for(uint vid=0; vid<m.num_verts(); ++vid)
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    for(uint vid : seeds)
     {
-        // find all incoming creases, if any
-        std::vector<uint> incoming_creases;
         for(uint eid : m.adj_v2e(vid))
         {
-            if(m.edge_data(eid).flags[CREASE]) incoming_creases.push_back(eid);
-        }
-
-        // if it's a corner or a feature endpint start tracing
-        if(!incoming_creases.empty() && incoming_creases.size()!=2)
-        {
-            for(uint eid : incoming_creases)
+            if(!visited.at(eid) && m.edge_data(eid).flags[CREASE])
             {
-                if(!visited.at(eid)) network.emplace_back(flood_feature(vid,eid));
+                network.emplace_back(flood_feature(vid,eid));
             }
         }
     }

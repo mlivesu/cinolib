@@ -41,15 +41,29 @@
 namespace cinolib
 {
 
-/* Extracts a list of feature lines from an input mesh with previously flagged crease edges.
+/*
+ * Extracts a list of feature lines from an input mesh with previously flagged crease edges.
  * Each feature line is a list of mesh vertices, ordered starting from one of the endpoints.
- * For closed loops, the first and last items coincide.
+ * For closed loops, the first and last items coincide. The function can optionally split
+ * feature lines at high curvature points (default is ON).
 */
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+typedef struct
+{
+    bool  split_lines_at_high_curvature_points = true;
+    float ang_thresh_deg                       = 60;
+}
+FeatureNetworkOptions;
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class P>
 CINO_INLINE
-void feature_network(const AbstractPolygonMesh<M,V,E,P>   & m,
-                           std::vector<std::vector<uint>> & network);
-
+void feature_network(const AbstractPolygonMesh<M,V,E,P>   & m,                     
+                           std::vector<std::vector<uint>> & network,
+                     const FeatureNetworkOptions          & opt);
 }
 
 #ifndef  CINO_STATIC_LIB
