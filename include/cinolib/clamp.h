@@ -33,79 +33,22 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_QUADMESH_H
-#define CINO_QUADMESH_H
+#ifndef CINO_CLAMP
+#define CINO_CLAMP
 
-#include <vector>
-#include <sys/types.h>
-#include <cinolib/meshes/mesh_attributes.h>
-#include <cinolib/meshes/abstract_polygonmesh.h>
+#include <cinolib/cino_inline.h>
 
 namespace cinolib
 {
 
-template<class M = Mesh_std_attributes, // default template arguments
-         class V = Vert_std_attributes,
-         class E = Edge_std_attributes,
-         class P = Polygon_std_attributes>
-class Quadmesh : public AbstractPolygonMesh<M,V,E,P>
-{
-    public:
-
-        explicit Quadmesh(){}
-
-        explicit Quadmesh(const char * filename);
-
-        explicit Quadmesh(const std::vector<vec3d> & verts,
-                          const std::vector<uint>  & polys);
-
-        explicit Quadmesh(const std::vector<double> & coords,
-                          const std::vector<uint>   & polys);
-
-        explicit Quadmesh(const std::vector<vec3d>             & verts,
-                          const std::vector<std::vector<uint>> & polys);
-
-        explicit Quadmesh(const std::vector<double>            & coords,
-                          const std::vector<std::vector<uint>> & polys);
-
-        ~Quadmesh(){}
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        MeshType mesh_type() const override { return QUADMESH; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        uint verts_per_poly(const uint) const override { return 4; }
-        uint verts_per_poly()           const          { return 4; }
-        uint edges_per_poly(const uint) const override { return 4; }
-        uint edges_per_poly()           const          { return 4; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        bool              vert_is_singular     (const uint vid) const;
-        bool              vert_is_regular      (const uint vid) const;
-        int               vert_next_along_chain(const uint curr, const uint prev) const;
-        std::vector<uint> vert_chain           (const uint start, const uint next) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        int                            edge_next_along_chain(const uint eid, const uint vid) const;
-        uint                           edge_opposite_to(const uint pid, const uint eid) const;
-        std::vector<uint>              edges_opposite_to(const uint eid) const;
-        std::vector<uint>              edge_chain(const uint eid, const uint vid) const; // chain of ADJACENT edges
-        std::vector<uint>              edge_parallel_chain(const uint eid) const;        // chain of PARALLEL edges
-        std::vector<std::vector<uint>> edge_parallel_chains() const;                     // chain of PARALLEL edges
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        uint poly_vert_opposite_to(const uint pid, const uint vid) const;
-};
+template<typename T>
+CINO_INLINE
+T clamp(const T & val, const T & min, const T & max);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "quadmesh.cpp"
+#include "clamp.cpp"
 #endif
 
-#endif // CINO_QUADMESH_H
+#endif // CINO_CLAMP
