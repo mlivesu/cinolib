@@ -88,6 +88,16 @@ CINO_INLINE
 double dijkstra(const AbstractMesh<M,V,E,P> & m,
                 const uint                    source,
                 const uint                    dest,
+                const std::vector<double>   & weights,
+                      std::vector<uint>     & path);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double dijkstra(const AbstractMesh<M,V,E,P> & m,
+                const uint                    source,
+                const uint                    dest,
                 const std::vector<bool>     & mask, // if mask[v] = true, path cannot pass through it
                       std::vector<uint>     & path);
 
