@@ -75,7 +75,6 @@ double feature_mapping(const AbstractPolygonMesh<M1,V1,E1,P1> & m_source,
     }
 
     // STEP 2: map curves
-
     Octree o_curves;
     o_curves.build_from_mesh_polys(m_target);
     double L = m_target.edge_avg_length();
@@ -114,13 +113,7 @@ double feature_mapping(const AbstractPolygonMesh<M1,V1,E1,P1> & m_source,
         });
         std::vector<uint> path;
         dijkstra(m_target, corners.at(f.front()), corners.at(f.back()), w, path);
-        for(uint i=0; i<path.size()-1; ++i)
-        {
-            int eid = m_target.edge_id(path.at(i),path.at(i+1));
-            assert(eid>=0);
-            m_target.edge_data(eid).flags[MARKED] = true;
-            m_target.edge_data(eid).flags[CREASE] = true;
-        }
+        f_target.push_back(path);
     }
 
     return f_source.size()==f_target.size();
