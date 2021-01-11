@@ -35,9 +35,6 @@
 *********************************************************************************/
 #include <cinolib/grid_projector.h>
 #include <cinolib/octree.h>
-#include <cinolib/feature_network.h>
-#include <cinolib/feature_mapping.h>
-#include <cinolib/export_surface.h>
 
 namespace cinolib
 {
@@ -57,54 +54,53 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     };
     std::vector<Proj> targets;
 
-    // compute feature network on srf, transfer it to hexmesh, and prepare octrees for projection
+    // prepare octrees for projection
     Octree o_srf;
-    o_srf.build_from_mesh_polys(srf);
     Octree o_corners;
-    Octree o_feat_lines;
-    std::vector<std::vector<uint>> fn,h_fn;
-    FeatureNetworkOptions fn_opt;
-    feature_network(srf, fn, fn_opt);
-    for(auto f : fn)
+    Octree o_lines;
+    for(uint vid=0; vid<srf.num_verts(); ++vid)
     {
-        o_corners.push_point(f.front(), srf.vert(f.front()));
-        o_corners.push_point(f.back(), srf.vert(f.back()));
-        for(uint i=1; i<f.size(); ++i)
+        uint count = 0;
+        for(uint eid : srf.adj_v2e(vid))
         {
-            int eid = srf.edge_id(f.at(i), f.at(i-1));
-            assert(eid>=0);
-            o_feat_lines.push_segment(eid, {srf.vert(f.at(i)), srf.vert(f.at(i-1))});
+            if(srf.edge_data(eid).flags[CREASE]) ++count;
+        }
+        switch(count)
+        {
+            case 0  : break;
+            case 2  : break;
+            default : o_corners.push_point(vid, srf.vert(vid));
         }
     }
-    o_feat_lines.build();
-    o_corners.build();
-    Quadmesh<> h_srf;
-    std::unordered_map<uint,uint> m2srf, srf2m;
-    export_surface(m, h_srf, m2srf, srf2m);
-    feature_mapping(srf, fn, h_srf, h_fn);
-    enum
+    for(uint eid=0; eid<srf.num_edges(); ++eid)
     {
-        CORNER  = 0,
-        LINE    = 1,
-        REGULAR = 2,
-    };
-    m.vert_apply_label(REGULAR);
-    m.edge_set_flag(CREASE, false);
-    for(auto f : h_fn)
-    {
-        for(uint i=1; i<f.size(); ++i)
+        if(srf.edge_data(eid).flags[CREASE])
         {
-            uint v0 = srf2m.at(f.at(i));
-            uint v1 = srf2m.at(f.at(i-1));
-            m.vert_data(v0).label = LINE;
-            m.vert_data(v1).label = LINE;
-            int eid = m.edge_id(v0,v1);
-            assert(eid>=0);
-            m.edge_data(eid).flags[CREASE] = true;
-            m.edge_data(eid).flags[MARKED] = true;
+            o_lines.push_segment(eid, srf.edge_verts(eid));
         }
-        m.vert_data(srf2m.at(f.front())).label = CORNER;
-        m.vert_data(srf2m.at(f.back())).label  = CORNER;
+    }
+    o_srf.build_from_mesh_polys(srf);
+    o_corners.build();
+    o_lines.build();
+
+    // lavel mesh elements to set the target octree for projection
+    enum { CORNER, LINE, REGULAR };
+    m.vert_apply_label(REGULAR);
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        if(!m.vert_is_on_srf(vid)) continue;
+        uint count = 0;
+        for(uint eid : m.adj_v2e(vid))
+        {
+            if(m.edge_data(eid).flags[CREASE]) ++count;
+        }
+        switch(count)
+        {
+            case 0  : m.vert_data(vid).label = REGULAR; break;
+            case 1  : m.vert_data(vid).label = CORNER;  break;
+            case 2  : m.vert_data(vid).label = LINE;    break;
+            default : m.vert_data(vid).label = CORNER;
+        }
     }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -150,7 +146,7 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
             {
                 case REGULAR : proj.target = (m.vert_is_on_srf(vid)) ? o_srf.closest_point(verts.at(vid)) : verts.at(vid); break;
                 case CORNER  : proj.target = o_corners.closest_point(verts.at(vid)); break;
-                case LINE    : proj.target = o_feat_lines.closest_point(verts.at(vid)); break;
+                case LINE    : proj.target = o_lines.closest_point(verts.at(vid)); break;
             }
             proj.dist   = (m.vert_is_on_srf(vid)) ? 1/verts.at(vid).dist(proj.target) : -verts.at(vid).dist(proj.target);
             targets.push_back(proj);
@@ -169,8 +165,8 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
         double SJ_bef = hex_scaled_jacobian(h[0],h[1],h[2],h[3],h[4],h[5],h[6],h[7]);
         h.at(m.poly_vert_offset(pid, vid)) = pos;
         double SJ_aft = hex_scaled_jacobian(h[0],h[1],h[2],h[3],h[4],h[5],h[6],h[7]);
-        if(SJ_bef <= opt.SJ_thresh && SJ_aft >= SJ_bef)       return true; // if it was bad since the beginning, just don't make it worse
         if(SJ_bef >  opt.SJ_thresh && SJ_aft > opt.SJ_thresh) return true;
+        if(SJ_bef <= opt.SJ_thresh && SJ_aft >= SJ_bef)       return true; // if it was already bad, just don't make it worse
         return false;
     };
 
