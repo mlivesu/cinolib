@@ -122,7 +122,6 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
             ///  TODO 2: propagate smoothing and projections from srf to interior
             ///  to push in the right direction..
 
-            // smooth surface
             PARALLEL_FOR(0, m.num_verts(), 1000,[&](const uint vid)
             {
                 vec3d p;
