@@ -33,41 +33,42 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_FEATURE_NETWORK_H
-#define CINO_FEATURE_NETWORK_H
+#ifndef CINO_FEATURE_MAPPING_H
+#define CINO_FEATURE_MAPPING_H
 
 #include <cinolib/meshes/meshes.h>
 
 namespace cinolib
 {
 
-/*
- * Extracts a list of feature lines from an input mesh with previously flagged crease edges.
- * Each feature line is a list of mesh vertices, ordered starting from one of the endpoints.
- * For closed loops, the first and last items coincide. The function can optionally split
- * feature lines at high curvature points (default is ON).
+/* Given a mesh and its feature network (i.e., a set of chains made of consecutive mesh vertices),
+ * this function maps the network onto a target mesh, finding a corresponding set of vertices in
+ * the new connectivity.
+ *
+ * The algorithm maps feature endpoints first, then samples all the curves and finds the closest points
+ * in the target geometry. These points are used to generate a distance field, which is eventually used
+ * to trace the curves in the new connectivity using Dijkstra. A similar method was firstly proposed in
+ *
+ *    Feature Preserving Octree-Based Hexahedral Meshing
+ *    Xifeng Gao, Hanxiao Shen, Daniele Panozzo
+ *    Computer Graphics Forum (SGP), 2019
+ *
+ * WARNING: the algorithm does not guarantee that ALL the input curves will be mapped. Edge conflicts
+ * during the shortest path tracing may arise. The method returns true if all input features have been
+ * sucecssfully mapped, false otherwise.
 */
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-typedef struct
-{
-    bool  split_lines_at_high_curvature_points = true;
-    float ang_thresh_deg                       = 60;
-}
-FeatureNetworkOptions;
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
+template<class M1, class V1, class E1, class P1,
+         class M2, class V2, class E2, class P2>
 CINO_INLINE
-void feature_network(const AbstractPolygonMesh<M,V,E,P>   & m,                     
-                           std::vector<std::vector<uint>> & network,
-                     const FeatureNetworkOptions          & opt);
+double feature_mapping(const AbstractPolygonMesh<M1,V1,E1,P1> & m_source,
+                       const std::vector<std::vector<uint>>   & f_source,
+                             AbstractPolygonMesh<M2,V2,E2,P2> & m_target,
+                             std::vector<std::vector<uint>>   & f_target);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "feature_network.cpp"
+#include "feature_mapping.cpp"
 #endif
 
-#endif // CINO_FEATURE_NETWORK_H
+#endif // CINO_FEATURE_MAPPING_H
