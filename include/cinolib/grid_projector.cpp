@@ -57,7 +57,7 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     };
     std::vector<Proj> targets;
 
-    // compute feature network, transfer it to hexmesh, and prepare octrees for projection
+    // compute feature network on srf, transfer it to hexmesh, and prepare octrees for projection
     Octree o_srf;
     o_srf.build_from_mesh_polys(srf);
     Octree o_corners;
@@ -118,6 +118,10 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
         std::vector<vec3d> verts = m.vector_verts();
         for(uint i=0; i<smooth_iters; ++i)
         {
+            //// TODO 1: smooth corners, lines, and surface separately
+            ///  TODO 2: propagate smoothing and projections from srf to interior
+            ///  to push in the right direction..
+
             // smooth surface
             PARALLEL_FOR(0, m.num_verts(), 1000,[&](const uint vid)
             {
