@@ -84,9 +84,9 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     feature_mapping(srf, fn, h_srf, h_fn);
     enum
     {
-        REGULAR = 0,
-        CORNER  = 1,
-        LINE    = 2
+        CORNER  = 0,
+        LINE    = 1,
+        REGULAR = 2,
     };
     m.vert_apply_label(REGULAR);
     m.edge_set_flag(CREASE, false);
@@ -118,10 +118,6 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
         std::vector<vec3d> verts = m.vector_verts();
         for(uint i=0; i<smooth_iters; ++i)
         {
-            //// TODO 1: smooth corners, lines, and surface separately
-            ///  TODO 2: propagate smoothing and projections from srf to interior
-            ///  to push in the right direction..
-
             PARALLEL_FOR(0, m.num_verts(), 1000,[&](const uint vid)
             {
                 vec3d p;
@@ -132,8 +128,14 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
                 }
                 else
                 {
-                    for(uint nbr : m.adj_v2v(vid)) p += verts.at(nbr);
-                    p /= static_cast<double>(m.adj_v2v(vid).size());
+                    double sum = 0.0;
+                    for(uint nbr : m.adj_v2v(vid))
+                    {
+                        double w = (m.vert_is_on_srf(nbr)) ? 2.0 : 0.5;
+                        p   += w * verts.at(nbr);
+                        sum += w;
+                    }
+                    p /= sum;
                 }
                 verts.at(vid) = p;
             });
