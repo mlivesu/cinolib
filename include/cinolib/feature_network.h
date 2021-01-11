@@ -63,7 +63,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void feature_network(const AbstractPolygonMesh<M,V,E,P>   & m,                     
                            std::vector<std::vector<uint>> & network,
-                     const FeatureNetworkOptions          & opt);
+                     const FeatureNetworkOptions          & opt = FeatureNetworkOptions());
 }
 
 #ifndef  CINO_STATIC_LIB
