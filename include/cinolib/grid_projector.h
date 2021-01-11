@@ -49,7 +49,6 @@ typedef struct
     uint   max_iter    = 10;    // force convergence after a maximum number of iterations
     bool   use_H_dist  = false; // uses Hausdorff distance if true. Average distance otherwise
     double SJ_thresh   = 0;     // minimum threshold for SJ (elements must be strictly above the thresh...)
-    bool   add_padding = true;  // adds a padding layer to avoid surface hexa with more than 1 face exposed
 }
 GridProjectorOptions;
 
