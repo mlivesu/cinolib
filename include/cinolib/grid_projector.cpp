@@ -57,11 +57,11 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     };
     std::vector<Proj> targets;
 
+    // compute feature network, transfer it to hexmesh, and prepare octrees for projection
     Octree o_srf;
     o_srf.build_from_mesh_polys(srf);
     Octree o_corners;
     Octree o_feat_lines;
-
     std::vector<std::vector<uint>> fn,h_fn;
     FeatureNetworkOptions fn_opt;
     feature_network(srf, fn, fn_opt);
@@ -82,8 +82,6 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     std::unordered_map<uint,uint> m2srf, srf2m;
     export_surface(m, h_srf, m2srf, srf2m);
     feature_mapping(srf, fn, h_srf, h_fn);
-    m.edge_set_flag(CREASE, false);
-    m.vert_set_flag(CREASE, false);
     enum
     {
         REGULAR = 0,
@@ -91,6 +89,7 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
         LINE    = 2
     };
     m.vert_apply_label(REGULAR);
+    m.edge_set_flag(CREASE, false);
     for(auto f : h_fn)
     {
         for(uint i=1; i<f.size(); ++i)
@@ -119,11 +118,20 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
         std::vector<vec3d> verts = m.vector_verts();
         for(uint i=0; i<smooth_iters; ++i)
         {
+            // smooth surface
             PARALLEL_FOR(0, m.num_verts(), 1000,[&](const uint vid)
             {
-                vec3d p = verts.at(vid);
-                for(uint nbr : m.adj_v2v(vid)) p += verts.at(nbr);
-                p /= static_cast<double>(m.adj_v2v(vid).size()+1);
+                vec3d p;
+                if(m.vert_is_on_srf(vid))
+                {
+                    for(uint nbr : m.vert_adj_srf_verts(vid)) p += verts.at(nbr);
+                    p /= static_cast<double>(m.vert_adj_srf_verts(vid).size());
+                }
+                else
+                {
+                    for(uint nbr : m.adj_v2v(vid)) p += verts.at(nbr);
+                    p /= static_cast<double>(m.adj_v2v(vid).size());
+                }
                 verts.at(vid) = p;
             });
         }
