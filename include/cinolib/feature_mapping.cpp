@@ -34,20 +34,52 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/feature_mapping.h>
+#include <cinolib/feature_network.h>
 #include <cinolib/octree.h>
 #include <cinolib/clamp.h>
 #include <cinolib/dijkstra.h>
+#include <cinolib/export_surface.h>
 
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M1, class V1, class E1, class P1,
          class M2, class V2, class E2, class P2>
 CINO_INLINE
-double feature_mapping(const AbstractPolygonMesh<M1,V1,E1,P1> & m_source,
-                       const std::vector<std::vector<uint>>   & f_source,
-                             AbstractPolygonMesh<M2,V2,E2,P2> & m_target,
-                             std::vector<std::vector<uint>>   & f_target)
+bool feature_mapping(const AbstractPolygonMesh<M1,V1,E1,P1> & m_source,
+                           AbstractPolygonMesh<M2,V2,E2,P2> & m_target)
+{
+    m_target.edge_set_flag(CREASE,false);
+
+    std::vector<std::vector<uint>> f_source, f_target;
+    feature_network(m_source, f_source);
+
+    feature_mapping(m_source, f_source, m_target, f_target);
+
+    for(auto f : f_target)
+    {
+        for(uint i=1; i<f.size(); ++i)
+        {
+            uint v0 = f.at(i);
+            uint v1 = f.at(i-1);
+            int eid = m_target.edge_id(v0,v1);
+            assert(eid>=0);
+            m_target.edge_data(eid).flags[CREASE] = true;
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M1, class V1, class E1, class P1,
+         class M2, class V2, class E2, class P2>
+CINO_INLINE
+bool feature_mapping(const AbstractPolygonMesh<M1,V1,E1,P1> & m_source,
+                     const std::vector<std::vector<uint>>   & f_source,
+                           AbstractPolygonMesh<M2,V2,E2,P2> & m_target,
+                           std::vector<std::vector<uint>>   & f_target)
 {
     m_target.edge_set_flag(MARKED,false);
     m_target.edge_set_flag(CREASE,false);
