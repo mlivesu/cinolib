@@ -35,7 +35,9 @@
 *********************************************************************************/
 #include <cinolib/grid_projector.h>
 #include <cinolib/octree.h>
-#include <cinolib/padding.h>
+#include <cinolib/feature_network.h>
+#include <cinolib/feature_mapping.h>
+#include <cinolib/export_surface.h>
 
 namespace cinolib
 {
@@ -55,8 +57,56 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     };
     std::vector<Proj> targets;
 
-    Octree o;
-    o.build_from_mesh_polys(srf);
+    Octree o_srf;
+    o_srf.build_from_mesh_polys(srf);
+    Octree o_corners;
+    Octree o_feat_lines;
+
+    std::vector<std::vector<uint>> fn,h_fn;
+    FeatureNetworkOptions fn_opt;
+    feature_network(srf, fn, fn_opt);
+    for(auto f : fn)
+    {
+        o_corners.push_point(f.front(), srf.vert(f.front()));
+        o_corners.push_point(f.back(), srf.vert(f.back()));
+        for(uint i=1; i<f.size(); ++i)
+        {
+            int eid = srf.edge_id(f.at(i), f.at(i-1));
+            assert(eid>=0);
+            o_feat_lines.push_segment(eid, {srf.vert(f.at(i)), srf.vert(f.at(i-1))});
+        }
+    }
+    o_feat_lines.build();
+    o_corners.build();
+    Quadmesh<> h_srf;
+    std::unordered_map<uint,uint> m2srf, srf2m;
+    export_surface(m, h_srf, m2srf, srf2m);
+    feature_mapping(srf, fn, h_srf, h_fn);
+    m.edge_set_flag(CREASE, false);
+    m.vert_set_flag(CREASE, false);
+    enum
+    {
+        REGULAR = 0,
+        CORNER  = 1,
+        LINE    = 2
+    };
+    m.vert_apply_label(REGULAR);
+    for(auto f : h_fn)
+    {
+        for(uint i=1; i<f.size(); ++i)
+        {
+            uint v0 = srf2m.at(f.at(i));
+            uint v1 = srf2m.at(f.at(i-1));
+            m.vert_data(v0).label = LINE;
+            m.vert_data(v1).label = LINE;
+            int eid = m.edge_id(v0,v1);
+            assert(eid>=0);
+            m.edge_data(eid).flags[CREASE] = true;
+            m.edge_data(eid).flags[MARKED] = true;
+        }
+        m.vert_data(srf2m.at(f.front())).label = CORNER;
+        m.vert_data(srf2m.at(f.back())).label  = CORNER;
+    }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     //:::::::::::::::::::::::::   LAMBDA UTILITIES   :::::::::::::::::::::::::
@@ -83,7 +133,12 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
         {
             Proj proj;
             proj.vid    = vid;
-            proj.target = (m.vert_is_on_srf(vid)) ? o.closest_point(verts.at(vid)) : verts.at(vid);
+            switch(m.vert_data(vid).label)
+            {
+                case REGULAR : proj.target = (m.vert_is_on_srf(vid)) ? o_srf.closest_point(verts.at(vid)) : verts.at(vid); break;
+                case CORNER  : proj.target = o_corners.closest_point(verts.at(vid)); break;
+                case LINE    : proj.target = o_feat_lines.closest_point(verts.at(vid)); break;
+            }
             proj.dist   = (m.vert_is_on_srf(vid)) ? 1/verts.at(vid).dist(proj.target) : -verts.at(vid).dist(proj.target);
             targets.push_back(proj);
         }
@@ -148,13 +203,12 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     //::::::::::::::::::::::   BEGIN OF ACTUAL METHOD   ::::::::::::::::::::::
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    if(opt.add_padding) padding(m);
     bool converged = false;
     for(uint i=0; i<opt.max_iter && !converged; ++i)
     {
         update_targets(3,true);
 
-        // process points  and store the new distance to target for next iteration
+        // process points and store the new distance to target for next iteration
         for(auto & t : targets)
         {
             vec3d p = binary_search(t.vid, t.target);
