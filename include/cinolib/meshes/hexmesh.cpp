@@ -324,6 +324,20 @@ vec3d Hexmesh<M,V,E,F,P>::verts_average(const std::vector<uint> & vids) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+uint Hexmesh<M,V,E,F,P>::poly_vert_opposite_to(const uint pid, const uint fid, const uint vid) const
+{
+    for(uint nbr : this->poly_v2v(pid,vid))
+    {
+        if(!this->face_contains_vert(fid,nbr)) return nbr;
+    }
+    assert(false);
+    return 0; // warning killer
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 uint Hexmesh<M,V,E,F,P>::poly_face_opposite_to(const uint pid, const uint fid) const
 {
     assert(this->poly_contains_face(pid, fid));

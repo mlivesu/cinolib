@@ -113,6 +113,7 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint   poly_face_opposite_to(const uint pid, const uint fid) const;
+        uint   poly_vert_opposite_to(const uint pid, const uint fid, const uint vid) const;
         void   poly_subdivide       (const std::vector<std::vector<std::vector<uint>>> & split_scheme);
         double poly_volume          (const uint pid) const override;
         bool   poly_fix_orientation ();
