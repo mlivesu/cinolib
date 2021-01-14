@@ -22,6 +22,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* implement convertion operators between surface meshes and volume meshes (see http://www.cplusplus.com/doc/tutorial/typecasting/)
 * use parallel for to handle all-vs-all tests in octree leaves
 * splitting rule for octree generation should be passed as an external function, so that each one can make the tree he wants to make....
 * double check vertex non manifoldness checks, they can probably be made much faster exploiting Euler to check the topology of the link....
