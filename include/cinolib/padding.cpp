@@ -40,11 +40,13 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void padding(AbstractPolyhedralMesh<M,V,E,F,P> & m)
+void padding(AbstractPolyhedralMesh<M,V,E,F,P> & m, const bool inwards)
 {
     uint nv = m.num_verts();
     uint ne = m.num_edges();
     uint nf = m.num_faces();
+
+    double l = m.edge_min_length()*0.1;
 
     // add copies of surface vertices
     std::unordered_map<uint,uint> vmap;
@@ -52,10 +54,10 @@ void padding(AbstractPolyhedralMesh<M,V,E,F,P> & m)
     {
         if(m.vert_is_on_srf(vid))
         {
-            double l = inf_double;
-            for(uint eid : m.adj_v2e(vid)) l = std::min(l, m.edge_length(eid));
-            uint new_vid = m.vert_add(m.vert(vid));       // update position;
-            m.vert(vid) -= m.vert_data(vid).normal*l*0.1; // push old vertex inwards
+            uint  new_vid = m.vert_add(m.vert(vid));       // update position;
+            vec3d off     = m.vert_data(vid).normal*l*0.5;
+            if(inwards) m.vert(  vid  ) -= off;
+            else        m.vert(new_vid) += off;
             vmap[vid] = new_vid;
         }
     }
