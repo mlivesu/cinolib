@@ -145,6 +145,10 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 assert(primal.poly_contains_face(p_beg, srf_beg));
                 assert(primal.poly_contains_face(p_end, srf_end));
                 face.push_back(pf2dv.at(srf_end));
+                if(primal.edge_data(eid).flags[CREASE])
+                {
+                    face.push_back(pe2dv.at(eid));
+                }
                 face.push_back(pf2dv.at(srf_beg));
             }
             faces.push_back(face);
@@ -231,8 +235,12 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                 poly_winding.push_back(false);
             }
         }
-        dual_polys.push_back(poly);
-        dual_polys_winding.push_back(poly_winding);
+        // this may happen if the mesh contains dangling vertices
+        if(!poly.empty())
+        {
+            dual_polys.push_back(poly);
+            dual_polys_winding.push_back(poly_winding);
+        }
     }
 }
 
