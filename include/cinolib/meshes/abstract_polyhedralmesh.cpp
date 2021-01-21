@@ -2582,6 +2582,47 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist
         update_p_quality(pid);
         return pid;
     }
+    else if(vlist.size()==6) // triangular prism
+    {
+        // detect faces
+        std::vector<uint> f0 = { vlist.at(PRISM_FACES[0][0]), vlist.at(PRISM_FACES[0][1]), vlist.at(PRISM_FACES[0][2]) };
+        std::vector<uint> f1 = { vlist.at(PRISM_FACES[1][0]), vlist.at(PRISM_FACES[1][1]), vlist.at(PRISM_FACES[1][2]) };
+        std::vector<uint> f2 = { vlist.at(PRISM_FACES[2][0]), vlist.at(PRISM_FACES[2][1]), vlist.at(PRISM_FACES[2][2]), vlist.at(PRISM_FACES[2][3]) };
+        std::vector<uint> f3 = { vlist.at(PRISM_FACES[3][0]), vlist.at(PRISM_FACES[3][1]), vlist.at(PRISM_FACES[3][2]), vlist.at(PRISM_FACES[3][3]) };
+        std::vector<uint> f4 = { vlist.at(PRISM_FACES[4][0]), vlist.at(PRISM_FACES[4][1]), vlist.at(PRISM_FACES[4][2]), vlist.at(PRISM_FACES[4][3]) };
+
+        // detect face ids
+        int fid0 = this->face_id(f0);
+        int fid1 = this->face_id(f1);
+        int fid2 = this->face_id(f2);
+        int fid3 = this->face_id(f3);
+        int fid4 = this->face_id(f4);
+
+        // add missing faces
+        if(fid0 == -1) { fid0 = this->face_add(f0); }
+        if(fid1 == -1) { fid1 = this->face_add(f1); }
+        if(fid2 == -1) { fid2 = this->face_add(f2); }
+        if(fid3 == -1) { fid3 = this->face_add(f3); }
+        if(fid4 == -1) { fid4 = this->face_add(f4); }
+
+        // assign face winding
+        std::vector<bool> w(5,false);
+        if(this->face_verts_are_CCW(fid0, f0.at(1), f0.at(0))) w.at(0) = true;
+        if(this->face_verts_are_CCW(fid1, f1.at(1), f1.at(0))) w.at(1) = true;
+        if(this->face_verts_are_CCW(fid2, f2.at(1), f2.at(0))) w.at(2) = true;
+        if(this->face_verts_are_CCW(fid3, f3.at(1), f3.at(0))) w.at(3) = true;
+        if(this->face_verts_are_CCW(fid4, f4.at(1), f4.at(0))) w.at(4) = true;
+
+        // add tet
+        uint pid = poly_add({static_cast<uint>(fid0),
+                             static_cast<uint>(fid1),
+                             static_cast<uint>(fid2),
+                             static_cast<uint>(fid3),
+                             static_cast<uint>(fid4)},w);
+
+        // enforce standard vertex ordering (I SHOULDN'T NEED IT FOR PRISMS...)
+        return pid;
+    }
     else assert(false && "Unknown polyhedral element!");
     return 0; // warning killer
 }
