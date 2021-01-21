@@ -175,6 +175,20 @@ static const uint HEXA_INCIDENT_EDGES[8][3] =
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+static const uint HEXA_CORNER_TETS[8][4] =
+{
+    { 3, 0, 1, 4 }, // tet incident at vertex v0
+    { 0, 1, 2, 5 }, // tet incident at vertex v1
+    { 1, 2, 3, 6 }, // tet incident at vertex v2
+    { 2, 3, 0, 7 }, // tet incident at vertex v3
+    { 5, 4, 7, 0 }, // tet incident at vertex v4
+    { 6, 5, 4, 1 }, // tet incident at vertex v5
+    { 7, 6, 5, 2 }, // tet incident at vertex v6
+    { 4, 7, 6, 3 }, // tet incident at vertex v7
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 }
 
 #endif // CINO_STANDARD_ELEMENTS_TABLES_H
