@@ -2487,6 +2487,11 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & flist
         this->f2p.at(fid).push_back(pid);
     }
 
+    if(this->poly_is_hexahedron (pid) || this->poly_is_tetrahedron(pid))
+    {
+        this->poly_reorder_p2v(pid);
+    }
+
     return pid;
 }
 
