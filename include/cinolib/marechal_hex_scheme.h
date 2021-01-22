@@ -48,9 +48,8 @@ namespace cinolib
  *     Loic Marechal
  *     Proceedings of the 18th international meshing roundtable, 2009
  *
- * The algorithm works in the primal mesh, and modifies the connectivity to adjust the
- * valence of the vertices and have valence 6 everywhere. Dualizing the so generated
- * polyhedral mesh generates the output hexmesh (see cinolib::dual_mesh for dualization).
+ * The algorithm works in the primal mesh, modifying the connectivity to adjust the
+ * valence of the vertices, and achieving valence 6 everywhere. 
  *
  * The code takes as input:
  *
@@ -59,8 +58,8 @@ namespace cinolib
  *  - a 3x3 grid of mesh vertices
  *
  * It produces in output the polyhedral cells that stay in between the two grids, and realize the
- * necessary grading to connect them in a conforming way. Dualizing these elements only hexahedra
- * are generated.
+ * necessary grading to connect them in a conforming way. 
+ * Dualizing these elements only hexahedra are generated (see cinolib::dual_mesh for dualization).
 */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
