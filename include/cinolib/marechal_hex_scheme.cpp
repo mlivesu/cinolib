@@ -142,32 +142,32 @@ void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
     faces.push_back({bot[3][3], bot[3][4], map.at(bot[2][4]), map.at(bot[2][3])});
 
     // other internal faces (from face 22 to face 37)
-    faces.push_back({bot[4][2],         bot[4][3],         map.at(bot[4][2])});
-    faces.push_back({bot[0][2],         bot[0][3],         map.at(bot[0][2])});
-    faces.push_back({bot[4][2],         bot[4][1],         map.at(bot[4][2])});
-    faces.push_back({bot[0][2],         bot[0][1],         map.at(bot[0][2])});
+    faces.push_back({       bot[4][2],         bot[4][3],  map.at(bot[4][2])});
+    faces.push_back({       bot[0][2],         bot[0][3],  map.at(bot[0][2])});
+    faces.push_back({       bot[4][2],         bot[4][1],  map.at(bot[4][2])});
+    faces.push_back({       bot[0][2],         bot[0][1],  map.at(bot[0][2])});
     faces.push_back({map.at(bot[2][2]), map.at(bot[2][3]), map.at(top[1][1])});
     faces.push_back({map.at(bot[2][2]), map.at(bot[2][1]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[4][2]), map.at(top[1][1]), top[1][1],         top[2][1]});
-    faces.push_back({map.at(bot[0][2]), map.at(top[1][1]), top[1][1],         top[0][1]});
-    faces.push_back({map.at(top[1][1]), map.at(bot[2][3]), map.at(bot[2][4]), top[1][2],         top[1][1]});
-    faces.push_back({map.at(top[1][1]), map.at(bot[2][1]), map.at(bot[2][0]), top[1][0],         top[1][1]});
-    faces.push_back({map.at(bot[2][2]), bot[3][2],         bot[4][2],         map.at(bot[4][2]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[2][3]), bot[3][3],         bot[4][3],         map.at(bot[4][2]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[2][2]), bot[1][2],         bot[0][2],         map.at(bot[0][2]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[2][3]), bot[1][3],         bot[0][3],         map.at(bot[0][2]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[2][1]), bot[3][1],         bot[4][1],         map.at(bot[4][2]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[2][1]), bot[1][1],         bot[0][1],         map.at(bot[0][2]), map.at(top[1][1])});
+    faces.push_back({map.at(bot[4][2]), map.at(top[1][1]),        top[1][1],         top[2][1]});
+    faces.push_back({map.at(bot[0][2]), map.at(top[1][1]),        top[1][1],         top[0][1]});
+    faces.push_back({map.at(top[1][1]), map.at(bot[2][3]), map.at(bot[2][4]),        top[1][2],         top[1][1]});
+    faces.push_back({map.at(top[1][1]), map.at(bot[2][1]), map.at(bot[2][0]),        top[1][0],         top[1][1]});
+    faces.push_back({map.at(bot[2][2]),        bot[3][2],         bot[4][2],  map.at(bot[4][2]), map.at(top[1][1])});
+    faces.push_back({map.at(bot[2][3]),        bot[3][3],         bot[4][3],  map.at(bot[4][2]), map.at(top[1][1])});
+    faces.push_back({map.at(bot[2][2]),        bot[1][2],         bot[0][2],  map.at(bot[0][2]), map.at(top[1][1])});
+    faces.push_back({map.at(bot[2][3]),        bot[1][3],         bot[0][3],  map.at(bot[0][2]), map.at(top[1][1])});
+    faces.push_back({map.at(bot[2][1]),        bot[3][1],         bot[4][1],  map.at(bot[4][2]), map.at(top[1][1])});
+    faces.push_back({map.at(bot[2][1]),        bot[1][1],         bot[0][1],  map.at(bot[0][2]), map.at(top[1][1])});
 
     // lateral faces (excluded exposed faces of triangular prisms) (from face 38 to face 45)
-    faces.push_back({bot[0][0], bot[0][1], map.at(bot[0][2]), top[0][1], top[0][0]});
-    faces.push_back({bot[0][4], bot[0][3], map.at(bot[0][2]), top[0][1], top[0][2]});
-    faces.push_back({bot[4][0], bot[4][1], map.at(bot[4][2]), top[2][1], top[2][0]});
-    faces.push_back({bot[4][4], bot[4][3], map.at(bot[4][2]), top[2][1], top[2][2]});
-    faces.push_back({bot[1][0], bot[0][0], top[0][0],         top[1][0], map.at(bot[2][0])});
-    faces.push_back({bot[1][4], bot[0][4], top[0][2],         top[1][2], map.at(bot[2][4])});
-    faces.push_back({bot[3][0], bot[4][0], top[2][0],         top[1][0], map.at(bot[2][0])});
-    faces.push_back({bot[3][4], bot[4][4], top[2][2],         top[1][2], map.at(bot[2][4])});
+    faces.push_back({bot[0][0], bot[0][1], map.at(bot[0][2]), top[0][1],        top[0][0]});
+    faces.push_back({bot[0][4], bot[0][3], map.at(bot[0][2]), top[0][1],        top[0][2]});
+    faces.push_back({bot[4][0], bot[4][1], map.at(bot[4][2]), top[2][1],        top[2][0]});
+    faces.push_back({bot[4][4], bot[4][3], map.at(bot[4][2]), top[2][1],        top[2][2]});
+    faces.push_back({bot[1][0], bot[0][0],        top[0][0],  top[1][0], map.at(bot[2][0])});
+    faces.push_back({bot[1][4], bot[0][4],        top[0][2],  top[1][2], map.at(bot[2][4])});
+    faces.push_back({bot[3][0], bot[4][0],        top[2][0],  top[1][0], map.at(bot[2][0])});
+    faces.push_back({bot[3][4], bot[4][4],        top[2][2],  top[1][2], map.at(bot[2][4])});
 
     uint off = m.num_faces();
 
