@@ -106,6 +106,13 @@ void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
     int b32 = m.face_id({bot[4][2], bot[3][2], bot[3][3], bot[4][3]}); assert(b32>=0);
     int b33 = m.face_id({bot[4][3], bot[3][3], bot[3][4], bot[4][4]}); assert(b33>=0);
 
+    // ceiling
+    // THESE ARE ASSUMED TO BE ALREADY IN THE INPUT MESH
+    int t00 = m.face_id({top[0][0], top[1][0], top[1][1], top[0][1]}); assert(t00>=0);
+    int t01 = m.face_id({top[0][1], top[0][2], top[1][2], top[1][1]}); assert(t01>=0);
+    int t10 = m.face_id({top[1][0], top[1][1], top[2][1], top[2][0]}); assert(t10>=0);
+    int t11 = m.face_id({top[2][1], top[2][2], top[1][2], top[1][1]}); assert(t11>=0);
+
     // triangular flaps attached to base (from face 0 to face 9)
     faces.push_back({bot[1][0], bot[2][0], map.at(bot[2][0])});
     faces.push_back({bot[2][0], bot[3][0], map.at(bot[2][0])});
@@ -161,13 +168,6 @@ void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
     faces.push_back({bot[1][4], bot[0][4], top[0][2],         top[1][2], map.at(bot[2][4])});
     faces.push_back({bot[3][0], bot[4][0], top[2][0],         top[1][0], map.at(bot[2][0])});
     faces.push_back({bot[3][4], bot[4][4], top[2][2],         top[1][2], map.at(bot[2][4])});
-
-    // ceiling
-    // THESE ARE ASSUMED TO BE ALREADY IN THE INPUT MESH
-    int t00 = m.face_id({top[0][0], top[1][0], top[1][1], top[0][1]}); assert(t00>=0);
-    int t01 = m.face_id({top[0][1], top[0][2], top[1][2], top[1][1]}); assert(t01>=0);
-    int t10 = m.face_id({top[1][0], top[1][1], top[2][1], top[2][0]}); assert(t10>=0);
-    int t11 = m.face_id({top[2][1], top[2][2], top[1][2], top[1][1]}); assert(t11>=0);
 
     uint off = m.num_faces();
 
