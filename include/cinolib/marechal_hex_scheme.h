@@ -58,8 +58,9 @@ namespace cinolib
  *  - a 5x5 grid of mesh vertices
  *  - a 3x3 grid of mesh vertices
  *
- * It produces in output the cells that stay in between the two basis and realize the
- * necessary grading to connect the two basis.
+ * It produces in output the polyhedral cells that stay in between the two grids, and realize the
+ * necessary grading to connect them in a conforming way. Dualizing these elements only hexahedra
+ * are generated.
 */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
