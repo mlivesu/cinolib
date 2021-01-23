@@ -40,18 +40,19 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void marechal(AbstractPolyhedralMesh<M,V,E,F,P> & m,
-              uint                                bot[5][5],
-              uint                                top[3][3])
+void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                    Polyhedralmesh<>                  & m_out,
+              uint                                      bot[5][5],
+              uint                                      top[3][3])
 {
     std::vector<vec3d> verts;
     std::vector<std::vector<uint>> faces;
     std::vector<std::vector<uint>> polys;
     marechal(m, bot, top, verts, faces, polys);
 
-    for(auto v : verts) m.vert_add(v);
-    for(auto f : faces) m.face_add(f);
-    for(auto p : polys) m.poly_add(p, std::vector<bool>(p.size(),true));
+    for(auto v : verts) m_out.vert_add(v);
+    for(auto f : faces) m_out.face_add(f);
+    for(auto p : polys) m_out.poly_add(p, std::vector<bool>(p.size(),true));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

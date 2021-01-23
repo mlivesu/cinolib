@@ -37,16 +37,17 @@
 #define CINO_MARECHAL_HEX_SCHEME_H
 
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
+#include <cinolib/meshes/polyhedralmesh.h>
 
 namespace cinolib
 {
 
 /* Implementation of the convertion schemes to transform an adaptively refined grid
- * with hangin nodes into a conformin hexahedral mesh. This code is based on
+ * with hanging nodes into a conformin hexahedral mesh. This code is based on
  *
  *     Advances in Octree-Based All-Hexahedral Mesh Generation: Handling Sharp Features
  *     Loic Marechal
- *     Proceedings of the 18th international meshing roundtable, 2009
+ *     Proceedings of the 18th International Meshing Roundtable, 2009
  *
  * The algorithm works in the primal mesh, modifying the connectivity to adjust the
  * valence of the vertices, and achieving valence 6 everywhere. 
@@ -54,12 +55,15 @@ namespace cinolib
  * The code takes as input:
  *
  *  - a generic voluemtric mesh (both a non conforming hexmesh and a polyhedral mesh are good)
- *  - a 5x5 grid of mesh vertices
- *  - a 3x3 grid of mesh vertices
+ *  - a bottom 5x5 grid of mesh vertices
+ *  - a top    3x3 grid of mesh vertices
  *
- * It produces in output the polyhedral cells that stay in between the two grids, and realize the
- * necessary grading to connect them in a conforming way. 
- * Dualizing these elements only hexahedra are generated (see cinolib::dual_mesh for dualization).
+ * Input grids must be aligned, meaning that bot[0][0] should have top[0][0] above it in the mesh,
+ * bot[4][0] should have top[2][0] above it, bot[4][4] should have top[2][2] above it, and so on...
+ *
+ * The output is a set of polyhedral cells that stay in between the two grids, and realize the
+ * necessary grading to connect them in a conforming way. Dualizing these elements only hexahedra
+ * are generated (see cinolib::dual_mesh for dualization).
 */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -67,6 +71,7 @@ namespace cinolib
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                    Polyhedralmesh<>                  & m_out,
               uint                                      bot[5][5],
               uint                                      top[3][3]);
 
