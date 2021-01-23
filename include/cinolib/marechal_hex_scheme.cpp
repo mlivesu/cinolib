@@ -193,4 +193,79 @@ void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
     polys.push_back({ off+14, off+37, off+29, off+31, off+42, off+38, (uint)t00, (uint)b00 });
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                                   Polyhedralmesh<M,V,E,F,P>         & m_out,
+                             const uint                                edge[5],
+                             const uint                                grid[3][4])
+{
+    std::vector<vec3d> verts;
+    std::vector<std::vector<uint>> faces;
+    std::vector<std::vector<uint>> polys;
+    marechal_convex_element(m, edge, grid, verts, faces, polys);
+
+    for(auto v : verts) m_out.vert_add(v);
+    for(auto f : faces) m_out.face_add(f);
+    for(auto p : polys) m_out.poly_add(p, std::vector<bool>(p.size(),true)); // I am ignoring windind
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                             const uint                                edge[5],
+                             const uint                                grid[3][4],
+                                   std::vector<vec3d>                & verts,
+                                   std::vector<std::vector<uint>>    & faces,
+                                   std::vector<std::vector<uint>>    & polys)
+{
+    assert(edge[0] == grid[0][0]);
+    assert(edge[2] == grid[1][0]);
+    assert(edge[4] == grid[2][0]);
+
+    // create inner points
+    uint v11 = m.num_verts();
+    uint v13 = v11 + 1;
+    //
+    vec3d u = (m.vert(grid[1][1]) - m.vert(grid[1][0]))*0.5;
+    vec3d v = (m.vert(grid[1][3]) - m.vert(grid[1][0]))*0.5;
+    verts.push_back(m.vert(grid[1][0]) + u);
+    verts.push_back(m.vert(grid[1][0]) + v);
+
+    // THESE ARE ASSUMED TO BE ALREADY IN THE INPUT MESH
+    int f0   = m.face_id({grid[0][1], grid[0][2], grid[1][2], grid[1][1]}); assert(f0>=0);
+    int f1   = m.face_id({grid[1][1], grid[1][2], grid[2][2], grid[2][1]}); assert(f1>=0);
+    int f2   = m.face_id({grid[0][2], grid[0][3], grid[1][3], grid[1][2]}); assert(f2>=0);
+    int f3   = m.face_id({grid[1][2], grid[1][3], grid[2][3], grid[2][2]}); assert(f3>=0);
+    int ftop = m.face_id({grid[2][0], grid[2][1], grid[2][2], grid[2][3]}); assert(ftop>=0);
+    int fbot = m.face_id({grid[0][0], grid[0][1], grid[0][2], grid[0][3]}); assert(fbot>=0);
+
+    // faces of the two tetrahedra inside each cube
+    faces.push_back({edge[1],    grid[1][0], v11 }); // f0
+    faces.push_back({edge[1],    grid[1][0], v13 }); // f1
+    faces.push_back({edge[3],    grid[1][0], v11 }); // f2
+    faces.push_back({edge[3],    grid[1][0], v13 }); // f3
+    faces.push_back({edge[1],    v11,        v13 }); // f4
+    faces.push_back({edge[3],    v11,        v13 }); // f5
+    faces.push_back({grid[1][0], v11,        v13 }); // f6
+
+    // pentagonal faces
+    faces.push_back({grid[1][3], grid[1][2], grid[1][1], v11,     v13 }); // f7
+    faces.push_back({grid[1][1], grid[2][1], grid[2][0], edge[3], v11 }); // f8
+    faces.push_back({grid[1][3], grid[2][3], grid[2][0], edge[3], v13 }); // f9
+    faces.push_back({grid[1][1], grid[0][1], grid[0][0], edge[1], v11 }); // f10
+    faces.push_back({grid[1][3], grid[0][3], grid[0][0], edge[1], v13 }); // f11
+
+    uint off = m.num_faces();
+
+    polys.push_back({ off+0, off+1, off+4,  off+6 });
+    polys.push_back({ off+6, off+2, off+3,  off+5 });
+    polys.push_back({ off+5, off+7, off+8,  off+9,  (uint)f1, (uint)f3, (uint)ftop});
+    polys.push_back({ off+4, off+7, off+10, off+11, (uint)f0, (uint)f2, (uint)fbot});
+}
+
 }

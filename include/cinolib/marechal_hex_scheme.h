@@ -55,8 +55,8 @@ namespace cinolib
  * The code takes as input:
  *
  *  - a generic volumetric mesh (both a non conforming hexmesh and a polyhedral mesh are good)
- *  - a bottom 5x5 grid of mesh vertices
- *  - a top    3x3 grid of mesh vertices
+ *  - a bottom  5x5 grid of mesh vertices
+ *  - a top     3x3 grid of mesh vertices
  *
  * Input grids must be aligned, meaning that bot[0][0] should have top[0][0] above it in the mesh,
  * bot[4][0] should have top[2][0] above it, bot[4][4] should have top[2][2] above it, and so on...
@@ -64,6 +64,24 @@ namespace cinolib
  * The output is a set of polyhedral cells that stay in between the two grids, and realize the
  * necessary grading to connect them in a conforming way. Dualizing these elements only hexahedra
  * are generated (see cinolib::dual_mesh for dualization).
+ *
+ * -------------------------------------------------------------------------------------------
+ *
+ * Besides the main scheme, there two extra schemes that ensure a conforming transition between
+ * refined and unrefined cells that touch at some shared edge.
+ *
+ * Convex edges arise when among the four cells surrounding an edge, only one cell is refined.
+ * The only cell that does not share a face with the refined cell must be split with the function
+ *
+ *     marechal_convex_element
+ *
+ * which inputs
+ *
+ *   - edge[5]      which contains the vertices on the refined edge
+ *   - grid[3][4]   a 2D array that is a planar unfolding of the two hexahedra that touch such edge,
+ *                  such that the zero column contains the vertices of the same edge (only three,
+ *                  because from this side the grid is unrefined), and the other columns are the chains
+ *                  of topologically parallel edges that complete the two hexahedral cells
 */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -86,6 +104,25 @@ void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                     std::vector<std::vector<uint>>    & faces,
                     std::vector<std::vector<uint>>    & polys);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                                   Polyhedralmesh<M,V,E,F,P>         & m_out,
+                             const uint                                edge[5],
+                             const uint                                grid[3][4]);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                             const uint                                edge[5],
+                             const uint                                grid[3][4],
+                                   std::vector<vec3d>                & verts,
+                                   std::vector<std::vector<uint>>    & faces,
+                                   std::vector<std::vector<uint>>    & polys);
 }
 
 
