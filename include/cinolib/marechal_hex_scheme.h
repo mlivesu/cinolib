@@ -54,7 +54,7 @@ namespace cinolib
  *
  * The code takes as input:
  *
- *  - a generic voluemtric mesh (both a non conforming hexmesh and a polyhedral mesh are good)
+ *  - a generic volumetric mesh (both a non conforming hexmesh and a polyhedral mesh are good)
  *  - a bottom 5x5 grid of mesh vertices
  *  - a top    3x3 grid of mesh vertices
  *

@@ -52,7 +52,7 @@ void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 
     for(auto v : verts) m_out.vert_add(v);
     for(auto f : faces) m_out.face_add(f);
-    for(auto p : polys) m_out.poly_add(p, std::vector<bool>(p.size(),true));
+    for(auto p : polys) m_out.poly_add(p, std::vector<bool>(p.size(),true)); // I am ignoring windind
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -115,60 +115,60 @@ void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
     int t11 = m.face_id({top[2][1], top[2][2], top[1][2], top[1][1]}); assert(t11>=0);
 
     // triangular flaps attached to base (from face 0 to face 9)
-    faces.push_back({bot[1][0], bot[2][0], map.at(bot[2][0])});
-    faces.push_back({bot[2][0], bot[3][0], map.at(bot[2][0])});
-    faces.push_back({bot[1][1], bot[2][1], map.at(bot[2][1])});
-    faces.push_back({bot[2][1], bot[3][1], map.at(bot[2][1])});
-    faces.push_back({bot[1][2], bot[2][2], map.at(bot[2][2])});
-    faces.push_back({bot[3][2], bot[2][2], map.at(bot[2][2])});
-    faces.push_back({bot[1][3], bot[2][3], map.at(bot[2][3])});
-    faces.push_back({bot[3][3], bot[2][3], map.at(bot[2][3])});
-    faces.push_back({bot[1][4], bot[2][4], map.at(bot[2][4])});
-    faces.push_back({bot[3][4], bot[2][4], map.at(bot[2][4])});
+    faces.push_back({bot[1][0], bot[2][0], map.at(bot[2][0])}); // f0
+    faces.push_back({bot[2][0], bot[3][0], map.at(bot[2][0])}); // f1
+    faces.push_back({bot[1][1], bot[2][1], map.at(bot[2][1])}); // f2
+    faces.push_back({bot[2][1], bot[3][1], map.at(bot[2][1])}); // f3
+    faces.push_back({bot[1][2], bot[2][2], map.at(bot[2][2])}); // f4
+    faces.push_back({bot[3][2], bot[2][2], map.at(bot[2][2])}); // f5
+    faces.push_back({bot[1][3], bot[2][3], map.at(bot[2][3])}); // f6
+    faces.push_back({bot[3][3], bot[2][3], map.at(bot[2][3])}); // f7
+    faces.push_back({bot[1][4], bot[2][4], map.at(bot[2][4])}); // f8
+    faces.push_back({bot[3][4], bot[2][4], map.at(bot[2][4])}); // f9
 
     // rectangular flaps attached to base (from face 10 to face 13)
-    faces.push_back({bot[2][0], bot[2][1], map.at(bot[2][1]), map.at(bot[2][0])});
-    faces.push_back({bot[2][1], bot[2][2], map.at(bot[2][2]), map.at(bot[2][1])});
-    faces.push_back({bot[2][2], bot[2][3], map.at(bot[2][3]), map.at(bot[2][2])});
-    faces.push_back({bot[2][3], bot[2][4], map.at(bot[2][4]), map.at(bot[2][3])});
+    faces.push_back({bot[2][0], bot[2][1], map.at(bot[2][1]), map.at(bot[2][0])}); // f10
+    faces.push_back({bot[2][1], bot[2][2], map.at(bot[2][2]), map.at(bot[2][1])}); // f11
+    faces.push_back({bot[2][2], bot[2][3], map.at(bot[2][3]), map.at(bot[2][2])}); // f12
+    faces.push_back({bot[2][3], bot[2][4], map.at(bot[2][4]), map.at(bot[2][3])}); // f13
 
     // rectangular lids of the lower prism (from face 14 to face 21)
-    faces.push_back({bot[1][0], bot[1][1], map.at(bot[2][1]), map.at(bot[2][0])});
-    faces.push_back({bot[3][0], bot[3][1], map.at(bot[2][1]), map.at(bot[2][0])});
-    faces.push_back({bot[1][1], bot[1][2], map.at(bot[2][2]), map.at(bot[2][1])});
-    faces.push_back({bot[3][1], bot[3][2], map.at(bot[2][2]), map.at(bot[2][1])});
-    faces.push_back({bot[1][2], bot[1][3], map.at(bot[2][3]), map.at(bot[2][2])});
-    faces.push_back({bot[3][2], bot[3][3], map.at(bot[2][3]), map.at(bot[2][2])});
-    faces.push_back({bot[1][3], bot[1][4], map.at(bot[2][4]), map.at(bot[2][3])});
-    faces.push_back({bot[3][3], bot[3][4], map.at(bot[2][4]), map.at(bot[2][3])});
+    faces.push_back({bot[1][0], bot[1][1], map.at(bot[2][1]), map.at(bot[2][0])}); // f14
+    faces.push_back({bot[3][0], bot[3][1], map.at(bot[2][1]), map.at(bot[2][0])}); // f15
+    faces.push_back({bot[1][1], bot[1][2], map.at(bot[2][2]), map.at(bot[2][1])}); // f16
+    faces.push_back({bot[3][1], bot[3][2], map.at(bot[2][2]), map.at(bot[2][1])}); // f17
+    faces.push_back({bot[1][2], bot[1][3], map.at(bot[2][3]), map.at(bot[2][2])}); // f18
+    faces.push_back({bot[3][2], bot[3][3], map.at(bot[2][3]), map.at(bot[2][2])}); // f19
+    faces.push_back({bot[1][3], bot[1][4], map.at(bot[2][4]), map.at(bot[2][3])}); // f20
+    faces.push_back({bot[3][3], bot[3][4], map.at(bot[2][4]), map.at(bot[2][3])}); // f21
 
     // other internal faces (from face 22 to face 37)
-    faces.push_back({       bot[4][2],         bot[4][3],  map.at(bot[4][2])});
-    faces.push_back({       bot[0][2],         bot[0][3],  map.at(bot[0][2])});
-    faces.push_back({       bot[4][2],         bot[4][1],  map.at(bot[4][2])});
-    faces.push_back({       bot[0][2],         bot[0][1],  map.at(bot[0][2])});
-    faces.push_back({map.at(bot[2][2]), map.at(bot[2][3]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[2][2]), map.at(bot[2][1]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[4][2]), map.at(top[1][1]),        top[1][1],         top[2][1]});
-    faces.push_back({map.at(bot[0][2]), map.at(top[1][1]),        top[1][1],         top[0][1]});
-    faces.push_back({map.at(top[1][1]), map.at(bot[2][3]), map.at(bot[2][4]),        top[1][2],         top[1][1]});
-    faces.push_back({map.at(top[1][1]), map.at(bot[2][1]), map.at(bot[2][0]),        top[1][0],         top[1][1]});
-    faces.push_back({map.at(bot[2][2]),        bot[3][2],         bot[4][2],  map.at(bot[4][2]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[2][3]),        bot[3][3],         bot[4][3],  map.at(bot[4][2]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[2][2]),        bot[1][2],         bot[0][2],  map.at(bot[0][2]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[2][3]),        bot[1][3],         bot[0][3],  map.at(bot[0][2]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[2][1]),        bot[3][1],         bot[4][1],  map.at(bot[4][2]), map.at(top[1][1])});
-    faces.push_back({map.at(bot[2][1]),        bot[1][1],         bot[0][1],  map.at(bot[0][2]), map.at(top[1][1])});
+    faces.push_back({       bot[4][2],         bot[4][3],  map.at(bot[4][2])}); // f22
+    faces.push_back({       bot[0][2],         bot[0][3],  map.at(bot[0][2])}); // f23
+    faces.push_back({       bot[4][2],         bot[4][1],  map.at(bot[4][2])}); // f24
+    faces.push_back({       bot[0][2],         bot[0][1],  map.at(bot[0][2])}); // f25
+    faces.push_back({map.at(bot[2][2]), map.at(bot[2][3]), map.at(top[1][1])}); // f26
+    faces.push_back({map.at(bot[2][2]), map.at(bot[2][1]), map.at(top[1][1])}); // f27
+    faces.push_back({map.at(bot[4][2]), map.at(top[1][1]),        top[1][1],         top[2][1]}); // f28
+    faces.push_back({map.at(bot[0][2]), map.at(top[1][1]),        top[1][1],         top[0][1]}); // f29
+    faces.push_back({map.at(top[1][1]), map.at(bot[2][3]), map.at(bot[2][4]),        top[1][2],         top[1][1]});  // f30
+    faces.push_back({map.at(top[1][1]), map.at(bot[2][1]), map.at(bot[2][0]),        top[1][0],         top[1][1]});  // f31
+    faces.push_back({map.at(bot[2][2]),        bot[3][2],         bot[4][2],  map.at(bot[4][2]), map.at(top[1][1])}); // f32
+    faces.push_back({map.at(bot[2][3]),        bot[3][3],         bot[4][3],  map.at(bot[4][2]), map.at(top[1][1])}); // f33
+    faces.push_back({map.at(bot[2][2]),        bot[1][2],         bot[0][2],  map.at(bot[0][2]), map.at(top[1][1])}); // f34
+    faces.push_back({map.at(bot[2][3]),        bot[1][3],         bot[0][3],  map.at(bot[0][2]), map.at(top[1][1])}); // f35
+    faces.push_back({map.at(bot[2][1]),        bot[3][1],         bot[4][1],  map.at(bot[4][2]), map.at(top[1][1])}); // f36
+    faces.push_back({map.at(bot[2][1]),        bot[1][1],         bot[0][1],  map.at(bot[0][2]), map.at(top[1][1])}); // f37
 
     // lateral faces (excluded exposed faces of triangular prisms) (from face 38 to face 45)
-    faces.push_back({bot[0][0], bot[0][1], map.at(bot[0][2]), top[0][1],        top[0][0]});
-    faces.push_back({bot[0][4], bot[0][3], map.at(bot[0][2]), top[0][1],        top[0][2]});
-    faces.push_back({bot[4][0], bot[4][1], map.at(bot[4][2]), top[2][1],        top[2][0]});
-    faces.push_back({bot[4][4], bot[4][3], map.at(bot[4][2]), top[2][1],        top[2][2]});
-    faces.push_back({bot[1][0], bot[0][0],        top[0][0],  top[1][0], map.at(bot[2][0])});
-    faces.push_back({bot[1][4], bot[0][4],        top[0][2],  top[1][2], map.at(bot[2][4])});
-    faces.push_back({bot[3][0], bot[4][0],        top[2][0],  top[1][0], map.at(bot[2][0])});
-    faces.push_back({bot[3][4], bot[4][4],        top[2][2],  top[1][2], map.at(bot[2][4])});
+    faces.push_back({bot[0][0], bot[0][1], map.at(bot[0][2]), top[0][1],        top[0][0]});  // f38
+    faces.push_back({bot[0][4], bot[0][3], map.at(bot[0][2]), top[0][1],        top[0][2]});  // f39
+    faces.push_back({bot[4][0], bot[4][1], map.at(bot[4][2]), top[2][1],        top[2][0]});  // f40
+    faces.push_back({bot[4][4], bot[4][3], map.at(bot[4][2]), top[2][1],        top[2][2]});  // f41
+    faces.push_back({bot[1][0], bot[0][0],        top[0][0],  top[1][0], map.at(bot[2][0])}); // f42
+    faces.push_back({bot[1][4], bot[0][4],        top[0][2],  top[1][2], map.at(bot[2][4])}); // f43
+    faces.push_back({bot[3][0], bot[4][0],        top[2][0],  top[1][0], map.at(bot[2][0])}); // f44
+    faces.push_back({bot[3][4], bot[4][4],        top[2][2],  top[1][2], map.at(bot[2][4])}); // f45
 
     uint off = m.num_faces();
 
