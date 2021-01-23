@@ -72,8 +72,8 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                     Polyhedralmesh<>                  & m_out,
-              uint                                      bot[5][5],
-              uint                                      top[3][3]);
+              const uint                                bot[5][5],
+              const uint                                top[3][3]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
