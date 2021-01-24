@@ -198,7 +198,7 @@ void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
-                                   Polyhedralmesh<M,V,E,F,P>         & m_out,
+                                   Polyhedralmesh<M,V,E,F,P>         & m_out,                             
                              const uint                                edge[5],
                              const uint                                grid[3][4])
 {
@@ -218,7 +218,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                              const uint                                edge[5],
-                             const uint                                grid[3][4],
+                             const uint                                grid[3][4],                             
                                    std::vector<vec3d>                & verts,
                                    std::vector<std::vector<uint>>    & faces,
                                    std::vector<std::vector<uint>>    & polys)
@@ -266,6 +266,158 @@ void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
     polys.push_back({ off+6, off+2, off+3,  off+5 });
     polys.push_back({ off+5, off+7, off+8,  off+9,  (uint)f1, (uint)f3, (uint)ftop});
     polys.push_back({ off+4, off+7, off+10, off+11, (uint)f0, (uint)f2, (uint)fbot});
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_concave_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                                    Polyhedralmesh<M,V,E,F,P>         & m_out,
+                              const uint                                grid[5][5],
+                              const uint                                edge[3])
+{
+    std::vector<vec3d> verts;
+    std::vector<std::vector<uint>> faces;
+    std::vector<std::vector<uint>> polys;
+    marechal_concave_element(m, grid, edge, verts, faces, polys);
+
+    for(auto v : verts) m_out.vert_add(v);
+    for(auto f : faces) m_out.face_add(f);
+    for(auto p : polys) m_out.poly_add(p, std::vector<bool>(p.size(),true)); // I am ignoring windind
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_concave_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                              const uint                                grid[5][5],
+                              const uint                                edge[3],
+                                    std::vector<vec3d>                & verts,
+                                    std::vector<std::vector<uint>>    & faces,
+                                    std::vector<std::vector<uint>>    & polys)
+{
+    // create inner points
+    vec3d up0 = (m.vert(edge[0]) - m.vert(grid[0][0]))*0.5;
+    vec3d up1 = (m.vert(edge[0]) - m.vert(grid[0][4]))*0.5;
+    verts.push_back(m.vert(grid[2][0]) + up0*0.6);
+    verts.push_back(m.vert(grid[2][1]) + up0*0.6);
+    verts.push_back(m.vert(grid[2][3]) + up1*0.6);
+    verts.push_back(m.vert(grid[2][4]) + up1*0.6);
+    verts.push_back(m.vert(grid[2][0]) + up0);
+    verts.push_back(m.vert(grid[2][4]) + up1);
+    verts.push_back(m.vert(grid[0][0]) + up0*0.6);
+    verts.push_back(m.vert(grid[4][0]) + up0*0.6);
+    verts.push_back(m.vert(grid[0][4]) + up1*0.6);
+    verts.push_back(m.vert(grid[4][4]) + up1*0.6);
+    //
+    std::map<uint,uint> map;
+    uint v_off = m.num_verts();
+    uint above_map_of_g20 = grid[1][0]; // just a unique number to identify the second vert above g[2][0]
+    uint above_map_of_g24 = grid[1][4]; // just a unique number to identify the second vert above g[2][4]
+    map[grid[2][0]] = v_off;
+    map[grid[2][1]] = v_off+1;
+    map[grid[2][3]] = v_off+2;
+    map[grid[2][4]] = v_off+3;
+    map[above_map_of_g20] = v_off+4;
+    map[above_map_of_g24] = v_off+5;
+    map[grid[0][0]] = v_off+6;
+    map[grid[4][0]] = v_off+7;
+    map[grid[0][4]] = v_off+8;
+    map[grid[4][4]] = v_off+9;
+
+    // THESE ARE ASSUMED TO BE ALREADY IN THE INPUT MESH
+    int f00 = m.face_id({grid[0][0], grid[0][1], grid[1][1], grid[1][0]}); assert(f00>=0);
+    int f01 = m.face_id({grid[1][1], grid[0][1], grid[0][2], grid[1][2]}); assert(f01>=0);
+    int f02 = m.face_id({grid[1][2], grid[0][2], grid[0][3], grid[1][3]}); assert(f02>=0);
+    int f03 = m.face_id({grid[1][3], grid[0][3], grid[0][4], grid[1][4]}); assert(f03>=0);
+    int f10 = m.face_id({grid[1][0], grid[1][1], grid[2][1], grid[2][0]}); assert(f10>=0);
+    int f11 = m.face_id({grid[2][1], grid[1][1], grid[1][2], grid[2][2]}); assert(f11>=0);
+    int f12 = m.face_id({grid[2][2], grid[1][2], grid[1][3], grid[2][3]}); assert(f12>=0);
+    int f13 = m.face_id({grid[2][3], grid[1][3], grid[1][4], grid[2][4]}); assert(f13>=0);
+    int f20 = m.face_id({grid[3][0], grid[2][0], grid[2][1], grid[3][1]}); assert(f20>=0);
+    int f21 = m.face_id({grid[3][1], grid[2][1], grid[2][2], grid[3][2]}); assert(f21>=0);
+    int f22 = m.face_id({grid[3][2], grid[2][2], grid[2][3], grid[3][3]}); assert(f22>=0);
+    int f23 = m.face_id({grid[3][3], grid[2][3], grid[2][4], grid[3][4]}); assert(f23>=0);
+    int f30 = m.face_id({grid[4][0], grid[3][0], grid[3][1], grid[4][1]}); assert(f30>=0);
+    int f31 = m.face_id({grid[3][1], grid[3][2], grid[4][2], grid[4][1]}); assert(f31>=0);
+    int f32 = m.face_id({grid[4][2], grid[3][2], grid[3][3], grid[4][3]}); assert(f32>=0);
+    int f33 = m.face_id({grid[4][3], grid[3][3], grid[3][4], grid[4][4]}); assert(f33>=0);
+
+    // triangular flaps attached to background grid
+    faces.push_back({grid[1][0], grid[2][0], map.at(grid[2][0])}); // f0
+    faces.push_back({grid[2][0], grid[3][0], map.at(grid[2][0])}); // f1
+    faces.push_back({grid[1][1], grid[2][1], map.at(grid[2][1])}); // f2
+    faces.push_back({grid[2][1], grid[3][1], map.at(grid[2][1])}); // f3
+    faces.push_back({grid[1][3], grid[2][3], map.at(grid[2][3])}); // f4
+    faces.push_back({grid[3][3], grid[2][3], map.at(grid[2][3])}); // f5
+    faces.push_back({grid[1][4], grid[2][4], map.at(grid[2][4])}); // f6
+    faces.push_back({grid[3][4], grid[2][4], map.at(grid[2][4])}); // f7
+    faces.push_back({grid[0][0], grid[0][1], map.at(grid[0][0])}); // f8
+    faces.push_back({grid[4][0], grid[4][1], map.at(grid[4][0])}); // f9
+    faces.push_back({grid[0][4], grid[0][3], map.at(grid[0][4])}); // f10
+    faces.push_back({grid[4][4], grid[4][3], map.at(grid[4][4])}); // f11
+
+    // rectangular flaps attached to base (from face 10 to face 13)
+    faces.push_back({grid[2][0], grid[2][1], map.at(grid[2][1]), map.at(grid[2][0])}); // f12
+    faces.push_back({grid[2][3], grid[2][4], map.at(grid[2][4]), map.at(grid[2][3])}); // f13
+
+    // rectangular lids of the lower prism (from face 14 to face 21)
+    faces.push_back({grid[1][0], grid[1][1], map.at(grid[2][1]), map.at(grid[2][0])}); // f14
+    faces.push_back({grid[3][0], grid[3][1], map.at(grid[2][1]), map.at(grid[2][0])}); // f15
+    faces.push_back({grid[1][3], grid[1][4], map.at(grid[2][4]), map.at(grid[2][3])}); // f16
+    faces.push_back({grid[3][3], grid[3][4], map.at(grid[2][4]), map.at(grid[2][3])}); // f17
+
+    // triangular flaps internal to the higher prisms
+    faces.push_back({map.at(grid[2][0]), map.at(grid[2][1]), map.at(above_map_of_g20)}); // f18
+    faces.push_back({map.at(grid[2][4]), map.at(grid[2][3]), map.at(above_map_of_g24)}); // f19
+
+    // pentagonal lids in the lower prisms merged at the concavity
+    faces.push_back({map.at(grid[2][3]), map.at(grid[2][1]), grid[2][1], grid[2][2], grid[2][3] }); // f20
+    faces.push_back({map.at(grid[2][3]), map.at(grid[2][1]), grid[1][1], grid[1][2], grid[1][3] }); // f21
+    faces.push_back({map.at(grid[2][3]), map.at(grid[2][1]), grid[3][1], grid[3][2], grid[3][3] }); // f22
+    faces.push_back({map.at(grid[2][3]), map.at(grid[2][1]), map.at(above_map_of_g20), edge[1], map.at(above_map_of_g24) }); // f23
+
+    // lids of the upper prisms
+    faces.push_back({map.at(grid[0][0]), grid[0][1], grid[1][1], map.at(grid[2][1]), map.at(above_map_of_g20)}); // f24
+    faces.push_back({map.at(grid[4][0]), grid[4][1], grid[3][1], map.at(grid[2][1]), map.at(above_map_of_g20)}); // f25
+    faces.push_back({map.at(grid[0][4]), grid[0][3], grid[1][3], map.at(grid[2][3]), map.at(above_map_of_g24)}); // f26
+    faces.push_back({map.at(grid[4][4]), grid[4][3], grid[3][3], map.at(grid[2][3]), map.at(above_map_of_g24)}); // f27
+
+    // lateral faces (excluded triangular lids of the inner prisms)
+    faces.push_back({grid[0][0], map.at(grid[0][0]), map.at(above_map_of_g20), map.at(grid[2][0]), grid[1][0] }); // f28
+    faces.push_back({grid[4][0], map.at(grid[4][0]), map.at(above_map_of_g20), map.at(grid[2][0]), grid[3][0] }); // f29
+    faces.push_back({grid[4][4], map.at(grid[4][4]), map.at(above_map_of_g24), map.at(grid[2][4]), grid[3][4] }); // f30
+    faces.push_back({grid[0][4], map.at(grid[0][4]), map.at(above_map_of_g24), map.at(grid[2][4]), grid[1][4] }); // f31
+    faces.push_back({map.at(above_map_of_g20), map.at(grid[0][0]), edge[0], edge[1]}); // f32
+    faces.push_back({map.at(above_map_of_g20), map.at(grid[4][0]), edge[2], edge[1]}); // f33
+    faces.push_back({map.at(above_map_of_g24), map.at(grid[0][4]), edge[0], edge[1]}); // f34
+    faces.push_back({map.at(above_map_of_g24), map.at(grid[4][4]), edge[2], edge[1]}); // f35
+
+    // top and bottom lids (excluded triangular lids of the inner prisms)
+    faces.push_back({map.at(grid[0][0]), grid[0][1], grid[0][2], grid[0][3], map.at(grid[0][4]), edge[0]}); // f36
+    faces.push_back({map.at(grid[4][0]), grid[4][1], grid[4][2], grid[4][3], map.at(grid[4][4]), edge[2]}); // f37
+
+    uint off = m.num_faces();
+
+    // lower prism
+    polys.push_back({ (uint)f10, off+0, off+2, off+12, off+14 });
+    polys.push_back({ (uint)f20, off+1, off+3, off+12, off+15 });
+    polys.push_back({ (uint)f11, (uint)f12, off+2, off+4, off+20, off+21 });
+    polys.push_back({ (uint)f21, (uint)f22, off+3, off+5, off+20, off+22 });
+    polys.push_back({ (uint)f13, off+4, off+6, off+13, off+16 });
+    polys.push_back({ (uint)f23, off+5, off+7, off+13, off+17 });
+
+    // upper prism
+    polys.push_back({ (uint)f00, off+28, off+14, off+18, off+ 8, off+24 });
+    polys.push_back({ (uint)f30, off+29, off+15, off+18, off+ 9, off+25 });
+    polys.push_back({ (uint)f03, off+31, off+16, off+19, off+10, off+26 });
+    polys.push_back({ (uint)f33, off+30, off+17, off+19, off+11, off+27 });
+
+    // lid elements
+    polys.push_back( {(uint)f01, (uint)f02, off+24, off+26, off+32, off+34, off+36, off+23, off+21});
+    polys.push_back( {(uint)f31, (uint)f32, off+25, off+27, off+33, off+35, off+37, off+23, off+22});
 }
 
 }

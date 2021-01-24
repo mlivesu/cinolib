@@ -82,6 +82,18 @@ namespace cinolib
  *                  such that the zero column contains the vertices of the same edge (only three,
  *                  because from this side the grid is unrefined), and the other columns are the chains
  *                  of topologically parallel edges that complete the two hexahedral cells
+ *
+ * Concave edges arise when among the four cells surrounding an edge, three are refined.
+ * The only cell that is not refined must be split with the function
+ *
+ *     marechal_concave_element
+ *
+ * which inputs
+ *
+ *   - grid[5][5]   a 2D array that is a planar unfolding of the two 4x2 columns of quads at the
+ *                  two sides of a concave edge.
+ *   - edge[3]      which contains the vertices on the unrefined edge opposite to the concave edge
+ *
 */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -123,6 +135,26 @@ void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                                    std::vector<vec3d>                & verts,
                                    std::vector<std::vector<uint>>    & faces,
                                    std::vector<std::vector<uint>>    & polys);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_concave_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                                    Polyhedralmesh<M,V,E,F,P>         & m_out,
+                              const uint                                grid[5][5],
+                              const uint                                edge[3]);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_concave_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                              const uint                                grid[5][5],
+                              const uint                                edge[3],
+                                    std::vector<vec3d>                & verts,
+                                    std::vector<std::vector<uint>>    & faces,
+                                    std::vector<std::vector<uint>>    & polys);
 }
 
 
