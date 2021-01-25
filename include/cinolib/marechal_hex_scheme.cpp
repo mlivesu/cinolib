@@ -420,4 +420,132 @@ void marechal_concave_edge(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
     polys.push_back( {(uint)f31, (uint)f32, off+25, off+27, off+33, off+35, off+37, off+23, off+22});
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_concave_corner(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                                   Polyhedralmesh<M,V,E,F,P>         & m_out,
+                             const uint                                lef[3][3],
+                             const uint                                rig[3][3],
+                             const uint                                bot[3][3],
+                             const uint                                opp)
+{
+    std::vector<vec3d> verts;
+    std::vector<std::vector<uint>> faces;
+    std::vector<std::vector<uint>> polys;
+    marechal_concave_corner(m, lef, rig, bot, opp, verts, faces, polys);
+
+    for(auto v : verts) m_out.vert_add(v);
+    for(auto f : faces) m_out.face_add(f);
+    for(auto p : polys) m_out.poly_add(p, std::vector<bool>(p.size(),true)); // I am ignoring windind
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_concave_corner(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                             const uint                                lef[3][3],
+                             const uint                                rig[3][3],
+                             const uint                                bot[3][3],
+                             const uint                                opp,
+                                   std::vector<vec3d>                & verts,
+                                   std::vector<std::vector<uint>>    & faces,
+                                   std::vector<std::vector<uint>>    & polys)
+{
+    // create inner points
+    vec3d l_up = (m.vert(rig[0][2]) - m.vert(rig[0][0]))*0.5;
+    vec3d r_up = (m.vert(lef[0][0]) - m.vert(lef[0][2]))*0.5;
+    vec3d b_up = (m.vert(lef[2][0]) - m.vert(lef[0][0]))*0.5;
+    verts.push_back(m.vert(lef[2][0]) + l_up*0.6);
+    verts.push_back(m.vert(lef[2][0]) + l_up);
+    verts.push_back(m.vert(bot[2][0]) + b_up*0.6);
+    verts.push_back(m.vert(bot[2][0]) + b_up);
+    verts.push_back(m.vert(rig[2][2]) + r_up*0.6);
+    verts.push_back(m.vert(rig[2][2]) + r_up);
+    verts.push_back(m.vert(lef[1][0]) + l_up*0.6);
+    verts.push_back(m.vert(bot[2][1]) + b_up*0.6);
+    verts.push_back(m.vert(rig[2][1]) + r_up*0.6);
+    //
+    uint v_off = m.num_verts();
+    uint above_l20_once  = v_off;
+    uint above_l20_twice = v_off+1;
+    uint above_b20_once  = v_off+2;
+    uint above_b20_twice = v_off+3;
+    uint above_r22_once  = v_off+4;
+    uint above_r22_twice = v_off+5;
+    uint above_l10       = v_off+6;
+    uint above_b21       = v_off+7;
+    uint above_r21       = v_off+8;
+
+    int l00 = m.face_id({lef[0][0], lef[0][1], lef[1][1], lef[1][0]}); assert(l00>=0);
+    int l01 = m.face_id({lef[1][1], lef[0][1], lef[0][2], lef[1][2]}); assert(l01>=0);
+    int l10 = m.face_id({lef[1][0], lef[1][1], lef[2][1], lef[2][0]}); assert(l10>=0);
+    int l11 = m.face_id({lef[2][1], lef[1][1], lef[1][2], lef[2][2]}); assert(l11>=0);
+
+    int r00 = m.face_id({rig[0][0], rig[0][1], rig[1][1], rig[1][0]}); assert(r00>=0);
+    int r01 = m.face_id({rig[1][1], rig[0][1], rig[0][2], rig[1][2]}); assert(r01>=0);
+    int r10 = m.face_id({rig[1][0], rig[1][1], rig[2][1], rig[2][0]}); assert(r10>=0);
+    int r11 = m.face_id({rig[2][1], rig[1][1], rig[1][2], rig[2][2]}); assert(r11>=0);
+
+    int b00 = m.face_id({bot[0][0], bot[0][1], bot[1][1], bot[1][0]}); assert(b00>=0);
+    int b01 = m.face_id({bot[1][1], bot[0][1], bot[0][2], bot[1][2]}); assert(b01>=0);
+    int b10 = m.face_id({bot[1][0], bot[1][1], bot[2][1], bot[2][0]}); assert(b10>=0);
+    int b11 = m.face_id({bot[2][1], bot[1][1], bot[1][2], bot[2][2]}); assert(b11>=0);
+
+    // rectangular flaps attached to basis
+    faces.push_back({ lef[1][0], above_l10, above_l20_once, lef[2][0] }); // f0
+    faces.push_back({ bot[2][0], above_b20_once, above_b21, bot[2][1] }); // f1
+    faces.push_back({ rig[2][2], above_r22_once, above_r21, rig[2][1] }); // f2
+
+    // triangular flaps attached to basis
+    faces.push_back({ lef[1][0], above_l10,      lef[1][1] }); // f3
+    faces.push_back({ lef[2][0], above_l20_once, lef[2][1] }); // f4
+    faces.push_back({ bot[1][1], above_b21,      bot[2][1] }); // f5
+    faces.push_back({ bot[2][0], above_b20_once, bot[1][0] }); // f6
+    faces.push_back({ rig[1][1], above_r21,      rig[2][1] }); // f7
+    faces.push_back({ rig[1][2], above_r22_once, rig[2][2] }); // f8
+
+    // rectangular lids of lower prisms
+    faces.push_back({ lef[2][1], above_l20_once, above_l10, lef[1][1] }); // f9
+    faces.push_back({ bot[1][0], above_b20_once, above_b21, bot[1][1] }); // f10
+    faces.push_back({ rig[1][2], above_r22_once, above_r21, rig[1][1] }); // f11
+
+    // triangular flaps for higher prisms
+    faces.push_back({ above_l20_once, above_l20_twice, above_l10 }); // f12
+    faces.push_back({ above_b20_once, above_b20_twice, above_b21 }); // f13
+    faces.push_back({ above_r22_once, above_r22_twice, above_r21 }); // f14
+
+    // hexagon lids
+    faces.push_back({ above_l20_twice, above_l20_once, lef[2][1], lef[2][2], rig[2][1], above_r21 }); // f15
+    faces.push_back({ above_b20_twice, above_b20_once, bot[1][0], bot[0][0], lef[1][0], above_l10 }); // f16
+    faces.push_back({ above_r22_twice, above_r22_once, rig[1][2], rig[0][2], bot[2][1], above_b21 }); // f17
+
+    // quadrilateral lids
+    faces.push_back({ above_l20_twice, opp, above_r22_twice, above_r21 }); // f18
+    faces.push_back({ above_l20_twice, opp, above_b20_twice, above_l10 }); // f19
+    faces.push_back({ above_b20_twice, opp, above_r22_twice, above_b21 }); // f20
+
+    // weird internal hexagons
+    faces.push_back({ above_l10, lef[1][1], lef[0][1], bot[1][1], above_b21, above_b20_twice }); // f21
+    faces.push_back({ above_b21, bot[1][1], rig[0][1], rig[1][1], above_r21, above_r22_twice }); // f22
+    faces.push_back({ above_r21, rig[1][1], rig[1][0], lef[1][1], above_l10, above_l20_twice }); // f23
+
+    uint off = m.num_faces();
+
+    // lower prisms
+    polys.push_back({ (uint)l10, off+0, off+3, off+4, off+9  }); // l lower prism
+    polys.push_back({ (uint)b10, off+1, off+5, off+6, off+10 }); // b lower prism
+    polys.push_back({ (uint)r11, off+2, off+7, off+8, off+11 }); // r lower prism
+
+    // weird elements
+    polys.push_back({ (uint)l11, (uint)r10, off+12, off+23, off+ 9, off+7, off+15 });
+    polys.push_back({ (uint)l00, (uint)b00, off+13, off+21, off+10, off+3, off+16 });
+    polys.push_back({ (uint)r01, (uint)b11, off+14, off+22, off+11, off+5, off+17 });
+
+    // pass through element
+    polys.push_back({ (uint)l01, (uint)r00, (uint)b01, off+21, off+22, off+23, off+18, off+19, off+20 });
+}
+
 }

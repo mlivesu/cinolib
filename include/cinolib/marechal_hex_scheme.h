@@ -155,8 +155,31 @@ void marechal_concave_edge(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                                  std::vector<vec3d>                & verts,
                                  std::vector<std::vector<uint>>    & faces,
                                  std::vector<std::vector<uint>>    & polys);
-}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_concave_corner(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                                   Polyhedralmesh<M,V,E,F,P>         & m_out,
+                             const uint                                lef[3][3],
+                             const uint                                rig[3][3],
+                             const uint                                bot[3][3],
+                             const uint                                opp);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void marechal_concave_corner(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                             const uint                                lef[3][3],
+                             const uint                                rig[3][3],
+                             const uint                                bot[3][3],
+                             const uint                                opp,
+                                   std::vector<vec3d>                & verts,
+                                   std::vector<std::vector<uint>>    & faces,
+                                   std::vector<std::vector<uint>>    & polys);
+}
 
 #ifndef  CINO_STATIC_LIB
 #include "marechal_hex_scheme.cpp"
