@@ -224,7 +224,7 @@ namespace HalfFlat
 // 4x2 to 2x1 frustum
 static const std::vector<double> verts =
 {
-    0.5  , 0.5  , 0.5  ,
+    0.5  , 0.5  , 0.5  , // v0 -> center of the 4x4 grid of which this scheme is one half. Useful to position the scheme in the target mesh
     0.5  , 0.5  , 0    ,
     0    , 0.5  , 0.25 ,
     0.25 , 0.5  , 1    ,
