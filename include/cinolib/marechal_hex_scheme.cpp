@@ -197,10 +197,10 @@ void marechal(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
-                                   Polyhedralmesh<M,V,E,F,P>         & m_out,                             
-                             const uint                                edge[5],
-                             const uint                                grid[3][4])
+void marechal_convex_edge(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                                Polyhedralmesh<M,V,E,F,P>         & m_out,
+                          const uint                                edge[5],
+                          const uint                                grid[3][4])
 {
     std::vector<vec3d> verts;
     std::vector<std::vector<uint>> faces;
@@ -216,12 +216,12 @@ void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
-                             const uint                                edge[5],
-                             const uint                                grid[3][4],                             
-                                   std::vector<vec3d>                & verts,
-                                   std::vector<std::vector<uint>>    & faces,
-                                   std::vector<std::vector<uint>>    & polys)
+void marechal_convex_edge(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                          const uint                                edge[5],
+                          const uint                                grid[3][4],
+                                std::vector<vec3d>                & verts,
+                                std::vector<std::vector<uint>>    & faces,
+                                std::vector<std::vector<uint>>    & polys)
 {
     assert(edge[0] == grid[0][0]);
     assert(edge[2] == grid[1][0]);
@@ -272,10 +272,10 @@ void marechal_convex_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void marechal_concave_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
-                                    Polyhedralmesh<M,V,E,F,P>         & m_out,
-                              const uint                                grid[5][5],
-                              const uint                                edge[3])
+void marechal_concave_edge(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                                 Polyhedralmesh<M,V,E,F,P>         & m_out,
+                           const uint                                grid[5][5],
+                           const uint                                edge[3])
 {
     std::vector<vec3d> verts;
     std::vector<std::vector<uint>> faces;
@@ -291,12 +291,12 @@ void marechal_concave_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void marechal_concave_element(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
-                              const uint                                grid[5][5],
-                              const uint                                edge[3],
-                                    std::vector<vec3d>                & verts,
-                                    std::vector<std::vector<uint>>    & faces,
-                                    std::vector<std::vector<uint>>    & polys)
+void marechal_concave_edge(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
+                           const uint                                grid[5][5],
+                           const uint                                edge[3],
+                                 std::vector<vec3d>                & verts,
+                                 std::vector<std::vector<uint>>    & faces,
+                                 std::vector<std::vector<uint>>    & polys)
 {
     // create inner points
     vec3d up0 = (m.vert(edge[0]) - m.vert(grid[0][0]))*0.5;
