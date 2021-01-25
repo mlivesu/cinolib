@@ -219,7 +219,7 @@ static const std::vector<std::vector<bool>> winding =
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-namespace HalfFlat
+namespace Half_Flat
 {
 
 // 4x2 to 2x1 frustum
@@ -256,6 +256,7 @@ static const std::vector<double> verts =
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// 4x2 to 2x1 frustum
 static const std::vector<std::vector<uint>> faces =
 {
     { 16 ,  3 , 20 , 22      },
@@ -298,6 +299,7 @@ static const std::vector<std::vector<uint>> faces =
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// 4x2 to 2x1 frustum
 static const std::vector<std::vector<uint>> polys =
 {
     { 20 , 22 , 30 , 34 ,  4                 },
@@ -310,7 +312,6 @@ static const std::vector<std::vector<uint>> polys =
     { 35 , 27 , 28 , 17 , 11 , 29 , 18 , 12  },
 
 };
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -405,6 +406,67 @@ static const std::vector<std::vector<bool>> winding =
     { true, true, true, true, true, true, true },
 };
 } // namespace ConvexEdge
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+namespace Half_ConvexEdge
+{
+
+// 2 to 1 convex edge
+static const std::vector<double> verts =
+{
+    0.5  , 0.5  , 1    ,
+    0    , 0    , 0.5  ,
+    0.5  , 0.5  , 0.75 ,
+    0    , 0    , 1    ,
+    0.5  , 0    , 0.5  ,
+    0    , 0.5  , 0.5  ,
+    0.5  , 0.5  , 0.5  ,
+    0.5  , 0    , 1    ,
+    0    , 0.5  , 1    ,
+    0.25 , 0.5  , 1    ,
+    0.5  , 0.25 , 1
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// 2 to 1 convex edge
+static const std::vector<std::vector<uint>> faces =
+{
+    { 6 ,  4 ,  7 , 10 ,  2 },
+    { 7 ,  4 ,  1 ,  3      },
+    { 7 ,  3 ,  8 ,  9 , 10 },
+    { 4 ,  6 ,  5 ,  1      },
+    { 8 ,  3 ,  1 ,  5      },
+    { 6 ,  5 ,  8 ,  9 ,  2 },
+    { 0 , 10 ,  2           },
+    { 9 , 10 ,  2           },
+    { 9 ,  0 , 10           },
+    { 9 ,  0 ,  2           },
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// 2 to 1 convex edge
+static const std::vector<std::vector<uint>> polys =
+{
+    { 7 , 0 , 2 , 5 , 1 , 3 , 4 },
+    { 6 , 8 , 9 , 7             },
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// 2 to 1 convex edge
+static const std::vector<std::vector<bool>> winding =
+{
+    { true, true, true, true, true, true, true },
+    { true, true, true, true                   },
+};
+
+} // namespace Half_ConvexEdge
 
 } // namespace HexTransitions
 } // namespace cinolib
