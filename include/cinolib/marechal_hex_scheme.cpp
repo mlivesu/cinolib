@@ -548,4 +548,6 @@ void marechal_concave_corner(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
     polys.push_back({ (uint)l01, (uint)r00, (uint)b01, off+21, off+22, off+23, off+18, off+19, off+20 });
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 }
