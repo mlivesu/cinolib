@@ -191,21 +191,21 @@ static const std::vector<std::vector<uint>> polys =
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// 4x4 to 2x2 frustum  TODO
+// 4x4 to 2x2 frustum -> TODO
 static const std::vector<std::vector<bool>> winding =
 {
-    {                   true, true, true, true, true },
-    {                   true, true, true, true, true },
-    {                   true, true, true, true, true },
-    {                   true, true, true, true, true },
-    {                   true, true, true, true, true },
-    {                   true, true, true, true, true },
-    {                   true, true, true, true, true },
-    {                   true, true, true, true, true },
-    {             true, true, true, true, true, true },
-    {             true, true, true, true, true, true },
-    {             true, true, true, true, true, true },
-    {             true, true, true, true, true, true },
+    { true, true, true, true, true                   },
+    { true, true, true, true, true                   },
+    { true, true, true, true, true                   },
+    { true, true, true, true, true                   },
+    { true, true, true, true, true                   },
+    { true, true, true, true, true                   },
+    { true, true, true, true, true                   },
+    { true, true, true, true, true                   },
+    { true, true, true, true, true, true             },
+    { true, true, true, true, true, true             },
+    { true, true, true, true, true, true             },
+    { true, true, true, true, true, true             },
     { true, true, true, true, true, true, true, true },
     { true, true, true, true, true, true, true, true },
     { true, true, true, true, true, true, true, true },
@@ -213,6 +213,121 @@ static const std::vector<std::vector<bool>> winding =
 };
 
 } // Flat
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+namespace HalfFlat
+{
+
+// 4x2 to 2x1 frustum
+static const std::vector<double> verts =
+{
+    0.5  , 0.5  , 0.5  ,
+    0.5  , 0.5  , 0    ,
+    0    , 0.5  , 0.25 ,
+    0.25 , 0.5  , 1    ,
+    0.5  , 1    , 0    ,
+    0.5  , 1    , 0.5  ,
+    0.5  , 0.75 , 1    ,
+    0    , 0.75 , 0.5  ,
+    0    , 0.5  , 0    ,
+    0    , 0.5  , 0.5  ,
+    0    , 1    , 0    ,
+    0    , 1    , 0.5  ,
+    0.5  , 0.5  , 1    ,
+    0.25 , 0.5  , 0.5  ,
+    0.5  , 1    , 1    ,
+    0.25 , 0.65 , 0.5  ,
+    0    , 0.5  , 1    ,
+    0    , 1    , 1    ,
+    0.5  , 0.65 , 0.5  ,
+    0.25 , 0.5  , 0    ,
+    0.25 , 0.5  , 0.75 ,
+    0.5  , 0.5  , 0.75 ,
+    0    , 0.5  , 0.75 ,
+    0.25 , 0.5  , 0.25 ,
+    0.5  , 0.75 , 0.5  ,
+    0.5  , 0.75 , 0    ,
+    0.5  , 0.5  , 0.25
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const std::vector<std::vector<uint>> faces =
+{
+    { 16 ,  3 , 20 , 22      },
+    { 20 ,  3 , 12 , 21      },
+    { 18 , 15 , 24           },
+    { 22 , 16 , 17 , 11 , 7  },
+    { 22 , 20 , 13 ,  9      },
+    { 13 , 20 , 21 ,  0      },
+    { 20 , 21 , 18 , 15      },
+    { 18 , 21 , 12 ,  6 , 24 },
+    {  2 ,  9 , 13 , 23      },
+    { 23 , 13 ,  0 , 26      },
+    { 12 ,  3 ,  6           },
+    {  8 , 19 , 25 ,  4 , 10 },
+    {  8 ,  2 , 23 , 19      },
+    { 23 , 26 ,  1 , 19      },
+    { 23 , 26 , 18 , 15      },
+    { 15 , 20 ,  3 ,  6 , 24 },
+    { 16 ,  3 ,  6 , 14 , 17 },
+    {  2 ,  8 , 10 , 11 ,  7 },
+    {  4 , 10 , 11 ,  5      },
+    { 14 , 17 , 11 ,  5      },
+    { 22 ,  9 ,  7           },
+    {  9 ,  2 ,  7           },
+    { 20 , 13 , 15           },
+    { 13 , 23 , 15           },
+    { 21 ,  0 , 18           },
+    { 26 ,  0 , 18           },
+    {  1 , 19 , 25           },
+    { 15 , 23 , 19 , 25 , 24 },
+    { 25 , 24 ,  5 ,  4      },
+    { 24 , 15 ,  7 , 11 ,  5 },
+    {  9 , 13 , 15 ,  7      },
+    { 13 ,  0 , 18 , 15      },
+    {  6 , 24 ,  5 , 14      },
+    { 18 , 26 ,  1 , 25 , 24 },
+    { 22 , 20 , 15 ,  7      },
+    {  2 , 23 , 15 ,  7      },
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const std::vector<std::vector<uint>> polys =
+{
+    { 20 , 22 , 30 , 34 ,  4                 },
+    { 21 , 23 , 30 , 35 ,  8                 },
+    { 22 , 24 , 31 ,  6 ,  5                 },
+    { 23 , 25 , 31 , 14 ,  9                 },
+    {  6 ,  2 ,  7 , 10 , 15 ,  1            },
+    { 14 , 33 , 26 , 27 ,  2 , 13            },
+    { 34 , 15 , 32 , 29 ,  3 , 16 , 19 ,  0  },
+    { 35 , 27 , 28 , 17 , 11 , 29 , 18 , 12  },
+
+};
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// 4x4 to 2x2 frustum -> TODO
+static const std::vector<std::vector<bool>> winding =
+{
+    { true, true, true, true, true                   },
+    { true, true, true, true, true                   },
+    { true, true, true, true, true                   },
+    { true, true, true, true, true                   },
+    { true, true, true, true, true, true             },
+    { true, true, true, true, true, true             },
+    { true, true, true, true, true, true, true, true },
+    { true, true, true, true, true, true, true, true },
+};
+
+} // Half_Flat
+
 } // namespace HexTransitions
 } // namespace cinolib
 
