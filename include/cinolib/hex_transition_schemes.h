@@ -46,6 +46,7 @@ namespace HexTransitions
 
 namespace Flat
 {
+
 // 4x4 to 2x2 frustum
 static const std::vector<double> verts =
 {
@@ -327,6 +328,83 @@ static const std::vector<std::vector<bool>> winding =
 };
 
 } // Half_Flat
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+namespace ConvexEdge
+{
+
+// 4 to 2 convex edge
+static const std::vector<double> verts =
+{
+    0.5  , 0.5  , 1    ,
+    0    , 0    , 0.5  ,
+    1    , 0.5  , 1    ,
+    0    , 0    , 1    ,
+    0.5  , 0    , 0.5  ,
+    0    , 0.5  , 0.5  ,
+    0.5  , 0.5  , 0.5  ,
+    0.5  , 0    , 1    ,
+    0    , 0.5  , 1    ,
+    1    , 0    , 0.5  ,
+    1    , 0.5  , 0.5  ,
+    1    , 0    , 1    ,
+    0.75 , 0.5  , 1    ,
+    0.25 , 0.5  , 1    ,
+    0.5  , 0.25 , 1    ,
+    0.5  , 0.5  , 0.75
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// 4 to 2 convex edge
+static const std::vector<std::vector<uint>> faces =
+{
+    { 11 ,  9 ,  4 ,  7       },
+    {  7 ,  4 ,  1 ,  3       },
+    {  9 , 10 ,  6 ,  4       },
+    {  4 ,  6 ,  5 ,  1       },
+    {  8 ,  3 ,  1 ,  5       },
+    {  2 , 11 ,  9 , 10       },
+    { 12 ,  0 , 14            },
+    { 12 ,  0 , 15            },
+    { 13 ,  0 , 14            },
+    { 13 ,  0 , 15            },
+    { 12 , 14 , 15            },
+    { 13 , 14 , 15            },
+    {  0 , 14 , 15            },
+    {  6 ,  4 ,  7 , 14 , 15  },
+    {  7 ,  3 ,  8 , 13 , 14  },
+    {  6 ,  5 ,  8 , 13 , 15  },
+    {  7 , 11 ,  2 , 12 , 14  },
+    {  6 , 10 ,  2 , 12 , 15  },
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// 4 to 2 convex edge
+static const std::vector<std::vector<uint>> polys =
+{
+    {  6 ,  7 , 10 , 12              },
+    { 12 ,  8 ,  9 , 11              },
+    { 11 , 13 , 14 , 15 , 1 , 3 , 4  },
+    { 10 , 13 , 16 , 17 , 0 , 2 , 5  },
+};
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// 4 to 2 convex edge -> TODO
+static const std::vector<std::vector<bool>> winding =
+{
+    { true, true, true, true                   },
+    { true, true, true, true                   },
+    { true, true, true, true, true, true, true },
+    { true, true, true, true, true, true, true },
+};
+} // namespace ConvexEdge
 
 } // namespace HexTransitions
 } // namespace cinolib
