@@ -38,4 +38,94 @@
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
+                    const int                   type,
+                    const vec3d               & center,
+                    const double                scale,
+                    const vec3d               & dir)
+{
+    std::vector<vec3d> verts;
+    std::vector<std::vector<uint>> faces;
+    std::vector<std::vector<uint>> polys;
+    std::vector<std::vector<bool>> winding;
+
+    switch(type)
+    {
+        case FRUSTUM:
+        {
+            verts   = vec3d_from_serialized_xyz(HexTransitions::Flat::verts);
+            faces   = HexTransitions::Flat::faces;
+            polys   = HexTransitions::Flat::polys;
+            winding = HexTransitions::Flat::winding;
+            break;
+        }
+
+        case CONV_EDGE:
+        {
+            verts   = vec3d_from_serialized_xyz(HexTransitions::Flat::verts);
+            faces   = HexTransitions::ConvexEdge::faces;
+            polys   = HexTransitions::ConvexEdge::polys;
+            winding = HexTransitions::ConvexEdge::winding;
+            break;
+        }
+
+        case CONC_EDGE:
+        {
+            break;
+        }
+
+        case CONC_VERT:
+        {
+            break;
+        }
+
+        case FRUSTUM_HALF:
+        {
+            verts   = vec3d_from_serialized_xyz(HexTransitions::Flat::verts);
+            faces   = HexTransitions::Half_Flat::faces;
+            polys   = HexTransitions::Half_Flat::polys;
+            winding = HexTransitions::Half_Flat::winding;
+            break;
+        }
+
+
+        case CONV_EDGE_HALF:
+        {
+            verts   = vec3d_from_serialized_xyz(HexTransitions::Flat::verts);
+            faces   = HexTransitions::Half_ConvexEdge::faces;
+            polys   = HexTransitions::Half_ConvexEdge::polys;
+            winding = HexTransitions::Half_ConvexEdge::winding;
+            break;
+        }
+
+        case CONC_EDGE_HALF:
+        {
+            break;
+        }
+
+        default: assert(false && "unknown scheme!");
+    }
+
+    m = Polyhedralmesh<M,V,E,F,P>(verts, faces, polys, winding);
+    m.translate(-m.bbox().center());
+    m.scale(scale);
+    if(dir[0]==0 && dir[2]==0) // schemes are already oriented along the Y axis
+    {
+        if(dir[1]!=1) m.scale(dir[1]);
+    }
+    else
+    {
+        vec3d axis = dir.cross(vec3d(0,1,0));
+        axis.normalize();
+        double ang = dir.angle_rad(vec3d(0,1,0));
+        m.rotate(axis, -ang);
+    }
+    m.translate(center);
+    m.update_bbox();
+}
+
 }

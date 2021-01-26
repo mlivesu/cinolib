@@ -41,6 +41,29 @@
 namespace cinolib
 {
 
+enum
+{
+    FRUSTUM,
+    FRUSTUM_HALF,
+    CONV_EDGE,
+    CONV_EDGE_HALF,
+    CONC_EDGE,
+    CONC_EDGE_HALF,
+    CONC_VERT
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
+                    const int                   type,
+                    const vec3d               & center = vec3d(0,0,0),
+                    const double                scale  = 1.0,
+                    const vec3d               & dir    = vec3d(0,1,0));
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 namespace HexTransitions
 {
 
