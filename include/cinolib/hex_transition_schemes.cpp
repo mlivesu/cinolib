@@ -75,6 +75,10 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
 
         case CONC_EDGE:
         {
+            verts   = vec3d_from_serialized_xyz(HexTransitions::ConcaveEgde::verts);
+            faces   = HexTransitions::ConcaveEgde::faces;
+            polys   = HexTransitions::ConcaveEgde::polys;
+            winding = HexTransitions::ConcaveEgde::winding;
             break;
         }
 
