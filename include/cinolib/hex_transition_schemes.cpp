@@ -131,7 +131,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
         double ang = dir.angle_rad(vec3d(0,1,0));
         m.rotate(axis, -ang);
     }
-    m.translate(center);
+    m.translate(center - m.vert(0));
     m.update_bbox();
 }
 
