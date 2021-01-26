@@ -66,7 +66,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
 
         case CONV_EDGE:
         {
-            verts   = vec3d_from_serialized_xyz(HexTransitions::Flat::verts);
+            verts   = vec3d_from_serialized_xyz(HexTransitions::ConvexEdge::verts);
             faces   = HexTransitions::ConvexEdge::faces;
             polys   = HexTransitions::ConvexEdge::polys;
             winding = HexTransitions::ConvexEdge::winding;
@@ -85,7 +85,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
 
         case FRUSTUM_HALF:
         {
-            verts   = vec3d_from_serialized_xyz(HexTransitions::Flat::verts);
+            verts   = vec3d_from_serialized_xyz(HexTransitions::Half_Flat::verts);
             faces   = HexTransitions::Half_Flat::faces;
             polys   = HexTransitions::Half_Flat::polys;
             winding = HexTransitions::Half_Flat::winding;
@@ -95,7 +95,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
 
         case CONV_EDGE_HALF:
         {
-            verts   = vec3d_from_serialized_xyz(HexTransitions::Flat::verts);
+            verts   = vec3d_from_serialized_xyz(HexTransitions::Half_ConvexEdge::verts);
             faces   = HexTransitions::Half_ConvexEdge::faces;
             polys   = HexTransitions::Half_ConvexEdge::polys;
             winding = HexTransitions::Half_ConvexEdge::winding;
