@@ -52,6 +52,7 @@ namespace cinolib
         SEGMENT,
         TRIANGLE,
         TETRAHEDRON,
+        SPHERE,
     }
     ItemType;
 

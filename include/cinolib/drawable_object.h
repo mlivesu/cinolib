@@ -56,7 +56,7 @@ typedef enum
     DRAWABLE_VECTOR_FIELD  ,
     DRAWABLE_OCTREE        ,
     ARROW                  ,
-    SPHERE
+    SPHERE_
 }
 ObjectType;
 
