@@ -113,6 +113,10 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void operator+=(const AbstractPolyhedralMesh<M,V,E,F,P> & m);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         virtual uint verts_per_poly(const uint pid) const override { return this->p2v.at(pid).size();   }
         virtual uint faces_per_poly(const uint pid) const          { return this->polys.at(pid).size(); }
         virtual uint verts_per_face(const uint fid) const          { return this->faces.at(fid).size(); }
