@@ -43,13 +43,13 @@ namespace cinolib
 
 enum
 {
-    FRUSTUM,
-    FRUSTUM_HALF,
-    CONV_EDGE,
-    CONV_EDGE_HALF,
-    CONC_EDGE,
-    CONC_EDGE_HALF,
-    CONC_VERT
+    FLAT,
+    FLAT_HALF,
+    CONV,
+    CONV_HALF,
+    CONC,
+    CONC_HALF,
+    CORN
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

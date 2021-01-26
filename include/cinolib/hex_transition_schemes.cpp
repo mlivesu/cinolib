@@ -55,7 +55,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
 
     switch(type)
     {
-        case FRUSTUM:
+        case FLAT:
         {
             verts   = vec3d_from_serialized_xyz(HexTransitions::Flat::verts);
             faces   = HexTransitions::Flat::faces;
@@ -64,7 +64,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
             break;
         }
 
-        case CONV_EDGE:
+        case CONV:
         {
             verts   = vec3d_from_serialized_xyz(HexTransitions::ConvexEdge::verts);
             faces   = HexTransitions::ConvexEdge::faces;
@@ -73,7 +73,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
             break;
         }
 
-        case CONC_EDGE:
+        case CONC:
         {
             verts   = vec3d_from_serialized_xyz(HexTransitions::ConcaveEgde::verts);
             faces   = HexTransitions::ConcaveEgde::faces;
@@ -82,12 +82,12 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
             break;
         }
 
-        case CONC_VERT:
+        case CORN:
         {
             break;
         }
 
-        case FRUSTUM_HALF:
+        case FLAT_HALF:
         {
             verts   = vec3d_from_serialized_xyz(HexTransitions::Half_Flat::verts);
             faces   = HexTransitions::Half_Flat::faces;
@@ -97,7 +97,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
         }
 
 
-        case CONV_EDGE_HALF:
+        case CONV_HALF:
         {
             verts   = vec3d_from_serialized_xyz(HexTransitions::Half_ConvexEdge::verts);
             faces   = HexTransitions::Half_ConvexEdge::faces;
@@ -106,7 +106,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
             break;
         }
 
-        case CONC_EDGE_HALF:
+        case CONC_HALF:
         {
             break;
         }
