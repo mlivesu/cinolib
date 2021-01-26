@@ -115,7 +115,6 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
     }
 
     m = Polyhedralmesh<M,V,E,F,P>(verts, faces, polys, winding);
-    m.translate(-m.bbox().center());
     m.scale(scale);
     if(dir[0]==0 && dir[2]==0) // schemes are already oriented along the Y axis
     {
