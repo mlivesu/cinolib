@@ -36,7 +36,64 @@
 #ifndef CINO_HEX_TRANSITION_SCHEMES_H
 #define CINO_HEX_TRANSITION_SCHEMES_H
 
-#include <cinolib/meshes/meshes.h>
+#include <vector>
+#include <sys/types.h>
+
+/* Implementation of the convertion schemes to transform an adaptively refined grid
+ * with hanging nodes into a conformin hexahedral mesh. These schemes are based (and
+ * extend) ideas contained in
+ *
+ *     Advances in Octree-Based All-Hexahedral Mesh Generation: Handling Sharp Features
+ *     Loic Marechal
+ *     Proceedings of the 18th International Meshing Roundtable, 2009
+ *
+ * Schemes are defined in the primal mesh, and they are meant to regularize grid vertex
+ * valences, bringing them to 6 such that, once dualized, each vertex yields a hexahedron.
+ *
+ * Four schemes are necessary to handle all the possible cases:
+ *
+ *   - Flat_Face_4_to_2 => transitions from a 4x4 grid to a 2x2 grid
+ *
+ *   - Conv_Edge_4_to_2 => transitions from a convex edge split into 4 parts
+ *                         to an edge split into 2 parts
+ *
+ *   - Conc_Edge_4_to_2 => transitions from a concave edge split into 4 parts
+ *                         to an edge split into 2 parts
+ *
+ *   - Conv_Vert_4_to_2 => transition brick for concave vertices shared between
+ *                         three mutually orthogonal 4x4 grids
+ *
+ *
+ * For each scheme we hard coded vertices, faces and cells of the (primal) polyhedral mesh.
+ * Each mesh has normal size (the longest side has length 1), and the vertex with id 0 is the
+ * "pivot" of the scheme, that is the vertex that must be used for positioning. Specifically:
+ *
+ *   - for Flat_Face_4_to_2 vertex v0 is the point at the middle of the 4x4 grid
+ *
+ *   - for Conv_Edge_4_to_2 vertex v0 is the midpoint of the refined edge
+ *
+ *   - for Conc_Edge_4_to_2 vertex v0 is the midpoint of the refined edge
+ *
+ *   - for Conv_Vert_4_to_2 vertex v0 is the concave vertex at the intersection of the 4x4 grids
+ *
+ * Schemes are meant to be used as follows:
+ *
+ *  1 - locate type, size, and application point of the scheme in your adaptive grid
+ *
+ *  2 - apply geometric transformations to position the scheme in your grid
+ *      (can be done with cinolib::hex_transition)
+ *
+ *  3 - remove the standard grid elements from your grid, and append the schemes
+ *      to your mesh, merging coincident vertices to topologically weld the two objects
+ *      (can be done with cinolib::merge_meshes_at_coincident_vertices)
+ *
+ *  4 - dualize the polyhedral mesh to obtain a full hexahedral mesh
+ *      (can be done with cinolib::dual_mesh)
+ *
+ *
+ * TODO: fix orientation of mesh elements
+ *
+*/
 
 namespace cinolib
 {
