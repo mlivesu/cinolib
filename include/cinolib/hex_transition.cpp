@@ -33,6 +33,7 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
+#include <cinolib/hex_transition.h>
 #include <cinolib/hex_transition_schemes.h>
 
 namespace cinolib
@@ -43,7 +44,7 @@ namespace cinolib
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
-                    const int                   type,
+                    const HexTransition         type,
                     const vec3d               & center,
                     const double                scale,
                     const vec3d               & dir)
@@ -55,39 +56,39 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
 
     switch(type)
     {
-        case FLAT:
+        case HexTransition::FLAT_FACE_4_TO_2:
         {
-            verts   = vec3d_from_serialized_xyz(HexTransitions::Flat::verts);
-            faces   = HexTransitions::Flat::faces;
-            polys   = HexTransitions::Flat::polys;
-            winding = HexTransitions::Flat::winding;
+            verts   = vec3d_from_serialized_xyz(Flat_Face_4_to_2::verts);
+            faces   = Flat_Face_4_to_2::faces;
+            polys   = Flat_Face_4_to_2::polys;
+            winding = Flat_Face_4_to_2::winding;
             break;
         }
 
-        case CONV:
+        case HexTransition::CONV_EDGE_4_TO_2:
         {
-            verts   = vec3d_from_serialized_xyz(HexTransitions::ConvexEdge::verts);
-            faces   = HexTransitions::ConvexEdge::faces;
-            polys   = HexTransitions::ConvexEdge::polys;
-            winding = HexTransitions::ConvexEdge::winding;
+            verts   = vec3d_from_serialized_xyz(Conv_Edge_4_to_2::verts);
+            faces   = Conv_Edge_4_to_2::faces;
+            polys   = Conv_Edge_4_to_2::polys;
+            winding = Conv_Edge_4_to_2::winding;
             break;
         }
 
-        case CONC:
+        case HexTransition::CONC_EDGE_4_TO_2:
         {
-            verts   = vec3d_from_serialized_xyz(HexTransitions::ConcaveEgde::verts);
-            faces   = HexTransitions::ConcaveEgde::faces;
-            polys   = HexTransitions::ConcaveEgde::polys;
-            winding = HexTransitions::ConcaveEgde::winding;
+            verts   = vec3d_from_serialized_xyz(Conc_Edge_4_to_2::verts);
+            faces   = Conc_Edge_4_to_2::faces;
+            polys   = Conc_Edge_4_to_2::polys;
+            winding = Conc_Edge_4_to_2::winding;
             break;
         }
 
-        case CORN:
+        case HexTransition::CONC_VERT_4_TO_2:
         {
-            verts   = vec3d_from_serialized_xyz(HexTransitions::ConcaveCorner::verts);
-            faces   = HexTransitions::ConcaveCorner::faces;
-            polys   = HexTransitions::ConcaveCorner::polys;
-            winding = HexTransitions::ConcaveCorner::winding;
+            verts   = vec3d_from_serialized_xyz(Conv_Vert_4_to_2::verts);
+            faces   = Conv_Vert_4_to_2::faces;
+            polys   = Conv_Vert_4_to_2::polys;
+            winding = Conv_Vert_4_to_2::winding;
             break;
         }
 
