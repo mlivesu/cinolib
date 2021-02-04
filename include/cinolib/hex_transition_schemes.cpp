@@ -84,34 +84,10 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
 
         case CORN:
         {
-            break;
-        }
-
-        case FLAT_HALF:
-        {
-            verts   = vec3d_from_serialized_xyz(HexTransitions::Half_Flat::verts);
-            faces   = HexTransitions::Half_Flat::faces;
-            polys   = HexTransitions::Half_Flat::polys;
-            winding = HexTransitions::Half_Flat::winding;
-            break;
-        }
-
-
-        case CONV_HALF:
-        {
-            verts   = vec3d_from_serialized_xyz(HexTransitions::Half_ConvexEdge::verts);
-            faces   = HexTransitions::Half_ConvexEdge::faces;
-            polys   = HexTransitions::Half_ConvexEdge::polys;
-            winding = HexTransitions::Half_ConvexEdge::winding;
-            break;
-        }
-
-        case CONC_HALF:
-        {
-            verts   = vec3d_from_serialized_xyz(HexTransitions::Half_ConcaveEgde::verts);
-            faces   = HexTransitions::Half_ConcaveEgde::faces;
-            polys   = HexTransitions::Half_ConcaveEgde::polys;
-            winding = HexTransitions::Half_ConcaveEgde::winding;
+            verts   = vec3d_from_serialized_xyz(HexTransitions::ConcaveCorner::verts);
+            faces   = HexTransitions::ConcaveCorner::faces;
+            polys   = HexTransitions::ConcaveCorner::polys;
+            winding = HexTransitions::ConcaveCorner::winding;
             break;
         }
 
