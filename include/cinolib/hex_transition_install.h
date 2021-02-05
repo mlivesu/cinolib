@@ -43,6 +43,14 @@
 namespace cinolib
 {
 
+/* This code serves to install a transition scheme in an adaptively refined grid,
+ * in order to transform it into a pure hexahedral mesh. What the code does is to
+ * merge coincident vertices and faces, and append the scheme elements to the mesh.
+ *
+ * WARNING: this code does not remove the older elements from the grid, which must
+ * be removed a priori or afterwards.
+*/
+
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void hex_transition_install(Polyhedralmesh<M,V,E,F,P> & m,

@@ -41,6 +41,14 @@
 namespace cinolib
 {
 
+/* This code instantiates an all hex transition scheme to transform an adaptively
+ * refined grid into a pure hexahedral mesh. Schemes can be positioned as needed,
+ * specifying a center, scale and orientation.
+ *
+ * For more info on the schemes, and their default size, positioning and orientation
+ * refer to cinolib/hex_transition_schemes.h
+*/
+
 enum class HexTransition
 {
     FLAT_FACE_4_TO_2, // transition from 4x4 to 2x2 grid: flat    region
