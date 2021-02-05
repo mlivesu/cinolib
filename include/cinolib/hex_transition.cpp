@@ -122,7 +122,6 @@ void hex_transition(const HexTransition                    type,
                 double & x = verts.at(ptr  );
                 double & y = verts.at(ptr+1);
                 std::swap(x,y);
-                x = -x;
             }
             break;
         }
@@ -137,7 +136,6 @@ void hex_transition(const HexTransition                    type,
                 double & y = verts.at(ptr+1);
                 double & z = verts.at(ptr+2);
                 std::swap(y,z);
-                z = -z;
             }
             break;
         }
@@ -150,7 +148,7 @@ void hex_transition(const HexTransition                    type,
                 double & x = verts.at(ptr  );
                 double & y = verts.at(ptr+1);
                 std::swap(x,y);
-                y = -y;
+                x = -x;
             }
             break;
         }
@@ -176,7 +174,7 @@ void hex_transition(const HexTransition                    type,
                 double & y = verts.at(ptr+1);
                 double & z = verts.at(ptr+2);
                 std::swap(y,z);
-                y = -y;
+                z = -z;
             }
             break;
         }
