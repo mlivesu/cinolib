@@ -33,48 +33,72 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_DRAWABLE_OBJECT_H
-#define CINO_DRAWABLE_OBJECT_H
-
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/merge_meshes_at_coincident_vertices.h>
+#include <cinolib/octree.h>
 
 namespace cinolib
 {
 
-typedef enum
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void merge_meshes_at_coincident_vertices(const AbstractPolyhedralMesh<M,V,E,F,P> & m1,
+                                         const AbstractPolyhedralMesh<M,V,E,F,P> & m2,
+                                               AbstractPolyhedralMesh<M,V,E,F,P> & res,
+                                         const double                              proximity_thresh)
 {
-    DRAWABLE_TRIMESH       ,
-    DRAWABLE_TETMESH       ,
-    DRAWABLE_QUADMESH      ,
-    DRAWABLE_HEXMESH       ,
-    DRAWABLE_POLYGONMESH   ,
-    DRAWABLE_POLYHEDRALMESH,
-    DRAWABLE_SKELETON      ,
-    DRAWABLE_CURVE         ,
-    DRAWABLE_ISOSURFACE    ,
-    DRAWABLE_SLICED_OBJ    ,
-    DRAWABLE_VECTOR_FIELD  ,
-    DRAWABLE_OCTREE        ,
-    ARROW                  ,
-    SPHERE_
+    Octree o;
+    for(uint vid=0; vid<m1.num_verts(); ++vid) o.push_sphere(vid, m1.vert(vid), proximity_thresh);
+    o.build();
+
+    res = m1;
+
+    std::map<uint,uint> vmap;
+    for(uint vid=0; vid<m2.num_verts(); ++vid)
+    {
+        vec3d p = m2.vert(vid);
+        std::unordered_set<uint> ids;
+        if(o.contains(p, false, ids))
+        {
+            // WARNING: I am assuming that the mapping is one to one at most
+            assert(ids.size()==1);
+            vmap[vid] = *ids.begin();
+        }
+        else
+        {
+            uint fresh_id = res.vert_add(p);
+            vmap[vid] = fresh_id;
+        }
+    }
+
+    std::map<uint,uint> fmap;
+    for(uint fid=0; fid<m2.num_faces(); ++fid)
+    {
+        auto f = m2.face_verts_id(fid);
+        for(auto & vid : f) vid = vmap.at(vid);
+
+        int test_id = res.face_id(f);
+        if(test_id>=0)
+        {
+            fmap[fid] = test_id;
+        }
+        else
+        {
+            uint fresh_id = res.face_add(f);
+            fmap[fid] = fresh_id;
+        }
+    }
+
+    for(uint pid=0; pid<m2.num_polys(); ++pid)
+    {
+        auto p = m2.poly_faces_id(pid);
+        for(auto & fid : p) fid = fmap.at(fid);
+
+        int test_id = res.poly_id(p);
+        if(test_id==-1)
+        {
+            res.poly_add(p, m2.poly_faces_winding(pid));
+        }
+    }
 }
-ObjectType;
-
-class DrawableObject
-{
-    public :
-
-        explicit  DrawableObject(){}
-        virtual  ~DrawableObject(){}
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        virtual  ObjectType  object_type()                    const = 0;
-        virtual  void        draw(const float scene_size = 1) const = 0;  // do rendering
-        virtual  vec3d       scene_center()                   const = 0;  // get position in space
-        virtual  float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
-};
 
 }
-
-#endif // CINO_DRAWABLE_OBJECT_H

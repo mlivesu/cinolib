@@ -37,6 +37,7 @@
 #include <cinolib/how_many_seconds.h>
 #include <cinolib/parallel_for.h>
 #include <cinolib/geometry/point.h>
+#include <cinolib/geometry/sphere.h>
 #include <cinolib/geometry/segment.h>
 #include <cinolib/geometry/triangle.h>
 #include <cinolib/geometry/tetrahedron.h>
@@ -231,6 +232,14 @@ CINO_INLINE
 void Octree::push_point(const uint id, const vec3d & v)
 {
     items.push_back(new Point(id,v));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Octree::push_sphere(const uint id, const vec3d & c, const double r)
+{
+    items.push_back(new Sphere(id,c,r));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

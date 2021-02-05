@@ -33,48 +33,71 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_DRAWABLE_OBJECT_H
-#define CINO_DRAWABLE_OBJECT_H
-
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/sphere.h>
+#include <cinolib/predicates.h>
 
 namespace cinolib
 {
 
-typedef enum
+CINO_INLINE
+std::ostream & operator<<(std::ostream & in, const Sphere & s)
 {
-    DRAWABLE_TRIMESH       ,
-    DRAWABLE_TETMESH       ,
-    DRAWABLE_QUADMESH      ,
-    DRAWABLE_HEXMESH       ,
-    DRAWABLE_POLYGONMESH   ,
-    DRAWABLE_POLYHEDRALMESH,
-    DRAWABLE_SKELETON      ,
-    DRAWABLE_CURVE         ,
-    DRAWABLE_ISOSURFACE    ,
-    DRAWABLE_SLICED_OBJ    ,
-    DRAWABLE_VECTOR_FIELD  ,
-    DRAWABLE_OCTREE        ,
-    ARROW                  ,
-    SPHERE_
-}
-ObjectType;
-
-class DrawableObject
-{
-    public :
-
-        explicit  DrawableObject(){}
-        virtual  ~DrawableObject(){}
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        virtual  ObjectType  object_type()                    const = 0;
-        virtual  void        draw(const float scene_size = 1) const = 0;  // do rendering
-        virtual  vec3d       scene_center()                   const = 0;  // get position in space
-        virtual  float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
-};
-
+    in << s.c << " " << s.r << "\n";
+    return in;
 }
 
-#endif // CINO_DRAWABLE_OBJECT_H
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d Sphere::point_closest_to(const vec3d & /*p*/) const
+{
+    assert(false && "TODO");
+    return c;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Sphere::intersects_ray(const vec3d & /*p*/, const vec3d & /*dir*/, double & /*t*/, vec3d & /*pos*/) const
+{
+    assert(false && "TODO");
+    return true;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Sphere::barycentric_coordinates(const vec3d & /*p*/, double /*bc*/[]) const
+{
+    assert(false && "NONSENSE");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Sphere::contains(const vec3d & p, const bool strict) const
+{
+    if(strict) return p.dist(c) <  r;
+    else       return p.dist(c) <= r;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Sphere::intersects_segment(const vec3d /*s*/[], const bool /*ignore_if_valid_complex*/) const
+{
+    assert(false && "TODO");
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool Sphere::intersects_triangle(const vec3d /*t*/[], const bool /*ignore_if_valid_complex*/) const
+{
+    assert(false && "TODO");
+    return false;
+}
+
+}

@@ -59,6 +59,14 @@ enum
     VW_param,
     UVW_param,
 
+    //
+    PLUS_X,
+    PLUS_Y,
+    PLUS_Z,
+    MINUS_X,
+    MINUS_Y,
+    MINUS_Z,
+
     // Quality, Label (for slicer)
     Q,
     L,

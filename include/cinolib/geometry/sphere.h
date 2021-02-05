@@ -33,48 +33,54 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_DRAWABLE_OBJECT_H
-#define CINO_DRAWABLE_OBJECT_H
+#ifndef CINO_SPHERE_H
+#define CINO_SPHERE_H
 
-#include <cinolib/geometry/vec3.h>
+#include <iostream>
+#include <cinolib/geometry/spatial_data_structure_item.h>
 
 namespace cinolib
 {
 
-typedef enum
+class Sphere : public SpatialDataStructureItem
 {
-    DRAWABLE_TRIMESH       ,
-    DRAWABLE_TETMESH       ,
-    DRAWABLE_QUADMESH      ,
-    DRAWABLE_HEXMESH       ,
-    DRAWABLE_POLYGONMESH   ,
-    DRAWABLE_POLYHEDRALMESH,
-    DRAWABLE_SKELETON      ,
-    DRAWABLE_CURVE         ,
-    DRAWABLE_ISOSURFACE    ,
-    DRAWABLE_SLICED_OBJ    ,
-    DRAWABLE_VECTOR_FIELD  ,
-    DRAWABLE_OCTREE        ,
-    ARROW                  ,
-    SPHERE_
-}
-ObjectType;
+    public:
 
-class DrawableObject
-{
-    public :
+        Sphere(const uint id, const vec3d & c, const double r)
+        {
+            this->c   = c;
+            this->r   = r;
+            this->id  = id;
+            item_type = SPHERE;
+            double hr = r*0.5;
+            aabb.push({ c - vec3d(hr,hr,hr),
+                        c + vec3d(hr,hr,hr) });
+        }
 
-        explicit  DrawableObject(){}
-        virtual  ~DrawableObject(){}
+        ~Sphere() {}
+
+        // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
+
+        vec3d    point_closest_to       (const vec3d & p) const override;
+        bool     intersects_ray         (const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const override;
+        void     barycentric_coordinates(const vec3d & p, double bc[]) const override;
+        bool     contains               (const vec3d & p, const bool strict) const override;
+        bool     intersects_segment     (const vec3d   s[], const bool ignore_if_valid_complex) const override;
+        bool     intersects_triangle    (const vec3d   t[], const bool ignore_if_valid_complex) const override;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual  ObjectType  object_type()                    const = 0;
-        virtual  void        draw(const float scene_size = 1) const = 0;  // do rendering
-        virtual  vec3d       scene_center()                   const = 0;  // get position in space
-        virtual  float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
+        vec3d  c; // center
+        double r; // radius
 };
+
+CINO_INLINE
+std::ostream & operator<<(std::ostream & in, const Sphere & p);
 
 }
 
-#endif // CINO_DRAWABLE_OBJECT_H
+#ifndef  CINO_STATIC_LIB
+#include "sphere.cpp"
+#endif
+
+#endif // CINO_SPHERE_H

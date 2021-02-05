@@ -1953,7 +1953,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::vert_switch_id(const uint vid0, const uint vid1)
 {
-    if (vid0 == vid1) return;
+    if(vid0 == vid1) return;
 
     std::swap(this->verts.at(vid0),   this->verts.at(vid1));
     std::swap(this->v2v.at(vid0),     this->v2v.at(vid1));
@@ -3143,6 +3143,44 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_prism(const uint pid, const uint
         if(this->verts_per_face(nbr)==this->verts_per_face(fid)) return true;
     }
     return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::operator+=(const AbstractPolyhedralMesh<M,V,E,F,P> & m)
+{
+    // THIS CODE IS RECOMPUTING CONNECTIVITY FROM SCRATCH
+    // THERE ARE BETTER WAYS TO DO IT (for surfaces I think I did it the right way...)
+
+    uint nv = this->num_verts();
+    uint nf = this->num_faces();
+
+    // add verts
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        this->vert_add(m.vert(vid));
+    }
+
+    // add faces
+    for(uint fid=0; fid<m.num_faces(); ++fid)
+    {
+        auto f = m.face_verts_id(fid);
+        for(uint & vid : f) vid += nv;
+        this->face_add(f);
+    }
+
+    // add polys
+    for(uint pid=0; pid<m.num_polys(); ++pid)
+    {
+        auto f = m.poly_faces_id(pid);
+        auto w = m.poly_faces_winding(pid);        
+        for(uint & fid : f) fid += nf;
+        this->poly_add(f,w);
+    }
+
+    if(this->mesh_data().update_bbox) this->update_bbox();
 }
 
 }

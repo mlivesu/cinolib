@@ -33,48 +33,24 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_DRAWABLE_OBJECT_H
-#define CINO_DRAWABLE_OBJECT_H
+#ifndef CINO_MERGE_MESHES_AT_COINCIDENT_VERTICES_H
+#define CINO_MERGE_MESHES_AT_COINCIDENT_VERTICES_H
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/meshes/meshes.h>
 
 namespace cinolib
 {
 
-typedef enum
-{
-    DRAWABLE_TRIMESH       ,
-    DRAWABLE_TETMESH       ,
-    DRAWABLE_QUADMESH      ,
-    DRAWABLE_HEXMESH       ,
-    DRAWABLE_POLYGONMESH   ,
-    DRAWABLE_POLYHEDRALMESH,
-    DRAWABLE_SKELETON      ,
-    DRAWABLE_CURVE         ,
-    DRAWABLE_ISOSURFACE    ,
-    DRAWABLE_SLICED_OBJ    ,
-    DRAWABLE_VECTOR_FIELD  ,
-    DRAWABLE_OCTREE        ,
-    ARROW                  ,
-    SPHERE_
-}
-ObjectType;
-
-class DrawableObject
-{
-    public :
-
-        explicit  DrawableObject(){}
-        virtual  ~DrawableObject(){}
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        virtual  ObjectType  object_type()                    const = 0;
-        virtual  void        draw(const float scene_size = 1) const = 0;  // do rendering
-        virtual  vec3d       scene_center()                   const = 0;  // get position in space
-        virtual  float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
-};
-
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void merge_meshes_at_coincident_vertices(const AbstractPolyhedralMesh<M,V,E,F,P> & m1,
+                                         const AbstractPolyhedralMesh<M,V,E,F,P> & m2,
+                                               AbstractPolyhedralMesh<M,V,E,F,P> & res,
+                                         const double proximity_thresh);
 }
 
-#endif // CINO_DRAWABLE_OBJECT_H
+#ifndef  CINO_STATIC_LIB
+#include "merge_meshes_at_coincident_vertices.cpp"
+#endif
+
+#endif // CINO_MERGE_MESHES_AT_COINCIDENT_VERTICES_H

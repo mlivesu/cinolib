@@ -33,48 +33,48 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_DRAWABLE_OBJECT_H
-#define CINO_DRAWABLE_OBJECT_H
+#ifndef CINO_HEX_TRANSITION_H
+#define CINO_HEX_TRANSITION_H
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/meshes/meshes.h>
 
 namespace cinolib
 {
 
-typedef enum
+enum class HexTransition
 {
-    DRAWABLE_TRIMESH       ,
-    DRAWABLE_TETMESH       ,
-    DRAWABLE_QUADMESH      ,
-    DRAWABLE_HEXMESH       ,
-    DRAWABLE_POLYGONMESH   ,
-    DRAWABLE_POLYHEDRALMESH,
-    DRAWABLE_SKELETON      ,
-    DRAWABLE_CURVE         ,
-    DRAWABLE_ISOSURFACE    ,
-    DRAWABLE_SLICED_OBJ    ,
-    DRAWABLE_VECTOR_FIELD  ,
-    DRAWABLE_OCTREE        ,
-    ARROW                  ,
-    SPHERE_
-}
-ObjectType;
-
-class DrawableObject
-{
-    public :
-
-        explicit  DrawableObject(){}
-        virtual  ~DrawableObject(){}
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        virtual  ObjectType  object_type()                    const = 0;
-        virtual  void        draw(const float scene_size = 1) const = 0;  // do rendering
-        virtual  vec3d       scene_center()                   const = 0;  // get position in space
-        virtual  float       scene_radius()                   const = 0;  // get size (approx. radius of the bounding sphere)
+    FLAT_FACE_4_TO_2, // transition from 4x4 to 2x2 grid: flat    region
+    CONV_EDGE_4_TO_2, // transition from 4x4 to 2x2 grid: convex  edge
+    CONC_EDGE_4_TO_2, // transition from 4x4 to 2x2 grid: concave edge
+    CONC_VERT_4_TO_2  // transition from 4x4 to 2x2 grid: concave vertex
 };
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
+                    const HexTransition         type,
+                    const vec3d               & center      = vec3d(0,0,0),
+                    const double                scale       = 1.0,
+                    const int                   orientation = PLUS_Y);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void hex_transition(const HexTransition                    type,
+                          std::vector<double>            & verts,
+                          std::vector<std::vector<uint>> & faces,
+                          std::vector<std::vector<uint>> & polys,
+                          std::vector<std::vector<bool>> & winding,
+                    const vec3d                          & center,
+                    const double                           scale,
+                    const int                              orientation);
+
 }
 
-#endif // CINO_DRAWABLE_OBJECT_H
+#ifndef  CINO_STATIC_LIB
+#include "hex_transition.cpp"
+#endif
+
+#endif // CINO_HEX_TRANSITION_H
