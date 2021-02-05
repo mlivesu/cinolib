@@ -49,26 +49,27 @@ enum class HexTransition
     CONC_VERT_4_TO_2  // transition from 4x4 to 2x2 grid: concave vertex
 };
 
-enum class Orientation
-{
-    PLUS_X,
-    PLUS_Y,
-    PLUS_Z,
-    MINUS_X,
-    MINUS_Y,
-    MINUS_Z
-};
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
                     const HexTransition         type,
-                    const vec3d               & center = vec3d(0,0,0),
-                    const double                scale  = 1.0,
-                    const vec3d               & dir    = vec3d(0,1,0));
+                    const vec3d               & center      = vec3d(0,0,0),
+                    const double                scale       = 1.0,
+                    const int                   orientation = PLUS_Y);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void hex_transition(const HexTransition                    type,
+                          std::vector<double>            & verts,
+                          std::vector<std::vector<uint>> & faces,
+                          std::vector<std::vector<uint>> & polys,
+                          std::vector<std::vector<bool>> & winding,
+                    const vec3d                          & center,
+                    const double                           scale,
+                    const int                              orientation);
 
 }
 

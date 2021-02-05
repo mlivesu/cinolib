@@ -47,18 +47,34 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
                     const HexTransition         type,
                     const vec3d               & center,
                     const double                scale,
-                    const vec3d               & dir)
+                    const int                   orientation)
 {
-    std::vector<vec3d> verts;
+    std::vector<double> verts;
     std::vector<std::vector<uint>> faces;
     std::vector<std::vector<uint>> polys;
     std::vector<std::vector<bool>> winding;
+    hex_transition(type, verts, faces, polys, winding, center, scale, orientation);
 
+    m = Polyhedralmesh<>(vec3d_from_serialized_xyz(verts), faces, polys, winding);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void hex_transition(const HexTransition                    type,
+                          std::vector<double>            & verts,
+                          std::vector<std::vector<uint>> & faces,
+                          std::vector<std::vector<uint>> & polys,
+                          std::vector<std::vector<bool>> & winding,
+                    const vec3d                          & center,
+                    const double                           scale,
+                    const int                              orientation)
+{
     switch(type)
     {
         case HexTransition::FLAT_FACE_4_TO_2:
         {
-            verts   = vec3d_from_serialized_xyz(Flat_Face_4_to_2::verts);
+            verts   = Flat_Face_4_to_2::verts;
             faces   = Flat_Face_4_to_2::faces;
             polys   = Flat_Face_4_to_2::polys;
             winding = Flat_Face_4_to_2::winding;
@@ -67,7 +83,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
 
         case HexTransition::CONV_EDGE_4_TO_2:
         {
-            verts   = vec3d_from_serialized_xyz(Conv_Edge_4_to_2::verts);
+            verts   = Conv_Edge_4_to_2::verts;
             faces   = Conv_Edge_4_to_2::faces;
             polys   = Conv_Edge_4_to_2::polys;
             winding = Conv_Edge_4_to_2::winding;
@@ -76,7 +92,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
 
         case HexTransition::CONC_EDGE_4_TO_2:
         {
-            verts   = vec3d_from_serialized_xyz(Conc_Edge_4_to_2::verts);
+            verts   = Conc_Edge_4_to_2::verts;
             faces   = Conc_Edge_4_to_2::faces;
             polys   = Conc_Edge_4_to_2::polys;
             winding = Conc_Edge_4_to_2::winding;
@@ -85,7 +101,7 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
 
         case HexTransition::CONC_VERT_4_TO_2:
         {
-            verts   = vec3d_from_serialized_xyz(Conv_Vert_4_to_2::verts);
+            verts   = Conv_Vert_4_to_2::verts;
             faces   = Conv_Vert_4_to_2::faces;
             polys   = Conv_Vert_4_to_2::polys;
             winding = Conv_Vert_4_to_2::winding;
@@ -95,21 +111,93 @@ void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
         default: assert(false && "unknown scheme!");
     }
 
-    m = Polyhedralmesh<M,V,E,F,P>(verts, faces, polys, winding);
-    m.scale(scale);
-    if(dir[0]==0 && dir[2]==0) // schemes are already oriented along the Y axis
+    uint nv = verts.size()/3;
+    switch(orientation)
     {
-        if(dir[1]!=1) m.scale(dir[1]);
+        case PLUS_X:
+        {
+            for(uint vid=0; vid<nv; ++vid)
+            {
+                uint ptr = 3*vid;
+                double & x = verts.at(ptr  );
+                double & y = verts.at(ptr+1);
+                std::swap(x,y);
+                x = -x;
+            }
+            break;
+        }
+
+        case PLUS_Y: break; // deaful orientation
+
+        case PLUS_Z:
+        {
+            for(uint vid=0; vid<nv; ++vid)
+            {
+                uint ptr = 3*vid;
+                double & y = verts.at(ptr+1);
+                double & z = verts.at(ptr+2);
+                std::swap(y,z);
+                z = -z;
+            }
+            break;
+        }
+
+        case MINUS_X:
+        {
+            for(uint vid=0; vid<nv; ++vid)
+            {
+                uint ptr = 3*vid;
+                double & x = verts.at(ptr  );
+                double & y = verts.at(ptr+1);
+                std::swap(x,y);
+                y = -y;
+            }
+            break;
+        }
+
+        case MINUS_Y:
+        {
+            for(uint vid=0; vid<nv; ++vid)
+            {
+                uint ptr = 3*vid;
+                double & x = verts.at(ptr  );
+                double & y = verts.at(ptr+1);
+                x = -x;
+                y = -y;
+            }
+            break;
+        }
+
+        case MINUS_Z:
+        {
+            for(uint vid=0; vid<nv; ++vid)
+            {
+                uint ptr = 3*vid;
+                double & y = verts.at(ptr+1);
+                double & z = verts.at(ptr+2);
+                std::swap(y,z);
+                y = -y;
+            }
+            break;
+        }
     }
-    else
+
+    // scale and center
+    for(uint vid=0; vid<nv; ++vid)
     {
-        vec3d axis = dir.cross(vec3d(0,1,0));
-        axis.normalize();
-        double ang = dir.angle_rad(vec3d(0,1,0));
-        m.rotate(axis, -ang);
+        uint ptr = 3*vid;
+        double & x = verts.at(ptr+1);
+        double & y = verts.at(ptr+1);
+        double & z = verts.at(ptr+2);
+        //
+        x *= scale;
+        y *= scale;
+        z *= scale;
+        //
+        x -= center.x();
+        y -= center.y();
+        z -= center.z();
     }
-    m.translate(center - m.vert(0));
-    m.update_bbox();
 }
 
 }
