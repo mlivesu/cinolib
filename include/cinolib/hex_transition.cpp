@@ -184,7 +184,7 @@ void hex_transition(const HexTransition                    type,
     for(uint vid=0; vid<nv; ++vid)
     {
         uint ptr = 3*vid;
-        double & x = verts.at(ptr+1);
+        double & x = verts.at(ptr+0);
         double & y = verts.at(ptr+1);
         double & z = verts.at(ptr+2);
         //
