@@ -192,9 +192,9 @@ void hex_transition(const HexTransition                    type,
         y *= scale;
         z *= scale;
         //
-        x -= center.x();
-        y -= center.y();
-        z -= center.z();
+        x = center.x();
+        y = center.y();
+        z = center.z();
     }
 }
 
