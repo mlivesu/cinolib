@@ -531,7 +531,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & pid_beneath) const
 {
-    // note: returns also the ID of the poy that makes the face visible
+    // note: returns also the ID of the poly that makes the face visible
     int id=-1;
     for(uint pid : this->adj_f2p(fid))
     {
