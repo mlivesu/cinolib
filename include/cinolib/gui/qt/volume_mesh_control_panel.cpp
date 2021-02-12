@@ -39,6 +39,7 @@
 #include <cinolib/gradient.h>
 #include <cinolib/symbols.h>
 #include <cinolib/ambient_occlusion.h>
+#include <cinolib/export_visible.h>
 #include <iostream>
 
 namespace cinolib
@@ -590,6 +591,7 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         cb_actions->insertItem(5,"Mark sharp creases (>60deg)");
         cb_actions->insertItem(6,"Mark sharp creases (>30deg)");
         cb_actions->insertItem(7,"Update normals");
+        cb_actions->insertItem(8,"Export Visible");
         cb_actions->setFont(global_font);
         QVBoxLayout *layout = new QVBoxLayout();
         layout->addWidget(cb_actions);
@@ -1434,6 +1436,13 @@ void VolumeMeshControlPanel<Mesh>::connect()
             case 5: m->edge_mark_sharp_creases(to_rad(60.0)); break;
             case 6: m->edge_mark_sharp_creases(to_rad(30.0)); break;
             case 7: m->update_normals(); break;
+            case 8: {
+                        Polyhedralmesh<M,V,E,F,P> tmp;
+                        export_visible(*m, tmp);
+                        std::string filename = QFileDialog::getSaveFileName(NULL, "Save mesh", ".", "3D Meshes (*.HEDRA)").toStdString();
+                        if(!filename.empty()) tmp.save(filename.c_str());
+                        break;
+                    }
         }
         m->updateGL();
         canvas->updateGL();
