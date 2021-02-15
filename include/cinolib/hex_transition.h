@@ -51,10 +51,16 @@ namespace cinolib
 
 enum class HexTransition
 {
-    FLAT_FACE_4_TO_2, // transition from 4x4 to 2x2 grid: flat    region
-    CONV_EDGE_4_TO_2, // transition from 4x4 to 2x2 grid: convex  edge
-    CONC_EDGE_4_TO_2, // transition from 4x4 to 2x2 grid: concave edge
-    CONC_VERT_4_TO_2  // transition from 4x4 to 2x2 grid: concave vertex
+    FLAT_FACE_4_TO_2_0,      // transition from 4x4 to 2x2 grid: flat    region
+    FLAT_FACE_4_TO_2_1,      // transition from 4x4 to 2x2 grid: flat    region
+    FLAT_FACE_4_TO_2_2_diag, // transition from 4x4 to 2x2 grid: flat    region
+    FLAT_FACE_4_TO_2_2_line, // transition from 4x4 to 2x2 grid: flat    region
+    FLAT_FACE_4_TO_2_3,      // transition from 4x4 to 2x2 grid: flat    region
+    FLAT_FACE_4_TO_2_4,      // transition from 4x4 to 2x2 grid: flat    region
+    CONV_EDGE_4_TO_2,        // transition from 4x4 to 2x2 grid: convex  edge
+    CONC_EDGE_4_TO_2,        // transition from 4x4 to 2x2 grid: concave edge
+    CONC_VERT_4_TO_2,        // transition from 4x4 to 2x2 grid: concave vertex
+    HYBR_VERT_4_TO_2         // transition from 4x4 to 2x2 grid: concave vertex
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
