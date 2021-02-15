@@ -54,8 +54,7 @@
  * each vertex yields a hexahedron.
  *
  * Marechal's article describes only the basic (flat) scheme, and barely mentions the
- * schemes that are necessary to handle convex and concave edges. Additionally to these
- * three, a fourth scheme is necessary to handle concave corners. Overall, we have:
+ * schemes that are necessary to handle convex and concave edges. Our schemes are:
  *
  *   - Flat_Face_4_to_2 => transitions from a 4x4 grid to a 2x2 grid
  *
@@ -68,6 +67,8 @@
  *   - Conv_Vert_4_to_2 => transition brick for concave vertices shared between
  *                         three mutually orthogonal 4x4 grids
  *
+ *   - Hybr_Vert_4_to_2 => transition brick for vertices shared between
+ *                         three convex and three concave edges
  *
  * For each scheme we hard coded vertices, faces and cells of the (primal) polyhedral mesh.
  * Each mesh has normal size (i.e. the longest side has length 1), and the vertex with id 0
@@ -82,6 +83,7 @@
  *
  *   - for Conv_Vert_4_to_2 => vertex v0 is the concave vertex at the intersection of the 4x4 grids
  *
+ *   - for Hybr_Vert_4_to_2 => vertex v0 is the middle vertex at the intersection of all conves and concave edges
  *
  * USAGE: Schemes are meant to be used as follows:
  *
@@ -100,9 +102,6 @@
  * old elements from the grid.
  *
  * Step 4 is a standard dualization, and can be done with cinolib::dual_mesh
- *
- * TODO: fix orientation of mesh elements
- *
 */
 
 namespace cinolib
