@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include <cinolib/polygon_kernel.h>
 #include <cinolib/min_max_inf.h>
+#include <cinolib/geometry/polygon_utils.h>
 
 #ifdef CINOLIB_USES_BOOST
 #include <boost/geometry/geometries/polygon.hpp>
@@ -54,6 +55,9 @@ double polygon_kernel(const std::vector<vec3d> & poly,   // will discard z compo
 {
     std::vector<vec2d> poly_2d, kernel_2d;
     for(auto p : poly) poly_2d.push_back(vec2d(p));
+
+    if (!polygon_is_CCW(poly_2d))
+        std::reverse(poly_2d.begin(), poly_2d.end());
 
     double area = polygon_kernel(poly_2d, kernel_2d);
 
