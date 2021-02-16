@@ -59,8 +59,8 @@ namespace cinolib
 */
 
 CINO_INLINE
-double polygon_kernel(const std::vector<vec2d> & poly,
-                            std::vector<vec2d> & kernel);
+double polygon_kernel(std::vector<vec2d>   poly,
+                      std::vector<vec2d> & kernel);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

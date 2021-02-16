@@ -72,8 +72,8 @@ double polygon_kernel(const std::vector<vec3d> & poly,   // will discard z compo
 #ifdef CINOLIB_USES_BOOST
 
 CINO_INLINE
-double polygon_kernel(const std::vector<vec2d> & poly,
-                            std::vector<vec2d> & kernel)
+double polygon_kernel(std::vector<vec2d>   poly,
+                      std::vector<vec2d> & kernel)
 {
     kernel.clear();
     if(poly.empty()) return 0;
