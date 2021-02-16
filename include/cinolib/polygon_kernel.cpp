@@ -56,12 +56,9 @@ double polygon_kernel(const std::vector<vec3d> & poly,   // will discard z compo
     std::vector<vec2d> poly_2d, kernel_2d;
     for(auto p : poly) poly_2d.push_back(vec2d(p));
 
-    if (!polygon_is_CCW(poly_2d))
-        std::reverse(poly_2d.begin(), poly_2d.end());
-
     double area = polygon_kernel(poly_2d, kernel_2d);
 
-    if (area > 0)
+    if(area > 0)
     {
         kernel.clear();
         for(auto p : kernel_2d) kernel.push_back(vec3d(p.x(), p.y(), 0));
@@ -79,8 +76,10 @@ double polygon_kernel(const std::vector<vec2d> & poly,
                             std::vector<vec2d> & kernel)
 {
     kernel.clear();
-    if (poly.empty()) return 0;
+    if(poly.empty()) return 0;
 
+    if(!polygon_is_CCW(poly)) std::reverse(poly.begin(), poly.end());
+  
     // define 2d axis aligned bbox
     vec2d min( inf_double,  inf_double);
     vec2d max(-inf_double, -inf_double);
