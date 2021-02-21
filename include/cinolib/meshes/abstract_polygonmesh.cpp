@@ -1784,7 +1784,7 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::poly_export_element(const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const
 {
     std::vector<uint> f(this->verts_per_poly(pid));
-    std::iota(f.begin(), f.end(), verts.size());
+    std::iota(f.begin(), f.end(), static_cast<uint>(verts.size()));
     for(uint vid : adj_p2v(pid)) verts.push_back(this->vert(vid));
     faces.push_back(f);
 }
