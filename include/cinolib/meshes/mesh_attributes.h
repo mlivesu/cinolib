@@ -122,17 +122,16 @@ enum
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct Mesh_std_attributes
 {
     std::string filename;
     bool        update_normals = true;
     bool        update_bbox    = true;
-}
-Mesh_std_attributes;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct Vert_std_attributes
 {
     vec3d          normal  = vec3d(0,0,0);
     Color          color   = Color::WHITE();
@@ -140,22 +139,20 @@ typedef struct
     int            label   = -1;
     float          quality = 0.0;
     std::bitset<8> flags   = 0x00;
-}
-Vert_std_attributes;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct Edge_std_attributes
 {
     Color          color = Color::BLACK();
     int            label = -1;
     std::bitset<8> flags = 0x00;
-}
-Edge_std_attributes;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct Polygon_std_attributes
 {
     vec3d          normal  = vec3d(0,0,0);
     Color          color   = Color::WHITE();
@@ -163,19 +160,17 @@ typedef struct
     float          quality = 0.0;
     float          AO      = 1.0;
     std::bitset<8> flags   = 0x00;
-}
-Polygon_std_attributes;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct Polyhedron_std_attributes
 {
     Color          color   = Color::WHITE();
     int            label   = -1;
     float          quality = 0.0;
     std::bitset<8> flags   = 0x00;
-}
-Polyhedron_std_attributes;
+};
 
 }
 
