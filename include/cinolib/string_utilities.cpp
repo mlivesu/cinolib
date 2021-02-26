@@ -38,8 +38,6 @@
 namespace cinolib
 {
 
-// "/folder1/folder2/file.ext" => "ext"
-//
 CINO_INLINE
 std::string get_file_extension(const std::string & s)
 {
@@ -50,21 +48,18 @@ std::string get_file_extension(const std::string & s)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// "/folder1/folder2/file.ext" => "/folder1/folder2/"
-//
 CINO_INLINE
-std::string get_file_path(const std::string & s)
+std::string get_file_path(const std::string & s, const bool with_basename)
 {
-    size_t pos = s.find_last_of("/");
+    size_t pos =  (with_basename) ? s.find_last_of(".") : s.find_last_of("/");
     if(pos>=s.size()) return "./";
+    if(with_basename) return s.substr(0,pos);
     return s.substr(0,pos+1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-// "/folder1/folder2/file.ext" => "file.ext"
-//
 CINO_INLINE
 std::string get_file_name(const std::string & s, const bool with_extension)
 {
