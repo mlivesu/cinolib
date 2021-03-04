@@ -1567,8 +1567,11 @@ void VolumeMeshControlPanel<Mesh>::connect()
                 {
                     uint fid = m->pick_face(p);
                     uint pid_beneath;
-                    bool b = m->face_is_visible(fid,pid_beneath);
-                    assert(b); // sanity check
+                    if(!m->face_is_visible(fid,pid_beneath))
+                    {
+                        // not a good selection...
+                        return;
+                    }
                     for(uint vid : m->adj_p2v(pid_beneath))
                     for(uint pid : m->adj_v2p(vid))
                     {
