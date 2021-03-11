@@ -51,16 +51,22 @@ namespace cinolib
 
 enum class HexTransition
 {
-    FLAT_FACE_4_TO_2_0,      // transition from 4x4 to 2x2 grid: flat region
-    FLAT_FACE_4_TO_2_1,      // transition from 4x4 to 2x2 grid: flat region (1 convex edge  incident on top)
-    FLAT_FACE_4_TO_2_2_diag, // transition from 4x4 to 2x2 grid: flat region (2 convex edges incident on top)
-    FLAT_FACE_4_TO_2_2_line, // transition from 4x4 to 2x2 grid: flat region (2 convex edges incident on top)
-    FLAT_FACE_4_TO_2_3,      // transition from 4x4 to 2x2 grid: flat region (3 convex edges incident on top)
-    FLAT_FACE_4_TO_2_4,      // transition from 4x4 to 2x2 grid: flat region (4 convex edges incident on top)
-    CONV_EDGE_4_TO_2,        // transition from 4x4 to 2x2 grid: convex  edge
-    CONC_EDGE_4_TO_2,        // transition from 4x4 to 2x2 grid: concave edge
-    CONC_VERT_4_TO_2,        // transition from 4x4 to 2x2 grid: concave vertex (3 concave incident edges)
-    HYBR_VERT_4_TO_2         // transition from 4x4 to 2x2 grid: hybrid  vertex (3 convex + 3 concave incident edges)
+    // schemes for strongly balanced grids
+    FLAT,
+    FLAT_CONVEX,
+    CONVEX_1,
+    CONVEX_2,
+    CONVEX_3,
+    EDGE,
+    VERT_CENTER,
+    VERT_SIDE,
+
+    // additional schemes for weakly balanced grids
+    EDGE_WB,
+    VERT_CENTER_WB_1,
+    VERT_CENTER_WB_2,
+    VERT_CENTER_WB_3,
+    VERT_SIDE_WB
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
