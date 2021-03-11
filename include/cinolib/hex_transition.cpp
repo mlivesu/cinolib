@@ -81,6 +81,15 @@ void hex_transition(const HexTransition                    type,
             break;
         }
 
+        case HexTransition::FLAT_CONVEX:
+        {
+            verts   = Flat_Convex::verts;
+            faces   = Flat_Convex::faces;
+            polys   = Flat_Convex::polys;
+            winding = Flat_Convex::winding;
+            break;
+        }
+
         default: assert(false && "unknown scheme!");
     }
 
