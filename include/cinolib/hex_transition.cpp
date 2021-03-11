@@ -180,6 +180,15 @@ void hex_transition(const HexTransition                    type,
             break;
         }
 
+        case HexTransition::VERT_SIDE_WB:
+        {
+            verts   = Vert_side_WB::verts;
+            faces   = Vert_side_WB::faces;
+            polys   = Vert_side_WB::polys;
+            winding = Vert_side_WB::winding;
+            break;
+        }
+
         default: assert(false && "unknown scheme!");
     }
 
