@@ -135,6 +135,15 @@ void hex_transition(const HexTransition                    type,
             break;
         }
 
+        case HexTransition::VERT_SIDE:
+        {
+            verts   = Vert_side::verts;
+            faces   = Vert_side::faces;
+            polys   = Vert_side::polys;
+            winding = Vert_side::winding;
+            break;
+        }
+
         default: assert(false && "unknown scheme!");
     }
 
