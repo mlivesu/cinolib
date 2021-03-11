@@ -74,10 +74,10 @@ void hex_transition(const HexTransition                    type,
     {
         case HexTransition::FLAT:
         {
-            verts   = Flat_Face_4_to_2_0::verts;
-            faces   = Flat_Face_4_to_2_0::faces;
-            polys   = Flat_Face_4_to_2_0::polys;
-            winding = Flat_Face_4_to_2_0::winding;
+            verts   = Flat::verts;
+            faces   = Flat::faces;
+            polys   = Flat::polys;
+            winding = Flat::winding;
             break;
         }
 
