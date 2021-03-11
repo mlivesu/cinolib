@@ -108,6 +108,15 @@ void hex_transition(const HexTransition                    type,
             break;
         }
 
+        case HexTransition::CONVEX_3:
+        {
+            verts   = Convex_3::verts;
+            faces   = Convex_3::faces;
+            polys   = Convex_3::polys;
+            winding = Convex_3::winding;
+            break;
+        }
+
         default: assert(false && "unknown scheme!");
     }
 

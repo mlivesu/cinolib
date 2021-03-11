@@ -347,6 +347,64 @@ namespace Convex_2
 
 namespace Convex_3
 {
+    static const std::vector<double> verts =
+    {
+          0 ,   0 ,   0 ,
+          1 ,   1 ,   1 ,
+          1 ,   1 ,   0 ,
+          1 ,   0 ,   1 ,
+          0 ,   1 ,   1 ,
+          0 ,   0 ,   1 ,
+          1 ,   0 ,   0 ,
+          0 ,   1 ,   0 ,
+          0 , 0.5 ,   0 ,
+        0.5 ,   0 ,   0 ,
+          0 ,   0 , 0.5 ,
+          0 , 0.5 ,   1 ,
+        0.5 ,   1 ,   1 ,
+          0 ,   1 , 0.5 ,
+          1 ,   1 , 0.5 ,
+          1 , 0.5 ,   0 ,
+        0.5 ,   1 ,   0 ,
+    };
+
+    static const std::vector<std::vector<uint>> faces =
+    {
+        { 16 ,  7 ,  8 ,  9 ,  6 , 15 },
+        { 13 ,  7 ,  8 , 10 ,  5 , 11 },
+        { 12 ,  1 ,  3 ,  5 , 11      },
+        {  8 ,  0 ,  9                },
+        {  8 ,  0 , 10                },
+        {  8 ,  9 , 10                },
+        {  0 ,  9 , 10                },
+        {  5 ,  3 ,  6 ,  9 , 10      },
+        { 15 ,  6 ,  3 ,  1 , 14      },
+        { 14 ,  1 , 12 , 13 ,  7 , 16 },
+        { 11 , 12 , 13                },
+        {  4 , 12 , 13                },
+        { 11 ,  4 , 13                },
+        { 11 , 12 ,  4                },
+        { 14 , 15 , 16                },
+        {  2 , 15 , 16                },
+        { 14 ,  2 , 16                },
+        { 14 , 15 ,  2                },
+    };
+
+    static const std::vector<std::vector<uint>> polys =
+    {
+        {  6 ,  3 ,  4 ,  5                       },
+        {  5 ,  7 ,  0 ,  1 , 8 , 2 , 9 , 10 , 14 },
+        { 10 , 11 , 12 , 13                       },
+        { 14 , 15 , 16 , 17                       },
+    };
+
+    static const std::vector<std::vector<bool>> winding =
+    {
+        { true  , false , true  , false                                        },
+        { true  , false , false , true  , false , false , false , true  , true },
+        { false , true  , true  , true                                         },
+        { false , true  , true  , true                                         },
+    };
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
