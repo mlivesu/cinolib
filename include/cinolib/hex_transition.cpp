@@ -117,6 +117,15 @@ void hex_transition(const HexTransition                    type,
             break;
         }
 
+        case HexTransition::EDGE:
+        {
+            verts   = Edge::verts;
+            faces   = Edge::faces;
+            polys   = Edge::polys;
+            winding = Edge::winding;
+            break;
+        }
+
         default: assert(false && "unknown scheme!");
     }
 
