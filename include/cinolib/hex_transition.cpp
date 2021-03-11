@@ -126,6 +126,15 @@ void hex_transition(const HexTransition                    type,
             break;
         }
 
+        case HexTransition::VERT_CENTER:
+        {
+            verts   = Vert_center::verts;
+            faces   = Vert_center::faces;
+            polys   = Vert_center::polys;
+            winding = Vert_center::winding;
+            break;
+        }
+
         default: assert(false && "unknown scheme!");
     }
 
