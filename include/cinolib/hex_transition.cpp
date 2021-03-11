@@ -144,6 +144,15 @@ void hex_transition(const HexTransition                    type,
             break;
         }
 
+        case HexTransition::EDGE_WB:
+        {
+            verts   = Edge_WB::verts;
+            faces   = Edge_WB::faces;
+            polys   = Edge_WB::polys;
+            winding = Edge_WB::winding;
+            break;
+        }
+
         default: assert(false && "unknown scheme!");
     }
 
