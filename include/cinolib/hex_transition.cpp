@@ -72,93 +72,12 @@ void hex_transition(const HexTransition                    type,
 {
     switch(type)
     {
-        case HexTransition::FLAT_FACE_4_TO_2_0:
+        case HexTransition::FLAT:
         {
             verts   = Flat_Face_4_to_2_0::verts;
             faces   = Flat_Face_4_to_2_0::faces;
             polys   = Flat_Face_4_to_2_0::polys;
             winding = Flat_Face_4_to_2_0::winding;
-            break;
-        }
-
-        case HexTransition::FLAT_FACE_4_TO_2_1:
-        {
-            verts   = Flat_Face_4_to_2_1::verts;
-            faces   = Flat_Face_4_to_2_1::faces;
-            polys   = Flat_Face_4_to_2_1::polys;
-            winding = Flat_Face_4_to_2_1::winding;
-            break;
-        }
-
-        case HexTransition::FLAT_FACE_4_TO_2_2_line:
-        {
-            verts   = Flat_Face_4_to_2_2_line::verts;
-            faces   = Flat_Face_4_to_2_2_line::faces;
-            polys   = Flat_Face_4_to_2_2_line::polys;
-            winding = Flat_Face_4_to_2_2_line::winding;
-            break;
-        }
-
-        case HexTransition::FLAT_FACE_4_TO_2_2_diag:
-        {
-            verts   = Flat_Face_4_to_2_2_diag::verts;
-            faces   = Flat_Face_4_to_2_2_diag::faces;
-            polys   = Flat_Face_4_to_2_2_diag::polys;
-            winding = Flat_Face_4_to_2_2_diag::winding;
-            break;
-        }
-
-        case HexTransition::FLAT_FACE_4_TO_2_3:
-        {
-            verts   = Flat_Face_4_to_2_3::verts;
-            faces   = Flat_Face_4_to_2_3::faces;
-            polys   = Flat_Face_4_to_2_3::polys;
-            winding = Flat_Face_4_to_2_3::winding;
-            break;
-        }
-
-        case HexTransition::FLAT_FACE_4_TO_2_4:
-        {
-            verts   = Flat_Face_4_to_2_4::verts;
-            faces   = Flat_Face_4_to_2_4::faces;
-            polys   = Flat_Face_4_to_2_4::polys;
-            winding = Flat_Face_4_to_2_4::winding;
-            break;
-        }
-
-        case HexTransition::CONV_EDGE_4_TO_2:
-        {
-            verts   = Conv_Edge_4_to_2::verts;
-            faces   = Conv_Edge_4_to_2::faces;
-            polys   = Conv_Edge_4_to_2::polys;
-            winding = Conv_Edge_4_to_2::winding;
-            break;
-        }
-
-        case HexTransition::CONC_EDGE_4_TO_2:
-        {
-            verts   = Conc_Edge_4_to_2::verts;
-            faces   = Conc_Edge_4_to_2::faces;
-            polys   = Conc_Edge_4_to_2::polys;
-            winding = Conc_Edge_4_to_2::winding;
-            break;
-        }
-
-        case HexTransition::HYBR_VERT_4_TO_2:
-        {
-            verts   = Hybr_Vert_4_to_2::verts;
-            faces   = Hybr_Vert_4_to_2::faces;
-            polys   = Hybr_Vert_4_to_2::polys;
-            winding = Hybr_Vert_4_to_2::winding;
-            break;
-        }
-
-        case HexTransition::CONC_VERT_4_TO_2:
-        {
-            verts   = Conc_Vert_4_to_2::verts;
-            faces   = Conc_Vert_4_to_2::faces;
-            polys   = Conc_Vert_4_to_2::polys;
-            winding = Conc_Vert_4_to_2::winding;
             break;
         }
 
