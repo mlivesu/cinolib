@@ -90,6 +90,24 @@ void hex_transition(const HexTransition                    type,
             break;
         }
 
+        case HexTransition::CONVEX_1:
+        {
+            verts   = Convex_1::verts;
+            faces   = Convex_1::faces;
+            polys   = Convex_1::polys;
+            winding = Convex_1::winding;
+            break;
+        }
+
+        case HexTransition::CONVEX_2:
+        {
+            verts   = Convex_2::verts;
+            faces   = Convex_2::faces;
+            polys   = Convex_2::polys;
+            winding = Convex_2::winding;
+            break;
+        }
+
         default: assert(false && "unknown scheme!");
     }
 

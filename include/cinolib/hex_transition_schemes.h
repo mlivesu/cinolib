@@ -245,12 +245,102 @@ namespace Flat_Convex
 
 namespace Convex_1
 {
+
+    static const std::vector<double> verts =
+    {
+          0 ,   0 ,   0 ,
+          1 ,   1 ,   1 ,
+          1 ,   1 ,   0 ,
+          1 ,   0 ,   1 ,
+          0 ,   1 ,   1 ,
+          0 ,   0 ,   1 ,
+          1 ,   0 ,   0 ,
+          0 ,   1 ,   0 ,
+          0 , 0.5 ,   0 ,
+        0.5 ,   0 ,   0 ,
+          0 ,   0 , 0.5 ,
+    };
+
+    static const std::vector<std::vector<uint>> faces =
+    {
+        { 6 , 3 ,  1 , 2      },
+        { 3 , 5 ,  4 , 1      },
+        { 7 , 2 ,  1 , 4      },
+        { 8 , 0 ,  9          },
+        { 8 , 0 , 10          },
+        { 8 , 9 , 10          },
+        { 0 , 9 , 10 ,        },
+        { 5 , 3 ,  6 , 9 , 10 },
+        { 6 , 2 ,  7 , 8 ,  9 },
+        { 5 , 4 ,  7 , 8 , 10 },
+    };
+
+    static const std::vector<std::vector<uint>> polys =
+    {
+        { 6 , 3 , 4 , 5             },
+        { 5 , 7 , 8 , 9 , 0 , 1 , 2 },
+    };
+
+    static const std::vector<std::vector<bool>> winding =
+    {
+        { true  , false , true  , false                         },
+        { true  , false , false , true  , false , false , false },
+    };
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 namespace Convex_2
 {
+    static const std::vector<double> verts =
+    {
+          0 ,   0 ,   0 ,
+          1 ,   1 ,   1 ,
+          1 ,   1 ,   0 ,
+          1 ,   0 ,   1 ,
+          0 ,   1 ,   1 ,
+          0 ,   0 ,   1 ,
+          1 ,   0 ,   0 ,
+          0 ,   1 ,   0 ,
+          0 , 0.5 ,   0 ,
+        0.5 ,   0 ,   0 ,
+          0 ,   0 , 0.5 ,
+          0 , 0.5 ,   1 ,
+        0.5 ,   1 ,   1 ,
+          0 ,   1 , 0.5 ,
+    };
+
+    static const std::vector<std::vector<uint>> faces =
+    {
+        {  6 ,  3 ,  1 ,  2           },
+        { 13 ,  7 ,  8 , 10 ,  5 , 11 },
+        { 12 ,  1 ,  3 ,  5 , 11      },
+        {  8 ,  0 ,  9                },
+        {  8 ,  0 , 10                },
+        {  8 ,  9 , 10                },
+        {  0 ,  9 , 10                },
+        {  5 ,  3 ,  6 ,  9 , 10      },
+        {  6 ,  2 ,  7 ,  8 ,  9      },
+        { 13 ,  7 ,  2 ,  1 , 12      },
+        { 11 , 12 , 13                },
+        {  4 , 12 , 13                },
+        { 11 ,  4 , 13                },
+        { 11 , 12 , 4                 },
+    };
+
+    static const std::vector<std::vector<uint>> polys =
+    {
+        {  6 ,  3 ,  4 ,  5                  },
+        {  5 ,  7 ,  8 ,  1 , 0 , 2 , 9 , 10 },
+        { 10 , 11 , 12 , 13                  },
+    };
+
+    static const std::vector<std::vector<bool>> winding =
+    {
+        { true  , false , true  , false                                },
+        { true  , false , false , true  , false , false , false , true },
+        { false , true  , true  , true                                 },
+    };
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
