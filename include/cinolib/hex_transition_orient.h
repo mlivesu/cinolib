@@ -37,8 +37,8 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_HEX_TRANSITION_H
-#define CINO_HEX_TRANSITION_H
+#ifndef CINO_HEX_TRANSITION_ORIENT_H
+#define CINO_HEX_TRANSITION_ORIENT_H
 
 #include <cinolib/geometry/vec3.h>
 #include <map>
@@ -105,7 +105,7 @@ struct SchemeInfo
  *    - application_poly_centroid     => centroid of the hexahedron that will be replaced with the transition
  */
 CINO_INLINE
-void orient_hex_transition(std::vector<vec3d>             & verts,
+void hex_transition_orient(std::vector<vec3d>             & verts,
                            std::vector<std::vector<uint>> & faces,
                            std::vector<std::vector<uint>> & polys,
                            std::vector<std::vector<bool>> & winding,
@@ -114,7 +114,7 @@ void orient_hex_transition(std::vector<vec3d>             & verts,
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "hex_transition.cpp"
+#include "hex_transition_orient.cpp"
 #endif
 
-#endif // CINO_HEX_TRANSITION_H
+#endif // CINO_HEX_TRANSITION_ORIENT_H

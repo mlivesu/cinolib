@@ -38,6 +38,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/hex_transition_install.h>
+#include <cinolib/hex_transition_orient.h>
 
 namespace cinolib
 {
@@ -773,7 +774,7 @@ void merge_schemes_into_mesh(Polyhedralmesh<M,V,E,F,P>           & m,
 
         vec3d poly_centroid = m.poly_centroid(p.first);
         SchemeInfo info = p.second;
-        orient_hex_transition(verts, faces, polys, winding, info, poly_centroid);
+        hex_transition_orient(verts, faces, polys, winding, info, poly_centroid);
 
         //merge vertices
         for(auto & v : verts)

@@ -40,7 +40,7 @@
 #ifndef CINO_HEX_TRANSITION_INSTALL_H
 #define CINO_HEX_TRANSITION_INSTALL_H
 
-#include <cinolib/hex_transition.h>
+#include <cinolib/meshes/meshes.h>
 
 namespace cinolib
 {

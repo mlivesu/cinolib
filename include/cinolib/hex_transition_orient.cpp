@@ -37,7 +37,7 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/hex_transition.h>
+#include <cinolib/hex_transition_orient.h>
 #include <cinolib/hex_transition_schemes.h>
 
 namespace cinolib
@@ -811,7 +811,7 @@ void orient_concave_vert_side(std::vector<vec3d>             & verts,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void orient_hex_transition(std::vector<vec3d>             & verts,
+void hex_transition_orient(std::vector<vec3d>             & verts,
                            std::vector<std::vector<uint>> & faces,
                            std::vector<std::vector<uint>> & polys,
                            std::vector<std::vector<bool>> & winding,
