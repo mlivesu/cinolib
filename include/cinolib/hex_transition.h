@@ -116,7 +116,7 @@ void orient_hex_transition(std::vector<vec3d>             & verts,
                            std::vector<std::vector<uint>> & polys,
                            std::vector<std::vector<bool>> & winding,
                            const SchemeInfo               & info,
-                           const vec3d                      application_poly_centroid);
+                           const vec3d                      poly_centroid);
 }
 
 #ifndef  CINO_STATIC_LIB

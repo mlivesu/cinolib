@@ -54,9 +54,9 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m,
+void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m_in,
                             const std::vector<bool>         & transition_verts,
-                                  Polyhedralmesh<M,V,E,F,P> & out);
+                                  Polyhedralmesh<M,V,E,F,P> & m_out);
 }
 
 #ifndef  CINO_STATIC_LIB
