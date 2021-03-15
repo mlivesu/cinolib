@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2021: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -331,121 +331,122 @@ void orient_flat(std::vector<vec3d>             & verts,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void orient_convex(std::vector<vec3d>        &verts,
-                   std::vector<std::vector<uint>> &faces,
-                   std::vector<std::vector<uint>> &polys,
-                   std::vector<std::vector<bool>> &winding,
-                   SchemeInfo &info,
-                   const vec3d &poly_centroid){
-
-    if (info.type == HexTransition::CONVEX_1){
-
+void orient_convex(std::vector<vec3d>             & verts,
+                   std::vector<std::vector<uint>> & faces,
+                   std::vector<std::vector<uint>> & polys,
+                   std::vector<std::vector<bool>> & winding,
+                   SchemeInfo                     & info,
+                   const vec3d                    & poly_centroid)
+{
+    if (info.type == HexTransition::CONVEX_1)
+    {
         verts.reserve(Convex_1::verts.size()/3);
-        for(uint vid=0; vid<Convex_1::verts.size(); vid+=3){
+        for(uint vid=0; vid<Convex_1::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Convex_1::verts[vid]-0.5, Convex_1::verts[vid+1]-0.5, Convex_1::verts[vid+2]-0.5));
         }
         polys   = Convex_1::polys;
         faces   = Convex_1::faces;
         winding = Convex_1::winding;
 
-        switch (info.orientations[0]) {
-
-        case PLUS_X:
-            rotate(verts, "z", -M_PI/2);
-            break;
-        case PLUS_Y: break; //DEFAULT
-        case PLUS_Z:
-            rotate(verts, "x", M_PI/2);
-            break;
-        case MINUS_X:
-            rotate(verts, "z", M_PI/2);
-            break;
-        case MINUS_Y:
-            rotate(verts, "z", M_PI);
-            break;
-        case MINUS_Z:
-            rotate(verts, "x", -M_PI/2);
-            break;
+        switch (info.orientations[0])
+        {
+            case PLUS_Y:  break; //DEFAULT
+            case PLUS_X:  rotate(verts, "z", -M_PI/2); break;
+            case PLUS_Z:  rotate(verts, "x",  M_PI/2); break;
+            case MINUS_X: rotate(verts, "z",  M_PI/2); break;
+            case MINUS_Y: rotate(verts, "z",  M_PI);   break;
+            case MINUS_Z: rotate(verts, "x", -M_PI/2); break;
         }
 
-        for(auto &vert : verts){
-            vert *= info.scale;
-            vert += poly_centroid;
+        for(auto & v : verts)
+        {
+            v *= info.scale;
+            v += poly_centroid;
         }
-        if(!eps_eq(info.t_verts[0], verts.at(0))) {
+        if(!eps_eq(info.t_verts[0], verts.at(0)))
+        {
             try_reflections(verts, info, poly_centroid);
         }
     }
-
-    else if(info.type == HexTransition::CONVEX_2){
-
+    else if(info.type == HexTransition::CONVEX_2)
+    {
         verts.reserve(Convex_2::verts.size()/3);
-        for(uint vid=0; vid<Convex_2::verts.size(); vid+=3){
+        for(uint vid=0; vid<Convex_2::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Convex_2::verts[vid]-0.5, Convex_2::verts[vid+1]-0.5, Convex_2::verts[vid+2]-0.5));
         }
         polys   = Convex_2::polys;
         faces   = Convex_2::faces;
         winding = Convex_2::winding;
 
-        for(auto &vert : verts){
-            vert *= info.scale;
-            vert += poly_centroid;
+        for(auto & v : verts)
+        {
+            v *= info.scale;
+            v += poly_centroid;
         }
 
         if(!((eps_eq(info.t_verts[0], verts.at(0)) && eps_eq(info.t_verts[1], verts.at(4))) ||
-            (eps_eq(info.t_verts[0], verts.at(4)) && eps_eq(info.t_verts[1], verts.at(0))))){
+             (eps_eq(info.t_verts[0], verts.at(4)) && eps_eq(info.t_verts[1], verts.at(0)))))
+        {
             try_rotations(verts, info, poly_centroid);
         }
         return;
-
     }
-    else if(info.type == HexTransition::CONVEX_3){
-
+    else if(info.type == HexTransition::CONVEX_3)
+    {
         verts.reserve(Convex_3::verts.size()/3);
-        for(uint vid=0; vid<Convex_3::verts.size(); vid+=3){
+        for(uint vid=0; vid<Convex_3::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Convex_3::verts[vid]-0.5, Convex_3::verts[vid+1]-0.5, Convex_3::verts[vid+2]-0.5));
         }
         polys   = Convex_3::polys;
         faces   = Convex_3::faces;
         winding = Convex_3::winding;
 
-        if(info.cuts[PLUS_X] && info.cuts[PLUS_Y]  && info.cuts[PLUS_Z]){ //10 11 12
-            rotate(verts, "y", M_PI);
+        if(info.cuts[PLUS_X] && info.cuts[PLUS_Y]  && info.cuts[PLUS_Z])
+        {
+            rotate(verts, "y", M_PI); //10 11 12
         }
-        else if(info.cuts[PLUS_X] && info.cuts[PLUS_Z]  && info.cuts[MINUS_Y]){ //10 12 14
-            rotate(verts, "x", -M_PI_2);
-            rotate(verts, "y", M_PI);
-
+        else if(info.cuts[PLUS_X] && info.cuts[PLUS_Z] && info.cuts[MINUS_Y])
+        {
+            rotate(verts, "x", -M_PI_2); //10 12 14
+            rotate(verts, "y",  M_PI);
         }
-        else if(info.cuts[PLUS_Z] && info.cuts[MINUS_X]  && info.cuts[MINUS_Y]){ //12 13 14
-            rotate(verts, "y", M_PI_2);
+        else if(info.cuts[PLUS_Z] && info.cuts[MINUS_X] && info.cuts[MINUS_Y])
+        {
+            rotate(verts, "y", M_PI_2); //12 13 14
             rotate(verts, "z", M_PI_2);
         }
-        else if(info.cuts[PLUS_X] && info.cuts[MINUS_Y]  && info.cuts[MINUS_Z]){ //10 14 15
-            rotate(verts, "x", M_PI);
+        else if(info.cuts[PLUS_X] && info.cuts[MINUS_Y] && info.cuts[MINUS_Z])
+        {
+            rotate(verts, "x", M_PI); //10 14 15
             rotate(verts, "y", M_PI);
 
         }
-        else if(info.cuts[PLUS_X] && info.cuts[PLUS_Y]  && info.cuts[MINUS_Z]){ //10 11 15
-            rotate(verts, "y", -M_PI/2);
+        else if(info.cuts[PLUS_X] && info.cuts[PLUS_Y] && info.cuts[MINUS_Z])
+        {
+            rotate(verts, "y", -M_PI/2); //10 11 15
         }
-        else if(info.cuts[PLUS_Y] && info.cuts[PLUS_Z]  && info.cuts[MINUS_X]){ //10 11 13
-            rotate(verts, "x", M_PI_2);
+        else if(info.cuts[PLUS_Y] && info.cuts[PLUS_Z] && info.cuts[MINUS_X])
+        {
+            rotate(verts, "x", M_PI_2); //10 11 13
         }
-        else if(info.cuts[MINUS_X] && info.cuts[MINUS_Y]  && info.cuts[MINUS_Z]){ //13 14 15
-             rotate(verts, "z", M_PI_2);
+        else if(info.cuts[MINUS_X] && info.cuts[MINUS_Y] && info.cuts[MINUS_Z])
+        {
+             rotate(verts, "z", M_PI_2); //13 14 15
         }
-        else if(info.cuts[PLUS_Y] && info.cuts[MINUS_X]  && info.cuts[MINUS_Z]){ //11 13 15
-            //rotate(scheme, "z", M_PI/2);
+        else if(info.cuts[PLUS_Y] && info.cuts[MINUS_X] && info.cuts[MINUS_Z])
+        {
+            //rotate(scheme, "z", M_PI/2); //11 13 15
         }
 
-        for(auto &vert : verts){
-            vert *= info.scale;
-            vert += poly_centroid;
+        for(auto & v : verts)
+        {
+            v *= info.scale;
+            v += poly_centroid;
         }
-
     }
-
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
