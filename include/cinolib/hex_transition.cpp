@@ -46,6 +46,16 @@ namespace cinolib
 namespace
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+bool eps_eq(const vec3d & a, const vec3d & b, double eps = 1e-6)
+{
+    return (a.dist(b) <= eps);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void reflect(std::vector<vec3d> & verts,
              const std::string  & axis)

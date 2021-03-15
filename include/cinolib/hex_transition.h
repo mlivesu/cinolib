@@ -40,7 +40,7 @@
 #ifndef CINO_HEX_TRANSITION_H
 #define CINO_HEX_TRANSITION_H
 
-#include <cinolib/meshes/meshes.h>
+#include <cinolib/geometry/vec3.h>
 
 namespace cinolib
 {
@@ -94,13 +94,6 @@ struct SchemeInfo
     std::map<uint,bool> cuts;
     std::vector<int>    orientations;
 };
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-inline bool eps_eq(const vec3d & a, const vec3d & b, double eps = 1e-6)
-{
-    return (a.dist(b) <= eps);
-}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
