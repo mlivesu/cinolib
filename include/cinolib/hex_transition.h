@@ -41,6 +41,7 @@
 #define CINO_HEX_TRANSITION_H
 
 #include <cinolib/geometry/vec3.h>
+#include <map>
 
 namespace cinolib
 {
