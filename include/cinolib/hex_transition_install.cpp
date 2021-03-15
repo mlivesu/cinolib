@@ -794,6 +794,7 @@ void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m,
     }
 
     out.polys_remove(polys_to_remove);
+    out.poly_fix_orientation();
 }
 
 }
