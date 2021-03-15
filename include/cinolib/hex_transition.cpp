@@ -659,167 +659,140 @@ void orient_concave_vert_side(std::vector<vec3d>             & verts,
                               SchemeInfo                     & info,
                               const vec3d                    & poly_centroid)
 {
-    uint  tv_idx = 0;
-    if(info.type == HexTransition::VERT_SIDE_WB){
-
+    uint tv_idx = 0;
+    if(info.type == HexTransition::VERT_SIDE_WB)
+    {
         verts.reserve(Vert_side_WB::verts.size()/3);
-        for(uint vid=0; vid<Vert_side_WB::verts.size(); vid+=3){
+        for(uint vid=0; vid<Vert_side_WB::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Vert_side_WB::verts[vid]-0.5, Vert_side_WB::verts[vid+1]-0.5, Vert_side_WB::verts[vid+2]-0.5));
         }
         polys   = Vert_side_WB::polys;
         faces   = Vert_side_WB::faces;
         winding = Vert_side_WB::winding;
-
         rotate(verts, "z", M_PI/2);
         rotate(verts, "y", M_PI/2);
     }
-    else{
+    else
+    {
         verts.reserve(Vert_side::verts.size()/3);
-        for(uint vid=0; vid<Vert_side::verts.size(); vid+=3){
+        for(uint vid=0; vid<Vert_side::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Vert_side::verts[vid]-0.5, Vert_side::verts[vid+1]-0.5, Vert_side::verts[vid+2]-0.5));
         }
         polys   = Vert_side::polys;
         faces   = Vert_side::faces;
         winding = Vert_side::winding;
         tv_idx = 2;
-
     }
-
 
     std::sort(info.orientations.begin(), info.orientations.begin()+2);
 
-    //std::cout<<"LATERAL: "<<info.orientations[0]<<" "<<info.orientations[1]<<std::endl;
-
-    if(info.orientations[0] == PLUS_X && info.orientations[1] == PLUS_Y){ //DEFAULT
-
+    if(info.orientations[0] == PLUS_X && info.orientations[1] == PLUS_Y) //DEFAULT
+    {
         rotate(verts, "y", M_PI/2);
         rotate(verts, "x", M_PI/2);
 
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
         tmp_v0 += poly_centroid;
-        if(!eps_eq(info.t_verts[0], tmp_v0))
-            reflect(verts, "xy");
+        if(!eps_eq(info.t_verts[0], tmp_v0)) reflect(verts, "xy");
     }
-    else if(info.orientations[0] == PLUS_X && info.orientations[1] == PLUS_Z){ // DEFAULT
-
+    else if(info.orientations[0] == PLUS_X && info.orientations[1] == PLUS_Z) // DEFAULT
+    {
         if(info.orientations[2] == MINUS_Y) reflect(verts, "xz");
     }
-    else if(info.orientations[0] == PLUS_X && info.orientations[1] == MINUS_Y){
-
+    else if(info.orientations[0] == PLUS_X && info.orientations[1] == MINUS_Y)
+    {
         rotate(verts, "y", M_PI/2);
         rotate(verts, "x", M_PI/2);
-
-
         reflect(verts, "xz");
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
         tmp_v0 += poly_centroid;
-        if(!eps_eq(info.t_verts[0], tmp_v0))
-            reflect(verts, "xy");
-
+        if(!eps_eq(info.t_verts[0], tmp_v0)) reflect(verts, "xy");
     }
-    else if(info.orientations[0] == PLUS_X && info.orientations[1] == MINUS_Z){
-
+    else if(info.orientations[0] == PLUS_X && info.orientations[1] == MINUS_Z)
+    {
         reflect(verts, "xy");
         if(info.orientations[2] == MINUS_Y) reflect(verts, "xz");
     }
-    else if(info.orientations[0] == PLUS_Y && info.orientations[1] == PLUS_Z){  //DEFAULT
+    else if(info.orientations[0] == PLUS_Y && info.orientations[1] == PLUS_Z) //DEFAULT
+    {
         rotate(verts, "y", -M_PI/2);
         rotate(verts, "z", -M_PI/2);
-
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
         tmp_v0 += poly_centroid;
-        if(!eps_eq(info.t_verts[0], tmp_v0))
-            reflect(verts, "yz");
+        if(!eps_eq(info.t_verts[0], tmp_v0)) reflect(verts, "yz");
     }
-    else if(info.orientations[0] == PLUS_Y && info.orientations[1] == MINUS_X){
-
+    else if(info.orientations[0] == PLUS_Y && info.orientations[1] == MINUS_X)
+    {
         rotate(verts, "y", M_PI/2);
         rotate(verts, "x", M_PI/2);
-
         reflect(verts, "yz");
         vec3d tmp_v0 = verts.at(tv_idx);
-
-
         tmp_v0 *= info.scale;
         tmp_v0 += poly_centroid;
-
-        if(!eps_eq(info.t_verts[0], tmp_v0))
-            reflect(verts, "xy");
-
+        if(!eps_eq(info.t_verts[0], tmp_v0)) reflect(verts, "xy");
     }
-    else if(info.orientations[0] == PLUS_Y && info.orientations[1] == MINUS_Z){
+    else if(info.orientations[0] == PLUS_Y && info.orientations[1] == MINUS_Z)
+    {
         rotate(verts, "y", -M_PI/2);
         rotate(verts, "z", -M_PI/2);
-
         reflect(verts, "xy");
-
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
         tmp_v0 += poly_centroid;
-        if(!eps_eq(info.t_verts[0], tmp_v0))
-            reflect(verts, "yz");
-
+        if(!eps_eq(info.t_verts[0], tmp_v0)) reflect(verts, "yz");
     }
-    else if(info.orientations[0] == PLUS_Z && info.orientations[1] == MINUS_X){
-
+    else if(info.orientations[0] == PLUS_Z && info.orientations[1] == MINUS_X)
+    {
          reflect(verts, "yz");
          if(info.orientations[2] == MINUS_Y) reflect(verts, "xz");
     }
-    else if(info.orientations[0] == PLUS_Z && info.orientations[1] == MINUS_Y){
+    else if(info.orientations[0] == PLUS_Z && info.orientations[1] == MINUS_Y)
+    {
         rotate(verts, "y", -M_PI/2);
         rotate(verts, "z", -M_PI/2);
-
-
         reflect(verts, "xz");
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
         tmp_v0 += poly_centroid;
-        if(!eps_eq(info.t_verts[0], tmp_v0))
-            reflect(verts, "yz");
-
-
+        if(!eps_eq(info.t_verts[0], tmp_v0)) reflect(verts, "yz");
     }
-    else if(info.orientations[0] == MINUS_X && info.orientations[1] == MINUS_Y){
+    else if(info.orientations[0] == MINUS_X && info.orientations[1] == MINUS_Y)
+    {
         rotate(verts, "y", M_PI/2);
         rotate(verts, "x", M_PI/2);
-
         reflect(verts, "xz");
         reflect(verts, "yz");
-
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
         tmp_v0 += poly_centroid;
-        if(!eps_eq(info.t_verts[0], tmp_v0))
-            reflect(verts, "xy");
+        if(!eps_eq(info.t_verts[0], tmp_v0)) reflect(verts, "xy");
     }
-    else if(info.orientations[0] == MINUS_X && info.orientations[1] == MINUS_Z){
-
-
+    else if(info.orientations[0] == MINUS_X && info.orientations[1] == MINUS_Z)
+    {
         reflect(verts, "y");
         if(info.orientations[2] == MINUS_Y) reflect(verts, "xz");
     }
-    else if(info.orientations[0] == MINUS_Y && info.orientations[1] == MINUS_Z){
-
+    else if(info.orientations[0] == MINUS_Y && info.orientations[1] == MINUS_Z)
+    {
         rotate(verts, "y", -M_PI/2);
         rotate(verts, "z", -M_PI/2);
-
-
         reflect(verts, "xz");
         reflect(verts, "xy");
-
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
         tmp_v0 += poly_centroid;
-        if(!eps_eq(info.t_verts[0], tmp_v0))
-            reflect(verts, "yz");
+        if(!eps_eq(info.t_verts[0], tmp_v0)) reflect(verts, "yz");
     }
 
-    for(auto &vert : verts){
-        vert *= info.scale;
-        vert += poly_centroid;
+    for(auto & v : verts)
+    {
+        v *= info.scale;
+        v += poly_centroid;
     }
 }
 
