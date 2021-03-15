@@ -45,14 +45,11 @@
 namespace cinolib
 {
 
-/* This function installs the hex transition schemes defined in hex_transition_schemes.h
- * to turn an adaptive grid with hanging nodes into a conformin all hexahedral mesh. The
- * function takes 3 parameters:
- * -m                => The input grid (must be a polyhedral mesh since the schemes are composed of generic polyhedra)
- * -transition_verts => vector of booleans with true values in correspondence of transition vertices. A transition
- * 			vertex in the grid is a vertex with 8 different hexahedra, four with size n and four with size n-1.
- * 			The transition vertices must be selected carefully in order achieve a correct installation.
- * -out 	     => The output mesh with schemes installed.
+/* This function installs the 8+5 transition defined in cinolib/hex_transition_schemes.h,
+ * which allow to transform a stringly or weakly baanced grid into a pure hexahedral mesh.
+ *
+ * Transition_verts is a vector having as many entries as the number of grid vertices, and
+ * is set to true in correspondence of the vertices where transition schemes must be applied.
  */
 
 template<class M, class V, class E, class F, class P>
