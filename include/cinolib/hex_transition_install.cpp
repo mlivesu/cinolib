@@ -823,14 +823,14 @@ void merge_schemes_into_mesh(Polyhedralmesh<M,V,E,F,P>           & m,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m,
+void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m_in,
                             const std::vector<bool>         & transition_verts,
-                                  Polyhedralmesh<M,V,E,F,P> & out)
+                                  Polyhedralmesh<M,V,E,F,P> & m_out)
 {
-    out = m;
+    m_out = m_in;
 
     std::vector<uint> transition_verts_direction;
-    get_transition_verts_direction(m, transition_verts, transition_verts_direction);
+    get_transition_verts_direction(m_in, transition_verts, transition_verts_direction);
 
     //Each entry of these sets is a collection of transition vertices that compose a particular scheme
     std::set<uint> flats;
@@ -840,10 +840,10 @@ void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m,
     std::unordered_set<uint>	not_flats; // Set containing all the transition verts that are not part of a flat transition
 
     //Schemes detection based on transition vertices configuration
-    for(uint pid=0; pid<m.num_polys(); pid++)
+    for(uint pid=0; pid<m_in.num_polys(); pid++)
     {
         std::vector<uint> scheme_vids;
-        for(uint vid : m.poly_verts_id(pid))
+        for(uint vid : m_in.poly_verts_id(pid))
         {
             if(transition_verts[vid]) scheme_vids.push_back(vid);
         }
@@ -858,10 +858,10 @@ void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m,
             if(scheme_vids.size() == 2) //Concave edge candidate
             {
                 //ensure that the transition verts are on the same poly face
-                for(uint fid : m.poly_faces_id(pid))
+                for(uint fid : m_in.poly_faces_id(pid))
                 {
-                    if(m.face_contains_vert(fid, scheme_vids[0]) &&
-                       m.face_contains_vert(fid, scheme_vids[1]))
+                    if(m_in.face_contains_vert(fid, scheme_vids[0]) &&
+                       m_in.face_contains_vert(fid, scheme_vids[1]))
                     {
                         concaves.insert(scheme_vids);
                         for(uint vid : scheme_vids)
@@ -884,12 +884,12 @@ void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m,
             }
         }
     }
-    for(uint vid = 0; vid<m.num_verts(); vid++)
+    for(uint vid = 0; vid<m_in.num_verts(); vid++)
     {
         if(!transition_verts[vid])
         {
             std::vector<uint> adj_t_verts;
-            for(uint adj_v : m.adj_v2v(vid))
+            for(uint adj_v : m_in.adj_v2v(vid))
             {
                 if(transition_verts[adj_v]) adj_t_verts.push_back(adj_v);
             }
@@ -907,13 +907,13 @@ void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m,
     }
 
     std::unordered_map<uint, SchemeInfo> poly2scheme;
-    for(const auto &corner : corners)   mark_concave_vert(out, corner, transition_verts_direction, poly2scheme);
-    for(const auto &concave : concaves) mark_concave_edge(out, concave, transition_verts_direction, poly2scheme);
-    for(const auto &convex : convexes)  mark_convex(out, convex, transition_verts_direction, poly2scheme);
-    for(uint flat : flats)              mark_flat(out, flat, transition_verts_direction, poly2scheme);
+    for(const auto &corner : corners)   mark_concave_vert(m_out, corner, transition_verts_direction, poly2scheme);
+    for(const auto &concave : concaves) mark_concave_edge(m_out, concave, transition_verts_direction, poly2scheme);
+    for(const auto &convex : convexes)  mark_convex(m_out, convex, transition_verts_direction, poly2scheme);
+    for(uint flat : flats)              mark_flat(m_out, flat, transition_verts_direction, poly2scheme);
 
-    cut_flats(out, poly2scheme);
-    merge_schemes_into_mesh(out, poly2scheme);
+    cut_flats(m_out, poly2scheme);
+    merge_schemes_into_mesh(m_out, poly2scheme);
 
     std::vector<uint> polys_to_remove;
     for(auto p : poly2scheme)
@@ -921,8 +921,8 @@ void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m,
         polys_to_remove.push_back(p.first);
     }
 
-    out.polys_remove(polys_to_remove);
-    out.poly_fix_orientation();
+    m_out.polys_remove(polys_to_remove);
+    m_out.poly_fix_orientation();
 }
 
 }
