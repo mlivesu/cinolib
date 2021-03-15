@@ -452,25 +452,29 @@ void orient_convex(std::vector<vec3d>             & verts,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void orient_concave_edge(std::vector<vec3d>        &verts,
-                         std::vector<std::vector<uint>> &faces,
-                         std::vector<std::vector<uint>> &polys,
-                         std::vector<std::vector<bool>> &winding,
-                         SchemeInfo &info,
-                         const vec3d &poly_centroid){
-
-    if(info.type == HexTransition::EDGE){
+void orient_concave_edge(std::vector<vec3d>             & verts,
+                         std::vector<std::vector<uint>> & faces,
+                         std::vector<std::vector<uint>> & polys,
+                         std::vector<std::vector<bool>> & winding,
+                         SchemeInfo                     & info,
+                         const vec3d                    & poly_centroid)
+{
+    if(info.type == HexTransition::EDGE)
+    {
         verts.reserve(Edge::verts.size()/3);
-        for(uint vid=0; vid<Edge::verts.size(); vid+=3){
+        for(uint vid=0; vid<Edge::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Edge::verts[vid]-0.5, Edge::verts[vid+1]-0.5, Edge::verts[vid+2]-0.5));
         }
         polys   = Edge::polys;
         faces   = Edge::faces;
         winding = Edge::winding;
     }
-    else{
+    else
+    {
         verts.reserve(Edge_WB::verts.size()/3);
-        for(uint vid=0; vid<Edge_WB::verts.size(); vid+=3){
+        for(uint vid=0; vid<Edge_WB::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Edge_WB::verts[vid]-0.5, Edge_WB::verts[vid+1]-0.5, Edge_WB::verts[vid+2]-0.5));
         }
         polys   = Edge_WB::polys;
@@ -479,99 +483,76 @@ void orient_concave_edge(std::vector<vec3d>        &verts,
     }
 
     reflect(verts, "xz");
-    //std::cout<<info.orientations[0]<<std::endl;
-    switch (info.orientations[0]) {
-
-    case PLUS_X:
+    switch(info.orientations[0])
     {
-        rotate(verts, "z", -M_PI/2);
-        reflect(verts, "yz");
-        break;
-    }
-    case PLUS_Y:
-    {
-        reflect(verts, "xz");
-        break; //DEFAULT
-    }
-    case PLUS_Z:
-    {
-        rotate(verts, "x", M_PI/2);
-        reflect(verts, "xy");
-        break;
-    }
-    case MINUS_X:
-    {
-        rotate(verts, "z", M_PI/2);
-        reflect(verts, "yz");
-        break;
-    }
-    case MINUS_Y:
-    {
-        rotate(verts, "z", M_PI);
-        reflect(verts, "xz");
-        break;
-    }
-    case MINUS_Z:
-    {
-        rotate(verts, "x", -M_PI/2);
-        reflect(verts, "xy");
-    }
-        break;
+        case PLUS_Y:                               reflect(verts, "xz"); break; //DEFAULT
+        case PLUS_X:  rotate(verts, "z", -M_PI/2); reflect(verts, "yz"); break;
+        case PLUS_Z:  rotate(verts, "x",  M_PI/2); reflect(verts, "xy"); break;
+        case MINUS_X: rotate(verts, "z",  M_PI/2); reflect(verts, "yz"); break;
+        case MINUS_Y: rotate(verts, "z",  M_PI);   reflect(verts, "xz"); break;
+        case MINUS_Z: rotate(verts, "x", -M_PI/2); reflect(verts, "xy"); break;
     }
 
-    for(auto &vert : verts){
-        vert *= info.scale;
-        vert += poly_centroid;
+    for(auto & v : verts)
+    {
+        v *= info.scale;
+        v += poly_centroid;
     }
 
-
-    if(!eps_eq(info.t_verts[0], verts.at(0))) {
+    if(!eps_eq(info.t_verts[0], verts.at(0)))
+    {
         try_reflections(verts, info, poly_centroid);
     }
-
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void orient_concave_vert(std::vector<vec3d>        &verts,
-                         std::vector<std::vector<uint>> &faces,
-                         std::vector<std::vector<uint>> &polys,
-                         std::vector<std::vector<bool>> &winding,
-                         SchemeInfo &info,
-                         const vec3d &poly_centroid){
-
-
-    if(info.type == HexTransition::VERT_CENTER_WB_1){
+void orient_concave_vert(std::vector<vec3d>             & verts,
+                         std::vector<std::vector<uint>> & faces,
+                         std::vector<std::vector<uint>> & polys,
+                         std::vector<std::vector<bool>> & winding,
+                         SchemeInfo                     & info,
+                         const vec3d                    & poly_centroid)
+{
+    if(info.type == HexTransition::VERT_CENTER_WB_1)
+    {
         verts.reserve(Vert_center_WB_1::verts.size()/3);
-        for(uint vid=0; vid<Vert_center_WB_1::verts.size(); vid+=3){
+        for(uint vid=0; vid<Vert_center_WB_1::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Vert_center_WB_1::verts[vid]-0.5, Vert_center_WB_1::verts[vid+1]-0.5, Vert_center_WB_1::verts[vid+2]-0.5));
         }
         polys   = Vert_center_WB_1::polys;
         faces   = Vert_center_WB_1::faces;
         winding = Vert_center_WB_1::winding;
     }
-    else if(info.type == HexTransition::VERT_CENTER_WB_2){
+    else if(info.type == HexTransition::VERT_CENTER_WB_2)
+    {
         verts.reserve(Vert_center_WB_2::verts.size()/3);
-        for(uint vid=0; vid<Vert_center_WB_2::verts.size(); vid+=3){
+        for(uint vid=0; vid<Vert_center_WB_2::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Vert_center_WB_2::verts[vid]-0.5, Vert_center_WB_2::verts[vid+1]-0.5, Vert_center_WB_2::verts[vid+2]-0.5));
         }
         polys   = Vert_center_WB_2::polys;
         faces   = Vert_center_WB_2::faces;
         winding = Vert_center_WB_2::winding;
     }
-    else if(info.type == HexTransition::VERT_CENTER_WB_3){
+    else if(info.type == HexTransition::VERT_CENTER_WB_3)
+    {
         verts.reserve(Vert_center_WB_3::verts.size()/3);
-        for(uint vid=0; vid<Vert_center_WB_3::verts.size(); vid+=3){
+        for(uint vid=0; vid<Vert_center_WB_3::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Vert_center_WB_3::verts[vid]-0.5, Vert_center_WB_3::verts[vid+1]-0.5, Vert_center_WB_3::verts[vid+2]-0.5));
         }
         polys   = Vert_center_WB_3::polys;
         faces   = Vert_center_WB_3::faces;
         winding = Vert_center_WB_3::winding;
     }
-    else{
+    else
+    {
         verts.reserve(Vert_center::verts.size()/3);
-        for(uint vid=0; vid<Vert_center::verts.size(); vid+=3){
+        for(uint vid=0; vid<Vert_center::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Vert_center::verts[vid]-0.5, Vert_center::verts[vid+1]-0.5, Vert_center::verts[vid+2]-0.5));
         }
         polys   = Vert_center::polys;
@@ -579,85 +560,105 @@ void orient_concave_vert(std::vector<vec3d>        &verts,
         winding = Vert_center::winding;
    }
 
-
     std::sort(info.orientations.begin(), info.orientations.end());
 
-
-    if(info.type == HexTransition::VERT_CENTER_WB_1){
-        if(info.cuts[PLUS_X]){
+    if(info.type == HexTransition::VERT_CENTER_WB_1)
+    {
+        if(info.cuts[PLUS_X])
+        {
             rotate(verts, "z", M_PI/2);
             rotate(verts, "y", M_PI/2);
         }
-        else if(info.cuts[PLUS_Y]){
+        else if(info.cuts[PLUS_Y])
+        {
             rotate(verts, "x", -M_PI/2);
             rotate(verts, "y", -M_PI/2);
         }
-        else if(info.cuts[PLUS_Z]){
+        else if(info.cuts[PLUS_Z])
+        {
             //DEFAULT
         }
-
     }
-
-    else if(info.type ==  HexTransition::VERT_CENTER_WB_2){
-        if(info.cuts[PLUS_X] && info.cuts[PLUS_Y]){
+    else if(info.type ==  HexTransition::VERT_CENTER_WB_2)
+    {
+        if(info.cuts[PLUS_X] && info.cuts[PLUS_Y])
+        {
             rotate(verts, "x", M_PI/2);
             rotate(verts, "z", M_PI/2);
         }
-        else if(info.cuts[PLUS_X] && info.cuts[PLUS_Z]){
+        else if(info.cuts[PLUS_X] && info.cuts[PLUS_Z])
+        {
             //DEFAULT
         }
-        else if(info.cuts[PLUS_Y] && info.cuts[PLUS_Z]){
+        else if(info.cuts[PLUS_Y] && info.cuts[PLUS_Z])
+        {
             rotate(verts, "x", -M_PI/2);
             rotate(verts, "y", -M_PI/2);
         }
     }
 
     //(info.orientations[0] == PLUS_X && info.orientations[1] == PLUS_Y && info.orientations[2] == PLUS_Z) //default
-    if(info.orientations[0] == PLUS_X && info.orientations[1] == PLUS_Y && info.orientations[2] == MINUS_Z){
+    if(info.orientations[0] == PLUS_X && info.orientations[1] == PLUS_Y && info.orientations[2] == MINUS_Z)
+    {
         reflect(verts, "xy");
     }
-    else if(info.orientations[0] == PLUS_Y && info.orientations[1] == MINUS_X && info.orientations[2] == MINUS_Z){
+    else if(info.orientations[0]==PLUS_Y  &&
+            info.orientations[1]==MINUS_X &&
+            info.orientations[2]==MINUS_Z)
+    {
         reflect(verts, "y");
     }
-    else if(info.orientations[0] == PLUS_Y && info.orientations[1] == PLUS_Z && info.orientations[2] == MINUS_X){
+    else if(info.orientations[0]==PLUS_Y  &&
+            info.orientations[1]==PLUS_Z  &&
+            info.orientations[2]==MINUS_X)
+    {
         reflect(verts, "yz");
     }
-    else if(info.orientations[0] == PLUS_X && info.orientations[1] == PLUS_Z && info.orientations[2] == MINUS_Y){
+    else if(info.orientations[0]==PLUS_X &&
+            info.orientations[1]==PLUS_Z &&
+            info.orientations[2]==MINUS_Y)
+    {
         reflect(verts, "xz");
     }
-    else if(info.orientations[0] == PLUS_X && info.orientations[1] == MINUS_Y && info.orientations[2] == MINUS_Z){
+    else if(info.orientations[0]==PLUS_X  &&
+            info.orientations[1]==MINUS_Y &&
+            info.orientations[2]==MINUS_Z)
+    {
         reflect(verts, "xz");
         reflect(verts, "xy");
     }
-    else if(info.orientations[0] == MINUS_X && info.orientations[1] == MINUS_Y && info.orientations[2] == MINUS_Z){
+    else if(info.orientations[0]==MINUS_X &&
+            info.orientations[1]==MINUS_Y &&
+            info.orientations[2]==MINUS_Z)
+    {
         reflect(verts, "xz");
         reflect(verts, "y");
     }
-    else if(info.orientations[0] == PLUS_Z && info.orientations[1] == MINUS_X && info.orientations[2] == MINUS_Y ){
+    else if(info.orientations[0]==PLUS_Z  &&
+            info.orientations[1]==MINUS_X &&
+            info.orientations[2]==MINUS_Y )
+    {
         reflect(verts, "xz");
         reflect(verts, "yz");
     }
 
-
-    for(auto &vert : verts){
-        vert *= info.scale;
-        vert += poly_centroid;
+    for(auto & v : verts)
+    {
+        v *= info.scale;
+        v += poly_centroid;
     }
-
-
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void orient_concave_vert_side(std::vector<vec3d>        &verts,
-                                 std::vector<std::vector<uint>> &faces,
-                                 std::vector<std::vector<uint>> &polys,
-                                 std::vector<std::vector<bool>> &winding,
-                                 SchemeInfo &info,
-                                 const vec3d &poly_centroid){
-
-
+void orient_concave_vert_side(std::vector<vec3d>             & verts,
+                              std::vector<std::vector<uint>> & faces,
+                              std::vector<std::vector<uint>> & polys,
+                              std::vector<std::vector<bool>> & winding,
+                              SchemeInfo                     & info,
+                              const vec3d                    & poly_centroid)
+{
     uint  tv_idx = 0;
     if(info.type == HexTransition::VERT_SIDE_WB){
 
