@@ -24,6 +24,10 @@
 *                                                                               *
 *  Author(s):                                                                   *
 *                                                                               *
+*     Luca Pitzalis (lucapizza@gmail.com)                                       *
+*     University of Cagliari                                                    *
+*                                                                               *
+*                                                                               *
 *     Marco Livesu (marco.livesu@gmail.com)                                     *
 *     http://pers.ge.imati.cnr.it/livesu/                                       *
 *                                                                               *
@@ -36,40 +40,58 @@
 #ifndef CINO_HEX_TRANSITION_INSTALL_H
 #define CINO_HEX_TRANSITION_INSTALL_H
 
-#include <cinolib/meshes/meshes.h>
 #include <cinolib/hex_transition.h>
-#include <cinolib/octree.h>
 
 namespace cinolib
 {
 
-/* This code serves to install a transition scheme in an adaptively refined grid,
- * in order to transform it into a pure hexahedral mesh. What the code does is to
- * merge coincident vertices and faces, and append the scheme elements to the mesh.
- *
- * WARNING: this code does not remove the older elements from the grid, which must
- * be removed a priori or afterwards.
-*/
+/* This function installs the hex transition schemes defined in hex_transition_schemes.h
+ * to turn an adaptive grid with hanging nodes into a conformin all hexahedral mesh. The
+ * function takes 3 parameters:
+ * -m                => The input grid (must be a polyhedral mesh since the schemes are composed of generic polyhedra)
+ * -transition_verts => vector of booleans with true values in correspondence of transition vertices. A transition
+ * 			vertex in the grid is a vertex with 8 different hexahedra, four with size n and four with size n-1.
+ * 			The transition vertices must be selected carefully in order achieve a correct installation.
+ * -out 	     => The output mesh with schemes installed.
+ */
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void hex_transition_install(Polyhedralmesh<M,V,E,F,P> & m,
-                            const HexTransition         type,
-                            const vec3d               & center      = vec3d(0,0,0),
-                            const double                scale       = 1.0,
-                            const int                   orientation = PLUS_Y);
+void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m,
+                            const std::vector<bool>         & transition_verts,
+                                  Polyhedralmesh<M,V,E,F,P> & out);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// version that takes a pre-built octree (to avoid making one octree for each installation)
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void hex_transition_install(Polyhedralmesh<M,V,E,F,P> & m,
-                            const Octree              & octree,
-                            const HexTransition         type,
-                            const vec3d               & center      = vec3d(0,0,0),
-                            const double                scale       = 1.0,
-                            const int                   orientation = PLUS_Y);
+//Custom comparator operator for maps of vec3d
+struct vert_compare
+{
+    bool operator()(const vec3d & a,
+                    const vec3d & b) const
+    {
+       double eps = 1e-6;
+       if(a.x()-b.x() < 0.0 && abs(a.x()-b.x()) > eps)
+       {
+           return true;
+       }
+       else if(abs(a.x()-b.x()) < eps)
+       {
+           if(a.y()-b.y() < 0.0 && abs(a.y()-b.y()) > eps)
+           {
+               return true;
+           }
+           else if(abs(a.y()-b.y()) < eps)
+           {
+               if(a.z()-b.z() < 0.0 && abs(a.z()-b.z()) > eps)
+               {
+                   return true;
+               }
+           }
+       }
+       return false;
+    }
+};
+
 }
 
 #ifndef  CINO_STATIC_LIB

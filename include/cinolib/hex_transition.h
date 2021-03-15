@@ -24,6 +24,10 @@
 *                                                                               *
 *  Author(s):                                                                   *
 *                                                                               *
+*     Luca Pitzalis (lucapizza@gmail.com)                                       *
+*     University of Cagliari                                                    *
+*                                                                               *
+*                                                                               *
 *     Marco Livesu (marco.livesu@gmail.com)                                     *
 *     http://pers.ge.imati.cnr.it/livesu/                                       *
 *                                                                               *
@@ -71,26 +75,48 @@ enum class HexTransition
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void hex_transition(Polyhedralmesh<M,V,E,F,P> & m,
-                    const HexTransition         type,
-                    const vec3d               & center      = vec3d(0,0,0),
-                    const double                scale       = 1.0,
-                    const int                   orientation = PLUS_Y);
+enum class SchemeType
+{
+    FLAT_S,
+    CONC_S,
+    CORN_S,
+    CONV_S
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-CINO_INLINE
-void hex_transition(const HexTransition                    type,
-                          std::vector<double>            & verts,
-                          std::vector<std::vector<uint>> & faces,
-                          std::vector<std::vector<uint>> & polys,
-                          std::vector<std::vector<bool>> & winding,
-                    const vec3d                          & center,
-                    const double                           scale,
-                    const int                              orientation);
+struct SchemeInfo
+{
+    HexTransition        type;
+    SchemeType           scheme_type;
+    double               scale;
+    std::vector<vec3d>   t_verts;
+    std::map<uint,bool>  cuts;
+    std::vector<int>     orientations;
+};
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+inline bool eps_eq(const vec3d & a, const vec3d & b, double eps = 1e-6)
+{
+    return (a.dist(b) <= eps);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* This function sets a hex transition scheme to the right position, scale and orientation.
+ * The parameters are:
+ *    - verts, faces, polys, winding  => geometry and connectivity of the scheme specified in info
+ *    - info                          => struct containing all the information needed to position the scheme
+ *    - application_poly_centroid     => centroid of the hexahedron that will be replaced with the transition
+ */
+CINO_INLINE
+void orient_hex_transition(std::vector<vec3d>             & verts,
+                           std::vector<std::vector<uint>> & faces,
+                           std::vector<std::vector<uint>> & polys,
+                           std::vector<std::vector<bool>> & winding,
+                           const SchemeInfo               & info,
+                           const vec3d                      application_poly_centroid);
 }
 
 #ifndef  CINO_STATIC_LIB
