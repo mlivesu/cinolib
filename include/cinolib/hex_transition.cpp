@@ -43,7 +43,10 @@
 namespace cinolib
 {
 
-inline void bake_reflection_matrix(double (*m)[3], std::string plane){
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void bake_reflection_matrix(double (*m)[3], std::string plane){
 
     m[0][0] = -1; m[0][1] = 0; m[0][2] = 0;
     m[1][0] = 0; m[1][1] = -1; m[1][2] = 0;
@@ -60,6 +63,9 @@ inline void bake_reflection_matrix(double (*m)[3], std::string plane){
     }
 
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void reflect(std::vector<vec3d> &verts, std::string axis){
 
@@ -70,6 +76,8 @@ void reflect(std::vector<vec3d> &verts, std::string axis){
         transform(vert, refl);
     }
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void rotate(std::vector<vec3d> &verts, std::string axis, double angle){
@@ -85,8 +93,11 @@ void rotate(std::vector<vec3d> &verts, std::string axis, double angle){
         transform(vert, rot);
     }
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
-void try_reflections(std::vector<vec3d> &verts, const SchemeInfo &info, const vec3d &application_poly_centroid){
+void try_reflections(std::vector<vec3d> &verts, const SchemeInfo &info, const vec3d &poly_centroid){
 
     std::vector<std::string> axes_to_try = {"x", "y", "z", "xy", "xz", "yz"};
     for(const auto &axis : axes_to_try){
@@ -95,7 +106,7 @@ void try_reflections(std::vector<vec3d> &verts, const SchemeInfo &info, const ve
         AABB bbox(tmp_verts);
         for(auto &vert : tmp_verts){
             vert -= bbox.center();
-            vert += application_poly_centroid;
+            vert += poly_centroid;
         }
 
         if(eps_eq(info.t_verts[0], tmp_verts.at(0))){
@@ -106,12 +117,13 @@ void try_reflections(std::vector<vec3d> &verts, const SchemeInfo &info, const ve
     }
 
     assert(false && "Failed to find the right reflection");
-
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //This function is necessary to find the right rotation of CONVEX_2 transitions. Find a clever way to find the correct rotation without trying all the possible ones.
 CINO_INLINE
-void try_rotations(std::vector<vec3d> &verts, const SchemeInfo &info, const vec3d &application_poly_centroid){
+void try_rotations(std::vector<vec3d> &verts, const SchemeInfo &info, const vec3d &poly_centroid){
 
     auto tmp_verts = verts;
 
@@ -122,7 +134,7 @@ void try_rotations(std::vector<vec3d> &verts, const SchemeInfo &info, const vec3
                 AABB bbox(tmp_verts);
                 for(auto &vert : tmp_verts){
                     vert -= bbox.center();
-                    vert += application_poly_centroid;
+                    vert += poly_centroid;
                 }
 
                 if((eps_eq(info.t_verts[0], tmp_verts.at(0)) && eps_eq(info.t_verts[1], tmp_verts.at(4))) ||
@@ -135,10 +147,10 @@ void try_rotations(std::vector<vec3d> &verts, const SchemeInfo &info, const vec3
         }
         rotate(tmp_verts, "x", M_PI_2);
     }
-
     assert(false && "Failed to find the right rotation");
-
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void orient_flat(std::vector<vec3d>        &verts,
@@ -146,7 +158,7 @@ void orient_flat(std::vector<vec3d>        &verts,
             std::vector<std::vector<uint>> &polys,
             std::vector<std::vector<bool>> &winding,
             SchemeInfo &info,
-            const vec3d &application_poly_centroid){
+            const vec3d &poly_centroid){
 
 
     if(info.type == HexTransition::FLAT){
@@ -324,17 +336,18 @@ void orient_flat(std::vector<vec3d>        &verts,
     }
     for(auto &vert : verts){
         vert *= info.scale;
-        vert += application_poly_centroid;
+        vert += poly_centroid;
     }
 
     if(!eps_eq(info.t_verts[0], verts.at(0))) {
-        try_reflections(verts, info, application_poly_centroid);
+        try_reflections(verts, info, poly_centroid);
     }
 
 
 
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void orient_convex(std::vector<vec3d>        &verts,
@@ -342,7 +355,7 @@ void orient_convex(std::vector<vec3d>        &verts,
                    std::vector<std::vector<uint>> &polys,
                    std::vector<std::vector<bool>> &winding,
                    SchemeInfo &info,
-                   const vec3d &application_poly_centroid){
+                   const vec3d &poly_centroid){
 
     if (info.type == HexTransition::CONVEX_1){
 
@@ -376,10 +389,10 @@ void orient_convex(std::vector<vec3d>        &verts,
 
         for(auto &vert : verts){
             vert *= info.scale;
-            vert += application_poly_centroid;
+            vert += poly_centroid;
         }
         if(!eps_eq(info.t_verts[0], verts.at(0))) {
-            try_reflections(verts, info, application_poly_centroid);
+            try_reflections(verts, info, poly_centroid);
         }
     }
 
@@ -395,12 +408,12 @@ void orient_convex(std::vector<vec3d>        &verts,
 
         for(auto &vert : verts){
             vert *= info.scale;
-            vert += application_poly_centroid;
+            vert += poly_centroid;
         }
 
         if(!((eps_eq(info.t_verts[0], verts.at(0)) && eps_eq(info.t_verts[1], verts.at(4))) ||
             (eps_eq(info.t_verts[0], verts.at(4)) && eps_eq(info.t_verts[1], verts.at(0))))){
-            try_rotations(verts, info, application_poly_centroid);
+            try_rotations(verts, info, poly_centroid);
         }
         return;
 
@@ -447,13 +460,14 @@ void orient_convex(std::vector<vec3d>        &verts,
 
         for(auto &vert : verts){
             vert *= info.scale;
-            vert += application_poly_centroid;
+            vert += poly_centroid;
         }
 
     }
 
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void orient_concave_edge(std::vector<vec3d>        &verts,
@@ -461,7 +475,7 @@ void orient_concave_edge(std::vector<vec3d>        &verts,
                          std::vector<std::vector<uint>> &polys,
                          std::vector<std::vector<bool>> &winding,
                          SchemeInfo &info,
-                         const vec3d &application_poly_centroid){
+                         const vec3d &poly_centroid){
 
     if(info.type == HexTransition::EDGE){
         verts.reserve(Edge::verts.size()/3);
@@ -525,16 +539,17 @@ void orient_concave_edge(std::vector<vec3d>        &verts,
 
     for(auto &vert : verts){
         vert *= info.scale;
-        vert += application_poly_centroid;
+        vert += poly_centroid;
     }
 
 
     if(!eps_eq(info.t_verts[0], verts.at(0))) {
-        try_reflections(verts, info, application_poly_centroid);
+        try_reflections(verts, info, poly_centroid);
     }
 
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void orient_concave_vert(std::vector<vec3d>        &verts,
@@ -542,7 +557,7 @@ void orient_concave_vert(std::vector<vec3d>        &verts,
                          std::vector<std::vector<uint>> &polys,
                          std::vector<std::vector<bool>> &winding,
                          SchemeInfo &info,
-                         const vec3d &application_poly_centroid){
+                         const vec3d &poly_centroid){
 
 
     if(info.type == HexTransition::VERT_CENTER_WB_1){
@@ -644,13 +659,13 @@ void orient_concave_vert(std::vector<vec3d>        &verts,
 
     for(auto &vert : verts){
         vert *= info.scale;
-        vert += application_poly_centroid;
+        vert += poly_centroid;
     }
 
 
 }
 
-
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void orient_concave_vert_side(std::vector<vec3d>        &verts,
@@ -658,7 +673,7 @@ void orient_concave_vert_side(std::vector<vec3d>        &verts,
                                  std::vector<std::vector<uint>> &polys,
                                  std::vector<std::vector<bool>> &winding,
                                  SchemeInfo &info,
-                                 const vec3d &application_poly_centroid){
+                                 const vec3d &poly_centroid){
 
 
     uint  tv_idx = 0;
@@ -699,7 +714,7 @@ void orient_concave_vert_side(std::vector<vec3d>        &verts,
 
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
-        tmp_v0 += application_poly_centroid;
+        tmp_v0 += poly_centroid;
         if(!eps_eq(info.t_verts[0], tmp_v0))
             reflect(verts, "xy");
     }
@@ -716,7 +731,7 @@ void orient_concave_vert_side(std::vector<vec3d>        &verts,
         reflect(verts, "xz");
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
-        tmp_v0 += application_poly_centroid;
+        tmp_v0 += poly_centroid;
         if(!eps_eq(info.t_verts[0], tmp_v0))
             reflect(verts, "xy");
 
@@ -732,7 +747,7 @@ void orient_concave_vert_side(std::vector<vec3d>        &verts,
 
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
-        tmp_v0 += application_poly_centroid;
+        tmp_v0 += poly_centroid;
         if(!eps_eq(info.t_verts[0], tmp_v0))
             reflect(verts, "yz");
     }
@@ -746,7 +761,7 @@ void orient_concave_vert_side(std::vector<vec3d>        &verts,
 
 
         tmp_v0 *= info.scale;
-        tmp_v0 += application_poly_centroid;
+        tmp_v0 += poly_centroid;
 
         if(!eps_eq(info.t_verts[0], tmp_v0))
             reflect(verts, "xy");
@@ -760,7 +775,7 @@ void orient_concave_vert_side(std::vector<vec3d>        &verts,
 
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
-        tmp_v0 += application_poly_centroid;
+        tmp_v0 += poly_centroid;
         if(!eps_eq(info.t_verts[0], tmp_v0))
             reflect(verts, "yz");
 
@@ -778,7 +793,7 @@ void orient_concave_vert_side(std::vector<vec3d>        &verts,
         reflect(verts, "xz");
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
-        tmp_v0 += application_poly_centroid;
+        tmp_v0 += poly_centroid;
         if(!eps_eq(info.t_verts[0], tmp_v0))
             reflect(verts, "yz");
 
@@ -793,7 +808,7 @@ void orient_concave_vert_side(std::vector<vec3d>        &verts,
 
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
-        tmp_v0 += application_poly_centroid;
+        tmp_v0 += poly_centroid;
         if(!eps_eq(info.t_verts[0], tmp_v0))
             reflect(verts, "xy");
     }
@@ -814,57 +829,66 @@ void orient_concave_vert_side(std::vector<vec3d>        &verts,
 
         vec3d tmp_v0 = verts.at(tv_idx);
         tmp_v0 *= info.scale;
-        tmp_v0 += application_poly_centroid;
+        tmp_v0 += poly_centroid;
         if(!eps_eq(info.t_verts[0], tmp_v0))
             reflect(verts, "yz");
     }
 
     for(auto &vert : verts){
         vert *= info.scale;
-        vert += application_poly_centroid;
+        vert += poly_centroid;
     }
 }
 
-
-
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void orient_hex_transition(std::vector<vec3d>        &verts,
-                                 std::vector<std::vector<uint>> &faces,
-                                 std::vector<std::vector<uint>> &polys,
-                                 std::vector<std::vector<bool>> &winding,
-                                 SchemeInfo &info,
-                                 const vec3d &application_poly_centroid){
+void orient_hex_transition(std::vector<vec3d>             & verts,
+                           std::vector<std::vector<uint>> & faces,
+                           std::vector<std::vector<uint>> & polys,
+                           std::vector<std::vector<bool>> & winding,
+                           SchemeInfo                     & info,
+                           const vec3d                    & poly_centroid)
+{
+    switch (info.type)
+    {
+        case HexTransition::FLAT:
+        case HexTransition::FLAT_CONVEX:
+        {
+            orient_flat(verts, faces, polys, winding, info, poly_centroid);
+            break;
+        }
 
+        case HexTransition::CONVEX_1:
+        case HexTransition::CONVEX_2:
+        case HexTransition::CONVEX_3:
+        {
+            orient_convex(verts, faces, polys, winding, info, poly_centroid);
+            break;
+        }
 
-    switch (info.type){
-    case HexTransition::FLAT: case HexTransition::FLAT_CONVEX:
-    {
-        orient_flat(verts, faces, polys, winding, info, application_poly_centroid);
-        break;
-    }
-    case HexTransition::CONVEX_1: case HexTransition::CONVEX_2: case HexTransition::CONVEX_3:
-    {
-        orient_convex(verts, faces, polys, winding, info, application_poly_centroid);
-        break;
-    }
+        case HexTransition::EDGE:
+        case HexTransition::EDGE_WB:
+        {
+            orient_concave_edge(verts, faces, polys, winding, info, poly_centroid);
+            break;
+        }
+        case HexTransition::VERT_CENTER:
+        case HexTransition::VERT_CENTER_WB_1:
+        case HexTransition::VERT_CENTER_WB_2:
+        case HexTransition::VERT_CENTER_WB_3:
+        {
+            orient_concave_vert(verts, faces, polys, winding, info, poly_centroid);
+            break;
+        }
 
-    case HexTransition::EDGE: case HexTransition::EDGE_WB:
-    {
-        orient_concave_edge(verts, faces, polys, winding, info, application_poly_centroid);
-        break;
-    }
-    case HexTransition::VERT_CENTER: case HexTransition::VERT_CENTER_WB_1: case HexTransition::VERT_CENTER_WB_2: case HexTransition::VERT_CENTER_WB_3:
-    {
-        orient_concave_vert(verts, faces, polys, winding, info, application_poly_centroid);
-        break;
-    }
-    case HexTransition::VERT_SIDE: case HexTransition::VERT_SIDE_WB:
-    {
-        orient_concave_vert_side(verts, faces, polys, winding, info, application_poly_centroid);
-        break;
-    }
-
+        case HexTransition::VERT_SIDE:
+        case HexTransition::VERT_SIDE_WB:
+        {
+            orient_concave_vert_side(verts, faces, polys, winding, info, poly_centroid);
+            break;
+        }
     }
 }
+
 }
