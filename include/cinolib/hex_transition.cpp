@@ -850,7 +850,7 @@ void orient_hex_transition(std::vector<vec3d>             & verts,
                            SchemeInfo                     & info,
                            const vec3d                    & poly_centroid)
 {
-    switch (info.type)
+    switch(info.type)
     {
         case HexTransition::FLAT:
         case HexTransition::FLAT_CONVEX:
