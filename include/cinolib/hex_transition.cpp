@@ -61,42 +61,41 @@ void reflect(std::vector<vec3d> &verts, const std::string & axis)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void rotate(std::vector<vec3d> &verts, std::string axis, double angle){
-
+void rotate(std::vector<vec3d> & verts, const std::string & axis, const double & angle)
+{
     double rot[3][3];
-    vec3d ax(0,0,0);
-    if(axis == "x")      ax.x() = 1;
-    else if(axis == "y") ax.y() = 1;
-    else                 ax.z() = 1;
+    vec3d vec(0,0,0);
+         if(axis == "x") vec.x() = 1;
+    else if(axis == "y") vec.y() = 1;
+    else                 vec.z() = 1;
 
-    bake_rotation_matrix(ax, angle, rot);
-    for(auto &vert : verts){
-        transform(vert, rot);
-    }
+    bake_rotation_matrix(vec, angle, rot);
+    for(auto & v : verts) transform(v, rot);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void try_reflections(std::vector<vec3d> &verts, const SchemeInfo &info, const vec3d &poly_centroid){
-
-    std::vector<std::string> axes_to_try = {"x", "y", "z", "xy", "xz", "yz"};
-    for(const auto &axis : axes_to_try){
+void try_reflections(std::vector<vec3d> & verts, const SchemeInfo & info, const vec3d & poly_centroid)
+{
+    std::vector<std::string> axes_to_try = { "x", "y", "z", "xy", "xz", "yz" };
+    for(const auto & axis : axes_to_try)
+    {
         auto tmp_verts = verts;
         reflect(tmp_verts, axis);
         AABB bbox(tmp_verts);
-        for(auto &vert : tmp_verts){
+        for(auto &vert : tmp_verts)
+        {
             vert -= bbox.center();
             vert += poly_centroid;
         }
 
-        if(eps_eq(info.t_verts[0], tmp_verts.at(0))){
+        if(eps_eq(info.t_verts[0], tmp_verts.at(0)))
+        {
             verts = tmp_verts;
             return;
         }
-
     }
-
     assert(false && "Failed to find the right reflection");
 }
 
