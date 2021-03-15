@@ -102,7 +102,7 @@ struct SchemeInfo
  * The parameters are:
  *    - verts, faces, polys, winding  => geometry and connectivity of the scheme specified in info
  *    - info                          => struct containing all the information needed to position the scheme
- *    - application_poly_centroid     => centroid of the hexahedron that will be replaced with the transition
+ *    - poly_centroid                 => centroid of the hexahedron that will be replaced with the transition
  */
 CINO_INLINE
 void hex_transition_orient(std::vector<vec3d>             & verts,

@@ -45,8 +45,8 @@
 namespace cinolib
 {
 
-/* This function installs the 8+5 transition defined in cinolib/hex_transition_schemes.h,
- * which allow to transform a stringly or weakly baanced grid into a pure hexahedral mesh.
+/* This function installs the 8+5 transitions defined in cinolib/hex_transition_schemes.h,
+ * which allow to transform a strongly or weakly balanced grid into a pure hexahedral mesh.
  *
  * Transition_verts is a vector having as many entries as the number of grid vertices, and
  * is set to true in correspondence of the vertices where transition schemes must be applied.
