@@ -24,6 +24,10 @@
 *                                                                               *
 *  Author(s):                                                                   *
 *                                                                               *
+*     Luca Pitzalis (lucapizza@gmail.com)                                       *
+*     University of Cagliari                                                    *
+*                                                                               *
+*                                                                               *
 *     Marco Livesu (marco.livesu@gmail.com)                                     *
 *     http://pers.ge.imati.cnr.it/livesu/                                       *
 *                                                                               *
@@ -36,40 +40,23 @@
 #ifndef CINO_HEX_TRANSITION_INSTALL_H
 #define CINO_HEX_TRANSITION_INSTALL_H
 
-#include <cinolib/meshes/meshes.h>
 #include <cinolib/hex_transition.h>
-#include <cinolib/octree.h>
 
 namespace cinolib
 {
 
-/* This code serves to install a transition scheme in an adaptively refined grid,
- * in order to transform it into a pure hexahedral mesh. What the code does is to
- * merge coincident vertices and faces, and append the scheme elements to the mesh.
+/* This function installs the 8+5 transition defined in cinolib/hex_transition_schemes.h,
+ * which allow to transform a stringly or weakly baanced grid into a pure hexahedral mesh.
  *
- * WARNING: this code does not remove the older elements from the grid, which must
- * be removed a priori or afterwards.
-*/
+ * Transition_verts is a vector having as many entries as the number of grid vertices, and
+ * is set to true in correspondence of the vertices where transition schemes must be applied.
+ */
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void hex_transition_install(Polyhedralmesh<M,V,E,F,P> & m,
-                            const HexTransition         type,
-                            const vec3d               & center      = vec3d(0,0,0),
-                            const double                scale       = 1.0,
-                            const int                   orientation = PLUS_Y);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// version that takes a pre-built octree (to avoid making one octree for each installation)
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void hex_transition_install(Polyhedralmesh<M,V,E,F,P> & m,
-                            const Octree              & octree,
-                            const HexTransition         type,
-                            const vec3d               & center      = vec3d(0,0,0),
-                            const double                scale       = 1.0,
-                            const int                   orientation = PLUS_Y);
+void hex_transition_install(const Polyhedralmesh<M,V,E,F,P> & m,
+                            const std::vector<bool>         & transition_verts,
+                                  Polyhedralmesh<M,V,E,F,P> & out);
 }
 
 #ifndef  CINO_STATIC_LIB
