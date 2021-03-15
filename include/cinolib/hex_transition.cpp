@@ -43,8 +43,12 @@
 namespace cinolib
 {
 
+namespace
+{
+
 CINO_INLINE
-void reflect(std::vector<vec3d> &verts, const std::string & axis)
+void reflect(std::vector<vec3d> & verts,
+             const std::string  & axis)
 {
     double m[3][3];
     m[0][0] = -1; m[0][1] =  0; m[0][2] =  0;
@@ -61,7 +65,9 @@ void reflect(std::vector<vec3d> &verts, const std::string & axis)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void rotate(std::vector<vec3d> & verts, const std::string & axis, const double & angle)
+void rotate(std::vector<vec3d> & verts,
+            const std::string  & axis,
+            const double       & angle)
 {
     double rot[3][3];
     vec3d vec(0,0,0);
@@ -76,7 +82,9 @@ void rotate(std::vector<vec3d> & verts, const std::string & axis, const double &
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void try_reflections(std::vector<vec3d> & verts, const SchemeInfo & info, const vec3d & poly_centroid)
+void try_reflections(std::vector<vec3d> & verts,
+                     const SchemeInfo   & info,
+                     const vec3d        & poly_centroid)
 {
     std::vector<std::string> axes_to_try = { "x", "y", "z", "xy", "xz", "yz" };
     for(const auto & axis : axes_to_try)
@@ -103,22 +111,28 @@ void try_reflections(std::vector<vec3d> & verts, const SchemeInfo & info, const 
 
 //This function is necessary to find the right rotation of CONVEX_2 transitions. Find a clever way to find the correct rotation without trying all the possible ones.
 CINO_INLINE
-void try_rotations(std::vector<vec3d> &verts, const SchemeInfo &info, const vec3d &poly_centroid){
-
+void try_rotations(std::vector<vec3d> & verts,
+                   const SchemeInfo   & info,
+                   const vec3d        & poly_centroid)
+{
     auto tmp_verts = verts;
-
-    for(uint x=0; x<4; x++){
-        for(uint y=0; y<4; y++){
-            for(uint z=0; z<4; z++){
+    for(uint x=0; x<4; x++)
+    {
+        for(uint y=0; y<4; y++)
+        {
+            for(uint z=0; z<4; z++)
+            {
                 rotate(tmp_verts, "z", M_PI_2);
                 AABB bbox(tmp_verts);
-                for(auto &vert : tmp_verts){
+                for(auto &vert : tmp_verts)
+                {
                     vert -= bbox.center();
                     vert += poly_centroid;
                 }
 
                 if((eps_eq(info.t_verts[0], tmp_verts.at(0)) && eps_eq(info.t_verts[1], tmp_verts.at(4))) ||
-                    (eps_eq(info.t_verts[0], tmp_verts.at(4)) && eps_eq(info.t_verts[1], tmp_verts.at(0)))){
+                   (eps_eq(info.t_verts[0], tmp_verts.at(4)) && eps_eq(info.t_verts[1], tmp_verts.at(0))))
+                {
                     verts = tmp_verts;
                     return;
                 }
@@ -133,26 +147,29 @@ void try_rotations(std::vector<vec3d> &verts, const SchemeInfo &info, const vec3
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void orient_flat(std::vector<vec3d>        &verts,
-            std::vector<std::vector<uint>> &faces,
-            std::vector<std::vector<uint>> &polys,
-            std::vector<std::vector<bool>> &winding,
-            SchemeInfo &info,
-            const vec3d &poly_centroid){
-
-
-    if(info.type == HexTransition::FLAT){
+void orient_flat(std::vector<vec3d>             & verts,
+                 std::vector<std::vector<uint>> & faces,
+                 std::vector<std::vector<uint>> & polys,
+                 std::vector<std::vector<bool>> & winding,
+                 SchemeInfo                     & info,
+                 const vec3d                    & poly_centroid)
+{
+    if(info.type == HexTransition::FLAT)
+    {
         verts.reserve(Flat::verts.size()/3);
-        for(uint vid=0; vid<Flat::verts.size(); vid+=3){
+        for(uint vid=0; vid<Flat::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Flat::verts[vid]-0.5, Flat::verts[vid+1]-0.5, Flat::verts[vid+2]-0.5));
         }
         polys   = Flat::polys;
         faces   = Flat::faces;
         winding = Flat::winding;
     }
-    else{
+    else
+    {
         verts.reserve(Flat_Convex::verts.size()/3);
-        for(uint vid=0; vid<Flat_Convex::verts.size(); vid+=3){
+        for(uint vid=0; vid<Flat_Convex::verts.size(); vid+=3)
+        {
             verts.push_back(vec3d(Flat_Convex::verts[vid]-0.5, Flat_Convex::verts[vid+1]-0.5, Flat_Convex::verts[vid+2]-0.5));
         }
         polys   = Flat_Convex::polys;
@@ -160,171 +177,155 @@ void orient_flat(std::vector<vec3d>        &verts,
         winding = Flat_Convex::winding;
     }
 
-    if(info.scheme_type == SchemeType::FLAT_S){
-        switch (info.orientations[0]) {
-
-        case PLUS_X:
-            rotate(verts, "z", -M_PI/2);
-            break;
-        case PLUS_Y: break; //DEFAULT
-        case PLUS_Z:
-            rotate(verts, "x", M_PI/2);
-            break;
-        case MINUS_X:
-            rotate(verts, "z", M_PI/2);
-            break;
-        case MINUS_Y:
-            rotate(verts, "z", M_PI);
-            break;
-        case MINUS_Z:
-            rotate(verts, "x", -M_PI/2);
-            break;
+    if(info.scheme_type == SchemeType::FLAT_S)
+    {
+        switch(info.orientations[0])
+        {
+            case PLUS_Y:  break; //DEFAULT
+            case PLUS_X:  rotate(verts, "z", -M_PI/2); break;
+            case PLUS_Z:  rotate(verts, "x",  M_PI/2); break;
+            case MINUS_X: rotate(verts, "z",  M_PI/2); break;
+            case MINUS_Y: rotate(verts, "z",  M_PI);   break;
+            case MINUS_Z: rotate(verts, "x", -M_PI/2); break;
         }
     }
-
-    else if(info.scheme_type == SchemeType::CONC_S){
-        //std::cout<<info.orientations[0]<<" "<<info.orientations[1]<<std::endl;
-        switch (info.orientations[0]) {
-        case PLUS_X:
+    else if(info.scheme_type == SchemeType::CONC_S)
+    {
+        switch(info.orientations[0])
         {
-            rotate(verts, "z", -M_PI/2);
-            if(info.orientations[1] == PLUS_Y) break;
-            if(info.orientations[1] == MINUS_Y) rotate(verts, "x", M_PI);
-            if(info.orientations[1] == PLUS_Z) rotate(verts, "x",   -M_PI/2);
-            if(info.orientations[1] == MINUS_Z) rotate(verts, "x",  M_PI/2);
-            break;
+            case PLUS_X:
+            {
+                rotate(verts, "z", -M_PI/2);
+                if(info.orientations[1] == PLUS_Y)  break;
+                if(info.orientations[1] == PLUS_Z)  rotate(verts, "x", -M_PI/2);
+                if(info.orientations[1] == MINUS_Y) rotate(verts, "x",  M_PI);
+                if(info.orientations[1] == MINUS_Z) rotate(verts, "x",  M_PI/2);
+                break;
+            }
+            case PLUS_Y:
+            {
+                if(info.orientations[1] == PLUS_X ) break;
+                if(info.orientations[1] == PLUS_Z ) rotate(verts, "y",  M_PI/2);
+                if(info.orientations[1] == MINUS_X) rotate(verts, "y",  M_PI);
+                if(info.orientations[1] == MINUS_Z) rotate(verts, "y", -M_PI/2);
+                break;
+            }
+            case PLUS_Z:
+            {
+                rotate(verts, "x", M_PI/2);
+                if(info.orientations[1] == PLUS_X ) break;
+                if(info.orientations[1] == PLUS_Y ) rotate(verts, "z", -M_PI/2);
+                if(info.orientations[1] == MINUS_X) rotate(verts, "z",  M_PI);
+                if(info.orientations[1] == MINUS_Y) rotate(verts, "z",  M_PI/2);
+                break;
+            }
+            case MINUS_X:
+            {
+                rotate(verts, "z", M_PI/2);
+                if(info.orientations[1] == PLUS_Y ) break;
+                if(info.orientations[1] == PLUS_Z ) rotate(verts, "x",  M_PI/2);
+                if(info.orientations[1] == MINUS_Y) rotate(verts, "x",  M_PI);
+                if(info.orientations[1] == MINUS_Z) rotate(verts, "x", -M_PI/2);
+                break;
+            }
+            case MINUS_Y:
+            {
+                rotate(verts, "z", M_PI);
+                if(info.orientations[1] == MINUS_X) break;
+                if(info.orientations[1] == MINUS_Z) rotate(verts, "y",  M_PI/2);
+                if(info.orientations[1] == PLUS_X ) rotate(verts, "y",  M_PI);
+                if(info.orientations[1] == PLUS_Z ) rotate(verts, "y", -M_PI/2);
+                break;
+            }
+            case MINUS_Z:
+            {
+                rotate(verts, "x", -M_PI/2);
+                if(info.orientations[1] == MINUS_X) break;
+                if(info.orientations[1] == MINUS_Y) rotate(verts, "z", -M_PI/2);
+                if(info.orientations[1] == PLUS_X ) rotate(verts, "z",  M_PI);
+                if(info.orientations[1] == PLUS_Y ) rotate(verts, "z",  M_PI/2);
+                break;
+            }
         }
-        case PLUS_Y:
-        {
-            if(info.orientations[1] == PLUS_X) break;
-            if(info.orientations[1] == MINUS_X) rotate(verts, "y", M_PI);  //OK
-            if(info.orientations[1] == PLUS_Z) rotate(verts, "y", M_PI/2); //OK
-            if(info.orientations[1] == MINUS_Z) rotate(verts, "y", -M_PI/2);//OK
-            break;
-        }
-        case PLUS_Z:
-        {
-            rotate(verts, "x", M_PI/2);
-            if(info.orientations[1] == PLUS_X) break;
-            if(info.orientations[1] == MINUS_X) rotate(verts, "z", M_PI);
-            if(info.orientations[1] == PLUS_Y) rotate(verts, "z", -M_PI/2); //OK
-            if(info.orientations[1] == MINUS_Y) rotate(verts, "z", M_PI/2);
-            break;
-        }
-        case MINUS_X:
-        {
-            rotate(verts, "z", M_PI/2);
-            if(info.orientations[1] == PLUS_Y) break;
-            if(info.orientations[1] == MINUS_Y) rotate(verts, "x", M_PI);
-            if(info.orientations[1] == PLUS_Z) rotate(verts, "x", M_PI/2);
-            if(info.orientations[1] == MINUS_Z) rotate(verts, "x", -M_PI/2);
-            break;
-        }
-        case MINUS_Y:
-        {
-            rotate(verts, "z", M_PI);
-            if(info.orientations[1] == PLUS_X) rotate(verts, "y", M_PI);
-            if(info.orientations[1] == MINUS_X) break;
-            if(info.orientations[1] == PLUS_Z) rotate(verts, "y", -M_PI/2);
-            if(info.orientations[1] == MINUS_Z) rotate(verts, "y", M_PI/2);
-            break;
-        }
-        case MINUS_Z:
-        {
-            rotate(verts, "x", -M_PI/2);
-            if(info.orientations[1] == PLUS_X) rotate(verts, "z", M_PI);
-            if(info.orientations[1] == MINUS_X) break;
-            if(info.orientations[1] == PLUS_Y) rotate(verts, "z",   M_PI/2);
-            if(info.orientations[1] == MINUS_Y) rotate(verts, "z", -M_PI/2);
-            break;
-        }
-        }
-
     }
-    else if(info.scheme_type == SchemeType::CORN_S){
+    else if(info.scheme_type == SchemeType::CORN_S)
+    {
         std::sort(info.orientations.begin()+1, info.orientations.end());
-        switch (info.orientations[0]) {
-        case PLUS_X:
+        switch(info.orientations[0])
         {
-            rotate(verts, "z", -M_PI/2);
-            reflect(verts, "xz");
-            if(info.orientations[1] == PLUS_Y && info.orientations[2] == PLUS_Z){} //DEFAULT;
-            if(info.orientations[1] == PLUS_Y && info.orientations[2] == MINUS_Z) reflect(verts, "xy");
-            if(info.orientations[1] == PLUS_Z && info.orientations[2] == MINUS_Y) reflect(verts, "xz");
-            if(info.orientations[1] == MINUS_Y && info.orientations[2] == MINUS_Z) {reflect(verts, "xy"); reflect(verts, "xz");}
+            case PLUS_X:
+            {
+                rotate(verts, "z", -M_PI/2);
+                reflect(verts, "xz");
+                if(info.orientations[1] == PLUS_Y  && info.orientations[2] == PLUS_Z)    {} //DEFAULT;
+                if(info.orientations[1] == PLUS_Y  && info.orientations[2] == MINUS_Z)   reflect(verts, "xy");
+                if(info.orientations[1] == PLUS_Z  && info.orientations[2] == MINUS_Y)   reflect(verts, "xz");
+                if(info.orientations[1] == MINUS_Y && info.orientations[2] == MINUS_Z) { reflect(verts, "xy"); reflect(verts, "xz"); }
+                break;
+            }
+            case PLUS_Y:
+            {
+                rotate(verts, "y", M_PI/2);
+                reflect(verts, "xy");
 
-            break;
+                if(info.orientations[1] == PLUS_X  && info.orientations[2] == PLUS_Z)   {} //DEFAULT
+                if(info.orientations[1] == PLUS_X  && info.orientations[2] == MINUS_Z)  reflect(verts, "xy");
+                if(info.orientations[1] == MINUS_X && info.orientations[2] == MINUS_Z)  reflect(verts, "y");
+                if(info.orientations[1] == PLUS_Z  && info.orientations[2] == MINUS_X)  reflect(verts, "yz");
+                break;
+            }
+            case PLUS_Z:
+            {
+                rotate(verts, "x", M_PI/2);
+                reflect(verts, "xz");
+                if(info.orientations[1] == PLUS_X  && info.orientations[2] == PLUS_Y)    {} //DEFAULT;
+                if(info.orientations[1] == PLUS_Y  && info.orientations[2] == MINUS_X)   reflect(verts, "yz");
+                if(info.orientations[1] == PLUS_X  && info.orientations[2] == MINUS_Y)   reflect(verts, "xz");
+                if(info.orientations[1] == MINUS_X && info.orientations[2] == MINUS_Y) { reflect(verts, "yz"); reflect(verts, "xz"); }
+                break;
+            }
+            case MINUS_X:
+            {
+                rotate(verts, "z", M_PI/2);
+                if(info.orientations[1] == PLUS_Y  && info.orientations[2] == PLUS_Z)   {} //DEFAULT;
+                if(info.orientations[1] == PLUS_Y  && info.orientations[2] == MINUS_Z)   reflect(verts, "xy");
+                if(info.orientations[1] == PLUS_Z  && info.orientations[2] == MINUS_Y)   reflect(verts, "xz");;
+                if(info.orientations[1] == MINUS_Y && info.orientations[2] == MINUS_Z) { reflect(verts, "yz"); reflect(verts, "xz"); }
+                break;
+            }
+            case MINUS_Y:
+            {
+                rotate(verts, "y", M_PI/2);
+                reflect(verts, "xy");
+                reflect(verts, "xz");
+                if(info.orientations[1] == PLUS_X  && info.orientations[2] == PLUS_Z)  {} //DEFAULT;
+                if(info.orientations[1] == PLUS_X  && info.orientations[2] == MINUS_Z) reflect(verts, "xy");
+                if(info.orientations[1] == MINUS_X && info.orientations[2] == MINUS_Z) reflect(verts, "y");
+                if(info.orientations[1] == PLUS_Z  && info.orientations[2] == MINUS_X) reflect(verts, "yz");;
+                break;
+            }
+            case MINUS_Z:
+            {
+                rotate(verts, "x", -M_PI/2);
+                if(info.orientations[1] == PLUS_X  && info.orientations[2] == PLUS_Y)    {} //DEFAULT;
+                if(info.orientations[1] == PLUS_Y  && info.orientations[2] == MINUS_X)   reflect(verts, "yz");;
+                if(info.orientations[1] == PLUS_X  && info.orientations[2] == MINUS_Y)   reflect(verts, "xz");;
+                if(info.orientations[1] == MINUS_X && info.orientations[2] == MINUS_Y) { reflect(verts, "yz"); reflect(verts, "xz");}
+                break;
+            }
         }
-        case PLUS_Y:
-        {
-            rotate(verts, "y", M_PI/2);
-            reflect(verts, "xy");
-
-            if(info.orientations[1] == PLUS_X && info.orientations[2] == PLUS_Z){} //DEFAULT
-            if(info.orientations[1] == PLUS_X && info.orientations[2] == MINUS_Z)  reflect(verts, "xy");
-            if(info.orientations[1] == MINUS_X && info.orientations[2] == MINUS_Z) reflect(verts, "y");
-            if(info.orientations[1] == PLUS_Z && info.orientations[2] == MINUS_X)  reflect(verts, "yz");
-
-            break;
-        }
-        case PLUS_Z:
-        {
-            rotate(verts, "x", M_PI/2);
-            reflect(verts, "xz");
-            if(info.orientations[1] == PLUS_X && info.orientations[2] == PLUS_Y){} //DEFAULT;
-            if(info.orientations[1] == PLUS_Y && info.orientations[2] == MINUS_X)  reflect(verts, "yz");
-            if(info.orientations[1] == PLUS_X && info.orientations[2] == MINUS_Y)  reflect(verts, "xz");
-            if(info.orientations[1] == MINUS_X && info.orientations[2] == MINUS_Y) {reflect(verts, "yz"); reflect(verts, "xz");}
-
-            break;
-        }
-        case MINUS_X:
-        {
-            rotate(verts, "z", M_PI/2);
-            if(info.orientations[1] == PLUS_Y && info.orientations[2] == PLUS_Z){} //DEFAULT;
-            if(info.orientations[1] == PLUS_Y && info.orientations[2] == MINUS_Z) reflect(verts, "xy");
-            if(info.orientations[1] == PLUS_Z && info.orientations[2] == MINUS_Y) reflect(verts, "xz");;
-            if(info.orientations[1] == MINUS_Y && info.orientations[2] == MINUS_Z) {reflect(verts, "yz"); reflect(verts, "xz");}
-
-            break;
-        }
-        case MINUS_Y:
-        {
-            rotate(verts, "y", M_PI/2);
-            reflect(verts, "xy");
-            reflect(verts, "xz");
-            if(info.orientations[1] == PLUS_X && info.orientations[2] == PLUS_Z){} //DEFAULT;
-            if(info.orientations[1] == PLUS_X && info.orientations[2] == MINUS_Z)  reflect(verts, "xy");
-            if(info.orientations[1] == MINUS_X && info.orientations[2] == MINUS_Z) reflect(verts, "y");
-            if(info.orientations[1] == PLUS_Z && info.orientations[2] == MINUS_X)  reflect(verts, "yz");;
-
-            break;
-        }
-        case MINUS_Z:
-        {
-            rotate(verts, "x", -M_PI/2);
-
-            if(info.orientations[1] == PLUS_X && info.orientations[2] == PLUS_Y){} //DEFAULT;
-            if(info.orientations[1] == PLUS_Y && info.orientations[2] == MINUS_X)  reflect(verts, "yz");;
-            if(info.orientations[1] == PLUS_X && info.orientations[2] == MINUS_Y)  reflect(verts, "xz");;
-            if(info.orientations[1] == MINUS_X && info.orientations[2] == MINUS_Y) { reflect(verts, "yz"); reflect(verts, "xz");}
-
-            break;
-        }
-        }
-
     }
-    for(auto &vert : verts){
+
+    for(auto &vert : verts)
+    {
         vert *= info.scale;
         vert += poly_centroid;
     }
 
-    if(!eps_eq(info.t_verts[0], verts.at(0))) {
+    if(!eps_eq(info.t_verts[0], verts.at(0)))
+    {
         try_reflections(verts, info, poly_centroid);
     }
-
-
-
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -819,6 +820,8 @@ void orient_concave_vert_side(std::vector<vec3d>        &verts,
         vert += poly_centroid;
     }
 }
+
+} // end anonymous namespace
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
