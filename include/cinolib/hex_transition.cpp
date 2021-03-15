@@ -43,38 +43,19 @@
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void bake_reflection_matrix(double (*m)[3], std::string plane){
+void reflect(std::vector<vec3d> &verts, const std::string & axis)
+{
+    double m[3][3];
+    m[0][0] = -1; m[0][1] =  0; m[0][2] =  0;
+    m[1][0] =  0; m[1][1] = -1; m[1][2] =  0;
+    m[2][0] =  0; m[2][1] =  0; m[2][2] = -1;
 
-    m[0][0] = -1; m[0][1] = 0; m[0][2] = 0;
-    m[1][0] = 0; m[1][1] = -1; m[1][2] = 0;
-    m[2][0] = 0; m[2][1] = 0; m[2][2] = -1;
+    if(axis.find('x') != std::string::npos) m[0][0] = 1;
+    if(axis.find('y') != std::string::npos) m[1][1] = 1;
+    if(axis.find('z') != std::string::npos) m[2][2] = 1;
 
-    if(plane.find('x') != std::string::npos){
-        m[0][0] = 1;
-    }
-    if(plane.find('y') != std::string::npos){
-        m[1][1] = 1;
-    }
-    if(plane.find('z') != std::string::npos){
-        m[2][2] = 1;
-    }
-
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void reflect(std::vector<vec3d> &verts, std::string axis){
-
-    double refl[3][3];
-    bake_reflection_matrix(refl, axis);
-
-    for(auto &vert : verts){
-        transform(vert, refl);
-    }
+    for(auto & v : verts) transform(v, m);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
