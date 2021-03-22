@@ -1556,6 +1556,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 int AbstractPolyhedralMesh<M,V,E,F,P>::poly_shared_face(const uint pid0, const uint pid1) const
 {
+    assert(pid0!=pid1);
     for(uint fid0 : adj_p2f(pid0))
     for(uint fid1 : adj_p2f(pid1))
     {
