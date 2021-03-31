@@ -7,6 +7,9 @@ Please consider this to be just development notes and not any real planning.
 * Polygon Laplacian Made Simple (EG2020)
 * Fast and Robust Triangle-Triangle Overlap Test Using Orientation Predicates
 
+### Tips and Tricks to test/implement
+* https://zeux.io/2010/10/17/aabb-from-obb-with-component-wise-abs/
+
 ### Things to be fixed:
 * Dijkstra is faster with std::priority_queue than with std::set (double check this)
 * use enum classes instead of enums for strong typing and easier code/parameter handling
