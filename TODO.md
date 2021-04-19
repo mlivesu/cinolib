@@ -25,6 +25,9 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* allow to copy/paste visual options (e.g. slicer)
+* add line color for 2D checkerboard maps
+* allow to select clamping or repeation for 1D texture
 * implement convertion operators between surface meshes and volume meshes (see http://www.cplusplus.com/doc/tutorial/typecasting/)
 * use parallel for to handle all-vs-all tests in octree leaves
 * splitting rule for octree generation should be passed as an external function, so that each one can make the tree he wants to make....
