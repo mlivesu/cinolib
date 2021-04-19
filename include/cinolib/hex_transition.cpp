@@ -63,7 +63,7 @@ void try_reflections(std::vector<vec3d> &verts, const SchemeInfo &info, const ve
 
     }
 
-    assert(false && "Failed to find the right reflection");
+    //assert(false && "Failed to find the right reflection");
 
 }
 
@@ -94,7 +94,7 @@ void try_rotations(std::vector<vec3d> &verts, const SchemeInfo &info, const vec3
         rotate(tmp_verts, "x", M_PI_2);
     }
 
-    assert(false && "Failed to find the right rotation");
+    //assert(false && "Failed to find the right rotation");
 
 }
 
@@ -754,6 +754,7 @@ void orient_concave_vert_side(std::vector<vec3d>        &verts,
         tmp_v0 += application_poly_centroid;
         if(!eps_eq(info.t_verts[0], tmp_v0))
             reflect(verts, "xy");
+
     }
     else if(info.orientations[0] == MINUS_X && info.orientations[1] == MINUS_Z){
 

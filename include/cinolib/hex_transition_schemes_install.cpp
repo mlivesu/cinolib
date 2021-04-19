@@ -35,6 +35,16 @@ inline int find_min_ref(const Polyhedralmesh<M, V, E, F, P> &m, uint vid){
 }
 
 template<class M, class V, class E, class F, class P>
+inline int find_max_ref(const Polyhedralmesh<M, V, E, F, P> &m, uint vid){
+    int max_ref = -1;
+    for(uint pid : m.adj_v2p(vid)){
+        if(m.poly_data(pid).label > max_ref)
+            max_ref = m.poly_data(pid).label;
+    }
+    return max_ref;
+}
+
+template<class M, class V, class E, class F, class P>
 void get_transition_verts_direction(const Polyhedralmesh<M, V, E, F, P> &m, const std::vector<bool> &transition_verts, std::vector<uint> &transition_verts_direction){
 
     transition_verts_direction = std::vector<uint>(m.num_verts());
@@ -245,9 +255,12 @@ void mark_concave_vert(const Polyhedralmesh<M, V, E, F, P> &m,
 
                 }
                 else{
+                    uint curr_ref = m.poly_data(pid).label;
                     std::set<uint> refs;
                     for(uint adj : m.adj_v2p(vid)){
-                        refs.insert(m.poly_data(adj).label);
+                        if(m.poly_data(adj).label >= curr_ref){
+                            refs.insert(m.poly_data(adj).label);
+                        }
                     }
                     if(refs.size() >= 2) info.t_verts.push_back(m.vert(vid));
                 }
@@ -307,14 +320,24 @@ void mark_concave_edge(const Polyhedralmesh<M, V, E, F, P> &m,
     std::sort(adjs_v2.begin(), adjs_v2.end());
     std::set_intersection(adjs_v1.begin(), adjs_v1.end(), adjs_v2.begin(), adjs_v2.end(), std::back_inserter(intersection));
 
+    if(!(intersection.size() == 2 || intersection.size() == 1)) std::cerr<<"Wrong Edge: "<<intersection.size()<<std::endl;
+    //assert(intersection.size() == 2 || intersection.size() == 1);
 
-    assert(intersection.size() == 2 || intersection.size() == 1);
+    int ref = 0;
+    for(uint pid : m.adj_v2p(t_verts[0])){
+        if(m.poly_contains_vert(pid, t_verts[1])){
+            ref = m.poly_data(pid).label;
+            break;
+        }
+    }
+
     uint conc_edge_vid = 0;
     bool nested_candidate = false;
     for(uint vid : intersection){
         std::set<int> refs;
         for(uint pid : m.adj_v2p(vid)){
-            refs.insert(m.poly_data(pid).label);
+            if(ref <= m.poly_data(pid).label)
+                refs.insert(m.poly_data(pid).label);
         }
         if(refs.size() == 2){
             conc_edge_vid = vid;
@@ -333,8 +356,10 @@ void mark_concave_edge(const Polyhedralmesh<M, V, E, F, P> &m,
 
 
     for(uint pid : m.adj_v2p(conc_edge_vid)){
+
         if(!(m.poly_contains_vert(pid, t_verts[0]) && m.poly_contains_vert(pid, t_verts[1]))) continue;
         if(m.poly_data(pid).label == min_ref){
+
             auto query = poly2scheme.find(pid);
             if(query == poly2scheme.end() || query->second.type == HexTransition::FLAT || query->second.type == HexTransition::FLAT_CONVEX){
 
@@ -405,13 +430,13 @@ void mark_concave_edge(const Polyhedralmesh<M, V, E, F, P> &m,
                     }
                 }
 
-
                 info.scale = m.edge_length(m.adj_p2e(pid)[0]);
                 info.t_verts.push_back(m.vert(t_verts[i]));
                 info.orientations.push_back(t_verts_direction[t_verts[i]]);
                 info.orientations.push_back(t_verts_direction[t_verts[(i+1)%t_verts.size()]]);
                 info.scheme_type = SchemeType::CONC_S;
                 poly2scheme[pid] = info;
+
             }
         }
     }
@@ -427,6 +452,7 @@ void mark_concave_edge(const Polyhedralmesh<M, V, E, F, P> &m,
                 if(query->second.type == HexTransition::FLAT){
                     poly2scheme[adj].type = HexTransition::FLAT_CONVEX;
                 }
+
             }
         }
     }
@@ -551,13 +577,16 @@ void mark_flat(const Polyhedralmesh<M, V, E, F, P> &m,
                 info.scheme_type = SchemeType::FLAT_S;
                 poly2scheme[pid] = info;
 
+
                 //ADJSUST ADJACENTS
 
                 for(uint adj : m.adj_p2p(pid)){
                     auto query = poly2scheme.find(adj);
                     if(query != poly2scheme.end() && query->second.type == HexTransition::FLAT && (query->second.scheme_type == SchemeType::CONC_S ||
                                                                                                    query->second.scheme_type == SchemeType::CORN_S)){
+
                         poly2scheme[adj].type = HexTransition::FLAT_CONVEX;
+
                     }
                 }
             }
@@ -571,13 +600,23 @@ void mark_flat(const Polyhedralmesh<M, V, E, F, P> &m,
 template<class M, class V, class E, class F, class P>
 void cut_flats(const Polyhedralmesh<M, V, E, F, P> &m, std::unordered_map<uint, SchemeInfo> &poly2scheme){
 
+    std::deque<uint> queue;
     for(auto &p : poly2scheme){
+        queue.push_back(p.first);
+    }
+
+    while(!queue.empty()){//for(auto &p : poly2scheme){
+        uint id = queue.front();
+        queue.pop_front();
+        auto p = *poly2scheme.find(id);
         if(p.second.type == HexTransition::FLAT_CONVEX){
             for(uint adj : m.adj_p2p(p.first)){
                 auto query = poly2scheme.find(adj);
                 if(query != poly2scheme.end() && query->second.type == HexTransition::FLAT && (query->second.scheme_type == SchemeType::CONC_S || query->second.scheme_type == SchemeType::CORN_S)){
-                    if(!eps_eq(p.second.t_verts[0], query->second.t_verts[0]))
+                    if(!eps_eq(p.second.t_verts[0], query->second.t_verts[0])){
                         poly2scheme[adj].type = HexTransition::FLAT_CONVEX;
+                        queue.push_back(adj);
+                    }
                 }
             }
         }
@@ -591,6 +630,7 @@ void cut_flats(const Polyhedralmesh<M, V, E, F, P> &m, std::unordered_map<uint, 
             }
             if(num_adj_conc_lateral > 2){
                  poly2scheme[p.first].type = HexTransition::FLAT_CONVEX;
+                 queue.push_back(p.first);
             }
         }
     }
@@ -689,19 +729,31 @@ void hex_transition_schemes_install(const Polyhedralmesh<M, V, E, F, P> &m, cons
         }
 
         std::sort(scheme_vids.begin(), scheme_vids.end());
-        if(scheme_vids.size() == 1 && not_flats.find(scheme_vids[0]) == not_flats.end()) flats.insert(scheme_vids[0]); //Flat
+        bool flat_condition = scheme_vids.size() == 1;
+        if(scheme_vids.size()==2){
+            flat_condition = flat_condition || m.edge_id(scheme_vids[0], scheme_vids[1]) != -1;
+        }
+        if(flat_condition){
+            for(uint sv : scheme_vids){
+                if(not_flats.find(sv) == not_flats.end()) flats.insert(sv); //Flat
+            }
+        }
+
         else{
             if(scheme_vids.size() == 2){ //Concave edge candidate
-
+                if(m.edge_id(scheme_vids[0], scheme_vids[1]) != -1) continue;
                 //ensure that the transition verts are on the same poly face
                 for(uint fid : m.poly_faces_id(pid)){
                     if(m.face_contains_vert(fid, scheme_vids[0]) && m.face_contains_vert(fid, scheme_vids[1])){
-                        concaves.insert(scheme_vids);
-                        for(uint vid : scheme_vids){
-                            not_flats.insert(vid);
-                            flats.erase(vid);
+                        if(find_max_ref(m, scheme_vids[0]) == find_max_ref(m, scheme_vids[1])){
+                            concaves.insert(scheme_vids);
+                            for(uint vid : scheme_vids){
+                                not_flats.insert(vid);
+                                flats.erase(vid);
+                            }
+
+                            break;
                         }
-                        break;
                     }
                 }
             }
@@ -725,6 +777,20 @@ void hex_transition_schemes_install(const Polyhedralmesh<M, V, E, F, P> &m, cons
                 if(transition_verts[adj_v])
                     adj_t_verts.push_back(adj_v);
             }
+
+            if(adj_t_verts.size() == 3){
+                int max = 0;
+                for(uint v : adj_t_verts){
+                    max = std::max(find_max_ref(m, v), max);
+                }
+                for(uint i=0; i<3;i++){
+                    if(find_max_ref(m, adj_t_verts[i]) != max){
+                        adj_t_verts.erase(std::next(adj_t_verts.begin(), i));
+                        break;
+                    }
+                }
+            }
+
             if(adj_t_verts.size() == 2 && transition_verts_direction[adj_t_verts[0]] != transition_verts_direction[adj_t_verts[1]]){ //Convex candidate
 
                 std::sort(adj_t_verts.begin(), adj_t_verts.end());
