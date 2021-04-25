@@ -37,13 +37,27 @@
 #define CINO_CLAMP
 
 #include <cinolib/cino_inline.h>
+#include <vector>
 
 namespace cinolib
 {
 
+// clamps a value, projecting it inside the range [min,max]s
+//
 template<typename T>
 CINO_INLINE
 T clamp(const T & val, const T & min, const T & max);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// clamps a vector, discarding upper and lower outliers.
+// The algorithm works as follows: elements in vec are first ordered,
+// than elements in the first <below_perc_thresh>% and in the last
+// <above_perc_thresh>% are clmaped so as to remove outliers.
+//
+template<typename T>
+CINO_INLINE
+void clamp(std::vector<T> & vec, const float below_perc_thresh, const float above_perc_thresh);
 
 }
 

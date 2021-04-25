@@ -47,4 +47,20 @@ T clamp(const T & val, const T & min, const T & max)
     return res;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void clamp(std::vector<T> & vec, const float below_perc_thresh, const float above_perc_thresh)
+{
+    std::vector<T> tmp = vec;
+    sort(tmp.begin(), tmp.end());
+
+    T b = tmp.at(below_perc_thresh*vec.size());
+    T t = tmp.at(vec.size() - above_perc_thresh*vec.size());
+
+    for(T & val : vec) clamp(val, b, t);
 }
+
+}
+
