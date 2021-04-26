@@ -215,6 +215,30 @@ double AbstractPolyhedralMesh<M,V,E,F,P>::mesh_srf_area() const
     return area;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double AbstractPolyhedralMesh<M,V,E,F,P>::mesh_volume() const
+{
+    double vol = 0;
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        vol += this->poly_volume(pid);
+    }
+    return vol;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::normalize_volume()
+{
+    this->scale(1.0/sqrt(this->mesh_volume()));
+    assert(std::fabs(this->mesh_volume()-1)<1e-5);
+    if(this->mesh_data().update_bbox) this->update_bbox();
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
