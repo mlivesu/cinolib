@@ -40,7 +40,7 @@
 #include <sys/types.h>
 
 /* Implementation of the convertion schemes to transform an adaptively refined grid
- * with hanging nodes into a conformin all hexahedral mesh. These schemes are based
+ * with hanging nodes into a conforming all hexahedral mesh. These schemes are based
  * on ideas contained in:
  *
  *     Optimal Dual Schemes for Adaptive Grid Based Hexmeshing
@@ -90,11 +90,8 @@
  *
  *  4 - dualize the so generated polyhedral mesh to obtain a full hexahedral mesh
  *
- * Steps (2,3) can be done with cinolib::hex_transition_install. Note that this routine
- * does the installation of the new elements only, and does not take care of removing the
- * old elements from the grid.
- *
- * Step 4 is a standard dualization, and can be done with cinolib::dual_mesh
+ * Steps (2,3) can be done with cinolib::hex_transition_install. Step 4 is a standard
+ * dualization, and can be done with cinolib::dual_mesh
 */
 
 namespace cinolib
