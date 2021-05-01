@@ -33,70 +33,47 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SCALAR_FIELD_V_H
-#define CINO_SCALAR_FIELD_V_H
+#ifndef CINO_ARAP_2D_MAP_H
+#define CINO_ARAP_2D_MAP_H
 
-#include <iostream>
-#include <vector>
-#include <sys/types.h>
-#include <Eigen/Dense>
-#include <cinolib/serializable.h>
-#include <cinolib/symbols.h>
-
+#include <cinolib/meshes/trimesh.h>
+#include <cinolib/linear_solvers.h>
 
 namespace cinolib
 {
 
-class ScalarField : public Eigen::VectorXd, public Serializable
+/* Implementation of the ARAP UV mapping algorithm as described in:
+ *
+ *   A Local/Global Approach to Mesh Parameterization
+ *   Ligang Liu, Lei Zhang, Yin Xu, Craig Gotsman and Steven J. Gortler
+ *   Eurographics Symposium on Geometry Processing 2008
+*/
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+struct ARAP_2D_map_data
 {
-    public:
+    uint n_iters = 4;
+    bool init    = true; // initialize just once (useful for multiple calls, e.g. to make more iterations)
 
-        explicit ScalarField();
-        explicit ScalarField(const std::vector<double> & data);
-        explicit ScalarField(const uint size);
-        explicit ScalarField(const char *filename);
+    std::vector<Eigen::Vector2d> uv;     // output uv coords
+    std::vector<Eigen::Vector2d> uv_ref; // per triangle reference uv coords (w.r.t. a local frame)
+    std::vector<Eigen::Vector2d> uv_loc; // per triangle uv targets (100% rigid)
+    std::vector<double>          w;      // edge weights (cotangent)
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        template<class Mesh>
-        void copy_to_mesh(Mesh & m, const int tex_coord = U_param) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        uint size() const { return rows(); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void clamp(const float thresh_from_below, const float thresh_from_above);
-        void normalize_in_01();
-        uint min_element_index() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void serialize  (const char *filename) const;
-        void deserialize(const char *filename);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        // for more info, see:
-        // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
-        //
-        // This method allows you to assign Eigen expressions to ScalarField
-        //
-        template<typename OtherDerived>
-        ScalarField & operator= (const Eigen::MatrixBase<OtherDerived>& other);
-
-        //
-        // This constructor allows you to construct ScalarField from Eigen expressions
-        //
-        template<typename OtherDerived>
-        ScalarField(const Eigen::MatrixBase<OtherDerived>& other);
+    Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> cache; // factorized matrix
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "scalar_field.cpp"
+#include "ARAP_2D_map.cpp"
 #endif
 
-#endif // CINO_SCALAR_FIELD_V_H
+#endif // CINO_ARAP_2D_MAP_H

@@ -7,6 +7,9 @@ Please consider this to be just development notes and not any real planning.
 * Polygon Laplacian Made Simple (EG2020)
 * Fast and Robust Triangle-Triangle Overlap Test Using Orientation Predicates
 
+### Tips and Tricks to test/implement
+* https://zeux.io/2010/10/17/aabb-from-obb-with-component-wise-abs/
+
 ### Things to be fixed:
 * Dijkstra is faster with std::priority_queue than with std::set (double check this)
 * use enum classes instead of enums for strong typing and easier code/parameter handling
@@ -22,6 +25,9 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* allow to copy/paste visual options (e.g. slicer)
+* add line color for 2D checkerboard maps
+* allow to select clamping or repeation for 1D texture
 * implement convertion operators between surface meshes and volume meshes (see http://www.cplusplus.com/doc/tutorial/typecasting/)
 * use parallel for to handle all-vs-all tests in octree leaves
 * splitting rule for octree generation should be passed as an external function, so that each one can make the tree he wants to make....
@@ -64,7 +70,6 @@ Please consider this to be just development notes and not any real planning.
 * Use robust geometric computations (volumes, dihedral angles ecc.)
   (ref. => Lecture Notes on Geometric Robustness di Jonathan Richard Shewchuk)
 * add 2D medial axis computation facilities using qgarlib
-* ARAP parameterization and shape deformation
 * linear blend skinning and dual quaternions
 
 ### Documentation:

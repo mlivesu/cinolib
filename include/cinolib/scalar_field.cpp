@@ -36,6 +36,7 @@
 #include <cinolib/scalar_field.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/min_max_inf.h>
+#include <cinolib/clamp.h>
 #include <fstream>
 
 namespace cinolib
@@ -71,6 +72,25 @@ CINO_INLINE
 ScalarField::ScalarField(const char *filename)
 {
     deserialize(filename);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void ScalarField::clamp(const float thresh_from_below, const float thresh_from_above)
+{
+    std::vector<double> tmp(size());
+    for(int i=0; i<rows(); ++i)
+    {
+        tmp[i] = (*this)[i];
+    }
+    sort(tmp.begin(), tmp.end());
+    double b = tmp[thresh_from_below*size()];
+    double t = tmp[size() - thresh_from_above*size()];
+    for(int i=0; i<rows(); ++i)
+    {
+        (*this)[i] = cinolib::clamp((*this)[i],b,t);
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

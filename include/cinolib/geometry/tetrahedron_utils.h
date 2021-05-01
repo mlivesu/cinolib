@@ -53,6 +53,13 @@ void tet_barycentric_coords(const vec3d & A,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+vec3d tetrahedron_circumcenter(const vec3d & A,
+                               const vec3d & B,
+                               const vec3d & C,
+                               const vec3d & D);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // Given a point P and a tetrahedron ABCD, finds the point in ABCD that
 // is closest to P. This code was taken directly from Ericson's seminal
 // book "Real Time Collision Detection", Section 5.1.6
