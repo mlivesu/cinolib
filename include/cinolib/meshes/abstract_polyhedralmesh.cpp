@@ -235,7 +235,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::normalize_volume()
 {
-    this->scale(1.0/sqrt(this->mesh_volume()));
+    this->scale(1.0/std::pow(this->mesh_volume(), 1.0/3));
     assert(std::fabs(this->mesh_volume()-1)<1e-5);
     if(this->mesh_data().update_bbox) this->update_bbox();
 }
