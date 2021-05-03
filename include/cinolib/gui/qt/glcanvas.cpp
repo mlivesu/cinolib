@@ -681,6 +681,8 @@ void GLcanvas::fit_scene()
     double dist = 0;
     for(const DrawableObject *obj : objects)
     {
+        if(obj->scene_radius()==0) continue;
+        
         dist = std::max(dist, obj->scene_center().dist(center));
     }
     trackball.scene_size = size + dist;
