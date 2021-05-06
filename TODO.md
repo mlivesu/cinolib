@@ -5,7 +5,6 @@ Please consider this to be just development notes and not any real planning.
 * Properties of Laplace Operators for Tetrahedral Meshes (SGP2020)
 * A Laplacian for Nonmanifold Triangle Meshes (SGP2020)
 * Polygon Laplacian Made Simple (EG2020)
-* Fast and Robust Triangle-Triangle Overlap Test Using Orientation Predicates
 
 ### Tips and Tricks to test/implement
 * https://zeux.io/2010/10/17/aabb-from-obb-with-component-wise-abs/
@@ -25,6 +24,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* remove vecs of vecs for mesh polygons and polyhedra. use serialized elements and two separated vectors to index them
 * allow to copy/paste visual options (e.g. slicer)
 * add line color for 2D checkerboard maps
 * allow to select clamping or repeation for 1D texture
