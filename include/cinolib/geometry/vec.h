@@ -58,10 +58,11 @@ class vec                 // d => dimension (2,3,...)
         explicit vec(const T s = 0);
         explicit vec(const std::initializer_list<T> & il);
 
-        // Specialized (faster) for R^2 and R^3 ::::::::::::::::::::::::::::::::::
+        // Specialized (faster) for R^2, R^3 and R^4 :::::::::::::::::::::::::::::
 
         explicit vec(const double v0, const double v1);
         explicit vec(const double v0, const double v1, const double v2);
+        explicit vec(const double v0, const double v1, const double v2, const double v3);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -72,26 +73,31 @@ class vec                 // d => dimension (2,3,...)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-              T & at(const uint pos);
-        const T & at(const uint pos) const;
+        const T * ptr() const { return val; }
+              T * ptr()       { return val; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        const T & at(const uint pos) const { return val.at(pos); }
+              T & at(const uint pos)       { return val.at(pos); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // Cartesian XYZ access
-        const T & x() const { return val.at(0); }
-              T & x()       { return val.at(0); }
-        const T & y() const { return val.at(1); }
-              T & y()       { return val.at(1); }
-        const T & z() const { return val.at(2); }
-              T & z()       { return val.at(2); }
+        const T & x() const { return val[0]; }
+              T & x()       { return val[0]; }
+        const T & y() const { return val[1]; }
+              T & y()       { return val[1]; }
+        const T & z() const { return val[2]; }
+              T & z()       { return val[2]; }
 
         // Parametric UVW access
-        const T & u() const { return val.at(0); }
-              T & u()       { return val.at(0); }
-        const T & v() const { return val.at(1); }
-              T & v()       { return val.at(1); }
-        const T & w() const { return val.at(2); }
-              T & w()       { return val.at(2); }
+        const T & u() const { return val[0]; }
+              T & u()       { return val[0]; }
+        const T & v() const { return val[1]; }
+              T & v()       { return val[1]; }
+        const T & w() const { return val[2]; }
+              T & w()       { return val[2]; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -108,10 +114,6 @@ class vec                 // d => dimension (2,3,...)
               vec<T,d> & operator/= (const T s);
               bool       operator== (const vec<T,d> & v) const;
               bool       operator<  (const vec<T,d> & v) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        const T * ptr() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -154,15 +156,15 @@ class vec                 // d => dimension (2,3,...)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // useful types to have
-typedef vec<double,2> Vec2d;
-typedef vec<float,2>  Vec2f;
-typedef vec<int,2>    Vec2i;
-typedef vec<double,3> Vec3d;
-typedef vec<float,3>  Vec3f;
-typedef vec<int,3>    Vec3i;
-typedef vec<double,4> Vec4d;
-typedef vec<float,4>  Vec4f;
-typedef vec<int,4>    Vec4i;
+typedef vec<double,2> vec2d;
+typedef vec<float,2>  vec2f;
+typedef vec<int,2>    vec2i;
+typedef vec<double,3> vec3d;
+typedef vec<float,3>  vec3f;
+typedef vec<int,3>    vec3i;
+typedef vec<double,4> vec4d;
+typedef vec<float,4>  vec4f;
+typedef vec<int,4>    vec4i;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

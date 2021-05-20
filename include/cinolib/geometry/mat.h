@@ -44,6 +44,10 @@
 namespace cinolib
 {
 
+/* row major or column major????
+ * perhaps is better column major!
+*/
+
 template<class T, uint r, uint c> // T   => element type (float, double, int,...)
 class mat                         // r,c => matrix rows and columns
 {
@@ -88,6 +92,7 @@ class mat                         // r,c => matrix rows and columns
         mat<T,r,c>   operator-  (const mat<T,r,c> & m) const;
         mat<T,r,c>   operator-  ()                     const;
         mat<T,r,c>   operator*  (const T s)            const;
+        vec<T,r>     operator*  (const vec<T,c> v)     const; // mat vec multiplication
         mat<T,r,c>   operator/  (const T s)            const;
         mat<T,r,c> & operator+= (const mat<T,r,c> & m);
         mat<T,r,c> & operator-= (const mat<T,r,c> & m);
@@ -97,18 +102,30 @@ class mat                         // r,c => matrix rows and columns
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+              T * ptr();
         const T * ptr() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void svd()        const;
-        void ssvd()       const;
-        void p_norm()     const;
-        void transposed() const;
-        void inverse()    const;
-        void solve()      const; // solve linear system m * x = b
-        void eigenvals()  const;
-        void eigenvecs()  const;
+        void svd()                    const;
+        void ssvd()                   const;
+        void p_norm()                 const;
+        void transposed()             const;
+        void inverse()                const;
+        void eigenvals()              const;
+        void eigenvecs()              const;
+        void det()                    const;
+        void det_Cramer(const uint i) const; // substitutes i-th colum and computes determinant (for Cramer solves)
+        void solve()                  const; // solve linear system m * x = b with Cramer
+        void trace()                  const;
+        void col()                    const;
+        void row()                    const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void affine_map()           const; // finds the affinity that maps two frames (these three are the same!)
+        void deformation_gradient() const; // finds the affinity that maps two frames
+        void change_of_basis()      const; // finds the affinity that maps two frames
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -117,6 +134,8 @@ class mat                         // r,c => matrix rows and columns
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        bool is_full_rank()  const;
+        bool is_symmetric()  const;
         bool is_null()       const;
         bool is_nan()        const;
         bool is_inf()        const;

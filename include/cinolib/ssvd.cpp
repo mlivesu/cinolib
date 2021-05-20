@@ -51,7 +51,7 @@ void ssvd(const Eigen::Matrix3d                 & m,
     u = svd.matrixU();
     v = svd.matrixV();
 
-    if (v.determinant() < 0)
+    if(v.determinant()<0)
     {
         v.coeffRef(0,2) = -v.coeff(0,2);
         v.coeffRef(1,2) = -v.coeff(1,2);
@@ -61,10 +61,9 @@ void ssvd(const Eigen::Matrix3d                 & m,
         u.coeffRef(1,2) = - u.coeff(1,2);
         u.coeffRef(2,2) = - u.coeff(2,2);
     }
+    assert(v.determinant()>0);
 
-    assert(v.determinant() > 0);
-
-    if (u.determinant() < 0)
+    if(u.determinant()<0)
     {
         u.coeffRef(0,2) = -u.coeff(0,2);
         u.coeffRef(1,2) = -u.coeff(1,2);
@@ -72,21 +71,43 @@ void ssvd(const Eigen::Matrix3d                 & m,
 
         s.diagonal()[2] = -s.diagonal()[2];
     }
-
-    assert(u.determinant() > 0);
-
-    //assert(m.determinant() * (u * s * v.transpose()).determinant() > 0);
-    //cout << "m :\n" << m << std::endl;
-    //cout << std::endl;
-    //cout << "m':\n" << u * s * v.transpose() << std::endl;
-    //cout << std::endl;
-    //cout << "m' - m:\n" << m - (u * s * v.transpose()) << std::endl;
-    //cout << std::endl;
-    //cout << "det m: " << m.determinant() << std::endl;
-    //cout << std::endl;
-    //cout << "det m': " << (u * s * v.transpose()).determinant() << std::endl;
+    assert(u.determinant()>0);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void ssvd(const Eigen::Matrix2d                 & m,
+                Eigen::Matrix2d                 & u,
+                Eigen::DiagonalMatrix<double,2> & s,
+                Eigen::Matrix2d                 & v)
+{
+    Eigen::JacobiSVD<Eigen::Matrix2d> svd(m, Eigen::ComputeFullU | Eigen::ComputeFullV);
+
+    s = Eigen::DiagonalMatrix<double,2>(svd.singularValues());
+    u = svd.matrixU();
+    v = svd.matrixV();
+
+    if(v.determinant()<0)
+    {
+        v.coeffRef(0,1) = -v.coeff(0,1);
+        v.coeffRef(1,1) = -v.coeff(1,1);
+
+        u.coeffRef(0,1) = - u.coeff(0,1);
+        u.coeffRef(1,1) = - u.coeff(1,1);
+    }
+    assert(v.determinant()>0);
+
+    if(u.determinant()<0)
+    {
+        u.coeffRef(0,1) = -u.coeff(0,1);
+        u.coeffRef(1,1) = -u.coeff(1,1);
+        s.diagonal()[1] = -s.diagonal()[1];
+    }
+    assert(u.determinant()>0);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void closest_pos_det_matrix(double T[3][3])
@@ -99,7 +120,7 @@ void closest_pos_det_matrix(double T[3][3])
     Eigen::Matrix3d u, v;
     Eigen::DiagonalMatrix<double,3> s;
 
-    ssvd(t, u, s, v);
+    ssvd(t,u,s,v);
 
     //cout << ":::::::::::::::::::::::::::::::::::::::::::" << std::endl;
     //cout << T[0][0] << "\t" << T[0][1] << "\t" << T[0][2] << std::endl;

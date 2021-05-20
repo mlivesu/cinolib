@@ -7,12 +7,14 @@ Please consider this to be just development notes and not any real planning.
 * Polygon Laplacian Made Simple (EG2020)
 * Fast and Robust Triangle-Triangle Overlap Test Using Orientation Predicates
 
+### Tips and Tricks to test/implement
+* https://zeux.io/2010/10/17/aabb-from-obb-with-component-wise-abs/
+
 ### Things to be fixed:
 * Dijkstra is faster with std::priority_queue than with std::set (double check this)
 * use enum classes instead of enums for strong typing and easier code/parameter handling
 * in DrawableSegmentSoup, edge rendering is orientation dependend when cheap mode is not active (cylinders are defined as points + dir!)
 * find ways to speedup updateGL(). For big meshes it's overly slow...
-* fix mesh dualization of clipped cells (cluster planar faces, preserve sharp crases in the dual)
 * transform all NULL into nullptr
 * merge vec2<T> vec3<T> (and colors!) into a unified vec<D,T>. This will make much easier write algorithms that scale across multiple dimensions (e.g. Poisson sampling). For the same reason vertex types should become template parameters for meshes
 * provide mechanisms to enable operations between meshes with different template signatures (e.g. export_hexahedra,...)
@@ -23,6 +25,10 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* allow to copy/paste visual options (e.g. slicer)
+* add line color for 2D checkerboard maps
+* allow to select clamping or repeation for 1D texture
+* implement convertion operators between surface meshes and volume meshes (see http://www.cplusplus.com/doc/tutorial/typecasting/)
 * use parallel for to handle all-vs-all tests in octree leaves
 * splitting rule for octree generation should be passed as an external function, so that each one can make the tree he wants to make....
 * double check vertex non manifoldness checks, they can probably be made much faster exploiting Euler to check the topology of the link....
@@ -64,7 +70,6 @@ Please consider this to be just development notes and not any real planning.
 * Use robust geometric computations (volumes, dihedral angles ecc.)
   (ref. => Lecture Notes on Geometric Robustness di Jonathan Richard Shewchuk)
 * add 2D medial axis computation facilities using qgarlib
-* ARAP parameterization and shape deformation
 * linear blend skinning and dual quaternions
 
 ### Documentation:

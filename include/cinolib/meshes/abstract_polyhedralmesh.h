@@ -93,6 +93,11 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double mesh_srf_area() const;
+        double mesh_volume()   const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void normalize_volume();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -110,6 +115,10 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 void update_v_normal(const uint vid);
                 void update_quality();
                 void update_p_quality(const uint pid);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void operator+=(const AbstractPolyhedralMesh<M,V,E,F,P> & m);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -184,13 +193,14 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         std::vector<uint>  vert_adj_srf_verts         (const uint vid) const;
         std::vector<uint>  vert_adj_srf_edges         (const uint vid) const;
         std::vector<uint>  vert_adj_srf_faces         (const uint vid) const;
-        std::vector<uint>  vert_ordered_srf_vert_ring (const uint vid) const;
-        std::vector<uint>  vert_ordered_srf_edge_ring (const uint vid) const;
-        std::vector<uint>  vert_ordered_srf_face_ring (const uint vid) const;
+        std::vector<uint>  vert_ordered_srf_vert_ring (const uint vid, const bool CCW = false) const;
+        std::vector<uint>  vert_ordered_srf_edge_ring (const uint vid, const bool CCW = false) const;
+        std::vector<uint>  vert_ordered_srf_face_ring (const uint vid, const bool CCW = false) const;
         void               vert_ordered_srf_one_ring  (const uint vid,
                                                        std::vector<uint> & v_ring,
                                                        std::vector<uint> & e_ring,
-                                                       std::vector<uint> & f_ring) const;
+                                                       std::vector<uint> & f_ring,
+                                                       const bool          CCW = false) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

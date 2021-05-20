@@ -79,35 +79,6 @@ vec<T,d>::vec(const std::initializer_list<T> & il)
 
 template<class T, uint d>
 CINO_INLINE
-const T & vec<T,d>::at(const uint pos) const
-{
-    assert(pos<d);
-    return val[pos];
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class T, uint d>
-CINO_INLINE
-T & vec<T,d>::at(const uint pos)
-{
-    assert(pos<d);
-    return val[pos];
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class T, uint d>
-CINO_INLINE
-const T * vec<T,d>::ptr() const
-{
-    return val;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class T, uint d>
-CINO_INLINE
 T vec<T,d>::dot(const vec<T,d> & v) const
 {
     T res = 0;
@@ -124,7 +95,7 @@ template<class T, uint d>
 CINO_INLINE
 vec<T,d> vec<T,d>::cross(const vec<T,d> & v) const
 {
-    assert(d==3 && "cross product is defined only in R^3 so far");
+    assert(d==3 && "cross product is defined only in R^3");
 
     return vec<T,d>({val[1] * v.val[2] - val[2] * v.val[1],
                      val[2] * v.val[0] - val[0] * v.val[2],
@@ -467,6 +438,20 @@ vec<double,3>::vec(const double v0, const double v1, const double v2)
     val[1] = v1;
     val[2] = v2;
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// faster vec4d constructor
+template<>
+CINO_INLINE
+vec<double,4>::vec(const double v0, const double v1, const double v2, const double v3)
+{
+    val[0] = v0;
+    val[1] = v1;
+    val[2] = v2;
+    val[3] = v3;
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<>

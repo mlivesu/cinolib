@@ -36,15 +36,23 @@
 #ifndef CINO_DUAL_MESH
 #define CINO_DUAL_MESH
 
-#include <vector>
-#include <sys/types.h>
-#include <cinolib/cino_inline.h>
 #include <cinolib/geometry/vec3.h>
 #include <cinolib/meshes/polygonmesh.h>
 #include <cinolib/meshes/polyhedralmesh.h>
 
 namespace cinolib
 {
+
+/* Mesh dualization facilities for surfaces and volumes.
+ * Features (e.g. sharp creases) will be preserved in the
+ * dual if the CREASE flag is enabled in mesh edges. For
+ * geometric features the easiest way t do it is to call
+ * the method:
+ *
+ *      mesh.edge_mark_sharp_creases([angle_thresh]);
+ *
+ * This works both for surfaces and volumes.
+*/
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE

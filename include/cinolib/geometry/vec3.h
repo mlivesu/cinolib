@@ -109,6 +109,7 @@ template<typename real> class vec3
 
         real length() const
         {
+            // ROBUSTER LIKE THIS: https://twitter.com/lisyarus/status/1328967765244436482
             return sqrt(m_x * m_x +
                         m_y * m_y +
                         m_z * m_z);

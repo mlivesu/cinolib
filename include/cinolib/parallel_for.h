@@ -45,6 +45,12 @@ namespace cinolib
 /* OpenMP-like parallel for loop realized in plain C++11
  * Thanks to Jeremy Dumas for his code (https://ideone.com/Z7zldb)
  *
+ * DISCLAIMER: this routine is as good as OpenMP with STATIC scheduling.
+ * That is, it works best when computational cost is equally distributed
+ * across all threads. In case of unbalanced distribution, performances
+ * may degrade, and using the DYNAMIC scheduling of a library such as OpenMP
+ * will greatly benefit performances.
+ *
  * PARALLEL_FOR has three arguments
  *
  *     beg,end             : define a range of indices

@@ -183,6 +183,49 @@ void dijkstra_exhaustive_srf_only(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void dijkstra_exhaustive_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
+                                       const std::vector<uint>     & sources,
+                                       const std::vector<double>   & weights, // per vert weights (used as metric instead of edge lengths)
+                                       const std::vector<bool>     & mask,    // if mask[e] = true, path cannot pass through edge e
+                                             std::vector<double>   & dist)
+{
+    dist = std::vector<double>(m.num_verts(), inf_double);
+    for(uint vid : sources) dist.at(vid) = 0.0;
+
+    std::set<std::pair<double,uint>> q;
+    for(uint vid : sources) q.insert(std::make_pair(0.0,vid));
+
+    while(!q.empty())
+    {
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
+
+        for(uint eid : m.adj_v2e(vid))
+        {
+            if(mask.at(eid)) continue;
+
+            uint   nbr      = m.vert_opposite_to(eid,vid);
+            double new_dist = dist.at(vid) + weights.at(nbr);
+
+            if(dist.at(nbr) > new_dist)
+            {
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
+                {
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
+                }
+                dist.at(nbr) = new_dist;
+                q.insert(std::make_pair(new_dist,nbr));
+            }
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 double dijkstra(const AbstractMesh<M,V,E,P> & m,
                 const uint                    source,
                 const uint                    dest,
@@ -230,6 +273,184 @@ double dijkstra(const AbstractMesh<M,V,E,P> & m,
         }
     }
     assert(false && "Dijkstra did not converge!");
+    return 0.0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double dijkstra(const AbstractMesh<M,V,E,P> & m,
+                const uint                    source,
+                const uint                    dest,
+                const std::vector<double>   & weights,
+                      std::vector<uint>     & path)
+{
+    path.clear();
+
+    std::vector<int> prev(m.num_verts(), -1);
+
+    std::vector<double> dist(m.num_verts(), inf_double);
+    dist.at(source) = 0.0;
+
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
+
+    while(!q.empty())
+    {
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
+
+        if(vid==dest)
+        {
+            int tmp = vid;
+            do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
+            std::reverse(path.begin(), path.end());
+            return dist.at(dest);
+        }
+
+        for(uint nbr : m.adj_v2v(vid))
+        {
+            double new_dist = dist.at(vid) + weights.at(nbr);
+
+            if(dist.at(nbr) > new_dist)
+            {
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
+                {
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
+                }
+                dist.at(nbr) = new_dist;
+                prev.at(nbr) = vid;
+                q.insert(std::make_pair(new_dist,nbr));
+            }
+        }
+    }
+    assert(false && "Dijkstra did not converge!");
+    return 0.0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double dijkstra(const AbstractMesh<M,V,E,P> & m,
+                const uint                    source,
+                const uint                    dest,
+                const std::vector<double>   & weights, // per vert weights (used as metric instead of edge lengths)
+                const std::vector<bool>     & mask, // if mask[v] = true, path cannot pass through it
+                      std::vector<uint>     & path)
+{
+    path.clear();
+
+    std::vector<int> prev(m.num_verts(), -1);
+
+    std::vector<double> dist(m.num_verts(), inf_double);
+    dist.at(source) = 0.0;
+
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
+
+    while(!q.empty())
+    {
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
+
+        if(vid==dest)
+        {
+            int tmp = vid;
+            do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
+            std::reverse(path.begin(), path.end());
+            return dist.at(dest);
+        }
+
+        for(uint nbr : m.adj_v2v(vid))
+        {
+            if(mask.at(nbr)) continue;
+
+            double new_dist = dist.at(vid) + weights.at(nbr);
+
+            if(dist.at(nbr) > new_dist)
+            {
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
+                {
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
+                }
+                dist.at(nbr) = new_dist;
+                prev.at(nbr) = vid;
+                q.insert(std::make_pair(new_dist,nbr));
+            }
+        }
+    }
+
+    // there exists no path with the given mask constraints
+    path.clear();
+    return 0.0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
+                              const uint                    source,
+                              const uint                    dest,
+                              const std::vector<double>   & weights, // per vert weights (used as metric instead of edge lengths)
+                              const std::vector<bool>     & mask,    // if mask[e] = true, path cannot pass through edge e
+                                    std::vector<uint>     & path)
+{
+    path.clear();
+
+    std::vector<int> prev(m.num_verts(), -1);
+
+    std::vector<double> dist(m.num_verts(), inf_double);
+    dist.at(source) = 0.0;
+
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
+
+    while(!q.empty())
+    {
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
+
+        if(vid==dest)
+        {
+            int tmp = vid;
+            do { path.push_back(tmp); tmp = prev.at(tmp); } while (tmp != -1);
+            std::reverse(path.begin(), path.end());
+            return dist.at(dest);
+        }
+
+        for(uint nbr : m.adj_v2v(vid))
+        {
+            int eid = m.edge_id(vid,nbr);
+            assert(eid>=0);
+
+            if(mask.at(eid)) continue;
+
+            double new_dist = dist.at(vid) + weights.at(nbr);
+
+            if(dist.at(nbr) > new_dist)
+            {
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
+                {
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
+                }
+                dist.at(nbr) = new_dist;
+                prev.at(nbr) = vid;
+                q.insert(std::make_pair(new_dist,nbr));
+            }
+        }
+    }
+
+    // there exists no path with the given mask constraints
+    path.clear();
     return 0.0;
 }
 
@@ -290,7 +511,9 @@ double dijkstra(const AbstractMesh<M,V,E,P> & m,
             }
         }
     }
-    assert(false && "Dijkstra did not converge!");
+
+    // there exists no path with the given mask constraints
+    path.clear();
     return 0.0;
 }
 
@@ -354,7 +577,9 @@ double dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
             }
         }
     }
-    assert(false && "Dijkstra did not converge!");
+
+    // there exists no path with the given mask constraints
+    path.clear();
     return 0.0;
 }
 
@@ -416,7 +641,9 @@ double dijkstra(const AbstractMesh<M,V,E,P> & m,
             }
         }
     }
-    assert(false && "Dijkstra did not converge!");
+
+    // there exists no path with the given mask constraints
+    path.clear();
     return 0.0;
 }
 
@@ -607,7 +834,9 @@ double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
             }
         }
     }
-    assert(false && "Dijkstra did not converge!");
+
+    // there exists no path with the given mask constraints
+    path.clear();
     return 0.0;
 }
 
@@ -664,7 +893,9 @@ double dijkstra_on_dual(const AbstractMesh<M,V,E,P> & m,
             }
         }
     }
-    assert(false && "Dijkstra did not converge!");
+
+    // there exists no path with the given mask constraints
+    path.clear();
     return 0.0;
 }
 

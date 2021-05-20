@@ -76,9 +76,50 @@ void dijkstra_exhaustive_srf_only(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void dijkstra_exhaustive_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
+                                       const std::vector<uint>     & sources,
+                                       const std::vector<double>   & weights, // per vert weights (used as metric instead of edge lengths)
+                                       const std::vector<bool>     & mask,    // if mask[e] = true, path cannot pass through edge e
+                                             std::vector<double>   & dist);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 double dijkstra(const AbstractMesh<M,V,E,P> & m,
                 const uint                    source,
                 const uint                    dest,
+                      std::vector<uint>     & path);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double dijkstra(const AbstractMesh<M,V,E,P> & m,
+                const uint                    source,
+                const uint                    dest,
+                const std::vector<double>   & weights, // per vert weights (used as metric instead of edge lengths)
+                      std::vector<uint>     & path);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double dijkstra(const AbstractMesh<M,V,E,P> & m,
+                const uint                    source,
+                const uint                    dest,
+                const std::vector<double>   & weights, // per vert weights (used as metric instead of edge lengths)
+                      std::vector<uint>     & path);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double dijkstra(const AbstractMesh<M,V,E,P> & m,
+                const uint                    source,
+                const uint                    dest,
+                const std::vector<double>   & weights, // per vert weights (used as metric instead of edge lengths)
+                const std::vector<bool>     & mask, // if mask[v] = true, path cannot pass through it
                       std::vector<uint>     & path);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -109,6 +150,17 @@ double dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
                               const uint                    source,
                               const uint                    dest,
                               const std::vector<bool>     & mask, // if mask[e] = true, path cannot pass through edge e
+                                    std::vector<uint>     & path);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double dijkstra_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
+                              const uint                    source,
+                              const uint                    dest,
+                              const std::vector<double>   & weights, // per vert weights (used as metric instead of edge lengths)
+                              const std::vector<bool>     & mask,    // if mask[e] = true, path cannot pass through edge e
                                     std::vector<uint>     & path);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -38,13 +38,29 @@
 namespace cinolib
 {
 
-template<class T>
+template<typename T>
 CINO_INLINE
-T clamp(const T & val, const T & low, const T & high)
+T clamp(const T & val, const T & min, const T & max)
 {
-    if(val<low ) return low;
-    if(val>high) return high;
-    return val;
+    T res = std::max(val,min);
+      res = std::min(res,max);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void clamp(std::vector<T> & vec, const float below_perc_thresh, const float above_perc_thresh)
+{
+    std::vector<T> tmp = vec;
+    sort(tmp.begin(), tmp.end());
+
+    T b = tmp.at(below_perc_thresh*vec.size());
+    T t = tmp.at(vec.size() - above_perc_thresh*vec.size());
+
+    for(T & val : vec) clamp(val, b, t);
 }
 
 }
+

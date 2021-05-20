@@ -67,6 +67,7 @@ class ScalarField : public Eigen::VectorXd, public Serializable
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void clamp(const float thresh_from_below, const float thresh_from_above);
         void normalize_in_01();
         uint min_element_index() const;
 

@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include <cinolib/tetrahedralization.h>
 #include <cinolib/ipair.h>
+#include <cinolib/standard_elements_tables.h>
 #include <set>
 
 namespace cinolib
@@ -437,6 +438,52 @@ void prism_to_tets(const std::vector<uint> & prism,
     tets.push_back(ref_p[4]);
     tets.push_back(ref_p[5]);
     tets.push_back(ref_p[3]);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Subdivides a hexahedron into 8 tetrahedra centered at each of
+// the hex corners. This decomposition can be useful in hexmesh
+// optimization, because those tets are the ones that directly
+// control the minimum jacobian, which is the minimum of the
+// per tet jacobians measured at the hex corners
+CINO_INLINE
+void hex_to_corner_tets(const std::vector<uint> & hex,
+                              std::vector<uint> & tets)
+
+{
+    assert(hex.size()==8);
+    tets.clear();
+
+    for(uint i=0; i<8; ++i)
+    {
+        tets.push_back(hex.at(HEXA_CORNER_TETS[i][0]));
+        tets.push_back(hex.at(HEXA_CORNER_TETS[i][1]));
+        tets.push_back(hex.at(HEXA_CORNER_TETS[i][2]));
+        tets.push_back(hex.at(HEXA_CORNER_TETS[i][3]));
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void hex_to_corner_tets(const Hexmesh<M,V,E,F,P> & hm,
+                              Tetmesh<M,V,E,F,P> & tm)
+{
+    for(uint vid=0; vid<hm.num_verts(); ++vid)
+    {
+        tm.vert_add(hm.vert(vid));
+    }
+
+    for(uint pid=0; pid<hm.num_polys(); ++pid)
+    {
+        std::vector<uint> tets;
+        hex_to_corner_tets(hm.poly_verts_id(pid),tets);
+
+        auto t = polys_from_serialized_vids(tets,4);
+        for(auto tet : t) tm.poly_add(tet);
+    }
 }
 
 }

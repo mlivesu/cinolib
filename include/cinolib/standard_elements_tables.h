@@ -39,16 +39,17 @@
 #include <sys/types.h>
 #include <cinolib/geometry/vec3.h>
 
-/*    Reference               Reference
- *    Hexahedron:             Tetrahedron:
+/*    Reference               Reference              Reference
+ *    Hexahedron:             Tetrahedron:           Prism:
  *
- *       v7------v6              v3
- *      / |     / |             /| \
- *    v4------v5  |           /  |   \
- *    |   |    |  |         v0---|----v2
- *    |  v3----|--v2         \   |   /
- *    | /      | /             \ | /
- *    v0------v1                 v1
+ *                                                 v3--------v5
+ *       v7------v6              v3                |\       /|
+ *      / |     / |             /| \               |  \   /  |
+ *    v4------v5  |           /  |   \             |    v4   |
+ *    |   |    |  |         v0---|----v2           v0---|----v2
+ *    |  v3----|--v2         \   |   /              \   |   /
+ *    | /      | /             \ | /                  \ | /
+ *    v0------v1                 v1                     v1
 */
 
 namespace cinolib
@@ -172,6 +173,32 @@ static const uint HEXA_INCIDENT_EDGES[8][3] =
     { 5, 6, 10 }, // edges incident to v6
     { 6, 7, 11 }, // edges incident to v7
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const uint HEXA_CORNER_TETS[8][4] =
+{
+    { 3, 0, 1, 4 }, // tet incident at vertex v0
+    { 0, 1, 2, 5 }, // tet incident at vertex v1
+    { 1, 2, 3, 6 }, // tet incident at vertex v2
+    { 2, 3, 0, 7 }, // tet incident at vertex v3
+    { 5, 4, 7, 0 }, // tet incident at vertex v4
+    { 6, 5, 4, 1 }, // tet incident at vertex v5
+    { 7, 6, 5, 2 }, // tet incident at vertex v6
+    { 4, 7, 6, 3 }, // tet incident at vertex v7
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+static const uint PRISM_FACES[5][4] =
+{
+    { 0 , 2 , 1 ,   } , // f0
+    { 4 , 5 , 3 ,   } , // f1
+    { 4 , 3 , 0 , 1 } , // f2
+    { 5 , 4 , 1 , 2 } , // f3
+    { 3 , 5 , 2 , 0 } , // f4
+};
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

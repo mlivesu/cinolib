@@ -38,6 +38,7 @@
 #include <cinolib/geometry/segment.h>
 #include <cinolib/Moller_Trumbore_intersection.h>
 #include <cinolib/geometry/triangle_utils.h>
+#include <cinolib/matrix.h>
 #include <Eigen/Dense>
 #include <set>
 
@@ -45,11 +46,44 @@ namespace cinolib
 {
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+CINO_INLINE
+vec3d tetrahedron_circumcenter(const vec3d & A,
+                               const vec3d & B,
+                               const vec3d & C,
+                               const vec3d & D)
+{
+    // see Appendix B.2 in:
+    //   Lp Centroidal Voronoi Tessellation and its Applications
+    //   Bruno Levy and Yang Liu
+    //   ACM Transactions on Graphics (SIGGRAPH 2010)
+
+    vec3d  u = B - A;
+    vec3d  v = C - A;
+    vec3d  w = D - A;
+
+    double u_len = u.length_squared();
+    double v_len = v.length_squared();
+    double w_len = w.length_squared();
+
+    double num_x = determinant_3x3(u.y(), u.z(), u_len, v.y(), v.z(), v_len, w.y(), w.z(), w_len);
+    double num_y = determinant_3x3(u.x(), u.z(), u_len, v.x(), v.z(), v_len, w.x(), w.z(), w_len);
+    double num_z = determinant_3x3(u.x(), u.y(), u_len, v.x(), v.y(), v_len, w.x(), w.y(), w_len);
+    double den   = determinant_3x3(u.x(), u.y(), u.z(), v.x(), v.y(), v.z(), w.x(), w.y(), w.z()) * 2.0;
+
+    vec3d c(A.x() + num_x / den,
+            A.y() - num_y / den,
+            A.z() + num_z / den);
+
+     return c;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // Given a point P and a tetrahedron ABCD, finds the point in ABCD that
 // is closest to P. This code was taken directly from Ericson's seminal
 // book "Real Time Collision Detection", Section 5.1.6
 //
+CINO_INLINE
 vec3d tetrahedron_closest_point(const vec3d & P,
                                 const vec3d & A,
                                 const vec3d & B,

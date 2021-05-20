@@ -191,6 +191,11 @@ class VolumeMeshControlPanel
         //
         QCheckBox                     *cb_face_normals;
         QCheckBox                     *cb_vert_normals;
+        //
+        QRadioButton                   *rb_dig;
+        QRadioButton                   *rb_undig;
+        QRadioButton                   *rb_isolate;
+        QRadioButton                   *rb_dig_reset;
 };
 
 }

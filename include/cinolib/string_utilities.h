@@ -49,15 +49,16 @@ std::string get_file_extension(const std::string & s);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// "/folder1/folder2/file.ext" => "/folder1/folder2/"
+// "/folder1/folder2/file.ext" => "/folder1/folder2/"     [without basename]
+// "/folder1/folder2/file.ext" => "/folder1/folder2/file" [with    basename]
 //
 CINO_INLINE
-std::string get_file_path(const std::string & s);
+std::string get_file_path(const std::string & s, const bool with_basename = false);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
-// "/folder1/folder2/file.ext" => "file.ext"
+// "/folder1/folder2/file.ext" => "file.ext" [with    extension]
+// "/folder1/folder2/file.ext" => "file"     [without extension]
 //
 CINO_INLINE
 std::string get_file_name(const std::string & s, const bool with_extension = true);

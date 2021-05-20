@@ -64,7 +64,7 @@ class DrawableSphere : public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        ObjectType object_type()  const { return SPHERE; }
+        ObjectType object_type()  const { return SPHERE_; }
         vec3d      scene_center() const { return center; }
         float      scene_radius() const { return 0.0;    }
 

@@ -39,6 +39,7 @@
 #include <cinolib/gradient.h>
 #include <cinolib/symbols.h>
 #include <cinolib/ambient_occlusion.h>
+#include <cinolib/export_visible.h>
 #include <iostream>
 
 namespace cinolib
@@ -590,6 +591,7 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         cb_actions->insertItem(5,"Mark sharp creases (>60deg)");
         cb_actions->insertItem(6,"Mark sharp creases (>30deg)");
         cb_actions->insertItem(7,"Update normals");
+        cb_actions->insertItem(8,"Export Visible");
         cb_actions->setFont(global_font);
         QVBoxLayout *layout = new QVBoxLayout();
         layout->addWidget(cb_actions);
@@ -612,6 +614,29 @@ VolumeMeshControlPanel<Mesh>::VolumeMeshControlPanel(Mesh *m, GLcanvas *canvas, 
         vert_normals.set_cheap_rendering(true);
         vert_normals.set_color(Color::RED());
         right_col->addWidget(cb_vert_normals);
+    }
+
+    // digging
+    {
+        QGroupBox *gbox = new QGroupBox("Manual digging", widget);
+        rb_dig         = new QRadioButton("Dig",     gbox);
+        rb_undig       = new QRadioButton("Undig",   gbox);
+        rb_isolate     = new QRadioButton("Isolate", gbox);
+        rb_dig_reset   = new QRadioButton("Reset",   gbox);
+        gbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        gbox->setFont(global_font);
+        rb_dig->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_undig->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_isolate->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_dig_reset->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        rb_dig_reset->setChecked(true);
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget(rb_dig);
+        layout->addWidget(rb_undig);
+        layout->addWidget(rb_isolate);
+        layout->addWidget(rb_dig_reset);
+        gbox->setLayout(layout);
+        left_col->addWidget(gbox);
     }
 
     global_layout->addStretch();
@@ -779,7 +804,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_point_shading, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_point_shading, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
         if (rb_point_shading->isChecked()) m->show_mesh_points();
@@ -788,7 +813,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_flat_shading, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_flat_shading, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
         if (rb_flat_shading->isChecked()) m->show_mesh_flat();
@@ -797,7 +822,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_smooth_shading, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_smooth_shading, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
         if (rb_smooth_shading->isChecked()) m->show_mesh_smooth();
@@ -806,7 +831,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_out_vert_color, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_out_vert_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
         if (rb_out_vert_color->isChecked()) m->show_out_vert_color();
@@ -815,7 +840,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_out_face_color, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_out_face_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
         if (rb_out_face_color->isChecked()) m->show_out_face_color();
@@ -824,7 +849,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_out_poly_color, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_out_poly_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
         if (rb_out_poly_color->isChecked()) m->show_out_poly_color();
@@ -833,7 +858,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_out_qual_color, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_out_qual_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
         if (rb_out_qual_color->isChecked()) m->show_out_poly_quality();
@@ -842,14 +867,14 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_out_tex1D, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_out_tex1D, &QPushButton::clicked, [&]()
     {
         if (rb_out_tex1D->isChecked()) set_tex1d(OUTSIDE);
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_out_tex2D, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_out_tex2D, &QPushButton::clicked, [&]()
     {
         if (rb_out_tex2D->isChecked()) set_tex2d(OUTSIDE);
     });
@@ -919,7 +944,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_in_vert_color, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_in_vert_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
         if (rb_in_vert_color->isChecked()) m->show_in_vert_color();
@@ -928,7 +953,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_in_face_color, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_in_face_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
         if (rb_in_face_color->isChecked()) m->show_in_face_color();
@@ -937,7 +962,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_in_poly_color, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_in_poly_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
         if (rb_in_poly_color->isChecked()) m->show_in_poly_color();
@@ -946,7 +971,7 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_in_qual_color, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_in_qual_color, &QPushButton::clicked, [&]()
     {
         if (m == NULL || canvas == NULL) return;
         if (rb_in_qual_color->isChecked()) m->show_in_poly_quality();
@@ -955,14 +980,14 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_in_tex1D, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_in_tex1D, &QPushButton::clicked, [&]()
     {
         if (rb_in_tex1D->isChecked()) set_tex1d(INSIDE);
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_in_tex2D, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_in_tex2D, &QPushButton::clicked, [&]()
     {
         if (rb_in_tex2D->isChecked()) set_tex2d(INSIDE);
     });
@@ -1260,49 +1285,49 @@ void VolumeMeshControlPanel<Mesh>::connect()
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QCheckBox::connect(cb_slice_flip_x, &QCheckBox::toggled, [&]()
+    QCheckBox::connect(cb_slice_flip_x, &QCheckBox::clicked, [&]()
     {
         set_slice();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QCheckBox::connect(cb_slice_flip_y, &QCheckBox::toggled, [&]()
+    QCheckBox::connect(cb_slice_flip_y, &QCheckBox::clicked, [&]()
     {
         set_slice();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QCheckBox::connect(cb_slice_flip_z, &QCheckBox::toggled, [&]()
+    QCheckBox::connect(cb_slice_flip_z, &QCheckBox::clicked, [&]()
     {
         set_slice();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QCheckBox::connect(cb_slice_flip_q, &QCheckBox::toggled, [&]()
+    QCheckBox::connect(cb_slice_flip_q, &QCheckBox::clicked, [&]()
     {
         set_slice();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QCheckBox::connect(cb_slice_flip_l, &QCheckBox::toggled, [&]()
+    QCheckBox::connect(cb_slice_flip_l, &QCheckBox::clicked, [&]()
     {
         set_slice();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_slice_AND, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_slice_AND, &QPushButton::clicked, [&]()
     {
         set_slice();
     });
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    QRadioButton::connect(rb_slice_OR, &QPushButton::toggled, [&]()
+    QRadioButton::connect(rb_slice_OR, &QPushButton::clicked, [&]()
     {
         set_slice();
     });
@@ -1411,6 +1436,13 @@ void VolumeMeshControlPanel<Mesh>::connect()
             case 5: m->edge_mark_sharp_creases(to_rad(60.0)); break;
             case 6: m->edge_mark_sharp_creases(to_rad(30.0)); break;
             case 7: m->update_normals(); break;
+            case 8: {
+                        Polyhedralmesh<M,V,E,F,P> tmp;
+                        export_visible(*m, tmp);
+                        std::string filename = QFileDialog::getSaveFileName(NULL, "Save mesh", ".", "3D Meshes (*.HEDRA)").toStdString();
+                        if(!filename.empty()) tmp.save(filename.c_str());
+                        break;
+                    }
         }
         m->updateGL();
         canvas->updateGL();
@@ -1464,6 +1496,108 @@ void VolumeMeshControlPanel<Mesh>::connect()
             canvas->push_obj(&vert_normals,false);
         }
         else canvas->pop(&vert_normals);
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_dig, &QPushButton::clicked, [&]()
+    {
+        canvas->callback_mouse_press = [&](GLcanvas *c, QMouseEvent *e)
+        {
+            if(e->modifiers() == Qt::ShiftModifier)
+            {
+                vec3d p;
+                vec2i click(e->x(), e->y());
+                if(c->unproject(click, p)) // transform click in a 3d point
+                {
+                    uint fid = m->pick_face(p);
+                    for(uint pid : m->adj_f2p(fid))
+                    {
+                        if(m->poly_data(pid).flags[HIDDEN] == false)
+                        {
+                            m->poly_data(pid).flags[HIDDEN] = true;
+                        }
+                    }
+                    m->updateGL();
+                    c->updateGL();
+                }
+            }
+        };
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_undig, &QPushButton::clicked, [&]()
+    {
+        canvas->callback_mouse_press = [&](GLcanvas *c, QMouseEvent *e)
+        {
+            if(e->modifiers() == Qt::ShiftModifier)
+            {
+                vec3d p;
+                vec2i click(e->x(), e->y());
+                if(c->unproject(click, p)) // transform click in a 3d point
+                {
+                    uint fid = m->pick_face(p);
+                    for(uint pid : m->adj_f2p(fid))
+                    {
+                        if(m->poly_data(pid).flags[HIDDEN] == true)
+                        {
+                            m->poly_data(pid).flags[HIDDEN] = false;
+                        }
+                    }
+                    m->updateGL();
+                    c->updateGL();
+                }
+            }
+        };
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_isolate, &QRadioButton::clicked, [&]()
+    {
+        canvas->callback_mouse_press = [&](GLcanvas *c, QMouseEvent *e)
+        {
+            if(e->modifiers() == Qt::ShiftModifier)
+            {
+                vec3d p;
+                vec2i click(e->x(), e->y());
+                if(c->unproject(click, p)) // transform click in a 3d point
+                {
+                    uint fid = m->pick_face(p);
+                    uint pid_beneath;
+                    if(!m->face_is_visible(fid,pid_beneath))
+                    {
+                        // not a good selection...
+                        return;
+                    }
+                    for(uint vid : m->adj_p2v(pid_beneath))
+                    for(uint pid : m->adj_v2p(vid))
+                    {
+                        if(m->poly_data(pid).flags[HIDDEN] == false)
+                        {
+                            m->poly_data(pid).flags[HIDDEN] = true;
+                        }
+                    }
+                    m->poly_data(pid_beneath).flags[HIDDEN] = false;
+                    m->updateGL();
+                    c->updateGL();
+                }
+            }
+        };
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QRadioButton::connect(rb_dig_reset, &QPushButton::clicked, [&]()
+    {
+        canvas->callback_mouse_press = nullptr;
+        for(uint pid=0; pid<m->num_polys(); ++pid)
+        {
+            m->poly_data(pid).flags[HIDDEN] = false;
+        }
+        m->updateGL();
         canvas->updateGL();
     });
 }

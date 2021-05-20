@@ -55,7 +55,7 @@ namespace cinolib
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void padding(AbstractPolyhedralMesh<M,V,E,F,P> & m);
+void padding(AbstractPolyhedralMesh<M,V,E,F,P> & m, const bool inwards);
 
 }
 

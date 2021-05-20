@@ -50,9 +50,9 @@ namespace cinolib
  *
  * Mesh vertices are grouped in 3 categories:
  *
- *  - R: regular vertices, to be smooth in the tangent space
- *  - F: feature vertices, to be smooth along the sharp crease they belong to
- *  - C: corner vertices, at the intersection of multiple features, to be held in place
+ *  - R: regular vertices, smoothed in the tangent space
+ *  - F: feature vertices, smoothed along the sharp crease they belong to
+ *  - C: corner  vertices, at the intersection of multiple features, be held in place
  *
  * NOTE: feature lines are detected as chains of consecutive edges marked in the mesh.
  * While the classification is done internally, proper edge marking/unmarking must be
@@ -60,42 +60,45 @@ namespace cinolib
  *
  * The energy being minimized is the following :
  *
- * E_smooth = w_curr_pos  * E_curr_pos  +
- *            w_laplacian * E_laplacian +
- *            w_regular   * E_regular   +
+ * E_smooth = w_regular   * E_regular   +
  *            w_feature   * E_feature   +
- *            w_corner    * E_corner
- *
- * E_curr_pos = \sum_{\forall i} (v_i - v_i*)^2,
- * where v_i* is the current position of v_i
- *
- * E_laplacian = \sum_{\forall i} \sum_{\forall j \in N(i)} (v_i - v_j)^2
+ *            w_corner    * E_corner    +
+ *            w_laplacian * E_laplacian
  *
  * E_regular = \sum_{\forall i \in R} (n*v_i + d)^2,
  * where <n,d> is the plane tangent to the mesh at v_i
  *
  * E_feature = \sum_{\forall i \in F} (v_i - (v_i + t*d))^2 + t^2,
- * where <t,d> is the line L::= v_i + t*d tangent to the crase at v_i, parameterized by the extra varaible t
+ * where <t,d> is the line L::= v_i + t*d tangent to the crease at v_i,
+ * parameterized by the extra varaible t
  *
  * E_corner = \sum_{\forall i \in C} (v_i - v_i*)^2,
  * where v_i* is the current position of v_i
+ *
+ * E_laplacian = \sum_{\forall i} \sum_{\forall j \in N(i)} (v_i - v_j)^2
+ *
+ * NOTE: for E_regular, E_feature and E_corner v_i is meanth to be the ith
+ * vertex of the mesh to be smoothed, projected on the target surface. For
+ * each category type we use a dedicated spatial data structure, ensuring
+ * that surface vertices map to surface vertices, feature lines to feature
+ * lines, and corners to corners.
+ *
+ * TODO: iterate until convergence
+ * TODO: optionally use ray casting instead of closest point for projection
 */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-enum { REGULAR, CORNER, FEATURE };
-
 typedef struct
 {
-    uint   n_iters             = 10;      // # of smoothing iterations
-    double w_curr_pos          = 10.0;    // attraction to current position
-    double w_regular           = 10.0;    // attraction to tangent space for regular vertices
-    double w_feature           = 100.0;   // attraction to tangent curve for feature vertices
-    double w_corner            = 100.0;   // attraction to current pos for features corner
+    uint   n_iters             = 1;       // # of smoothing iterations
+    double w_regular           = 10.0;    // attraction to tangent space  for regular vertices
+    double w_feature           = 100.0;   // attraction to tangent curve  for feature vertices
+    double w_corner            = 100.0;   // attraction to closest corner for features corner
     double w_laplace           = 0.001;   // weight of laplacian energy terms
     int    laplacian_mode      = UNIFORM; // laplacian mode (UNIFORM or COTANGENT)
     bool   reproject_on_target = true;    // reproject to target surface after each smoothing iteration
-    //bool   with_ray_casting    = false;   // reproject via aray casting if true, via closest point if false
+    //bool   with_ray_casting    = false;   // reproject via ray casting if true, via closest point if false
 }
 SmootherOptions;
 

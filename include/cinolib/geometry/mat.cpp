@@ -175,16 +175,6 @@ mat<T,r,c> mat<T,r,c>::operator*(const T s) const
     return res;
 }
 
-
-
-
-
-
-
-
-
-
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T, uint r, uint c>

@@ -67,7 +67,7 @@ uint connected_components(const AbstractMesh<M,V,E,P> & m,
         for(uint vid : cc) visited.at(vid) = true;
 
         seed = 0;
-        while (seed < num_verts() && visited.at(seed)) ++seed;
+        while (seed < m.num_verts() && visited.at(seed)) ++seed;
     }
     while (seed < m.num_verts());
 

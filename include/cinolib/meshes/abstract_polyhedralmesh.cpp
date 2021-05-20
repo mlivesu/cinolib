@@ -215,6 +215,30 @@ double AbstractPolyhedralMesh<M,V,E,F,P>::mesh_srf_area() const
     return area;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double AbstractPolyhedralMesh<M,V,E,F,P>::mesh_volume() const
+{
+    double vol = 0;
+    for(uint pid=0; pid<this->num_polys(); ++pid)
+    {
+        vol += this->poly_volume(pid);
+    }
+    return vol;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::normalize_volume()
+{
+    this->scale(1.0/std::pow(this->mesh_volume(), 1.0/3));
+    assert(std::fabs(this->mesh_volume()-1)<1e-5);
+    if(this->mesh_data().update_bbox) this->update_bbox();
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -531,7 +555,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & pid_beneath) const
 {
-    // note: returns also the ID of the poy that makes the face visible
+    // note: returns also the ID of the poly that makes the face visible
     int id=-1;
     for(uint pid : this->adj_f2p(fid))
     {
@@ -1165,7 +1189,8 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::poly_f2f(const uint pid, co
     {
         if(this->poly_contains_face(pid,nbr)) faces.push_back(nbr);
     }
-    assert(faces.size()==this->edges_per_face(fid));
+    // this is false if two faces share more than one edge
+    //assert(faces.size()==this->edges_per_face(fid));
     return faces;
 }
 
@@ -1555,6 +1580,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 int AbstractPolyhedralMesh<M,V,E,F,P>::poly_shared_face(const uint pid0, const uint pid1) const
 {
+    assert(pid0!=pid1);
     for(uint fid0 : adj_p2f(pid0))
     for(uint fid1 : adj_p2f(pid1))
     {
@@ -1764,12 +1790,12 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_srf_verts(const ui
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_vert_ring(const uint vid) const
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_vert_ring(const uint vid, const bool CCW) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
     std::vector<uint> e_ring; // sorted list of surface edges incident to vid
     std::vector<uint> f_ring; // sorted list of adjacent surface faces
-    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring, CCW);
     return v_ring;
 }
 
@@ -1777,12 +1803,12 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_vert_ring(
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_edge_ring(const uint vid) const
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_edge_ring(const uint vid, const bool CCW) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
     std::vector<uint> e_ring; // sorted list of surface edges incident to vid
     std::vector<uint> f_ring; // sorted list of adjacent surface faces
-    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring, CCW);
     return e_ring;
 }
 
@@ -1790,12 +1816,12 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_edge_ring(
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_face_ring(const uint vid) const
+std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_face_ring(const uint vid, const bool CCW) const
 {
     std::vector<uint> v_ring; // sorted list of adjacent surfaces vertices
     std::vector<uint> e_ring; // sorted list of surface edges incident to vid
     std::vector<uint> f_ring; // sorted list of adjacent surface faces
-    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring);
+    vert_ordered_srf_one_ring(vid, v_ring, e_ring, f_ring, CCW);
     return f_ring;
 }
 
@@ -1806,7 +1832,8 @@ CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_one_ring(const uint          vid,
                                                                   std::vector<uint> & v_ring,
                                                                   std::vector<uint> & e_ring,
-                                                                  std::vector<uint> & f_ring) const
+                                                                  std::vector<uint> & f_ring,
+                                                                  const bool          CCW) const
 {
     assert(vert_is_on_srf(vid));
 
@@ -1829,6 +1856,24 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_one_ring(const uint    
         curr_v = this->vert_opposite_to(curr_e, vid);
     }
     while(e_ring.size() < this->vert_adj_srf_edges(vid).size());
+
+    if(CCW) // make sure surface rings are CCW ordered
+    {
+        uint e0 = e_ring.at(0);
+        uint e1 = e_ring.at(1);
+        uint f0 = f_ring.at(0);
+        assert(this->face_contains_edge(f0,e0) && this->face_contains_edge(f0,e1));
+        uint v0 = this->vert_opposite_to(e0,vid);
+        uint v1 = this->vert_opposite_to(e1,vid);
+        if(!this->face_verts_are_CCW(f0,v1,v0))
+        {
+            uint last = e_ring.size()-1;
+            REVERSE_VEC(e_ring);
+            REVERSE_VEC(f_ring);
+            std::rotate(e_ring.begin(), e_ring.begin()+last, e_ring.end());
+            std::rotate(v_ring.begin(), v_ring.begin()+last, v_ring.end());
+        }
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1933,7 +1978,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::vert_switch_id(const uint vid0, const uint vid1)
 {
-    if (vid0 == vid1) return;
+    if(vid0 == vid1) return;
 
     std::swap(this->verts.at(vid0),   this->verts.at(vid1));
     std::swap(this->v2v.at(vid0),     this->v2v.at(vid1));
@@ -2467,6 +2512,11 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & flist
         this->f2p.at(fid).push_back(pid);
     }
 
+    if(this->poly_is_hexahedron (pid) || this->poly_is_tetrahedron(pid))
+    {
+        this->poly_reorder_p2v(pid);
+    }
+
     return pid;
 }
 
@@ -2560,6 +2610,47 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist
         // enforce standard vertex ordering
         poly_reorder_p2v(pid);
         update_p_quality(pid);
+        return pid;
+    }
+    else if(vlist.size()==6) // triangular prism
+    {
+        // detect faces
+        std::vector<uint> f0 = { vlist.at(PRISM_FACES[0][0]), vlist.at(PRISM_FACES[0][1]), vlist.at(PRISM_FACES[0][2]) };
+        std::vector<uint> f1 = { vlist.at(PRISM_FACES[1][0]), vlist.at(PRISM_FACES[1][1]), vlist.at(PRISM_FACES[1][2]) };
+        std::vector<uint> f2 = { vlist.at(PRISM_FACES[2][0]), vlist.at(PRISM_FACES[2][1]), vlist.at(PRISM_FACES[2][2]), vlist.at(PRISM_FACES[2][3]) };
+        std::vector<uint> f3 = { vlist.at(PRISM_FACES[3][0]), vlist.at(PRISM_FACES[3][1]), vlist.at(PRISM_FACES[3][2]), vlist.at(PRISM_FACES[3][3]) };
+        std::vector<uint> f4 = { vlist.at(PRISM_FACES[4][0]), vlist.at(PRISM_FACES[4][1]), vlist.at(PRISM_FACES[4][2]), vlist.at(PRISM_FACES[4][3]) };
+
+        // detect face ids
+        int fid0 = this->face_id(f0);
+        int fid1 = this->face_id(f1);
+        int fid2 = this->face_id(f2);
+        int fid3 = this->face_id(f3);
+        int fid4 = this->face_id(f4);
+
+        // add missing faces
+        if(fid0 == -1) { fid0 = this->face_add(f0); }
+        if(fid1 == -1) { fid1 = this->face_add(f1); }
+        if(fid2 == -1) { fid2 = this->face_add(f2); }
+        if(fid3 == -1) { fid3 = this->face_add(f3); }
+        if(fid4 == -1) { fid4 = this->face_add(f4); }
+
+        // assign face winding
+        std::vector<bool> w(5,false);
+        if(this->face_verts_are_CCW(fid0, f0.at(1), f0.at(0))) w.at(0) = true;
+        if(this->face_verts_are_CCW(fid1, f1.at(1), f1.at(0))) w.at(1) = true;
+        if(this->face_verts_are_CCW(fid2, f2.at(1), f2.at(0))) w.at(2) = true;
+        if(this->face_verts_are_CCW(fid3, f3.at(1), f3.at(0))) w.at(3) = true;
+        if(this->face_verts_are_CCW(fid4, f4.at(1), f4.at(0))) w.at(4) = true;
+
+        // add tet
+        uint pid = poly_add({static_cast<uint>(fid0),
+                             static_cast<uint>(fid1),
+                             static_cast<uint>(fid2),
+                             static_cast<uint>(fid3),
+                             static_cast<uint>(fid4)},w);
+
+        // enforce standard vertex ordering (I SHOULDN'T NEED IT FOR PRISMS...)
         return pid;
     }
     else assert(false && "Unknown polyhedral element!");
@@ -3077,6 +3168,44 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_prism(const uint pid, const uint
         if(this->verts_per_face(nbr)==this->verts_per_face(fid)) return true;
     }
     return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void AbstractPolyhedralMesh<M,V,E,F,P>::operator+=(const AbstractPolyhedralMesh<M,V,E,F,P> & m)
+{
+    // THIS CODE IS RECOMPUTING CONNECTIVITY FROM SCRATCH
+    // THERE ARE BETTER WAYS TO DO IT (for surfaces I think I did it the right way...)
+
+    uint nv = this->num_verts();
+    uint nf = this->num_faces();
+
+    // add verts
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        this->vert_add(m.vert(vid));
+    }
+
+    // add faces
+    for(uint fid=0; fid<m.num_faces(); ++fid)
+    {
+        auto f = m.face_verts_id(fid);
+        for(uint & vid : f) vid += nv;
+        this->face_add(f);
+    }
+
+    // add polys
+    for(uint pid=0; pid<m.num_polys(); ++pid)
+    {
+        auto f = m.poly_faces_id(pid);
+        auto w = m.poly_faces_winding(pid);        
+        for(uint & fid : f) fid += nf;
+        this->poly_add(f,w);
+    }
+
+    if(this->mesh_data().update_bbox) this->update_bbox();
 }
 
 }

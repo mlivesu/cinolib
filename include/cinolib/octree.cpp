@@ -36,6 +36,11 @@
 #include <cinolib/octree.h>
 #include <cinolib/how_many_seconds.h>
 #include <cinolib/parallel_for.h>
+#include <cinolib/geometry/point.h>
+#include <cinolib/geometry/sphere.h>
+#include <cinolib/geometry/segment.h>
+#include <cinolib/geometry/triangle.h>
+#include <cinolib/geometry/tetrahedron.h>
 #include <stack>
 
 namespace cinolib
@@ -224,6 +229,22 @@ void Octree::subdivide(OctreeNode * node)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void Octree::push_point(const uint id, const vec3d & v)
+{
+    items.push_back(new Point(id,v));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void Octree::push_sphere(const uint id, const vec3d & c, const double r)
+{
+    items.push_back(new Sphere(id,c,r));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void Octree::push_segment(const uint id, const std::vector<vec3d> & v)
 {
     items.push_back(new Segment(id,v.data()));
@@ -289,12 +310,26 @@ void Octree::closest_point(const vec3d  & p,          // query point
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    Obj obj;
-    obj.node = root;
-    obj.dist = root->bbox.dist_sqrd(p);
-
     PrioQueue q;
-    q.push(obj);
+    if(root->is_inner)
+    {
+        Obj obj;
+        obj.node = root;
+        obj.dist = root->bbox.dist_sqrd(p);
+        q.push(obj);
+    }
+    else // in case the root is alrady a leaf...
+    {
+        for(uint index : root->item_indices)
+        {
+            Obj obj;
+            obj.node  = root;
+            obj.index = index;
+            obj.pos   = items.at(index)->point_closest_to(p);
+            obj.dist  = obj.pos.dist_squared(p);
+            q.push(obj);
+        }
+    }
 
     while(q.top().node->is_inner)
     {

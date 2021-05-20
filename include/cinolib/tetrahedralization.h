@@ -70,6 +70,24 @@ void hex_to_tets(const std::vector<uint> & hex,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// Subdivides a hexahedron into 8 tetrahedra centered at each of
+// the hex corners. This decomposition can be useful in hexmesh
+// optimization, because those tets are the ones that directly
+// control the minimum jacobian, which is the minimum of the
+// per tet jacobians measured at the hex corners
+CINO_INLINE
+void hex_to_corner_tets(const std::vector<uint> & hex,
+                              std::vector<uint> & tets);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void hex_to_corner_tets(const Hexmesh<M,V,E,F,P> & hm,
+                              Tetmesh<M,V,E,F,P> & tm);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // Subdivides a prism with triangular base into 3 tets.
 // Prism vertices are assumed in the following order:
 //
