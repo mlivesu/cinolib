@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2021: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -41,15 +41,12 @@
 namespace cinolib
 {
 
-namespace vec
-{
-
 // c = a + b
 template<uint D, typename T>
 CINO_INLINE
-void plus(const T *a,
-          const T *b,
-                T *c)
+void vec_plus(const T *a,
+              const T *b,
+                    T *c)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -59,12 +56,26 @@ void plus(const T *a,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// a += b
+template<uint D, typename T>
+CINO_INLINE
+void vec_plus(      T *a,
+              const T *b)
+{
+    for(uint i=0; i<D; ++i)
+    {
+        a[i] += b[i];
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // c = a - b
 template<uint D, typename T>
 CINO_INLINE
-void minus(const T * a,
-           const T * b,
-                 T * c)
+void vec_minus(const T * a,
+               const T * b,
+                     T * c)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -74,14 +85,15 @@ void minus(const T * a,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// a = -a
+// a -= b
 template<uint D, typename T>
 CINO_INLINE
-void flip_sign(const T *a)
+void vec_minus(      T * a,
+               const T * b)
 {
     for(uint i=0; i<D; ++i)
     {
-        a[i] = -a[i];
+        a[i] -= b[i];
     }
 }
 
@@ -90,9 +102,9 @@ void flip_sign(const T *a)
 // c = a * b
 template<uint D, typename T>
 CINO_INLINE
-void scale(const T *a,
-           const T  b,
-                 T *c)
+void vec_multiply(const T *a,
+                  const T &b,
+                        T *c)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -102,12 +114,26 @@ void scale(const T *a,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// a *= b
+template<uint D, typename T>
+CINO_INLINE
+void vec_multiply(      T *a,
+                  const T &b)
+{
+    for(uint i=0; i<D; ++i)
+    {
+        a[i] *= b;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // c = a / b
 template<uint D, typename T>
 CINO_INLINE
-void divide(const T *a,
-            const T  b,
-                  T *c)
+void vec_divide(const T *a,
+                const T &b,
+                      T *c)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -117,10 +143,38 @@ void divide(const T *a,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// a /= b
 template<uint D, typename T>
 CINO_INLINE
-bool equals(const T *a,
-            const T *b)
+void vec_divide(      T *a,
+                const T &b)
+{
+    for(uint i=0; i<D; ++i)
+    {
+        a[i] /= b;
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// a = -a
+template<uint D, typename T>
+CINO_INLINE
+void vec_flip_sign(const T *a)
+{
+    for(uint i=0; i<D; ++i)
+    {
+        a[i] = -a[i];
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// a == b
+template<uint D, typename T>
+CINO_INLINE
+bool vec_equals(const T *a,
+                const T *b)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -131,10 +185,11 @@ bool equals(const T *a,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// a < b
 template<uint D, typename T>
 CINO_INLINE
-bool less(const T *a,
-          const T *b)
+bool vec_less(const T *a,
+              const T *b)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -148,8 +203,8 @@ bool less(const T *a,
 
 template<uint D, typename T>
 CINO_INLINE
-T dot(const T *a,
-      const T *b)
+T vec_dot(const T *a,
+          const T *b)
 {
     T res = 0;
     for(uint i=0; i<D; ++i)
@@ -164,9 +219,9 @@ T dot(const T *a,
 // c = a x b (cross product)
 template<uint D, typename T>
 CINO_INLINE
-void cross(const T *a,
-           const T *b,
-           const T *c)
+void vec_cross(const T *a,
+               const T *b,
+                     T *c)
 {
     assert(D==3);
     c[0] = a[1] * b[2] - a[2] * b[1];
@@ -178,18 +233,18 @@ void cross(const T *a,
 
 template<uint D, typename T>
 CINO_INLINE
-double length(const T *a)
+double vec_length(const T *a)
 {
-    return sqrt(length_sqrd(a));
+    return sqrt(vec_length_sqrd<D,T>(a));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint D, typename T>
 CINO_INLINE
-double length_sqrd(const T *a)
+T vec_length_sqrd(const T *a)
 {
-    double len = 0;
+    T len = 0;
     for(uint i=0; i<D; ++i)
     {
         len += a[i] * a[i];
@@ -201,32 +256,32 @@ double length_sqrd(const T *a)
 
 template<uint D, typename T>
 CINO_INLINE
-double dist(const T *a,
-            const T *b)
+double vec_dist(const T *a,
+                const T *b)
 {
-    return sqrt(dist_sqrd(a,b));
+    return sqrt(vec_dist_sqrd<D,T>(a,b));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint D, typename T>
 CINO_INLINE
-double dist_sqrd(const T *a,
-                 const T *b)
+double vec_dist_sqrd(const T *a,
+                     const T *b)
 {
     T tmp[D];
-    minus(a,b,tmp);
-    return length_sqrd(tmp);
+    vec_minus<D,T>(a,b,tmp);
+    return vec_length_sqrd<D,T>(tmp);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint D, typename T>
 CINO_INLINE
-double normalize(T *a)
+double vec_normalize(T *a)
 {
-    double len = length(a);
-    divide(a, len, a);
+    double len = vec_length<D,T>(a);
+    vec_divide<D,T>(a, len, a);
     return len;
 }
 
@@ -234,7 +289,7 @@ double normalize(T *a)
 
 template<uint D, typename T>
 CINO_INLINE
-void swap(T *a, const uint i, const uint j)
+void vec_swap(T *a, const uint i, const uint j)
 {
     assert(i<D && j<D);
     std::swap(a[i],a[j]);
@@ -244,7 +299,7 @@ void swap(T *a, const uint i, const uint j)
 
 template<uint D, typename T>
 CINO_INLINE
-T min_entry(const T *a)
+T vec_min_entry(const T *a)
 {
     return *std::min_element(a, a+D);
 }
@@ -253,7 +308,7 @@ T min_entry(const T *a)
 
 template<uint D, typename T>
 CINO_INLINE
-T max_entry(const T *a)
+T vec_max_entry(const T *a)
 {
     return *std::max_element(a, a+D);
 }
@@ -262,11 +317,11 @@ T max_entry(const T *a)
 
 template<uint D, typename T>
 CINO_INLINE
-void set_ZERO(T *a)
+void vec_set_val(T *a, const T &val)
 {
     for(uint i=0; i<D; ++i)
     {
-        a[i] = 0;
+        a[i] = val;
     }
 }
 
@@ -274,45 +329,45 @@ void set_ZERO(T *a)
 
 template<uint D, typename T>
 CINO_INLINE
-void set_MIN(T *a)
+void vec_set_ZERO(T *a)
 {
-    for(uint i=0; i<D; ++i)
-    {
-        a[i] = std::numeric_limits<T>::min();
-    }
+    vec_set_val<D,T>(a, 0);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint D, typename T>
 CINO_INLINE
-void set_MAX(T *a)
+void vec_set_MIN(T *a)
 {
-    for(uint i=0; i<D; ++i)
-    {
-        a[i] = std::numeric_limits<T>::max();
-    }
+    vec_set_val<D,T>(a, std::numeric_limits<T>::min());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint D, typename T>
 CINO_INLINE
-void set_INF(T *a)
+void vec_set_MAX(T *a)
 {
-    for(uint i=0; i<D; ++i)
-    {
-        a[i] = std::numeric_limits<T>::infinity();
-    }
+    vec_set_val<D,T>(a, std::numeric_limits<T>::max());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint D, typename T>
 CINO_INLINE
-void min(const T *a,
-         const T *b,
-               T *c)
+void vec_set_INF(T *a)
+{
+    vec_set_val<D,T>(a, std::numeric_limits<T>::infinity());
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint D, typename T>
+CINO_INLINE
+void vec_min(const T *a,
+             const T *b,
+                   T *c)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -324,9 +379,9 @@ void min(const T *a,
 
 template<uint D, typename T>
 CINO_INLINE
-T max(const T *a,
-      const T *b,
-            T *c)
+T vec_max(const T *a,
+          const T *b,
+                T *c)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -338,9 +393,9 @@ T max(const T *a,
 
 template<uint D, typename T>
 CINO_INLINE
-void clamp(const T *a,
-           const T  min,
-           const T  max)
+void vec_clamp(const T *a,
+               const T &min,
+               const T &max)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -352,36 +407,36 @@ void clamp(const T *a,
 
 template<uint D, typename T>
 CINO_INLINE
-double angle_deg(const T *a,
-                 const T *b)
+double vec_angle_deg(const T *a,
+                     const T *b)
 {
-    return to_deg(angle_rad(a,b));
+    return to_deg(vec_angle_rad<D,T>(a,b));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint D, typename T>
 CINO_INLINE
-double angle_rad(const T *a,
-                 const T *b)
+double vec_angle_rad(const T *a,
+                     const T *b)
 {
     T tmp_a[D], tmp_b[D];
-    copy(a, tmp_a);
-    copy(b, tmp_b);
-    normalize(tmp_a);
-    normalize(tmp_b);
-    if(is_degenerate(tmp_a) || is_degenerate(tmp_b))
+    vec_copy<D,T>(a, tmp_a);
+    vec_copy<D,T>(b, tmp_b);
+    vec_normalize<D,T>(tmp_a);
+    vec_normalize<D,T>(tmp_b);
+    if(vec_is_degenerate<D,T>(tmp_a) || vec_is_degenerate<D,T>(tmp_b))
     {
         return std::numeric_limits<double>::infinity();
     }
-    return acos(clamp(dot(tmp_a, tmp_b), -1, 1));
+    return acos(clamp(vec_dot<D,T>(tmp_a, tmp_b), -1, 1));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint D, typename T>
 CINO_INLINE
-bool is_null(const T *a)
+bool vec_is_null(const T *a)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -394,7 +449,7 @@ bool is_null(const T *a)
 
 template<uint D, typename T>
 CINO_INLINE
-bool has_nan(const T *a)
+bool vec_has_nan(const T *a)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -407,7 +462,7 @@ bool has_nan(const T *a)
 
 template<uint D, typename T>
 CINO_INLINE
-bool has_inf(const T *a)
+bool vec_has_inf(const T *a)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -420,21 +475,17 @@ bool has_inf(const T *a)
 
 template<uint D, typename T>
 CINO_INLINE
-bool is_degenerate(const T *a)
+bool vec_is_degenerate(const T *a)
 {
-    for(uint i=0; i<D; ++i)
-    {
-        if(!std::isnormal(a[i])) return true;
-    }
-    return false;
+    return (vec_is_null<D,T>(a) || vec_has_inf<D,T>(a) || vec_has_nan<D,T>(a));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint D, typename T>
 CINO_INLINE
-void copy(const T *a,
-                T *b)
+void vec_copy(const T *a,
+                    T *b)
 {
     std::copy(a, a+D, b);
 }
@@ -443,7 +494,7 @@ void copy(const T *a,
 
 template<uint D, typename T>
 CINO_INLINE
-void print(const T* a)
+void vec_print(const T* a)
 {
     std::cout << "[";
     for(uint i=0; i<D-1; ++i)
@@ -451,8 +502,6 @@ void print(const T* a)
         std::cout << a[i] << ", ";
     }
     std::cout << a[D-1] << "]" << std::endl;
-}
-
 }
 
 }

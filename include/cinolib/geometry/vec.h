@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2021: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -42,27 +42,26 @@
 /* Base class for n dimensional points and vectors in R^d.
  * Useful also for colors, quaternions ecc..
 */
-
 namespace cinolib
 {
 
 template<class T, uint d> // T => type      (float, double, int,...)
 class vec                 // d => dimension (2,3,...)
 {
-    private:
-
-        T val[(d>0) ? d : 1]; // avoid constructing a vector with zero elements
-
     public:
 
-        explicit vec(const T s = 0);
-        explicit vec(const std::initializer_list<T> & il);
+        T data[(d>0) ? d : 1]; // avoid constructing a vector with zero elements
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        explicit vec(const T & s = 0);
+        explicit vec(const std::initializer_list<T> & il); // slow, avoid using it if possible
 
         // Specialized (faster) for R^2, R^3 and R^4 :::::::::::::::::::::::::::::
 
-        explicit vec(const double v0, const double v1);
-        explicit vec(const double v0, const double v1, const double v2);
-        explicit vec(const double v0, const double v1, const double v2, const double v3);
+        explicit vec(const T & v0, const T & v1);
+        explicit vec(const T & v0, const T & v1, const T & v2);
+        explicit vec(const T & v0, const T & v1, const T & v2, const T & v3);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -73,31 +72,26 @@ class vec                 // d => dimension (2,3,...)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const T * ptr() const { return val; }
-              T * ptr()       { return val; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        const T & at(const uint pos) const { return val.at(pos); }
-              T & at(const uint pos)       { return val.at(pos); }
+        const T * ptr() const { return data; }
+              T * ptr()       { return data; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // Cartesian XYZ access
-        const T & x() const { return val[0]; }
-              T & x()       { return val[0]; }
-        const T & y() const { return val[1]; }
-              T & y()       { return val[1]; }
-        const T & z() const { return val[2]; }
-              T & z()       { return val[2]; }
+        const T & x() const { return data[0]; }
+              T & x()       { return data[0]; }
+        const T & y() const { return data[1]; }
+              T & y()       { return data[1]; }
+        const T & z() const { return data[2]; }
+              T & z()       { return data[2]; }
 
         // Parametric UVW access
-        const T & u() const { return val[0]; }
-              T & u()       { return val[0]; }
-        const T & v() const { return val[1]; }
-              T & v()       { return val[1]; }
-        const T & w() const { return val[2]; }
-              T & w()       { return val[2]; }
+        const T & u() const { return data[0]; }
+              T & u()       { return data[0]; }
+        const T & v() const { return data[1]; }
+              T & v()       { return data[1]; }
+        const T & w() const { return data[2]; }
+              T & w()       { return data[2]; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -106,12 +100,12 @@ class vec                 // d => dimension (2,3,...)
               vec<T,d>   operator+  (const vec<T,d> & v)  const;
               vec<T,d>   operator-  (const vec<T,d> & v)  const;
               vec<T,d>   operator-  ()                    const;
-              vec<T,d>   operator*  (const T s)           const;
-              vec<T,d>   operator/  (const T s)           const;
+              vec<T,d>   operator*  (const T & s)         const;
+              vec<T,d>   operator/  (const T & s)         const;
               vec<T,d> & operator+= (const vec<T,d> & v);
               vec<T,d> & operator-= (const vec<T,d> & v);
-              vec<T,d> & operator*= (const T s);
-              vec<T,d> & operator/= (const T s);
+              vec<T,d> & operator*= (const T & s);
+              vec<T,d> & operator/= (const T & s);
               bool       operator== (const vec<T,d> & v) const;
               bool       operator<  (const vec<T,d> & v) const;
 
@@ -127,11 +121,11 @@ class vec                 // d => dimension (2,3,...)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        T length_squared() const;
-        T length        () const;
-        T dist          (const vec<T,d> & v) const;
-        T dist_squared  (const vec<T,d> & v) const;
-        T normalize     ();
+        T      length_sqrd() const;
+        double length     () const;
+        double dist       (const vec<T,d> & v) const;
+        T      dist_sqrd  (const vec<T,d> & v) const;
+        T      normalize  ();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -148,23 +142,23 @@ class vec                 // d => dimension (2,3,...)
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         bool is_null()       const;
-        bool is_nan()        const;
-        bool is_inf()        const;
+        bool has_nan()       const;
+        bool has_inf()       const;
         bool is_degenerate() const; // either null, nan or inf
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // useful types to have
-typedef vec<double,2> vec2d;
-typedef vec<float,2>  vec2f;
-typedef vec<int,2>    vec2i;
-typedef vec<double,3> vec3d;
-typedef vec<float,3>  vec3f;
-typedef vec<int,3>    vec3i;
-typedef vec<double,4> vec4d;
-typedef vec<float,4>  vec4f;
-typedef vec<int,4>    vec4i;
+//typedef vec<double,2> vec2d;
+//typedef vec<float,2>  vec2f;
+//typedef vec<int,2>    vec2i;
+//typedef vec<double,3> vec3d;
+//typedef vec<float,3>  vec3f;
+//typedef vec<int,3>    vec3i;
+//typedef vec<double,4> vec4d;
+//typedef vec<float,4>  vec4f;
+//typedef vec<int,4>    vec4i;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
