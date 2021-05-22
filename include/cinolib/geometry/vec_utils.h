@@ -42,15 +42,15 @@
 namespace cinolib
 {
 
-template<uint D, typename T> CINO_INLINE void   vec_plus     (const T *a, const T *b, T *c);
-template<uint D, typename T> CINO_INLINE void   vec_plus     (      T *a, const T *b);
-template<uint D, typename T> CINO_INLINE void   vec_minus    (const T *a, const T *b, T *c);
-template<uint D, typename T> CINO_INLINE void   vec_minus    (      T *a, const T *b);
-template<uint D, typename T> CINO_INLINE void   vec_multiply (const T *a, const T &b, T *c);
-template<uint D, typename T> CINO_INLINE void   vec_multiply (      T *a, const T &b);
-template<uint D, typename T> CINO_INLINE void   vec_divide   (const T *a, const T &b, T *c);
-template<uint D, typename T> CINO_INLINE void   vec_divide   (      T *a, const T &b);
-template<uint D, typename T> CINO_INLINE void   vec_flip_sign(T *a);
+template<uint D, typename T> CINO_INLINE void vec_plus     (const T *a, const T *b, T *c);
+template<uint D, typename T> CINO_INLINE void vec_plus     (      T *a, const T *b);
+template<uint D, typename T> CINO_INLINE void vec_minus    (const T *a, const T *b, T *c);
+template<uint D, typename T> CINO_INLINE void vec_minus    (      T *a, const T *b);
+template<uint D, typename T> CINO_INLINE void vec_multiply (const T *a, const T &b, T *c);
+template<uint D, typename T> CINO_INLINE void vec_multiply (      T *a, const T &b);
+template<uint D, typename T> CINO_INLINE void vec_divide   (const T *a, const T &b, T *c);
+template<uint D, typename T> CINO_INLINE void vec_divide   (      T *a, const T &b);
+template<uint D, typename T> CINO_INLINE void vec_flip_sign(T *a);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
