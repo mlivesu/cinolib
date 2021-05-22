@@ -42,67 +42,67 @@
 namespace cinolib
 {
 
-template<uint D, typename T> CINO_INLINE void vec_plus     (const T *a, const T *b, T *c);
-template<uint D, typename T> CINO_INLINE void vec_plus     (      T *a, const T *b);
-template<uint D, typename T> CINO_INLINE void vec_minus    (const T *a, const T *b, T *c);
-template<uint D, typename T> CINO_INLINE void vec_minus    (      T *a, const T *b);
-template<uint D, typename T> CINO_INLINE void vec_multiply (const T *a, const T &b, T *c);
-template<uint D, typename T> CINO_INLINE void vec_multiply (      T *a, const T &b);
-template<uint D, typename T> CINO_INLINE void vec_divide   (const T *a, const T &b, T *c);
-template<uint D, typename T> CINO_INLINE void vec_divide   (      T *a, const T &b);
-template<uint D, typename T> CINO_INLINE void vec_flip_sign(T *a);
+template<uint d, typename T> CINO_INLINE void vec_plus     (const T * a, const T * b, T * c);
+template<uint d, typename T> CINO_INLINE void vec_minus    (const T * a, const T * b, T * c);
+template<uint d, typename T> CINO_INLINE void vec_multiply (const T * a, const T & b, T * c);
+template<uint d, typename T> CINO_INLINE void vec_divide   (const T * a, const T & b, T * c);
+template<uint d, typename T> CINO_INLINE void vec_plus     (      T * a, const T * b);
+template<uint d, typename T> CINO_INLINE void vec_minus    (      T * a, const T * b);
+template<uint d, typename T> CINO_INLINE void vec_multiply (      T * a, const T & b);
+template<uint d, typename T> CINO_INLINE void vec_divide   (      T * a, const T & b);
+template<uint d, typename T> CINO_INLINE void vec_flip_sign(T *a);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint D, typename T> CINO_INLINE bool vec_equals(const T *a, const T *b);
-template<uint D, typename T> CINO_INLINE bool vec_less  (const T *a, const T *b);
+template<uint d, typename T> CINO_INLINE bool vec_equals(const T * a, const T * b);
+template<uint d, typename T> CINO_INLINE bool vec_less  (const T * a, const T * b);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint D, typename T> CINO_INLINE T    vec_dot  (const T *a, const T *b);
-template<uint D, typename T> CINO_INLINE void vec_cross(const T *a, const T *b, const T *c);
+template<uint d, typename T> CINO_INLINE T    vec_dot  (const T * a, const T * b);
+template<uint d, typename T> CINO_INLINE void vec_cross(const T * a, const T * b, const T * c);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint D, typename T> CINO_INLINE double vec_normalize  (T *a);
-template<uint D, typename T> CINO_INLINE double vec_length     (const T *a);
-template<uint D, typename T> CINO_INLINE double vec_dist       (const T *a, const T *b);
-template<uint D, typename T> CINO_INLINE T      vec_length_sqrd(const T *a);
-template<uint D, typename T> CINO_INLINE T      vec_dist_sqrd  (const T *a, const T *b);
+template<uint d, typename T> CINO_INLINE double vec_normalize  (T * a);
+template<uint d, typename T> CINO_INLINE double vec_length     (const T * a);
+template<uint d, typename T> CINO_INLINE double vec_dist       (const T * a, const T * b);
+template<uint d, typename T> CINO_INLINE T      vec_length_sqrd(const T * a);
+template<uint d, typename T> CINO_INLINE T      vec_dist_sqrd  (const T * a, const T * b);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint D, typename T> CINO_INLINE void vec_set_val (T *a, const T & val);
-template<uint D, typename T> CINO_INLINE void vec_set_ZERO(T *a);
-template<uint D, typename T> CINO_INLINE void vec_set_MIN (T *a);
-template<uint D, typename T> CINO_INLINE void vec_set_MAX (T *a);
-template<uint D, typename T> CINO_INLINE void vec_set_INF (T *a);
+template<uint d, typename T> CINO_INLINE void vec_set_val (T * a, const T & val);
+template<uint d, typename T> CINO_INLINE void vec_set_ZERO(T * a);
+template<uint d, typename T> CINO_INLINE void vec_set_MIN (T * a);
+template<uint d, typename T> CINO_INLINE void vec_set_MAX (T * a);
+template<uint d, typename T> CINO_INLINE void vec_set_INF (T * a);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint D, typename T> CINO_INLINE T    vec_min_entry(const T *a);
-template<uint D, typename T> CINO_INLINE T    vec_max_entry(const T *a);
-template<uint D, typename T> CINO_INLINE void vec_min      (const T *a, const T *b, T *c);
-template<uint D, typename T> CINO_INLINE void vec_max      (const T *a, const T *b, T *c);
-template<uint D, typename T> CINO_INLINE void vec_clamp    (const T *a, const T &min, const T &max);
+template<uint d, typename T> CINO_INLINE T    vec_min_entry(const T * a);
+template<uint d, typename T> CINO_INLINE T    vec_max_entry(const T * a);
+template<uint d, typename T> CINO_INLINE void vec_min      (const T * a, const T * b, T * c);
+template<uint d, typename T> CINO_INLINE void vec_max      (const T * a, const T * b, T * c);
+template<uint d, typename T> CINO_INLINE void vec_clamp    (const T * a, const T & min, const T & max);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint D, typename T> CINO_INLINE double vec_angle_deg(const T *a, const T *b);
-template<uint D, typename T> CINO_INLINE double vec_angle_rad(const T *a, const T *b);
+template<uint d, typename T> CINO_INLINE double vec_angle_deg(const T * a, const T * b);
+template<uint d, typename T> CINO_INLINE double vec_angle_rad(const T * a, const T * b);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint D, typename T> CINO_INLINE bool vec_is_null      (const T *a);
-template<uint D, typename T> CINO_INLINE bool vec_is_nan       (const T *a);
-template<uint D, typename T> CINO_INLINE bool vec_is_inf       (const T *a);
-template<uint D, typename T> CINO_INLINE bool vec_is_degenerate(const T *a);
+template<uint d, typename T> CINO_INLINE bool vec_is_null      (const T * a);
+template<uint d, typename T> CINO_INLINE bool vec_is_nan       (const T * a);
+template<uint d, typename T> CINO_INLINE bool vec_is_inf       (const T * a);
+template<uint d, typename T> CINO_INLINE bool vec_is_degenerate(const T * a);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint D, typename T> CINO_INLINE void vec_swap (T *a, const uint i, const uint j);
-template<uint D, typename T> CINO_INLINE void vec_copy (const T *a, T *b);
-template<uint D, typename T> CINO_INLINE void vec_print(const T* a);
+template<uint d, typename T> CINO_INLINE void vec_swap (T * a, const uint i, const uint j);
+template<uint d, typename T> CINO_INLINE void vec_copy (const T * a, T * b);
+template<uint d, typename T> CINO_INLINE void vec_print(const T * a);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
