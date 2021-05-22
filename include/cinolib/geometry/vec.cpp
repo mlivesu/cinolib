@@ -337,18 +337,18 @@ bool vec<T,d>::is_null() const
 
 template<class T, uint d>
 CINO_INLINE
-bool vec<T,d>::has_nan() const
+bool vec<T,d>::is_nan() const
 {
-    return vec_has_nan<3,T>(data);
+    return vec_is_nan<3,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T, uint d>
 CINO_INLINE
-bool vec<T,d>::has_inf() const
+bool vec<T,d>::is_inf() const
 {
-    return vec_has_inf<3,T>(data);
+    return vec_is_inf<3,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -357,7 +357,7 @@ template<class T, uint d>
 CINO_INLINE
 bool vec<T,d>::is_degenerate() const
 {
-    return is_null() || has_nan() || has_inf();
+    return is_null() || is_nan() || is_inf();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -94,8 +94,8 @@ template<uint D, typename T> CINO_INLINE double vec_angle_rad(const T *a, const 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint D, typename T> CINO_INLINE bool vec_is_null      (const T *a);
-template<uint D, typename T> CINO_INLINE bool vec_has_nan      (const T *a);
-template<uint D, typename T> CINO_INLINE bool vec_has_inf      (const T *a);
+template<uint D, typename T> CINO_INLINE bool vec_is_nan       (const T *a);
+template<uint D, typename T> CINO_INLINE bool vec_is_inf       (const T *a);
 template<uint D, typename T> CINO_INLINE bool vec_is_degenerate(const T *a);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

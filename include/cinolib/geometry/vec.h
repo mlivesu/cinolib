@@ -54,7 +54,8 @@ class vec                 // d => dimension (2,3,...)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        explicit vec(const T & s = 0);
+        explicit vec() {}
+        explicit vec(const T & s);
         explicit vec(const std::initializer_list<T> & il); // slow, avoid using it if possible
 
         // Specialized (faster) for R^2, R^3 and R^4 :::::::::::::::::::::::::::::
@@ -142,8 +143,8 @@ class vec                 // d => dimension (2,3,...)
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         bool is_null()       const;
-        bool has_nan()       const;
-        bool has_inf()       const;
+        bool is_nan()        const;
+        bool is_inf()        const;
         bool is_degenerate() const; // either null, nan or inf
 };
 

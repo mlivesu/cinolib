@@ -84,7 +84,7 @@ template<uint R, uint C, typename T> CINO_INLINE void clamp    (const T *a, cons
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint R, uint C, typename T> CINO_INLINE bool is_null      (const T *a);
-template<uint R, uint C, typename T> CINO_INLINE bool has_nan      (const T *a);
+template<uint R, uint C, typename T> CINO_INLINE bool is_nan      (const T *a);
 template<uint R, uint C, typename T> CINO_INLINE bool has_inf      (const T *a);
 template<uint R, uint C, typename T> CINO_INLINE bool is_degenerate(const T *a);
 template<uint R, uint C, typename T> CINO_INLINE bool is_full_rank (const T *a);

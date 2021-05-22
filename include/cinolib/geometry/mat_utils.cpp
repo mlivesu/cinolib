@@ -286,7 +286,7 @@ bool is_null(const T *a)
 
 template<uint R, uint C, typename T>
 CINO_INLINE
-bool has_nan(const T *a)
+bool is_nan(const T *a)
 {
     for(uint j=0; j<C; ++j)
     for(uint i=0; i<R; ++i)

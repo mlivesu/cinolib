@@ -449,7 +449,7 @@ bool vec_is_null(const T *a)
 
 template<uint D, typename T>
 CINO_INLINE
-bool vec_has_nan(const T *a)
+bool vec_is_nan(const T *a)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -462,7 +462,7 @@ bool vec_has_nan(const T *a)
 
 template<uint D, typename T>
 CINO_INLINE
-bool vec_has_inf(const T *a)
+bool vec_is_inf(const T *a)
 {
     for(uint i=0; i<D; ++i)
     {
@@ -477,7 +477,7 @@ template<uint D, typename T>
 CINO_INLINE
 bool vec_is_degenerate(const T *a)
 {
-    return (vec_is_null<D,T>(a) || vec_has_inf<D,T>(a) || vec_has_nan<D,T>(a));
+    return (vec_is_null<D,T>(a) || vec_is_inf<D,T>(a) || vec_is_nan<D,T>(a));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
