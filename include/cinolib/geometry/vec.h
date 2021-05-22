@@ -50,12 +50,11 @@ class vec                 // d => dimension (2,3,...)
 {
     public:
 
-        T data[(d>0) ? d : 1]; // avoid constructing a vector with zero elements
+        T data[d];
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        explicit vec() {}
-        explicit vec(const T & s);
+        explicit vec(const T & s = 0);
         explicit vec(const std::initializer_list<T> & il); // slow, avoid using it if possible
 
         // Specialized (faster) for R^2, R^3 and R^4 :::::::::::::::::::::::::::::
