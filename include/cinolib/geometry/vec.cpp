@@ -40,9 +40,9 @@
 namespace cinolib
 {
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-std::ostream & operator<<(std::ostream & in, const vec<T,d> & v)
+std::ostream & operator<<(std::ostream & in, const vec<d,T> & v)
 {
     in << "[";
     for(uint i=0; i<d; ++i) in << v[i] << " ";
@@ -52,18 +52,18 @@ std::ostream & operator<<(std::ostream & in, const vec<T,d> & v)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d>::vec(const T & s)
+vec<d,T>::vec(const T & s)
 {
     for(uint i=0; i<d; ++i) data[i] = s;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d>::vec(const std::initializer_list<T> & il)
+vec<d,T>::vec(const std::initializer_list<T> & il)
 {
     assert(il.size()==d);
     auto it = il.begin();
@@ -72,290 +72,290 @@ vec<T,d>::vec(const std::initializer_list<T> & il)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-T vec<T,d>::dot(const vec<T,d> & v) const
+T vec<d,T>::dot(const vec<d,T> & v) const
 {
-    return vec_dot<3,T>(data, v.data);
+    return vec_dot<d,T>(data, v.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> vec<T,d>::cross(const vec<T,d> & v) const
+vec<d,T> vec<d,T>::cross(const vec<d,T> & v) const
 {
-    vec<T,d> res;
-    vec_cross<3,T>(data, v.data, res.data);
+    vec<d,T> res;
+    vec_cross<d,T>(data, v.data, res.data);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-T & vec<T,d>::operator[](const uint pos)
+T & vec<d,T>::operator[](const uint pos)
 {
     return data[pos];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-const T & vec<T,d>::operator[](const uint pos) const
+const T & vec<d,T>::operator[](const uint pos) const
 {
     return data[pos];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> vec<T,d>::operator+(const vec<T,d> & v) const
+vec<d,T> vec<d,T>::operator+(const vec<d,T> & v) const
 {
-    vec<T,d> res;
-    vec_plus<3,T>(data, v.data, res);
+    vec<d,T> res;
+    vec_plus<d,T>(data, v.data, res);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> vec<T,d>::operator-(const vec<T,d> & v) const
+vec<d,T> vec<d,T>::operator-(const vec<d,T> & v) const
 {
-    vec<T,d> res;
-    vec_minus<3,T>(data, v.data, res);
+    vec<d,T> res;
+    vec_minus<d,T>(data, v.data, res);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> vec<T,d>::operator-() const
+vec<d,T> vec<d,T>::operator-() const
 {
-    vec<T,d> res;
-    vec_flip_sign<3,T>(data);
+    vec<d,T> res;
+    vec_flip_sign<d,T>(data);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> vec<T,d>::operator*(const T & s) const
+vec<d,T> vec<d,T>::operator*(const T & s) const
 {
-    vec<T,d> res;
-    vec_multiply<3,T>(data, s, res);
+    vec<d,T> res;
+    vec_multiply<d,T>(data, s, res);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> vec<T,d>::operator/(const T & s) const
+vec<d,T> vec<d,T>::operator/(const T & s) const
 {
-    vec<T,d> res;
-    vec_divide<3,T>(data, s, res);
+    vec<d,T> res;
+    vec_divide<d,T>(data, s, res);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> & vec<T,d>::operator+=(const vec<T,d> & v)
+vec<d,T> & vec<d,T>::operator+=(const vec<d,T> & v)
 {
-    vec_plus<3,T>(data, v.data);
+    vec_plus<d,T>(data, v.data);
     return *this;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> & vec<T,d>::operator-=(const vec<T,d> & v)
+vec<d,T> & vec<d,T>::operator-=(const vec<d,T> & v)
 {
-    vec_minus<3,T>(data, v.data);
+    vec_minus<d,T>(data, v.data);
     return *this;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> & vec<T,d>::operator*=(const T & s)
+vec<d,T> & vec<d,T>::operator*=(const T & s)
 {
-    vec_multiply<3,T>(data, s);
+    vec_multiply<d,T>(data, s);
     return *this;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> & vec<T,d>::operator/=(const T & s)
+vec<d,T> & vec<d,T>::operator/=(const T & s)
 {
-    vec_divide<3,T>(data, s);
+    vec_divide<d,T>(data, s);
     return *this;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-bool vec<T,d>::operator==(const vec<T,d> & v) const
+bool vec<d,T>::operator==(const vec<d,T> & v) const
 {
-    return vec_equals<3,T>(data, v.data);
+    return vec_equals<d,T>(data, v.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-bool vec<T,d>::operator<(const vec<T,d> & v) const
+bool vec<d,T>::operator<(const vec<d,T> & v) const
 {
-    return vec_less<3,T>(data, v.data);
+    return vec_less<d,T>(data, v.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-double vec<T,d>::length() const
+double vec<d,T>::length() const
 {
-    return vec_length<3,T>(data);
+    return vec_length<d,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-T vec<T,d>::length_sqrd() const
+T vec<d,T>::length_sqrd() const
 {
-    return vec_length_sqrd<3,T>(data);
+    return vec_length_sqrd<d,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-double vec<T,d>::dist(const vec<T,d> & v) const
+double vec<d,T>::dist(const vec<d,T> & v) const
 {
-    return vec_dist<3,T>(data, v.data);
+    return vec_dist<d,T>(data, v.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-T vec<T,d>::dist_sqrd(const vec<T,d> & v) const
+T vec<d,T>::dist_sqrd(const vec<d,T> & v) const
 {
-    return vec_dist_sqrd<3,T>(data, v.data);
+    return vec_dist_sqrd<d,T>(data, v.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-T vec<T,d>::normalize()
+T vec<d,T>::normalize()
 {
-    return vec_normalize<3,T>(data);
+    return vec_normalize<d,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-T vec<T,d>::min_entry() const
+T vec<d,T>::min_entry() const
 {
-    return vec_min_entry<3,T>(data);
+    return vec_min_entry<d,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-T vec<T,d>::max_entry() const
+T vec<d,T>::max_entry() const
 {
-    return vec_max_entry<3,T>(data);
+    return vec_max_entry<d,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> vec<T,d>::min(const vec<T,d> & v) const
+vec<d,T> vec<d,T>::min(const vec<d,T> & v) const
 {
-    vec<T,d> res;
-    vec_min<3,T>(data, v.data, res);
+    vec<d,T> res;
+    vec_min<d,T>(data, v.data, res);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d> vec<T,d>::max(const vec<T,d> & v) const
+vec<d,T> vec<d,T>::max(const vec<d,T> & v) const
 {
-    vec<T,d> res;
-    vec_max<3,T>(data, v.data, res);
+    vec<d,T> res;
+    vec_max<d,T>(data, v.data, res);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-T vec<T,d>::angle_rad(const vec<T,d> & v) const
+T vec<d,T>::angle_rad(const vec<d,T> & v) const
 {
-    return vec_angle_rad<3,T>(data, v.data);
+    return vec_angle_rad<d,T>(data, v.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-T vec<T,d>::angle_deg(const vec<T,d> & v) const
+T vec<d,T>::angle_deg(const vec<d,T> & v) const
 {
-    return vec_angle_deg<3,T>(data, v.data);
+    return vec_angle_deg<d,T>(data, v.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-bool vec<T,d>::is_null() const
+bool vec<d,T>::is_null() const
 {
-    return vec_is_null<3,T>(data);
+    return vec_is_null<d,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-bool vec<T,d>::is_nan() const
+bool vec<d,T>::is_nan() const
 {
-    return vec_is_nan<3,T>(data);
+    return vec_is_nan<d,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-bool vec<T,d>::is_inf() const
+bool vec<d,T>::is_inf() const
 {
-    return vec_is_inf<3,T>(data);
+    return vec_is_inf<d,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-bool vec<T,d>::is_degenerate() const
+bool vec<d,T>::is_degenerate() const
 {
     return is_null() || is_nan() || is_inf();
 }
@@ -370,9 +370,9 @@ bool vec<T,d>::is_degenerate() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // faster vec2d constructor
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d>::vec(const T & v0, const T & v1)
+vec<d,T>::vec(const T & v0, const T & v1)
 {
     data[0] = v0;
     data[1] = v1;
@@ -381,9 +381,9 @@ vec<T,d>::vec(const T & v0, const T & v1)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // faster vec3d constructor
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d>::vec(const T & v0, const T & v1, const T & v2)
+vec<d,T>::vec(const T & v0, const T & v1, const T & v2)
 {
     data[0] = v0;
     data[1] = v1;
@@ -393,9 +393,9 @@ vec<T,d>::vec(const T & v0, const T & v1, const T & v2)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // faster vec4d constructor
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
-vec<T,d>::vec(const T & v0, const T & v1, const T & v2, const T & v3)
+vec<d,T>::vec(const T & v0, const T & v1, const T & v2, const T & v3)
 {
     data[0] = v0;
     data[1] = v1;

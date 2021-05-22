@@ -45,8 +45,8 @@
 namespace cinolib
 {
 
-template<class T, uint d> // T => type      (float, double, int,...)
-class vec                 // d => dimension (2,3,...)
+template<uint d, class T> // d => dimension (2,3,...)
+class vec                 // T => type      (float, double, int,...)
 {
     public:
 
@@ -55,9 +55,9 @@ class vec                 // d => dimension (2,3,...)
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         explicit vec(const T & s = 0);
-        explicit vec(const std::initializer_list<T> & il); // slow, avoid using it if possible
+        explicit vec(const std::initializer_list<T> & il);
 
-        // Specialized (faster) for R^2, R^3 and R^4 :::::::::::::::::::::::::::::
+        // Specialized (faster?) for R^2, R^3 and R^4 ::::::::::::::::::::::::::::
 
         explicit vec(const T & v0, const T & v1);
         explicit vec(const T & v0, const T & v1, const T & v2);
@@ -65,10 +65,10 @@ class vec                 // d => dimension (2,3,...)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        static vec<T,d> ZERO() { return vec<T,d>(0);                                  }
-        static vec<T,d> MIN()  { return vec<T,d>(std::numeric_limits<T>::min());      }
-        static vec<T,d> MAX()  { return vec<T,d>(std::numeric_limits<T>::max());      }
-        static vec<T,d> INF()  { return vec<T,d>(std::numeric_limits<T>::infinity()); }
+        static vec<d,T> ZERO() { return vec<d,T>(0);                                  }
+        static vec<d,T> MIN()  { return vec<d,T>(std::numeric_limits<T>::min());      }
+        static vec<d,T> MAX()  { return vec<d,T>(std::numeric_limits<T>::max());      }
+        static vec<d,T> INF()  { return vec<d,T>(std::numeric_limits<T>::infinity()); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -97,47 +97,47 @@ class vec                 // d => dimension (2,3,...)
 
               T        & operator[] (const uint pos);
         const T        & operator[] (const uint pos)      const;
-              vec<T,d>   operator+  (const vec<T,d> & v)  const;
-              vec<T,d>   operator-  (const vec<T,d> & v)  const;
-              vec<T,d>   operator-  ()                    const;
-              vec<T,d>   operator*  (const T & s)         const;
-              vec<T,d>   operator/  (const T & s)         const;
-              vec<T,d> & operator+= (const vec<T,d> & v);
-              vec<T,d> & operator-= (const vec<T,d> & v);
-              vec<T,d> & operator*= (const T & s);
-              vec<T,d> & operator/= (const T & s);
-              bool       operator== (const vec<T,d> & v) const;
-              bool       operator<  (const vec<T,d> & v) const;
+              vec<d,T>   operator+  (const vec<d,T> & v)  const;
+              vec<d,T>   operator-  (const vec<d,T> & v)  const;
+              vec<d,T>   operator-  ()                    const;
+              vec<d,T>   operator*  (const T & s)         const;
+              vec<d,T>   operator/  (const T & s)         const;
+              vec<d,T> & operator+= (const vec<d,T> & v);
+              vec<d,T> & operator-= (const vec<d,T> & v);
+              vec<d,T> & operator*= (const T & s);
+              vec<d,T> & operator/= (const T & s);
+              bool       operator== (const vec<d,T> & v) const;
+              bool       operator<  (const vec<d,T> & v) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        T        dot  (const vec<T,d> & v) const;
-        vec<T,d> cross(const vec<T,d> & v) const;
+        T        dot  (const vec<d,T> & v) const;
+        vec<d,T> cross(const vec<d,T> & v) const;
 
         // Static members for dot and cross products (watchout the overhead!) ::::
 
-        static T        dot  (const vec<T,d> & v0, const vec<T,d> & v1) { return v0.dot(v1);   }
-        static vec<T,d> cross(const vec<T,d> & v0, const vec<T,d> & v1) { return v0.cross(v1); }
+        static T        dot  (const vec<d,T> & v0, const vec<d,T> & v1) { return v0.dot(v1);   }
+        static vec<d,T> cross(const vec<d,T> & v0, const vec<d,T> & v1) { return v0.cross(v1); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         T      length_sqrd() const;
         double length     () const;
-        double dist       (const vec<T,d> & v) const;
-        T      dist_sqrd  (const vec<T,d> & v) const;
+        double dist       (const vec<d,T> & v) const;
+        T      dist_sqrd  (const vec<d,T> & v) const;
         T      normalize  ();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         T        min_entry()                   const;
         T        max_entry()                   const;
-        vec<T,d> min      (const vec<T,d> & v) const;
-        vec<T,d> max      (const vec<T,d> & v) const;
+        vec<d,T> min      (const vec<d,T> & v) const;
+        vec<d,T> max      (const vec<d,T> & v) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        T angle_rad(const vec<T,d> & v) const;
-        T angle_deg(const vec<T,d> & v) const;
+        T angle_rad(const vec<d,T> & v) const;
+        T angle_deg(const vec<d,T> & v) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -164,7 +164,7 @@ class vec                 // d => dimension (2,3,...)
 
 template<class T, uint d>
 CINO_INLINE
-std::ostream & operator<< (std::ostream & in, const vec<T,d> & v);
+std::ostream & operator<< (std::ostream & in, const vec<d,T> & v);
 
 }
 
