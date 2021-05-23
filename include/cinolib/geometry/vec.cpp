@@ -74,6 +74,39 @@ vec<d,T>::vec(const std::initializer_list<T> & il)
 
 template<uint d, class T>
 CINO_INLINE
+vec<d,T>::vec(const T & v0, const T & v1)
+{
+    data[0] = v0;
+    data[1] = v1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint d, class T>
+CINO_INLINE
+vec<d,T>::vec(const T & v0, const T & v1, const T & v2)
+{
+    data[0] = v0;
+    data[1] = v1;
+    data[2] = v2;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint d, class T>
+CINO_INLINE
+vec<d,T>::vec(const T & v0, const T & v1, const T & v2, const T & v3)
+{
+    data[0] = v0;
+    data[1] = v1;
+    data[2] = v2;
+    data[3] = v3;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint d, class T>
+CINO_INLINE
 T vec<d,T>::dot(const vec<d,T> & v) const
 {
     return vec_dot<d,T>(data, v.data);
@@ -115,7 +148,7 @@ CINO_INLINE
 vec<d,T> vec<d,T>::operator+(const vec<d,T> & v) const
 {
     vec<d,T> res;
-    vec_plus<d,T>(data, v.data, res);
+    vec_plus<d,T>(data, v.data, res.data);
     return res;
 }
 
@@ -126,7 +159,7 @@ CINO_INLINE
 vec<d,T> vec<d,T>::operator-(const vec<d,T> & v) const
 {
     vec<d,T> res;
-    vec_minus<d,T>(data, v.data, res);
+    vec_minus<d,T>(data, v.data, res.data);
     return res;
 }
 
@@ -148,7 +181,7 @@ CINO_INLINE
 vec<d,T> vec<d,T>::operator*(const T & s) const
 {
     vec<d,T> res;
-    vec_multiply<d,T>(data, s, res);
+    vec_multiply<d,T>(data, s, res.data);
     return res;
 }
 
@@ -159,7 +192,7 @@ CINO_INLINE
 vec<d,T> vec<d,T>::operator/(const T & s) const
 {
     vec<d,T> res;
-    vec_divide<d,T>(data, s, res);
+    vec_divide<d,T>(data, s, res.data);
     return res;
 }
 
@@ -291,7 +324,7 @@ CINO_INLINE
 vec<d,T> vec<d,T>::min(const vec<d,T> & v) const
 {
     vec<d,T> res;
-    vec_min<d,T>(data, v.data, res);
+    vec_min<d,T>(data, v.data, res.data);
     return res;
 }
 
@@ -302,7 +335,7 @@ CINO_INLINE
 vec<d,T> vec<d,T>::max(const vec<d,T> & v) const
 {
     vec<d,T> res;
-    vec_max<d,T>(data, v.data, res);
+    vec_max<d,T>(data, v.data, res.data);
     return res;
 }
 

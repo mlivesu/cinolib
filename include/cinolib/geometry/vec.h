@@ -162,7 +162,7 @@ class vec                 // T => type      (float, double, int,...)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint d>
+template<uint d, class T>
 CINO_INLINE
 std::ostream & operator<< (std::ostream & in, const vec<d,T> & v);
 

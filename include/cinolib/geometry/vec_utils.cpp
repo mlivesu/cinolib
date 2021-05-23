@@ -266,8 +266,8 @@ double vec_dist(const T * a,
 
 template<uint d, typename T>
 CINO_INLINE
-double vec_dist_sqrd(const T * a,
-                     const T * b)
+T vec_dist_sqrd(const T * a,
+                const T * b)
 {
     T tmp[d];
     vec_minus<d,T>(a,b,tmp);
@@ -380,9 +380,9 @@ void vec_min(const T * a,
 
 template<uint d, typename T>
 CINO_INLINE
-T vec_max(const T * a,
-          const T * b,
-                T * c)
+void vec_max(const T * a,
+             const T * b,
+                   T * c)
 {
     for(uint i=0; i<d; ++i)
     {
@@ -430,7 +430,7 @@ double vec_angle_rad(const T * a,
     {
         return std::numeric_limits<double>::infinity();
     }
-    return acos(clamp(vec_dot<d,T>(tmp_a, tmp_b), -1, 1));
+    return acos(vec_dot<d,T>(tmp_a, tmp_b));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
