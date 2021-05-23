@@ -430,7 +430,8 @@ double vec_angle_rad(const T * a,
     {
         return std::numeric_limits<double>::infinity();
     }
-    return acos(vec_dot<d,T>(tmp_a, tmp_b));
+    T dot = vec_dot<d,T>(tmp_a, tmp_b);
+    return acos(clamp(dot,T(-1),T(1)));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
