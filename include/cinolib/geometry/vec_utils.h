@@ -60,7 +60,7 @@ template<uint d, typename T> CINO_INLINE bool vec_less  (const T * a, const T * 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint d, typename T> CINO_INLINE T    vec_dot  (const T * a, const T * b);
-template<uint d, typename T> CINO_INLINE void vec_cross(const T * a, const T * b, const T * c);
+template<        typename T> CINO_INLINE void vec_cross(const T * a, const T * b, const T * c);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -88,8 +88,9 @@ template<uint d, typename T> CINO_INLINE void vec_clamp    (const T * a, const T
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint d, typename T> CINO_INLINE double vec_angle_deg(const T * a, const T * b);
-template<uint d, typename T> CINO_INLINE double vec_angle_rad(const T * a, const T * b);
+// if BOTH vecs are known to be unit length, setting unit_length to TRUE will skip the normalization step
+template<uint d, typename T> CINO_INLINE double vec_angle_deg(const T * a, const T * b, const bool unit_length = false);
+template<uint d, typename T> CINO_INLINE double vec_angle_rad(const T * a, const T * b, const bool unit_length = false);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

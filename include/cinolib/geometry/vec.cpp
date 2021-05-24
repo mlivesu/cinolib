@@ -107,26 +107,6 @@ vec<d,T>::vec(const T & v0, const T & v1, const T & v2, const T & v3)
 
 template<uint d, class T>
 CINO_INLINE
-T vec<d,T>::dot(const vec<d,T> & v) const
-{
-    return vec_dot<d,T>(data, v.data);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint d, class T>
-CINO_INLINE
-vec<d,T> vec<d,T>::cross(const vec<d,T> & v) const
-{
-    vec<d,T> res;
-    vec_cross<d,T>(data, v.data, res.data);
-    return res;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint d, class T>
-CINO_INLINE
 T & vec<d,T>::operator[](const uint pos)
 {
     return data[pos];
@@ -343,24 +323,6 @@ vec<d,T> vec<d,T>::max(const vec<d,T> & v) const
 
 template<uint d, class T>
 CINO_INLINE
-T vec<d,T>::angle_rad(const vec<d,T> & v) const
-{
-    return vec_angle_rad<d,T>(data, v.data);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint d, class T>
-CINO_INLINE
-T vec<d,T>::angle_deg(const vec<d,T> & v) const
-{
-    return vec_angle_deg<d,T>(data, v.data);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint d, class T>
-CINO_INLINE
 bool vec<d,T>::is_null() const
 {
     return vec_is_null<d,T>(data);
@@ -391,6 +353,46 @@ CINO_INLINE
 bool vec<d,T>::is_degenerate() const
 {
     return is_null() || is_nan() || is_inf();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//:::::::::::::: STATIC OPERATORS (FOR MORE READABLE CODE) :::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint d, class T>
+CINO_INLINE
+T dot(const vec<d,T> & v0, const vec<d,T> & v1)
+{
+    return vec_dot<d,T>(v0.data, v1.data);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+vec<3,T> cross(const vec<3,T> & v0, const vec<3,T> & v1)
+{
+    vec<3,T> res;
+    vec_cross<T>(v0.data, v1.data, res.data);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint d, class T>
+CINO_INLINE
+T angle_deg(const vec<d,T> & v0, const vec<d,T> & v1, const bool unit_length)
+{
+    return vec_angle_deg<d,T>(v0.data, v1.data, unit_length);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint d, class T>
+CINO_INLINE
+T angle_rad(const vec<d,T> & v0, const vec<d,T> & v1, const bool unit_length)
+{
+    return vec_angle_rad<d,T>(v0.data, v1.data, unit_length);
 }
 
 }

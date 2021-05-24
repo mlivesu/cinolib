@@ -217,13 +217,12 @@ T vec_dot(const T * a,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // c = a x b (cross product)
-template<uint d, typename T>
+template<typename T>
 CINO_INLINE
 void vec_cross(const T * a,
                const T * b,
                      T * c)
 {
-    assert(d==3);
     c[0] = a[1] * b[2] - a[2] * b[1];
     c[1] = a[2] * b[0] - a[0] * b[2];
     c[2] = a[0] * b[1] - a[1] * b[0];
@@ -408,29 +407,40 @@ void vec_clamp(const T * a,
 
 template<uint d, typename T>
 CINO_INLINE
-double vec_angle_deg(const T * a,
-                     const T * b)
+double vec_angle_deg(const T  * a,
+                     const T  * b,
+                     const bool unit_length)
 {
-    return to_deg(vec_angle_rad<d,T>(a,b));
+    return to_deg(vec_angle_rad<d,T>(a,b,unit_length));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint d, typename T>
 CINO_INLINE
-double vec_angle_rad(const T * a,
-                     const T * b)
+double vec_angle_rad(const T  * a,
+                     const T  * b,
+                     const bool unit_length)
 {
-    T tmp_a[d], tmp_b[d];
-    vec_copy<d,T>(a, tmp_a);
-    vec_copy<d,T>(b, tmp_b);
-    vec_normalize<d,T>(tmp_a);
-    vec_normalize<d,T>(tmp_b);
-    if(vec_is_degenerate<d,T>(tmp_a) || vec_is_degenerate<d,T>(tmp_b))
+    T dot;
+    if(unit_length)
     {
-        return std::numeric_limits<double>::infinity();
+        dot = vec_dot<d,T>(a,b);
     }
-    T dot = vec_dot<d,T>(tmp_a, tmp_b);
+    else
+    {
+        // normalize input vecs if they are not known to be BOTH already normal
+        T tmp_a[d], tmp_b[d];
+        vec_copy<d,T>(a, tmp_a);
+        vec_copy<d,T>(b, tmp_b);
+        vec_normalize<d,T>(tmp_a);
+        vec_normalize<d,T>(tmp_b);
+        if(vec_is_degenerate<d,T>(tmp_a) || vec_is_degenerate<d,T>(tmp_b))
+        {
+            return std::numeric_limits<double>::infinity();
+        }
+        dot = vec_dot<d,T>(tmp_a,tmp_b);
+    }
     return acos(clamp(dot,T(-1),T(1)));
 }
 

@@ -111,16 +111,6 @@ class vec                 // T => type      (float, double, int,...)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        T        dot  (const vec<d,T> & v) const;
-        vec<d,T> cross(const vec<d,T> & v) const;
-
-        // Static members for dot and cross products (watchout the overhead!) ::::
-
-        static T        dot  (const vec<d,T> & v0, const vec<d,T> & v1) { return v0.dot(v1);   }
-        static vec<d,T> cross(const vec<d,T> & v0, const vec<d,T> & v1) { return v0.cross(v1); }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         T      length_sqrd() const;
         double length     () const;
         double dist       (const vec<d,T> & v) const;
@@ -136,16 +126,20 @@ class vec                 // T => type      (float, double, int,...)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        T angle_rad(const vec<d,T> & v) const;
-        T angle_deg(const vec<d,T> & v) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         bool is_null()       const;
         bool is_nan()        const;
         bool is_inf()        const;
         bool is_degenerate() const; // either null, nan or inf
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//:::::::::: EXTERNAL BINARY OPERATORS (FOR MORE READABLE CODE) ::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint d, class T> CINO_INLINE T        dot      (const vec<d,T> & v0, const vec<d,T> & v1);
+template<        class T> CINO_INLINE vec<3,T> cross    (const vec<3,T> & v0, const vec<3,T> & v1);
+template<uint d, class T> CINO_INLINE T        angle_deg(const vec<d,T> & v0, const vec<d,T> & v1, const bool unit_length = false);
+template<uint d, class T> CINO_INLINE T        angle_rad(const vec<d,T> & v0, const vec<d,T> & v1, const bool unit_length = false);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
