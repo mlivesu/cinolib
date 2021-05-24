@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2021: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -34,7 +34,6 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/geometry/mat_utils.h>
-#include <cinolib/geometry/vec_utils.h>
 #include <cinolib/clamp.h>
 #include <limits>
 #include <ostream>
@@ -43,327 +42,428 @@
 namespace cinolib
 {
 
-namespace mat
-{
-
-// c = a + b
-template<uint R, uint C, typename T>
+// m3 = m1 + m2
+template<uint r, uint c, typename T>
 CINO_INLINE
-void plus(const T *a,
-          const T *b,
-                T *c)
+void min_plus(const T * m1,
+              const T * m2,
+                    T * m3)
 {
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
+    for(uint i=0; i<r*c; ++i)
     {
-        c[j][i] = a[j][i] + b[j][i];
+        m3[i] = m1[i] + m2[i];
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// c = a - b
-template<uint R, uint C, typename T>
+// m1 += m2
+template<uint r, uint c, typename T>
 CINO_INLINE
-void minus(const T * a,
-           const T * b,
-                 T * c)
+void min_plus(      T * m1,
+              const T * m2)
 {
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
+    for(uint i=0; i<r*c; ++i)
     {
-        c[j][i] = a[j][i] - b[j][i];
+        m1[i] += m2[i];
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// a = -a
-template<uint R, uint C, typename T>
+// m3 = m1 - m2
+template<uint r, uint c, typename T>
 CINO_INLINE
-void flip_sign(const T *a)
+void mat_minus(const T * m1,
+               const T * m2,
+                     T * m3)
 {
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
+    for(uint i=0; i<r*c; ++i)
     {
-        a[j][i] = -a[j][i];
+        m3[i] = m1[i] - m2[i];
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// c = a * b
-template<uint R, uint C, typename T>
+// m1 -= m2
+template<uint r, uint c, typename T>
 CINO_INLINE
-void scale(const T *a,
-           const T  b,
-                 T *c)
+void min_minus(      T * m1,
+               const T * m2)
 {
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
+    for(uint i=0; i<r*c; ++i)
     {
-        c[j][i] = a[j][i] * b;
+        m1[i] -= m2[i];
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// c = a / b
-template<uint R, uint C, typename T>
+// m2 = m1 * s (element-wise)
+template<uint r, uint c, typename T>
 CINO_INLINE
-void divide(const T *a,
-            const T  b,
-                  T *c)
+void mat_scale(const T * m1,
+               const T & s,
+                     T * m2)
 {
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
+    for(uint i=0; i<r*c; ++i)
     {
-        c[j][i] = a[j][i] / b;
+        m2[i] = m1[i] * s;
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint R0, uint C0, uint R1, uint C1, typename T>
+// m1 *= s (element-wise)
+template<uint r, uint c, typename T>
 CINO_INLINE
-void multiply(const T *a,
-              const T *b,
-                    T *c)
+void mat_scale(      T * m1,
+               const T & s)
 {
-    assert(C0==R1);
-    for(uint i=0; i<R0; ++i)
-    for(uint j=0; j<C1; ++i)
+    for(uint i=0; i<r*c; ++i)
     {
-        c[j][i] = vec::dot(row(a,i), col(b,j));
+        m1[i] *= s;
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint R, uint C, typename T>
+// m3 = m1 / s
+template<uint r, uint c, typename T>
 CINO_INLINE
-bool equals(const T *a,
-            const T *b)
+void mat_divide(const T * m1,
+                const T & s,
+                      T * m2)
 {
-    for(uint i=0; i<R; ++i)
-    for(uint j=0; j<C; ++j)
+    for(uint i=0; i<r*m2; ++i)
     {
-        if(a[j][i] != b[j][i]) return false;
-    }
-    return true;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-T min_entry(const T *a)
-{
-    return *std::min_element(a, a+(R*C));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-T max_entry(const T *a)
-{
-    return *std::max_element(a, a+(R*C));
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-void set_ZERO(T *a)
-{
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
-    {
-        a[j][i] = 0;
+        m2[i] = m1[i] / s;
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint R, uint C, typename T>
+// m1 /= s
+template<uint r, uint c, typename T>
 CINO_INLINE
-void set_MIN(T *a)
+void mat_divide(      T * m1,
+                const T & s)
 {
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
+    for(uint i=0; i<r*c; ++i)
     {
-        a[j][i] = std::numeric_limits<T>::min();
+        m1[i] /= s;
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint R, uint C, typename T>
+// m = -m
+template<uint r, uint c, typename T>
 CINO_INLINE
-void set_MAX(T *a)
+void mat_flip_sign(const T *m)
 {
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
+    for(uint i=0; i<r*c; ++i)
     {
-        a[j][i] = std::numeric_limits<T>::max();
+        m[i] = -m[i];
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint R, uint C, typename T>
+template<uint r1, uint c1, uint r2, uint c2, typename T>
 CINO_INLINE
-void set_INF(T *a)
+void mat_multiply(const T * m1,
+                  const T * m2,
+                        T * m3)
 {
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
+    assert(c1==r2 && "matrix size mismatch");
+
+    for(uint i=0; i<r1; ++i)
+    for(uint j=0; j<c2; ++j)
     {
-        a[j][i] = std::numeric_limits<T>::infinity();
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-void min(const T *a,
-         const T *b,
-               T *c)
-{
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
-    {
-        c[j][i] = std::min(a[j][i],b[j][i]);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-T max(const T *a,
-      const T *b,
-            T *c)
-{
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
-    {
-        c[j][i] = std::max(a[j][i],b[j][i]);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-void clamp(const T *a,
-           const T  min,
-           const T  max)
-{
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
-    {
-        a[j][i] = clamp(a[j][i], min, max);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-bool is_null(const T *a)
-{
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
-    {
-        if(a[j][i]!=0) return false;
-    }
-    return true;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-bool is_nan(const T *a)
-{
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
-    {
-        if(std::isnan(a[j][i])) return true;
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-bool has_inf(const T *a)
-{
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
-    {
-        if(std::isinf(a[j][i])) return true;
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-bool is_degenerate(const T *a)
-{
-    for(uint j=0; j<C; ++j)
-    for(uint i=0; i<R; ++i)
-    {
-        if(!std::isnormal(a[j][i])) return true;
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-void copy(const T *a,
-                T *b)
-{
-    std::copy(a, a+(R*C), b);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-void row_ptr(T a[][C], const uint i, T* r[])
-{
-    for(uint j=0; j<C; ++j)
-    {
-        r[j] = &(a[j][i]);
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint R, uint C, typename T>
-CINO_INLINE
-void print(const T* a)
-{
-    std::cout << "[ ";
-    for(uint i=0; i<R; ++i)
-    {
-        for(uint j=0; j<C; ++j)
+        uint ij = c1*i+j;
+        m3[ij] = 0;
+        for(uint k=0; k<c1; ++k)
         {
-            std::cout << a[i][j] << ", ";
+            uint ik = c1*i+k;
+            uint kj = c2*k+j;
+            m3[ij] += m1[ik] * m2[kj];
         }
-        if(i<R-1) std::cout << "\n";
     }
-    std::cout << "]" << std::endl;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//// c = a * b
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//void scale(const T *a,
+//           const T  b,
+//                 T *c)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        c[j][i] = a[j][i] * b;
+//    }
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//// c = a / b
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//void divide(const T *a,
+//            const T  b,
+//                  T *c)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        c[j][i] = a[j][i] / b;
+//    }
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R0, uint C0, uint R1, uint C1, typename T>
+//CINO_INLINE
+//void multiply(const T *a,
+//              const T *b,
+//                    T *c)
+//{
+//    assert(C0==R1);
+//    for(uint i=0; i<R0; ++i)
+//    for(uint j=0; j<C1; ++i)
+//    {
+//        c[j][i] = vec::dot(row(a,i), col(b,j));
+//    }
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//bool equals(const T *a,
+//            const T *b)
+//{
+//    for(uint i=0; i<R; ++i)
+//    for(uint j=0; j<C; ++j)
+//    {
+//        if(a[j][i] != b[j][i]) return false;
+//    }
+//    return true;
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//T min_entry(const T *a)
+//{
+//    return *std::min_element(a, a+(R*C));
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//T max_entry(const T *a)
+//{
+//    return *std::max_element(a, a+(R*C));
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//void set_ZERO(T *a)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        a[j][i] = 0;
+//    }
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//void set_MIN(T *a)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        a[j][i] = std::numeric_limits<T>::min();
+//    }
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//void set_MAX(T *a)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        a[j][i] = std::numeric_limits<T>::max();
+//    }
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//void set_INF(T *a)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        a[j][i] = std::numeric_limits<T>::infinity();
+//    }
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//void min(const T *a,
+//         const T *b,
+//               T *c)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        c[j][i] = std::min(a[j][i],b[j][i]);
+//    }
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//T max(const T *a,
+//      const T *b,
+//            T *c)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        c[j][i] = std::max(a[j][i],b[j][i]);
+//    }
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//void clamp(const T *a,
+//           const T  min,
+//           const T  max)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        a[j][i] = clamp(a[j][i], min, max);
+//    }
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//bool is_null(const T *a)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        if(a[j][i]!=0) return false;
+//    }
+//    return true;
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//bool is_nan(const T *a)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        if(std::isnan(a[j][i])) return true;
+//    }
+//    return false;
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//bool has_inf(const T *a)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        if(std::isinf(a[j][i])) return true;
+//    }
+//    return false;
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//bool is_degenerate(const T *a)
+//{
+//    for(uint j=0; j<C; ++j)
+//    for(uint i=0; i<R; ++i)
+//    {
+//        if(!std::isnormal(a[j][i])) return true;
+//    }
+//    return false;
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//void copy(const T *a,
+//                T *b)
+//{
+//    std::copy(a, a+(R*C), b);
+//}
+
+////::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint R, uint C, typename T>
+//CINO_INLINE
+//void row_ptr(T a[][C], const uint i, T* r[])
+//{
+//    for(uint j=0; j<C; ++j)
+//    {
+//        r[j] = &(a[j][i]);
+//    }
+//}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_print(const T * m)
+{
+    for(uint i=0; i<r; ++i)
+    {
+        for(uint j=0; j<c; ++j)
+        {
+            if(j%c==0) std::cout << "\n";
+            std::cout << m[i*c+j] << " ";
+        }
+    }
+    std::cout << "\n";
 }
 
 }

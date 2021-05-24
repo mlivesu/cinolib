@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2021: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -34,24 +34,21 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/geometry/mat.h>
+#include <cinolib/geometry/mat_utils.h>
 #include <iostream>
-#include <assert.h>
 
 namespace cinolib
 {
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-std::ostream & operator<<(std::ostream & in, const mat<T,r,c> & m)
+std::ostream & operator<<(std::ostream & in, const mat<r,c,T> & v)
 {
     in << "[";
-    for(uint i=0; i<r; ++i)
+    for(uint i=0; i<r*c; ++i)
     {
-        for(uint j=0; j<c; ++j)
-        {
-            in << m[i][j] << " ";
-        }
-        in << "\n";
+        in << v[i] << " ";
+        if(i%c==0) in << "\n";
     }
     in << "]";
     return in;
@@ -59,244 +56,277 @@ std::ostream & operator<<(std::ostream & in, const mat<T,r,c> & m)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-mat<T,r,c>::mat(const T s)
+mat<r,c,T>::mat(const T & s)
 {
-    for(uint i=0; i<r; ++i)
-    for(uint j=0; j<c; ++j)
+    for(uint i=0; i<r*c; ++i)
     {
-        val[i][j] = s;
+        data[i] = s;
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-mat<T,r,c>::mat(const std::initializer_list<T> & il)
+mat<r,c,T>::mat(const std::initializer_list<T> & il)
 {
     assert(il.size()==r*c);
     auto it = il.begin();
-    for(uint i=0; i<r; ++i)
-    for(uint j=0; j<c; ++j)
-    {
-        val[i][j] = *it;
-        ++it;
-    }
+    for(uint i=0; i<r*c; ++i,++it) data[i] = *it;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-const T & mat<T,r,c>::at(const uint _r, const uint _c) const
+T & mat<r,c,T>::operator[](const uint pos)
 {
-    assert(_r<r && _c<c);
-    return val[r][c];
+    assert(pos<r*c);
+    return data[pos];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-T & mat<T,r,c>::at(const uint _r, const uint _c)
+const T & mat<r,c,T>::operator[](const uint pos) const
 {
-    assert(_r<r && _c<c);
-    return val[r][c];
+    assert(pos<r*c);
+    return data[pos];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-const T * mat<T,r,c>::ptr() const
+mat<r,c,T> mat<r,c,T>::operator+(const mat<r,c,T> & v) const
 {
-    return val;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class T, uint r, uint c>
-CINO_INLINE
-mat<T,r,c> mat<T,r,c>::operator+(const mat<T,r,c> & m) const
-{
-    mat<T,r,c> res;
-    for(uint i=0; i<r; ++i)
-    for(uint j=0; j<c; ++j)
-    {
-        res.val[i][j] = val[i][j] + m.val[i][j];
-    }
+    mat<r,c,T> res;
+    mat_plus<r,c,T>(data, v.data, res.data);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-mat<T,r,c> mat<T,r,c>::operator-(const mat<T,r,c> & m) const
+mat<r,c,T> mat<r,c,T>::operator-(const mat<r,c,T> & v) const
 {
-    mat<T,r,c> res;
-    for(uint i=0; i<r; ++i)
-    for(uint j=0; j<c; ++j)
-    {
-        res.val[i][j] = val[i][j] - m.val[i][j];
-    }
+    mat<r,c,T> res;
+    mat_minus<r,c,T>(data, v.data, res.data);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-mat<T,r,c> mat<T,r,c>::operator-() const
+mat<r,c,T> mat<r,c,T>::operator-() const
 {
-    mat<T,r,c> res;
-    for(uint i=0; i<r; ++i)
-    for(uint j=0; j<c; ++j)
-    {
-        res.val[i][j] = -val[i][j];
-    }
+    mat<r,c,T> res;
+    //mat_flip_sign<r,c,T>(data);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-mat<T,r,c> mat<T,r,c>::operator*(const T s) const
+mat<r,c,T> mat<r,c,T>::operator*(const T & s) const
 {
-    mat<T,r,c> res;
-    for(uint i=0; i<r; ++i)
-    for(uint j=0; j<c; ++j)
-    {
-        res.val[i][j] = val[i][j] * s;
-    }
+    mat<r,c,T> res;
+    mat_multiply<r,c,T>(data, s, res.data);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-mat<T,r,c> mat<T,r,c>::operator/(const T s) const
+mat<r,c,T> mat<r,c,T>::operator/(const T & s) const
 {
-    mat<T,r,c> res;
-    for(uint i=0; i<d; ++i) res.val[i] = val[i] / s;
+    mat<r,c,T> res;
+    mat_divide<r,c,T>(data, s, res.data);
     return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-mat<T,r,c> & mat<T,r,c>::operator+=(const mat<T,r,c> & m)
+mat<r,c,T> & mat<r,c,T>::operator+=(const mat<r,c,T> & v)
 {
-    for(uint i=0; i<d; ++i) val[i] += m.val[i];
+    mat_plus<r,c,T>(data, v.data);
     return *this;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-mat<T,r,c> & mat<T,r,c>::operator-=(const mat<T,r,c> & m)
+mat<r,c,T> & mat<r,c,T>::operator-=(const mat<r,c,T> & v)
 {
-    for(uint i=0; i<d; ++i) val[i] -= m.val[i];
+    mat_minus<r,c,T>(data, v.data);
     return *this;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-mat<T,r,c> & mat<T,r,c>::operator*=(const T s)
+mat<r,c,T> & mat<r,c,T>::operator*=(const T & s)
 {
-    for(uint i=0; i<d; ++i) val[i] *= s;
+    mat_multiply<r,c,T>(data, s);
     return *this;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-mat<T,r,c> & mat<T,r,c>::operator/=(const T s)
+mat<r,c,T> & mat<r,c,T>::operator/=(const T & s)
 {
-    for(uint i=0; i<d; ++i) val[i] /= s;
+    mat_divide<r,c,T>(data, s);
     return *this;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-bool mat<T,r,c>::operator==(const mat<T,r,c> & m) const
+bool mat<r,c,T>::operator==(const mat<r,c,T> & v) const
 {
-    for(uint i=0; i<d; ++i)
-    {
-        if(val[i]!=m.val[i]) return false;
-    }
-    return true;
+    return true;//mat_equals<r,c,T>(data, v.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-bool mat<T,r,c>::operator<(const mat<T,r,c> & m) const
+bool mat<r,c,T>::operator<(const mat<r,c,T> & v) const
 {
-    for(uint i=0; i<d; ++i)
-    {
-        if(val[i]<m.val[i]) return true;
-        if(val[i]>m.val[i]) return false;
-    }
-    return false;
+    return false;//mat_less<r,c,T>(data, v.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-bool mat<T,r,c>::is_null() const
+double mat<r,c,T>::length() const
 {
-    for(uint i=0; i<d; ++i)
-    {
-        if(val[i]!=0) return false;
-    }
-    return true;
+    return 0;//mat_length<r,c,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-bool mat<T,r,c>::is_nan() const
+T mat<r,c,T>::length_sqrd() const
 {
-    for(uint i=0; i<d; ++i)
-    {
-        if(std::isnan(val[i])) return true;
-    }
-    return true;
+    return 0;//mat_length_sqrd<r,c,T>(data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-bool mat<T,r,c>::is_inf() const
+double mat<r,c,T>::dist(const mat<r,c,T> & v) const
 {
-    for(uint i=0; i<d; ++i)
-    {
-        if(std::isinf(val[i])) return true;
-    }
-    return true;
+    return 0;//mat_dist<r,c,T>(data, v.data);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-bool mat<T,r,c>::is_degenerate() const
+T mat<r,c,T>::dist_sqrd(const mat<r,c,T> & v) const
+{
+    return 0;//mat_dist_sqrd<r,c,T>(data, v.data);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::normalize()
+{
+    return 0;//mat_normalize<r,c,T>(data);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::min_entry() const
+{
+    return 0;//mat_min_entry<r,c,T>(data);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::max_entry() const
+{
+    return 0;//mat_max_entry<r,c,T>(data);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::min(const mat<r,c,T> & v) const
+{
+    mat<r,c,T> res;
+    //mat_min<r,c,T>(data, v.data, res.data);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::max(const mat<r,c,T> & v) const
+{
+    mat<r,c,T> res;
+    //mat_max<r,c,T>(data, v.data, res.data);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+bool mat<r,c,T>::is_null() const
+{
+    return 0;//mat_is_null<r,c,T>(data);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+bool mat<r,c,T>::is_nan() const
+{
+    return 0;//mat_is_nan<r,c,T>(data);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+bool mat<r,c,T>::is_inf() const
+{
+    return 0;//mat_is_inf<r,c,T>(data);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+bool mat<r,c,T>::is_degenerate() const
 {
     return is_null() || is_nan() || is_inf();
 }

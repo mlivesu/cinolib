@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2021: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -39,103 +39,66 @@
 #include <cinolib/cino_inline.h>
 #include <initializer_list>
 
-/* Base class for nxm dimensional matrices. */
-
 namespace cinolib
 {
 
-/* row major or column major????
- * perhaps is better column major!
-*/
-
-template<class T, uint r, uint c> // T   => element type (float, double, int,...)
-class mat                         // r,c => matrix rows and columns
+template<uint r, uint c, class T>
+class mat
 {
-    private:
-
-        T val[r][c];
-
     public:
 
-        explicit mat(const T s = 0);
+        T data[r*c];
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        explicit mat(const T & s = 0);
         explicit mat(const std::initializer_list<T> & il);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        static mat<T,r,c> DIAG(const T s);
-        static mat<T,r,c> DIAG(const std::vector<T> & d);
+        static mat<r,c,T> ZERO() { return mat<r,c,T>(0);                                  }
+        static mat<r,c,T> MIN()  { return mat<r,c,T>(std::numeric_limits<T>::min());      }
+        static mat<r,c,T> MAX()  { return mat<r,c,T>(std::numeric_limits<T>::max());      }
+        static mat<r,c,T> INF()  { return mat<r,c,T>(std::numeric_limits<T>::infinity()); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        static mat<T,r,r> SCALING(const std::vector<T> & d);
-        static mat<T,r,r> ROTATION(/* axis , angle */);
+        const T * ptr() const { return data; }
+              T * ptr()       { return data; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        static mat<T,r,c> ZERO() { return mat<T,r,c>(0);                                  }
-        static mat<T,r,c> MIN()  { return mat<T,r,c>(std::numeric_limits<T>::min());      }
-        static mat<T,r,c> MAX()  { return mat<T,r,c>(std::numeric_limits<T>::max());      }
-        static mat<T,r,c> INF()  { return mat<T,r,c>(std::numeric_limits<T>::infinity()); }
+              T          & operator[] (const uint pos);
+        const T          & operator[] (const uint pos)        const;
+              mat<r,c,T>   operator+  (const mat<r,c,T> & v)  const;
+              mat<r,c,T>   operator-  (const mat<r,c,T> & v)  const;
+              mat<r,c,T>   operator-  ()                      const;
+              mat<r,c,T>   operator*  (const T & s)           const;
+              mat<r,c,T>   operator/  (const T & s)           const;
+              mat<r,c,T> & operator+= (const mat<r,c,T> & v);
+              mat<r,c,T> & operator-= (const mat<r,c,T> & v);
+              mat<r,c,T> & operator*= (const T & s);
+              mat<r,c,T> & operator/= (const T & s);
+              bool         operator== (const mat<r,c,T> & v) const;
+              bool         operator<  (const mat<r,c,T> & v) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-              T & at(const uint _r, const uint _c);
-        const T & at(const uint _r, const uint _c) const;
+        T      length_sqrd() const;
+        double length     () const;
+        double dist       (const mat<r,c,T> & v) const;
+        T      dist_sqrd  (const mat<r,c,T> & v) const;
+        T      normalize  ();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        typedef T* T_ptr; // implements the double parenthesis matrix operator
-        T_ptr        operator[] (const uint  i)        const;
-        T            operator[] (const T_ptr ptr)      const;
-
-        mat<T,r,c>   operator+  (const mat<T,r,c> & m) const;
-        mat<T,r,c>   operator-  (const mat<T,r,c> & m) const;
-        mat<T,r,c>   operator-  ()                     const;
-        mat<T,r,c>   operator*  (const T s)            const;
-        vec<T,r>     operator*  (const vec<T,c> v)     const; // mat vec multiplication
-        mat<T,r,c>   operator/  (const T s)            const;
-        mat<T,r,c> & operator+= (const mat<T,r,c> & m);
-        mat<T,r,c> & operator-= (const mat<T,r,c> & m);
-        mat<T,r,c> & operator*= (const T s);
-        mat<T,r,c> & operator/= (const T s);
-        bool         operator== (const mat<T,r,c> & m) const;
+        T        min_entry()                   const;
+        T        max_entry()                   const;
+        mat<r,c,T> min      (const mat<r,c,T> & v) const;
+        mat<r,c,T> max      (const mat<r,c,T> & v) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-              T * ptr();
-        const T * ptr() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void svd()                    const;
-        void ssvd()                   const;
-        void p_norm()                 const;
-        void transposed()             const;
-        void inverse()                const;
-        void eigenvals()              const;
-        void eigenvecs()              const;
-        void det()                    const;
-        void det_Cramer(const uint i) const; // substitutes i-th colum and computes determinant (for Cramer solves)
-        void solve()                  const; // solve linear system m * x = b with Cramer
-        void trace()                  const;
-        void col()                    const;
-        void row()                    const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void affine_map()           const; // finds the affinity that maps two frames (these three are the same!)
-        void deformation_gradient() const; // finds the affinity that maps two frames
-        void change_of_basis()      const; // finds the affinity that maps two frames
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void to_Eigen();
-        void from_Eigen();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        bool is_full_rank()  const;
-        bool is_symmetric()  const;
         bool is_null()       const;
         bool is_nan()        const;
         bool is_inf()        const;
@@ -145,16 +108,21 @@ class mat                         // r,c => matrix rows and columns
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // useful types to have
-typedef mat<double,2,2> mat22d;
-typedef mat<float,2,2>  mat22f;
-typedef mat<double,3,3> mat33d;
-typedef mat<float,3,3>  mat33f;
+//typedef mat<double,2> mat2d;
+//typedef mat<float,2>  mat2f;
+//typedef mat<int,2>    mat2i;
+//typedef mat<double,3> mat3d;
+//typedef mat<float,3>  mat3f;
+//typedef mat<int,3>    mat3i;
+//typedef mat<double,4> mat4d;
+//typedef mat<float,4>  mat4f;
+//typedef mat<int,4>    mat4i;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class T, uint r, uint c>
+template<uint r, uint c, class T>
 CINO_INLINE
-std::ostream & operator<< (std::ostream & in, const mat<T,r,c> & m);
+std::ostream & operator<< (std::ostream & in, const mat<r,c,T> & v);
 
 }
 
