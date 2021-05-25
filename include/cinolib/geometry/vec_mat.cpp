@@ -48,7 +48,7 @@ std::ostream & operator<< (std::ostream & in, const vec_mat<r,c,T> & op)
     for(uint i=0; i<r; ++i)
     for(uint j=0; j<c; ++j)
     {
-        if(j%c==0) std::cout << "\n";
+        if(c>1 && j%c==0) std::cout << "\n";
         std::cout << op.mat[i][j] << " ";
     }
     std::cout << "\n";
