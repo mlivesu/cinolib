@@ -47,7 +47,12 @@ class mat
 {
     public:
 
-        T data[r*c];
+        // this allows to look at the raw data both in vector and matrix form
+        union
+        {
+            T _vec[r*c];
+            T _mat[r][c];
+        };
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -63,8 +68,11 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const T * ptr() const { return data; }
-              T * ptr()       { return data; }
+        const T  * ptr_vec() const { return _vec; }
+              T  * ptr_vec()       { return _vec; }
+
+        const T ** ptr_mat() const { return _mat; }
+              T ** ptr_mat()       { return _mat; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -92,8 +100,8 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        T        min_entry()                   const;
-        T        max_entry()                   const;
+        T          min_entry()                   const;
+        T          max_entry()                   const;
         mat<r,c,T> min      (const mat<r,c,T> & v) const;
         mat<r,c,T> max      (const mat<r,c,T> & v) const;
 

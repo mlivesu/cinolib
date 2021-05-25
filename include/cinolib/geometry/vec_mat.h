@@ -33,17 +33,19 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_VEC_H
-#define CINO_VEC_H
+#ifndef CINO_VEC_MAT_H
+#define CINO_VEC_MAT_H
 
-#include <cinolib/geometry/vec_mat.h>
-#include <initializer_list>
+#include <cinolib/cino_inline.h>
+#include <sys/types.h>
 
 namespace cinolib
 {
 
 /*
- * Cinolib implementation of (column) vectors.
+ * Base class for dense vectors and matrices. This is templated on matrix size (r,c), and scalar type (T).
+ * Data is internally stored as both 1D and 2D C arrays with a shared memory allocation, so that both views
+ * can be efficiently accessed without requiring any type casting.
  *
  * This class is a wrapper for (a subset of) basic linear algebra operations for raw C arrays.
  * The full set of per vector and per matrix functionalities can be directly accessed through
@@ -53,79 +55,72 @@ namespace cinolib
  *    cinolib/geometry/mat_utils.h
 */
 
-template<uint d, class T>
-class vec : public vec_mat<d,1,T>
+template<uint r, uint c, class T>
+class vec_mat
 {
     public:
 
-        explicit vec();
-        explicit vec(const std::initializer_list<T> & il);
-        explicit vec(const T & scalar);
-
-        // Specialized (faster?) for R^2, R^3 and R^4 ::::::::::::::::::::::::::::
-
-        explicit vec(const T & v0, const T & v1);
-        explicit vec(const T & v0, const T & v1, const T & v2);
-        explicit vec(const T & v0, const T & v1, const T & v2, const T & v3);
+        union
+        {
+            T vec[r*c];  // 1D view
+            T mat[r][c]; // 2D view
+        };
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const T * ptr() const { return this->ptr_vec(); }
-              T * ptr()       { return this->ptr_vec(); }
+        explicit vec_mat() {}
+        explicit vec_mat(const T & scalar);
+        virtual ~vec_mat() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        // Specialized Cartesian XYZ access
-        const T & x() const { return this->vec[0]; }
-              T & x()       { return this->vec[0]; }
-        const T & y() const { return this->vec[1]; }
-              T & y()       { return this->vec[1]; }
-        const T & z() const { return this->vec[2]; }
-              T & z()       { return this->vec[2]; }
+        const T *  ptr_vec() const { return vec; }
+              T *  ptr_vec()       { return vec; }
 
-        // Specialized Parametric UVW access
-        const T & u() const { return this->vec[0]; }
-              T & u()       { return this->vec[0]; }
-        const T & v() const { return this->vec[1]; }
-              T & v()       { return this->vec[1]; }
-        const T & w() const { return this->vec[2]; }
-              T & w()       { return this->vec[2]; }
+        const T ** ptr_mat() const { return mat; }
+              T ** ptr_mat()       { return mat; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        T      length_sqrd() const;
-        double length     () const;
-        double dist       (const vec<d,T> & v) const;
-        T      dist_sqrd  (const vec<d,T> & v) const;
-        T      normalize  ();
+              T              & operator[] (const uint pos);
+        const T              & operator[] (const uint pos)            const;
+              vec_mat<r,c,T>   operator-  ()                          const;
+              vec_mat<r,c,T>   operator-  (const vec_mat<r,c,T> & op) const;
+              vec_mat<r,c,T>   operator+  (const vec_mat<r,c,T> & op) const;
+              vec_mat<r,c,T> & operator+= (const vec_mat<r,c,T> & op);
+              vec_mat<r,c,T> & operator-= (const vec_mat<r,c,T> & op);
+              vec_mat<r,c,T>   operator*  (const T & scalar)          const;
+              vec_mat<r,c,T>   operator/  (const T & scalar)          const;
+              vec_mat<r,c,T> & operator*= (const T & scalar);
+              vec_mat<r,c,T> & operator/= (const T & scalar);
+              bool             operator== (const vec_mat<r,c,T> & op) const;
+              bool             operator<  (const vec_mat<r,c,T> & op) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        T              min_entry()                   const;
+        T              max_entry()                   const;
+        vec_mat<r,c,T> min(const vec_mat<r,c,T> & v) const;
+        vec_mat<r,c,T> max(const vec_mat<r,c,T> & v) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        bool is_null()       const;
+        bool is_nan()        const;
+        bool is_inf()        const;
+        bool is_degenerate() const; // either null, nan or inf
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//:::::::::: EXTERNAL BINARY OPERATORS (FOR MORE READABLE CODE) ::::::::::
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint d, class T> CINO_INLINE T        dot      (const vec<d,T> & v0, const vec<d,T> & v1);
-template<        class T> CINO_INLINE vec<3,T> cross    (const vec<3,T> & v0, const vec<3,T> & v1);
-template<uint d, class T> CINO_INLINE T        angle_deg(const vec<d,T> & v0, const vec<d,T> & v1, const bool unit_length = false);
-template<uint d, class T> CINO_INLINE T        angle_rad(const vec<d,T> & v0, const vec<d,T> & v1, const bool unit_length = false);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// useful types to have
-//typedef vec<double,2> vec2d;
-//typedef vec<float,2>  vec2f;
-//typedef vec<int,2>    vec2i;
-//typedef vec<double,3> vec3d;
-//typedef vec<float,3>  vec3f;
-//typedef vec<int,3>    vec3i;
-//typedef vec<double,4> vec4d;
-//typedef vec<float,4>  vec4f;
-//typedef vec<int,4>    vec4i;
+template<uint r, uint c, class T>
+CINO_INLINE
+std::ostream & operator<< (std::ostream & in, const vec_mat<r,c,T> & op);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "vec.cpp"
+#include "vec_mat.cpp"
 #endif
 
-#endif // CINO_VEC_H
+#endif // CINO_VEC_MAT_H
