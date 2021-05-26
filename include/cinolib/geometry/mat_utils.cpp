@@ -219,10 +219,13 @@ void mat_set_rot(T m[2][2], const T ang_rad)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<typename T>
+template<uint r, uint c, typename T>
 CINO_INLINE
-void mat_set_rot(T m[3][3], const T ang_rad, const T axis[3])
-{
+void mat_set_rot(T m[r][c], const T ang_rad, const T axis[3])
+{    
+    assert(r==c);
+    if(r>3) mat_set_diag<r,c,T>(m, 1); // for transformations in homogeneous coordinates
+
     T u     = axis[0];
     T v     = axis[1];
     T w     = axis[2];
@@ -237,6 +240,18 @@ void mat_set_rot(T m[3][3], const T ang_rad, const T axis[3])
     m[0][2] =  v * rsin + u*w*(1-rcos);
     m[1][2] = -u * rsin + v*w*(1-rcos);
     m[2][2] =      rcos + w*w*(1-rcos);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void mat_set_trans(T m[4][4], const T trans[3])
+{
+    mat_set_diag<4,4,T>(m, 1);
+    m[0][4] = trans[0];
+    m[1][4] = trans[1];
+    m[2][4] = trans[2];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

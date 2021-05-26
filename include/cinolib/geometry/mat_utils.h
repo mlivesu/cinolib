@@ -61,11 +61,12 @@ template<uint r, uint c, typename T> CINO_INLINE bool mat_less  (const T ma[r][c
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint r, uint c, typename T> CINO_INLINE void mat_set_full(T m[r][c], const T scalar);
-template<uint r, uint c, typename T> CINO_INLINE void mat_set_diag(T m[r][c], const T scalar);
-template<uint r, uint c, typename T> CINO_INLINE void mat_set_diag(T m[r][c], const T diag[r]);
-template<                typename T> CINO_INLINE void mat_set_rot (T m[2][2], const T ang_rad);
-template<                typename T> CINO_INLINE void mat_set_rot (T m[3][3], const T ang_rad, const T axis[3]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_set_full (T m[r][c], const T scalar);
+template<uint r, uint c, typename T> CINO_INLINE void mat_set_diag (T m[r][c], const T scalar);
+template<uint r, uint c, typename T> CINO_INLINE void mat_set_diag (T m[r][c], const T diag[r]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_set_rot  (T m[r][c], const T ang_rad, const T axis[3]);
+template<                typename T> CINO_INLINE void mat_set_rot  (T m[2][2], const T ang_rad);
+template<                typename T> CINO_INLINE void mat_set_trans(T m[4][4], const T trans[3]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
