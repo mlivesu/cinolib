@@ -379,6 +379,132 @@ bool mat_is_symmetric(const T m[r][c])
 
 template<uint r, uint c, typename T>
 CINO_INLINE
+void mat_svd (const T m[r][c], T S[r][c], T V[], T D[r][c])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_ssvd(const T m[r][c], T S[r][c], T V[], T D[r][c])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+double mat_norm_Frobenius(const T m[r][c])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_eigen_decomp(const T m[r][c], T eval[], T evec[][c])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_eigenvalues(const T m[r][c], T eval[])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_eigenvectors(const T m[r][c], T evec[r][c])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+T mat_det(const T m[r][c])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+T mat_trace(const T m[r][c])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_transposed(const T m[r][c], T tr[r][c])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_inverse(const T m[r][c], T in[r][c])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+T mat_det_Cramer(const T m[r][c])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_solve_w_Cramer(const T m[r][c], const T b[], T x[])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_col(const T m[r][c], T col [])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_row(const T m[r][c], T row [])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_diag(const T m[r][c], T diag[])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_col_ptr(const T m[r][c], const uint i, T *col [])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_row_ptr(T m[r][c], const uint i, T *row [])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_diag_ptr(const T m[r][c], const uint i, T *diag[])
+{}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
 void mat_copy(const T m1[r][c], T m2[r][c])
 {
     std::copy(((T*)m1), ((T*)m1)+(r*c), ((T*)m2));
