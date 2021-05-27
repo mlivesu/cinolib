@@ -33,7 +33,7 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/geometry/mat_utils.h>
+#include <cinolib/geometry/vec_mat_utils.h>
 #include <cinolib/clamp.h>
 #include <cinolib/deg_rad.h>
 #include <ostream>

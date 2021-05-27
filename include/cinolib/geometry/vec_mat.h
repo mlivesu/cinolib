@@ -38,84 +38,137 @@
 
 #include <cinolib/cino_inline.h>
 #include <sys/types.h>
+#include <ostream>
 
 namespace cinolib
 {
 
-/*
- * Base class for dense vectors and matrices. This is templated on matrix size (r,c), and scalar type (T).
- * Data is internally stored as both 1D and 2D C arrays with a shared memory allocation, so that both views
- * can be efficiently accessed without requiring any type casting.
- *
- * This class is a wrapper for (a subset of) basic linear algebra operations for raw C arrays.
- * The full set of per vector and per matrix functionalities can be directly accessed through
- * the original methods, defined in:
- *
- *    cinolib/geometry/vec_utils.h
- *    cinolib/geometry/mat_utils.h
-*/
-
 template<uint r, uint c, class T>
-class vec_mat
+class mat
 {
     public:
 
         union
         {
-            T vec[r*c];  // 1D view
-            T mat[r][c]; // 2D view
+            T _vec[r*c];  // 1D view
+            T _mat[r][c]; // 2D view
         };
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        explicit vec_mat() {}
-        explicit vec_mat(const T & scalar);
-        virtual ~vec_mat() {}
+        explicit mat(const std::initializer_list<T> & il);
+        explicit mat();
+        virtual ~mat();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        const T *  ptr_vec() const { return vec; }
-              T *  ptr_vec()       { return vec; }
-
-        const T ** ptr_mat() const { return mat; }
-              T ** ptr_mat()       { return mat; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-              T              & operator[] (const uint pos);
-        const T              & operator[] (const uint pos)            const;
-              vec_mat<r,c,T>   operator-  ()                          const;
-              vec_mat<r,c,T>   operator-  (const vec_mat<r,c,T> & op) const;
-              vec_mat<r,c,T>   operator+  (const vec_mat<r,c,T> & op) const;
-              vec_mat<r,c,T> & operator+= (const vec_mat<r,c,T> & op);
-              vec_mat<r,c,T> & operator-= (const vec_mat<r,c,T> & op);
-              vec_mat<r,c,T>   operator*  (const T & scalar)          const;
-              vec_mat<r,c,T>   operator/  (const T & scalar)          const;
-              vec_mat<r,c,T> & operator*= (const T & scalar);
-              vec_mat<r,c,T> & operator/= (const T & scalar);
-              bool             operator== (const vec_mat<r,c,T> & op) const;
-              bool             operator<  (const vec_mat<r,c,T> & op) const;
+        static mat<r,c,T> DENSE      (const T   scalar);
+        static mat<r,c,T> DIAGONAL   (const T   scalar);
+        static mat<r,c,T> DIAGONAL   (const T * scalar);
+        static mat<r,c,T> ROTATION   (const T   angle_rad);
+        static mat<r,c,T> ROTATION   (const T   angle_rad, const T * axis);
+        static mat<r,c,T> TRANSLATION(const T * tx);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        T              min_entry()                   const;
-        T              max_entry()                   const;
-        vec_mat<r,c,T> min(const vec_mat<r,c,T> & v) const;
-        vec_mat<r,c,T> max(const vec_mat<r,c,T> & v) const;
+        const T * ptr() const { return _vec; }
+              T * ptr()       { return _vec; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool is_null()       const;
-        bool is_nan()        const;
-        bool is_inf()        const;
-        bool is_degenerate() const; // either null, nan or inf
+        mat<1,c,T> row (const uint i) const;
+        mat<r,1,T> col (const uint i) const;
+        T*         diag()             const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        T          det()       const;
+        T          trace()     const;
+        mat<r,c,T> transpose() const;
+        mat<r,c,T> inverse()   const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void eigenvalues()  const;
+        void eigenvectors() const;
+        void eigendcomp()   const;
+        void SVD()          const;
+        void SSVD()         const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        mat<c,1,T> solve(const mat<c,1,T> & b);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+              T          & operator[] (const uint pos);
+        const T          & operator[] (const uint pos)        const;
+              mat<r,c,T>   operator-  ()                      const;
+              mat<r,c,T>   operator-  (const mat<r,c,T> & op) const;
+              mat<r,c,T>   operator+  (const mat<r,c,T> & op) const;
+              mat<r,c,T> & operator+= (const mat<r,c,T> & op);
+              mat<r,c,T> & operator-= (const mat<r,c,T> & op);
+              mat<r,c,T>   operator*  (const T & scalar)      const;
+              mat<r,c,T>   operator/  (const T & scalar)      const;
+              mat<r,c,T> & operator*= (const T & scalar);
+              mat<r,c,T> & operator/= (const T & scalar);
+              bool         operator== (const mat<r,c,T> & op) const;
+              bool         operator<  (const mat<r,c,T> & op) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        double norm     (const mat<r,c,T> & v) const;
+        double norm_p   (const mat<r,c,T> & v, const float p) const;
+        double dist     (const mat<r,c,T> & v) const;
+        T      norm_sqrd(const mat<r,c,T> & v) const;
+        T      dist_sqrd(const mat<r,c,T> & v) const;
+        double normalize();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        T          min_entry()               const;
+        T          max_entry()               const;
+        mat<r,c,T> min(const mat<r,c,T> & v) const;
+        mat<r,c,T> max(const mat<r,c,T> & v) const;
+        void       clamp(const T min, const T max);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void swap(const uint i, const uint j, const uint k, const uint l);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        bool is_null() const;
+        bool is_nan()  const;
+        bool is_inf()  const;
+        bool is_deg()  const; // either null, nan or inf
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//template<uint d, class T> CINO_INLINE T        dot      (const vec<d,1,T> & v0, const vec<d,1,T> & v1);
+//template<        class T> CINO_INLINE vec<3,T> cross    (const vec<3,T> & v0, const vec<3,T> & v1);
+//template<uint d, class T> CINO_INLINE T        angle_deg(const vec<d,T> & v0, const vec<d,T> & v1, const bool unit_length = false);
+//template<uint d, class T> CINO_INLINE T        angle_rad(const vec<d,T> & v0, const vec<d,T> & v1, const bool unit_length = false);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// useful types to have
+//typedef vec<double,2> vec2d;
+//typedef vec<float,2>  vec2f;
+//typedef vec<int,2>    vec2i;
+//typedef vec<double,3> vec3d;
+//typedef vec<float,3>  vec3f;
+//typedef vec<int,3>    vec3i;
+//typedef vec<double,4> vec4d;
+//typedef vec<float,4>  vec4f;
+//typedef vec<int,4>    vec4i;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint r, uint c, class T>
 CINO_INLINE
-std::ostream & operator<< (std::ostream & in, const vec_mat<r,c,T> & op);
+std::ostream & operator<< (std::ostream & in, const mat<r,c,T> & op);
 
 }
 

@@ -37,6 +37,7 @@
 #define CINO_MAT_UTILS_H
 
 #include <cinolib/cino_inline.h>
+#include <initializer_list>
 #include <sys/types.h>
 
 namespace cinolib
