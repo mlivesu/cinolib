@@ -113,6 +113,7 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<uint d, typename T> CINO_INLINE void   vec_set      (      T * vec, const std::initializer_list<T> & il);
 template<uint d, typename T> CINO_INLINE void   vec_set_dense(      T * vec, const T   val);
 template<uint d, typename T> CINO_INLINE void   vec_plus     (const T * v_0, const T * v_1, T * v_2);
 template<uint d, typename T> CINO_INLINE void   vec_minus    (const T * v_0, const T * v_1, T * v_2);
@@ -121,7 +122,14 @@ template<uint d, typename T> CINO_INLINE void   vec_times    (const T * v_0, con
 template<uint d, typename T> CINO_INLINE void   vec_divide   (const T * v_0, const T   val, T * v_1);
 template<uint d, typename T> CINO_INLINE bool   vec_equals   (const T * v_0, const T * v_1);
 template<uint d, typename T> CINO_INLINE bool   vec_less     (const T * v_0, const T * v_1);
+template<uint d, typename T> CINO_INLINE T      vec_dot      (const T * v_0, const T * v_1);
+template<        typename T> CINO_INLINE void   vec_cross    (const T * v_0, const T * v_1, T *v_2);
+template<uint d, typename T> CINO_INLINE T      vec_angle_deg(const T * v_0, const T * v_1, const bool prenormalize);
+template<uint d, typename T> CINO_INLINE T      vec_angle_rad(const T * v_0, const T * v_1, const bool prenormalize);
+template<uint d, typename T> CINO_INLINE double vec_dist     (const T * v_0, const T * v_1);
+template<uint d, typename T> CINO_INLINE double vec_dist_sqrd(const T * v_0, const T * v_1);
 template<uint d, typename T> CINO_INLINE double vec_norm     (const T * vec);
+template<uint d, typename T> CINO_INLINE double vec_norm_sqrd(const T * vec);
 template<uint d, typename T> CINO_INLINE double vec_norm_p   (const T * vec, const float p);
 template<uint d, typename T> CINO_INLINE double vec_normalize(      T * vec);
 template<uint d, typename T> CINO_INLINE void   vec_min      (const T * v_0, const T * v_1, T * c);
@@ -139,6 +147,7 @@ template<uint d, typename T> CINO_INLINE void   vec_print    (const T * vec);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<uint r, uint c, typename T> CINO_INLINE void mat_set         (      T m[][c], const std::initializer_list<T> & il);
 template<uint d,         typename T> CINO_INLINE void mat_set_diag    (      T m[][d], const T val);
 template<uint d,         typename T> CINO_INLINE void mat_set_diag    (      T m[][d], const T diag[]);
 template<uint d,         typename T> CINO_INLINE void mat_set_rot_2d  (      T m[][d], const T ang_rad);
@@ -155,7 +164,7 @@ template<uint d,         typename T> CINO_INLINE bool mat_is_symmetric(const T m
 template<uint d,         typename T> CINO_INLINE T    mat_trace       (const T m[][d]);
 template<uint d,         typename T> CINO_INLINE T    mat_det         (const T m[][d]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_transpose   (const T m[][c], T tr[][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_inverse     (const T m[][c], T in[][c]);
+template<uint r, uint c, typename T> CINO_INLINE bool mat_inverse     (const T m[][c], T in[][c]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_eigendec    (const T m[][c], T eval[], T evec[][c]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_eigenval    (const T m[][c], T eval[]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_eigenvec    (const T m[][c], T evec[][c]);

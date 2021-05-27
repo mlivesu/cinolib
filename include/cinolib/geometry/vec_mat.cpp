@@ -61,7 +61,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 vec_mat<r,c,T>::vec_mat(const T & scalar)
 {
-    mat_set_full<r,c,T>(mat, scalar);
+//    mat_set_/*full*/<r,c,T>(mat, scalar);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -89,7 +89,7 @@ CINO_INLINE
 vec_mat<r,c,T> vec_mat<r,c,T>::operator+(const vec_mat<r,c,T> & v) const
 {
     vec_mat<r,c,T> res;
-    mat_plus<r,c,T>(mat, v.mat, res.mat);
+//    mat_plus<r,c,T>(mat, v.mat, res.mat);
     return res;
 }
 
@@ -100,7 +100,7 @@ CINO_INLINE
 vec_mat<r,c,T> vec_mat<r,c,T>::operator-(const vec_mat<r,c,T> & v) const
 {
     vec_mat<r,c,T> res;
-    mat_minus<r,c,T>(mat, v.mat, res.mat);
+//    mat_minus<r,c,T>(mat, v.mat, res.mat);
     return res;
 }
 
@@ -111,7 +111,7 @@ CINO_INLINE
 vec_mat<r,c,T> vec_mat<r,c,T>::operator-() const
 {
     vec_mat<r,c,T> res;
-    mat_minus<r,c,T>(mat);
+//    mat_minus<r,c,T>(mat);
     return res;
 }
 
@@ -122,7 +122,7 @@ CINO_INLINE
 vec_mat<r,c,T> vec_mat<r,c,T>::operator*(const T & s) const
 {
     vec_mat<r,c,T> res;
-    mat_times<r,c,T>(mat, s, res.mat);
+//    mat_times<r,c,T>(mat, s, res.mat);
     return res;
 }
 
@@ -133,7 +133,7 @@ CINO_INLINE
 vec_mat<r,c,T> vec_mat<r,c,T>::operator/(const T & s) const
 {
     vec_mat<r,c,T> res;
-    mat_divide<r,c,T>(mat, s, res.mat);
+//    mat_divide<r,c,T>(mat, s, res.mat);
     return res;
 }
 
@@ -143,7 +143,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 vec_mat<r,c,T> & vec_mat<r,c,T>::operator+=(const vec_mat<r,c,T> & v)
 {
-    mat_plus<r,c,T>(mat, v.mat, mat);
+//    mat_plus<r,c,T>(mat, v.mat, mat);
     return *this;
 }
 
@@ -153,7 +153,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 vec_mat<r,c,T> & vec_mat<r,c,T>::operator-=(const vec_mat<r,c,T> & v)
 {
-    mat_minus<r,c,T>(mat, v.mat, mat);
+//    mat_minus<r,c,T>(mat, v.mat, mat);
     return *this;
 }
 
@@ -163,7 +163,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 vec_mat<r,c,T> & vec_mat<r,c,T>::operator*=(const T & s)
 {
-    mat_times<r,c,T>(mat, s, mat);
+//    mat_times<r,c,T>(mat, s, mat);
     return *this;
 }
 
@@ -173,7 +173,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 vec_mat<r,c,T> & vec_mat<r,c,T>::operator/=(const T & s)
 {
-    mat_divide<r,c,T>(mat, s, mat);
+//    mat_divide<r,c,T>(mat, s, mat);
     return *this;
 }
 
@@ -183,7 +183,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 bool vec_mat<r,c,T>::operator==(const vec_mat<r,c,T> & v) const
 {
-    return mat_equals<r,c,T>(mat, v.mat);
+//    return mat_equals<r,c,T>(mat, v.mat);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -192,7 +192,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 bool vec_mat<r,c,T>::operator<(const vec_mat<r,c,T> & v) const
 {
-    return mat_less<r,c,T>(mat, v.mat);
+//    return mat_less<r,c,T>(mat, v.mat);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -201,7 +201,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 T vec_mat<r,c,T>::min_entry() const
 {
-    return mat_min_entry<r,c,T>(mat);
+//    return mat_min_entry<r,c,T>(mat);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -210,7 +210,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 T vec_mat<r,c,T>::max_entry() const
 {
-    return mat_max_entry<r,c,T>(mat);
+//    return mat_max_entry<r,c,T>(mat);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -220,7 +220,7 @@ CINO_INLINE
 vec_mat<r,c,T> vec_mat<r,c,T>::min(const vec_mat<r,c,T> & v) const
 {
     vec_mat<r,c,T> res;
-    mat_min<r,c,T>(mat, v.mat, res.mat);
+//    mat_min<r,c,T>(mat, v.mat, res.mat);
     return res;
 }
 
@@ -231,7 +231,7 @@ CINO_INLINE
 vec_mat<r,c,T> vec_mat<r,c,T>::max(const vec_mat<r,c,T> & v) const
 {
     vec_mat<r,c,T> res;
-    mat_max<r,c,T>(mat, v.mat, res.mat);
+//    mat_max<r,c,T>(mat, v.mat, res.mat);
     return res;
 }
 
@@ -241,7 +241,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 bool vec_mat<r,c,T>::is_null() const
 {
-    return mat_is_null<r,c,T>(mat);
+//    return mat_is_null<r,c,T>(mat);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -250,7 +250,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 bool vec_mat<r,c,T>::is_nan() const
 {
-    return mat_is_nan<r,c,T>(mat);
+//    return mat_is_nan<r,c,T>(mat);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -259,7 +259,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 bool vec_mat<r,c,T>::is_inf() const
 {
-    return mat_is_inf<r,c,T>(mat);
+//    return mat_is_inf<r,c,T>(mat);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -268,7 +268,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 bool vec_mat<r,c,T>::is_degenerate() const
 {
-    return mat_is_degenerate<r,c,T>(mat);
+//    return mat_is_degenerate<r,c,T>(mat);
 }
 
 }

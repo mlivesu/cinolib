@@ -35,12 +35,22 @@
 *********************************************************************************/
 #include <cinolib/geometry/mat_utils.h>
 #include <cinolib/clamp.h>
+#include <cinolib/deg_rad.h>
 #include <ostream>
 #include <cmath>>
 #include <assert.h>
 
 namespace cinolib
 {
+
+template<uint d, typename T>
+CINO_INLINE
+void vec_set(T * v, const std::initializer_list<T> & il)
+{
+    assert(il.size()==d);
+    auto it = il.begin();
+    for(uint i=0; i<d; ++i,++it) v[i] = *it;
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -150,17 +160,114 @@ bool vec_less(const T * v0, const T * v1)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<uint d, typename T>
+CINO_INLINE
+T vec_dot(const T * v0, const T * v1)
+{
+    T res = 0;
+    for(uint i=0; i<d; ++i)
+    {
+        res += v0[i]*v1[i];
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+void vec_cross(const T * v0, const T * v1, T *v2)
+{
+        v2[0] = v0[1] * v1[2] - v0[2] * v1[1];
+        v2[1] = v0[2] * v1[0] - v0[0] * v1[2];
+        v2[2] = v0[0] * v1[1] - v0[1] * v1[0];
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint d, typename T>
+CINO_INLINE
+T vec_angle_deg(const T * v0, const T * v1, const bool prenormalize)
+{
+    return (T)to_deg((double)vec_angle_rad(v0,v1,prenormalize));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint d, typename T>
+CINO_INLINE
+T vec_angle_rad(const T * v0, const T * v1, const bool prenormalize)
+{
+    T dot;
+    if(prenormalize)
+    {
+        // normalize input vecs if they are not known to be BOTH already normal
+        T tmp0[d], tmp1[d];
+        vec_copy(v0, tmp0);
+        vec_copy(v1, tmp1);
+        vec_normalize(tmp0);
+        vec_normalize(tmp1);
+        if(vec_is_deg(tmp0) || vec_is_deg(tmp1))
+        {
+            return std::numeric_limits<T>::infinity();
+        }
+        dot = vec_dot(tmp0,tmp1);
+    }
+    else
+    {
+        dot = vec_dot<d,T>(v0,v1);
+    }
+    return acos(clamp(dot,T(-1),T(1)));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// vector distance (in the L2 sense)
+template<uint d, typename T>
+CINO_INLINE
+double vec_dist_sqrd(const T * v_0, const T * v_1)
+{
+    double res = 0.0;
+    for(uint i=0; i<d; ++i)
+    {
+        T tmp = v_0[i] - v_1[i];
+        res += tmp*tmp;
+    }
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // L2 vector norm
 template<uint d, typename T>
 CINO_INLINE
-double vec_norm(const T * v)
+double vec_norm_sqrd(const T * v)
 {
     double res = 0.0;
     for(uint i=0; i<d; ++i)
     {
         res += v[i]*v[i];
     }
-    return sqrt(res);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// vector distance (in the L2 sense)
+template<uint d, typename T>
+CINO_INLINE
+double vec_dist(const T * v_0, const T * v_1)
+{
+    return sqrt(vec_dist_sqrd(v_0,v_1));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// L2 vector norm
+template<uint d, typename T>
+CINO_INLINE
+double vec_norm(const T * v)
+{
+    return sqrt(vec_norm_sqrd(v));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -233,19 +340,6 @@ CINO_INLINE
 T vec_max_entry(const T * v)
 {
     return *std::max_element(v,v+d);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// element-wise max
-template<uint d, typename T>
-CINO_INLINE
-void vec_max(const T * v0, const T * v1, T * c)
-{
-    for(uint i=0; i<d; ++i)
-    {
-        c[i] = std::max(v0[i], v1[i]);
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -346,6 +440,22 @@ void vec_print(const T * v)
     for(uint i=0; i<d; ++i)
     {
         std::cout << v[i] << " ";
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_set(T m[][c], const std::initializer_list<T> & il)
+{
+    assert(il.size()==r*c);
+    auto it = il.begin();
+    for(uint i=0; i<r; ++i)
+    for(uint j=0; j<c; ++j)
+    {
+        m[i][j] = *it;
+        ++it;
     }
 }
 
@@ -563,7 +673,16 @@ template<uint d, typename T>
 CINO_INLINE
 T mat_det(const T m[][d])
 {
-    assert(false && "TODO");
+    switch(d)
+    {
+        case 2: return m[0][0]*m[1][1] - m[1][0]*m[0][1];
+
+        case 3: return m[0][0] * mat_det( { m[1][1], m[1][2], m[2][1], m[2][2] } ) -
+                       m[0][1] * mat_det( { m[1][0], m[1][2], m[2][0], m[2][2] } ) +
+                       m[0][2] * mat_det( { m[1][0], m[1][1], m[2][0], m[2][1] } );
+
+        default: std::cerr << "mat_determinant: unsupported matrix size" << std::endl;
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -572,8 +691,8 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_transpose(const T m[][c], T tr[][c])
 {
-    for(uint i=0; i<d; ++i)
-    for(uint j=0; j<d; ++j)
+    for(uint i=0; i<r; ++i)
+    for(uint j=0; j<c; ++j)
     {
         tr[j][i] = m[i][j];
     }
@@ -583,27 +702,117 @@ void mat_transpose(const T m[][c], T tr[][c])
 
 template<uint r, uint c, typename T>
 CINO_INLINE
-void mat_inverse(const T m[][c], T in[][c])
+bool mat_inverse(const T m[][c], T in[][c])
 {
-    assert(false && "TODO");
+    assert(r==2 && c==2);
+
+    // https://www.mathsisfun.com/algebra/matrix-inverse.html
+
+    double one_over_det = 1.0 / mat_det(m);
+
+    in[0][0] =  m[1][1] * one_over_det;
+    in[0][1] = -m[0][1] * one_over_det;
+    in[1][0] = -m[1][0] * one_over_det;
+    in[1][1] =  m[0][0] * one_over_det;
+
+    return one_over_det!=0; // false if the matrix is singular
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// matrix eigen values and eigenvectors (from highest to lowest)s
 template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_eigendec(const T m[][c], T eval[], T evec[][c])
 {
-    assert(false && "TODO");
+    assert(r==2 && c==2);
+
+    // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
+
+    mat_eigenval(m, eval);
+
+    if(std::fabs(m[1][0])>1e-5)
+    {
+        vec_set(evec[0], { eval[0]-m[1][1], m[1][0] });
+        vec_set(evec[1], { eval[1]-m[1][1], m[1][0] });
+    }
+    else if(std::fabs(m[0][1])>1e-5)
+    {
+        vec_set(evec[0], { m[0][1], eval[0]-m[0][0] });
+        vec_set(evec[1], { m[0][1], eval[1]-m[0][0] });
+    }
+    else if(m[0][0]>=m[1][1])
+    {
+        vec_set(evec[0], { 1, 0 });
+        vec_set(evec[1], { 0, 1 });
+    }
+    else
+    {
+        vec_set(evec[0], { 0, 1 });
+        vec_set(evec[1], { 1, 0 });
+    }
+
+    vec_normalize(evec[0]);
+    vec_normalize(evec[1]);
+
+//    Eigen::Matrix3d m;
+//    m << a00, a01, a02,
+//         a10, a11, a12,
+//         a20, a21, a22;
+
+//    bool symmetric = (a10==a01) && (a20==a02) && (a21==a12);
+
+//    if(symmetric)
+//    {
+//        // eigen decomposition for self-adjoint matrices
+//        Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eig(m);
+//        assert(eig.info() == Eigen::Success);
+
+//        v_min = vec3d(eig.eigenvectors()(0,0), eig.eigenvectors()(1,0), eig.eigenvectors()(2,0));
+//        v_mid = vec3d(eig.eigenvectors()(0,1), eig.eigenvectors()(1,1), eig.eigenvectors()(2,1));
+//        v_max = vec3d(eig.eigenvectors()(0,2), eig.eigenvectors()(1,2), eig.eigenvectors()(2,2));
+
+//        min = eig.eigenvalues()[0];
+//        mid = eig.eigenvalues()[1];
+//        max = eig.eigenvalues()[2];
+//    }
+//    else
+//    {
+//        // eigen decomposition for general matrices
+//        Eigen::EigenSolver<Eigen::Matrix3d> eig(m);
+//        assert(eig.info() == Eigen::Success);
+
+//        // WARNING: I am taking only the real part!
+//        v_min = vec3d(eig.eigenvectors()(0,0).real(), eig.eigenvectors()(1,0).real(), eig.eigenvectors()(2,0).real());
+//        v_mid = vec3d(eig.eigenvectors()(0,1).real(), eig.eigenvectors()(1,1).real(), eig.eigenvectors()(2,1).real());
+//        v_max = vec3d(eig.eigenvectors()(0,2).real(), eig.eigenvectors()(1,2).real(), eig.eigenvectors()(2,2).real());
+
+//        // WARNING: I am taking only the real part!
+//        min = eig.eigenvalues()[0].real();
+//        mid = eig.eigenvalues()[1].real();
+//        max = eig.eigenvalues()[2].real();
+//    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// matrix eigen values (from highest to lowest)
 template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_eigenval(const T m[][c], T eval[])
 {
+    assert(r==2 && c==2);
 
+    // https://lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
+
+    T m00_2 = m[0][0]*m[0][0];
+    T m01_2 = m[0][1]*m[0][1];
+    T m10_2 = m[1][0]*m[1][0];
+    T m11_2 = m[1][1]*m[0][0];
+    T s1    = m00_2 + m01_2 + m10_2 + m11_2;
+    T s2    = sqrt(std::pow(m00_2 + m01_2 - m10_2 - m11_2,2) + 4*pow(m[0][0]*m[1][0] + m[0][1]*m[1][1],2));
+    eval[0] = sqrt((s1+s2)*0.5);
+    eval[1] = sqrt((s1-s2)*0.5);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -612,7 +821,10 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_eigenvec(const T m[][c], T evec[][c])
 {
+    assert(r==2 && c==2);
 
+    T eval[2];
+    mat_eigendec(m, eval, evec);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
