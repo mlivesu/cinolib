@@ -33,8 +33,8 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_MAT_UTILS_H
-#define CINO_MAT_UTILS_H
+#ifndef CINO_VEC_MAT_UTILS_H
+#define CINO_VEC_MAT_UTILS_H
 
 #include <cinolib/cino_inline.h>
 #include <initializer_list>
@@ -183,7 +183,7 @@ void mat_times(const T m0[][c0], const T m1[][c1], T m2[][c1]);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "mat_utils.cpp"
+#include "vec_mat_utils.cpp"
 #endif
 
-#endif // CINO_MAT_UTILS_H
+#endif // CINO_VEC_MAT_UTILS_H

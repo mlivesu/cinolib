@@ -37,7 +37,7 @@
 #include <cinolib/clamp.h>
 #include <cinolib/deg_rad.h>
 #include <ostream>
-#include <cmath>>
+#include <cmath>
 #include <assert.h>
 
 namespace cinolib
@@ -833,7 +833,7 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_svd(const T m[][c], T S[][r], T V[], T D[][c])
 {
-
+    assert(false && "TODO");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -842,7 +842,7 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_ssvd(const T m[][c], T S[][r], T V[], T D[][c])
 {
-
+    assert(false && "TODO");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -851,7 +851,7 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 T mat_det_Cramer(const T m[][c])
 {
-
+    assert(false && "TODO");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -860,7 +860,7 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_solve_Cramer(const T m[][c], const T b[], T x[])
 {
-
+    assert(false && "TODO");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
