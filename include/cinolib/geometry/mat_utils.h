@@ -42,99 +42,133 @@
 namespace cinolib
 {
 
-template<uint r, uint c, typename T> CINO_INLINE void mat_plus  (const T ma[r][c], const T mb[r][c], T mc[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_minus (const T ma[r][c], const T mb[r][c], T mc[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_minus (      T ma[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_times (const T ma[r][c], const T scalar,   T mb[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_divide(const T ma[r][c], const T scalar,   T mb[r][c]);
+/* Exhaustive list of basic linear algebra operators for vector/matrix
+ * entities represented as plain C-like arrays of some scalar type T
+ *
+ *      T my_vector[size];
+ *      T my_matrix[rows][cols];
+ *
+ * Since both 1d and 2d arrays guarantee contiguous memory allocation,
+ * whenever size = rows * cols, the same portion of memory can be seen
+ * vecnd be processed either as a 2d matrix or as a 1d vector.
+ *
+ * Functions are divided in two main categories:
+ *
+ *    - functions that operate on a serialized list of scalars
+ *    - functions that operate on a 2d array
+ *
+ * For functions of the first type, IO is performed as follows:
+ *
+ *      template<uint d, typename T>
+ *      void my_serial_function(T * array) { ... }
+ *
+ *      my_serial_function<size,T>(my_vector);    // passing a vector
+ *      my_serial_function<rows*cols,T>(my_matrix[0]); // passing a matrix
+ *
+ * For functions of the secont type, IO is performed as follows:
+ *
+ *      template<uint rows, uint cols, typename T>
+ *      void my_matrix_function(T array[][cols]) { ... }
+ *
+ *      my_matrix_function<rows,cols,T>(my_matrix); // passing a matrix
+ *
+ *
+ * Serialized operations that apply to both vectors and matrices
+ *
+ *   - addition
+ *   - subtraction
+ *   - multiplication (scalar)
+ *   - division
+ *   - equals
+ *   - less
+ *   - initialization (dense)
+ *   - min_entry
+ *   - max_entry
+ *   - min
+ *   - max
+ *   - clamp
+ *   - checks for null / inf / nan elements
+ *   - copy
+ *   - norm / distance
+ *   - normalization
+ *   - print
+ *   - dot product
+ *   - cross product
+ *   - angles
+ *
+ * Non serialized operations that apply to 2D arrays:
+ *
+ *   - matrix multiplication
+ *   - initialization (diagonal, rotation 2D or 3D, translation)
+ *   - svd / ssvd
+ *   - eigen values / vectors
+ *   - determinant
+ *   - trace
+ *   - inverse
+ *   - transposed
+ *   - symmetry check
+ *   - linear solves (with Cramer)
+ *   - row/col access
+*/
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint ra, uint ca, uint rb, uint cb, typename T>
+template<uint d, typename T> CINO_INLINE void   vec_set_dense(      T * vec, const T   val);
+template<uint d, typename T> CINO_INLINE void   vec_plus     (const T * v_0, const T * v_1, T * v_2);
+template<uint d, typename T> CINO_INLINE void   vec_minus    (const T * v_0, const T * v_1, T * v_2);
+template<uint d, typename T> CINO_INLINE void   vec_minus    (      T * vec);
+template<uint d, typename T> CINO_INLINE void   vec_times    (const T * v_0, const T   val, T * v_1);
+template<uint d, typename T> CINO_INLINE void   vec_divide   (const T * v_0, const T   val, T * v_1);
+template<uint d, typename T> CINO_INLINE bool   vec_equals   (const T * v_0, const T * v_1);
+template<uint d, typename T> CINO_INLINE bool   vec_less     (const T * v_0, const T * v_1);
+template<uint d, typename T> CINO_INLINE double vec_norm     (const T * vec);
+template<uint d, typename T> CINO_INLINE double vec_norm_p   (const T * vec, const float p);
+template<uint d, typename T> CINO_INLINE double vec_normalize(      T * vec);
+template<uint d, typename T> CINO_INLINE void   vec_min      (const T * v_0, const T * v_1, T * c);
+template<uint d, typename T> CINO_INLINE void   vec_max      (const T * v_0, const T * v_1, T * c);
+template<uint d, typename T> CINO_INLINE T      vec_min_entry(const T * vec);
+template<uint d, typename T> CINO_INLINE T      vec_max_entry(const T * vec);
+template<uint d, typename T> CINO_INLINE void   vec_clamp    (const T * vec, const T min, const T max);
+template<uint d, typename T> CINO_INLINE void   vec_swap     (      T * vec, const uint i, const uint j);
+template<uint d, typename T> CINO_INLINE bool   vec_is_null  (const T * vec);
+template<uint d, typename T> CINO_INLINE bool   vec_is_nan   (const T * vec);
+template<uint d, typename T> CINO_INLINE bool   vec_is_inf   (const T * vec);
+template<uint d, typename T> CINO_INLINE bool   vec_is_deg   (const T * vec);
+template<uint d, typename T> CINO_INLINE void   vec_copy     (const T * v_0, T * v_1);
+template<uint d, typename T> CINO_INLINE void   vec_print    (const T * vec);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint d,         typename T> CINO_INLINE void mat_set_diag    (      T m[][d], const T val);
+template<uint d,         typename T> CINO_INLINE void mat_set_diag    (      T m[][d], const T diag[]);
+template<uint d,         typename T> CINO_INLINE void mat_set_rot_2d  (      T m[][d], const T ang_rad);
+template<uint d,         typename T> CINO_INLINE void mat_set_rot_3d  (      T m[][d], const T ang_rad, const T axis[]);
+template<uint d,         typename T> CINO_INLINE void mat_set_trans   (      T m[][d], const T tx[]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_swap        (      T m[][c], const uint i, const uint j, const uint k, const uint l);
+template<uint r, uint c, typename T> CINO_INLINE void mat_col         (const T m[][c], const uint i, T  col []);
+template<uint r, uint c, typename T> CINO_INLINE void mat_row         (const T m[][c], const uint i, T  row []);
+template<uint d,         typename T> CINO_INLINE void mat_diag        (const T m[][d], const         T  diag[]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_col_ptr     (const T m[][c], const uint i, T *col []);
+template<uint r, uint c, typename T> CINO_INLINE void mat_row_ptr     (      T m[][c], const uint i, T *row []);
+template<uint d,         typename T> CINO_INLINE void mat_diag_ptr    (const T m[][d],               T *diag[]);
+template<uint d,         typename T> CINO_INLINE bool mat_is_symmetric(const T m[][d]);
+template<uint d,         typename T> CINO_INLINE T    mat_trace       (const T m[][d]);
+template<uint d,         typename T> CINO_INLINE T    mat_det         (const T m[][d]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_transpose   (const T m[][c], T tr[][c]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_inverse     (const T m[][c], T in[][c]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_eigendec    (const T m[][c], T eval[], T evec[][c]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_eigenval    (const T m[][c], T eval[]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_eigenvec    (const T m[][c], T evec[][c]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_svd         (const T m[][c], T S[][r], T V[], T D[][c]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_ssvd        (const T m[][c], T S[][r], T V[], T D[][c]);
+template<uint r, uint c, typename T> CINO_INLINE T    mat_det_Cramer  (const T m[][c]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_solve_Cramer(const T m[][c], const T b[], T x[]);
+template<uint r, uint c, typename T> CINO_INLINE T    mat_copy        (const T m[][c], T n[][c]);
+template<uint r, uint c, typename T> CINO_INLINE T    mat_print       (const T m[][c]);
+
+template<uint r0, uint c0, uint c1, typename T>
 CINO_INLINE
-void mat_times(const T ma[ra][ca], const T mb[rb][cb], T mc[ra][cb]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE bool mat_equals(const T ma[r][c], const T mb[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE bool mat_less  (const T ma[r][c], const T mb[r][c]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE void mat_set_full (T m[r][c], const T scalar);
-template<uint r, uint c, typename T> CINO_INLINE void mat_set_diag (T m[r][c], const T scalar);
-template<uint r, uint c, typename T> CINO_INLINE void mat_set_diag (T m[r][c], const T diag[r]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_set_rot  (T m[r][c], const T ang_rad, const T axis[3]);
-template<                typename T> CINO_INLINE void mat_set_rot  (T m[2][2], const T ang_rad);
-template<                typename T> CINO_INLINE void mat_set_trans(T m[4][4], const T trans[3]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE void mat_min      (const T m1[r][c], const T m2[r][c], T m3[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_max      (const T m1[r][c], const T m2[r][c], T m3[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE T    mat_min_entry(const T m1[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE T    mat_max_entry(const T m1[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_clamp    (const T m1[r][c], const T min, const T max);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE bool mat_is_null      (const T m[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE bool mat_is_nan       (const T m[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE bool mat_is_inf       (const T m[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE bool mat_is_degenerate(const T m[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE bool mat_is_symmetric (const T m[r][c]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE void mat_svd (const T m[r][c], T S[r][c], T V[], T D[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_ssvd(const T m[r][c], T S[r][c], T V[], T D[r][c]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE double mat_norm_Frobenius(const T m[r][c]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE void mat_eigen_decomp(const T m[r][c], T eval[], T evec[][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_eigenvalues (const T m[r][c], T eval[]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_eigenvectors(const T m[r][c], T evec[r][c]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE T mat_det  (const T m[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE T mat_trace(const T m[r][c]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE void mat_transposed(const T m[r][c], T tr[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_inverse   (const T m[r][c], T in[r][c]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE T    mat_det_Cramer    (const T m[r][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_solve_w_Cramer(const T m[r][c], const T b[], T x[]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE void mat_col (const T m[r][c], T col []);
-template<uint r, uint c, typename T> CINO_INLINE void mat_row (const T m[r][c], T row []);
-template<uint r, uint c, typename T> CINO_INLINE void mat_diag(const T m[r][c], T diag[]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE void mat_col_ptr (const T m[r][c], const uint i, T *col []);
-template<uint r, uint c, typename T> CINO_INLINE void mat_row_ptr (      T m[r][c], const uint i, T *row []);
-template<uint r, uint c, typename T> CINO_INLINE void mat_diag_ptr(const T m[r][c], const uint i, T *diag[]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE void mat_copy(const T m1[r][c], T m2[r][c]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T> CINO_INLINE void mat_print(const T m[r][c]);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+void mat_times(const T m0[][c0], const T m1[][c1], T m2[][c1]);
 
 }
 
