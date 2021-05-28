@@ -101,7 +101,7 @@ mat<r,c,T> mat<r,c,T>::DIAG(const mat<r,1,T> & diag)
 {
     assert(r==c);
     mat<r,c,T> m;
-    mat_set_diag<r,c,T>(m._mat, diag._vec);
+    mat_set_diag<r,T>(m._mat, diag._vec);
     return m;
 }
 
@@ -133,12 +133,46 @@ mat<r,c,T> mat<r,c,T>::ROT_3D(const mat<r,1,T> & axis, const T angle_rad)
 
 template<uint r, uint c, class T>
 CINO_INLINE
-mat<r,c,T> mat<r,c,T>::TRANS(const mat<r,1,T> & tx)
+mat<r,c,T> mat<r,c,T>::TRANS(const mat<r-1,1,T> & tx)
 {
     assert(r==c);
     mat<r,c,T> m;
     mat_set_trans<r,T>(m._mat, tx._vec);
     return m;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<c,1,T> mat<r,c,T>::row(const uint i) const
+{
+    mat<c,1,T> row;
+    mat_row<r,c,T>(_mat, i, row._vec);
+    return row;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,1,T> mat<r,c,T>::col(const uint i) const
+{
+    mat<r,1,T> col;
+    mat_col<r,c,T>(_mat, i, col._vec);
+    return col;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,1,T> mat<r,c,T>::diag() const
+{
+    assert(r==c);
+    mat<r,1,T> diag;
+    mat_diag<r,T>(_mat, diag._vec);
+    return diag;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

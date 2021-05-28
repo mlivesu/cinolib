@@ -614,9 +614,8 @@ CINO_INLINE
 void mat_diag(const T m[][d], T diag[])
 {
     for(uint i=0; i<d; ++i)
-    for(uint j=0; j<d; ++j)
     {
-        diag[i] = m[i][j];
+        diag[i] = m[i][i];
     }
 }
 

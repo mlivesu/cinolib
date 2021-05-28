@@ -65,9 +65,9 @@ class mat
 
         static mat<r,c,T> ZERO  ();
         static mat<r,c,T> DIAG  (const T scalar);
-        static mat<r,c,T> DIAG  (const mat<r,1,T> & diag);
-        static mat<r,c,T> TRANS (const mat<r,1,T> & tx);
-        static mat<r,c,T> ROT_3D(const mat<r,1,T> & axis, const T angle_rad);
+        static mat<r,c,T> DIAG  (const mat<r,  1,T> & diag);
+        static mat<r,c,T> TRANS (const mat<r-1,1,T> & tx);
+        static mat<r,c,T> ROT_3D(const mat<r,  1,T> & axis, const T angle_rad);
         static mat<r,c,T> ROT_2D(const T angle_rad);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -77,9 +77,9 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        mat<1,c,T> row (const uint i) const;
+        mat<c,1,T> row (const uint i) const;
         mat<r,1,T> col (const uint i) const;
-        T*         diag()             const;
+        mat<r,1,T> diag()             const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
