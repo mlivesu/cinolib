@@ -151,6 +151,8 @@ template<uint d, typename T> CINO_INLINE void   vec_print    (const T * vec);
 template<uint r, uint c, typename T> CINO_INLINE void mat_set         (      T m[][c], const std::initializer_list<T> & il);
 template<uint d,         typename T> CINO_INLINE void mat_set_diag    (      T m[][d], const T val);
 template<uint d,         typename T> CINO_INLINE void mat_set_diag    (      T m[][d], const T diag[]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_set_col     (const T m[][c], const uint i, T col []);
+template<uint r, uint c, typename T> CINO_INLINE void mat_set_row     (const T m[][c], const uint i, T row []);
 template<uint d,         typename T> CINO_INLINE void mat_set_rot_2d  (      T m[][d], const T ang_rad);
 template<uint d,         typename T> CINO_INLINE void mat_set_rot_3d  (      T m[][d], const T ang_rad, const T axis[]);
 template<uint d,         typename T> CINO_INLINE void mat_set_trans   (      T m[][d], const T tx[]);
@@ -171,8 +173,7 @@ template<uint r, uint c, typename T> CINO_INLINE void mat_eigenval    (const T m
 template<uint r, uint c, typename T> CINO_INLINE void mat_eigenvec    (const T m[][c], T evec[][c]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_svd         (const T m[][c], T S[][r], T V[], T D[][c]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_ssvd        (const T m[][c], T S[][r], T V[], T D[][c]);
-template<uint r, uint c, typename T> CINO_INLINE T    mat_det_Cramer  (const T m[][c]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_solve_Cramer(const T m[][c], const T b[], T x[]);
+template<uint d,         typename T> CINO_INLINE void mat_solve_Cramer(const T m[][d], const T b[], T x[]);
 template<uint r, uint c, typename T> CINO_INLINE T    mat_copy        (const T m[][c], T n[][c]);
 template<uint r, uint c, typename T> CINO_INLINE T    mat_print       (const T m[][c]);
 

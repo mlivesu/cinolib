@@ -57,17 +57,18 @@ class mat
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         explicit mat(const std::initializer_list<T> & il);
-        explicit mat();
-        virtual ~mat();
+        explicit mat(const T scalar);
+        explicit mat() {}
+        virtual ~mat() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        static mat<r,c,T> DENSE      (const T   scalar);
-        static mat<r,c,T> DIAGONAL   (const T   scalar);
-        static mat<r,c,T> DIAGONAL   (const T * scalar);
-        static mat<r,c,T> ROTATION   (const T   angle_rad);
-        static mat<r,c,T> ROTATION   (const T   angle_rad, const T * axis);
-        static mat<r,c,T> TRANSLATION(const T * tx);
+        static mat<r,c,T> ZERO  ();
+        static mat<r,c,T> DIAG  (const T scalar);
+        static mat<r,c,T> DIAG  (const mat<r,1,T> & diag);
+        static mat<r,c,T> TRANS (const mat<r,1,T> & tx);
+        static mat<r,c,T> ROT_3D(const mat<r,1,T> & axis, const T angle_rad);
+        static mat<r,c,T> ROT_2D(const T angle_rad);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -89,6 +90,7 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        // move outside?
         void eigenvalues()  const;
         void eigenvectors() const;
         void eigendcomp()   const;
@@ -101,19 +103,21 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-              T          & operator[] (const uint pos);
-        const T          & operator[] (const uint pos)        const;
-              mat<r,c,T>   operator-  ()                      const;
-              mat<r,c,T>   operator-  (const mat<r,c,T> & op) const;
-              mat<r,c,T>   operator+  (const mat<r,c,T> & op) const;
+        const T          & operator[] (const uint i)  const;
+              T          & operator[] (const uint i);
+        const T          & operator() (const uint i, const uint j)  const;
+              T          & operator() (const uint i, const uint j);
+              mat<r,c,T>   operator-  ()                            const;
+              mat<r,c,T>   operator-  (const mat<r,c,T> & op)       const;
+              mat<r,c,T>   operator+  (const mat<r,c,T> & op)       const;
               mat<r,c,T> & operator+= (const mat<r,c,T> & op);
               mat<r,c,T> & operator-= (const mat<r,c,T> & op);
-              mat<r,c,T>   operator*  (const T & scalar)      const;
-              mat<r,c,T>   operator/  (const T & scalar)      const;
+              mat<r,c,T>   operator*  (const T & scalar)            const;
+              mat<r,c,T>   operator/  (const T & scalar)            const;
               mat<r,c,T> & operator*= (const T & scalar);
               mat<r,c,T> & operator/= (const T & scalar);
-              bool         operator== (const mat<r,c,T> & op) const;
-              bool         operator<  (const mat<r,c,T> & op) const;
+              bool         operator== (const mat<r,c,T> & op)       const;
+              bool         operator<  (const mat<r,c,T> & op)       const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -154,6 +158,19 @@ class mat
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // useful types to have
+
+typedef mat<2,2,double> mat22d;
+typedef mat<2,2,float>  mat22f;
+typedef mat<2,2,int>    mat22i;
+
+typedef mat<3,3,double> mat33d;
+typedef mat<3,3,float>  mat33f;
+typedef mat<3,3,int>    mat33i;
+
+typedef mat<4,4,double> mat44d;
+typedef mat<4,4,float>  mat44f;
+typedef mat<4,4,int>    mat44i;
+
 //typedef vec<double,2> vec2d;
 //typedef vec<float,2>  vec2f;
 //typedef vec<int,2>    vec2i;

@@ -175,7 +175,7 @@ T vec_dot(const T * v0, const T * v1)
 
 template<typename T>
 CINO_INLINE
-void vec_cross(const T * v0, const T * v1, T *v2)
+void vec_cross(const T * v0, const T * v1, T * v2)
 {
         v2[0] = v0[1] * v1[2] - v0[2] * v1[1];
         v2[1] = v0[2] * v1[0] - v0[0] * v1[2];
@@ -188,7 +188,7 @@ template<uint d, typename T>
 CINO_INLINE
 T vec_angle_deg(const T * v0, const T * v1, const bool prenormalize)
 {
-    return (T)to_deg((double)vec_angle_rad(v0,v1,prenormalize));
+    return (T)to_deg((double)vec_angle_rad<d,T>(v0,v1,prenormalize));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -202,15 +202,15 @@ T vec_angle_rad(const T * v0, const T * v1, const bool prenormalize)
     {
         // normalize input vecs if they are not known to be BOTH already normal
         T tmp0[d], tmp1[d];
-        vec_copy(v0, tmp0);
-        vec_copy(v1, tmp1);
-        vec_normalize(tmp0);
-        vec_normalize(tmp1);
-        if(vec_is_deg(tmp0) || vec_is_deg(tmp1))
+        vec_copy<d,T>(v0, tmp0);
+        vec_copy<d,T>(v1, tmp1);
+        vec_normalize<d,T>(tmp0);
+        vec_normalize<d,T>(tmp1);
+        if(vec_is_deg<d,T>(tmp0) || vec_is_deg<d,T>(tmp1))
         {
             return std::numeric_limits<T>::infinity();
         }
-        dot = vec_dot(tmp0,tmp1);
+        dot = vec_dot<d,T>(tmp0,tmp1);
     }
     else
     {
@@ -257,7 +257,7 @@ template<uint d, typename T>
 CINO_INLINE
 double vec_dist(const T * v_0, const T * v_1)
 {
-    return sqrt(vec_dist_sqrd(v_0,v_1));
+    return sqrt(vec_dist_sqrd<d,T>(v_0,v_1));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -267,7 +267,7 @@ template<uint d, typename T>
 CINO_INLINE
 double vec_norm(const T * v)
 {
-    return sqrt(vec_norm_sqrd(v));
+    return sqrt(vec_norm_sqrd<d,T>(v));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -292,9 +292,9 @@ template<uint d, typename T>
 CINO_INLINE
 double vec_normalize(T * v)
 {
-    double n = vec_norm(v);
-    if(vec_is_deg(v)) return -1;
-    vec_divide(v,n,v);
+    double n = vec_norm<d,T>(v);
+    if(vec_is_deg<d,T>(v)) return -1;
+    vec_divide<d,T>(v,n,v);
     return n;
 }
 
@@ -303,11 +303,11 @@ double vec_normalize(T * v)
 // element-wise min
 template<uint d, typename T>
 CINO_INLINE
-void vec_min(const T * v0, const T * v1, T * c)
+void vec_min(const T * v0, const T * v1, T * v2)
 {
     for(uint i=0; i<d; ++i)
     {
-        c[i] = std::min(v0[i], v1[i]);
+        v2[i] = std::min(v0[i], v1[i]);
     }
 }
 
@@ -316,11 +316,11 @@ void vec_min(const T * v0, const T * v1, T * c)
 // element-wise max
 template<uint d, typename T>
 CINO_INLINE
-void vec_max(const T * v0, const T * v1, T * c)
+void vec_max(const T * v0, const T * v1, T * v2)
 {
     for(uint i=0; i<d; ++i)
     {
-        c[i] = std::max(v0[i], v1[i]);
+        v2[i] = std::max(v0[i], v1[i]);
     }
 }
 
@@ -419,7 +419,7 @@ bool vec_is_deg(const T * v)
     {
         if(std::isinf(v[i]) || std::isnan(v[i])) return true;
     }
-    return vec_is_null(v);
+    return vec_is_null<d,T>(v);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -489,13 +489,37 @@ void mat_set_diag(T m[][d], const T diag[])
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_set_row(T m[][c], const uint i, const T row[])
+{
+    for(uint j=0; j<c; ++j)
+    {
+        m[i][j] = row[j];
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, typename T>
+CINO_INLINE
+void mat_set_col(T m[][c], const uint i, const T col[])
+{
+    for(uint j=0; j<r; ++j)
+    {
+        m[j][i] = col[j];
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // initialize 2D rotation matrix
 template<uint d,typename T>
 CINO_INLINE
 void mat_set_rot_2d(T m[][d], const T ang_rad)
 {
     assert(d==2 || d==3);
-    if(d==3) mat_set_diag(m,1); // for transformations in homogeneous coordinates
+    if(d==3) mat_set_diag<d,T>(m,1); // for transformations in homogeneous coordinates
 
     T rcos  = (T)cos(ang_rad);
     T rsin  = (T)sin(ang_rad);
@@ -513,7 +537,7 @@ CINO_INLINE
 void mat_set_rot_3d(T m[][d], const T ang_rad, const T axis[])
 {
     assert(d==3 || d==4);
-    if(d==4) mat_set_diag(m, 1); // for transformations in homogeneous coordinates
+    if(d==4) mat_set_diag<d,T>(m, 1); // for transformations in homogeneous coordinates
 
     T u     = axis[0];
     T v     = axis[1];
@@ -534,13 +558,13 @@ void mat_set_rot_3d(T m[][d], const T ang_rad, const T axis[])
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // initialize translation matrix
-// NOTE: translation is a non linear operation. Homogeneous coordinates
-// are assumed here, hence tx is a (d-1) vector
+// NOTE: translation is a non linear operation.
+// Homogeneous coordinates are assumed here, hence tx is supposed to be a (d-1) vector
 template<uint d, typename T>
 CINO_INLINE
 void mat_set_trans(T m[][d], const T tx[])
 {
-    mat_set_diag(m,1);
+    mat_set_diag<d,T>(m,1);
     for(uint i=0; i<d-1; ++i)
     {
         m[i][d-1] = tx[i];
@@ -677,9 +701,9 @@ T mat_det(const T m[][d])
     {
         case 2: return m[0][0]*m[1][1] - m[1][0]*m[0][1];
 
-        case 3: return m[0][0] * mat_det( { m[1][1], m[1][2], m[2][1], m[2][2] } ) -
-                       m[0][1] * mat_det( { m[1][0], m[1][2], m[2][0], m[2][2] } ) +
-                       m[0][2] * mat_det( { m[1][0], m[1][1], m[2][0], m[2][1] } );
+        case 3: return m[0][0] * mat_det<d-1,T>( { m[1][1], m[1][2], m[2][1], m[2][2] } ) -
+                       m[0][1] * mat_det<d-1,T>( { m[1][0], m[1][2], m[2][0], m[2][2] } ) +
+                       m[0][2] * mat_det<d-1,T>( { m[1][0], m[1][1], m[2][0], m[2][1] } );
 
         default: std::cerr << "mat_determinant: unsupported matrix size" << std::endl;
     }
@@ -729,31 +753,31 @@ void mat_eigendec(const T m[][c], T eval[], T evec[][c])
 
     // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
 
-    mat_eigenval(m, eval);
+    mat_eigenval<r,c,T>(m, eval);
 
     if(std::fabs(m[1][0])>1e-5)
     {
-        vec_set(evec[0], { eval[0]-m[1][1], m[1][0] });
-        vec_set(evec[1], { eval[1]-m[1][1], m[1][0] });
+        vec_set<2,T>(evec[0], { eval[0]-m[1][1], m[1][0] });
+        vec_set<2,T>(evec[1], { eval[1]-m[1][1], m[1][0] });
     }
     else if(std::fabs(m[0][1])>1e-5)
     {
-        vec_set(evec[0], { m[0][1], eval[0]-m[0][0] });
-        vec_set(evec[1], { m[0][1], eval[1]-m[0][0] });
+        vec_set<2,T>(evec[0], { m[0][1], eval[0]-m[0][0] });
+        vec_set<2,T>(evec[1], { m[0][1], eval[1]-m[0][0] });
     }
     else if(m[0][0]>=m[1][1])
     {
-        vec_set(evec[0], { 1, 0 });
-        vec_set(evec[1], { 0, 1 });
+        vec_set<2,T>(evec[0], { 1, 0 });
+        vec_set<2,T>(evec[1], { 0, 1 });
     }
     else
     {
-        vec_set(evec[0], { 0, 1 });
-        vec_set(evec[1], { 1, 0 });
+        vec_set<2,T>(evec[0], { 0, 1 });
+        vec_set<2,T>(evec[1], { 1, 0 });
     }
 
-    vec_normalize(evec[0]);
-    vec_normalize(evec[1]);
+    vec_normalize<2,T>(evec[0]);
+    vec_normalize<2,T>(evec[1]);
 
 //    Eigen::Matrix3d m;
 //    m << a00, a01, a02,
@@ -824,7 +848,7 @@ void mat_eigenvec(const T m[][c], T evec[][c])
     assert(r==2 && c==2);
 
     T eval[2];
-    mat_eigendec(m, eval, evec);
+    mat_eigendec<r,c,T>(m, eval, evec);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -834,6 +858,7 @@ CINO_INLINE
 void mat_svd(const T m[][c], T S[][r], T V[], T D[][c])
 {
     assert(false && "TODO");
+    mat_ssvd<r,c,T>(m,S,V,D);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -843,24 +868,28 @@ CINO_INLINE
 void mat_ssvd(const T m[][c], T S[][r], T V[], T D[][c])
 {
     assert(false && "TODO");
+    mat_svd<r,c,T>(m,S,V,D);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint r, uint c, typename T>
+template<uint d, typename T>
 CINO_INLINE
-T mat_det_Cramer(const T m[][c])
+void mat_solve_Cramer(const T m[][d], const T b[], T x[])
 {
-    assert(false && "TODO");
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, typename T>
-CINO_INLINE
-void mat_solve_Cramer(const T m[][c], const T b[], T x[])
-{
-    assert(false && "TODO");
+    T det = mat_det<d,T>(m);
+    if(det==0)
+    {
+        vec_set_dense<d,T>(x,0);
+        return;
+    }
+    for(uint i=0; i<d; ++i)
+    {
+        T m_i[d][d];
+        mat_copy<d,d,T>(m, m_i);
+        mat_set_col<d,d,T>(m_i, i, b);
+        x[i] = mat_det<d,T>(m_i) / det;
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -49,9 +49,114 @@ std::ostream & operator<< (std::ostream & in, const mat<r,c,T> & op)
     for(uint j=0; j<c; ++j)
     {
         if(i>0 && c>1 && j%c==0) std::cout << "\n";
-        std::cout << op.mat[i][j] << " ";
+        std::cout << op(i,j) << " ";
     }
     return in;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T>::mat(const std::initializer_list<T> & il)
+{
+    mat_set<r,c,T>(_mat, il);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T>::mat(const T scalar)
+{
+    vec_set_dense<r*c,T>(_vec, scalar);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::ZERO()
+{
+    return mat<r,c,T>(0);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::DIAG(const T scalar)
+{
+    assert(r==c);
+    mat<r,c,T> m;
+    mat_set_diag<r,T>(m._mat, scalar);
+    return m;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::DIAG(const mat<r,1,T> & diag)
+{
+    assert(r==c);
+    mat<r,c,T> m;
+    mat_set_diag<r,c,T>(m._mat, diag._vec);
+    return m;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::ROT_2D(const T angle_rad)
+{
+    assert(r==c);
+    mat<r,c,T> m;
+    mat_set_rot_2d<r,T>(m._mat, angle_rad);
+    return m;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::ROT_3D(const mat<r,1,T> & axis, const T angle_rad)
+{
+    assert(r==c);
+    mat<r,c,T> m;
+    mat_set_rot_3d<r,T>(m._mat, angle_rad, axis._vec);
+    return m;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::TRANS(const mat<r,1,T> & tx)
+{
+    assert(r==c);
+    mat<r,c,T> m;
+    mat_set_trans<r,T>(m._mat, tx._vec);
+    return m;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+const T & mat<r,c,T>::operator()(const uint i, const uint j) const
+{
+    return _mat[i][j];
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T & mat<r,c,T>::operator()(const uint i, const uint j)
+{
+    return _mat[i][j];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
