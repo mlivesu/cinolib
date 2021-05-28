@@ -137,7 +137,7 @@ template<uint d, typename T> CINO_INLINE void   vec_min      (const T * v_0, con
 template<uint d, typename T> CINO_INLINE void   vec_max      (const T * v_0, const T * v_1, T * c);
 template<uint d, typename T> CINO_INLINE T      vec_min_entry(const T * vec);
 template<uint d, typename T> CINO_INLINE T      vec_max_entry(const T * vec);
-template<uint d, typename T> CINO_INLINE void   vec_clamp    (const T * vec, const T min, const T max);
+template<uint d, typename T> CINO_INLINE void   vec_clamp    (      T * vec, const T min, const T max);
 template<uint d, typename T> CINO_INLINE void   vec_swap     (      T * vec, const uint i, const uint j);
 template<uint d, typename T> CINO_INLINE bool   vec_is_null  (const T * vec);
 template<uint d, typename T> CINO_INLINE bool   vec_is_nan   (const T * vec);

@@ -432,4 +432,100 @@ double mat<r,c,T>::normalize()
     return vec_normalize<r*c,T>(_vec);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::min_entry() const
+{
+    return vec_min_entry<r*c,T>(_vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::max_entry() const
+{
+    return vec_max_entry<r*c,T>(_vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::min(const mat<r,c,T> & v) const
+{
+    mat<r,c,T> res;
+    vec_min<r*c,T>(_vec, v._vec, res._vec);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::max(const mat<r,c,T> & v) const
+{
+    mat<r,c,T> res;
+    vec_max<r*c,T>(_vec, v._vec, res._vec);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+void mat<r,c,T>::clamp(const T min, const T max)
+{
+    vec_clamp<r*c,T>(_vec, min, max);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+void mat<r,c,T>::swap(const uint i, const uint j, const uint k, const uint l)
+{
+    mat_swap<r,c,T>(_mat, i, j, k, l);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+bool mat<r,c,T>::is_null() const
+{
+    return vec_is_null<r*c,T>(_vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+bool mat<r,c,T>::is_nan() const
+{
+    return vec_is_nan<r*c,T>(_vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+bool mat<r,c,T>::is_inf() const
+{
+    return vec_is_inf<r*c,T>(_vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+bool mat<r,c,T>::is_deg() const // either null, nan or inf
+{
+    return vec_is_deg<r*c,T>(_vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 }

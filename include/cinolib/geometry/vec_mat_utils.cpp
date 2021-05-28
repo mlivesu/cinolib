@@ -347,7 +347,7 @@ T vec_max_entry(const T * v)
 // element-wise clamp
 template<uint d, typename T>
 CINO_INLINE
-void vec_clamp(const T * v, const T min, const T max)
+void vec_clamp(T * v, const T min, const T max)
 {
     for(uint i=0; i<d; ++i)
     {
