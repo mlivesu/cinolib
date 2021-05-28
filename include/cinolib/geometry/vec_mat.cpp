@@ -378,4 +378,58 @@ bool mat<r,c,T>::operator<(const mat<r,c,T> & op) const
     return vec_less<r*c,T>(_vec, op._vec);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+double mat<r,c,T>::norm() const
+{
+    return vec_norm<r*c,T>(_vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::norm_sqrd() const
+{
+    return vec_norm_sqrd<r*c,T>(_vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+double mat<r,c,T>::norm_p(const float p) const
+{
+    return vec_norm_p<r*c,T>(_vec, p);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+double mat<r,c,T>::dist(const mat<r,c,T> & v) const
+{
+    return vec_dist<r*c,T>(_vec, v._vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::dist_sqrd(const mat<r,c,T> & v) const
+{
+    return vec_dist_sqrd<r*c,T>(_vec, v._vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+double mat<r,c,T>::normalize()
+{
+    return vec_normalize<r*c,T>(_vec);
+}
+
 }

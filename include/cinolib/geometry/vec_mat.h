@@ -121,10 +121,10 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double norm     (const mat<r,c,T> & v) const;
-        double norm_p   (const mat<r,c,T> & v, const float p) const;
+        double norm     () const;
+        double norm_p   (const float p) const;
+        T      norm_sqrd() const;
         double dist     (const mat<r,c,T> & v) const;
-        T      norm_sqrd(const mat<r,c,T> & v) const;
         T      dist_sqrd(const mat<r,c,T> & v) const;
         double normalize();
 
