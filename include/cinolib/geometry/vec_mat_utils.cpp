@@ -683,9 +683,8 @@ T mat_trace(const T m[][d])
 {
     T res = 0;
     for(uint i=0; i<d; ++i)
-    for(uint j=0; j<d; ++j)
     {
-        res += m[i][j];
+        res += m[i][i];
     }
     return res;
 }
@@ -700,9 +699,19 @@ T mat_det(const T m[][d])
     {
         case 2: return m[0][0]*m[1][1] - m[1][0]*m[0][1];
 
-        case 3: return m[0][0] * mat_det<d-1,T>( { m[1][1], m[1][2], m[2][1], m[2][2] } ) -
-                       m[0][1] * mat_det<d-1,T>( { m[1][0], m[1][2], m[2][0], m[2][2] } ) +
-                       m[0][2] * mat_det<d-1,T>( { m[1][0], m[1][1], m[2][0], m[2][1] } );
+        case 3:
+        {
+            T m0[2][2];
+            T m1[2][2];
+            T m2[2][2];
+            mat_set<2,2,T>(m0, {m[1][1], m[1][2], m[2][1], m[2][2]});
+            mat_set<2,2,T>(m1, {m[1][0], m[1][2], m[2][0], m[2][2]});
+            mat_set<2,2,T>(m2, {m[1][0], m[1][1], m[2][0], m[2][1]});
+
+            return m[0][0] * mat_det<2,T>(m0) -
+                   m[0][1] * mat_det<2,T>(m1) +
+                   m[0][2] * mat_det<2,T>(m2);
+        }
 
         default: std::cerr << "mat_determinant: unsupported matrix size" << std::endl;
     }
@@ -712,7 +721,7 @@ T mat_det(const T m[][d])
 
 template<uint r, uint c, typename T>
 CINO_INLINE
-void mat_transpose(const T m[][c], T tr[][c])
+void mat_transpose(const T m[][c], T tr[][r])
 {
     for(uint i=0; i<r; ++i)
     for(uint j=0; j<c; ++j)
@@ -723,22 +732,26 @@ void mat_transpose(const T m[][c], T tr[][c])
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint r, uint c, typename T>
+template<uint d, typename T>
 CINO_INLINE
-bool mat_inverse(const T m[][c], T in[][c])
+bool mat_inverse(const T m[][d], T in[][d])
 {
-    assert(r==2 && c==2);
+    switch(d)
+    {
+        case 2:
+        {
+            // https://mathworld.wolfram.com/MatrixInverse.html
+            // https://www.mathsisfun.com/algebra/matrix-inverse.html
+            double one_over_det = 1.0 / mat_det(m);
+            in[0][0] =  m[1][1] * one_over_det;
+            in[0][1] = -m[0][1] * one_over_det;
+            in[1][0] = -m[1][0] * one_over_det;
+            in[1][1] =  m[0][0] * one_over_det;
+            return one_over_det!=0; // false if the matrix is singular
+        }
 
-    // https://www.mathsisfun.com/algebra/matrix-inverse.html
-
-    double one_over_det = 1.0 / mat_det(m);
-
-    in[0][0] =  m[1][1] * one_over_det;
-    in[0][1] = -m[0][1] * one_over_det;
-    in[1][0] = -m[1][0] * one_over_det;
-    in[1][1] =  m[0][0] * one_over_det;
-
-    return one_over_det!=0; // false if the matrix is singular
+        default: std::cerr << "mat_inverse: unsupported matrix size" << std::endl;
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

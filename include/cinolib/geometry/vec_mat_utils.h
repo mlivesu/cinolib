@@ -166,8 +166,8 @@ template<uint d,         typename T> CINO_INLINE void mat_diag_ptr    (const T m
 template<uint d,         typename T> CINO_INLINE bool mat_is_symmetric(const T m[][d]);
 template<uint d,         typename T> CINO_INLINE T    mat_trace       (const T m[][d]);
 template<uint d,         typename T> CINO_INLINE T    mat_det         (const T m[][d]);
-template<uint r, uint c, typename T> CINO_INLINE void mat_transpose   (const T m[][c], T tr[][c]);
-template<uint r, uint c, typename T> CINO_INLINE bool mat_inverse     (const T m[][c], T in[][c]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_transpose   (const T m[][c], T tr[][r]);
+template<uint d,         typename T> CINO_INLINE bool mat_inverse     (const T m[][d], T in[][d]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_eigendec    (const T m[][c], T eval[], T evec[][c]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_eigenval    (const T m[][c], T eval[]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_eigenvec    (const T m[][c], T evec[][c]);

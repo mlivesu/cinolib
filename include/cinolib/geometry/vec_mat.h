@@ -85,21 +85,21 @@ class mat
 
         T          det()       const;
         T          trace()     const;
-        mat<r,c,T> transpose() const;
+        mat<c,r,T> transpose() const;
         mat<r,c,T> inverse()   const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // move outside?
-        void eigenvalues()  const;
-        void eigenvectors() const;
-        void eigendcomp()   const;
-        void SVD()          const;
-        void SSVD()         const;
+        //void eigenvalues()  const;
+        //void eigenvectors() const;
+        //void eigendcomp()   const;
+        //void SVD()          const;
+        //void SSVD()         const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        mat<c,1,T> solve(const mat<c,1,T> & b);
+        mat<r,1,T> solve(const mat<c,1,T> & b);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

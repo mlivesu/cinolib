@@ -179,6 +179,60 @@ mat<r,1,T> mat<r,c,T>::diag() const
 
 template<uint r, uint c, class T>
 CINO_INLINE
+T mat<r,c,T>::det() const
+{
+    assert(r==c);
+    return mat_det<r,T>(_mat);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::trace() const
+{
+    assert(r==c);
+    return mat_trace<r,T>(_mat);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<c,r,T> mat<r,c,T>::transpose() const
+{
+    mat<c,r,T> res;
+    mat_transpose<r,c,T>(_mat, res._mat);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::inverse() const
+{
+    assert(r==c);
+    mat<r,c,T> res;
+    mat_inverse<r,T>(_mat, res._mat);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,1,T> mat<r,c,T>::solve(const mat<c,1,T> & b)
+{
+    mat<r,1,T> res;
+    mat_solve_Cramer(_mat, b._vec, res._vec);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
 const T & mat<r,c,T>::operator()(const uint i, const uint j) const
 {
     return _mat[i][j];
