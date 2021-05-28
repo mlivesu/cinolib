@@ -95,11 +95,11 @@ void vec_minus(const T * v0, const T * v1, T * v2)
 // v = -v
 template<uint d, typename T>
 CINO_INLINE
-void vec_minus(T * v)
+void vec_minus(const T * v0, T * v1)
 {
     for(uint i=0; i<d; ++i)
     {
-        v[i] = -v[i];
+        v1[i] = -v0[i];
     }
 }
 
@@ -908,7 +908,7 @@ void mat_solve_Cramer(const T m[][d], const T b[], T x[])
 
 template<uint r, uint c, typename T>
 CINO_INLINE
-T mat_copy(const T m1[][c], T m2[][c])
+void mat_copy(const T m1[][c], T m2[][c])
 {
     std::copy(m1[0], m1[0]+(r*c), m2[0]);
 }
@@ -917,7 +917,7 @@ T mat_copy(const T m1[][c], T m2[][c])
 
 template<uint r, uint c, typename T>
 CINO_INLINE
-T mat_print(const T m[][c])
+void mat_print(const T m[][c])
 {
     for(uint i=0; i<r; ++i)
     for(uint j=0; j<c; ++j)

@@ -118,7 +118,7 @@ template<uint d, typename T> CINO_INLINE void   vec_set      (      T * vec, con
 template<uint d, typename T> CINO_INLINE void   vec_set_dense(      T * vec, const T   val);
 template<uint d, typename T> CINO_INLINE void   vec_plus     (const T * v_0, const T * v_1, T * v_2);
 template<uint d, typename T> CINO_INLINE void   vec_minus    (const T * v_0, const T * v_1, T * v_2);
-template<uint d, typename T> CINO_INLINE void   vec_minus    (      T * vec);
+template<uint d, typename T> CINO_INLINE void   vec_minus    (const T * v_0,       T * v_1);
 template<uint d, typename T> CINO_INLINE void   vec_times    (const T * v_0, const T   val, T * v_1);
 template<uint d, typename T> CINO_INLINE void   vec_divide   (const T * v_0, const T   val, T * v_1);
 template<uint d, typename T> CINO_INLINE bool   vec_equals   (const T * v_0, const T * v_1);
@@ -174,8 +174,8 @@ template<uint r, uint c, typename T> CINO_INLINE void mat_eigenvec    (const T m
 template<uint r, uint c, typename T> CINO_INLINE void mat_svd         (const T m[][c], T S[][r], T V[], T D[][c]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_ssvd        (const T m[][c], T S[][r], T V[], T D[][c]);
 template<uint d,         typename T> CINO_INLINE void mat_solve_Cramer(const T m[][d], const T b[], T x[]);
-template<uint r, uint c, typename T> CINO_INLINE T    mat_copy        (const T m[][c], T n[][c]);
-template<uint r, uint c, typename T> CINO_INLINE T    mat_print       (const T m[][c]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_copy        (const T m[][c], T n[][c]);
+template<uint r, uint c, typename T> CINO_INLINE void mat_print       (const T m[][c]);
 
 template<uint r0, uint c0, uint c1, typename T>
 CINO_INLINE

@@ -233,6 +233,24 @@ mat<r,1,T> mat<r,c,T>::solve(const mat<c,1,T> & b)
 
 template<uint r, uint c, class T>
 CINO_INLINE
+const T & mat<r,c,T>::operator[](const uint i) const
+{
+    return _vec[i];
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T & mat<r,c,T>::operator[](const uint i)
+{
+    return _vec[i];
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
 const T & mat<r,c,T>::operator()(const uint i, const uint j) const
 {
     return _mat[i][j];
@@ -248,5 +266,116 @@ T & mat<r,c,T>::operator()(const uint i, const uint j)
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T>mat<r,c,T>::operator-() const
+{
+    mat<r,c,T> res;
+    vec_minus<r*c,T>(_vec, res._vec);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T>mat<r,c,T>::operator-(const mat<r,c,T> & op) const
+{
+    mat<r,c,T> res;
+    vec_minus<r*c,T>(_vec, op._vec, res._vec);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::operator+(const mat<r,c,T> & op) const
+{
+    mat<r,c,T> res;
+    vec_plus<r*c,T>(_vec, op._vec, res._vec);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> & mat<r,c,T>::operator+=(const mat<r,c,T> & op)
+{
+    vec_plus<r*c,T>(_vec, op._vec, _vec);
+    return *this;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> & mat<r,c,T>::operator-=(const mat<r,c,T> & op)
+{
+    vec_minus<r*c,T>(_vec, op._vec, _vec);
+    return *this;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::operator*(const T & scalar) const
+{
+    mat<r,c,T> res;
+    vec_times<r*c,T>(_vec, scalar, res._vec);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> mat<r,c,T>::operator/(const T & scalar) const
+{
+    mat<r,c,T> res;
+    vec_divide<r*c,T>(_vec, scalar, res._vec);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> & mat<r,c,T>::operator*=(const T & scalar)
+{
+    vec_times<r*c,T>(_vec, scalar, _vec);
+    return *this;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> & mat<r,c,T>::operator/=(const T & scalar)
+{
+    vec_divide<r*c,T>(_vec, scalar, _vec);
+    return *this;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+bool mat<r,c,T>::operator==(const mat<r,c,T> & op) const
+{
+    return vec_equals<r*c,T>(_vec, op._vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+bool mat<r,c,T>::operator<(const mat<r,c,T> & op) const
+{
+    return vec_less<r*c,T>(_vec, op._vec);
+}
 
 }
