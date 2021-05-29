@@ -125,8 +125,8 @@ template<uint d, typename T> CINO_INLINE bool   vec_equals   (const T * v_0, con
 template<uint d, typename T> CINO_INLINE bool   vec_less     (const T * v_0, const T * v_1);
 template<uint d, typename T> CINO_INLINE T      vec_dot      (const T * v_0, const T * v_1);
 template<        typename T> CINO_INLINE void   vec_cross    (const T * v_0, const T * v_1, T *v_2);
-template<uint d, typename T> CINO_INLINE T      vec_angle_deg(const T * v_0, const T * v_1, const bool prenormalize);
-template<uint d, typename T> CINO_INLINE T      vec_angle_rad(const T * v_0, const T * v_1, const bool prenormalize);
+template<uint d, typename T> CINO_INLINE T      vec_angle_deg(const T * v_0, const T * v_1, const bool normalize);
+template<uint d, typename T> CINO_INLINE T      vec_angle_rad(const T * v_0, const T * v_1, const bool normalize);
 template<uint d, typename T> CINO_INLINE double vec_dist     (const T * v_0, const T * v_1);
 template<uint d, typename T> CINO_INLINE double vec_dist_sqrd(const T * v_0, const T * v_1);
 template<uint d, typename T> CINO_INLINE double vec_norm     (const T * vec);

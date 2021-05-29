@@ -168,14 +168,24 @@ class mat
               T & v()       { return _vec[1]; }
         const T & w() const { return _vec[2]; }
               T & w()       { return _vec[2]; }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        mat<3,1,T> cross(const mat<3,1,T> & v) const;
+        T          dot  (const mat<r,c,T> & v) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        T angle_deg(const mat<r,c,T> & v0, const bool normalize = true);
+        T angle_rad(const mat<r,c,T> & v0, const bool normalize = true);
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint d, class T> CINO_INLINE T          vec_dot      (const mat<d,1,T> & v0, const mat<d,1,T> & v1);
-template<        class T> CINO_INLINE mat<3,1,T> vec_cross    (const mat<3,1,T> & v0, const mat<3,1,T> & v1);
-template<uint d, class T> CINO_INLINE T          vec_angle_deg(const mat<d,1,T> & v0, const mat<d,1,T> & v1, const bool normalize = true);
-template<uint d, class T> CINO_INLINE T          vec_angle_rad(const mat<d,1,T> & v0, const mat<d,1,T> & v1, const bool normalize = true);
+//template<uint d, class T> CINO_INLINE T          vec_dot      (const mat<d,1,T> & v0, const mat<d,1,T> & v1);
+//template<        class T> CINO_INLINE mat<3,1,T> vec_cross    (const mat<3,1,T> & v0, const mat<3,1,T> & v1);
+//template<uint d, class T> CINO_INLINE T          vec_angle_deg(const mat<d,1,T> & v0, const mat<d,1,T> & v1, const bool normalize = true);
+//template<uint d, class T> CINO_INLINE T          vec_angle_rad(const mat<d,1,T> & v0, const mat<d,1,T> & v1, const bool normalize = true);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -186,19 +186,19 @@ void vec_cross(const T * v0, const T * v1, T * v2)
 
 template<uint d, typename T>
 CINO_INLINE
-T vec_angle_deg(const T * v0, const T * v1, const bool prenormalize)
+T vec_angle_deg(const T * v0, const T * v1, const bool normalize)
 {
-    return (T)to_deg((double)vec_angle_rad<d,T>(v0,v1,prenormalize));
+    return (T)to_deg((double)vec_angle_rad<d,T>(v0,v1,normalize));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint d, typename T>
 CINO_INLINE
-T vec_angle_rad(const T * v0, const T * v1, const bool prenormalize)
+T vec_angle_rad(const T * v0, const T * v1, const bool normalize)
 {
     T dot;
-    if(prenormalize)
+    if(normalize)
     {
         // normalize input vecs if they are not known to be BOTH already normal
         T tmp0[d], tmp1[d];

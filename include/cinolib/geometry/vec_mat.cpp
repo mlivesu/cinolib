@@ -549,4 +549,44 @@ bool mat<r,c,T>::is_deg() const // either null, nan or inf
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<3,1,T> mat<r,c,T>::cross(const mat<3,1,T> & v) const
+{
+    assert(r==3 && c==1);
+    mat<3,1,T> res;
+    vec_cross<T>(_vec, v._vec, res._vec);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::dot(const mat<r,c,T> & v) const
+{
+    assert(r==1 || c==1);
+    return vec_dot<r,T>(_vec, v._vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::angle_deg(const mat<r,c,T> & v, const bool normalize)
+{
+    assert(c==1);
+    return vec_angle_deg<r,T>(_vec, v._vec, normalize);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::angle_rad(const mat<r,c,T> & v, const bool normalize)
+{
+    assert(c==1);
+    return vec_angle_rad<r,T>(_vec, v._vec, normalize);
+}
+
 }
