@@ -85,6 +85,15 @@ mat<r,c,T> mat<r,c,T>::ZERO()
 
 template<uint r, uint c, class T>
 CINO_INLINE
+mat<r,c,T> mat<r,c,T>::ONES()
+{
+    return mat<r,c,T>(1);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
 mat<r,c,T> mat<r,c,T>::DIAG(const T scalar)
 {
     assert(r==c);
@@ -326,6 +335,18 @@ mat<r,c,T> mat<r,c,T>::operator*(const T & scalar) const
 {
     mat<r,c,T> res;
     vec_times<r*c,T>(_vec, scalar, res._vec);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+template<uint c2>
+CINO_INLINE
+mat<r,c2,T> mat<r,c,T>::operator*(const mat<c,c2,T> & op) const
+{
+    mat<r,c2,T> res;
+    mat_times<r,c,c2,T>(_mat, op._mat, res._mat);
     return res;
 }
 

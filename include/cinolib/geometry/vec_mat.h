@@ -64,6 +64,7 @@ class mat
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         static mat<r,c,T> ZERO  ();
+        static mat<r,c,T> ONES  ();
         static mat<r,c,T> DIAG  (const T scalar);
         static mat<r,c,T> DIAG  (const mat<r,  1,T> & diag);
         static mat<r,c,T> TRANS (const mat<r-1,1,T> & tx);
@@ -119,6 +120,9 @@ class mat
               bool         operator== (const mat<r,c,T> & op)       const;
               bool         operator<  (const mat<r,c,T> & op)       const;
 
+        template<uint c2>
+        mat<r,c2,T> operator*(const mat<c,c2,T> & op) const;
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         double norm     () const;
@@ -146,14 +150,32 @@ class mat
         bool is_nan()  const;
         bool is_inf()  const;
         bool is_deg()  const; // either null, nan or inf
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        // Specialized Cartesian XYZ access
+        const T & x() const { return _vec[0]; }
+              T & x()       { return _vec[0]; }
+        const T & y() const { return _vec[1]; }
+              T & y()       { return _vec[1]; }
+        const T & z() const { return _vec[2]; }
+              T & z()       { return _vec[2]; }
+
+        // Specialized Parametric UVW access
+        const T & u() const { return _vec[0]; }
+              T & u()       { return _vec[0]; }
+        const T & v() const { return _vec[1]; }
+              T & v()       { return _vec[1]; }
+        const T & w() const { return _vec[2]; }
+              T & w()       { return _vec[2]; }
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//template<uint d, class T> CINO_INLINE T        dot      (const vec<d,1,T> & v0, const vec<d,1,T> & v1);
-//template<        class T> CINO_INLINE vec<3,T> cross    (const vec<3,T> & v0, const vec<3,T> & v1);
-//template<uint d, class T> CINO_INLINE T        angle_deg(const vec<d,T> & v0, const vec<d,T> & v1, const bool unit_length = false);
-//template<uint d, class T> CINO_INLINE T        angle_rad(const vec<d,T> & v0, const vec<d,T> & v1, const bool unit_length = false);
+template<uint d, class T> CINO_INLINE T          vec_dot      (const mat<d,1,T> & v0, const mat<d,1,T> & v1);
+template<        class T> CINO_INLINE mat<3,1,T> vec_cross    (const mat<3,1,T> & v0, const mat<3,1,T> & v1);
+template<uint d, class T> CINO_INLINE T          vec_angle_deg(const mat<d,1,T> & v0, const mat<d,1,T> & v1, const bool normalize = true);
+template<uint d, class T> CINO_INLINE T          vec_angle_rad(const mat<d,1,T> & v0, const mat<d,1,T> & v1, const bool normalize = true);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -171,15 +193,17 @@ typedef mat<4,4,double> mat44d;
 typedef mat<4,4,float>  mat44f;
 typedef mat<4,4,int>    mat44i;
 
-//typedef vec<double,2> vec2d;
-//typedef vec<float,2>  vec2f;
-//typedef vec<int,2>    vec2i;
-//typedef vec<double,3> vec3d;
-//typedef vec<float,3>  vec3f;
-//typedef vec<int,3>    vec3i;
-//typedef vec<double,4> vec4d;
-//typedef vec<float,4>  vec4f;
-//typedef vec<int,4>    vec4i;
+typedef mat<2,1,double> Vec2d;
+typedef mat<2,1,float>  Vec2f;
+typedef mat<2,1,int>    Vec2i;
+
+typedef mat<3,1,double> Vec3d;
+typedef mat<3,1,float>  Vec3f;
+typedef mat<3,1,int>    Vec3i;
+
+typedef mat<4,1,double> Vec4d;
+typedef mat<4,1,float>  Vec4f;
+typedef mat<4,1,int>    Vec4i;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
