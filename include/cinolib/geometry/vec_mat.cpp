@@ -76,6 +76,29 @@ mat<r,c,T>::mat(const T scalar)
 
 template<uint r, uint c, class T>
 CINO_INLINE
+mat<r,c,T>::mat(const T v0, const T v1)
+{
+    assert(r==2 && c==1);
+    _vec[0] = v0;
+    _vec[1] = v1;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T>::mat(const T v0, const T v1, const T v2)
+{
+    assert(r==3 && c==1);
+    _vec[0] = v0;
+    _vec[1] = v1;
+    _vec[2] = v2;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
 mat<r,c,T> mat<r,c,T>::ZERO()
 {
     return mat<r,c,T>(0);
