@@ -37,7 +37,7 @@
 #define CINO_MOLLER_TRUMBORE_INTERSECTION_H
 
 #include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {

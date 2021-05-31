@@ -36,7 +36,7 @@
 #ifndef CINO_FIND_INTERSECTIONS_H
 #define CINO_FIND_INTERSECTIONS_H
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/ipair.h>
 #include <set>
 

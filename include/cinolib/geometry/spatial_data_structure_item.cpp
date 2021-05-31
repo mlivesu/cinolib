@@ -39,7 +39,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-double SpatialDataStructureItem::dist(const vec3<double> &p) const
+double SpatialDataStructureItem::dist(const vec3d &p) const
 {
     return p.dist(point_closest_to(p));
 }
@@ -47,9 +47,9 @@ double SpatialDataStructureItem::dist(const vec3<double> &p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double SpatialDataStructureItem::dist_sqrd(const vec3<double> &p) const
+double SpatialDataStructureItem::dist_sqrd(const vec3d &p) const
 {
-    return p.dist_squared(point_closest_to(p));
+    return p.dist_sqrd(point_closest_to(p));
 }
 
 }

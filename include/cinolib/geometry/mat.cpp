@@ -326,7 +326,7 @@ bool mat<r,c,T>::is_inf() const
 
 template<uint r, uint c, class T>
 CINO_INLINE
-bool mat<r,c,T>::is_degenerate() const
+bool mat<r,c,T>::is_deg() const
 {
     return is_null() || is_nan() || is_inf();
 }

@@ -39,6 +39,7 @@
 #include <cinolib/cino_inline.h>
 #include <sys/types.h>
 #include <ostream>
+#include <cinolib/geometry/vec_mat_utils.h>
 
 namespace cinolib
 {
@@ -57,7 +58,8 @@ class mat
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         explicit mat(const std::initializer_list<T> & il);
-        explicit mat(const T scalar);
+        explicit mat(const T   scalar);
+        explicit mat(const T * values);
         explicit mat(const T v0, const T v1);
         explicit mat(const T v0, const T v1, const T v2);
         explicit mat() {}
@@ -127,12 +129,18 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double norm     () const;
-        double norm_p   (const float p) const;
-        T      norm_sqrd() const;
-        double dist     (const mat<r,c,T> & v) const;
-        T      dist_sqrd(const mat<r,c,T> & v) const;
-        double normalize();
+        mat<r,c,T> & rotate(const mat<3,1,T> & axis, const T angle_rad);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        double normalize  ();
+        double norm       () const;
+        T      norm_sqrd  () const;
+        double norm_p     (const float p) const;
+        double dist       (const mat<r,c,T> & v) const;
+        T      dist_sqrd  (const mat<r,c,T> & v) const;
+        double length     () const;
+        T      length_sqrd() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -178,9 +186,20 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        T angle_deg(const mat<r,c,T> & v0, const bool normalize = true);
-        T angle_rad(const mat<r,c,T> & v0, const bool normalize = true);
+        T angle_deg(const mat<r,c,T> & v0, const bool normalize = true) const;
+        T angle_rad(const mat<r,c,T> & v0, const bool normalize = true) const;
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> operator*(const T & scalar, const mat<r,c,T> & m)
+{
+    mat<r,c,T> res;
+    vec_times<r*c,T>(m._vec, scalar, res._vec);
+    return res;
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -205,17 +224,17 @@ typedef mat<4,4,double> mat44d;
 typedef mat<4,4,float>  mat44f;
 typedef mat<4,4,int>    mat44i;
 
-typedef mat<2,1,double> Vec2d;
-typedef mat<2,1,float>  Vec2f;
-typedef mat<2,1,int>    Vec2i;
+typedef mat<2,1,double> vec2d;
+typedef mat<2,1,float>  vec2f;
+typedef mat<2,1,int>    vec2i;
 
-typedef mat<3,1,double> Vec3d;
-typedef mat<3,1,float>  Vec3f;
-typedef mat<3,1,int>    Vec3i;
+typedef mat<3,1,double> vec3d;
+typedef mat<3,1,float>  vec3f;
+typedef mat<3,1,int>    vec3i;
 
-typedef mat<4,1,double> Vec4d;
-typedef mat<4,1,float>  Vec4f;
-typedef mat<4,1,int>    Vec4i;
+typedef mat<4,1,double> vec4d;
+typedef mat<4,1,float>  vec4f;
+typedef mat<4,1,int>    vec4i;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

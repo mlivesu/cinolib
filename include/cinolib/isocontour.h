@@ -38,7 +38,7 @@
 
 #include <vector>
 #include <cinolib/meshes/trimesh.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {

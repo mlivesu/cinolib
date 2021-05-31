@@ -36,8 +36,7 @@
 #ifndef CINO_LINEAR_MAP_H
 #define CINO_LINEAR_MAP_H
 
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/geometry/vec2.h>
+#include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {

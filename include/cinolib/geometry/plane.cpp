@@ -118,7 +118,7 @@ Plane::Plane(const std::vector<vec3d> & samples)
 CINO_INLINE
 void Plane::set_plane(const vec3d & point, const vec3d & normal)
 {
-    if(point.is_degenerate() || normal.is_degenerate())
+    if(point.is_deg() || normal.is_deg())
     {
         //std::cout << "WARNING : failed to set degenerate plane!" << std::endl;
         p = vec3d(0,0,0);

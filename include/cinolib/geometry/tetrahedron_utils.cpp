@@ -61,9 +61,9 @@ vec3d tetrahedron_circumcenter(const vec3d & A,
     vec3d  v = C - A;
     vec3d  w = D - A;
 
-    double u_len = u.length_squared();
-    double v_len = v.length_squared();
-    double w_len = w.length_squared();
+    double u_len = u.length_sqrd();
+    double v_len = v.length_sqrd();
+    double w_len = w.length_sqrd();
 
     double num_x = determinant_3x3(u.y(), u.z(), u_len, v.y(), v.z(), v_len, w.y(), w.z(), w_len);
     double num_y = determinant_3x3(u.x(), u.z(), u_len, v.x(), v.z(), v_len, w.x(), w.z(), w_len);
@@ -100,7 +100,7 @@ vec3d tetrahedron_closest_point(const vec3d & P,
     if(n_ACB.dot(P-A)>0)
     {
         vec3d  q = triangle_closest_point(P,A,C,B);
-        double d = q.dist_squared(P);
+        double d = q.dist_sqrd(P);
         if(d < best_dist)
         {
             best_dist  = d;
@@ -114,7 +114,7 @@ vec3d tetrahedron_closest_point(const vec3d & P,
     if(n_ADC.dot(P-A)>0)
     {
         vec3d  q = triangle_closest_point(P,A,D,C);
-        double d = q.dist_squared(P);
+        double d = q.dist_sqrd(P);
         if(d < best_dist)
         {
             best_dist  = d;
@@ -128,7 +128,7 @@ vec3d tetrahedron_closest_point(const vec3d & P,
     if(n_ABD.dot(P-A)>0)
     {
         vec3d  q = triangle_closest_point(P,A,B,D);
-        double d = q.dist_squared(P);
+        double d = q.dist_sqrd(P);
         if(d < best_dist)
         {
             best_dist  = d;
@@ -142,7 +142,7 @@ vec3d tetrahedron_closest_point(const vec3d & P,
     if(n_BCD.dot(P-B)>0)
     {
         vec3d  q = triangle_closest_point(P,B,C,D);
-        double d = q.dist_squared(P);
+        double d = q.dist_sqrd(P);
         if(d < best_dist)
         {
             best_dist  = d;

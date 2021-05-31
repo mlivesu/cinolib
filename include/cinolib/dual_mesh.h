@@ -36,7 +36,7 @@
 #ifndef CINO_DUAL_MESH
 #define CINO_DUAL_MESH
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/meshes/polygonmesh.h>
 #include <cinolib/meshes/polyhedralmesh.h>
 

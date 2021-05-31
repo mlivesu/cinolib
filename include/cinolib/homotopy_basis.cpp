@@ -682,10 +682,10 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
     uint eid = edge_fan.at(edge_fan.size()*0.5);
     uint v_opp = m.vert_opposite_to(eid, v_mid);
 
-    vec3d A = m.vert(v_opp);
-    vec3d B = m.vert(v_mid);
-    uint  i = 0;
-    float t = 0.75;
+    vec3d  A = m.vert(v_opp);
+    vec3d  B = m.vert(v_mid);
+    uint   i = 0;
+    double t = 0.75;
     pos = t*A + (1-t)*B;
     while(true)
     {
@@ -699,7 +699,7 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
             if(m.poly_vert_id(pid,2)==v_mid) v.at(2) = pos; else
             assert(false);
             vec3d n2 = triangle_normal(v.at(0), v.at(1), v.at(2));
-            if(n2.is_degenerate() || n1.dot(n2) <= 0)
+            if(n2.is_deg() || n1.dot(n2) <= 0)
             {
                 reject = true;
                 break;
@@ -717,7 +717,7 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
             assert(false);
             vec3d n1 = m.poly_data(pid).normal;
             vec3d n2 = triangle_normal(v.at(0), v.at(1), v.at(2));
-            if(n2.is_degenerate() || n1.dot(n2) <= 0) reject = true;
+            if(n2.is_deg() || n1.dot(n2) <= 0) reject = true;
         }
         // test second newly generated triangle
         if(!reject)
@@ -731,7 +731,7 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
             assert(false);
             vec3d n1 = m.poly_data(pid).normal;
             vec3d n2 = triangle_normal(v.at(0), v.at(1), v.at(2));
-            if(n2.is_degenerate() || n1.dot(n2) <= 0) reject = true;
+            if(n2.is_deg() || n1.dot(n2) <= 0) reject = true;
         }
         if(!reject) return true;
         if(++i>5)   return false; // stop after 5 attempts

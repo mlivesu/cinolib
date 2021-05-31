@@ -54,7 +54,7 @@ std::vector<vec3d> n_sided_polygon(const uint n,
             for(uint i=1; i<n; ++i)
             {
                 verts[i] = verts[i-1];
-                rotate(verts[i], vec3d(0,0,1), 2.0*M_PI/double(n));
+                verts[i].rotate(vec3d(0,0,1), 2.0*M_PI/double(n));
             }
             break;
         }
@@ -72,22 +72,22 @@ std::vector<vec3d> n_sided_polygon(const uint n,
             verts.at(d) = vec3d( 1,-1, 0);
             for(uint i=a+1; i<b; ++i)
             {
-                float t = (float)(i-a)/(float)(b-a);
+                double t = (double)(i-a)/(double)(b-a);
                 verts.at(i) = (1-t)*verts.at(a) + t*verts.at(b);
             }
             for(uint i=b+1; i<c; ++i)
             {
-                float t = (float)(i-b)/(float)(c-b);
+                double t = (double)(i-b)/(double)(c-b);
                 verts.at(i) = (1-t)*verts.at(b) + t*verts.at(c);
             }
             for(uint i=c+1; i<d; ++i)
             {
-                float t = (float)(i-c)/(float)(d-c);
+                double t = (double)(i-c)/(double)(d-c);
                 verts.at(i) = (1-t)*verts.at(c) + t*verts.at(d);
             }
             for(uint i=d+1; i<n; ++i)
             {
-                float t = (float)(i-d)/(float)(n-d);
+                double t = (double)(i-d)/(double)(n-d);
                 verts.at(i) = (1-t)*verts.at(d) + t*verts.at(a);
             }
             break;
@@ -100,7 +100,7 @@ std::vector<vec3d> n_sided_polygon(const uint n,
             for(uint i=1; i<n; ++i)
             {
                 verts[i] = verts[i-1];
-                rotate(verts[i], vec3d(0,0,1), 2.0*M_PI/double(n));
+                verts[i].rotate(vec3d(0,0,1), 2.0*M_PI/double(n));
             }
             for(uint i=1; i<n; i+=2) verts[i] -= 0.5*verts[i];
             break;

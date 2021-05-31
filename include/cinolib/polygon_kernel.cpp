@@ -54,7 +54,7 @@ double polygon_kernel(const std::vector<vec3d> & poly,   // will discard z compo
                             std::vector<vec3d> & kernel) // z component will be zero
 {
     std::vector<vec2d> poly_2d, kernel_2d;
-    for(auto p : poly) poly_2d.push_back(vec2d(p));
+    for(auto p : poly) poly_2d.push_back(vec2d(p._vec));
 
     double area = polygon_kernel(poly_2d, kernel_2d);
 

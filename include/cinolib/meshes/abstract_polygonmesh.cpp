@@ -43,6 +43,7 @@
 #include <cinolib/how_many_seconds.h>
 #include <cinolib/deg_rad.h>
 #include <unordered_set>
+#include <cinolib/ANSI_color_codes.h>
 #include <queue>
 
 namespace cinolib

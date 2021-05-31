@@ -100,7 +100,7 @@ template<typename real> class vec3
                               m_x * in.m_y - m_y * in.m_x);
         }
 
-        real length_squared() const
+        real length_sqrd() const
         {
             return m_x * m_x +
                    m_y * m_y +
@@ -275,8 +275,8 @@ template<typename real> class vec3
         {
             vec3<real> u = *this;
             vec3<real> v = in;
-            if(!u.is_degenerate()) u.normalize(); else return 0;
-            if(!v.is_degenerate()) v.normalize(); else return 0;
+            if(!u.is_deg()) u.normalize(); else return 0;
+            if(!v.is_deg()) v.normalize(); else return 0;
             // ensure dot stays srictly in between 0 and 1 (included)
             double dot   = std::min( 1.0, u.dot(v));
                    dot   = std::max(-1.0, dot);
@@ -295,9 +295,9 @@ template<typename real> class vec3
             return (*this - in).length();
         }
 
-        double dist_squared(const vec3<real> &in) const
+        double dist_sqrd(const vec3<real> &in) const
         {
-            return (*this - in).length_squared();
+            return (*this - in).length_sqrd();
         }
 
         bool is_null() const
@@ -322,7 +322,7 @@ template<typename real> class vec3
             return false;
         }
 
-        bool is_degenerate() const
+        bool is_deg() const
         {
             return is_null() || is_nan() || is_inf();
         }

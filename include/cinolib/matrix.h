@@ -37,7 +37,7 @@
 #define CINO_MATRIX_H
 
 #include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec2.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <Eigen/Dense>
 
 namespace cinolib

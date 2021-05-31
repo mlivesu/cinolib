@@ -36,7 +36,7 @@
 #ifndef CINO_VECTOR_FIELD_H
 #define CINO_VECTOR_FIELD_H
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/serializable.h>
 #include <Eigen/Dense>
 

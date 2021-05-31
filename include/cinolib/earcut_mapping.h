@@ -36,7 +36,7 @@
 #ifndef CINO_EARCUT_MAPPING_H
 #define CINO_EARCUT_MAPPING_H
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/symbols.h>
 
 namespace cinolib

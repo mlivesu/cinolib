@@ -110,7 +110,7 @@ class mat
         bool is_null()       const;
         bool is_nan()        const;
         bool is_inf()        const;
-        bool is_degenerate() const; // either null, nan or inf
+        bool is_deg() const; // either null, nan or inf
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

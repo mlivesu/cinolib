@@ -34,7 +34,6 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/geometry/vec_mat.h>
-#include <cinolib/geometry/vec_mat_utils.h>
 
 namespace cinolib
 {
@@ -70,6 +69,15 @@ CINO_INLINE
 mat<r,c,T>::mat(const T scalar)
 {
     vec_set_dense<r*c,T>(_vec, scalar);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T>::mat(const T * values)
+{
+    vec_copy<r*c,T>(values,_vec);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -444,6 +452,24 @@ T mat<r,c,T>::norm_sqrd() const
 
 template<uint r, uint c, class T>
 CINO_INLINE
+double mat<r,c,T>::length() const
+{
+    return vec_norm<r*c,T>(_vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+T mat<r,c,T>::length_sqrd() const
+{
+    return vec_norm_sqrd<r*c,T>(_vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
 double mat<r,c,T>::norm_p(const float p) const
 {
     return vec_norm_p<r*c,T>(_vec, p);
@@ -465,6 +491,17 @@ CINO_INLINE
 T mat<r,c,T>::dist_sqrd(const mat<r,c,T> & v) const
 {
     return vec_dist_sqrd<r*c,T>(_vec, v._vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r,c,T> & mat<r,c,T>::rotate(const mat<3,1,T> & axis, const T angle_rad)
+{
+    mat33d R = mat33d::ROT_3D(axis,angle_rad);
+    (*this) = R*(*this);
+    return *this;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -596,7 +633,7 @@ T mat<r,c,T>::dot(const mat<r,c,T> & v) const
 
 template<uint r, uint c, class T>
 CINO_INLINE
-T mat<r,c,T>::angle_deg(const mat<r,c,T> & v, const bool normalize)
+T mat<r,c,T>::angle_deg(const mat<r,c,T> & v, const bool normalize) const
 {
     assert(c==1);
     return vec_angle_deg<r,T>(_vec, v._vec, normalize);
@@ -606,7 +643,7 @@ T mat<r,c,T>::angle_deg(const mat<r,c,T> & v, const bool normalize)
 
 template<uint r, uint c, class T>
 CINO_INLINE
-T mat<r,c,T>::angle_rad(const mat<r,c,T> & v, const bool normalize)
+T mat<r,c,T>::angle_rad(const mat<r,c,T> & v, const bool normalize) const
 {
     assert(c==1);
     return vec_angle_rad<r,T>(_vec, v._vec, normalize);

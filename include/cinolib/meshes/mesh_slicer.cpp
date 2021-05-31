@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/meshes/mesh_slicer.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/meshes/mesh_attributes.h>
 
 namespace cinolib

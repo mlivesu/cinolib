@@ -187,7 +187,7 @@ void polygon_maximum_inscribed_circle(const std::vector<vec2d> & poly,
             if(d>radius)
             {
                 radius = d;
-                center = vec2d(c3d); // will automatically drop z
+                center = vec2d(c3d._vec); // will automatically drop z
             }
         }
     }

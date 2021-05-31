@@ -37,7 +37,7 @@
 #define CINO_DRAWABLE_CURVE_H
 
 #include <vector>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/meshes/skel.h>
 #include <cinolib/curve.h>

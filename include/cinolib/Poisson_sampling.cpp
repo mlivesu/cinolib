@@ -61,7 +61,7 @@ void sample_annulus(const double radius, const Point & center, uint & seed, Poin
         {
             r[i]=4*(random_uint(seed++)/static_cast<double>(max_uint)-0.5);
         }
-        double r2=r.length_squared();
+        double r2=r.length_sqrd();
         if(r2>1 && r2<=4) break;
     }
     x=center+radius*r;
@@ -144,7 +144,7 @@ void Poisson_sampling(const double          radius,
                 if(grid[index]>=0 && grid[index]!=p)
                 {
                     // if there is a sample point different from p
-                    if((x - samples[grid[index]]).length_squared()<radius*radius) goto reject_sample;
+                    if((x - samples[grid[index]]).length_sqrd()<radius*radius) goto reject_sample;
                 }
 
                 // move on to next j

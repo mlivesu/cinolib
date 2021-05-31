@@ -36,8 +36,7 @@
 #ifndef CINO_PREDICATES
 #define CINO_PREDICATES
 
-#include <cinolib/geometry/vec2.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <bitset>
 
 namespace cinolib
@@ -605,35 +604,35 @@ SimplexIntersection triangle_triangle_intersect_3d(const double * t00,
 
 // returns true if s0==s1
 CINO_INLINE
-bool segment_is_degenerate_2d(const vec2d & s0,
+bool segment_is_deg_2d(const vec2d & s0,
                               const vec2d & s1);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if s0==s1
 CINO_INLINE
-bool segment_is_degenerate_2d(const double * s0,
+bool segment_is_deg_2d(const double * s0,
                               const double * s1);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if s0==s1
 CINO_INLINE
-bool segment_is_degenerate_3d(const vec3d & s0,
+bool segment_is_deg_3d(const vec3d & s0,
                               const vec3d & s1);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if s0==s1
 CINO_INLINE
-bool segment_is_degenerate_3d(const double * s0,
+bool segment_is_deg_3d(const double * s0,
                               const double * s1);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t0, t1 and t2 are colinear
 CINO_INLINE
-bool triangle_is_degenerate_2d(const vec2d & t0,
+bool triangle_is_deg_2d(const vec2d & t0,
                                const vec2d & t1,
                                const vec2d & t2);
 
@@ -641,7 +640,7 @@ bool triangle_is_degenerate_2d(const vec2d & t0,
 
 // returns true if t0, t1 and t2 are colinear
 CINO_INLINE
-bool triangle_is_degenerate_2d(const double * t0,
+bool triangle_is_deg_2d(const double * t0,
                                const double * t1,
                                const double * t2);
 
@@ -649,7 +648,7 @@ bool triangle_is_degenerate_2d(const double * t0,
 
 // returns true if t0, t1 and t2 are colinear
 CINO_INLINE
-bool triangle_is_degenerate_3d(const vec3d & t0,
+bool triangle_is_deg_3d(const vec3d & t0,
                                const vec3d & t1,
                                const vec3d & t2);
 
@@ -657,7 +656,7 @@ bool triangle_is_degenerate_3d(const vec3d & t0,
 
 // returns true if t0, t1 and t2 are colinear
 CINO_INLINE
-bool triangle_is_degenerate_3d(const double * t0,
+bool triangle_is_deg_3d(const double * t0,
                                const double * t1,
                                const double * t2);
 
@@ -665,7 +664,7 @@ bool triangle_is_degenerate_3d(const double * t0,
 
 // returns true if t0, t1, t2 and t3 are coplanar
 CINO_INLINE
-bool tet_is_degenerate(const vec3d & t0,
+bool tet_is_deg(const vec3d & t0,
                        const vec3d & t1,
                        const vec3d & t2,
                        const vec3d & t3);
@@ -674,7 +673,7 @@ bool tet_is_degenerate(const vec3d & t0,
 
 // returns true if t0, t1, t2 and t3 are coplanar
 CINO_INLINE
-bool tet_is_degenerate(const double * t0,
+bool tet_is_deg(const double * t0,
                        const double * t1,
                        const double * t2,
                        const double * t3);

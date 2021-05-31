@@ -40,7 +40,7 @@
 #include <iostream>
 #include <assert.h>
 #include <cinolib/pi.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {
@@ -112,7 +112,7 @@ template<typename real> class vec2
         //                      -m_y * in.m_x);
         //}
 
-        inline real length_squared() const
+        inline real length_sqrd() const
         {
             return m_x * m_x +
                    m_y * m_y;

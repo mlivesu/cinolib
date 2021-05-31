@@ -36,7 +36,7 @@
 #ifndef CINO_DRAWABLE_OBJECT_H
 #define CINO_DRAWABLE_OBJECT_H
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {

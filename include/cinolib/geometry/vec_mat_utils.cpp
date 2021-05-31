@@ -36,7 +36,7 @@
 #include <cinolib/geometry/vec_mat_utils.h>
 #include <cinolib/clamp.h>
 #include <cinolib/deg_rad.h>
-#include <ostream>
+#include <iostream>
 #include <cmath>
 #include <assert.h>
 
@@ -169,6 +169,7 @@ T vec_dot(const T * v0, const T * v1)
     {
         res += v0[i]*v1[i];
     }
+    return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -177,9 +178,9 @@ template<typename T>
 CINO_INLINE
 void vec_cross(const T * v0, const T * v1, T * v2)
 {
-        v2[0] = v0[1] * v1[2] - v0[2] * v1[1];
-        v2[1] = v0[2] * v1[0] - v0[0] * v1[2];
-        v2[2] = v0[0] * v1[1] - v0[1] * v1[0];
+    v2[0] = v0[1] * v1[2] - v0[2] * v1[1];
+    v2[1] = v0[2] * v1[0] - v0[0] * v1[2];
+    v2[2] = v0[0] * v1[1] - v0[1] * v1[0];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

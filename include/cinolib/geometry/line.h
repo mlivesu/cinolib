@@ -37,7 +37,7 @@
 #define CINO_LINE_H
 
 #include <vector>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/geometry/plane.h>
 
 namespace cinolib

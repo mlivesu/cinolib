@@ -256,7 +256,7 @@ double point_to_triangle_dist_sqrd(const vec3d & P,
                                    const vec3d & B,
                                    const vec3d & C)
 {
-    return P.dist_squared(triangle_closest_point(P,A,B,C));
+    return P.dist_sqrd(triangle_closest_point(P,A,B,C));
 }
 
 }

@@ -40,8 +40,7 @@
 #include <sys/types.h>
 #include <string>
 #include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec2.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/meshes/trimesh.h>
 
 namespace cinolib

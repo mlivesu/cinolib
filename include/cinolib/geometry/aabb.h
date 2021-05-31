@@ -37,7 +37,7 @@
 #define CINO_AABB_H
 
 #include <cinolib/min_max_inf.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <vector>
 
 namespace cinolib
