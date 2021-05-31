@@ -74,7 +74,7 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> &
                 vec3d u_90 = u.cross(n); u_90.normalize();
                 vec3d v_90 = v.cross(n); v_90.normalize();
 
-                vec3d per_vert_sum_over_edge_normals = u_90 * u.length() + v_90 * v.length();
+                vec3d per_vert_sum_over_edge_normals = u_90 * u.norm() + v_90 * v.norm();
                 per_vert_sum_over_edge_normals /= area;
 
                 uint row = 3 * pid;
@@ -112,7 +112,7 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> &
                     vec3d v_90 = v.cross(n); v_90.normalize();
 
                     // note: Eigen::setFromTriplets will take care of summing contributs w.r.t. multiple polys
-                    vert_contr.push_back(std::make_pair(curr, u_90*u.length()+v_90*v.length()));
+                    vert_contr.push_back(std::make_pair(curr, u_90*u.norm()+v_90*v.norm()));
                 }
             }
             uint row = vid * 3;

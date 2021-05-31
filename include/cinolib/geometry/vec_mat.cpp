@@ -452,24 +452,6 @@ T mat<r,c,T>::norm_sqrd() const
 
 template<uint r, uint c, class T>
 CINO_INLINE
-double mat<r,c,T>::length() const
-{
-    return vec_norm<r*c,T>(_vec);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, class T>
-CINO_INLINE
-T mat<r,c,T>::length_sqrd() const
-{
-    return vec_norm_sqrd<r*c,T>(_vec);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, class T>
-CINO_INLINE
 double mat<r,c,T>::norm_p(const float p) const
 {
     return vec_norm_p<r*c,T>(_vec, p);

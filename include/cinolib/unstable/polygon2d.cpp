@@ -628,7 +628,7 @@ void Polygon2D::merge_adjacent_nearby_vertices(const double eps)
             vec3d curr = old_rings[r][i];
             vec3d next = old_rings[r][(i+1)%old_rings[r].size()];
 
-            if ((curr-next).length() < eps)
+            if ((curr-next).norm() < eps)
             {
                 ++count;
                 continue;

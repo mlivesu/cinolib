@@ -189,7 +189,7 @@ class Skel
         inline double segment_length(int sid) const
         {
             seg s = segment(sid);
-            return (vertex(s.first) - vertex(s.second)).length();
+            return (vertex(s.first) - vertex(s.second)).norm();
         }
 
         inline double bone_length(int bid) const

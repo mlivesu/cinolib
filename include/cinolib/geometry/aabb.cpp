@@ -141,7 +141,7 @@ CINO_INLINE
 double AABB::diag() const
 {
     if(min.x()==inf_double) return 0.0;
-    return (min - max).length();
+    return (min - max).norm();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -61,9 +61,9 @@ vec3d tetrahedron_circumcenter(const vec3d & A,
     vec3d  v = C - A;
     vec3d  w = D - A;
 
-    double u_len = u.length_sqrd();
-    double v_len = v.length_sqrd();
-    double w_len = w.length_sqrd();
+    double u_len = u.norm_sqrd();
+    double v_len = v.norm_sqrd();
+    double w_len = w.norm_sqrd();
 
     double num_x = determinant_3x3(u.y(), u.z(), u_len, v.y(), v.z(), v_len, w.y(), w.z(), w_len);
     double num_y = determinant_3x3(u.x(), u.z(), u_len, v.x(), v.z(), v_len, w.x(), w.z(), w_len);

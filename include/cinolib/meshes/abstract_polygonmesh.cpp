@@ -342,7 +342,7 @@ void AbstractPolygonMesh<M,V,E,P>::update_v_normal(const uint vid)
     {
         n += this->poly_data(pid).normal;
     }
-    if (n.length()>0) n.normalize();
+    if (n.norm()>0) n.normalize();
     this->vert_data(vid).normal = n;
 }
 

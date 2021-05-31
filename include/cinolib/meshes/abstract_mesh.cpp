@@ -797,7 +797,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 double AbstractMesh<M,V,E,P>::edge_length(const uint eid) const
 {
-    return edge_vec(eid).length();
+    return edge_vec(eid).norm();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

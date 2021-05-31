@@ -88,7 +88,7 @@ vec3d polygon_normal(const std::vector<vec3d> & poly)
 
     // if the face is degenerate (i.e. does not span a plane),
     // return the null vector
-    if(best_fit.n.length()==0) return vec3d(0,0,0);
+    if(best_fit.n.norm()==0) return vec3d(0,0,0);
 
     std::vector<vec2d> poly2d;
     for(auto p : poly)
@@ -117,7 +117,7 @@ bool polygon_flatten(const std::vector<vec3d> & poly3d,
     poly2d.reserve(poly3d.size());
 
     Plane best_fit(poly3d);
-    if(best_fit.n.is_deg() || best_fit.n.length()==0) return false;
+    if(best_fit.n.is_deg() || best_fit.n.norm()==0) return false;
 
     vec3d  Z     = vec3d(0,0,1);
     vec3d  axis  = best_fit.n.cross(Z);

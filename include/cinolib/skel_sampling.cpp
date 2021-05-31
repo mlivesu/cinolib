@@ -62,8 +62,8 @@ void recursive_mid_sampling(Skel          & skel,
     double mid_r = skel.max_sphere_radius(mid_vid);
     double end_r = skel.max_sphere_radius(end_vid);
 
-    if ((beg_pos - mid_pos).length() > beg_r + mid_r || // <= logic OR, remember that!
-        (mid_pos - end_pos).length() > mid_r + end_r)   //    note to myself ;)
+    if ((beg_pos - mid_pos).norm() > beg_r + mid_r || // <= logic OR, remember that!
+        (mid_pos - end_pos).norm() > mid_r + end_r)   //    note to myself ;)
     {
         samples.insert(mid_vid);
 

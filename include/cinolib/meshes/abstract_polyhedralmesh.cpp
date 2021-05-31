@@ -487,7 +487,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_v_normal(const uint vid)
             n += this->poly_face_normal(pid,fid);
         }
     }
-    if (n.length()>0) n.normalize();
+    if (n.norm()>0) n.normalize();
     this->vert_data(vid).normal = n;
 }
 

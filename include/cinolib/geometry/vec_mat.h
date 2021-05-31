@@ -139,8 +139,6 @@ class mat
         double norm_p     (const float p) const;
         double dist       (const mat<r,c,T> & v) const;
         T      dist_sqrd  (const mat<r,c,T> & v) const;
-        double length     () const;
-        T      length_sqrd() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -87,7 +87,7 @@ void VectorField::normalize()
     /* IMPORTANT NOTE: for heatflow-based geodesic
      * distances there is a BIG difference between
      * this:
-     *          v /= v.length()
+     *          v /= v.norm()
      *
      * and this:
      *
@@ -99,9 +99,9 @@ void VectorField::normalize()
     for(int i=0; i<rows(); i+=3)
     {
         vec3d tmp((*this)[i], (*this)[i+1], (*this)[i+2]);
-        (*this)[i + 0] /= tmp.length();
-        (*this)[i + 1] /= tmp.length();
-        (*this)[i + 2] /= tmp.length();
+        (*this)[i + 0] /= tmp.norm();
+        (*this)[i + 1] /= tmp.norm();
+        (*this)[i + 2] /= tmp.norm();
     }
 }
 

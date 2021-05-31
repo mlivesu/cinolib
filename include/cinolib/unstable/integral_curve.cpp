@@ -226,7 +226,7 @@ Curve::Sample IntegralCurve<Trimesh<>>::move_forward_from_vertex(const uint vid)
     for(uint fid : m_ptr->adj_v2p(vid)) grad += grad_ptr->vec_at(fid);
     grad = tangent_plane.project_onto(v+grad) - v;
     grad.normalize();
-    assert(grad.length() > 0);
+    assert(grad.norm() > 0);
 
     std::map<uint,vec3d> tangent_space;
     for(uint nbr : m_ptr->adj_v2v(vid))
@@ -309,7 +309,7 @@ Curve::Sample IntegralCurve<Trimesh<>>::move_forward_from_edge(const uint eid, c
     vec3d grad = g0 + g1;
     grad = tangent_plane.project_onto(p + grad) - p; // this should be redundant...
     grad.normalize();
-    assert(grad.length() > 0);
+    assert(grad.norm() > 0);
 
     std::vector<ipair> edges_to_check;
     for(uint e : m_ptr->adj_p2e(f0)) if (e!=eid) edges_to_check.push_back(std::make_pair(e,f0));
@@ -530,7 +530,7 @@ Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_vertex(const uint vid)
     vec3d grad(0,0,0);
     for(uint pid : m_ptr->adj_v2p(vid)) grad += grad_ptr->vec_at(pid);
     grad.normalize();
-    assert(grad.length() > 0);
+    assert(grad.norm() > 0);
 
     for(uint pid : m_ptr->adj_v2p(vid))
     {
@@ -566,7 +566,7 @@ Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_edge(const uint eid, c
     vec3d grad(0,0,0);
     for(uint pid : m_ptr->adj_e2p(eid)) grad += grad_ptr->vec_at(pid);
     grad.normalize();
-    assert(grad.length() > 0);
+    assert(grad.norm() > 0);
 
     uint v0 = m_ptr->edge_vert_id(eid, 0);
     uint v1 = m_ptr->edge_vert_id(eid, 1);
@@ -630,7 +630,7 @@ Curve::Sample IntegralCurve<Tetmesh<>>::move_forward_from_face(const uint pid, c
         grad += grad_ptr->vec_at(nbr);
     }
     grad.normalize();
-    if (grad.length() == 0) // need to understand when and why this may happen....
+    if (grad.norm() == 0) // need to understand when and why this may happen....
     {
         Sample dummy;
         return dummy;
