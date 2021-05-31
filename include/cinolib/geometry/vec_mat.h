@@ -133,12 +133,12 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        double normalize  ();
-        double norm       () const;
-        T      norm_sqrd  () const;
-        double norm_p     (const float p) const;
-        double dist       (const mat<r,c,T> & v) const;
-        T      dist_sqrd  (const mat<r,c,T> & v) const;
+        double normalize();
+        double norm     () const;
+        T      norm_sqrd() const;
+        double norm_p   (const float p) const;
+        double dist     (const mat<r,c,T> & v) const;
+        T      dist_sqrd(const mat<r,c,T> & v) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -201,10 +201,9 @@ mat<r,c,T> operator*(const T & scalar, const mat<r,c,T> & m)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-//template<uint d, class T> CINO_INLINE T          vec_dot      (const mat<d,1,T> & v0, const mat<d,1,T> & v1);
-//template<        class T> CINO_INLINE mat<3,1,T> vec_cross    (const mat<3,1,T> & v0, const mat<3,1,T> & v1);
-//template<uint d, class T> CINO_INLINE T          vec_angle_deg(const mat<d,1,T> & v0, const mat<d,1,T> & v1, const bool normalize = true);
-//template<uint d, class T> CINO_INLINE T          vec_angle_rad(const mat<d,1,T> & v0, const mat<d,1,T> & v1, const bool normalize = true);
+template<uint r, uint c, class T>
+CINO_INLINE
+std::ostream & operator<< (std::ostream & in, const mat<r,c,T> & op);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -233,12 +232,6 @@ typedef mat<3,1,int>    vec3i;
 typedef mat<4,1,double> vec4d;
 typedef mat<4,1,float>  vec4f;
 typedef mat<4,1,int>    vec4i;
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<uint r, uint c, class T>
-CINO_INLINE
-std::ostream & operator<< (std::ostream & in, const mat<r,c,T> & op);
 
 }
 
