@@ -53,8 +53,8 @@ class Sphere : public SpatialDataStructureItem
             this->id  = id;
             item_type = SPHERE;
             double hr = r*0.5;
-            aabb.push({ c - vec3d(hr,hr,hr),
-                        c + vec3d(hr,hr,hr) });
+            aabb.push( c - vec3d(hr,hr,hr));
+            aabb.push( c + vec3d(hr,hr,hr));
         }
 
         ~Sphere() {}
