@@ -95,7 +95,7 @@ class mat
 
         void eigenvectors(mat<r,c,T> & evec)                    const;
         void eigenvalues (mat<r,1,T> & eval)                    const;
-        void eigendcomp  (mat<r,1,T> & eval, mat<r,c,T> & evec) const;
+        void eigendecomp (mat<r,1,T> & eval, mat<r,c,T> & evec) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

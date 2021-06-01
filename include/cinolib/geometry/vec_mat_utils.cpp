@@ -763,34 +763,36 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_eigendec(const T m[][c], T eval[], T evec[][c])
 {
-    if(r==2 && c==2)
-    {
-        // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
-        mat_eigenval<r,c,T>(m, eval);
-        if(std::fabs(m[1][0])>1e-5)
-        {
-            vec_set<2,T>(evec[0], { eval[0]-m[1][1], m[1][0] });
-            vec_set<2,T>(evec[1], { eval[1]-m[1][1], m[1][0] });
-        }
-        else if(std::fabs(m[0][1])>1e-5)
-        {
-            vec_set<2,T>(evec[0], { m[0][1], eval[0]-m[0][0] });
-            vec_set<2,T>(evec[1], { m[0][1], eval[1]-m[0][0] });
-        }
-        else if(m[0][0]>=m[1][1])
-        {
-            vec_set<2,T>(evec[0], { 1, 0 });
-            vec_set<2,T>(evec[1], { 0, 1 });
-        }
-        else
-        {
-            vec_set<2,T>(evec[0], { 0, 1 });
-            vec_set<2,T>(evec[1], { 1, 0 });
-        }
-        vec_normalize<2,T>(evec[0]);
-        vec_normalize<2,T>(evec[1]);
-    }
-    else if(r==3 && c==3)
+    if(r!=c) assert(false && "mat_eigendec: unsupported matrix size");
+
+//    if(r==2)
+//    {
+//        // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
+//        mat_eigenval<r,c,T>(m, eval);
+//        if(std::fabs(m[1][0])>1e-5)
+//        {
+//            vec_set<2,T>(evec[0], { eval[0]-m[1][1], m[1][0] });
+//            vec_set<2,T>(evec[1], { eval[1]-m[1][1], m[1][0] });
+//        }
+//        else if(std::fabs(m[0][1])>1e-5)
+//        {
+//            vec_set<2,T>(evec[0], { m[0][1], eval[0]-m[0][0] });
+//            vec_set<2,T>(evec[1], { m[0][1], eval[1]-m[0][0] });
+//        }
+//        else if(m[0][0]>=m[1][1])
+//        {
+//            vec_set<2,T>(evec[0], { 1, 0 });
+//            vec_set<2,T>(evec[1], { 0, 1 });
+//        }
+//        else
+//        {
+//            vec_set<2,T>(evec[0], { 0, 1 });
+//            vec_set<2,T>(evec[1], { 1, 0 });
+//        }
+//        vec_normalize<2,T>(evec[0]);
+//        vec_normalize<2,T>(evec[1]);
+//    }
+//    else
     {
         if(mat_is_symmetric(m))
         {
@@ -801,8 +803,8 @@ void mat_eigendec(const T m[][c], T eval[], T evec[][c])
             Eigen::Map<const M> tmp(m[0]);
             Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T,r,c>> eig(tmp);
             assert(eig.info() == Eigen::Success);
-            mat_copy<r,c,T>(eig.eigenvectors().data(), evec);
-            mat_copy<r,1,T>(eig.eigenvalues().data(),  eval);
+            vec_copy<r*c,T>(eig.eigenvectors().data(), evec[0]);
+            vec_copy<r,T>(eig.eigenvalues().data(),  eval);
         }
         else
         {
@@ -811,28 +813,17 @@ void mat_eigendec(const T m[][c], T eval[], T evec[][c])
             Eigen::Map<const M> tmp(m[0]);
             Eigen::EigenSolver<Eigen::Matrix<T,r,c>> eig(tmp);
             assert(eig.info() == Eigen::Success);
-            // WARNING: I am taking only the real part!
-            // e_min
-            evec[0][2] = eig.eigenvectors()(0,0).real();
-            evec[1][2] = eig.eigenvectors()(1,0).real();
-            evec[2][2] = eig.eigenvectors()(2,0).real();
-            // e_mid
-            evec[0][1] = eig.eigenvectors()(0,1).real();
-            evec[1][1] = eig.eigenvectors()(1,1).real();
-            evec[2][1] = eig.eigenvectors()(2,1).real();
-            // e_max
-            evec[0][0] = eig.eigenvectors()(0,2).real();
-            evec[1][0] = eig.eigenvectors()(1,2).real();
-            evec[2][0] = eig.eigenvectors()(2,2).real();
-            // min, mid, max eigenvalues
-            eval[2] = eig.eigenvalues()[0].real();
-            eval[1] = eig.eigenvalues()[1].real();
-            eval[0] = eig.eigenvalues()[2].real();
+
+            for(uint i=0; i<r; ++i)
+            {
+                for(uint j=0; j<r; ++j)
+                {
+                    // WARNING: I am taking only the real part!
+                    evec[j][i] = eig.eigenvectors()(j,i).real();
+                }
+                eval[i] = eig.eigenvalues()[i].real();
+            }
         }
-    }
-    else
-    {
-        assert(false && "mat_eigendec: unsupported matrix size");
     }
 }
 
@@ -855,9 +846,10 @@ void mat_eigenval(const T m[][c], T eval[])
         eval[0] = sqrt((s1+s2)*0.5);
         eval[1] = sqrt((s1-s2)*0.5);
     }
-    else
+    else if(r==c)
     {
-        assert(false && "mat_eigenval: unsupported matrix size");
+        T evec[r][c];
+        mat_eigendec<r,c,T>(m, eval, evec);
     }
 }
 

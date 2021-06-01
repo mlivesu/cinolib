@@ -280,7 +280,7 @@ void mat<r,c,T>::eigenvalues(mat<r,1,T> & eval) const
 
 template<uint r, uint c, class T>
 CINO_INLINE
-void mat<r,c,T>::eigendcomp(mat<r,1,T> & eval, mat<r,c,T> & evec) const
+void mat<r,c,T>::eigendecomp(mat<r,1,T> & eval, mat<r,c,T> & evec) const
 {
     mat_eigendec<r,c,T>(_mat, eval._vec, evec._mat);
 }
