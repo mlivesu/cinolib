@@ -262,6 +262,51 @@ mat<r,c,T> mat<r,c,T>::inverse() const
 
 template<uint r, uint c, class T>
 CINO_INLINE
+void mat<r,c,T>::eigenvectors(mat<r,c,T> & evec) const
+{
+    mat_eigenvec<r,c,T>(_mat, evec._mat);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+void mat<r,c,T>::eigenvalues(mat<r,1,T> & eval) const
+{
+    mat_eigenval<r,c,T>(_mat, eval._vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+void mat<r,c,T>::eigendcomp(mat<r,1,T> & eval, mat<r,c,T> & evec) const
+{
+    mat_eigendec<r,c,T>(_mat, eval._vec, evec._mat);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+void mat<r,c,T>::SVD(mat<r,c,T> & U, mat<r,1,T> & S, mat<r,c,T> & V) const
+{
+    mat_svd<r,c,T>(_mat, U._mat, S._vec, V._mat);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+void mat<r,c,T>::SSVD(mat<r,c,T> & U, mat<r,1,T> & S, mat<r,c,T> & V) const
+{
+    mat_ssvd<r,c,T>(_mat, U._mat, S._vec, V._mat);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
 mat<r,1,T> mat<r,c,T>::solve(const mat<c,1,T> & b)
 {
     mat<r,1,T> res;

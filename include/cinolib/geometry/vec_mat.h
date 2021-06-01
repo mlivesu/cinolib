@@ -36,8 +36,6 @@
 #ifndef CINO_VEC_MAT_H
 #define CINO_VEC_MAT_H
 
-#include <cinolib/cino_inline.h>
-#include <sys/types.h>
 #include <ostream>
 #include <cinolib/geometry/vec_mat_utils.h>
 
@@ -95,12 +93,14 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        // move outside?
-        //void eigenvalues()  const;
-        //void eigenvectors() const;
-        //void eigendcomp()   const;
-        //void SVD()          const;
-        //void SSVD()         const;
+        void eigenvectors(mat<r,c,T> & evec)                    const;
+        void eigenvalues (mat<r,1,T> & eval)                    const;
+        void eigendcomp  (mat<r,1,T> & eval, mat<r,c,T> & evec) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void SVD (mat<r,c,T> & U, mat<r,1,T> & S, mat<r,c,T> & V) const;
+        void SSVD(mat<r,c,T> & U, mat<r,1,T> & S, mat<r,c,T> & V) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

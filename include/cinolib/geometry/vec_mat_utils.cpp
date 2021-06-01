@@ -39,6 +39,7 @@
 #include <iostream>
 #include <cmath>
 #include <assert.h>
+#include <Eigen/Dense>
 
 namespace cinolib
 {
@@ -714,7 +715,7 @@ T mat_det(const T m[][d])
                    m[0][2] * mat_det<2,T>(m2);
         }
 
-        default: std::cerr << "mat_determinant: unsupported matrix size" << std::endl;
+        default: assert(false && "mat_determinant: unsupported matrix size");
     }
 }
 
@@ -751,84 +752,88 @@ bool mat_inverse(const T m[][d], T in[][d])
             return one_over_det!=0; // false if the matrix is singular
         }
 
-        default: std::cerr << "mat_inverse: unsupported matrix size" << std::endl;
+        default: assert(false && "mat_inverse: unsupported matrix size");
     }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// matrix eigen values and eigenvectors (from highest to lowest)s
+// matrix eigen values and eigenvectors (from highest to lowest)
 template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_eigendec(const T m[][c], T eval[], T evec[][c])
 {
-    assert(r==2 && c==2);
-
-    // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
-
-    mat_eigenval<r,c,T>(m, eval);
-
-    if(std::fabs(m[1][0])>1e-5)
+    if(r==2 && c==2)
     {
-        vec_set<2,T>(evec[0], { eval[0]-m[1][1], m[1][0] });
-        vec_set<2,T>(evec[1], { eval[1]-m[1][1], m[1][0] });
+        // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
+        mat_eigenval<r,c,T>(m, eval);
+        if(std::fabs(m[1][0])>1e-5)
+        {
+            vec_set<2,T>(evec[0], { eval[0]-m[1][1], m[1][0] });
+            vec_set<2,T>(evec[1], { eval[1]-m[1][1], m[1][0] });
+        }
+        else if(std::fabs(m[0][1])>1e-5)
+        {
+            vec_set<2,T>(evec[0], { m[0][1], eval[0]-m[0][0] });
+            vec_set<2,T>(evec[1], { m[0][1], eval[1]-m[0][0] });
+        }
+        else if(m[0][0]>=m[1][1])
+        {
+            vec_set<2,T>(evec[0], { 1, 0 });
+            vec_set<2,T>(evec[1], { 0, 1 });
+        }
+        else
+        {
+            vec_set<2,T>(evec[0], { 0, 1 });
+            vec_set<2,T>(evec[1], { 1, 0 });
+        }
+        vec_normalize<2,T>(evec[0]);
+        vec_normalize<2,T>(evec[1]);
     }
-    else if(std::fabs(m[0][1])>1e-5)
+    else if(r==3 && c==3)
     {
-        vec_set<2,T>(evec[0], { m[0][1], eval[0]-m[0][0] });
-        vec_set<2,T>(evec[1], { m[0][1], eval[1]-m[0][0] });
-    }
-    else if(m[0][0]>=m[1][1])
-    {
-        vec_set<2,T>(evec[0], { 1, 0 });
-        vec_set<2,T>(evec[1], { 0, 1 });
+        if(mat_is_symmetric(m))
+        {
+            // eigen decomposition for self-adjoint (i.e. real valued symmetric) matrices
+            //  - guaranteed real valued eigen values and vectors
+            //  - faster and more precise than Eigen::EigenSolver
+            typedef Eigen::Matrix<T,r,c,Eigen::RowMajor> M;
+            Eigen::Map<const M> tmp(m[0]);
+            Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T,r,c>> eig(tmp);
+            assert(eig.info() == Eigen::Success);
+            mat_copy<r,c,T>(eig.eigenvectors().data(), evec);
+            mat_copy<r,1,T>(eig.eigenvalues().data(),  eval);
+        }
+        else
+        {
+            // eigen decomposition for general matrices
+            typedef Eigen::Matrix<T,r,c,Eigen::RowMajor> M;
+            Eigen::Map<const M> tmp(m[0]);
+            Eigen::EigenSolver<Eigen::Matrix<T,r,c>> eig(tmp);
+            assert(eig.info() == Eigen::Success);
+            // WARNING: I am taking only the real part!
+            // e_min
+            evec[0][2] = eig.eigenvectors()(0,0).real();
+            evec[1][2] = eig.eigenvectors()(1,0).real();
+            evec[2][2] = eig.eigenvectors()(2,0).real();
+            // e_mid
+            evec[0][1] = eig.eigenvectors()(0,1).real();
+            evec[1][1] = eig.eigenvectors()(1,1).real();
+            evec[2][1] = eig.eigenvectors()(2,1).real();
+            // e_max
+            evec[0][0] = eig.eigenvectors()(0,2).real();
+            evec[1][0] = eig.eigenvectors()(1,2).real();
+            evec[2][0] = eig.eigenvectors()(2,2).real();
+            // min, mid, max eigenvalues
+            eval[2] = eig.eigenvalues()[0].real();
+            eval[1] = eig.eigenvalues()[1].real();
+            eval[0] = eig.eigenvalues()[2].real();
+        }
     }
     else
     {
-        vec_set<2,T>(evec[0], { 0, 1 });
-        vec_set<2,T>(evec[1], { 1, 0 });
+        assert(false && "mat_eigendec: unsupported matrix size");
     }
-
-    vec_normalize<2,T>(evec[0]);
-    vec_normalize<2,T>(evec[1]);
-
-//    Eigen::Matrix3d m;
-//    m << a00, a01, a02,
-//         a10, a11, a12,
-//         a20, a21, a22;
-
-//    bool symmetric = (a10==a01) && (a20==a02) && (a21==a12);
-
-//    if(symmetric)
-//    {
-//        // eigen decomposition for self-adjoint matrices
-//        Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eig(m);
-//        assert(eig.info() == Eigen::Success);
-
-//        v_min = vec3d(eig.eigenvectors()(0,0), eig.eigenvectors()(1,0), eig.eigenvectors()(2,0));
-//        v_mid = vec3d(eig.eigenvectors()(0,1), eig.eigenvectors()(1,1), eig.eigenvectors()(2,1));
-//        v_max = vec3d(eig.eigenvectors()(0,2), eig.eigenvectors()(1,2), eig.eigenvectors()(2,2));
-
-//        min = eig.eigenvalues()[0];
-//        mid = eig.eigenvalues()[1];
-//        max = eig.eigenvalues()[2];
-//    }
-//    else
-//    {
-//        // eigen decomposition for general matrices
-//        Eigen::EigenSolver<Eigen::Matrix3d> eig(m);
-//        assert(eig.info() == Eigen::Success);
-
-//        // WARNING: I am taking only the real part!
-//        v_min = vec3d(eig.eigenvectors()(0,0).real(), eig.eigenvectors()(1,0).real(), eig.eigenvectors()(2,0).real());
-//        v_mid = vec3d(eig.eigenvectors()(0,1).real(), eig.eigenvectors()(1,1).real(), eig.eigenvectors()(2,1).real());
-//        v_max = vec3d(eig.eigenvectors()(0,2).real(), eig.eigenvectors()(1,2).real(), eig.eigenvectors()(2,2).real());
-
-//        // WARNING: I am taking only the real part!
-//        min = eig.eigenvalues()[0].real();
-//        mid = eig.eigenvalues()[1].real();
-//        max = eig.eigenvalues()[2].real();
-//    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -838,18 +843,22 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_eigenval(const T m[][c], T eval[])
 {
-    assert(r==2 && c==2);
-
-    // https://lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
-
-    T m00_2 = m[0][0]*m[0][0];
-    T m01_2 = m[0][1]*m[0][1];
-    T m10_2 = m[1][0]*m[1][0];
-    T m11_2 = m[1][1]*m[0][0];
-    T s1    = m00_2 + m01_2 + m10_2 + m11_2;
-    T s2    = sqrt(std::pow(m00_2 + m01_2 - m10_2 - m11_2,2) + 4*pow(m[0][0]*m[1][0] + m[0][1]*m[1][1],2));
-    eval[0] = sqrt((s1+s2)*0.5);
-    eval[1] = sqrt((s1-s2)*0.5);
+    if(r==2 && c==2)
+    {
+        // https://lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
+        T m00_2 = m[0][0]*m[0][0];
+        T m01_2 = m[0][1]*m[0][1];
+        T m10_2 = m[1][0]*m[1][0];
+        T m11_2 = m[1][1]*m[1][1];
+        T s1    = m00_2 + m01_2 + m10_2 + m11_2;
+        T s2    = sqrt(std::pow(m00_2 + m01_2 - m10_2 - m11_2,2) + 4*std::pow(m[0][0]*m[1][0] + m[0][1]*m[1][1],2));
+        eval[0] = sqrt((s1+s2)*0.5);
+        eval[1] = sqrt((s1-s2)*0.5);
+    }
+    else
+    {
+        assert(false && "mat_eigenval: unsupported matrix size");
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -858,8 +867,6 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_eigenvec(const T m[][c], T evec[][c])
 {
-    assert(r==2 && c==2);
-
     T eval[2];
     mat_eigendec<r,c,T>(m, eval, evec);
 }
@@ -868,20 +875,95 @@ void mat_eigenvec(const T m[][c], T evec[][c])
 
 template<uint r, uint c, typename T>
 CINO_INLINE
-void mat_svd(const T m[][c], T S[][r], T V[], T D[][c])
+void mat_svd(const T m[][c], T U[][r], T S[], T V[][c])
 {
-    assert(false && "TODO");
-    mat_ssvd<r,c,T>(m,S,V,D);
+    if(r==2 && c==2)
+    {
+        // https://lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
+
+        double theta = 0.5 * atan2(2.0*m[0][0]*m[1][0]+2.0*m[0][1]*m[1][1], m[0][0]*m[0][0] + m[0][1]*m[0][1] - m[1][0]*m[1][0] - m[1][1]*m[1][1]);
+        double phi   = 0.5 * atan2(2.0*m[0][0]*m[0][1]+2.0*m[1][0]*m[1][1], m[0][0]*m[0][0] - m[0][1]*m[0][1] + m[1][0]*m[1][0] - m[1][1]*m[1][1]);
+
+        double cos_theta = cos(theta);
+        double sin_theta = cos(theta);
+        double cos_phi   = cos(phi);
+        double sin_phi   = cos(phi);
+
+        int s1 = ((m[0][0]*cos_theta + m[1][0]*sin_theta)*cos_phi + ( m[0][1]*cos_theta + m[1][1]*sin_theta)*sin_phi > 0) ? +1 : -1;
+        int s2 = ((m[0][0]*sin_theta - m[1][0]*cos_theta)*sin_phi + (-m[0][1]*sin_theta + m[1][1]*cos_theta)*cos_phi > 0) ? +1 : -1;
+
+        mat_set_rot_2d<r,T>(U, theta);
+        mat_set_rot_2d<r,T>(V, phi);
+
+        V[0][0] *= s1;
+        V[1][0] *= s1;
+        V[0][1] *= s2;
+        V[1][1] *= s2;
+
+        mat_eigenval<r,r,T>(m,S);
+    }
+    else
+    {
+        typedef Eigen::Matrix<T,r,c,Eigen::RowMajor> M;
+        Eigen::Map<const M> tmp(m[0]);
+        Eigen::JacobiSVD<M> svd(tmp, Eigen::ComputeFullU | Eigen::ComputeFullV);
+        vec_copy<r*r,T>(svd.matrixU().data(), U[0]);
+        vec_copy<c*c,T>(svd.matrixV().data(), V[0]);
+        if(r<c) vec_copy<r>(svd.singularValues().data(), S);
+        else    vec_copy<c>(svd.singularValues().data(), S);
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint r, uint c, typename T>
 CINO_INLINE
-void mat_ssvd(const T m[][c], T S[][r], T V[], T D[][c])
+void mat_ssvd(const T m[][c], T U[][r], T S[], T V[][c])
 {
-    assert(false && "TODO");
-    mat_svd<r,c,T>(m,S,V,D);
+    mat_svd<r,c,T>(m,U,S,V);
+
+    if(r==2 && c==2)
+    {
+        if(mat_det<c,T>(V)<0)
+        {
+            V[0][1] = -V[0][1];
+            V[1][1] = -V[1][1];
+            U[0][1] = -U[0][1];
+            U[1][1] = -U[1][1];
+            assert((mat_det<c,T>(V)>0));
+        }
+
+        if(mat_det<r,T>(U)<0)
+        {
+            U[0][1] = -U[0][1];
+            U[1][1] = -U[1][1];
+            S[1]    = -S[1];
+            assert((mat_det<r,T>(U)>0));
+        }
+    }
+    else if(r==3 && c==3)
+    {
+        if(mat_det<c,T>(V)<0)
+        {
+            V[0][2] = -V[0][2];
+            V[1][2] = -V[1][2];
+            V[2][2] = -V[2][2];
+            U[0][2] = -U[0][2];
+            U[1][2] = -U[1][2];
+            U[2][2] = -U[2][2];
+            assert((mat_det<c,T>(V)>0));
+        }
+
+        if(mat_det<r,T>(U)<0)
+        {
+            U[0][2] = -U[0][2];
+            U[1][2] = -U[1][2];
+            U[2][2] = -U[2][2];
+            S[2]    = -S[2];
+            assert((mat_det<c,T>(U)>0));
+        }
+    }
+    else assert(false && "mat_ssvd: unsupported matrix size");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
