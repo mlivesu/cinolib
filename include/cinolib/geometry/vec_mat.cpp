@@ -109,7 +109,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 mat<r,c,T> mat<r,c,T>::ZERO()
 {
-    return mat<r,c,T>(0);
+    return mat<r,c,T>((T)0);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -118,7 +118,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 mat<r,c,T> mat<r,c,T>::ONES()
 {
-    return mat<r,c,T>(1);
+    return mat<r,c,T>((T)1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -35,7 +35,6 @@
 *********************************************************************************/
 #include <cinolib/ARAP_2D_map.h>
 #include <cinolib/parallel_for.h>
-#include <cinolib/ssvd.h>
 #include <cinolib/tangent_space.h>
 #include <cinolib/lscm.h>
 
@@ -59,15 +58,13 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
         // compute reference local uv coords
         for(uint pid=0; pid<m.num_polys(); ++pid)
         {
-            vec2d p0,p1,p2;
+            uint off = pid*3;
             tangent_space_2d_coords(m.poly_vert(pid,0),
                                     m.poly_vert(pid,1),
                                     m.poly_vert(pid,2),
-                                    p0, p1, p2);
-            uint off = pid*3;
-            data.uv_ref.at(off)   << p0[0], p0[1];
-            data.uv_ref.at(off+1) << p1[0], p1[1];
-            data.uv_ref.at(off+2) << p2[0], p2[1];
+                                    data.uv_ref.at(off),
+                                    data.uv_ref.at(off+1),
+                                    data.uv_ref.at(off+2));
         }
 
         // warm start current global uv's with some mapping
@@ -75,7 +72,7 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
         uint nv = m.num_verts();
         for(uint vid=0; vid<nv; ++vid)
         {
-            data.uv.at(vid) << f[vid], f[vid+nv];
+            data.uv.at(vid) = vec2d(f[vid], f[vid+nv]);
         }
 
         // per edge weights
@@ -113,26 +110,26 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
         {
             // per triangle covariance matrix
             uint off = 3*pid;
-            Eigen::Matrix2d cov = Eigen::Matrix2d::Zero();
+            mat22d cov = mat22d::ZERO();
             for(int i=0; i<3; ++i)
             {
                 uint v0  = m.poly_vert_id(pid,i);
                 uint v1  = m.poly_vert_id(pid,(i+1)%3);
                 int  eid = m.edge_id(v0,v1);
                 assert(eid>=0);
-                Eigen::Vector2d e_cur = data.uv.at(v0)    - data.uv.at(v1);
-                Eigen::Vector2d e_ref = data.uv_ref.at(off+i) - data.uv_ref.at(off+((i+1)%3));
+                vec2d e_cur = data.uv.at(v0)    - data.uv.at(v1);
+                vec2d e_ref = data.uv_ref.at(off+i) - data.uv_ref.at(off+((i+1)%3));
                 cov += data.w.at(eid) * (e_cur * e_ref.transpose());
             }
 
-            Eigen::Matrix2d u,v;
-            Eigen::DiagonalMatrix<double,2> s;
-            ssvd(cov,u,s,v);
-            Eigen::Matrix2d R = u*v.transpose();
-
-            data.uv_loc.at(off  ) = R * data.uv_ref.at(off  );
-            data.uv_loc.at(off+1) = R * data.uv_ref.at(off+1);
-            data.uv_loc.at(off+2) = R * data.uv_ref.at(off+2);
+            // find closest rotation and store rotated point
+            mat22d u,v;
+            vec2d  s;
+            cov.SSVD(u,s,v);
+            mat22d rot = u*v.transpose();
+            data.uv_loc.at(off  ) = rot * data.uv_ref.at(off  );
+            data.uv_loc.at(off+1) = rot * data.uv_ref.at(off+1);
+            data.uv_loc.at(off+2) = rot * data.uv_ref.at(off+2);
         });
     };
 
@@ -140,7 +137,7 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
     {
         Eigen::VectorXd rhs_u = Eigen::VectorXd::Zero(m.num_verts()-1);
         Eigen::VectorXd rhs_v = Eigen::VectorXd::Zero(m.num_verts()-1);
-        for(uint vid=0; vid<m.num_verts(); ++vid)
+        for(uint vid=0; vid<m.num_verts()-1; ++vid)
         {
             for(uint nbr : m.adj_v2v(vid))
             {
@@ -151,7 +148,7 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
                     uint j = m.poly_vert_offset(pid,nbr);
                     assert(i>=0 && i<3);
                     assert(j>=0 && j<3);
-                    Eigen::Vector2d Re = data.uv_loc.at(pid*3+i) - data.uv_loc.at(pid*3+j);
+                    vec2d Re = data.uv_loc.at(pid*3+i) - data.uv_loc.at(pid*3+j);
                     rhs_u[vid] += data.w.at(eid) * Re[0];
                     rhs_v[vid] += data.w.at(eid) * Re[1];
                 }
@@ -159,11 +156,11 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
         }
         Eigen::VectorXd u = data.cache.solve(rhs_u);
         Eigen::VectorXd v = data.cache.solve(rhs_v);
-        for(uint vid=0; vid<m.num_verts(); ++vid)
+        for(uint vid=0; vid<m.num_verts()-1; ++vid)
         {
-            if(vid!=bc) data.uv[vid] << u[vid], v[vid];
-            else        data.uv[vid] << 0, 0;
+            data.uv[vid] = vec2d(u[vid],v[vid]);
         }
+        data.uv[bc] = vec2d(0,0); // last vertex
     };
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

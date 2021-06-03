@@ -38,8 +38,6 @@
 #include <cinolib/geometry/segment.h>
 #include <cinolib/Moller_Trumbore_intersection.h>
 #include <cinolib/geometry/triangle_utils.h>
-#include <cinolib/matrix.h>
-#include <Eigen/Dense>
 #include <set>
 
 namespace cinolib
@@ -65,14 +63,15 @@ vec3d tetrahedron_circumcenter(const vec3d & A,
     double v_len = v.norm_sqrd();
     double w_len = w.norm_sqrd();
 
-    double num_x = determinant_3x3(u.y(), u.z(), u_len, v.y(), v.z(), v_len, w.y(), w.z(), w_len);
-    double num_y = determinant_3x3(u.x(), u.z(), u_len, v.x(), v.z(), v_len, w.x(), w.z(), w_len);
-    double num_z = determinant_3x3(u.x(), u.y(), u_len, v.x(), v.y(), v_len, w.x(), w.y(), w_len);
-    double den   = determinant_3x3(u.x(), u.y(), u.z(), v.x(), v.y(), v.z(), w.x(), w.y(), w.z()) * 2.0;
+    mat33d Mx({u.y(), u.z(), u_len, v.y(), v.z(), v_len, w.y(), w.z(), w_len});
+    mat33d My({u.x(), u.z(), u_len, v.x(), v.z(), v_len, w.x(), w.z(), w_len});
+    mat33d Mz({u.x(), u.y(), u_len, v.x(), v.y(), v_len, w.x(), w.y(), w_len});
+    mat33d M ({u.x(), u.y(), u.z(), v.x(), v.y(), v.z(), w.x(), w.y(), w.z()});
+    double den = M.det()*2.0;
 
-    vec3d c(A.x() + num_x / den,
-            A.y() - num_y / den,
-            A.z() + num_z / den);
+    vec3d c(A.x() + Mx.det() / den,
+            A.y() - My.det() / den,
+            A.z() + Mz.det() / den);
 
      return c;
 }

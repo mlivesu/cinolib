@@ -35,7 +35,6 @@
 *********************************************************************************/
 #include <cinolib/pca.h>
 #include <cinolib/covmat.h>
-#include <cinolib/matrix.h>
 
 namespace cinolib
 {
@@ -51,13 +50,17 @@ void PCA(const std::vector<vec3d> & points, vec3d & e_min, vec3d & e_mid, vec3d 
     double cov[3][3];
     covariance_matrix(points, cov);
 
-    double min, mid, max;
-    eigen_decomposition_3x3(cov, e_min, e_mid, e_max, min, mid, max);
+    double eval[3];
+    double evec[3][3];
+    mat_eigendec<3,3,double>(cov, eval, evec);
 
     // rescale vectors according to eigenvalues
-    e_min *= min;
-    e_mid *= mid;
-    e_max *= max;
+    mat_col<3,3,double>(evec,0,e_min.ptr());
+    mat_col<3,3,double>(evec,1,e_mid.ptr());
+    mat_col<3,3,double>(evec,2,e_max.ptr());
+    e_min *= eval[0];
+    e_mid *= eval[1];
+    e_max *= eval[2];
 }
 
 }
