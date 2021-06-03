@@ -84,7 +84,7 @@ vec3d polygon_normal(const std::vector<vec3d> & poly)
     vec3d  Z     = vec3d(0,0,1);
     vec3d  axis  = best_fit.n.cross(Z);
     double angle = best_fit.n.angle_rad(Z);
-    mat33d R     = mat33d::ROT_3D(axis,angle);
+    mat3d  R     = mat3d::ROT_3D(axis,angle);
 
     // if the face is degenerate (i.e. does not span a plane),
     // return the null vector
@@ -122,7 +122,7 @@ bool polygon_flatten(const std::vector<vec3d> & poly3d,
     vec3d  Z     = vec3d(0,0,1);
     vec3d  axis  = best_fit.n.cross(Z);
     double angle = best_fit.n.angle_rad(Z);
-    mat33d R     = mat33d::ROT_3D(axis, angle);
+    mat3d  R     = mat3d::ROT_3D(axis, angle);
 
     for(auto p : poly3d)
     {

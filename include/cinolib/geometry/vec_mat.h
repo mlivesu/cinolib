@@ -209,17 +209,17 @@ std::ostream & operator<< (std::ostream & in, const mat<r,c,T> & op);
 
 // useful types to have
 
-typedef mat<2,2,double> mat22d;
-typedef mat<2,2,float>  mat22f;
-typedef mat<2,2,int>    mat22i;
+typedef mat<2,2,double> mat2d;
+typedef mat<2,2,float>  mat2f;
+typedef mat<2,2,int>    mat2i;
 
-typedef mat<3,3,double> mat33d;
-typedef mat<3,3,float>  mat33f;
-typedef mat<3,3,int>    mat33i;
+typedef mat<3,3,double> mat3d;
+typedef mat<3,3,float>  mat3f;
+typedef mat<3,3,int>    mat3i;
 
-typedef mat<4,4,double> mat44d;
-typedef mat<4,4,float>  mat44f;
-typedef mat<4,4,int>    mat44i;
+typedef mat<4,4,double> mat4d;
+typedef mat<4,4,float>  mat4f;
+typedef mat<4,4,int>    mat4i;
 
 typedef mat<2,1,double> vec2d;
 typedef mat<2,1,float>  vec2f;

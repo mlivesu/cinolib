@@ -67,14 +67,14 @@ namespace cinolib
 // Symposium on Computer Animation, 2015
 //
 CINO_INLINE
-void stretch_tensor(const vec3d  & p0,    // reference triangle <p0,p1,p2>
-                    const vec3d  & p1,    //
-                    const vec3d  & p2,    //
-                    const vec3d  & q0,    // deformed triangle <q0,q1,q2>
-                    const vec3d  & q1,    //
-                    const vec3d  & q2,    //
-                          mat22d & vec,
-                          vec2d  & val)
+void stretch_tensor(const vec3d & p0,    // reference triangle <p0,p1,p2>
+                    const vec3d & p1,    //
+                    const vec3d & p2,    //
+                    const vec3d & q0,    // deformed triangle <q0,q1,q2>
+                    const vec3d & q1,    //
+                    const vec3d & q2,    //
+                          mat2d & vec,
+                          vec2d & val)
 {
     // express triangle vertices as 2D coordinates
     vec2d P0,P1,P2,Q0,Q1,Q2;
@@ -88,10 +88,10 @@ void stretch_tensor(const vec3d  & p0,    // reference triangle <p0,p1,p2>
     vec2d u2     = Q2-Q0;
 
     // right Green Cauchy deformation tensor C (multiplying F by its transpose cancels out rotations)
-    mat22d U_ref({ u1_ref.x(), u2_ref.x(), u1_ref.y(), u2_ref.y() });
-    mat22d U({ u1.x(), u2.x(), u1.y(), u2.y() });
-    mat22d F = U * U_ref.inverse();
-    mat22d C = F.transpose() * F;
+    mat2d U_ref({ u1_ref.x(), u2_ref.x(), u1_ref.y(), u2_ref.y() });
+    mat2d U({ u1.x(), u2.x(), u1.y(), u2.y() });
+    mat2d F = U * U_ref.inverse();
+    mat2d C = F.transpose() * F;
 
     // Stretch tensor is defined as: U = sqrt(C).
     // Here I compute the eigenvectors and eigenvalues of sqrt(C)

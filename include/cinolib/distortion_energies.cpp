@@ -80,7 +80,7 @@ double distortion(const vec2d      & u0,
                   const vec2d      & v1,
                   const DistEnergy & energy)
 {
-    mat22d T;
+    mat2d T;
     linear_map(u0,v0,u1,v1,T);
 
     vec2d eval;
@@ -101,7 +101,7 @@ double distortion(const vec3d      & a0,
                   const vec3d      & b2,
                   const DistEnergy & energy)
 {
-    mat22d T;
+    mat2d T;
     linear_map(a0,a1,a2,b0,b1,b2,T);
 
     vec2d eval;

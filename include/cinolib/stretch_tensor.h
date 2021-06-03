@@ -70,14 +70,14 @@ namespace cinolib
 // Symposium on Computer Animation, 2015
 //
 CINO_INLINE
-void stretch_tensor(const vec3d  & p0,    // reference triangle <p0,p1,p2>
-                    const vec3d  & p1,    //
-                    const vec3d  & p2,    //
-                    const vec3d  & q0,    // deformed triangle <q0,q1,q2>
-                    const vec3d  & q1,    //
-                    const vec3d  & q2,    //
-                          mat22d & vec,
-                          vec2d  & val);
+void stretch_tensor(const vec3d & p0,    // reference triangle <p0,p1,p2>
+                    const vec3d & p1,    //
+                    const vec3d & p2,    //
+                    const vec3d & q0,    // deformed triangle <q0,q1,q2>
+                    const vec3d & q1,    //
+                    const vec3d & q2,    //
+                          mat2d & vec,
+                          vec2d & val);
 }
 
 #ifndef  CINO_STATIC_LIB

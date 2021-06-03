@@ -110,7 +110,7 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
         {
             // per triangle covariance matrix
             uint off = 3*pid;
-            mat22d cov = mat22d::ZERO();
+            mat2d cov = mat2d::ZERO();
             for(int i=0; i<3; ++i)
             {
                 uint v0  = m.poly_vert_id(pid,i);
@@ -123,10 +123,10 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
             }
 
             // find closest rotation and store rotated point
-            mat22d u,v;
+            mat2d u,v;
             vec2d  s;
             cov.SSVD(u,s,v);
-            mat22d rot = u*v.transpose();
+            mat2d rot = u*v.transpose();
             data.uv_loc.at(off  ) = rot * data.uv_ref.at(off  );
             data.uv_loc.at(off+1) = rot * data.uv_ref.at(off+1);
             data.uv_loc.at(off+2) = rot * data.uv_ref.at(off+2);

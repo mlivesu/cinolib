@@ -126,7 +126,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::rotate(const vec3d & axis, const double angle)
 {
     vec3d  c = centroid();
-    mat33d R = mat33d::ROT_3D(axis, angle);
+    mat3d R = mat3d::ROT_3D(axis, angle);
 
     for(uint vid=0; vid<num_verts(); ++vid)
     {

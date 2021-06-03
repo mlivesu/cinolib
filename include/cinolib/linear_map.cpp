@@ -58,16 +58,16 @@ void linear_map(const double u0[2],
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void linear_map(const vec2d  & u0,
-                const vec2d  & v0,
-                const vec2d  & u1,
-                const vec2d  & v1,
-                      mat22d & T)
+void linear_map(const vec2d & u0,
+                const vec2d & v0,
+                const vec2d & u1,
+                const vec2d & v1,
+                      mat2d & T)
 {
     // compute the transformation as T = |u1 v1| * |u0 v0|^-1
 
-    mat22d uv0({u0[0],v0[0], u0[1],v0[1]});
-    mat22d uv1({u1[0],v1[0], u1[1],v1[1]});
+    mat2d uv0({u0[0],v0[0], u0[1],v0[1]});
+    mat2d uv1({u1[0],v1[0], u1[1],v1[1]});
 
     T = uv1 * uv0.inverse();
 }
@@ -75,13 +75,13 @@ void linear_map(const vec2d  & u0,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void linear_map(const vec3d  & a0,
-                const vec3d  & a1,
-                const vec3d  & a2,
-                const vec3d  & b0,
-                const vec3d  & b1,
-                const vec3d  & b2,
-                      mat22d & T)
+void linear_map(const vec3d & a0,
+                const vec3d & a1,
+                const vec3d & a2,
+                const vec3d & b0,
+                const vec3d & b1,
+                const vec3d & b2,
+                      mat2d & T)
 {
     // compute 2D coordinates in tangent space
     vec2d A0,A1,A2;

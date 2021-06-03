@@ -526,7 +526,7 @@ template<uint r, uint c, class T>
 CINO_INLINE
 mat<r,c,T> & mat<r,c,T>::rotate(const mat<3,1,T> & axis, const T angle_rad)
 {
-    mat33d R = mat33d::ROT_3D(axis,angle_rad);
+    mat3d R = mat3d::ROT_3D(axis,angle_rad);
     (*this) = R*(*this);
     return *this;
 }
