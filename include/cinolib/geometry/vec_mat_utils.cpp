@@ -858,39 +858,39 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_svd(const T m[][c], T U[][r], T S[], T V[][c])
 {
-    // https://lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
-    if(r==2 && c==2)
-    {
-        // singular values (S)
-        {
-            T m00_2 = m[0][0]*m[0][0];
-            T m01_2 = m[0][1]*m[0][1];
-            T m10_2 = m[1][0]*m[1][0];
-            T m11_2 = m[1][1]*m[1][1];
-            T s1    = m00_2 + m01_2 + m10_2 + m11_2;
-            T s2    = sqrt(std::pow(m00_2 + m01_2 - m10_2 - m11_2,2) + 4*std::pow(m[0][0]*m[1][0] + m[0][1]*m[1][1],2));
-            S[0]    = sqrt((s1+s2)*0.5);
-            S[1]    = sqrt((s1-s2)*0.5);
-        }
-        // orthogonal matrices (U,V)
-        {
-            double theta     = 0.5 * atan2(2.0*m[0][0]*m[1][0]+2.0*m[0][1]*m[1][1], m[0][0]*m[0][0] + m[0][1]*m[0][1] - m[1][0]*m[1][0] - m[1][1]*m[1][1]);
-            double phi       = 0.5 * atan2(2.0*m[0][0]*m[0][1]+2.0*m[1][0]*m[1][1], m[0][0]*m[0][0] - m[0][1]*m[0][1] + m[1][0]*m[1][0] - m[1][1]*m[1][1]);
-            double cos_theta = cos(theta);
-            double sin_theta = cos(theta);
-            double cos_phi   = cos(phi);
-            double sin_phi   = cos(phi);
-            int sign1        = ((m[0][0]*cos_theta + m[1][0]*sin_theta)*cos_phi + ( m[0][1]*cos_theta + m[1][1]*sin_theta)*sin_phi > 0) ? +1 : -1;
-            int sign2        = ((m[0][0]*sin_theta - m[1][0]*cos_theta)*sin_phi + (-m[0][1]*sin_theta + m[1][1]*cos_theta)*cos_phi > 0) ? +1 : -1;
-            mat_set_rot_2d<r,T>(U, theta);
-            mat_set_rot_2d<r,T>(V, phi);
-            V[0][0] *= sign1;
-            V[1][0] *= sign1;
-            V[0][1] *= sign2;
-            V[1][1] *= sign2;
-        }
-    }
-    else
+//    // https://lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
+//    if(r==2 && c==2)
+//    {
+//        // singular values (S)
+//        {
+//            T m00_2 = m[0][0]*m[0][0];
+//            T m01_2 = m[0][1]*m[0][1];
+//            T m10_2 = m[1][0]*m[1][0];
+//            T m11_2 = m[1][1]*m[1][1];
+//            T s1    = m00_2 + m01_2 + m10_2 + m11_2;
+//            T s2    = sqrt(std::pow(m00_2 + m01_2 - m10_2 - m11_2,2) + 4*std::pow(m[0][0]*m[1][0] + m[0][1]*m[1][1],2));
+//            S[0]    = sqrt((s1+s2)*0.5);
+//            S[1]    = sqrt((s1-s2)*0.5);
+//        }
+//        // orthogonal matrices (U,V)
+//        {
+//            double theta     = 0.5 * atan2(2.0*m[0][0]*m[1][0]+2.0*m[0][1]*m[1][1], m[0][0]*m[0][0] + m[0][1]*m[0][1] - m[1][0]*m[1][0] - m[1][1]*m[1][1]);
+//            double phi       = 0.5 * atan2(2.0*m[0][0]*m[0][1]+2.0*m[1][0]*m[1][1], m[0][0]*m[0][0] - m[0][1]*m[0][1] + m[1][0]*m[1][0] - m[1][1]*m[1][1]);
+//            double cos_theta = cos(theta);
+//            double sin_theta = cos(theta);
+//            double cos_phi   = cos(phi);
+//            double sin_phi   = cos(phi);
+//            int sign1        = ((m[0][0]*cos_theta + m[1][0]*sin_theta)*cos_phi + ( m[0][1]*cos_theta + m[1][1]*sin_theta)*sin_phi > 0) ? +1 : -1;
+//            int sign2        = ((m[0][0]*sin_theta - m[1][0]*cos_theta)*sin_phi + (-m[0][1]*sin_theta + m[1][1]*cos_theta)*cos_phi > 0) ? +1 : -1;
+//            mat_set_rot_2d<r,T>(U, theta);
+//            mat_set_rot_2d<r,T>(V, phi);
+//            V[0][0] *= sign1;
+//            V[1][0] *= sign1;
+//            V[0][1] *= sign2;
+//            V[1][1] *= sign2;
+//        }
+//    }
+//    else
     {
         typedef Eigen::Matrix<T,r,c,Eigen::RowMajor> M;
         Eigen::Map<const M> tmp(m[0]);
