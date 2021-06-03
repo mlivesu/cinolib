@@ -758,41 +758,44 @@ bool mat_inverse(const T m[][d], T in[][d])
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// matrix eigen values and eigenvectors (from highest to lowest)
+// matrix eigen values and eigenvectors (from lowest to highest)
 template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_eigendec(const T m[][c], T eval[], T evec[][c])
 {
-    if(r!=c) assert(false && "mat_eigendec: unsupported matrix size");
+    assert(r==c);
 
-//    if(r==2)
-//    {
-//        // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
-//        mat_eigenval<r,c,T>(m, eval);
-//        if(std::fabs(m[1][0])>1e-5)
-//        {
-//            vec_set<2,T>(evec[0], { eval[0]-m[1][1], m[1][0] });
-//            vec_set<2,T>(evec[1], { eval[1]-m[1][1], m[1][0] });
-//        }
-//        else if(std::fabs(m[0][1])>1e-5)
-//        {
-//            vec_set<2,T>(evec[0], { m[0][1], eval[0]-m[0][0] });
-//            vec_set<2,T>(evec[1], { m[0][1], eval[1]-m[0][0] });
-//        }
-//        else if(m[0][0]>=m[1][1])
-//        {
-//            vec_set<2,T>(evec[0], { 1, 0 });
-//            vec_set<2,T>(evec[1], { 0, 1 });
-//        }
-//        else
-//        {
-//            vec_set<2,T>(evec[0], { 0, 1 });
-//            vec_set<2,T>(evec[1], { 1, 0 });
-//        }
-//        vec_normalize<2,T>(evec[0]);
-//        vec_normalize<2,T>(evec[1]);
-//    }
-//    else
+    if(r==2)
+    {
+        // http://legacy-www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
+        T trace = mat_trace<r,T>(m);
+        T det   = mat_det<r,T>(m);
+        eval[0] = trace*0.5 - sqrt((trace*trace)*0.25 - det);
+        eval[1] = trace*0.5 + sqrt((trace*trace)*0.25 - det);
+
+        T e0[c];
+        T e1[c];
+        if(m[1][0]!=0)
+        {
+            vec_set<r,T>(e0, { eval[0]-m[1][1], m[1][0] });
+            vec_set<r,T>(e1, { eval[1]-m[1][1], m[1][0] });
+        }
+        else if(m[0][1]!=0)
+        {
+            vec_set<r,T>(e0, { m[0][1], eval[0]-m[0][0] });
+            vec_set<r,T>(e1, { m[0][1], eval[1]-m[0][0] });
+        }
+        else
+        {
+            vec_set<r,T>(e0, { 0, 1 });
+            vec_set<r,T>(e1, { 1, 0 });
+        }
+        vec_normalize<r,T>(e0);
+        vec_normalize<r,T>(e1);
+        mat_set_col<r,c,T>(evec, 0, e0);
+        mat_set_col<r,c,T>(evec, 1, e1);
+    }
+    else
     {
         if(mat_is_symmetric(m))
         {
@@ -805,6 +808,8 @@ void mat_eigendec(const T m[][c], T eval[], T evec[][c])
             assert(eig.info() == Eigen::Success);
             vec_copy<r*c,T>(eig.eigenvectors().data(), evec[0]);
             vec_copy<r,T>(eig.eigenvalues().data(),  eval);
+            std::cout << eig.eigenvectors() << std::endl;
+            std::cout << eig.eigenvalues() << std::endl;
         }
         else
         {
@@ -813,7 +818,6 @@ void mat_eigendec(const T m[][c], T eval[], T evec[][c])
             Eigen::Map<const M> tmp(m[0]);
             Eigen::EigenSolver<Eigen::Matrix<T,r,c>> eig(tmp);
             assert(eig.info() == Eigen::Success);
-
             for(uint i=0; i<r; ++i)
             {
                 for(uint j=0; j<r; ++j)
@@ -834,23 +838,8 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_eigenval(const T m[][c], T eval[])
 {
-    if(r==2 && c==2)
-    {
-        // https://lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
-        T m00_2 = m[0][0]*m[0][0];
-        T m01_2 = m[0][1]*m[0][1];
-        T m10_2 = m[1][0]*m[1][0];
-        T m11_2 = m[1][1]*m[1][1];
-        T s1    = m00_2 + m01_2 + m10_2 + m11_2;
-        T s2    = sqrt(std::pow(m00_2 + m01_2 - m10_2 - m11_2,2) + 4*std::pow(m[0][0]*m[1][0] + m[0][1]*m[1][1],2));
-        eval[0] = sqrt((s1+s2)*0.5);
-        eval[1] = sqrt((s1-s2)*0.5);
-    }
-    else if(r==c)
-    {
-        T evec[r][c];
-        mat_eigendec<r,c,T>(m, eval, evec);
-    }
+    T evec[r][c];
+    mat_eigendec<r,c,T>(m, eval, evec);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -869,30 +858,37 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_svd(const T m[][c], T U[][r], T S[], T V[][c])
 {
+    // https://lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
     if(r==2 && c==2)
     {
-        // https://lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
-
-        double theta = 0.5 * atan2(2.0*m[0][0]*m[1][0]+2.0*m[0][1]*m[1][1], m[0][0]*m[0][0] + m[0][1]*m[0][1] - m[1][0]*m[1][0] - m[1][1]*m[1][1]);
-        double phi   = 0.5 * atan2(2.0*m[0][0]*m[0][1]+2.0*m[1][0]*m[1][1], m[0][0]*m[0][0] - m[0][1]*m[0][1] + m[1][0]*m[1][0] - m[1][1]*m[1][1]);
-
-        double cos_theta = cos(theta);
-        double sin_theta = cos(theta);
-        double cos_phi   = cos(phi);
-        double sin_phi   = cos(phi);
-
-        int s1 = ((m[0][0]*cos_theta + m[1][0]*sin_theta)*cos_phi + ( m[0][1]*cos_theta + m[1][1]*sin_theta)*sin_phi > 0) ? +1 : -1;
-        int s2 = ((m[0][0]*sin_theta - m[1][0]*cos_theta)*sin_phi + (-m[0][1]*sin_theta + m[1][1]*cos_theta)*cos_phi > 0) ? +1 : -1;
-
-        mat_set_rot_2d<r,T>(U, theta);
-        mat_set_rot_2d<r,T>(V, phi);
-
-        V[0][0] *= s1;
-        V[1][0] *= s1;
-        V[0][1] *= s2;
-        V[1][1] *= s2;
-
-        mat_eigenval<r,r,T>(m,S);
+        // singular values (S)
+        {
+            T m00_2 = m[0][0]*m[0][0];
+            T m01_2 = m[0][1]*m[0][1];
+            T m10_2 = m[1][0]*m[1][0];
+            T m11_2 = m[1][1]*m[1][1];
+            T s1    = m00_2 + m01_2 + m10_2 + m11_2;
+            T s2    = sqrt(std::pow(m00_2 + m01_2 - m10_2 - m11_2,2) + 4*std::pow(m[0][0]*m[1][0] + m[0][1]*m[1][1],2));
+            S[0]    = sqrt((s1+s2)*0.5);
+            S[1]    = sqrt((s1-s2)*0.5);
+        }
+        // orthogonal matrices (U,V)
+        {
+            double theta     = 0.5 * atan2(2.0*m[0][0]*m[1][0]+2.0*m[0][1]*m[1][1], m[0][0]*m[0][0] + m[0][1]*m[0][1] - m[1][0]*m[1][0] - m[1][1]*m[1][1]);
+            double phi       = 0.5 * atan2(2.0*m[0][0]*m[0][1]+2.0*m[1][0]*m[1][1], m[0][0]*m[0][0] - m[0][1]*m[0][1] + m[1][0]*m[1][0] - m[1][1]*m[1][1]);
+            double cos_theta = cos(theta);
+            double sin_theta = cos(theta);
+            double cos_phi   = cos(phi);
+            double sin_phi   = cos(phi);
+            int sign1        = ((m[0][0]*cos_theta + m[1][0]*sin_theta)*cos_phi + ( m[0][1]*cos_theta + m[1][1]*sin_theta)*sin_phi > 0) ? +1 : -1;
+            int sign2        = ((m[0][0]*sin_theta - m[1][0]*cos_theta)*sin_phi + (-m[0][1]*sin_theta + m[1][1]*cos_theta)*cos_phi > 0) ? +1 : -1;
+            mat_set_rot_2d<r,T>(U, theta);
+            mat_set_rot_2d<r,T>(V, phi);
+            V[0][0] *= sign1;
+            V[1][0] *= sign1;
+            V[0][1] *= sign2;
+            V[1][1] *= sign2;
+        }
     }
     else
     {
