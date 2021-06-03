@@ -35,7 +35,6 @@
 *********************************************************************************/
 #include <cinolib/linear_map.h>
 #include <cinolib/tangent_space.h>
-#include <cinolib/matrix.h>
 
 namespace cinolib
 {
@@ -47,39 +46,42 @@ void linear_map(const double u0[2],
                 const double v1[2],
                       double T[2][2])
 {
-    // compute |u0 v0|^-1
-    double inv[2][2];
-    inverse_2x2(u0[0],v0[0],u0[1],v0[1],inv[0][0],inv[0][1],inv[1][0],inv[1][1]);
-
     // compute the transformation as T = |u1 v1| * |u0 v0|^-1
-    T[0][0] = u1[0]*inv[0][0] + v1[0]*inv[1][0];
-    T[0][1] = u1[0]*inv[0][1] + v1[0]*inv[1][1];
-    T[1][0] = u1[1]*inv[0][0] + v1[1]*inv[1][0];
-    T[1][1] = u1[1]*inv[0][1] + v1[1]*inv[1][1];
+
+    double uv0[2][2] = {{u0[0],v0[0]}, {u0[1],v0[1]}};
+    double uv1[2][2] = {{u1[0],v1[0]}, {u1[1],v1[1]}};
+    double inv[2][2];
+    mat_inverse<2,double>(uv0,inv);
+    mat_times<2,2,2,double>(uv1,inv,T);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void linear_map(const vec2d & u0,
-                const vec2d & v0,
-                const vec2d & u1,
-                const vec2d & v1,
-                      double  T[2][2])
+void linear_map(const vec2d  & u0,
+                const vec2d  & v0,
+                const vec2d  & u1,
+                const vec2d  & v1,
+                      mat22d & T)
 {
-    linear_map(u0.ptr(),v0.ptr(),u1.ptr(),v1.ptr(),T);
+    // compute the transformation as T = |u1 v1| * |u0 v0|^-1
+
+    mat22d uv0({u0[0],v0[0], u0[1],v0[1]});
+    mat22d uv1({u1[0],v1[0], u1[1],v1[1]});
+
+    T = uv1 * uv0.inverse();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void linear_map(const vec3d & a0,
-                const vec3d & a1,
-                const vec3d & a2,
-                const vec3d & b0,
-                const vec3d & b1,
-                const vec3d & b2,
-                      double  T[2][2])
+void linear_map(const vec3d  & a0,
+                const vec3d  & a1,
+                const vec3d  & a2,
+                const vec3d  & b0,
+                const vec3d  & b1,
+                const vec3d  & b2,
+                      mat22d & T)
 {
     // compute 2D coordinates in tangent space
     vec2d A0,A1,A2;

@@ -76,10 +76,8 @@ void stretch_tensor(const vec3d  & p0,    // reference triangle <p0,p1,p2>
                     const vec3d  & q0,    // deformed triangle <q0,q1,q2>
                     const vec3d  & q1,    //
                     const vec3d  & q2,    //
-                          vec2d  & v_min, // eigenvector of the minimum eigenvalue
-                          vec2d  & v_max, // eigenvector of the maximum eigenvalue
-                          double & min,   // minimum eigenvalue
-                          double & max);  // maximum eigenvalue
+                          mat22d & vec,
+                          vec2d  & val);
 }
 
 #ifndef  CINO_STATIC_LIB

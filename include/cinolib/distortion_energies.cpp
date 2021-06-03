@@ -80,13 +80,13 @@ double distortion(const vec2d      & u0,
                   const vec2d      & v1,
                   const DistEnergy & energy)
 {
-    double T[2][2];
+    mat22d T;
     linear_map(u0,v0,u1,v1,T);
 
-    double s_max, s_min;
-    eigenvalues_2x2(T[0][0], T[0][1], T[1][0], T[1][1], s_max, s_min);
+    vec2d eval;
+    T.eigenvalues(eval);
 
-    return distortion(s_max, s_min, energy);
+    return distortion(eval[1], eval[0], energy);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -101,13 +101,13 @@ double distortion(const vec3d      & a0,
                   const vec3d      & b2,
                   const DistEnergy & energy)
 {
-    double T[2][2];
+    mat22d T;
     linear_map(a0,a1,a2,b0,b1,b2,T);
 
-    double s_max, s_min;
-    eigenvalues_2x2(T[0][0], T[0][1], T[1][0], T[1][1], s_max, s_min);
+    vec2d eval;
+    T.eigenvalues(eval);
 
-    return distortion(s_max, s_min, energy);
+    return distortion(eval[1], eval[0], energy);
 }
 
 }

@@ -53,23 +53,23 @@ void linear_map(const double u0[2],
 
 // Computes the linear map that connects 2D frames (u0,v0) and (u1,v1)
 CINO_INLINE
-void linear_map(const vec2d & u0,
-                const vec2d & v0,
-                const vec2d & u1,
-                const vec2d & v1,
-                      double  T[2][2]);
+void linear_map(const vec2d  & u0,
+                const vec2d  & v0,
+                const vec2d  & u1,
+                const vec2d  & v1,
+                      mat22d & T);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // Computes the linear component of the affine map that connects triangles (a0,a1,a2) and (b0,b1,b2)
 CINO_INLINE
-void linear_map(const vec3d & a0,
-                const vec3d & a1,
-                const vec3d & a2,
-                const vec3d & b0,
-                const vec3d & b1,
-                const vec3d & b2,
-                      double  T[2][2]);
+void linear_map(const vec3d  & a0,
+                const vec3d  & a1,
+                const vec3d  & a2,
+                const vec3d  & b0,
+                const vec3d  & b1,
+                const vec3d  & b2,
+                      mat22d & T);
 }
 
 #ifndef  CINO_STATIC_LIB
