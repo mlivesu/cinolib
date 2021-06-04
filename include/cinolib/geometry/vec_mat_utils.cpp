@@ -699,24 +699,38 @@ T mat_det(const T m[][d])
 {
     switch(d)
     {
-        case 2: return m[0][0]*m[1][1] - m[1][0]*m[0][1];
+        case 2: return mat_det22<T>(m[0][0], m[0][1],
+                                    m[1][0], m[1][1]);
 
-        case 3:
-        {
-            T m0[2][2];
-            T m1[2][2];
-            T m2[2][2];
-            mat_set<2,2,T>(m0, {m[1][1], m[1][2], m[2][1], m[2][2]});
-            mat_set<2,2,T>(m1, {m[1][0], m[1][2], m[2][0], m[2][2]});
-            mat_set<2,2,T>(m2, {m[1][0], m[1][1], m[2][0], m[2][1]});
-
-            return m[0][0] * mat_det<2,T>(m0) -
-                   m[0][1] * mat_det<2,T>(m1) +
-                   m[0][2] * mat_det<2,T>(m2);
-        }
+        case 3: return mat_det33<T>(m[0][0], m[0][1], m[0][2],
+                                    m[1][0], m[1][1], m[1][2],
+                                    m[2][0], m[2][1], m[2][2]);
 
         default: assert(false && "mat_determinant: unsupported matrix size");
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+T mat_det22(const T m00, const T m01,
+            const T m10, const T m11)
+{
+    return m00*m11 - m10*m01;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<typename T>
+CINO_INLINE
+T mat_det33(const T m00, const T m01, const T m02,
+            const T m10, const T m11, const T m12,
+            const T m20, const T m21, const T m22)
+{
+    return m00 * mat_det22(m11, m12, m21, m22) -
+           m01 * mat_det22(m10, m12, m20, m22) +
+           m02 * mat_det22(m10, m11, m20, m21);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

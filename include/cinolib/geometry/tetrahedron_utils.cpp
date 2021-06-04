@@ -63,15 +63,14 @@ vec3d tetrahedron_circumcenter(const vec3d & A,
     double v_len = v.norm_sqrd();
     double w_len = w.norm_sqrd();
 
-    mat3d Mx({u.y(), u.z(), u_len, v.y(), v.z(), v_len, w.y(), w.z(), w_len});
-    mat3d My({u.x(), u.z(), u_len, v.x(), v.z(), v_len, w.x(), w.z(), w_len});
-    mat3d Mz({u.x(), u.y(), u_len, v.x(), v.y(), v_len, w.x(), w.y(), w_len});
-    mat3d M ({u.x(), u.y(), u.z(), v.x(), v.y(), v.z(), w.x(), w.y(), w.z()});
-    double den = M.det()*2.0;
+    double num_x = mat_det33(u.y(), u.z(), u_len, v.y(), v.z(), v_len, w.y(), w.z(), w_len);
+    double num_y = mat_det33(u.x(), u.z(), u_len, v.x(), v.z(), v_len, w.x(), w.z(), w_len);
+    double num_z = mat_det33(u.x(), u.y(), u_len, v.x(), v.y(), v_len, w.x(), w.y(), w_len);
+    double den   = mat_det33(u.x(), u.y(), u.z(), v.x(), v.y(), v.z(), w.x(), w.y(), w.z()) * 2.0;
 
-    vec3d c(A.x() + Mx.det() / den,
-            A.y() - My.det() / den,
-            A.z() + Mz.det() / den);
+    vec3d c(A.x() + num_x / den,
+            A.y() - num_y / den,
+            A.z() + num_z / den);
 
      return c;
 }
