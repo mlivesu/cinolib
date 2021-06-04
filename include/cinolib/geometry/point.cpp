@@ -77,7 +77,7 @@ void Point::barycentric_coordinates(const vec3d & /*p*/, double /*bc*/[]) const
 CINO_INLINE
 bool Point::contains(const vec3d & p, const bool /*strict*/) const
 {
-    return p.dist_squared(v)==0;
+    return p.dist_sqrd(v)==0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -35,8 +35,6 @@
 *********************************************************************************/
 #include <cinolib/stretch_tensor.h>
 #include <cinolib/tangent_space.h>
-#include <cinolib/matrix.h>
-#include <Eigen/Dense>
 
 namespace cinolib
 {
@@ -69,55 +67,39 @@ namespace cinolib
 // Symposium on Computer Animation, 2015
 //
 CINO_INLINE
-void stretch_tensor(const vec3d  & p0,    // reference triangle <p0,p1,p2>
-                    const vec3d  & p1,    //
-                    const vec3d  & p2,    //
-                    const vec3d  & q0,    // deformed triangle <q0,q1,q2>
-                    const vec3d  & q1,    //
-                    const vec3d  & q2,    //
-                          vec2d  & v_min, // eigenvector of the minimum eigenvalue
-                          vec2d  & v_max, // eigenvector of the maximum eigenvalue
-                          double & min,   // minimum eigenvalue
-                          double & max)   // maximum eigenvalue
+void stretch_tensor(const vec3d & p0,    // reference triangle <p0,p1,p2>
+                    const vec3d & p1,    //
+                    const vec3d & p2,    //
+                    const vec3d & q0,    // deformed triangle <q0,q1,q2>
+                    const vec3d & q1,    //
+                    const vec3d & q2,    //
+                          mat2d & vec,
+                          vec2d & val)
 {
     // express triangle vertices as 2D coordinates
     vec2d P0,P1,P2,Q0,Q1,Q2;
     tangent_space_2d_coords(p0, p1, p2, P0, P1, P2);
     tangent_space_2d_coords(q0, q1, q2, Q0, Q1, Q2);
 
-    //std::cout << "P0: " << P0 << std::endl;
-    //std::cout << "P1: " << P1 << std::endl;
-    //std::cout << "P2: " << P2 << std::endl;
-    //std::cout << "Q0: " << Q0 << std::endl;
-    //std::cout << "Q1: " << Q1 << std::endl;
-    //std::cout << "Q2: " << Q2 << std::endl;
-
     // compute deformation gradient F
     vec2d u1_ref = P1-P0;
     vec2d u2_ref = P2-P0;
     vec2d u1     = Q1-Q0;
     vec2d u2     = Q2-Q0;
-    //
-    Eigen::Matrix<double,2,2> U_ref;
-    U_ref(0,0)=u1_ref.x();  U_ref(0,1)=u2_ref.x();
-    U_ref(1,0)=u1_ref.y();  U_ref(1,1)=u2_ref.y();
-    //
-    Eigen::Matrix<double,2,2> U;
-    U(0,0)=u1.x();  U(0,1)=u2.x();
-    U(1,0)=u1.y();  U(1,1)=u2.y();
-    //
-    Eigen::Matrix<double,2,2> F = U * U_ref.inverse();
 
     // right Green Cauchy deformation tensor C (multiplying F by its transpose cancels out rotations)
-    Eigen::Matrix<double,2,2> C = F.transpose() * F;
+    mat2d U_ref({ u1_ref.x(), u2_ref.x(), u1_ref.y(), u2_ref.y() });
+    mat2d U({ u1.x(), u2.x(), u1.y(), u2.y() });
+    mat2d F = U * U_ref.inverse();
+    mat2d C = F.transpose() * F;
 
     // Stretch tensor is defined as: U = sqrt(C).
     // Here I compute the eigenvectors and eigenvalues of sqrt(C)
     // by means of spectral decomposition and eigenprojection
     // https://en.wikiversity.org/wiki/Continuum_mechanics/Polar_decomposition
-    eigen_decomposition_2x2(C(0,0), C(0,1), C(1,0), C(1,1), v_min, v_max, min, max);
-    min = sqrt(min);
-    max = sqrt(max);
+    C.eigendecomp(val,vec);
+    val[0] = sqrt(val[0]);
+    val[1] = sqrt(val[1]);
 }
 
 }

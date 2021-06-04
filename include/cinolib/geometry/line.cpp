@@ -59,9 +59,9 @@ std::vector<Plane> Line::to_planes() const
     vec3d n2(     0, -d.z(), d.y());
 
     std::vector<Plane> planes;
-    if (n0.length() > 0) planes.push_back(Plane(p0, n0));
-    if (n1.length() > 0) planes.push_back(Plane(p0, n1));
-    if (n2.length() > 0) if (planes.size() < 2) planes.push_back(Plane(p0, n2));
+    if (n0.norm() > 0) planes.push_back(Plane(p0, n0));
+    if (n1.norm() > 0) planes.push_back(Plane(p0, n1));
+    if (n2.norm() > 0) if (planes.size() < 2) planes.push_back(Plane(p0, n2));
     assert(planes.size() == 2);
 
     return planes;

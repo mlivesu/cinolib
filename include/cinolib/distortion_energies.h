@@ -44,8 +44,8 @@
 #ifndef CINO_DISTORTION_ENERGIES_H
 #define CINO_DISTORTION_ENERGIES_H
 
-#include <cinolib/geometry/vec2.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
+#include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {

@@ -58,12 +58,12 @@ double tet_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2,
     vec3d L4 = p3 - p1;
     vec3d L5 = p3 - p2;
 
-    double L0_length = L0.length();
-    double L1_length = L1.length();
-    double L2_length = L2.length();
-    double L3_length = L3.length();
-    double L4_length = L4.length();
-    double L5_length = L5.length();
+    double L0_length = L0.norm();
+    double L1_length = L1.norm();
+    double L2_length = L2.norm();
+    double L3_length = L3.norm();
+    double L4_length = L4.norm();
+    double L5_length = L5.norm();
 
     double J = (L2.cross(L0)).dot(L3);
 

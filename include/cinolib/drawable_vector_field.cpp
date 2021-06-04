@@ -102,7 +102,7 @@ void DrawableVectorField::draw(const float) const
 {
     for(uint i=0; i<pos.size(); ++i)
     {
-        vec3d tip  = pos.at(i) + arrow_size * vec_at(i);
+        vec3d tip  = pos.at(i) + (double)arrow_size * vec_at(i);
         arrow<vec3d>(pos.at(i), tip, arrow_size*0.1, arrow_color.rgba);
     }
 }

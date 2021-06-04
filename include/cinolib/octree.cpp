@@ -326,7 +326,7 @@ void Octree::closest_point(const vec3d  & p,          // query point
             obj.node  = root;
             obj.index = index;
             obj.pos   = items.at(index)->point_closest_to(p);
-            obj.dist  = obj.pos.dist_squared(p);
+            obj.dist  = obj.pos.dist_sqrd(p);
             q.push(obj);
         }
     }
@@ -354,7 +354,7 @@ void Octree::closest_point(const vec3d  & p,          // query point
                     obj.node  = child;
                     obj.index = index;
                     obj.pos   = items.at(index)->point_closest_to(p);
-                    obj.dist  = obj.pos.dist_squared(p);
+                    obj.dist  = obj.pos.dist_sqrd(p);
                     q.push(obj);
                 }
             }

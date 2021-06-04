@@ -152,7 +152,7 @@ bool least_squares_intersection(const std::vector<Plane> & planes, vec3d & inter
 CINO_INLINE
 bool intersection(const Ray & r, const Segment & s, vec3d & inters, const double tol)
 {
-    if (((r.dir()).cross(s.dir())).length() == 0) return false;
+    if (((r.dir()).cross(s.dir())).norm() == 0) return false;
 
     std::vector<Plane> r_planes = r.to_planes();
     std::vector<Plane> s_planes = s.to_planes();

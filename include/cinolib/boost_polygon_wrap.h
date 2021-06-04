@@ -38,7 +38,7 @@
 
 #ifdef CINOLIB_USES_BOOST
 
-#include <cinolib/geometry/vec2.h>
+#include <cinolib/geometry/vec_mat.h>
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/polygon.hpp>

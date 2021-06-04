@@ -36,8 +36,7 @@
 #ifndef CINO_LINEAR_MAP_H
 #define CINO_LINEAR_MAP_H
 
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/geometry/vec2.h>
+#include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {
@@ -58,7 +57,7 @@ void linear_map(const vec2d & u0,
                 const vec2d & v0,
                 const vec2d & u1,
                 const vec2d & v1,
-                      double  T[2][2]);
+                      mat2d & T);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -70,7 +69,7 @@ void linear_map(const vec3d & a0,
                 const vec3d & b0,
                 const vec3d & b1,
                 const vec3d & b2,
-                      double  T[2][2]);
+                      mat2d & T);
 }
 
 #ifndef  CINO_STATIC_LIB

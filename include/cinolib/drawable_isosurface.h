@@ -37,7 +37,7 @@
 #define CINO_DRAWABLE_ISOSURFACE_H
 
 #include <cinolib/drawable_object.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/isosurface.h>
 #include <cinolib/meshes/tetmesh.h>
 #include <cinolib/color.h>

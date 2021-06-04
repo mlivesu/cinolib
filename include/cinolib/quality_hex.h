@@ -37,7 +37,7 @@
 #define CINO_QUALITY_HEX
 
 #include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 
 /*
  * Scaled Jacobian and Volume computations are all based on:

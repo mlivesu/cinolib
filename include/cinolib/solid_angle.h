@@ -36,7 +36,7 @@
 #ifndef CINO_SOLID_ANGLE_H
 #define CINO_SOLID_ANGLE_H
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {

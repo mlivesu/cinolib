@@ -141,7 +141,7 @@ CINO_INLINE
 double AABB::diag() const
 {
     if(min.x()==inf_double) return 0.0;
-    return (min - max).length();
+    return (min - max).norm();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -209,7 +209,7 @@ vec3d AABB::point_closest_to(const vec3d & p) const
 CINO_INLINE
 double AABB::dist_sqrd(const vec3d & p) const
 {
-    return p.dist_squared(point_closest_to(p));
+    return p.dist_sqrd(point_closest_to(p));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

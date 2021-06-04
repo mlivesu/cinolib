@@ -84,7 +84,7 @@ void Segment::barycentric_coordinates(const vec3d & p, double bc[]) const
 
     vec3d  u = v[1] - v[0];
     double t = (p-v[0]).dot(u);
-    bc[1] = t / u.length();
+    bc[1] = t / u.norm();
     bc[0] = 1.0 - bc[0];
 }
 
@@ -174,9 +174,9 @@ bool Segment::intersects_triangle(const vec3d t[], const bool ignore_if_valid_co
 //    vec3d n2(     0, -d.z(), d.y());
 
 //    std::vector<Plane> planes;
-//    if(n0.length() > 0) planes.push_back(Plane(first, n0));
-//    if(n1.length() > 0) planes.push_back(Plane(first, n1));
-//    if(n2.length() > 0) if (planes.size() < 2) planes.push_back(Plane(first, n2));
+//    if(n0.norm() > 0) planes.push_back(Plane(first, n0));
+//    if(n1.norm() > 0) planes.push_back(Plane(first, n1));
+//    if(n2.norm() > 0) if (planes.size() < 2) planes.push_back(Plane(first, n2));
 //    assert(planes.size()==2);
 
 //    return planes;

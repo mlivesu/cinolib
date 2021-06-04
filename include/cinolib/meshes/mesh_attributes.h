@@ -36,7 +36,7 @@
 #ifndef CINO_MESH_ATTRIBUTES_H
 #define CINO_MESH_ATTRIBUTES_H
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/color.h>
 #include <string>
 #include <bitset>

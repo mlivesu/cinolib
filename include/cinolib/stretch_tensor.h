@@ -37,8 +37,7 @@
 #define CINO_STRETCH_TENSOR_H
 
 #include <cinolib/cino_inline.h>
-#include <cinolib/geometry/vec3.h>
-#include <cinolib/geometry/vec2.h>
+#include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {
@@ -71,16 +70,14 @@ namespace cinolib
 // Symposium on Computer Animation, 2015
 //
 CINO_INLINE
-void stretch_tensor(const vec3d  & p0,    // reference triangle <p0,p1,p2>
-                    const vec3d  & p1,    //
-                    const vec3d  & p2,    //
-                    const vec3d  & q0,    // deformed triangle <q0,q1,q2>
-                    const vec3d  & q1,    //
-                    const vec3d  & q2,    //
-                          vec2d  & v_min, // eigenvector of the minimum eigenvalue
-                          vec2d  & v_max, // eigenvector of the maximum eigenvalue
-                          double & min,   // minimum eigenvalue
-                          double & max);  // maximum eigenvalue
+void stretch_tensor(const vec3d & p0,    // reference triangle <p0,p1,p2>
+                    const vec3d & p1,    //
+                    const vec3d & p2,    //
+                    const vec3d & q0,    // deformed triangle <q0,q1,q2>
+                    const vec3d & q1,    //
+                    const vec3d & q2,    //
+                          mat2d & vec,
+                          vec2d & val);
 }
 
 #ifndef  CINO_STATIC_LIB

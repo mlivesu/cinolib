@@ -48,8 +48,7 @@
 #include <cinolib/drawable_object.h>
 #include <cinolib/geometry/aabb.h>
 #include <cinolib/color.h>
-#include <cinolib/geometry/vec2.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/symbols.h>
 
 namespace cinolib

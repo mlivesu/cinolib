@@ -118,7 +118,7 @@ Plane::Plane(const std::vector<vec3d> & samples)
 CINO_INLINE
 void Plane::set_plane(const vec3d & point, const vec3d & normal)
 {
-    if(point.is_degenerate() || normal.is_degenerate())
+    if(point.is_deg() || normal.is_deg())
     {
         //std::cout << "WARNING : failed to set degenerate plane!" << std::endl;
         p = vec3d(0,0,0);
@@ -148,7 +148,7 @@ double Plane::operator[](const vec3d & p) const
 CINO_INLINE
 double Plane::point_plane_dist_signed(const vec3d & p) const
 {
-    assert(fabs(n.length()-1.0) < 1e-10);
+    assert(fabs(n.norm()-1.0) < 1e-10);
     vec3d u = p - this->p;
     return u.dot(n);
 }

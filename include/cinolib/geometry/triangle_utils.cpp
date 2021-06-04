@@ -57,7 +57,7 @@ template <class vec>
 CINO_INLINE
 double triangle_area(const vec & A, const vec & B, const vec & C)
 {
-    return (0.5 * (B-A).cross(C-A).length());
+    return (0.5 * (B-A).cross(C-A).norm());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -104,7 +104,7 @@ void triangle_traverse_with_ray(const vec3d   tri[3],
 
     double V0_ang  = e2_dir.angle_rad(-e1_dir);
     double V2_ang  = e1_dir.angle_rad(-e0_dir);
-    double e2_len  = (V1 - V0).length();
+    double e2_len  = (V1 - V0).norm();
     double e0_len  = triangle_law_of_sines(V2_ang, V0_ang, e2_len);
 
     exit_pos =  V1 + e0_len * e0_dir;
@@ -256,7 +256,7 @@ double point_to_triangle_dist_sqrd(const vec3d & P,
                                    const vec3d & B,
                                    const vec3d & C)
 {
-    return P.dist_squared(triangle_closest_point(P,A,B,C));
+    return P.dist_sqrd(triangle_closest_point(P,A,B,C));
 }
 
 }

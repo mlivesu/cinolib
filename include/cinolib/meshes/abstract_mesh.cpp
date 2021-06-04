@@ -125,15 +125,13 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void AbstractMesh<M,V,E,P>::rotate(const vec3d & axis, const double angle)
 {
-    double R[3][3];
-    bake_rotation_matrix(axis, angle, R);
-    //
-    vec3d c = centroid();
-    //
+    vec3d  c = centroid();
+    mat3d R = mat3d::ROT_3D(axis, angle);
+
     for(uint vid=0; vid<num_verts(); ++vid)
     {
         vert(vid) -= c;
-        transform(vert(vid), R);
+        vert(vid)  = R*vert(vid);
         vert(vid) += c;
     }
     //
@@ -799,7 +797,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 double AbstractMesh<M,V,E,P>::edge_length(const uint eid) const
 {
-    return edge_vec(eid).length();
+    return edge_vec(eid).norm();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

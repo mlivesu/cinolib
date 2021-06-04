@@ -382,8 +382,8 @@ bool Trimesh<M,V,E,P>::edge_is_flippable(const uint eid)
     if(triangle_area(this->vert(opp1),this->vert(vid1),this->vert(opp0))<1e-5) return false;
     vec3d n2   = triangle_normal(this->vert(opp0),this->vert(vid0),this->vert(opp1));
     vec3d n3   = triangle_normal(this->vert(opp1),this->vert(vid1),this->vert(opp0));
-    if(std::fabs(1.f-n2.length())>0.1) return false;
-    if(std::fabs(1.f-n3.length())>0.1) return false;
+    if(std::fabs(1.f-n2.norm())>0.1) return false;
+    if(std::fabs(1.f-n3.norm())>0.1) return false;
     if(n0.dot(n2)<0) return false;
     if(n0.dot(n3)<0) return false;
     if(n1.dot(n2)<0) return false;
@@ -586,7 +586,7 @@ double Trimesh<M,V,E,P>::poly_area(const uint pid) const
     vec3d p = this->poly_vert(pid,0);
     vec3d u = this->poly_vert(pid,1) - p;
     vec3d v = this->poly_vert(pid,2) - p;
-    double area = 0.5 * u.cross(v).length();
+    double area = 0.5 * u.cross(v).norm();
     return area;
 }
 

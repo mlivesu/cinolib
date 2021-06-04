@@ -40,7 +40,7 @@
 #ifndef CINO_HEX_TRANSITION_ORIENT_H
 #define CINO_HEX_TRANSITION_ORIENT_H
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <map>
 
 namespace cinolib

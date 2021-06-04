@@ -42,7 +42,7 @@
 #include <assert.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/geometry/aabb.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/stl_container_utilities.h>
 
 namespace cinolib
@@ -189,7 +189,7 @@ class Skel
         inline double segment_length(int sid) const
         {
             seg s = segment(sid);
-            return (vertex(s.first) - vertex(s.second)).length();
+            return (vertex(s.first) - vertex(s.second)).norm();
         }
 
         inline double bone_length(int bid) const

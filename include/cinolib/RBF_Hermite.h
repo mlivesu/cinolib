@@ -36,7 +36,7 @@
 #ifndef CINO_RBF_HERMITE_H
 #define CINO_RBF_HERMITE_H
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/scalar_field.h>
 #include <Eigen/Dense>
 

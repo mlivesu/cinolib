@@ -50,7 +50,7 @@ namespace cinolib
 CINO_INLINE
 void norms(const vec3d vec[], const int size, double norms[])
 {
-    for(int i=0; i<size; ++i) norms[i] = vec[i].length();
+    for(int i=0; i<size; ++i) norms[i] = vec[i].norm();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -428,9 +428,9 @@ double hex_skew(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3
     vec3d X[3];
     hex_principal_axes(p0, p1, p2, p3, p4, p5, p6, p7, X, true);
 
-    if(X[0].length() <= min_double) return 0;
-    if(X[1].length() <= min_double) return 0;
-    if(X[2].length() <= min_double) return 0;
+    if(X[0].norm() <= min_double) return 0;
+    if(X[1].norm() <= min_double) return 0;
+    if(X[2].norm() <= min_double) return 0;
 
     double skew[3] =
     {

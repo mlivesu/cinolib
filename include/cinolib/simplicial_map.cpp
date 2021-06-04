@@ -138,14 +138,14 @@ void affine_simplicial_map(const vec3d & A0,
     //transform(test1, m); test1 += vec3d(t[0], t[1], t[2]);
     //transform(test2, m); test2 += vec3d(t[0], t[1], t[2]);
     //transform(test3, m); test3 += vec3d(t[0], t[1], t[2]);
-    //if((B0 - test0).length() > 1e-10) std::cout << (B0 - test0).length() << "\t" << tet_scaled_jacobian(A0,A1,A2,A3) << "\t" << tet_scaled_jacobian(B0,B1,B2,B3) << std::endl;
-    //if((B1 - test1).length() > 1e-10) std::cout << (B1 - test1).length() << "\t" << tet_scaled_jacobian(A0,A1,A2,A3) << "\t" << tet_scaled_jacobian(B0,B1,B2,B3) << std::endl;
-    //if((B2 - test2).length() > 1e-10) std::cout << (B2 - test2).length() << "\t" << tet_scaled_jacobian(A0,A1,A2,A3) << "\t" << tet_scaled_jacobian(B0,B1,B2,B3) << std::endl;
-    //if((B3 - test3).length() > 1e-10) std::cout << (B3 - test3).length() << "\t" << tet_scaled_jacobian(A0,A1,A2,A3) << "\t" << tet_scaled_jacobian(B0,B1,B2,B3) << std::endl;
-    //assert((B0 - test0).length() < 1e-10);
-    //assert((B1 - test1).length() < 1e-10);
-    //assert((B2 - test2).length() < 1e-10);
-    //assert((B3 - test3).length() < 1e-10);
+    //if((B0 - test0).norm() > 1e-10) std::cout << (B0 - test0).norm() << "\t" << tet_scaled_jacobian(A0,A1,A2,A3) << "\t" << tet_scaled_jacobian(B0,B1,B2,B3) << std::endl;
+    //if((B1 - test1).norm() > 1e-10) std::cout << (B1 - test1).norm() << "\t" << tet_scaled_jacobian(A0,A1,A2,A3) << "\t" << tet_scaled_jacobian(B0,B1,B2,B3) << std::endl;
+    //if((B2 - test2).norm() > 1e-10) std::cout << (B2 - test2).norm() << "\t" << tet_scaled_jacobian(A0,A1,A2,A3) << "\t" << tet_scaled_jacobian(B0,B1,B2,B3) << std::endl;
+    //if((B3 - test3).norm() > 1e-10) std::cout << (B3 - test3).norm() << "\t" << tet_scaled_jacobian(A0,A1,A2,A3) << "\t" << tet_scaled_jacobian(B0,B1,B2,B3) << std::endl;
+    //assert((B0 - test0).norm() < 1e-10);
+    //assert((B1 - test1).norm() < 1e-10);
+    //assert((B2 - test2).norm() < 1e-10);
+    //assert((B3 - test3).norm() < 1e-10);
     //#endif
 }
 

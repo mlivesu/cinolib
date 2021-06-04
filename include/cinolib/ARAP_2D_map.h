@@ -56,10 +56,10 @@ struct ARAP_2D_map_data
     uint n_iters = 4;
     bool init    = true; // initialize just once (useful for multiple calls, e.g. to make more iterations)
 
-    std::vector<Eigen::Vector2d> uv;     // output uv coords
-    std::vector<Eigen::Vector2d> uv_ref; // per triangle reference uv coords (w.r.t. a local frame)
-    std::vector<Eigen::Vector2d> uv_loc; // per triangle uv targets (100% rigid)
-    std::vector<double>          w;      // edge weights (cotangent)
+    std::vector<vec2d>  uv;     // output uv coords
+    std::vector<vec2d>  uv_ref; // per triangle reference uv coords (w.r.t. a local frame)
+    std::vector<vec2d>  uv_loc; // per triangle uv targets (100% rigid)
+    std::vector<double> w;      // edge weights (cotangent)
 
     Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> cache; // factorized matrix
 };

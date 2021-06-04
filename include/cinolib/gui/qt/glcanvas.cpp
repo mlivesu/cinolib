@@ -394,10 +394,10 @@ void GLcanvas::mouseMoveEvent(QMouseEvent *event)
         if (trackball.mouse_pressed)
         {
             vec3d axis = trackball.last_click_3d.cross(p3d);
-            if (axis.length_squared()<1e-7) axis = vec3d(1,0,0);
+            if (axis.norm_sqrd()<1e-7) axis = vec3d(1,0,0);
             axis.normalize();
             vec3d d = trackball.last_click_3d - p3d;
-            float t = 0.5*d.length()/trackball.radius;
+            float t = 0.5*d.norm()/trackball.radius;
             if (t < -1.0) t = -1.0;
             else if ( t > 1.0 ) t = 1.0;
             float   phi = 2.0*asin(t);

@@ -56,9 +56,9 @@ double solid_angle(const vec3d & v0,
     vec3d  a   = v0 - p;
     vec3d  b   = v1 - p;
     vec3d  c   = v2 - p;
-    double al  = a.length();
-    double bl  = b.length();
-    double cl  = c.length();
+    double al  = a.norm();
+    double bl  = b.norm();
+    double cl  = c.norm();
     double ab  = a.dot(b);
     double ac  = a.dot(c);
     double bc  = b.dot(c);

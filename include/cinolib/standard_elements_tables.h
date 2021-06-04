@@ -37,7 +37,7 @@
 #define CINO_STANDARD_ELEMENTS_TABLES_H
 
 #include <sys/types.h>
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 
 /*    Reference               Reference              Reference
  *    Hexahedron:             Tetrahedron:           Prism:

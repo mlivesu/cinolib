@@ -36,7 +36,7 @@
 #ifndef CINO_N_SIDED_POLYGON_H
 #define CINO_N_SIDED_POLYGON_H
 
-#include <cinolib/geometry/vec3.h>
+#include <cinolib/geometry/vec_mat.h>
 #include <cinolib/symbols.h>
 
 namespace cinolib

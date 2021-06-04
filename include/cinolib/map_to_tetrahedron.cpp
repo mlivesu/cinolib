@@ -101,7 +101,7 @@ void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
                 {
                     // linearly interpolate the points along the path connecting opp0 and opp1
                     vec3d  dir  = bcs.at(opp1) - bcs.at(opp0);
-                    double step = dir.length()/(path.size()-1.0);
+                    double step = dir.norm()/(path.size()-1.0);
                     dir.normalize();
                     dir *= step;
                     for(uint i=1; i<path.size()-1; ++i)
