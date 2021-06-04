@@ -390,7 +390,8 @@ bool AABB::intersects_triangle(const vec3d t[3]) const
     }
 
     // check intersection between aabbs
-    AABB tb({t[0],t[1],t[2]});
+    std::vector<vec3d> list ({t[0],t[1],t[2]});
+    AABB tb(list);
     if(!intersects_box(tb)) return false;
 
     // lastly, check intersection with triangle's supporting plane
