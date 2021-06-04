@@ -57,6 +57,35 @@ std::ostream & operator<< (std::ostream & in, const mat<r,c,T> & op)
 
 template<uint r, uint c, class T>
 CINO_INLINE
+mat<r,c,T>::mat(const std::initializer_list<mat<r,1,T>> & il, const int mode)
+{
+    if(mode==COLS)
+    {
+        assert(il.size()==c);
+        auto it = il.begin();
+        for(uint i=0; i<c; ++i)
+        {
+            set_col(i,*it);
+            ++it;
+        }
+    }
+    else
+    {
+        assert(mode==ROWS);
+        assert(il.size()==r);
+        auto it = il.begin();
+        for(uint i=0; i<r; ++i)
+        {
+            set_row(i,*it);
+            ++it;
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
 mat<r,c,T>::mat(const std::initializer_list<T> & il)
 {
     mat_set<r,c,T>(_mat, il);
@@ -213,6 +242,33 @@ mat<r,1,T> mat<r,c,T>::diag() const
     mat<r,1,T> diag;
     mat_diag<r,T>(_mat, diag._vec);
     return diag;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+void mat<r,c,T>::set_row(const uint i, const mat<c,1,T> & row)
+{
+    mat_set_row<r,c,T>(_mat, i, row._vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+void mat<r,c,T>::set_col(const uint i, const mat<r,1,T> & col )
+{
+    mat_set_col<r,c,T>(_mat, i, col._vec);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<uint r, uint c, class T>
+CINO_INLINE
+void mat<r,c,T>::set_diag(const mat<r,1,T> & diag)
+{
+    mat_set_diag<r,c,T>(_mat, diag._vec);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

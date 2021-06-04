@@ -94,6 +94,10 @@ enum
     CIRCLE,
     SQUARE,
     STAR,
+
+    //
+    ROWS,
+    COLS,
 };
 
 }

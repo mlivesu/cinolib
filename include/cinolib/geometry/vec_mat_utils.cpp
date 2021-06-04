@@ -495,6 +495,7 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_set_row(T m[][c], const uint i, const T row[])
 {
+    assert(i<r);
     for(uint j=0; j<c; ++j)
     {
         m[i][j] = row[j];
@@ -507,6 +508,7 @@ template<uint r, uint c, typename T>
 CINO_INLINE
 void mat_set_col(T m[][c], const uint i, const T col[])
 {
+    assert(i<c);
     for(uint j=0; j<r; ++j)
     {
         m[j][i] = col[j];

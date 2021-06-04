@@ -38,6 +38,7 @@
 
 #include <ostream>
 #include <cinolib/geometry/vec_mat_utils.h>
+#include <cinolib/symbols.h>
 
 namespace cinolib
 {
@@ -55,6 +56,7 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        explicit mat(const std::initializer_list<mat<r,1,T>> & il, const int mode = COLS);
         explicit mat(const std::initializer_list<T> & il);
         explicit mat(const T   scalar);
         explicit mat(const T * values);
@@ -83,6 +85,12 @@ class mat
         mat<c,1,T> row (const uint i) const;
         mat<r,1,T> col (const uint i) const;
         mat<r,1,T> diag()             const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void set_row (const uint i, const mat<c,1,T> & row);
+        void set_col (const uint i, const mat<r,1,T> & col );
+        void set_diag(              const mat<r,1,T> & diag);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
