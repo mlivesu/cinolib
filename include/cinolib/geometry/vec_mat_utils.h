@@ -49,67 +49,10 @@ namespace cinolib
  *      T my_vector[size];
  *      T my_matrix[rows][cols];
  *
- * Since both 1d and 2d arrays guarantee contiguous memory allocation,
- * whenever size = rows * cols, the same portion of memory can be seen
- * vecnd be processed either as a 2d matrix or as a 1d vector.
+ * Element-wise vector operators (e.g. plus, minus,...) can be used
+ * for both 1D and 2D arrays.
  *
- * Functions are divided in two main categories:
- *
- *    - functions that operate on a serialized list of scalars
- *    - functions that operate on a 2d array
- *
- * For functions of the first type, IO is performed as follows:
- *
- *      template<uint d, typename T>
- *      void my_serial_function(T * array) { ... }
- *
- *      my_serial_function<size,T>(my_vector);    // passing a vector
- *      my_serial_function<rows*cols,T>(my_matrix[0]); // passing a matrix
- *
- * For functions of the secont type, IO is performed as follows:
- *
- *      template<uint rows, uint cols, typename T>
- *      void my_matrix_function(T array[][cols]) { ... }
- *
- *      my_matrix_function<rows,cols,T>(my_matrix); // passing a matrix
- *
- *
- * Serialized operations that apply to both vectors and matrices
- *
- *   - addition
- *   - subtraction
- *   - multiplication (scalar)
- *   - division
- *   - equals
- *   - less
- *   - initialization (dense)
- *   - min_entry
- *   - max_entry
- *   - min
- *   - max
- *   - clamp
- *   - checks for null / inf / nan elements
- *   - copy
- *   - norm / distance
- *   - normalization
- *   - print
- *   - dot product
- *   - cross product
- *   - angles
- *
- * Non serialized operations that apply to 2D arrays:
- *
- *   - matrix multiplication
- *   - initialization (diagonal, rotation 2D or 3D, translation)
- *   - svd / ssvd
- *   - eigen values / vectors
- *   - determinant
- *   - trace
- *   - inverse
- *   - transposed
- *   - symmetry check
- *   - linear solves (with Cramer)
- *   - row/col access
+ * 2D Arrays are stored in row major order.
 */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
