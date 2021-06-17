@@ -3027,8 +3027,8 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_export_element(const uint          
                 f.push_back(fresh_id);
             }
             else f.push_back(it->second);
-            if(this->poly_face_is_CW(pid,fid)) std::reverse(f.begin(), f.end());
         }
+        if(this->poly_face_is_CW(pid,fid)) std::reverse(f.begin(), f.end());
         faces.push_back(f);
     }
 }
