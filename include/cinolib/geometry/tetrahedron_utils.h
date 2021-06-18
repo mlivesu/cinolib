@@ -53,6 +53,7 @@ void tet_barycentric_coords(const vec3d & A,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 vec3d tetrahedron_circumcenter(const vec3d & A,
                                const vec3d & B,
                                const vec3d & C,

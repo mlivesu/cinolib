@@ -44,6 +44,7 @@ namespace cinolib
 {
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 vec3d tetrahedron_circumcenter(const vec3d & A,
                                const vec3d & B,
