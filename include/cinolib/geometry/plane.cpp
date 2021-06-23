@@ -167,7 +167,8 @@ CINO_INLINE
 vec3d Plane::project_onto(const vec3d & p) const
 {
     vec3d res = p - n * point_plane_dist_signed(p);
-    assert(point_plane_dist(res) < 1e-10);
+    //auto  err = point_plane_dist(res);
+    //assert(err < 1e-7);
     return res;
 }
 
