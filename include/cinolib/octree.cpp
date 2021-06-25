@@ -609,7 +609,8 @@ bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_com
     Time::time_point t0 = Time::now();
 
     std::unordered_set<uint> tmp;
-    intersects_box(AABB({t[0],t[1],t[2]}), tmp);
+    std::vector<vec3d> list = {t[0],t[1],t[2]};
+    intersects_box(AABB(list), tmp);
 
     ids.clear();
     for(uint i : tmp)
