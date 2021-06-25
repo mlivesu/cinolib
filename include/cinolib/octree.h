@@ -114,8 +114,8 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        template<class M, class V, class E, class P>
-        void build_from_mesh_polys(const AbstractPolyhedralMesh<M,V,E,P> & m)
+        template<class M, class V, class E, class F, class P>
+        void build_from_mesh_polys(const AbstractPolyhedralMesh<M,V,E,F,P> & m)
         {
             assert(items.empty());
             items.reserve(m.num_polys());
