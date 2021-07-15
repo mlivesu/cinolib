@@ -2,5 +2,5 @@
 	path = external/graph_cut
 	url = https://github.com/mlivesu/GraphCuts
 [submodule "eigen"]
-	path = eigen
+	path = external/eigen
 	url = https://gitlab.com/libeigen/eigen.git
