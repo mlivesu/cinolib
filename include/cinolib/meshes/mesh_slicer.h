@@ -41,7 +41,7 @@
 namespace cinolib
 {
 
-typedef struct
+struct SlicerState
 {
     float X_thresh =  1;      // X coord \in [0,1] ( relative w.r.t. bbox delta x)
     float Y_thresh =  1;      // Y coord \in [0,1] ( relative w.r.t. bbox delta y)
@@ -54,8 +54,7 @@ typedef struct
     int   Q_sign   = LEQ;     // { LEQ, GEQ   }
     int   L_mode   = IS_NOT;  // { IS, IS_NOT }
     int   mode     = AND;     // { AND, OR    }
-}
-SlicerState;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
