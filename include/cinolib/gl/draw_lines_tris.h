@@ -73,7 +73,7 @@ enum
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // https://www.khronos.org/registry/OpenGL-Refpages/es1.1/xhtml/glMaterial.xml
-typedef struct
+struct Material
 {
     GLfloat ambient [4] = {0.2, 0.2, 0.2, 1.0};
     GLfloat diffuse [4] = {0.8, 0.8, 0.8, 1.0};
@@ -90,12 +90,11 @@ typedef struct
         glMaterialf    (GL_FRONT_AND_BACK, GL_SHININESS, shininess);
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     }
-}
-Material;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct RenderData
 {
     Material           material;
     //
@@ -113,8 +112,7 @@ typedef struct
     std::vector<float> seg_colors; // rgba
     GLfloat            seg_width = 1;
     //
-}
-RenderData;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

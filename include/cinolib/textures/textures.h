@@ -74,7 +74,7 @@ enum
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct Texture
 {
     int          type;
     GLuint       id             = 0;
@@ -84,8 +84,7 @@ typedef struct
     std::string  diffuse_path;
     std::string  specular_path;
     std::string  normal_path;
-}
-Texture;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -54,7 +54,7 @@
 namespace cinolib
 {
 
-typedef struct
+struct Marker
 {
     vec2i       p2d = vec2i(-1,-1);       // pos 2D
     vec3d       p3d;                      // if p2d points offscreen (i.e. p.x<0) a projection of p3d will be used instead
@@ -62,12 +62,11 @@ typedef struct
     uint        font_size = 10;           // font size;
     std::string label     = "";           // text to render. empty string if don't want any text to appear
     Color       color     = Color::RED(); // color, for both text and disk
-}
-Marker;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct Trackball
 {
     bool     mouse_pressed = false;        // true if mouse is pressed
     double   radius        = 0.5;          // trackball radius
@@ -84,8 +83,7 @@ typedef struct
     float    zoom_persp    = 45.0;         // field of view in perspective mode (used to zoom in perspective mode)
     float    zoom_ortho    = 1.0;          // scale factor of GL world (used to zoom in orthographic mode)
     bool     mode_2d       = false;        // disable rotations
-}
-Trackball;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
