@@ -670,7 +670,7 @@ SimplexIntersection segment_segment_intersect_3d(const double * s00,
                                                  const double * s10,
                                                  const double * s11)
 {
-    assert(!segment_is_deg_3d(s00, s01) && !segment_is_deg_3d(s10, s11));
+    assert(!segment_is_degenerate_3d(s00, s01) && !segment_is_degenerate_3d(s10, s11));
 
     if(!points_are_coplanar_3d(s00, s01, s10, s11)) return DO_NOT_INTERSECT;
 
@@ -742,7 +742,7 @@ SimplexIntersection segment_triangle_intersect_2d(const double * s0,
                                                   const double * t1,
                                                   const double * t2)
 {
-    assert(!segment_is_deg_2d(s0, s1) && !triangle_is_deg_2d(t0, t1, t2));
+    assert(!segment_is_degenerate_2d(s0, s1) && !triangle_is_degenerate_2d(t0, t1, t2));
 
     if(point_in_triangle_2d(s0, t0, t1, t2) >= STRICTLY_INSIDE ||
        point_in_triangle_2d(s1, t0, t1, t2) >= STRICTLY_INSIDE)
@@ -809,7 +809,7 @@ SimplexIntersection segment_triangle_intersect_3d(const double * s0,
                                                   const double * t1,
                                                   const double * t2)
 {
-    assert(!segment_is_deg_3d(s0, s1) && !triangle_is_deg_3d(t0, t1, t2));
+    assert(!segment_is_degenerate_3d(s0, s1) && !triangle_is_degenerate_3d(t0, t1, t2));
 
     if((vec_equals_3d(s0, t0) || vec_equals_3d(s0, t1) || vec_equals_3d(s0, t2)) &&
        (vec_equals_3d(s1, t0) || vec_equals_3d(s1, t1) || vec_equals_3d(s1, t2)))
@@ -911,7 +911,7 @@ SimplexIntersection segment_tet_intersect_3d(const double * s0,
                                              const double * t2,
                                              const double * t3)
 {
-    assert(!segment_is_deg_3d(s0, s1) && !tet_is_deg(t0, t1, t2, t3));
+    assert(!segment_is_degenerate_3d(s0, s1) && !tet_is_degenerate(t0, t1, t2, t3));
 
     // check if s is an edge of t
     if((vec_equals_3d(s0, t0) && vec_equals_3d(s1, t2)) || (vec_equals_3d(s1, t0) && vec_equals_3d(s0, t2))) return SIMPLICIAL_COMPLEX;
@@ -978,8 +978,8 @@ SimplexIntersection triangle_triangle_intersect_2d(const double * t00,
                                                    const double * t11,
                                                    const double * t12)
 {
-    assert(!triangle_is_deg_2d(t00, t01, t02) &&
-           !triangle_is_deg_2d(t10, t11, t12));
+    assert(!triangle_is_degenerate_2d(t00, t01, t02) &&
+           !triangle_is_degenerate_2d(t10, t11, t12));
 
     // binary flags to mark coincident vertices in t0 and t1
     std::bitset<3> t0_shared = { 0b000 };
@@ -1120,8 +1120,8 @@ SimplexIntersection triangle_triangle_intersect_3d(const double * t00,
                                                    const double * t11,
                                                    const double * t12)
 {
-    assert(!triangle_is_deg_3d(t00, t01, t02) &&
-           !triangle_is_deg_3d(t10, t11, t12));
+    assert(!triangle_is_degenerate_3d(t00, t01, t02) &&
+           !triangle_is_degenerate_3d(t10, t11, t12));
 
     // binary flags to mark coincident vertices in t0 and t1
     std::bitset<3> t0_shared = { 0b000 };
@@ -1238,27 +1238,27 @@ SimplexIntersection triangle_triangle_intersect_3d(const double * t00,
 
 // returns true if s0==s1
 CINO_INLINE
-bool segment_is_deg_2d(const vec2d & s0,
+bool segment_is_degenerate_2d(const vec2d & s0,
                               const vec2d & s1)
 {
-    return segment_is_deg_2d(s0.ptr(), s1.ptr());
+    return segment_is_degenerate_2d(s0.ptr(), s1.ptr());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if s0==s1
 CINO_INLINE
-bool segment_is_deg_3d(const vec3d & s0,
+bool segment_is_degenerate_3d(const vec3d & s0,
                               const vec3d & s1)
 {
-    return segment_is_deg_3d(s0.ptr(), s1.ptr());
+    return segment_is_degenerate_3d(s0.ptr(), s1.ptr());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if s0==s1
 CINO_INLINE
-bool segment_is_deg_2d(const double * s0,
+bool segment_is_degenerate_2d(const double * s0,
                               const double * s1)
 {
     return vec_equals_2d(s0, s1);
@@ -1268,7 +1268,7 @@ bool segment_is_deg_2d(const double * s0,
 
 // returns true if s0==s1
 CINO_INLINE
-bool segment_is_deg_3d(const double * s0,
+bool segment_is_degenerate_3d(const double * s0,
                               const double * s1)
 {
     return vec_equals_3d(s0, s1);
@@ -1278,29 +1278,29 @@ bool segment_is_deg_3d(const double * s0,
 
 // returns true if t0, t1 and t2 are colinear
 CINO_INLINE
-bool triangle_is_deg_2d(const vec2d & t0,
+bool triangle_is_degenerate_2d(const vec2d & t0,
                                const vec2d & t1,
                                const vec2d & t2)
 {
-    return triangle_is_deg_2d(t0.ptr(), t1.ptr(), t2.ptr());
+    return triangle_is_degenerate_2d(t0.ptr(), t1.ptr(), t2.ptr());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t0, t1 and t2 are colinear
 CINO_INLINE
-bool triangle_is_deg_3d(const vec3d & t0,
+bool triangle_is_degenerate_3d(const vec3d & t0,
                                const vec3d & t1,
                                const vec3d & t2)
 {
-    return triangle_is_deg_3d(t0.ptr(), t1.ptr(), t2.ptr());
+    return triangle_is_degenerate_3d(t0.ptr(), t1.ptr(), t2.ptr());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t0, t1 and t2 are colinear
 CINO_INLINE
-bool triangle_is_deg_2d(const double * t0,
+bool triangle_is_degenerate_2d(const double * t0,
                                const double * t1,
                                const double * t2)
 {
@@ -1311,7 +1311,7 @@ bool triangle_is_deg_2d(const double * t0,
 
 // returns true if t0, t1 and t2 are colinear
 CINO_INLINE
-bool triangle_is_deg_3d(const double * t0,
+bool triangle_is_degenerate_3d(const double * t0,
                                const double * t1,
                                const double * t2)
 {
@@ -1322,19 +1322,19 @@ bool triangle_is_deg_3d(const double * t0,
 
 // returns true if t0, t1, t2 and t3 are coplanar
 CINO_INLINE
-bool tet_is_deg(const vec3d & t0,
+bool tet_is_degenerate(const vec3d & t0,
                        const vec3d & t1,
                        const vec3d & t2,
                        const vec3d & t3)
 {
-    return tet_is_deg(t0.ptr(), t1.ptr(), t2.ptr(), t3.ptr());
+    return tet_is_degenerate(t0.ptr(), t1.ptr(), t2.ptr(), t3.ptr());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns true if t0, t1, t2 and t3 are coplanar
 CINO_INLINE
-bool tet_is_deg(const double * t0,
+bool tet_is_degenerate(const double * t0,
                        const double * t1,
                        const double * t2,
                        const double * t3)
