@@ -38,13 +38,14 @@
 
 #ifdef CINOLIB_USES_OPENGL
 
-#ifdef __APPLE__
-#include <gl.h>
-#include <glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+//#ifdef __APPLE__
+//#include <gl.h>
+//#include <glu.h>
+//#else
+//#include <GL/gl.h>
+//#include <GL/glu.h>
+//#endif
+#include <GLFW/glfw3.h>
 
 #include <vector>
 #include <cmath>
