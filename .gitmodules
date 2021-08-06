@@ -1,3 +1,0 @@
-[submodule "external/graph_cut"]
-	path = external/graph_cut
-	url = https://github.com/mlivesu/GraphCuts
