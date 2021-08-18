@@ -62,6 +62,9 @@ namespace cinolib
  *
  * NOTE: matrices are transposed because OpenGL uses a column-major ordering for
  * its matrices, whereas cinolib uses the standard row-major ordering.
+ *
+ * Here is a great reference on GL transformations:
+ * http://www.songho.ca/opengl/gl_transform.html
 */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
