@@ -51,38 +51,11 @@ Camera<T>::Camera()
 
 template<class T>
 CINO_INLINE
-Camera<T>::Camera(const mat<3,1,T> & scene_center,
-                  const T          & scene_radius,
-                  const T          & asp_ratio)
-{
-    fit_scene(scene_center, scene_radius);
-    set_persp_frustum(90, asp_ratio, -scene_radius, scene_radius);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class T>
-CINO_INLINE
-Camera<T>::Camera(const mat<3,1,T> & eye,
-                  const mat<3,1,T> & center,
-                  const mat<3,1,T> & up,
-                  const T          & asp_ratio)
-{
-    look_at(eye, center, up);
-
-    auto radius = eye.dist(center);
-    set_persp_frustum(90, asp_ratio, -radius, radius);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class T>
-CINO_INLINE
-void Camera<T>::fit_scene(const mat<3,1,T> & scene_center,
-                          const T          & scene_radius)
+void Camera<T>::set_MV(const mat<3,1,T> & scene_center,
+                       const T          & scene_radius)
 {
     // set the scene center at the WORLD origin
-    // move the camera just outside the radius of scene along -Z
+    // set the camera just outside of the scene radius along WORLD's -Z
     model = mat<4,4,T>::TRANS(-scene_center);
     view  = mat<4,4,T>::TRANS(-mat<3,1,T>(0,0,scene_radius));
 }
@@ -91,10 +64,13 @@ void Camera<T>::fit_scene(const mat<3,1,T> & scene_center,
 
 template<class T>
 CINO_INLINE
-void Camera<T>::look_at(const mat<3,1,T> & eye,
-                        const mat<3,1,T> & center,
-                        const mat<3,1,T> & up)
+void Camera<T>::set_MV(const mat<3,1,T> & eye,
+                       const mat<3,1,T> & center,
+                       const mat<3,1,T> & up)
 {
+    // this is equivalent to gluLookAt()
+    // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml
+
     mat<3,1,T> z_axis = center - eye;            z_axis.normalize();
     mat<3,1,T> x_axis = z_axis.cross(up);        x_axis.normalize();
     mat<3,1,T> y_axis = x_axis.cross(z_axis);    y_axis.normalize();
@@ -111,13 +87,16 @@ void Camera<T>::look_at(const mat<3,1,T> & eye,
 
 template<class T>
 CINO_INLINE
-void Camera<T>::set_ortho_frustum(const T & l, // left
-                                  const T & r, // right
-                                  const T & b, // bottom
-                                  const T & t, // top
-                                  const T & n, // near
-                                  const T & f) // far
+void Camera<T>::set_PR_ortho(const T & l, // left
+                             const T & r, // right
+                             const T & b, // bottom
+                             const T & t, // top
+                             const T & n, // near
+                             const T & f) // far
 {
+    // this is equivalent to glOrtho()
+    // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glOrtho.xml
+
     projection = mat4d({2/(r-l),   0,        0,       -(r+l)/(r-l),
                            0,     2/(t-b),   0,       -(t+b)/(t-b),
                            0,      0,      -2/(f-n),  -(f+n)/(f-n),
@@ -128,13 +107,16 @@ void Camera<T>::set_ortho_frustum(const T & l, // left
 
 template<class T>
 CINO_INLINE
-void Camera<T>::set_persp_frustum(const T & l, // left
-                                  const T & r, // right
-                                  const T & b, // bottom
-                                  const T & t, // top
-                                  const T & n, // near
-                                  const T & f) // far
+void Camera<T>::set_PR_persp(const T & l, // left
+                             const T & r, // right
+                             const T & b, // bottom
+                             const T & t, // top
+                             const T & n, // near
+                             const T & f) // far
 {
+    // this is equivalent to glFrustum()
+    // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glFrustum.xml
+
     projection = mat4d({2*n/(r-l),     0,        (r+l)/(r-l),         0,
                            0,       2*n/(t-b),   (t+b)/(t-b),         0,
                            0,          0,       -(f+n)/(f-n), -(2*f*n)/(f-n),
@@ -145,15 +127,18 @@ void Camera<T>::set_persp_frustum(const T & l, // left
 
 template<class T>
 CINO_INLINE
-void Camera<T>::set_persp_frustum(const T & fovY, // vertical field of view (degrees)
-                                  const T & ar,   // aspect ratio
-                                  const T & n,    // near
-                                  const T & f)    // far
+void Camera<T>::set_PR_persp(const T & fovY, // vertical field of view (degrees)
+                             const T & ar,   // aspect ratio
+                             const T & n,    // near
+                             const T & f)    // far
 {
+    // this is equivalent to gluPerspective()
+    // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml
+
     float  tangent = tanf(to_rad(fovY/2.f));
     float  height  = n * tangent;
     float  width   = height * ar;
-    return set_persp_frustum(-width, width, -height, height, n, f);
+    return set_PR_persp(-width, width, -height, height, n, f);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

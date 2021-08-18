@@ -79,31 +79,20 @@ class Camera
 
         Camera();
 
-        Camera(const mat<3,1,T> & scene_center,
-               const T          & scene_radius,
-               const T          & asp_ratio);
+        // METHODS TO SET THE MODELVIEW MATRICES :::::::::::::::::::::::::::::::::
 
-        Camera(const mat<3,1,T> & eye,
-               const mat<3,1,T> & center,
-               const mat<3,1,T> & up,
-               const T          & asp_ratio);
+        void set_MV(const mat<3,1,T> & eye,
+                    const mat<3,1,T> & center,
+                    const mat<3,1,T> & up);
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        void set_MV(const mat<3,1,T> & scene_center,
+                    const T          & scene_radius);
 
-        void look_at(const mat<3,1,T> & eye,
-                     const mat<3,1,T> & center,
-                     const mat<3,1,T> & up);
+        // METHODS TO SET THE PROJECTION MATRIX ::::::::::::::::::::::::::::::::::
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void fit_scene(const mat<3,1,T> & scene_center,
-                       const T          & scene_radius);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void set_ortho_frustum(const T & l,    const T & r,  const T & b, const T & t, const T & n, const T & f);
-        void set_persp_frustum(const T & l,    const T & r,  const T & b, const T & t, const T & n, const T & f);
-        void set_persp_frustum(const T & fovY, const T & ar, const T & n, const T & f);
+        void set_PR_ortho(const T & l,    const T & r,  const T & b, const T & t, const T & n, const T & f);
+        void set_PR_persp(const T & l,    const T & r,  const T & b, const T & t, const T & n, const T & f);
+        void set_PR_persp(const T & fovY, const T & ar, const T & n, const T & f);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
