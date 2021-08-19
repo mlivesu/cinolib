@@ -55,9 +55,9 @@ void Camera<T>::set_MV(const mat<3,1,T> & scene_center,
                        const T          & scene_radius)
 {
     // set the scene center at the WORLD origin
-    // set the camera just outside of the scene radius along WORLD's -Z
+    // set the camera outside of the scene radius along WORLD's -Z
     model = mat<4,4,T>::TRANS(-scene_center);
-    view  = mat<4,4,T>::TRANS(-mat<3,1,T>(0,0,scene_radius));
+    view  = mat<4,4,T>::TRANS(-mat<3,1,T>(0,0,2*scene_radius));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -156,7 +156,9 @@ template<class T>
 CINO_INLINE
 void Camera<T>::rotate(const mat<3,1,T> & axis, const T & deg)
 {
-
+    mat<4,4,T> R;
+    mat_set_rot_3d(R._mat, to_rad(deg), axis._vec);
+    model = R * model;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
