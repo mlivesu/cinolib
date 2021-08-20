@@ -102,11 +102,30 @@ class Camera
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void look_at(const mat<3,1,T> & eye,
-                     const mat<3,1,T> & center,
-                     const mat<3,1,T> & up);
+        void zoom       (const T & delta_fov);
+        void rotate     (const T & deg, const mat<3,1,T> & axis);
+        void rotate_x   (const T & deg);
+        void rotate_y   (const T & deg);
+        void rotate_z   (const T & deg);
+        void translate  (const mat<3,1,T> & delta);
+        void translate_x(const T & delta);
+        void translate_y(const T & delta);
+        void translate_z(const T & delta);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        std::string serialize() const;
+        void        deserialize(const std::string & s);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void print() const;
+
+        // STATIC FACILITIES FOR MATRIX SYNTHESIS ::::::::::::::::::::::::::::::::
+
+        static mat<4,4,T> look_at(const mat<3,1,T> & eye,
+                                  const mat<3,1,T> & center,
+                                  const mat<3,1,T> & up);
 
         static mat<4,4,T> frustum_ortho(const T & l,   // left
                                         const T & r,   // right
@@ -128,25 +147,6 @@ class Camera
                                         const T & f);  // far
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void zoom       (const T & delta_fov);
-        void rotate     (const T & deg, const mat<3,1,T> & axis);
-        void rotate_x   (const T & deg);
-        void rotate_y   (const T & deg);
-        void rotate_z   (const T & deg);
-        void translate  (const mat<3,1,T> & delta);
-        void translate_x(const T & delta);
-        void translate_y(const T & delta);
-        void translate_z(const T & delta);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        std::string serialize() const;
-        void        deserialize(const std::string & s);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void print() const;
 };
 
 }

@@ -78,29 +78,6 @@ void Camera<T>::update_modelview()
 
 template<class T>
 CINO_INLINE
-void Camera<T>::look_at(const mat<3,1,T> & eye,
-                        const mat<3,1,T> & center,
-                        const mat<3,1,T> & up)
-{
-    // this is equivalent to gluLookAt()
-    // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml
-
-    mat<3,1,T> z_axis = center - eye;            z_axis.normalize();
-    mat<3,1,T> x_axis = z_axis.cross(up);        x_axis.normalize();
-    mat<3,1,T> y_axis = x_axis.cross(z_axis);    y_axis.normalize();
-
-    model = mat4d({ x_axis[0], y_axis[0], -z_axis[0], 0,
-                    x_axis[1], y_axis[1], -z_axis[1], 0,
-                    x_axis[2], y_axis[2], -z_axis[2], 0,
-                       0    ,     0    ,      0    ,  1});
-
-    view = mat4d::TRANS(-eye);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class T>
-CINO_INLINE
 void Camera<T>::update_projection()
 {
     if(is_ortho()) update_projection_ortho();
@@ -131,6 +108,31 @@ void Camera<T>::update_projection_ortho()
                                 scene_radius * zoom_factor,  // top
                                 scene_radius,                // near
                               3*scene_radius);               // far
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+mat<4,4,T> Camera<T>::look_at(const mat<3,1,T> & eye,
+                              const mat<3,1,T> & center,
+                              const mat<3,1,T> & up)
+{
+    // this is equivalent to gluLookAt()
+    // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml
+
+    mat<3,1,T> z_axis = center - eye;            z_axis.normalize();
+    mat<3,1,T> x_axis = z_axis.cross(up);        x_axis.normalize();
+    mat<3,1,T> y_axis = x_axis.cross(z_axis);    y_axis.normalize();
+
+    mat<4,4,T> M({x_axis[0], y_axis[0], -z_axis[0], 0,
+                  x_axis[1], y_axis[1], -z_axis[1], 0,
+                  x_axis[2], y_axis[2], -z_axis[2], 0,
+                     0    ,     0    ,      0    ,  1});
+
+    mat<4,4,T> V = mat<4,4,T>::TRANS(-eye);
+
+    return V*M;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -247,6 +249,8 @@ void Camera<T>::translate(const mat<3,1,T> & delta)
     mat<4,4,T> Tx;
     mat_set_trans(Tx._mat, delta._vec);
     model = Tx * model;
+    // WARNING: large translations may move the scene outside of its original
+    // radius and cause trouble with clipping planes. Should I do anything about it?
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
