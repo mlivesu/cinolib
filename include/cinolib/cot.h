@@ -46,6 +46,13 @@ namespace cinolib
 CINO_INLINE
 double cot(double x);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// https://stackoverflow.com/questions/1746635/how-do-i-compute-the-arcot-inverse-cotangent-in-php
+//
+CINO_INLINE
+double acot(double x);
+
 }
 
 #ifndef  CINO_STATIC_LIB

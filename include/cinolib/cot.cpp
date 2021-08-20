@@ -47,4 +47,14 @@ double cot(double x)
     return tan(M_PI_2 - x);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// https://stackoverflow.com/questions/1746635/how-do-i-compute-the-arcot-inverse-cotangent-in-php
+//
+CINO_INLINE
+double acot(double x)
+{
+    return M_PI*0.5 - atan(x);
+}
+
 }
