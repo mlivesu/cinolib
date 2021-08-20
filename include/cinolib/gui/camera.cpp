@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include "camera.h"
 #include <cinolib/cot.h>
+#include <cinolib/deg_rad.h>
 
 namespace cinolib
 {
@@ -56,17 +57,17 @@ Camera<T>::Camera(const int width, const int height) : width(width), height(heig
 
 template<class T>
 CINO_INLINE
-void Camera<T>::update_matrices()
+void Camera<T>::reset_matrices()
 {
-    update_modelview();
-    update_projection();
+    reset_modelview();
+    reset_projection();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T>
 CINO_INLINE
-void Camera<T>::update_modelview()
+void Camera<T>::reset_modelview()
 {
     // set the scene center at the WORLD origin
     // set the camera outside of the scene radius along WORLD's -Z
@@ -78,36 +79,36 @@ void Camera<T>::update_modelview()
 
 template<class T>
 CINO_INLINE
-void Camera<T>::update_projection()
+void Camera<T>::reset_projection()
 {
-    if(is_ortho()) update_projection_ortho();
-    else           update_projection_persp();
+    if(is_ortho()) reset_projection_ortho();
+    else           reset_projection_persp();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T>
 CINO_INLINE
-void Camera<T>::update_projection_persp()
+void Camera<T>::reset_projection_persp()
 {
-    projection = frustum_persp(fov * zoom_factor,     // vertical fiel of view
-                               (double)width/height,  // aspect ratio
-                               scene_radius,          // near
-                               3*scene_radius);       // far
+    projection = frustum_persp(fov * zoom_factor,    // vertical fiel of view
+                               (double)width/height, // aspect ratio
+                               scene_radius,         // near
+                               3*scene_radius);      // far
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T>
 CINO_INLINE
-void Camera<T>::update_projection_ortho()
+void Camera<T>::reset_projection_ortho()
 {
-    projection = frustum_ortho(-scene_radius * zoom_factor,  // left
-                                scene_radius * zoom_factor,  // right
-                               -scene_radius * zoom_factor,  // bottom
-                                scene_radius * zoom_factor,  // top
-                                scene_radius,                // near
-                              3*scene_radius);               // far
+    projection = frustum_ortho(-scene_radius * zoom_factor, // left
+                                scene_radius * zoom_factor, // right
+                               -scene_radius * zoom_factor, // bottom
+                                scene_radius * zoom_factor, // top
+                                scene_radius,               // near
+                              3*scene_radius);              // far
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -199,7 +200,7 @@ void Camera<T>::zoom(const T & delta)
 {    
     zoom_factor += delta;
     zoom_factor  = clamp(zoom_factor, 1e-20, 1e20);
-    update_projection();
+    reset_projection();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -303,8 +304,8 @@ template<class T>
 CINO_INLINE
 void Camera<T>::toggle_persp_ortho()
 {
-    if(is_ortho()) update_projection_persp();
-    else           update_projection_ortho();
+    if(is_ortho()) reset_projection_persp();
+    else           reset_projection_ortho();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

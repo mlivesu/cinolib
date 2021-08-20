@@ -89,11 +89,11 @@ class Camera
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update_matrices();
-        void update_modelview();
-        void update_projection();
-        void update_projection_persp();
-        void update_projection_ortho();
+        void reset_matrices();
+        void reset_modelview();
+        void reset_projection();
+        void reset_projection_persp();
+        void reset_projection_ortho();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
