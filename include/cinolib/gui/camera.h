@@ -74,33 +74,65 @@ class Camera
 {
     public:
 
-        mat<4,4,T> model;      // from MODEL space to WORLD  space
-        mat<4,4,T> view;       // from WORLD space to CAMERA space
-        mat<4,4,T> projection; // viewing frustum
+        int        width, height; // sensor size
+        mat<3,1,T> scene_center;  // center of the scene
+        double     scene_radius;  // radius of the smallest ball containing the whole scene
+        double     fov;           // vertical field of view (degrees)
+        double     zoom_factor;   // both for perspective and orthographics modes
+        mat<4,4,T> model;         // from MODEL space to WORLD  space
+        mat<4,4,T> view;          // from WORLD space to CAMERA space
+        mat<4,4,T> projection;    // viewing frustum
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Camera();
-
-        // METHODS TO SET THE MODELVIEW MATRICES :::::::::::::::::::::::::::::::::
-
-        void set_MV(const mat<3,1,T> & eye,
-                    const mat<3,1,T> & center,
-                    const mat<3,1,T> & up);
-
-        void set_MV(const mat<3,1,T> & scene_center,
-                    const T          & scene_radius);
-
-        // METHODS TO SET THE PROJECTION MATRIX ::::::::::::::::::::::::::::::::::
-
-        void set_PR_ortho(const T & l,    const T & r,  const T & b, const T & t, const T & n, const T & f);
-        void set_PR_persp(const T & l,    const T & r,  const T & b, const T & t, const T & n, const T & f);
-        void set_PR_persp(const T & fovY, const T & ar, const T & n, const T & f);
+        Camera(const int width = 640, const int height = 480);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void zoom     (const T & factor);
-        void rotate   (const mat<3,1,T> & axis, const T & deg);
+        void update_modelview();
+        void update_projection();
+        void update_projection_persp();
+        void update_projection_ortho();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void toggle_persp_ortho();
+        bool is_ortho() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void look_at(const mat<3,1,T> & eye,
+                     const mat<3,1,T> & center,
+                     const mat<3,1,T> & up);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        static mat<4,4,T> frustum_ortho(const T & l,   // left
+                                        const T & r,   // right
+                                        const T & b,   // bottom
+                                        const T & t,   // top
+                                        const T & n,   // near
+                                        const T & f);  // far
+
+        static mat<4,4,T> frustum_persp(const T & l,   // left
+                                        const T & r,   // right
+                                        const T & b,   // bottom
+                                        const T & t,   // top
+                                        const T & n,   // near
+                                        const T & f);  // far
+
+        static mat<4,4,T> frustum_persp(const T & fov, // vertical field of view (degrees)
+                                        const T & ar,  // aspect ratio
+                                        const T & n,   // near
+                                        const T & f);  // far
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void zoom     (const T & delta_fov);
+        void rotate_x (const T & deg);
+        void rotate_y (const T & deg);
+        void rotate_z (const T & deg);
+        void rotate   (const T & deg, const mat<3,1,T> & axis);
         void translate(const mat<3,1,T> & delta);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -34,25 +34,29 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include "camera.h"
+#include <cinolib/cot.h>
 
 namespace cinolib
 {
 
 template<class T>
 CINO_INLINE
-Camera<T>::Camera()
+Camera<T>::Camera(const int width, const int height) : width(width), height(height)
 {
-    model      = mat<4,4,T>::DIAG(1);
-    view       = mat<4,4,T>::DIAG(1);
-    projection = mat<4,4,T>::DIAG(1);
+    scene_center = mat<3,1,T>((T)0);
+    scene_radius = 0;
+    fov          = 55;  // matches no zoom in orthographic mode
+    zoom_factor  = 1.0;
+    model        = mat<4,4,T>::DIAG(1);
+    view         = mat<4,4,T>::DIAG(1);
+    projection   = mat<4,4,T>::DIAG(1);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T>
 CINO_INLINE
-void Camera<T>::set_MV(const mat<3,1,T> & scene_center,
-                       const T          & scene_radius)
+void Camera<T>::update_modelview()
 {
     // set the scene center at the WORLD origin
     // set the camera outside of the scene radius along WORLD's -Z
@@ -64,9 +68,9 @@ void Camera<T>::set_MV(const mat<3,1,T> & scene_center,
 
 template<class T>
 CINO_INLINE
-void Camera<T>::set_MV(const mat<3,1,T> & eye,
-                       const mat<3,1,T> & center,
-                       const mat<3,1,T> & up)
+void Camera<T>::look_at(const mat<3,1,T> & eye,
+                        const mat<3,1,T> & center,
+                        const mat<3,1,T> & up)
 {
     // this is equivalent to gluLookAt()
     // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml
@@ -87,74 +91,110 @@ void Camera<T>::set_MV(const mat<3,1,T> & eye,
 
 template<class T>
 CINO_INLINE
-void Camera<T>::set_PR_ortho(const T & l, // left
-                             const T & r, // right
-                             const T & b, // bottom
-                             const T & t, // top
-                             const T & n, // near
-                             const T & f) // far
+void Camera<T>::update_projection()
+{
+    if(is_ortho()) update_projection_ortho();
+    else           update_projection_persp();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+void Camera<T>::update_projection_persp()
+{
+    projection = frustum_persp(fov * zoom_factor,     // vertical fiel of view
+                               (double)width/height,  // aspect ratio
+                               scene_radius,          // near
+                               3*scene_radius);       // far
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+void Camera<T>::update_projection_ortho()
+{
+    projection = frustum_ortho(-scene_radius * zoom_factor,  // left
+                                scene_radius * zoom_factor,  // right
+                               -scene_radius * zoom_factor,  // bottom
+                                scene_radius * zoom_factor,  // top
+                                scene_radius,                // near
+                              3*scene_radius);               // far
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+mat<4,4,T> Camera<T>::frustum_ortho(const T & l, // left
+                                    const T & r, // right
+                                    const T & b, // bottom
+                                    const T & t, // top
+                                    const T & n, // near
+                                    const T & f) // far
 {
     // this is equivalent to glOrtho()
     // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glOrtho.xml
-
-    projection = mat4d({2/(r-l),   0,        0,       -(r+l)/(r-l),
-                           0,     2/(t-b),   0,       -(t+b)/(t-b),
-                           0,      0,      -2/(f-n),  -(f+n)/(f-n),
-                           0,      0,        0,             1   });
+    return mat<4,4,T>({2/(r-l),   0,        0,       -(r+l)/(r-l),
+                          0,     2/(t-b),   0,       -(t+b)/(t-b),
+                          0,      0,      -2/(f-n),  -(f+n)/(f-n),
+                          0,      0,        0,             1   });
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T>
 CINO_INLINE
-void Camera<T>::set_PR_persp(const T & l, // left
-                             const T & r, // right
-                             const T & b, // bottom
-                             const T & t, // top
-                             const T & n, // near
-                             const T & f) // far
+mat<4,4,T> Camera<T>::frustum_persp(const T & l, // left
+                                    const T & r, // right
+                                    const T & b, // bottom
+                                    const T & t, // top
+                                    const T & n, // near
+                                    const T & f) // far
 {
     // this is equivalent to glFrustum()
     // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glFrustum.xml
-
-    projection = mat4d({2*n/(r-l),     0,        (r+l)/(r-l),         0,
-                           0,       2*n/(t-b),   (t+b)/(t-b),         0,
-                           0,          0,       -(f+n)/(f-n), -(2*f*n)/(f-n),
-                           0,          0,            -1,              0   });
+    return mat<4,4,T>({2*n/(r-l),     0,        (r+l)/(r-l),         0,
+                          0,       2*n/(t-b),   (t+b)/(t-b),         0,
+                          0,          0,       -(f+n)/(f-n), -(2*f*n)/(f-n),
+                          0,          0,            -1,              0   });
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T>
 CINO_INLINE
-void Camera<T>::set_PR_persp(const T & fovY, // vertical field of view (degrees)
-                             const T & ar,   // aspect ratio
-                             const T & n,    // near
-                             const T & f)    // far
+mat<4,4,T> Camera<T>::frustum_persp(const T & fov, // vertical field of view (in degrees)
+                                    const T & ar,  // aspect ratio
+                                    const T & n,   // near
+                                    const T & f)   // far
 {
     // this is equivalent to gluPerspective()
     // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml
-
-    float  tangent = tanf(to_rad(fovY/2.f));
-    float  height  = n * tangent;
-    float  width   = height * ar;
-    return set_PR_persp(-width, width, -height, height, n, f);
+    double c = cot(to_rad(fov)*0.5);
+    return mat<4,4,T>({c/ar,  0,      0,         0,
+                        0,    c,      0,         0,
+                        0,    0, (f+n)/(n-f), -(2*f*n)/(f-n),
+                        0,    0,     -1,         0         });
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T>
 CINO_INLINE
-void Camera<T>::zoom(const T & factor)
-{
-
+void Camera<T>::zoom(const T & delta)
+{    
+    zoom_factor += delta;
+    zoom_factor  = clamp(zoom_factor, 1e-20, 1e20);
+    update_projection();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T>
 CINO_INLINE
-void Camera<T>::rotate(const mat<3,1,T> & axis, const T & deg)
+void Camera<T>::rotate(const T & deg, const mat<3,1,T> & axis)
 {
     mat<4,4,T> R;
     mat_set_rot_3d(R._mat, to_rad(deg), axis._vec);
@@ -165,9 +205,35 @@ void Camera<T>::rotate(const mat<3,1,T> & axis, const T & deg)
 
 template<class T>
 CINO_INLINE
+void Camera<T>::rotate_x(const T & deg)
+{
+    rotate(deg, mat<3,1,T>(1,0,0));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+void Camera<T>::rotate_y(const T & deg)
+{
+    rotate(deg, mat<3,1,T>(0,1,0));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+void Camera<T>::rotate_z(const T & deg)
+{
+    rotate(deg, mat<3,1,T>(0,0,1));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
 void Camera<T>::translate(const mat<3,1,T> & delta)
 {
-
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -183,9 +249,27 @@ std::string Camera<T>::serialize() const
 
 template<class T>
 CINO_INLINE
-void Camera<T>::deserialize(const std::string & s)
+void Camera<T>::deserialize(const std::string & )
 {
+}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+void Camera<T>::toggle_persp_ortho()
+{
+    if(is_ortho()) update_projection_persp();
+    else           update_projection_ortho();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+bool Camera<T>::is_ortho() const
+{
+    return (projection[14] == 0);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -194,10 +278,10 @@ template<class T>
 CINO_INLINE
 void Camera<T>::print() const
 {
-    std::cout << "Camera M:\n"  << model
-              << "Camera V:\n"  << view
-              << "Camera MV:\n" << view * model
-              << "Camera PR:\n" << projection << std::endl;
+    std::cout << "\nCamera M:\n"  << model
+              << "\nCamera V:\n"  << view
+              << "\nCamera MV:\n" << view * model
+              << "\nCamera PR:\n" << projection << std::endl;
 }
 
 }
