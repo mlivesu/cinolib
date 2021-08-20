@@ -89,6 +89,7 @@ class Camera
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void update_matrices();
         void update_modelview();
         void update_projection();
         void update_projection_persp();
@@ -128,12 +129,15 @@ class Camera
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void zoom     (const T & delta_fov);
-        void rotate_x (const T & deg);
-        void rotate_y (const T & deg);
-        void rotate_z (const T & deg);
-        void rotate   (const T & deg, const mat<3,1,T> & axis);
-        void translate(const mat<3,1,T> & delta);
+        void zoom       (const T & delta_fov);
+        void rotate     (const T & deg, const mat<3,1,T> & axis);
+        void rotate_x   (const T & deg);
+        void rotate_y   (const T & deg);
+        void rotate_z   (const T & deg);
+        void translate  (const mat<3,1,T> & delta);
+        void translate_x(const T & delta);
+        void translate_y(const T & delta);
+        void translate_z(const T & delta);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

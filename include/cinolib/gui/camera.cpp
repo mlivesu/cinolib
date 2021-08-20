@@ -56,6 +56,16 @@ Camera<T>::Camera(const int width, const int height) : width(width), height(heig
 
 template<class T>
 CINO_INLINE
+void Camera<T>::update_matrices()
+{
+    update_modelview();
+    update_projection();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
 void Camera<T>::update_modelview()
 {
     // set the scene center at the WORLD origin
@@ -234,6 +244,36 @@ template<class T>
 CINO_INLINE
 void Camera<T>::translate(const mat<3,1,T> & delta)
 {
+    mat<4,4,T> Tx;
+    mat_set_trans(Tx._mat, delta._vec);
+    model = Tx * model;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+void Camera<T>::translate_x(const T & delta)
+{
+    translate(mat<3,1,T>(delta,0,0));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+void Camera<T>::translate_y(const T & delta)
+{
+    translate(mat<3,1,T>(0,delta,0));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+void Camera<T>::translate_z(const T & delta)
+{
+    translate(mat<3,1,T>(0,0,delta));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
