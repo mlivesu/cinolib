@@ -123,9 +123,9 @@ class Camera
 
         // STATIC FACILITIES FOR MATRIX SYNTHESIS ::::::::::::::::::::::::::::::::
 
-        static mat<4,4,T> look_at(const mat<3,1,T> & eye,
-                                  const mat<3,1,T> & center,
-                                  const mat<3,1,T> & up);
+        static mat<4,4,T> look_at(const mat<3,1,T> & eye,    // camera pos
+                                  const mat<3,1,T> & center, // center of scene (rotation pivot)
+                                  const mat<3,1,T> & up);    // upwards direction
 
         static mat<4,4,T> frustum_ortho(const T & l,   // left
                                         const T & r,   // right
