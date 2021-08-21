@@ -656,6 +656,34 @@ void mat<r,c,T>::swap(const uint i, const uint j, const uint k, const uint l)
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// e.g. from cartesian to homogeneous coords
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r+1,c,T> mat<r,c,T>::add_coord(const T & val) const
+{
+    assert(c==1);
+    mat<r+1,c,T> res;
+    vec_copy<r>(_vec,res._vec);
+    res[r] = val;
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// e.g. from homogeneous to cartesian coords
+template<uint r, uint c, class T>
+CINO_INLINE
+mat<r-1,c,T> mat<r,c,T>::rem_coord() const
+{
+    assert(c==1);
+    assert(r>=2);
+    mat<r-1,c,T> res;
+    vec_copy<r-1>(_vec,res._vec);
+    return res;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<uint r, uint c, class T>
 CINO_INLINE
 bool mat<r,c,T>::is_null() const
