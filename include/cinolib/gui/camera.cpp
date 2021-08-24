@@ -98,11 +98,11 @@ CINO_INLINE
 void Camera<T>::reset_projection_persp()
 {
     static constexpr double fov = 55; // vertical field of view, in degrees.
-                                      // a 55 degrees fov in perspective mode
-                                      // is rouglhy equivalent to no zoom in
+                                      // A 55 degrees fov in perspective mode
+                                      // is roughly equivalent to no zoom in
                                       // orthographic mode
 
-    projection = frustum_persp(fov * zoom_factor,    // vertical fiel of view
+    projection = frustum_persp(fov * zoom_factor,    // vertical field of view
                                (double)width/height, // aspect ratio
                                2*scene_radius,       // near
                                6*scene_radius);      // far
@@ -128,13 +128,23 @@ void Camera<T>::reset_projection_ortho()
 
 template<class T>
 CINO_INLINE
-void Camera<T>::set_pivot(const mat<3,1,T> & pivot)
+void Camera<T>::set_pivot(const mat<3,1,T> & p)
 {
     // map the pivot to the WORLD space, then position its mapped
     // coordinates at the origin the coordinate reference system
     //
-    mat<3,1,T> p = (model * pivot.add_coord(1)).rem_coord();
-    model = mat<4,4,T>::TRANS(-p) * model;
+    mat<3,1,T> Mp = (model * p.add_coord(1)).rem_coord();
+    model = mat<4,4,T>::TRANS(-Mp) * model;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+void Camera<T>::set_focus(const mat<3,1,T> & p)
+{
+    set_pivot(p);
+    zoom(-zoom_factor*0.5);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
