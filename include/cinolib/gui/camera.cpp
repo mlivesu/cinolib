@@ -55,7 +55,7 @@ template<class T>
 CINO_INLINE
 void Camera<T>::reset()
 {    
-    zoom_factor = 1.0;
+    zoom_factor = 0.5;
     reset_matrices();
 }
 
@@ -78,7 +78,7 @@ void Camera<T>::reset_modelview()
     // set the scene center at the WORLD origin
     // set the camera outside of the scene radius along WORLD's -Z
     model = mat<4,4,T>::TRANS(-scene_center);
-    view  = mat<4,4,T>::TRANS(-mat<3,1,T>(0,0,2*scene_radius));
+    view  = mat<4,4,T>::TRANS(-mat<3,1,T>(0,0,4*scene_radius));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -104,8 +104,8 @@ void Camera<T>::reset_projection_persp()
 
     projection = frustum_persp(fov * zoom_factor,    // vertical fiel of view
                                (double)width/height, // aspect ratio
-                               scene_radius,         // near
-                               3*scene_radius);      // far
+                               2*scene_radius,       // near
+                               6*scene_radius);      // far
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -116,12 +116,12 @@ void Camera<T>::reset_projection_ortho()
 {
     auto ar = (double)width/height; // aspect ratio
 
-    projection = frustum_ortho(-scene_radius * zoom_factor * ar, // left
-                                scene_radius * zoom_factor * ar, // right
-                               -scene_radius * zoom_factor,      // bottom
-                                scene_radius * zoom_factor,      // top
-                                scene_radius,                    // near
-                              3*scene_radius);                   // far
+    projection = frustum_ortho(-2 * scene_radius * zoom_factor * ar, // left
+                                2 * scene_radius * zoom_factor * ar, // right
+                               -2 * scene_radius * zoom_factor,      // bottom
+                                2 * scene_radius * zoom_factor,      // top
+                                2 * scene_radius,                    // near
+                                6 * scene_radius);                   // far
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
