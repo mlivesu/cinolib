@@ -128,7 +128,7 @@ void Camera<T>::reset_projection_ortho()
 
 template<class T>
 CINO_INLINE
-void Camera<T>::set_pivot(const mat<3,1,T> & p)
+void Camera<T>::set_rotation_pivot(const mat<3,1,T> & p)
 {
     // map the pivot to the WORLD space, then position its mapped
     // coordinates at the origin the coordinate reference system
@@ -141,9 +141,9 @@ void Camera<T>::set_pivot(const mat<3,1,T> & p)
 
 template<class T>
 CINO_INLINE
-void Camera<T>::set_focus(const mat<3,1,T> & p)
+void Camera<T>::set_focus_point(const mat<3,1,T> & p)
 {
-    set_pivot(p);
+    set_rotation_pivot(p);
     zoom(-zoom_factor*0.5);
 }
 

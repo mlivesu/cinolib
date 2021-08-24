@@ -107,8 +107,8 @@ class Camera
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void set_pivot(const mat<3,1,T> & p);
-        void set_focus(const mat<3,1,T> & p);
+        void set_rotation_pivot(const mat<3,1,T> & p);
+        void set_focus_point   (const mat<3,1,T> & p);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
