@@ -768,7 +768,14 @@ bool mat_inverse(const T m[][d], T in[][d])
             return one_over_det!=0; // false if the matrix is singular
         }
 
-        default: assert(false && "mat_inverse: unsupported matrix size");
+        default:
+        {
+            typedef Eigen::Matrix<T,d,d,Eigen::RowMajor> M;
+            Eigen::Map<const M> _m(m[0]);
+            Eigen::Map<M> _in(in[0]);
+            _in = _m.inverse();
+            return true;
+        }
     }
 }
 
