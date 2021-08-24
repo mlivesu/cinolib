@@ -54,8 +54,7 @@ Camera<T>::Camera(const int width, const int height) : width(width), height(heig
 template<class T>
 CINO_INLINE
 void Camera<T>::reset()
-{
-    fov          = 55;  // matches no zoom in orthographic mode
+{    
     zoom_factor = 1.0;
     reset_matrices();
 }
@@ -98,6 +97,11 @@ template<class T>
 CINO_INLINE
 void Camera<T>::reset_projection_persp()
 {
+    static constexpr double fov = 55; // vertical field of view, in degrees.
+                                      // a 55 degrees fov in perspective mode
+                                      // is rouglhy equivalent to no zoom in
+                                      // orthographic mode
+
     projection = frustum_persp(fov * zoom_factor,    // vertical fiel of view
                                (double)width/height, // aspect ratio
                                scene_radius,         // near
