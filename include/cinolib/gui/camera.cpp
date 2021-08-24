@@ -128,6 +128,19 @@ void Camera<T>::reset_projection_ortho()
 
 template<class T>
 CINO_INLINE
+void Camera<T>::set_pivot(const mat<3,1,T> & pivot)
+{
+    // map the pivot to the WORLD space, then position its mapped
+    // coordinates at the origin the coordinate reference system
+    //
+    mat<3,1,T> p = (model * pivot.add_coord(1)).rem_coord();
+    model = mat<4,4,T>::TRANS(-p) * model;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
 void Camera<T>::zoom(const T & delta)
 {    
     zoom_factor += delta;

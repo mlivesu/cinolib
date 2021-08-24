@@ -107,6 +107,10 @@ class Camera
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void set_pivot(const mat<3,1,T> & pivot);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void zoom       (const T & delta);
         void rotate     (const T & deg, const mat<3,1,T> & axis);
         void rotate_x   (const T & deg);
