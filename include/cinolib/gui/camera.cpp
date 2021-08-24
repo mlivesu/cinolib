@@ -45,12 +45,19 @@ CINO_INLINE
 Camera<T>::Camera(const int width, const int height) : width(width), height(height)
 {
     scene_center = mat<3,1,T>((T)0);
-    scene_radius = 0;
+    scene_radius = 1;
+    reset();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+void Camera<T>::reset()
+{
     fov          = 55;  // matches no zoom in orthographic mode
-    zoom_factor  = 1.0;
-    model        = mat<4,4,T>::DIAG(1);
-    view         = mat<4,4,T>::DIAG(1);
-    projection   = mat<4,4,T>::DIAG(1);
+    zoom_factor = 1.0;
+    reset_matrices();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

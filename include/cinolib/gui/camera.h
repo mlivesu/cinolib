@@ -89,6 +89,7 @@ class Camera
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void reset();
         void reset_matrices();
         void reset_modelview();
         void reset_projection();
