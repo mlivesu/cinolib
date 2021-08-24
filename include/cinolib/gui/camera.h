@@ -97,12 +97,17 @@ class Camera
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        mat<4,4,T> MV()  const; // Model-View matrix
+        mat<4,4,T> MVP() const; // Model-View-Projecetion matrix
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         void toggle_persp_ortho();
         bool is_ortho() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void zoom       (const T & delta_fov);
+        void zoom       (const T & delta);
         void rotate     (const T & deg, const mat<3,1,T> & axis);
         void rotate_x   (const T & deg);
         void rotate_y   (const T & deg);

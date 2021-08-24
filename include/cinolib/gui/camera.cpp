@@ -217,17 +217,71 @@ void Camera<T>::translate_z(const T & delta)
 
 template<class T>
 CINO_INLINE
-std::string Camera<T>::serialize() const
+mat<4,4,T> Camera<T>::MV() const
 {
-
+    return view * model;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T>
 CINO_INLINE
-void Camera<T>::deserialize(const std::string & )
+mat<4,4,T> Camera<T>::MVP() const
 {
+    return projection * MV();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+std::string Camera<T>::serialize() const
+{
+    std::stringstream ss;
+    ss << width           << " "
+       << height          << " "
+       << scene_center[0] << " " << scene_center[1] << " " << scene_center[2] << " "
+       << scene_radius    << " "
+       << zoom_factor     << " "
+       << model[ 0]       << " " << model[ 1]      << " " << model[ 2]      << " " << model[ 3]      << " "
+       << model[ 4]       << " " << model[ 5]      << " " << model[ 6]      << " " << model[ 7]      << " "
+       << model[ 8]       << " " << model[ 9]      << " " << model[10]      << " " << model[11]      << " "
+       << model[12]       << " " << model[13]      << " " << model[14]      << " " << model[15]      << " "
+       << view[ 0]        << " " << view[ 1]       << " " << view[ 2]       << " " << view[ 3]       << " "
+       << view[ 4]        << " " << view[ 5]       << " " << view[ 6]       << " " << view[ 7]       << " "
+       << view[ 8]        << " " << view[ 9]       << " " << view[10]       << " " << view[11]       << " "
+       << view[12]        << " " << view[13]       << " " << view[14]       << " " << view[15]       << " "
+       << projection[ 0]  << " " << projection[ 1] << " " << projection[ 2] << " " << projection[ 3] << " "
+       << projection[ 4]  << " " << projection[ 5] << " " << projection[ 6] << " " << projection[ 7] << " "
+       << projection[ 8]  << " " << projection[ 9] << " " << projection[10] << " " << projection[11] << " "
+       << projection[12]  << " " << projection[13] << " " << projection[14] << " " << projection[15];
+    return ss.str();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class T>
+CINO_INLINE
+void Camera<T>::deserialize(const std::string & s)
+{
+    std::stringstream ss(s);
+    ss >> width
+       >> height
+       >> scene_center[0] >> scene_center[1] >> scene_center[2]
+       >> scene_radius
+       >> zoom_factor
+       >> model[ 0]       >> model[ 1]      >> model[ 2]      >> model[ 3]
+       >> model[ 4]       >> model[ 5]      >> model[ 6]      >> model[ 7]
+       >> model[ 8]       >> model[ 9]      >> model[10]      >> model[11]
+       >> model[12]       >> model[13]      >> model[14]      >> model[15]
+       >> view[ 0]        >> view[ 1]       >> view[ 2]       >> view[ 3]
+       >> view[ 4]        >> view[ 5]       >> view[ 6]       >> view[ 7]
+       >> view[ 8]        >> view[ 9]       >> view[10]       >> view[11]
+       >> view[12]        >> view[13]       >> view[14]       >> view[15]
+       >> projection[ 0]  >> projection[ 1] >> projection[ 2] >> projection[ 3]
+       >> projection[ 4]  >> projection[ 5] >> projection[ 6] >> projection[ 7]
+       >> projection[ 8]  >> projection[ 9] >> projection[10] >> projection[11]
+       >> projection[12]  >> projection[13] >> projection[14] >> projection[15];
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
