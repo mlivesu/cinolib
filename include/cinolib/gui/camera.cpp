@@ -103,12 +103,14 @@ template<class T>
 CINO_INLINE
 void Camera<T>::reset_projection_ortho()
 {
-    projection = frustum_ortho(-scene_radius * zoom_factor, // left
-                                scene_radius * zoom_factor, // right
-                               -scene_radius * zoom_factor, // bottom
-                                scene_radius * zoom_factor, // top
-                                scene_radius,               // near
-                              3*scene_radius);              // far
+    auto ar = (double)width/height; // aspect ratio
+
+    projection = frustum_ortho(-scene_radius * zoom_factor * ar, // left
+                                scene_radius * zoom_factor * ar, // right
+                               -scene_radius * zoom_factor,      // bottom
+                                scene_radius * zoom_factor,      // top
+                                scene_radius,                    // near
+                              3*scene_radius);                   // far
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
