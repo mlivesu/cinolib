@@ -77,10 +77,10 @@ class Camera
         int        width, height; // sensor size
         mat<3,1,T> scene_center;  // center of the scene
         double     scene_radius;  // radius of the smallest ball containing the whole scene
-        double     zoom_factor;   // both for perspective and orthographics modes
-        mat<4,4,T> model;         // from MODEL space to WORLD  space
-        mat<4,4,T> view;          // from WORLD space to CAMERA space
-        mat<4,4,T> projection;    // viewing frustum
+        double     zoom_factor;   // works for both perspective and orthographic modes
+        mat<4,4,T> model;         // from OBJECT space to WORLD  space
+        mat<4,4,T> view;          // from WORLD  space to CAMERA space
+        mat<4,4,T> projection;    // defines the view frustum
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
