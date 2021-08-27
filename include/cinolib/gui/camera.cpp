@@ -154,7 +154,7 @@ CINO_INLINE
 void Camera<T>::zoom(const T & delta)
 {    
     zoom_factor += delta;
-    zoom_factor  = clamp(zoom_factor, 1e-30, 1e10);
+    zoom_factor  = clamp(zoom_factor, 1e-20, 1e3);
     reset_projection();
 }
 
