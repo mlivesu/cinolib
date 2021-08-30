@@ -37,6 +37,8 @@
 #include <cinolib/gui/trackball.h>
 #include <cinolib/how_many_seconds.h>
 #include <cinolib/fonts/droid_sans.h>
+#include <../external/imgui/imgui_impl_opengl2.h>
+#include <../external/imgui/imgui_impl_glfw.h>
 
 namespace cinolib
 {

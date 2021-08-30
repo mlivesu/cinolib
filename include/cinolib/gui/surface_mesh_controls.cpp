@@ -34,7 +34,6 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/gui/surface_mesh_controls.h>
-#include "imgui.h"
 
 namespace cinolib
 {

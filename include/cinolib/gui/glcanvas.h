@@ -43,10 +43,6 @@
 #include <cinolib/min_max_inf.h>
 #include <cinolib/color.h>
 
-// include in cinolib
-#include "backends/imgui_impl_opengl2.h"
-#include "backends/imgui_impl_glfw.h"
-
 namespace cinolib
 {
 
