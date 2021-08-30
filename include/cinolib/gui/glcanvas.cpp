@@ -112,7 +112,7 @@ GLcanvas::~GLcanvas()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::push_obj(const DrawableObject *obj, const bool refit_scene)
+void GLcanvas::push(const DrawableObject *obj, const bool refit_scene)
 {
     drawlist.push_back(obj);
 
@@ -120,6 +120,22 @@ void GLcanvas::push_obj(const DrawableObject *obj, const bool refit_scene)
     {
         this->refit_scene();
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::push(VisualControl *vc)
+{
+    visual_controls.push_back(vc);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::push(const Marker & m)
+{
+    markers.push_back(m);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -137,7 +153,7 @@ void GLcanvas::push_marker(const vec2d       & p,
     m.color       = color;
     m.disk_radius = disk_radius;
     m.font_size   = font_size;
-    markers.push_back(m);
+    push(m);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -155,7 +171,7 @@ void GLcanvas::push_marker(const vec3d       & p,
     m.color       = color;
     m.disk_radius = disk_radius;
     m.font_size   = font_size;
-    markers.push_back(m);
+    push(m);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -331,9 +347,12 @@ void GLcanvas::draw_controls() const
     if(visual_controls.empty()) return;
     for(auto vc : visual_controls)
     {
-        ImGui::Begin(vc->name.c_str());
-        vc->draw();
-        ImGui::End();
+        if(vc->show)
+        {
+            ImGui::Begin(vc->name.c_str(), &vc->show);
+            vc->draw();
+            ImGui::End();
+        }
     }
 }
 

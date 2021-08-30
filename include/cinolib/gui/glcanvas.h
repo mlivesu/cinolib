@@ -112,8 +112,11 @@ class GLcanvas
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void push_obj(const DrawableObject *obj,
-                      const bool            refit_scene = true);
+        void push(const DrawableObject *obj, const bool refit_scene = true);
+        void push(const Marker         & m);
+        void push(      VisualControl  *vc);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void push_marker(const vec2d       & p,
                          const std::string & text        = "",
