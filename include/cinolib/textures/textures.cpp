@@ -50,10 +50,8 @@
 #include <stdint.h>
 #include <iterator>
 
-#ifdef CINOLIB_USES_QT
-#include <QImage>
-#include <QGLWidget>
-#endif
+#define STB_IMAGE_IMPLEMENTATION
+#include "../external/stb/stb_image.h"
 
 namespace cinolib
 {
@@ -225,24 +223,13 @@ void texture_parula_with_isolines(Texture & texture)
 CINO_INLINE
 void texture_bitmap(Texture & texture, const char *bitmap)
 {
-#ifdef CINOLIB_USES_QT
-    // https://stackoverflow.com/questions/20245865/render-qimage-with-opengl
-    QImage img = QGLWidget::convertToGLFormat(QImage(bitmap));
-    if (img.height()!=img.width())
-    {
-        std::cerr << "CinoLib supports only textures with 1:1 ratio. Image discarded!" << std::endl;
-        return;
-    }
-    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
-
     delete[] texture.data;
-    texture.size = img.height();
-    texture.data = new uint8_t[texture.size*texture.size*4];
-    std::copy(img.bits(), img.bits()+(texture.size*texture.size*4), texture.data);
-#else
-    std::cerr << "ERROR : Qt missing. Install Qt and recompile defining symbol CINOLIB_USES_QT" << std::endl;
-#endif
+    int w,h,n;
+    stbi_set_flip_vertically_on_load(true); // avoids vertical mirroring of the texture
+    texture.data = stbi_load(bitmap, &w, &h, &n, STBI_rgb_alpha);
+    texture.size = (texture.data!=NULL && w==h) ? h : 0; // does not currently support non squared images....
 }
 
 }
