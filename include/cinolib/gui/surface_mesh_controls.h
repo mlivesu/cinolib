@@ -33,59 +33,31 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_VISUAL_CONTROL_H
-#define CINO_VISUAL_CONTROL_H
+#ifndef CINO_SURFACE_MESH_CONTROLS_H
+#define CINO_SURFACE_MESH_CONTROLS_H
 
-#include <string>
+#include <cinolib/cino_inline.h>
+#include <cinolib/gui/visual_control.h>
 
 namespace cinolib
 {
 
-/*
- * This class models a generic ImGui widget to be displayed inside a cinolib::GLcanvas
- *
- * Each VisualControl must be associated with a unique name, whch is internally used by ImGui
- * to distinguish between the various items. Ideally, each VisualControl models a window with
- * some controls (buttons, sliders,...). Pushing two visual controls with same name in the same
- * canvas will result in a window containing both controls.
- *
- * All controls and relative event handling must be implemented in the draw() method.
- * This function will be called by the GLcanvas from within a
- *
- *     ImGui::NewFrame();
- *     {
- *          for each visual control vc
- *          {
- *              if(vc->show)
- *              {
- *                  ImGui::Begin(vc->name, vc->show);
- *                  {
- *                      vc->draw();
- *                  }
- *                  ImGui::End();
- *              }
- *          }
- *     }
- *     ImGui::Render();
- *
- * block. Therefore, draw() is expected to only contain code for the controls themselves,
- * and not for window/frame handling.
-*/
-class VisualControl
+class SurfaceMeshControls : public VisualControl
 {
-    public :
+    public:
 
-        std::string name;
-        bool        show = true;
-
-        explicit  VisualControl(const std::string & name) : name(name) {}
-        virtual  ~VisualControl(){}
+        SurfaceMeshControls(const std::string & name);
+       ~SurfaceMeshControls() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        virtual void draw() const = 0;
+        void draw() const;
 };
 
 }
 
-#endif // CINO_VISUAL_CONTROL_H
+#ifndef  CINO_STATIC_LIB
+#include "surface_mesh_controls.cpp"
+#endif
+
+#endif // CINO_SURFACE_MESH_CONTROLS_H
