@@ -44,7 +44,7 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-GLcanvas2::GLcanvas2(const int width, const int height)
+GLcanvas::GLcanvas(const int width, const int height)
 {
     camera = Camera<double>(width,height);
     camera.toggle_persp_ortho(); // make it perspective
@@ -100,7 +100,7 @@ GLcanvas2::GLcanvas2(const int width, const int height)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-GLcanvas2::~GLcanvas2()
+GLcanvas::~GLcanvas()
 {
     ImGui_ImplOpenGL2_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -112,7 +112,7 @@ GLcanvas2::~GLcanvas2()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::push_obj(const DrawableObject *obj, const bool refit_scene)
+void GLcanvas::push_obj(const DrawableObject *obj, const bool refit_scene)
 {
     drawlist.push_back(obj);
 
@@ -125,11 +125,11 @@ void GLcanvas2::push_obj(const DrawableObject *obj, const bool refit_scene)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::push_marker(const vec2d       & p,
-                            const std::string & text,
-                            const Color         color,
-                            const uint          disk_radius,
-                            const uint          font_size)
+void GLcanvas::push_marker(const vec2d       & p,
+                           const std::string & text,
+                           const Color         color,
+                           const uint          disk_radius,
+                           const uint          font_size)
 {
     Marker m;
     m.pos_2d      = p;
@@ -143,11 +143,11 @@ void GLcanvas2::push_marker(const vec2d       & p,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::push_marker(const vec3d       & p,
-                            const std::string & text,
-                            const Color         color,
-                            const uint          disk_radius,
-                            const uint          font_size)
+void GLcanvas::push_marker(const vec3d       & p,
+                           const std::string & text,
+                           const Color         color,
+                           const uint          disk_radius,
+                           const uint          font_size)
 {
     Marker m;
     m.pos_3d      = p;
@@ -161,7 +161,7 @@ void GLcanvas2::push_marker(const vec3d       & p,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::pop_all_markers()
+void GLcanvas::pop_all_markers()
 {
     markers.clear();
 }
@@ -169,7 +169,7 @@ void GLcanvas2::pop_all_markers()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::refit_scene()
+void GLcanvas::refit_scene()
 {
     // update camera scene parameters
     camera.scene_center = vec3d(0.0);
@@ -195,7 +195,7 @@ void GLcanvas2::refit_scene()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::update_GL_matrices() const
+void GLcanvas::update_GL_matrices() const
 {
     update_GL_modelview();
     update_GL_projection();
@@ -204,7 +204,7 @@ void GLcanvas2::update_GL_matrices() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::update_GL_modelview() const
+void GLcanvas::update_GL_modelview() const
 {
     glfwMakeContextCurrent(window);
     glMatrixMode(GL_MODELVIEW);
@@ -214,7 +214,7 @@ void GLcanvas2::update_GL_modelview() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::update_GL_projection() const
+void GLcanvas::update_GL_projection() const
 {
     glfwMakeContextCurrent(window);
     glMatrixMode(GL_PROJECTION);
@@ -224,7 +224,7 @@ void GLcanvas2::update_GL_projection() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::draw() const
+void GLcanvas::draw() const
 {
     glfwMakeContextCurrent(window);
     glClearColor(1,1,1,1);
@@ -252,7 +252,7 @@ void GLcanvas2::draw() const
 // and Z-buffer access. I could not entirely fix it...
 //
 CINO_INLINE
-void GLcanvas2::draw_markers() const
+void GLcanvas::draw_markers() const
 {
     if(markers.empty()) return;
 
@@ -326,7 +326,7 @@ void GLcanvas2::draw_markers() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::draw_controls() const
+void GLcanvas::draw_controls() const
 {
     if(visual_controls.empty()) return;
     for(auto vc : visual_controls)
@@ -340,7 +340,7 @@ void GLcanvas2::draw_controls() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-int GLcanvas2::launch() const
+int GLcanvas::launch() const
 {
     while(!glfwWindowShouldClose(window))
     {
@@ -353,7 +353,7 @@ int GLcanvas2::launch() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::update_DPI_factor()
+void GLcanvas::update_DPI_factor()
 {
     // https://www.glfw.org/docs/latest/intro_guide.html#coordinate_systems
     // https://www.glfw.org/docs/latest/window_guide.html#window_fbsize
@@ -365,7 +365,7 @@ void GLcanvas2::update_DPI_factor()
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-vec2d GLcanvas2::cursor_pos() const
+vec2d GLcanvas::cursor_pos() const
 {
     vec2d pos;
     glfwGetCursorPos(window, &pos.x(), &pos.y());
@@ -375,7 +375,7 @@ vec2d GLcanvas2::cursor_pos() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::whole_Z_buffer(GLfloat * buf) const
+void GLcanvas::whole_Z_buffer(GLfloat * buf) const
 {
     glfwMakeContextCurrent(window);
     GLint viewport[4];
@@ -386,7 +386,7 @@ void GLcanvas2::whole_Z_buffer(GLfloat * buf) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-GLfloat GLcanvas2::query_Z_buffer(const vec2d & p) const
+GLfloat GLcanvas::query_Z_buffer(const vec2d & p) const
 {
     glfwMakeContextCurrent(window);
     GLint x = p.x()         * DPI_factor;
@@ -400,7 +400,7 @@ GLfloat GLcanvas2::query_Z_buffer(const vec2d & p) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-bool GLcanvas2::unproject(const vec2d & p2d, vec3d & p3d) const
+bool GLcanvas::unproject(const vec2d & p2d, vec3d & p3d) const
 {
     // retrieve the missing z coordinate from the Z buffer, then unproject
     return unproject(p2d, query_Z_buffer(p2d), p3d);
@@ -412,7 +412,7 @@ bool GLcanvas2::unproject(const vec2d & p2d, vec3d & p3d) const
 // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluUnProject.xml
 //
 CINO_INLINE
-bool GLcanvas2::unproject(const vec2d & p2d, const GLfloat & depth, vec3d & p3d) const
+bool GLcanvas::unproject(const vec2d & p2d, const GLfloat & depth, vec3d & p3d) const
 {
     // depth must be in the closed range (0,1)
     if(depth<=0 || depth>=1) return false;
@@ -440,7 +440,7 @@ bool GLcanvas2::unproject(const vec2d & p2d, const GLfloat & depth, vec3d & p3d)
 // https://stackoverflow.com/questions/54385727/gluunproject-giving-incorrect-values-on-macretina-display-but-works-correctl
 //
 CINO_INLINE
-void GLcanvas2::project(const vec3d & p3d, vec2d & p2d, GLdouble & depth) const
+void GLcanvas::project(const vec3d & p3d, vec2d & p2d, GLdouble & depth) const
 {
     GLint viewport[4] = { 0,             camera.height,
                           camera.width, -camera.height};
@@ -458,9 +458,9 @@ void GLcanvas2::project(const vec3d & p3d, vec2d & p2d, GLdouble & depth) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::window_size_event(GLFWwindow *window, int width, int height)
+void GLcanvas::window_size_event(GLFWwindow *window, int width, int height)
 {
-    GLcanvas2* v = static_cast<GLcanvas2*>(glfwGetWindowUserPointer(window));
+    GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
     v->camera.height = height;
     v->camera.width  = width;
     v->camera.reset_projection(); // update the camera frustum
@@ -471,7 +471,7 @@ void GLcanvas2::window_size_event(GLFWwindow *window, int width, int height)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::key_event(GLFWwindow *window, int key, int /*scancode*/, int action, int modifiers)
+void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int action, int modifiers)
 {
     // if visual controls claim the event, let them handle it!
     if(ImGui::GetIO().WantCaptureKeyboard) return;
@@ -479,7 +479,7 @@ void GLcanvas2::key_event(GLFWwindow *window, int key, int /*scancode*/, int act
     // handle repeated keys as if they were a sequence of single key press events
     if(action==GLFW_PRESS || action==GLFW_REPEAT)
     {
-        GLcanvas2* v = static_cast<GLcanvas2*>(glfwGetWindowUserPointer(window));
+        GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
 
         if(v->callback_key_pressed) v->callback_key_pressed(key,modifiers);
 
@@ -539,12 +539,12 @@ void GLcanvas2::key_event(GLFWwindow *window, int key, int /*scancode*/, int act
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::mouse_button_event(GLFWwindow *window, int button, int action, int modifiers)
+void GLcanvas::mouse_button_event(GLFWwindow *window, int button, int action, int modifiers)
 {
     // if visual controls claim the event, let them handle it
     if(ImGui::GetIO().WantCaptureMouse) return;
 
-    GLcanvas2* v = static_cast<GLcanvas2*>(glfwGetWindowUserPointer(window));
+    GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
 
     if(action==GLFW_RELEASE)
     {
@@ -592,9 +592,9 @@ void GLcanvas2::mouse_button_event(GLFWwindow *window, int button, int action, i
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::cursor_event(GLFWwindow *window, double x_pos, double y_pos)
+void GLcanvas::cursor_event(GLFWwindow *window, double x_pos, double y_pos)
 {
-    GLcanvas2* v = static_cast<GLcanvas2*>(glfwGetWindowUserPointer(window));
+    GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
 
     if(v->callback_cursor) v->callback_cursor(x_pos,y_pos);
 
@@ -633,9 +633,9 @@ void GLcanvas2::cursor_event(GLFWwindow *window, double x_pos, double y_pos)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas2::scroll_event(GLFWwindow *window, double x_offset, double y_offset)
+void GLcanvas::scroll_event(GLFWwindow *window, double x_offset, double y_offset)
 {
-    GLcanvas2* v = static_cast<GLcanvas2*>(glfwGetWindowUserPointer(window));
+    GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
 
     // if visual controls claim the event, let them handle it
     if(ImGui::GetIO().WantCaptureMouse) return;

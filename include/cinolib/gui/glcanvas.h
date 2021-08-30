@@ -74,7 +74,7 @@ struct Trackball
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-class GLcanvas2
+class GLcanvas
 {
     public:
 
@@ -93,8 +93,8 @@ class GLcanvas2
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-         GLcanvas2(const int width = 640, const int height = 480);
-        ~GLcanvas2();
+         GLcanvas(const int width = 640, const int height = 480);
+        ~GLcanvas();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
