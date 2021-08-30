@@ -229,7 +229,7 @@ void texture_bitmap(Texture & texture, const char *bitmap)
     int w,h,n;
     stbi_set_flip_vertically_on_load(true); // avoids vertical mirroring of the texture
     texture.data = stbi_load(bitmap, &w, &h, &n, STBI_rgb_alpha);
-    texture.size = (texture.data!=NULL && w==h) ? h : 0; // does not currently support non squared images....
+    texture.size = (texture.data!=nullptr && w==h) ? h : 0; // does not currently support non squared images....
 }
 
 }
