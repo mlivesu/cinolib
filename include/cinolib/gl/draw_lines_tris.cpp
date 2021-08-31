@@ -43,7 +43,7 @@ namespace cinolib
 CINO_INLINE
 void render_tris(const RenderData & data)
 {
-    if (data.draw_mode & DRAW_TRI_POINTS)
+    if(data.draw_mode & DRAW_TRI_POINTS)
     {
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(4, GL_FLOAT, 0, data.tri_v_colors.data());
@@ -56,29 +56,18 @@ void render_tris(const RenderData & data)
     }
     else
     {
-        if (data.draw_mode & DRAW_TRI_TEXTURE1D)
+        if(data.draw_mode & DRAW_TRI_TEXTURE1D)
         {
             glBindTexture(GL_TEXTURE_1D, data.texture.id);
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, data.texture.size, 0, GL_RGB, GL_UNSIGNED_BYTE, data.texture.data);
-            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
-
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(1, GL_FLOAT, 0, data.tri_text.data());
             glColor3f(1,1,1);
             glEnable(GL_COLOR_MATERIAL);
             glEnable(GL_TEXTURE_1D);
         }
-        else if (data.draw_mode & DRAW_TRI_TEXTURE2D)
+        else if(data.draw_mode & DRAW_TRI_TEXTURE2D)
         {
             glBindTexture(GL_TEXTURE_2D, data.texture.id);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, data.texture.size, data.texture.size, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.texture.data);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(2, GL_FLOAT, 0, data.tri_text.data());
             glColor3f(1,1,1);
@@ -98,13 +87,13 @@ void render_tris(const RenderData & data)
         glDrawElements(GL_TRIANGLES, data.tris.size(), GL_UNSIGNED_INT, data.tris.data());
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
-        if (data.draw_mode & DRAW_TRI_TEXTURE1D)
+        if(data.draw_mode & DRAW_TRI_TEXTURE1D)
         {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
             glDisable(GL_TEXTURE_1D);
             glEnable(GL_COLOR_MATERIAL);
         }
-        else if (data.draw_mode & DRAW_TRI_TEXTURE2D)
+        else if(data.draw_mode & DRAW_TRI_TEXTURE2D)
         {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
             glDisable(GL_TEXTURE_2D);
@@ -123,7 +112,7 @@ void render_tris(const RenderData & data)
 CINO_INLINE
 void render_segs(const RenderData & data)
 {
-    if (data.draw_mode & DRAW_SEGS)
+    if(data.draw_mode & DRAW_SEGS)
     {
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);        
@@ -155,14 +144,14 @@ void render(const RenderData & data)
     glEnable(GL_BLEND);
     glPolygonOffset(1.0, 1);
 
-    if (data.draw_mode & DRAW_TRIS)
+    if(data.draw_mode & DRAW_TRIS)
     {
-        if (data.draw_mode & DRAW_TRI_POINTS)
+        if(data.draw_mode & DRAW_TRI_POINTS)
         {
             glDisable(GL_LIGHTING);
             render_tris(data);
         }
-        else if (data.draw_mode & DRAW_TRI_SMOOTH)
+        else if(data.draw_mode & DRAW_TRI_SMOOTH)
         {
             glEnable(GL_LIGHTING);
             glShadeModel(GL_SMOOTH);

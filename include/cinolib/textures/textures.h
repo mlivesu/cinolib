@@ -55,13 +55,12 @@
 //#endif
 #include <GLFW/glfw3.h>
 
-#include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
 
 namespace cinolib
 {
 
-enum
+enum // texture types currently supported
 {
     TEXTURE_1D_ISOLINES,
     TEXTURE_1D_HSV,
@@ -71,21 +70,40 @@ enum
     TEXTURE_2D_ISOLINES,
     TEXTURE_2D_CHECKERBOARD,
     TEXTURE_2D_BITMAP
-}; // texture types currently supported
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 struct Texture
 {
-    int          type;
-    GLuint       id             = 0;
-    GLsizei      size           = 0;
-    double       scaling_factor = 1.0;
-    uint8_t     *data           = nullptr;
-    std::string  diffuse_path;
-    std::string  specular_path;
-    std::string  normal_path;
+    int    type;
+    GLuint id             = 0;
+    double scaling_factor = 1.0;
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void create_texture_1D(const GLuint    id,
+                       const uint8_t * data,
+                       const GLsizei   size,
+                       const GLint     format,      // GL_RGB,     GL_RGBA, ...
+                       const GLint     wrap,        // GL_REPEAT,  GL_CLAMP
+                       const GLint     mag_filter,  // GL_NEAREST, GL_LINEAR, ...
+                       const GLint     min_filter); // GL_NEAREST, GL_LINEAR, ...
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void create_texture_2D(const GLuint    id,
+                       const uint8_t * data,
+                       const GLsizei   width,
+                       const GLsizei   height,
+                       const GLint     format,      // GL_RGB,     GL_RGBA, ...
+                       const GLint     wrap_s,      // GL_REPEAT,  GL_CLAMP
+                       const GLint     wrap_t,      // GL_REPEAT,  GL_CLAMP
+                       const GLint     mag_filter,  // GL_NEAREST, GL_LINEAR, ...
+                       const GLint     min_filter); // GL_NEAREST, GL_LINEAR, ...
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -113,7 +131,7 @@ CINO_INLINE
 void texture_isolines1D(      Texture & texture,
                         const Color   & c0 = Color::BLACK(),
                         const Color   & c1 = Color::WHITE(),
-                        const uint      n_bands = 32);
+                        const int       n_bands = 32);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

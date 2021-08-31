@@ -64,37 +64,39 @@ void texture_isolines2D(      Texture & texture,
                         const Color   & v_isolines,
                         const Color   & background)
 {
-    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
 
-    delete[] texture.data;
-    texture.size = 8;
-    texture.data = new uint8_t[texture.size*texture.size*4];
-    for(int32_t r=0; r<texture.size; ++r)
-    for(int32_t c=0; c<texture.size; ++c)
+    const uint size = 8;
+    uint8_t * data = new uint8_t[size*size*4];
+    for(uint r=0; r<size; ++r)
+    for(uint c=0; c<size; ++c)
     {
-        uint i = 4 * serialize_2D_index(r,c,texture.size);
-        texture.data[i  ] = background.r_uchar();
-        texture.data[i+1] = background.g_uchar();
-        texture.data[i+2] = background.b_uchar();
-        texture.data[i+3] = background.a_uchar();
+        uint i = 4 * serialize_2D_index(r,c,size);
+        data[i  ] = background.r_uchar();
+        data[i+1] = background.g_uchar();
+        data[i+2] = background.b_uchar();
+        data[i+3] = background.a_uchar();
     }
-    for(int32_t c=0; c<texture.size; ++c)
+    for(uint c=0; c<size; ++c)
     {
-        uint i = 4 * serialize_2D_index(0,c,texture.size);
-        texture.data[i  ] = u_isolines.r_uchar();
-        texture.data[i+1] = u_isolines.g_uchar();
-        texture.data[i+2] = u_isolines.b_uchar();
-        texture.data[i+3] = u_isolines.a_uchar();
+        uint i = 4 * serialize_2D_index(0,c,size);
+        data[i  ] = u_isolines.r_uchar();
+        data[i+1] = u_isolines.g_uchar();
+        data[i+2] = u_isolines.b_uchar();
+        data[i+3] = u_isolines.a_uchar();
     }
-    for(int32_t r=0; r<texture.size; ++r)
+    for(uint r=0; r<size; ++r)
     {
-        uint i = 4 * serialize_2D_index(r,0,texture.size);
-        texture.data[i  ] = v_isolines.r_uchar();
-        texture.data[i+1] = v_isolines.g_uchar();
-        texture.data[i+2] = v_isolines.b_uchar();
-        texture.data[i+3] = v_isolines.a_uchar();
+        uint i = 4 * serialize_2D_index(r,0,size);
+        data[i  ] = v_isolines.r_uchar();
+        data[i+1] = v_isolines.g_uchar();
+        data[i+2] = v_isolines.b_uchar();
+        data[i+3] = v_isolines.a_uchar();
     }
+
+    create_texture_2D(texture.id, data, size, size, GL_RGBA, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
+    delete[] data;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -104,31 +106,33 @@ void texture_checkerboard(      Texture & texture,
                           const Color   & c0,
                           const Color   & c1)
 {
-    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
 
-    delete[] texture.data;
-    texture.size = 8;
-    texture.data = new uint8_t[texture.size*texture.size*4];
-    for(int32_t r=0; r<texture.size; ++r)
-    for(int32_t c=0; c<texture.size; ++c)
+    const uint size = 8;
+    uint8_t * data = new uint8_t[size*size*4];
+    for(uint r=0; r<size; ++r)
+    for(uint c=0; c<size; ++c)
     {
-        uint i = 4 * serialize_2D_index(r,c,texture.size);
-        if (r%2 == c%2)
+        uint i = 4 * serialize_2D_index(r,c,size);
+        if(r%2 == c%2)
         {
-            texture.data[i  ] = c0.r_uchar();
-            texture.data[i+1] = c0.g_uchar();
-            texture.data[i+2] = c0.b_uchar();
-            texture.data[i+3] = c0.a_uchar();
+            data[i  ] = c0.r_uchar();
+            data[i+1] = c0.g_uchar();
+            data[i+2] = c0.b_uchar();
+            data[i+3] = c0.a_uchar();
         }
         else
         {
-            texture.data[i  ] = c1.r_uchar();
-            texture.data[i+1] = c1.g_uchar();
-            texture.data[i+2] = c1.b_uchar();
-            texture.data[i+3] = c1.a_uchar();
+            data[i  ] = c1.r_uchar();
+            data[i+1] = c1.g_uchar();
+            data[i+2] = c1.b_uchar();
+            data[i+3] = c1.a_uchar();
         }
     }
+
+    create_texture_2D(texture.id, data, size, size, GL_RGBA, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
+    delete[] data;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -137,29 +141,30 @@ CINO_INLINE
 void texture_isolines1D(      Texture & texture,
                         const Color   & c0,
                         const Color   & c1,
-                        const uint     n_bands)
+                        const int       n_bands)
 {
-    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
 
-    delete[] texture.data;
-    texture.size = n_bands;
-    texture.data = new uint8_t[3*texture.size];
-    for(int32_t i=0; i<texture.size; ++i)
+    uint8_t * data = new uint8_t[3*n_bands];
+    for(int i=0; i<n_bands; ++i)
     {
-        if (i%2)
+        if(i%2)
         {
-            texture.data[3*i  ] = c0.r_uchar();
-            texture.data[3*i+1] = c0.g_uchar();
-            texture.data[3*i+2] = c0.b_uchar();
+            data[3*i  ] = c0.r_uchar();
+            data[3*i+1] = c0.g_uchar();
+            data[3*i+2] = c0.b_uchar();
         }
         else
         {
-            texture.data[3*i  ] = c1.r_uchar();
-            texture.data[3*i+1] = c1.g_uchar();
-            texture.data[3*i+2] = c1.b_uchar();
+            data[3*i  ] = c1.r_uchar();
+            data[3*i+1] = c1.g_uchar();
+            data[3*i+2] = c1.b_uchar();
         }
-    };
+    }
+
+    create_texture_1D(texture.id, data, n_bands, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
+    delete[] data;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -167,13 +172,9 @@ void texture_isolines1D(      Texture & texture,
 CINO_INLINE
 void texture_HSV(Texture & texture)
 {
-    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
-
-    delete[] texture.data;
-    texture.size = 256;
-    texture.data = new uint8_t[768];
-    std::copy(std::begin(hsv_texture1D), std::end(hsv_texture1D), texture.data);
+    create_texture_1D(texture.id, hsv_texture1D, 256, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -181,13 +182,9 @@ void texture_HSV(Texture & texture)
 CINO_INLINE
 void texture_HSV_with_isolines(Texture & texture)
 {
-    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
-
-    delete[] texture.data;
-    texture.size = 256;
-    texture.data = new uint8_t[768];
-    std::copy(std::begin(hsv_texture1D_with_isolines), std::end(hsv_texture1D_with_isolines), texture.data);
+    create_texture_1D(texture.id, hsv_texture1D_with_isolines, 256, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -195,13 +192,9 @@ void texture_HSV_with_isolines(Texture & texture)
 CINO_INLINE
 void texture_parula(Texture & texture)
 {
-    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
-
-    delete[] texture.data;
-    texture.size = 64;
-    texture.data = new uint8_t[192];
-    std::copy(std::begin(parula_texture1D), std::end(parula_texture1D), texture.data);
+    create_texture_1D(texture.id, parula_texture1D, 64, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -209,13 +202,9 @@ void texture_parula(Texture & texture)
 CINO_INLINE
 void texture_parula_with_isolines(Texture & texture)
 {
-    if (texture.id > 0) glDeleteTextures(1, &texture.id);
+    if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
-
-    delete[] texture.data;
-    texture.size = 80;
-    texture.data = new uint8_t[240];
-    std::copy(std::begin(parula_w_isolines_texture1D), std::end(parula_w_isolines_texture1D), texture.data);
+    create_texture_1D(texture.id, parula_w_isolines_texture1D, 80, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -225,11 +214,60 @@ void texture_bitmap(Texture & texture, const char *bitmap)
 {
     if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
-    delete[] texture.data;
     int w,h,n;
     stbi_set_flip_vertically_on_load(true); // avoids vertical mirroring of the texture
-    texture.data = stbi_load(bitmap, &w, &h, &n, STBI_rgb_alpha);
-    texture.size = (texture.data!=nullptr && w==h) ? h : 0; // does not currently support non squared images....
+    uint8_t * data = stbi_load(bitmap, &w, &h, &n, STBI_rgb_alpha); // it always returns an RGBA image, regardless of the actual file encoding
+    if(data==nullptr)
+    {
+        std::cerr << "ERROR: could not load texture " << bitmap << std::endl;
+    }
+    else
+    {
+        create_texture_2D(texture.id, data, w, h, GL_RGBA, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
+        stbi_image_free(data);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void create_texture_1D(const GLuint    id,
+                      const uint8_t * data,
+                      const GLsizei   size,
+                      const GLint     format,     // GL_RGB,     GL_RGBA, ...
+                      const GLint     wrap,       // GL_REPEAT,  GL_CLAMP
+                      const GLint     mag_filter, // GL_NEAREST, GL_LINEAR, ...
+                      const GLint     min_filter) // GL_NEAREST, GL_LINEAR, ...
+{
+    glBindTexture(GL_TEXTURE_1D, id);
+    glTexImage1D(GL_TEXTURE_1D, 0, format, size, 0, (GLenum)format, GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S    , wrap);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, min_filter);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, mag_filter);
+    glBindTexture(GL_TEXTURE_1D, 0);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void create_texture_2D(const GLuint    id,
+                      const uint8_t * data,
+                      const GLsizei   width,
+                      const GLsizei   height,
+                      const GLint     format,     // GL_RGB,     GL_RGBA, ...
+                      const GLint     wrap_s,     // GL_REPEAT,  GL_CLAMP
+                      const GLint     wrap_t,     // GL_REPEAT,  GL_CLAMP
+                      const GLint     mag_filter, // GL_NEAREST, GL_LINEAR, ...
+                      const GLint     min_filter) // GL_NEAREST, GL_LINEAR, ...
+{
+    glBindTexture(GL_TEXTURE_2D, id);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, (GLenum)format, GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S    , wrap_s);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T    , wrap_t);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    // TODO: add mipmapping support...
 }
 
 }
