@@ -232,12 +232,12 @@ void texture_bitmap(Texture & texture, const char *bitmap)
 
 CINO_INLINE
 void create_texture_1D(const GLuint    id,
-                      const uint8_t * data,
-                      const GLsizei   size,
-                      const GLint     format,     // GL_RGB,     GL_RGBA, ...
-                      const GLint     wrap,       // GL_REPEAT,  GL_CLAMP
-                      const GLint     mag_filter, // GL_NEAREST, GL_LINEAR, ...
-                      const GLint     min_filter) // GL_NEAREST, GL_LINEAR, ...
+                       const uint8_t * data,
+                       const GLsizei   size,
+                       const GLint     format,     // GL_RGB,     GL_RGBA, ...
+                       const GLint     wrap,       // GL_REPEAT,  GL_CLAMP
+                       const GLint     mag_filter, // GL_NEAREST, GL_LINEAR, ...
+                       const GLint     min_filter) // GL_NEAREST, GL_LINEAR, ...
 {
     glBindTexture(GL_TEXTURE_1D, id);
     glTexImage1D(GL_TEXTURE_1D, 0, format, size, 0, (GLenum)format, GL_UNSIGNED_BYTE, data);
@@ -251,14 +251,14 @@ void create_texture_1D(const GLuint    id,
 
 CINO_INLINE
 void create_texture_2D(const GLuint    id,
-                      const uint8_t * data,
-                      const GLsizei   width,
-                      const GLsizei   height,
-                      const GLint     format,     // GL_RGB,     GL_RGBA, ...
-                      const GLint     wrap_s,     // GL_REPEAT,  GL_CLAMP
-                      const GLint     wrap_t,     // GL_REPEAT,  GL_CLAMP
-                      const GLint     mag_filter, // GL_NEAREST, GL_LINEAR, ...
-                      const GLint     min_filter) // GL_NEAREST, GL_LINEAR, ...
+                       const uint8_t * data,
+                       const GLsizei   width,
+                       const GLsizei   height,
+                       const GLint     format,     // GL_RGB,     GL_RGBA, ...
+                       const GLint     wrap_s,     // GL_REPEAT,  GL_CLAMP
+                       const GLint     wrap_t,     // GL_REPEAT,  GL_CLAMP
+                       const GLint     mag_filter, // GL_NEAREST, GL_LINEAR, ...
+                       const GLint     min_filter) // GL_NEAREST, GL_LINEAR, ...
 {
     glBindTexture(GL_TEXTURE_2D, id);
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, (GLenum)format, GL_UNSIGNED_BYTE, data);
