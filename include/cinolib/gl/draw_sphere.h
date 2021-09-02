@@ -60,6 +60,7 @@ static void sphere(const vec3  & center,
     glEnable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
     glColor3fv(color);
+    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glTranslated(center[0], center[1], center[2]);
     GLUquadric *sphere = gluNewQuadric();
