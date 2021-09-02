@@ -50,13 +50,15 @@ class OctreeNode
        ~OctreeNode();
         const OctreeNode *father;
         OctreeNode       *children[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-        bool              is_inner = false;
         AABB              bbox;
         std::vector<uint> item_indices; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
+        bool              is_inner = false;
 };
-// NOTE: father is not necessary and could be removed. However, it acts also as a padding
-// layer for node size in memory and secures better caching. Removing it actually degrades
-// performances
+// TODO: due to the bool flag this struct requires 7 bytes padding. Also the
+// pointer to the father is not necessary and could be removed, shrinking it.
+// It could be designed better....
+// https://stackoverflow.com/questions/4306186/structure-padding-and-packing
+// http://www.catb.org/esr/structure-packing/
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
