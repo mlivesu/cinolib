@@ -68,6 +68,7 @@ static void cylinder(const vec3  & a,
     glEnable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
     glColor3fv(color);
+    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glTranslated(a[0], a[1], a[2]);
     glRotatef(-angle, normal[0], normal[1], normal[2]);
