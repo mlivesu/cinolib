@@ -39,6 +39,8 @@
 #include <cinolib/fonts/droid_sans.h>
 #include <../external/imgui/imgui_impl_opengl2.h>
 #include <../external/imgui/imgui_impl_glfw.h>
+#include <cinolib/gl/draw_arrow.h>
+#include <cinolib/gl/draw_sphere.h>
 
 namespace cinolib
 {
@@ -260,7 +262,30 @@ void GLcanvas::draw() const
     ImGui::Render();
     ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 
+    if(show_axis) draw_axis();
+
     glfwSwapBuffers(window);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void GLcanvas::draw_axis() const
+{
+    vec3d  O = camera.scene_center;
+    vec3d  X = O + vec3d(1,0,0)*camera.scene_radius;
+    vec3d  Y = O + vec3d(0,1,0)*camera.scene_radius;
+    vec3d  Z = O + vec3d(0,0,1)*camera.scene_radius;
+    double r = camera.scene_radius*0.01;
+    glfwMakeContextCurrent(window);
+    glEnable(GL_COLOR_MATERIAL);
+    glDisable(GL_DEPTH_TEST);
+    cylinder(O, X, r, r, Color::RED().rgba);
+    cylinder(O, Y, r, r, Color::GREEN().rgba);
+    cylinder(O, Z, r, r, Color::BLUE().rgba);
+    sphere(O, r*2, Color::WHITE().rgba);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_COLOR_MATERIAL);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -550,6 +575,7 @@ void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int acti
                 case GLFW_KEY_O     : v->camera.toggle_persp_ortho(); break;
                 case GLFW_KEY_Z     : v->camera.zoom(-0.01);          break; // zoom in
                 case GLFW_KEY_R     : v->camera.reset();              break;
+                case GLFW_KEY_A     : v->show_axis = !v->show_axis;   break; // toggle show axis
             }
         }
         v->update_GL_matrices();
