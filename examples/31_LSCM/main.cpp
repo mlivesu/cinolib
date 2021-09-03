@@ -9,7 +9,7 @@
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/gui/qt/qt_gui_tools.h>
 #include <cinolib/lscm.h>
-#include <cinolib/textures/textures.h>
+#include <cinolib/gui/load_texture.h>
 #include <cinolib/profiler.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

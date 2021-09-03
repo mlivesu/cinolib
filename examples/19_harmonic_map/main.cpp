@@ -14,7 +14,7 @@
 #include <cinolib/gui/qt/qt_gui_tools.h>
 #include <cinolib/harmonic_map.h>
 #include <cinolib/geometry/n_sided_poygon.h>
-#include <cinolib/textures/textures.h>
+#include <cinolib/gui/load_texture.h>
 #include <cinolib/profiler.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

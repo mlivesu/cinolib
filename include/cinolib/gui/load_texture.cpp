@@ -41,7 +41,7 @@
 *     09124 Cagliari,                                                           *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/textures/textures.h>
+#include <cinolib/gui/load_texture.h>
 #include <cinolib/textures/texture_hsv.h>
 #include <cinolib/textures/texture_hsv_w_isolines.h>
 #include <cinolib/textures/texture_parula.h>
@@ -59,10 +59,10 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_isolines2D(      Texture & texture,
-                        const Color   & u_isolines,
-                        const Color   & v_isolines,
-                        const Color   & background)
+void load_texture_isolines2D(      Texture & texture,
+                             const Color   & u_isolines,
+                             const Color   & v_isolines,
+                             const Color   & background)
 {
     if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
@@ -95,16 +95,16 @@ void texture_isolines2D(      Texture & texture,
         data[i+3] = v_isolines.a_uchar();
     }
 
-    create_texture_2D(texture.id, data, size, size, GL_RGBA, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
+    load_texture_2D(texture.id, data, size, size, GL_RGBA, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
     delete[] data;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_checkerboard(      Texture & texture,
-                          const Color   & c0,
-                          const Color   & c1)
+void load_texture_checkerboard(      Texture & texture,
+                               const Color   & c0,
+                               const Color   & c1)
 {
     if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
@@ -131,17 +131,17 @@ void texture_checkerboard(      Texture & texture,
         }
     }
 
-    create_texture_2D(texture.id, data, size, size, GL_RGBA, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
+    load_texture_2D(texture.id, data, size, size, GL_RGBA, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
     delete[] data;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_isolines1D(      Texture & texture,
-                        const Color   & c0,
-                        const Color   & c1,
-                        const int       n_bands)
+void load_texture_isolines1D(      Texture & texture,
+                             const Color   & c0,
+                             const Color   & c1,
+                             const int       n_bands)
 {
     if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
@@ -163,54 +163,54 @@ void texture_isolines1D(      Texture & texture,
         }
     }
 
-    create_texture_1D(texture.id, data, n_bands, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
+    load_texture_1D(texture.id, data, n_bands, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
     delete[] data;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_HSV(Texture & texture)
+void load_texture_HSV(Texture & texture)
 {
     if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
-    create_texture_1D(texture.id, hsv_texture1D, 256, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
+    load_texture_1D(texture.id, hsv_texture1D, 256, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_HSV_with_isolines(Texture & texture)
+void load_texture_HSV_with_isolines(Texture & texture)
 {
     if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
-    create_texture_1D(texture.id, hsv_texture1D_with_isolines, 256, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
+    load_texture_1D(texture.id, hsv_texture1D_with_isolines, 256, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_parula(Texture & texture)
+void load_texture_parula(Texture & texture)
 {
     if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
-    create_texture_1D(texture.id, parula_texture1D, 64, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
+    load_texture_1D(texture.id, parula_texture1D, 64, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_parula_with_isolines(Texture & texture)
+void load_texture_parula_with_isolines(Texture & texture)
 {
     if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
-    create_texture_1D(texture.id, parula_w_isolines_texture1D, 80, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
+    load_texture_1D(texture.id, parula_w_isolines_texture1D, 80, GL_RGB, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_bitmap(Texture & texture, const char *bitmap)
+void load_texture_bitmap(Texture & texture, const char *bitmap)
 {
     if(texture.id > 0) glDeleteTextures(1, &texture.id);
     glGenTextures(1, &texture.id);
@@ -223,7 +223,7 @@ void texture_bitmap(Texture & texture, const char *bitmap)
     }
     else
     {
-        create_texture_2D(texture.id, data, w, h, GL_RGBA, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
+        load_texture_2D(texture.id, data, w, h, GL_RGBA, GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
         stbi_image_free(data);
     }
 }
@@ -231,13 +231,13 @@ void texture_bitmap(Texture & texture, const char *bitmap)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void create_texture_1D(const GLuint    id,
-                       const uint8_t * data,
-                       const GLsizei   size,
-                       const GLint     format,     // GL_RGB,     GL_RGBA, ...
-                       const GLint     wrap,       // GL_REPEAT,  GL_CLAMP
-                       const GLint     mag_filter, // GL_NEAREST, GL_LINEAR, ...
-                       const GLint     min_filter) // GL_NEAREST, GL_LINEAR, ...
+void load_texture_1D(const GLuint    id,
+                     const uint8_t * data,
+                     const GLsizei   size,
+                     const GLint     format,     // GL_RGB,     GL_RGBA, ...
+                     const GLint     wrap,       // GL_REPEAT,  GL_CLAMP
+                     const GLint     mag_filter, // GL_NEAREST, GL_LINEAR, ...
+                     const GLint     min_filter) // GL_NEAREST, GL_LINEAR, ...
 {
     glBindTexture(GL_TEXTURE_1D, id);
     glTexImage1D(GL_TEXTURE_1D, 0, format, size, 0, (GLenum)format, GL_UNSIGNED_BYTE, data);
@@ -250,15 +250,15 @@ void create_texture_1D(const GLuint    id,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void create_texture_2D(const GLuint    id,
-                       const uint8_t * data,
-                       const GLsizei   width,
-                       const GLsizei   height,
-                       const GLint     format,     // GL_RGB,     GL_RGBA, ...
-                       const GLint     wrap_s,     // GL_REPEAT,  GL_CLAMP
-                       const GLint     wrap_t,     // GL_REPEAT,  GL_CLAMP
-                       const GLint     mag_filter, // GL_NEAREST, GL_LINEAR, ...
-                       const GLint     min_filter) // GL_NEAREST, GL_LINEAR, ...
+void load_texture_2D(const GLuint    id,
+                     const uint8_t * data,
+                     const GLsizei   width,
+                     const GLsizei   height,
+                     const GLint     format,     // GL_RGB,     GL_RGBA, ...
+                     const GLint     wrap_s,     // GL_REPEAT,  GL_CLAMP
+                     const GLint     wrap_t,     // GL_REPEAT,  GL_CLAMP
+                     const GLint     mag_filter, // GL_NEAREST, GL_LINEAR, ...
+                     const GLint     min_filter) // GL_NEAREST, GL_LINEAR, ...
 {
     glBindTexture(GL_TEXTURE_2D, id);
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, (GLenum)format, GL_UNSIGNED_BYTE, data);

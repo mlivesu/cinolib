@@ -41,8 +41,8 @@
 *     09124 Cagliari,                                                           *
 *     Italy                                                                     *                                                                               *
 *********************************************************************************/
-#ifndef CINO_TEXTURES_H
-#define CINO_TEXTURES_H
+#ifndef CINO_LOAD_TEXTURE_H
+#define CINO_LOAD_TEXTURE_H
 
 #ifdef CINOLIB_USES_OPENGL
 
@@ -76,80 +76,80 @@ struct Texture
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void create_texture_1D(const GLuint    id,
-                       const uint8_t * data,
-                       const GLsizei   size,
-                       const GLint     format,      // GL_RGB,     GL_RGBA, ...
-                       const GLint     wrap,        // GL_REPEAT,  GL_CLAMP
-                       const GLint     mag_filter,  // GL_NEAREST, GL_LINEAR, ...
-                       const GLint     min_filter); // GL_NEAREST, GL_LINEAR, ...
+void load_texture_1D(const GLuint    id,
+                     const uint8_t * data,
+                     const GLsizei   size,
+                     const GLint     format,      // GL_RGB,     GL_RGBA, ...
+                     const GLint     wrap,        // GL_REPEAT,  GL_CLAMP
+                     const GLint     mag_filter,  // GL_NEAREST, GL_LINEAR, ...
+                     const GLint     min_filter); // GL_NEAREST, GL_LINEAR, ...
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void create_texture_2D(const GLuint    id,
-                       const uint8_t * data,
-                       const GLsizei   width,
-                       const GLsizei   height,
-                       const GLint     format,      // GL_RGB,     GL_RGBA, ...
-                       const GLint     wrap_s,      // GL_REPEAT,  GL_CLAMP
-                       const GLint     wrap_t,      // GL_REPEAT,  GL_CLAMP
-                       const GLint     mag_filter,  // GL_NEAREST, GL_LINEAR, ...
-                       const GLint     min_filter); // GL_NEAREST, GL_LINEAR, ...
+void load_texture_2D(const GLuint    id,
+                     const uint8_t * data,
+                     const GLsizei   width,
+                     const GLsizei   height,
+                     const GLint     format,      // GL_RGB,     GL_RGBA, ...
+                     const GLint     wrap_s,      // GL_REPEAT,  GL_CLAMP
+                     const GLint     wrap_t,      // GL_REPEAT,  GL_CLAMP
+                     const GLint     mag_filter,  // GL_NEAREST, GL_LINEAR, ...
+                     const GLint     min_filter); // GL_NEAREST, GL_LINEAR, ...
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_HSV(Texture & texture);
+void load_texture_HSV(Texture & texture);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_HSV_with_isolines(Texture & texture);
+void load_texture_HSV_with_isolines(Texture & texture);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_parula(Texture & texture);
+void load_texture_parula(Texture & texture);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_parula_with_isolines(Texture & texture);
+void load_texture_parula_with_isolines(Texture & texture);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_isolines1D(      Texture & texture,
-                        const Color   & c0 = Color::BLACK(),
-                        const Color   & c1 = Color::WHITE(),
-                        const int       n_bands = 32);
+void load_texture_isolines1D(      Texture & texture,
+                             const Color   & c0 = Color::BLACK(),
+                             const Color   & c1 = Color::WHITE(),
+                             const int       n_bands = 32);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_checkerboard(      Texture & texture,
-                          const Color   & c0 = Color(.5,.5,.5),
-                          const Color   & c1 = Color::WHITE());
+void load_texture_checkerboard(      Texture & texture,
+                               const Color   & c0 = Color(.5,.5,.5),
+                               const Color   & c1 = Color::WHITE());
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_isolines2D(      Texture & texture,
-                        const Color   & u_isolines = Color::BLUE(),
-                        const Color   & v_isolines = Color::RED(),
-                        const Color   & background = Color::WHITE());
+void load_texture_isolines2D(      Texture & texture,
+                             const Color   & u_isolines = Color::BLUE(),
+                             const Color   & v_isolines = Color::RED(),
+                             const Color   & background = Color::WHITE());
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void texture_bitmap(Texture & texture, const char *bitmap);
+void load_texture_bitmap(Texture & texture, const char *bitmap);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "textures.cpp"
+#include "load_texture.cpp"
 #endif
 
 #endif // CINOLIB_USES_OPENGL
-#endif // CINO_TEXTURES_H
+#endif // CINO_LOAD_TEXTURE_H

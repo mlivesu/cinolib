@@ -36,7 +36,7 @@
 #include <cinolib/meshes/abstract_drawable_polyhedralmesh.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/gui/draw_lines_tris.h>
-#include <cinolib/textures/textures.h>
+#include <cinolib/gui/load_texture.h>
 #include <cinolib/color.h>
 #include <unordered_set>
 
@@ -797,11 +797,11 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture1D(const int tex_type
     drawlist_out.texture.type = tex_type;
     switch (tex_type)
     {
-        case TEXTURE_1D_ISOLINES :          texture_isolines1D(drawlist_out.texture);           break;
-        case TEXTURE_1D_HSV :               texture_HSV(drawlist_out.texture);                  break;
-        case TEXTURE_1D_HSV_W_ISOLINES :    texture_HSV_with_isolines(drawlist_out.texture);    break;
-        case TEXTURE_1D_PARULA :            texture_parula(drawlist_out.texture);               break;
-        case TEXTURE_1D_PARULA_W_ISOLINES : texture_parula_with_isolines(drawlist_out.texture); break;
+        case TEXTURE_1D_ISOLINES :          load_texture_isolines1D(drawlist_out.texture);           break;
+        case TEXTURE_1D_HSV :               load_texture_HSV(drawlist_out.texture);                  break;
+        case TEXTURE_1D_HSV_W_ISOLINES :    load_texture_HSV_with_isolines(drawlist_out.texture);    break;
+        case TEXTURE_1D_PARULA :            load_texture_parula(drawlist_out.texture);               break;
+        case TEXTURE_1D_PARULA_W_ISOLINES : load_texture_parula_with_isolines(drawlist_out.texture); break;
         default: assert("Unknown Texture!" && false);
     }
     updateGL_out();
@@ -823,9 +823,9 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture2D(const int tex_type
     drawlist_out.texture.scaling_factor = tex_unit_scalar;
     switch (tex_type)
     {
-        case TEXTURE_2D_CHECKERBOARD : texture_checkerboard(drawlist_out.texture);   break;
-        case TEXTURE_2D_ISOLINES:      texture_isolines2D(drawlist_out.texture);     break;
-        case TEXTURE_2D_BITMAP:        texture_bitmap(drawlist_out.texture, bitmap); break;
+        case TEXTURE_2D_CHECKERBOARD : load_texture_checkerboard(drawlist_out.texture);   break;
+        case TEXTURE_2D_ISOLINES:      load_texture_isolines2D(drawlist_out.texture);     break;
+        case TEXTURE_2D_BITMAP:        load_texture_bitmap(drawlist_out.texture, bitmap); break;
         default: assert("Unknown Texture!" && false);
     }
     updateGL_out();
@@ -928,11 +928,11 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture1D(const int tex_type)
     drawlist_in.texture.type = tex_type;
     switch (tex_type)
     {
-        case TEXTURE_1D_ISOLINES :          texture_isolines1D(drawlist_in.texture);           break;
-        case TEXTURE_1D_HSV :               texture_HSV(drawlist_in.texture);                  break;
-        case TEXTURE_1D_HSV_W_ISOLINES :    texture_HSV_with_isolines(drawlist_in.texture);    break;
-        case TEXTURE_1D_PARULA :            texture_parula(drawlist_in.texture);               break;
-        case TEXTURE_1D_PARULA_W_ISOLINES : texture_parula_with_isolines(drawlist_in.texture); break;
+        case TEXTURE_1D_ISOLINES :          load_texture_isolines1D(drawlist_in.texture);           break;
+        case TEXTURE_1D_HSV :               load_texture_HSV(drawlist_in.texture);                  break;
+        case TEXTURE_1D_HSV_W_ISOLINES :    load_texture_HSV_with_isolines(drawlist_in.texture);    break;
+        case TEXTURE_1D_PARULA :            load_texture_parula(drawlist_in.texture);               break;
+        case TEXTURE_1D_PARULA_W_ISOLINES : load_texture_parula_with_isolines(drawlist_in.texture); break;
         default: assert("Unknown Texture!" && false);
     }
     updateGL_in();
@@ -954,9 +954,9 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture2D(const int tex_type,
     drawlist_in.texture.scaling_factor = tex_unit_scalar;
     switch (tex_type)
     {
-        case TEXTURE_2D_CHECKERBOARD : texture_checkerboard(drawlist_in.texture);   break;
-        case TEXTURE_2D_ISOLINES:      texture_isolines2D(drawlist_in.texture);     break;
-        case TEXTURE_2D_BITMAP:        texture_bitmap(drawlist_in.texture, bitmap); break;
+        case TEXTURE_2D_CHECKERBOARD : load_texture_checkerboard(drawlist_in.texture);   break;
+        case TEXTURE_2D_ISOLINES:      load_texture_isolines2D(drawlist_in.texture);     break;
+        case TEXTURE_2D_BITMAP:        load_texture_bitmap(drawlist_in.texture, bitmap); break;
         default: assert("Unknown Texture!" && false);
     }
     updateGL_in();

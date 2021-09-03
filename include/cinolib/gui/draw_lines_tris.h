@@ -45,7 +45,7 @@
 #include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
-#include <cinolib/textures/textures.h>
+#include <cinolib/gui/load_texture.h>
 
 namespace cinolib
 {
