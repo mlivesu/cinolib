@@ -20,33 +20,25 @@ set_target_properties(cinolib PROPERTIES CXX_EXTENSIONS OFF)
 # OPTIONAL MODULES ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-option(CINOLIB_USES_OPENGL_GUI       "Use GLFW and ImGui"   OFF)
-option(CINOLIB_USES_OPENGL           "Use OpenGL"           OFF)
-option(CINOLIB_USES_TETGEN           "Use Tetgen"           OFF)
-option(CINOLIB_USES_TRIANGLE         "Use Triangle"         OFF)
-option(CINOLIB_USES_EXACT_PREDICATES "Use Exact Predicates" OFF)
-option(CINOLIB_USES_GRAPH_CUT        "Use Graph Cut"        OFF)
-option(CINOLIB_USES_BOOST            "Use Boost"            OFF)
-option(CINOLIB_USES_VTK              "Use VTK"              OFF)
+option(CINOLIB_USES_OPENGL_GLFW_IMGUI "Use OpenGL, GLFW and ImGui" OFF)
+option(CINOLIB_USES_TETGEN            "Use Tetgen"                 OFF)
+option(CINOLIB_USES_TRIANGLE          "Use Triangle"               OFF)
+option(CINOLIB_USES_EXACT_PREDICATES  "Use Exact Predicates"       OFF)
+option(CINOLIB_USES_GRAPH_CUT         "Use Graph Cut"              OFF)
+option(CINOLIB_USES_BOOST             "Use Boost"                  OFF)
+option(CINOLIB_USES_VTK               "Use VTK"                    OFF)
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-if(CINOLIB_USES_OPENGL)
-    message("CINOLIB OPTIONAL MODULE: OpenGL")
+if(CINOLIB_USES_OPENGL_GLFW_IMGUI)
+    message("CINOLIB OPTIONAL MODULES: OpenGL, GLFW, ImGui")
     find_package(OpenGL REQUIRED)
     target_link_libraries(cinolib INTERFACE OpenGL::GL)
-    target_compile_definitions(cinolib INTERFACE CINOLIB_USES_OPENGL)
-endif()
-
-#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-if(CINOLIB_USES_OPENGL_GUI)
-    message("CINOLIB OPTIONAL MODULE: OpenGL GUI (Glfw,ImGui)")
     add_subdirectory(${cinolib_DIR}/external/imgui imgui)
     target_link_libraries(cinolib INTERFACE imgui)
-    target_compile_definitions(cinolib INTERFACE CINOLIB_USES_OPENGL_GUI)
+    target_compile_definitions(cinolib INTERFACE CINOLIB_USES_OPENGL)
 endif()
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
