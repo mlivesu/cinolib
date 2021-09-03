@@ -36,7 +36,7 @@
 #ifndef CINO_GLCANVAS_H
 #define CINO_GLCANVAS_H
 
-#include <GLFW/glfw3.h>
+#include <cinolib/gui/gl_glu_glfw.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/gui/visual_control.h>
 #include <cinolib/gui/camera.h>
@@ -64,8 +64,8 @@ struct Trackball
 {
     vec2d last_click_2d = vec2d(inf_double);
     vec3d last_click_3d = vec3d(inf_double);
-    bool  mouse_pressed = false;
     std::chrono::high_resolution_clock::time_point t_last_click;
+    bool  mouse_pressed = false;
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -74,13 +74,14 @@ class GLcanvas
 {
     public:
 
-        int                                font_size          = 15;
-        bool                               depth_cull_markers = false; // skip occluded 3D markers, testing their depth with the Z-buffer
         GLFWwindow                        *window;
         std::vector<const DrawableObject*> drawlist;
         std::vector<Marker>                markers;
         std::vector<VisualControl*>        visual_controls;
         double                             DPI_factor;
+        int                                font_size          = 15;
+        bool                               show_axis          = false;
+        bool                               depth_cull_markers = false; // skip occluded 3D markers, testing their depth with the Z-buffer
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -101,6 +102,7 @@ class GLcanvas
         void draw()          const; // single render pass
         void draw_controls() const; // render visual controls
         void draw_markers()  const; // render text labels with ImGui (3d markers are depth tested if culling is enabled)
+        void draw_axis()     const; // render the global frame XYZ
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

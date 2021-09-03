@@ -35,13 +35,7 @@
 *********************************************************************************/
 #include "drawable_octree.h"
 
-#ifdef __APPLE__
-#include <gl.h>
-#include <glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#include <cinolib/gui/gl_glu_glfw.h>
 
 namespace cinolib
 {

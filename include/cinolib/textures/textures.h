@@ -46,15 +46,7 @@
 
 #ifdef CINOLIB_USES_OPENGL
 
-//#ifdef __APPLE__
-//#include <gl.h>
-//#include <glu.h>
-//#else
-//#include <GL/gl.h>
-//#include <GL/glu.h>
-//#endif
-#include <GLFW/glfw3.h>
-
+#include <cinolib/gui/gl_glu_glfw.h>
 #include <cinolib/color.h>
 
 namespace cinolib

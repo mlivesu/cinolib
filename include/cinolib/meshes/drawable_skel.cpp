@@ -36,12 +36,7 @@
 
 #ifdef CINOLIB_USES_OPENGL
 
-#ifdef __APPLE__
-#include <gl.h>
-#else
-#include <GL/gl.h>
-#endif
-
+#include <cinolib/gui/gl_glu_glfw.h>
 #include <cinolib/meshes/drawable_skel.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
