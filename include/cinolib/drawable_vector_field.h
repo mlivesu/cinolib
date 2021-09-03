@@ -41,7 +41,7 @@
 #include <cinolib/geometry/vec_mat.h>
 #include <cinolib/meshes/abstract_mesh.h>
 #include <cinolib/color.h>
-#include <cinolib/gl/draw_arrow.h>
+#include <cinolib/gui/draw_arrow.h>
 
 namespace cinolib
 {

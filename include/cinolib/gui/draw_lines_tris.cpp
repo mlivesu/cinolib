@@ -33,7 +33,7 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/gl/draw_lines_tris.h>
+#include <cinolib/gui/draw_lines_tris.h>
 
 namespace cinolib
 {

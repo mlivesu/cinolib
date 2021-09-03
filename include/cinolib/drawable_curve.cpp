@@ -35,7 +35,7 @@
 *********************************************************************************/
 #include "drawable_curve.h"
 #include <cinolib/cino_inline.h>
-#include <cinolib/gl/draw_cylinder.h>
+#include <cinolib/gui/draw_cylinder.h>
 
 namespace cinolib
 {

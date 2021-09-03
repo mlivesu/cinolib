@@ -35,8 +35,8 @@
 *********************************************************************************/
 #include <cinolib/drawable_segment_soup.h>
 #include <cinolib/cino_inline.h>
-#include <cinolib/gl/draw_sphere.h>
-#include <cinolib/gl/draw_cylinder.h>
+#include <cinolib/gui/draw_sphere.h>
+#include <cinolib/gui/draw_cylinder.h>
 
 namespace cinolib
 {

@@ -36,8 +36,8 @@
 #include <cinolib/drawable_isocontour.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
-#include <cinolib/gl/draw_sphere.h>
-#include <cinolib/gl/draw_cylinder.h>
+#include <cinolib/gui/draw_sphere.h>
+#include <cinolib/gui/draw_cylinder.h>
 
 namespace cinolib
 {

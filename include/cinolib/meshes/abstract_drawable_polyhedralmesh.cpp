@@ -35,7 +35,7 @@
 *********************************************************************************/
 #include <cinolib/meshes/abstract_drawable_polyhedralmesh.h>
 #include <cinolib/cino_inline.h>
-#include <cinolib/gl/draw_lines_tris.h>
+#include <cinolib/gui/draw_lines_tris.h>
 #include <cinolib/textures/textures.h>
 #include <cinolib/color.h>
 #include <unordered_set>

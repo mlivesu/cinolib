@@ -37,7 +37,7 @@
 #define CINO_DRAWABLE_SPHERE_H
 
 #include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_sphere.h>
+#include <cinolib/gui/draw_sphere.h>
 #include <cinolib/geometry/vec_mat.h>
 #include <cinolib/color.h>
 
