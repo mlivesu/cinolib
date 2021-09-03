@@ -18,7 +18,7 @@
 
 #include <QApplication>
 #include <QHBoxLayout>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/qt/qt_gui_tools.h>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/homotopy_basis.h>
 #include <cinolib/canonical_polygonal_schema.h>

@@ -11,10 +11,10 @@
 #include <QApplication>
 #include <QHBoxLayout>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/qt/qt_gui_tools.h>
 #include <cinolib/harmonic_map.h>
 #include <cinolib/geometry/n_sided_poygon.h>
-#include <cinolib/gui/load_texture.h>
+#include <cinolib/gl/load_texture.h>
 #include <cinolib/profiler.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

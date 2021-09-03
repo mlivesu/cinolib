@@ -36,10 +36,10 @@
 #ifndef CINO_GLCANVAS_H
 #define CINO_GLCANVAS_H
 
-#include <cinolib/gui/gl_glu_glfw.h>
+#include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/gui/visual_control.h>
-#include <cinolib/gui/camera.h>
+#include <cinolib/gl/visual_control.h>
+#include <cinolib/gl/camera.h>
 #include <cinolib/min_max_inf.h>
 #include <cinolib/color.h>
 

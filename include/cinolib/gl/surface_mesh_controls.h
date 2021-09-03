@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2021: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,28 +33,55 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_DRAW_ARROW_H
-#define CINO_DRAW_ARROW_H
+#ifndef CINO_SURFACE_MESH_CONTROLS_H
+#define CINO_SURFACE_MESH_CONTROLS_H
 
 #include <cinolib/cino_inline.h>
-#include <cinolib/gui/draw_cylinder.h>
+#include <cinolib/gl/glcanvas.h>
+#include <cinolib/gl/visual_control.h>
+#include <cinolib/meshes/meshes.h>
 
 namespace cinolib
 {
 
-template <typename vec3>
-CINO_INLINE
-void arrow(const vec3  & base,
-           const vec3  & tip,
-           float         radius,
-           const float * color)
+template<class Mesh>
+class SurfaceMeshControls : public VisualControl
 {
-    vec3 tip_base = 0.3 * tip + 0.7 * base;
+    Mesh     * m   = nullptr;
+    GLcanvas * gui = nullptr;
 
-    cylinder<vec3>(tip_base, tip, radius, 0.0, color);
-    cylinder<vec3>(base, tip_base, radius * 0.2,  radius * 0.2, color);
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    typedef typename Mesh::M_type M;
+    typedef typename Mesh::V_type V;
+    typedef typename Mesh::E_type E;
+    typedef typename Mesh::P_type P;
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    bool  show_mesh       = true;
+    bool  show_wireframe  = true;
+    int   shading         = 2; // 0 = point, 1 = flat, 2 = smooth
+    int   wireframe_width = 1;
+    float wireframe_alpha = 1;
+    int   color           = 1; // 0 = vert, 1 = poly, 2 = text 1D, 3 = text 2D
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    public:
+
+        SurfaceMeshControls(Mesh *m, GLcanvas *gui, const std::string & name);
+       ~SurfaceMeshControls() override {}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void draw() override;
+};
+
 }
 
-}
+#ifndef  CINO_STATIC_LIB
+#include "surface_mesh_controls.cpp"
+#endif
 
-#endif // CINO_DRAW_ARROW_H
+#endif // CINO_SURFACE_MESH_CONTROLS_H

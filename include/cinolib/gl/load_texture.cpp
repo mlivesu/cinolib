@@ -41,7 +41,7 @@
 *     09124 Cagliari,                                                           *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/gui/load_texture.h>
+#include <cinolib/gl/load_texture.h>
 #include <cinolib/textures/texture_hsv.h>
 #include <cinolib/textures/texture_hsv_w_isolines.h>
 #include <cinolib/textures/texture_parula.h>

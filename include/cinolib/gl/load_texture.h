@@ -46,7 +46,7 @@
 
 #ifdef CINOLIB_USES_OPENGL
 
-#include <cinolib/gui/gl_glu_glfw.h>
+#include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/color.h>
 
 namespace cinolib

@@ -2,7 +2,7 @@
 #define DRAWABLE_TRIANGLE_SOUP_H
 
 #include <cinolib/drawable_object.h>
-#include <cinolib/gui/draw_lines_tris.h>
+#include <cinolib/gl/draw_lines_tris.h>
 
 namespace cinolib
 {

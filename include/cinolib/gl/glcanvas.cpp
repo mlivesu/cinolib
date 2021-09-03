@@ -33,14 +33,14 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/gui/glcanvas.h>
-#include <cinolib/gui/trackball.h>
+#include <cinolib/gl/glcanvas.h>
+#include <cinolib/gl/trackball.h>
 #include <cinolib/how_many_seconds.h>
 #include <cinolib/fonts/droid_sans.h>
 #include <../external/imgui/imgui_impl_opengl2.h>
 #include <../external/imgui/imgui_impl_glfw.h>
-#include <cinolib/gui/draw_arrow.h>
-#include <cinolib/gui/draw_sphere.h>
+#include <cinolib/gl/draw_arrow.h>
+#include <cinolib/gl/draw_sphere.h>
 
 namespace cinolib
 {

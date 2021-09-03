@@ -11,7 +11,7 @@
 
 #include <QApplication>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/qt/qt_gui_tools.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

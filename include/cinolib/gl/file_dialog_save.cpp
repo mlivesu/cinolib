@@ -33,7 +33,7 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/gui/file_dialog_save.h>
+#include <cinolib/gl/file_dialog_save.h>
 #include <cstdio>
 #include <cstring>
 

@@ -33,41 +33,28 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_DRAW_SPHERE_H
-#define CINO_DRAW_SPHERE_H
+#ifndef CINO_DRAW_ARROW_H
+#define CINO_DRAW_ARROW_H
 
-#ifdef CINOLIB_USES_OPENGL
-
-#include <cinolib/gui/gl_glu_glfw.h>
 #include <cinolib/cino_inline.h>
+#include <cinolib/gl/draw_cylinder.h>
 
 namespace cinolib
 {
 
 template <typename vec3>
 CINO_INLINE
-static void sphere(const vec3  & center,
-                   float         radius,
-                   const float * color)
+void arrow(const vec3  & base,
+           const vec3  & tip,
+           float         radius,
+           const float * color)
 {
-    glEnable(GL_LIGHTING);
-    glEnable(GL_COLOR_MATERIAL);
-    glColor3fv(color);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glTranslated(center[0], center[1], center[2]);
-    GLUquadric *sphere = gluNewQuadric();
-    gluQuadricNormals(sphere, GLU_SMOOTH);
-    gluQuadricOrientation(sphere, GLU_OUTSIDE);
-    gluSphere(sphere, radius, 10, 10);
-    glPopMatrix();
-    glColor3f(1.f,1.f,1.f);
-    glDisable(GL_COLOR_MATERIAL);
-    glDisable(GL_LIGHTING);
+    vec3 tip_base = 0.3 * tip + 0.7 * base;
+
+    cylinder<vec3>(tip_base, tip, radius, 0.0, color);
+    cylinder<vec3>(base, tip_base, radius * 0.2,  radius * 0.2, color);
 }
 
 }
 
-#endif // #ifdef CINOLIB_USES_OPENGL
-
-#endif // CINO_DRAW_SPHERE_H
+#endif // CINO_DRAW_ARROW_H

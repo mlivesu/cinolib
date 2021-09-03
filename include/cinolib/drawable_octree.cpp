@@ -35,7 +35,7 @@
 *********************************************************************************/
 #include "drawable_octree.h"
 
-#include <cinolib/gui/gl_glu_glfw.h>
+#include <cinolib/gl/gl_glu_glfw.h>
 
 namespace cinolib
 {

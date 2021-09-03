@@ -13,7 +13,7 @@
 #include <cinolib/geodesics.h>
 #include <cinolib/profiler.h>
 #include <cinolib/drawable_isocontour.h>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/qt/qt_gui_tools.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

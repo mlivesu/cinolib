@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2021: Marco Livesu                                              *
+*  Copyright(C) 2016: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,55 +33,53 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SURFACE_MESH_CONTROLS_H
-#define CINO_SURFACE_MESH_CONTROLS_H
+#ifndef CINO_DRAW_CYLINDER_H
+#define CINO_DRAW_CYLINDER_H
 
+#ifdef CINOLIB_USES_OPENGL
+
+#include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/cino_inline.h>
-#include <cinolib/gui/glcanvas.h>
-#include <cinolib/gui/visual_control.h>
-#include <cinolib/meshes/meshes.h>
+#include <cinolib/pi.h>
 
 namespace cinolib
 {
 
-template<class Mesh>
-class SurfaceMeshControls : public VisualControl
+template <typename vec3>
+CINO_INLINE
+static void cylinder(const vec3  & a,
+                     const vec3  & b,
+                     float         top_radius,
+                     float         bottom_radius,
+                     const float * color)
 {
-    Mesh     * m   = nullptr;
-    GLcanvas * gui = nullptr;
+    vec3   dir     = b - a; dir.normalize();
+    vec3   axis    = vec3(0,0,1);
+    vec3   normal  = dir.cross(axis);
+    double angle   = acos(dir.dot(axis)) * 180 / M_PI;
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    typedef typename Mesh::M_type M;
-    typedef typename Mesh::V_type V;
-    typedef typename Mesh::E_type E;
-    typedef typename Mesh::P_type P;
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    bool  show_mesh       = true;
-    bool  show_wireframe  = true;
-    int   shading         = 2; // 0 = point, 1 = flat, 2 = smooth
-    int   wireframe_width = 1;
-    float wireframe_alpha = 1;
-    int   color           = 1; // 0 = vert, 1 = poly, 2 = text 1D, 3 = text 2D
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    public:
-
-        SurfaceMeshControls(Mesh *m, GLcanvas *gui, const std::string & name);
-       ~SurfaceMeshControls() override {}
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void draw() override;
-};
+    glEnable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
+    glColor3fv(color);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslated(a[0], a[1], a[2]);
+    glRotatef(-angle, normal[0], normal[1], normal[2]);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glPolygonMode(GL_FRONT, GL_FILL);
+    GLUquadric *cylinder = gluNewQuadric();
+    gluQuadricNormals(cylinder, GLU_SMOOTH);
+    gluQuadricOrientation(cylinder, GLU_OUTSIDE);
+    gluCylinder(cylinder, top_radius, bottom_radius, (a-b).norm(), 10, 5);
+    glPopMatrix();
+    glColor3f(1.f,1.f,1.f);
+    glDisable(GL_COLOR_MATERIAL);
+    glDisable(GL_LIGHTING);
+}
 
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "surface_mesh_controls.cpp"
-#endif
+#endif // #ifdef CINOLIB_USES_OPENGL
 
-#endif // CINO_SURFACE_MESH_CONTROLS_H
+#endif // CINO_DRAW_CYLINDER_H

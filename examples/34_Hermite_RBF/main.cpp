@@ -7,7 +7,7 @@
 */
 
 #include <QApplication>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/qt/qt_gui_tools.h>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/tetgen_wrap.h>
 #include <cinolib/RBF_Hermite.h>

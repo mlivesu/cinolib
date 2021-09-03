@@ -38,14 +38,14 @@
 
 #ifdef CINOLIB_USES_OPENGL
 
-#include <cinolib/gui/gl_glu_glfw.h>
+#include <cinolib/gl/gl_glu_glfw.h>
 
 #include <vector>
 #include <cmath>
 #include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
-#include <cinolib/gui/load_texture.h>
+#include <cinolib/gl/load_texture.h>
 
 namespace cinolib
 {

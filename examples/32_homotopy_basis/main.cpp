@@ -11,7 +11,7 @@
 #include <QApplication>
 #include <QGridLayout>
 #include <QCheckBox>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/qt/qt_gui_tools.h>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/drawable_segment_soup.h>
 #include <cinolib/homotopy_basis.h>

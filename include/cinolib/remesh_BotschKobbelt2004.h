@@ -37,7 +37,7 @@
 #define CINO_REMESH_BOTSCH_KOBBELT_2004_H
 
 #include <cinolib/meshes/drawable_trimesh.h>
-#include <cinolib/gui/qt/glcanvas.h>
+#include <cinolib/gl/qt/glcanvas.h>
 
 namespace cinolib
 {

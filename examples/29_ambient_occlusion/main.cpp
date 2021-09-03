@@ -8,7 +8,7 @@
 #include <QSlider>
 #include <QVBoxLayout>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/qt/qt_gui_tools.h>
 #include <cinolib/ambient_occlusion.h>
 #include <cinolib/profiler.h>
 

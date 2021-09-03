@@ -33,10 +33,10 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/gui/surface_mesh_controls.h>
+#include <cinolib/gl/surface_mesh_controls.h>
 #include <../external/imgui/imgui.h>
-#include <cinolib/gui/file_dialog_open.h>
-#include <cinolib/gui/file_dialog_save.h>
+#include <cinolib/gl/file_dialog_open.h>
+#include <cinolib/gl/file_dialog_save.h>
 #include <iostream>
 
 namespace cinolib

@@ -10,7 +10,7 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/qt/qt_gui_tools.h>
 #include <cinolib/harmonic_map.h>
 #include <cinolib/profiler.h>
 

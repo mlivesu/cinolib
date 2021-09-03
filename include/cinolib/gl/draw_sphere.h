@@ -33,45 +33,33 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_DRAW_CYLINDER_H
-#define CINO_DRAW_CYLINDER_H
+#ifndef CINO_DRAW_SPHERE_H
+#define CINO_DRAW_SPHERE_H
 
 #ifdef CINOLIB_USES_OPENGL
 
-#include <cinolib/gui/gl_glu_glfw.h>
+#include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/cino_inline.h>
-#include <cinolib/pi.h>
 
 namespace cinolib
 {
 
 template <typename vec3>
 CINO_INLINE
-static void cylinder(const vec3  & a,
-                     const vec3  & b,
-                     float         top_radius,
-                     float         bottom_radius,
-                     const float * color)
+static void sphere(const vec3  & center,
+                   float         radius,
+                   const float * color)
 {
-    vec3   dir     = b - a; dir.normalize();
-    vec3   axis    = vec3(0,0,1);
-    vec3   normal  = dir.cross(axis);
-    double angle   = acos(dir.dot(axis)) * 180 / M_PI;
-
     glEnable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
     glColor3fv(color);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    glTranslated(a[0], a[1], a[2]);
-    glRotatef(-angle, normal[0], normal[1], normal[2]);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glPolygonMode(GL_FRONT, GL_FILL);
-    GLUquadric *cylinder = gluNewQuadric();
-    gluQuadricNormals(cylinder, GLU_SMOOTH);
-    gluQuadricOrientation(cylinder, GLU_OUTSIDE);
-    gluCylinder(cylinder, top_radius, bottom_radius, (a-b).norm(), 10, 5);
+    glTranslated(center[0], center[1], center[2]);
+    GLUquadric *sphere = gluNewQuadric();
+    gluQuadricNormals(sphere, GLU_SMOOTH);
+    gluQuadricOrientation(sphere, GLU_OUTSIDE);
+    gluSphere(sphere, radius, 10, 10);
     glPopMatrix();
     glColor3f(1.f,1.f,1.f);
     glDisable(GL_COLOR_MATERIAL);
@@ -82,4 +70,4 @@ static void cylinder(const vec3  & a,
 
 #endif // #ifdef CINOLIB_USES_OPENGL
 
-#endif // CINO_DRAW_CYLINDER_H
+#endif // CINO_DRAW_SPHERE_H

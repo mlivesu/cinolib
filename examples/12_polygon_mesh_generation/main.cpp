@@ -12,7 +12,7 @@
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/dual_mesh.h>
 #include <cinolib/triangle_wrap.h>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/qt/qt_gui_tools.h>
 #include <cinolib/profiler.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -37,7 +37,7 @@
 #define CINO_DRAWABLE_ARROW_H
 
 #include <cinolib/drawable_object.h>
-#include <cinolib/gui/draw_arrow.h>
+#include <cinolib/gl/draw_arrow.h>
 #include <cinolib/geometry/vec_mat.h>
 #include <cinolib/color.h>
 

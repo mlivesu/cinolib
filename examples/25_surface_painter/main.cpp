@@ -9,7 +9,7 @@
 #include <QSlider>
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/qt/qt_gui_tools.h>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/geodesics.h>
 

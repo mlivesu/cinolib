@@ -40,7 +40,7 @@
 
 #include <cinolib/drawable_object.h>
 #include <cinolib/meshes/mesh_slicer.h>
-#include <cinolib/gui/draw_lines_tris.h>
+#include <cinolib/gl/draw_lines_tris.h>
 
 namespace cinolib
 {
