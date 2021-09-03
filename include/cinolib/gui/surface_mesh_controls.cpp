@@ -34,23 +34,101 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/gui/surface_mesh_controls.h>
+#include <../external/imgui/imgui.h>
+#include <cinolib/gui/file_dialog_open.h>
+#include <cinolib/gui/file_dialog_save.h>
+#include <iostream>
 
 namespace cinolib
 {
 
+template <class Mesh>
 CINO_INLINE
-SurfaceMeshControls::SurfaceMeshControls(const std::string & name) : VisualControl(name)
+SurfaceMeshControls<Mesh>::SurfaceMeshControls(Mesh *m, GLcanvas *gui, const std::string & name)
+    : VisualControl(name)
+    , m(m)
+    , gui(gui)
 {}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls::draw() const
+void SurfaceMeshControls<Mesh>::draw()
 {
-    ImGui::Text("...label...");
-    if(ImGui::Button("PushMe"))
+    // LOAD/SAVE mesh
+    if(ImGui::Button("Load"))
     {
-        std::cout << "button pressed" << std::endl;
+        std::string filename = file_dialog_open();
+        if(!filename.empty())
+        {
+            *m = Mesh(filename.c_str());
+            gui->refit_scene();
+        }
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Save"))
+    {
+        std::string filename = file_dialog_save();
+        if(!filename.empty())
+        {
+            std::cout << "save to file: " << filename << std::endl;
+            m->save(filename.c_str());
+        }
+    }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ImGui::Separator(); //::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    if(ImGui::Checkbox("Show mesh", &show_mesh))
+    {
+        if(m!=nullptr) m->show_mesh(show_mesh);
+    }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ImGui::Separator(); //::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    // SHADING
+    ImGui::Text("Shading");
+    if(ImGui::RadioButton("Point ", &shading, 0)) m->show_mesh_points();
+    if(ImGui::RadioButton("Flat  ", &shading, 1)) m->show_mesh_flat();
+    if(ImGui::RadioButton("Smooth", &shading, 2)) m->show_mesh_smooth();
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ImGui::Separator(); //::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    // WIREFRAME
+    if(ImGui::Checkbox   ("Wireframe",    &show_wireframe        )) m->show_wireframe(show_wireframe);
+    if(ImGui::SliderInt  ("Width",        &wireframe_width, 1, 10)) m->show_wireframe_width(wireframe_width);
+    if(ImGui::SliderFloat("Transparency", &wireframe_alpha, 0,  1)) m->show_wireframe_transparency(wireframe_alpha);
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    ImGui::Separator(); //::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    ImGui::Text("Colors/Textures");
+    ImGui::Button("Set"); ImGui::SameLine(); if(ImGui::RadioButton("Point  ", &color, 0)) {}
+    ImGui::Button("Set"); ImGui::SameLine(); if(ImGui::RadioButton("Poly   ", &color, 1)) {}
+    ImGui::Button("Set"); ImGui::SameLine(); if(ImGui::RadioButton("Text 1D", &color, 2)) {}
+    ImGui::Button("Set"); ImGui::SameLine(); if(ImGui::RadioButton("Text 2D", &color, 3)) {}
+
+    const char *combo_text1D_items[] = { "Lines", "Heat", "HSV" };
+    static const char* item_current = combo_text1D_items[0];
+    if(ImGui::BeginCombo("", item_current))
+    {
+        for(int n=0; n<3; ++n)
+        {
+            bool is_selected = (item_current == combo_text1D_items[n]);
+            if(ImGui::Selectable(combo_text1D_items[n], is_selected))
+            {
+                item_current = combo_text1D_items[n];
+            }
+            if(is_selected) ImGui::SetItemDefaultFocus(); // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
+        }
+        ImGui::EndCombo();
     }
 }
 

@@ -37,21 +37,45 @@
 #define CINO_SURFACE_MESH_CONTROLS_H
 
 #include <cinolib/cino_inline.h>
+#include <cinolib/gui/glcanvas.h>
 #include <cinolib/gui/visual_control.h>
+#include <cinolib/meshes/meshes.h>
 
 namespace cinolib
 {
 
+template<class Mesh>
 class SurfaceMeshControls : public VisualControl
 {
+    Mesh     * m   = nullptr;
+    GLcanvas * gui = nullptr;
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    typedef typename Mesh::M_type M;
+    typedef typename Mesh::V_type V;
+    typedef typename Mesh::E_type E;
+    typedef typename Mesh::P_type P;
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    bool  show_mesh       = true;
+    bool  show_wireframe  = true;
+    int   shading         = 2; // 0 = point, 1 = flat, 2 = smooth
+    int   wireframe_width = 1;
+    float wireframe_alpha = 1;
+    int   color           = 1; // 0 = vert, 1 = poly, 2 = text 1D, 3 = text 2D
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     public:
 
-        SurfaceMeshControls(const std::string & name);
-       ~SurfaceMeshControls() {}
+        SurfaceMeshControls(Mesh *m, GLcanvas *gui, const std::string & name);
+       ~SurfaceMeshControls() override {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void draw() const;
+        void draw() override;
 };
 
 }
