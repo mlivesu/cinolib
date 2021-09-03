@@ -36,7 +36,7 @@
 #ifndef CINO_DRAW_SPHERE_H
 #define CINO_DRAW_SPHERE_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/cino_inline.h>
@@ -68,6 +68,6 @@ static void sphere(const vec3  & center,
 
 }
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_DRAW_SPHERE_H

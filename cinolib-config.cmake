@@ -38,7 +38,7 @@ if(CINOLIB_USES_OPENGL_GLFW_IMGUI)
     target_link_libraries(cinolib INTERFACE OpenGL::GL)
     add_subdirectory(${cinolib_DIR}/external/imgui imgui)
     target_link_libraries(cinolib INTERFACE imgui)
-    target_compile_definitions(cinolib INTERFACE CINOLIB_USES_OPENGL)
+    target_compile_definitions(cinolib INTERFACE CINOLIB_USES_OPENGL_GLFW_IMGUI)
 endif()
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

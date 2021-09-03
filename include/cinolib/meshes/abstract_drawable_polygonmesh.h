@@ -36,7 +36,7 @@
 #ifndef CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H
 #define CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/drawable_object.h>
 #include <cinolib/meshes/mesh_slicer.h>
@@ -124,6 +124,6 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 #include "abstract_drawable_polygonmesh.cpp"
 #endif
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H

@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/meshes/drawable_skel.h>
@@ -285,4 +285,4 @@ void DrawableSkel::update_bone_colors()
 
 }
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI

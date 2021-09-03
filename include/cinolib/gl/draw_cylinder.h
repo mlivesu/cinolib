@@ -36,7 +36,7 @@
 #ifndef CINO_DRAW_CYLINDER_H
 #define CINO_DRAW_CYLINDER_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/cino_inline.h>
@@ -80,6 +80,6 @@ static void cylinder(const vec3  & a,
 
 }
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_DRAW_CYLINDER_H

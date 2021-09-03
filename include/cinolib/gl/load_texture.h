@@ -44,7 +44,7 @@
 #ifndef CINO_LOAD_TEXTURE_H
 #define CINO_LOAD_TEXTURE_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/color.h>
@@ -151,5 +151,5 @@ void load_texture_bitmap(Texture & texture, const char *bitmap);
 #include "load_texture.cpp"
 #endif
 
-#endif // CINOLIB_USES_OPENGL
+#endif // CINOLIB_USES_OPENGL_GLFW_IMGUI
 #endif // CINO_LOAD_TEXTURE_H

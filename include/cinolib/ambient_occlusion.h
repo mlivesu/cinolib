@@ -36,7 +36,7 @@
 #ifndef CINO_AMBIENT_OCCLUSION_H
 #define CINO_AMBIENT_OCCLUSION_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 #ifdef CINOLIB_USES_QT
 
 #include <QGLPixelBuffer>
@@ -84,6 +84,6 @@ class AO_vol : public QGLPixelBuffer
 #endif
 
 #endif // #ifdef CINOLIB_USES_QT
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_AMBIENT_OCCLUSION_H

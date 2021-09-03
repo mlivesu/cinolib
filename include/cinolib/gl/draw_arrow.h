@@ -36,7 +36,7 @@
 #ifndef CINO_DRAW_ARROW_H
 #define CINO_DRAW_ARROW_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/cino_inline.h>
 #include <cinolib/gl/draw_cylinder.h>
@@ -59,6 +59,6 @@ void arrow(const vec3  & base,
 
 }
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_DRAW_ARROW_H

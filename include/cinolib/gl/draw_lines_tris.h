@@ -36,7 +36,7 @@
 #ifndef CINO_DRAW_LINES_TRIS_H
 #define CINO_DRAW_LINES_TRIS_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/gl/gl_glu_glfw.h>
 
@@ -119,6 +119,6 @@ void render(const RenderData & data);
 #include "draw_lines_tris.cpp"
 #endif
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_DRAW_LINES_TRIS_H
