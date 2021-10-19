@@ -40,6 +40,7 @@
 #include <cinolib/gl/glcanvas.h>
 #include <cinolib/gl/visual_control.h>
 #include <cinolib/meshes/meshes.h>
+#include <cinolib/gl/load_texture.h>
 
 namespace cinolib
 {
@@ -59,12 +60,37 @@ class SurfaceMeshControls : public VisualControl
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+    // ImGui options for color picker
+    static const ImGuiColorEditFlags color_edit_flags = ImGuiColorEditFlags_NoSidePreview  |
+                                                        ImGuiColorEditFlags_NoTooltip      |
+                                                        ImGuiColorEditFlags_NoLabel        |
+                                                        ImGuiColorEditFlags_NoInputs       |
+                                                        ImGuiColorEditFlags_PickerHueWheel |
+                                                        ImGuiColorEditFlags_NoBorder;
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    const char *text1D_items[5] =
+    {
+        "Lines       ",
+        "HSV         ",
+        "HSV + ISO   ",
+        "Parula      ",
+        "Parula + ISO"
+    };
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     bool  show_mesh       = true;
     bool  show_wireframe  = true;
     int   shading         = 2; // 0 = point, 1 = flat, 2 = smooth
     int   wireframe_width = 1;
     float wireframe_alpha = 1;
     int   color           = 1; // 0 = vert, 1 = poly, 2 = text 1D, 3 = text 2D
+    Color vert_color      = Color::WHITE();
+    Color poly_color      = Color::WHITE();
+    int   text_1d         = TEXTURE_1D_ISOLINES;
+    float texture_scale_factor = 1.0;
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -76,6 +102,21 @@ class SurfaceMeshControls : public VisualControl
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void draw() override;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        // tematic collapsing headers
+        void header_IO          (const bool show_open);
+        void header_shading     (const bool show_open);
+        void header_wireframe   (const bool show_open);
+        void header_colors      (const bool show_open);
+        void header_isolines    (const bool show_open);
+        void header_gradient    (const bool show_open);
+        void header_AO          (const bool show_open);
+        void header_slicing     (const bool show_open);
+        void header_marked_edges(const bool show_open);
+        void header_actions     (const bool show_open);
+        void header_normals     (const bool show_open);
 };
 
 }

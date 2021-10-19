@@ -54,14 +54,14 @@ namespace cinolib
 
 enum // texture types currently supported
 {
-    TEXTURE_1D_ISOLINES,
-    TEXTURE_1D_HSV,
-    TEXTURE_1D_HSV_W_ISOLINES,
-    TEXTURE_1D_PARULA,
-    TEXTURE_1D_PARULA_W_ISOLINES,
-    TEXTURE_2D_ISOLINES,
-    TEXTURE_2D_CHECKERBOARD,
-    TEXTURE_2D_BITMAP
+    TEXTURE_1D_ISOLINES            = 0,
+    TEXTURE_1D_HSV                 = 1,
+    TEXTURE_1D_HSV_W_ISOLINES      = 2,
+    TEXTURE_1D_PARULA              = 3,
+    TEXTURE_1D_PARULA_W_ISOLINES   = 4,
+    TEXTURE_2D_ISOLINES            = 0,
+    TEXTURE_2D_CHECKERBOARD        = 1,
+    TEXTURE_2D_BITMAP              = 2
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
