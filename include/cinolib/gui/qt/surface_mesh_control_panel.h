@@ -160,6 +160,9 @@ class SurfaceMeshControlPanel
         QComboBox                   *cb_actions;
         QCheckBox                   *cb_face_normals;
         QCheckBox                   *cb_vert_normals;
+        QCheckBox                   *cb_verts_id;
+        QCheckBox                   *cb_edges_id;
+        QCheckBox                   *cb_polys_id;
 };
 
 }
