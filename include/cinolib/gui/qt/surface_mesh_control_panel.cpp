@@ -466,6 +466,24 @@ SurfaceMeshControlPanel<Mesh>::SurfaceMeshControlPanel(Mesh *m, GLcanvas *canvas
         left_col->addWidget(cb_vert_normals);
     }
 
+    // ids
+    {
+        cb_verts_id = new QCheckBox("Show Verts ID", widget);
+        cb_verts_id->setFont(global_font);
+        cb_verts_id->setChecked(false);
+        right_col->addWidget(cb_verts_id);
+
+        cb_edges_id = new QCheckBox("Show Edges ID", widget);
+        cb_edges_id->setFont(global_font);
+        cb_edges_id->setChecked(false);
+        right_col->addWidget(cb_edges_id);
+
+        cb_polys_id = new QCheckBox("Show Polys ID", widget);
+        cb_polys_id->setFont(global_font);
+        cb_polys_id->setChecked(false);
+        right_col->addWidget(cb_polys_id);
+    }
+        
     global_layout->addStretch();
     left_col->addStretch();
     right_col->addStretch();
@@ -1091,6 +1109,61 @@ void SurfaceMeshControlPanel<Mesh>::connect()
             canvas->push_obj(&vert_normals,false);
         }
         else canvas->pop(&vert_normals);
+        canvas->updateGL();
+    });
+    
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_verts_id, &QCheckBox::stateChanged, [&]()
+    {
+        if(m == NULL || canvas == NULL) return;
+
+        if(cb_verts_id->isChecked())
+        {
+            for(uint vid=0; vid<m->num_verts(); ++vid)
+            {
+                if(m->vert_is_visible(vid))
+                {
+                    canvas->push_marker(m->vert(vid), std::to_string(vid), Color::BLUE());
+                }
+            }
+        }
+        else canvas->pop_all_markers();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_edges_id, &QCheckBox::stateChanged, [&]()
+    {
+        if(m == NULL || canvas == NULL) return;
+
+        if(cb_edges_id->isChecked())
+        {
+            for(uint eid=0; eid<m->num_edges(); ++eid)
+            {
+                vec3d v = (m->edge_vert(eid, 0) + m->edge_vert(eid, 1)) / 2;
+                canvas->push_marker(v, std::to_string(eid), Color::CYAN());
+            }
+        }
+        else canvas->pop_all_markers();
+        canvas->updateGL();
+    });
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    QCheckBox::connect(cb_polys_id, &QCheckBox::stateChanged, [&]()
+    {
+        if(m == NULL || canvas == NULL) return;
+
+        if(cb_polys_id->isChecked())
+        {
+            for(uint pid=0; pid<m->num_polys(); ++pid)
+            {
+                canvas->push_marker(m->poly_centroid(pid), std::to_string(pid), Color::GREEN());
+            }
+        }
+        else canvas->pop_all_markers();
         canvas->updateGL();
     });
 }
