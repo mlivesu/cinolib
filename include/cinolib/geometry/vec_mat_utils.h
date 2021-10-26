@@ -112,7 +112,7 @@ template<uint d,         typename T> CINO_INLINE T    mat_det         (const T m
 template<                typename T> CINO_INLINE T    mat_det22       (const T m00, const T m01, const T m10, const T m11);
 template<                typename T> CINO_INLINE T    mat_det33       (const T m00, const T m01, const T m02, const T m10, const T m11, const T m12, const T m20, const T m21, const T m22);
 template<uint r, uint c, typename T> CINO_INLINE void mat_transpose   (const T m[][c], T tr[][r]);
-template<uint d,         typename T> CINO_INLINE bool mat_inverse     (const T m[][d], T in[][d]);
+template<uint d,         typename T> CINO_INLINE void mat_inverse     (const T m[][d], T in[][d]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_eigendec    (const T m[][c], T eval[], T evec[][c]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_eigenval    (const T m[][c], T eval[]);
 template<uint r, uint c, typename T> CINO_INLINE void mat_eigenvec    (const T m[][c], T evec[][c]);
