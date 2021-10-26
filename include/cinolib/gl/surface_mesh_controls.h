@@ -81,6 +81,15 @@ class SurfaceMeshControls : public VisualControl
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+    const char *text2D_items[3] =
+    {
+        "ISO         ",
+        "Checkerboard",
+        "File Image  ",
+    };
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     bool  show_mesh       = true;
     bool  show_wireframe  = true;
     int   shading         = 2; // 0 = point, 1 = flat, 2 = smooth
@@ -90,6 +99,7 @@ class SurfaceMeshControls : public VisualControl
     Color vert_color      = Color::WHITE();
     Color poly_color      = Color::WHITE();
     int   text_1d         = TEXTURE_1D_ISOLINES;
+    int   text_2d         = TEXTURE_2D_ISOLINES;
     float texture_scale_factor = 1.0;
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

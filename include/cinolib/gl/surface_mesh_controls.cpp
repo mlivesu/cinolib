@@ -173,10 +173,23 @@ void SurfaceMeshControls<Mesh>::header_colors(const bool show_open)
             m->show_texture1D(text_1d);
         }
         ImGui::TableNextColumn();
-        if(ImGui::Combo("", &text_1d, text1D_items, IM_ARRAYSIZE(text1D_items)))
+        if(ImGui::Combo("comb1", &text_1d, text1D_items, IM_ARRAYSIZE(text1D_items)))
         {
             color = 2; // selects the "Texture 1D" radio button
             m->show_texture1D(text_1d);
+        }
+        ImGui::TableNextRow();
+        //
+        ImGui::TableNextColumn();
+        if(ImGui::RadioButton("Texture 2D", &color, 3))
+        {
+            m->show_texture2D(text_2d,texture_scale_factor);
+        }
+        ImGui::TableNextColumn();
+        if(ImGui::Combo("combo2", &text_2d, text2D_items, IM_ARRAYSIZE(text2D_items)))
+        {
+            color = 3; // selects the "Texture 2D" radio button
+            m->show_texture2D(text_2d,texture_scale_factor);
         }
         ImGui::TableNextRow();
         //
@@ -186,9 +199,10 @@ void SurfaceMeshControls<Mesh>::header_colors(const bool show_open)
             std::cout << "load texture" << std::endl;
         }
         ImGui::TableNextColumn();
-        if(ImGui::SliderFloat(" ", &texture_scale_factor, 0.01, 10))
+        if(ImGui::SliderFloat(" ", &texture_scale_factor, 0.01, 100))
         {
-            std::cout << "texture scale factor " << texture_scale_factor << std::endl;
+            color = 3; // selects the "Texture 2D" radio button
+            m->show_texture2D(text_2d,texture_scale_factor);
         }
         ImGui::TableNextRow();
         //
