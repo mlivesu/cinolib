@@ -752,7 +752,7 @@ void mat_transpose(const T m[][c], T tr[][r])
 
 template<uint d, typename T>
 CINO_INLINE
-bool mat_inverse(const T m[][d], T in[][d])
+void mat_inverse(const T m[][d], T in[][d])
 {
     switch(d)
     {
@@ -765,7 +765,6 @@ bool mat_inverse(const T m[][d], T in[][d])
             in[0][1] = -m[0][1] * one_over_det;
             in[1][0] = -m[1][0] * one_over_det;
             in[1][1] =  m[0][0] * one_over_det;
-            return one_over_det!=0; // false if the matrix is singular
         }
 
         default:
@@ -774,7 +773,6 @@ bool mat_inverse(const T m[][d], T in[][d])
             Eigen::Map<const M> _m(m[0]);
             Eigen::Map<M> _in(in[0]);
             _in = _m.inverse();
-            return true;
         }
     }
 }
