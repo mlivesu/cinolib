@@ -1,3 +1,8 @@
+external/eigen/.gitignore
+external/eigen/.gitlab-ci.yml
+external/eigen/.gitlab/
+external/eigen/.hgeol
+external/graph_cut/
 examples/build*
 examples/build_all_examples.pro.user
 examples/*_demo
