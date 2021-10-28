@@ -181,6 +181,23 @@ void GLcanvas::push_marker(const vec3d       & p,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+bool GLcanvas::pop(const DrawableObject *obj)
+{
+    // pops the first occurrence of obj (if found)
+    for(std::vector<const DrawableObject*>::iterator it=drawlist.begin(); it!=drawlist.end(); ++it)
+    {
+        if(obj==*it)
+        {
+            drawlist.erase(it);
+            return true;
+        }
+    }
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::pop_all_markers()
 {
     markers.clear();
