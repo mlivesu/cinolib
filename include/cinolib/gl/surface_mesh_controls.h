@@ -41,6 +41,7 @@
 #include <cinolib/gl/visual_control.h>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/gl/load_texture.h>
+#include <cinolib/drawable_isocontour.h>
 
 namespace cinolib
 {
@@ -70,37 +71,25 @@ class SurfaceMeshControls : public VisualControl
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    const char *text1D_items[5] =
-    {
-        "Lines       ",
-        "HSV         ",
-        "HSV + ISO   ",
-        "Parula      ",
-        "Parula + ISO"
-    };
+    DrawableIsocontour<M,V,E,P> isocontour;
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    const char *text2D_items[3] =
-    {
-        "ISO         ",
-        "Checkerboard",
-        "File Image  ",
-    };
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    bool  show_mesh       = true;
-    bool  show_wireframe  = true;
-    int   shading         = 2; // 0 = point, 1 = flat, 2 = smooth
-    int   wireframe_width = 1;
-    float wireframe_alpha = 1;
-    int   rb_color        = 0;
-    Color vert_color      = Color::WHITE();
-    Color poly_color      = Color::WHITE();
-    int   text_1d         = TEXTURE_1D_ISOLINES;
-    int   text_2d         = TEXTURE_2D_ISOLINES;
-    float texture_scale_factor = 1.0;
+    bool  show_mesh         = true;
+    bool  show_wireframe    = true;
+    bool  show_isoline      = false;
+    int   shading           = 2; // 0 = point, 1 = flat, 2 = smooth
+    int   wireframe_width   = 1;
+    float wireframe_alpha   = 1;
+    int   isoline_width   = 1;
+    float iso_val           = 0.5;
+    int   rb_color          = 0;
+    Color vert_color        = Color::WHITE();
+    Color poly_color        = Color::WHITE();
+    Color iso_color        = Color::RED();
+    int   text_1d           = TEXTURE_1D_ISOLINES;
+    int   text_2d           = TEXTURE_2D_ISOLINES;
+    float text_scale_factor = 1.0;
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

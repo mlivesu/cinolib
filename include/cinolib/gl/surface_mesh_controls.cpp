@@ -179,12 +179,12 @@ void SurfaceMeshControls<Mesh>::header_textures(const bool show_open)
         if(ImGui::Button("Isolines"))
         {
             text_2d = TEXTURE_2D_ISOLINES;
-            m->show_texture2D(text_2d,texture_scale_factor);
+            m->show_texture2D(text_2d,text_scale_factor);
         }
         if(ImGui::Button("Checkerboard"))
         {
             text_2d = TEXTURE_2D_CHECKERBOARD;
-            m->show_texture2D(text_2d,texture_scale_factor);
+            m->show_texture2D(text_2d,text_scale_factor);
         }
         if(ImGui::Button("Load..."))
         {
@@ -192,13 +192,13 @@ void SurfaceMeshControls<Mesh>::header_textures(const bool show_open)
             if(!filename.empty())
             {
                 text_2d = TEXTURE_2D_BITMAP;
-                m->show_texture2D(text_2d, texture_scale_factor, filename.c_str());
+                m->show_texture2D(text_2d, text_scale_factor, filename.c_str());
             }
         }
-        if(ImGui::SliderFloat("Scaling", &texture_scale_factor, 0.01, 100))
+        if(ImGui::SliderFloat("Scaling", &text_scale_factor, 0.01, 100))
         {
             if(text_2d==TEXTURE_2D_BITMAP) text_2d = TEXTURE_2D_ISOLINES;
-            m->show_texture2D(text_2d,texture_scale_factor);
+            m->show_texture2D(text_2d,text_scale_factor);
         }
     }
 }
@@ -211,7 +211,7 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Scalar Field"))
-    {
+    {        
         if(ImGui::Button("Isolines"))
         {
             text_1d = TEXTURE_1D_ISOLINES;
@@ -236,6 +236,47 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
         {
             text_1d = TEXTURE_1D_PARULA_W_ISOLINES;
             m->show_texture1D(text_1d);
+        }
+
+        auto update_isoline = [&]()
+        {
+            float  max           = m->vert_max_uvw_value(U_param);
+            float  min           = m->vert_min_uvw_value(U_param);
+            float  val           = min*(1.0-iso_val) + max*iso_val;
+            isocontour           = DrawableIsocontour<M,V,E,P>(*m,val);
+            isocontour.thickness = isoline_width;
+            isocontour.color     = iso_color;
+            gui->push(&isocontour,false);
+            std::cout << gui->drawlist.size() << std::endl;
+        };
+        if(ImGui::Checkbox("Isoline", &show_isoline))
+        {
+            if(show_isoline) update_isoline();
+            else             gui->pop(&isocontour);
+        }
+        if(ImGui::SliderFloat("Val", &iso_val,0,1))
+        {
+            if(show_isoline)
+            {
+                gui->pop(&isocontour);
+                update_isoline();
+            }
+        }
+        if(ImGui::SliderInt("Width", &isoline_width, 1, 10))
+        {
+            if(show_isoline)
+            {
+                gui->pop(&isocontour);
+                update_isoline();
+            }
+        }
+        if(ImGui::ColorEdit4("Isoline Color", iso_color.rgba, color_edit_flags))
+        {
+            if(show_isoline)
+            {
+                gui->pop(&isocontour);
+                update_isoline();
+            }
         }
     }
 }
