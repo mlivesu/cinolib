@@ -95,7 +95,7 @@ class SurfaceMeshControls : public VisualControl
     int   shading         = 2; // 0 = point, 1 = flat, 2 = smooth
     int   wireframe_width = 1;
     float wireframe_alpha = 1;
-    int   color           = 1; // 0 = vert, 1 = poly, 2 = text 1D, 3 = text 2D
+    int   rb_color        = 0;
     Color vert_color      = Color::WHITE();
     Color poly_color      = Color::WHITE();
     int   text_1d         = TEXTURE_1D_ISOLINES;
@@ -120,8 +120,9 @@ class SurfaceMeshControls : public VisualControl
         void header_shading     (const bool show_open);
         void header_wireframe   (const bool show_open);
         void header_colors      (const bool show_open);
-        void header_isolines    (const bool show_open);
-        void header_gradient    (const bool show_open);
+        void header_textures    (const bool show_open);
+        void header_scalar_field(const bool show_open);
+        void header_vector_field(const bool show_open);
         void header_AO          (const bool show_open);
         void header_slicing     (const bool show_open);
         void header_marked_edges(const bool show_open);

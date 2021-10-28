@@ -60,12 +60,13 @@ void SurfaceMeshControls<Mesh>::draw()
     header_shading     (false);
     header_wireframe   (false);
     header_colors      (false);
+    header_textures    (false);
+    header_scalar_field(false);
+    header_vector_field(false);
     header_slicing     (false);
     header_marked_edges(false);
     header_normals     (false);
     header_AO          (false);
-    header_isolines    (false);
-    header_gradient    (false);
     header_actions     (false);
 }
 
@@ -140,84 +141,29 @@ CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_colors(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Colors/Textures"))
+    if(ImGui::CollapsingHeader("Colors"))
     {
-        ImGui::BeginTable("Colors/Textures",2);
-        ImGui::TableNextColumn();
-        if(ImGui::RadioButton("Vert", &color, 0))
-        {
-            m->show_vert_color();
-        }
-        ImGui::TableNextColumn();
         if(ImGui::ColorEdit4("Vert Color", vert_color.rgba, color_edit_flags))
         {
             m->vert_set_color(vert_color);
+            m->show_vert_color();
         }
-        ImGui::TableNextRow();
-        //
-        ImGui::TableNextColumn();
-        if(ImGui::RadioButton("Poly", &color, 1))
+        ImGui::SameLine();
+        if(ImGui::Button("Vert"))
         {
-            m->show_poly_color();
+            m->show_vert_color();
         }
-        ImGui::TableNextColumn();
+        //
         if(ImGui::ColorEdit4("Poly Color", poly_color.rgba, color_edit_flags))
         {
             m->poly_set_color(poly_color);
+            m->show_poly_color();
         }
-        ImGui::TableNextRow();
-        //
-        ImGui::TableNextColumn();
-        if(ImGui::RadioButton("Texture 1D", &color, 2))
+        ImGui::SameLine();
+        if(ImGui::Button("Poly"))
         {
-            m->show_texture1D(text_1d);
+            m->show_poly_color();
         }
-        ImGui::TableNextColumn();
-        if(ImGui::Combo("comb1", &text_1d, text1D_items, IM_ARRAYSIZE(text1D_items)))
-        {
-            color = 2; // selects the "Texture 1D" radio button
-            m->show_texture1D(text_1d);
-        }
-        ImGui::TableNextRow();
-        //
-        ImGui::TableNextColumn();
-        if(ImGui::RadioButton("Texture 2D", &color, 3))
-        {
-            m->show_texture2D(text_2d,texture_scale_factor);
-        }
-        ImGui::TableNextColumn();
-        if(ImGui::Combo("combo2", &text_2d, text2D_items, IM_ARRAYSIZE(text2D_items)))
-        {
-            color = 3; // selects the "Texture 2D" radio button
-            m->show_texture2D(text_2d,texture_scale_factor);
-        }
-        ImGui::TableNextRow();
-        //
-        ImGui::TableNextColumn();
-        if(ImGui::Button("Load"))
-        {
-            std::cout << "load texture" << std::endl;
-        }
-        ImGui::TableNextColumn();
-        if(ImGui::SliderFloat(" ", &texture_scale_factor, 0.01, 100))
-        {
-            color = 3; // selects the "Texture 2D" radio button
-            m->show_texture2D(text_2d,texture_scale_factor);
-        }
-        ImGui::TableNextRow();
-        //
-        ImGui::TableNextColumn();
-        if(ImGui::Button("Serialize"))
-        {
-            std::cout << "serializze" << std::endl;
-        }
-        ImGui::TableNextColumn();
-        if(ImGui::Button("Deserialize"))
-        {
-            std::cout << "deserializze" << std::endl;
-        }
-        ImGui::TableNextRow();
-        ImGui::EndTable();
     }
 }
 
@@ -225,12 +171,35 @@ void SurfaceMeshControls<Mesh>::header_colors(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_isolines(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_textures(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Isolines"))
+    if(ImGui::CollapsingHeader("Textures"))
     {
-        ImGui::Text("ciao");
+        if(ImGui::Button("Isolines"))
+        {
+            text_2d = TEXTURE_2D_ISOLINES;
+            m->show_texture2D(text_2d,texture_scale_factor);
+        }
+        if(ImGui::Button("Checkerboard"))
+        {
+            text_2d = TEXTURE_2D_CHECKERBOARD;
+            m->show_texture2D(text_2d,texture_scale_factor);
+        }
+        if(ImGui::Button("Load..."))
+        {
+            std::string filename = file_dialog_open();
+            if(!filename.empty())
+            {
+                text_2d = TEXTURE_2D_BITMAP;
+                m->show_texture2D(text_2d, texture_scale_factor, filename.c_str());
+            }
+        }
+        if(ImGui::SliderFloat("Scaling", &texture_scale_factor, 0.01, 100))
+        {
+            if(text_2d==TEXTURE_2D_BITMAP) text_2d = TEXTURE_2D_ISOLINES;
+            m->show_texture2D(text_2d,texture_scale_factor);
+        }
     }
 }
 
@@ -238,10 +207,47 @@ void SurfaceMeshControls<Mesh>::header_isolines(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_gradient(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Gradients"))
+    if(ImGui::CollapsingHeader("Scalar Field"))
+    {
+        if(ImGui::Button("Isolines"))
+        {
+            text_1d = TEXTURE_1D_ISOLINES;
+            m->show_texture1D(text_1d);
+        }
+        if(ImGui::Button("HSV"))
+        {
+            text_1d = TEXTURE_1D_HSV;
+            m->show_texture1D(text_1d);
+        }
+        if(ImGui::Button("HSV + ISO"))
+        {
+            text_1d = TEXTURE_1D_HSV_W_ISOLINES;
+            m->show_texture1D(text_1d);
+        }
+        if(ImGui::Button("Parula"))
+        {
+            text_1d = TEXTURE_1D_PARULA;
+            m->show_texture1D(text_1d);
+        }
+        if(ImGui::Button("Parula + ISO"))
+        {
+            text_1d = TEXTURE_1D_PARULA_W_ISOLINES;
+            m->show_texture1D(text_1d);
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class Mesh>
+CINO_INLINE
+void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
+{
+    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    if(ImGui::CollapsingHeader("Vector Fields"))
     {
         ImGui::Text("ciao");
     }
