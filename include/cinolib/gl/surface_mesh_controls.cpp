@@ -240,10 +240,7 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
 
         auto update_isoline = [&]()
         {
-            float  max           = m->vert_max_uvw_value(U_param);
-            float  min           = m->vert_min_uvw_value(U_param);
-            float  val           = min*(1.0-iso_val) + max*iso_val;
-            isocontour           = DrawableIsocontour<M,V,E,P>(*m,val);
+            isocontour           = DrawableIsocontour<M,V,E,P>(*m,iso_val);
             isocontour.thickness = isoline_width;
             isocontour.color     = iso_color;
             gui->push(&isocontour,false);
@@ -254,13 +251,19 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
             if(show_isoline) update_isoline();
             else             gui->pop(&isocontour);
         }
-        if(ImGui::SliderFloat("Val", &iso_val,0,1))
+        if(ImGui::SliderFloat("Val", &iso_val,iso_min,iso_max))
         {
             if(show_isoline)
             {
                 gui->pop(&isocontour);
                 update_isoline();
             }
+        }
+        if(ImGui::Button("Update Range"))
+        {
+            iso_max = m->vert_max_uvw_value(U_param);
+            iso_min = m->vert_min_uvw_value(U_param);
+            iso_val = (iso_max-iso_min)*0.5;
         }
         if(ImGui::SliderInt("Width", &isoline_width, 1, 10))
         {

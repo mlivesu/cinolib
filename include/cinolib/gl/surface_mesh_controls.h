@@ -83,6 +83,8 @@ class SurfaceMeshControls : public VisualControl
     float wireframe_alpha   = 1;
     int   isoline_width   = 1;
     float iso_val           = 0.5;
+    float iso_min           = 0;
+    float iso_max           = 1;
     int   rb_color          = 0;
     Color vert_color        = Color::WHITE();
     Color poly_color        = Color::WHITE();
