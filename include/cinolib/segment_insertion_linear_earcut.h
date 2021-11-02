@@ -55,7 +55,7 @@ namespace cinolib
  *
  *     Deterministic Linear Time Constrained Triangulation using Simplified Earcut
  *     Marco Livesu, Gianmarco Cherchi, Riccardo Scateni, Marco Attene
- *     (to appear)
+ *     IEEE Transactions on Visualization and Computer Graphics, 2021
 */
 
 template<class vec>
