@@ -7,6 +7,7 @@ Please consider this to be just development notes and not any real planning.
 * Polygon Laplacian Made Simple (EG2020)
 
 ### Tips and Tricks to test/implement
+* https://github.com/Ten0/updatable_priority_queue (for Dijkstra)
 * https://zeux.io/2010/10/17/aabb-from-obb-with-component-wise-abs/
 
 ### Things to be fixed:
