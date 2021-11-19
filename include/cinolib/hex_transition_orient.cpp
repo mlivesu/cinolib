@@ -60,16 +60,11 @@ CINO_INLINE
 void reflect(std::vector<vec3d> & verts,
              const std::string  & axis)
 {
-    double m[3][3];
-    m[0][0] = -1; m[0][1] =  0; m[0][2] =  0;
-    m[1][0] =  0; m[1][1] = -1; m[1][2] =  0;
-    m[2][0] =  0; m[2][1] =  0; m[2][2] = -1;
-
-    if(axis.find('x') != std::string::npos) m[0][0] = 1;
-    if(axis.find('y') != std::string::npos) m[1][1] = 1;
-    if(axis.find('z') != std::string::npos) m[2][2] = 1;
-
-    for(auto & v : verts) transform(v, m);
+    mat3d M = mat3d::DIAG(-1.0);
+    if(axis.find('x') != std::string::npos) M._mat[0][0] = 1;
+    if(axis.find('y') != std::string::npos) M._mat[1][1] = 1;
+    if(axis.find('z') != std::string::npos) M._mat[2][2] = 1;
+    for(auto & v : verts) v = M*v;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -79,14 +74,14 @@ void rotate(std::vector<vec3d> & verts,
             const std::string  & axis,
             const double       & angle)
 {
-    double rot[3][3];
     vec3d vec(0,0,0);
-         if(axis == "x") vec.x() = 1;
-    else if(axis == "y") vec.y() = 1;
-    else                 vec.z() = 1;
+    if(axis == "x") vec.x() = 1; else
+    if(axis == "y") vec.y() = 1; else
+    if(axis == "z") vec.z() = 1; else
+    assert(false);
 
-    bake_rotation_matrix(vec, angle, rot);
-    for(auto & v : verts) transform(v, rot);
+    mat3d R = mat3d::ROT_3D(vec, angle);
+    for(auto & v : verts) v = R*v;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

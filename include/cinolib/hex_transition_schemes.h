@@ -44,7 +44,8 @@
  * on ideas contained in:
  *
  *     Optimal Dual Schemes for Adaptive Grid Based Hexmeshing
- *     Marco Livesu, Luca Pitzalis, Gianmarco Cherchi, 2021
+ *     Marco Livesu, Luca Pitzalis, Gianmarco Cherchi
+ *     ACM Transactions on Graphics, 2021
  *
  * Schemes are defined in the primal (grid) mesh, and are meant to regularize the
  * valence of hanging nodes, ensuring that once dualized each vertex yields a hexahedron.
