@@ -64,7 +64,7 @@ template<class Mesh>
 CINO_INLINE
 void MeshSlicer<Mesh>::update(Mesh & m, const SlicerState & s)
 {
-    float eps      = m.bbox().diag()/1000.f;
+    float eps      = 0.0;//m.bbox().diag()/1000.f;
     float X_thresh = m.bbox().min[0] + m.bbox().delta()[0] * (s.X_thresh + eps);
     float Y_thresh = m.bbox().min[1] + m.bbox().delta()[1] * (s.Y_thresh + eps);
     float Z_thresh = m.bbox().min[2] + m.bbox().delta()[2] * (s.Z_thresh + eps);
