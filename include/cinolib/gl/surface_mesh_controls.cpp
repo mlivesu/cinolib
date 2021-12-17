@@ -37,6 +37,8 @@
 #include <../external/imgui/imgui.h>
 #include <cinolib/gl/file_dialog_open.h>
 #include <cinolib/gl/file_dialog_save.h>
+#include <cinolib/gradient.h>
+#include <cinolib/scalar_field.h>
 #include <iostream>
 
 namespace cinolib
@@ -244,7 +246,6 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
             isocontour.thickness = isoline_width;
             isocontour.color     = iso_color;
             gui->push(&isocontour,false);
-            std::cout << gui->drawlist.size() << std::endl;
         };
         if(ImGui::Checkbox("Isoline", &show_isoline))
         {
@@ -293,7 +294,34 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Vector Fields"))
     {
-        ImGui::Text("ciao");
+        if(ImGui::Checkbox("Vector Field", &show_vecfield))
+        {
+            if(show_vecfield) gui->push(&vec_field,false);
+            else              gui->pop(&vec_field);
+        }
+        if(ImGui::Button("Gradient"))
+        {
+            vec_field = DrawableVectorField(*m);
+            ScalarField f(m->serialize_uvw(U_param));
+            vec_field = gradient_matrix(*m) * f;
+            vec_field.normalize();
+            vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
+            vec_field.set_arrow_color(vec_color);
+        }
+        if(ImGui::SliderFloat("Size", &vecfield_size, 0.1, 5))
+        {
+            if(show_vecfield)
+            {
+                vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
+            }
+        }
+        if(ImGui::ColorEdit4("Vec Color", vec_color.rgba, color_edit_flags))
+        {
+            if(show_vecfield)
+            {
+                vec_field.set_arrow_color(vec_color);
+            }
+        }
     }
 }
 

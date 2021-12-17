@@ -42,6 +42,7 @@
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/gl/load_texture.h>
 #include <cinolib/drawable_isocontour.h>
+#include <cinolib/drawable_vector_field.h>
 
 namespace cinolib
 {
@@ -72,23 +73,27 @@ class SurfaceMeshControls : public VisualControl
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     DrawableIsocontour<M,V,E,P> isocontour;
+    DrawableVectorField         vec_field;
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     bool  show_mesh         = true;
     bool  show_wireframe    = true;
     bool  show_isoline      = false;
+    bool  show_vecfield     = false;
     int   shading           = 2; // 0 = point, 1 = flat, 2 = smooth
     int   wireframe_width   = 1;
     float wireframe_alpha   = 1;
-    int   isoline_width   = 1;
+    int   isoline_width     = 1;
+    float vecfield_size     = 0.9;
     float iso_val           = 0.5;
     float iso_min           = 0;
     float iso_max           = 1;
     int   rb_color          = 0;
     Color vert_color        = Color::WHITE();
     Color poly_color        = Color::WHITE();
-    Color iso_color        = Color::RED();
+    Color iso_color         = Color::RED();
+    Color vec_color         = Color::RED();
     int   text_1d           = TEXTURE_1D_ISOLINES;
     int   text_2d           = TEXTURE_2D_ISOLINES;
     float text_scale_factor = 1.0;
