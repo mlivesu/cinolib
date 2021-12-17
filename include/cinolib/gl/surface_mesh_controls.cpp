@@ -334,7 +334,7 @@ void SurfaceMeshControls<Mesh>::header_AO(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Ambient Occlusion"))
     {
-        ImGui::Text("ciao");
+        // STILL QT DEPENDENT!
     }
 }
 
@@ -347,7 +347,28 @@ void SurfaceMeshControls<Mesh>::header_slicing(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Slicing"))
     {
-        ImGui::Text("ciao");
+        bool refresh = false;
+        refresh |= ImGui::RadioButton("AND", &slice_mode, 0); ImGui::SameLine();
+        refresh |= ImGui::RadioButton("OR ", &slice_mode, 1);
+        refresh |= ImGui::SliderFloat("x", &slice.X_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox("Flip x", &flip_x);
+        refresh |= ImGui::SliderFloat("y", &slice.Y_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox("Flip y", &flip_y);
+        refresh |= ImGui::SliderFloat("z", &slice.Z_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox("Flip z", &flip_z);
+        refresh |= ImGui::SliderFloat("q", &slice.Q_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox("Flip q", &flip_q);
+        refresh |= ImGui::SliderInt("l", &slice.L_filter, 0, 10); ImGui::SameLine();
+        refresh |= ImGui::Checkbox("Flip l", &flip_l);
+
+        slice.mode  =  (slice_mode==0) ? AND    : OR;
+        slice.X_sign = (flip_x) ?        GEQ    : LEQ;
+        slice.Y_sign = (flip_y) ?        GEQ    : LEQ;
+        slice.Z_sign = (flip_z) ?        GEQ    : LEQ;
+        slice.Q_sign = (flip_q) ?        GEQ    : LEQ;
+        slice.L_mode = (flip_l) ?        IS_NOT : IS;
+
+        if(refresh) m->slice(slice);
     }
 }
 
