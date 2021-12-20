@@ -40,6 +40,7 @@
 #include <cinolib/gradient.h>
 #include <cinolib/scalar_field.h>
 #include <iostream>
+#include <sstream>
 
 namespace cinolib
 {
@@ -81,7 +82,7 @@ void SurfaceMeshControls<Mesh>::header_IO(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("IO"))
     {
-        if(ImGui::Button("Load"))
+        if(ImGui::SmallButton("Load"))
         {
             std::string filename = file_dialog_open();
             if(!filename.empty())
@@ -91,7 +92,7 @@ void SurfaceMeshControls<Mesh>::header_IO(const bool show_open)
             }
         }
         ImGui::SameLine();
-        if(ImGui::Button("Save"))
+        if(ImGui::SmallButton("Save"))
         {
             std::string filename = file_dialog_save();
             if(!filename.empty())
@@ -151,7 +152,7 @@ void SurfaceMeshControls<Mesh>::header_colors(const bool show_open)
             m->show_vert_color();
         }
         ImGui::SameLine();
-        if(ImGui::Button("Vert"))
+        if(ImGui::SmallButton("Vert"))
         {
             m->show_vert_color();
         }
@@ -162,7 +163,7 @@ void SurfaceMeshControls<Mesh>::header_colors(const bool show_open)
             m->show_poly_color();
         }
         ImGui::SameLine();
-        if(ImGui::Button("Poly"))
+        if(ImGui::SmallButton("Poly"))
         {
             m->show_poly_color();
         }
@@ -178,17 +179,17 @@ void SurfaceMeshControls<Mesh>::header_textures(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Textures"))
     {
-        if(ImGui::Button("Isolines"))
+        if(ImGui::SmallButton("Isolines"))
         {
             text_2d = TEXTURE_2D_ISOLINES;
             m->show_texture2D(text_2d,text_scale_factor);
         }
-        if(ImGui::Button("Checkerboard"))
+        if(ImGui::SmallButton("Checkerboard"))
         {
             text_2d = TEXTURE_2D_CHECKERBOARD;
             m->show_texture2D(text_2d,text_scale_factor);
         }
-        if(ImGui::Button("Load..."))
+        if(ImGui::SmallButton("Load..."))
         {
             std::string filename = file_dialog_open();
             if(!filename.empty())
@@ -214,27 +215,27 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Scalar Field"))
     {        
-        if(ImGui::Button("Isolines"))
+        if(ImGui::SmallButton("Isolines"))
         {
             text_1d = TEXTURE_1D_ISOLINES;
             m->show_texture1D(text_1d);
         }
-        if(ImGui::Button("HSV"))
+        if(ImGui::SmallButton("HSV"))
         {
             text_1d = TEXTURE_1D_HSV;
             m->show_texture1D(text_1d);
         }
-        if(ImGui::Button("HSV + ISO"))
+        if(ImGui::SmallButton("HSV + ISO"))
         {
             text_1d = TEXTURE_1D_HSV_W_ISOLINES;
             m->show_texture1D(text_1d);
         }
-        if(ImGui::Button("Parula"))
+        if(ImGui::SmallButton("Parula"))
         {
             text_1d = TEXTURE_1D_PARULA;
             m->show_texture1D(text_1d);
         }
-        if(ImGui::Button("Parula + ISO"))
+        if(ImGui::SmallButton("Parula + ISO"))
         {
             text_1d = TEXTURE_1D_PARULA_W_ISOLINES;
             m->show_texture1D(text_1d);
@@ -260,7 +261,7 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
                 update_isoline();
             }
         }
-        if(ImGui::Button("Update Range"))
+        if(ImGui::SmallButton("Update Range"))
         {
             iso_max = m->vert_max_uvw_value(U_param);
             iso_min = m->vert_min_uvw_value(U_param);
@@ -299,7 +300,7 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
             if(show_vecfield) gui->push(&vec_field,false);
             else              gui->pop(&vec_field);
         }
-        if(ImGui::Button("Gradient"))
+        if(ImGui::SmallButton("Gradient"))
         {
             vec_field = DrawableVectorField(*m);
             ScalarField f(m->serialize_uvw(U_param));
@@ -331,11 +332,11 @@ template <class Mesh>
 CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_AO(const bool show_open)
 {
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Ambient Occlusion"))
-    {
-        // STILL QT DEPENDENT!
-    }
+    // STILL QT DEPENDENT!
+    //ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    //if(ImGui::CollapsingHeader("Ambient Occlusion"))
+    //{
+    //}
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -348,26 +349,34 @@ void SurfaceMeshControls<Mesh>::header_slicing(const bool show_open)
     if(ImGui::CollapsingHeader("Slicing"))
     {
         bool refresh = false;
-        refresh |= ImGui::RadioButton("AND", &slice_mode, 0); ImGui::SameLine();
-        refresh |= ImGui::RadioButton("OR ", &slice_mode, 1);
-        refresh |= ImGui::SliderFloat("x", &slice.X_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox("Flip x", &flip_x);
-        refresh |= ImGui::SliderFloat("y", &slice.Y_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox("Flip y", &flip_y);
-        refresh |= ImGui::SliderFloat("z", &slice.Z_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox("Flip z", &flip_z);
-        refresh |= ImGui::SliderFloat("q", &slice.Q_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox("Flip q", &flip_q);
-        refresh |= ImGui::SliderInt("l", &slice.L_filter, 0, 10); ImGui::SameLine();
-        refresh |= ImGui::Checkbox("Flip l", &flip_l);
-
-        slice.mode  =  (slice_mode==0) ? AND    : OR;
-        slice.X_sign = (flip_x) ?        GEQ    : LEQ;
-        slice.Y_sign = (flip_y) ?        GEQ    : LEQ;
-        slice.Z_sign = (flip_z) ?        GEQ    : LEQ;
-        slice.Q_sign = (flip_q) ?        GEQ    : LEQ;
-        slice.L_mode = (flip_l) ?        IS_NOT : IS;
-
+        if(ImGui::SmallButton("Copy"))
+        {
+            glfwSetClipboardString(gui->window,slice.to_string().c_str());
+        }
+        ImGui::SameLine();
+        if(ImGui::SmallButton("Paste"))
+        {
+            slice.from_string(glfwGetClipboardString(gui->window));
+            refresh = true;
+        }
+        ImGui::SameLine();
+        if(ImGui::SmallButton("Reset"))
+        {
+            slice.reset();
+            refresh = true;
+        }
+        refresh |= ImGui::RadioButton("AND", (int*)&slice.mode_AND, 1); ImGui::SameLine();
+        refresh |= ImGui::RadioButton("OR ", (int*)&slice.mode_AND, 0);
+        refresh |= ImGui::SliderFloat("x",   &slice.X_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("!x",  &slice.X_leq);
+        refresh |= ImGui::SliderFloat("y",   &slice.Y_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("!y",  &slice.Y_leq);
+        refresh |= ImGui::SliderFloat("z",   &slice.Z_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("!z",  &slice.Z_leq);
+        refresh |= ImGui::SliderFloat("q",   &slice.Q_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("!q",  &slice.Q_leq);
+        refresh |= ImGui::SliderInt  ("l",   &slice.L_filter, 0, 10); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("!l",  &slice.L_is);
         if(refresh) m->slice(slice);
     }
 }

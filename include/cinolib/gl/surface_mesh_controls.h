@@ -91,12 +91,6 @@ class SurfaceMeshControls : public VisualControl
     float iso_max           = 1;
     int   rb_color          = 0;
     SlicerState slice;
-    int  slice_mode         = 0; // 0 = AND, 1 = OR
-    bool flip_x             = false;
-    bool flip_y             = false;
-    bool flip_z             = false;
-    bool flip_q             = false;
-    bool flip_l             = false;
     Color vert_color        = Color::WHITE();
     Color poly_color        = Color::WHITE();
     Color iso_color         = Color::RED();
