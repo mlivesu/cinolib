@@ -78,7 +78,7 @@ class VisualControl
         std::string name;
         bool        show       = true;
         float       rel_pos[2] = {0,0};
-        float       rel_width  = 0.2;
+        float       rel_width  = 0.25;
         float       rel_height = 1.0;
         float       alpha      = 1.0;
 
