@@ -37,23 +37,69 @@
 #define CINO_MESH_SLICER_H
 
 #include <cinolib/symbols.h>
+#include <sstream>
 
 namespace cinolib
 {
 
 struct SlicerState
 {
-    float X_thresh =  1;      // X coord \in [0,1] ( relative w.r.t. bbox delta x)
-    float Y_thresh =  1;      // Y coord \in [0,1] ( relative w.r.t. bbox delta y)
-    float Z_thresh =  1;      // Z coord \in [0,1] ( relative w.r.t. bbox delta z)
-    float Q_thresh =  1;      // Quality \in [0,1] ( assumes quality metric is in [0,1] too)
-    int   L_filter = -1;      // Label (-1 : show all labels)
-    int   X_sign   = LEQ;     // { LEQ, GEQ   }
-    int   Y_sign   = LEQ;     // { LEQ, GEQ   }
-    int   Z_sign   = LEQ;     // { LEQ, GEQ   }
-    int   Q_sign   = LEQ;     // { LEQ, GEQ   }
-    int   L_mode   = IS_NOT;  // { IS, IS_NOT }
-    int   mode     = AND;     // { AND, OR    }
+    float X_thresh  =  1;  // X coord \in [0,1] ( relative w.r.t. bbox delta x)
+    float Y_thresh  =  1;  // Y coord \in [0,1] ( relative w.r.t. bbox delta y)
+    float Z_thresh  =  1;  // Z coord \in [0,1] ( relative w.r.t. bbox delta z)
+    float Q_thresh  =  1;  // Quality \in [0,1] ( assumes quality metric is in [0,1] too)
+    int   L_filter  = -1;  // Label (-1 : show all labels)
+    bool  X_leq    = true; // { LEQ, GEQ   }
+    bool  Y_leq    = true; // { LEQ, GEQ   }
+    bool  Z_leq    = true; // { LEQ, GEQ   }
+    bool  Q_leq    = true; // { LEQ, GEQ   }
+    bool  L_is     = true; // { IS, IS_NOT }
+    bool  mode_AND = true; // { AND, OR    }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    void reset()
+    {
+        X_thresh =  1;
+        Y_thresh =  1;
+        Z_thresh =  1;
+        Q_thresh =  1;
+        L_filter = -1;
+        X_leq    = true;
+        Y_leq    = true;
+        Z_leq    = true;
+        Q_leq    = true;
+        L_is     = true;
+        mode_AND = true;
+    }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    void from_string(const std::string & str)
+    {
+        std::stringstream ss(str);
+        ss >> X_thresh >> Y_thresh >> Z_thresh >> Q_thresh >> L_filter
+           >> X_leq >> Y_leq >> Z_leq >> Q_leq >> L_is >> mode_AND;
+    }
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    std::string to_string() const
+    {
+        std::stringstream ss;
+        ss << X_thresh << " "
+           << Y_thresh << " "
+           << Z_thresh << " "
+           << Q_thresh << " "
+           << L_filter << " "
+           << X_leq    << " "
+           << Y_leq    << " "
+           << Z_leq    << " "
+           << Q_leq    << " "
+           << L_is     << " "
+           << mode_AND;
+        return ss.str();
+    }
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -64,10 +64,9 @@ template<class Mesh>
 CINO_INLINE
 void MeshSlicer<Mesh>::update(Mesh & m, const SlicerState & s)
 {
-    float eps      = m.bbox().diag()/1000.f;
-    float X_thresh = m.bbox().min[0] + m.bbox().delta()[0] * (s.X_thresh + eps);
-    float Y_thresh = m.bbox().min[1] + m.bbox().delta()[1] * (s.Y_thresh + eps);
-    float Z_thresh = m.bbox().min[2] + m.bbox().delta()[2] * (s.Z_thresh + eps);
+    float X_thresh = m.bbox().min[0] + m.bbox().delta()[0] * (s.X_thresh);
+    float Y_thresh = m.bbox().min[1] + m.bbox().delta()[1] * (s.Y_thresh);
+    float Z_thresh = m.bbox().min[2] + m.bbox().delta()[2] * (s.Z_thresh);
 
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
@@ -75,14 +74,14 @@ void MeshSlicer<Mesh>::update(Mesh & m, const SlicerState & s)
         float  q = m.poly_data(pid).quality;
         int    l = m.poly_data(pid).label;
 
-        bool pass_X = (s.X_sign == LEQ) ? (c.x() <=   X_thresh) : (c.x() >=   X_thresh);
-        bool pass_Y = (s.Y_sign == LEQ) ? (c.y() <=   Y_thresh) : (c.y() >=   Y_thresh);
-        bool pass_Z = (s.Z_sign == LEQ) ? (c.z() <=   Z_thresh) : (c.z() >=   Z_thresh);
-        bool pass_Q = (s.Q_sign == LEQ) ? (q     <= s.Q_thresh) : (q     >= s.Q_thresh);
-        bool pass_L = (s.L_mode == IS ) ? (l == -1 || l == s.L_filter) : (l == -1 || l != s.L_filter);
+        bool pass_X = (s.X_leq) ? (c.x() <=   X_thresh) : (c.x() >=   X_thresh);
+        bool pass_Y = (s.Y_leq) ? (c.y() <=   Y_thresh) : (c.y() >=   Y_thresh);
+        bool pass_Z = (s.Z_leq) ? (c.z() <=   Z_thresh) : (c.z() >=   Z_thresh);
+        bool pass_Q = (s.Q_leq) ? (q     <= s.Q_thresh) : (q     >= s.Q_thresh);
+        bool pass_L = (s.L_is ) ? (l == -1 || l == s.L_filter) : (l == -1 || l != s.L_filter);
 
-        bool b = (s.mode == AND) ? ( pass_X &&  pass_Y &&  pass_Z &&  pass_L &&  pass_Q)
-                                 : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
+        bool b = (s.mode_AND) ? ( pass_X &&  pass_Y &&  pass_Z &&  pass_L &&  pass_Q)
+                              : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
 
         m.poly_data(pid).flags[HIDDEN] = !b;
 
