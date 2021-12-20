@@ -393,6 +393,9 @@ void GLcanvas::draw_controls() const
     {
         if(vc->show)
         {
+            ImGui::SetNextWindowPos({vc->rel_pos[0], vc->rel_pos[1]}, ImGuiCond_Always);
+            ImGui::SetNextWindowSize({camera.width*vc->rel_width, camera.height*vc->rel_height}, ImGuiCond_Always);
+            ImGui::SetNextWindowBgAlpha(vc->alpha);
             ImGui::Begin(vc->name.c_str(), &vc->show);
             vc->draw();
             ImGui::End();
@@ -524,11 +527,12 @@ CINO_INLINE
 void GLcanvas::window_size_event(GLFWwindow *window, int width, int height)
 {
     GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
-    v->camera.height = height;
-    v->camera.width  = width;
-    v->camera.reset_projection(); // update the camera frustum
-    v->update_GL_projection();    // update OpenGL's projection matrix
-    v->draw();                    // refresh canvas while resizing
+    v->camera.height           = height;
+    v->camera.width            = width;
+    v->trackball.last_click_2d = vec2d(inf_double); // fixes crazy translation deltas after window resizing!
+    v->camera.reset_projection();                   // update the camera frustum
+    v->update_GL_projection();                      // update OpenGL's projection matrix
+    v->draw();                                      // refresh canvas while resizing
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

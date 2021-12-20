@@ -79,7 +79,7 @@ class GLcanvas
         std::vector<Marker>                markers;
         std::vector<VisualControl*>        visual_controls;
         double                             DPI_factor;
-        int                                font_size          = 15;
+        int                                font_size          = 13;
         bool                               show_axis          = false;
         bool                               depth_cull_markers = false; // skip occluded 3D markers, testing their depth with the Z-buffer
 
