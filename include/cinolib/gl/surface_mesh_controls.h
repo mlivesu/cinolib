@@ -97,6 +97,7 @@ class SurfaceMeshControls : public VisualControl
     float iso_min           = 0;
     float iso_max           = 1;
     int   rb_color          = 0;
+    int   crease_deg        = 60;
     SlicerState slice;
     Color vert_color        = Color::WHITE();
     Color poly_color        = Color::WHITE();

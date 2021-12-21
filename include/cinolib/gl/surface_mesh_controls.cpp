@@ -266,7 +266,7 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
             iso_min = m->vert_min_uvw_value(U_param);
             iso_val = (iso_max-iso_min)*0.5;
         }
-        if(ImGui::SliderInt("Width", &isoline_width, 1, 10))
+        if(ImGui::SliderInt("Width##1", &isoline_width, 1, 10))
         {
             if(show_isoline)
             {
@@ -389,7 +389,7 @@ void SurfaceMeshControls<Mesh>::header_marked_edges(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Marked Edges"))
     {
-        if(ImGui::SliderInt("Width##1", &marked_edge_width, 0, 10))
+        if(ImGui::SliderInt("Width##2", &marked_edge_width, 0, 10))
         {
             m->show_marked_edge(marked_edge_width>0);
             m->show_marked_edge_width(marked_edge_width);
@@ -472,7 +472,40 @@ void SurfaceMeshControls<Mesh>::header_actions(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Actions"))
     {
-        ImGui::Text("ciao");
+        bool refresh = false;
+        if(ImGui::SmallButton("Unmark all edges          "))
+        {
+            m->edge_set_flag(MARKED,false);
+            refresh = true;
+        }
+        if(ImGui::SmallButton("Color wrt Label"))
+        {
+            m->poly_color_wrt_label();
+            refresh = true;
+        }
+        if(ImGui::SmallButton("Label wrt Color"))
+        {
+            m->poly_label_wrt_color();
+            refresh = true;
+        }
+        if(ImGui::SmallButton("Mark Color Discontinuities"))
+        {
+            m->edge_mark_color_discontinuities();
+            refresh = true;
+        }
+        if(ImGui::SmallButton("Mark Boundaries"))
+        {
+            m->edge_mark_boundaries();
+            refresh = true;
+        }
+        if(ImGui::SmallButton("Mark Creases"))
+        {
+            m->edge_mark_sharp_creases(to_rad(crease_deg));
+            refresh = true;
+        }
+        ImGui::InputInt("Crease deg", &crease_deg);
+
+        if(refresh) m->updateGL();
     }
 }
 
