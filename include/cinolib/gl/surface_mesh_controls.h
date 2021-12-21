@@ -43,6 +43,7 @@
 #include <cinolib/gl/load_texture.h>
 #include <cinolib/drawable_isocontour.h>
 #include <cinolib/drawable_vector_field.h>
+#include <cinolib/drawable_segment_soup.h>
 
 namespace cinolib
 {
@@ -74,6 +75,9 @@ class SurfaceMeshControls : public VisualControl
 
     DrawableIsocontour<M,V,E,P> isocontour;
     DrawableVectorField         vec_field;
+    DrawableSegmentSoup         face_normals;
+    DrawableSegmentSoup         vert_normals;
+
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -81,9 +85,12 @@ class SurfaceMeshControls : public VisualControl
     bool  show_wireframe    = true;
     bool  show_isoline      = false;
     bool  show_vecfield     = false;
+    bool  show_face_normals = false;
+    bool  show_vert_normals = false;
     int   shading           = 2; // 0 = point, 1 = flat, 2 = smooth
     int   wireframe_width   = 1;
     float wireframe_alpha   = 1;
+    int   marked_edge_width = 1;
     int   isoline_width     = 1;
     float vecfield_size     = 0.9;
     float iso_val           = 0.5;
@@ -95,6 +102,7 @@ class SurfaceMeshControls : public VisualControl
     Color poly_color        = Color::WHITE();
     Color iso_color         = Color::RED();
     Color vec_color         = Color::RED();
+    Color marked_edge_color = Color::RED();
     int   text_1d           = TEXTURE_1D_ISOLINES;
     int   text_2d           = TEXTURE_2D_ISOLINES;
     float text_scale_factor = 1.0;

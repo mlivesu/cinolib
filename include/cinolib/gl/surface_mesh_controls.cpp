@@ -59,6 +59,8 @@ template <class Mesh>
 CINO_INLINE
 void SurfaceMeshControls<Mesh>::draw()
 {
+    if(m==nullptr || gui==nullptr) return;
+
     header_IO          (false);
     header_shading     (false);
     header_wireframe   (false);
@@ -112,10 +114,7 @@ void SurfaceMeshControls<Mesh>::header_shading(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Shading"))
     {
-        if(ImGui::Checkbox("Show mesh", &show_mesh))
-        {
-            if(m!=nullptr) m->show_mesh(show_mesh);
-        }
+        if(ImGui::Checkbox("Show mesh", &show_mesh))  m->show_mesh(show_mesh);
         if(ImGui::RadioButton("Point ", &shading, 0)) m->show_mesh_points();
         if(ImGui::RadioButton("Flat  ", &shading, 1)) m->show_mesh_flat();
         if(ImGui::RadioButton("Smooth", &shading, 2)) m->show_mesh_smooth();
@@ -390,20 +389,17 @@ void SurfaceMeshControls<Mesh>::header_marked_edges(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Marked Edges"))
     {
-        ImGui::Text("ciao");
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class Mesh>
-CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_actions(const bool show_open)
-{
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Actions"))
-    {
-        ImGui::Text("ciao");
+        if(ImGui::SliderInt("Width##1", &marked_edge_width, 0, 10))
+        {
+            m->show_marked_edge(marked_edge_width>0);
+            m->show_marked_edge_width(marked_edge_width);
+            m->updateGL();
+        }
+        if(ImGui::ColorEdit4("Color", marked_edge_color.rgba, color_edit_flags))
+        {
+            m->show_marked_edge_color(marked_edge_color);
+            m->updateGL();
+        }
     }
 }
 
@@ -415,6 +411,66 @@ void SurfaceMeshControls<Mesh>::header_normals(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Normals"))
+    {
+        if(ImGui::Checkbox("Show Face Normals", &show_face_normals))
+        {
+            if(show_face_normals)
+            {
+                face_normals.clear();
+                face_normals.set_cheap_rendering(true);
+                face_normals.set_color(Color::BLUE());
+                double l = gui->camera.scene_radius/5.0;
+                for(uint pid=0; pid<m->num_polys(); ++pid)
+                {
+                    if(!m->poly_data(pid).flags[HIDDEN])
+                    {
+                        vec3d n = m->poly_data(pid).normal;
+                        vec3d c = m->poly_centroid(pid);
+                        face_normals.push_seg(c, c+(n*l));
+                    }
+                }
+                gui->push(&face_normals,false);
+            }
+            else
+            {
+                gui->pop(&face_normals);
+            }
+        }
+        if(ImGui::Checkbox("Show Vert Normals", &show_vert_normals))
+        {
+            if(show_vert_normals)
+            {
+                vert_normals.clear();
+                vert_normals.set_cheap_rendering(true);
+                vert_normals.set_color(Color::RED());
+                double l = gui->camera.scene_radius/5.0;
+                for(uint vid=0; vid<m->num_verts(); ++vid)
+                {
+                    if(m->vert_is_visible(vid))
+                    {
+                        vec3d n = m->vert_data(vid).normal;
+                        vec3d p = m->vert(vid);
+                        vert_normals.push_seg(p, p+(n*l));
+                    }
+                }
+                gui->push(&vert_normals,false);
+            }
+            else
+            {
+                gui->pop(&vert_normals);
+            }
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class Mesh>
+CINO_INLINE
+void SurfaceMeshControls<Mesh>::header_actions(const bool show_open)
+{
+    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    if(ImGui::CollapsingHeader("Actions"))
     {
         ImGui::Text("ciao");
     }
