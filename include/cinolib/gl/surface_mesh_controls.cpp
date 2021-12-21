@@ -366,16 +366,16 @@ void SurfaceMeshControls<Mesh>::header_slicing(const bool show_open)
         }
         refresh |= ImGui::RadioButton("AND", (int*)&slice.mode_AND, 1); ImGui::SameLine();
         refresh |= ImGui::RadioButton("OR ", (int*)&slice.mode_AND, 0);
-        refresh |= ImGui::SliderFloat("x",   &slice.X_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox   ("!x",  &slice.X_leq);
-        refresh |= ImGui::SliderFloat("y",   &slice.Y_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox   ("!y",  &slice.Y_leq);
-        refresh |= ImGui::SliderFloat("z",   &slice.Z_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox   ("!z",  &slice.Z_leq);
-        refresh |= ImGui::SliderFloat("q",   &slice.Q_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox   ("!q",  &slice.Q_leq);
-        refresh |= ImGui::SliderInt  ("l",   &slice.L_filter, 0, 10); ImGui::SameLine();
-        refresh |= ImGui::Checkbox   ("!l",  &slice.L_is);
+        refresh |= ImGui::SliderFloat("X",   &slice.X_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("##x", &slice.X_leq);
+        refresh |= ImGui::SliderFloat("Y",   &slice.Y_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("##y", &slice.Y_leq);
+        refresh |= ImGui::SliderFloat("Z",   &slice.Z_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("##z", &slice.Z_leq);
+        refresh |= ImGui::SliderFloat("Q",   &slice.Q_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("##q", &slice.Q_leq);
+        refresh |= ImGui::SliderInt  ("L",   &slice.L_filter, 0, 10); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("##l", &slice.L_is);
         if(refresh) m->slice(slice);
     }
 }
@@ -473,7 +473,7 @@ void SurfaceMeshControls<Mesh>::header_actions(const bool show_open)
     if(ImGui::CollapsingHeader("Actions"))
     {
         bool refresh = false;
-        if(ImGui::SmallButton("Unmark all edges          "))
+        if(ImGui::SmallButton("Unmark all edges"))
         {
             m->edge_set_flag(MARKED,false);
             refresh = true;
