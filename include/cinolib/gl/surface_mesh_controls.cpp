@@ -333,7 +333,13 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
         if(ImGui::SmallButton("Load##vecfield"))
         {
             std::string filename = file_dialog_open();
-            if(!filename.empty()) vec_field.deserialize(filename.c_str());
+            if(!filename.empty())
+            {
+                vec_field = DrawableVectorField(*m);
+                vec_field.deserialize(filename.c_str());
+                vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
+                vec_field.set_arrow_color(vec_color);
+            }
         }
         ImGui::SameLine();
         if(ImGui::SmallButton("Save##vecfield"))
