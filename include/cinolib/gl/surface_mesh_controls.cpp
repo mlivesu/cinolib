@@ -68,6 +68,7 @@ void SurfaceMeshControls<Mesh>::draw()
     header_textures    (false);
     header_scalar_field(false);
     header_vector_field(false);
+    header_isoline     (false);
     header_slicing     (false);
     header_marked_edges(false);
     header_normals     (false);
@@ -212,6 +213,26 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Scalar Field"))
     {        
+        if(ImGui::SmallButton("Load##scfield"))
+        {
+            std::string filename = file_dialog_open();
+            if(!filename.empty())
+            {
+                ScalarField sf(filename.c_str());
+                if ((uint)sf.size() == m->num_verts()) sf.copy_to_mesh(*m);
+                else std::cerr << "Could not load scalar field " << filename << " - array size mismatch!" << std::endl;
+            }
+        }
+        ImGui::SameLine();
+        if(ImGui::SmallButton("Save##scfield"))
+        {
+            std::string filename = file_dialog_save();
+            if(!filename.empty())
+            {
+                ScalarField sf(m->serialize_uvw(U_param));
+                sf.serialize(filename.c_str());
+            }
+        }
         if(ImGui::SmallButton("Isolines"))
         {
             text_1d = TEXTURE_1D_ISOLINES;
@@ -237,7 +258,18 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
             text_1d = TEXTURE_1D_PARULA_W_ISOLINES;
             m->show_texture1D(text_1d);
         }
+    }
+}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void SurfaceMeshControls<Mesh>::header_isoline(const bool show_open)
+{
+    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    if(ImGui::CollapsingHeader("Isolines"))
+    {
         auto update_isoline = [&]()
         {
             isocontour           = DrawableIsocontour<M,V,E,P>(*m,iso_val);
@@ -245,7 +277,7 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
             isocontour.color     = iso_color;
             gui->push(&isocontour,false);
         };
-        if(ImGui::Checkbox("Isoline", &show_isoline))
+        if(ImGui::Checkbox("Show##isoline", &show_isoline))
         {
             if(show_isoline) update_isoline();
             else             gui->pop(&isocontour);
@@ -264,7 +296,7 @@ void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
             iso_min = m->vert_min_uvw_value(U_param);
             iso_val = (iso_max-iso_min)*0.5;
         }
-        if(ImGui::SliderInt("Width##1", &isoline_width, 1, 10))
+        if(ImGui::SliderInt("Width##isoline", &isoline_width, 1, 10))
         {
             if(show_isoline)
             {
@@ -292,10 +324,22 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Vector Fields"))
     {
-        if(ImGui::Checkbox("Vector Field", &show_vecfield))
+        if(ImGui::Checkbox("Show##vecfield", &show_vecfield))
         {
             if(show_vecfield) gui->push(&vec_field,false);
             else              gui->pop(&vec_field);
+        }
+        ImGui::SameLine();
+        if(ImGui::SmallButton("Load##vecfield"))
+        {
+            std::string filename = file_dialog_open();
+            if(!filename.empty()) vec_field.deserialize(filename.c_str());
+        }
+        ImGui::SameLine();
+        if(ImGui::SmallButton("Save##vecfield"))
+        {
+            std::string filename = file_dialog_save();
+            if(!filename.empty()) vec_field.serialize(filename.c_str());
         }
         if(ImGui::SmallButton("Gradient"))
         {

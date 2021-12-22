@@ -116,6 +116,7 @@ class SurfaceMeshControls : public VisualControl
         void header_textures    (const bool show_open);
         void header_scalar_field(const bool show_open);
         void header_vector_field(const bool show_open);
+        void header_isoline     (const bool show_open);
         void header_slicing     (const bool show_open);
         void header_marked_edges(const bool show_open);
         void header_actions     (const bool show_open);
