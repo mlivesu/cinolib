@@ -71,6 +71,7 @@ namespace cinolib
  * block. Therefore, draw() is expected to only contain code for the controls themselves,
  * and not for window/frame handling.
 */
+
 class VisualControl
 {
     public :
@@ -78,12 +79,12 @@ class VisualControl
         std::string name;
         bool        show       = true;
         float       rel_pos[2] = {0,0};
-        float       rel_width  = 0.25;
+        float       rel_width  = 0.25;  // this is meant to be a LEFT side bar in the window
         float       rel_height = 1.0;
         float       alpha      = 1.0;
 
         explicit  VisualControl(const std::string & name) : name(name) {}
-        virtual  ~VisualControl(){}
+        virtual  ~VisualControl() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
