@@ -50,17 +50,17 @@ class MeshSlicer
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        float X_thresh  =  1;   // X coord \in [0,1] ( relative w.r.t. bbox delta x)
-        float Y_thresh  =  1;   // Y coord \in [0,1] ( relative w.r.t. bbox delta y)
-        float Z_thresh  =  1;   // Z coord \in [0,1] ( relative w.r.t. bbox delta z)
-        float Q_thresh  =  1;   // Quality \in [0,1] ( assumes quality metric is in [0,1] too)
-        int   L_filter  = -1;   // Label (-1 : show all labels)
-        bool  X_leq     = true; // { LEQ, GEQ   }
-        bool  Y_leq     = true; // { LEQ, GEQ   }
-        bool  Z_leq     = true; // { LEQ, GEQ   }
-        bool  Q_leq     = true; // { LEQ, GEQ   }
-        bool  L_is      = true; // { IS, IS_NOT }
-        bool  mode_AND  = true; // { AND, OR    }
+        float X_thresh  =  1;   // X coord \in [0,1] (relative w.r.t. bbox delta x)
+        float Y_thresh  =  1;   // Y coord \in [0,1] (relative w.r.t. bbox delta y)
+        float Z_thresh  =  1;   // Z coord \in [0,1] (relative w.r.t. bbox delta z)
+        float Q_thresh  =  1;   // Quality \in [0,1] (assumes quality metric is in [0,1] too)
+        int   L_filter  = -1;   // Label             (-1 : show all labels)
+        bool  X_leq     = true; // { <=  or >=     }
+        bool  Y_leq     = true; // { <=  or >=     }
+        bool  Z_leq     = true; // { <=  or >=     }
+        bool  Q_leq     = true; // { <=  or >=     }
+        bool  L_is      = true; // { IS  or IS_NOT }
+        bool  mode_AND  = true; // { AND or OR     }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
