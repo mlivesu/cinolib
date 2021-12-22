@@ -71,7 +71,6 @@ void SurfaceMeshControls<Mesh>::draw()
     header_slicing     (false);
     header_marked_edges(false);
     header_normals     (false);
-    header_AO          (false);
     header_actions     (false);
 }
 
@@ -329,19 +328,6 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_AO(const bool show_open)
-{
-    // STILL QT DEPENDENT!
-    //ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    //if(ImGui::CollapsingHeader("Ambient Occlusion"))
-    //{
-    //}
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class Mesh>
-CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_slicing(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
@@ -350,33 +336,37 @@ void SurfaceMeshControls<Mesh>::header_slicing(const bool show_open)
         bool refresh = false;
         if(ImGui::SmallButton("Copy"))
         {
-            glfwSetClipboardString(gui->window,slice.to_string().c_str());
+            glfwSetClipboardString(gui->window,slicer.serialize().c_str());
         }
         ImGui::SameLine();
         if(ImGui::SmallButton("Paste"))
         {
-            slice.from_string(glfwGetClipboardString(gui->window));
+            slicer.deserialize(glfwGetClipboardString(gui->window));
             refresh = true;
         }
         ImGui::SameLine();
         if(ImGui::SmallButton("Reset"))
         {
-            slice.reset();
+            slicer.reset();
             refresh = true;
         }
-        refresh |= ImGui::RadioButton("AND", (int*)&slice.mode_AND, 1); ImGui::SameLine();
-        refresh |= ImGui::RadioButton("OR ", (int*)&slice.mode_AND, 0);
-        refresh |= ImGui::SliderFloat("X",   &slice.X_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox   ("##x", &slice.X_leq);
-        refresh |= ImGui::SliderFloat("Y",   &slice.Y_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox   ("##y", &slice.Y_leq);
-        refresh |= ImGui::SliderFloat("Z",   &slice.Z_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox   ("##z", &slice.Z_leq);
-        refresh |= ImGui::SliderFloat("Q",   &slice.Q_thresh, 0, 1); ImGui::SameLine();
-        refresh |= ImGui::Checkbox   ("##q", &slice.Q_leq);
-        refresh |= ImGui::SliderInt  ("L",   &slice.L_filter, 0, 10); ImGui::SameLine();
-        refresh |= ImGui::Checkbox   ("##l", &slice.L_is);
-        if(refresh) m->slice(slice);
+        refresh |= ImGui::RadioButton("AND", (int*)&slicer.mode_AND, 1); ImGui::SameLine();
+        refresh |= ImGui::RadioButton("OR ", (int*)&slicer.mode_AND, 0);
+        refresh |= ImGui::SliderFloat("X",   &slicer.X_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("##x", &slicer.X_leq);
+        refresh |= ImGui::SliderFloat("Y",   &slicer.Y_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("##y", &slicer.Y_leq);
+        refresh |= ImGui::SliderFloat("Z",   &slicer.Z_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("##z", &slicer.Z_leq);
+        refresh |= ImGui::SliderFloat("Q",   &slicer.Q_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("##q", &slicer.Q_leq);
+        refresh |= ImGui::SliderInt  ("L",   &slicer.L_filter, 0, 10); ImGui::SameLine();
+        refresh |= ImGui::Checkbox   ("##l", &slicer.L_is);
+        if(refresh)
+        {
+            slicer.slice(*m);
+            m->updateGL();
+        }
     }
 }
 

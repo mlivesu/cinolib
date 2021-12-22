@@ -48,8 +48,6 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::init_drawable_stuff()
 {
-    slicer = MeshSlicer<Mesh>(*this);
-
     drawlist.draw_mode        = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_marked.draw_mode = DRAW_SEGS;
     drawlist_marked.seg_width = 3;
@@ -343,26 +341,6 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
             drawlist.seg_colors.push_back(this->edge_data(eid).color.a);
         }
     }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class Mesh>
-CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::slice(const SlicerState & s)
-{
-    slicer.update(*this, s); // update per element visibility flags
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class Mesh>
-CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::slicer_reset()
-{
-    slicer.reset(*this);
-    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

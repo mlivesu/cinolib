@@ -47,8 +47,6 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::init_drawable_stuff()
 {
-    slicer = MeshSlicer<Mesh>(*this);
-
     drawlist_in.draw_mode     = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_out.draw_mode    = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_marked.draw_mode = DRAW_TRIS | DRAW_SEGS;
@@ -616,26 +614,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
 //            drawlist_in.flags[MARKED]_seg_coords.push_back(vid1.z());
 //        }
     }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class Mesh>
-CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::slice(const SlicerState & s)
-{
-    slicer.update(*this, s); // update per element visibility flags
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class Mesh>
-CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::slicer_reset()   // either AND or OR
-{
-    slicer.reset(*this);
-    updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

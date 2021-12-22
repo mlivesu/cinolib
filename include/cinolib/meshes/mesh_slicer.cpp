@@ -34,39 +34,75 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/meshes/mesh_slicer.h>
-#include <cinolib/geometry/vec_mat.h>
-#include <cinolib/meshes/mesh_attributes.h>
+#include <sstream>
 
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class Mesh>
 CINO_INLINE
-MeshSlicer<Mesh>::MeshSlicer(Mesh & m)
+void MeshSlicer::reset()
 {
-    reset(m);
+    X_thresh =  1;
+    Y_thresh =  1;
+    Z_thresh =  1;
+    Q_thresh =  1;
+    L_filter = -1;
+    X_leq    = true;
+    Y_leq    = true;
+    Z_leq    = true;
+    Q_leq    = true;
+    L_is     = true;
+    mode_AND = true;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class Mesh>
 CINO_INLINE
-void MeshSlicer<Mesh>::reset(Mesh & m)
-{    
-    m.poly_set_flag(HIDDEN,false); // show all
+void MeshSlicer::deserialize(const std::string & str)
+{
+    std::stringstream ss(str);
+    ss >> X_thresh
+       >> Y_thresh
+       >> Z_thresh
+       >> Q_thresh
+       >> L_filter
+       >> X_leq
+       >> Y_leq
+       >> Z_leq
+       >> Q_leq
+       >> L_is
+       >> mode_AND;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class Mesh>
 CINO_INLINE
-void MeshSlicer<Mesh>::update(Mesh & m, const SlicerState & s)
+std::string MeshSlicer::serialize() const
 {
-    double X_thresh = m.bbox().min[0] + m.bbox().delta()[0] * (s.X_thresh);
-    double Y_thresh = m.bbox().min[1] + m.bbox().delta()[1] * (s.Y_thresh);
-    double Z_thresh = m.bbox().min[2] + m.bbox().delta()[2] * (s.Z_thresh);
+    std::stringstream ss;
+    ss << X_thresh << " "
+       << Y_thresh << " "
+       << Z_thresh << " "
+       << Q_thresh << " "
+       << L_filter << " "
+       << X_leq    << " "
+       << Y_leq    << " "
+       << Z_leq    << " "
+       << Q_leq    << " "
+       << L_is     << " "
+       << mode_AND;
+    return ss.str();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void MeshSlicer::slice(AbstractMesh<M,V,E,P> & m)
+{
+    double X_abs_thresh = m.bbox().min[0] + m.bbox().delta()[0] * (X_thresh);
+    double Y_abs_thresh = m.bbox().min[1] + m.bbox().delta()[1] * (Y_thresh);
+    double Z_abs_thresh = m.bbox().min[2] + m.bbox().delta()[2] * (Z_thresh);
 
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
@@ -74,18 +110,16 @@ void MeshSlicer<Mesh>::update(Mesh & m, const SlicerState & s)
         float q = m.poly_data(pid).quality;
         int   l = m.poly_data(pid).label;
 
-        bool pass_X = (s.X_leq) ? (c.x() <=   X_thresh) : (c.x() >=   X_thresh);
-        bool pass_Y = (s.Y_leq) ? (c.y() <=   Y_thresh) : (c.y() >=   Y_thresh);
-        bool pass_Z = (s.Z_leq) ? (c.z() <=   Z_thresh) : (c.z() >=   Z_thresh);
-        bool pass_Q = (s.Q_leq) ? (q     <= s.Q_thresh) : (q     >= s.Q_thresh);
-        bool pass_L = (s.L_is ) ? (l == -1 || l == s.L_filter) : (l == -1 || l != s.L_filter);
+        bool pass_X = (X_leq) ? (c.x() <= X_abs_thresh) : (c.x() >= X_abs_thresh);
+        bool pass_Y = (Y_leq) ? (c.y() <= Y_abs_thresh) : (c.y() >= Y_abs_thresh);
+        bool pass_Z = (Z_leq) ? (c.z() <= Z_abs_thresh) : (c.z() >= Z_abs_thresh);
+        bool pass_Q = (Q_leq) ? (q     <= Q_thresh    ) : (q     >  Q_thresh);
+        bool pass_L = (L_is ) ? (l == -1 || l == L_filter) : (l == -1 || l != L_filter);
 
-        bool b = (s.mode_AND) ? ( pass_X &&  pass_Y &&  pass_Z &&  pass_L &&  pass_Q)
-                              : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
+        bool b = (mode_AND) ? ( pass_X &&  pass_Y &&  pass_Z &&  pass_L &&  pass_Q)
+                            : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
 
         m.poly_data(pid).flags[HIDDEN] = !b;
-
-        //std::cout << pass_X << " " << pass_Y << " " << pass_Z << " " << pass_Q << " " << pass_L << std::endl;
     }
 }
 

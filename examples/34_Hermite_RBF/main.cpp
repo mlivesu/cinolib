@@ -57,9 +57,9 @@ int main(int argc, char **argv)
     gui.push_obj(&iso);
 
     // slice the volume, hide the target surface (for visualization)
-    SlicerState ss;
+    MeshSlicer ss;
     ss.Z_thresh = 0.5;
-    vol_sampling.slice(ss);
+    ss.slice(vol_sampling);
     vol_sampling.show_in_wireframe(false);
     vol_sampling.show_out_wireframe(false);
     vol_sampling.show_in_texture1D(TEXTURE_1D_PARULA_W_ISOLINES);

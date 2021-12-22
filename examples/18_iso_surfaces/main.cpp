@@ -56,9 +56,10 @@ int main(int argc, char **argv)
     m.show_out_texture1D(TEXTURE_1D_HSV_W_ISOLINES);
     gui.push_obj(&m);
 
-    SlicerState ss;
+    MeshSlicer ss;
     ss.Z_thresh = 0.5;
-    m.slice(ss);
+    ss.slice(m);
+    m.updateGL();
 
     DrawableIsosurface<> iso(m, 0.5);
     gui.push_obj(&iso, false);
@@ -77,7 +78,7 @@ int main(int argc, char **argv)
     {
         ss.Z_thresh = static_cast<float>(sl_slice.value())/100.0;
         profiler.push("update slicing");
-        m.slice(ss);
+        ss.slice(m);
         profiler.pop();
         gui.updateGL();
     });
@@ -87,7 +88,8 @@ int main(int argc, char **argv)
         profiler.push("tessellate iso-surface");
         iso.tessellate(m);
         profiler.pop();
-        m.slice(ss);
+        ss.slice(m);
+        m.updateGL();
         gui.updateGL();
     });
 

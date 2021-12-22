@@ -31,10 +31,6 @@ int main(int argc, char **argv)
     m.poly_color_wrt_label();
     m.updateGL();
 
-    //SlicerState ss;
-    //ss.Z_thresh = 0.5;
-    //m.slice(ss);
-
     GLcanvas gui;
     gui.push_obj(&m);
     gui.show();

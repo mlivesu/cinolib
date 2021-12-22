@@ -67,11 +67,14 @@ int main(int argc, char **argv)
     gui_poly.deserialize_POV(pov);
 
     // show interior
-    SlicerState slice_params;
-    slice_params.Z_thresh = 0.6;
-    m_in.slice(slice_params);
-    m_tet.slice(slice_params);
-    m_poly.slice(slice_params);
+    MeshSlicer slicer;
+    slicer.Z_thresh = 0.6;
+    slicer.slice(m_in);
+    slicer.slice(m_tet);
+    slicer.slice(m_poly);
+    m_in.updateGL();
+    m_tet.updateGL();
+    m_poly.updateGL();
 
     // CMD+1 to show in   mesh controls.
     // CMD+2 to show tet  mesh controls.

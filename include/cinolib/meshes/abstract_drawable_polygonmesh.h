@@ -50,12 +50,11 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 {
     protected:
 
-        MeshSlicer<Mesh> slicer;
-        Material         material_;
-        RenderData       drawlist;
-        RenderData       drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces too)
-        Color            marked_edge_color;
-        float            AO_alpha = 1.0;
+        Material   material_;
+        RenderData drawlist;
+        RenderData drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces too)
+        Color      marked_edge_color;
+        float      AO_alpha = 1.0;
 
     public:
 
@@ -91,11 +90,6 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 
         const Material & material() const { return material_; }
               Material & material()       { return material_; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void slice(const SlicerState & s);
-        void slicer_reset();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
