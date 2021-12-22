@@ -326,8 +326,20 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
     {
         if(ImGui::Checkbox("Show##vecfield", &show_vecfield))
         {
-            if(show_vecfield) gui->push(&vec_field,false);
-            else              gui->pop(&vec_field);
+            if(show_vecfield)
+            {
+                if(vec_field.size()==0) // if the field is empty compute the gradient
+                {
+                    vec_field = DrawableVectorField(*m);
+                    ScalarField f(m->serialize_uvw(U_param));
+                    vec_field = gradient_matrix(*m) * f;
+                    vec_field.normalize();
+                    vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
+                    vec_field.set_arrow_color(vec_color);
+                }
+                gui->push(&vec_field,false);
+            }
+            else gui->pop(&vec_field);
         }
         ImGui::SameLine();
         if(ImGui::SmallButton("Load##vecfield"))
@@ -346,15 +358,6 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
         {
             std::string filename = file_dialog_save();
             if(!filename.empty()) vec_field.serialize(filename.c_str());
-        }
-        if(ImGui::SmallButton("Gradient"))
-        {
-            vec_field = DrawableVectorField(*m);
-            ScalarField f(m->serialize_uvw(U_param));
-            vec_field = gradient_matrix(*m) * f;
-            vec_field.normalize();
-            vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
-            vec_field.set_arrow_color(vec_color);
         }
         if(ImGui::SliderFloat("Size", &vecfield_size, 0.1, 5))
         {
