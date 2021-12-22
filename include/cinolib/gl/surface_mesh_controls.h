@@ -36,7 +36,6 @@
 #ifndef CINO_SURFACE_MESH_CONTROLS_H
 #define CINO_SURFACE_MESH_CONTROLS_H
 
-#include <cinolib/cino_inline.h>
 #include <cinolib/gl/glcanvas.h>
 #include <cinolib/gl/visual_control.h>
 #include <cinolib/meshes/meshes.h>
@@ -51,11 +50,6 @@ namespace cinolib
 template<class Mesh>
 class SurfaceMeshControls : public VisualControl
 {
-    Mesh     * m   = nullptr;
-    GLcanvas * gui = nullptr;
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     typedef typename Mesh::M_type M;
     typedef typename Mesh::V_type V;
     typedef typename Mesh::E_type E;
@@ -63,13 +57,8 @@ class SurfaceMeshControls : public VisualControl
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    // ImGui options for color picker
-    static const ImGuiColorEditFlags color_edit_flags = ImGuiColorEditFlags_NoSidePreview  |
-                                                        ImGuiColorEditFlags_NoTooltip      |
-                                                        ImGuiColorEditFlags_NoLabel        |
-                                                        ImGuiColorEditFlags_NoInputs       |
-                                                        ImGuiColorEditFlags_PickerHueWheel |
-                                                        ImGuiColorEditFlags_NoBorder;
+    Mesh     * m   = nullptr;
+    GLcanvas * gui = nullptr;
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -88,23 +77,22 @@ class SurfaceMeshControls : public VisualControl
     bool       show_vert_normals = false;
     int        shading           = 2; // 0 = point, 1 = flat, 2 = smooth
     int        wireframe_width   = 1;
-    float      wireframe_alpha   = 1;
     int        marked_edge_width = 1;
     int        isoline_width     = 1;
+    int        text_1d           = TEXTURE_1D_ISOLINES;
+    int        text_2d           = TEXTURE_2D_ISOLINES;
+    float      text_scale_factor = 1.0;
+    float      wireframe_alpha   = 1;
     float      vecfield_size     = 0.9;
     float      iso_val           = 0.5;
     float      iso_min           = 0;
     float      iso_max           = 1;
-    int        rb_color          = 0;
     int        crease_deg        = 60;
     Color      vert_color        = Color::WHITE();
     Color      poly_color        = Color::WHITE();
     Color      iso_color         = Color::RED();
     Color      vec_color         = Color::RED();
     Color      marked_edge_color = Color::RED();
-    int        text_1d           = TEXTURE_1D_ISOLINES;
-    int        text_2d           = TEXTURE_2D_ISOLINES;
-    float      text_scale_factor = 1.0;
     MeshSlicer slicer;
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -132,6 +120,16 @@ class SurfaceMeshControls : public VisualControl
         void header_marked_edges(const bool show_open);
         void header_actions     (const bool show_open);
         void header_normals     (const bool show_open);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        // ImGui options for color picker
+        static const ImGuiColorEditFlags color_edit_flags = ImGuiColorEditFlags_NoSidePreview  |
+                                                            ImGuiColorEditFlags_NoTooltip      |
+                                                            ImGuiColorEditFlags_NoLabel        |
+                                                            ImGuiColorEditFlags_NoInputs       |
+                                                            ImGuiColorEditFlags_PickerHueWheel |
+                                                            ImGuiColorEditFlags_NoBorder;
 };
 
 }

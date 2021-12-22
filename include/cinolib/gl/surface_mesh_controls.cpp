@@ -47,8 +47,8 @@ namespace cinolib
 
 template <class Mesh>
 CINO_INLINE
-SurfaceMeshControls<Mesh>::SurfaceMeshControls(Mesh *m, GLcanvas *gui, const std::string & name)
-    : VisualControl(name)
+SurfaceMeshControls<Mesh>::SurfaceMeshControls(Mesh *m, GLcanvas *gui, const std::string & _name)
+    : VisualControl(_name)
     , m(m)
     , gui(gui)
 {}
@@ -80,7 +80,7 @@ template <class Mesh>
 CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_IO(const bool show_open)
 {
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    ImGui::SetNextItemOpen(show_open, ImGuiCond_Once);
     if(ImGui::CollapsingHeader("IO"))
     {
         if(ImGui::SmallButton("Load"))
@@ -154,7 +154,6 @@ void SurfaceMeshControls<Mesh>::header_colors(const bool show_open)
         {
             m->show_vert_color();
         }
-        //
         if(ImGui::ColorEdit4("Poly Color", poly_color.rgba, color_edit_flags))
         {
             m->poly_set_color(poly_color);
