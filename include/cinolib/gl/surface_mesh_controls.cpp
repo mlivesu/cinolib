@@ -114,10 +114,10 @@ void SurfaceMeshControls<Mesh>::header_shading(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Shading"))
     {
-        if(ImGui::Checkbox("Show mesh", &show_mesh))  m->show_mesh(show_mesh);
-        if(ImGui::RadioButton("Point ", &shading, 0)) m->show_mesh_points();
-        if(ImGui::RadioButton("Flat  ", &shading, 1)) m->show_mesh_flat();
-        if(ImGui::RadioButton("Smooth", &shading, 2)) m->show_mesh_smooth();
+        if(ImGui::Checkbox("Show##mesh", &show_mesh))  m->show_mesh(show_mesh);
+        if(ImGui::RadioButton("Point ",  &shading, 0)) m->show_mesh_points();
+        if(ImGui::RadioButton("Flat  ",  &shading, 1)) m->show_mesh_flat();
+        if(ImGui::RadioButton("Smooth",  &shading, 2)) m->show_mesh_smooth();
     }
 }
 
@@ -425,9 +425,12 @@ void SurfaceMeshControls<Mesh>::header_marked_edges(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Marked Edges"))
     {
-        if(ImGui::SliderInt("Width##2", &marked_edge_width, 0, 10))
+        if(ImGui::Checkbox("Show##MarkedEdge", &show_marked_edges))
         {
-            m->show_marked_edge(marked_edge_width>0);
+            m->show_marked_edge(show_marked_edges);
+        }
+        if(ImGui::SliderInt("Width##2", &marked_edge_width, 1, 10))
+        {
             m->show_marked_edge_width(marked_edge_width);
             m->updateGL();
         }
