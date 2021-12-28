@@ -37,7 +37,7 @@
 #define CINO_SURFACE_MESH_CONTROLS_H
 
 #include <cinolib/gl/glcanvas.h>
-#include <cinolib/gl/visual_control.h>
+#include <cinolib/gl/side_bar_item.h>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/gl/load_texture.h>
 #include <cinolib/drawable_isocontour.h>
@@ -48,7 +48,7 @@ namespace cinolib
 {
 
 template<class Mesh>
-class SurfaceMeshControls : public VisualControl
+class SurfaceMeshControls : public SideBarItem
 {
     typedef typename Mesh::M_type M;
     typedef typename Mesh::V_type V;

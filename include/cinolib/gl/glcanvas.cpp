@@ -129,9 +129,9 @@ void GLcanvas::push(const DrawableObject *obj, const bool refit_scene)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::push(VisualControl *vc)
+void GLcanvas::push(SideBarItem *item)
 {
-    visual_controls.push_back(vc);
+    side_bar_items.push_back(item);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -275,7 +275,7 @@ void GLcanvas::draw() const
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     draw_markers();
-    draw_controls();
+    draw_side_bar();
     ImGui::Render();
     ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 
@@ -386,18 +386,17 @@ void GLcanvas::draw_markers() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::draw_controls() const
+void GLcanvas::draw_side_bar() const
 {
-    if(visual_controls.empty()) return;
-    for(auto vc : visual_controls)
+    for(auto item : side_bar_items)
     {
-        if(vc->show)
+        if(item->show)
         {
-            ImGui::SetNextWindowPos({vc->rel_pos[0], vc->rel_pos[1]}, ImGuiCond_Always);
-            ImGui::SetNextWindowSize({camera.width*vc->rel_width, camera.height*vc->rel_height}, ImGuiCond_Always);
-            ImGui::SetNextWindowBgAlpha(vc->alpha);
-            ImGui::Begin(vc->name.c_str(), &vc->show);
-            vc->draw();
+            ImGui::SetNextWindowPos({0,0}, ImGuiCond_Once);
+            ImGui::SetNextWindowSize({camera.width*side_bar_width, camera.height*1.f}, ImGuiCond_Once);
+            ImGui::SetNextWindowBgAlpha(side_bar_alpha);
+            ImGui::Begin(item->name.c_str(), &item->show);
+            item->draw();
             ImGui::End();
         }
     }

@@ -38,7 +38,7 @@
 
 #include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/drawable_object.h>
-#include <cinolib/gl/visual_control.h>
+#include <cinolib/gl/side_bar_item.h>
 #include <cinolib/gl/camera.h>
 #include <cinolib/min_max_inf.h>
 #include <cinolib/color.h>
@@ -77,7 +77,9 @@ class GLcanvas
         GLFWwindow                        *window;
         std::vector<const DrawableObject*> drawlist;
         std::vector<Marker>                markers;
-        std::vector<VisualControl*>        visual_controls;
+        std::vector<SideBarItem*>          side_bar_items;
+        float                              side_bar_width     = 0.25;
+        float                              side_bar_alpha     = 1.0;
         double                             DPI_factor;
         int                                font_size          = 13;
         bool                               show_axis          = false;
@@ -100,7 +102,7 @@ class GLcanvas
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void draw()          const; // single render pass
-        void draw_controls() const; // render visual controls
+        void draw_side_bar() const; // render side bar with visual controls (if any)
         void draw_markers()  const; // render text labels with ImGui (3d markers are depth tested if culling is enabled)
         void draw_axis()     const; // render the global frame XYZ
 
@@ -110,9 +112,9 @@ class GLcanvas
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void push(const DrawableObject *obj, const bool refit_scene = true);
+        void push(const DrawableObject * obj, const bool refit_scene = true);
         void push(const Marker         & m);
-        void push(      VisualControl  *vc);
+        void push(SideBarItem          * item);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

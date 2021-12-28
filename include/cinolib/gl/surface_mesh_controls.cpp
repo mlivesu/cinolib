@@ -48,7 +48,7 @@ namespace cinolib
 template <class Mesh>
 CINO_INLINE
 SurfaceMeshControls<Mesh>::SurfaceMeshControls(Mesh *m, GLcanvas *gui, const std::string & _name)
-    : VisualControl(_name)
+    : SideBarItem(_name)
     , m(m)
     , gui(gui)
 {}
@@ -361,17 +361,11 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
         }
         if(ImGui::SliderFloat("Size", &vecfield_size, 0.1, 5))
         {
-            if(show_vecfield)
-            {
-                vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
-            }
+            vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
         }
         if(ImGui::ColorEdit4("Vec Color", vec_color.rgba, color_edit_flags))
         {
-            if(show_vecfield)
-            {
-                vec_field.set_arrow_color(vec_color);
-            }
+            vec_field.set_arrow_color(vec_color);
         }
     }
 }
