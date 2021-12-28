@@ -163,16 +163,16 @@ void render(const RenderData & data)
             glShadeModel(GL_SMOOTH); // flatness is given by input normals
             render_tris(data);
         }
-    }
 
-    if(data.draw_mode & DRAW_SEGS)
-    {
-        glDisable(GL_POLYGON_OFFSET_FILL);
-        glPushAttrib(GL_POLYGON_BIT);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        render_segs(data);
-        glPopAttrib();
-        glEnable(GL_POLYGON_OFFSET_FILL);
+        if(data.draw_mode & DRAW_SEGS)
+        {
+            glDisable(GL_POLYGON_OFFSET_FILL);
+            glPushAttrib(GL_POLYGON_BIT);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            render_segs(data);
+            glPopAttrib();
+            glEnable(GL_POLYGON_OFFSET_FILL);
+        }
     }
 }
 

@@ -49,7 +49,7 @@ CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::init_drawable_stuff()
 {
     drawlist.draw_mode        = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
-    drawlist_marked.draw_mode = DRAW_SEGS;
+    drawlist_marked.draw_mode = DRAW_TRIS | DRAW_SEGS;
     drawlist_marked.seg_width = 3;
     marked_edge_color         = Color::RED();
 
@@ -142,7 +142,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
     drawlist.seg_coords.clear();
     drawlist.seg_colors.clear();
 
-    if (this->num_polys() == 0) // for point clouds
+    if(this->num_polys() == 0) // for point clouds
     {
         drawlist.tri_coords.reserve(this->num_verts()*3);
         drawlist.tri_v_colors.reserve(this->num_verts()*4);
