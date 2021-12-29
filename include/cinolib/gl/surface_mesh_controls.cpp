@@ -173,7 +173,7 @@ void SurfaceMeshControls<Mesh>::header_colors_textures(const bool show_open)
             //
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
-            if(ImGui::RadioButton("Tex 1D", m->drawlist.draw_mode & DRAW_TRI_TEXTURE1D))
+            if(ImGui::RadioButton("Tex1D", m->drawlist.draw_mode & DRAW_TRI_TEXTURE1D))
             {
                 m->show_texture1D(m->drawlist.texture.type);
             }
@@ -185,7 +185,7 @@ void SurfaceMeshControls<Mesh>::header_colors_textures(const bool show_open)
             //
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
-            if(ImGui::RadioButton("Tex 2D", m->drawlist.draw_mode & DRAW_TRI_TEXTURE2D))
+            if(ImGui::RadioButton("Tex2D", m->drawlist.draw_mode & DRAW_TRI_TEXTURE2D))
             {
                 // m->drawlist.texture.type indexes both 1D and 2D textures, but there are more 1D than 2D!
                 if(m->drawlist.texture.type<2) m->show_texture2D(m->drawlist.texture.type, m->drawlist.texture.scaling_factor);
