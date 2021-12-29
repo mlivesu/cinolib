@@ -48,7 +48,7 @@ namespace cinolib
 template<class Mesh>
 class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObject
 {
-    protected:
+    public:
 
         Material   material_;
         RenderData drawlist_in;
@@ -58,7 +58,11 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         Color      marked_face_color;
         float      AO_alpha;
 
-    public:
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        explicit AbstractDrawablePolyhedralMesh() : Mesh() {}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void       draw(const float scene_size=1) const;
         vec3d      scene_center() const { return this->bb.center();     }

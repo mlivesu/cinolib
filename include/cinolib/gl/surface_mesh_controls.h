@@ -80,9 +80,6 @@ class SurfaceMeshControls : public SideBarItem
     int        wireframe_width   = 1;
     int        marked_edge_width = 1;
     int        isoline_width     = 1;
-    int        text_1d           = TEXTURE_1D_ISOLINES;
-    int        text_2d           = TEXTURE_2D_ISOLINES;
-    float      text_scale_factor = 1.0;
     float      wireframe_alpha   = 1;
     float      vecfield_size     = 0.9;
     float      iso_val           = 0.5;
@@ -110,18 +107,17 @@ class SurfaceMeshControls : public SideBarItem
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // tematic collapsing headers
-        void header_IO          (const bool show_open);
-        void header_shading     (const bool show_open);
-        void header_wireframe   (const bool show_open);
-        void header_colors      (const bool show_open);
-        void header_textures    (const bool show_open);
-        void header_scalar_field(const bool show_open);
-        void header_vector_field(const bool show_open);
-        void header_isoline     (const bool show_open);
-        void header_slicing     (const bool show_open);
-        void header_marked_edges(const bool show_open);
-        void header_actions     (const bool show_open);
-        void header_normals     (const bool show_open);
+        void header_IO             (const bool show_open);
+        void header_shading        (const bool show_open);
+        void header_wireframe      (const bool show_open);
+        void header_colors_textures(const bool show_open);
+        void header_textures       (const bool show_open);
+        void header_vector_field   (const bool show_open);
+        void header_isoline        (const bool show_open);
+        void header_slicing        (const bool show_open);
+        void header_marked_edges   (const bool show_open);
+        void header_actions        (const bool show_open);
+        void header_normals        (const bool show_open);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

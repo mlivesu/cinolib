@@ -48,7 +48,7 @@ namespace cinolib
 template<class Mesh>
 class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 {
-    protected:
+    public:
 
         Material   material_;
         RenderData drawlist;
@@ -56,7 +56,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         Color      marked_edge_color;
         float      AO_alpha = 1.0;
 
-    public:
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         explicit AbstractDrawablePolygonMesh() : Mesh() {}
 

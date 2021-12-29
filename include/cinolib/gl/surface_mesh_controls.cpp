@@ -61,18 +61,16 @@ void SurfaceMeshControls<Mesh>::draw()
 {
     if(m==nullptr || gui==nullptr) return;
 
-    header_IO          (false);
-    header_shading     (false);
-    header_wireframe   (false);
-    header_colors      (false);
-    header_textures    (false);
-    header_scalar_field(false);
-    header_vector_field(false);
-    header_isoline     (false);
-    header_slicing     (false);
-    header_marked_edges(false);
-    header_normals     (false);
-    header_actions     (false);
+    header_IO             (false);
+    header_shading        (false);
+    header_wireframe      (false);
+    header_colors_textures(false);
+    header_vector_field   (false);
+    header_isoline        (false);
+    header_slicing        (false);
+    header_marked_edges   (false);
+    header_normals        (false);
+    header_actions        (false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -140,123 +138,106 @@ void SurfaceMeshControls<Mesh>::header_wireframe(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_colors(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_colors_textures(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Colors"))
+    if(ImGui::CollapsingHeader("Colors/Textures"))
     {
-        if(ImGui::ColorEdit4("Vert Color", vert_color.rgba, color_edit_flags))
+        if(ImGui::BeginTable("Color by:",2))
         {
-            m->vert_set_color(vert_color);
-            m->show_vert_color();
-        }
-        ImGui::SameLine();
-        if(ImGui::SmallButton("Vert"))
-        {
-            m->show_vert_color();
-        }
-        if(ImGui::ColorEdit4("Poly Color", poly_color.rgba, color_edit_flags))
-        {
-            m->poly_set_color(poly_color);
-            m->show_poly_color();
-        }
-        ImGui::SameLine();
-        if(ImGui::SmallButton("Poly"))
-        {
-            m->show_poly_color();
-        }
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class Mesh>
-CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_textures(const bool show_open)
-{
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Textures"))
-    {
-        if(ImGui::SmallButton("Isolines"))
-        {
-            text_2d = TEXTURE_2D_ISOLINES;
-            m->show_texture2D(text_2d,text_scale_factor);
-        }
-        if(ImGui::SmallButton("Checkerboard"))
-        {
-            text_2d = TEXTURE_2D_CHECKERBOARD;
-            m->show_texture2D(text_2d,text_scale_factor);
-        }
-        if(ImGui::SmallButton("Load..."))
-        {
-            std::string filename = file_dialog_open();
-            if(!filename.empty())
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if(ImGui::RadioButton("Vert", m->drawlist.draw_mode & DRAW_TRI_VERTCOLOR))
             {
-                text_2d = TEXTURE_2D_BITMAP;
-                m->show_texture2D(text_2d, text_scale_factor, filename.c_str());
+                m->show_vert_color();
             }
-        }
-        if(ImGui::SliderFloat("Scaling", &text_scale_factor, 0.01, 100))
-        {
-            if(text_2d==TEXTURE_2D_BITMAP) text_2d = TEXTURE_2D_ISOLINES;
-            m->show_texture2D(text_2d,text_scale_factor);
-        }
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class Mesh>
-CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_scalar_field(const bool show_open)
-{
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Scalar Field"))
-    {        
-        if(ImGui::SmallButton("Load##scfield"))
-        {
-            std::string filename = file_dialog_open();
-            if(!filename.empty())
+            ImGui::TableNextColumn();
+            if(ImGui::ColorEdit4("##VertColor", vert_color.rgba, color_edit_flags))
             {
-                ScalarField sf(filename.c_str());
-                if ((uint)sf.size() == m->num_verts()) sf.copy_to_mesh(*m);
-                else std::cerr << "Could not load scalar field " << filename << " - array size mismatch!" << std::endl;
+                m->vert_set_color(vert_color);
+                m->show_vert_color();
             }
-        }
-        ImGui::SameLine();
-        if(ImGui::SmallButton("Save##scfield"))
-        {
-            std::string filename = file_dialog_save();
-            if(!filename.empty())
+            //
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if(ImGui::RadioButton("Poly", m->drawlist.draw_mode & DRAW_TRI_FACECOLOR))
             {
-                ScalarField sf(m->serialize_uvw(U_param));
-                sf.serialize(filename.c_str());
+                m->show_poly_color();
             }
-        }
-        if(ImGui::SmallButton("Isolines"))
-        {
-            text_1d = TEXTURE_1D_ISOLINES;
-            m->show_texture1D(text_1d);
-        }
-        if(ImGui::SmallButton("HSV"))
-        {
-            text_1d = TEXTURE_1D_HSV;
-            m->show_texture1D(text_1d);
-        }
-        if(ImGui::SmallButton("HSV + ISO"))
-        {
-            text_1d = TEXTURE_1D_HSV_W_ISOLINES;
-            m->show_texture1D(text_1d);
-        }
-        if(ImGui::SmallButton("Parula"))
-        {
-            text_1d = TEXTURE_1D_PARULA;
-            m->show_texture1D(text_1d);
-        }
-        if(ImGui::SmallButton("Parula + ISO"))
-        {
-            text_1d = TEXTURE_1D_PARULA_W_ISOLINES;
-            m->show_texture1D(text_1d);
+            ImGui::TableNextColumn();
+            if(ImGui::ColorEdit4("##PolyColor", poly_color.rgba, color_edit_flags))
+            {
+                m->poly_set_color(poly_color);
+                m->show_poly_color();
+            }
+            //
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if(ImGui::RadioButton("Tex 1D", m->drawlist.draw_mode & DRAW_TRI_TEXTURE1D))
+            {
+                m->show_texture1D(m->drawlist.texture.type);
+            }
+            ImGui::TableNextColumn();
+            if(ImGui::Combo("##1DTexture", &m->drawlist.texture.type, "Isolines\0HSV\0HSV+Isolines\0Parula\0Parula+Isolines\0"))
+            {
+                m->show_texture1D(m->drawlist.texture.type);
+            }
+            //
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if(ImGui::RadioButton("Tex 2D", m->drawlist.draw_mode & DRAW_TRI_TEXTURE2D))
+            {
+                // m->drawlist.texture.type indexes both 1D and 2D textures, but there are more 1D than 2D!
+                if(m->drawlist.texture.type<2) m->show_texture2D(m->drawlist.texture.type, m->drawlist.texture.scaling_factor);
+            }
+            ImGui::TableNextColumn();
+            if(ImGui::Combo("##2DTexture", &m->drawlist.texture.type, "Isolines\0Checkerboard\0File\0"))
+            {
+                switch(m->drawlist.texture.type)
+                {
+                    case TEXTURE_2D_ISOLINES:
+                    case TEXTURE_2D_CHECKERBOARD: m->show_texture2D(m->drawlist.texture.type, m->drawlist.texture.scaling_factor); break;
+                    case TEXTURE_2D_BITMAP:
+                    {
+                        std::string filename = file_dialog_open();
+                        if(!filename.empty())
+                        {
+                            m->show_texture2D(TEXTURE_2D_BITMAP, m->drawlist.texture.scaling_factor, filename.c_str());
+                        }
+                        break;
+                    }
+                    default : break; // texture.type indexes both 1D and 2D textures, but there are more 1D indices than 2D!
+                }
+            }
+            ImGui::EndTable();
+            //
+            if(ImGui::SliderFloat("Tex scaling", &m->drawlist.texture.scaling_factor, 0.01, 100))
+            {
+                if(m->drawlist.texture.type!=TEXTURE_2D_BITMAP)
+                {
+                    m->show_texture2D(m->drawlist.texture.type,m->drawlist.texture.scaling_factor);
+                }
+            }
+            //
+            if(ImGui::SmallButton("Load 1D field"))
+            {
+                std::string filename = file_dialog_open();
+                if(!filename.empty())
+                {
+                    ScalarField sf(filename.c_str());
+                    if ((uint)sf.size() == m->num_verts()) sf.copy_to_mesh(*m);
+                    else std::cerr << "Could not load scalar field " << filename << " - array size mismatch!" << std::endl;
+                }
+            }
+            if(ImGui::SmallButton("Save 1D field"))
+            {
+                std::string filename = file_dialog_save();
+                if(!filename.empty())
+                {
+                    ScalarField sf(m->serialize_uvw(U_param));
+                    sf.serialize(filename.c_str());
+                }
+            }
         }
     }
 }
@@ -542,7 +523,7 @@ void SurfaceMeshControls<Mesh>::header_actions(const bool show_open)
             m->edge_mark_sharp_creases(to_rad(crease_deg));
             refresh = true;
         }
-        ImGui::InputInt("Crease deg", &crease_deg);
+        ImGui::InputInt("deg", &crease_deg);
 
         if(refresh) m->updateGL();
     }

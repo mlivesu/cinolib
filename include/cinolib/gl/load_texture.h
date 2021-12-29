@@ -70,7 +70,7 @@ struct Texture
 {
     int    type;
     GLuint id             = 0;
-    double scaling_factor = 1.0;
+    float  scaling_factor = 1.0;
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
