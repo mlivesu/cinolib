@@ -75,7 +75,7 @@ class SideBarItem
     public :
 
         std::string name;
-        bool        show = true;
+        bool        show_open = false;
 
         explicit  SideBarItem(const std::string & name) : name(name) {}
         virtual  ~SideBarItem() {}

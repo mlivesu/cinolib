@@ -388,18 +388,20 @@ void GLcanvas::draw_markers() const
 CINO_INLINE
 void GLcanvas::draw_side_bar() const
 {
+    ImGui::SetNextWindowPos({0,0}, ImGuiCond_Once);
+    ImGui::SetNextWindowSize({camera.width*side_bar_width, camera.height*1.f}, ImGuiCond_Once);
+    ImGui::SetNextWindowBgAlpha(side_bar_alpha);
+    ImGui::Begin("##SideBar");
     for(auto item : side_bar_items)
     {
-        if(item->show)
+        ImGui::SetNextItemOpen(item->show_open,ImGuiCond_Once);
+        if(ImGui::TreeNode(item->name.c_str()))
         {
-            ImGui::SetNextWindowPos({0,0}, ImGuiCond_Once);
-            ImGui::SetNextWindowSize({camera.width*side_bar_width, camera.height*1.f}, ImGuiCond_Once);
-            ImGui::SetNextWindowBgAlpha(side_bar_alpha);
-            ImGui::Begin(item->name.c_str(), &item->show);
             item->draw();
-            ImGui::End();
+            ImGui::TreePop();
         }
     }
+    ImGui::End();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
