@@ -112,10 +112,10 @@ void SurfaceMeshControls<Mesh>::header_shading(const bool show_open)
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
     if(ImGui::CollapsingHeader("Shading"))
     {
-        if(ImGui::Checkbox("Show##mesh", &show_mesh))  m->show_mesh(show_mesh);
-        if(ImGui::RadioButton("Point ",  &shading, 0)) m->show_mesh_points();
-        if(ImGui::RadioButton("Flat  ",  &shading, 1)) m->show_mesh_flat();
-        if(ImGui::RadioButton("Smooth",  &shading, 2)) m->show_mesh_smooth();
+        if(ImGui::Checkbox("Show##mesh", &show_mesh)) m->show_mesh(show_mesh);
+        if(ImGui::RadioButton("Point ",  m->drawlist.draw_mode & DRAW_TRI_POINTS)) m->show_mesh_points();
+        if(ImGui::RadioButton("Flat  ",  m->drawlist.draw_mode & DRAW_TRI_FLAT  )) m->show_mesh_flat();
+        if(ImGui::RadioButton("Smooth",  m->drawlist.draw_mode & DRAW_TRI_SMOOTH)) m->show_mesh_smooth();
     }
 }
 
