@@ -437,12 +437,12 @@ int GLcanvas::main_loop(std::vector<GLcanvas*> guis)
 
             if(glfwWindowShouldClose(gui->window))
             {
-                exit(EXIT_SUCCESS);
+                return EXIT_SUCCESS;
             }
         }
         glfwPollEvents();
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
