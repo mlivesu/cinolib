@@ -109,7 +109,13 @@ class GLcanvas
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        static int main_loop(std::vector<GLcanvas *> guis); // infinite loop that interleaves rendering and event handling
+        // Main application loop. This is the typical return statement in
+        // the main of your application. It consists in an infinite loop
+        // that interleaves rendering and event handling. Since there may be
+        // multiple windows in your app, this is a static member that receives
+        // in input a vector of pointers to each window. Closing *any* of the
+        // windows will cause a termination of the program.
+        static int main_loop(std::vector<GLcanvas*> guis);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
