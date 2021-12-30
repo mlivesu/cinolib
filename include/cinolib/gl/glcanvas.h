@@ -64,8 +64,8 @@ struct Trackball
 {
     vec2d last_click_2d = vec2d(inf_double);
     vec3d last_click_3d = vec3d(inf_double);
-    std::chrono::high_resolution_clock::time_point t_last_click;
     bool  mouse_pressed = false;
+    std::chrono::high_resolution_clock::time_point t_last_click;
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -89,9 +89,8 @@ class GLcanvas
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // ImGui and GLFW do not yet handle multi windows properly.
-        // This variable ensuring that only one window will create
-        // and handle the ImGui context. This is going to be the first
-        // GLcanvas created in the app, and it means that only that
+        // This variable ensures that only one window will create
+        // and handle the ImGui context. meaning that only that
         // window will benefit from the functionalities implemented
         // with ImGui, such as the side bar with visual controls and
         // visual markers
