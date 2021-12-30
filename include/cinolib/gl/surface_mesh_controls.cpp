@@ -77,9 +77,9 @@ void SurfaceMeshControls<Mesh>::draw()
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_IO(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_IO(const bool open)
 {
-    ImGui::SetNextItemOpen(show_open, ImGuiCond_Once);
+    ImGui::SetNextItemOpen(open, ImGuiCond_Once);
     if(ImGui::TreeNode("IO"))
     {
         if(ImGui::SmallButton("Load"))
@@ -108,9 +108,9 @@ void SurfaceMeshControls<Mesh>::header_IO(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_shading(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_shading(const bool open)
 {
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Shading"))
     {
         if(ImGui::Checkbox("Show##mesh", &show_mesh)) m->show_mesh(show_mesh);
@@ -125,9 +125,9 @@ void SurfaceMeshControls<Mesh>::header_shading(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_wireframe(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_wireframe(const bool open)
 {
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Wireframe"))
     {
         if(ImGui::Checkbox   ("Show",         &show_wireframe        )) m->show_wireframe(show_wireframe);
@@ -141,9 +141,9 @@ void SurfaceMeshControls<Mesh>::header_wireframe(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_colors_textures(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_colors_textures(const bool open)
 {
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Colors/Textures"))
     {
         if(ImGui::BeginTable("Color by:",2))
@@ -250,9 +250,9 @@ void SurfaceMeshControls<Mesh>::header_colors_textures(const bool show_open)
 
 template<class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_isoline(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_isoline(const bool open)
 {
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Isolines"))
     {
         auto update_isoline = [&]()
@@ -305,9 +305,9 @@ void SurfaceMeshControls<Mesh>::header_isoline(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_vector_field(const bool open)
 {
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Vector Fields"))
     {
         if(ImGui::Checkbox("Show##vecfield", &show_vecfield))
@@ -361,9 +361,9 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_slicing(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_slicing(const bool open)
 {
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Slicing"))
     {
         bool refresh = false;
@@ -408,9 +408,9 @@ void SurfaceMeshControls<Mesh>::header_slicing(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_marked_edges(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_marked_edges(const bool open)
 {
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Marked Edges"))
     {
         if(ImGui::Checkbox("Show##MarkedEdge", &show_marked_edges))
@@ -435,9 +435,9 @@ void SurfaceMeshControls<Mesh>::header_marked_edges(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_normals(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_normals(const bool open)
 {
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Normals"))
     {
         if(ImGui::Checkbox("Show Face Normals", &show_face_normals))
@@ -496,9 +496,9 @@ void SurfaceMeshControls<Mesh>::header_normals(const bool show_open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_actions(const bool show_open)
+void SurfaceMeshControls<Mesh>::header_actions(const bool open)
 {
-    ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Actions"))
     {
         bool refresh = false;

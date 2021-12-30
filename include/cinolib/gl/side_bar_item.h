@@ -45,26 +45,27 @@ namespace cinolib
  * This class models a generic ImGui widget to be displayed inside a cinolib::GLcanvas
  *
  * Each item must be associated with a unique name, whch is internally used by ImGui
- * to distinguish between the various items. Ideally, each SideBarItem models a collapsible
- * header containing some controls (buttons, sliders,...). Pushing two items with same name
+ * to distinguish between the various items. Each SideBarItem populates a TreeNode
+ * containing some controls (buttons, sliders,...). Pushing two items with same name
  * in the same canvas will result in a window containing both controls (and likely a bug)
  *
  * All controls and relative event handling must be implemented in the draw() method.
  * This function will be called by the GLcanvas from within a code block similar to:
  *
  *     ImGui::NewFrame();
+ *     ImGui::Begin();
  *     {
  *          for each side bar item it
  *          {
- *              if(it->show)
+ *              ImGui::SetNextItemOpen(it->show_open,ImGuiCond_Once);
+ *              if(ImGui::TreeNode(it->name.c_str()))
  *              {
- *                  ImGui::Begin(it->name, it->show);
-                    vc->draw();
- *                  ImGui::End();
+                    it->draw();
+ *                  ImGui::TreePop();
  *              }
  *          }
  *     }
- *     ImGui::Render();
+ *     ImGui::End();
  *
  * Therefore, draw() is expected to only contain code for the controls themselves,
  * and not for window/frame handling.
