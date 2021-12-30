@@ -77,13 +77,25 @@ class GLcanvas
         GLFWwindow                        *window;
         std::vector<const DrawableObject*> drawlist;
         std::vector<Marker>                markers;
+        bool                               with_side_bar;
         std::vector<SideBarItem*>          side_bar_items;
         float                              side_bar_width     = 0.25;
         float                              side_bar_alpha     = 1.0;
-        double                             DPI_factor;
         int                                font_size          = 13;
         bool                               show_axis          = false;
         bool                               depth_cull_markers = false; // skip occluded 3D markers, testing their depth with the Z-buffer
+        double                             DPI_factor;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        // ImGui and GLFW do not yet handle multi windows properly.
+        // This variable ensuring that only one window will create
+        // and handle the ImGui context. This is going to be the first
+        // GLcanvas created in the app, and it means that only that
+        // window will benefit from the functionalities implemented
+        // with ImGui, such as the side bar with visual controls and
+        // visual markers
+        bool owns_ImGui = false;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -92,12 +104,12 @@ class GLcanvas
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-         GLcanvas(const int width = 640, const int height = 480);
+         GLcanvas(const int width = 700, const int height = 700);
         ~GLcanvas();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        int launch() const; // infinite loop, interleaves rendering and event handling
+        static int main_loop(std::vector<GLcanvas *> guis); // infinite loop that interleaves rendering and event handling
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

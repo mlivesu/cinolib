@@ -50,6 +50,12 @@ namespace cinolib
 CINO_INLINE
 GLcanvas::GLcanvas(const int width, const int height)
 {
+    // make sure that only the first window
+    // in the app creates a ImGui context
+    static int window_count = 0;
+    owns_ImGui = (window_count==0);
+    window_count++;
+
     camera = Camera<double>(width,height);
     camera.toggle_persp_ortho(); // make it perspective
 
@@ -86,19 +92,22 @@ GLcanvas::GLcanvas(const int width, const int height)
     // to handle high DPI displays
     update_DPI_factor();
 
-    // initialize ImGui backend for visual controls...
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, false);
-    ImGui_ImplOpenGL2_Init();
-    // NOTE: since ImGui does not support dynamic font sizing, I am using oversized fonts
-    // (10x) to account for zoom factor (downscaling is visually better than upscaling)
-    // https://github.com/ocornut/imgui/issues/797
-    ImGuiIO &io = ImGui::GetIO();
-    io.Fonts->Clear();
-    io.Fonts->AddFontFromMemoryCompressedTTF(droid_sans_data, droid_sans_size, font_size*10);
-    io.FontGlobalScale = 0.1; // compensate for high-res fonts
+    if(owns_ImGui)
+    {
+        // initialize ImGui backend for visual controls...
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui::StyleColorsDark();
+        ImGui_ImplGlfw_InitForOpenGL(window, false);
+        ImGui_ImplOpenGL2_Init();
+        // NOTE: since ImGui does not support dynamic font sizing, I am using oversized fonts
+        // (10x) to account for zoom factor (downscaling is visually better than upscaling)
+        // https://github.com/ocornut/imgui/issues/797
+        ImGuiIO &io = ImGui::GetIO();
+        io.Fonts->Clear();
+        io.Fonts->AddFontFromMemoryCompressedTTF(droid_sans_data, droid_sans_size, font_size*10);
+        io.FontGlobalScale = 0.1; // compensate for high-res fonts
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -106,9 +115,12 @@ GLcanvas::GLcanvas(const int width, const int height)
 CINO_INLINE
 GLcanvas::~GLcanvas()
 {
-    ImGui_ImplOpenGL2_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    if(owns_ImGui)
+    {
+        ImGui_ImplOpenGL2_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+    }
     glfwDestroyWindow(window);
     glfwTerminate();
 }
@@ -270,14 +282,17 @@ void GLcanvas::draw() const
     // draw your 3D scene
     for(auto obj : drawlist) obj->draw();
 
-    // draw markers and visual controls
-    ImGui_ImplOpenGL2_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    draw_markers();
-    draw_side_bar();
-    ImGui::Render();
-    ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+    if(owns_ImGui)
+    {
+        // draw markers and visual controls
+        ImGui_ImplOpenGL2_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        draw_markers();
+        draw_side_bar();
+        ImGui::Render();
+        ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+    }
 
     if(show_axis) draw_axis();
 
@@ -314,6 +329,8 @@ void GLcanvas::draw_axis() const
 CINO_INLINE
 void GLcanvas::draw_markers() const
 {
+    assert(owns_ImGui && "Only the first canvas created handles the ImGui context");
+
     if(markers.empty()) return;
 
     ImGui::SetNextWindowPos(ImVec2(0,0), ImGuiCond_Always);
@@ -388,6 +405,8 @@ void GLcanvas::draw_markers() const
 CINO_INLINE
 void GLcanvas::draw_side_bar() const
 {
+    assert(owns_ImGui && "Only the first canvas created handles the ImGui context");
+
     ImGui::SetNextWindowPos({0,0}, ImGuiCond_Once);
     ImGui::SetNextWindowSize({camera.width*side_bar_width, camera.height*1.f}, ImGuiCond_Once);
     ImGui::SetNextWindowBgAlpha(side_bar_alpha);
@@ -407,11 +426,20 @@ void GLcanvas::draw_side_bar() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-int GLcanvas::launch() const
+int GLcanvas::main_loop(std::vector<GLcanvas*> guis)
 {
-    while(!glfwWindowShouldClose(window))
+    while(true)
     {
-        draw();
+        for(auto gui : guis)
+        {
+            glfwMakeContextCurrent(gui->window);
+            gui->draw();
+
+            if(glfwWindowShouldClose(gui->window))
+            {
+                exit(EXIT_SUCCESS);
+            }
+        }
         glfwPollEvents();
     }
     return 0;
