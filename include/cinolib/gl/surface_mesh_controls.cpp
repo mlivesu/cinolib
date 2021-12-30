@@ -80,7 +80,7 @@ CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_IO(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open, ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("IO"))
+    if(ImGui::TreeNode("IO"))
     {
         if(ImGui::SmallButton("Load"))
         {
@@ -100,6 +100,7 @@ void SurfaceMeshControls<Mesh>::header_IO(const bool show_open)
                 m->save(filename.c_str());
             }
         }
+        ImGui::TreePop();
     }
 }
 
@@ -110,12 +111,13 @@ CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_shading(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Shading"))
+    if(ImGui::TreeNode("Shading"))
     {
         if(ImGui::Checkbox("Show##mesh", &show_mesh)) m->show_mesh(show_mesh);
         if(ImGui::RadioButton("Point ",  m->drawlist.draw_mode & DRAW_TRI_POINTS)) m->show_mesh_points();
         if(ImGui::RadioButton("Flat  ",  m->drawlist.draw_mode & DRAW_TRI_FLAT  )) m->show_mesh_flat();
         if(ImGui::RadioButton("Smooth",  m->drawlist.draw_mode & DRAW_TRI_SMOOTH)) m->show_mesh_smooth();
+        ImGui::TreePop();
     }
 }
 
@@ -126,11 +128,12 @@ CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_wireframe(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Wireframe"))
+    if(ImGui::TreeNode("Wireframe"))
     {
         if(ImGui::Checkbox   ("Show",         &show_wireframe        )) m->show_wireframe(show_wireframe);
         if(ImGui::SliderInt  ("Width",        &wireframe_width, 1, 10)) m->show_wireframe_width(wireframe_width);
         if(ImGui::SliderFloat("Transparency", &wireframe_alpha, 0,  1)) m->show_wireframe_transparency(wireframe_alpha);
+        ImGui::TreePop();
     }
 }
 
@@ -141,7 +144,7 @@ CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_colors_textures(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Colors/Textures"))
+    if(ImGui::TreeNode("Colors/Textures"))
     {
         if(ImGui::BeginTable("Color by:",2))
         {
@@ -239,6 +242,7 @@ void SurfaceMeshControls<Mesh>::header_colors_textures(const bool show_open)
                 }
             }
         }
+        ImGui::TreePop();
     }
 }
 
@@ -249,7 +253,7 @@ CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_isoline(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Isolines"))
+    if(ImGui::TreeNode("Isolines"))
     {
         auto update_isoline = [&]()
         {
@@ -293,6 +297,7 @@ void SurfaceMeshControls<Mesh>::header_isoline(const bool show_open)
                 update_isoline();
             }
         }
+        ImGui::TreePop();
     }
 }
 
@@ -303,7 +308,7 @@ CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Vector Fields"))
+    if(ImGui::TreeNode("Vector Fields"))
     {
         if(ImGui::Checkbox("Show##vecfield", &show_vecfield))
         {
@@ -348,6 +353,7 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool show_open)
         {
             vec_field.set_arrow_color(vec_color);
         }
+        ImGui::TreePop();
     }
 }
 
@@ -358,7 +364,7 @@ CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_slicing(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Slicing"))
+    if(ImGui::TreeNode("Slicing"))
     {
         bool refresh = false;
         if(ImGui::SmallButton("Copy"))
@@ -394,6 +400,7 @@ void SurfaceMeshControls<Mesh>::header_slicing(const bool show_open)
             slicer.slice(*m);
             m->updateGL();
         }
+        ImGui::TreePop();
     }
 }
 
@@ -404,7 +411,7 @@ CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_marked_edges(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Marked Edges"))
+    if(ImGui::TreeNode("Marked Edges"))
     {
         if(ImGui::Checkbox("Show##MarkedEdge", &show_marked_edges))
         {
@@ -420,6 +427,7 @@ void SurfaceMeshControls<Mesh>::header_marked_edges(const bool show_open)
             m->show_marked_edge_color(marked_edge_color);
             m->updateGL();
         }
+        ImGui::TreePop();
     }
 }
 
@@ -430,7 +438,7 @@ CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_normals(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Normals"))
+    if(ImGui::TreeNode("Normals"))
     {
         if(ImGui::Checkbox("Show Face Normals", &show_face_normals))
         {
@@ -480,6 +488,7 @@ void SurfaceMeshControls<Mesh>::header_normals(const bool show_open)
                 gui->pop(&vert_normals);
             }
         }
+        ImGui::TreePop();
     }
 }
 
@@ -490,7 +499,7 @@ CINO_INLINE
 void SurfaceMeshControls<Mesh>::header_actions(const bool show_open)
 {
     ImGui::SetNextItemOpen(show_open,ImGuiCond_Once);
-    if(ImGui::CollapsingHeader("Actions"))
+    if(ImGui::TreeNode("Actions"))
     {
         bool refresh = false;
         if(ImGui::SmallButton("Unmark all edges"))
@@ -526,6 +535,7 @@ void SurfaceMeshControls<Mesh>::header_actions(const bool show_open)
         ImGui::InputInt("deg", &crease_deg);
 
         if(refresh) m->updateGL();
+        ImGui::TreePop();
     }
 }
 
