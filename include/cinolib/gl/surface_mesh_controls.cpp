@@ -39,6 +39,7 @@
 #include <cinolib/gl/file_dialog_save.h>
 #include <cinolib/gradient.h>
 #include <cinolib/scalar_field.h>
+#include <cinolib/string_utilities.h>
 #include <iostream>
 #include <sstream>
 
@@ -51,7 +52,10 @@ SurfaceMeshControls<Mesh>::SurfaceMeshControls(Mesh *m, GLcanvas *gui, const std
     : SideBarItem(_name)
     , m(m)
     , gui(gui)
-{}
+{
+    // if no name is provided, assign name memorized in the mesh data (typically the filename)
+    if(_name.empty()) this->name = get_file_name(m->mesh_data().filename);
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

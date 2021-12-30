@@ -96,7 +96,7 @@ class SurfaceMeshControls : public SideBarItem
 
     public:
 
-        SurfaceMeshControls(Mesh *m, GLcanvas *gui, const std::string & name);
+        SurfaceMeshControls(Mesh *m, GLcanvas *gui, const std::string & name = "");
        ~SurfaceMeshControls() override {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
