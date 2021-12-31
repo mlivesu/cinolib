@@ -365,9 +365,10 @@ void GLcanvas::draw_markers() const
             int x  = pos.x()*DPI_factor;
             int y  = pos.y()*DPI_factor;
             // marker is outside the frustum
-            if(z<0 || z>=1 || x<0 || x>=W || y<0 || y>=H) continue;
+            if(z<0 || z>=1 || x<=0 || x>=W || y<=0 || y>=H) continue;
             // marker is occluded in the current view
-            if(depth_cull_markers && fabs(z-z_buf[x+W*(H-y)])>0.01) continue;
+            assert((x+W*(H-y-1)<W*H));
+            if(depth_cull_markers && fabs(z-z_buf[x+W*(H-y-1)])>0.01) continue;
         }
         // adjust marker size based on zoom
         auto zoom_factor = clamp(camera.zoom_factor, 1e-5, 1e10); // avoids overflow inside ImGui radius calculation
@@ -394,7 +395,7 @@ void GLcanvas::draw_markers() const
                               &m.text[0] + m.text.size());
         }
     }
-    delete[] z_buf;
+    if(depth_cull_markers) delete[] z_buf;
     ImGui::End();
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();
