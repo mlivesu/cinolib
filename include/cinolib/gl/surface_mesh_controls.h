@@ -64,7 +64,7 @@ class SurfaceMeshControls : public SideBarItem
 
     DrawableIsocontour<M,V,E,P> isocontour;
     DrawableVectorField         vec_field;
-    DrawableSegmentSoup         face_normals;
+    DrawableSegmentSoup         poly_normals;
     DrawableSegmentSoup         vert_normals;
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -91,6 +91,8 @@ class SurfaceMeshControls : public SideBarItem
     bool       show_poly_ids     = false;
     Color      vert_color        = Color::WHITE();
     Color      poly_color        = Color::WHITE();
+    Color      vert_debug_color  = Color::RED();
+    Color      poly_debug_color  = Color::BLUE();
     Color      iso_color         = Color::RED();
     Color      vec_color         = Color::RED();
     Color      marked_edge_color = Color::RED();

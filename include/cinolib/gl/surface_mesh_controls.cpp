@@ -444,13 +444,13 @@ void SurfaceMeshControls<Mesh>::header_debug(const bool open)
     ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Debug"))
     {
-        if(ImGui::Checkbox("Show Face Normals", &show_face_normals))
+        if(ImGui::Checkbox("Show Poly Normals", &show_face_normals))
         {
             if(show_face_normals)
             {
-                face_normals.clear();
-                face_normals.set_cheap_rendering(true);
-                face_normals.set_color(Color::BLUE());
+                poly_normals.clear();
+                poly_normals.set_cheap_rendering(true);
+                poly_normals.set_color(poly_debug_color);
                 double l = gui->camera.scene_radius/5.0;
                 for(uint pid=0; pid<m->num_polys(); ++pid)
                 {
@@ -458,14 +458,14 @@ void SurfaceMeshControls<Mesh>::header_debug(const bool open)
                     {
                         vec3d n = m->poly_data(pid).normal;
                         vec3d c = m->poly_centroid(pid);
-                        face_normals.push_seg(c, c+(n*l));
+                        poly_normals.push_seg(c, c+(n*l));
                     }
                 }
-                gui->push(&face_normals,false);
+                gui->push(&poly_normals,false);
             }
             else
             {
-                gui->pop(&face_normals);
+                gui->pop(&poly_normals);
             }
         }
         if(ImGui::Checkbox("Show Vert Normals", &show_vert_normals))
@@ -474,7 +474,7 @@ void SurfaceMeshControls<Mesh>::header_debug(const bool open)
             {
                 vert_normals.clear();
                 vert_normals.set_cheap_rendering(true);
-                vert_normals.set_color(Color::RED());
+                vert_normals.set_color(vert_debug_color);
                 double l = gui->camera.scene_radius/5.0;
                 for(uint vid=0; vid<m->num_verts(); ++vid)
                 {
@@ -492,43 +492,35 @@ void SurfaceMeshControls<Mesh>::header_debug(const bool open)
                 gui->pop(&vert_normals);
             }
         }
-        auto update_vert_ids = [&]()
-        {
-            for(uint vid=0; vid<m->num_verts(); ++vid)
-            {
-                if(m->vert_is_visible(vid))
-                {
-                    gui->push_marker(m->vert(vid), std::to_string(vid), Color::BLUE(), marker_size, marker_font_size);
-                }
-            }
-        };
-        auto update_poly_ids = [&]()
-        {
-            for(uint pid=0; pid<m->num_polys(); ++pid)
-            {
-                if(!m->poly_data(pid).flags[HIDDEN])
-                {
-                    gui->push_marker(m->poly_centroid(pid), std::to_string(pid), Color::BLUE(), marker_size, marker_font_size);
-                }
-            }
-        };
-        if(ImGui::Checkbox("Show Vert IDs", &show_vert_ids))
-        {
-            if(show_vert_ids) update_vert_ids();
-            else              gui->pop_all_markers();
-        }
-        if(ImGui::Checkbox("Show Poly IDs", &show_poly_ids))
-        {
-            if(show_poly_ids) update_poly_ids();
-            else              gui->pop_all_markers();
-        }
-        if(ImGui::Checkbox("Depth Cull IDs", &gui->depth_cull_markers) ||
-           ImGui::SliderInt("Font", &marker_font_size, 4,15)           ||
-           ImGui::SliderInt("Disk", &marker_size, 0,10)                )
+        if(ImGui::Checkbox("Show Vert IDs", &show_vert_ids)                           ||
+           ImGui::Checkbox("Show Poly IDs", &show_poly_ids)                           ||
+           ImGui::Checkbox("Depth Cull IDs", &gui->depth_cull_markers)                ||
+           ImGui::SliderInt("Font", &marker_font_size, 4,15)                          ||
+           ImGui::SliderInt("Disk", &marker_size, 0,10)                               ||
+           ImGui::ColorEdit4("VertID Color", vert_debug_color.rgba, color_edit_flags) ||
+           ImGui::ColorEdit4("PolyID Color", poly_debug_color.rgba, color_edit_flags))
         {
             gui->pop_all_markers();
-            if(show_vert_ids) update_vert_ids();
-            if(show_poly_ids) update_poly_ids();
+            if(show_vert_ids)
+            {
+                for(uint vid=0; vid<m->num_verts(); ++vid)
+                {
+                    if(m->vert_is_visible(vid))
+                    {
+                        gui->push_marker(m->vert(vid), std::to_string(vid), vert_debug_color, marker_size, marker_font_size);
+                    }
+                }
+            }
+            if(show_poly_ids)
+            {
+                for(uint pid=0; pid<m->num_polys(); ++pid)
+                {
+                    if(!m->poly_data(pid).flags[HIDDEN])
+                    {
+                        gui->push_marker(m->poly_centroid(pid), std::to_string(pid), poly_debug_color, marker_size, marker_font_size);
+                    }
+                }
+            }
         }
         ImGui::TreePop();
     }
