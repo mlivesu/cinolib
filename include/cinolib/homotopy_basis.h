@@ -67,6 +67,10 @@ namespace cinolib
  *    Globally Optimal Surface Mapping for Surfaces with Arbitrary Topology
  *    Xin Li, Yunfan Bao, Xiaohu Guo, Miao Jin, Xianfeng Gu and Hong Qin
  *    IEEE Transactions on Visualization and Computer Graphics, 2008
+ *
+ * NOTE: after having computed a fully detached system of loops, one can 
+ * flatten the mesh on the plane using the Tutte embedding using the code
+ * in cinolib/canonical_polygonal_schema.h
  */
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -708,7 +708,12 @@ T mat_det(const T m[][d])
                                     m[1][0], m[1][1], m[1][2],
                                     m[2][0], m[2][1], m[2][2]);
 
-        default: assert(false && "mat_determinant: unsupported matrix size");
+        default:
+        {
+            typedef Eigen::Matrix<T,d,d,Eigen::RowMajor> M;
+            Eigen::Map<const M> tmp(m[0]);
+            return tmp.determinant();
+        }
     }
 }
 
@@ -767,12 +772,12 @@ void mat_inverse(const T m[][d], T in[][d])
             in[1][1] =  m[0][0] * one_over_det;
         }
 
-        default:
+        default: // up to 4x4 matrices with Eigen
         {
             typedef Eigen::Matrix<T,d,d,Eigen::RowMajor> M;
-            Eigen::Map<const M> _m(m[0]);
-            Eigen::Map<M> _in(in[0]);
-            _in = _m.inverse();
+            Eigen::Map<const M> tmp_m(m[0]);
+            Eigen::Map<M> tmp_in(in[0]);
+            tmp_in = tmp_m.inverse();
         }
     }
 }
