@@ -151,6 +151,8 @@ void GLcanvas::push(SideBarItem *item)
 CINO_INLINE
 void GLcanvas::push(const Marker & m)
 {
+    // ImGui uses 16 bits to index items. It cannot handle more than this
+    //if(markers.size() >= (1 << 16)) return;
     markers.push_back(m);
 }
 
@@ -338,13 +340,14 @@ void GLcanvas::draw_markers() const
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
     bool visible = true;
-    ImGui::Begin("Markers", &visible, ImGuiWindowFlags_NoTitleBar        |
-                                      ImGuiWindowFlags_NoResize          |
-                                      ImGuiWindowFlags_NoMove            |
-                                      ImGuiWindowFlags_NoScrollbar       |
-                                      ImGuiWindowFlags_NoScrollWithMouse |
-                                      ImGuiWindowFlags_NoCollapse        |
-                                      ImGuiWindowFlags_NoSavedSettings   |
+    ImGui::Begin("Markers", &visible, ImGuiWindowFlags_NoTitleBar            |
+                                      ImGuiWindowFlags_NoResize              |
+                                      ImGuiWindowFlags_NoMove                |
+                                      ImGuiWindowFlags_NoScrollbar           |
+                                      ImGuiWindowFlags_NoBringToFrontOnFocus |
+                                      ImGuiWindowFlags_NoScrollWithMouse     |
+                                      ImGuiWindowFlags_NoCollapse            |
+                                      ImGuiWindowFlags_NoSavedSettings       |
                                       ImGuiWindowFlags_NoInputs);
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 

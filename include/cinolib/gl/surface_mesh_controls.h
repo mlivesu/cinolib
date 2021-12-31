@@ -85,6 +85,10 @@ class SurfaceMeshControls : public SideBarItem
     float      iso_min           = 0;
     float      iso_max           = 1;
     int        crease_deg        = 60;
+    int        marker_font_size  = 10;
+    int        marker_size       = 5;
+    bool       show_vert_ids     = false;
+    bool       show_poly_ids     = false;
     Color      vert_color        = Color::WHITE();
     Color      poly_color        = Color::WHITE();
     Color      iso_color         = Color::RED();
@@ -116,7 +120,7 @@ class SurfaceMeshControls : public SideBarItem
         void header_slicing        (const bool open);
         void header_marked_edges   (const bool open);
         void header_actions        (const bool open);
-        void header_normals        (const bool open);
+        void header_debug          (const bool open);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

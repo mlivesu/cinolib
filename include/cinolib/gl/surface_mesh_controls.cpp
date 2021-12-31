@@ -73,8 +73,8 @@ void SurfaceMeshControls<Mesh>::draw()
     header_isoline        (false);
     header_slicing        (false);
     header_marked_edges   (false);
-    header_normals        (false);
     header_actions        (false);
+    header_debug          (false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -439,10 +439,10 @@ void SurfaceMeshControls<Mesh>::header_marked_edges(const bool open)
 
 template <class Mesh>
 CINO_INLINE
-void SurfaceMeshControls<Mesh>::header_normals(const bool open)
+void SurfaceMeshControls<Mesh>::header_debug(const bool open)
 {
     ImGui::SetNextItemOpen(open,ImGuiCond_Once);
-    if(ImGui::TreeNode("Normals"))
+    if(ImGui::TreeNode("Debug"))
     {
         if(ImGui::Checkbox("Show Face Normals", &show_face_normals))
         {
@@ -491,6 +491,44 @@ void SurfaceMeshControls<Mesh>::header_normals(const bool open)
             {
                 gui->pop(&vert_normals);
             }
+        }
+        auto update_vert_ids = [&]()
+        {
+            for(uint vid=0; vid<m->num_verts(); ++vid)
+            {
+                if(m->vert_is_visible(vid))
+                {
+                    gui->push_marker(m->vert(vid), std::to_string(vid), Color::BLUE(), marker_size, marker_font_size);
+                }
+            }
+        };
+        auto update_poly_ids = [&]()
+        {
+            for(uint pid=0; pid<m->num_polys(); ++pid)
+            {
+                if(!m->poly_data(pid).flags[HIDDEN])
+                {
+                    gui->push_marker(m->poly_centroid(pid), std::to_string(pid), Color::BLUE(), marker_size, marker_font_size);
+                }
+            }
+        };
+        if(ImGui::Checkbox("Show Vert IDs", &show_vert_ids))
+        {
+            if(show_vert_ids) update_vert_ids();
+            else              gui->pop_all_markers();
+        }
+        if(ImGui::Checkbox("Show Poly IDs", &show_poly_ids))
+        {
+            if(show_poly_ids) update_poly_ids();
+            else              gui->pop_all_markers();
+        }
+        if(ImGui::Checkbox("Depth Cull IDs", &gui->depth_cull_markers) ||
+           ImGui::SliderInt("Font", &marker_font_size, 4,15)           ||
+           ImGui::SliderInt("Disk", &marker_size, 0,10)                )
+        {
+            gui->pop_all_markers();
+            if(show_vert_ids) update_vert_ids();
+            if(show_poly_ids) update_poly_ids();
         }
         ImGui::TreePop();
     }

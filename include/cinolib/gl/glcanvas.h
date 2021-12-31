@@ -83,7 +83,7 @@ class GLcanvas
         float                              side_bar_alpha     = 1.0;
         int                                font_size          = 13;
         bool                               show_axis          = false;
-        bool                               depth_cull_markers = false; // skip occluded 3D markers, testing their depth with the Z-buffer
+        bool                               depth_cull_markers = true; // skip occluded 3D markers, testing their depth with the Z-buffer
         double                             DPI_factor;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
