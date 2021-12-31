@@ -129,7 +129,6 @@ class SurfaceMeshControls : public SideBarItem
         // ImGui options for color picker
         static const ImGuiColorEditFlags color_edit_flags = ImGuiColorEditFlags_NoSidePreview  |
                                                             ImGuiColorEditFlags_NoTooltip      |
-                                                            ImGuiColorEditFlags_NoLabel        |
                                                             ImGuiColorEditFlags_NoInputs       |
                                                             ImGuiColorEditFlags_PickerHueWheel |
                                                             ImGuiColorEditFlags_NoBorder;

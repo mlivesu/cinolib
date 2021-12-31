@@ -293,7 +293,7 @@ void SurfaceMeshControls<Mesh>::header_isoline(const bool open)
                 update_isoline();
             }
         }
-        if(ImGui::ColorEdit4("Isoline Color", iso_color.rgba, color_edit_flags))
+        if(ImGui::ColorEdit4("Color##isoline", iso_color.rgba, color_edit_flags))
         {
             if(show_isoline)
             {
@@ -353,7 +353,7 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool open)
         {
             vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
         }
-        if(ImGui::ColorEdit4("Vec Color", vec_color.rgba, color_edit_flags))
+        if(ImGui::ColorEdit4("Color##vec", vec_color.rgba, color_edit_flags))
         {
             vec_field.set_arrow_color(vec_color);
         }
@@ -426,7 +426,7 @@ void SurfaceMeshControls<Mesh>::header_marked_edges(const bool open)
             m->show_marked_edge_width(marked_edge_width);
             m->updateGL();
         }
-        if(ImGui::ColorEdit4("Color", marked_edge_color.rgba, color_edit_flags))
+        if(ImGui::ColorEdit4("Color##markededge", marked_edge_color.rgba, color_edit_flags))
         {
             m->show_marked_edge_color(marked_edge_color);
             m->updateGL();
@@ -444,30 +444,6 @@ void SurfaceMeshControls<Mesh>::header_debug(const bool open)
     ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Debug"))
     {
-        if(ImGui::Checkbox("Show Poly Normals", &show_face_normals))
-        {
-            if(show_face_normals)
-            {
-                poly_normals.clear();
-                poly_normals.set_cheap_rendering(true);
-                poly_normals.set_color(poly_debug_color);
-                double l = gui->camera.scene_radius/5.0;
-                for(uint pid=0; pid<m->num_polys(); ++pid)
-                {
-                    if(!m->poly_data(pid).flags[HIDDEN])
-                    {
-                        vec3d n = m->poly_data(pid).normal;
-                        vec3d c = m->poly_centroid(pid);
-                        poly_normals.push_seg(c, c+(n*l));
-                    }
-                }
-                gui->push(&poly_normals,false);
-            }
-            else
-            {
-                gui->pop(&poly_normals);
-            }
-        }
         if(ImGui::Checkbox("Show Vert Normals", &show_vert_normals))
         {
             if(show_vert_normals)
@@ -492,13 +468,37 @@ void SurfaceMeshControls<Mesh>::header_debug(const bool open)
                 gui->pop(&vert_normals);
             }
         }
+        if(ImGui::Checkbox("Show Poly Normals", &show_face_normals))
+        {
+            if(show_face_normals)
+            {
+                poly_normals.clear();
+                poly_normals.set_cheap_rendering(true);
+                poly_normals.set_color(poly_debug_color);
+                double l = gui->camera.scene_radius/5.0;
+                for(uint pid=0; pid<m->num_polys(); ++pid)
+                {
+                    if(!m->poly_data(pid).flags[HIDDEN])
+                    {
+                        vec3d n = m->poly_data(pid).normal;
+                        vec3d c = m->poly_centroid(pid);
+                        poly_normals.push_seg(c, c+(n*l));
+                    }
+                }
+                gui->push(&poly_normals,false);
+            }
+            else
+            {
+                gui->pop(&poly_normals);
+            }
+        }
         if(ImGui::Checkbox("Show Vert IDs", &show_vert_ids)                           ||
            ImGui::Checkbox("Show Poly IDs", &show_poly_ids)                           ||
            ImGui::Checkbox("Depth Cull IDs", &gui->depth_cull_markers)                ||
            ImGui::SliderInt("Font", &marker_font_size, 4,15)                          ||
            ImGui::SliderInt("Disk", &marker_size, 0,10)                               ||
-           ImGui::ColorEdit4("VertID Color", vert_debug_color.rgba, color_edit_flags) ||
-           ImGui::ColorEdit4("PolyID Color", poly_debug_color.rgba, color_edit_flags))
+           ImGui::ColorEdit4("Vert Color", vert_debug_color.rgba, color_edit_flags) ||
+           ImGui::ColorEdit4("Poly Color", poly_debug_color.rgba, color_edit_flags))
         {
             gui->pop_all_markers();
             if(show_vert_ids)
