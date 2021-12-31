@@ -90,10 +90,10 @@ class GLcanvas
 
         // ImGui and GLFW do not yet handle multi windows properly.
         // This variable ensures that only one window will create
-        // and handle the ImGui context. meaning that only that
+        // and handle the ImGui context. As a result, only that
         // window will benefit from the functionalities implemented
         // with ImGui, such as the side bar with visual controls and
-        // visual markers
+        // the visual markers
         bool owns_ImGui = false;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -109,12 +109,13 @@ class GLcanvas
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // Main application loop. This is the typical return statement in
-        // the main of your application. It consists in an infinite loop
-        // that interleaves rendering and event handling. Since there may be
-        // multiple windows in your app, this is a static member that receives
-        // in input a vector of pointers to each window. Closing *any* of the
-        // windows will cause a termination of the program.
-        static int main_loop(std::vector<GLcanvas*> guis);
+        // the main of your application. It consists of an infinite loop
+        // that interleaves rendering and event handling.
+        // In case the application has multiple windows, secondary windows
+        // can be passed as additional parameters, such that rendering and
+        // event polling are all controlled from a single place. Closing
+        // *any* of the windows will cause a termination of the program.
+        int launch(std::initializer_list<GLcanvas*> additional_windows = {});
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

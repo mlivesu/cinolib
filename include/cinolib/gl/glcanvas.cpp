@@ -430,20 +430,21 @@ void GLcanvas::draw_side_bar() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-int GLcanvas::main_loop(std::vector<GLcanvas*> guis)
+int GLcanvas::launch(std::initializer_list<GLcanvas*> additional_windows)
 {
     while(true)
     {
-        for(auto gui : guis)
-        {
-            glfwMakeContextCurrent(gui->window);
-            gui->draw();
+        glfwMakeContextCurrent(window);
+        draw();
+        if(glfwWindowShouldClose(window)) return EXIT_SUCCESS;
 
-            if(glfwWindowShouldClose(gui->window))
-            {
-                return EXIT_SUCCESS;
-            }
+        for(auto it=additional_windows.begin(); it!=additional_windows.end(); ++it)
+        {
+            glfwMakeContextCurrent((*it)->window);
+            (*it)->draw();
+            if(glfwWindowShouldClose((*it)->window)) return EXIT_SUCCESS;
         }
+
         glfwPollEvents();
     }
     return EXIT_SUCCESS;
