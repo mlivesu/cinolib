@@ -150,6 +150,7 @@ static bool ImGui_ImplGlfw_Init(GLFWwindow* window, bool install_callbacks, Glfw
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;    // Cino Edit: enable 64K+ vertices for large meshes
     io.BackendPlatformName = "imgui_impl_glfw";
 
     // Keyboard mapping. Dear ImGui will use those indices to peek into the io.KeysDown[] array.
