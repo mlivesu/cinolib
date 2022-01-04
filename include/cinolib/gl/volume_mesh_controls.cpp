@@ -40,6 +40,8 @@
 #include <cinolib/gradient.h>
 #include <cinolib/scalar_field.h>
 #include <cinolib/string_utilities.h>
+#include <cinolib/export_visible.h>
+#include <cinolib/export_surface.h>
 #include <iostream>
 #include <sstream>
 
@@ -760,6 +762,11 @@ void VolumeMeshControls<Mesh>::header_actions(const bool open)
             m->edge_set_flag(MARKED,false);
             refresh = true;
         }
+        if(ImGui::SmallButton("Unmark all faces"))
+        {
+            m->face_set_flag(MARKED,false);
+            refresh = true;
+        }
         if(ImGui::SmallButton("Color wrt Label"))
         {
             m->poly_color_wrt_label();
@@ -768,6 +775,22 @@ void VolumeMeshControls<Mesh>::header_actions(const bool open)
         if(ImGui::SmallButton("Label wrt Color"))
         {
             m->poly_label_wrt_color();
+            refresh = true;
+        }
+        if(ImGui::SmallButton("Export Visible"))
+        {
+            Polyhedralmesh<M,V,E,F,P> tmp;
+            export_visible(*m, tmp);
+            std::string filename = file_dialog_save();
+            if(!filename.empty()) tmp.save(filename.c_str());
+            refresh = true;
+        }
+        if(ImGui::SmallButton("Export Surface"))
+        {
+            Polygonmesh<M,V,E,F> tmp;
+            export_surface(*m, tmp);
+            std::string filename = file_dialog_save();
+            if(!filename.empty()) tmp.save(filename.c_str());
             refresh = true;
         }
         if(ImGui::SmallButton("Mark Creases"))
