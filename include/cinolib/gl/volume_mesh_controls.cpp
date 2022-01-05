@@ -347,8 +347,9 @@ void VolumeMeshControls<Mesh>::header_isosurface(const bool open)
     {
         auto update_isosurface = [&]()
         {
-            isosurface           = DrawableIsosurface<M,V,E,F,P>(*m,iso_val);
-            isosurface.color     = iso_color;
+            Tetmesh<M,V,E,F,P> *ptr = dynamic_cast<Tetmesh<M,V,E,F,P>*>(m);
+            isosurface              = DrawableIsosurface<M,V,E,F,P>(*ptr, iso_val);
+            isosurface.color        = iso_color;
             gui->push(&isosurface,false);
         };
         if(ImGui::Checkbox("Show##isosurface", &show_isosurface))
