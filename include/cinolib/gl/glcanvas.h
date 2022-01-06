@@ -197,6 +197,7 @@ class GLcanvas
         std::function<void(int    button,   int    modifiers)> callback_mouse_double_click = nullptr;
         std::function<void(double x_pos,    double y_pos    )> callback_cursor             = nullptr;
         std::function<void(double x_offset, double y_offset )> callback_scroll             = nullptr;
+        std::function<void(void                             )> callback_app_controls       = nullptr;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 };

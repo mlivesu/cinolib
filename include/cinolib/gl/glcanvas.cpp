@@ -104,6 +104,7 @@ GLcanvas::GLcanvas(const int width, const int height)
         // (10x) to account for zoom factor (downscaling is visually better than upscaling)
         // https://github.com/ocornut/imgui/issues/797
         ImGuiIO &io = ImGui::GetIO();
+        io.IniFilename = NULL;
         io.Fonts->Clear();
         io.Fonts->AddFontFromMemoryCompressedTTF(droid_sans_data, droid_sans_size, font_size*10);
         io.FontGlobalScale = 0.1; // compensate for high-res fonts
@@ -414,7 +415,16 @@ void GLcanvas::draw_side_bar() const
     ImGui::SetNextWindowPos({0,0}, ImGuiCond_Once);
     ImGui::SetNextWindowSize({camera.width*side_bar_width, camera.height*1.f}, ImGuiCond_Once);
     ImGui::SetNextWindowBgAlpha(side_bar_alpha);
-    ImGui::Begin("##SideBar");
+    ImGui::Begin("##SideBar");    
+    if(callback_app_controls!=nullptr)
+    {
+        ImGui::SetNextItemOpen(true,ImGuiCond_Once);
+        if(ImGui::TreeNode("APP CONTROLS"))
+        {
+            callback_app_controls();
+            ImGui::TreePop();
+        }
+    }
     for(auto item : side_bar_items)
     {
         ImGui::SetNextItemOpen(item->show_open,ImGuiCond_Once);
@@ -723,7 +733,9 @@ void GLcanvas::cursor_event(GLFWwindow *window, double x_pos, double y_pos)
         vec2d click(x_pos, y_pos);
         if(!v->trackball.last_click_2d.is_inf())
         {
-            vec2d delta = (v->trackball.last_click_2d - click) * v->camera.scene_radius * 0.01;
+            vec2d delta = (v->trackball.last_click_2d - click);
+            delta.normalize();
+            delta *= v->camera.scene_radius * 0.01;
             v->camera.translate(vec3d(-delta.x(), delta.y(), 0));
             v->update_GL_matrices();
             v->draw();
