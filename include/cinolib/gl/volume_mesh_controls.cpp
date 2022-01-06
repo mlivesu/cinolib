@@ -567,9 +567,9 @@ void VolumeMeshControls<Mesh>::header_manual_digging(const bool open)
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    static auto func_dig = [&](int button, int modifiers)
+    static auto func_dig = [&](int modifiers)
     {
-        if(button==GLFW_MOUSE_BUTTON_LEFT && modifiers & GLFW_MOD_SHIFT)
+        if(modifiers & GLFW_MOD_SHIFT)
         {
             vec3d p;
             vec2d click = gui->cursor_pos();
@@ -590,9 +590,9 @@ void VolumeMeshControls<Mesh>::header_manual_digging(const bool open)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    static auto func_undig = [&](int button, int modifiers)
+    static auto func_undig = [&](int modifiers)
     {
-        if(button==GLFW_MOUSE_BUTTON_LEFT && modifiers & GLFW_MOD_SHIFT)
+        if(modifiers & GLFW_MOD_SHIFT)
         {
             vec3d p;
             vec2d click = gui->cursor_pos();
@@ -613,9 +613,9 @@ void VolumeMeshControls<Mesh>::header_manual_digging(const bool open)
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    static auto func_isolate = [&](int button, int modifiers)
+    static auto func_isolate = [&](int modifiers)
     {
-        if(button==GLFW_MOUSE_BUTTON_LEFT && modifiers & GLFW_MOD_SHIFT)
+        if(modifiers & GLFW_MOD_SHIFT)
         {
             vec3d p;
             vec2d click = gui->cursor_pos();
@@ -647,10 +647,10 @@ void VolumeMeshControls<Mesh>::header_manual_digging(const bool open)
     ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Manual Digging"))
     {
-        if(ImGui::RadioButton("Dig    ", &dig_choice, DIG    )) gui->callback_mouse_single_click = func_dig;
-        if(ImGui::RadioButton("Undig  ", &dig_choice, UNDIG  )) gui->callback_mouse_single_click = func_undig;
-        if(ImGui::RadioButton("Isolate", &dig_choice, ISOLATE)) gui->callback_mouse_single_click = func_isolate;
-        if(ImGui::RadioButton("Reset  ", &dig_choice, RESET  )) gui->callback_mouse_single_click = nullptr;
+        if(ImGui::RadioButton("Dig    ", &dig_choice, DIG    )) gui->callback_mouse_left_click = func_dig;
+        if(ImGui::RadioButton("Undig  ", &dig_choice, UNDIG  )) gui->callback_mouse_left_click = func_undig;
+        if(ImGui::RadioButton("Isolate", &dig_choice, ISOLATE)) gui->callback_mouse_left_click = func_isolate;
+        if(ImGui::RadioButton("Reset  ", &dig_choice, RESET  )) gui->callback_mouse_left_click = nullptr;
         ImGui::TreePop();
     }
 }

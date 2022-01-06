@@ -193,8 +193,10 @@ class GLcanvas
         // events occurr (e.g. for picking, drawing). If defined, they will be called
         // **before** the internal event handlers
         std::function<void(int    key,      int    modifiers)> callback_key_pressed        = nullptr;
-        std::function<void(int    button,   int    modifiers)> callback_mouse_single_click = nullptr;
-        std::function<void(int    button,   int    modifiers)> callback_mouse_double_click = nullptr;
+        std::function<void(int    modifiers                 )> callback_mouse_left_click   = nullptr;
+        std::function<void(int    modifiers                 )> callback_mouse_left_click2  = nullptr; // double click
+        std::function<void(int    modifiers                 )> callback_mouse_right_click  = nullptr;
+        std::function<void(int    modifiers                 )> callback_mouse_right_click2 = nullptr; // double click
         std::function<void(double x_pos,    double y_pos    )> callback_cursor             = nullptr;
         std::function<void(double x_offset, double y_offset )> callback_scroll             = nullptr;
         std::function<void(void                             )> callback_app_controls       = nullptr;

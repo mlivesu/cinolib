@@ -667,7 +667,7 @@ void GLcanvas::mouse_button_event(GLFWwindow *window, int button, int action, in
         assert(action==GLFW_PRESS);
 
         // thanks GLFW for asking me to handle the single/double click burden...
-        auto double_click = [&]() -> bool
+        static const auto double_click = [&]() -> bool
         {
             auto   t  = std::chrono::high_resolution_clock::now();
             double dt = how_many_seconds(v->trackball.t_last_click,t);
@@ -679,23 +679,34 @@ void GLcanvas::mouse_button_event(GLFWwindow *window, int button, int action, in
 
         if(double_click())
         {
-            if(v->callback_mouse_double_click) v->callback_mouse_double_click(button,modifiers);
-
-            vec3d click_3d;
-            if(v->unproject(click, click_3d))
+            if(button==GLFW_MOUSE_BUTTON_LEFT)
             {
-                v->camera.set_focus_point(click_3d);
-                v->update_GL_matrices();
+                if(v->callback_mouse_left_click2) v->callback_mouse_left_click2(modifiers);
+
+                vec3d click_3d;
+                if(v->unproject(click, click_3d))
+                {
+                    v->camera.set_focus_point(click_3d);
+                    v->update_GL_matrices();
+                }
+            }
+            else if(button==GLFW_MOUSE_BUTTON_RIGHT)
+            {
+                if(v->callback_mouse_right_click2) v->callback_mouse_right_click2(modifiers);
             }
         }
         else // single click
         {
             if(button==GLFW_MOUSE_BUTTON_LEFT)
             {
-                if(v->callback_mouse_single_click) v->callback_mouse_single_click(button,modifiers);
+                if(v->callback_mouse_left_click) v->callback_mouse_left_click(modifiers);
                 v->trackball.mouse_pressed = true;
                 v->trackball.last_click_2d = click;
                 v->trackball.last_click_3d = trackball_to_sphere(click, v->camera.width, v->camera.height);
+            }
+            else if(button==GLFW_MOUSE_BUTTON_RIGHT)
+            {
+                if(v->callback_mouse_right_click) v->callback_mouse_right_click(modifiers);
             }
         }
     }
