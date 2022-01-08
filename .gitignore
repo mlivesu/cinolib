@@ -4,6 +4,5 @@ external/eigen/.gitlab/
 external/eigen/.hgeol
 external/graph_cut/
 examples/build*
-examples/build_all_examples.pro.user
-examples/*_demo
 *.DS_Store
+examples/bin/*
