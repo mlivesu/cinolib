@@ -410,6 +410,8 @@ void GLcanvas::draw_markers() const
 CINO_INLINE
 void GLcanvas::draw_side_bar() const
 {
+    if(callback_app_controls==nullptr && side_bar_items.empty()) return;
+
     assert(owns_ImGui && "Only the first canvas created handles the ImGui context");
 
     ImGui::SetNextWindowPos({0,0}, ImGuiCond_Once);
