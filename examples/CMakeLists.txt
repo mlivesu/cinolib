@@ -12,14 +12,14 @@ set(CINOLIB_USES_GRAPH_CUT         OFF)
 set(CINOLIB_USES_BOOST             OFF)
 set(CINOLIB_USES_VTK               OFF)
 
-# pass cinolib to all examples
+# pass cinolib and the external dependencies to all examples
 find_package(cinolib REQUIRED)
 link_libraries(cinolib)
 
-# defines a path for sample meshes
+# define the path where all the input meshes are available
 add_compile_definitions(DATA_PATH="${PROJECT_SOURCE_DIR}/data")
 
-# position executables in the main examples directory
+# make a bin folder to host all the executables
 make_directory(${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
@@ -35,8 +35,10 @@ add_subdirectory(08_picking)
 add_subdirectory(09_polyharmonic_functions_srf)
 add_subdirectory(10_polyharmonic_functions_vol)
 add_subdirectory(11_sphere_mapping)
+
 #if(CINOLIB_USES_TRIANGLE)
 #    add_subdirectory(12_polygon_mesh_generation)
+     #FIXME: LINKING ISSUES (NAME MANGLING?)
 #endif()
 if(CINOLIB_USES_TETGEN)
     add_subdirectory(13_polyhedral_mesh_generation)
