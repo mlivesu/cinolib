@@ -1,19 +1,10 @@
-/* This program maps substitutes the skin of a volumetric mesh with an input surface mesh.
- * The correspondences between vertices in the surface and volumetric meshes are provided
- * with a text file.
- *
- * Enjoy!
-*/
-
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/string_utilities.h>
 
-using namespace cinolib;
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 int main(int argc, char **argv)
 {
+    using namespace cinolib;
+
     if(argc!=5)
     {
         std::cout << "\n\nusage:\n\timport_surface -tet|hex|poly volume_mesh surface_mesh vertex_map\n\n" << std::endl;;

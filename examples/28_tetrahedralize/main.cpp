@@ -1,20 +1,12 @@
-/* This is a simple tetrahedralization tool that reads a surface mesh and a set of
- * flags to pass along to tetgen
- *
- * Enjoy!
-*/
-
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/tetgen_wrap.h>
 #include <cinolib/string_utilities.h>
 #include <cinolib/stl_container_utilities.h>
 
-using namespace cinolib;
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 int main(int argc, char **argv)
 {
+    using namespace cinolib;
+
     if(argc<2)
     {
         std::cout << "\n\nusage:\n\ttetrahedralize input [tetgen_flags]\n\n" << std::endl;;
