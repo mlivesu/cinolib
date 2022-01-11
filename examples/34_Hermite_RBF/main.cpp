@@ -1,26 +1,14 @@
-/* This is a base application for cinolib (https://github.com/maxicino/cinolib).
- *
- * It will take in input a triangle mesh, and compute the Hermite RBF that
- * interpolates its vertices and (per vertex) normals
- *
- * Enjoy!
-*/
-
-#include <QApplication>
-#include <cinolib/gl/qt/qt_gui_tools.h>
+#include <cinolib/gl/glcanvas.h>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/tetgen_wrap.h>
 #include <cinolib/RBF_Hermite.h>
 #include <cinolib/RBF_kernels.h>
 #include <cinolib/profiler.h>
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#include <cinolib/drawable_isosurface.h>
 
 int main(int argc, char **argv)
 {
     using namespace cinolib;
-
-    QApplication a(argc, argv);
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/sphere_coarse.obj";
 
@@ -48,13 +36,12 @@ int main(int argc, char **argv)
     profiler.pop();
 
     GLcanvas gui;
-    gui.push_obj(&vol_sampling);
-    gui.push_obj(&srf_target);
-    gui.show();
+    gui.push(&vol_sampling);
+    gui.push(&srf_target);
 
     // the BRHF interpolant is the zero level set of the so generated field
     DrawableIsosurface<> iso(vol_sampling, 0);
-    gui.push_obj(&iso);
+    gui.push(&iso);
 
     // slice the volume, hide the target surface (for visualization)
     MeshSlicer ss;
@@ -69,11 +56,5 @@ int main(int argc, char **argv)
     srf_target.show_mesh(false);
     srf_target.updateGL();
 
-    // visual mesh controls, for interactive exploration
-    VolumeMeshControlPanel<DrawableTetmesh<>>  panel_vol(&vol_sampling, &gui);
-    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_srf(&srf_target,   &gui);
-    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel_vol.show();});
-    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_2), &gui), &QShortcut::activated, [&](){panel_srf.show();});
-
-    return a.exec();
+    return gui.launch();
 }
