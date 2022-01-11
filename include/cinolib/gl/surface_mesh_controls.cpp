@@ -397,7 +397,7 @@ void SurfaceMeshControls<Mesh>::header_slicing(const bool open)
         refresh |= ImGui::Checkbox   ("##z", &slicer.Z_leq);
         refresh |= ImGui::SliderFloat("Q",   &slicer.Q_thresh, 0, 1); ImGui::SameLine();
         refresh |= ImGui::Checkbox   ("##q", &slicer.Q_leq);
-        refresh |= ImGui::SliderInt  ("L",   &slicer.L_filter, 0, 10); ImGui::SameLine();
+        refresh |= ImGui::SliderInt  ("L",   &slicer.L_filter, -1, 10); ImGui::SameLine();
         refresh |= ImGui::Checkbox   ("##l", &slicer.L_is);
         if(refresh)
         {

@@ -113,13 +113,15 @@ void MeshSlicer::slice(AbstractMesh<M,V,E,P> & m)
         bool pass_X = (X_leq) ? (c.x() <= X_abs_thresh) : (c.x() >= X_abs_thresh);
         bool pass_Y = (Y_leq) ? (c.y() <= Y_abs_thresh) : (c.y() >= Y_abs_thresh);
         bool pass_Z = (Z_leq) ? (c.z() <= Z_abs_thresh) : (c.z() >= Z_abs_thresh);
-        bool pass_Q = (Q_leq) ? (q     <= Q_thresh    ) : (q     >  Q_thresh);
-        bool pass_L = (L_is ) ? (l == -1 || l == L_filter) : (l == -1 || l != L_filter);
+        bool pass_Q = (Q_leq) ? (q     <= Q_thresh    ) : (q     >= Q_thresh);
+        bool pass_L = (L_is ) ? (L_filter==-1 || l == L_filter) : (L_filter == -1 || l != L_filter);
 
         bool b = (mode_AND) ? ( pass_X &&  pass_Y &&  pass_Z &&  pass_L &&  pass_Q)
                             : (!pass_X || !pass_Y || !pass_Z || !pass_L || !pass_Q);
 
         m.poly_data(pid).flags[HIDDEN] = !b;
+
+        //std::cout << pass_X << " " << pass_Y << " " << pass_Z << " " << pass_Q << " " << pass_L << std::endl;
     }
 }
 
