@@ -1,5 +1,6 @@
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/gl/glcanvas.h>
+#include <cinolib/gl/surface_mesh_controls.h>
 #include <cinolib/profiler.h>
 #include <cinolib/remesh_BotschKobbelt2004.h>
 
@@ -8,7 +9,7 @@ int main(int argc, char **argv)
     using namespace cinolib;
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/pyramid.off";
-    cinolib::DrawableTrimesh<> m(s.c_str());
+    DrawableTrimesh<> m(s.c_str());
     m.show_marked_edge(true);
     m.show_wireframe(true);
     m.show_mesh_flat();
@@ -19,7 +20,9 @@ int main(int argc, char **argv)
     int   n_iters            = 10;
 
     GLcanvas gui;
+    SurfaceMeshControls<DrawableTrimesh<>> menu(&m, &gui);
     gui.push(&m);
+    gui.push(&menu);
     gui.callback_app_controls = [&]()
     {
         if(ImGui::SmallButton("Mark Color Discontinuities"))
