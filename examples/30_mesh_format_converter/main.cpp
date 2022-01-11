@@ -1,22 +1,15 @@
-/* This is a simple file converter tool for all the fule formats supported by cinolib
- *
- * Enjoy!
-*/
-
 #include <cinolib/io/read_write.h>
 #include <cinolib/string_utilities.h>
 #include <cinolib/stl_container_utilities.h>
 #include <cinolib/meshes/trimesh.h>
 
-using namespace cinolib;
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 int main(int argc, char **argv)
 {
+    using namespace cinolib;
+
     if(argc!=3)
     {
-        std::cout << "\n\nusage:\n\tfile_converter input output\n\n" << std::endl;;
+        std::cout << "\n\nusage:\n\tfile_converter input output\n\n" << std::endl;
         return -1;
     }
 
@@ -68,7 +61,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        std::cout << "ERROR: unknown input format" << std::endl;;
+        std::cout << "ERROR: unknown input format" << std::endl;
         return -1;
     }
 
@@ -116,10 +109,9 @@ int main(int argc, char **argv)
     }
     else
     {
-        std::cout << "ERROR: unknown output format" << std::endl;;
+        std::cout << "ERROR: unknown output format" << std::endl;
         return -1;
     }
-
 
     return 0;
 }
