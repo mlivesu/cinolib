@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     // make polygon (voronoi) mesh
     DrawablePolygonmesh<> m_poly;
     dual_mesh(m_tri, m_poly, true);
-    m_tri.translate(vec3d(m.bbox().delta_x()*3.0,0,0));
+    m_poly.translate(vec3d(m.bbox().delta_x()*1.5,0,0));
     m_poly.updateGL();
 
     GLcanvas gui;
