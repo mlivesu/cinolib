@@ -267,7 +267,6 @@ void load_texture_2D(const GLuint    id,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
     glBindTexture(GL_TEXTURE_2D, 0);
-    // TODO: add mipmapping support...
 }
 
 }
