@@ -2,14 +2,10 @@
 This folder contains a number of sample programs that illustrate the core functionalities of CinoLib.
 
 ### How to compile the example projects
-To compile the examples you must download CinoLib on your machine and install [Qt](https://www.qt.io) for the GUI. You can compile all the examples together by considering the file `build_all_examples.pro`, or compile a specific example by considering its project file (.pro). Project files can be compiled either with [QtCreator](https://www.qt.io/qt-features-libraries-apis-tools-and-ide/) or by opening a terminal in the same folder and typing
-```
-qmake .
-make -j4
-```
+To compile the examples you must download CinoLib on your machine. You can compile all the examples together by considering the file `CMakeLists.txt`.
 
 ### External dependencies
-Some of the projects depend from external libraries which are not included in CinoLib (e.g. [Triangle](https://www.cs.cmu.edu/~quake/triangle.html), [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) or [VTK](https://www.vtk.org)). These libraries should be installed separately, and the project files updated with correct paths for compiler and linker. Projects with external dependencies are marked in `build_all_examples.pro`. If you are not interested in these examples, you can safely comment them by adding `#` at the beginning of the corresponding lines in the project file, and they will be automatically ignored by qmake.
+Some of the projects depend from external libraries which are only optionally included in CinoLib (e.g. [Triangle](https://www.cs.cmu.edu/~quake/triangle.html), [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1) or [VTK](https://www.vtk.org)). The cmake scripts will try to detect and link to previously installed libraries, or automatically install them from scratch. If you are not interested in these examples, you can set the associated options to `OFF` in the cmake file.
 
 # List of Examples
 Here is a list of the sample programs available in CinoLib.
