@@ -608,7 +608,7 @@ void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int acti
             {
                 // translations along major axes
                 case GLFW_KEY_LEFT  : v->camera.translate_x(-delta_t); break;
-                case GLFW_KEY_RIGHT : v->camera.translate_x(+delta_t); std::cout << "translate " << delta_t << std::endl; break;
+                case GLFW_KEY_RIGHT : v->camera.translate_x(+delta_t); break;
                 case GLFW_KEY_UP    : v->camera.translate_y(+delta_t); break;
                 case GLFW_KEY_DOWN  : v->camera.translate_y(-delta_t); break;
                 case GLFW_KEY_1     : v->camera.translate_z(+delta_t); break;
