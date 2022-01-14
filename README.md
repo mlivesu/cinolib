@@ -6,10 +6,9 @@ A generic programming header only C++ library for processing polygonal and polyh
 ## Usage
 CinoLib is header only. It does not need to be installed, all you have to do is to clone the repo with
 ```
-git clone --recursive https://github.com/mlivesu/cinolib.git
+git clone https://github.com/mlivesu/cinolib.git
 ```
 and include in your C++ application the header files you need. A tutorial with detailed info on how to use the library is under developement. In the meanwhile, you can explore the [**examples**](https://github.com/mlivesu/cinolib/tree/master/examples#examples)  folder, which contains a constantly growing number of sample projects that showcase the core features of the library, and will be the backbone of the forthcoming tutorial.
-
 
 ## Other contributors
 * Claudio Mancinelli (University of Genoa), Daniela Cabiddu (CNR IMATI), Chrystiano Araújo (UBC), Thomas Alderighi (CNR ISTI), Fabrizio Corda (University of Cagliari), Gianmarco Cherchi (University of Cagliari), Tommaso Sorgente (CNR IMATI)
