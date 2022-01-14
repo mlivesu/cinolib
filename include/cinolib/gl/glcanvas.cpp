@@ -109,6 +109,8 @@ GLcanvas::GLcanvas(const int width, const int height)
         io.Fonts->AddFontFromMemoryCompressedTTF(droid_sans_data, droid_sans_size, font_size*10);
         io.FontGlobalScale = 0.1; // compensate for high-res fonts
     }
+
+    window_size_event(window, width, height);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -276,7 +278,7 @@ void GLcanvas::update_GL_projection() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::draw() const
+void GLcanvas::draw()
 {
     glfwMakeContextCurrent(window);
     glClearColor(1,1,1,1);
@@ -408,16 +410,16 @@ void GLcanvas::draw_markers() const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void GLcanvas::draw_side_bar() const
+void GLcanvas::draw_side_bar()
 {
     if(callback_app_controls==nullptr && side_bar_items.empty()) return;
 
     assert(owns_ImGui && "Only the first canvas created handles the ImGui context");
 
-    ImGui::SetNextWindowPos({0,0}, ImGuiCond_Once);
-    ImGui::SetNextWindowSize({camera.width*side_bar_width, camera.height*1.f}, ImGuiCond_Once);
+    ImGui::SetNextWindowPos({0,0}, ImGuiCond_Always);
+    ImGui::SetNextWindowSize({camera.width*side_bar_width, camera.height*1.f}, ImGuiCond_Always);
     ImGui::SetNextWindowBgAlpha(side_bar_alpha);
-    ImGui::Begin("##SideBar");    
+    ImGui::Begin("MENU");
     if(callback_app_controls!=nullptr)
     {
         ImGui::SetNextItemOpen(true,ImGuiCond_Once);
@@ -435,8 +437,10 @@ void GLcanvas::draw_side_bar() const
             item->draw();
             ImGui::TreePop();
         }
-    }
-    ImGui::End();
+    }    
+    // this allows the user to interactively resize the width of the side bar
+    side_bar_width = ImGui::GetWindowWidth() / camera.width;
+    ImGui::End();        
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -604,14 +608,14 @@ void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int acti
             {
                 // translations along major axes
                 case GLFW_KEY_LEFT  : v->camera.translate_x(-delta_t); break;
-                case GLFW_KEY_RIGHT : v->camera.translate_x(+delta_t); break;
+                case GLFW_KEY_RIGHT : v->camera.translate_x(+delta_t); std::cout << "translate " << delta_t << std::endl; break;
                 case GLFW_KEY_UP    : v->camera.translate_y(+delta_t); break;
                 case GLFW_KEY_DOWN  : v->camera.translate_y(-delta_t); break;
                 case GLFW_KEY_1     : v->camera.translate_z(+delta_t); break;
                 case GLFW_KEY_2     : v->camera.translate_z(-delta_t); break;
                 // camera control
                 case GLFW_KEY_Z     : v->camera.zoom(0.01); break; // zoom out
-            }
+            }                        
         }
         else if(modifiers & (GLFW_MOD_CONTROL|GLFW_MOD_SUPER)) // handle CTRL/CMD + KEY events...
         {

@@ -79,7 +79,7 @@ class GLcanvas
         std::vector<Marker>                markers;
         bool                               with_side_bar;
         std::vector<SideBarItem*>          side_bar_items;
-        float                              side_bar_width     = 0.25;
+        float                              side_bar_width     = 0.20;
         float                              side_bar_alpha     = 1.0;
         int                                font_size          = 13;
         bool                               show_axis          = false;
@@ -119,10 +119,10 @@ class GLcanvas
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void draw()          const; // single render pass
-        void draw_side_bar() const; // render side bar with visual controls (if any)
-        void draw_markers()  const; // render text labels with ImGui (3d markers are depth tested if culling is enabled)
-        void draw_axis()     const; // render the global frame XYZ
+        void draw();                 // single render pass
+        void draw_side_bar();        // render side bar with visual controls (if any)
+        void draw_markers()   const; // render text labels with ImGui (3d markers are depth tested if culling is enabled)
+        void draw_axis()      const; // render the global frame XYZ
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
