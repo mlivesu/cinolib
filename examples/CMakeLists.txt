@@ -2,15 +2,14 @@ cmake_minimum_required(VERSION 3.2)
 
 project(examples)
 
-# set cinolib options. projects depending from
-# options that are disabled won't be compiled
+# set cinolib options. projects depending from options that are disabled won't be compiled
 set(CINOLIB_USES_OPENGL_GLFW_IMGUI ON )
 set(CINOLIB_USES_TETGEN            ON )
 set(CINOLIB_USES_TRIANGLE          ON )
 set(CINOLIB_USES_EXACT_PREDICATES  OFF)
 set(CINOLIB_USES_GRAPH_CUT         OFF)
 set(CINOLIB_USES_BOOST             ON )
-set(CINOLIB_USES_VTK               OFF)
+set(CINOLIB_USES_VTK               ON ) # optional, if added VTK formats will be supported everywhere
 
 # pass cinolib and the external dependencies to all examples
 find_package(cinolib REQUIRED)
@@ -27,7 +26,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 
 #list of examples
-
 if(CINOLIB_USES_OPENGL_GLFW_IMGUI)
     add_subdirectory(01_trimesh_viewer)
     add_subdirectory(02_quadmesh_viewer)
