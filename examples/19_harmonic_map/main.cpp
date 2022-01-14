@@ -1,29 +1,14 @@
-/* This sample program maps a disk-like triangulated surface
- * into the 2D unit circle. The map is computed by solving
- * the harmonic equation, fixing the boundary of the shape
- * on the perimeter of the circle through Dirichelet boundary
- * conditions. Alternative parametric domains could also be 
- * considered (e.g. a square or other convex polygons)
- *
- * Enjoy!
-*/
-
-#include <QApplication>
-#include <QHBoxLayout>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/glcanvas.h>
+#include <cinolib/gl/surface_mesh_controls.h>
 #include <cinolib/harmonic_map.h>
 #include <cinolib/geometry/n_sided_poygon.h>
-#include <cinolib/textures/textures.h>
+#include <cinolib/gl/load_texture.h>
 #include <cinolib/profiler.h>
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 int main(int argc, char **argv)
 {
     using namespace cinolib;
-
-    QApplication a(argc, argv);
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/Laurana.obj";
     DrawableTrimesh<> m_xyz(s.c_str());
@@ -32,7 +17,7 @@ int main(int argc, char **argv)
     std::vector<uint> boundary = m_xyz.get_ordered_boundary_vertices();
 
     // create parametric space (discrete unit circle with as many point as the boundary vertices)
-    std::vector<vec3d> uv_boundary = n_sided_polygon(boundary.size(), CIRCLE);
+    std::vector<vec3d> uv_boundary = n_sided_polygon((uint)boundary.size(), CIRCLE);
 
     // set potitional constraints for boundary vertices (map mesh boundary to the unit circle)
     std::map<uint,vec3d> dirichlet_bcs;
@@ -50,31 +35,22 @@ int main(int argc, char **argv)
     // copy uv coordinates to m (for texture visualization)
     for(uint vid=0; vid<m_xyz.num_verts(); ++vid) m_xyz.vert_data(vid).uvw = m_uvw.vert(vid);
 
-    // visualize original and parametric mesh in two separated windows
-    QWidget window;
-    GLcanvas gui_xyz;
-    GLcanvas gui_uvw;
-    QHBoxLayout layout;
-    layout.addWidget(&gui_xyz);
-    layout.addWidget(&gui_uvw);
-    window.setLayout(&layout);
+    GLcanvas gui_xyz, gui_uvw;
     m_xyz.show_wireframe(true);
     m_xyz.show_wireframe_transparency(0.4);
     m_xyz.show_texture2D(TEXTURE_2D_ISOLINES, 3.0);
-    gui_xyz.push_obj(&m_xyz);
+    gui_xyz.push(&m_xyz);
     m_uvw.show_wireframe(true);
     m_uvw.show_wireframe_transparency(0.4);
     m_uvw.show_texture2D(TEXTURE_2D_ISOLINES, 3.0);
-    gui_uvw.push_obj(&m_uvw);
-    window.resize(800,600);
-    window.show();
+    gui_uvw.push(&m_uvw);
 
-    // CMD+1 to show XYZ mesh controls.
-    // CMD+2 to show UVW mesh controls.
-    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_xyz(&m_xyz, &gui_xyz);
-    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_uvw(&m_uvw, &gui_uvw);
-    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui_xyz), &QShortcut::activated, [&](){panel_xyz.show();});
-    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_2), &gui_uvw), &QShortcut::activated, [&](){panel_uvw.show();});
+    // only the main window can host visual controls, so all menus are pushed in gui_xyz
+    SurfaceMeshControls<DrawableTrimesh<>> menu_xyz(&m_xyz, &gui_xyz, "object space");
+    SurfaceMeshControls<DrawableTrimesh<>> menu_uvw(&m_uvw, &gui_xyz, "texture space");
+    gui_xyz.push(&menu_xyz);
+    gui_xyz.push(&menu_uvw);
 
-    return a.exec();
+    // the main window launches the event loop for itself and for all other windows in the app
+    return gui_xyz.launch({&gui_uvw});
 }

@@ -1,21 +1,11 @@
-/* This program reads a volumetric mesh from file, and saves on the disk
- * a copy of its outer skin in the form of a polygon mesh. Using the additional
- * parameter -vmap it also exports a text file containing per vertex correspondences
- * between the volumetric and surface mesh
- *
- * Enjoy!
-*/
-
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/export_surface.h>
 #include <cinolib/string_utilities.h>
 
-using namespace cinolib;
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 int main(int argc, char **argv)
 {
+    using namespace cinolib;
+
     if(argc<3)
     {
         std::cout << "\n\nUsage:\n\texport_surface -tet|hex|poly filename [-vmap]\n\n" << std::endl;;

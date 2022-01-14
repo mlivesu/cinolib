@@ -1,36 +1,13 @@
-/* This sample program computes a canonical polygonal schema of a closed manifodl
- * with genus g, which is basically a map to a regular polygon with 4g sides. For
- * more details refer to:
- *
- *    Obtaining a Canonical Polygonal Schema from a
- *    Greedy Homotopy Basis with Minimal Mesh Refinement
- *    Marco Livesu
- *    IEEE Transactions on Visualization and Computer Graphics, 2020
- *
- * and
- *
- *    Globally Optimal Surface Mapping for Surfaces with Arbitrary Topology
- *    Xin Li, Yunfan Bao, Xiaohu Guo, Miao Jin, Xianfeng Gu and Hong Qin
- *    IEEE Transactions on Visualization and Computer Graphics, 2008
- *
- * Enjoy!
-*/
-
-#include <QApplication>
-#include <QHBoxLayout>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/glcanvas.h>
+#include <cinolib/gl/surface_mesh_controls.h>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/homotopy_basis.h>
 #include <cinolib/canonical_polygonal_schema.h>
 #include <cinolib/polycube.h>
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 int main(int argc, char **argv)
 {
     using namespace cinolib;
-
-    QApplication app(argc, argv);
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/torus.obj";
     DrawableTrimesh<> m_xyz(s.c_str());
@@ -42,42 +19,33 @@ int main(int argc, char **argv)
     data.split_strategy = EDGE_SPLIT_STRATEGY;
     homotopy_basis(m_xyz, data);
     std::cout << data << std::endl;
-    DrawableTrimesh<> m_uvw;
-    canonical_polygonal_schema(m_xyz, data, m_uvw);
+    DrawableTrimesh<> m_cps;
+    canonical_polygonal_schema(m_xyz, data, m_cps);
 
     // set UV coordinates
     auto xyz = m_xyz.vector_verts();
-    m_xyz.vector_verts() = m_uvw.vector_verts();
+    m_xyz.vector_verts() = m_cps.vector_verts();
     m_xyz.copy_xyz_to_uvw(UV_param);
-    m_uvw.copy_xyz_to_uvw(UV_param);
+    m_cps.copy_xyz_to_uvw(UV_param);
     m_xyz.vector_verts() = xyz;
 
-    QWidget window;
     GLcanvas gui_xyz;
     GLcanvas gui_uvw;
-    QHBoxLayout layout;
-    layout.addWidget(&gui_xyz);
-    layout.addWidget(&gui_uvw);
-    window.setLayout(&layout);
     m_xyz.show_wireframe(false);
     m_xyz.edge_mark_boundaries();
     m_xyz.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
     m_xyz.updateGL();
-    gui_xyz.push_obj(&m_xyz);
-    m_uvw.show_wireframe(false);
-    m_uvw.edge_mark_boundaries();
-    m_uvw.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
-    m_uvw.updateGL();
-    gui_uvw.push_obj(&m_uvw);
-    window.resize(800,600);
-    window.show();
+    gui_xyz.push(&m_xyz);
+    m_cps.show_wireframe(false);
+    m_cps.edge_mark_boundaries();
+    m_cps.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
+    m_cps.updateGL();
+    gui_uvw.push(&m_cps);
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    SurfaceMeshControls<DrawableTrimesh<>> menu_xyz(&m_xyz,&gui_xyz,"OBJ space");
+    SurfaceMeshControls<DrawableTrimesh<>> menu_cps(&m_cps,&gui_xyz,"CPS space");
+    gui_xyz.push(&menu_xyz);
+    gui_xyz.push(&menu_cps);
 
-    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_xyz(&m_xyz, &gui_xyz);
-    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_uvw(&m_uvw, &gui_uvw);
-    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui_xyz), &QShortcut::activated, [&](){panel_xyz.show();});
-    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_2), &gui_uvw), &QShortcut::activated, [&](){panel_uvw.show();});
-
-    return app.exec();
+    return gui_xyz.launch({&gui_uvw});
 }

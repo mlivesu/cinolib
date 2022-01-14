@@ -1,29 +1,14 @@
-/* This sample program computes the kernel (in red),
- * the maximally inscribed circle (in blue) and the
- * smallest enclosing circle (in red) of a general
- * 2D polygon. The user can change the polygon shape
- * through a slider placed on the top part of the canvas.
- *
- * Enjoy!
-*/
-#include <QApplication>
-#include <QSlider>
-#include <QVBoxLayout>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gui/qt/qt_gui_tools.h>
+#include <cinolib/gl/glcanvas.h>
 #include <cinolib/polygon_kernel.h>
 #include <cinolib/profiler.h>
 #include <cinolib/polygon_maximum_inscribed_circle.h>
 #include <cinolib/smallest_enclosing_disk.h>
 #include <cinolib/geometry/n_sided_poygon.h>
 
-using namespace cinolib;
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-int main(int argc, char **argv)
+int main(int, char **)
 {
-    QApplication a(argc, argv);
+    using namespace cinolib;
 
     DrawablePolygonmesh<> m({
         vec3d(0,0,0), // v0
@@ -61,59 +46,52 @@ int main(int argc, char **argv)
     sec.show_marked_edge(false);
     mic.show_marked_edge(false);
 
-    QWidget     window;
-    QSlider     slider(Qt::Horizontal);
-    QVBoxLayout layout;
-    GLcanvas    canvas(&window);
-    canvas.push_obj(&sec);
-    canvas.push_obj(&mic);
-    canvas.push_obj(&k);
-    canvas.push_obj(&m);
-    layout.addWidget(&slider);
-    layout.addWidget(&canvas);
-    window.setLayout(&layout);
-    window.show();
-    window.resize(600,600);
+    GLcanvas gui;
+    gui.push(&m);
+    gui.push(&k);
+    gui.push(&sec);
+    gui.push(&mic);
 
+    // position heat sources with CMD + left click
     Profiler profiler;
-
-    QSlider::connect(&slider, &QSlider::valueChanged, [&]()
+    gui.callback_app_controls = [&]()
     {
-        float t = static_cast<float>(slider.value()-slider.minimum())/static_cast<float>(slider.maximum()-slider.minimum());
-        m.vert(2) = vec3d(2,  3,0)*t + vec3d(2,1,0)*(1.0-t);
-        m.vert(3) = vec3d(1,0.1,0)*t + vec3d(1,1,0)*(1.0-t);
-        m.vert(4) = vec3d(0,  3,0)*t + vec3d(0,1,0)*(1.0-t);
-        m.update_p_tessellations();
-        m.updateGL();
+        static float t = 0;
+        if(ImGui::SliderFloat("##t", &t, 0, 1))
+        {
+            m.vert(2) = vec3d(2,  3,0)*t + vec3d(2,1,0)*(1.0-t);
+            m.vert(3) = vec3d(1,0.1,0)*t + vec3d(1,1,0)*(1.0-t);
+            m.vert(4) = vec3d(0,  3,0)*t + vec3d(0,1,0)*(1.0-t);
+            m.update_p_tessellations();
+            m.updateGL();
 
-        profiler.push("Compute polygon kernel");
-        double area = polygon_kernel(m.vector_verts(), kernel);
-        profiler.pop();
-        k = DrawablePolygonmesh<>(kernel);
-        k.poly_set_color(Color::PASTEL_RED());
-        k.show_marked_edge(false);
+            profiler.push("Compute polygon kernel");
+            double area = polygon_kernel(m.vector_verts(), kernel);
+            profiler.pop();
+            k = DrawablePolygonmesh<>(kernel);
+            k.poly_set_color(Color::PASTEL_RED());
+            k.show_marked_edge(false);
 
-        profiler.push("Compute smallest enclosing circle");
-        smallest_enclosing_disk(m.vector_verts(), sec_c, sec_r);
-        profiler.pop();
-        profiler.push("Compute maximum inscribed circle");
-        polygon_maximum_inscribed_circle(m.vector_verts(), mic_c, mic_r);
-        profiler.pop();
-        sec.vector_verts() = n_sided_polygon(50, CIRCLE);
-        mic.vector_verts() = n_sided_polygon(50, CIRCLE);
-        sec.translate(sec_c);
-        mic.translate(mic_c);
-        sec.scale(sec_r);
-        mic.scale(mic_r);
-        sec.updateGL();
-        mic.updateGL();
+            profiler.push("Compute smallest enclosing circle");
+            smallest_enclosing_disk(m.vector_verts(), sec_c, sec_r);
+            profiler.pop();
+            profiler.push("Compute maximum inscribed circle");
+            polygon_maximum_inscribed_circle(m.vector_verts(), mic_c, mic_r);
+            profiler.pop();
+            sec.vector_verts() = n_sided_polygon(50, CIRCLE);
+            mic.vector_verts() = n_sided_polygon(50, CIRCLE);
+            sec.translate(sec_c);
+            mic.translate(mic_c);
+            sec.scale(sec_r);
+            mic.scale(mic_r);
+            sec.updateGL();
+            mic.updateGL();
 
-        std::cout << "kernel area: " << area << std::endl;
-        std::cout << "radius of smallest enclosing circle: " << sec_r << std::endl;
-        std::cout << "radius of maximum inscribed circle: " << mic_r << "\n" << std::endl;
+            std::cout << "kernel area: " << area << std::endl;
+            std::cout << "radius of smallest enclosing circle: " << sec_r << std::endl;
+            std::cout << "radius of maximum inscribed circle: " << mic_r << "\n" << std::endl;
+        }
+    };
 
-        canvas.updateGL();
-    });
-
-    return a.exec();
+    return gui.launch();
 }

@@ -36,7 +36,7 @@
 #ifndef CINO_DRAWABLE_POLYHEDRALMESH_H
 #define CINO_DRAWABLE_POLYHEDRALMESH_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/meshes/polyhedralmesh.h>
 #include <cinolib/meshes/abstract_drawable_polyhedralmesh.h>
@@ -85,6 +85,6 @@ class DrawablePolyhedralmesh : public AbstractDrawablePolyhedralMesh<Polyhedralm
 
 }
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_DRAWABLE_POLYHEDRALMESH_H

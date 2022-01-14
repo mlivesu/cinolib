@@ -36,22 +36,16 @@
 #ifndef CINO_DRAW_LINES_TRIS_H
 #define CINO_DRAW_LINES_TRIS_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
-#ifdef __APPLE__
-#include <gl.h>
-#include <glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#include <cinolib/gl/gl_glu_glfw.h>
 
 #include <vector>
 #include <cmath>
 #include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
-#include <cinolib/textures/textures.h>
+#include <cinolib/gl/load_texture.h>
 
 namespace cinolib
 {
@@ -125,6 +119,6 @@ void render(const RenderData & data);
 #include "draw_lines_tris.cpp"
 #endif
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_DRAW_LINES_TRIS_H

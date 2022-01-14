@@ -36,7 +36,7 @@
 #ifndef CINO_DRAWABLE_TRIMESH_H
 #define CINO_DRAWABLE_TRIMESH_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/meshes/abstract_drawable_polygonmesh.h>
@@ -111,6 +111,6 @@ class DrawableTrimesh : public AbstractDrawablePolygonMesh<Trimesh<M,V,E,P>>
 
 }
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_DRAWABLE_TRIMESH_H

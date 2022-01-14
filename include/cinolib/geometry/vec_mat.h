@@ -162,6 +162,11 @@ class mat
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        mat<r+1,c,T> add_coord(const T & val) const; // e.g. from cartesian to homogeneous coords
+        mat<r-1,c,T> rem_coord()              const; // e.g. from homogeneous to cartesian coords
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         bool is_null() const;
         bool is_nan()  const;
         bool is_inf()  const;

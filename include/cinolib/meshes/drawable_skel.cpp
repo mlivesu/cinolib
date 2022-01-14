@@ -34,14 +34,9 @@
 *     Italy                                                                     *
 *********************************************************************************/
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
-#ifdef __APPLE__
-#include <gl.h>
-#else
-#include <GL/gl.h>
-#endif
-
+#include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/meshes/drawable_skel.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
@@ -290,4 +285,4 @@ void DrawableSkel::update_bone_colors()
 
 }
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI

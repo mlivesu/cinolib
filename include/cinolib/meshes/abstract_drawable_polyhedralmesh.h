@@ -36,7 +36,7 @@
 #ifndef CINO_ABSTRACT_DRAWABLE_POLYHEDRAL_MESH_H
 #define CINO_ABSTRACT_DRAWABLE_POLYHEDRAL_MESH_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/drawable_object.h>
 #include <cinolib/gl/draw_lines_tris.h>
@@ -48,18 +48,21 @@ namespace cinolib
 template<class Mesh>
 class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObject
 {
-    protected:
-
-        MeshSlicer<Mesh> slicer;
-        Material         material_;
-        RenderData       drawlist_in;
-        RenderData       drawlist_out;
-        RenderData       drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces/poly too)
-        Color            marked_edge_color;
-        Color            marked_face_color;
-        float            AO_alpha;
-
     public:
+
+        Material   material_;
+        RenderData drawlist_in;
+        RenderData drawlist_out;
+        RenderData drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces/poly too)
+        Color      marked_edge_color;
+        Color      marked_face_color;
+        float      AO_alpha;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        explicit AbstractDrawablePolyhedralMesh() : Mesh() {}
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void       draw(const float scene_size=1) const;
         vec3d      scene_center() const { return this->bb.center();     }
@@ -92,11 +95,6 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
 
         const Material & material() const { return material_; }
               Material & material()       { return material_; }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void slice(const SlicerState & s);
-        void slicer_reset();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -144,6 +142,6 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
 #include "abstract_drawable_polyhedralmesh.cpp"
 #endif
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_ABSTRACT_DRAWABLE_POLYHEDRAL_MESH_H

@@ -38,23 +38,39 @@
 #include <cinolib/vector_serialization.h>
 
 #ifdef CINOLIB_USES_TRIANGLE
-    /*
-     * triangle.h is written in an old fashioned C style. As such, it requires
-     * some annoying adjustment to comply with C++ standards
-    */
-    #ifndef ANSI_DECLARATORS
-    #define ANSI_DECLARATORS
-    #endif
-    #ifndef REAL
-    #define REAL double
-    #endif
-    #ifndef VOID
-    #define VOID void
-    #endif
-    extern "C" // set C-like linking style (i.e. no name mungling)
-    {
-    #include <triangle.h>
-    }
+
+// define symbols used by triangle (with a backup of previous symbols, if any)
+#ifdef ANSI_DECLARATORS
+#  define PREVIOUSLY_DEFINED_ANSI_DECLARATORS ANSI_DECLARATORS
+#  undef ANSI_DECLARATORS
+#endif
+#ifdef REAL
+#  define PREVIOUSLY_DEFINED_REAL REAL
+#  undef REAL
+#endif
+#ifdef VOID
+#  define PREVIOUSLY_DEFINED_VOID VOID
+#  undef VOID
+#endif
+#define ANSI_DECLARATORS
+#define REAL double
+#define VOID int
+
+#include <triangle.h>
+
+// restore previously existing symbols
+#undef ANSI_DECLARATORS
+#ifdef PREVIOUSLY_DEFINED_ANSI_DECLARATORS
+#  define ANSI_DECLARATORS PREVIOUSLY_DEFINED_ANSI_DECLARATORS
+#endif
+#undef REAL
+#ifdef PREVIOUSLY_DEFINED_REAL
+#  define REAL PREVIOUSLY_DEFINED_REAL
+#endif
+#undef VOID
+#ifdef PREVIOUSLY_DEFINED_VOID
+#  define VOID PREVIOUSLY_DEFINED_VOID
+#endif
 #endif
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

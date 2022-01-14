@@ -36,16 +36,9 @@
 #ifndef CINO_DRAW_CYLINDER_H
 #define CINO_DRAW_CYLINDER_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
-#ifdef __APPLE__
-#include <gl.h>
-#include <glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
+#include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/pi.h>
 
@@ -68,6 +61,7 @@ static void cylinder(const vec3  & a,
     glEnable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
     glColor3fv(color);
+    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glTranslated(a[0], a[1], a[2]);
     glRotatef(-angle, normal[0], normal[1], normal[2]);
@@ -86,6 +80,6 @@ static void cylinder(const vec3  & a,
 
 }
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_DRAW_CYLINDER_H

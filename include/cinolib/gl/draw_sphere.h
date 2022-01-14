@@ -36,16 +36,9 @@
 #ifndef CINO_DRAW_SPHERE_H
 #define CINO_DRAW_SPHERE_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
-#ifdef __APPLE__
-#include <gl.h>
-#include <glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
+#include <cinolib/gl/gl_glu_glfw.h>
 #include <cinolib/cino_inline.h>
 
 namespace cinolib
@@ -60,6 +53,7 @@ static void sphere(const vec3  & center,
     glEnable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
     glColor3fv(color);
+    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glTranslated(center[0], center[1], center[2]);
     GLUquadric *sphere = gluNewQuadric();
@@ -74,6 +68,6 @@ static void sphere(const vec3  & center,
 
 }
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_DRAW_SPHERE_H

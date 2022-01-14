@@ -36,7 +36,7 @@
 #include <cinolib/meshes/abstract_drawable_polygonmesh.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/gl/draw_lines_tris.h>
-#include <cinolib/textures/textures.h>
+#include <cinolib/gl/load_texture.h>
 #include <cinolib/color.h>
 
 namespace cinolib
@@ -48,10 +48,8 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::init_drawable_stuff()
 {
-    slicer = MeshSlicer<Mesh>(*this);
-
     drawlist.draw_mode        = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
-    drawlist_marked.draw_mode = DRAW_SEGS;
+    drawlist_marked.draw_mode = DRAW_TRIS | DRAW_SEGS;
     drawlist_marked.seg_width = 3;
     marked_edge_color         = Color::RED();
 
@@ -144,7 +142,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
     drawlist.seg_coords.clear();
     drawlist.seg_colors.clear();
 
-    if (this->num_polys() == 0) // for point clouds
+    if(this->num_polys() == 0) // for point clouds
     {
         drawlist.tri_coords.reserve(this->num_verts()*3);
         drawlist.tri_v_colors.reserve(this->num_verts()*4);
@@ -349,26 +347,6 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::slice(const SlicerState & s)
-{
-    slicer.update(*this, s); // update per element visibility flags
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class Mesh>
-CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::slicer_reset()
-{
-    slicer.reset(*this);
-    updateGL();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class Mesh>
-CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::show_mesh(const bool b)
 {
     if (b) drawlist.draw_mode |=  DRAW_TRIS;
@@ -463,11 +441,11 @@ void AbstractDrawablePolygonMesh<Mesh>::show_texture1D(const int tex_type)
     drawlist.texture.type = tex_type;
     switch (tex_type)
     {
-        case TEXTURE_1D_ISOLINES :          texture_isolines1D(drawlist.texture);           break;
-        case TEXTURE_1D_HSV :               texture_HSV(drawlist.texture);                  break;
-        case TEXTURE_1D_HSV_W_ISOLINES :    texture_HSV_with_isolines(drawlist.texture);    break;
-        case TEXTURE_1D_PARULA :            texture_parula(drawlist.texture);               break;
-        case TEXTURE_1D_PARULA_W_ISOLINES : texture_parula_with_isolines(drawlist.texture); break;
+        case TEXTURE_1D_ISOLINES :          load_texture_isolines1D(drawlist.texture);           break;
+        case TEXTURE_1D_HSV :               load_texture_HSV(drawlist.texture);                  break;
+        case TEXTURE_1D_HSV_W_ISOLINES :    load_texture_HSV_with_isolines(drawlist.texture);    break;
+        case TEXTURE_1D_PARULA :            load_texture_parula(drawlist.texture);               break;
+        case TEXTURE_1D_PARULA_W_ISOLINES : load_texture_parula_with_isolines(drawlist.texture); break;
         default: assert("Unknown Texture!" && false);
     }
     updateGL();
@@ -489,9 +467,9 @@ void AbstractDrawablePolygonMesh<Mesh>::show_texture2D(const int tex_type, const
     drawlist.texture.scaling_factor = tex_unit_scalar;
     switch (tex_type)
     {
-        case TEXTURE_2D_CHECKERBOARD : texture_checkerboard(drawlist.texture);   break;
-        case TEXTURE_2D_ISOLINES:      texture_isolines2D(drawlist.texture);     break;
-        case TEXTURE_2D_BITMAP:        texture_bitmap(drawlist.texture, bitmap); break;
+        case TEXTURE_2D_CHECKERBOARD : load_texture_checkerboard(drawlist.texture);   break;
+        case TEXTURE_2D_ISOLINES:      load_texture_isolines2D(drawlist.texture);     break;
+        case TEXTURE_2D_BITMAP:        load_texture_bitmap(drawlist.texture, bitmap); break;
         default: assert("Unknown Texture!" && false);
     }
     updateGL();

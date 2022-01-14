@@ -1,37 +1,21 @@
-/* This is a base application for cinolib (https://github.com/maxicino/cinolib).
- *
- * It will iteratively collapse all internal edges of a given mesh until possible,
- * candidate collapses are checked for both topological (i.e. manifold) and geometrical
- * (i.e. no flips) consistency.
- *
- * Enjoy!
-*/
-
-#include <QApplication>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gui/qt/qt_gui_tools.h>
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#include <cinolib/gl/glcanvas.h>
 
 int main(int argc, char **argv)
 {
     using namespace cinolib;
 
-    QApplication a(argc, argv);
-
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/circle.obj";
-
     DrawableTrimesh<> m(s.c_str());
 
     GLcanvas gui;
-    gui.push_obj(&m);
-    gui.show();
+    gui.push(&m);
 
     std::cout << "\n\nPress SPACE to start the collapsing sequence\n\n" << std::endl;
 
-    gui.callback_key_press = [&](GLcanvas *c, QKeyEvent *e)
+    gui.callback_key_pressed = [&](int key, int)
     {
-        if(e->key() == Qt::Key_Space)
+        if(key == GLFW_KEY_SPACE)
         {
             bool converged = false;
             do
@@ -44,19 +28,14 @@ int main(int argc, char **argv)
                     {
                         converged = false;
                         m.updateGL();
-                        c->updateGL_strict();
+                        gui.draw();
                     }
                 }
             }
             while(!converged);
             m.updateGL();
-            c->updateGL();
         }
     };
 
-    // CMD+1 to show mesh controls.
-    SurfaceMeshControlPanel<DrawableTrimesh<>> panel(&m, &gui);
-    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
-
-    return a.exec();
+    gui.launch();
 }

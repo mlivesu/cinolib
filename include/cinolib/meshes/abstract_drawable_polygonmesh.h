@@ -36,7 +36,7 @@
 #ifndef CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H
 #define CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H
 
-#ifdef CINOLIB_USES_OPENGL
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/drawable_object.h>
 #include <cinolib/meshes/mesh_slicer.h>
@@ -48,16 +48,15 @@ namespace cinolib
 template<class Mesh>
 class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 {
-    protected:
-
-        MeshSlicer<Mesh> slicer;
-        Material         material_;
-        RenderData       drawlist;
-        RenderData       drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces too)
-        Color            marked_edge_color;
-        float            AO_alpha = 1.0;
-
     public:
+
+        Material   material_;
+        RenderData drawlist;
+        RenderData drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces too)
+        Color      marked_edge_color;
+        float      AO_alpha = 1.0;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         explicit AbstractDrawablePolygonMesh() : Mesh() {}
 
@@ -94,11 +93,6 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void slice(const SlicerState & s);
-        void slicer_reset();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void show_mesh(const bool b);
         void show_AO_alpha(const float alpha);
         void show_mesh_flat();
@@ -124,6 +118,6 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 #include "abstract_drawable_polygonmesh.cpp"
 #endif
 
-#endif // #ifdef CINOLIB_USES_OPENGL
+#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #endif // CINO_ABSTRACT_DRAWABLE_POLYGON_MESH_H

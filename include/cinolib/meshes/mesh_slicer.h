@@ -36,48 +36,45 @@
 #ifndef CINO_MESH_SLICER_H
 #define CINO_MESH_SLICER_H
 
-#include <cinolib/symbols.h>
+#include <cinolib/meshes/abstract_mesh.h>
 
 namespace cinolib
 {
 
-struct SlicerState
-{
-    float X_thresh =  1;      // X coord \in [0,1] ( relative w.r.t. bbox delta x)
-    float Y_thresh =  1;      // Y coord \in [0,1] ( relative w.r.t. bbox delta y)
-    float Z_thresh =  1;      // Z coord \in [0,1] ( relative w.r.t. bbox delta z)
-    float Q_thresh =  1;      // Quality \in [0,1] ( assumes quality metric is in [0,1] too)
-    int   L_filter = -1;      // Label (-1 : show all labels)
-    int   X_sign   = LEQ;     // { LEQ, GEQ   }
-    int   Y_sign   = LEQ;     // { LEQ, GEQ   }
-    int   Z_sign   = LEQ;     // { LEQ, GEQ   }
-    int   Q_sign   = LEQ;     // { LEQ, GEQ   }
-    int   L_mode   = IS_NOT;  // { IS, IS_NOT }
-    int   mode     = AND;     // { AND, OR    }
-};
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-/* Filter mesh elements according to a number of different criteria.
- * Useful to inspect the interior of volume meshes, or to isolate
- * interesting portions of a complex surface mesh.
-*/
-template<class Mesh>
 class MeshSlicer
 {
     public:
 
-        explicit MeshSlicer() {}
-
-        explicit MeshSlicer(Mesh & m);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void reset(Mesh & m);
+        MeshSlicer(){}
+       ~MeshSlicer(){}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void update(Mesh & m, const SlicerState & s);
+        float X_thresh  =  1;   // X coord \in [0,1] (relative w.r.t. bbox delta x)
+        float Y_thresh  =  1;   // Y coord \in [0,1] (relative w.r.t. bbox delta y)
+        float Z_thresh  =  1;   // Z coord \in [0,1] (relative w.r.t. bbox delta z)
+        float Q_thresh  =  1;   // Quality \in [0,1] (assumes quality metric is in [0,1] too)
+        int   L_filter  = -1;   // Label             (-1 : show all labels)
+        bool  X_leq     = true; // { <=  or >=     }
+        bool  Y_leq     = true; // { <=  or >=     }
+        bool  Z_leq     = true; // { <=  or >=     }
+        bool  Q_leq     = true; // { <=  or >=     }
+        bool  L_is      = true; // { IS  or IS_NOT }
+        bool  mode_AND  = true; // { AND or OR     }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void reset();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        void        deserialize(const std::string & str);
+        std::string serialize() const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        template<class M, class V, class E, class P>
+        void slice(AbstractMesh<M,V,E,P> & m);
 };
 
 }
