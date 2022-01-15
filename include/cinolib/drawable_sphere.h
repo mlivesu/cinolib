@@ -37,9 +37,9 @@
 #define CINO_DRAWABLE_SPHERE_H
 
 #include <cinolib/drawable_object.h>
-#include <cinolib/gl/draw_sphere.h>
 #include <cinolib/geometry/vec_mat.h>
 #include <cinolib/color.h>
+#include <cinolib/gl/draw_sphere.h>
 
 namespace cinolib
 {
@@ -48,32 +48,40 @@ class DrawableSphere : public DrawableObject
 {
     public :
 
-        DrawableSphere(const vec3d & center, const double size = 1.0, const Color & c = Color::RED())
-            : center(center)
-            , size(size)
-            , color(c)
-        {}
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        ~DrawableSphere(){}
+       ~DrawableSphere() override {}
+
+        DrawableSphere(const vec3d & center = vec3d(0,0,0),
+                       const float   radius = 1.0,
+                       const Color & color  = Color::RED(),
+                       const uint    subdiv = 1) // number of subdivisions of the regular icosahedron
+            : center(center)
+            , radius(radius)
+            , color(color)
+            , subdiv(subdiv)
+        {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         vec3d  center;
-        double size;
+        double radius;
         Color  color;
+        uint   subdiv;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        ObjectType object_type()  const { return SPHERE_; }
-        vec3d      scene_center() const { return center; }
-        float      scene_radius() const { return 0.0;    }
+        ObjectType object_type()  const override { return SPHERE_; }
+        vec3d      scene_center() const override { return center;  }
+        float      scene_radius() const override { return radius;  }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void draw(const float scene_size) const
+        void draw(const float) const override
         {
-            sphere<vec3d>(center, size*scene_size/100.0, color.rgba);
+            sphere(center._vec, radius, color.rgba, subdiv);
         }
+
 };
 
 }

@@ -65,7 +65,7 @@ void DrawableSegmentSoup::draw(const float scene_size) const
 
         for(vec3d p : *this)
         {
-            sphere<vec3d>(p, cylind_rad, color.rgba);
+            sphere(p._vec, cylind_rad, color.rgba);
         }
 
         for(uint i=0; i<size()/2; ++i)
