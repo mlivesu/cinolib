@@ -320,7 +320,7 @@ void GLcanvas::draw_axis() const
     cylinder(O, X, r, r, Color::RED().rgba);
     cylinder(O, Y, r, r, Color::GREEN().rgba);
     cylinder(O, Z, r, r, Color::BLUE().rgba);
-    sphere(O._vec, r*2, Color::WHITE().rgba);
+    sphere(O, r*2, Color::WHITE(), 0);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_COLOR_MATERIAL);
 }

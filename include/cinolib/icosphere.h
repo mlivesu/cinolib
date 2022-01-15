@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2022: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,78 +33,31 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_DRAW_SPHERE_H
-#define CINO_DRAW_SPHERE_H
+#ifndef CINO_ICOSPHERE
+#define CINO_ICOSPHERE
 
-#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
-
-#include <cinolib/gl/gl_glu_glfw.h>
-#include <cinolib/icosphere.h>
-#include <cinolib/color.h>
+#include <cinolib/cino_inline.h>
+#include <vector>
+#include <sys/types.h>
 
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+/* Constructs a sphere by iteratively refining a regular icosahedron.
+ * Only vertex positions and triangles are generated. The sphere is
+ * centered at the originm, therefore the (normalized) vertex coordinates
+ * are also per vertex normals.
+*/
+template<class T>
 CINO_INLINE
-static void sphere(const double * center,
-                   const float    radius,
-                   const float  * color,
-                   const double * verts,
-                   const uint   * tris,
-                   const GLsizei  size) // length of tris
-{
-    glEnable(GL_LIGHTING);
-    glShadeModel(GL_SMOOTH);
-    glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_NORMALIZE);
-    glColor3fv(color);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glTranslated(center[0], center[1], center[2]);
-    glScalef(radius, radius, radius);
-    glVertexPointer(3, GL_DOUBLE, 0, verts);
-    glNormalPointer(GL_DOUBLE, 0, verts); // only for spheres: normals and xyz coords coincide (up to a scaling factor, comepnsated by GL_NORMALIZE)
-    glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, tris);
-    glPopMatrix();
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
-    glColor3f(1.f,1.f,1.f);
-    glDisable(GL_NORMALIZE);
-    glDisable(GL_COLOR_MATERIAL);
-    glDisable(GL_LIGHTING);
+void icosphere(const T             radius, // sphere radius
+               const uint          n_subd, // number of subdivisions of the icosahedron
+               std::vector<T>    & verts,  // output vertices
+               std::vector<uint> & tris);  // output triangles
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifndef  CINO_STATIC_LIB
+#include "icosphere.cpp"
+#endif
 
-CINO_INLINE
-static void sphere(const double * center,
-                   const float    radius,
-                   const float  * color,
-                   const uint     subdiv = 1) // number of subdivisions of the regular icosahedron
-{
-    std::vector<double> verts;
-    std::vector<uint>   tris;
-    icosphere(1.0, subdiv, verts, tris);
-    sphere(center, radius, color, verts.data(), tris.data(), (GLsizei)tris.size());
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-static void sphere(const vec3d & center,
-                   const float   radius,
-                   const Color & color,
-                   const uint    subdiv = 1) // number of subdivisions of the regular icosahedron
-{
-    sphere(center._vec, radius, color.rgba, subdiv);
-}
-
-}
-
-#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
-
-#endif // CINO_DRAW_SPHERE_H
+#endif // CINO_ICOSPHERE
