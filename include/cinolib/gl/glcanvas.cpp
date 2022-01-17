@@ -109,8 +109,6 @@ GLcanvas::GLcanvas(const int width, const int height)
         io.Fonts->AddFontFromMemoryCompressedTTF(droid_sans_data, droid_sans_size, font_size*10);
         io.FontGlobalScale = 0.1; // compensate for high-res fonts
     }
-
-    window_size_event(window, width, height);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
