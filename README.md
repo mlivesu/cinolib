@@ -25,7 +25,7 @@ int main(void)
     return gui.launch();
 }
 ```
-and this the `CMakeLists.txt` that can be used to compile it
+and this is the `CMakeLists.txt` that can be used to compile it
 ```
 project(test)
 add_executable(${PROJECT_NAME} main.cpp)
