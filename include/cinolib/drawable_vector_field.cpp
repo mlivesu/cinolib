@@ -34,6 +34,8 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/drawable_vector_field.h>
+#include <cinolib/arrow.h>
+#include <cinolib/drawable_arrow.h>
 
 namespace cinolib
 {
@@ -43,6 +45,7 @@ DrawableVectorField::DrawableVectorField()
 {
     arrow_color = Color::RED();
     arrow_size  = 1.0;
+    update_arrow_tessellation();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -53,6 +56,7 @@ DrawableVectorField::DrawableVectorField(const uint size) : VectorField(size)
     pos.resize(size);
     arrow_color = Color::RED();
     arrow_size  = 1.0;
+    update_arrow_tessellation();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -65,6 +69,7 @@ DrawableVectorField::DrawableVectorField(const std::vector<vec3d> & data,
 {
     arrow_color = Color::RED();
     arrow_size  = 1.0;
+    update_arrow_tessellation();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -93,6 +98,7 @@ DrawableVectorField::DrawableVectorField(const AbstractMesh<M,V,E,P> &m, const b
     }
     arrow_color = Color::RED();
     arrow_size  = 0.5 * m.edge_avg_length();
+    update_arrow_tessellation();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -102,8 +108,9 @@ void DrawableVectorField::draw(const float) const
 {
     for(uint i=0; i<pos.size(); ++i)
     {
-        vec3d tip  = pos.at(i) + (double)arrow_size * vec_at(i);
-        arrow<vec3d>(pos.at(i), tip, arrow_size*0.1, arrow_color.rgba);
+        vec3d base = pos[i];
+        vec3d tip  = base + (double)arrow_size * vec_at((int)i);
+        draw_arrow(base, tip-base, verts, tris, normals, arrow_color);
     }
 }
 
@@ -121,22 +128,15 @@ CINO_INLINE
 void DrawableVectorField::set_arrow_size(float s)
 {
     arrow_size = s;
+    update_arrow_tessellation();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Color DrawableVectorField::get_arrow_color() const
+void DrawableVectorField::update_arrow_tessellation()
 {
-    return arrow_color;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-float DrawableVectorField::get_arrow_size() const
-{
-    return arrow_size;
+    arrow((float)arrow_size, (float)arrow_size*0.12f, 0.4f, 0.5f, 6, verts, tris, normals);
 }
 
 }

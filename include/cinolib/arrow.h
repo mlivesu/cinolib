@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2021: Marco Livesu                                              *
+*  Copyright(C) 2022: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,16 +33,34 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_GL_GLU_GLFW_H
-#define CINO_GL_GLU_GLFW_H
+#ifndef CINO_ARROW_H
+#define CINO_ARROW_H
 
-/* Include OpenGL headers through GLFW.
- * All libraries will then need to be linked
- * properly to define all symbols
- *
- * https://www.glfw.org/docs/3.0/build.html#build_macros
+#include <cinolib/cino_inline.h>
+#include <vector>
+#include <sys/types.h>
+
+namespace cinolib
+{
+
+/* Constructs an arrow with regular cross section. Vertex positions, vertex normals
+ * and triangles are generated. The object is aligned with the Z axis, with the base
+ * centered at the origin.
 */
-#include <GLFW/glfw3.h>
+template<class T>
+CINO_INLINE
+void arrow(const T            height,
+           const T            radius,
+           const T            base_rel_height, // percentage of the height (a good value is 0.7)
+           const T            base_rel_radius, // percentage of the radius (a good value is 0.5)
+           const uint         n_sides,         // cross section
+           std::vector<T>    & verts,          // output vertices
+           std::vector<uint> & tris,           // output triangles
+           std::vector<T>    & normals);       // output normals (per vertex)
+}
 
+#ifndef  CINO_STATIC_LIB
+#include "arrow.cpp"
 #endif
 
+#endif // CINO_ARROW_H

@@ -61,16 +61,16 @@ void DrawableSegmentSoup::draw(const float scene_size) const
 
     if(!use_gl_lines)
     {
-        float cylind_rad = scene_size*0.002*thickness;
+        double cylind_rad = scene_size*0.002*thickness;
 
         for(vec3d p : *this)
         {
-            sphere(p._vec, cylind_rad, color.rgba);
+            draw_sphere(p, cylind_rad, color);
         }
 
         for(uint i=0; i<size()/2; ++i)
         {
-            cylinder<vec3d>(at(2*i+0), at(2*i+1), cylind_rad, cylind_rad, color.rgba);
+            draw_cylinder(at(2*i+0), at(2*i+1), cylind_rad, cylind_rad, color);
         }
     }
     else

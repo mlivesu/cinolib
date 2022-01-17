@@ -47,32 +47,38 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// this function does only the rendering. It assumes the sphere has already
+// been constructed and a tessellation is expected in input. Useful to pay the
+// cost of tessellation just once, and then render many instances of the same
+// cylinder in the scene (e.g. for rendering of point clouds)
+template<class T>
 CINO_INLINE
-static void sphere(const double * center,
-                   const float    radius,
-                   const float  * color,
-                   const double * verts,
-                   const uint   * tris,
-                   const GLsizei  size) // length of tris
+void draw_sphere(const mat<3,1,T>         & center,
+                 const T                    radius,
+                 const Color              & color,
+                 const std::vector<float> & verts,
+                 const std::vector<uint>  & tris)
 {
     glEnable(GL_LIGHTING);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_NORMALIZE);
-    glColor3fv(color);
+    glEnable(GL_CULL_FACE);
+    glColor3fv(color.rgba);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glTranslated(center[0], center[1], center[2]);
     glScalef(radius, radius, radius);
-    glVertexPointer(3, GL_DOUBLE, 0, verts);
-    glNormalPointer(GL_DOUBLE, 0, verts); // only for spheres: normals and xyz coords coincide (up to a scaling factor, comepnsated by GL_NORMALIZE)
-    glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, tris);
+    glVertexPointer(3, GL_FLOAT, 0, verts.data());
+    glNormalPointer(GL_FLOAT, 0, verts.data()); // only for spheres: normals and xyz coords coincide (up to a scaling factor, comepnsated by GL_NORMALIZE)
+    glDrawElements(GL_TRIANGLES, (GLsizei)tris.size(), GL_UNSIGNED_INT, tris.data());
     glPopMatrix();
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
     glColor3f(1.f,1.f,1.f);
+    glDisable(GL_CULL_FACE);
     glDisable(GL_NORMALIZE);
     glDisable(GL_COLOR_MATERIAL);
     glDisable(GL_LIGHTING);
@@ -80,27 +86,17 @@ static void sphere(const double * center,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template<class T>
 CINO_INLINE
-static void sphere(const double * center,
-                   const float    radius,
-                   const float  * color,
-                   const uint     subdiv = 1) // number of subdivisions of the regular icosahedron
+void draw_sphere(const mat<3,1,T> & center,
+                 const T            radius,
+                 const Color      & color,
+                 const uint         subdiv = 1) // number of subdivisions of the regular icosahedron
 {
-    std::vector<double> verts;
-    std::vector<uint>   tris;
-    icosphere(1.0, subdiv, verts, tris);
-    sphere(center, radius, color, verts.data(), tris.data(), (GLsizei)tris.size());
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-static void sphere(const vec3d & center,
-                   const float   radius,
-                   const Color & color,
-                   const uint    subdiv = 1) // number of subdivisions of the regular icosahedron
-{
-    sphere(center._vec, radius, color.rgba, subdiv);
+    std::vector<float> verts;
+    std::vector<uint>  tris;
+    icosphere(1.f, subdiv, verts, tris);
+    draw_sphere(center, radius, color, verts, tris);
 }
 
 }

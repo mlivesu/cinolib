@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2021: Marco Livesu                                              *
+*  Copyright(C) 2022: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,16 +33,66 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_GL_GLU_GLFW_H
-#define CINO_GL_GLU_GLFW_H
+#include <cinolib/cylinder.h>
+#include <cinolib/geometry/vec_mat.h>
 
-/* Include OpenGL headers through GLFW.
- * All libraries will then need to be linked
- * properly to define all symbols
- *
- * https://www.glfw.org/docs/3.0/build.html#build_macros
-*/
-#include <GLFW/glfw3.h>
+namespace cinolib
+{
 
-#endif
+template<class T>
+CINO_INLINE
+void cylinder(const T             height,
+              const T             bot_radius,
+              const T             top_radius,
+              const uint          n_sides,    // cross section
+              std::vector<T>    & verts,      // output vertices
+              std::vector<uint> & tris,       // output triangles
+              std::vector<T>    & normals)    // output normals (per vertex)
+{
+    // add first two points
+    verts   = { bot_radius, 0,      0,
+                top_radius, 0, height };
+    normals = { 1, 0, 0,
+                1, 0, 0 };
+    tris    = {};
 
+    // add remaining points and triangles
+    mat<2,1,T> b(bot_radius,0);
+    mat<2,1,T> t(top_radius,0);
+    mat<2,2,T> R = mat<2,2,T>::ROT_2D(2*M_PI/n_sides);
+    uint off = 0;
+    for(uint i=1; i<n_sides; ++i)
+    {
+        b = R*b;
+        verts.push_back(b.x());
+        verts.push_back(b.y());
+        verts.push_back(0);
+        t = R*t;
+        verts.push_back(t.x());
+        verts.push_back(t.y());
+        verts.push_back(height);
+
+        tris.push_back(off);
+        tris.push_back(off+2);
+        tris.push_back(off+1);
+        tris.push_back(off+1);
+        tris.push_back(off+2);
+        tris.push_back(off+3);
+        off+=2;
+
+        normals.push_back(b.x());
+        normals.push_back(b.y());
+        normals.push_back(0);
+        normals.push_back(t.x());
+        normals.push_back(t.y());
+        normals.push_back(0);
+    }
+    tris.push_back(off);
+    tris.push_back(0);
+    tris.push_back(off+1);
+    tris.push_back(off+1);
+    tris.push_back(0);
+    tris.push_back(1);
+}
+
+}

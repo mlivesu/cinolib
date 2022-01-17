@@ -313,16 +313,14 @@ void GLcanvas::draw_axis() const
     vec3d  X = O + vec3d(1,0,0)*camera.scene_radius;
     vec3d  Y = O + vec3d(0,1,0)*camera.scene_radius;
     vec3d  Z = O + vec3d(0,0,1)*camera.scene_radius;
-    double r = camera.scene_radius*0.01;
+    double r = camera.scene_radius*0.02;
     glfwMakeContextCurrent(window);
-    glEnable(GL_COLOR_MATERIAL);
     glDisable(GL_DEPTH_TEST);
-    cylinder(O, X, r, r, Color::RED().rgba);
-    cylinder(O, Y, r, r, Color::GREEN().rgba);
-    cylinder(O, Z, r, r, Color::BLUE().rgba);
-    sphere(O, r*2, Color::WHITE(), 0);
+    draw_arrow(O, X, r, Color::RED(),   0.9, 0.5, 8);
+    draw_arrow(O, Y, r, Color::GREEN(), 0.9, 0.5, 8);
+    draw_arrow(O, Z, r, Color::BLUE(),  0.9, 0.5, 8);
+    draw_sphere(O, r*2, Color::WHITE(), 1);
     glEnable(GL_DEPTH_TEST);
-    glDisable(GL_COLOR_MATERIAL);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2021: Marco Livesu                                              *
+*  Copyright(C) 2022: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,16 +33,34 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_GL_GLU_GLFW_H
-#define CINO_GL_GLU_GLFW_H
+#ifndef CINO_CYLINDER_H
+#define CINO_CYLINDER_H
 
-/* Include OpenGL headers through GLFW.
- * All libraries will then need to be linked
- * properly to define all symbols
- *
- * https://www.glfw.org/docs/3.0/build.html#build_macros
+#include <cinolib/cino_inline.h>
+#include <vector>
+#include <sys/types.h>
+
+namespace cinolib
+{
+
+/* Constructs a cylinder with regular cross section. The two extrema can
+ * be scaled differently to also create pyramids or truncated pyramids.
+ * Vertex positions, vertex normals and triangles are generated. The object
+ * is aligned with the Z axis, with the bottom base centerd at the origin.
 */
-#include <GLFW/glfw3.h>
+template<class T>
+CINO_INLINE
+void cylinder(const T            height,
+              const T            bot_radius,
+              const T            top_radius,
+              const uint         n_sides,    // cross section
+              std::vector<T>    & verts,     // output vertices
+              std::vector<uint> & tris,      // output triangles
+              std::vector<T>    & normals);  // output normals (per vertex)
+}
 
+#ifndef  CINO_STATIC_LIB
+#include "cylinder.cpp"
 #endif
 
+#endif // CINO_CYLINDER_H

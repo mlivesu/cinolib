@@ -41,7 +41,6 @@
 #include <cinolib/geometry/vec_mat.h>
 #include <cinolib/meshes/abstract_mesh.h>
 #include <cinolib/color.h>
-#include <cinolib/gl/draw_arrow.h>
 
 namespace cinolib
 {
@@ -65,11 +64,15 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void update_arrow_tessellation();
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         ObjectType object_type() const { return DRAWABLE_VECTOR_FIELD; }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        void draw(const float) const;
+        void  draw(const float) const;
         vec3d scene_center() const { return vec3d(); }
         float scene_radius() const { return 0.0;     }
 
@@ -77,8 +80,6 @@ class DrawableVectorField : public VectorField, public DrawableObject
 
         void  set_arrow_color(const Color & c);
         void  set_arrow_size (float s);
-        Color get_arrow_color() const;
-        float get_arrow_size () const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -104,6 +105,9 @@ class DrawableVectorField : public VectorField, public DrawableObject
         std::vector<vec3d> pos; // application points for each element in the field
         float arrow_size;
         Color arrow_color;
+        // arrow tessellation
+        std::vector<float> verts, normals;
+        std::vector<uint>  tris;
 };
 
 }

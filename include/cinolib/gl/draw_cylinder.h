@@ -39,43 +39,75 @@
 #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 #include <cinolib/gl/gl_glu_glfw.h>
-#include <cinolib/cino_inline.h>
-#include <cinolib/pi.h>
+#include <cinolib/geometry/vec_mat.h>
+#include <cinolib/cylinder.h>
+#include <cinolib/color.h>
 
 namespace cinolib
 {
 
-template <typename vec3>
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// this function does only the rendering. It assumes the cylinder has already
+// been constructed and a tessellation is expected in input. Useful to pay the
+// cost of tessellation just once, and then render many instances of the same
+// cylinder in the scene (e.g. for curve networks)
+template<class T>
 CINO_INLINE
-static void cylinder(const vec3  & a,
-                     const vec3  & b,
-                     float         top_radius,
-                     float         bottom_radius,
-                     const float * color)
+void draw_cylinder(const mat<3,1,T>         & base,    // base
+                   const mat<3,1,T>         & dir,     // axis orientation
+                   const std::vector<float> & verts,   // tessellation verts
+                   const std::vector<uint>  & tris,    // tessellation triangles
+                   const std::vector<float> & normals, // tessellation normals (per vertex)
+                   const Color              & color)   // color
 {
-    vec3   dir     = b - a; dir.normalize();
-    vec3   axis    = vec3(0,0,1);
-    vec3   normal  = dir.cross(axis);
-    double angle   = acos(dir.dot(axis)) * 180 / M_PI;
+    mat<3,1,T> Z     = mat<3,1,T>(0,0,1);
+    mat<3,1,T> axis  = dir.cross(Z); axis.normalize();
+    float      angle = dir.angle_deg(Z,true);
 
     glEnable(GL_LIGHTING);
+    glShadeModel(GL_SMOOTH);
     glEnable(GL_COLOR_MATERIAL);
-    glColor3fv(color);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_CULL_FACE);
+    glColor3fv(color.rgba);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    glTranslated(a[0], a[1], a[2]);
-    glRotatef(-angle, normal[0], normal[1], normal[2]);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glPolygonMode(GL_FRONT, GL_FILL);
-    GLUquadric *cylinder = gluNewQuadric();
-    gluQuadricNormals(cylinder, GLU_SMOOTH);
-    gluQuadricOrientation(cylinder, GLU_OUTSIDE);
-    gluCylinder(cylinder, top_radius, bottom_radius, (a-b).norm(), 10, 5);
+    glTranslatef((float)base[0], (float)base[1], (float)base[2]);
+    glRotatef(-angle, (float)axis[0], (float)axis[1], (float)axis[2]);
+    glVertexPointer(3, GL_FLOAT, 0, verts.data());
+    glNormalPointer(GL_FLOAT, 0, normals.data());
+    glDrawElements(GL_TRIANGLES, (GLsizei)tris.size(), GL_UNSIGNED_INT, tris.data());
     glPopMatrix();
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
     glColor3f(1.f,1.f,1.f);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_NORMALIZE);
     glDisable(GL_COLOR_MATERIAL);
     glDisable(GL_LIGHTING);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// tessellate and render a new cylinder
+template<class T>
+CINO_INLINE
+void draw_cylinder(const mat<3,1,T> & bot,
+                   const mat<3,1,T> & top,
+                   const T            bot_radius,
+                   const T            top_radius,
+                   const Color      & color,
+                   const uint         n_sides = 6)
+{
+    // tessellation
+    std::vector<float> verts, normals;
+    std::vector<uint>  tris;
+    cylinder((float)bot.dist(top), (float)bot_radius, (float)top_radius, n_sides, verts, tris, normals);
+    // rendering
+    draw_cylinder(bot, top-bot, verts, tris, normals, color);
 }
 
 }

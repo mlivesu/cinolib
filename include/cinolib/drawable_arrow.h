@@ -72,7 +72,7 @@ class DrawableArrow : public DrawableObject
 
         void draw(const float) const
         {
-            arrow<vec3d>(beg, end, size, color.rgba);
+            draw_arrow(beg, end, size, color);
         }
 };
 

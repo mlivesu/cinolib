@@ -64,7 +64,7 @@ class DrawableSphere : public DrawableObject
             // apply the subdivsion algorithm just once, filling the verts and tris vectors
             // Then you can render any time you want (scaling and translation are efficiently
             // handled at render time by opengl)
-            icosphere(1.0, subdiv, verts, tris);
+            icosphere(1.f, subdiv, verts, tris);
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -73,8 +73,8 @@ class DrawableSphere : public DrawableObject
         double radius;
         Color  color;
         uint   subdiv;
-        std::vector<double> verts;
-        std::vector<uint>   tris;
+        std::vector<float> verts;
+        std::vector<uint>  tris;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -86,7 +86,7 @@ class DrawableSphere : public DrawableObject
 
         void draw(const float) const override
         {
-            sphere(center._vec, radius, color.rgba, verts.data(), tris.data(), (GLsizei)tris.size());
+            draw_sphere(center, radius, color, verts, tris);
         }
 
 };

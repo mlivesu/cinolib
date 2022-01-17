@@ -38,23 +38,81 @@
 
 #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
-#include <cinolib/cino_inline.h>
-#include <cinolib/gl/draw_cylinder.h>
+#include <cinolib/gl/gl_glu_glfw.h>
+#include <cinolib/geometry/vec_mat.h>
+#include <cinolib/arrow.h>
+#include <cinolib/color.h>
 
 namespace cinolib
 {
 
-template <typename vec3>
-CINO_INLINE
-void arrow(const vec3  & base,
-           const vec3  & tip,
-           float         radius,
-           const float * color)
-{
-    vec3 tip_base = 0.3 * tip + 0.7 * base;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    cylinder<vec3>(tip_base, tip, radius, 0.0, color);
-    cylinder<vec3>(base, tip_base, radius * 0.2,  radius * 0.2, color);
+// this function does only the rendering. It assumes the arrow has already
+// been constructed and a tessellation is expected in input. Useful to pay
+// the cost of tessellation just once, and then render many instances of the
+// same arrow in the scene (e.g. for vector field rendering)
+template<class T>
+CINO_INLINE
+void draw_arrow(const mat<3,1,T>         & base,    // base
+                const mat<3,1,T>         & dir,     // axis orientation
+                const std::vector<float> & verts,   // tessellation verts
+                const std::vector<uint>  & tris,    // tessellation triangles
+                const std::vector<float> & normals, // tessellation normals (per vertex)
+                const Color              & color)   // color
+{
+    mat<3,1,T> Z     = mat<3,1,T>(0,0,1);
+    mat<3,1,T> axis  = dir.cross(Z); axis.normalize();
+    float      angle = dir.angle_deg(Z,true);
+
+    glEnable(GL_LIGHTING);
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_CULL_FACE);
+    glColor3fv(color.rgba);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef((float)base[0], (float)base[1], (float)base[2]);
+    glRotatef(-angle, (float)axis[0], (float)axis[1], (float)axis[2]);
+    glVertexPointer(3, GL_FLOAT, 0, verts.data());
+    glNormalPointer(GL_FLOAT, 0, normals.data());
+    glDrawElements(GL_TRIANGLES, (GLsizei)tris.size(), GL_UNSIGNED_INT, tris.data());
+    glPopMatrix();
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glColor3f(1.f,1.f,1.f);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_NORMALIZE);
+    glDisable(GL_COLOR_MATERIAL);
+    glDisable(GL_LIGHTING);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// tessellate and render a new cylinder
+template<class T>
+CINO_INLINE
+void draw_arrow(const mat<3,1,T> & bot,
+                const mat<3,1,T> & top,
+                const T            radius,
+                const Color      & color,
+                const T            base_rel_height = 0.7, // percentage of the height
+                const T            base_rel_radius = 0.5, // percentage of the radius
+                const uint         n_sides         = 6)   // cross section
+{
+    // tessellation
+    std::vector<float> verts, normals;
+    std::vector<uint>  tris;
+    arrow((float)bot.dist(top),
+          (float)radius,
+          (float)base_rel_height,
+          (float)base_rel_radius,
+          n_sides, verts, tris, normals);
+    // rendering
+    draw_arrow(bot, top-bot, verts, tris, normals, color);
 }
 
 }
