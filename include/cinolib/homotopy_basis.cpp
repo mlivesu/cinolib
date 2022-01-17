@@ -320,6 +320,10 @@ uint detach_loops(Trimesh<M,V,E,P>  & m,
 
         default : assert(false && "unknown split strategy");
     }
+
+    // warning killer
+    assert(false);
+    return -1;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
