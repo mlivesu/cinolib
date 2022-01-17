@@ -27,7 +27,7 @@ int main(void)
 ```
 and this is the `CMakeLists.txt` that can be used to compile it
 ```
-project(test)
+project(sample_project)
 add_executable(${PROJECT_NAME} main.cpp)
 set(CINOLIB_USES_OPENGL_GLFW_IMGUI ON)
 find_package(cinolib REQUIRED)
