@@ -20,6 +20,9 @@ set_target_properties(cinolib PROPERTIES CXX_EXTENSIONS OFF)
 # OPTIONAL MODULES ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+# https://cmake.org/cmake/help/latest/policy/CMP0077.html
+cmake_policy(SET CMP0077 NEW)
+
 option(CINOLIB_USES_OPENGL_GLFW_IMGUI "Use OpenGL, GLFW and ImGui" OFF)
 option(CINOLIB_USES_TETGEN            "Use Tetgen"                 OFF)
 option(CINOLIB_USES_TRIANGLE          "Use Triangle"               OFF)
