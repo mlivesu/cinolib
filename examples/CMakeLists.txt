@@ -22,9 +22,6 @@ add_compile_definitions(DATA_PATH="${PROJECT_SOURCE_DIR}/data")
 make_directory(${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
-# suppress GLU deprecated warnings
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
-
 #list of examples
 if(CINOLIB_USES_OPENGL_GLFW_IMGUI)
     add_subdirectory(01_trimesh_viewer)
