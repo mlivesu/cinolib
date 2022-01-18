@@ -1,14 +1,16 @@
-# cinolib
-A generic programming header only C++ library for processing polygonal and polyhedral meshes. CinoLib supports surface meshes made of triangles, quads or general polygons as well as volumetric meshes made of tetrahedra, hexahedra or general polyhedra. A distinctive feature of the library is that all supported meshes inherit from a unique base class that implements their common traits, permitting to deploy algorithms that operate on _abstract_ meshes that may be any of the above. This allows to implement algorithms just once and run them on any possible mesh, thus avoiding code duplication and reducing the debugging effort.
+# CinoLib
+CinoLib is a generic programming header only C++ library for processing polygonal and polyhedral meshes. It supports surface meshes made of triangles, quads or general polygons as well as volumetric meshes made of tetrahedra, hexahedra or general polyhedra. 
+
+A distinctive feature of the library is that all supported meshes inherit from a unique base class that implements their common traits, permitting to deploy algorithms that operate on _abstract_ meshes that may be any of the above. This allows to implement algorithms just once and run the same code on any possible mesh, thus avoiding code duplication and reducing the debugging effort.
 
 <p align="center"><img src="cinolib_rep_image.png" width="500"></p>
 
-## Usage
+## Getting started
 CinoLib is header only. It does not need to be installed, all you have to do is to clone the repo with
 ```
 git clone https://github.com/mlivesu/cinolib.git
 ```
-and include in your C++ application the header files you need. While for very small projects this could already be done by directly calling the compiler via command line with the `-I` option, it is strongly suggested to rely on a building system that can also handle optional external dependencies, compilation flags and symbols. CinoLib supports CMake, which is the standard the facto.
+and include in your C++ application the header files you need. For very small projects this could already be done by instructing the compiler on where to find the library sources, with the `-I` option. For more convoluted projects it is suggested to rely on a building system such as CMake, that can also handle optional external dependencies and compilation flags or symbols.
 
 ## Build a sample project (with CMake)
 Here is an example of a toy program that reads a triangle mesh and displays it on a window
@@ -16,7 +18,7 @@ Here is an example of a toy program that reads a triangle mesh and displays it o
 #include <cinolib/meshes/drawable_trimesh.h>
 #include <cinolib/gl/glcanvas.h>
 
-int main(void)
+int main()
 {
     using namespace cinolib;
     DrawableTrimesh<> m("bunny.obj");
@@ -27,7 +29,7 @@ int main(void)
 ```
 and this is the `CMakeLists.txt` that can be used to compile it
 ```
-project(sample_project)
+project(cinolib_demo)
 add_executable(${PROJECT_NAME} main.cpp)
 set(CINOLIB_USES_OPENGL_GLFW_IMGUI ON)
 find_package(cinolib REQUIRED)
@@ -39,17 +41,62 @@ mkdir build
 cd build
 cd .. -DCMAKE_BUILD_TYPE=Release -DCinoLib_DIR=<path-to-cinolib>
 ```
-Note that for the rendering part CinoLib uses GLFW, which will be automatically installed and linked by the script `cinolib-config.cmake`, contained in the main directory. 
-The same script can automatically download and install any other external dependency, meaning that if you want to access a functionality that depends from an external library all you have to do is setting to `ON` a cmake variable that looks like `CINOLIB_USES_XXX`. 
-Valid options are
-* `CINOLIB_USES_OPENGL_GLFW_IMGUI`: optional, used for rendering
+Note that for the rendering part CinoLib uses GLFW, which will be automatically installed and linked by the script `cinolib-config.cmake`, contained in the main directory of the library. The same script can automatically download and install any other external dependency, meaning that if you want to access a functionality that depends on an external library, all you have to do is setting to `ON` a cmake variable that looks like `CINOLIB_USES_XXX`. 
+Valid options are:
+* `CINOLIB_USES_OPENGL_GLFW_IMGUI`: optional, used for rendering with OpenGL
 * `CINOLIB_USES_OPENGL_TRIANGLE`: optional, used for polygon triangulation
 * `CINOLIB_USES_OPENGL_TETGEN`: optional, used for tetrahedralization
 * `CINOLIB_USES_EXACT_PREDICATES`: optional, used for robust geometry processing (e.g. exact detection of intersections) 
 * `CINOLIB_USES_GRAPH_CUT`: optional, used for graph clustering
-* `CINOLIB_USES_BOOST`: optional, used for 2D polygon operations (thickening, clipping, booleans...)
+* `CINOLIB_USES_BOOST`: optional, used for 2D polygon operations (e.g. thickening, clipping, 2D booleans...)
 * `CINOLIB_USES_VTK`: optional, used just to support VTK file formats
 
+## GUI
+CinoLib is designed for researchers in computer graphics and geometry processing that need to quickly realize software prototypes that demonstate a novel algorithm or technique. In this context a simple OpenGL window and a side bar containing a few buttons and sliders are often more than enough. The library uses [ImGui](https://github.com/ocornut/imgui) for the GUI and [GLFW](https://www.glfw.org) for OpenGL rendering. Typical visual controls for the rendering of a mesh (e.g. shading, wireframe, texturing, planar slicing, ecc) are all encoded in two classes `cinolib::SurfaceMeshControls` and `cinolib::VolumeMeshControls`, that operate on surface and volume meshes respectively. To add a side bar that displays all such controls one can modify the sample progam above as follows:
+```
+#include <cinolib/meshes/drawable_trimesh.h>
+#include <cinolib/gl/glcanvas.h>
+#include <cinolib/gl/surface_mesh_controls.h>
+
+int main()
+{
+    using namespace cinolib;
+    DrawableTrimesh<> m("bunny.obj");
+    GLcanvas gui;
+    SurfaceMeshControls<DrawableTrimesh<>>(&m, &gui);
+    gui.push(&m);
+    gui.push(&mesh_controls);
+    return gui.launch();
+}
+```
+The canvas can host multiple mesh controls, ideally one of each mesh in the scene. Additional GUI elements that may be necessary to control the application (e.g. the parameters of your algorithm) can be added by implementing a dedicated callback:
+```
+#include <cinolib/meshes/drawable_trimesh.h>
+#include <cinolib/gl/glcanvas.h>
+#include <cinolib/gl/surface_mesh_controls.h>
+
+int main()
+{
+    using namespace cinolib;
+    DrawableTrimesh<> m("bunny.obj");
+    GLcanvas gui;
+    SurfaceMeshControls<DrawableTrimesh<>>(&m, &gui);
+    gui.push(&m);
+    gui.push(&mesh_controls);
+    gui.callback_app_controls = [&]()
+    {
+        if(ImGui::Button("MyButton"))
+        {
+            // button clicked: do something
+        }
+        if(ImGui::SliderFloat("MySlider", val, min, max))
+        {
+            // slider moved: do something
+        }       
+    };
+    return gui.launch();
+}
+```
 
 ## Other examples
 A tutorial with detailed info on how to use the library is under developement. In the meanwhile, you can explore the [**examples**](https://github.com/mlivesu/cinolib/tree/master/examples#examples)  folder, which contains a constantly growing number of sample projects that showcase the core features of the library, and will be the backbone of the forthcoming tutorial.
