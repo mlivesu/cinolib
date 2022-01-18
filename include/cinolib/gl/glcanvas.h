@@ -197,8 +197,8 @@ class GLcanvas
         std::function<void(int    modifiers                 )> callback_mouse_left_click2  = nullptr; // double click
         std::function<void(int    modifiers                 )> callback_mouse_right_click  = nullptr;
         std::function<void(int    modifiers                 )> callback_mouse_right_click2 = nullptr; // double click
-        std::function<void(double x_pos,    double y_pos    )> callback_cursor             = nullptr;
-        std::function<void(double x_offset, double y_offset )> callback_scroll             = nullptr;
+        std::function<void(double x_pos,    double y_pos    )> callback_mouse_moved        = nullptr;
+        std::function<void(double x_offset, double y_offset )> callback_mouse_scroll       = nullptr;
         std::function<void(void                             )> callback_app_controls       = nullptr; // useful to insert app-dependent visual controls (with ImGui)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

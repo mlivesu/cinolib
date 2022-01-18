@@ -721,7 +721,7 @@ void GLcanvas::cursor_event(GLFWwindow *window, double x_pos, double y_pos)
 {
     GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
 
-    if(v->callback_cursor) v->callback_cursor(x_pos,y_pos);
+    if(v->callback_mouse_moved) v->callback_mouse_moved(x_pos,y_pos);
 
     // mouse move + left click => rotate
     if(glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_LEFT)==GLFW_PRESS)
@@ -767,7 +767,7 @@ void GLcanvas::scroll_event(GLFWwindow *window, double x_offset, double y_offset
     // if visual controls claim the event, let them handle it
     if(ImGui::GetIO().WantCaptureMouse) return;
 
-    if(v->callback_scroll) v->callback_scroll(x_offset, y_offset);
+    if(v->callback_mouse_scroll) v->callback_mouse_scroll(x_offset, y_offset);
 
     v->camera.zoom(y_offset*0.01);
     v->camera.reset_projection();
