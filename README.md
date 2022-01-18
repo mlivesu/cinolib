@@ -29,6 +29,7 @@ int main()
 ```
 and this is the `CMakeLists.txt` that can be used to compile it
 ```
+cmake_minimum_required(VERSION 3.2)
 project(cinolib_demo)
 add_executable(${PROJECT_NAME} main.cpp)
 set(CINOLIB_USES_OPENGL_GLFW_IMGUI ON)
@@ -39,7 +40,7 @@ Compiling should be as easy as opening a terminal in the folder containing the t
 ```
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCinoLib_DIR=<path-to-cinolib>
+cmake .. -DCMAKE_BUILD_TYPE=Release -DcinoLib_DIR=<path-to-cinolib>
 ```
 Note that for the rendering part CinoLib uses GLFW, which will be automatically installed and linked by the script `cinolib-config.cmake`, contained in the main directory of the library. The same script can automatically download and install any other external dependency, meaning that if you want to access a functionality that depends on an external library, all you have to do is setting to `ON` a cmake variable that looks like `CINOLIB_USES_XXX`. 
 Valid options are:
