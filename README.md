@@ -64,7 +64,7 @@ int main()
     using namespace cinolib;
     DrawableTrimesh<> m("bunny.obj");
     GLcanvas gui;
-    SurfaceMeshControls<DrawableTrimesh<>>(&m, &gui);
+    SurfaceMeshControls<DrawableTrimesh<>> mesh_controls(&m, &gui);
     gui.push(&m);
     gui.push(&mesh_controls);
     return gui.launch();
@@ -81,16 +81,17 @@ int main()
     using namespace cinolib;
     DrawableTrimesh<> m("bunny.obj");
     GLcanvas gui;
-    SurfaceMeshControls<DrawableTrimesh<>>(&m, &gui);
+    SurfaceMeshControls<DrawableTrimesh<>> mesh_controls(&m, &gui);
     gui.push(&m);
     gui.push(&mesh_controls);
+    float val = 1.0, min = 0.0, max = 10.0;
     gui.callback_app_controls = [&]()
     {
         if(ImGui::Button("MyButton"))
         {
             // button clicked: do something
         }
-        if(ImGui::SliderFloat("MySlider", val, min, max))
+        if(ImGui::SliderFloat("MySlider", &val, min, max))
         {
             // slider moved: do something
         }       
