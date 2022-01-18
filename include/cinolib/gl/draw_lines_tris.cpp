@@ -122,7 +122,7 @@ void render_segs(const RenderData & data)
         glLineWidth(data.seg_width);
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(4, GL_FLOAT, 0, data.seg_colors.data());
-        glDrawElements(GL_LINES, data.segs.size(), GL_UNSIGNED_INT, data.segs.data());
+        glDrawElements(GL_LINES, (GLsizei)data.segs.size(), GL_UNSIGNED_INT, data.segs.data());
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
         glEnable(GL_LIGHTING);
