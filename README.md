@@ -97,6 +97,16 @@ int main()
     return gui.launch();
 }
 ```
+The full list of callbacks exposed by `GLcanvas` to interact with user events (e.g. for scene navigation, picking, ecc) are:
+* `callback_key_pressed(int key, int modifiers)`
+* `callback_mouse_left_click(int modifiers)`
+* `callback_mouse_left_click2(int modifiers)` 
+* `callback_mouse_right_click(int modifiers)`
+* `callback_mouse_right_click2(int modifiers)`
+* `callback_mouse_moved(double x_pos, double y_pos)`
+* `callback_mouse_scroll(double x_offset, double y_offset)`
+* `callback_app_controls(void)`
+
 
 ## Other examples
 A tutorial with detailed info on how to use the library is under developement. In the meanwhile, you can explore the [**examples**](https://github.com/mlivesu/cinolib/tree/master/examples#examples)  folder, which contains a constantly growing number of sample projects that showcase the core features of the library, and will be the backbone of the forthcoming tutorial.
