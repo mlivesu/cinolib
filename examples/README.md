@@ -12,25 +12,25 @@ Cmake will automatically detect and download the necessary external libraries (e
 # List of Examples
 
 #### 01 - Load and render a triangle mesh
-[<p align="left"><img src="snapshots/01_base_app_trimesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/01_base_app_trimesh)
+[<p align="left"><img src="snapshots/01_base_app_trimesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/01_trimesh_viewer)
 
 #### 02 - Load and render a quadrilateral mesh
-[<p align="left"><img src="snapshots/02_base_app_quadmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/02_base_app_quadmesh)
+[<p align="left"><img src="snapshots/02_base_app_quadmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/02_quadmesh_viewer)
 
 #### 03 - Load and render a general polygonal mesh
-[<p align="left"><img src="snapshots/03_base_app_polygonmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/03_base_app_polygonmesh)
+[<p align="left"><img src="snapshots/03_base_app_polygonmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/03_polygonmesh_viewer)
 
 #### 04 - Load and render a tetrahedral mesh
-[<p align="left"><img src="snapshots/04_base_app_tetmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/04_base_app_tetmesh)
+[<p align="left"><img src="snapshots/04_base_app_tetmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/blob/master/examples/04_tetmesh_viewer)
 
 #### 05 - Load and render a hexahedral mesh
-[<p align="left"><img src="snapshots/05_base_app_hexmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/05_base_app_hexmesh)
+[<p align="left"><img src="snapshots/05_base_app_hexmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/05_hexmesh_viewer)
 
 #### 06 - Load and render a general polyhedral mesh
-[<p align="left"><img src="snapshots/06_base_app_polyhedralmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/06_base_app_polyhedralmesh)
+[<p align="left"><img src="snapshots/06_base_app_polyhedralmesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/06_polyhedralmesh_viewer)
 
 #### 07 - Load and render a textured object in OBJ format
-[<p align="left"><img src="snapshots/07_textured_OBJs.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/07_textured_OBJs)
+[<p align="left"><img src="snapshots/07_textured_OBJs.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/07_texture_loading)
 
 #### 08 - Do vertex picking for interactive applications
 [<p align="left"><img src="snapshots/08_picking.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/08_picking)
@@ -42,7 +42,7 @@ Cmake will automatically detect and download the necessary external libraries (e
 [<p align="left"><img src="snapshots/10_polyharmonic_functions_vol.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/10_polyharmonic_functions_vol)
 
 #### 11 - Map a genus zero object to a sphere using conformalized mean curvature flow
-[<p align="left"><img src="snapshots/11_map_to_sphere.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/11_map_to_sphere)
+[<p align="left"><img src="snapshots/11_map_to_sphere.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/11_sphere_mapping)
 
 #### 12 - Generate triangular and polygonal tessellations of 2D domains
 [<p align="left"><img src="snapshots/12_polygon_mesh_generation.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/12_polygon_mesh_generation)
@@ -51,7 +51,7 @@ Cmake will automatically detect and download the necessary external libraries (e
 [<p align="left"><img src="snapshots/13_polyhedral_mesh_generation.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/13_polyhedral_mesh_generation)
 
 #### 14 - Compute geodesic distances using the heat flow method
-[<p align="left"><img src="snapshots/14_heat_based_geodesics.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/14_heat_based_geodesics)
+[<p align="left"><img src="snapshots/14_heat_based_geodesics.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/14_heat_geodesics)
 
 #### 15 - Compute kernels, incircles and circumcircles of 2D polygons
 [<p align="left"><img src="snapshots/15_polygon_measures.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/15_polygon_measures)
@@ -81,7 +81,7 @@ Cmake will automatically detect and download the necessary external libraries (e
 [<p align="left"><img src="snapshots/23_sharp_creases.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/23_sharp_creases)
 
 #### 24 - Read and visualize a sliced object for 3D printing
-[<p align="left"><img src="snapshots/24_sliced_obj.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/24_sliced_obj)
+[<p align="left"><img src="snapshots/24_sliced_obj.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/24_sliced_CLI_loader)
 
 #### 25 - Paint on a 3D surface using brushes of different sizes
 [<p align="left"><img src="snapshots/25_surface_painter.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/25_surface_painter)
