@@ -10,7 +10,7 @@ CinoLib is header only. It does not need to be installed, all you have to do is 
 ```
 git clone https://github.com/mlivesu/cinolib.git
 ```
-and include in your C++ application the header files you need. For very small projects this could already be done by instructing the compiler on where to find the library sources, e.g. with the `-I` option. For more convoluted projects it is suggested to rely on a building system such as [CMake](https://cmake.org), that can also handle optional external dependencies and compilation flags or symbols.
+and include in your C++ application the header files you need. For small projects this could already be done by instructing the compiler on where to find the library sources, e.g. with the `-I` option. For more convoluted projects it is suggested to rely on a building system such as [CMake](https://cmake.org), that can also handle optional external dependencies and compilation flags or symbols.
 
 ## Build a sample project (with CMake)
 Here is an example of a toy program that reads a triangle mesh and displays it on a window
