@@ -1,5 +1,5 @@
 # CinoLib
-CinoLib is a generic programming header only C++ library for processing polygonal and polyhedral meshes. It supports surface meshes made of triangles, quads or general polygons as well as volumetric meshes made of tetrahedra, hexahedra or general polyhedra. 
+CinoLib is a C++ library for processing polygonal and polyhedral meshes. It supports surface meshes made of triangles, quads or general polygons as well as volumetric meshes made of tetrahedra, hexahedra or general polyhedra. 
 
 A distinctive feature of the library is that all supported meshes inherit from a unique base class that implements their common traits, permitting to deploy algorithms that operate on _abstract_ meshes that may be any of the above. This allows to implement algorithms just once and run the same code on any possible mesh, thus avoiding code duplication and reducing the debugging effort.
 
@@ -10,7 +10,7 @@ CinoLib is header only. It does not need to be installed, all you have to do is 
 ```
 git clone https://github.com/mlivesu/cinolib.git
 ```
-and include in your C++ application the header files you need. For very small projects this could already be done by instructing the compiler on where to find the library sources, with the `-I` option. For more convoluted projects it is suggested to rely on a building system such as CMake, that can also handle optional external dependencies and compilation flags or symbols.
+and include in your C++ application the header files you need. For very small projects this could already be done by instructing the compiler on where to find the library sources, e.g. with the `-I` option. For more convoluted projects it is suggested to rely on a building system such as [CMake](https://cmake.org), that can also handle optional external dependencies and compilation flags or symbols.
 
 ## Build a sample project (with CMake)
 Here is an example of a toy program that reads a triangle mesh and displays it on a window
@@ -42,7 +42,7 @@ mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release -Dcinolib_DIR=<path-to-cinolib>
 ```
-Note that for the rendering part CinoLib uses GLFW, which will be automatically installed and linked by the script `cinolib-config.cmake`, contained in the main directory of the library. The same script can automatically download and install any other external dependency, meaning that if you want to access a functionality that depends on an external library, all you have to do is setting to `ON` a cmake variable that looks like `CINOLIB_USES_XXX`. 
+Note that for the rendering part CinoLib uses [GLFW](https://www.glfw.org), which will be automatically installed and linked by the script `cinolib-config.cmake`, contained in the main directory of the library. The same script can automatically download and install any other external dependency, meaning that if you want to access a functionality that depends on some external library `XXX`, all you have to do is setting to `ON` a cmake variable that looks like `CINOLIB_USES_XXX`. 
 Valid options are:
 * `CINOLIB_USES_OPENGL_GLFW_IMGUI`: optional, used for rendering with OpenGL
 * `CINOLIB_USES_OPENGL_TRIANGLE`: optional, used for polygon triangulation
