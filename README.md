@@ -44,13 +44,13 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -Dcinolib_DIR=<path-to-cinolib>
 ```
 Note that for the rendering part CinoLib uses [GLFW](https://www.glfw.org), which will be automatically installed and linked by the script `cinolib-config.cmake`, contained in the main directory of the library. The same script can automatically download and install any other external dependency, meaning that if you want to access a functionality that depends on some external library `XXX`, all you have to do is setting to `ON` a cmake variable that looks like `CINOLIB_USES_XXX`. 
 Valid options are:
-* `CINOLIB_USES_OPENGL_GLFW_IMGUI`: optional, used for rendering with OpenGL
-* `CINOLIB_USES_OPENGL_TRIANGLE`: optional, used for polygon triangulation
-* `CINOLIB_USES_OPENGL_TETGEN`: optional, used for tetrahedralization
-* `CINOLIB_USES_EXACT_PREDICATES`: optional, used for robust geometry processing (e.g. exact detection of intersections) 
-* `CINOLIB_USES_GRAPH_CUT`: optional, used for graph clustering
-* `CINOLIB_USES_BOOST`: optional, used for 2D polygon operations (e.g. thickening, clipping, 2D booleans...)
-* `CINOLIB_USES_VTK`: optional, used just to support VTK file formats
+* `CINOLIB_USES_OPENGL_GLFW_IMGUI`, used for rendering with OpenGL
+* `CINOLIB_USES_OPENGL_TRIANGLE`, used for polygon triangulation
+* `CINOLIB_USES_OPENGL_TETGEN`, used for tetrahedralization
+* `CINOLIB_USES_EXACT_PREDICATES`, used for robust geometry processing (e.g. exact detection of intersections) 
+* `CINOLIB_USES_GRAPH_CUT`, used for graph clustering
+* `CINOLIB_USES_BOOST`, used for 2D polygon operations (e.g. thickening, clipping, 2D booleans...)
+* `CINOLIB_USES_VTK`, used just to support VTK file formats
 
 ## GUI
 CinoLib is designed for researchers in computer graphics and geometry processing that need to quickly realize software prototypes that demonstate a novel algorithm or technique. In this context a simple OpenGL window and a side bar containing a few buttons and sliders are often more than enough. The library uses [ImGui](https://github.com/ocornut/imgui) for the GUI and [GLFW](https://www.glfw.org) for OpenGL rendering. Typical visual controls for the rendering of a mesh (e.g. shading, wireframe, texturing, planar slicing, ecc) are all encoded in two classes `cinolib::SurfaceMeshControls` and `cinolib::VolumeMeshControls`, that operate on surface and volume meshes respectively. To add a side bar that displays all such controls one can modify the sample progam above as follows:
