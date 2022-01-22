@@ -99,7 +99,7 @@ int main()
     return gui.launch();
 }
 ```
-The full list of callbacks exposed by `GLcanvas` to interact with user events (e.g. for scene navigation, picking, ecc) are:
+The full list of callbacks exposed by `GLcanvas` to interact with user events (e.g. for scene navigation, mouse picking, ecc) are:
 * `callback_key_pressed(int key, int modifiers)`
 * `callback_mouse_left_click(int modifiers)`
 * `callback_mouse_left_click2(int modifiers)` => double click
