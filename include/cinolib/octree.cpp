@@ -431,8 +431,6 @@ bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uin
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    ids.clear();
-
     std::stack<OctreeNode*> lifo;
     if(root && root->bbox.contains(p,strict))
     {
@@ -612,7 +610,6 @@ bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_com
     std::vector<vec3d> list = {t[0],t[1],t[2]};
     intersects_box(AABB(list), tmp);
 
-    ids.clear();
     for(uint i : tmp)
     {
         if(items.at(i)->intersects_triangle(t, ignore_if_valid_complex))
@@ -642,7 +639,6 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
     std::unordered_set<uint> tmp;
     intersects_box(AABB(s[0],s[1]), tmp);
 
-    ids.clear();
     for(uint i : tmp)
     {
         if(items.at(i)->intersects_segment(s, ignore_if_valid_complex))
@@ -668,8 +664,6 @@ bool Octree::intersects_box(const AABB & b, std::unordered_set<uint> & ids) cons
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
-
-    ids.clear();
 
     std::stack<OctreeNode*> lifo;
     if(root && root->bbox.intersects_box(b))
