@@ -62,7 +62,6 @@ void overhangs(      Trimesh<M,V,E,P> & m,
 
     std::mutex mutex;
     std::vector<bool> edges_to_extrude(m.num_edges(),false);
-
     PARALLEL_FOR(0, m.num_polys(), 1000, [&](const uint pid)
     {
         float ang = build_dir.angle_deg(m.poly_data(pid).normal);
@@ -78,7 +77,7 @@ void overhangs(      Trimesh<M,V,E,P> & m,
         }
     });
 
-    double delta= m.bbox().diag();
+    double delta = m.bbox().diag();
     Octree octree;
     octree.build_from_mesh_polys(m);
     PARALLEL_FOR(0, m.num_edges(), 1000, [&](const uint eid)
@@ -108,30 +107,6 @@ void overhangs(      Trimesh<M,V,E,P> & m,
             }
         }
     });
-
-//    // synthesize supports
-//    std::unordered_map<uint,uint> v_map;
-//    for(uint eid=0; eid<m.num_edges(); ++eid)
-//    {
-//        if(edges_to_extrude[eid])
-//        {
-//            // initialize a quad (extruded edge)
-//            uint quad[4] = { m.edge_vert_id(eid,0), m.edge_vert_id(eid,1), 0, 0 };
-//            // find the extruded endpoints
-//            for(uint i=0; i<2; ++i)
-//            {
-//                auto it = v_map.find(quad[i]);
-//                if(it==v_map.end())
-//                {
-//                    quad[i+2] = m.vert_add(m.vert(quad[i]) - delta*build_dir);
-//                }
-//                else quad[i+2] = it->second;
-//            }
-//            // tessellate
-//            m.poly_add({ quad[0], quad[1], quad[2] });
-//            m.poly_add({ quad[1], quad[2], quad[3] });
-//        }
-//    }
 }
 
 }
