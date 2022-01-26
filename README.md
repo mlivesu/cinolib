@@ -47,7 +47,7 @@ Valid options are:
 * `CINOLIB_USES_OPENGL_GLFW_IMGUI`, used for rendering with OpenGL
 * `CINOLIB_USES_OPENGL_TRIANGLE`, used for polygon triangulation
 * `CINOLIB_USES_OPENGL_TETGEN`, used for tetrahedralization
-* `CINOLIB_USES_EXACT_PREDICATES`, used for robust geometry processing (e.g. exact detection of intersections) 
+* `CINOLIB_USES_EXACT_PREDICATES`, used for exact geometric predicates (e.g. for intersection checks) 
 * `CINOLIB_USES_GRAPH_CUT`, used for graph clustering
 * `CINOLIB_USES_BOOST`, used for 2D polygon operations (e.g. thickening, clipping, 2D booleans...)
 * `CINOLIB_USES_VTK`, used just to support VTK file formats
