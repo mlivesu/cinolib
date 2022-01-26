@@ -37,7 +37,7 @@
 #define CINO_FIND_INTERSECTIONS_H
 
 #include <cinolib/geometry/vec_mat.h>
-#include <cinolib/meshes/abstract_polygonmesh.h>
+#include <cinolib/meshes/trimesh.h>
 #include <cinolib/ipair.h>
 #include <set>
 
@@ -59,8 +59,8 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void find_intersections(const AbstractPolygonMesh<M,V,E,P> & m,
-                        std::set<ipair>                    & intersections);
+void find_intersections(const Trimesh<M,V,E,P> & m,
+                        std::set<ipair>        & intersections);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
