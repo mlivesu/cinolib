@@ -52,58 +52,45 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void overhangs(      Trimesh<M,V,E,P> & m,
-               const float                          thresh,                    // degrees
-                     std::vector<uint>            & polys_hanging,             // IDs of hanging polys
-                     std::vector<uint>            & polys_below_hanging_polys, // IDs of polys lying below some overhang
-               const mat3d                        & R)                         // global orientation matrix
+void overhangs(const Trimesh<M,V,E,P>  & m,
+               const float               thresh,                    // degrees
+                     std::vector<uint> & polys_hanging,             // IDs of hanging polys
+                     std::vector<uint> & polys_below_hanging_polys, // IDs of polys lying below some overhang
+               const mat3d             & R)                         // global orientation matrix
 {
     static const vec3d build_dir = R * vec3d(0,0,1);
 
     std::mutex mutex;
-    std::vector<bool> edges_to_extrude(m.num_edges(),false);
     PARALLEL_FOR(0, m.num_polys(), 1000, [&](const uint pid)
     {
         float ang = build_dir.angle_deg(m.poly_data(pid).normal);
         if(ang-90.f > thresh)
         {
-            // critical section
             {
+                // critical section
                 std::lock_guard<std::mutex> guard(mutex);
                 polys_hanging.push_back(pid);
             }
-            m.poly_data(pid).color = Color::RED();
-            for(uint eid : m.adj_p2e(pid)) edges_to_extrude.at(eid) = true;
         }
     });
 
-    double delta = m.bbox().diag();
+    // for each hanging polygon, throw a ray opposite to the build direction to
+    // discover whether the support structures will emanate from the build
+    // platform or from some triangle below
     Octree octree;
     octree.build_from_mesh_polys(m);
-    PARALLEL_FOR(0, m.num_edges(), 1000, [&](const uint eid)
+    PARALLEL_FOR(0, polys_hanging.size(), 1000, [&](const uint i)
     {
-        if(edges_to_extrude[eid])
+        uint pid = polys_hanging[i];
+        std::set<std::pair<double,uint>> hits;
+        if(octree.intersects_ray(m.poly_centroid(pid), -build_dir, hits))
         {
-            vec3d t0[3] =
-            {
-                m.edge_vert(eid,0),
-                m.edge_vert(eid,1),
-                m.edge_vert(eid,1) - delta*build_dir,
-            };
-            vec3d t1[3] =
-            {
-                m.edge_vert(eid,1) - delta*build_dir,
-                m.edge_vert(eid,0) - delta*build_dir,
-                m.edge_vert(eid,0),
-            };
-            std::unordered_set<uint> ids;
-            octree.intersects_triangle(t0, true, ids);
-            octree.intersects_triangle(t1, true, ids);
-            for(uint pid : ids)
+            auto h = hits.begin();
+            if(h->second == pid) ++h; // skip the first hit, it's the starting polygon
+            if(h!=hits.end())
             {
                 std::lock_guard<std::mutex> guard(mutex);
-                m.poly_data(pid).color = Color::BLUE();
-                polys_below_hanging_polys.push_back(pid);
+                polys_below_hanging_polys.push_back(h->second);
             }
         }
     });

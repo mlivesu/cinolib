@@ -64,11 +64,11 @@ namespace cinolib
 //
 template<class M, class V, class E, class P>
 CINO_INLINE
-void overhangs(      Trimesh<M,V,E,P> & m,
-               const float                          thresh,                    // degrees
-                     std::vector<uint>            & polys_hanging,             // IDs of hanging polys
-                     std::vector<uint>            & polys_below_hanging_polys, // IDs of polys lying below some overhang
-               const mat3d                        & R = mat3d::DIAG(1));       // global orientation matrix
+void overhangs(const Trimesh<M,V,E,P>  & m,
+               const float               thresh,                    // degrees
+                     std::vector<uint> & polys_hanging,             // IDs of hanging polys
+                     std::vector<uint> & polys_below_hanging_polys, // IDs of polys lying below some overhang
+               const mat3d             & R = mat3d::DIAG(1));       // global orientation matrix
 
 }
 
