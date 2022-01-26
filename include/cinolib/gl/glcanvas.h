@@ -43,6 +43,8 @@
 #include <cinolib/min_max_inf.h>
 #include <cinolib/color.h>
 
+#include <chrono>
+
 namespace cinolib
 {
 
