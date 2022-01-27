@@ -70,12 +70,13 @@ void overhangs(const Trimesh<M,V,E,P>                  & m,
                const vec3d                             & build_dir,
                      std::vector<std::pair<uint,uint>> & polys_hanging)
 {
+    // find overhanging triangles
     std::vector<uint> tmp;
     overhangs(m, thresh, build_dir, tmp);
 
+    // cast a ray from each overhang to find the first triangle below it
     Octree octree;
     octree.build_from_mesh_polys(m);
-
     std::mutex mutex;
     PARALLEL_FOR(0, tmp.size(), 1000, [&](const uint i)
     {
