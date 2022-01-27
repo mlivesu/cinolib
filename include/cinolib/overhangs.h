@@ -32,14 +32,6 @@
 *     Via de Marini, 6                                                          *
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
-*                                                                               *
-*     Fabrizio Corda (cordafab@gmail.com)                                       *
-*     http://www.fabriziocorda.com                                              *
-*                                                                               *
-*     University of Cagliari                                                    *
-*     Via Ospedale, 72                                                          *
-*     09124 Cagliari,                                                           *
-*     Italy                                                                     *                                                                               *
 *********************************************************************************/
 #ifndef CINO_OVERHANGS_H
 #define CINO_OVERHANGS_H
