@@ -53,46 +53,54 @@ namespace cinolib
 template<class M, class V, class E, class P>
 CINO_INLINE
 void overhangs(const Trimesh<M,V,E,P>  & m,
-               const float               thresh,                    // degrees
-                     std::vector<uint> & polys_hanging,             // IDs of hanging polys
-                     std::vector<uint> & polys_below_hanging_polys, // IDs of polys lying below some overhang
-               const mat3d             & R)                         // global orientation matrix
+               const float               thresh, // degrees
+               const vec3d             & build_dir,
+                     std::vector<uint> & polys_hanging)
 {
-    static const vec3d build_dir = R * vec3d(0,0,1);
-
     std::mutex mutex;
     PARALLEL_FOR(0, m.num_polys(), 1000, [&](const uint pid)
     {
         float ang = build_dir.angle_deg(m.poly_data(pid).normal);
         if(ang-90.f > thresh)
         {
-            {
-                // critical section
-                std::lock_guard<std::mutex> guard(mutex);
-                polys_hanging.push_back(pid);
-            }
+            std::lock_guard<std::mutex> guard(mutex);
+            polys_hanging.push_back(pid);
         }
     });
+}
 
-    // for each hanging polygon, throw a ray opposite to the build direction to
-    // discover whether the support structures will emanate from the build
-    // platform or from some triangle below
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void overhangs(const Trimesh<M,V,E,P>                  & m,
+               const float                               thresh, // degrees
+               const vec3d                             & build_dir,
+                     std::vector<std::pair<uint,uint>> & polys_hanging)
+{
+    std::vector<uint> tmp;
+    overhangs(m, thresh, build_dir, tmp);
+
     Octree octree;
     octree.build_from_mesh_polys(m);
-    PARALLEL_FOR(0, polys_hanging.size(), 1000, [&](const uint i)
+
+    std::mutex mutex;
+    PARALLEL_FOR(0, tmp.size(), 1000, [&](const uint i)
     {
-        uint pid = polys_hanging[i];
+        uint pid  = tmp[i];
+        auto pair = std::make_pair(pid,pid);
         std::set<std::pair<double,uint>> hits;
         if(octree.intersects_ray(m.poly_centroid(pid), -build_dir, hits))
         {
-            auto h = hits.begin();
-            if(h->second == pid) ++h; // skip the first hit, it's the starting polygon
-            if(h!=hits.end())
+            auto hit = hits.begin();
+            if(hit->second==pid) ++hit; // skip the first hit, it's the starting polygon
+            if(hit!=hits.end())
             {
-                std::lock_guard<std::mutex> guard(mutex);
-                polys_below_hanging_polys.push_back(h->second);
+                pair.second = hit->second;
             }
         }
+        std::lock_guard<std::mutex> guard(mutex);
+        polys_hanging.push_back(pair);
     });
 }
 

@@ -51,25 +51,38 @@
 namespace cinolib
 {
 
-// detect the hanging faces that must be supported from below
-// in 3D printing  and also upfacing polygons that have some
-// overhang above them (they will sustain support stuctures
-// from below).
-//
-// WARNING: polys_below_hanging_polys does not take into account
-// possible occlusions along the vertical direction. In reality,
-// if multiple surface patches are located below an overhang, only
-// the top one will host supports, but this function will detect
-// them all
-//
 template<class M, class V, class E, class P>
 CINO_INLINE
 void overhangs(const Trimesh<M,V,E,P>  & m,
-               const float               thresh,                    // degrees
-                     std::vector<uint> & polys_hanging,             // IDs of hanging polys
-                     std::vector<uint> & polys_below_hanging_polys, // IDs of polys lying below some overhang
-               const mat3d             & R = mat3d::DIAG(1));       // global orientation matrix
+               const float               thresh, // degrees
+               const vec3d             & build_dir,
+                     std::vector<uint> & polys_hanging);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// for each overhang returns also the ID of the first triangle below it along the
+// direction of projection. If there is no such triangle, it returns the same ID
+// of the hanging triangle. For example:
+//
+//   (x,y) => triangle with id y is below hanging triangle with id x,
+//            supports will emanate from triangle y
+//
+//   (x,x) => triangle with id x has no other triangles below it,
+//            supports will emanate from the building platform
+//
+// Triangles below overhangs are computed via ray casting, throwing one ray from
+// the center of the offending element towards the opposite of the build direction.
+// The cluster of rays being shoot is therefore quite sparse, and some triangle
+// may be missed. Nevertheless, assuming a uniform tessellation, this method
+// should allow to detect a decent approximation of the surface lying below
+// the overhangs
+//
+template<class M, class V, class E, class P>
+CINO_INLINE
+void overhangs(const Trimesh<M,V,E,P>                  & m,
+               const float                               thresh, // degrees
+               const vec3d                             & build_dir,
+                     std::vector<std::pair<uint,uint>> & polys_hanging);
 }
 
 #ifndef  CINO_STATIC_LIB
