@@ -178,7 +178,7 @@ class GLcanvas
 
         void project  (const vec3d & p3d, vec2d & p2d, GLdouble & depth)      const;
         bool unproject(const vec2d & p2d, vec3d & p3d)                        const;
-        bool unproject(const vec2d & p2d, const GLfloat & depth, vec3d & p3d) const;
+        bool unproject(const vec2d & p2d, const GLdouble & depth, vec3d & p3d) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

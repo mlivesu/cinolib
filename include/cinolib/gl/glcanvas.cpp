@@ -41,6 +41,8 @@
 #include <../external/imgui/imgui_impl_glfw.h>
 #include <cinolib/gl/draw_arrow.h>
 #include <cinolib/gl/draw_sphere.h>
+#include <cinolib/gl/glproject.h>
+#include <cinolib/gl/glunproject.h>
 
 namespace cinolib
 {
@@ -515,7 +517,7 @@ CINO_INLINE
 bool GLcanvas::unproject(const vec2d & p2d, vec3d & p3d) const
 {
     // retrieve the missing z coordinate from the Z buffer, then unproject
-    return unproject(p2d, query_Z_buffer(p2d), p3d);
+    return unproject(p2d, (double)query_Z_buffer(p2d), p3d);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -524,45 +526,23 @@ bool GLcanvas::unproject(const vec2d & p2d, vec3d & p3d) const
 // https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluUnProject.xml
 //
 CINO_INLINE
-bool GLcanvas::unproject(const vec2d & p2d, const GLfloat & depth, vec3d & p3d) const
+bool GLcanvas::unproject(const vec2d & p2d, const GLdouble & depth, vec3d & p3d) const
 {
-    // depth must be in the closed range (0,1)
-    if(depth<=0 || depth>=1) return false;
+    mat2i viewport({ 0,             camera.height,
+                     camera.width, -camera.height});
 
-    GLint viewport[4] = { 0,             camera.height,
-                          camera.width, -camera.height};
-
-    vec4d p({(p2d.x()-viewport[0])/viewport[2]*2 - 1,
-             (p2d.y()-viewport[1])/viewport[3]*2 - 1,
-                                         depth*2 - 1,
-                                                   1});
-    vec4d res = camera.MVP().inverse() * p;
-
-    // convert from homogeneous to cartesian coordinates
-    res /= res[3];
-    p3d  = res.rem_coord();
-    return true;
+    return gl_unproject(p2d, depth, camera.MV(), camera.projection, viewport, p3d);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// this is equivalent to gluProject
-// https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluProject.xml
-// https://www.khronos.org/opengl/wiki/GluProject_and_gluUnProject_code
-// https://stackoverflow.com/questions/54385727/gluunproject-giving-incorrect-values-on-macretina-display-but-works-correctl
-//
 CINO_INLINE
 void GLcanvas::project(const vec3d & p3d, vec2d & p2d, GLdouble & depth) const
 {
-    GLint viewport[4] = { 0,             camera.height,
-                          camera.width, -camera.height};
+    mat2i viewport({0,             camera.height,
+                    camera.width, -camera.height});
 
-    vec4d res = (camera.MVP() * p3d.add_coord(1)); // add one (homogeneous) coordinate to p3d
-    res /= res[3];                                 // convert from homogeneous to cartesian coordinates
-
-    p2d.x() = viewport[0] + (viewport[2]*(res[0]+1))/2.0;
-    p2d.y() = viewport[1] + (viewport[3]*(res[1]+1))/2.0;
-    depth   = (res[2]+1)/2.0;
+    gl_project(p3d, camera.MV(), camera.projection, viewport, p2d, depth);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
