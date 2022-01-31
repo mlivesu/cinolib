@@ -63,7 +63,7 @@ add_subdirectory(27_import_surface)
 if(CINOLIB_USES_TETGEN)
     add_subdirectory(28_tetrahedralize)
 endif()
-#add_subdirectory(29_ambient_occlusion) It still depends on Qt....
+add_subdirectory(29_ambient_occlusion)
 add_subdirectory(30_mesh_format_converter)
 if(CINOLIB_USES_OPENGL_GLFW_IMGUI)
     add_subdirectory(31_LSCM)
