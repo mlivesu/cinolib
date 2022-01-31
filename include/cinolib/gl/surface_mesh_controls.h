@@ -112,17 +112,18 @@ class SurfaceMeshControls : public SideBarItem
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // tematic collapsing headers
-        void header_IO             (const bool open);
-        void header_shading        (const bool open);
-        void header_wireframe      (const bool open);
-        void header_colors_textures(const bool open);
-        void header_textures       (const bool open);
-        void header_vector_field   (const bool open);
-        void header_isoline        (const bool open);
-        void header_slicing        (const bool open);
-        void header_marked_edges   (const bool open);
-        void header_actions        (const bool open);
-        void header_debug          (const bool open);
+        void header_IO               (const bool open);
+        void header_shading          (const bool open);
+        void header_wireframe        (const bool open);
+        void header_colors_textures  (const bool open);
+        void header_textures         (const bool open);
+        void header_vector_field     (const bool open);
+        void header_isoline          (const bool open);
+        void header_slicing          (const bool open);
+        void header_marked_edges     (const bool open);
+        void header_ambient_occlusion(const bool open);
+        void header_actions          (const bool open);
+        void header_debug            (const bool open);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

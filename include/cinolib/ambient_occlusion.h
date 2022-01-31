@@ -37,53 +37,46 @@
 #define CINO_AMBIENT_OCCLUSION_H
 
 #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
-#ifdef CINOLIB_USES_QT
 
-#include <QGLPixelBuffer>
-#include <cinolib/scalar_field.h>
+#include <cinolib/cino_inline.h>
+#include <sys/types.h>
 
 namespace cinolib
 {
 
-/* These classes compute per face AO values by projecting the mesh on the framebuffer and
- * using the depth buffer to test visiblity. AO values are stored on mesh faces, and averaged
- * at mesh vertices only if smooth shading is enabled, as happens for surface normals. AO_srf
- * is dedicated to triangle, hexahedral and polygonal meshes. AO_vol is for tetraheral, hexahedral
- * and general polyhedral meshes
+/* updates the ambient occlusion for the (visible portion of) an input mesh.
+ * All surface and volumetric meshes are supported. AO values are approximated
+ * with a dirty trick: the mesh is rendered from a given number of viepoints,
+ * and visibility is checked for each render using the Z-buffer
+ *
+ * WARNING: this method uses GLFW, but it cannot know whether it has already
+ * be initialized or not (e.g. by creating a GLcanvas). It is therefore up to
+ * the programmer to instruct this method to call (or not call) glfwInit() and
+ * glfwTerminate(). In short: if this is the first call to a GLFW in your
+ * application, set init_glfw to true. If it's not, set it to false. Since AO
+ * is for rendering, I would expect this flag to be false almost always.
 */
 
 template<class Mesh>
-class AO_srf : public QGLPixelBuffer
-{
-    ScalarField ao;
-
-    public:
-
-        AO_srf(const Mesh & m, const int buffer_size = 500, const int n_dirs = 256);
-        void copy_to_mesh(Mesh & m);
-};
+CINO_INLINE
+void ambient_occlusion_srf_meshes(      Mesh & m,
+                                  const int    buffer_size = 350,
+                                  const uint   sample_dirs = 256,
+                                  const bool   init_glfw   = false);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
-class AO_vol : public QGLPixelBuffer
-{
-    ScalarField ao;
-    std::vector<bool> visible;
-
-    public:
-
-        AO_vol(const Mesh & m, const int buffer_size = 500, const int n_dirs = 256);
-        void copy_to_mesh(Mesh & m);
-};
-
+CINO_INLINE
+void ambient_occlusion_vol_meshes(      Mesh & m,
+                                  const int    buffer_size = 350,
+                                  const uint   sample_dirs = 256,
+                                  const bool   init_glfw   = false);
 }
 
 #ifndef  CINO_STATIC_LIB
 #include "ambient_occlusion.cpp"
 #endif
 
-#endif // #ifdef CINOLIB_USES_QT
-#endif // #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
-
+#endif // CINOLIB_USES_OPENGL_GLFW_IMGUI
 #endif // CINO_AMBIENT_OCCLUSION_H

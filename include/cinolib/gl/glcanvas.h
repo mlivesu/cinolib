@@ -171,6 +171,10 @@ class GLcanvas
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        // TODO:
+        //   https://stackoverflow.com/questions/18006299/quickly-read-values-from-the-depth-buffer
+        //   (GLFW uses 24 bits by default)
+        //
         void    whole_Z_buffer(      GLfloat * buf) const;
         GLfloat query_Z_buffer(const vec2d   & p2d) const;
 

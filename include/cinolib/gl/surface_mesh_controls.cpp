@@ -40,6 +40,7 @@
 #include <cinolib/gradient.h>
 #include <cinolib/scalar_field.h>
 #include <cinolib/string_utilities.h>
+#include <cinolib/ambient_occlusion.h>
 #include <iostream>
 #include <sstream>
 
@@ -65,16 +66,17 @@ void SurfaceMeshControls<Mesh>::draw()
 {
     if(m==nullptr || gui==nullptr) return;
 
-    header_IO             (false);
-    header_shading        (false);
-    header_wireframe      (false);
-    header_colors_textures(false);
-    header_vector_field   (false);
-    header_isoline        (false);
-    header_slicing        (false);
-    header_marked_edges   (false);
-    header_actions        (false);
-    header_debug          (false);
+    header_IO               (false);
+    header_shading          (false);
+    header_wireframe        (false);
+    header_colors_textures  (false);
+    header_vector_field     (false);
+    header_isoline          (false);
+    header_slicing          (false);
+    header_marked_edges     (false);
+    header_ambient_occlusion(false);
+    header_actions          (false);
+    header_debug            (false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -429,6 +431,28 @@ void SurfaceMeshControls<Mesh>::header_marked_edges(const bool open)
         if(ImGui::ColorEdit4("Color##markededge", marked_edge_color.rgba, color_edit_flags))
         {
             m->show_marked_edge_color(marked_edge_color);
+            m->updateGL();
+        }
+        ImGui::TreePop();
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class Mesh>
+CINO_INLINE
+void SurfaceMeshControls<Mesh>::header_ambient_occlusion(const bool open)
+{
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
+    if(ImGui::TreeNode("AO"))
+    {
+        if(ImGui::SmallButton("Update AO"))
+        {
+            ambient_occlusion_srf_meshes(*m);
+            m->updateGL();
+        }
+        if(ImGui::SliderFloat("Alpha",&m->AO_alpha, 0.f, 1.f))
+        {
             m->updateGL();
         }
         ImGui::TreePop();

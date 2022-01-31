@@ -42,6 +42,7 @@
 #include <cinolib/string_utilities.h>
 #include <cinolib/export_visible.h>
 #include <cinolib/export_surface.h>
+#include <cinolib/ambient_occlusion.h>
 #include <iostream>
 #include <sstream>
 
@@ -77,6 +78,7 @@ void VolumeMeshControls<Mesh>::draw()
     header_slicing            (false);
     header_marked_edges       (false);
     header_marked_faces       (false);
+    header_ambient_occlusion  (false);
     header_manual_digging     (false);
     header_actions            (false);
     header_debug              (false);
@@ -553,6 +555,28 @@ void VolumeMeshControls<Mesh>::header_marked_faces(const bool open)
         if(ImGui::ColorEdit4("Color##markedface", marked_face_color.rgba, color_edit_flags))
         {
             m->show_marked_face_color(marked_face_color);
+            m->updateGL();
+        }
+        ImGui::TreePop();
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class Mesh>
+CINO_INLINE
+void VolumeMeshControls<Mesh>::header_ambient_occlusion(const bool open)
+{
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
+    if(ImGui::TreeNode("AO"))
+    {
+        if(ImGui::SmallButton("Update AO"))
+        {
+            ambient_occlusion_vol_meshes(*m);
+            m->updateGL();
+        }
+        if(ImGui::SliderFloat("Alpha",&m->AO_alpha, 0.f, 1.f))
+        {
             m->updateGL();
         }
         ImGui::TreePop();

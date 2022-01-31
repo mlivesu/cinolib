@@ -132,6 +132,7 @@ class VolumeMeshControls : public SideBarItem
         void header_slicing            (const bool open);
         void header_marked_edges       (const bool open);
         void header_marked_faces       (const bool open);
+        void header_ambient_occlusion  (const bool open);
         void header_manual_digging     (const bool open);
         void header_actions            (const bool open);
         void header_debug              (const bool open);
