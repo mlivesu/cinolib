@@ -41,11 +41,11 @@ namespace cinolib
 
 template<class Mesh>
 CINO_INLINE
-void cast_shadow(const Mesh    & m,      // mesh to be rendered
-                 const vec3d   & dir,    // light direction
-                 const uint      w,      // width  (must be an EVEN number)
-                 const uint      h,      // height (must be an EVEN number)
-                       uint8_t * data)   // w x h buffer, 8 bits per pixel
+void cast_shadow(const Mesh    & m,    // mesh to be rendered
+                 const vec3d   & dir,  // light direction
+                 const uint      w,    // width  (must be an EVEN number)
+                 const uint      h,    // height (must be an EVEN number)
+                       uint8_t * data) // w x h buffer, 8 bits per pixel
 {
     // create an invisible window for offline rendering as suggested in
     // https://www.glfw.org/docs/latest/context.html#context_offscreen
@@ -66,7 +66,7 @@ void cast_shadow(const Mesh    & m,      // mesh to be rendered
     assert(w%2==0 && h%2==0); // sanity checks
     assert(fb_w==w && fb_h==h);
 
-    // setp the model-view-projection-viewport
+    // set the model-view-projection-viewport
     glfwMakeContextCurrent(GL_context);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
