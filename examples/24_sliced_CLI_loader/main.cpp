@@ -1,7 +1,7 @@
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/gl/glcanvas.h>
-#include <cinolib/drawable_sliced_object.h>
 #include <cinolib/gl/surface_mesh_controls.h>
+#include <cinolib/3d_printing/drawable_sliced_object.h>
 
 int main(int argc, char **argv)
 {
