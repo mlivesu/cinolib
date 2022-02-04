@@ -33,68 +33,41 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/3d_printing/overhangs.h>
-#include <cinolib/parallel_for.h>
-#include <cinolib/octree.h>
-#include <cinolib/find_intersections.h>
-#include <mutex>
+#ifndef CINO_SUPPORTS_CONTACT_AREA_H
+#define CINO_SUPPORTS_CONTACT_AREA_H
+
+#include <cinolib/meshes/trimesh.h>
 
 namespace cinolib
 {
 
+// computes the total area of the surface patches where support
+// structures are attached. Both overhanging triangles and triangles
+// that lie below an overhang along the build direction are accounted
+// for. The information about overhangs is assumed in input and can
+// be computed with the function cinolib::overhangs. Each overhang is
+// represented as a pair of triangle ids. The first one is the ID of
+// the hanging triangle, the second one is the ID of a triangle lying
+// below it (if any). In case the overhanging triangle projects directly
+// onto the building platform, the second element of the pair is the
+// ID of the hanging triangle itself
+//
+// WARNING: an overhanging triangle may project over multiple triangles,
+// entirely or partially. Since the input data allows to specify the ID
+// of a single triangle, the computation of the contact area is approximated.
+// Nevertheless, assuming an even tessellation, the accuracy of the result
+// should be good enough for most applications that necessitate this type
+// of information (e.g. for optimally orient an object prior printing)
+//
 template<class M, class V, class E, class P>
 CINO_INLINE
-void overhangs(const Trimesh<M,V,E,P>  & m,
-               const float               thresh, // degrees
-               const vec3d             & build_dir,
-                     std::vector<uint> & polys_hanging)
-{
-    std::mutex mutex;
-    PARALLEL_FOR(0, m.num_polys(), 1000, [&](const uint pid)
-    {
-        float ang = build_dir.angle_deg(m.poly_data(pid).normal);
-        if(ang-90.f > thresh)
-        {
-            std::lock_guard<std::mutex> guard(mutex);
-            polys_hanging.push_back(pid);
-        }
-    });
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void overhangs(const Trimesh<M,V,E,P>                  & m,
-               const float                               thresh, // degrees
-               const vec3d                             & build_dir,
-                     std::vector<std::pair<uint,uint>> & polys_hanging)
-{
-    // find overhanging triangles
-    std::vector<uint> tmp;
-    overhangs(m, thresh, build_dir, tmp);
-
-    // cast a ray from each overhang to find the first triangle below it
-    Octree octree;
-    octree.build_from_mesh_polys(m);
-    std::mutex mutex;
-    PARALLEL_FOR(0, tmp.size(), 1000, [&](const uint i)
-    {
-        uint pid  = tmp[i];
-        auto pair = std::make_pair(pid,pid);
-        std::set<std::pair<double,uint>> hits;
-        if(octree.intersects_ray(m.poly_centroid(pid), -build_dir, hits))
-        {
-            auto hit = hits.begin();
-            if(hit->second==pid) ++hit; // skip the first hit, it's the starting polygon
-            if(hit!=hits.end())
-            {
-                pair.second = hit->second;
-            }
-        }
-        std::lock_guard<std::mutex> guard(mutex);
-        polys_hanging.push_back(pair);
-    });
-}
+float supports_contact_area(const Trimesh<M,V,E,P>                  & m,
+                            const std::vector<std::pair<uint,uint>> & overhangs);
 
 }
+
+#ifndef  CINO_STATIC_LIB
+#include "supports_contact_area.cpp"
+#endif
+
+#endif // CINO_SUPPORTS_CONTACT_AREA_H

@@ -33,68 +33,28 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/3d_printing/overhangs.h>
-#include <cinolib/parallel_for.h>
-#include <cinolib/octree.h>
-#include <cinolib/find_intersections.h>
-#include <mutex>
+#include <cinolib/3d_printing/height_along_build_dir.h>
 
 namespace cinolib
 {
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void overhangs(const Trimesh<M,V,E,P>  & m,
-               const float               thresh, // degrees
-               const vec3d             & build_dir,
-                     std::vector<uint> & polys_hanging)
+float height_along_build_dir(const Trimesh<M,V,E,P> & m,
+                             const vec3d            & build_dir, // assumed to be unit length!
+                                   float            & floor)
 {
-    std::mutex mutex;
-    PARALLEL_FOR(0, m.num_polys(), 1000, [&](const uint pid)
+    vec3d c = m.centroid();
+    std::vector<float> vals(m.num_verts());
+    for(uint vid=0; vid<m.num_verts(); ++vid)
     {
-        float ang = build_dir.angle_deg(m.poly_data(pid).normal);
-        if(ang-90.f > thresh)
-        {
-            std::lock_guard<std::mutex> guard(mutex);
-            polys_hanging.push_back(pid);
-        }
-    });
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void overhangs(const Trimesh<M,V,E,P>                  & m,
-               const float                               thresh, // degrees
-               const vec3d                             & build_dir,
-                     std::vector<std::pair<uint,uint>> & polys_hanging)
-{
-    // find overhanging triangles
-    std::vector<uint> tmp;
-    overhangs(m, thresh, build_dir, tmp);
-
-    // cast a ray from each overhang to find the first triangle below it
-    Octree octree;
-    octree.build_from_mesh_polys(m);
-    std::mutex mutex;
-    PARALLEL_FOR(0, tmp.size(), 1000, [&](const uint i)
-    {
-        uint pid  = tmp[i];
-        auto pair = std::make_pair(pid,pid);
-        std::set<std::pair<double,uint>> hits;
-        if(octree.intersects_ray(m.poly_centroid(pid), -build_dir, hits))
-        {
-            auto hit = hits.begin();
-            if(hit->second==pid) ++hit; // skip the first hit, it's the starting polygon
-            if(hit!=hits.end())
-            {
-                pair.second = hit->second;
-            }
-        }
-        std::lock_guard<std::mutex> guard(mutex);
-        polys_hanging.push_back(pair);
-    });
+        vec3d v = m.vert(vid) - c;
+        vals.at(vid) = (float)v.dot(build_dir);
+    }
+    auto min_max = std::minmax_element(vals.begin(), vals.end());
+    floor = *min_max.first;
+    //std::cout << "\tfloor: " << floor << " height: " << *min_max.second - *min_max.first << std::endl;
+    return *min_max.second - *min_max.first;
 }
 
 }

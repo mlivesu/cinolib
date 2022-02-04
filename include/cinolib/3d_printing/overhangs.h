@@ -36,9 +36,7 @@
 #ifndef CINO_OVERHANGS_H
 #define CINO_OVERHANGS_H
 
-#include <cinolib/meshes/abstract_polygonmesh.h>
 #include <cinolib/meshes/trimesh.h>
-#include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {

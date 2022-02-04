@@ -33,68 +33,28 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/3d_printing/overhangs.h>
-#include <cinolib/parallel_for.h>
-#include <cinolib/octree.h>
-#include <cinolib/find_intersections.h>
-#include <mutex>
+#include <cinolib/3d_printing/supports_volume.h>
 
 namespace cinolib
 {
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void overhangs(const Trimesh<M,V,E,P>  & m,
-               const float               thresh, // degrees
-               const vec3d             & build_dir,
-                     std::vector<uint> & polys_hanging)
+float supports_volume(const Trimesh<M,V,E,P>                  & m,
+                      const vec3d                               build_dir,
+                      const float                               floor,
+                      const std::vector<std::pair<uint,uint>> & overhangs)
 {
-    std::mutex mutex;
-    PARALLEL_FOR(0, m.num_polys(), 1000, [&](const uint pid)
+    vec3d c   = m.centroid();
+    float vol = 0;
+    for(const auto & o : overhangs)
     {
-        float ang = build_dir.angle_deg(m.poly_data(pid).normal);
-        if(ang-90.f > thresh)
-        {
-            std::lock_guard<std::mutex> guard(mutex);
-            polys_hanging.push_back(pid);
-        }
-    });
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void overhangs(const Trimesh<M,V,E,P>                  & m,
-               const float                               thresh, // degrees
-               const vec3d                             & build_dir,
-                     std::vector<std::pair<uint,uint>> & polys_hanging)
-{
-    // find overhanging triangles
-    std::vector<uint> tmp;
-    overhangs(m, thresh, build_dir, tmp);
-
-    // cast a ray from each overhang to find the first triangle below it
-    Octree octree;
-    octree.build_from_mesh_polys(m);
-    std::mutex mutex;
-    PARALLEL_FOR(0, tmp.size(), 1000, [&](const uint i)
-    {
-        uint pid  = tmp[i];
-        auto pair = std::make_pair(pid,pid);
-        std::set<std::pair<double,uint>> hits;
-        if(octree.intersects_ray(m.poly_centroid(pid), -build_dir, hits))
-        {
-            auto hit = hits.begin();
-            if(hit->second==pid) ++hit; // skip the first hit, it's the starting polygon
-            if(hit!=hits.end())
-            {
-                pair.second = hit->second;
-            }
-        }
-        std::lock_guard<std::mutex> guard(mutex);
-        polys_hanging.push_back(pair);
-    });
+        float area  = m.poly_area(o.first);
+        float z_beg = (m.poly_centroid(o.first) - c).dot(build_dir);
+        float z_end = (o.first==o.second) ? floor : (m.poly_centroid(o.second) - c).dot(build_dir);
+        vol += area* (z_beg - z_end);
+    }
+    return vol;
 }
 
 }

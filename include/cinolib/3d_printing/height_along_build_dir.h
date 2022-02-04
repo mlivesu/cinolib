@@ -33,68 +33,34 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/3d_printing/overhangs.h>
-#include <cinolib/parallel_for.h>
-#include <cinolib/octree.h>
-#include <cinolib/find_intersections.h>
-#include <mutex>
+#ifndef CINO_HEIGHT_ALONG_BUILD_DIR_H
+#define CINO_HEIGHT_ALONG_BUILD_DIR_H
+
+#include <cinolib/meshes/trimesh.h>
 
 namespace cinolib
 {
 
+// returns the height of mesh m along a given build direction
+// (e.g. for 3D printing or 3 axis CNC milling). Height is
+// computed by projecting all mesh vertices onto the build
+// direction, and then measuring the 1D distance among the
+// extrema. The smallest projection is also stored in the
+// output variable "floor" and it ideally represents the
+// level of the building platform. This quantity is used
+// by other functions in cinolib, e.g. to estimate the
+// volume of support structures
+//
 template<class M, class V, class E, class P>
 CINO_INLINE
-void overhangs(const Trimesh<M,V,E,P>  & m,
-               const float               thresh, // degrees
-               const vec3d             & build_dir,
-                     std::vector<uint> & polys_hanging)
-{
-    std::mutex mutex;
-    PARALLEL_FOR(0, m.num_polys(), 1000, [&](const uint pid)
-    {
-        float ang = build_dir.angle_deg(m.poly_data(pid).normal);
-        if(ang-90.f > thresh)
-        {
-            std::lock_guard<std::mutex> guard(mutex);
-            polys_hanging.push_back(pid);
-        }
-    });
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void overhangs(const Trimesh<M,V,E,P>                  & m,
-               const float                               thresh, // degrees
-               const vec3d                             & build_dir,
-                     std::vector<std::pair<uint,uint>> & polys_hanging)
-{
-    // find overhanging triangles
-    std::vector<uint> tmp;
-    overhangs(m, thresh, build_dir, tmp);
-
-    // cast a ray from each overhang to find the first triangle below it
-    Octree octree;
-    octree.build_from_mesh_polys(m);
-    std::mutex mutex;
-    PARALLEL_FOR(0, tmp.size(), 1000, [&](const uint i)
-    {
-        uint pid  = tmp[i];
-        auto pair = std::make_pair(pid,pid);
-        std::set<std::pair<double,uint>> hits;
-        if(octree.intersects_ray(m.poly_centroid(pid), -build_dir, hits))
-        {
-            auto hit = hits.begin();
-            if(hit->second==pid) ++hit; // skip the first hit, it's the starting polygon
-            if(hit!=hits.end())
-            {
-                pair.second = hit->second;
-            }
-        }
-        std::lock_guard<std::mutex> guard(mutex);
-        polys_hanging.push_back(pair);
-    });
-}
+float height_along_build_dir(const Trimesh<M,V,E,P> & m,
+                             const vec3d            & build_dir, // assumed to be unit length!
+                                   float            & floor);
 
 }
+
+#ifndef  CINO_STATIC_LIB
+#include "height_along_build_dir.cpp"
+#endif
+
+#endif // CINO_HEIGHT_ALONG_BUILD_DIR_H

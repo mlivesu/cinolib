@@ -33,68 +33,57 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/3d_printing/overhangs.h>
-#include <cinolib/parallel_for.h>
-#include <cinolib/octree.h>
-#include <cinolib/find_intersections.h>
-#include <mutex>
+#ifndef CINO_SUPPORTS_VOLUME_H
+#define CINO_SUPPORTS_VOLUME_H
+
+#include <cinolib/meshes/trimesh.h>
 
 namespace cinolib
 {
 
+// computes the total volume of the support structures necessary to sustain
+// the overhangs of mesh m if printed along the given build direction.
+// Supports are assumed to emanate from each overhang and propagate downwards
+// until they hit the building platform (floor) or some mesh triangle.
+//
+// The supporting volume is modelled as the volume of a thick prism with
+// triangular cross section. More precisely, for each haning triangle t,
+// the estimated volume is:
+//
+//    Vol[Support(t)] = area(t) * height
+//
+// where heght is either the distance of the centroid of t from the floor,
+// or its distance from a triangle positioned below t along the build direction.
+//
+// WARNING: this function provides just a rough approximation of the supports'
+// volume, mainly for two reasons:
+//
+//     1) the contact points between supports and object are not modelled,
+//        therefore tiny volume variations may arise
+//
+//     2) in reality supports will not be a dense extrusion of overhangs,
+//        but will likely have a much sparser structure
+//
+// For (1) we assume that approximation errors are negligible. For (2)
+// the users may want to scale the output volume by a density factor that
+// takes into account the sparsity of the real supports. The necessity to
+// perform this operation depends on the specific application. E.g., if one
+// want to find the build direction that minimizes supports' volume, using
+// a density factor is unnecessary. If one wants to estimate the actual
+// material used for printing such a scaling is necessary, otherwise the
+// amunt of material will be severely overestimated.
+//
 template<class M, class V, class E, class P>
 CINO_INLINE
-void overhangs(const Trimesh<M,V,E,P>  & m,
-               const float               thresh, // degrees
-               const vec3d             & build_dir,
-                     std::vector<uint> & polys_hanging)
-{
-    std::mutex mutex;
-    PARALLEL_FOR(0, m.num_polys(), 1000, [&](const uint pid)
-    {
-        float ang = build_dir.angle_deg(m.poly_data(pid).normal);
-        if(ang-90.f > thresh)
-        {
-            std::lock_guard<std::mutex> guard(mutex);
-            polys_hanging.push_back(pid);
-        }
-    });
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void overhangs(const Trimesh<M,V,E,P>                  & m,
-               const float                               thresh, // degrees
-               const vec3d                             & build_dir,
-                     std::vector<std::pair<uint,uint>> & polys_hanging)
-{
-    // find overhanging triangles
-    std::vector<uint> tmp;
-    overhangs(m, thresh, build_dir, tmp);
-
-    // cast a ray from each overhang to find the first triangle below it
-    Octree octree;
-    octree.build_from_mesh_polys(m);
-    std::mutex mutex;
-    PARALLEL_FOR(0, tmp.size(), 1000, [&](const uint i)
-    {
-        uint pid  = tmp[i];
-        auto pair = std::make_pair(pid,pid);
-        std::set<std::pair<double,uint>> hits;
-        if(octree.intersects_ray(m.poly_centroid(pid), -build_dir, hits))
-        {
-            auto hit = hits.begin();
-            if(hit->second==pid) ++hit; // skip the first hit, it's the starting polygon
-            if(hit!=hits.end())
-            {
-                pair.second = hit->second;
-            }
-        }
-        std::lock_guard<std::mutex> guard(mutex);
-        polys_hanging.push_back(pair);
-    });
-}
+float supports_volume(const Trimesh<M,V,E,P>                  & m,
+                      const vec3d                               build_dir,
+                      const float                               floor,
+                      const std::vector<std::pair<uint,uint>> & overhangs);
 
 }
+
+#ifndef  CINO_STATIC_LIB
+#include "supports_volume.cpp"
+#endif
+
+#endif // CINO_SUPPORTS_VOLUME_H
