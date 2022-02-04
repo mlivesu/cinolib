@@ -33,7 +33,7 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/sliced_object.h>
+#include <cinolib/3d_printing/sliced_object.h>
 #include <cinolib/io/read_CLI.h>
 #include <cinolib/triangle_wrap.h>
 #include <cinolib/vector_serialization.h>

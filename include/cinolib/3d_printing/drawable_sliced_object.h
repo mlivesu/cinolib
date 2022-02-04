@@ -41,7 +41,7 @@
 #ifdef CINOLIB_USES_TRIANGLE
 
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/sliced_object.h>
+#include <cinolib/3d_printing/sliced_object.h>
 
 namespace cinolib
 {
