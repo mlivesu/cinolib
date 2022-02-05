@@ -37,6 +37,7 @@
 #define CINO_OVERHANGS_H
 
 #include <cinolib/meshes/trimesh.h>
+#include <cinolib/octree.h>
 
 namespace cinolib
 {
@@ -73,6 +74,19 @@ void overhangs(const Trimesh<M,V,E,P>                  & m,
                const float                               thresh, // degrees
                const vec3d                             & build_dir,
                      std::vector<std::pair<uint,uint>> & polys_hanging);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// in case the function is called multiple times, it is convenient to
+// pay the cost for building the octree just once
+//
+template<class M, class V, class E, class P>
+CINO_INLINE
+void overhangs(const Trimesh<M,V,E,P>                  & m,
+               const float                               thresh, // degrees
+               const vec3d                             & build_dir,
+                     std::vector<std::pair<uint,uint>> & polys_hanging,
+               const Octree                            & octree); // cached
 }
 
 #ifndef  CINO_STATIC_LIB

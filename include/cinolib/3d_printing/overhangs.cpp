@@ -68,15 +68,14 @@ CINO_INLINE
 void overhangs(const Trimesh<M,V,E,P>                  & m,
                const float                               thresh, // degrees
                const vec3d                             & build_dir,
-                     std::vector<std::pair<uint,uint>> & polys_hanging)
+                     std::vector<std::pair<uint,uint>> & polys_hanging,
+               const Octree                            & octree) // cached
 {
     // find overhanging triangles
     std::vector<uint> tmp;
     overhangs(m, thresh, build_dir, tmp);
 
     // cast a ray from each overhang to find the first triangle below it
-    Octree octree;
-    octree.build_from_mesh_polys(m);
     std::mutex mutex;
     PARALLEL_FOR(0, tmp.size(), 1000, [&](const uint i)
     {
@@ -95,6 +94,20 @@ void overhangs(const Trimesh<M,V,E,P>                  & m,
         std::lock_guard<std::mutex> guard(mutex);
         polys_hanging.push_back(pair);
     });
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void overhangs(const Trimesh<M,V,E,P>                  & m,
+               const float                               thresh, // degrees
+               const vec3d                             & build_dir,
+                     std::vector<std::pair<uint,uint>> & polys_hanging)
+{
+    Octree octree;
+    octree.build_from_mesh_polys(m);
+    overhangs(m, thresh, build_dir, polys_hanging, octree);
 }
 
 }
