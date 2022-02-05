@@ -74,7 +74,7 @@ class Octree
     public:
 
         explicit Octree(const uint max_depth      = 7,
-                        const uint items_per_leaf = 10);
+                        const uint items_per_leaf = 50);
 
         virtual ~Octree();
 
