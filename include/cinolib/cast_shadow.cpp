@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/cast_shadow.h>
-#include <cinolib/gl/gl_glfw.h>
+#include <cinolib/gl/offline_gl_context.h>
 
 namespace cinolib
 {
@@ -47,25 +47,27 @@ void cast_shadow(const Mesh    & m,    // mesh to be rendered
                  const uint      h,    // height (must be an EVEN number)
                        uint8_t * data) // w x h buffer, 8 bits per pixel
 {
-    // create an invisible window for offline rendering as suggested in
-    // https://www.glfw.org/docs/latest/context.html#context_offscreen
-    //
-    // since the window may be associated to a retina display or similar,
-    // get the monitor pixel scale factor and adjust the input width and
-    // height to make sure that the size of OpenGL buffers matches them.
-    // To avoid roundoff errors due to cast to int, w and h MUST BE EVEN
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    assert(monitor!=NULL);
-    float w_scale, h_scale;
-    glfwGetMonitorContentScale(monitor, &w_scale, &h_scale);
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    GLFWwindow* GL_context = glfwCreateWindow(w/w_scale, h/h_scale, "", NULL, NULL);
-    glfwDefaultWindowHints(); // restore default hints
-    int fb_w,fb_h;
-    glfwGetFramebufferSize(GL_context, &fb_w, &fb_h);
-    assert(w%2==0 && h%2==0); // sanity checks
-    assert(fb_w==w && fb_h==h);
+    GLFWwindow* GL_context = create_offline_GL_context(w,h);
+    if(GL_context==NULL)
+    {
+        std::cerr << "Impossible to create a GL context. Make sure GLFW has been initialized" << std::endl;
+        return;
+    }
+    cast_shadow(m, dir, w, h, data, GL_context);
+    destroy_offline_GL_context(GL_context);
+}
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
+void cast_shadow(const Mesh       & m,           // mesh to be rendered
+                 const vec3d      & dir,         // light direction
+                 const uint         w,           // width  (must be an EVEN number)
+                 const uint         h,           // height (must be an EVEN number)
+                       uint8_t    * data,        // w x h buffer, 8 bits per pixel
+                       GLFWwindow * GL_context)  // cached GL context (for amortized calls)
+{
     // set the model-view-projection-viewport
     glfwMakeContextCurrent(GL_context);
     glMatrixMode(GL_PROJECTION);
@@ -94,7 +96,6 @@ void cast_shadow(const Mesh    & m,    // mesh to be rendered
     m.draw();
     // dump the stencil buffer and destroy the GL context
     glReadPixels(0, 0, w, h, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, data);
-    glfwDestroyWindow(GL_context);
 }
 
 }
