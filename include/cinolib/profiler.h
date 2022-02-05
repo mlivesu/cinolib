@@ -64,7 +64,7 @@ class Profiler
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void   push(const std::string & key);
-        double pop(const std::string extra_string = "");
+        double pop (const bool print_time = true, const std::string extra_string = "");
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
