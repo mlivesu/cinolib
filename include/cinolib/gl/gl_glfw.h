@@ -33,8 +33,8 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_GL_GLU_GLFW_H
-#define CINO_GL_GLU_GLFW_H
+#ifndef CINO_GL_GLFW_H
+#define CINO_GL_GLFW_H
 
 /* Include OpenGL headers through GLFW.
  * All libraries will then need to be linked
@@ -44,5 +44,5 @@
 */
 #include <GLFW/glfw3.h>
 
-#endif
+#endif CINO_GL_GLFW_H
 

@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/ambient_occlusion.h>
-#include <cinolib/gl/gl_glu_glfw.h>
+#include <cinolib/gl/gl_glfw.h>
 #include <cinolib/gl/glproject.h>
 #include <cinolib/gl/glunproject.h>
 #include <cinolib/sphere_coverage.h>

@@ -38,7 +38,7 @@
 
 #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
-#include <cinolib/gl/gl_glu_glfw.h>
+#include <cinolib/gl/gl_glfw.h>
 #include <cinolib/geometry/vec_mat.h>
 #include <cinolib/arrow.h>
 #include <cinolib/color.h>

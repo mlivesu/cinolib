@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/cast_shadow.h>
-#include <cinolib/gl/gl_glu_glfw.h>
+#include <cinolib/gl/gl_glfw.h>
 
 namespace cinolib
 {

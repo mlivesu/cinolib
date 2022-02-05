@@ -36,7 +36,7 @@
 #ifndef CINO_GLCANVAS_H
 #define CINO_GLCANVAS_H
 
-#include <cinolib/gl/gl_glu_glfw.h>
+#include <cinolib/gl/gl_glfw.h>
 #include <cinolib/drawable_object.h>
 #include <cinolib/gl/side_bar_item.h>
 #include <cinolib/gl/camera.h>
