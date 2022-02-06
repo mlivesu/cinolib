@@ -44,5 +44,5 @@
 */
 #include <GLFW/glfw3.h>
 
-#endif CINO_GL_GLFW_H
+#endif // CINO_GL_GLFW_H
 
