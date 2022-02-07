@@ -50,7 +50,7 @@ bool ray_triangle_intersection(const vec3d  & ray_orig,
     double t;
     vec3d  bary;
     bool   coplanar, hits_back;
-    if (Moller_Trumbore_intersection(ray_orig, ray_dir, v0, v1, v2, hits_back, coplanar, t, bary) && t>=0.0)
+    if(Moller_Trumbore_intersection(ray_orig, ray_dir, v0, v1, v2, hits_back, coplanar, t, bary) && t>=0.0)
     {
         res = ray_orig + ray_dir * t;
         return true;
