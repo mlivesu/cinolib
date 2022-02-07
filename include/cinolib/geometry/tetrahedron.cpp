@@ -62,7 +62,7 @@ bool Tetrahedron::intersects_ray(const vec3d & p, const vec3d & dir, double & t,
     if(!Moller_Trumbore_intersection(p, dir, v[0], v[3], v[2], backside, coplanar, face_t[2], bary)) face_t[2] = inf_double;
     if(!Moller_Trumbore_intersection(p, dir, v[1], v[2], v[3], backside, coplanar, face_t[3], bary)) face_t[3] = inf_double;
     double min_t = *std::min_element(face_t, face_t+4);
-    if(min_t!=inf_double)
+    if(min_t!=inf_double && min_t>=0)
     {
         t   = min_t;
         pos = p + t*dir;

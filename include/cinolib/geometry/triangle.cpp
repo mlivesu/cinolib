@@ -57,7 +57,7 @@ bool Triangle::intersects_ray(const vec3d & p, const vec3d & dir, double & t, ve
     bool  hits_backside;
     bool  coplanar;
     vec3d bary;
-    if(Moller_Trumbore_intersection(p, dir, v[0], v[1], v[2], hits_backside, coplanar, t, bary))
+    if(Moller_Trumbore_intersection(p, dir, v[0], v[1], v[2], hits_backside, coplanar, t, bary) && t>=0)
     {
         pos = p + t * dir;
         return true;
