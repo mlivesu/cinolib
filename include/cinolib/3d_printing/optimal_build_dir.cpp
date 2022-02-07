@@ -79,10 +79,10 @@ vec3d optimal_build_dir(const DrawableTrimesh<M,V,E,P> & m,
         // which are supposed to expand from the overhang down to the floor
         float floor;
 
-        h[i] = height_along_build_dir(m, dirs[i], floor);
-        a[i] = shadow_on_build_platform(m, dirs[i], opt.buffer_size, data, GL_context);
-        c[i] = supports_contact_area(m, polys_hanging);
-        v[i] = supports_volume(m, dirs[i], floor, polys_hanging);
+        if(opt.w_height         >0) h[i] = height_along_build_dir(m, dirs[i], floor);
+        if(opt.w_shadow_area    >0) a[i] = shadow_on_build_platform(m, dirs[i], opt.buffer_size, data, GL_context);
+        if(opt.w_support_contact>0) c[i] = supports_contact_area(m, polys_hanging);
+        if(opt.w_support_volume >0) v[i] = supports_volume(m, dirs[i], floor, polys_hanging);
     }
 
     // release memory
