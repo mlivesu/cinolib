@@ -91,8 +91,11 @@ void overhangs(const Trimesh<M,V,E,P>                  & m,
                 pair.second = hit->second;
             }
         }
-        std::lock_guard<std::mutex> guard(mutex);
-        polys_hanging.push_back(pair);
+        // critical section
+        {
+            std::lock_guard<std::mutex> guard(mutex);
+            polys_hanging.push_back(pair);
+        }
     });
 }
 
