@@ -56,15 +56,21 @@ bool Tetrahedron::intersects_ray(const vec3d & p, const vec3d & dir, double & t,
     bool   backside;
     bool   coplanar;
     vec3d  bary;
-    double face_t[4];
-    if(!Moller_Trumbore_intersection(p, dir, v[0], v[2], v[1], backside, coplanar, face_t[0], bary)) face_t[0] = inf_double;
-    if(!Moller_Trumbore_intersection(p, dir, v[0], v[1], v[3], backside, coplanar, face_t[1], bary)) face_t[1] = inf_double;
-    if(!Moller_Trumbore_intersection(p, dir, v[0], v[3], v[2], backside, coplanar, face_t[2], bary)) face_t[2] = inf_double;
-    if(!Moller_Trumbore_intersection(p, dir, v[1], v[2], v[3], backside, coplanar, face_t[3], bary)) face_t[3] = inf_double;
-    double min_t = *std::min_element(face_t, face_t+4);
-    if(min_t!=inf_double && min_t>=0)
+    double tt[4] = { -1, -1, -1, -1 };
+    Moller_Trumbore_intersection(p, dir, v[0], v[2], v[1], backside, coplanar, tt[0], bary);
+    Moller_Trumbore_intersection(p, dir, v[0], v[1], v[3], backside, coplanar, tt[1], bary);
+    Moller_Trumbore_intersection(p, dir, v[0], v[3], v[2], backside, coplanar, tt[2], bary);
+    Moller_Trumbore_intersection(p, dir, v[1], v[2], v[3], backside, coplanar, tt[3], bary);
+    // NOTE: here tt is used as a boolean flag for intersection. If an intersection occurs,
+    // the corresponding tt value will become positive
+    if(*std::max_element(tt, tt+4)>=0)
     {
-        t   = min_t;
+        // the smallest positive tt locates the correct intersection point
+        t = 0;
+        for(uint i=0; i<4; ++i)
+        {
+            if(tt[i]>0 && tt[i]<t) t = tt[i];
+        }
         pos = p + t*dir;
         return true;
     }
