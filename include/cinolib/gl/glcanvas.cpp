@@ -287,7 +287,7 @@ void GLcanvas::draw()
     // draw your 3D scene
     for(auto obj : drawlist) obj->draw();
 
-    if(owns_ImGui)
+    if(owns_ImGui && show_side_bar)
     {
         // draw markers and visual controls
         ImGui_ImplOpenGL2_NewFrame();
@@ -619,10 +619,11 @@ void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int acti
                 case GLFW_KEY_1     : v->camera.rotate_z(+3); break;
                 case GLFW_KEY_2     : v->camera.rotate_z(-3); break;
                 // camera control
-                case GLFW_KEY_O     : v->camera.toggle_persp_ortho(); break;
-                case GLFW_KEY_Z     : v->camera.zoom(-0.01);          break; // zoom in
-                case GLFW_KEY_R     : v->camera.reset();              break;
-                case GLFW_KEY_A     : v->show_axis = !v->show_axis;   break; // toggle show axis
+                case GLFW_KEY_O     : v->camera.toggle_persp_ortho();       break;
+                case GLFW_KEY_Z     : v->camera.zoom(-0.01);                break; // zoom in
+                case GLFW_KEY_R     : v->camera.reset();                    break;
+                case GLFW_KEY_A     : v->show_axis = !v->show_axis;         break; // toggle show axis
+                case GLFW_KEY_TAB   : v->show_side_bar = !v->show_side_bar; break; // toggle side bar
             }
         }
         v->update_GL_matrices();

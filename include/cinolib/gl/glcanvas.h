@@ -79,8 +79,8 @@ class GLcanvas
         GLFWwindow                        *window;
         std::vector<const DrawableObject*> drawlist;
         std::vector<Marker>                markers;
-        bool                               with_side_bar;
         std::vector<SideBarItem*>          side_bar_items;
+        bool                               show_side_bar      = true;
         float                              side_bar_width     = 0.20;
         float                              side_bar_alpha     = 1.0;
         int                                font_size          = 13;
