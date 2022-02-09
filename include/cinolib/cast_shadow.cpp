@@ -79,6 +79,7 @@ void cast_shadow(const Mesh       & m,           // mesh to be rendered
     vec3d  c = m.centroid();
     double s = 2.0/m.bbox().diag();
     glPushMatrix();
+    glLoadIdentity();
     glRotatef(Z.angle_deg(dir), a.x(), a.y(), a.z());
     glScaled(s,s,s);
     glTranslated(-c.x(), -c.y(), -c.z());
