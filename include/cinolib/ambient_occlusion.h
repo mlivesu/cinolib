@@ -48,21 +48,13 @@ namespace cinolib
  * All surface and volumetric meshes are supported. AO values are approximated
  * with a dirty trick: the mesh is rendered from a given number of viepoints,
  * and visibility is checked for each render using the Z-buffer
- *
- * WARNING: this method uses GLFW, but it cannot know whether it has already
- * be initialized or not (e.g. by creating a GLcanvas). It is therefore up to
- * the programmer to instruct this method to call (or not call) glfwInit() and
- * glfwTerminate(). In short: if this is the first call to a GLFW in your
- * application, set init_glfw to true. If it's not, set it to false. Since AO
- * is for rendering, I would expect this flag to be false almost always.
 */
 
 template<class Mesh>
 CINO_INLINE
 void ambient_occlusion_srf_meshes(      Mesh & m,
-                                  const int    buffer_size = 350,
-                                  const uint   sample_dirs = 256,
-                                  const bool   init_glfw   = false);
+                                  const int    buffer_size = 256,
+                                  const uint   sample_dirs = 32);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -70,8 +62,7 @@ template<class Mesh>
 CINO_INLINE
 void ambient_occlusion_vol_meshes(      Mesh & m,
                                   const int    buffer_size = 350,
-                                  const uint   sample_dirs = 256,
-                                  const bool   init_glfw   = false);
+                                  const uint   sample_dirs = 256);
 }
 
 #ifndef  CINO_STATIC_LIB

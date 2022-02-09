@@ -40,6 +40,7 @@
 #include <cinolib/sphere_coverage.h>
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/parallel_for.h>
+#include <cinolib/gl/offline_gl_context.h>
 
 namespace cinolib
 {
@@ -48,52 +49,45 @@ template<class Mesh>
 CINO_INLINE
 void ambient_occlusion_srf_meshes(      Mesh & m,
                                   const int    buffer_size,
-                                  const uint   sample_dirs,
-                                  const bool   init_glfw)
+                                  const uint   sample_dirs)
 {
     std::vector<float> ao(m.num_polys(),0);
     std::vector<vec3d> dirs;
     sphere_coverage(sample_dirs, dirs);
 
-    if(init_glfw) glfwInit();
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // https://www.glfw.org/docs/latest/context.html#context_offscreen
-    GLFWwindow* GL_context = glfwCreateWindow(buffer_size, buffer_size, "", NULL, NULL);
-    glfwDefaultWindowHints(); // restore default hints
+    GLFWwindow* GL_context = create_offline_GL_context(buffer_size, buffer_size);
+    if(GL_context==NULL)
+    {
+        std::cerr << "Impossible to create a GL context. Make sure GLFW has been initialized" << std::endl;
+        return;
+    }
 
     glfwMakeContextCurrent(GL_context);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
+    glViewport(0,0,buffer_size,buffer_size);
 
     float* z_buffer = new float[buffer_size*buffer_size];
 
-    for(vec3d u : dirs)
+    for(vec3d dir : dirs)
     {
         // for each POV render on a buffer, and do a visibility check
         // by reading values from the Z buffer and comparing with the actual depth
 
-        glClear(GL_DEPTH_BUFFER_BIT);
-        vec3d w(1,0,0), v;
-        v = u.cross(w); v.normalize();
-        w = v.cross(u); w.normalize();
-        double mat[16]=
-        {
-            w[0], v[0], u[0], 0,
-            w[1], v[1], u[1], 0,
-            w[2], v[2], u[2], 0,
-            0,    0,    0,    1
-        };
+        glMatrixMode(GL_MODELVIEW);
+        vec3d  Z(0,0,1);
+        vec3d  a = dir.cross(Z); a.normalize();
+        vec3d  c = m.centroid();
+        double s = 2.0/m.bbox().diag();
+        glPushMatrix();
         glLoadIdentity();
-        glMultMatrixd(mat);
-        vec3d c = -m.bbox().center();
-        vec3d s =  m.bbox().delta();
-        glScaled(1.0/s.x(), 1.0/s.y(), 1.0/s.z());
-        glTranslated(c.x(), c.y(), c.z());
+        glRotatef(Z.angle_deg(dir), a.x(), a.y(), a.z());
+        glScaled(s,s,s);
+        glTranslated(-c.x(), -c.y(), -c.z());
 
+        glClear(GL_DEPTH_BUFFER_BIT);
         m.draw();
         glReadPixels(0, 0, buffer_size, buffer_size, GL_DEPTH_COMPONENT, GL_FLOAT, z_buffer);
 
@@ -116,15 +110,14 @@ void ambient_occlusion_srf_meshes(      Mesh & m,
 
                 if(z_buffer[buffer_size*int(pp.y())+int(pp.x())]+0.0025 > depth)
                 {
-                    double diff = std::max(-u.dot(m.poly_data(pid).normal), 0.0);
+                    double diff = std::max(-dir.dot(m.poly_data(pid).normal), 0.0);
                     ao[pid] += diff;
                 }
             }
         });
     }
     delete[] z_buffer;
-    glfwDestroyWindow(GL_context);
-    if(init_glfw) glfwTerminate();
+    destroy_offline_GL_context(GL_context);
 
     // apply AO
     auto min_max = std::minmax_element(ao.begin(), ao.end());
@@ -142,53 +135,46 @@ template<class Mesh>
 CINO_INLINE
 void ambient_occlusion_vol_meshes(      Mesh & m,
                                   const int    buffer_size,
-                                  const uint   sample_dirs,
-                                  const bool   init_glfw)
+                                  const uint   sample_dirs)
 {
     std::vector<float> ao(m.num_faces(),0);
     std::vector<bool>  face_visible(m.num_faces(),false);
     std::vector<vec3d> dirs;
     sphere_coverage(sample_dirs, dirs);
 
-    if(init_glfw) glfwInit();
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // https://www.glfw.org/docs/latest/context.html#context_offscreen
-    GLFWwindow* GL_context = glfwCreateWindow(buffer_size, buffer_size, "", NULL, NULL);
-    glfwDefaultWindowHints(); // restore default hints
+    GLFWwindow* GL_context = create_offline_GL_context(buffer_size, buffer_size);
+    if(GL_context==NULL)
+    {
+        std::cerr << "Impossible to create a GL context. Make sure GLFW has been initialized" << std::endl;
+        return;
+    }
 
     glfwMakeContextCurrent(GL_context);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
 
     float* z_buffer = new float[buffer_size*buffer_size];
 
-    for(vec3d u : dirs)
+    for(vec3d dir : dirs)
     {
         // for each POV render on a buffer, and do a visibility check
         // by reading values from the Z buffer and comparing with the actual depth
 
-        glClear(GL_DEPTH_BUFFER_BIT);
-        vec3d w(1,0,0), v;
-        v = u.cross(w); v.normalize();
-        w = v.cross(u); w.normalize();
-        double mat[16]=
-        {
-            w[0], v[0], u[0], 0,
-            w[1], v[1], u[1], 0,
-            w[2], v[2], u[2], 0,
-            0,    0,    0,    1
-        };
+        glMatrixMode(GL_MODELVIEW);
+        vec3d  Z(0,0,1);
+        vec3d  a = dir.cross(Z); a.normalize();
+        vec3d  c = m.centroid();
+        double s = 2.0/m.bbox().diag();
+        glPushMatrix();
         glLoadIdentity();
-        glMultMatrixd(mat);
-        vec3d c = -m.bbox().center();
-        vec3d s =  m.bbox().delta();
-        glScaled(1.0/s.x(), 1.0/s.y(), 1.0/s.z());
-        glTranslated(c.x(), c.y(), c.z());
+        glRotatef(Z.angle_deg(dir), a.x(), a.y(), a.z());
+        glScaled(s,s,s);
+        glTranslated(-c.x(), -c.y(), -c.z());
+        glViewport(0,0,buffer_size,buffer_size);
 
+        glClear(GL_DEPTH_BUFFER_BIT);
         m.draw();
         glReadPixels(0, 0, buffer_size, buffer_size, GL_DEPTH_COMPONENT, GL_FLOAT, z_buffer);
 
@@ -213,15 +199,14 @@ void ambient_occlusion_vol_meshes(      Mesh & m,
 
                 if(z_buffer[buffer_size*int(pp.y())+int(pp.x())]+0.0025 > depth)
                 {
-                    double diff = std::max(-u.dot(m.poly_face_normal(pid_beneath,fid)), 0.0);
+                    double diff = std::max(-dir.dot(m.poly_face_normal(pid_beneath,fid)), 0.0);
                     ao[fid] += diff;
                 }
             }
         });
     }
     delete[] z_buffer;
-    glfwDestroyWindow(GL_context);
-    if(init_glfw) glfwTerminate();
+    destroy_offline_GL_context(GL_context);
 
     // apply AO
     auto min_max = std::minmax_element(ao.begin(), ao.end());
