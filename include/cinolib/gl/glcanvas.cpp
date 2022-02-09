@@ -319,7 +319,7 @@ void GLcanvas::draw_axis() const
     draw_arrow(O, X, r, Color::RED(),   0.9, 0.5, 8);
     draw_arrow(O, Y, r, Color::GREEN(), 0.9, 0.5, 8);
     draw_arrow(O, Z, r, Color::BLUE(),  0.9, 0.5, 8);
-    draw_sphere(O, r*2, Color::WHITE(), 1);
+    draw_sphere(O, r, Color::WHITE(), 1);
     glEnable(GL_DEPTH_TEST);
 }
 
