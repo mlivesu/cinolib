@@ -17,11 +17,14 @@ int main(int argc, char **argv)
     find_intersections(m, inters);
     p.pop();
 
-    std::cout << inters.size() << " pairs of intersecting triangles were found (in red)" << std::endl;
+    std::cout << "\n" << inters.size() << " pairs of intersecting triangles were found\n" << std::endl;
     for(const auto & i : inters)
     {
-        m.poly_data(i.first).color  = Color::RED();
+        m.poly_data(i.first ).color = Color::RED();
         m.poly_data(i.second).color = Color::RED();
+
+        m.poly_data(i.first ).flags[MARKED] = true;
+        m.poly_data(i.second).flags[MARKED] = true;
     }
     m.updateGL();
 
