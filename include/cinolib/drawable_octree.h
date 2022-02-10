@@ -48,7 +48,7 @@ class DrawableOctree : public Octree, public DrawableObject
     public:
 
         explicit DrawableOctree(const uint max_depth      = 7,
-                                const uint items_per_leaf = 3);
+                                const uint items_per_leaf = 50);
 
         ~DrawableOctree() {}
 
