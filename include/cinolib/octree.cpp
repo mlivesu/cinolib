@@ -673,15 +673,11 @@ bool Octree::intersects_box(const AABB & b, std::unordered_set<uint> & ids) cons
         lifo.push(root);
     }
 
-    std::cout << lifo.size() << " - " << ids.size() << std::endl;
-
     while(!lifo.empty())
     {        
         OctreeNode *node = lifo.top();
         lifo.pop();
         assert(node->bbox.intersects_box(b));
-
-        std::cout << lifo.size() << " - " << ids.size() << " inner node:" << node->is_inner << std::endl;
 
         if(node->is_inner)
         {            
