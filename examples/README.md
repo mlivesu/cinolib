@@ -118,6 +118,8 @@ Cmake will automatically detect and download the necessary external libraries (e
 #### 37 - Find (numerically exact) intersections between mesh elements
 [<p align="left"><img src="snapshots/37_find_intersections.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/37_find_intersections)
 
+#### 38 - Construct an acceleration spatial structure for fast queries, with or without exact predicates
+[<p align="left"><img src="snapshots/38_octree.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/38_octree)
 
 
 # Upcoming examples
