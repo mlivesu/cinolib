@@ -111,6 +111,20 @@ GLcanvas::GLcanvas(const int width, const int height)
         io.Fonts->AddFontFromMemoryCompressedTTF(droid_sans_data, droid_sans_size, font_size*10);
         io.FontGlobalScale = 0.1; // compensate for high-res fonts
     }
+
+    std::cout << ":::::::::::::::::::::::: SHORTCUTS ::::::::::::::::::::::::\n"
+                 "              TAB  : toggle show side bar (if any)         \n"
+                 "                A  : toggle show axis                      \n"
+                 "                P  : toggle perspective/orthographic camera\n"
+                 "                R  : reset camera                          \n"
+                 "       Left/Right  : rotate around Y                       \n"
+                 "          Up/Down  : rotate around X                       \n"
+                 "              1/2  : rotate around Z                       \n"
+                 "  SHIFT + Rot Keys : translate around same axis            \n"
+                 "          CMD + C  : copy  POV                             \n"
+                 "          CMD + V  : paste POV                             \n"
+                 " Mouse Double Clik : center scene and zoom in              \n"
+                 ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
