@@ -51,8 +51,9 @@ class AABB
 
         explicit AABB(const std::vector<AABB> & list, const double scaling_factor = 1.0); // AABB that contains all AABBs in b_list
 
-        explicit AABB(const vec3d min = vec3d( inf_double,  inf_double,  inf_double),
-                      const vec3d max = vec3d(-inf_double, -inf_double, -inf_double));
+        explicit AABB(const vec3d & p0, const vec3d & p1);
+
+        explicit AABB();
 
         virtual ~AABB() {}
 

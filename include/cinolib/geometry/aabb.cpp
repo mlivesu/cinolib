@@ -49,8 +49,20 @@ CINO_INLINE std::ostream & operator<<(std::ostream & in, const AABB & bb)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-AABB::AABB(const vec3d min, const vec3d max) : min(min), max(max)
-{}
+AABB::AABB()
+{
+    reset();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+AABB::AABB(const vec3d & p0, const vec3d & p1)
+{
+    reset();
+    push(p0);
+    push(p1);
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -293,7 +305,7 @@ bool AABB::intersects_ray(const vec3d & p, const vec3d & dir, double & t_min, ve
             if(t_near > t_far) std::swap(t_near, t_far);
 
             // Incrementally intersects slabs across X,Y and Z coordinates
-            // THIS PART IS WROnG IN THE BOOK!!!
+            // THIS PART IS WRONG IN THE BOOK!!!
             // (see http://realtimecollisiondetection.net/books/rtcd/errata/)
             t_min = std::max(t_min, t_near);
             t_max = std::min(t_max, t_far);
