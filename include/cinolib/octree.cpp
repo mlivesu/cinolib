@@ -639,8 +639,6 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
     std::unordered_set<uint> tmp;
     intersects_box(AABB(s[0],s[1]), tmp);
 
-    std::cout << tmp.size() << " intersected boxes" << std::endl;
-
     for(uint i : tmp)
     {
         if(items.at(i)->intersects_segment(s, ignore_if_valid_complex))
