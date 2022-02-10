@@ -639,6 +639,8 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
     std::unordered_set<uint> tmp;
     intersects_box(AABB(s[0],s[1]), tmp);
 
+    std::cout << tmp.size() << " intersected boxes" << std::endl;
+
     for(uint i : tmp)
     {
         if(items.at(i)->intersects_segment(s, ignore_if_valid_complex))
@@ -671,14 +673,18 @@ bool Octree::intersects_box(const AABB & b, std::unordered_set<uint> & ids) cons
         lifo.push(root);
     }
 
+    std::cout << lifo.size() << " - " << ids.size() << std::endl;
+
     while(!lifo.empty())
-    {
+    {        
         OctreeNode *node = lifo.top();
         lifo.pop();
         assert(node->bbox.intersects_box(b));
 
+        std::cout << lifo.size() << " - " << ids.size() << " inner node:" << node->is_inner << std::endl;
+
         if(node->is_inner)
-        {
+        {            
             for(int i=0; i<8; ++i)
             {
                 if(node->children[i]->bbox.intersects_box(b))
