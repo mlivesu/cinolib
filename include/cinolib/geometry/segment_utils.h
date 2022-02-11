@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2022: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -36,8 +36,30 @@
 #ifndef CINO_SEGMENT_UTILS_H
 #define CINO_SEGMENT_UTILS_H
 
+#include <cinolib/geometry/vec_mat.h>
+
 namespace cinolib
 {
+
+/* Given two segments S0(s00,s01) and S1(s10,s11) finds the pair
+ * of points in S0,S1 that are closest to each other. The function
+ * returns the distance between such points. Parameters p_on_s0,
+ * p_on_s1, s and t allow to precisely locate points on each segment,
+ * both in explicit and parametric form. In case the two segments are
+ * intersecting p_on_s0 and p_on_s1 coincide.
+ *
+ *      Ref: Real Time Collision Detection, Section 5.1.9
+*/
+template<class T>
+CINO_INLINE
+T closest_points_between_segments(const mat<3,1,T> & s00,
+                                  const mat<3,1,T> & s01,
+                                  const mat<3,1,T> & s10,
+                                  const mat<3,1,T> & s11,
+                                        T          & s,
+                                        T          & t,
+                                        mat<3,1,T> & p_on_s0,
+                                        mat<3,1,T> & p_on_s1);
 
 }
 
