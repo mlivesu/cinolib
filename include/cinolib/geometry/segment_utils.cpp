@@ -39,6 +39,15 @@
 namespace cinolib
 {
 
+/* Given two segments S0(s00,s01) and S1(s10,s11) finds the pair
+ * of points in S0,S1 that are closest to each other. The function
+ * returns the distance between such points. Parameters p_on_s0,
+ * p_on_s1, s and t allow to precisely locate points on each segment,
+ * both in explicit and parametric form. In case the two segments are
+ * intersecting p_on_s0 and p_on_s1 coincide.
+ *
+ *      Ref: Real Time Collision Detection, Section 5.1.9
+*/
 template<class T>
 CINO_INLINE
 T closest_points_between_segments(const mat<3,1,T> & s00,
@@ -107,6 +116,25 @@ T closest_points_between_segments(const mat<3,1,T> & s00,
     p_on_s0 = s00 + d1 * s;
     p_on_s1 = s10 + d2 * t;
     return (T)p_on_s0.dist(p_on_s1);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* WARNING: this assumes that the segments DO INTERSECT!
+ * For exact and approximate intersection checks, please
+ * refer to cinolib/predicates.h
+*/
+template<class T>
+CINO_INLINE
+mat<3,1,T> segment_intersection(const mat<3,1,T> & s00,
+                                const mat<3,1,T> & s01,
+                                const mat<3,1,T> & s10,
+                                const mat<3,1,T> & s11)
+{
+    mat<3,1,T> p;
+    T s,t;
+    closest_points_between_segments(s00,s01,s10,s11,s,t,p,p);
+    return p;
 }
 
 }

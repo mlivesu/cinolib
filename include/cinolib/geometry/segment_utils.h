@@ -61,6 +61,18 @@ T closest_points_between_segments(const mat<3,1,T> & s00,
                                         mat<3,1,T> & p_on_s0,
                                         mat<3,1,T> & p_on_s1);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* WARNING: this assumes that the segments DO INTERSECT!
+ * For exact and approximate intersection checks, please
+ * refer to cinolib/predicates.h
+*/
+template<class T>
+CINO_INLINE
+mat<3,1,T> segment_intersection(const mat<3,1,T> & s00,
+                                const mat<3,1,T> & s01,
+                                const mat<3,1,T> & s10,
+                                const mat<3,1,T> & s11);
 }
 
 #ifndef  CINO_STATIC_LIB
