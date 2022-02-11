@@ -301,14 +301,14 @@ void GLcanvas::draw()
     // draw your 3D scene
     for(auto obj : drawlist) obj->draw();
 
-    if(owns_ImGui && show_side_bar)
+    if(owns_ImGui)
     {
         // draw markers and visual controls
         ImGui_ImplOpenGL2_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         draw_markers();
-        draw_side_bar();
+        if(show_side_bar) draw_side_bar();
         ImGui::Render();
         ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
     }
