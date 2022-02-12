@@ -92,7 +92,7 @@ static const std::string ref_txt[3] =
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct RefinementStats
 {
    uint  splits_tot    = 0; // total number of splits
    uint  splits_vert   = 0; // number of vert split operations
@@ -104,15 +104,14 @@ typedef struct
    uint  num_verts_now = 0; // verts in the input  mesh
    uint  num_polys_bef = 0; // triangles in the output mesh
    uint  num_polys_now = 0; // triangles in the output mesh
-}
-RefinementStats;
+};
 
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const RefinementStats & stats);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct HomotopyBasisData
 {
     // INPUT: SETTINGS
     bool  globally_shortest  = false; // cost for globally shortest is O(n^2 log n). When this is set to true, root will contain the root of the globally shortest basis
@@ -132,8 +131,7 @@ typedef struct
     // note: tree and cotree reference the input mesh. If loops are detached they are useless
     std::vector<bool> tree;   // one element per edge. True if it is part of the tree, false otherwise
     std::vector<bool> cotree; // one element per edge. True if it is part of the cotree, false otherwise
-}
-HomotopyBasisData;
+};
 
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const HomotopyBasisData & data);
