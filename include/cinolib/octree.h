@@ -164,6 +164,20 @@ class Octree
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        template<class M, class V, class E, class P>
+        void build_from_mesh_points(const AbstractMesh<M,V,E,P> & m)
+        {
+            assert(items.empty());
+            items.reserve(m.num_verts());
+            for(uint vid=0; vid<m.num_verts(); ++vid)
+            {
+                push_point(vid, m.vert(vid));
+            }
+            build();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         uint max_items_per_leaf() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
