@@ -63,13 +63,24 @@ vec3d optimal_build_dir(const DrawableTrimesh<M,V,E,P> & m,
     // compute scores for all candidate directions. scores are stored separately because this will
     // allow to normalize them in the same range and combine them in a meaningful way...
     //
-    std::vector<float> h(opt.n_dirs); // height (along the build direction)
-    std::vector<float> a(opt.n_dirs); // area of the projection on the building platform
-    std::vector<float> c(opt.n_dirs); // area of the contacts between model and supports
-    std::vector<float> v(opt.n_dirs); // volume of the supports
+    std::vector<float> h(opt.n_dirs, inf_float); // height (along the build direction)
+    std::vector<float> a(opt.n_dirs, inf_float); // area of the projection on the building platform
+    std::vector<float> c(opt.n_dirs, inf_float); // area of the contacts between model and supports
+    std::vector<float> v(opt.n_dirs, inf_float); // volume of the supports
     //
     for(uint i=0; i<opt.n_dirs; ++i)
     {
+        bool skip = false;
+        for(const vec3d & fd : opt.forb_dirs)
+        {
+            if(fd.angle_deg(dirs[i])<opt.forb_cone_angle)
+            {
+                skip = true;
+                break;
+            }
+        }
+        if(skip) continue;
+
         // NOTE: this call is 90% of the computational cost
         std::vector<std::pair<uint,uint>> polys_hanging;
         overhangs(m, opt.overhang_threshold, dirs[i], polys_hanging, octree);
@@ -79,10 +90,29 @@ vec3d optimal_build_dir(const DrawableTrimesh<M,V,E,P> & m,
         // which are supposed to expand from the overhang down to the floor
         float floor;
 
-        if(opt.w_height         >0) h[i] = height_along_build_dir(m, dirs[i], floor);
-        if(opt.w_shadow_area    >0) a[i] = shadow_on_build_platform(m, dirs[i], opt.buffer_size, data, GL_context);
-        if(opt.w_support_contact>0) c[i] = supports_contact_area(m, polys_hanging);
-        if(opt.w_support_volume >0) v[i] = supports_volume(m, dirs[i], floor, polys_hanging);
+        h[i] = (opt.w_height         >0) ? height_along_build_dir(m, dirs[i], floor) : 0.f;
+        a[i] = (opt.w_shadow_area    >0) ? shadow_on_build_platform(m, dirs[i], opt.buffer_size, data, GL_context) : 0.f;
+        c[i] = (opt.w_support_contact>0) ? supports_contact_area(m, polys_hanging) : 0.f;
+        v[i] = (opt.w_support_volume >0) ? supports_volume(m, dirs[i], floor, polys_hanging) : 0.f;
+
+        // add penalty for critical surfaces
+        if(opt.w_support_contact>0 &&
+           opt.crit_srf.size()  >0)
+        {
+            for(auto & ov : polys_hanging)
+            {
+                // scale overhang area
+                if(CONTAINS(opt.crit_srf,ov.first))
+                {
+                    c[i] += m.poly_area(ov.first) * opt.crit_srf_boost;
+                }
+                // scale area of poly vertically below overhang
+                if(ov.second!=ov.first && CONTAINS(opt.crit_srf,ov.second))
+                {
+                    c[i] += m.poly_area(ov.second) * opt.crit_srf_boost;
+                }
+            }
+        }
     }
 
     // release memory
