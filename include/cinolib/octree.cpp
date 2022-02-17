@@ -658,7 +658,10 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// this query DOES NOT BECOME exact if CINOLIB_USES_EXACT_PREDICATES is defined
+// WARNING: this function may return false positives because it only checks intersection between
+// the box b and the AABB of the items in the tree. This is a partial result that it is useful for
+// some of the queries above, where a more expensive test between the geometric entity approximated
+// by box b and the actual items will be performed
 CINO_INLINE
 bool Octree::intersects_box(const AABB & b, std::unordered_set<uint> & ids) const
 {

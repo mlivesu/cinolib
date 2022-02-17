@@ -200,11 +200,15 @@ class Octree
         bool intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
         bool intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const;
 
-        // note: the first two queries become exact if CINOLIB_USES_EXACT_PREDICATES is defined
-        // (intersect_box DOES NOT BECOME exact)
+        // note: these queries become exact if CINOLIB_USES_EXACT_PREDICATES is defined
         bool intersects_segment (const vec3d s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
         bool intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
-        bool intersects_box     (const AABB  & b, std::unordered_set<uint> & ids) const;
+
+        // WARNING: this function may return false positives because it only checks intersection between
+        // the box b and the AABB of the items in the tree. This is a partial result that it is useful for
+        // some of the queries above, where a more expensive test between the geometric entity approximated
+        // by box b and the actual items will be performed
+        bool intersects_box(const AABB & b, std::unordered_set<uint> & ids) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
