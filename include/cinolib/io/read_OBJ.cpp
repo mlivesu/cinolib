@@ -78,7 +78,22 @@ void read_OBJ(const char                     * filename,
     std::vector<vec3d> tex, nor;
     std::vector<std::vector<uint>> poly_tex, poly_nor;
     std::vector<Color> poly_col;
-    read_OBJ(filename, verts, tex, nor, poly, poly_tex, poly_nor, poly_col);
+    std::vector<int> poly_lab;
+    read_OBJ(filename, verts, tex, nor, poly, poly_tex, poly_nor, poly_col, poly_lab);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void read_OBJ(const char                     * filename,
+              std::vector<vec3d>             & verts,
+              std::vector<std::vector<uint>> & poly,
+              std::vector<int>               & labels) // => cluster by OBJ groups
+{
+    std::vector<vec3d> tex, nor;
+    std::vector<std::vector<uint>> poly_tex, poly_nor;
+    std::vector<Color> poly_col;
+    read_OBJ(filename, verts, tex, nor, poly, poly_tex, poly_nor, poly_col, labels);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -92,7 +107,8 @@ void read_OBJ(const char                     * filename,
     std::vector<vec3d> pos, tex, nor;
     std::vector<std::vector<uint>> poly_pos, poly_tex, poly_nor;
     std::vector<Color> poly_col;
-    read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col);
+    std::vector<int>   poly_lab;
+    read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col, poly_lab);
 
     if (poly_pos.size() == poly_tex.size())
     {
@@ -111,6 +127,7 @@ void read_OBJ(const char                     * filename,
               std::vector<std::vector<uint>> & poly_tex,      // polygons with references to tex
               std::vector<std::vector<uint>> & poly_nor,      // polygons with references to nor
               std::vector<Color>             & poly_col,      // per polygon colors
+              std::vector<int>               & poly_lab,      // per polygon labels (cluster by OBJ groups "g")
               std::string                    & diffuse_path,  // path of the image encoding the diffuse  texture component
               std::string                    & specular_path, // path of the image encoding the specular texture component
               std::string                    & normal_path)   // path of the image encoding the normal   texture component
@@ -124,6 +141,7 @@ void read_OBJ(const char                     * filename,
     poly_tex.clear();
     poly_nor.clear();
     poly_col.clear();
+    poly_lab.clear();
     diffuse_path.clear();
     specular_path.clear();
     normal_path.clear();
@@ -135,10 +153,12 @@ void read_OBJ(const char                     * filename,
         exit(-1);
     }
 
+    int fresh_label = 0;
     std::map<std::string,Color> color_map;
     Color curr_color = Color::WHITE();     // set WHITE as default color
-    bool has_per_face_color = false;       // true if a mtllib is found. If "has_per_face_color" stays
-                                           // false the "poly_color" vector will be emptied before returning.
+    bool has_per_face_color = false;
+    bool has_groups         = false;
+
     std::string line;
     while(std::getline(f,line))
     {
@@ -176,6 +196,7 @@ void read_OBJ(const char                     * filename,
                     poly_pos.push_back(p_pos);
                     poly_col.push_back(curr_color);
                 }
+                poly_lab.push_back(fresh_label);
                 break;
             }
 
@@ -209,10 +230,19 @@ void read_OBJ(const char                     * filename,
                 }
                 break;
             }
+
+            case 'g':
+            {
+                has_groups = true;
+                fresh_label++;
+                break;
+            }
         }
     }
     f.close();
-    if (!has_per_face_color) poly_col.clear();
+
+    if(!has_per_face_color) poly_col.clear();
+    if(!has_groups)         poly_lab.clear();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -225,12 +255,13 @@ void read_OBJ(const char                     * filename,
               std::vector<std::vector<uint>> & poly_pos,    // polygons with references to pos
               std::vector<std::vector<uint>> & poly_tex,    // polygons with references to tex
               std::vector<std::vector<uint>> & poly_nor,    // polygons with references to nor
-              std::vector<Color>             & poly_col)    // per polygon colors
+              std::vector<Color>             & poly_col,    // per polygon colors
+              std::vector<int>               & poly_lab)    // per polygon labels (OBJ groups)
 {
     std::string  diffuse_path;
     std::string  specular_path;
     std::string  normal_path;
-    read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col, diffuse_path, specular_path, normal_path);
+    read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col, poly_lab, diffuse_path, specular_path, normal_path);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

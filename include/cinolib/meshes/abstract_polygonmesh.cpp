@@ -65,6 +65,7 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
     std::vector<std::vector<uint>> poly_tex; // polygons with references to tex
     std::vector<std::vector<uint>> poly_nor; // polygons with references to nor
     std::vector<Color>             poly_col; // per polygon colors
+    std::vector<int>               poly_lab; // per polygon labels
 
     std::string str(filename);
     std::string filetype = str.substr(str.size()-4,4);
@@ -78,7 +79,7 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
              filetype.compare(".OBJ") == 0)
     {
         //read_OBJ(filename, pos, poly_pos);
-        read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col);
+        read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col, poly_lab);
     }
     else if (filetype.compare(".stl") == 0 ||
              filetype.compare(".STL") == 0)
@@ -92,7 +93,7 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
     }
 
-    init(pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col);
+    init(pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col, poly_lab);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -209,7 +210,8 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
                                               std::vector<std::vector<uint>> & poly_pos,  // polygons with references to pos
                                         const std::vector<std::vector<uint>> & poly_tex,  // polygons with references to tex
                                         const std::vector<std::vector<uint>> & poly_nor,  // polygons with references to nor
-                                        const std::vector<Color>             & poly_col)  // per polygon colors
+                                        const std::vector<Color>             & poly_col,  // per polygon colors
+                                        const std::vector<int>               & poly_lab)  // per polygon labels
 {
     // if the model is textured or has multiple normals per vertex (or both),
     // cut mesh along seams to create unique openGL-like vertices having
@@ -276,6 +278,11 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
         {
             this->poly_data(pid).color = poly_col.at(pid);
         }
+    }
+
+    if(poly_lab.size()==this->num_polys())
+    {
+        this->poly_apply_labels(poly_lab);
     }
 }
 

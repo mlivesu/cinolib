@@ -76,7 +76,8 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
                         std::vector<std::vector<uint>> & poly_pos,  // polygons with references to pos
                   const std::vector<std::vector<uint>> & poly_tex,  // polygons with references to tex
                   const std::vector<std::vector<uint>> & poly_nor,  // polygons with references to nor
-                  const std::vector<Color>             & poly_col); // per polygon colors
+                  const std::vector<Color>             & poly_col,  // per polygon colors
+                  const std::vector<int>               & poly_lab); // per polygon labels
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
