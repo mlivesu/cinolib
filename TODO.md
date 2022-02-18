@@ -25,6 +25,7 @@ Please consider this to be just development notes and not any real planning.
 * gradients on hex-meshes look buggy. Find out why
 
 ### Extensions/improvements:
+* create a struct IOData that contains vectors for all input mesh elements (verts, polys, textures, normals, labels, colors, ecc), and use it for any IO operation in the lib
 * remove vecs of vecs for mesh polygons and polyhedra. use serialized elements and two separated vectors to index them
 * add line color for 2D checkerboard maps
 * allow to select clamping or repeation for 1D texture
