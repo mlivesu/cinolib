@@ -239,7 +239,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
     {
         std::vector<vec3d> tmp_xyz, tmp_nor;
         std::vector<std::vector<uint>> tmp_poly;
-        to_openGL_unified_verts(pos, tex, poly_pos, poly_tex, tmp_xyz, tmp_nor, tmp_poly);
+        to_openGL_unified_verts(pos, nor, poly_pos, poly_nor, tmp_xyz, tmp_nor, tmp_poly);
         pos      = tmp_xyz;
         nor      = tmp_nor;
         poly_pos = tmp_poly;
