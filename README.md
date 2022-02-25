@@ -14,7 +14,7 @@ and include in your C++ application the header files you need. For small project
 
 ## Build a sample project (with CMake)
 Here is an example of a toy program that reads a triangle mesh and displays it on a window
-```
+```c++
 #include <cinolib/meshes/drawable_trimesh.h>
 #include <cinolib/gl/glcanvas.h>
 
@@ -28,7 +28,7 @@ int main()
 }
 ```
 and this is the `CMakeLists.txt` that can be used to compile it
-```
+```cmake
 cmake_minimum_required(VERSION 3.2)
 project(cinolib_demo)
 add_executable(${PROJECT_NAME} main.cpp)
@@ -55,7 +55,7 @@ Valid options are:
 
 ## GUI
 CinoLib is designed for researchers in computer graphics and geometry processing that need to quickly realize software prototypes that demonstate a novel algorithm or technique. In this context a simple OpenGL window and a side bar containing a few buttons and sliders are often more than enough. The library uses [ImGui](https://github.com/ocornut/imgui) for the GUI and [GLFW](https://www.glfw.org) for OpenGL rendering. Typical visual controls for the rendering of a mesh (e.g. shading, wireframe, texturing, planar slicing, ecc) are all encoded in two classes `cinolib::SurfaceMeshControls` and `cinolib::VolumeMeshControls`, that operate on surface and volume meshes respectively. To add a side bar that displays all such controls one can modify the sample progam above as follows:
-```
+```c++
 #include <cinolib/meshes/drawable_trimesh.h>
 #include <cinolib/gl/glcanvas.h>
 #include <cinolib/gl/surface_mesh_controls.h>
@@ -72,7 +72,7 @@ int main()
 }
 ```
 The canvas can host multiple mesh controls, ideally one of each mesh in the scene. Additional GUI elements that may be necessary to control the application (e.g. the parameters of your algorithm) can be added by implementing a dedicated callback:
-```
+```c++
 #include <cinolib/meshes/drawable_trimesh.h>
 #include <cinolib/gl/glcanvas.h>
 #include <cinolib/gl/surface_mesh_controls.h>
