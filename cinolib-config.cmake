@@ -13,7 +13,8 @@ target_include_directories(cinolib INTERFACE $<BUILD_INTERFACE:${cinolib_DIR}/in
 target_include_directories(cinolib INTERFACE $<BUILD_INTERFACE:${cinolib_DIR}/external/eigen>)
 
 # https://cliutils.gitlab.io/modern-cmake/chapters/features/cpp11.html
-target_compile_features(cinolib INTERFACE cxx_std_11)
+# (bugfix: cinoLib requires only C++11 but modern Boost requires C++14)
+target_compile_features(cinolib INTERFACE cxx_std_14)
 set_target_properties(cinolib PROPERTIES CXX_EXTENSIONS OFF)
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -41,7 +42,7 @@ if(CINOLIB_USES_OPENGL_GLFW_IMGUI)
     target_link_libraries(cinolib INTERFACE OpenGL::GL)
     add_subdirectory(${cinolib_DIR}/external/imgui imgui)
     target_link_libraries(cinolib INTERFACE imgui)
-    target_compile_definitions(cinolib INTERFACE CINOLIB_USES_OPENGL_GLFW_IMGUI)
+    target_compile_definitions(cinolib INTERFACE CINOLIB_USES_OPENGL_GLFW_IMGUI GL_SILENCE_DEPRECATION)
 endif()
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -93,7 +94,7 @@ if(CINOLIB_USES_BOOST)
     message("CINOLIB OPTIONAL MODULE: Boost")
     find_package(Boost)
     if(Boost_FOUND)
-        target_include_directories(cinolib INTERFACE ${boost_INCLUDE_DIRS})
+        target_include_directories(cinolib INTERFACE ${Boost_INCLUDE_DIRS})
         target_compile_definitions(cinolib INTERFACE CINOLIB_USES_BOOST)
     else()
         message("Could not find Boost!")
