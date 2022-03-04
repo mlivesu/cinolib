@@ -8,7 +8,7 @@ set(CINOLIB_USES_TETGEN            ON )
 set(CINOLIB_USES_TRIANGLE          ON )
 set(CINOLIB_USES_EXACT_PREDICATES  ON )
 set(CINOLIB_USES_GRAPH_CUT         OFF)
-set(CINOLIB_USES_BOOST             OFF)
+set(CINOLIB_USES_BOOST             ON )
 set(CINOLIB_USES_VTK               OFF) # optional, if added VTK formats will be supported everywhere
 
 # pass cinolib and the external dependencies to all examples
