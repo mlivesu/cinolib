@@ -4,7 +4,7 @@ This folder contains a number of sample programs that illustrate the core functi
 cd examples
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -Dcinolib_DIR=..
+cmake .. -DCMAKE_BUILD_TYPE=Release -Dcinolib_DIR=<absolute-path-to-cinolib>
 make
 ```
 Cmake will automatically detect and download the necessary external libraries (e.g. [Triangle](https://www.cs.cmu.edu/~quake/triangle.html), [Tetgen](http://wias-berlin.de/software/index.jsp?id=TetGen&lang=1)). You can selectively enable/disable external dependencies directly from the `CMakeLists.txt` file. At the end of the process, all the executables will be positioned in the newly generated `bin` folder.
