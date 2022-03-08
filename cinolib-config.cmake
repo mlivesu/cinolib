@@ -114,7 +114,7 @@ if(CINOLIB_USES_VTK)
         target_compile_definitions(cinolib INTERFACE CINOLIB_USES_VTK)
     else()
         message("Could not find VTK!")
-        	set(CINOLIB_USES_VTK OFF)
+        set(CINOLIB_USES_VTK OFF)
     endif()
 endif()
 
