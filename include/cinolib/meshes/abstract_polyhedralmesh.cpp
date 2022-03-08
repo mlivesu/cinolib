@@ -1401,6 +1401,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_adj_srf_edge(const uint fid, const 
         }
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1421,6 +1422,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_opp_to_srf_edge(const uint fid, con
         }
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

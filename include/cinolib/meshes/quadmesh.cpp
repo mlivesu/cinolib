@@ -169,6 +169,7 @@ int Quadmesh<M,V,E,P>::edge_next_along_chain(const uint eid, const uint vid) con
         if (!this->edges_share_poly(eid,nbr)) return nbr;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

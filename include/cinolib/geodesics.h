@@ -79,13 +79,12 @@ ScalarField compute_geodesics(      Mesh              & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct GeodesicsCache
 {
     Eigen::SimplicialLLT<Eigen::SparseMatrix<double>>  *heat_flow_cache   = NULL;
     Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> *integration_cache = NULL;
     Eigen::SparseMatrix<double>                         gradient_matrix;
-}
-GeodesicsCache;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
