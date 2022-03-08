@@ -51,7 +51,7 @@ std::vector<Eigen::Triplet<double>> laplacian_matrix_entries(const AbstractMesh<
     std::vector<Entry> entries;
 
     uint nv = m.num_verts();
-    uint base[n];
+    std::vector<uint> base(n);
     for(int i=0; i<n; ++i) base[i] = nv*i;
 
     for(uint vid=0; vid<m.num_verts(); ++vid)

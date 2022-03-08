@@ -45,7 +45,7 @@ Eigen::SparseMatrix<double> mass_matrix(const AbstractMesh<M,V,E,P> & m, const i
     typedef Eigen::Triplet<double> Entry;
 
     uint nv = m.num_verts();
-    uint base[n];
+    std::vector<uint> base(n);
     for(int i=0; i<n; ++i) base[i] = nv*i;
 
     std::vector<Entry>  entries;
