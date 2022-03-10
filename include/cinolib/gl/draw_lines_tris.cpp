@@ -50,7 +50,7 @@ void render_tris(const RenderData & data)
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, data.tri_coords.data());
         glPointSize(data.seg_width);
-        glDrawArrays(GL_POINTS, 0, data.tri_coords.size()/3);
+        glDrawArrays(GL_POINTS, 0, (GLsizei)(data.tri_coords.size()/3));
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_COLOR_ARRAY);
     }
@@ -84,7 +84,7 @@ void render_tris(const RenderData & data)
         glVertexPointer(3, GL_FLOAT, 0, data.tri_coords.data());
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_FLOAT, 0, data.tri_v_norms.data());
-        glDrawElements(GL_TRIANGLES, data.tris.size(), GL_UNSIGNED_INT, data.tris.data());
+        glDrawElements(GL_TRIANGLES, (GLsizei)data.tris.size(), GL_UNSIGNED_INT, data.tris.data());
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
         if(data.draw_mode & DRAW_TRI_TEXTURE1D)

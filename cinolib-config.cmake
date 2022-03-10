@@ -53,6 +53,7 @@ if(CINOLIB_USES_TETGEN)
     FetchContent_MakeAvailable(tetgen)
     target_compile_definitions(cinolib INTERFACE CINOLIB_USES_TETGEN)
     target_compile_definitions(cinolib INTERFACE TETLIBRARY)
+    target_compile_definitions(cinolib INTERFACE _CRT_SECURE_NO_WARNINGS) # disable MSVC unsafe warnings
     target_include_directories(cinolib INTERFACE ${tetgen_SOURCE_DIR})
     target_link_libraries(cinolib INTERFACE tetgen)
 endif()

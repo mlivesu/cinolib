@@ -108,8 +108,8 @@ GLcanvas::GLcanvas(const int width, const int height)
         ImGuiIO &io = ImGui::GetIO();
         io.IniFilename = NULL;
         io.Fonts->Clear();
-        io.Fonts->AddFontFromMemoryCompressedTTF(droid_sans_data, droid_sans_size, font_size*10);
-        io.FontGlobalScale = 0.1; // compensate for high-res fonts
+        io.Fonts->AddFontFromMemoryCompressedTTF(droid_sans_data, droid_sans_size, font_size*10.f);
+        io.FontGlobalScale = 0.1f; // compensate for high-res fonts
     }
 
     std::cout << ":::::::::::::::::::::::: SHORTCUTS ::::::::::::::::::::::::\n"
@@ -367,8 +367,8 @@ void GLcanvas::draw_markers() const
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     // if marker culling is enabled, read the Z buffer to depth-test 3D markers
-    GLint    W     = camera.width  * DPI_factor;
-    GLint    H     = camera.height * DPI_factor;
+    GLint    W     = static_cast<GLint>(camera.width  * DPI_factor);
+    GLint    H     = static_cast<GLint>(camera.height * DPI_factor);
     GLfloat *z_buf = (depth_cull_markers) ? new GLfloat[W*H] : nullptr;
     if(depth_cull_markers) whole_Z_buffer(z_buf);
 
@@ -380,8 +380,8 @@ void GLcanvas::draw_markers() const
             assert(!m.pos_3d.is_inf());
             GLdouble z;
             project(m.pos_3d, pos, z);
-            int x  = pos.x()*DPI_factor;
-            int y  = pos.y()*DPI_factor;
+            int x  = static_cast<int>(pos.x()*DPI_factor);
+            int y  = static_cast<int>(pos.y()*DPI_factor);
             // marker is outside the frustum
             if(z<0 || z>=1 || x<=0 || x>=W || y<=0 || y>=H) continue;
             // marker is occluded in the current view

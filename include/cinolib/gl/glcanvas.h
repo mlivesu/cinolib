@@ -81,8 +81,8 @@ class GLcanvas
         std::vector<Marker>                markers;
         std::vector<SideBarItem*>          side_bar_items;
         bool                               show_side_bar      = false;
-        float                              side_bar_width     = 0.20;
-        float                              side_bar_alpha     = 1.0;
+        float                              side_bar_width     = 0.2f;
+        float                              side_bar_alpha     = 1.f;
         int                                font_size          = 13;
         bool                               show_axis          = false;
         bool                               depth_cull_markers = true; // skip occluded 3D markers, testing their depth with the Z-buffer

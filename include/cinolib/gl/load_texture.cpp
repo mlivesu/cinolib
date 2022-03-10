@@ -53,6 +53,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../external/stb/stb_image.h"
 
+// this is the only symbol not in OpenGL 1.1 in the whole library.
+// useful to define it when compiling CinoLib in Windows without
+// Glad, Glew or similar tools
+#ifndef GL_CLAMP_TO_EDGE
+#define GL_CLAMP_TO_EDGE 0x812F
+#endif
+
 namespace cinolib
 {
 

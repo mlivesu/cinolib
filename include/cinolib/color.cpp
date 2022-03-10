@@ -139,18 +139,18 @@ Color Color::red_white_blue_ramp_01(float val)
 
     if(val<=0.5)
     {
-        val *= 2.0;
-        return Color(WHITE().r * val + RED().r * (1.0 - val),
-                     WHITE().g * val + RED().g * (1.0 - val),
-                     WHITE().b * val + RED().b * (1.0 - val));
+        val *= 2.f;
+        return Color(WHITE().r * val + RED().r * (1.f - val),
+                     WHITE().g * val + RED().g * (1.f - val),
+                     WHITE().b * val + RED().b * (1.f - val));
     }
 
-    if(val<=1.0)
+    if(val<=1)
     {
-        val = 2.0*val - 1.0;
-        return Color(BLUE().r * val + WHITE().r * (1.0 - val),
-                     BLUE().g * val + WHITE().g * (1.0 - val),
-                     BLUE().b * val + WHITE().b * (1.0 - val));
+        val = 2.f*val - 1.f;
+        return Color(BLUE().r * val + WHITE().r * (1.f - val),
+                     BLUE().g * val + WHITE().g * (1.f - val),
+                     BLUE().b * val + WHITE().b * (1.f - val));
     }
 
     assert(false);
@@ -164,8 +164,8 @@ Color Color::red_ramp_01(const float val, const bool zero_is_white)
 {
     if(zero_is_white)
     {
-        if(val<0) return WHITE();
-        if(val>1) return RED();
+        if(val<0.f) return WHITE();
+        if(val>1.f) return RED();
         return Color(1,1-val,1-val);
     }
     else
@@ -207,12 +207,12 @@ Color Color::hsv2rgb(float h, float s, float v)
     if(s==0.0) return Color(v,v,v); // gray color
     if(h==1.0) h = 0.0;
 
-    int i   = int( floor(h*6.0) );
-    float f = float(h*6.0f - floor(h*6.0f));
+    int i   = int( floor(h*6.f) );
+    float f = float(h*6.f - floor(h*6.f));
 
-    float p = v*(1.0f-s);
-    float q = v*(1.0f-s*f);
-    float t = v*(1.0f-s*(1.0f-f));
+    float p = v*(1.f-s);
+    float q = v*(1.f-s*f);
+    float t = v*(1.f-s*(1.f-f));
 
     switch(i)
     {
@@ -266,9 +266,9 @@ Color Color::hsv_ramp(uint n_colors, uint pos)
 
     uint i = std::round(255 * static_cast<float>(pos)/static_cast<float>(n_colors));
 
-    float r = hsv_texture1D[3*i+0]/255.0;
-    float g = hsv_texture1D[3*i+1]/255.0;
-    float b = hsv_texture1D[3*i+2]/255.0;
+    float r = hsv_texture1D[3*i+0]/255.f;
+    float g = hsv_texture1D[3*i+1]/255.f;
+    float b = hsv_texture1D[3*i+2]/255.f;
 
     return Color(r,g,b);
 }
@@ -282,9 +282,9 @@ Color Color::parula_ramp(uint n_colors, uint pos)
 
     uint i = std::round(64 * static_cast<float>(pos)/static_cast<float>(n_colors));
 
-    float r = parula_texture1D[3*i+0]/255.0;
-    float g = parula_texture1D[3*i+1]/255.0;
-    float b = parula_texture1D[3*i+2]/255.0;
+    float r = parula_texture1D[3*i+0]/255.f;
+    float g = parula_texture1D[3*i+1]/255.f;
+    float b = parula_texture1D[3*i+2]/255.f;
 
     return Color(r,g,b);
 }

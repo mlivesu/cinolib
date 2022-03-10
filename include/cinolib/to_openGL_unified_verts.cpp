@@ -74,7 +74,7 @@ void to_openGL_unified_verts(const std::vector<vec3d>             & v_attr_0,   
             auto query = v_map.find(key);
             if (query == v_map.end())
             {
-                uint fresh_id = unified_v_attr_0.size();
+                uint fresh_id = (uint)unified_v_attr_0.size();
                 v_map[key] = fresh_id;
                 unified_v_attr_0.push_back(v_attr_0.at(v));
                 unified_v_attr_1.push_back(v_attr_1.at(vt));
@@ -129,7 +129,7 @@ void to_openGL_unified_verts(const std::vector<vec3d>             & v_attr_0,
             auto query = v_map.find(key);
             if (query == v_map.end())
             {
-                uint fresh_id = unified_v_attr_0.size();
+                uint fresh_id = (uint)unified_v_attr_0.size();
                 v_map[key] = fresh_id;
                 unified_v_attr_0.push_back(v_attr_0.at(v));
                 unified_v_attr_1.push_back(v_attr_1.at(vt));

@@ -69,11 +69,11 @@ enum
 // https://www.khronos.org/registry/OpenGL-Refpages/es1.1/xhtml/glMaterial.xml
 struct Material
 {
-    GLfloat ambient [4] = {0.2, 0.2, 0.2, 1.0};
-    GLfloat diffuse [4] = {0.8, 0.8, 0.8, 1.0};
-    GLfloat specular[4] = {0.0, 0.0, 0.0, 1.0};
-    GLfloat emission[4] = {0.0, 0.0, 0.0, 1.0};
-    GLint   shininess   = 0; // if you use this, you might want to set the specular component to white
+    GLfloat ambient [4] = {0.2f, 0.2f, 0.2f, 1.0f};
+    GLfloat diffuse [4] = {0.8f, 0.8f, 0.8f, 1.0f};
+    GLfloat specular[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+    GLfloat emission[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+    GLfloat shininess   = 0.f; // if you use this, you might want to set the specular component to white
 
     void apply() const
     {

@@ -41,7 +41,7 @@ namespace cinolib
 CINO_INLINE
 std::vector<vec3d> vec3d_from_serialized_xyz(const std::vector<double> & coords)
 {
-    uint nv = coords.size()/3;
+    uint nv = (uint)coords.size()/3;
     std::vector<vec3d> tmp(nv);
     for(uint vid=0; vid<nv; ++vid) tmp.at(vid) = vec3d(coords.at(3*vid+0), coords.at(3*vid+1), coords.at(3*vid+2));
     return tmp;
@@ -52,7 +52,7 @@ std::vector<vec3d> vec3d_from_serialized_xyz(const std::vector<double> & coords)
 CINO_INLINE
 std::vector<vec3d> vec3d_from_serialized_xy(const std::vector<double> & coords, const double z)
 {
-    uint nv = coords.size()/2;
+    uint nv = (uint)coords.size()/2;
     std::vector<vec3d> tmp(nv);
     for(uint vid=0; vid<nv; ++vid) tmp.at(vid) = vec3d(coords.at(2*vid+0), coords.at(2*vid+1), z);
     return tmp;
@@ -63,7 +63,7 @@ std::vector<vec3d> vec3d_from_serialized_xy(const std::vector<double> & coords, 
 CINO_INLINE
 std::vector<vec3d> vec3d_from_vec2d(const std::vector<vec2d> & verts, const double z)
 {
-    uint nv = verts.size();
+    uint nv = (uint)verts.size();
     std::vector<vec3d> tmp(nv);
     for(uint vid=0; vid<nv; ++vid) tmp.at(vid) = vec3d(verts.at(vid).x(), verts.at(vid).y(), z);
     return tmp;
@@ -74,7 +74,7 @@ std::vector<vec3d> vec3d_from_vec2d(const std::vector<vec2d> & verts, const doub
 CINO_INLINE
 std::vector<double> serialized_xyz_from_vec3d(const std::vector<vec3d> & verts)
 {
-    uint nv = verts.size();
+    uint nv = (uint)verts.size();
     std::vector<double> tmp(3*nv);
     for(uint vid=0; vid<nv; ++vid)
     {
@@ -90,7 +90,7 @@ std::vector<double> serialized_xyz_from_vec3d(const std::vector<vec3d> & verts)
 CINO_INLINE
 std::vector<double> serialized_xyz_from_vec2d(const std::vector<vec2d> & verts, const double z)
 {
-    uint nv = verts.size();
+    uint nv = (uint)verts.size();
     std::vector<double> tmp(3*nv);
     for(uint vid=0; vid<nv; ++vid)
     {
@@ -106,7 +106,7 @@ std::vector<double> serialized_xyz_from_vec2d(const std::vector<vec2d> & verts, 
 CINO_INLINE
 std::vector<double> serialized_xyz_from_serialized_xy(const std::vector<double> & coords, const double z)
 {
-    uint nv = coords.size()/2;
+    uint nv = (uint)coords.size()/2;
     std::vector<double> tmp(3*nv);
     for(uint vid=0; vid<nv; ++vid)
     {
@@ -122,7 +122,7 @@ std::vector<double> serialized_xyz_from_serialized_xy(const std::vector<double> 
 CINO_INLINE
 std::vector<vec2d> vec2d_from_serialized_xy(const std::vector<double> & coords)
 {
-    uint nv = coords.size()/2;
+    uint nv = (uint)coords.size()/2;
     std::vector<vec2d> tmp(nv);
     for(uint vid=0; vid<nv; ++vid) tmp.at(vid) = vec2d(coords.at(2*vid), coords.at(2*vid+1));
     return tmp;
@@ -133,7 +133,7 @@ std::vector<vec2d> vec2d_from_serialized_xy(const std::vector<double> & coords)
 CINO_INLINE
 std::vector<vec2d> vec2d_from_serialized_xyz(const std::vector<double> & coords)
 {
-    uint nv = coords.size()/3;
+    uint nv = (uint)coords.size()/3;
     std::vector<vec2d> tmp(nv);
     for(uint vid=0; vid<nv; ++vid) tmp.at(vid) = vec2d(coords.at(3*vid), coords.at(3*vid+1));
     return tmp;
@@ -144,7 +144,7 @@ std::vector<vec2d> vec2d_from_serialized_xyz(const std::vector<double> & coords)
 CINO_INLINE
 std::vector<vec2d> vec2d_from_vec3d(const std::vector<vec3d>  & verts)
 {
-    uint nv = verts.size();
+    uint nv = (uint)verts.size();
     std::vector<vec2d> tmp(nv);
     for(uint vid=0; vid<nv; ++vid) tmp.at(vid) = vec2d(verts.at(vid).x(), verts.at(vid).y());
     return tmp;
@@ -155,7 +155,7 @@ std::vector<vec2d> vec2d_from_vec3d(const std::vector<vec3d>  & verts)
 CINO_INLINE
 std::vector<double> serialized_xy_from_vec2d(const std::vector<vec2d> & verts)
 {
-    uint nv = verts.size();
+    uint nv = (uint)verts.size();
     std::vector<double> tmp(2*nv);
     for(uint vid=0; vid<nv; ++vid)
     {
@@ -170,7 +170,7 @@ std::vector<double> serialized_xy_from_vec2d(const std::vector<vec2d> & verts)
 CINO_INLINE
 std::vector<double> serialized_xy_from_vec3d(const std::vector<vec3d> & verts)
 {
-    uint nv = verts.size();
+    uint nv = (uint)verts.size();
     std::vector<double> tmp(2*nv);
     for(uint vid=0; vid<nv; ++vid)
     {
@@ -185,7 +185,7 @@ std::vector<double> serialized_xy_from_vec3d(const std::vector<vec3d> & verts)
 CINO_INLINE
 std::vector<double> serialized_xy_from_serialized_xyz(const std::vector<double> & coords)
 {
-    uint nv = coords.size()/3;
+    uint nv = (uint)coords.size()/3;
     std::vector<double> tmp(2*nv);
     for(uint vid=0; vid<nv; ++vid)
     {
@@ -200,7 +200,7 @@ std::vector<double> serialized_xy_from_serialized_xyz(const std::vector<double> 
 CINO_INLINE
 std::vector<std::vector<uint>> polys_from_serialized_vids(const std::vector<uint> & vids, const uint vids_per_poly)
 {
-    uint nf = vids.size()/vids_per_poly;
+    uint nf = (uint)vids.size()/vids_per_poly;
     std::vector<std::vector<uint>> tmp(nf);
     for(uint fid=0; fid<nf; ++fid)
     {
