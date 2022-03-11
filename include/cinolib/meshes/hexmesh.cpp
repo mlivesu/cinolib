@@ -433,4 +433,38 @@ bool Hexmesh<M,V,E,F,P>::poly_fix_orientation()
     return false;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Hexmesh<M,V,E,F,P>::poly_local_frame(const uint    pid,
+                                                mat3d & xyz)
+{
+    auto verts = this->poly_verts(pid);
+    mat3d m({(verts[0]+verts[1]+verts[2]+verts[3])/4 - (verts[4]+verts[5]+verts[6]+verts[7])/4,
+             (verts[1]+verts[2]+verts[6]+verts[5])/4 - (verts[0]+verts[3]+verts[7]+verts[4])/4,
+             (verts[0]+verts[1]+verts[5]+verts[4])/4 - (verts[3]+verts[2]+verts[6]+verts[7])/4});
+
+    // find the local frame that is closest to the segments joining the centroids of opposite hex faces
+    mat3d u,v; vec3d s;
+    m.SVD(u,s,v);
+    xyz = u*v.transpose();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Hexmesh<M,V,E,F,P>::poly_local_frame(const uint    pid,
+                                                vec3d & x,
+                                                vec3d & y,
+                                                vec3d & z)
+{
+    mat3d xyz;
+    poly_local_frame(pid, xyz);
+    x = xyz.col(0);
+    y = xyz.col(1);
+    z = xyz.col(2);
+}
+
 }

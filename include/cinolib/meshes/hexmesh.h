@@ -117,6 +117,8 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         void   poly_subdivide       (const std::vector<std::vector<std::vector<uint>>> & split_scheme);
         double poly_volume          (const uint pid) const override;
         bool   poly_fix_orientation ();
+        void   poly_local_frame     (const uint pid, vec3d & x, vec3d & y, vec3d & z);
+        void   poly_local_frame     (const uint pid, mat3d & xyz);
 };
 
 }
