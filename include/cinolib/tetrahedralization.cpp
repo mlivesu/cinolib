@@ -61,7 +61,11 @@ void hex_to_tets(const Hexmesh<M,V,E,F,P> & hm,
         hex_to_tets(hm.poly_verts_id(pid),tets);
 
         auto t = polys_from_serialized_vids(tets,4);
-        for(auto tet : t) tm.poly_add(tet);
+        for(auto tet : t)
+        {
+            uint id = tm.poly_add(tet);
+            tm.poly_data(id).label = pid;
+        }
     }
 }
 
