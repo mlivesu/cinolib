@@ -40,7 +40,7 @@ Compiling should be as easy as opening a terminal in the folder containing the t
 ```
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -Dcinolib_DIR=<path-to-cinolib>
+cmake .. -DCMAKE_BUILD_TYPE=Release -Dcinolib_DIR=<absolute-path-to-cinolib>
 make
 ```
 Note that for the rendering part CinoLib uses [GLFW](https://www.glfw.org), which will be automatically installed and linked by the script `cinolib-config.cmake`, contained in the main directory of the library. The same script can automatically download and install any other external dependency, meaning that if you want to access a functionality that depends on some external library `XXX`, all you have to do is setting to `ON` a cmake variable that looks like `CINOLIB_USES_XXX`. 
