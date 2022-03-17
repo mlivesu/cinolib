@@ -469,7 +469,7 @@ bool Tetmesh<M,V,E,F,P>::face_flip(const uint fid, bool geometric_check) // 2-to
         tets[i][3] = opp1;
         if(this->poly_face_is_CCW(pid0,id)) std::swap(tets[i][0],tets[i][1]);
 
-        // this check is exact only if symbol CINOLIB_USES_EXACT_PREDICATES is defined
+        // this check is exact only if symbol CINOLIB_USES_SHEWCHUK_PREDICATES is defined
         if(geometric_check)
         {
             if(orient3d(this->vert(tets[i][0]),

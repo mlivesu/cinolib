@@ -76,7 +76,7 @@ void find_intersections(const std::vector<vec3d> & verts,
             {
                 const Triangle *t0 = dynamic_cast<Triangle*>(T0);
                 const Triangle *t1 = dynamic_cast<Triangle*>(T1);
-                if(t0->intersects_triangle(t1->v,true)) // precise check (exact if CINOLIB_USES_EXACT_PREDICATES is defined)
+                if(t0->intersects_triangle(t1->v,true)) // precise check (exact if CINOLIB_USES_SHEWCHUK_PREDICATES is defined)
                 {
                     std::lock_guard<std::mutex> guard(mutex);
                     intersections.insert(unique_pair(tid0,tid1));

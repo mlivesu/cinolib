@@ -13,9 +13,7 @@ target_include_directories(cinolib INTERFACE $<BUILD_INTERFACE:${cinolib_DIR}/in
 target_include_directories(cinolib INTERFACE $<BUILD_INTERFACE:${cinolib_DIR}/external/eigen>)
 
 # https://cliutils.gitlab.io/modern-cmake/chapters/features/cpp11.html
-# (bugfix: cinoLib requires only C++11 but modern Boost requires C++14)
-target_compile_features(cinolib INTERFACE cxx_std_14)
-set_target_properties(cinolib PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(cinolib INTERFACE cxx_std_11)
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # OPTIONAL MODULES ::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -24,13 +22,14 @@ set_target_properties(cinolib PROPERTIES CXX_EXTENSIONS OFF)
 # https://cmake.org/cmake/help/latest/policy/CMP0077.html
 cmake_policy(SET CMP0077 NEW)
 
-option(CINOLIB_USES_OPENGL_GLFW_IMGUI "Use OpenGL, GLFW and ImGui" OFF)
-option(CINOLIB_USES_TETGEN            "Use Tetgen"                 OFF)
-option(CINOLIB_USES_TRIANGLE          "Use Triangle"               OFF)
-option(CINOLIB_USES_EXACT_PREDICATES  "Use Exact Predicates"       OFF)
-option(CINOLIB_USES_GRAPH_CUT         "Use Graph Cut"              OFF)
-option(CINOLIB_USES_BOOST             "Use Boost"                  OFF)
-option(CINOLIB_USES_VTK               "Use VTK"                    OFF)
+option(CINOLIB_USES_OPENGL_GLFW_IMGUI   "Use OpenGL, GLFW and ImGui" OFF)
+option(CINOLIB_USES_TETGEN              "Use Tetgen"                 OFF)
+option(CINOLIB_USES_TRIANGLE            "Use Triangle"               OFF)
+option(CINOLIB_USES_SHEWCHUK_PREDICATES "Use Shewchuk Predicates"    OFF)
+option(CINOLIB_USES_INDIRECT_PREDICATES "Use Indirect Predicates"    OFF)
+option(CINOLIB_USES_GRAPH_CUT           "Use Graph Cut"              OFF)
+option(CINOLIB_USES_BOOST               "Use Boost"                  OFF)
+option(CINOLIB_USES_VTK                 "Use VTK"                    OFF)
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -76,11 +75,21 @@ endif()
 
 ##::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-if(CINOLIB_USES_EXACT_PREDICATES)
-    message("CINOLIB OPTIONAL MODULE: Exact Predicates")
-    add_subdirectory(${cinolib_DIR}/external/predicates predicates)
-    target_link_libraries(cinolib INTERFACE predicates)
-    target_compile_definitions(cinolib INTERFACE CINOLIB_USES_EXACT_PREDICATES)
+if(CINOLIB_USES_SHEWCHUK_PREDICATES)
+    message("CINOLIB OPTIONAL MODULE: Shewchuk Predicates")
+    add_subdirectory(${cinolib_DIR}/external/shewchuk_predicates shewchuk_predicates)
+    target_link_libraries(cinolib INTERFACE shewchuk_predicates)
+    target_compile_definitions(cinolib INTERFACE CINOLIB_USES_SHEWCHUK_PREDICATES)
+endif()
+
+##::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+if(CINOLIB_USES_INDIRECT_PREDICATES)
+    message("CINOLIB OPTIONAL MODULE: Indirect Predicates")
+    FetchContent_Declare(indirect_predicates GIT_REPOSITORY "https://github.com/cinolib-dev-team/Indirect_Predicates.git")
+    FetchContent_MakeAvailable(indirect_predicates)
+    target_link_libraries(cinolib INTERFACE indirectPredicates)
+    target_compile_definitions(cinolib INTERFACE CINOLIB_USES_INDIRECT_PREDICATES)
 endif()
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -99,7 +108,8 @@ endif()
 if(CINOLIB_USES_BOOST)
     message("CINOLIB OPTIONAL MODULE: Boost")
     find_package(Boost)
-    if(Boost_FOUND)
+    if(Boost_FOUND)        
+        target_compile_features(cinolib INTERFACE cxx_std_14) # Boost requires C++14
         target_include_directories(cinolib INTERFACE ${Boost_INCLUDE_DIRS})
         target_compile_definitions(cinolib INTERFACE CINOLIB_USES_BOOST)
     else()

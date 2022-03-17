@@ -3,13 +3,14 @@ cmake_minimum_required(VERSION 3.2)
 project(examples)
 
 # set cinolib options. projects depending from options that are disabled won't be compiled
-set(CINOLIB_USES_OPENGL_GLFW_IMGUI ON )
-set(CINOLIB_USES_TETGEN            ON )
-set(CINOLIB_USES_TRIANGLE          ON )
-set(CINOLIB_USES_EXACT_PREDICATES  ON )
-set(CINOLIB_USES_GRAPH_CUT         OFF)
-set(CINOLIB_USES_BOOST             ON )
-set(CINOLIB_USES_VTK               ON ) # optional, if added VTK formats will be supported everywhere
+set(CINOLIB_USES_OPENGL_GLFW_IMGUI    ON )
+set(CINOLIB_USES_TETGEN               ON )
+set(CINOLIB_USES_TRIANGLE             ON )
+set(CINOLIB_USES_SHEWCHUK_PREDICATES  ON )
+set(CINOLIB_USES_INDIRECT_PREDICATES  ON )
+set(CINOLIB_USES_GRAPH_CUT            OFF)
+set(CINOLIB_USES_BOOST                ON )
+set(CINOLIB_USES_VTK                  ON ) # optional, if added VTK formats will be supported everywhere
 
 # pass cinolib and the external dependencies to all examples
 find_package(cinolib REQUIRED)

@@ -54,7 +54,7 @@ namespace cinolib
  *
  * IMPORTANT: intersections tests are based on the orient predicates contained
  * in cinolib/predicates.h. These predicates are exact if the symbol
- * CINOLIB_USES_EXACT_PREDICATES, and are approximated otherwise.
+ * CINOLIB_USES_SHEWCHUK_PREDICATES, and are approximated otherwise.
 */
 
 template<class M, class V, class E, class P>

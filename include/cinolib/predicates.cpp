@@ -40,7 +40,7 @@
 namespace cinolib
 {
 
-#ifndef CINOLIB_USES_EXACT_PREDICATES
+#ifndef CINOLIB_USES_SHEWCHUK_PREDICATES
 /*********************************************************
  * BEGIN OF IMPlEMENTATION OF INEXACT GEOMETRIC PREDICATES
  *********************************************************/

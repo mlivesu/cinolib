@@ -191,7 +191,7 @@ class Octree
         vec3d closest_point(const vec3d & p) const;
 
         // returns respectively the first item and the full list of items containing query point p
-        // note: this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
+        // note: this query becomes exact if CINOLIB_USES_SHEWCHUK_PREDICATES is defined
         bool contains(const vec3d & p, const bool strict, uint & id) const;
         bool contains(const vec3d & p, const bool strict, std::unordered_set<uint> & ids) const;
 
@@ -200,7 +200,7 @@ class Octree
         bool intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
         bool intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const;
 
-        // note: these queries become exact if CINOLIB_USES_EXACT_PREDICATES is defined
+        // note: these queries become exact if CINOLIB_USES_SHEWCHUK_PREDICATES is defined
         bool intersects_segment (const vec3d s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
         bool intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
 

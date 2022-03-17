@@ -50,8 +50,8 @@ namespace cinolib
  * the "fast" version of the Shewchuk predicates.
  *
  * *********************************************************************
- * IMPORTANT: to switch to EXACT PREDICATES, you must define the symbol
- * CINOLIB_USES_EXACT_PREDICATES at compilation time, and also add the
+ * IMPORTANT: to switch to exact predicates, you must define the symbol
+ * CINOLIB_USES_SHEWCHUK_PREDICATES at compilation time, and also add the
  * file <CINOLIB_HOME>/external/predicates/shewchuk.c in your project.
  * *********************************************************************
  *
@@ -122,7 +122,7 @@ SimplexIntersection;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-#ifdef CINOLIB_USES_EXACT_PREDICATES
+#ifdef CINOLIB_USES_SHEWCHUK_PREDICATES
 
 /* Wrap of the popular geometric predicates described by Shewchuk in:
  *
@@ -202,7 +202,7 @@ double insphere(const double * pa,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// wrap of orient2d for cinolib points. Either exact or not depending on CINOLIB_USES_EXACT_PREDICATES
+// wrap of orient2d for cinolib points. Either exact or not depending on CINOLIB_USES_SHEWCHUK_PREDICATES
 CINO_INLINE
 double orient2d(const vec2d & pa,
                 const vec2d & pb,
@@ -210,7 +210,7 @@ double orient2d(const vec2d & pa,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// wrap of orient3d for cinolib points. Either exact or not depending on CINOLIB_USES_EXACT_PREDICATES
+// wrap of orient3d for cinolib points. Either exact or not depending on CINOLIB_USES_SHEWCHUK_PREDICATES
 CINO_INLINE
 double orient3d(const vec3d & pa,
                 const vec3d & pb,
@@ -219,7 +219,7 @@ double orient3d(const vec3d & pa,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// wrap of incircle for cinolib points. Either exact or not depending on CINOLIB_USES_EXACT_PREDICATES
+// wrap of incircle for cinolib points. Either exact or not depending on CINOLIB_USES_SHEWCHUK_PREDICATES
 CINO_INLINE
 double incircle(const vec2d & pa,
                 const vec2d & pb,
@@ -228,7 +228,7 @@ double incircle(const vec2d & pa,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// wrap of insphere for cinolib points. Either exact or not depending on CINOLIB_USES_EXACT_PREDICATES
+// wrap of insphere for cinolib points. Either exact or not depending on CINOLIB_USES_SHEWCHUK_PREDICATES
 CINO_INLINE
 double insphere(const vec3d & pa,
                 const vec3d & pb,
