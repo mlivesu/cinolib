@@ -46,8 +46,7 @@ namespace cinolib
 
 typedef struct
 {
-    // http://www.cplusplus.com/reference/chrono/high_resolution_clock/now/
-    std::chrono::high_resolution_clock::time_point start, stop;
+    std::chrono::steady_clock::time_point start, stop;
     std::string key;
     std::string s;
 }

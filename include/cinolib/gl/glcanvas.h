@@ -67,7 +67,7 @@ struct Trackball
     vec2d last_click_2d = vec2d(inf_double);
     vec3d last_click_3d = vec3d(inf_double);
     bool  mouse_pressed = false;
-    std::chrono::high_resolution_clock::time_point t_last_click;
+    std::chrono::steady_clock::time_point t_last_click;
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

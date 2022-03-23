@@ -74,7 +74,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
                                              const std::vector<std::vector<uint>> & polys,
                                              const std::vector<std::vector<bool>> & polys_face_winding)
 {
-    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
 
     // pre-allocate memory
     uint nv = verts.size();
@@ -111,7 +111,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
 
     this->copy_xyz_to_uvw(UVW_param);
 
-    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
     std::cout << "load mesh\t"     <<
                  this->num_verts() << "V / " <<
@@ -128,7 +128,7 @@ CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>             & verts,
                                              const std::vector<std::vector<uint>> & polys)
 {
-    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
 
     // pre-allocate memory
     uint nv = verts.size();
@@ -152,7 +152,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
 
     this->copy_xyz_to_uvw(UVW_param);
 
-    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
     std::cout << "load mesh\t"     <<
                  this->num_verts() << "V / " <<

@@ -666,7 +666,7 @@ void GLcanvas::mouse_button_event(GLFWwindow *window, int button, int action, in
         // thanks GLFW for asking me to handle the single/double click burden...
         auto double_click = [&]() -> bool
         {
-            auto   t  = std::chrono::high_resolution_clock::now();
+            auto   t  = std::chrono::steady_clock::now();
             double dt = how_many_seconds(v->trackball.t_last_click,t);
             v->trackball.t_last_click = t;
             return (dt < 0.2);
