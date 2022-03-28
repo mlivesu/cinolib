@@ -98,7 +98,7 @@ void Octree::build()
 
     // initialize root with all items, also updating its AABB
     assert(root==nullptr);
-    root = new OctreeNode(nullptr, AABB());
+    root = new OctreeNode(AABB());
     root->item_indices.resize(items.size());
     std::iota(root->item_indices.begin(),root->item_indices.end(),0);
     for(auto it : items) root->bbox.push(it->aabb);
@@ -198,14 +198,14 @@ void Octree::subdivide(OctreeNode * node)
     vec3d min = node->bbox.min;
     vec3d max = node->bbox.max;
     vec3d avg = node->bbox.center();
-    node->children[0] = new OctreeNode(node, AABB(vec3d(min[0], min[1], min[2]), vec3d(avg[0], avg[1], avg[2])));
-    node->children[1] = new OctreeNode(node, AABB(vec3d(avg[0], min[1], min[2]), vec3d(max[0], avg[1], avg[2])));
-    node->children[2] = new OctreeNode(node, AABB(vec3d(avg[0], avg[1], min[2]), vec3d(max[0], max[1], avg[2])));
-    node->children[3] = new OctreeNode(node, AABB(vec3d(min[0], avg[1], min[2]), vec3d(avg[0], max[1], avg[2])));
-    node->children[4] = new OctreeNode(node, AABB(vec3d(min[0], min[1], avg[2]), vec3d(avg[0], avg[1], max[2])));
-    node->children[5] = new OctreeNode(node, AABB(vec3d(avg[0], min[1], avg[2]), vec3d(max[0], avg[1], max[2])));
-    node->children[6] = new OctreeNode(node, AABB(vec3d(avg[0], avg[1], avg[2]), vec3d(max[0], max[1], max[2])));
-    node->children[7] = new OctreeNode(node, AABB(vec3d(min[0], avg[1], avg[2]), vec3d(avg[0], max[1], max[2])));
+    node->children[0] = new OctreeNode(AABB(vec3d(min[0], min[1], min[2]), vec3d(avg[0], avg[1], avg[2])));
+    node->children[1] = new OctreeNode(AABB(vec3d(avg[0], min[1], min[2]), vec3d(max[0], avg[1], avg[2])));
+    node->children[2] = new OctreeNode(AABB(vec3d(avg[0], avg[1], min[2]), vec3d(max[0], max[1], avg[2])));
+    node->children[3] = new OctreeNode(AABB(vec3d(min[0], avg[1], min[2]), vec3d(avg[0], max[1], avg[2])));
+    node->children[4] = new OctreeNode(AABB(vec3d(min[0], min[1], avg[2]), vec3d(avg[0], avg[1], max[2])));
+    node->children[5] = new OctreeNode(AABB(vec3d(avg[0], min[1], avg[2]), vec3d(max[0], avg[1], max[2])));
+    node->children[6] = new OctreeNode(AABB(vec3d(avg[0], avg[1], avg[2]), vec3d(max[0], max[1], max[2])));
+    node->children[7] = new OctreeNode(AABB(vec3d(min[0], avg[1], avg[2]), vec3d(avg[0], max[1], max[2])));
 
     for(uint it : node->item_indices)
     {

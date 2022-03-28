@@ -46,9 +46,8 @@ namespace cinolib
 class OctreeNode
 {
     public:
-        OctreeNode(const OctreeNode * father, const AABB & bbox) : father(father), bbox(bbox) {}
+        OctreeNode(const AABB & bbox) : bbox(bbox) {}
        ~OctreeNode();
-        const OctreeNode *father;
         OctreeNode       *children[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
         AABB              bbox;
         std::vector<uint> item_indices; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
