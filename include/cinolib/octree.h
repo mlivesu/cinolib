@@ -53,9 +53,6 @@ class OctreeNode
         OctreeNode       *children[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
         bool              is_inner() const { return children[0]!=nullptr; }
 };
-// TODO: due to the bool flag this struct requires 7 bytes padding. Also the
-// pointer to the father is not necessary and could be removed, shrinking it.
-// It could be designed better....
 // https://stackoverflow.com/questions/4306186/structure-padding-and-packing
 // http://www.catb.org/esr/structure-packing/
 
