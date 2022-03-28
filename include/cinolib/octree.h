@@ -48,10 +48,10 @@ class OctreeNode
     public:
         OctreeNode(const AABB & bbox) : bbox(bbox) {}
        ~OctreeNode();
-        OctreeNode       *children[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
         AABB              bbox;
         std::vector<uint> item_indices; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
-        bool              is_inner = false;
+        OctreeNode       *children[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+        bool              is_inner() const { return children[0]!=nullptr; }
 };
 // TODO: due to the bool flag this struct requires 7 bytes padding. Also the
 // pointer to the father is not necessary and could be removed, shrinking it.

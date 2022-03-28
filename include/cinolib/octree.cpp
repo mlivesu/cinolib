@@ -223,7 +223,6 @@ void Octree::subdivide(OctreeNode * node)
     }
 
     node->item_indices.clear();
-    node->is_inner = true;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -311,7 +310,7 @@ void Octree::closest_point(const vec3d  & p,          // query point
     Time::time_point t0 = Time::now();
 
     PrioQueue q;
-    if(root->is_inner)
+    if(root->is_inner())
     {
         Obj obj;
         obj.node = root;
@@ -331,7 +330,7 @@ void Octree::closest_point(const vec3d  & p,          // query point
         }
     }
 
-    while(q.top().node->is_inner)
+    while(q.top().node->is_inner())
     {
         Obj obj = q.top();
         q.pop();
@@ -339,7 +338,7 @@ void Octree::closest_point(const vec3d  & p,          // query point
         for(int i=0; i<8; ++i)
         {
             OctreeNode *child = obj.node->children[i];
-            if(child->is_inner)
+            if(child->is_inner())
             {
                 Obj obj;
                 obj.node = child;
@@ -394,7 +393,7 @@ bool Octree::contains(const vec3d & p, const bool strict, uint & id) const
         lifo.pop();
         assert(node->bbox.contains(p, strict));
 
-        if(node->is_inner)
+        if(node->is_inner())
         {
             for(int i=0; i<8; ++i)
             {
@@ -443,7 +442,7 @@ bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uin
         lifo.pop();
         assert(node->bbox.contains(p,strict));
 
-        if(node->is_inner)
+        if(node->is_inner())
         {
             for(int i=0; i<8; ++i)
             {
@@ -489,7 +488,7 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
     PrioQueue q;
     q.push(obj);
 
-    while(!q.empty() && q.top().node->is_inner)
+    while(!q.empty() && q.top().node->is_inner())
     {
         Obj obj = q.top();
         q.pop();
@@ -499,7 +498,7 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
             OctreeNode *child = obj.node->children[i];
             if(child->bbox.intersects_ray(p, dir, t, pos))
             {
-                if(child->is_inner)
+                if(child->is_inner())
                 {
                     Obj obj;
                     obj.node = child;
@@ -565,7 +564,7 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pa
             OctreeNode *child = obj.node->children[i];
             if(child->bbox.intersects_ray(p, dir, t, pos))
             {
-                if(child->is_inner)
+                if(child->is_inner())
                 {
                     Obj obj;
                     obj.node = child;
@@ -680,7 +679,7 @@ bool Octree::intersects_box(const AABB & b, std::unordered_set<uint> & ids) cons
         lifo.pop();
         assert(node->bbox.intersects_box(b));
 
-        if(node->is_inner)
+        if(node->is_inner())
         {            
             for(int i=0; i<8; ++i)
             {
