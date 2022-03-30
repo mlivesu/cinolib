@@ -244,25 +244,25 @@ void Octree::push_sphere(const uint id, const vec3d & c, const double r)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Octree::push_segment(const uint id, const std::vector<vec3d> & v)
+void Octree::push_segment(const uint id, const vec3d & v0, const vec3d & v1)
 {
-    items.push_back(new Segment(id,v.data()));
+    items.push_back(new Segment(id,v0,v1));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Octree::push_triangle(const uint id, const std::vector<vec3d> & v)
+void Octree::push_triangle(const uint id, const vec3d & v0, const vec3d & v1, const vec3d & v2)
 {
-    items.push_back(new Triangle(id,v.data()));
+    items.push_back(new Triangle(id,v0,v1,v2));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void Octree::push_tetrahedron(const uint id, const std::vector<vec3d> & v)
+void Octree::push_tetrahedron(const uint id, const vec3d & v0, const vec3d & v1, const vec3d & v2, const vec3d & v3)
 {
-    items.push_back(new Tetrahedron(id,v.data()));
+    items.push_back(new Tetrahedron(id,v0,v1,v2,v3));
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

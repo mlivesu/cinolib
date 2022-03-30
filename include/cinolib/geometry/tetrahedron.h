@@ -59,6 +59,20 @@ class Tetrahedron : public SpatialDataStructureItem
             aabb.push(v[3]);
         }
 
+        Tetrahedron(const uint id, const vec3d & v0, const vec3d & v1, const vec3d & v2, const vec3d & v3)
+        {
+            this->v[0] = v0;
+            this->v[1] = v1;
+            this->v[2] = v2;
+            this->v[2] = v3;
+            this->id   = id;
+            item_type  = TETRAHEDRON;
+            aabb.push(v0);
+            aabb.push(v1);
+            aabb.push(v2);
+            aabb.push(v3);
+        }
+
        ~Tetrahedron() {}
 
         // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::

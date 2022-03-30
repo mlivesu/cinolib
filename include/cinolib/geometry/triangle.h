@@ -57,7 +57,19 @@ class Triangle : public SpatialDataStructureItem
             aabb.push(v[2]);
         }
 
-       ~Triangle(){}
+        Triangle(const uint id, const vec3d & v0, const vec3d & v1, const vec3d & v2)
+        {
+            this->v[0] = v0;
+            this->v[1] = v1;
+            this->v[2] = v2;
+            this->id   = id;
+            item_type  = TRIANGLE;
+            aabb.push(v0);
+            aabb.push(v1);
+            aabb.push(v2);
+        }
+
+        ~Triangle(){}
 
         // Implement SpatialDataStructureItem interface ::::::::::::::::::::::::::
 
