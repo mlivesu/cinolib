@@ -123,10 +123,7 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
             }
 
             // find closest rotation and store rotated point
-            mat2d u,v;
-            vec2d  s;
-            cov.SSVD(u,s,v);
-            mat2d rot = u*v.transpose();
+            mat2d rot = cov.closest_orthogonal_matrix(true);
             data.uv_loc.at(off  ) = rot * data.uv_ref.at(off  );
             data.uv_loc.at(off+1) = rot * data.uv_ref.at(off+1);
             data.uv_loc.at(off+2) = rot * data.uv_ref.at(off+2);

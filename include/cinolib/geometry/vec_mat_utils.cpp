@@ -930,54 +930,24 @@ void mat_svd(const T m[][c], T U[][r], T S[], T V[][c])
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<uint r, uint c, typename T>
+template<uint d, typename T>
 CINO_INLINE
-void mat_ssvd(const T m[][c], T U[][r], T S[], T V[][c])
+void mat_closest_orth_mat(const T m[][d], T n[][d], const bool force_pos_det)
 {
-    mat_svd<r,c,T>(m,U,S,V);
-
-    if(r==2 && c==2)
+    T U[d][d], S[d], V[d][d];
+    mat_svd<d,d,T>(m,U,S,V);
+    T Vt[d][d];
+    mat_transpose<d,d,T>(V,Vt);
+    mat_times<d,d,d,T>(U,Vt,n); // n = U * Vt
+    if(force_pos_det)
     {
-        if(mat_det<c,T>(V)<0)
-        {
-            V[0][1] = -V[0][1];
-            V[1][1] = -V[1][1];
-            U[0][1] = -U[0][1];
-            U[1][1] = -U[1][1];
-            assert((mat_det<c,T>(V)>0));
-        }
-
-        if(mat_det<r,T>(U)<0)
-        {
-            U[0][1] = -U[0][1];
-            U[1][1] = -U[1][1];
-            S[1]    = -S[1];
-            assert((mat_det<r,T>(U)>0));
-        }
+        T I[d][d];
+        mat_set_diag<d,T>(I,1);
+        I[d-1][d-1] = mat_det<d,T>(n);
+        T UI[d][d];
+        mat_times<d,d,d,T>(U,I,UI);
+        mat_times<d,d,d,T>(UI,Vt,n); // n = U*I*Vt
     }
-    else if(r==3 && c==3)
-    {
-        if(mat_det<c,T>(V)<0)
-        {
-            V[0][2] = -V[0][2];
-            V[1][2] = -V[1][2];
-            V[2][2] = -V[2][2];
-            U[0][2] = -U[0][2];
-            U[1][2] = -U[1][2];
-            U[2][2] = -U[2][2];
-            assert((mat_det<c,T>(V)>0));
-        }
-
-        if(mat_det<r,T>(U)<0)
-        {
-            U[0][2] = -U[0][2];
-            U[1][2] = -U[1][2];
-            U[2][2] = -U[2][2];
-            S[2]    = -S[2];
-            assert((mat_det<c,T>(U)>0));
-        }
-    }
-    else assert(false && "mat_ssvd: unsupported matrix size");
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

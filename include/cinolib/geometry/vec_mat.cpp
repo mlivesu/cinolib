@@ -354,9 +354,12 @@ void mat<r,c,T>::SVD(mat<r,c,T> & U, mat<r,1,T> & S, mat<r,c,T> & V) const
 
 template<uint r, uint c, class T>
 CINO_INLINE
-void mat<r,c,T>::SSVD(mat<r,c,T> & U, mat<r,1,T> & S, mat<r,c,T> & V) const
+mat<r,c,T> mat<r,c,T>::closest_orthogonal_matrix(const bool force_positive_det) const
 {
-    mat_ssvd<r,c,T>(_mat, U._mat, S._vec, V._mat);
+    assert(r==c);
+    mat<r,c,T> res;
+    mat_closest_orth_mat<r,T>(_mat, res._mat, force_positive_det);
+    return res;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -108,7 +108,10 @@ class mat
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void SVD (mat<r,c,T> & U, mat<r,1,T> & S, mat<r,c,T> & V) const;
-        void SSVD(mat<r,c,T> & U, mat<r,1,T> & S, mat<r,c,T> & V) const;
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+        mat<r,c,T> closest_orthogonal_matrix(const bool force_positve_det) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
