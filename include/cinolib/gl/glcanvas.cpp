@@ -591,22 +591,6 @@ void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int acti
                 case GLFW_KEY_2     : v->camera.translate_z(-delta_t); break;
                 // camera control
                 case GLFW_KEY_Z     : v->camera.zoom(0.01); break; // zoom out
-                case GLFW_KEY_H     : std::cout <<
-                                      ":::::::::::::::::::::::: SHORTCUTS ::::::::::::::::::::::::\n"
-                                      "              TAB  : toggle show side bar (if any)         \n"
-                                      "                A  : toggle show axis                      \n"
-                                      "                P  : toggle perspective/orthographic camera\n"
-                                      "                R  : reset camera                          \n"
-                                      "       Left/Right  : rotate around Y                       \n"
-                                      "          Up/Down  : rotate around X                       \n"
-                                      "              1/2  : rotate around Z                       \n"
-                                      "  SHIFT + Rot Keys : translate around same axis            \n"
-                                      "          CMD + C  : copy  POV                             \n"
-                                      "          CMD + V  : paste POV                             \n"
-                                      " Mouse Double Clik : center scene and zoom in              \n"
-                                      ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
-                                      << std::endl;
-                                      break;
             }
         }
         else if(modifiers & (GLFW_MOD_CONTROL|GLFW_MOD_SUPER)) // handle CTRL/CMD + KEY events...
@@ -640,6 +624,22 @@ void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int acti
                 case GLFW_KEY_R     : v->camera.reset();                    break;
                 case GLFW_KEY_A     : v->show_axis = !v->show_axis;         break; // toggle show axis
                 case GLFW_KEY_TAB   : v->show_side_bar = !v->show_side_bar; break; // toggle side bar
+                case GLFW_KEY_H     : std::cout <<
+                                      ":::::::::::::::::::::::: SHORTCUTS ::::::::::::::::::::::::\n"
+                                      "              TAB  : toggle show side bar (if any)         \n"
+                                      "                A  : toggle show axis                      \n"
+                                      "                P  : toggle perspective/orthographic camera\n"
+                                      "                R  : reset camera                          \n"
+                                      "       Left/Right  : rotate around Y                       \n"
+                                      "          Up/Down  : rotate around X                       \n"
+                                      "              1/2  : rotate around Z                       \n"
+                                      "  SHIFT + Rot Keys : translate around same axis            \n"
+                                      "          CMD + C  : copy  POV                             \n"
+                                      "          CMD + V  : paste POV                             \n"
+                                      " Mouse Double Clik : center scene and zoom in              \n"
+                                      ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
+                                      << std::endl;
+                                      break;
             }
         }
         v->update_GL_matrices();
