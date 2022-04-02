@@ -121,6 +121,10 @@ Cmake will automatically detect and download the necessary external libraries (e
 #### 38 - Construct an acceleration spatial structure for fast queries, with or without exact predicates
 [<p align="left"><img src="snapshots/38_octree.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/38_octree)
 
+#### 39 - Center a mesh in the origin and normalize its bounding box (command line tool)
+
+#### 40 - Compute a UV map with ARAP
+
 
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
