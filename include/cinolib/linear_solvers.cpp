@@ -104,11 +104,15 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
                                  const std::map<uint,double>       & bc, // Dirichlet boundary conditions
                                  int   solver)
 {
-    std::vector<int> col_map(A.rows(), -1);
+    std::vector<int> col_map(A.rows(), 0);
+    for(const auto & obj : bc)
+    {
+        col_map[obj.first] = -1;
+    }
     uint fresh_id = 0;
     for(uint col=0; col<A.cols(); ++col)
     {
-        if (DOES_NOT_CONTAIN(bc, col))
+        if(col_map.at(col)==0)
         {
             col_map[col] = fresh_id++;
         }
