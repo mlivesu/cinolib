@@ -140,6 +140,18 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
             for(uint nbr : m.adj_v2v(vid))
             {
                 int eid = m.edge_id(vid,nbr);
+                double w = 1.0/m.adj_e2p(eid).size();
+                for(uint pid : m.adj_e2p(eid))
+                {
+                    uint i = m.poly_vert_offset(pid,vid);
+                    uint j = m.poly_vert_offset(pid,nbr);
+                    assert(i>=0 && i<3);
+                    assert(j>=0 && j<3);
+                    vec3d Re = data.xyz_loc.at(pid*3+i) - data.xyz_loc.at(pid*3+j);
+                    rhs_x[col] += w * data.w.at(eid) * Re[0];
+                    rhs_y[col] += w * data.w.at(eid) * Re[1];
+                    rhs_z[col] += w * data.w.at(eid) * Re[2];
+                }
                 // if nbr is a BC sum its contibution to the Laplacian matrix to the rhs
                 if(data.col_map.at(nbr)==-1)
                 {
@@ -147,21 +159,6 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
                     rhs_x[col] += data.w.at(eid) * p.x();
                     rhs_y[col] += data.w.at(eid) * p.y();
                     rhs_z[col] += data.w.at(eid) * p.z();
-                }
-                else
-                {
-                    double w = 1.0/m.adj_e2p(eid).size();
-                    for(uint pid : m.adj_e2p(eid))
-                    {
-                        uint i = m.poly_vert_offset(pid,vid);
-                        uint j = m.poly_vert_offset(pid,nbr);
-                        assert(i>=0 && i<3);
-                        assert(j>=0 && j<3);
-                        vec3d Re = data.xyz_loc.at(pid*3+i) - data.xyz_loc.at(pid*3+j);
-                        rhs_x[col] += w * data.w.at(eid) * Re[0];
-                        rhs_y[col] += w * data.w.at(eid) * Re[1];
-                        rhs_z[col] += w * data.w.at(eid) * Re[2];
-                    }
                 }
             }
         }        
