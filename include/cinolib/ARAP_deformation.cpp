@@ -46,17 +46,7 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
     auto init = [&]()
     {
         data.init = false; // don't init next time
-
-        data.xyz_ref.resize(m.num_polys()*3);
         data.xyz_loc.resize(m.num_polys()*3);
-
-        // compute reference coords
-        for(uint pid=0; pid<m.num_polys(); ++pid)
-        {
-            data.xyz_ref[pid*3  ] = m.poly_vert(pid,0);
-            data.xyz_ref[pid*3+1] = m.poly_vert(pid,1);
-            data.xyz_ref[pid*3+2] = m.poly_vert(pid,2);
-        }
 
         // per edge weights
         data.w.resize(m.num_edges());
@@ -67,8 +57,8 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
 
         // warm start: initial guess is the input mesh
         // with contrained vertices positioned where prescribed
-        data.xyz_cur = m.vector_verts();
-        for(const auto & bc : data.bcs) data.xyz_cur.at(bc.first) = bc.second;
+        data.xyz_out = m.vector_verts();
+        for(const auto & bc : data.bcs) data.xyz_out.at(bc.first) = bc.second;
 
         // compute a map between matrix columns and mesh vertices
         // (Dirichlet boundary conditions will map to -1)
@@ -124,16 +114,16 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
                 uint v1  = m.poly_vert_id(pid,(i+1)%3);
                 int  eid = m.edge_id(v0,v1);
                 assert(eid>=0);
-                vec3d e_cur = data.xyz_cur.at(v0)    - data.xyz_cur.at(v1);
-                vec3d e_ref = data.xyz_ref.at(off+i) - data.xyz_ref.at(off+((i+1)%3));
+                vec3d e_cur = data.xyz_out.at(v0) - data.xyz_out.at(v1);
+                vec3d e_ref = m.vert(v0) - m.vert(v1);
                 cov += data.w.at(eid) * (e_cur * e_ref.transpose());
             }
 
             // find closest rotation and store rotated point
             mat3d rot = cov.closest_orthogonal_matrix(true);
-            data.xyz_loc.at(off  ) = rot * data.xyz_ref.at(off  ); // v0
-            data.xyz_loc.at(off+1) = rot * data.xyz_ref.at(off+1); // v1
-            data.xyz_loc.at(off+2) = rot * data.xyz_ref.at(off+2); // v2
+            data.xyz_loc.at(off  ) = rot * m.poly_vert(pid,0);
+            data.xyz_loc.at(off+1) = rot * m.poly_vert(pid,1);
+            data.xyz_loc.at(off+2) = rot * m.poly_vert(pid,2);
         });
     };
 
@@ -160,6 +150,7 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
                 }
                 else
                 {
+                    double w = 1.0/m.adj_e2p(eid).size();
                     for(uint pid : m.adj_e2p(eid))
                     {
                         uint i = m.poly_vert_offset(pid,vid);
@@ -167,9 +158,9 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
                         assert(i>=0 && i<3);
                         assert(j>=0 && j<3);
                         vec3d Re = data.xyz_loc.at(pid*3+i) - data.xyz_loc.at(pid*3+j);
-                        rhs_x[col] += 0.5 * data.w.at(eid) * Re[0];
-                        rhs_y[col] += 0.5 * data.w.at(eid) * Re[1];
-                        rhs_z[col] += 0.5 * data.w.at(eid) * Re[2];
+                        rhs_x[col] += w * data.w.at(eid) * Re[0];
+                        rhs_y[col] += w * data.w.at(eid) * Re[1];
+                        rhs_z[col] += w * data.w.at(eid) * Re[2];
                     }
                 }
             }
@@ -180,11 +171,11 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
             int col = data.col_map[vid];
-            if(col>=0) data.xyz_cur[vid] = vec3d(x[col],y[col],z[col]);
+            if(col>=0) data.xyz_out[vid] = vec3d(x[col],y[col],z[col]);
         }
         for(const auto & bc : data.bcs)
         {
-            data.xyz_cur[bc.first] = bc.second;
+            data.xyz_out[bc.first] = bc.second;
         }
     };
 

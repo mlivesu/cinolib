@@ -42,7 +42,7 @@
 namespace cinolib
 {
 
-/* Implementation of the ARAP surface modellibg algorithm as described in:
+/* Implementation of the ARAP surface modelling algorithm as described in:
  *
  *   As-Rigid-As-Possible Surface Modeling
  *   Olga Sorkine-Hornung, Marc Alexa
@@ -59,11 +59,9 @@ struct ARAP_deformation_data
     std::map<uint,vec3d> bcs;     // boundary conditions
     std::vector<int>     col_map; // maps vertex ids to matrix columns
 
-    std::vector<mat3d>   Rot;     // local rotations
-    std::vector<vec3d>   xyz_cur; // current solution (will be the output, eventually)
-    std::vector<vec3d>   xyz_ref; // per triangle reference coords (i.e. original coords)
-    std::vector<vec3d>   xyz_loc; // per triangle targets (100% rigid)
-    std::vector<double>  w;       // edge weights (cotangent)
+    std::vector<vec3d>  xyz_out; // current solution (will be the output, eventually)
+    std::vector<vec3d>  xyz_loc; // per triangle targets (100% rigid)
+    std::vector<double> w;       // edge weights (cotangent)
 
     Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> cache; // factorized matrix
 };
