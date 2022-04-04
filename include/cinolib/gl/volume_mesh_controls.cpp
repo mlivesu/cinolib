@@ -591,7 +591,7 @@ void VolumeMeshControls<Mesh>::header_manual_digging(const bool open)
 {
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    static auto func_dig = [&](int modifiers)
+    static auto func_dig = [&](int modifiers) -> bool
     {
         if(modifiers & GLFW_MOD_SHIFT)
         {
@@ -610,11 +610,12 @@ void VolumeMeshControls<Mesh>::header_manual_digging(const bool open)
                 m->updateGL();
             }
         }
+        return false;
     };
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    static auto func_undig = [&](int modifiers)
+    static auto func_undig = [&](int modifiers) -> bool
     {
         if(modifiers & GLFW_MOD_SHIFT)
         {
@@ -633,11 +634,12 @@ void VolumeMeshControls<Mesh>::header_manual_digging(const bool open)
                 m->updateGL();
             }
         }
+        return false;
     };
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    static auto func_isolate = [&](int modifiers)
+    static auto func_isolate = [&](int modifiers) -> bool
     {
         if(modifiers & GLFW_MOD_SHIFT)
         {
@@ -650,7 +652,7 @@ void VolumeMeshControls<Mesh>::header_manual_digging(const bool open)
                 if(!m->face_is_visible(fid,pid_beneath))
                 {
                     // not a good selection...
-                    return;
+                    return false;
                 }
                 for(uint vid : m->adj_p2v(pid_beneath))
                 for(uint pid : m->adj_v2p(vid))
@@ -664,6 +666,7 @@ void VolumeMeshControls<Mesh>::header_manual_digging(const bool open)
                 m->updateGL();
             }
         }
+        return false;
     };
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

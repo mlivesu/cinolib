@@ -197,14 +197,18 @@ class GLcanvas
 
         // these callbacks can be used to execute external code when mouse and keyboard
         // events occurr (e.g. for picking, drawing). If defined, they will be called
-        // **before** the internal event handlers
-        std::function<void(int    key,      int    modifiers)> callback_key_pressed        = nullptr;
-        std::function<void(int    modifiers                 )> callback_mouse_left_click   = nullptr;
-        std::function<void(int    modifiers                 )> callback_mouse_left_click2  = nullptr; // double click
-        std::function<void(int    modifiers                 )> callback_mouse_right_click  = nullptr;
-        std::function<void(int    modifiers                 )> callback_mouse_right_click2 = nullptr; // double click
-        std::function<void(double x_pos,    double y_pos    )> callback_mouse_moved        = nullptr;
-        std::function<void(double x_offset, double y_offset )> callback_mouse_scroll       = nullptr;
+        // **before** the internal event handlers.
+        // Each callback returns a boolean value. If true, the event handler will return
+        // after returning from the callback. If false, the event will be subsequently
+        // processed by the GLcanvas itself. This mechanism allows to "overwrite" the
+        // default behaviour of the canvas
+        std::function<bool(int    key,      int    modifiers)> callback_key_pressed        = nullptr;
+        std::function<bool(int    modifiers                 )> callback_mouse_left_click   = nullptr;
+        std::function<bool(int    modifiers                 )> callback_mouse_left_click2  = nullptr; // double click
+        std::function<bool(int    modifiers                 )> callback_mouse_right_click  = nullptr;
+        std::function<bool(int    modifiers                 )> callback_mouse_right_click2 = nullptr; // double click
+        std::function<bool(double x_pos,    double y_pos    )> callback_mouse_moved        = nullptr;
+        std::function<bool(double x_offset, double y_offset )> callback_mouse_scroll       = nullptr;
         std::function<void(void                             )> callback_app_controls       = nullptr; // useful to insert app-dependent visual controls (with ImGui)
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

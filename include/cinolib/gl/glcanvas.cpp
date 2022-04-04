@@ -574,7 +574,10 @@ void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int acti
     {
         GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
 
-        if(v->callback_key_pressed) v->callback_key_pressed(key,modifiers);
+        if(v->callback_key_pressed)
+        {
+            if(v->callback_key_pressed(key,modifiers)) return;
+        }
 
         if(modifiers & GLFW_MOD_SHIFT) // handle SHIFT + KEY events...
         {
@@ -680,7 +683,10 @@ void GLcanvas::mouse_button_event(GLFWwindow *window, int button, int action, in
         {
             if(button==GLFW_MOUSE_BUTTON_LEFT)
             {
-                if(v->callback_mouse_left_click2) v->callback_mouse_left_click2(modifiers);
+                if(v->callback_mouse_left_click2)
+                {
+                    if(v->callback_mouse_left_click2(modifiers)) return;
+                }
 
                 vec3d click_3d;
                 if(v->unproject(click, click_3d))
@@ -691,21 +697,30 @@ void GLcanvas::mouse_button_event(GLFWwindow *window, int button, int action, in
             }
             else if(button==GLFW_MOUSE_BUTTON_RIGHT)
             {
-                if(v->callback_mouse_right_click2) v->callback_mouse_right_click2(modifiers);
+                if(v->callback_mouse_right_click2)
+                {
+                    if(v->callback_mouse_right_click2(modifiers)) return;
+                }
             }
         }
         else // single click
         {
             if(button==GLFW_MOUSE_BUTTON_LEFT)
             {
-                if(v->callback_mouse_left_click) v->callback_mouse_left_click(modifiers);
+                if(v->callback_mouse_left_click)
+                {
+                    if(v->callback_mouse_left_click(modifiers)) return;
+                }
                 v->trackball.mouse_pressed = true;
                 v->trackball.last_click_2d = click;
                 v->trackball.last_click_3d = trackball_to_sphere(click, v->camera.width, v->camera.height);
             }
             else if(button==GLFW_MOUSE_BUTTON_RIGHT)
             {
-                if(v->callback_mouse_right_click) v->callback_mouse_right_click(modifiers);
+                if(v->callback_mouse_right_click)
+                {
+                    if(v->callback_mouse_right_click(modifiers)) return;
+                }
             }
         }
     }
@@ -718,7 +733,10 @@ void GLcanvas::cursor_event(GLFWwindow *window, double x_pos, double y_pos)
 {
     GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
 
-    if(v->callback_mouse_moved) v->callback_mouse_moved(x_pos,y_pos);
+    if(v->callback_mouse_moved)
+    {
+        if(v->callback_mouse_moved(x_pos,y_pos)) return;
+    }
 
     // mouse move + left click => rotate
     if(glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_LEFT)==GLFW_PRESS)
@@ -764,7 +782,10 @@ void GLcanvas::scroll_event(GLFWwindow *window, double x_offset, double y_offset
     // if visual controls claim the event, let them handle it
     if(ImGui::GetIO().WantCaptureMouse) return;
 
-    if(v->callback_mouse_scroll) v->callback_mouse_scroll(x_offset, y_offset);
+    if(v->callback_mouse_scroll)
+    {
+        if(v->callback_mouse_scroll(x_offset, y_offset)) return;
+    }
 
     v->camera.zoom(y_offset*0.01);
     v->camera.reset_projection();

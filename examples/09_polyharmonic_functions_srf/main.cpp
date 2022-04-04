@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     std::map<uint,double> dirichlet_bcs;
     bool has_at_least_one_min = false;
     bool has_at_least_one_max = false;
-    gui.callback_mouse_left_click = [&](int modifiers)
+    gui.callback_mouse_left_click = [&](int modifiers) -> bool
     {
         vec3d p;
         vec2d click = gui.cursor_pos();
@@ -43,6 +43,7 @@ int main(int argc, char **argv)
 
             }
         }
+        return false;
     };
 
     // visual controls to setup the level of harmonicity (1,2,...)

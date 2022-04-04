@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     gui.push(&menu);
     gui.push(&ss);
 
-    gui.callback_mouse_left_click = [&](int modifiers)
+    gui.callback_mouse_left_click = [&](int modifiers) -> bool
     {
         if(modifiers & GLFW_MOD_SHIFT)
         {
@@ -51,6 +51,7 @@ int main(int argc, char **argv)
                 }
             }
         }
+        return false;
     };
 
     bool show_octree = false;

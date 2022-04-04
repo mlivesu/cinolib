@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     Profiler profiler;
     std::vector<uint> sources;
     GeodesicsCache prefactored_matrices;
-    gui.callback_mouse_left_click = [&](int modifiers)
+    gui.callback_mouse_left_click = [&](int modifiers) -> bool
     {
         if(modifiers & GLFW_MOD_SUPER)
         {
@@ -37,6 +37,7 @@ int main(int argc, char **argv)
                 m.show_texture1D(TEXTURE_1D_HSV_W_ISOLINES);
             }
         }
+        return false;
     };
 
     gui.callback_app_controls = [&]()

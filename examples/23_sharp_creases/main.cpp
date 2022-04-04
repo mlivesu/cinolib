@@ -63,7 +63,7 @@ int main(int argc, char **argv)
     };
 
     // use SHIFT + click to manually mark/unmark a crease edge
-    gui.callback_mouse_left_click = [&](int modifier)
+    gui.callback_mouse_left_click = [&](int modifier) -> bool
     {
         if(modifier & GLFW_MOD_SHIFT)
         {
@@ -76,6 +76,7 @@ int main(int argc, char **argv)
                 m.updateGL();
             }
         }
+        return false;
     };
 
     return gui.launch();

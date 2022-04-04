@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 
     std::cout << "\n\nPress SPACE to start the collapsing sequence\n\n" << std::endl;
 
-    gui.callback_key_pressed = [&](int key, int)
+    gui.callback_key_pressed = [&](int key, int) -> bool
     {
         if(key == GLFW_KEY_SPACE)
         {
@@ -35,6 +35,7 @@ int main(int argc, char **argv)
             while(!converged);
             m.updateGL();
         }
+        return false;
     };
 
     gui.launch();

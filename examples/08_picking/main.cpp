@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     // even on big meshes. Should this be the case, accelleration data
     // structures (e.g. octrees) could be used
     Profiler profiler;
-    gui.callback_mouse_left_click = [&](int modifiers)
+    gui.callback_mouse_left_click = [&](int modifiers) -> bool
     {
         if(modifiers & GLFW_MOD_SHIFT)
         {
@@ -41,6 +41,7 @@ int main(int argc, char **argv)
                 m.updateGL();
             }
         }
+        return false;
     };
 
     return gui.launch();

@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     };
 
     // painting event (CMD + click)
-    gui.callback_mouse_left_click = [&](int modifiers)
+    gui.callback_mouse_left_click = [&](int modifiers) -> bool
     {
         if(modifiers & GLFW_MOD_SUPER)
         {
@@ -52,6 +52,7 @@ int main(int argc, char **argv)
                 m.updateGL();
             }
         }
+        return false;
     };
 
     return gui.launch();
