@@ -643,11 +643,6 @@ void Tetmesh<M,V,E,F,P>::vert_weights(const uint vid, const int type, std::vecto
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-/* As a reference for the tetmesh version of cotangent weights, see:
- * Gradient field based inhomogeneous volumetric mesh deformation for maxillofacial surgery simulation
- * Sheng-hui Liao, Ruo-feng Tong, Jin-xiang Dong, Fu-dong Zhu
- * Computer & Graphics, 2009
-*/
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Tetmesh<M,V,E,F,P>::vert_weights_cotangent(const uint vid, std::vector<std::pair<uint,double>> & wgts) const
@@ -655,21 +650,41 @@ void Tetmesh<M,V,E,F,P>::vert_weights_cotangent(const uint vid, std::vector<std:
     wgts.clear();
     for(uint eid : this->adj_v2e(vid))
     {
-        uint   nbr = this->vert_opposite_to(eid, vid);
-        double wgt = 0.0;
-        for(uint pid : this->adj_e2p(eid))
-        {
-            uint   e_opp     = poly_edge_opposite_to(pid, vid, nbr);
-            uint   f_opp_vid = poly_face_opposite_to(pid, vid);
-            uint   f_opp_nbr = poly_face_opposite_to(pid, nbr);
-            double l_k       = this->edge_length(e_opp);
-            double teta_k    = poly_dihedral_angle(pid, f_opp_vid, f_opp_nbr);
-
-            wgt += cot(teta_k) * l_k;
-        }
-        wgt /= 6.0;
-        wgts.push_back(std::make_pair(nbr,wgt));
+        uint nbr = this->vert_opposite_to(eid, vid);
+        wgts.push_back(std::make_pair(nbr,edge_cotangent_weight(eid)));
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* As a reference for the tetmesh version of cotangent weights, see:
+ * Gradient field based inhomogeneous volumetric mesh deformation for maxillofacial surgery simulation
+ * Sheng-hui Liao, Ruo-feng Tong, Jin-xiang Dong, Fu-dong Zhu
+ * Computer & Graphics, 2009
+ *
+ * The n-dimensional cotangent formula
+ * Keenan Crane, 2019
+ * https://www.cs.cmu.edu/~kmcrane/Projects/Other/nDCotanFormula.pdf
+*/
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double Tetmesh<M,V,E,F,P>::edge_cotangent_weight(const uint eid) const
+{
+    uint   v0  = this->edge_vert_id(eid,0);
+    uint   v1  = this->edge_vert_id(eid,1);
+    double wgt = 0;
+    for(uint pid : this->adj_e2p(eid))
+    {
+        uint   e_opp = this->poly_edge_opposite_to(pid,eid);
+        uint   f0    = this->poly_face_opposite_to(pid,v1);
+        uint   f1    = this->poly_face_opposite_to(pid,v0);
+        double len   = this->edge_length(e_opp);
+        double ang   = this->poly_dihedral_angle(pid,f0,f1);
+
+        wgt += len*cot(ang);
+    }
+    wgt /= 6.0;
+    return wgt;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

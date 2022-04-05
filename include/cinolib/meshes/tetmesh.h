@@ -101,15 +101,16 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool edge_flip                        (const uint eid); // 3-to-2 flip
-        uint edge_split                       (const uint eid, const vec3d & p);
-        uint edge_split                       (const uint eid, const double lambda = 0.5); // use linear interpolation: e0*(1-lambda) + e1*lambda
-        int  edge_collapse                    (const uint eid, const double lambda = 0.5, const double topologic_check = true, const double geometric_check = true);
-        int  edge_collapse                    (const uint eid, const vec3d & p, const double topologic_check = true, const double geometric_check = true);
-        bool edge_is_collapsible              (const uint eid, const vec3d & p) const;
-        bool edge_is_collapsible              (const uint eid, const double lambda) const;
-        bool edge_is_geometrically_collapsible(const uint eid, const vec3d & p) const;
-        bool edge_is_topologically_collapsible(const uint eid) const;
+        bool   edge_flip                        (const uint eid); // 3-to-2 flip
+        uint   edge_split                       (const uint eid, const vec3d & p);
+        uint   edge_split                       (const uint eid, const double lambda = 0.5); // use linear interpolation: e0*(1-lambda) + e1*lambda
+        int    edge_collapse                    (const uint eid, const double lambda = 0.5, const double topologic_check = true, const double geometric_check = true);
+        int    edge_collapse                    (const uint eid, const vec3d & p, const double topologic_check = true, const double geometric_check = true);
+        bool   edge_is_collapsible              (const uint eid, const vec3d & p) const;
+        bool   edge_is_collapsible              (const uint eid, const double lambda) const;
+        bool   edge_is_geometrically_collapsible(const uint eid, const vec3d & p) const;
+        bool   edge_is_topologically_collapsible(const uint eid) const;
+        double edge_cotangent_weight            (const uint eid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
