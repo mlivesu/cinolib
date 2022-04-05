@@ -136,6 +136,8 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
         {
             data.xyz_out[bc.first] = bc.second;
         }
+
+        // old fashioned (brutal) warm start
         //data.xyz_out = m.vector_verts();
         //for(const auto & bc : data.bcs) data.xyz_out.at(bc.first) = bc.second;
     };
