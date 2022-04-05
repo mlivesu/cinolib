@@ -445,10 +445,8 @@ void Hexmesh<M,V,E,F,P>::poly_local_frame(const uint    pid,
              (verts[1]+verts[2]+verts[6]+verts[5])/4 - (verts[0]+verts[3]+verts[7]+verts[4])/4,
              (verts[0]+verts[1]+verts[5]+verts[4])/4 - (verts[3]+verts[2]+verts[6]+verts[7])/4});
 
-    // find the local frame that is closest to the segments joining the centroids of opposite hex faces
-    mat3d u,v; vec3d s;
-    m.SVD(u,s,v);
-    xyz = u*v.transpose();
+    // find the local orthonormal frame that is closest to the segments joining the centroids of opposite hex faces
+    xyz = m.closest_orthogonal_matrix(false);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
