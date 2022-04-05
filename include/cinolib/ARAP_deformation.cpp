@@ -55,11 +55,6 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
             data.w.at(eid) = m.edge_cotangent_weight(eid);
         }
 
-        // warm start: initial guess is the input mesh
-        // with contrained vertices positioned where prescribed
-        data.xyz_out = m.vector_verts();
-        for(const auto & bc : data.bcs) data.xyz_out.at(bc.first) = bc.second;
-
         // compute a map between matrix columns and mesh vertices
         // (Dirichlet boundary conditions will map to -1)
         data.col_map.resize(m.num_verts(),0);
@@ -79,6 +74,7 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
         // Compute the Laplacian matrix and pre-factorize it
         typedef Eigen::Triplet<double> Entry;
         std::vector<Entry> entries;
+        uint size = m.num_verts()-data.bcs.size();
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
             int col = data.col_map.at(vid);
@@ -99,6 +95,49 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
         Eigen::SparseMatrix<double> A(m.num_verts()-data.bcs.size(), m.num_verts()-data.bcs.size());
         A.setFromTriplets(entries.begin(), entries.end());
         data.cache.derived().compute(A);
+
+        // warm start: initialize the solution as the minimizer or
+        // | L*p - delta(p) |^2
+        // where p are the xyz coordinates and delta the differential
+        // coordinates of each mesh vertex
+        Eigen::VectorXd rhs_x = Eigen::VectorXd::Zero(size);
+        Eigen::VectorXd rhs_y = Eigen::VectorXd::Zero(size);
+        Eigen::VectorXd rhs_z = Eigen::VectorXd::Zero(size);
+        for(uint vid=0; vid<m.num_verts(); ++vid)
+        {
+            int col = data.col_map.at(vid);
+            if(col==-1) continue; // skip BC
+            for(uint eid : m.adj_v2e(vid))
+            {
+                uint nbr   = m.vert_opposite_to(eid,vid);
+                rhs_x[col] += data.w.at(eid) * (m.vert(vid).x() - m.vert(nbr).x());
+                rhs_y[col] += data.w.at(eid) * (m.vert(vid).y() - m.vert(nbr).y());
+                rhs_z[col] += data.w.at(eid) * (m.vert(vid).z() - m.vert(nbr).z());
+                // move the contribution of BCs to the RHS
+                if(data.col_map.at(nbr)==-1)
+                {
+                    vec3d p = data.bcs.at(nbr);
+                    rhs_x[col] += data.w.at(eid) * p.x();
+                    rhs_y[col] += data.w.at(eid) * p.y();
+                    rhs_z[col] += data.w.at(eid) * p.z();
+                }
+            }
+        }
+        auto x = data.cache.solve(rhs_x).eval();
+        auto y = data.cache.solve(rhs_y).eval();
+        auto z = data.cache.solve(rhs_z).eval();
+        data.xyz_out.resize(m.num_verts());
+        for(uint vid=0; vid<m.num_verts(); ++vid)
+        {
+            int col = data.col_map[vid];
+            if(col>=0) data.xyz_out[vid] = vec3d(x[col],y[col],z[col]);
+        }
+        for(const auto & bc : data.bcs)
+        {
+            data.xyz_out[bc.first] = bc.second;
+        }
+        //data.xyz_out = m.vector_verts();
+        //for(const auto & bc : data.bcs) data.xyz_out.at(bc.first) = bc.second;
     };
 
     auto local_step = [&]()
@@ -162,9 +201,9 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
                 }
             }
         }        
-        Eigen::VectorXd x = data.cache.solve(rhs_x);
-        Eigen::VectorXd y = data.cache.solve(rhs_y);
-        Eigen::VectorXd z = data.cache.solve(rhs_z);
+        Eigen::VectorXd x = data.cache.solve(rhs_x).eval();
+        Eigen::VectorXd y = data.cache.solve(rhs_y).eval();
+        Eigen::VectorXd z = data.cache.solve(rhs_z).eval();
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
             int col = data.col_map[vid];
