@@ -33,7 +33,7 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/ARAP_deformation.h>
+#include <cinolib/ARAP.h>
 #include <cinolib/parallel_for.h>
 
 namespace cinolib
@@ -41,7 +41,7 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
+void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
 {
     auto init = [&]()
     {

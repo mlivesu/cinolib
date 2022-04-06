@@ -33,8 +33,8 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_ARAP_DEFORMATION_H
-#define CINO_ARAP_DEFORMATION_H
+#ifndef CINO_ARAP_H
+#define CINO_ARAP_H
 
 #include <cinolib/meshes/trimesh.h>
 #include <cinolib/linear_solvers.h>
@@ -51,7 +51,7 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-struct ARAP_deformation_data
+struct ARAP_data
 {
     uint n_iters = 4;
     bool init = true; // initialize just once (useful for multiple calls, e.g. to make more iterations)
@@ -81,12 +81,12 @@ struct ARAP_deformation_data
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data);
+void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "ARAP_deformation.cpp"
+#include "ARAP.cpp"
 #endif
 
-#endif // CINO_ARAP_DEFORMATION_H
+#endif // CINO_ARAP_H
