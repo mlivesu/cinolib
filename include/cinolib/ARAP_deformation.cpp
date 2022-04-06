@@ -58,10 +58,10 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
         // compute a map between matrix columns and mesh vertices
         // (Dirichlet boundary conditions will map to -1)
         data.col_map.resize(m.num_verts(),0);
-        for(const auto & bc : data.bcs)
-        {
-            data.col_map.at(bc.first) = -1;
-        }
+        //for(const auto & bc : data.bcs)
+        //{
+        //    data.col_map.at(bc.first) = -1;
+        //}
         uint fresh_id = 0;
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
@@ -74,72 +74,84 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
         // Compute the Laplacian matrix and pre-factorize it
         typedef Eigen::Triplet<double> Entry;
         std::vector<Entry> entries;
-        uint size = m.num_verts()-data.bcs.size();
+        uint size = m.num_verts()+data.bcs.size();
+        data.W.resize(size);
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
+            data.W[vid] = 1.0;
             int col = data.col_map.at(vid);
-            if(col==-1) continue; // skip, BC
+            //if(col==-1) continue; // skip, BC
             for(uint nbr : m.adj_v2v(vid))
             {
                 int col_nbr = data.col_map.at(nbr);
                 int eid = m.edge_id(vid,nbr);
                 assert(eid>=0);
                 entries.push_back(Entry(col, col, data.w.at(eid)));
-                if(col_nbr>=0)
-                {
+                //if(col_nbr>=0)
+                //{
                     // if BC will add this quantity times the known coordinates to the RHS
                     entries.push_back(Entry(col, col_nbr, -data.w.at(eid)));
-                }
+                //}
             }
         }
-        Eigen::SparseMatrix<double> A(m.num_verts()-data.bcs.size(), m.num_verts()-data.bcs.size());
-        A.setFromTriplets(entries.begin(), entries.end());
-        data.cache.derived().compute(A);
+        uint new_row = m.num_verts();
+        for(auto bc : data.bcs)
+        {
+            // models equation => x_bc = bc_value
+            entries.push_back(Entry(new_row,bc.first,1));
+            data.W[new_row] = 100.0;
+            ++new_row;
+        }
+        data.A = Eigen::SparseMatrix<double>(m.num_verts()+data.bcs.size(), m.num_verts());
+        data.A.setFromTriplets(entries.begin(), entries.end());
+        data.cache.derived().compute(data.A.transpose()*data.W.asDiagonal()*data.A);
+//        std::cout << "A: " << data.A << std::endl;
+//        std::cout << "WEIGHTS: " << data.W << std::endl;
 
         // warm start: initialize the solution as the minimizer or
         // | L*p - delta(p) |^2
         // where p are the xyz coordinates and delta the differential
         // coordinates of each mesh vertex
-        Eigen::VectorXd rhs_x = Eigen::VectorXd::Zero(size);
-        Eigen::VectorXd rhs_y = Eigen::VectorXd::Zero(size);
-        Eigen::VectorXd rhs_z = Eigen::VectorXd::Zero(size);
-        for(uint vid=0; vid<m.num_verts(); ++vid)
-        {
-            int col = data.col_map.at(vid);
-            if(col==-1) continue; // skip BC
-            for(uint eid : m.adj_v2e(vid))
-            {
-                uint nbr   = m.vert_opposite_to(eid,vid);
-                rhs_x[col] += data.w.at(eid) * (m.vert(vid).x() - m.vert(nbr).x());
-                rhs_y[col] += data.w.at(eid) * (m.vert(vid).y() - m.vert(nbr).y());
-                rhs_z[col] += data.w.at(eid) * (m.vert(vid).z() - m.vert(nbr).z());
-                // move the contribution of BCs to the RHS
-                if(data.col_map.at(nbr)==-1)
-                {
-                    vec3d p = data.bcs.at(nbr);
-                    rhs_x[col] += data.w.at(eid) * p.x();
-                    rhs_y[col] += data.w.at(eid) * p.y();
-                    rhs_z[col] += data.w.at(eid) * p.z();
-                }
-            }
-        }
-        auto x = data.cache.solve(rhs_x).eval();
-        auto y = data.cache.solve(rhs_y).eval();
-        auto z = data.cache.solve(rhs_z).eval();
-        data.xyz_out.resize(m.num_verts());
-        for(uint vid=0; vid<m.num_verts(); ++vid)
-        {
-            int col = data.col_map[vid];
-            if(col>=0) data.xyz_out[vid] = vec3d(x[col],y[col],z[col]);
-        }
-        for(const auto & bc : data.bcs)
-        {
-            data.xyz_out[bc.first] = bc.second;
-        }
+        //    Eigen::VectorXd rhs_x = Eigen::VectorXd::Zero(size);
+        //    Eigen::VectorXd rhs_y = Eigen::VectorXd::Zero(size);
+        //    Eigen::VectorXd rhs_z = Eigen::VectorXd::Zero(size);
+        //    for(uint vid=0; vid<m.num_verts(); ++vid)
+        //    {
+        //        int col = data.col_map.at(vid);
+        //        if(col==-1) continue; // skip BC
+        //        for(uint eid : m.adj_v2e(vid))
+        //        {
+        //            uint nbr   = m.vert_opposite_to(eid,vid);
+        //            rhs_x[col] += data.w.at(eid) * (m.vert(vid).x() - m.vert(nbr).x());
+        //            rhs_y[col] += data.w.at(eid) * (m.vert(vid).y() - m.vert(nbr).y());
+        //            rhs_z[col] += data.w.at(eid) * (m.vert(vid).z() - m.vert(nbr).z());
+        //            // move the contribution of BCs to the RHS
+        //            if(data.col_map.at(nbr)==-1)
+        //            {
+        //                vec3d p = data.bcs.at(nbr);
+        //                rhs_x[col] += data.w.at(eid) * p.x();
+        //                rhs_y[col] += data.w.at(eid) * p.y();
+        //                rhs_z[col] += data.w.at(eid) * p.z();
+        //            }
+        //        }
+        //    }
+        //    auto x = data.cache.solve(rhs_x).eval();
+        //    auto y = data.cache.solve(rhs_y).eval();
+        //    auto z = data.cache.solve(rhs_z).eval();
+        //    data.xyz_out.resize(m.num_verts());
+        //    for(uint vid=0; vid<m.num_verts(); ++vid)
+        //    {
+        //        int col = data.col_map[vid];
+        //        if(col>=0) data.xyz_out[vid] = vec3d(x[col],y[col],z[col]);
+        //    }
+        //    for(const auto & bc : data.bcs)
+        //    {
+        //        data.xyz_out[bc.first] = bc.second;
+        //    }
 
         // old fashioned (brutal) warm start
-        //data.xyz_out = m.vector_verts();
-        //for(const auto & bc : data.bcs) data.xyz_out.at(bc.first) = bc.second;
+        data.xyz_out = m.vector_verts();
+        for(const auto & bc : data.bcs) data.xyz_out.at(bc.first) = bc.second;
     };
 
     auto local_step = [&]()
@@ -170,14 +182,14 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
 
     auto global_step = [&]()
     {
-        uint size = m.num_verts()-data.bcs.size();
+        uint size = m.num_verts()+data.bcs.size();
         Eigen::VectorXd rhs_x = Eigen::VectorXd::Zero(size);
         Eigen::VectorXd rhs_y = Eigen::VectorXd::Zero(size);
         Eigen::VectorXd rhs_z = Eigen::VectorXd::Zero(size);
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
             int col = data.col_map.at(vid);
-            if(col==-1) continue; // skip, vert is BC
+            //if(col==-1) continue; // skip, vert is BC
             for(uint nbr : m.adj_v2v(vid))
             {
                 int eid = m.edge_id(vid,nbr);
@@ -194,27 +206,37 @@ void ARAP_deformation(const Trimesh<M,V,E,P> & m, ARAP_deformation_data & data)
                     rhs_z[col] += w * data.w.at(eid) * Re[2];
                 }
                 // if nbr is a BC sum its contibution to the Laplacian matrix to the rhs
-                if(data.col_map.at(nbr)==-1)
-                {
-                    vec3d p = data.bcs.at(nbr);
-                    rhs_x[col] += data.w.at(eid) * p.x();
-                    rhs_y[col] += data.w.at(eid) * p.y();
-                    rhs_z[col] += data.w.at(eid) * p.z();
-                }
+//                if(data.col_map.at(nbr)==-1)
+//                {
+//                    vec3d p = data.bcs.at(nbr);
+//                    rhs_x[col] += data.w.at(eid) * p.x();
+//                    rhs_y[col] += data.w.at(eid) * p.y();
+//                    rhs_z[col] += data.w.at(eid) * p.z();
+//                }
             }
-        }        
-        Eigen::VectorXd x = data.cache.solve(rhs_x).eval();
-        Eigen::VectorXd y = data.cache.solve(rhs_y).eval();
-        Eigen::VectorXd z = data.cache.solve(rhs_z).eval();
+        }
+        uint new_row = m.num_verts();
+        for(auto bc : data.bcs)
+        {
+            // models equation => x_bc = bc_value
+            rhs_x[new_row] = bc.second.x();
+            rhs_y[new_row] = bc.second.y();
+            rhs_z[new_row] = bc.second.z();
+            ++new_row;
+        }
+
+        Eigen::VectorXd x = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_x).eval();
+        Eigen::VectorXd y = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_y).eval();
+        Eigen::VectorXd z = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_z).eval();
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
             int col = data.col_map[vid];
             if(col>=0) data.xyz_out[vid] = vec3d(x[col],y[col],z[col]);
         }
-        for(const auto & bc : data.bcs)
-        {
-            data.xyz_out[bc.first] = bc.second;
-        }
+        //for(const auto & bc : data.bcs)
+        //{
+        //    data.xyz_out[bc.first] = bc.second;
+        //}
     };
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

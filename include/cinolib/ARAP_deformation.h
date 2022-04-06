@@ -63,6 +63,8 @@ struct ARAP_deformation_data
     std::vector<vec3d>  xyz_loc; // per triangle targets (100% rigid)
     std::vector<double> w;       // edge weights (cotangent)
 
+    Eigen::VectorXd             W;
+    Eigen::SparseMatrix<double> A;
     Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> cache; // factorized matrix
 };
 
