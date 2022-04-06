@@ -9,6 +9,7 @@ Please consider this to be just development notes and not any real planning.
 ### Tips and Tricks to test/implement
 * https://github.com/Ten0/updatable_priority_queue (for Dijkstra)
 * https://zeux.io/2010/10/17/aabb-from-obb-with-component-wise-abs/
+* https://www.codeproject.com/Articles/453022/The-new-Cplusplus-11-rvalue-reference-and-why-you
 
 ### Things to be fixed:
 * Dijkstra is faster with std::priority_queue than with std::set (double check this)
