@@ -54,18 +54,27 @@ namespace cinolib
 struct ARAP_deformation_data
 {
     uint n_iters = 4;
-    bool init    = true; // initialize just once (useful for multiple calls, e.g. to make more iterations)
+    bool init = true; // initialize just once (useful for multiple calls, e.g. to make more iterations)
 
     std::map<uint,vec3d> bcs;     // boundary conditions
     std::vector<int>     col_map; // maps vertex ids to matrix columns
 
     std::vector<vec3d>  xyz_out; // current solution (will be the output, eventually)
-    std::vector<vec3d>  xyz_loc; // per triangle targets (100% rigid)
-    std::vector<double> w;       // edge weights (cotangent)
+    std::vector<vec3d>  xyz_loc; // per element targets (100% rigid)
+    std::vector<double> w_cot;   // edge weights (cotangent)
 
-    Eigen::VectorXd             W;
-    Eigen::SparseMatrix<double> A;
     Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> cache; // factorized matrix
+
+    // In my experience replacing hard with soft constraints works
+    // much better for interactive shape deformation (no artifacts
+    // due to C-0 continuity around boundary conditions).
+    // On the other hand, things like simplicial volume maps require
+    // the use of hard constraints to ensure boundary conformity.
+    bool   use_soft_constraints = true;
+    double w_constr  = 100.0;      // weight for soft constraints
+    double w_laplace = 1.0;        // weight for the laplacian component of the matrix
+    Eigen::VectorXd W;             // diagonal matrix of weights
+    Eigen::SparseMatrix<double> A; // a copy of the matrix (to be pre-multiplied to the rhs to form the normal equations)
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
