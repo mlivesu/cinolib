@@ -61,8 +61,8 @@ struct ARAP_data
 
     std::vector<vec3d>  xyz_out; // current solution (will be the output, eventually)
     std::vector<vec3d>  xyz_loc; // per element targets (100% rigid)
-    std::vector<double> w;       // edge weights
-    int w_type = COTANGENT;
+    std::vector<double> w;       // edge weights { UNIFORM, COTANGENT }
+    int w_type = UNIFORM;        // WARNING: cot weights seem rather unstable on volume meshes in interactive deformations
 
     Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> cache; // factorized matrix
 
