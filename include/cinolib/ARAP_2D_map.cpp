@@ -53,7 +53,7 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
 
         data.uv_ref.resize(m.num_polys()*3);
         data.uv_loc.resize(m.num_polys()*3);
-        data.uv.resize(m.num_verts());
+        data.uv_out.resize(m.num_verts());
 
         // compute reference local uv coords
         for(uint pid=0; pid<m.num_polys(); ++pid)
@@ -72,7 +72,7 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
         uint nv = m.num_verts();
         for(uint vid=0; vid<nv; ++vid)
         {
-            data.uv.at(vid) = vec2d(f[vid], f[vid+nv]);
+            data.uv_out.at(vid) = vec2d(f[vid], f[vid+nv]);
         }
 
         // per edge weights
@@ -117,7 +117,7 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
                 uint v1  = m.poly_vert_id(pid,(i+1)%3);
                 int  eid = m.edge_id(v0,v1);
                 assert(eid>=0);
-                vec2d e_cur = data.uv.at(v0)    - data.uv.at(v1);
+                vec2d e_cur = data.uv_out.at(v0)    - data.uv_out.at(v1);
                 vec2d e_ref = data.uv_ref.at(off+i) - data.uv_ref.at(off+((i+1)%3));
                 cov += data.w.at(eid) * (e_cur * e_ref.transpose());
             }
@@ -155,9 +155,9 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
         Eigen::VectorXd v = data.cache.solve(rhs_v);
         for(uint vid=0; vid<m.num_verts()-1; ++vid)
         {
-            data.uv[vid] = vec2d(u[vid],v[vid]);
+            data.uv_out[vid] = vec2d(u[vid],v[vid]);
         }
-        data.uv[bc] = vec2d(0,0); // last vertex
+        data.uv_out[bc] = vec2d(0,0); // last vertex
     };
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -47,7 +47,7 @@ std::vector<Handle>::iterator pick_handle(const vec3d & click_3d)
 
 int main(int argc, char *argv[])
 {
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.obj";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cactus.off";
     DrawableTrimesh<> m(s.c_str());
     m.show_vert_color();
 

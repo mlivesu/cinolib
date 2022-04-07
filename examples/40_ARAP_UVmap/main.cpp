@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     profiler.pop();
     for(uint vid=0; vid<m_xyz.num_verts(); ++vid)
     {
-        m_xyz.vert_data(vid).uvw = data.uv[vid].add_coord(0);
+        m_xyz.vert_data(vid).uvw = data.uv_out[vid].add_coord(0);
     }
     m_xyz.updateGL();
 
