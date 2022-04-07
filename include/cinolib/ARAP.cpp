@@ -45,8 +45,10 @@ void ARAP(const AbstractMesh<M,V,E,P> & m, ARAP_data & data)
 {
     auto init = [&]()
     {
+        assert(m.mesh_type()==TRIMESH || m.mesh_type()==TETMESH);
+
         data.init = false; // don't init next time
-        data.xyz_loc.resize(m.num_polys()*3);
+        data.xyz_loc.resize(m.num_polys()*m.verts_per_poly(0));
 
         // per edge weights
         data.w.resize(m.num_edges());
@@ -180,15 +182,12 @@ void ARAP(const AbstractMesh<M,V,E,P> & m, ARAP_data & data)
     {
         PARALLEL_FOR(0, m.num_polys(), 1000, [&](uint pid)
         {
-            // per triangle covariance matrix
-            uint  off = 3*pid;
+            uint  off = pid*m.verts_per_poly(pid);
             mat3d cov = mat3d::ZERO();
-            for(int i=0; i<3; ++i)
+            for(uint eid : m.adj_p2e(pid))
             {
-                uint v0  = m.poly_vert_id(pid,i);
-                uint v1  = m.poly_vert_id(pid,(i+1)%3);
-                int  eid = m.edge_id(v0,v1);
-                assert(eid>=0);
+                uint  v0    = m.edge_vert_id(eid,0);
+                uint  v1    = m.edge_vert_id(eid,1);
                 vec3d e_cur = data.xyz_out.at(v0) - data.xyz_out.at(v1);
                 vec3d e_ref = m.vert(v0) - m.vert(v1);
                 cov += data.w.at(eid) * (e_cur * e_ref.transpose());
@@ -221,9 +220,7 @@ void ARAP(const AbstractMesh<M,V,E,P> & m, ARAP_data & data)
                 {
                     uint i = m.poly_vert_offset(pid,vid);
                     uint j = m.poly_vert_offset(pid,nbr);
-                    assert(i>=0 && i<3);
-                    assert(j>=0 && j<3);
-                    vec3d Re = data.xyz_loc.at(pid*3+i) - data.xyz_loc.at(pid*3+j);
+                    vec3d Re = data.xyz_loc.at(pid*m.verts_per_poly(pid)+i) - data.xyz_loc.at(pid*m.verts_per_poly(pid)+j);
                     rhs_x[col] += w * data.w.at(eid) * Re[0];
                     rhs_y[col] += w * data.w.at(eid) * Re[1];
                     rhs_z[col] += w * data.w.at(eid) * Re[2];
