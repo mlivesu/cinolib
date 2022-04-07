@@ -38,6 +38,9 @@
 // Resources:
 // https://stackoverflow.com/questions/669438/how-to-get-memory-usage-at-runtime-using-c/19770392#19770392
 // https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+//
+// https://maxliani.wordpress.com/2020/05/02/dev-tracking-memory-usage-part-1/
+// https://maxliani.wordpress.com/2020/05/04/dev-tracking-memory-usage-part-2/
 
 #ifdef _WIN32
 #include <windows.h>
