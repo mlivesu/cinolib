@@ -61,7 +61,8 @@ struct ARAP_data
 
     std::vector<vec3d>  xyz_out; // current solution (will be the output, eventually)
     std::vector<vec3d>  xyz_loc; // per element targets (100% rigid)
-    std::vector<double> w_cot;   // edge weights (cotangent)
+    std::vector<double> w;       // edge weights
+    int w_type = COTANGENT;
 
     Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> cache; // factorized matrix
 
@@ -88,7 +89,7 @@ struct ARAP_data
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data);
+void ARAP(const AbstractMesh<M,V,E,P> & m, ARAP_data & data);
 
 }
 

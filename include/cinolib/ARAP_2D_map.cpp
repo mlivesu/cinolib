@@ -79,7 +79,7 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
         data.w.resize(m.num_edges());
         for(uint eid=0; eid<m.num_edges(); ++eid)
         {
-            data.w.at(eid) = m.edge_cotangent_weight(eid);
+            data.w.at(eid) = m.edge_weight(eid,COTANGENT);
         }
 
         // Pre-factorize Laplacian matrix.

@@ -41,7 +41,7 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
+void ARAP(const AbstractMesh<M,V,E,P> & m, ARAP_data & data)
 {
     auto init = [&]()
     {
@@ -49,10 +49,10 @@ void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
         data.xyz_loc.resize(m.num_polys()*3);
 
         // per edge weights
-        data.w_cot.resize(m.num_edges());
+        data.w.resize(m.num_edges());
         for(uint eid=0; eid<m.num_edges(); ++eid)
         {
-            data.w_cot.at(eid) = m.edge_cotangent_weight(eid);
+            data.w.at(eid) = m.edge_weight(eid,data.w_type);
         }
 
         // compute a map between matrix columns and mesh vertices
@@ -95,9 +95,9 @@ void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
                 int col_nbr = data.col_map.at(nbr);
                 int eid = m.edge_id(vid,nbr);
                 assert(eid>=0);
-                entries.push_back(Entry(col, col, data.w_cot.at(eid)));
+                entries.push_back(Entry(col, col, data.w.at(eid)));
                 if(col_nbr==-1) continue; // skip, hard BC
-                entries.push_back(Entry(col, col_nbr, -data.w_cot.at(eid)));
+                entries.push_back(Entry(col, col_nbr, -data.w.at(eid)));
             }
         }
         if(data.use_soft_constraints)
@@ -128,16 +128,16 @@ void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
                 for(uint eid : m.adj_v2e(vid))
                 {
                     uint nbr   = m.vert_opposite_to(eid,vid);
-                    rhs_x[col] += data.w_cot.at(eid) * (m.vert(vid).x() - m.vert(nbr).x());
-                    rhs_y[col] += data.w_cot.at(eid) * (m.vert(vid).y() - m.vert(nbr).y());
-                    rhs_z[col] += data.w_cot.at(eid) * (m.vert(vid).z() - m.vert(nbr).z());
+                    rhs_x[col] += data.w.at(eid) * (m.vert(vid).x() - m.vert(nbr).x());
+                    rhs_y[col] += data.w.at(eid) * (m.vert(vid).y() - m.vert(nbr).y());
+                    rhs_z[col] += data.w.at(eid) * (m.vert(vid).z() - m.vert(nbr).z());
                     // move the contribution of BCs to the RHS
                     if(data.col_map.at(nbr)==-1)
                     {
                         vec3d p = data.bcs.at(nbr);
-                        rhs_x[col] += data.w_cot.at(eid) * p.x();
-                        rhs_y[col] += data.w_cot.at(eid) * p.y();
-                        rhs_z[col] += data.w_cot.at(eid) * p.z();
+                        rhs_x[col] += data.w.at(eid) * p.x();
+                        rhs_y[col] += data.w.at(eid) * p.y();
+                        rhs_z[col] += data.w.at(eid) * p.z();
                     }
                 }
             }
@@ -191,7 +191,7 @@ void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
                 assert(eid>=0);
                 vec3d e_cur = data.xyz_out.at(v0) - data.xyz_out.at(v1);
                 vec3d e_ref = m.vert(v0) - m.vert(v1);
-                cov += data.w_cot.at(eid) * (e_cur * e_ref.transpose());
+                cov += data.w.at(eid) * (e_cur * e_ref.transpose());
             }
 
             // find closest rotation and store rotated point
@@ -224,17 +224,17 @@ void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
                     assert(i>=0 && i<3);
                     assert(j>=0 && j<3);
                     vec3d Re = data.xyz_loc.at(pid*3+i) - data.xyz_loc.at(pid*3+j);
-                    rhs_x[col] += w * data.w_cot.at(eid) * Re[0];
-                    rhs_y[col] += w * data.w_cot.at(eid) * Re[1];
-                    rhs_z[col] += w * data.w_cot.at(eid) * Re[2];
+                    rhs_x[col] += w * data.w.at(eid) * Re[0];
+                    rhs_y[col] += w * data.w.at(eid) * Re[1];
+                    rhs_z[col] += w * data.w.at(eid) * Re[2];
                 }
                 // if nbr is a hard BC sum its contibution to the Laplacian matrix to the rhs
                 if(data.col_map.at(nbr)==-1)
                 {
                     vec3d p = data.bcs.at(nbr);
-                    rhs_x[col] += data.w_cot.at(eid) * p.x();
-                    rhs_y[col] += data.w_cot.at(eid) * p.y();
-                    rhs_z[col] += data.w_cot.at(eid) * p.z();
+                    rhs_x[col] += data.w.at(eid) * p.x();
+                    rhs_y[col] += data.w.at(eid) * p.y();
+                    rhs_z[col] += data.w.at(eid) * p.z();
                 }
             }
         }
