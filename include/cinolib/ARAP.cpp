@@ -89,7 +89,7 @@ void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
         {
             int col = data.col_map.at(vid);
             if(col==-1) continue; // skip, hard BC
-            if(data.use_soft_constraints) data.W[col] = 1.0;
+            if(data.use_soft_constraints) data.W[col] = data.w_laplace;
             for(uint nbr : m.adj_v2v(vid))
             {
                 int col_nbr = data.col_map.at(nbr);
@@ -102,12 +102,12 @@ void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
         }
         if(data.use_soft_constraints)
         {
-            // models equation => x_bc = bc_value
+            // models equation => x_bc = bc_value * w_constr
             uint new_row = m.num_verts();
             for(auto bc : data.bcs)
             {
                 entries.push_back(Entry(new_row,bc.first,1));
-                data.W[new_row] = 100.0;
+                data.W[new_row] = data.w_constr;
                 ++new_row;
             }
         }
