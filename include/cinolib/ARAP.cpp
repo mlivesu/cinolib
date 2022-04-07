@@ -116,50 +116,64 @@ void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
         if(data.use_soft_constraints) data.cache.derived().compute(data.A.transpose()*data.W.asDiagonal()*data.A);
         else data.cache.derived().compute(data.A);
 
-        // warm start: initialize the solution as the minimizer or
-        // | L*p - delta(p) |^2
-        // where p are the xyz coordinates and delta the differential
-        // coordinates of each mesh vertex
-        //    Eigen::VectorXd rhs_x = Eigen::VectorXd::Zero(size);
-        //    Eigen::VectorXd rhs_y = Eigen::VectorXd::Zero(size);
-        //    Eigen::VectorXd rhs_z = Eigen::VectorXd::Zero(size);
-        //    for(uint vid=0; vid<m.num_verts(); ++vid)
-        //    {
-        //        int col = data.col_map.at(vid);
-        //        if(col==-1) continue; // skip BC
-        //        for(uint eid : m.adj_v2e(vid))
-        //        {
-        //            uint nbr   = m.vert_opposite_to(eid,vid);
-        //            rhs_x[col] += data.w.at(eid) * (m.vert(vid).x() - m.vert(nbr).x());
-        //            rhs_y[col] += data.w.at(eid) * (m.vert(vid).y() - m.vert(nbr).y());
-        //            rhs_z[col] += data.w.at(eid) * (m.vert(vid).z() - m.vert(nbr).z());
-        //            // move the contribution of BCs to the RHS
-        //            if(data.col_map.at(nbr)==-1)
-        //            {
-        //                vec3d p = data.bcs.at(nbr);
-        //                rhs_x[col] += data.w.at(eid) * p.x();
-        //                rhs_y[col] += data.w.at(eid) * p.y();
-        //                rhs_z[col] += data.w.at(eid) * p.z();
-        //            }
-        //        }
-        //    }
-        //    auto x = data.cache.solve(rhs_x).eval();
-        //    auto y = data.cache.solve(rhs_y).eval();
-        //    auto z = data.cache.solve(rhs_z).eval();
-        //    data.xyz_out.resize(m.num_verts());
-        //    for(uint vid=0; vid<m.num_verts(); ++vid)
-        //    {
-        //        int col = data.col_map[vid];
-        //        if(col>=0) data.xyz_out[vid] = vec3d(x[col],y[col],z[col]);
-        //    }
-        //    for(const auto & bc : data.bcs)
-        //    {
-        //        data.xyz_out[bc.first] = bc.second;
-        //    }
-
-        // old fashioned (brutal) warm start
-        data.xyz_out = m.vector_verts();
-        for(const auto & bc : data.bcs) data.xyz_out.at(bc.first) = bc.second;
+        if(data.warm_start_with_laplacian)
+        {
+            Eigen::VectorXd rhs_x = Eigen::VectorXd::Zero(size);
+            Eigen::VectorXd rhs_y = Eigen::VectorXd::Zero(size);
+            Eigen::VectorXd rhs_z = Eigen::VectorXd::Zero(size);
+            for(uint vid=0; vid<m.num_verts(); ++vid)
+            {
+                int col = data.col_map.at(vid);
+                if(col==-1) continue; // skip BC
+                for(uint eid : m.adj_v2e(vid))
+                {
+                    uint nbr   = m.vert_opposite_to(eid,vid);
+                    rhs_x[col] += data.w_cot.at(eid) * (m.vert(vid).x() - m.vert(nbr).x());
+                    rhs_y[col] += data.w_cot.at(eid) * (m.vert(vid).y() - m.vert(nbr).y());
+                    rhs_z[col] += data.w_cot.at(eid) * (m.vert(vid).z() - m.vert(nbr).z());
+                    // move the contribution of BCs to the RHS
+                    if(data.col_map.at(nbr)==-1)
+                    {
+                        vec3d p = data.bcs.at(nbr);
+                        rhs_x[col] += data.w_cot.at(eid) * p.x();
+                        rhs_y[col] += data.w_cot.at(eid) * p.y();
+                        rhs_z[col] += data.w_cot.at(eid) * p.z();
+                    }
+                }
+            }
+            if(data.use_soft_constraints)
+            {
+                auto x = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_x).eval();
+                auto y = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_y).eval();
+                auto z = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_z).eval();
+                data.xyz_out.resize(m.num_verts());
+                for(uint vid=0; vid<m.num_verts(); ++vid)
+                {
+                    data.xyz_out[vid] = vec3d(x[vid],y[vid],z[vid]);
+                }
+            }
+            else
+            {
+                auto x = data.cache.solve(rhs_x).eval();
+                auto y = data.cache.solve(rhs_y).eval();
+                auto z = data.cache.solve(rhs_z).eval();
+                data.xyz_out.resize(m.num_verts());
+                for(uint vid=0; vid<m.num_verts(); ++vid)
+                {
+                    int col = data.col_map[vid];
+                    if(col>=0) data.xyz_out[vid] = vec3d(x[col],y[col],z[col]);
+                }
+                for(const auto & bc : data.bcs)
+                {
+                    data.xyz_out[bc.first] = bc.second;
+                }
+            }
+        }
+        else
+        {
+            data.xyz_out = m.vector_verts();
+            for(const auto & bc : data.bcs) data.xyz_out.at(bc.first) = bc.second;
+        }
     };
 
     auto local_step = [&]()
@@ -235,9 +249,9 @@ void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
                 rhs_z[new_row] = bc.second.z();
                 ++new_row;
             }
-            Eigen::VectorXd x = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_x).eval();
-            Eigen::VectorXd y = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_y).eval();
-            Eigen::VectorXd z = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_z).eval();
+            auto x = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_x).eval();
+            auto y = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_y).eval();
+            auto z = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_z).eval();
             for(uint vid=0; vid<m.num_verts(); ++vid)
             {
                 data.xyz_out[vid] = vec3d(x[vid],y[vid],z[vid]);
@@ -245,9 +259,9 @@ void ARAP(const Trimesh<M,V,E,P> & m, ARAP_data & data)
         }
         else
         {
-            Eigen::VectorXd x = data.cache.solve(rhs_x).eval();
-            Eigen::VectorXd y = data.cache.solve(rhs_y).eval();
-            Eigen::VectorXd z = data.cache.solve(rhs_z).eval();
+            auto x = data.cache.solve(rhs_x).eval();
+            auto y = data.cache.solve(rhs_y).eval();
+            auto z = data.cache.solve(rhs_z).eval();
             for(uint vid=0; vid<m.num_verts(); ++vid)
             {
                 int col = data.col_map[vid];

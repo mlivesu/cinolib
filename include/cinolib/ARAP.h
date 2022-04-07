@@ -75,6 +75,13 @@ struct ARAP_data
     double w_laplace = 1.0;        // weight for the laplacian component of the matrix
     Eigen::VectorXd W;             // diagonal matrix of weights
     Eigen::SparseMatrix<double> A; // a copy of the matrix (to be pre-multiplied to the rhs to form the normal equations)
+
+    // if true (default), the warm start will be the minimizer of
+    // | Lx - delta |^2
+    // where delta are the differential mesh coordinates. If false,
+    // the warm start will simply be a copy of the input mesh, with
+    // constrained vertices moved onto their prescribed position
+    bool warm_start_with_laplacian = true;
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
