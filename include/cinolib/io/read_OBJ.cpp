@@ -223,6 +223,10 @@ void read_OBJ(const char                     * filename,
                     std::string s0(filename);
                     std::string s1(mtu_c);
                     std::string s2 = get_file_path(s0) + get_file_name(s1);
+
+                    if (!s2.empty() && s2[s2.size() - 1] == '\r')
+                        s2.erase(s2.size() - 1);
+
                     if(read_MTU(s2.c_str(), color_map, diffuse_path, specular_path, normal_path))
                     {
                         has_per_face_color = true;
