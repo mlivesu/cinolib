@@ -395,7 +395,7 @@ bool Trimesh<M,V,E,P>::edge_is_flippable(const uint eid)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-double Trimesh<M,V,E,P>::edge_cotangent_weight(const uint eid) const
+double Trimesh<M,V,E,P>::edge_weight_cotangent(const uint eid) const
 {
     assert(this->edge_is_manifold(eid));
     uint   vid0  = this->edge_vert_id(eid,0);
@@ -669,9 +669,25 @@ void Trimesh<M,V,E,P>::vert_weights_cotangent(const uint vid, std::vector<std::p
     for(uint eid : this->adj_v2e(vid))
     {
         uint   nbr = this->vert_opposite_to(eid, vid);
-        double wgt = this->edge_cotangent_weight(eid);
+        double wgt = this->edge_weight_cotangent(eid);
         wgts.push_back(std::make_pair(nbr,wgt));
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+double Trimesh<M,V,E,P>::edge_weight(const uint eid, const int type) const
+{
+    switch (type)
+    {
+        case UNIFORM   : return 1.0;
+        case COTANGENT : return edge_weight_cotangent(eid);
+        default        : assert(false && "edge weight not supported at this level of the hierarchy!");
+    }
+    assert(false); // warning killer
+    return 0;
 }
 
 }

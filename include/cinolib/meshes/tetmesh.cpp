@@ -651,8 +651,24 @@ void Tetmesh<M,V,E,F,P>::vert_weights_cotangent(const uint vid, std::vector<std:
     for(uint eid : this->adj_v2e(vid))
     {
         uint nbr = this->vert_opposite_to(eid, vid);
-        wgts.push_back(std::make_pair(nbr,edge_cotangent_weight(eid)));
+        wgts.push_back(std::make_pair(nbr,edge_weight_cotangent(eid)));
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+double Tetmesh<M,V,E,F,P>::edge_weight(const uint eid, const int type) const
+{
+    switch (type)
+    {
+        case UNIFORM   : return 1.0;
+        case COTANGENT : return edge_weight_cotangent(eid);
+        default        : assert(false && "edge weight not supported at this level of the hierarchy!");
+    }
+    assert(false); // warning killer
+    return 0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -668,7 +684,7 @@ void Tetmesh<M,V,E,F,P>::vert_weights_cotangent(const uint vid, std::vector<std:
 */
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-double Tetmesh<M,V,E,F,P>::edge_cotangent_weight(const uint eid) const
+double Tetmesh<M,V,E,F,P>::edge_weight_cotangent(const uint eid) const
 {
     uint   v0  = this->edge_vert_id(eid,0);
     uint   v1  = this->edge_vert_id(eid,1);

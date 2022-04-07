@@ -516,6 +516,21 @@ void AbstractMesh<M,V,E,P>::vert_weights(const uint vid, const int type, std::ve
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+double AbstractMesh<M,V,E,P>::edge_weight(const uint eid, const int type) const
+{
+    switch (type)
+    {
+        case UNIFORM : return 1.0;
+        default      : assert(false && "edge weight not supported at this level of the hierarchy!");
+    }
+    assert(false); // warning killer
+    return 0;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractMesh<M,V,E,P>::vert_weights_uniform(const uint vid, std::vector<std::pair<uint,double>> & wgts) const
 {
     wgts.clear();

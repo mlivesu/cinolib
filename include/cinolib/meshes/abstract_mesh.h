@@ -260,6 +260,7 @@ class AbstractMesh
         virtual void                   edge_set_alpha             (const float alpha);
                 void                   edge_set_flag              (const int flag, const bool b);
                 void                   edge_set_flag              (const int flag, const bool b, const std::vector<uint> & eids);
+        virtual double                 edge_weight                (const uint eid, const int type) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
