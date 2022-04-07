@@ -182,8 +182,7 @@ void ARAP(const AbstractMesh<M,V,E,P> & m, ARAP_data & data)
     {
         PARALLEL_FOR(0, m.num_polys(), 1000, [&](uint pid)
         {
-            uint  off = pid*m.verts_per_poly(pid);
-            mat3d cov = mat3d::ZERO();
+            mat3d cov = mat3d::ZERO();            
             for(uint eid : m.adj_p2e(pid))
             {
                 uint  v0    = m.edge_vert_id(eid,0);
@@ -194,10 +193,12 @@ void ARAP(const AbstractMesh<M,V,E,P> & m, ARAP_data & data)
             }
 
             // find closest rotation and store rotated point
+            uint  off = pid*m.verts_per_poly(pid);
             mat3d rot = cov.closest_orthogonal_matrix(true);
-            data.xyz_loc.at(off  ) = rot * m.poly_vert(pid,0);
-            data.xyz_loc.at(off+1) = rot * m.poly_vert(pid,1);
-            data.xyz_loc.at(off+2) = rot * m.poly_vert(pid,2);
+            for(uint i=0; i<m.verts_per_poly(pid); ++i)
+            {
+                data.xyz_loc.at(off+i) = rot * m.poly_vert(pid,i);
+            }
         });
     };
 
