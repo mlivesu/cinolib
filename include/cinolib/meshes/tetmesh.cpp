@@ -696,8 +696,8 @@ double Tetmesh<M,V,E,F,P>::edge_weight_cotangent(const uint eid) const
         uint   f1    = this->poly_face_opposite_to(pid,v0);
         double len   = this->edge_length(e_opp);
         double ang   = this->poly_dihedral_angle(pid,f0,f1);
-
-        wgt += len*cot(ang);
+        double w     = std::max(1e-10, len*cot(ang)); // avoid negative weights
+        wgt += (std::isnormal(w)) ? w : 0.0;
     }
     wgt /= 6.0;
     return wgt;
