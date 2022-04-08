@@ -43,7 +43,7 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
+void ARAP_2D_mapping(Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
 {
     uint bc = m.num_verts()-1;
 
@@ -168,6 +168,11 @@ void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data)
     {
         local_step();
         global_step();
+    }
+
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        m.vert_data(vid).uvw = data.uv_out[vid].add_coord(0);
     }
 }
 

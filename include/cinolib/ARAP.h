@@ -89,7 +89,7 @@ struct ARAP_data
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void ARAP(const AbstractMesh<M,V,E,P> & m, ARAP_data & data);
+void ARAP(AbstractMesh<M,V,E,P> & m, ARAP_data & data);
 
 }
 

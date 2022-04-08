@@ -41,7 +41,7 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void ARAP(const AbstractMesh<M,V,E,P> & m, ARAP_data & data)
+void ARAP(AbstractMesh<M,V,E,P> & m, ARAP_data & data)
 {
     auto init = [&]()
     {
@@ -281,6 +281,9 @@ void ARAP(const AbstractMesh<M,V,E,P> & m, ARAP_data & data)
         local_step();
         global_step();
     }
+
+    m.vector_verts() = data.xyz_out;
+    m.update_normals();
 }
 
 }

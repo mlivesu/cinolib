@@ -68,7 +68,7 @@ struct ARAP_2D_map_data
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void ARAP_2D_mapping(const Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data);
+void ARAP_2D_mapping(Trimesh<M,V,E,P> & m, ARAP_2D_map_data & data);
 
 }
 

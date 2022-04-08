@@ -26,10 +26,6 @@ int main(int argc, char **argv)
     ARAP_2D_map_data data;
     ARAP_2D_mapping(m_xyz,data);
     profiler.pop();
-    for(uint vid=0; vid<m_xyz.num_verts(); ++vid)
-    {
-        m_xyz.vert_data(vid).uvw = data.uv_out[vid].add_coord(0);
-    }
     m_xyz.updateGL();
 
     // create a mesh of the uv parametric space (same connectivity, different embedding)
