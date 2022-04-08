@@ -80,7 +80,6 @@ int main(int argc, char *argv[])
                     h.click_2d = click_2d;
                     h.click_3d = click_3d;
                     h.vid  = m.pick_vert(click_3d);
-                    h.zbuf = gui.query_Z_buffer(click_2d);
                     std::cout << "defined handle at vert " << h.vid << std::endl;
                     handles.push_back(h);
                     data.bcs[h.vid] = m.vert(h.vid);
@@ -89,6 +88,7 @@ int main(int argc, char *argv[])
                 else if(mode==MOV_HANDLES)
                 {
                     curr_handle = pick_handle(click_3d);
+                    curr_handle->zbuf = gui.query_Z_buffer(click_2d);
                     std::cout << "selected handle " << curr_handle->vid << std::endl;
                     for(const auto & h : handles) m.vert_data(h.vid).color = Color::RED();
                     m.vert_data(curr_handle->vid).color = Color::YELLOW();
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
         if(key==GLFW_KEY_SPACE && !handles.empty())
         {
             mode = MOV_HANDLES;
-            std::cout << "DEFORMATION MODE: you can now move your handles with SHIFT + mouse drag" << std::endl;
+            std::cout << "\nDEFORMATION MODE: you can now move your handles with SHIFT + mouse drag\n" << std::endl;
             curr_handle = handles.begin(); // make sure curr_h is attached to a valid handle...
         }
         else if(key==GLFW_KEY_B)
@@ -133,8 +133,6 @@ int main(int argc, char *argv[])
             data.bcs[curr_handle->vid] += delta;
             curr_handle->click_3d = p;
             ARAP(m,data);
-            m.vector_verts() = data.xyz_out;
-            m.update_normals();
             m.updateGL();
             gui.draw();
             return true;
