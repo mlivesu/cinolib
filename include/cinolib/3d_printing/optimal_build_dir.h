@@ -100,7 +100,19 @@ struct OptimalBuildDirOptions
 template<class M, class V, class E, class P>
 CINO_INLINE
 vec3d optimal_build_dir(const DrawableTrimesh<M,V,E,P> & m,
+                        const OptimalBuildDirOptions   & opt,
+                              float                    & best_height,
+                              float                    & best_shadow_area,
+                              float                    & best_contact_area,
+                              float                    & best_supp_volume);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+vec3d optimal_build_dir(const DrawableTrimesh<M,V,E,P> & m,
                         const OptimalBuildDirOptions   & opt);
+
 }
 
 #ifndef  CINO_STATIC_LIB

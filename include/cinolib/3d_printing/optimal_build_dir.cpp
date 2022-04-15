@@ -47,7 +47,11 @@ namespace cinolib
 template<class M, class V, class E, class P>
 CINO_INLINE
 vec3d optimal_build_dir(const DrawableTrimesh<M,V,E,P> & m,
-                        const OptimalBuildDirOptions   & opt)
+                        const OptimalBuildDirOptions   & opt,
+                              float                    & best_height,
+                              float                    & best_shadow_area,
+                              float                    & best_contact_area,
+                              float                    & best_supp_volume)
 {
     // evenly sample the unit sphere to produce
     // a set of candidate build directions
@@ -147,7 +151,27 @@ vec3d optimal_build_dir(const DrawableTrimesh<M,V,E,P> & m,
 
     // pick the best dir (lowest score)
     auto   it = std::min_element(scores.begin(), scores.end());
+
+    best_height       = h.at(std::distance(scores.begin(),it));
+    best_shadow_area  = a.at(std::distance(scores.begin(),it));
+    best_contact_area = c.at(std::distance(scores.begin(),it));
+    best_supp_volume  = v.at(std::distance(scores.begin(),it));
+
     return dirs.at(std::distance(scores.begin(),it));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+vec3d optimal_build_dir(const DrawableTrimesh<M,V,E,P> & m,
+                        const OptimalBuildDirOptions   & opt)
+{
+    float best_height;
+    float best_shadow_area;
+    float best_contact_area;
+    float best_supp_volume;
+    return optimal_build_dir(m, opt, best_height, best_shadow_area, best_contact_area, best_supp_volume);
 }
 
 }
