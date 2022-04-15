@@ -89,7 +89,7 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct SmootherOptions
 {
     uint   n_iters             = 1;       // # of smoothing iterations
     double w_regular           = 10.0;    // attraction to tangent space  for regular vertices
@@ -99,8 +99,7 @@ typedef struct
     int    laplacian_mode      = UNIFORM; // laplacian mode (UNIFORM or COTANGENT)
     bool   reproject_on_target = true;    // reproject to target surface after each smoothing iteration
     //bool   with_ray_casting    = false;   // reproject via ray casting if true, via closest point if false
-}
-SmootherOptions;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

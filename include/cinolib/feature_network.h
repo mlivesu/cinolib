@@ -50,12 +50,11 @@ namespace cinolib
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-typedef struct
+struct FeatureNetworkOptions
 {
     bool  split_lines_at_high_curvature_points = true;
     float ang_thresh_deg                       = 60;
-}
-FeatureNetworkOptions;
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

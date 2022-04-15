@@ -76,7 +76,7 @@ double grid_projector(      Hexmesh<M1,V1,E1,F1,P1> & m,
     {
         if(srf.edge_data(eid).flags[CREASE])
         {
-            o_lines.push_segment(eid, srf.edge_verts(eid));
+            o_lines.push_segment(eid, srf.edge_vert(eid,0), srf.edge_vert(eid,1));
         }
     }
     o_srf.build_from_mesh_polys(srf);
