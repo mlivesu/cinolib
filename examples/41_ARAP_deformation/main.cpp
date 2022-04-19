@@ -51,12 +51,13 @@ int main(int argc, char *argv[])
                  "\nNOTE: if the mesh has open boundaries, press B to constrain their position."
     << std::endl;
 
+    ARAP_data data;
+    int curr_handle;
+
     GLcanvas gui;
     gui.push(&m);
     gui.push(new SurfaceMeshControls<DrawableTrimesh<>>(&m,&gui));
-
-    ARAP_data data;
-    uint curr_handle;
+    gui.depth_cull_markers = false;
 
     GLdouble zbuf = 0;
     gui.callback_mouse_left_click = [&](int mod) -> bool
@@ -72,16 +73,14 @@ int main(int argc, char *argv[])
                     uint vid  = m.pick_vert(click_3d);
                     handles.push_back(vid);
                     data.bcs[vid] = m.vert(vid);
-                    m.vert_data(vid).color = Color::RED();
                     std::cout << "defined handle at vert " << vid << std::endl;
+                    gui.push_marker(m.vert(vid), "", Color::BLUE(), 10);
                 }
                 else if(mode==MOV_HANDLES)
                 {
                     curr_handle = pick_handle(m, click_3d);
                     zbuf = gui.query_Z_buffer(click_2d);
                     std::cout << "selected handle " << curr_handle << std::endl;
-                    for(const auto & h : handles) m.vert_data(curr_handle).color = Color::RED();
-                    m.vert_data(curr_handle).color = Color::YELLOW();
                 }
             }
             m.updateGL();
@@ -123,6 +122,8 @@ int main(int argc, char *argv[])
             data.bcs[curr_handle] += delta;
             ARAP(m,data);
             m.updateGL();
+            gui.pop_all_markers();
+            for(uint vid : handles) gui.push_marker(m.vert(vid), "", Color::BLUE(), 10);
             gui.draw();
             return true;
         }
