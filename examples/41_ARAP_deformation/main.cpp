@@ -22,25 +22,17 @@ int mode = DEF_HANDLES;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-struct Handle
-{
-    uint     vid;
-    vec2d    click_2d;
-    vec3d    click_3d;
-    GLdouble zbuf;
-};
-std::vector<Handle> handles;
+std::vector<uint> handles;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-std::vector<Handle>::iterator pick_handle(const vec3d & click_3d)
+uint pick_handle(const Trimesh<> & m,
+                 const vec3d     & click_3d)
 {
-    return std::min_element(handles.begin(),
-                            handles.end(),
-                            [&](const Handle & a, const Handle & b)
-                            {
-                                return click_3d.dist(a.click_3d) < click_3d.dist(b.click_3d);
-                            });
+    return *std::min_element(handles.begin(), handles.end(), [&](const uint a, const uint b)
+                             {
+                                 return click_3d.dist(m.vert(a)) < click_3d.dist(m.vert(b));
+                             });
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -64,8 +56,9 @@ int main(int argc, char *argv[])
     gui.push(new SurfaceMeshControls<DrawableTrimesh<>>(&m,&gui));
 
     ARAP_data data;
-    std::vector<Handle>::iterator curr_handle = handles.end();
+    uint curr_handle;
 
+    GLdouble zbuf = 0;
     gui.callback_mouse_left_click = [&](int mod) -> bool
     {
         if(mod & GLFW_MOD_SHIFT)
@@ -76,22 +69,19 @@ int main(int argc, char *argv[])
             {
                 if(mode==DEF_HANDLES)
                 {
-                    Handle h;
-                    h.click_2d = click_2d;
-                    h.click_3d = click_3d;
-                    h.vid  = m.pick_vert(click_3d);
-                    std::cout << "defined handle at vert " << h.vid << std::endl;
-                    handles.push_back(h);
-                    data.bcs[h.vid] = m.vert(h.vid);
-                    m.vert_data(h.vid).color = Color::RED();
+                    uint vid  = m.pick_vert(click_3d);
+                    handles.push_back(vid);
+                    data.bcs[vid] = m.vert(vid);
+                    m.vert_data(vid).color = Color::RED();
+                    std::cout << "defined handle at vert " << vid << std::endl;
                 }
                 else if(mode==MOV_HANDLES)
                 {
-                    curr_handle = pick_handle(click_3d);
-                    curr_handle->zbuf = gui.query_Z_buffer(click_2d);
-                    std::cout << "selected handle " << curr_handle->vid << std::endl;
-                    for(const auto & h : handles) m.vert_data(h.vid).color = Color::RED();
-                    m.vert_data(curr_handle->vid).color = Color::YELLOW();
+                    curr_handle = pick_handle(m, click_3d);
+                    zbuf = gui.query_Z_buffer(click_2d);
+                    std::cout << "selected handle " << curr_handle << std::endl;
+                    for(const auto & h : handles) m.vert_data(curr_handle).color = Color::RED();
+                    m.vert_data(curr_handle).color = Color::YELLOW();
                 }
             }
             m.updateGL();
@@ -106,7 +96,7 @@ int main(int argc, char *argv[])
         {
             mode = MOV_HANDLES;
             std::cout << "\nDEFORMATION MODE: you can now move your handles with SHIFT + mouse drag\n" << std::endl;
-            curr_handle = handles.begin(); // make sure curr_h is attached to a valid handle...
+            curr_handle = *handles.begin(); // make sure curr_h is attached to a valid handle...
         }
         else if(key==GLFW_KEY_B)
         {
@@ -128,10 +118,9 @@ int main(int argc, char *argv[])
         if(left && shift)
         {
             vec3d p;
-            gui.unproject(vec2d(x_pos,y_pos),curr_handle->zbuf, p);
-            vec3d delta = p - curr_handle->click_3d;
-            data.bcs[curr_handle->vid] += delta;
-            curr_handle->click_3d = p;
+            gui.unproject(vec2d(x_pos,y_pos),zbuf, p);
+            vec3d delta = p - m.vert(curr_handle);
+            data.bcs[curr_handle] += delta;
             ARAP(m,data);
             m.updateGL();
             gui.draw();
