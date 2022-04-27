@@ -9,12 +9,12 @@ int main(int argc, char **argv)
 {
     using namespace cinolib;
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/torus.obj";
+    std::string s = (argc>=2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/torus.obj";
     DrawableTrimesh<> m_xyz(s.c_str());
 
     HomotopyBasisData data;
     data.globally_shortest = false;
-    data.root = 152; // best for torus
+    data.root = (argc==3) ? atoi(argv[2]) : 152; // best for torus
     data.detach_loops = true;
     data.split_strategy = EDGE_SPLIT_STRATEGY;
     homotopy_basis(m_xyz, data);

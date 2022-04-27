@@ -9,7 +9,7 @@ int main(int argc, char **argv)
     using namespace cinolib;
 
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/torus.obj";
+    std::string s = (argc>=2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/torus.obj";
     DrawableTrimesh<> m(s.c_str());
     m.show_wireframe(false);
 
@@ -17,7 +17,7 @@ int main(int argc, char **argv)
     std::vector<std::vector<uint>> basis;
     std::vector<bool> tree, cotree;
 
-    uint root = 152; // best for torus
+    uint root = (argc==3) ? atoi(argv[2]) : 152; // best for torus
     profiler.push("Homotopy basis");
     double len = homotopy_basis(m, root, basis, tree, cotree);
     profiler.pop();
