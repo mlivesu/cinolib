@@ -40,8 +40,6 @@ int main(int argc, char *argv[])
         if(key==GLFW_KEY_S)
         {
             auto basename = get_file_path(s,true);
-
-            // transfer cluster info to triangle labels
             for(uint i=0; i<n_ccs; ++i)
             {
                 for(uint vid : ccs[i])
