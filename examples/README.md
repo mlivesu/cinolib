@@ -129,6 +129,13 @@ Cmake will automatically detect and download the necessary external libraries (e
 #### 41 - Interactively deform a shape with ARAP
 [<p align="left"><img src="snapshots/41_ARAP_deform.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/40_ARAP_deform)
 
+#### 42 - Split a composite mesh into a single file for each connected component
+[<p align="left"><img src="snapshots/42_connected_components.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/42_connected_components)
+
+#### 43 - Convert a hexhedral mesh into a conforming tetrahedral mesh (command line tool)
+
+
+
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
 
