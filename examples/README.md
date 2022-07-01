@@ -129,7 +129,7 @@ Cmake will automatically detect and download the necessary external libraries (e
 #### 41 - Interactively deform a shape with ARAP
 [<p align="left"><img src="snapshots/41_ARAP_deform.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/40_ARAP_deform)
 
-#### 42 - Split a composite mesh into a single file for each connected component
+#### 42 - Find separate connected components in a composite mesh
 [<p align="left"><img src="snapshots/42_connected_components.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/42_connected_components)
 
 #### 43 - Convert a hexhedral mesh into a conforming tetrahedral mesh (command line tool)
