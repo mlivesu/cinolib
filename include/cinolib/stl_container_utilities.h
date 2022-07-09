@@ -38,6 +38,7 @@
 
 #include <vector>
 #include <chrono>
+#include <string>
 #include <cinolib/cino_inline.h>
 
 namespace cinolib

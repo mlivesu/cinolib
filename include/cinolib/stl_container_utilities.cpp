@@ -34,6 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/stl_container_utilities.h>
+#include <iostream>
 #include <algorithm>
 #include <numeric>
 #include <random>

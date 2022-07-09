@@ -1381,7 +1381,10 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 bool AbstractPolygonMesh<M,V,E,P>::poly_is_boundary(const uint pid) const
 {
-    return (this->adj_p2p(pid).size() < 3);
+    for(uint eid : this->adj_p2e(pid))
+    {
+        if(this->edge_is_boundary(eid)) return true;
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1797,4 +1800,75 @@ void AbstractPolygonMesh<M,V,E,P>::poly_export_element(const uint pid, std::vect
     faces.push_back(f);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::poly_boundary_edges(const uint pid) const
+{
+    std::vector<uint> eids;
+    eids.reserve(3);
+    for(uint eid : this->adj_p2e(pid))
+    {
+        if(this->edge_is_boundary(eid))
+        {
+            eids.push_back(eid);
+        }
+    }
+    return eids;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::poly_inner_edges(const uint pid) const
+{
+    std::vector<uint> eids;
+    eids.reserve(3);
+    for(uint eid : this->adj_p2e(pid))
+    {
+        if(!this->edge_is_boundary(eid))
+        {
+            eids.push_back(eid);
+        }
+    }
+    return eids;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::poly_boundary_verts(const uint pid) const
+{
+    std::vector<uint> vids;
+    vids.reserve(3);
+    for(uint vid : this->adj_p2v(pid))
+    {
+        if(this->vert_is_boundary(vid))
+        {
+            vids.push_back(vid);
+        }
+    }
+    return vids;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+std::vector<uint> AbstractPolygonMesh<M,V,E,P>::poly_inner_verts(const uint pid) const
+{
+    std::vector<uint> vids;
+    vids.reserve(3);
+    for(uint vid : this->adj_p2v(pid))
+    {
+        if(!this->vert_is_boundary(vid))
+        {
+            vids.push_back(vid);
+        }
+    }
+    return vids;
+}
 }
