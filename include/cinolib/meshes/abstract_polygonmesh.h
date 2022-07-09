@@ -192,6 +192,10 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
               std::vector<vec3d>   poly_vlist              (const uint pid) const;
         const std::vector<uint>  & poly_tessellation       (const uint pid) const;
               void                 poly_export_element     (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const override;
+              std::vector<uint>    poly_boundary_edges     (const uint pid) const;
+              std::vector<uint>    poly_inner_edges        (const uint pid) const;
+              std::vector<uint>    poly_boundary_verts     (const uint pid) const;
+              std::vector<uint>    poly_inner_verts        (const uint pid) const;
 };
 
 }
