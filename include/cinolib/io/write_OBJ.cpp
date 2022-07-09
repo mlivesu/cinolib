@@ -37,14 +37,12 @@
 #include <cinolib/color.h>
 #include <cinolib/stl_container_utilities.h>
 #include <cinolib/string_utilities.h>
-
 #include <iostream>
 #include <algorithm>
 #include <map>
 
 namespace cinolib
 {
-
 
 CINO_INLINE
 void write_OBJ(const char                * filename,
@@ -287,6 +285,8 @@ void write_OBJ(const char                           * filename,
     fclose(f_mtl);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 void write_OBJ(const char                           *filename,
                const std::vector<double>            &xyz,
@@ -338,7 +338,6 @@ void write_OBJ(const char                           *filename,
 
     fclose(f_obj);
     fclose(f_mtl);
-
 }
 
 }
