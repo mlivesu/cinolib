@@ -143,10 +143,15 @@ vec3d optimal_build_dir(const DrawableTrimesh<M,V,E,P> & m,
     std::vector<float> scores(opt.n_dirs);
     for(uint i=0; i<opt.n_dirs; ++i)
     {
-        scores[i] = opt.w_height          * h[i] +
-                    opt.w_shadow_area     * a[i] +
-                    opt.w_support_contact * c[i] +
-                    opt.w_support_volume  * v[i];
+        float h_norm = (h_max > h_min) ? (h[i] - h_min)/(h_max - h_min) : 1;
+        float a_norm = (a_max > a_min) ? (a[i] - a_min)/(a_max - a_min) : 1;
+        float c_norm = (c_max > c_min) ? (c[i] - c_min)/(c_max - c_min) : 1;
+        float v_norm = (v_max > v_min) ? (v[i] - v_min)/(v_max - v_min) : 1;
+
+        scores[i] = opt.w_height          * h_norm +
+                    opt.w_shadow_area     * a_norm +
+                    opt.w_support_contact * c_norm +
+                    opt.w_support_volume  * v_norm;
     }
 
     // pick the best dir (lowest score)
