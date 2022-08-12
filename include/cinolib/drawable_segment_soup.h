@@ -90,12 +90,12 @@ class DrawableSegmentSoup: public std::vector<vec3d>, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    private:
-
-        bool  no_depth_test; // render segments always in front, regardless of what's in the GL scene
-        bool  use_gl_lines;  // to speedup rendering (when lots of segments are to be rendered)
-        Color color;
-        float thickness;
+        Color color               = Color::RED(); // default color
+        float thickness           = 1;            // default thickness (automatically scaled by scene size)
+        bool  no_depth_test       = false;        // render segments always in front, regardless of what's in the GL scene
+        bool  use_gl_lines        = false;        // to speedup rendering (when lots of segments are to be rendered)
+        bool  draw_joint_speheres = false;        // insert a sphere in the gap between adjacent segments for higher quality renders
+        bool  joint_sphere_subd  = 2;            // number of subdivisions for joint spheres
 };
 
 }

@@ -44,13 +44,7 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-DrawableSegmentSoup::DrawableSegmentSoup()
-{
-    color         = Color::RED();
-    thickness     = 1.0;
-    use_gl_lines  = false;
-    no_depth_test = false;
-}
+DrawableSegmentSoup::DrawableSegmentSoup() {}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -63,14 +57,17 @@ void DrawableSegmentSoup::draw(const float scene_size) const
     {
         double cylind_rad = scene_size*0.002*thickness;
 
-        for(vec3d p : *this)
-        {
-            draw_sphere(p, cylind_rad, color);
-        }
-
         for(uint i=0; i<size()/2; ++i)
         {
             draw_cylinder(at(2*i+0), at(2*i+1), cylind_rad, cylind_rad, color);
+        }
+
+        if(draw_joint_speheres)
+        {
+            for(vec3d p : *this)
+            {
+                draw_sphere(p, cylind_rad, color, joint_sphere_subd);
+            }
         }
     }
     else
