@@ -12,8 +12,6 @@ int main(int argc, char **argv)
     std::string s = (argc>=2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/torus.obj";
     DrawableTrimesh<> m_xyz(s.c_str());
     DrawableTrimesh<> m_cps;
-    m_xyz.show_wireframe(false);
-    m_cps.show_wireframe(false);
 
     HomotopyBasisData data;
     data.globally_shortest = false;
@@ -41,9 +39,11 @@ int main(int argc, char **argv)
     GLcanvas gui_xyz;
     GLcanvas gui_uvw;
     m_xyz.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
+    m_xyz.show_wireframe(false);
     m_xyz.updateGL();
     gui_xyz.push(&m_xyz);
     m_cps.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
+    m_cps.show_wireframe(false);
     m_cps.updateGL();
     gui_uvw.push(&m_cps);
 
