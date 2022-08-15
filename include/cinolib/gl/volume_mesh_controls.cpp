@@ -696,8 +696,8 @@ void VolumeMeshControls<Mesh>::header_debug(const bool open)
             if(show_vert_normals)
             {
                 vert_normals.clear();
-                vert_normals.set_cheap_rendering(true);
-                vert_normals.set_color(vert_debug_color);
+                vert_normals.use_gl_lines = true;
+                vert_normals.color = vert_debug_color;
                 double l = gui->camera.scene_radius/5.0;
                 for(uint vid=0; vid<m->num_verts(); ++vid)
                 {
@@ -720,8 +720,8 @@ void VolumeMeshControls<Mesh>::header_debug(const bool open)
             if(show_face_normals)
             {
                 face_normals.clear();
-                face_normals.set_cheap_rendering(true);
-                face_normals.set_color(face_debug_color);
+                face_normals.use_gl_lines = true;
+                face_normals.color = face_debug_color;
                 double l = gui->camera.scene_radius/5.0;
                 for(uint fid=0; fid<m->num_faces(); ++fid)
                 {

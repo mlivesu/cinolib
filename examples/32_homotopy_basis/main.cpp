@@ -25,19 +25,19 @@ int main(int argc, char **argv)
 
     // Visualization part
     DrawableSegmentSoup ss_basis;
-    ss_basis.set_cheap_rendering(false);
-    ss_basis.set_color(Color::BLACK());
-    ss_basis.set_thickness(3);
+    ss_basis.use_gl_lines = true;
+    ss_basis.color        = Color::BLACK();
+    ss_basis.thickness    = 3;
 
     DrawableSegmentSoup ss_cotree;
-    ss_cotree.set_cheap_rendering(true);
-    ss_cotree.set_color(Color::BLUE());
-    ss_cotree.set_thickness(3);
+    ss_cotree.use_gl_lines = true;
+    ss_cotree.color        = Color::BLUE();
+    ss_cotree.thickness    = 3;
 
     DrawableSegmentSoup ss_tree;
-    ss_tree.set_cheap_rendering(true);
-    ss_tree.set_color(Color::RED());
-    ss_tree.set_thickness(3);
+    ss_tree.use_gl_lines = true;
+    ss_tree.color        = Color::RED();
+    ss_tree.thickness    = 3;
 
     for(auto loop : basis)
     for(uint i=0; i<loop.size(); ++i)

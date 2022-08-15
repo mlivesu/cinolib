@@ -21,9 +21,9 @@ int main(int argc, char **argv)
     octree.updateGL();
 
     DrawableSegmentSoup ss;
-    ss.set_color(Color::BLUE());
-    ss.set_cheap_rendering(true);
-    ss.set_thickness(5);
+    ss.color = Color::BLUE();
+    ss.use_gl_lines = true;
+    ss.thickness = 5;
 
     GLcanvas gui;
     SurfaceMeshControls<DrawableTrimesh<>> menu(&m,&gui);

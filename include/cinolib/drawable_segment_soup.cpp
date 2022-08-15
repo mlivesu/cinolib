@@ -113,36 +113,4 @@ void DrawableSegmentSoup::pop_seg()
     pop_back();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void DrawableSegmentSoup::set_cheap_rendering(const bool b)
-{
-    use_gl_lines = b;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void DrawableSegmentSoup::set_always_in_front(const bool b)
-{
-    no_depth_test = b;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void DrawableSegmentSoup::set_color(const Color & c)
-{
-    color = c;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void DrawableSegmentSoup::set_thickness(float t)
-{
-    thickness = t;
-}
-
 }
