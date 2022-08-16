@@ -47,7 +47,6 @@ CINO_INLINE
 void canonical_polygonal_schema(      Trimesh<M,V,E,P>                           & m_in,
                                 const HomotopyBasisData                          & basis,
                                       Trimesh<M,V,E,P>                           & m_out,
-                                      std::unordered_map<uint,std::vector<uint>> & v_map,
                                 const int                                          laplacian_mode)
 {
     std::cout << "Canonical Polygonal Schema" << std::endl;
@@ -69,6 +68,8 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>                          
             m_in.vert_data(vid).label = lid;
         }
     }
+    m_in.vert_data(basis.root).label = -1;
+    std::unordered_map<uint,std::vector<uint>> v_map;
     cut_mesh_along_marked_edges(m_in, v_map);
 
     // detect all the 4g copies of the basis' root
@@ -134,19 +135,6 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>                          
     m_out.vector_verts() = harmonic_map_3d(m_in, dirichlet_bcs, 1, laplacian_mode);
     m_out.update_bbox();
     m_out.update_normals();
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
-void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
-                                const HomotopyBasisData & basis,
-                                      Trimesh<M,V,E,P>  & m_out,
-                                const int                 laplacian_mode)
-{
-    std::unordered_map<uint,std::vector<uint>> v_map;
-    canonical_polygonal_schema(m_in, basis, m_out, v_map, laplacian_mode);
 }
 
 }
