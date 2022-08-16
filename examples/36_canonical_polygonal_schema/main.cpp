@@ -11,15 +11,15 @@ int main(int argc, char **argv)
     using namespace cinolib;
 
     std::string s = (argc>=2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/torus.obj";
-    DrawableTrimesh<> m_xyz(s.c_str());
-    DrawableTrimesh<> m_cps;
+    DrawableTrimesh<> obj(s.c_str());
+    DrawableTrimesh<> cps;
 
-    DrawableSegmentSoup cuts_xyz;
-    DrawableSegmentSoup cuts_cps;
-    cuts_xyz.draw_joint_speheres = true;
-    cuts_xyz.joint_sphere_subd = 2;
-    cuts_cps.draw_joint_speheres = true;
-    cuts_cps.joint_sphere_subd = 2;
+    DrawableSegmentSoup obj_loops;
+    DrawableSegmentSoup cps_edges;
+    obj_loops.draw_joint_speheres = true;
+    obj_loops.joint_sphere_subd = 2;
+    cps_edges.draw_joint_speheres = true;
+    cps_edges.joint_sphere_subd = 2;
 
     HomotopyBasisData data;
     data.globally_shortest = false;
@@ -41,68 +41,96 @@ int main(int argc, char **argv)
 
     auto CPS = [&]()
     {
-        homotopy_basis(m_xyz, data);
-        canonical_polygonal_schema(m_xyz, data, m_cps);
+        homotopy_basis(obj, data);
+        canonical_polygonal_schema(obj, data, cps);
         std::cout << data << std::endl;
-        update_cuts(m_xyz,cuts_xyz);
-        update_cuts(m_cps,cuts_cps);
+        update_cuts(obj,obj_loops);
+        update_cuts(cps,cps_edges);
         // update UV
-        auto xyz = m_xyz.vector_verts();
-        m_xyz.vector_verts() = m_cps.vector_verts();
-        m_xyz.copy_xyz_to_uvw(UV_param);
-        m_cps.copy_xyz_to_uvw(UV_param);
-        m_xyz.vector_verts() = xyz;        
+        auto xyz = obj.vector_verts();
+        obj.vector_verts() = cps.vector_verts();
+        obj.copy_xyz_to_uvw(UV_param);
+        cps.copy_xyz_to_uvw(UV_param);
+        obj.vector_verts() = xyz;
+        // color code basis loops/CPS edges...
+        obj_loops.clear();
+        cps_edges.clear();
+        obj_loops.colors.clear();
+        cps_edges.colors.clear();
+        for(uint eid=0; eid<obj.num_edges(); ++eid)
+        {
+            if(obj.edge_is_boundary(eid))
+            {
+                uint v0 = obj.edge_vert_id(eid,0);
+                uint v1 = obj.edge_vert_id(eid,1);
+                int loop_id = obj.vert_data(v0).label;
+                if(loop_id<0) loop_id = obj.vert_data(v1).label;
+                Color c = Color::scatter(data.loops.size(),loop_id,1,1);
+                obj_loops.push_seg(obj.vert(v0),obj.vert(v1),c);
+            }
+        }
+        for(uint eid=0; eid<cps.num_edges(); ++eid)
+        {
+            if(cps.edge_is_boundary(eid))
+            {
+                uint v0 = cps.edge_vert_id(eid,0);
+                uint v1 = cps.edge_vert_id(eid,1);
+                int loop_id = cps.vert_data(v0).label;
+                if(loop_id<0) loop_id = cps.vert_data(v1).label;
+                Color c = Color::scatter(data.loops.size(),loop_id,1,1);
+                cps_edges.push_seg(cps.vert(v0),cps.vert(v1),c);
+            }
+        }
     };
 
     CPS();
 
-    GLcanvas gui_xyz;
+    GLcanvas gui_obj;
     GLcanvas gui_cps;
-    m_xyz.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
-    m_xyz.show_wireframe(false);
-    m_xyz.updateGL();
-    gui_xyz.push(&m_xyz);
-    gui_xyz.push(&cuts_xyz);
-    m_cps.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
-    m_cps.show_wireframe(false);
-    m_cps.updateGL();
-    gui_cps.push(&m_cps);
-    gui_cps.push(&cuts_cps);
+    obj.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
+    obj.show_marked_edge(false);
+    obj.show_wireframe(false);
+    obj.updateGL();
+    gui_obj.push(&obj);
+    gui_obj.push(&obj_loops);
+    cps.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
+    cps.show_marked_edge(false);
+    cps.show_wireframe(false);
+    cps.updateGL();
+    gui_cps.push(&cps);
+    gui_cps.push(&cps_edges);
 
-    SurfaceMeshControls<DrawableTrimesh<>> menu_xyz(&m_xyz,&gui_xyz,"OBJ space");
-    SurfaceMeshControls<DrawableTrimesh<>> menu_cps(&m_cps,&gui_xyz,"CPS space");
-    gui_xyz.push(&menu_xyz);
-    gui_xyz.push(&menu_cps);
+    SurfaceMeshControls<DrawableTrimesh<>> menu_xyz(&obj,&gui_obj,"OBJ space");
+    SurfaceMeshControls<DrawableTrimesh<>> menu_cps(&cps,&gui_obj,"CPS space");
+    gui_obj.push(&menu_xyz);
+    gui_obj.push(&menu_cps);
 
-    gui_xyz.callback_mouse_left_click = [&](int modifiers) -> bool
+    gui_obj.callback_mouse_left_click = [&](int modifiers) -> bool
     {
         if(modifiers & GLFW_MOD_SHIFT)
         {
             vec3d p;
-            vec2d click = gui_xyz.cursor_pos();
-            if(gui_xyz.unproject(click, p)) // transform click in a 3d point
+            vec2d click = gui_obj.cursor_pos();
+            if(gui_obj.unproject(click, p)) // transform click in a 3d point
             {
-                m_xyz.load(s.c_str());
+                obj.load(s.c_str());
                 data.globally_shortest = false;
-                data.root = m_xyz.pick_vert(p);
+                data.root = obj.pick_vert(p);
                 std::cout << "Center Homotopy Basis at Vertex ID " << data.root << std::endl;
                 CPS();
-                m_xyz.updateGL();
+                obj.updateGL();
             }
         }
         return false;
     };
 
     // allow users to interactively edit cut thickness and color
-    gui_xyz.callback_app_controls = [&]()
+    gui_obj.callback_app_controls = [&]()
     {
         ImGui::Text("Cut Thicknesses");
-        ImGui::SliderFloat("#thickobj", &cuts_xyz.thickness,0,30);
-        ImGui::SliderFloat("#thickcps", &cuts_cps.thickness,0,30);
-        ImGui::Text("Cut Colors");
-        ImGui::ColorPicker4("#colobj", cuts_xyz.default_color.rgba, menu_xyz.color_edit_flags);
-        ImGui::ColorPicker4("#colcps", cuts_cps.default_color.rgba, menu_xyz.color_edit_flags);
+        ImGui::SliderFloat("#thickobj", &obj_loops.thickness,0,30);
+        ImGui::SliderFloat("#thickcps", &cps_edges.thickness,0,30);
     };
 
-    return gui_xyz.launch({&gui_cps});
+    return gui_obj.launch({&gui_cps});
 }
