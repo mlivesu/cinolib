@@ -78,17 +78,19 @@ class DrawableSegmentSoup: public std::vector<vec3d>, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        void push_seg(const vec3d v0, const vec3d v1, const Color & color);
         void push_seg(const vec3d v0, const vec3d v1);
         void pop_seg();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        Color color               = Color::RED(); // default color
-        float thickness           = 1;            // default thickness (automatically scaled by scene size)
-        bool  no_depth_test       = false;        // render segments always in front, regardless of what's in the GL scene
-        bool  use_gl_lines        = false;        // to speedup rendering (when lots of segments are to be rendered)
-        bool  draw_joint_speheres = false;        // insert a sphere in the gap between adjacent segments for higher quality renders
-        bool  joint_sphere_subd   = 1;            // number of subdivisions for joint spheres
+        std::vector<Color>          colors;
+        Color default_color       = Color::RED();
+        float thickness           = 1;            // automatically scaled by scene size
+        bool  no_depth_test       = false;        // disable depth test while rendering
+        bool  use_gl_lines        = false;        // cheaper rendering using GL_LINES instead of meshed cylinders
+        bool  draw_joint_speheres = false;        // fills the gap between adjacent segments with a small sphere
+        bool  joint_sphere_subd   = 1;            // snumber of subdivisions for joint spheres
 };
 
 }

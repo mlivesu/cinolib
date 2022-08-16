@@ -59,14 +59,12 @@ void DrawableSegmentSoup::draw(const float scene_size) const
 
         for(uint i=0; i<size()/2; ++i)
         {
-            draw_cylinder(at(2*i+0), at(2*i+1), cylind_rad, cylind_rad, color);
-        }
+            const Color & c = (colors.size()>i) ? colors.at(i) : default_color;
+            draw_cylinder(at(2*i+0), at(2*i+1), cylind_rad, cylind_rad, c);
 
-        if(draw_joint_speheres)
-        {
-            for(vec3d p : *this)
+            if(draw_joint_speheres)
             {
-                draw_sphere(p, cylind_rad, color, joint_sphere_subd);
+                draw_sphere(at(2*i+0), cylind_rad, c, joint_sphere_subd);
             }
         }
     }
@@ -76,9 +74,10 @@ void DrawableSegmentSoup::draw(const float scene_size) const
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
         glDisable(GL_LIGHTING);
-        glColor3fv(color.rgba);
         for(uint i=0; i<size()/2; ++i)
         {
+            const Color & c = (colors.size()>i) ? colors.at(i) : default_color;
+            glColor3fv(c.rgba);
             vec3d a = at(2*i+0);
             vec3d b = at(2*i+1);
             glBegin(GL_LINES);
@@ -99,6 +98,19 @@ void DrawableSegmentSoup::draw(const float scene_size) const
 CINO_INLINE
 void DrawableSegmentSoup::push_seg(const vec3d v0, const vec3d v1)
 {
+    push_back(v0);
+    push_back(v1);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableSegmentSoup::push_seg(const vec3d v0, const vec3d v1, const Color & color)
+{
+    // if it is the first non default color, fill
+    uint n_segs = this->size()/2;
+    if(colors.size()<n_segs) colors.resize(n_segs,default_color);
+    colors.push_back(color);
     push_back(v0);
     push_back(v1);
 }

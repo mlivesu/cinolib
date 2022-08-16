@@ -100,8 +100,8 @@ int main(int argc, char **argv)
         ImGui::SliderFloat("#thickobj", &cuts_xyz.thickness,0,30);
         ImGui::SliderFloat("#thickcps", &cuts_cps.thickness,0,30);
         ImGui::Text("Cut Colors");
-        ImGui::ColorPicker4("#colobj", cuts_xyz.color.rgba, menu_xyz.color_edit_flags);
-        ImGui::ColorPicker4("#colcps", cuts_cps.color.rgba, menu_xyz.color_edit_flags);
+        ImGui::ColorPicker4("#colobj", cuts_xyz.default_color.rgba, menu_xyz.color_edit_flags);
+        ImGui::ColorPicker4("#colcps", cuts_cps.default_color.rgba, menu_xyz.color_edit_flags);
     };
 
     return gui_xyz.launch({&gui_cps});

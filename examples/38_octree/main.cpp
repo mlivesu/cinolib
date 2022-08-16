@@ -21,8 +21,8 @@ int main(int argc, char **argv)
     octree.updateGL();
 
     DrawableSegmentSoup ss;
-    ss.color = Color::BLUE();
-    ss.use_gl_lines = true;
+    ss.default_color = Color::BLUE();
+    ss.use_gl_lines  = true;
     ss.thickness = 5;
 
     GLcanvas gui;
