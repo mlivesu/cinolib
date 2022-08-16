@@ -60,9 +60,9 @@ void DrawableSegmentSoup::draw(const float scene_size) const
         for(uint i=0; i<size()/2; ++i)
         {
             const Color & c = (colors.size()>i) ? colors.at(i) : default_color;
-            draw_cylinder(at(2*i+0), at(2*i+1), cylind_rad, cylind_rad, c);
+            draw_cylinder(at(2*i+0), at(2*i+1), cylind_rad, cylind_rad, c, segment_n_sides);
 
-            if(draw_joint_speheres)
+            if(draw_joint_spheres)
             {
                 draw_sphere(at(2*i+0), cylind_rad, c, joint_sphere_subd);
             }

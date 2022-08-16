@@ -89,8 +89,9 @@ class DrawableSegmentSoup: public std::vector<vec3d>, public DrawableObject
         float thickness           = 1;            // automatically scaled by scene size
         bool  no_depth_test       = false;        // disable depth test while rendering
         bool  use_gl_lines        = false;        // cheaper rendering using GL_LINES instead of meshed cylinders
-        bool  draw_joint_speheres = false;        // fills the gap between adjacent segments with a small sphere
-        bool  joint_sphere_subd   = 1;            // snumber of subdivisions for joint spheres
+        bool  draw_joint_spheres  = false;        // fills the gap between adjacent segments with a small sphere
+        bool  joint_sphere_subd   = 1;            // number of subdivisions for joint spheres
+        bool  segment_n_sides     = 16;           // number of sides for the segment cross-section
 };
 
 }
