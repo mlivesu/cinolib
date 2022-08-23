@@ -16,9 +16,9 @@ int main(int argc, char **argv)
 
     DrawableSegmentSoup obj_loops;
     DrawableSegmentSoup cps_edges;
-    obj_loops.draw_joint_speheres = true;
+    obj_loops.draw_joint_spheres = true;
     obj_loops.joint_sphere_subd = 2;
-    cps_edges.draw_joint_speheres = true;
+    cps_edges.draw_joint_spheres = true;
     cps_edges.joint_sphere_subd = 2;
 
     HomotopyBasisData data;
