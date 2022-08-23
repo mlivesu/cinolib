@@ -27,25 +27,11 @@ int main(int argc, char **argv)
     data.detach_loops = true;
     data.split_strategy = EDGE_SPLIT_STRATEGY;
 
-    auto update_cuts = [](DrawableTrimesh<> & m, DrawableSegmentSoup & ss)
-    {
-        ss.clear();
-        for(uint eid=0; eid<m.num_edges(); ++eid)
-        {
-            if(m.edge_is_boundary(eid))
-            {
-                ss.push_seg(m.edge_vert(eid,0), m.edge_vert(eid,1));
-            }
-        }
-    };
-
     auto CPS = [&]()
     {
         homotopy_basis(obj, data);
         canonical_polygonal_schema(obj, data, cps);
         std::cout << data << std::endl;
-        update_cuts(obj,obj_loops);
-        update_cuts(cps,cps_edges);
         // update UV
         auto xyz = obj.vector_verts();
         obj.vector_verts() = cps.vector_verts();
