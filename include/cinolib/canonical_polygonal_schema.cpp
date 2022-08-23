@@ -44,10 +44,10 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void canonical_polygonal_schema(      Trimesh<M,V,E,P>                           & m_in,
-                                const HomotopyBasisData                          & basis,
-                                      Trimesh<M,V,E,P>                           & m_out,
-                                const int                                          laplacian_mode)
+void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
+                                const HomotopyBasisData & basis,
+                                      Trimesh<M,V,E,P>  & m_out,
+                                const int                 laplacian_mode)
 {
     std::cout << "Canonical Polygonal Schema" << std::endl;
 
