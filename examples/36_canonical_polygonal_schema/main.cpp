@@ -53,17 +53,6 @@ int main(int argc, char **argv)
                 if(loop_id<0) loop_id = obj.vert_data(v1).label;
                 Color c = Color::scatter(data.loops.size(),loop_id,1,1);
                 obj_loops.push_seg(obj.vert(v0),obj.vert(v1),c);
-            }
-        }
-        for(uint eid=0; eid<cps.num_edges(); ++eid)
-        {
-            if(cps.edge_is_boundary(eid))
-            {
-                uint v0 = cps.edge_vert_id(eid,0);
-                uint v1 = cps.edge_vert_id(eid,1);
-                int loop_id = cps.vert_data(v0).label;
-                if(loop_id<0) loop_id = cps.vert_data(v1).label;
-                Color c = Color::scatter(data.loops.size(),loop_id,1,1);
                 cps_edges.push_seg(cps.vert(v0),cps.vert(v1),c);
             }
         }
