@@ -50,8 +50,8 @@ make
 Note that for the rendering part CinoLib uses [GLFW](https://www.glfw.org), which will be automatically installed and linked by the script `cinolib-config.cmake`, contained in the main directory of the library. The same script can automatically download and install any other external dependency, meaning that if you want to access a functionality that depends on some external library `XXX`, all you have to do is setting to `ON` a cmake variable that looks like `CINOLIB_USES_XXX`. 
 Valid options are:
 * `CINOLIB_USES_OPENGL_GLFW_IMGUI`, used for rendering with OpenGL
-* `CINOLIB_USES_OPENGL_TRIANGLE`, used for polygon triangulation
-* `CINOLIB_USES_OPENGL_TETGEN`, used for tetrahedralization
+* `CINOLIB_USES_TRIANGLE`, used for polygon triangulation
+* `CINOLIB_USES_TETGEN`, used for tetrahedralization
 * `CINOLIB_USES_SHEWCHUK_PREDICATES`, used for exact geometric tests on input points
 * `CINOLIB_USES_INDIRECT_PREDICATES`, used for exact geometric tests on implicit points
 * `CINOLIB_USES_GRAPH_CUT`, used for graph clustering
