@@ -98,6 +98,15 @@ class DrawableHexmesh : public AbstractDrawablePolyhedralMesh<Hexmesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        explicit DrawableHexmesh(const std::vector<vec3d>             & verts,
+                                 const std::vector<std::vector<uint>> & polys)
+        : Hexmesh<M,V,E,F,P>(verts, polys)
+        {
+            this->init_drawable_stuff();
+        }
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         ObjectType object_type() const { return DRAWABLE_HEXMESH; }
 };
 
