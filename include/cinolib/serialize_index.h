@@ -37,24 +37,34 @@
 #define CINO_SERIALIZE_INDEX
 
 #include <cinolib/cino_inline.h>
-#include <cinolib/ipair.h>
+#include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {
 
 CINO_INLINE
-uint serialize_2D_index(const uint r, const uint c, const uint n_cols);
+uint serialize_2D_index(const uint i, const uint j, const uint nj);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-ipair deserialize_2D_index(const uint i, const uint n_cols);
+vec2i deserialize_2D_index(const uint ij, const uint nj);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+uint serialize_3D_index(const uint i, const uint j, const uint k, const uint nj, const uint nk);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3i deserialize_3D_index(const uint ijk, const uint nj, const uint nk);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint N, class GridPoint>
 CINO_INLINE
-unsigned long int serialize_nD_index(const std::array<uint,N> & dim_extent, const GridPoint & p);
+uint serialize_nD_index(const std::array<uint,N> & dim_extent, const GridPoint & p);
 
 }
 

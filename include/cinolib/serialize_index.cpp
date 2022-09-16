@@ -40,38 +40,58 @@ namespace cinolib
 {
 
 CINO_INLINE
-uint serialize_2D_index(const uint r, const uint c, const uint n_cols)
+uint serialize_2D_index(const uint i, const uint j, const uint nj)
 {
-    return r * n_cols + c;
+    return i*nj + j;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-ipair deserialize_2D_index(const uint i, const uint n_cols)
+vec2i deserialize_2D_index(const uint ij, const uint nj)
 {
-    return std::make_pair(i/n_cols, i%n_cols);
+    return vec2i(ij/nj, ij%nj);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+uint serialize_3D_index(const uint i, const uint j, const uint k, const uint nj, const uint nk)
+{
+    return i*nk*nj + j*nk + k;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3i deserialize_3D_index(const uint ijk, const uint nj, const uint nk)
+{
+    uint njk = nj*nk;
+    uint i   = ijk/njk;
+    uint ij  = ijk%njk;
+    uint j   = ij/nk;
+    uint k   = ij%nk;
+    return vec3i(i,j,k);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<uint N, class GridPoint>
 CINO_INLINE
-unsigned long int serialize_nD_index(const std::array<uint,N> & dim_extent, const GridPoint & p)
+uint serialize_nD_index(const std::array<uint,N> & dim_extent, const GridPoint & p)
 {
-    unsigned long int index=0;
-
+    uint index=0;
     if(p[N-1]>=0)
     {
-       index=(unsigned long int)p[N-1];
+       index=(uint)p[N-1];
        if(index>=dim_extent[N-1]) index=dim_extent[N-1]-1;
     }
-    for(unsigned int i=N-1; i>0; --i)
+    for(uint i=N-1; i>0; --i)
     {
        index*=dim_extent[i-1];
        if(p[i-1]>=0)
        {
-          unsigned int j=(int)p[i-1];
+          uint j= (uint)p[i-1];
           if(j>=dim_extent[i-1]) j=dim_extent[i-1]-1;
           index+=j;
        }
