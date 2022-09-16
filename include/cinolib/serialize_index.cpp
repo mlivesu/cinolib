@@ -68,9 +68,9 @@ vec3i deserialize_3D_index(const uint ijk, const uint nj, const uint nk)
 {
     uint njk = nj*nk;
     uint i   = ijk/njk;
-    uint ij  = ijk%njk;
-    uint j   = ij/nk;
-    uint k   = ij%nk;
+    uint jk  = ijk%njk;
+    uint j   = jk/nk;
+    uint k   = jk%nk;
     return vec3i(i,j,k);
 }
 
