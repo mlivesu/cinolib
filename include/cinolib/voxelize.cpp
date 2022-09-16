@@ -38,7 +38,6 @@
 #include <cinolib/octree.h>
 #include <cinolib/clamp.h>
 
-
 namespace cinolib
 {
 
@@ -60,32 +59,21 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
     vec3d O = g.bbox.min;
     vec3d u(g.len,g.len,g.len);
     std::vector<uint> border_voxels;
-   // border_voxels.reserve(6*g.dim.max_entry()); // reserve memory
-    //int flood_seed = -1;
     Octree o;
     o.build_from_mesh_polys(m);
-    //for(int i=0; i<g.dim[0]; ++i)
-    //for(int j=0; j<g.dim[1]; ++j)
-    //for(int k=0; k<g.dim[2]; ++k)
     PARALLEL_FOR(0, size, 100000, [&](uint ijk)
     {
         vec3i tmp = deserialize_3D_index(ijk, g.dim[1], g.dim[2]);
         uint i = tmp[0];
         uint j = tmp[1];
         uint k = tmp[2];
-        g.voxels[ijk] = VOXEL_UNMARKED;
         vec3d d(g.len*i,g.len*j,g.len*k);
         vec3d min = O+d;
         vec3d max = min+u;
         AABB voxel(min,max);
         std::unordered_set<uint> elems;
         o.intersects_box(voxel,elems);
-        if(!elems.empty())
-        {
-            g.voxels[ijk] = VOXEL_BOUNDARY;
-           // border_voxels.push_back(ijk);
-        }
-       // else if(flood_seed<0 && (i==0 || j==0 || k==0)) flood_seed = int(ijk);
+        g.voxels[ijk] = (elems.empty()) ? VOXEL_UNMARKED : VOXEL_BOUNDARY;
     });
 
 //    // flood the outside
