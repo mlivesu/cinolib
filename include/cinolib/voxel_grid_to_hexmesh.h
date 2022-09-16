@@ -37,6 +37,7 @@
 #define CINO_VOXEL_GRID_TO_HEXMESH_H
 
 #include <cinolib/voxelize.h>
+#include <cinolib/meshes/hexmesh.h>
 
 namespace cinolib
 {
