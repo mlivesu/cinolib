@@ -71,9 +71,16 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
         vec3d min = O+d;
         vec3d max = min+u;
         AABB voxel(min,max);
+        bool boundary = false;
         std::unordered_set<uint> elems;
         o.intersects_box(voxel,elems);
-        g.voxels[ijk] = (elems.empty()) ? VOXEL_UNMARKED : VOXEL_BOUNDARY;
+        for(uint id : elems)
+        {
+            // MOVE THIS PART INSIDE THE OCTREE LOGIC...
+            const Triangle *t = dynamic_cast<Triangle*>(o.items.at(id));
+            if(voxel.intersects_triangle(t->v)) boundary = true;
+        }
+        g.voxels[ijk] = (boundary) ? VOXEL_BOUNDARY : VOXEL_UNMARKED;
     });
 
 //    // flood the outside
