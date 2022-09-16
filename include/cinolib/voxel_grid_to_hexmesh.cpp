@@ -63,7 +63,7 @@ void voxel_grid_to_hexmesh(const VoxelGrid          & g,
                 uint v_ijk = serialize_3D_index(vox_ijk[0] + REFERENCE_HEX_VERTS[i][0],
                                                 vox_ijk[1] + REFERENCE_HEX_VERTS[i][1],
                                                 vox_ijk[2] + REFERENCE_HEX_VERTS[i][2],
-                                                g.dim[1],g.dim[2]);
+                                                g.dim[1]+1,g.dim[2]+1);
                 if(vert_map[v_ijk]<0)
                 {
                     vec3d p;
