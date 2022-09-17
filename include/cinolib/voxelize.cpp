@@ -60,20 +60,13 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
     // non empty intersection with the input mesh elements
     uint size = g.dim[0]*g.dim[1]*g.dim[2];
     g.voxels = new int[size];
-    vec3d O = g.bbox.min;
-    vec3d u(g.len,g.len,g.len);
     Octree o;
     o.build_from_mesh_polys(m);
-    PARALLEL_FOR(0, size, 100000, [&](uint ijk)
+    int flood_seed = -1;
+    PARALLEL_FOR(0, size, 100000, [&](uint index)
     {
-        vec3u tmp = deserialize_3D_index(ijk, g.dim[1], g.dim[2]);
-        uint i = tmp[0];
-        uint j = tmp[1];
-        uint k = tmp[2];
-        vec3d d(g.len*i,g.len*j,g.len*k);
-        vec3d min = O+d;
-        vec3d max = min+u;
-        AABB voxel(min,max);
+        vec3u ijk = deserialize_3D_index(index, g.dim[1], g.dim[2]);
+        AABB voxel = voxel_bbox(g,ijk.ptr());
         bool boundary = false;
         std::unordered_set<uint> elems;
         o.intersects_box(voxel,elems);
@@ -83,7 +76,8 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
             const Triangle *t = dynamic_cast<Triangle*>(o.items.at(id));
             if(voxel.intersects_triangle(t->v)) boundary = true;
         }
-        g.voxels[ijk] = (boundary) ? VOXEL_BOUNDARY : VOXEL_UNKNOWN;
+        g.voxels[index] = (boundary) ? VOXEL_BOUNDARY : VOXEL_UNKNOWN;
+        if(!boundary && (ijk[0]==0 || ijk[1]==0 || ijk[2]==0)) flood_seed = index;
     });
 
 //    // flood the outside
@@ -160,8 +154,6 @@ void voxelize(const std::function<double(const vec3d & p)> & f,
     // on how function f evaluates at the voxel corners
     uint size = g.dim[0]*g.dim[1]*g.dim[2];
     g.voxels = new int[size];
-    vec3d O = g.bbox.min;
-    vec3d u(g.len,g.len,g.len);
     PARALLEL_FOR(0, size, 100000, [&](uint index)
     {
         vec3u ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);

@@ -85,5 +85,23 @@ vec3d voxel_corner_xyz(const VoxelGrid & g,
     return voxel_corner_xyz(g, ijk.ptr(), corner);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+AABB voxel_bbox(const VoxelGrid & g,
+                const uint        ijk[3])
+{
+    return AABB(voxel_corner_xyz(g,ijk,0),
+                voxel_corner_xyz(g,ijk,6));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+AABB voxel_bbox(const VoxelGrid & g,
+                const uint        index)
+{
+    vec3u ijk = deserialize_3D_index(index, g.dim[1], g.dim[2]);
+    return voxel_bbox(g, ijk.ptr());
+}
+
 }
 

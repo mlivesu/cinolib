@@ -90,6 +90,17 @@ CINO_INLINE
 vec3d voxel_corner_xyz(const VoxelGrid & g,
                        const uint        index,
                        const uint        corner);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+AABB voxel_bbox(const VoxelGrid & g,
+                const uint        ijk[3]);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+AABB voxel_bbox(const VoxelGrid & g,
+                const uint        index);
+
 }
 
 #ifndef  CINO_STATIC_LIB
