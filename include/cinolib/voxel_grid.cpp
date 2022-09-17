@@ -33,41 +33,57 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_VOXELIZE_H
-#define CINO_VOXELIZE_H
-
 #include <cinolib/voxel_grid.h>
-#include <cinolib/meshes/abstract_polygonmesh.h>
+#include <cinolib/standard_elements_tables.h>
+#include <cinolib/serialize_index.h>
 
 namespace cinolib
 {
 
-// Voxelizes an object described by a surface mesh. Voxels will be deemed
-// as being entirely inside, outside or traversed by the boundary of the
-// input surface mesh, which can contain triangles, quads or general polygons.
-//
-template<class M, class V, class E, class P>
 CINO_INLINE
-void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
-              const uint                           max_voxels_per_side,
-                    VoxelGrid                    & g);
-
+uint voxel_corner_index(const VoxelGrid & g,
+                        const uint        ijk[3],
+                        const uint        off)
+{
+    return serialize_3D_index(ijk[0] + REFERENCE_HEX_VERTS[off][0],
+                              ijk[1] + REFERENCE_HEX_VERTS[off][1],
+                              ijk[2] + REFERENCE_HEX_VERTS[off][2],
+                              g.dim[1]+1, g.dim[2]+1);
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// Voxelizes an object described by an analytic function f. Voxels will be
-// deemed as being entirely on the positive halfspace, negative halfspace
-// or traversed by the zero level set of the function f.
-//
 CINO_INLINE
-void voxelize(const std::function<double(const vec3d & p)> & f,
-              const AABB                                   & volume,
-              const uint                                     max_voxels_per_side,
-                    VoxelGrid                              & g);
+uint voxel_corner_index(const VoxelGrid & g,
+                        const uint        index,
+                        const uint        off)
+{
+    vec3u ijk = deserialize_3D_index(index, g.dim[1], g.dim[2]);
+    return voxel_corner_index(g, ijk.ptr(), off);
 }
 
-#ifndef  CINO_STATIC_LIB
-#include "voxelize.cpp"
-#endif
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-#endif // CINO_VOXELIZE_H
+CINO_INLINE
+vec3d voxel_corner_xyz(const VoxelGrid & g,
+                       const uint        ijk[3],
+                       const uint        off)
+{
+    return vec3d(g.bbox.min[0] + g.len*ijk[0] + g.len*REFERENCE_HEX_VERTS[off][0],
+                 g.bbox.min[1] + g.len*ijk[1] + g.len*REFERENCE_HEX_VERTS[off][1],
+                 g.bbox.min[2] + g.len*ijk[2] + g.len*REFERENCE_HEX_VERTS[off][2]);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d voxel_corner_xyz(const VoxelGrid & g,
+                       const uint        index,
+                       const uint        off)
+{
+    vec3u ijk = deserialize_3D_index(index, g.dim[1], g.dim[2]);
+    return voxel_corner_xyz(g, ijk.ptr(), off);
+}
+
+}
+

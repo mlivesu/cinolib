@@ -45,9 +45,6 @@ namespace cinolib
 // as being entirely inside, outside or traversed by the boundary of the
 // input surface mesh, which can contain triangles, quads or general polygons.
 //
-// Memory allocation is performed internally. It is up the the user to
-// release the memory when no longer needed (calling delete[] g.voxels)
-//
 template<class M, class V, class E, class P>
 CINO_INLINE
 void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_side, VoxelGrid & g)
@@ -69,7 +66,7 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
     o.build_from_mesh_polys(m);
     PARALLEL_FOR(0, size, 100000, [&](uint ijk)
     {
-        vec3i tmp = deserialize_3D_index(ijk, g.dim[1], g.dim[2]);
+        vec3u tmp = deserialize_3D_index(ijk, g.dim[1], g.dim[2]);
         uint i = tmp[0];
         uint j = tmp[1];
         uint k = tmp[2];
@@ -101,16 +98,16 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
 //            q.pop();
 //            assert(g.voxels[index]==VOXEL_OUTSIDE);
 
-//            static std::vector<vec3i> neighborhood =
+//            static std::vector<vec3u> neighborhood =
 //            {
-//                vec3i(-1,0,0),
-//                vec3i(+1,0,0),
-//                vec3i(0,-1,0),
-//                vec3i(0,+1,0),
-//                vec3i(0,0,-1),
-//                vec3i(0,0,+1),
+//                vec3u(-1,0,0),
+//                vec3u(+1,0,0),
+//                vec3u(0,-1,0),
+//                vec3u(0,+1,0),
+//                vec3u(0,0,-1),
+//                vec3u(0,0,+1),
 //            };
-//            vec3i ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);
+//            vec3u ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);
 //            for(auto delta : neighborhood)
 //            {
 //                auto nbr = ijk + delta;
@@ -146,14 +143,11 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
 // deemed as being entirely on the positive halfspace, negative halfspace
 // or traversed by the zero level set of the function f.
 //
-// Memory allocation is performed internally. It is up the the user to
-// release the memory when no longer needed (calling delete[] g.voxels)
-//
 CINO_INLINE
-void voxelize(const std::function<double(const vec3d &p)> & f,
-              const AABB                                  & volume,
-              const uint                                    max_voxels_per_side,
-                    VoxelGrid                             & g)
+void voxelize(const std::function<double(const vec3d & p)> & f,
+              const AABB                                   & volume,
+              const uint                                     max_voxels_per_side,
+                    VoxelGrid                              & g)
 {
     // determine grid size across all dimensions
     g.bbox = volume;
@@ -170,16 +164,13 @@ void voxelize(const std::function<double(const vec3d &p)> & f,
     vec3d u(g.len,g.len,g.len);
     PARALLEL_FOR(0, size, 100000, [&](uint index)
     {
-        vec3i ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);
+        vec3u ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);
         bool negative = false;
         bool positive = false;
         bool zero     = false;
-        for(uint i=0; i<8; ++i)
+        for(uint off=0; off<8; ++off)
         {
-            vec3d p;
-            p[0] = g.bbox.min[0] + g.len*ijk[0] + g.len*REFERENCE_HEX_VERTS[i][0];
-            p[1] = g.bbox.min[1] + g.len*ijk[1] + g.len*REFERENCE_HEX_VERTS[i][1];
-            p[2] = g.bbox.min[2] + g.len*ijk[2] + g.len*REFERENCE_HEX_VERTS[i][2];
+            vec3d p = voxel_corner_xyz(g,ijk.ptr(),off);
             double fp = f(p);
             positive |= (fp>0);
             negative |= (fp<0);

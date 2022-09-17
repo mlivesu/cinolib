@@ -33,41 +33,66 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_VOXELIZE_H
-#define CINO_VOXELIZE_H
+#ifndef CINO_VOXEL_GRID_H
+#define CINO_VOXEL_GRID_H
 
-#include <cinolib/voxel_grid.h>
 #include <cinolib/meshes/abstract_polygonmesh.h>
 
 namespace cinolib
 {
 
-// Voxelizes an object described by a surface mesh. Voxels will be deemed
-// as being entirely inside, outside or traversed by the boundary of the
-// input surface mesh, which can contain triangles, quads or general polygons.
-//
-template<class M, class V, class E, class P>
-CINO_INLINE
-void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
-              const uint                           max_voxels_per_side,
-                    VoxelGrid                    & g);
+struct VoxelGrid
+{
+    int  * voxels = nullptr; // array of voxels
+    vec3u  dim;              // number of voxels along XYZ axis
+    AABB   bbox;             // bounding box
+    double len;              // per voxel edge length
 
+    ~VoxelGrid(){ delete[] voxels; }
+};
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// Voxelizes an object described by an analytic function f. Voxels will be
-// deemed as being entirely on the positive halfspace, negative halfspace
-// or traversed by the zero level set of the function f.
-//
+// Per voxel flags
+enum
+{
+    VOXEL_OUTSIDE,
+    VOXEL_INSIDE,
+    VOXEL_BOUNDARY,
+    VOXEL_UNKNOWN
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
-void voxelize(const std::function<double(const vec3d & p)> & f,
-              const AABB                                   & volume,
-              const uint                                     max_voxels_per_side,
-                    VoxelGrid                              & g);
+uint voxel_corner_index(const VoxelGrid & g,
+                        const uint        ijk[3],
+                        const uint        off);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+uint voxel_corner_index(const VoxelGrid & g,
+                        const uint        index,
+                        const uint        off);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d voxel_corner_xyz(const VoxelGrid & g,
+                       const uint        ijk[3],
+                       const uint        off);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d voxel_corner_xyz(const VoxelGrid & g,
+                       const uint        index,
+                       const uint        off);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "voxelize.cpp"
+#include "voxel_grid.cpp"
 #endif
 
-#endif // CINO_VOXELIZE_H
+#endif // CINO_VOXEL_GRID_H

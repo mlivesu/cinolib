@@ -51,47 +51,41 @@ void voxel_grid_to_hexmesh(const VoxelGrid          & g,
     {
         if(g.voxels[id]==VOXEL_BOUNDARY)
         {
-            vec3i ijk = deserialize_3D_index(id,g.dim[1],g.dim[2]);
+            vec3u ijk = deserialize_3D_index(id,g.dim[1],g.dim[2]);
 
             std::vector<uint> verts(8);
             std::vector<uint> faces(6);
             std::vector<bool> winding(6,false);
 
             // make verts
-            for(uint i=0; i<8; ++i)
+            for(uint off=0; off<8; ++off)
             {
-                uint vid = serialize_3D_index(ijk[0] + REFERENCE_HEX_VERTS[i][0],
-                                              ijk[1] + REFERENCE_HEX_VERTS[i][1],
-                                              ijk[2] + REFERENCE_HEX_VERTS[i][2],
-                                              g.dim[1]+1,g.dim[2]+1);
-                if(vert_map[vid]<0)
+                uint index = voxel_corner_index(g, ijk.ptr(), off);
+                if(vert_map[index]<0)
                 {
-                    vec3d p;
-                    p[0] = g.bbox.min[0] + g.len*ijk[0] + g.len*REFERENCE_HEX_VERTS[i][0];
-                    p[1] = g.bbox.min[1] + g.len*ijk[1] + g.len*REFERENCE_HEX_VERTS[i][1];
-                    p[2] = g.bbox.min[2] + g.len*ijk[2] + g.len*REFERENCE_HEX_VERTS[i][2];
-                    vert_map[vid] = m.vert_add(p);
+                    vec3d p = voxel_corner_xyz(g,ijk.ptr(),off);
+                    vert_map[index] = m.vert_add(p);
                 }
-                verts[i] = vert_map[vid];
+                verts[off] = vert_map[index];
             }
 
             // make faces
-            for(uint ii=0; ii<6; ++ii)
+            for(uint off=0; off<6; ++off)
             {
                 std::vector<uint> face =
                 {
-                    verts[HEXA_FACES[ii][0]],
-                    verts[HEXA_FACES[ii][1]],
-                    verts[HEXA_FACES[ii][2]],
-                    verts[HEXA_FACES[ii][3]]
+                    verts[HEXA_FACES[off][0]],
+                    verts[HEXA_FACES[off][1]],
+                    verts[HEXA_FACES[off][2]],
+                    verts[HEXA_FACES[off][3]]
                 };
                 int fid = m.face_id(face);
                 if(fid<0)
                 {
                     fid = m.face_add(face);
-                    winding[ii] = true;
+                    winding[off] = true;
                 }
-                faces[ii] = fid;
+                faces[off] = fid;
             }
             // add voxel
             m.poly_add(faces,winding);
