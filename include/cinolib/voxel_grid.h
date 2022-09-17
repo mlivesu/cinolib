@@ -67,28 +67,28 @@ enum
 CINO_INLINE
 uint voxel_corner_index(const VoxelGrid & g,
                         const uint        ijk[3],
-                        const uint        off);
+                        const uint        corner);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 uint voxel_corner_index(const VoxelGrid & g,
                         const uint        index,
-                        const uint        off);
+                        const uint        corner);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 vec3d voxel_corner_xyz(const VoxelGrid & g,
                        const uint        ijk[3],
-                       const uint        off);
+                       const uint        corner);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 vec3d voxel_corner_xyz(const VoxelGrid & g,
                        const uint        index,
-                       const uint        off);
+                       const uint        corner);
 }
 
 #ifndef  CINO_STATIC_LIB

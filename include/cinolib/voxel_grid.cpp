@@ -43,11 +43,11 @@ namespace cinolib
 CINO_INLINE
 uint voxel_corner_index(const VoxelGrid & g,
                         const uint        ijk[3],
-                        const uint        off)
+                        const uint        corner)
 {
-    return serialize_3D_index(ijk[0] + REFERENCE_HEX_VERTS[off][0],
-                              ijk[1] + REFERENCE_HEX_VERTS[off][1],
-                              ijk[2] + REFERENCE_HEX_VERTS[off][2],
+    return serialize_3D_index(ijk[0] + REFERENCE_HEX_VERTS[corner][0],
+                              ijk[1] + REFERENCE_HEX_VERTS[corner][1],
+                              ijk[2] + REFERENCE_HEX_VERTS[corner][2],
                               g.dim[1]+1, g.dim[2]+1);
 }
 
@@ -56,10 +56,10 @@ uint voxel_corner_index(const VoxelGrid & g,
 CINO_INLINE
 uint voxel_corner_index(const VoxelGrid & g,
                         const uint        index,
-                        const uint        off)
+                        const uint        corner)
 {
     vec3u ijk = deserialize_3D_index(index, g.dim[1], g.dim[2]);
-    return voxel_corner_index(g, ijk.ptr(), off);
+    return voxel_corner_index(g, ijk.ptr(), corner);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -67,11 +67,11 @@ uint voxel_corner_index(const VoxelGrid & g,
 CINO_INLINE
 vec3d voxel_corner_xyz(const VoxelGrid & g,
                        const uint        ijk[3],
-                       const uint        off)
+                       const uint        corner)
 {
-    return vec3d(g.bbox.min[0] + g.len*ijk[0] + g.len*REFERENCE_HEX_VERTS[off][0],
-                 g.bbox.min[1] + g.len*ijk[1] + g.len*REFERENCE_HEX_VERTS[off][1],
-                 g.bbox.min[2] + g.len*ijk[2] + g.len*REFERENCE_HEX_VERTS[off][2]);
+    return vec3d(g.bbox.min[0] + g.len*ijk[0] + g.len*REFERENCE_HEX_VERTS[corner][0],
+                 g.bbox.min[1] + g.len*ijk[1] + g.len*REFERENCE_HEX_VERTS[corner][1],
+                 g.bbox.min[2] + g.len*ijk[2] + g.len*REFERENCE_HEX_VERTS[corner][2]);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -79,10 +79,10 @@ vec3d voxel_corner_xyz(const VoxelGrid & g,
 CINO_INLINE
 vec3d voxel_corner_xyz(const VoxelGrid & g,
                        const uint        index,
-                       const uint        off)
+                       const uint        corner)
 {
     vec3u ijk = deserialize_3D_index(index, g.dim[1], g.dim[2]);
-    return voxel_corner_xyz(g, ijk.ptr(), off);
+    return voxel_corner_xyz(g, ijk.ptr(), corner);
 }
 
 }
