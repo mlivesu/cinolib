@@ -42,14 +42,15 @@ namespace cinolib
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void voxel_grid_to_hexmesh(const VoxelGrid          & g,
-                                 Hexmesh<M,V,E,F,P> & m)
+                                 Hexmesh<M,V,E,F,P> & m,
+                           const int voxel_types)
 {
     uint n_voxel =  g.dim[0]   * g.dim[1]   * g.dim[2];
     uint n_verts = (g.dim[0]+1)*(g.dim[1]+1)*(g.dim[2]+1);
     std::vector<int> vert_map(n_verts,-1); // to keep track of already existing vertices
     for(uint id=0; id<n_voxel; ++id)
     {
-        if(g.voxels[id]==VOXEL_BOUNDARY)
+        if(g.voxels[id] & voxel_types)
         {
             vec3u ijk = deserialize_3D_index(id,g.dim[1],g.dim[2]);
 

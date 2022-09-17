@@ -56,10 +56,10 @@ struct VoxelGrid
 // Per voxel flags
 enum
 {
-    VOXEL_OUTSIDE,
-    VOXEL_INSIDE,
-    VOXEL_BOUNDARY,
-    VOXEL_UNKNOWN
+    VOXEL_OUTSIDE  = 0x00000001,
+    VOXEL_INSIDE   = 0x00000010,
+    VOXEL_BOUNDARY = 0x00000100,
+    VOXEL_UNKNOWN  = 0x00001000
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
