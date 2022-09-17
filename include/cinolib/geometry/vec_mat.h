@@ -228,26 +228,32 @@ std::ostream & operator<< (std::ostream & in, const mat<r,c,T> & op);
 typedef mat<2,2,double> mat2d;
 typedef mat<2,2,float>  mat2f;
 typedef mat<2,2,int>    mat2i;
+typedef mat<2,2,uint>   mat2u;
 
 typedef mat<3,3,double> mat3d;
 typedef mat<3,3,float>  mat3f;
 typedef mat<3,3,int>    mat3i;
+typedef mat<3,3,uint>   mat3u;
 
 typedef mat<4,4,double> mat4d;
 typedef mat<4,4,float>  mat4f;
 typedef mat<4,4,int>    mat4i;
+typedef mat<4,4,uint>   mat4u;
 
 typedef mat<2,1,double> vec2d;
 typedef mat<2,1,float>  vec2f;
 typedef mat<2,1,int>    vec2i;
+typedef mat<2,1,uint>   vec2u;
 
 typedef mat<3,1,double> vec3d;
 typedef mat<3,1,float>  vec3f;
 typedef mat<3,1,int>    vec3i;
+typedef mat<3,1,uint>   vec3u;
 
 typedef mat<4,1,double> vec4d;
 typedef mat<4,1,float>  vec4f;
 typedef mat<4,1,int>    vec4i;
+typedef mat<4,1,uint>   vec4u;
 
 }
 
