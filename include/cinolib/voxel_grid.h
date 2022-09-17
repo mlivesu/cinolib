@@ -101,6 +101,15 @@ AABB voxel_bbox(const VoxelGrid & g,
 AABB voxel_bbox(const VoxelGrid & g,
                 const uint        index);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+std::vector<uint> voxel_n6(const VoxelGrid & g,
+                           const uint        ijk[3]);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+std::vector<uint> voxel_n6(const VoxelGrid & g,
+                           const uint        index);
 }
 
 #ifndef  CINO_STATIC_LIB

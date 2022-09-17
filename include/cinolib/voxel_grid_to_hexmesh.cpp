@@ -89,7 +89,8 @@ void voxel_grid_to_hexmesh(const VoxelGrid          & g,
                 faces[off] = fid;
             }
             // add voxel
-            m.poly_add(faces,winding);
+            uint pid = m.poly_add(faces,winding);
+            m.poly_data(pid).label = g.voxels[id];
         }
     }
 }

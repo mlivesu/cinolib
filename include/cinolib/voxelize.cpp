@@ -80,55 +80,40 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
         if(!boundary && (ijk[0]==0 || ijk[1]==0 || ijk[2]==0)) flood_seed = index;
     });
 
-//    // flood the outside
-//    if(flood_seed>0)
-//    {
-//        g.voxels[flood_seed]=VOXEL_OUTSIDE;
-//        std::queue<int> q;
-//        q.push(flood_seed);
-//        while(!q.empty())
-//        {
-//            int index = q.front();
-//            q.pop();
-//            assert(g.voxels[index]==VOXEL_OUTSIDE);
+    // flood the outside
+    if(flood_seed>0)
+    {
+        g.voxels[flood_seed]=VOXEL_OUTSIDE;
+        std::queue<uint> q;
+        q.push(flood_seed);
+        while(!q.empty())
+        {
+            uint index = q.front();
+            q.pop();
+            assert(g.voxels[index]==VOXEL_OUTSIDE);
 
-//            static std::vector<vec3u> neighborhood =
-//            {
-//                vec3u(-1,0,0),
-//                vec3u(+1,0,0),
-//                vec3u(0,-1,0),
-//                vec3u(0,+1,0),
-//                vec3u(0,0,-1),
-//                vec3u(0,0,+1),
-//            };
-//            vec3u ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);
-//            for(auto delta : neighborhood)
-//            {
-//                auto nbr = ijk + delta;
-//                uint i = clamp(nbr[0],0,g.dim[0]-1);
-//                uint j = clamp(nbr[1],0,g.dim[1]-1);
-//                uint k = clamp(nbr[2],0,g.dim[2]-1);
-//                uint ijk = serialize_3D_index(i,j,k,g.dim[1],g.dim[2]);
-//                if(g.voxels[ijk]==VOXEL_UNMARKED)
-//                {
-//                    g.voxels[ijk]=VOXEL_OUTSIDE;
-//                    q.push(ijk);
-//                }
-//            }
-//        }
-//    }
+            vec3u ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);
+            std::vector<uint> n6 = voxel_n6(g,ijk.ptr());
 
-//    // flood the inside
-//    for(int i=0; i<g.dim[0]; ++i)
-//    for(int j=0; j<g.dim[1]; ++j)
-//    for(int k=0; k<g.dim[2]; ++k)
-//    {
-//        uint ijk = serialize_3D_index(i,j,k,g.dim[0],g.dim[1]);
-//        if(g.voxels[ijk]==VOXEL_UNMARKED)
-//        {
-//            g.voxels[ijk]=VOXEL_INSIDE;
-//        }
-//    }
+            for(auto nbr : n6)
+            {
+                if(g.voxels[nbr]==VOXEL_UNKNOWN)
+                {
+                    g.voxels[nbr]=VOXEL_OUTSIDE;
+                    q.push(nbr);
+                }
+            }
+        }
+    }
+
+    // mark the rest as inside
+    for(uint index=0; index<size; ++index)
+    {
+        if(g.voxels[index]==VOXEL_UNKNOWN)
+        {
+            g.voxels[index]=VOXEL_INSIDE;
+        }
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
