@@ -58,7 +58,7 @@ uint serialize_3D_index(const uint i, const uint j, const uint k, const uint nj,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-vec3i deserialize_3D_index(const uint ijk, const uint nj, const uint nk);
+vec3u deserialize_3D_index(const uint ijk, const uint nj, const uint nk);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
