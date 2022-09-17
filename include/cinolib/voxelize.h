@@ -55,10 +55,12 @@ enum
 
 struct VoxelGrid
 {
-    int  * voxels; // array of voxels
-    vec3i  dim;    // number of voxels along XYZ axis
-    AABB   bbox;   // bounding box
-    double len;    // per voxel edge length
+    int  * voxels = nullptr; // array of voxels
+    vec3i  dim;              // number of voxels along XYZ axis
+    AABB   bbox;             // bounding box
+    double len;              // per voxel edge length
+
+    ~VoxelGrid(){ delete[] voxels; }
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -66,9 +68,6 @@ struct VoxelGrid
 // Voxelizes an object described by a surface mesh. Voxels will be deemed
 // as being entirely inside, outside or traversed by the boundary of the
 // input surface mesh, which can contain triangles, quads or general polygons.
-//
-// Memory allocation is performed internally. It is up the the user to
-// release the memory when no longer needed (calling delete[] g.voxels)
 //
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -82,9 +81,6 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
 // Voxelizes an object described by an analytic function f. Voxels will be
 // deemed as being entirely on the positive halfspace, negative halfspace
 // or traversed by the zero level set of the function f.
-//
-// Memory allocation is performed internally. It is up the the user to
-// release the memory when no longer needed (calling delete[] g.voxels)
 //
 CINO_INLINE
 void voxelize(const std::function<double(const vec3d &p)> & f,
