@@ -36,7 +36,8 @@
 #ifndef CINO_VOXEL_GRID_H
 #define CINO_VOXEL_GRID_H
 
-#include <cinolib/meshes/abstract_polygonmesh.h>
+#include <cinolib/geometry/vec_mat.h>
+#include <cinolib/geometry/aabb.h>
 
 namespace cinolib
 {
