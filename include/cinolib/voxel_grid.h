@@ -45,7 +45,7 @@ namespace cinolib
 struct VoxelGrid
 {
     int  * voxels = nullptr; // array of voxels
-    vec3u  dim;              // number of voxels along XYZ axis
+    uint   dim[3];           // number of voxels along XYZ axis
     AABB   bbox;             // bounding box
     double len;              // per voxel edge length
 
