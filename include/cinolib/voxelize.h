@@ -48,7 +48,7 @@ enum
     VOXEL_OUTSIDE,
     VOXEL_INSIDE,
     VOXEL_BOUNDARY,
-    VOXEL_UNMARKED
+    VOXEL_UNKNOWN
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -63,13 +63,34 @@ struct VoxelGrid
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-/* Initializes a voxel grid having max_voxels_per_side on the longest side.
- * The input grid is assumed empty. Memory allocation is performed internally
-*/
+// Voxelizes an object described by a surface mesh. Voxels will be deemed
+// as being entirely inside, outside or traversed by the boundary of the
+// input surface mesh, which can contain triangles, quads or general polygons.
+//
+// Memory allocation is performed internally. It is up the the user to
+// release the memory when no longer needed (calling delete[] g.voxels)
+//
 template<class M, class V, class E, class P>
 CINO_INLINE
-void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_side, VoxelGrid & g);
+void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
+              const uint                           max_voxels_per_side,
+                    VoxelGrid                    & g);
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Voxelizes an object described by an analytic function f. Voxels will be
+// deemed as being entirely on the positive halfspace, negative halfspace
+// or traversed by the zero level set of the function f.
+//
+// Memory allocation is performed internally. It is up the the user to
+// release the memory when no longer needed (calling delete[] g.voxels)
+//
+CINO_INLINE
+void voxelize(const std::function<double(const vec3d &p)> & f,
+              const AABB                                  & volume,
+              const uint                                    max_voxels_per_side,
+                    VoxelGrid                             & g);
 }
 
 #ifndef  CINO_STATIC_LIB

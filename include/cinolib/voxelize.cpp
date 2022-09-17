@@ -41,6 +41,13 @@
 namespace cinolib
 {
 
+// Voxelizes an object described by a surface mesh. Voxels will be deemed
+// as being entirely inside, outside or traversed by the boundary of the
+// input surface mesh, which can contain triangles, quads or general polygons.
+//
+// Memory allocation is performed internally. It is up the the user to
+// release the memory when no longer needed (calling delete[] g.voxels)
+//
 template<class M, class V, class E, class P>
 CINO_INLINE
 void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_side, VoxelGrid & g)
@@ -58,7 +65,6 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
     g.voxels = new int[size];
     vec3d O = g.bbox.min;
     vec3d u(g.len,g.len,g.len);
-    std::vector<uint> border_voxels;
     Octree o;
     o.build_from_mesh_polys(m);
     PARALLEL_FOR(0, size, 100000, [&](uint ijk)
@@ -80,7 +86,7 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
             const Triangle *t = dynamic_cast<Triangle*>(o.items.at(id));
             if(voxel.intersects_triangle(t->v)) boundary = true;
         }
-        g.voxels[ijk] = (boundary) ? VOXEL_BOUNDARY : VOXEL_UNMARKED;
+        g.voxels[ijk] = (boundary) ? VOXEL_BOUNDARY : VOXEL_UNKNOWN;
     });
 
 //    // flood the outside
@@ -132,6 +138,57 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
 //            g.voxels[ijk]=VOXEL_INSIDE;
 //        }
 //    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Voxelizes an object described by an analytic function f. Voxels will be
+// deemed as being entirely on the positive halfspace, negative halfspace
+// or traversed by the zero level set of the function f.
+//
+// Memory allocation is performed internally. It is up the the user to
+// release the memory when no longer needed (calling delete[] g.voxels)
+//
+CINO_INLINE
+void voxelize(const std::function<double(const vec3d &p)> & f,
+              const AABB                                  & volume,
+              const uint                                    max_voxels_per_side,
+                    VoxelGrid                             & g)
+{
+    // determine grid size across all dimensions
+    g.bbox = volume;
+    g.len = g.bbox.delta().max_entry() / max_voxels_per_side;
+    g.dim[0] = int(ceil(g.bbox.delta_x()/g.len));
+    g.dim[1] = int(ceil(g.bbox.delta_y()/g.len));
+    g.dim[2] = int(ceil(g.bbox.delta_z()/g.len));
+
+    // allocate the grid memory and flag voxels depending
+    // on how function f evaluates at the voxel corners
+    uint size = g.dim[0]*g.dim[1]*g.dim[2];
+    g.voxels = new int[size];
+    vec3d O = g.bbox.min;
+    vec3d u(g.len,g.len,g.len);
+    PARALLEL_FOR(0, size, 100000, [&](uint index)
+    {
+        vec3i ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);
+        bool negative = false;
+        bool positive = false;
+        bool zero     = false;
+        for(uint i=0; i<8; ++i)
+        {
+            vec3d p;
+            p[0] = g.bbox.min[0] + g.len*ijk[0] + g.len*REFERENCE_HEX_VERTS[i][0];
+            p[1] = g.bbox.min[1] + g.len*ijk[1] + g.len*REFERENCE_HEX_VERTS[i][1];
+            p[2] = g.bbox.min[2] + g.len*ijk[2] + g.len*REFERENCE_HEX_VERTS[i][2];
+            double fp = f(p);
+            positive |= (fp>0);
+            negative |= (fp<0);
+            zero     |= (fp==0);
+        }
+        if( positive && !negative && !zero) g.voxels[index] = VOXEL_OUTSIDE; else
+        if(!positive &&  negative && !zero) g.voxels[index] = VOXEL_INSIDE;  else
+        g.voxels[index] = VOXEL_BOUNDARY;
+    });
 }
 
 }
