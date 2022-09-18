@@ -38,7 +38,13 @@
 namespace cinolib
 {
 
-// Converts a voxel grid into a hexahedral mesh
+// Converts a voxel grid into a hexahedral mesh. Users can select what voxel types
+// can be retained in the output mesh. Legal choices are combinations of the following
+// types:
+//         - VOXEL_INSIDE   => fully inside the voxelized object
+//         - VOXEL_OUTSIDE  => fully outside the voxelized object
+//         - VOXEL_BOUNDARY => traversed by the boundary of the voxelized object
+//
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void voxel_grid_to_hexmesh(const VoxelGrid          & g,

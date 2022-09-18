@@ -36,7 +36,6 @@
 #include <cinolib/voxelize.h>
 #include <cinolib/serialize_index.h>
 #include <cinolib/octree.h>
-#include <cinolib/clamp.h>
 
 namespace cinolib
 {
@@ -65,14 +64,14 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
     int flood_seed = -1;
     PARALLEL_FOR(0, size, 100000, [&](uint index)
     {
-        vec3u ijk = deserialize_3D_index(index, g.dim[1], g.dim[2]);
-        AABB voxel = voxel_bbox(g,ijk.ptr());
+        vec3u ijk     = deserialize_3D_index(index, g.dim[1], g.dim[2]);
+        AABB voxel    = voxel_bbox(g,ijk.ptr());
         bool boundary = false;
         std::unordered_set<uint> elems;
         o.intersects_box(voxel,elems);
         for(uint id : elems)
         {
-            // MOVE THIS PART INSIDE THE OCTREE LOGIC...
+            // TODO: move this part inside the octree logic...
             const Triangle *t = dynamic_cast<Triangle*>(o.items.at(id));
             if(voxel.intersects_triangle(t->v)) boundary = true;
         }
@@ -93,8 +92,7 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
             assert(g.voxels[index]==VOXEL_OUTSIDE);
 
             vec3u ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);
-            std::vector<uint> n6 = voxel_n6(g,ijk.ptr());
-
+            std::vector<uint> n6 = voxel_n6(g,ijk.ptr()); // 6 neighborhood
             for(auto nbr : n6)
             {
                 if(g.voxels[nbr]==VOXEL_UNKNOWN)
