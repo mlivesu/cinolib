@@ -135,7 +135,10 @@ Cmake will automatically detect and download the necessary external libraries (e
 #### 43 - Convert a hexhedral mesh into a conforming tetrahedral mesh (command line tool)
 
 #### 44 - Voxelize a volume decribed by a general polygonal mesh
-[<p align="left"><img src="snapshots/44_voxelize_mesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/voxelize_mesh)
+[<p align="left"><img src="snapshots/44_voxelize_mesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/44_voxelize_mesh)
+
+#### 45 - Voxelize an analytic function
+[<p align="left"><img src="snapshots/45_voxelize_function.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/45_voxelize_mesh)
 
 
 
