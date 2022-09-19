@@ -72,8 +72,16 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_
         for(uint id : elems)
         {
             // TODO: move this part inside the octree logic...
-            const Triangle *t = dynamic_cast<Triangle*>(o.items.at(id));
-            if(voxel.intersects_triangle(t->v)) boundary = true;
+            for(uint i=0; i<m.poly_tessellation(id).size()/3; ++i)
+            {
+                vec3d v[3] =
+                {
+                    m.vert(m.poly_tessellation(id).at(3*i+0)),
+                    m.vert(m.poly_tessellation(id).at(3*i+1)),
+                    m.vert(m.poly_tessellation(id).at(3*i+2))
+                };
+                if(voxel.intersects_triangle(v)) boundary = true;
+            }
         }
         g.voxels[index] = (boundary) ? VOXEL_BOUNDARY : VOXEL_UNKNOWN;
         if(!boundary && (ijk[0]==0 || ijk[1]==0 || ijk[2]==0)) flood_seed = index;
