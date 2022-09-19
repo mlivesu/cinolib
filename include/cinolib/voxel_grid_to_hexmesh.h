@@ -51,8 +51,8 @@ namespace cinolib
 //
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void voxel_grid_to_hexmesh(const VoxelGrid          & g,                           
-                                 Hexmesh<M,V,E,F,P> & m,
+void voxel_grid_to_hexmesh(const VoxelGrid                         & g,
+                                 AbstractPolyhedralMesh<M,V,E,F,P> & m,
                            const int voxel_types = VOXEL_INSIDE | VOXEL_BOUNDARY);
 }
 
