@@ -138,7 +138,7 @@ Cmake will automatically detect and download the necessary external libraries (e
 [<p align="left"><img src="snapshots/44_voxelize_mesh.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/44_voxelize_mesh)
 
 #### 45 - Voxelize an analytic function
-[<p align="left"><img src="snapshots/45_voxelize_function.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/45_voxelize_mesh)
+[<p align="left"><img src="snapshots/45_voxelize_function.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/45_voxelize_function)
 
 
 
