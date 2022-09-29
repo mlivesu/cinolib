@@ -66,17 +66,13 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
     std::mutex mutex;
     PARALLEL_FOR(0, m.num_polys(), 1000, [&](uint pid)
     {
-        AABB p_bbox = m.poly_aabb(pid);
-        uint i_beg = uint(floor((p_bbox.min[0] - g.bbox.min[0])/g.len));
-        uint j_beg = uint(floor((p_bbox.min[1] - g.bbox.min[1])/g.len));
-        uint k_beg = uint(floor((p_bbox.min[2] - g.bbox.min[2])/g.len));
-        uint i_end = uint(ceil ((p_bbox.max[0] - g.bbox.min[0])/g.len));
-        uint j_end = uint(ceil ((p_bbox.max[1] - g.bbox.min[1])/g.len));
-        uint k_end = uint(ceil ((p_bbox.max[2] - g.bbox.min[2])/g.len));
+        AABB  box = m.poly_aabb(pid);
+        vec3d beg = (box.min - g.bbox.min)/g.len;
+        vec3d end = (box.max - g.bbox.min)/g.len;
 
-        for(uint i=i_beg; i<i_end; ++i)
-        for(uint j=j_beg; j<j_end; ++j)
-        for(uint k=k_beg; k<k_end; ++k)
+        for(uint i=uint(floor(beg[0])); i<uint(ceil(end[0])); ++i)
+        for(uint j=uint(floor(beg[1])); j<uint(ceil(end[1])); ++j)
+        for(uint k=uint(floor(beg[2])); k<uint(ceil(end[2])); ++k)
         {
             uint index = serialize_3D_index(i,j,k,g.dim[1],g.dim[2]);
             if(g.voxels[index]==VOXEL_UNKNOWN)
@@ -93,9 +89,7 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
                     {
                         std::lock_guard<std::mutex> guard(mutex);
                         g.voxels[index] = VOXEL_BOUNDARY;
-                        if(ijk[0]==0 || ijk[0]==g.dim[0]-1 ||
-                           ijk[1]==0 || ijk[1]==g.dim[1]-1 ||
-                           ijk[2]==0 || ijk[2]==g.dim[2]-1)
+                        if(i==0 || j==0 || k==0 || i==g.dim[0]-1 || j==g.dim[1]-1 || k==g.dim[2]-1)
                         {
                             flood_seed = index;
                         }
