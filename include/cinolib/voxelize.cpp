@@ -99,7 +99,7 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
                         {
                             flood_seed = index;
                         }
-                        break;
+                        break; // do not test other triangles for this boundary voxel...
                     }
                 }
             }
