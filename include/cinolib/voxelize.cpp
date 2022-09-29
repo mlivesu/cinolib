@@ -35,7 +35,6 @@
 *********************************************************************************/
 #include <cinolib/voxelize.h>
 #include <cinolib/serialize_index.h>
-#include <cinolib/octree.h>
 
 namespace cinolib
 {
@@ -46,45 +45,64 @@ namespace cinolib
 //
 template<class M, class V, class E, class P>
 CINO_INLINE
-void voxelize(const AbstractPolygonMesh<M,V,E,P> & m, const uint max_voxels_per_side, VoxelGrid & g)
+void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
+              const uint                           max_voxels_per_side,
+                    VoxelGrid                    & g)
 {
     // determine grid size across all dimensions
-    g.bbox = m.bbox();
-    g.len = g.bbox.delta().max_entry() / max_voxels_per_side;
-    g.dim[0] = int(ceil(g.bbox.delta_x()/g.len));
-    g.dim[1] = int(ceil(g.bbox.delta_y()/g.len));
-    g.dim[2] = int(ceil(g.bbox.delta_z()/g.len));
+    g.bbox   = m.bbox();
+    g.len    = g.bbox.delta().max_entry() / max_voxels_per_side;
+    g.dim[0] = uint(ceil(g.bbox.delta_x()/g.len));
+    g.dim[1] = uint(ceil(g.bbox.delta_y()/g.len));
+    g.dim[2] = uint(ceil(g.bbox.delta_z()/g.len));
 
     // allocate the grid memory and flag voxels that have
     // non empty intersection with the input mesh elements
     uint size = g.dim[0]*g.dim[1]*g.dim[2];
     g.voxels = new int[size];
-    Octree o;
-    o.build_from_mesh_polys(m);
+    memset(g.voxels,VOXEL_UNKNOWN,size*sizeof(int)); // initialize grid
     int flood_seed = -1;
-    PARALLEL_FOR(0, size, 100000, [&](uint index)
+    std::mutex mutex;
+    PARALLEL_FOR(0, m.num_polys(), 1000, [&](uint pid)
     {
-        vec3u ijk     = deserialize_3D_index(index, g.dim[1], g.dim[2]);
-        AABB voxel    = voxel_bbox(g,ijk.ptr());
-        bool boundary = false;
-        std::unordered_set<uint> elems;
-        o.intersects_box(voxel,elems);
-        for(uint id : elems)
+        AABB p_bbox = m.poly_aabb(pid);
+        uint i_beg = uint(floor((p_bbox.min[0] - g.bbox.min[0])/g.len));
+        uint j_beg = uint(floor((p_bbox.min[1] - g.bbox.min[1])/g.len));
+        uint k_beg = uint(floor((p_bbox.min[2] - g.bbox.min[2])/g.len));
+        uint i_end = uint(ceil ((p_bbox.max[0] - g.bbox.min[0])/g.len));
+        uint j_end = uint(ceil ((p_bbox.max[1] - g.bbox.min[1])/g.len));
+        uint k_end = uint(ceil ((p_bbox.max[2] - g.bbox.min[2])/g.len));
+
+        for(uint i=i_beg; i<i_end; ++i)
+        for(uint j=j_beg; j<j_end; ++j)
+        for(uint k=k_beg; k<k_end; ++k)
         {
-            // TODO: move this part inside the octree logic...
-            for(uint i=0; i<m.poly_tessellation(id).size()/3; ++i)
+            uint index = serialize_3D_index(i,j,k,g.dim[1],g.dim[2]);
+            if(g.voxels[index]==VOXEL_UNKNOWN)
             {
-                vec3d v[3] =
+                vec3u ijk(i,j,k);
+                AABB voxel = voxel_bbox(g,ijk.ptr());
+                for(uint i=0; i<m.poly_tessellation(pid).size()/3; ++i)
                 {
-                    m.vert(m.poly_tessellation(id).at(3*i+0)),
-                    m.vert(m.poly_tessellation(id).at(3*i+1)),
-                    m.vert(m.poly_tessellation(id).at(3*i+2))
-                };
-                if(voxel.intersects_triangle(v)) boundary = true;
+                    vec3d t[3] = { m.vert(m.poly_tessellation(pid).at(3*i+0)),
+                                   m.vert(m.poly_tessellation(pid).at(3*i+1)),
+                                   m.vert(m.poly_tessellation(pid).at(3*i+2)) };
+
+                    if(voxel.intersects_triangle(t))
+                    {
+                        std::lock_guard<std::mutex> guard(mutex);
+                        g.voxels[index] = VOXEL_BOUNDARY;
+                        if(ijk[0]==0 || ijk[0]==g.dim[0]-1 ||
+                           ijk[1]==0 || ijk[1]==g.dim[1]-1 ||
+                           ijk[2]==0 || ijk[2]==g.dim[2]-1)
+                        {
+                            flood_seed = index;
+                        }
+                        break;
+                    }
+                }
             }
         }
-        g.voxels[index] = (boundary) ? VOXEL_BOUNDARY : VOXEL_UNKNOWN;
-        if(!boundary && (ijk[0]==0 || ijk[1]==0 || ijk[2]==0)) flood_seed = index;
     });
 
     // flood the outside

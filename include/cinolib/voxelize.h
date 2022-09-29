@@ -52,7 +52,6 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
               const uint                           max_voxels_per_side,
                     VoxelGrid                    & g);
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // Voxelizes an object described by an analytic function f. Voxels will be
