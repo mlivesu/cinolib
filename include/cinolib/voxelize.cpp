@@ -61,7 +61,7 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
     uint size = g.dim[0]*g.dim[1]*g.dim[2];
     g.voxels = new int[size];
     memset(g.voxels,VOXEL_UNKNOWN,size*sizeof(int)); // initialize grid
-    int flood_seed = -1;
+    int flood_seed = -1; // surely external voxel from which to start the in/out labeling
     std::mutex mutex;
     PARALLEL_FOR(0, m.num_polys(), 1000, [&](uint pid)
     {
@@ -129,6 +129,8 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
     }
 
     // mark the rest as inside
+    // WARNING: there may be external pockets surrounded by
+    //          boundary voxels that will be deemed as being inside!
     for(uint index=0; index<size; ++index)
     {
         if(g.voxels[index]==VOXEL_UNKNOWN)
