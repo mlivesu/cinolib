@@ -92,13 +92,11 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
                     {
                         std::lock_guard<std::mutex> guard(mutex);
                         g.voxels[index] = VOXEL_BOUNDARY;
-                        if(ijk[0]==0 || ijk[0]==g.dim[0]-1 ||
-                           ijk[1]==0 || ijk[1]==g.dim[1]-1 ||
-                           ijk[2]==0 || ijk[2]==g.dim[2]-1)
+                        if(i==0 || i==g.dim[0]-1 || j==0 || j==g.dim[1]-1 || k==0 || k==g.dim[2]-1)
                         {
                             flood_seed = index;
                         }
-                        break;
+                        break; // do not test other triangles for the current voxel
                     }
                 }
             }
