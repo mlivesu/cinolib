@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include <cinolib/voxelize.h>
 #include <cinolib/serialize_index.h>
+#include <cinolib/parallel_for.h>
 
 namespace cinolib
 {
@@ -60,8 +61,8 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
     // non empty intersection with the input mesh elements
     uint size = g.dim[0]*g.dim[1]*g.dim[2];
     g.voxels = new int[size];
-    memset(g.voxels,VOXEL_UNKNOWN,size*sizeof(int)); // initialize grid
-    int flood_seed = -1; // surely external voxel from which to start the in/out labeling
+    std::fill_n(g.voxels, size, VOXEL_UNKNOWN); // initialize grid
+    int flood_seed = -1;
     std::mutex mutex;
     PARALLEL_FOR(0, m.num_polys(), 1000, [&](uint pid)
     {
@@ -92,11 +93,13 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
                     {
                         std::lock_guard<std::mutex> guard(mutex);
                         g.voxels[index] = VOXEL_BOUNDARY;
-                        if(i==0 || i==g.dim[0]-1 || j==0 || j==g.dim[1]-1 || k==0 || k==g.dim[2]-1)
+                        if(ijk[0]==0 || ijk[0]==g.dim[0]-1 ||
+                           ijk[1]==0 || ijk[1]==g.dim[1]-1 ||
+                           ijk[2]==0 || ijk[2]==g.dim[2]-1)
                         {
                             flood_seed = index;
                         }
-                        break; // do not test other triangles for the current voxel
+                        break;
                     }
                 }
             }
@@ -129,8 +132,6 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
     }
 
     // mark the rest as inside
-    // WARNING: there may be external pockets surrounded by
-    //          boundary voxels that will be deemed as being inside!
     for(uint index=0; index<size; ++index)
     {
         if(g.voxels[index]==VOXEL_UNKNOWN)
