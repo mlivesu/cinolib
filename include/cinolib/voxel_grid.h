@@ -66,6 +66,20 @@ enum
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+uint voxel_corner_index(const uint dim[3],
+                        const uint ijk[3],
+                        const uint corner);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+uint voxel_corner_index(const uint dim[3],
+                        const uint index,
+                        const uint corner);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 uint voxel_corner_index(const VoxelGrid & g,
                         const uint        ijk[3],
                         const uint        corner);
@@ -76,6 +90,14 @@ CINO_INLINE
 uint voxel_corner_index(const VoxelGrid & g,
                         const uint        index,
                         const uint        corner);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d voxel_corner_xyz(const AABB   & bbox,
+                       const double & len,
+                       const uint     ijk[3],
+                       const uint     corner);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -93,21 +115,32 @@ vec3d voxel_corner_xyz(const VoxelGrid & g,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
+AABB voxel_bbox(const AABB   & bbox,
+                const double & len,
+                const uint     ijk[3]);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 AABB voxel_bbox(const VoxelGrid & g,
                 const uint        ijk[3]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 AABB voxel_bbox(const VoxelGrid & g,
                 const uint        index);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 std::vector<uint> voxel_n6(const VoxelGrid & g,
                            const uint        ijk[3]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 std::vector<uint> voxel_n6(const VoxelGrid & g,
                            const uint        index);
 }

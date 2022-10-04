@@ -41,14 +41,35 @@ namespace cinolib
 {
 
 CINO_INLINE
-uint voxel_corner_index(const VoxelGrid & g,
-                        const uint        ijk[3],
-                        const uint        corner)
+uint voxel_corner_index(const uint dim[3],
+                        const uint ijk[3],
+                        const uint corner)
 {
     return serialize_3D_index(ijk[0] + REFERENCE_HEX_VERTS[corner][0],
                               ijk[1] + REFERENCE_HEX_VERTS[corner][1],
                               ijk[2] + REFERENCE_HEX_VERTS[corner][2],
-                              g.dim[1]+1, g.dim[2]+1);
+                              dim[1]+1, dim[2]+1);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+uint voxel_corner_index(const uint dim[3],
+                        const uint index,
+                        const uint corner)
+{
+    vec3u ijk = deserialize_3D_index(index, dim[1], dim[2]);
+    return voxel_corner_index(dim, ijk.ptr(), corner);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+uint voxel_corner_index(const VoxelGrid & g,
+                        const uint        ijk[3],
+                        const uint        corner)
+{
+    return voxel_corner_index(g.dim, ijk, corner);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -58,8 +79,20 @@ uint voxel_corner_index(const VoxelGrid & g,
                         const uint        index,
                         const uint        corner)
 {
-    vec3u ijk = deserialize_3D_index(index, g.dim[1], g.dim[2]);
-    return voxel_corner_index(g, ijk.ptr(), corner);
+    return voxel_corner_index(g.dim, index, corner);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+vec3d voxel_corner_xyz(const AABB   & bbox,
+                       const double & len,
+                       const uint     ijk[3],
+                       const uint     corner)
+{
+    return vec3d(bbox.min[0] + len*ijk[0] + len*REFERENCE_HEX_VERTS[corner][0],
+                 bbox.min[1] + len*ijk[1] + len*REFERENCE_HEX_VERTS[corner][1],
+                 bbox.min[2] + len*ijk[2] + len*REFERENCE_HEX_VERTS[corner][2]);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -87,6 +120,18 @@ vec3d voxel_corner_xyz(const VoxelGrid & g,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
+AABB voxel_bbox(const AABB   & bbox,
+                const double & len,
+                const uint     ijk[3])
+{
+    return AABB(voxel_corner_xyz(bbox,len,ijk,0),
+                voxel_corner_xyz(bbox,len,ijk,6));
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 AABB voxel_bbox(const VoxelGrid & g,
                 const uint        ijk[3])
 {
@@ -96,6 +141,7 @@ AABB voxel_bbox(const VoxelGrid & g,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 AABB voxel_bbox(const VoxelGrid & g,
                 const uint        index)
 {
@@ -105,6 +151,7 @@ AABB voxel_bbox(const VoxelGrid & g,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 std::vector<uint> voxel_n6(const VoxelGrid & g,
                            const uint        ijk[3])
 {
@@ -124,6 +171,7 @@ std::vector<uint> voxel_n6(const VoxelGrid & g,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
 std::vector<uint> voxel_n6(const VoxelGrid & g,
                            const uint        index)
 {
