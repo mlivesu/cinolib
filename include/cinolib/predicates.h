@@ -51,8 +51,7 @@ namespace cinolib
  *
  * *********************************************************************
  * IMPORTANT: to switch to exact predicates, you must define the symbol
- * CINOLIB_USES_SHEWCHUK_PREDICATES at compilation time, and also add the
- * file <CINOLIB_HOME>/external/predicates/shewchuk.c in your project.
+ * CINOLIB_USES_SHEWCHUK_PREDICATES at compilation time.
  * *********************************************************************
  *
  * Return values for the point_in_{segment | triangle | tet} predicates:
