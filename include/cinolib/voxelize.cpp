@@ -50,9 +50,14 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
               const uint                           max_voxels_per_side,
                     VoxelGrid                    & g)
 {
+    // pad the bbox to ease the subsequent inside/outside labeling
+    g.bbox = m.bbox();
+    g.len  = g.bbox.delta().max_entry() / max_voxels_per_side;
+    vec3d pad(g.len,g.len,g.len);
+    g.bbox.min -= pad;
+    g.bbox.max += pad;
+
     // determine grid size across all dimensions
-    g.bbox   = m.bbox();
-    g.len    = g.bbox.delta().max_entry() / max_voxels_per_side;
     g.dim[0] = uint(ceil(g.bbox.delta_x()/g.len));
     g.dim[1] = uint(ceil(g.bbox.delta_y()/g.len));
     g.dim[2] = uint(ceil(g.bbox.delta_z()/g.len));
@@ -62,7 +67,6 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
     uint size = g.dim[0]*g.dim[1]*g.dim[2];
     g.voxels = new int[size];
     std::fill_n(g.voxels, size, VOXEL_UNKNOWN); // initialize grid
-    int flood_seed = -1;
     std::mutex mutex;
     PARALLEL_FOR(0, m.num_polys(), 1000, [&](uint pid)
     {
@@ -89,10 +93,6 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
                     {
                         std::lock_guard<std::mutex> guard(mutex);
                         g.voxels[index] = VOXEL_BOUNDARY;
-                        if(i==0 || j==0 || k==0 || i==g.dim[0]-1 || j==g.dim[1]-1 || k==g.dim[2]-1)
-                        {
-                            flood_seed = index;
-                        }
                         break; // do not test other triangles for this boundary voxel...
                     }
                 }
@@ -101,26 +101,23 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
     });
 
     // flood the outside
-    if(flood_seed>0)
+    std::queue<uint> q;
+    q.push(0); // voxel zero is guaranteed to be outside (due to the previous padding)
+    g.voxels[0]=VOXEL_OUTSIDE;
+    while(!q.empty())
     {
-        g.voxels[flood_seed]=VOXEL_OUTSIDE;
-        std::queue<uint> q;
-        q.push(flood_seed);
-        while(!q.empty())
-        {
-            uint index = q.front();
-            q.pop();
-            assert(g.voxels[index]==VOXEL_OUTSIDE);
+        uint index = q.front();
+        q.pop();
+        assert(g.voxels[index]==VOXEL_OUTSIDE);
 
-            vec3u ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);
-            std::vector<uint> n6 = voxel_n6(g,ijk.ptr()); // 6 neighborhood
-            for(auto nbr : n6)
+        vec3u ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);
+        std::vector<uint> n6 = voxel_n6(g,ijk.ptr()); // 6 neighborhood
+        for(auto nbr : n6)
+        {
+            if(g.voxels[nbr]==VOXEL_UNKNOWN)
             {
-                if(g.voxels[nbr]==VOXEL_UNKNOWN)
-                {
-                    g.voxels[nbr]=VOXEL_OUTSIDE;
-                    q.push(nbr);
-                }
+                g.voxels[nbr]=VOXEL_OUTSIDE;
+                q.push(nbr);
             }
         }
     }
