@@ -730,7 +730,10 @@ void GLcanvas::mouse_button_event(GLFWwindow *window, int button, int action, in
 
 CINO_INLINE
 void GLcanvas::cursor_event(GLFWwindow *window, double x_pos, double y_pos)
-{
+{    
+    // if visual controls claim the event, let them handle it
+    if(ImGui::GetIO().WantCaptureMouse) return;
+
     GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
 
     if(v->callback_mouse_moved)
