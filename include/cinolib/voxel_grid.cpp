@@ -152,19 +152,19 @@ AABB voxel_bbox(const VoxelGrid & g,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<uint> voxel_n6(const VoxelGrid & g,
-                           const uint        ijk[3])
+std::vector<uint> voxel_n6(const uint dim[3],
+                           const uint ijk[3])
 {
     std::vector<uint> n6;
     n6.reserve(6);
 
-    if(ijk[0]>0) n6.push_back(serialize_3D_index(ijk[0]-1,ijk[1]  ,ijk[2]  ,g.dim[1],g.dim[2]));
-    if(ijk[1]>0) n6.push_back(serialize_3D_index(ijk[0]  ,ijk[1]-1,ijk[2]  ,g.dim[1],g.dim[2]));
-    if(ijk[2]>0) n6.push_back(serialize_3D_index(ijk[0]  ,ijk[1]  ,ijk[2]-1,g.dim[1],g.dim[2]));
+    if(ijk[0]>0) n6.push_back(serialize_3D_index(ijk[0]-1,ijk[1]  ,ijk[2]  ,dim[1],dim[2]));
+    if(ijk[1]>0) n6.push_back(serialize_3D_index(ijk[0]  ,ijk[1]-1,ijk[2]  ,dim[1],dim[2]));
+    if(ijk[2]>0) n6.push_back(serialize_3D_index(ijk[0]  ,ijk[1]  ,ijk[2]-1,dim[1],dim[2]));
 
-    if(ijk[0]+1<g.dim[0]) n6.push_back(serialize_3D_index(ijk[0]+1,ijk[1]  ,ijk[2]  ,g.dim[1],g.dim[2]));
-    if(ijk[1]+1<g.dim[1]) n6.push_back(serialize_3D_index(ijk[0]  ,ijk[1]+1,ijk[2]  ,g.dim[1],g.dim[2]));
-    if(ijk[2]+1<g.dim[2]) n6.push_back(serialize_3D_index(ijk[0]  ,ijk[1]  ,ijk[2]+1,g.dim[1],g.dim[2]));
+    if(ijk[0]+1<dim[0]) n6.push_back(serialize_3D_index(ijk[0]+1,ijk[1]  ,ijk[2]  ,dim[1],dim[2]));
+    if(ijk[1]+1<dim[1]) n6.push_back(serialize_3D_index(ijk[0]  ,ijk[1]+1,ijk[2]  ,dim[1],dim[2]));
+    if(ijk[2]+1<dim[2]) n6.push_back(serialize_3D_index(ijk[0]  ,ijk[1]  ,ijk[2]+1,dim[1],dim[2]));
 
     return n6;
 }
@@ -172,11 +172,11 @@ std::vector<uint> voxel_n6(const VoxelGrid & g,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-std::vector<uint> voxel_n6(const VoxelGrid & g,
-                           const uint        index)
+std::vector<uint> voxel_n6(const uint dim[3],
+                           const uint index)
 {
-    vec3u ijk = deserialize_3D_index(index, g.dim[1], g.dim[2]);
-    return voxel_n6(g,ijk.ptr());
+    vec3u ijk = deserialize_3D_index(index, dim[1], dim[2]);
+    return voxel_n6(dim,ijk.ptr());
 }
 
 }

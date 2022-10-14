@@ -111,7 +111,7 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
         assert(g.voxels[index]==VOXEL_OUTSIDE);
 
         vec3u ijk = deserialize_3D_index(index,g.dim[1],g.dim[2]);
-        std::vector<uint> n6 = voxel_n6(g,ijk.ptr()); // 6 neighborhood
+        std::vector<uint> n6 = voxel_n6(g.dim,ijk.ptr()); // 6 neighborhood
         for(auto nbr : n6)
         {
             if(g.voxels[nbr]==VOXEL_UNKNOWN)
