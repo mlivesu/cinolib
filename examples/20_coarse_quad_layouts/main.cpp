@@ -26,10 +26,10 @@ int main(int argc, char **argv)
     gui.push(&m);
     gui.push(&controls);
 
-    float radius = m.bbox().diag() * 0.02;
+    float radius = m.bbox().diag() * 0.01;
     for(uint vid=0; vid<m.num_verts(); ++vid)
     {
-        if(m.vert_is_singular(vid)) gui.push(new DrawableSphere(m.vert(vid), radius));
+        if(m.vert_is_singular(vid)) gui.push(new DrawableSphere(m.vert(vid), radius),false);
     }
 
     return gui.launch();
