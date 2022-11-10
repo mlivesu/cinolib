@@ -68,25 +68,29 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 std::vector<uint> Isosurface<M,V,E,F,P>::tessellate(Tetmesh<M,V,E,F,P> & m) const
 {
-    typedef std::pair<uint,double> split_data;
-    std::set<split_data,std::greater<split_data>> edges_to_split; // from highest to lowest id
-
+    std::vector<ipair> splits;
     for(uint eid=0; eid<m.num_edges(); ++eid)
     {
-        double f0 = m.vert_data(m.edge_vert_id(eid,0)).uvw[0];
-        double f1 = m.vert_data(m.edge_vert_id(eid,1)).uvw[0];
-
-        if (is_into_interval<double>(iso_value, f0, f1))
-        {
-            double alpha = std::fabs(iso_value - f0)/fabs(f1 - f0);
-            edges_to_split.insert(std::make_pair(eid,alpha));
-        }
+        uint   v0 = m.edge_vert_id(eid,0);
+        uint   v1 = m.edge_vert_id(eid,1);
+        double f0 = m.vert_data(v0).uvw[0];
+        double f1 = m.vert_data(v1).uvw[0];
+        if(is_into_interval<double>(iso_value, f0, f1)) splits.emplace_back(v0,v1);
     }
 
     std::vector<uint> new_vids;
-    for(auto e : edges_to_split)
+    for(auto e : splits)
     {
-        uint vid = m.edge_split(e.first, e.second);
+        uint v0  = e.first;
+        uint v1  = e.second;
+        int  eid = m.edge_id(v0,v1);
+        assert(eid>=0);
+        if(m.edge_vert_id(eid,0)==v1) std::swap(v0,v1);
+        double f0 = m.vert_data(v0).uvw[0];
+        double f1 = m.vert_data(v1).uvw[0];
+        assert(is_into_interval<double>(iso_value, f0, f1));
+        double alpha = std::fabs(iso_value - f0)/fabs(f1 - f0);
+        uint vid = m.edge_split(eid, alpha);
         m.vert_data(vid).uvw[0] = iso_value;
         new_vids.push_back(vid);
     }
