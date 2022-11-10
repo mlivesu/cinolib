@@ -1,0 +1,22 @@
+name: macos-build
+
+on: [push]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: configure
+        run: |
+          cd examples
+          mkdir build
+          cd build
+          cmake .. -G"Unix Makefiles"
+      - name: build
+        run: |
+          cd build
+          cmake --build . --parallel 8
