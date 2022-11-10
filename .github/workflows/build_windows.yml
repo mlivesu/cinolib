@@ -1,0 +1,20 @@
+name: windows-build
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: configure
+        run: |
+          cd examples
+          mkdir build
+          cd build
+          cmake .. -G "Visual Studio 17 2022" -Dcinolib_DIR="c:/Users/runner/work/cinolib/cinolib"
+      - name: build
+        run: |
+          cd examples
+          cd build
+          cmake --build . --parallel 8
