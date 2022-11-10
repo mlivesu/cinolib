@@ -15,7 +15,7 @@ jobs:
           cd examples
           mkdir build
           cd build
-          cmake .. -G"Unix Makefiles"
+          cmake .. -G"Unix Makefiles" -Dcinolib_DIR=$PWD
       - name: build
         run: |
           cd build
