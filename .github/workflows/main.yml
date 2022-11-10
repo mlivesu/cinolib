@@ -16,7 +16,8 @@ jobs:
           mkdir build
           cd build
           cmake .. -G"Unix Makefiles" -Dcinolib_DIR="/Users/runner/work/cinolib/cinolib"
+          pwd
       - name: build
         run: |
-          cd build
+          pwd
           cmake --build . --parallel 8
