@@ -36,6 +36,7 @@
 #include <cinolib/voxelize.h>
 #include <cinolib/serialize_index.h>
 #include <cinolib/parallel_for.h>
+#include <mutex>
 
 namespace cinolib
 {
