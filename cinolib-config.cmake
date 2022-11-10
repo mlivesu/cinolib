@@ -125,7 +125,7 @@ endif()
 
 if(CINOLIB_USES_VTK)
     message("CINOLIB OPTIONAL MODULE: VTK")
-    find_package(VTK COMPONENTS IOGeometry IOImport IOExport)
+    find_package(VTK OPTIONAL_COMPONENTS IOGeometry IOImport IOExport)
     if(VTK_FOUND)
         # https://vtk.org/doc/nightly/html/md__builds_gitlab-kitware-sciviz-ci_Documentation_Doxygen_ModuleMigration.html
         target_link_libraries(cinolib INTERFACE VTK::IOGeometry VTK::IOImport VTK::IOExport)
