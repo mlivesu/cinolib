@@ -386,6 +386,12 @@ void VolumeMeshControls<Mesh>::header_isosurface(const bool open)
                 update_isosurface();
             }
         }
+        if(ImGui::SmallButton("Tessellate"))
+        {
+            Tetmesh<M,V,E,F,P> *ptr = dynamic_cast<Tetmesh<M,V,E,F,P>*>(m);
+            isosurface.tessellate(*ptr);
+            m->updateGL();
+        }
         if(ImGui::SmallButton("Load 1D field"))
         {
             std::string filename = file_dialog_open();
