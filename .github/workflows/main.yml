@@ -19,5 +19,7 @@ jobs:
           pwd
       - name: build
         run: |
+          cd examples
+          cd build
           pwd
           cmake --build . --parallel 8
