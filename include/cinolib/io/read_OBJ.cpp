@@ -48,7 +48,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <string.h>
+#include <cstring>
 #include <assert.h>
 
 namespace cinolib
