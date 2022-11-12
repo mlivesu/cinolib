@@ -75,12 +75,12 @@ void write_HEDRA(const char                           * filename,
 
     for(uint pid=0; pid<np; ++pid)
     {
-        fprintf(fp, "%d ", static_cast<int>(polys.at(pid).size()));
+        fprintf(fp, "%d ", int(polys.at(pid).size()));
 
         for(uint off=0; off<polys.at(pid).size(); ++off)
         {
-            if (polys_winding.at(pid).at(off)) fprintf(fp, "%d ",   polys.at(pid).at(off)+1);
-            else                               fprintf(fp, "%d ", -(polys.at(pid).at(off)+1));
+            if (polys_winding.at(pid).at(off)) fprintf(fp, "%d ",  int(polys.at(pid).at(off)+1));
+            else                               fprintf(fp, "%d ", -int(polys.at(pid).at(off)+1));
         }
         fprintf(fp, "\n");
     }

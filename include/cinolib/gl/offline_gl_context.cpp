@@ -54,7 +54,7 @@ GLFWwindow * create_offline_GL_context(const int w,  const int h)
     float w_scale, h_scale;
     glfwGetMonitorContentScale(monitor, &w_scale, &h_scale);
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    GLFWwindow* context = glfwCreateWindow(w/w_scale, h/h_scale, "", NULL, NULL);
+    GLFWwindow* context = glfwCreateWindow(int(w/w_scale), int(h/h_scale), "", NULL, NULL);
     glfwDefaultWindowHints(); // restore default hints
     int fb_w,fb_h;
     glfwGetFramebufferSize(context, &fb_w, &fb_h);

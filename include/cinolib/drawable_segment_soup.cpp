@@ -55,7 +55,7 @@ void DrawableSegmentSoup::draw(const float scene_size) const
 
     if(!use_gl_lines)
     {
-        double cylind_rad = scene_size*0.002*thickness;
+        float cylind_rad = scene_size*0.002f*thickness;
 
         for(uint i=0; i<size()/2; ++i)
         {
@@ -108,7 +108,7 @@ CINO_INLINE
 void DrawableSegmentSoup::push_seg(const vec3d v0, const vec3d v1, const Color & color)
 {
     // if it is the first non default color, fill
-    uint n_segs = this->size()/2;
+    uint n_segs = uint(this->size()/2);
     if(colors.size()<n_segs) colors.resize(n_segs,default_color);
     colors.push_back(color);
     push_back(v0);

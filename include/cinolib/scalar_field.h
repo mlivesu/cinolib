@@ -63,7 +63,7 @@ class ScalarField : public Eigen::VectorXd, public Serializable
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint size() const { return rows(); }
+        uint size() const { return uint(rows()); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

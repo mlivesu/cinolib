@@ -60,13 +60,13 @@ class DrawableArrow : public DrawableObject
 
         vec3d  beg, end;
         Color  color;
-        double size;
+        float  size;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         ObjectType object_type()  const { return ARROW; }
         vec3d      scene_center() const { return (beg+end)*0.5; }
-        float      scene_radius() const { return beg.dist(end); }
+        float      scene_radius() const { return float(beg.dist(end)); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

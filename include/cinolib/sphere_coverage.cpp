@@ -53,7 +53,7 @@ void sphere_coverage(const uint n_samples, std::vector<vec3d> & points)
 {
     points.clear();
 
-    srand(time(NULL));
+    srand(unsigned(time(NULL)));
     double rnd      = rand() * n_samples;
     double offset   = 2.0/double(n_samples);
     double increment = M_PI * (3.0 - sqrt(5.0));

@@ -258,7 +258,7 @@ void write_OBJ(const char                           * filename,
     {
         if (DOES_NOT_CONTAIN(color_map, c))
         {
-            uint fresh_id = color_map.size();
+            uint fresh_id = uint(color_map.size());
             color_map[c]  = fresh_id;
             fprintf(f_mtl, "newmtl color_%d\nKd %f %f %f\n", fresh_id, c.r, c.g, c.b);
         }

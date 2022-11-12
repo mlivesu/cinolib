@@ -176,7 +176,7 @@ void read_STL(const char         * filename,
                     auto it = vmap.find(v);
                     if(it == vmap.end())
                     {
-                        uint fresh_id = vmap.size();
+                        uint fresh_id = uint(vmap.size());
                         vmap[v] = fresh_id;
                         verts.push_back(v);
                         tris.push_back(fresh_id);

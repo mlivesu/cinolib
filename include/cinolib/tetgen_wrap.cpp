@@ -63,7 +63,7 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
     // vertices
     //
     in.firstnumber    = 0;
-    in.numberofpoints = coords_in.size() / 3;
+    in.numberofpoints = int(coords_in.size()/3);
     in.pointlist      = new REAL[coords_in.size()];
 
     for(uint i=0; i<coords_in.size(); ++i)
@@ -73,7 +73,7 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
 
     // faces
     //
-    in.numberoffacets = polys_in.size();
+    in.numberoffacets = int(polys_in.size());
     in.facetlist      = new tetgenio::facet[in.numberoffacets];
 
     for(int fid=0; fid<in.numberoffacets; ++fid)
@@ -84,7 +84,7 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
         f->numberofholes = 0;
         f->holelist = NULL;
         p = &f->polygonlist[0];
-        p->numberofvertices = polys_in.at(fid).size();
+        p->numberofvertices = int(polys_in.at(fid).size());
         p->vertexlist = new int[p->numberofvertices];
         for(int i=0; i<p->numberofvertices; ++i)
         {
@@ -94,7 +94,7 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
 
     // edges
     //
-    in.numberofedges = edges_in.size() / 2;
+    in.numberofedges = int(edges_in.size()/2);
     in.edgelist       = new int[edges_in.size()];
     for(uint i=0; i<edges_in.size(); ++i)
     {

@@ -97,15 +97,15 @@ template<class T>
 CINO_INLINE
 void draw_cylinder(const mat<3,1,T> & bot,
                    const mat<3,1,T> & top,
-                   const T            bot_radius,
-                   const T            top_radius,
+                   const float        bot_radius,
+                   const float        top_radius,
                    const Color      & color,
                    const uint         n_sides = 6)
 {
     // tessellation
     std::vector<float> verts, normals;
     std::vector<uint>  tris;
-    cylinder((float)bot.dist(top), (float)bot_radius, (float)top_radius, n_sides, verts, tris, normals);
+    cylinder((float)bot.dist(top), bot_radius, top_radius, n_sides, verts, tris, normals);
     // rendering
     draw_cylinder(bot, top-bot, verts, tris, normals, color);
 }
