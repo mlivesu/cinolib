@@ -63,11 +63,11 @@ const float & Color::operator[](const uint i) const
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-Color & Color::operator*=(const double d)
+Color & Color::operator*=(const float f)
 {
-    r*=d;
-    g*=d;
-    b*=d;
+    r*=f;
+    g*=f;
+    b*=f;
     return *this;
 }
 
