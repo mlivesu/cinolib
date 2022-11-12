@@ -191,7 +191,7 @@ Color Color::normal2rgb(const vec3d & n, bool flip_neg_z)
     float c[3];
     for(int i=0; i<3; ++i)
     {
-        c[i] = (float)(1 + dir[i])*0.5;
+        c[i] = float((1 + dir[i])*0.5);
         if(c[i]<0) c[i]=0;
         if(c[i]>1) c[i]=1;
     }
