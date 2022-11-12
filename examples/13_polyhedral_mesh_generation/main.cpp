@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     m_poly.update_bbox();
 
     MeshSlicer slicer;
-    slicer.Z_thresh = 0.6;
+    slicer.Z_thresh = 0.6f;
     slicer.slice(m_in);
     slicer.slice(m_tet);
     slicer.slice(m_poly);

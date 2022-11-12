@@ -133,7 +133,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         uint num_srf_edges() const;
         uint num_srf_faces() const;
         uint num_srf_polys() const;
-        uint num_faces()     const { return faces.size(); }
+        uint num_faces()     const { return uint(faces.size()); }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

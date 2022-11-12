@@ -131,8 +131,8 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
     std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
 
     // pre-allocate memory
-    uint nv = verts.size();
-    uint np = polys.size();
+    uint nv = uint(verts.size());
+    uint np = uint(polys.size());
     this->verts.reserve(nv);
     this->polys.reserve(np);
     this->v2v.reserve(nv);
@@ -3023,7 +3023,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::poly_export_element(const uint          
             auto it = v_map.find(vid);
             if(it==v_map.end())
             {
-                uint fresh_id = verts.size();
+                uint fresh_id = uint(verts.size());
                 v_map[vid] = fresh_id;
                 verts.push_back(this->vert(vid));
                 f.push_back(fresh_id);

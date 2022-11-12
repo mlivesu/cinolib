@@ -54,7 +54,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         RenderData drawlist;
         RenderData drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces too)
         Color      marked_edge_color;
-        float      AO_alpha = 1.0;
+        float      AO_alpha = 1.f;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

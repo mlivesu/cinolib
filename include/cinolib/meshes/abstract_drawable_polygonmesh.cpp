@@ -148,9 +148,9 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
         drawlist.tri_v_colors.reserve(this->num_verts()*4);
         for(uint vid=0; vid<this->num_verts(); ++vid)
         {
-            drawlist.tri_coords.push_back(this->vert(vid).x());
-            drawlist.tri_coords.push_back(this->vert(vid).y());
-            drawlist.tri_coords.push_back(this->vert(vid).z());
+            drawlist.tri_coords.push_back(float(this->vert(vid).x()));
+            drawlist.tri_coords.push_back(float(this->vert(vid).y()));
+            drawlist.tri_coords.push_back(float(this->vert(vid).z()));
 
             drawlist.tri_v_colors.push_back(this->vert_data(vid).color.r);
             drawlist.tri_v_colors.push_back(this->vert_data(vid).color.g);
@@ -176,12 +176,12 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
                 auto  vid0_vis_pids = this->vert_adj_visible_polys(vid0, n, 60.0);
                 auto  vid1_vis_pids = this->vert_adj_visible_polys(vid1, n, 60.0);
                 auto  vid2_vis_pids = this->vert_adj_visible_polys(vid2, n, 60.0);
-                float AO_vid0 = 0.0;
-                float AO_vid1 = 0.0;
-                float AO_vid2 = 0.0;
-                for(uint pid : vid0_vis_pids) AO_vid0 += this->poly_data(pid).AO*AO_alpha + (1.0 - AO_alpha);
-                for(uint pid : vid1_vis_pids) AO_vid1 += this->poly_data(pid).AO*AO_alpha + (1.0 - AO_alpha);
-                for(uint pid : vid2_vis_pids) AO_vid2 += this->poly_data(pid).AO*AO_alpha + (1.0 - AO_alpha);
+                float AO_vid0 = 0.f;
+                float AO_vid1 = 0.f;
+                float AO_vid2 = 0.f;
+                for(uint pid : vid0_vis_pids) AO_vid0 += this->poly_data(pid).AO*AO_alpha + (1.f - AO_alpha);
+                for(uint pid : vid1_vis_pids) AO_vid1 += this->poly_data(pid).AO*AO_alpha + (1.f - AO_alpha);
+                for(uint pid : vid2_vis_pids) AO_vid2 += this->poly_data(pid).AO*AO_alpha + (1.f - AO_alpha);
                 AO_vid0 /= static_cast<float>(vid0_vis_pids.size());
                 AO_vid1 /= static_cast<float>(vid1_vis_pids.size());
                 AO_vid2 /= static_cast<float>(vid2_vis_pids.size());
@@ -192,15 +192,15 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
                 drawlist.tris.push_back(base_addr + 1);
                 drawlist.tris.push_back(base_addr + 2);
 
-                drawlist.tri_coords.push_back(this->vert(vid0).x());
-                drawlist.tri_coords.push_back(this->vert(vid0).y());
-                drawlist.tri_coords.push_back(this->vert(vid0).z());
-                drawlist.tri_coords.push_back(this->vert(vid1).x());
-                drawlist.tri_coords.push_back(this->vert(vid1).y());
-                drawlist.tri_coords.push_back(this->vert(vid1).z());
-                drawlist.tri_coords.push_back(this->vert(vid2).x());
-                drawlist.tri_coords.push_back(this->vert(vid2).y());
-                drawlist.tri_coords.push_back(this->vert(vid2).z());
+                drawlist.tri_coords.push_back(float(this->vert(vid0).x()));
+                drawlist.tri_coords.push_back(float(this->vert(vid0).y()));
+                drawlist.tri_coords.push_back(float(this->vert(vid0).z()));
+                drawlist.tri_coords.push_back(float(this->vert(vid1).x()));
+                drawlist.tri_coords.push_back(float(this->vert(vid1).y()));
+                drawlist.tri_coords.push_back(float(this->vert(vid1).z()));
+                drawlist.tri_coords.push_back(float(this->vert(vid2).x()));
+                drawlist.tri_coords.push_back(float(this->vert(vid2).y()));
+                drawlist.tri_coords.push_back(float(this->vert(vid2).z()));
 
                 if (drawlist.draw_mode & DRAW_TRI_SMOOTH)
                 {

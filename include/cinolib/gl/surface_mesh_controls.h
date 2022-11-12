@@ -79,11 +79,11 @@ class SurfaceMeshControls : public SideBarItem
     int        wireframe_width   = 1;
     int        marked_edge_width = 1;
     int        isoline_width     = 1;
-    float      wireframe_alpha   = 1;
-    float      vecfield_size     = 0.9;
-    float      iso_val           = 0.5;
-    float      iso_min           = 0;
-    float      iso_max           = 1;
+    float      wireframe_alpha   = 1.f;
+    float      vecfield_size     = 0.9f;
+    float      iso_val           = 0.5f;
+    float      iso_min           = 0.f;
+    float      iso_max           = 1.f;
     int        crease_deg        = 60;
     int        marker_font_size  = 10;
     int        marker_size       = 5;
