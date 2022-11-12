@@ -264,7 +264,7 @@ Color Color::hsv_ramp(uint n_colors, uint pos)
 {
     assert(pos<n_colors);
 
-    uint i = std::round(255 * static_cast<float>(pos)/static_cast<float>(n_colors));
+    uint i = (uint)std::round(255 * static_cast<float>(pos)/static_cast<float>(n_colors));
 
     float r = hsv_texture1D[3*i+0]/255.f;
     float g = hsv_texture1D[3*i+1]/255.f;
@@ -280,7 +280,7 @@ Color Color::parula_ramp(uint n_colors, uint pos)
 {
     assert(pos<n_colors);
 
-    uint i = std::round(64 * static_cast<float>(pos)/static_cast<float>(n_colors));
+    uint i = (uint)std::round(64 * static_cast<float>(pos)/static_cast<float>(n_colors));
 
     float r = parula_texture1D[3*i+0]/255.f;
     float g = parula_texture1D[3*i+1]/255.f;
