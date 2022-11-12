@@ -375,9 +375,9 @@ void GLcanvas::draw_markers() const
             if(depth_cull_markers && fabs(z-z_buf[x+W*(H-y-1)])>0.01) continue;
         }
         // adjust marker size based on zoom
-        auto  zoom_factor = clamp(camera.zoom_factor, 1e-5, 1e10); // avoids overflow inside ImGui radius calculation
-        float zoom_radius = 0.5*m.disk_radius/float(zoom_factor);
-        float zoom_font_s = 0.5*m.font_size/float(zoom_factor);
+        float zoom_factor = float(clamp(camera.zoom_factor, 1e-5, 1e10)); // avoids overflow inside ImGui radius calculation
+        float zoom_radius = 0.5*m.disk_radius/zoom_factor;
+        float zoom_font_s = 0.5*m.font_size/zoom_factor;
         //
         if(m.disk_radius>0)
         {
@@ -386,7 +386,7 @@ void GLcanvas::draw_markers() const
             //    so I am always approximating circles with 20-gons
             //  - Besides, I should probably use something like AddSquare or AddRect to save limit polygon vertices....
             drawList->AddCircleFilled(ImVec2(float(pos.x()),float(pos.y())),
-                                      float(zoom_radius),
+                                      zoom_radius,
                                       ImGui::GetColorU32(ImVec4(m.color.r, m.color.g, m.color.b, m.color.a)), 20);
         }
         if(m.font_size>0 && m.text.length()>0)
