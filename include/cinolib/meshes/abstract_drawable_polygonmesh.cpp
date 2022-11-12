@@ -108,12 +108,12 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_marked()
         drawlist_marked.segs.push_back(base_addr    );
         drawlist_marked.segs.push_back(base_addr + 1);
 
-        drawlist_marked.seg_coords.push_back(vid0.x());
-        drawlist_marked.seg_coords.push_back(vid0.y());
-        drawlist_marked.seg_coords.push_back(vid0.z());
-        drawlist_marked.seg_coords.push_back(vid1.x());
-        drawlist_marked.seg_coords.push_back(vid1.y());
-        drawlist_marked.seg_coords.push_back(vid1.z());
+        drawlist_marked.seg_coords.push_back(float(vid0.x()));
+        drawlist_marked.seg_coords.push_back(float(vid0.y()));
+        drawlist_marked.seg_coords.push_back(float(vid0.z()));
+        drawlist_marked.seg_coords.push_back(float(vid1.x()));
+        drawlist_marked.seg_coords.push_back(float(vid1.y()));
+        drawlist_marked.seg_coords.push_back(float(vid1.z()));
 
         drawlist_marked.seg_colors.push_back(marked_edge_color.r);
         drawlist_marked.seg_colors.push_back(marked_edge_color.g);
@@ -227,31 +227,31 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
                 }
                 else if (drawlist.draw_mode & DRAW_TRI_FLAT)
                 {
-                    drawlist.tri_v_norms.push_back(n.x());
-                    drawlist.tri_v_norms.push_back(n.y());
-                    drawlist.tri_v_norms.push_back(n.z());
-                    drawlist.tri_v_norms.push_back(n.x());
-                    drawlist.tri_v_norms.push_back(n.y());
-                    drawlist.tri_v_norms.push_back(n.z());
-                    drawlist.tri_v_norms.push_back(n.x());
-                    drawlist.tri_v_norms.push_back(n.y());
-                    drawlist.tri_v_norms.push_back(n.z());
+                    drawlist.tri_v_norms.push_back(float(n.x()));
+                    drawlist.tri_v_norms.push_back(float(n.y()));
+                    drawlist.tri_v_norms.push_back(float(n.z()));
+                    drawlist.tri_v_norms.push_back(float(n.x()));
+                    drawlist.tri_v_norms.push_back(float(n.y()));
+                    drawlist.tri_v_norms.push_back(float(n.z()));
+                    drawlist.tri_v_norms.push_back(float(n.x()));
+                    drawlist.tri_v_norms.push_back(float(n.y()));
+                    drawlist.tri_v_norms.push_back(float(n.z()));
                 }
 
                 if (drawlist.draw_mode & DRAW_TRI_TEXTURE1D)
                 {
-                    drawlist.tri_text.push_back(this->vert_data(vid0).uvw[0]);
-                    drawlist.tri_text.push_back(this->vert_data(vid1).uvw[0]);
-                    drawlist.tri_text.push_back(this->vert_data(vid2).uvw[0]);
+                    drawlist.tri_text.push_back(float(this->vert_data(vid0).uvw[0]));
+                    drawlist.tri_text.push_back(float(this->vert_data(vid1).uvw[0]));
+                    drawlist.tri_text.push_back(float(this->vert_data(vid2).uvw[0]));
                 }
                 else if (drawlist.draw_mode & DRAW_TRI_TEXTURE2D)
                 {
-                    drawlist.tri_text.push_back(this->vert_data(vid0).uvw[0]*drawlist.texture.scaling_factor);
-                    drawlist.tri_text.push_back(this->vert_data(vid0).uvw[1]*drawlist.texture.scaling_factor);
-                    drawlist.tri_text.push_back(this->vert_data(vid1).uvw[0]*drawlist.texture.scaling_factor);
-                    drawlist.tri_text.push_back(this->vert_data(vid1).uvw[1]*drawlist.texture.scaling_factor);
-                    drawlist.tri_text.push_back(this->vert_data(vid2).uvw[0]*drawlist.texture.scaling_factor);
-                    drawlist.tri_text.push_back(this->vert_data(vid2).uvw[1]*drawlist.texture.scaling_factor);
+                    drawlist.tri_text.push_back(float(this->vert_data(vid0).uvw[0]*drawlist.texture.scaling_factor));
+                    drawlist.tri_text.push_back(float(this->vert_data(vid0).uvw[1]*drawlist.texture.scaling_factor));
+                    drawlist.tri_text.push_back(float(this->vert_data(vid1).uvw[0]*drawlist.texture.scaling_factor));
+                    drawlist.tri_text.push_back(float(this->vert_data(vid1).uvw[1]*drawlist.texture.scaling_factor));
+                    drawlist.tri_text.push_back(float(this->vert_data(vid2).uvw[0]*drawlist.texture.scaling_factor));
+                    drawlist.tri_text.push_back(float(this->vert_data(vid2).uvw[1]*drawlist.texture.scaling_factor));
                 }
 
                 if (drawlist.draw_mode & DRAW_TRI_FACECOLOR) // replicate f color on each vertex
@@ -324,12 +324,12 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
             vec3d vid0 = this->edge_vert(eid,0);
             vec3d vid1 = this->edge_vert(eid,1);
 
-            drawlist.seg_coords.push_back(vid0.x());
-            drawlist.seg_coords.push_back(vid0.y());
-            drawlist.seg_coords.push_back(vid0.z());
-            drawlist.seg_coords.push_back(vid1.x());
-            drawlist.seg_coords.push_back(vid1.y());
-            drawlist.seg_coords.push_back(vid1.z());
+            drawlist.seg_coords.push_back(float(vid0.x()));
+            drawlist.seg_coords.push_back(float(vid0.y()));
+            drawlist.seg_coords.push_back(float(vid0.z()));
+            drawlist.seg_coords.push_back(float(vid1.x()));
+            drawlist.seg_coords.push_back(float(vid1.y()));
+            drawlist.seg_coords.push_back(float(vid1.z()));
 
             drawlist.seg_colors.push_back(this->edge_data(eid).color.r);
             drawlist.seg_colors.push_back(this->edge_data(eid).color.g);

@@ -15,12 +15,12 @@ int main(int argc, char **argv)
     compute_geodesics(m, {100}, COTANGENT).copy_to_mesh(m); // generate some scalar field
     m.show_texture1D(TEXTURE_1D_HSV_W_ISOLINES);
     m.show_wireframe(true);
-    m.show_wireframe_transparency(0.5);
+    m.show_wireframe_transparency(0.5f);
     gui.push(&m);
 
-    float iso_val = 0.5;
+    float iso_val = 0.5f;
     DrawableIsocontour<> iso(m, iso_val);
-    iso.thickness = 3.0;
+    iso.thickness = 3.f;
     gui.push(&iso, false);
 
     Profiler profiler;

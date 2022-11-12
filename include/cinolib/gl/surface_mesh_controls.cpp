@@ -136,9 +136,9 @@ void SurfaceMeshControls<Mesh>::header_wireframe(const bool open)
     ImGui::SetNextItemOpen(open,ImGuiCond_Once);
     if(ImGui::TreeNode("Wireframe"))
     {
-        if(ImGui::Checkbox   ("Show",         &show_wireframe        )) m->show_wireframe(show_wireframe);
-        if(ImGui::SliderInt  ("Width",        &wireframe_width, 1, 10)) m->show_wireframe_width(wireframe_width);
-        if(ImGui::SliderFloat("Transparency", &wireframe_alpha, 0,  1)) m->show_wireframe_transparency(wireframe_alpha);
+        if(ImGui::Checkbox   ("Show",         &show_wireframe          )) m->show_wireframe(show_wireframe);
+        if(ImGui::SliderInt  ("Width",        &wireframe_width,   1, 10)) m->show_wireframe_width(wireframe_width);
+        if(ImGui::SliderFloat("Transparency", &wireframe_alpha, 0.f,1.f)) m->show_wireframe_transparency(wireframe_alpha);
         ImGui::TreePop();
     }
 }

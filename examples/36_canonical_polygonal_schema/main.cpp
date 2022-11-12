@@ -62,13 +62,13 @@ int main(int argc, char **argv)
 
     GLcanvas gui_obj;
     GLcanvas gui_cps;
-    obj.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
+    obj.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1.f);
     obj.show_marked_edge(false);
     obj.show_wireframe(false);
     obj.updateGL();
     gui_obj.push(&obj);
     gui_obj.push(&obj_loops);
-    cps.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1);
+    cps.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1.f);
     cps.show_marked_edge(false);
     cps.show_wireframe(false);
     cps.updateGL();

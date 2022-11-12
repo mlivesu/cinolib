@@ -59,7 +59,7 @@ ScalarField LSCM(const Trimesh<M,V,E,P>     & m,
     {
         auto b_verts = m.get_ordered_boundary_vertices();
         uint v0 = b_verts.front();
-        uint v1 = b_verts.at(b_verts.size()*0.5);
+        uint v1 = b_verts.at(uint(b_verts.size()*0.5));
         uint nv = m.num_verts();
         bc_uv[v0   ] = 0;
         bc_uv[v0+nv] = 0;

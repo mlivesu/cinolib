@@ -12,14 +12,14 @@ int main(int argc, char **argv)
     GLcanvas gui_xyz, gui_uvw;
 
     DrawableTrimesh<> m_xyz(filename.c_str());
-    m_xyz.show_texture2D(TEXTURE_2D_BITMAP, 1.0, texture.c_str());
+    m_xyz.show_texture2D(TEXTURE_2D_BITMAP, 1.f, texture.c_str());
     m_xyz.show_wireframe(false);
     gui_xyz.push(&m_xyz);
 
     DrawableTrimesh<> m_uvw = m_xyz;
     m_uvw.copy_uvw_to_xyz(UVW_param);
     m_uvw.update_normals();
-    m_uvw.show_texture2D(TEXTURE_2D_BITMAP, 1.0, texture.c_str());
+    m_uvw.show_texture2D(TEXTURE_2D_BITMAP, 1.f, texture.c_str());
     m_uvw.show_wireframe(false);
     gui_uvw.push(&m_uvw);
 

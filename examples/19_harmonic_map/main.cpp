@@ -37,12 +37,12 @@ int main(int argc, char **argv)
 
     GLcanvas gui_xyz, gui_uvw;
     m_xyz.show_wireframe(true);
-    m_xyz.show_wireframe_transparency(0.4);
-    m_xyz.show_texture2D(TEXTURE_2D_ISOLINES, 3.0);
+    m_xyz.show_wireframe_transparency(0.4f);
+    m_xyz.show_texture2D(TEXTURE_2D_ISOLINES, 3.f);
     gui_xyz.push(&m_xyz);
     m_uvw.show_wireframe(true);
-    m_uvw.show_wireframe_transparency(0.4);
-    m_uvw.show_texture2D(TEXTURE_2D_ISOLINES, 3.0);
+    m_uvw.show_wireframe_transparency(0.4f);
+    m_uvw.show_texture2D(TEXTURE_2D_ISOLINES, 3.f);
     gui_uvw.push(&m_uvw);
 
     // only the main window can host visual controls, so all menus are pushed in gui_xyz

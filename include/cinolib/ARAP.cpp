@@ -81,7 +81,7 @@ void ARAP(AbstractMesh<M,V,E,P> & m, ARAP_data & data)
         // Compute the Laplacian matrix and pre-factorize it
         typedef Eigen::Triplet<double> Entry;
         std::vector<Entry> entries;
-        uint size = m.num_verts() - data.bcs.size();
+        uint size = m.num_verts() - uint(data.bcs.size());
         if(data.use_soft_constraints)
         {
             size = m.num_verts() + data.bcs.size();
@@ -204,8 +204,8 @@ void ARAP(AbstractMesh<M,V,E,P> & m, ARAP_data & data)
 
     auto global_step = [&]()
     {
-        uint size = (data.use_soft_constraints) ? m.num_verts() + data.bcs.size()
-                                                : m.num_verts() - data.bcs.size();
+        uint size = (data.use_soft_constraints) ? m.num_verts() + uint(data.bcs.size())
+                                                : m.num_verts() - uint(data.bcs.size());
         Eigen::VectorXd rhs_x = Eigen::VectorXd::Zero(size);
         Eigen::VectorXd rhs_y = Eigen::VectorXd::Zero(size);
         Eigen::VectorXd rhs_z = Eigen::VectorXd::Zero(size);
