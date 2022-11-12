@@ -376,8 +376,8 @@ void GLcanvas::draw_markers() const
         }
         // adjust marker size based on zoom
         auto  zoom_factor = clamp(camera.zoom_factor, 1e-5, 1e10); // avoids overflow inside ImGui radius calculation
-        uint  zoom_radius = uint(0.5*m.disk_radius/zoom_factor);
-        float zoom_font_s = 0.5*m.font_size/zoom_factor;
+        float zoom_radius = 0.5*m.disk_radius/float(zoom_factor);
+        float zoom_font_s = 0.5*m.font_size/float(zoom_factor);
         //
         if(m.disk_radius>0)
         {
@@ -385,15 +385,15 @@ void GLcanvas::draw_markers() const
             //  - I noticed that the automatic segment count immediately triggers overflow with large amounts of zoom,
             //    so I am always approximating circles with 20-gons
             //  - Besides, I should probably use something like AddSquare or AddRect to save limit polygon vertices....
-            drawList->AddCircleFilled(ImVec2(pos.x(),pos.y()),
-                                      zoom_radius,
+            drawList->AddCircleFilled(ImVec2(float(pos.x()),float(pos.y())),
+                                      float(zoom_radius),
                                       ImGui::GetColorU32(ImVec4(m.color.r, m.color.g, m.color.b, m.color.a)), 20);
         }
         if(m.font_size>0 && m.text.length()>0)
         {
             drawList->AddText(ImGui::GetFont(),
                               zoom_font_s,
-                              ImVec2(pos.x()+zoom_radius, pos.y()-2*zoom_radius),
+                              ImVec2(float(pos.x()+zoom_radius), float(pos.y()-2*zoom_radius)),
                               ImGui::GetColorU32(ImVec4(m.color.r, m.color.g, m.color.b, m.color.a)),
                               &m.text[0],
                               &m.text[0] + m.text.size());

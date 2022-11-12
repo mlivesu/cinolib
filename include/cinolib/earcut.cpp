@@ -36,6 +36,7 @@
 #include <cinolib/earcut.h>
 #include <cinolib/predicates.h>
 #include <queue>
+#include <numeric>
 
 namespace cinolib
 {
@@ -51,7 +52,7 @@ bool earcut(const std::vector<point> & poly,
     if(sort==EarSorting::RANDOMIZED) srand(1234567);
 
     // doubly linked list for O(1) polygon update
-    uint size = poly.size();
+    uint size = uint(poly.size());
     assert(size>=3);
     std::vector<uint> prev(size);
     std::vector<uint> next(size);
