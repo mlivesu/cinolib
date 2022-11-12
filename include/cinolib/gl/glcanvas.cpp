@@ -375,9 +375,9 @@ void GLcanvas::draw_markers() const
             if(depth_cull_markers && fabs(z-z_buf[x+W*(H-y-1)])>0.01) continue;
         }
         // adjust marker size based on zoom
-        float zoom_factor = float(clamp(camera.zoom_factor, 1e-5, 1e10)); // avoids overflow inside ImGui radius calculation
-        float zoom_radius = 0.5*m.disk_radius/zoom_factor;
-        float zoom_font_s = 0.5*m.font_size/zoom_factor;
+        float zoom_factor = clamp(float(camera.zoom_factor), 1e-5f, 1e10f); // avoids overflow inside ImGui radius calculation
+        float zoom_radius = 0.5f*m.disk_radius/zoom_factor;
+        float zoom_font_s = 0.5f*m.font_size/zoom_factor;
         //
         if(m.disk_radius>0)
         {
