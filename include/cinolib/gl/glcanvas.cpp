@@ -376,8 +376,8 @@ void GLcanvas::draw_markers() const
         }
         // adjust marker size based on zoom
         auto zoom_factor = clamp(camera.zoom_factor, 1e-5, 1e10); // avoids overflow inside ImGui radius calculation
-        uint zoom_radius = 0.5*m.disk_radius/zoom_factor;
-        uint zoom_font_s = 0.5*m.font_size/zoom_factor;
+        uint zoom_radius = uint(0.5*m.disk_radius/zoom_factor);
+        uint zoom_font_s = uint(0.5*m.font_size/zoom_factor);
         //
         if(m.disk_radius>0)
         {
