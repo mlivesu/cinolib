@@ -313,7 +313,7 @@ void GLcanvas::draw_axis() const
     vec3d  X = O + vec3d(1,0,0)*camera.scene_radius;
     vec3d  Y = O + vec3d(0,1,0)*camera.scene_radius;
     vec3d  Z = O + vec3d(0,0,1)*camera.scene_radius;
-    double r = camera.scene_radius*0.02;
+    float  r = float(camera.scene_radius*0.02);
     glfwMakeContextCurrent(window);
     glDisable(GL_DEPTH_TEST);
     draw_arrow(O, X, r, Color::RED(),   0.9, 0.5, 8);

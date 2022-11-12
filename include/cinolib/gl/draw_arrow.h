@@ -97,19 +97,19 @@ template<class T>
 CINO_INLINE
 void draw_arrow(const mat<3,1,T> & bot,
                 const mat<3,1,T> & top,
-                const T            radius,
+                const float        radius,
                 const Color      & color,
-                const T            base_rel_height = 0.7, // percentage of the height
-                const T            base_rel_radius = 0.5, // percentage of the radius
+                const float        base_rel_height = 0.7, // percentage of the height
+                const float        base_rel_radius = 0.5, // percentage of the radius
                 const uint         n_sides         = 6)   // cross section
 {
     // tessellation
     std::vector<float> verts, normals;
     std::vector<uint>  tris;
     arrow((float)bot.dist(top),
-          (float)radius,
-          (float)base_rel_height,
-          (float)base_rel_radius,
+          radius,
+          base_rel_height,
+          base_rel_radius,
           n_sides, verts, tris, normals);
     // rendering
     draw_arrow(bot, top-bot, verts, tris, normals, color);
