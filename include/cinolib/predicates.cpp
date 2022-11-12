@@ -997,8 +997,8 @@ SimplexIntersection triangle_triangle_intersect_2d(const double * t00,
     if(vec_equals_2d(t02, t12)) { t0_shared[2] = true; t1_shared[2] = true; }
 
     // count number of coincident vertices in t0 and t1
-    uint t0_count = t0_shared.count();
-    uint t1_count = t1_shared.count();
+    uint t0_count = uint(t0_shared.count());
+    uint t1_count = uint(t1_shared.count());
 
     // either t0 and t1 are coincident or one of the two triangles
     // is degenerate and is an edge/vertex of the other
@@ -1139,7 +1139,7 @@ SimplexIntersection triangle_triangle_intersect_3d(const double * t00,
     if(vec_equals_3d(t02, t12)) { t0_shared[2] = true; t1_shared[2] = true; }
 
     // count number of coincident vertices in t0 and t1
-    uint t0_count = t0_shared.count();
+    uint t0_count = uint(t0_shared.count());
 
     // either t0 and t1 are coincident
     if(t0_count == 3) return SIMPLICIAL_COMPLEX;

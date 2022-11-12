@@ -171,8 +171,8 @@ double polygon_is_convex(const std::vector<vec2d> & poly)
     bool turn_right = false;
     for(uint curr=0; curr<poly.size(); ++curr)
     {
-        uint prev = (curr>0) ? curr-1 : poly.size()-1;
-        uint next = (curr<poly.size()-1) ? curr+1 : 0;
+        uint prev = uint((curr>0) ? curr-1 : poly.size()-1);
+        uint next = uint((curr<poly.size()-1) ? curr+1 : 0);
 
         double sign = orient2d(poly.at(prev), poly.at(curr), poly.at(next));
 

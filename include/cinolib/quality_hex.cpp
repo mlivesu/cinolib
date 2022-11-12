@@ -305,7 +305,7 @@ double hex_oddy(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3
             double AtA_sqrd = a11*a11 + 2.0*a12*a12 + 2.0*a13*a13 + a22*a22 + 2.0*a23*a23 +a33*a33;
             double A_sqrd   = a11 + a22 + a33;
 
-            oddy[i] = (AtA_sqrd - A_sqrd*A_sqrd/3.0) / pow(det,four_over_three);
+            oddy[i] = float((AtA_sqrd - A_sqrd*A_sqrd/3.0) / pow(det,four_over_three));
         }
         else return max_double;
     }
