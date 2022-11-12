@@ -110,8 +110,7 @@ void ambient_occlusion_srf_meshes(      Mesh & m,
 
                 if(z_buffer[buffer_size*int(pp.y())+int(pp.x())]+0.0025 > depth)
                 {
-                    double diff = std::max(-dir.dot(m.poly_data(pid).normal), 0.0);
-                    ao[pid] += diff;
+                    ao[pid] += float(std::max(-dir.dot(m.poly_data(pid).normal),0.0));
                 }
             }
         });
@@ -125,7 +124,7 @@ void ambient_occlusion_srf_meshes(      Mesh & m,
     auto max     = *min_max.second;
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        m.poly_data(pid).AO = (m.poly_data(pid).flags[HIDDEN]) ? 1.0 : (ao[pid]-min)/max;
+        m.poly_data(pid).AO = (m.poly_data(pid).flags[HIDDEN]) ? 1.f : (ao[pid]-min)/max;
     }
 }
 

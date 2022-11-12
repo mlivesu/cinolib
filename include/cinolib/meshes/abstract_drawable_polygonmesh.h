@@ -101,7 +101,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         void show_vert_color();
         void show_poly_color();
         void show_texture1D(const int tex_type);
-        void show_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap = NULL);
+        void show_texture2D(const int tex_type, const float tex_unit_scalar, const char *bitmap = NULL);
         void show_wireframe(const bool b);
         void show_wireframe_color(const Color & c);
         void show_wireframe_width(const float width);

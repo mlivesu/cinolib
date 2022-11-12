@@ -13,14 +13,14 @@ int main(int argc, char **argv)
 
     GeodesicsCache prefactored_matrices;
     compute_geodesics_amortized(m, prefactored_matrices, {0}); // init heat based solver
-    float brush_size = 0.01;
+    float brush_size = 0.01f;
 
     GLcanvas gui;
     gui.push(&m);
     gui.callback_app_controls = [&]()
     {
         ImGui::Text("Brush size");
-        ImGui::SliderFloat("##size", &brush_size, 0.001, 0.5);
+        ImGui::SliderFloat("##size", &brush_size, 0.001f, 0.5f);
         if(ImGui::SmallButton("Reset"))
         {
             m.vert_set_color(Color::WHITE());
@@ -40,7 +40,7 @@ int main(int argc, char **argv)
                 ScalarField f    = compute_geodesics_amortized(m, prefactored_matrices, {vid});
                 for(vid=0; vid<m.num_verts(); ++vid)
                 {
-                    float dist = 1.f - f[vid];
+                    float dist = 1.f - float(f[vid]);
                     if(dist<=brush_size)
                     {
                         float val = m.vert_data(vid).color.g;

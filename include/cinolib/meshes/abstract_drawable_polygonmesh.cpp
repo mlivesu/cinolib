@@ -186,7 +186,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
                 AO_vid1 /= static_cast<float>(vid1_vis_pids.size());
                 AO_vid2 /= static_cast<float>(vid2_vis_pids.size());
 
-                uint base_addr = drawlist.tri_coords.size()/3;
+                uint base_addr = uint(drawlist.tri_coords.size()/3);
 
                 drawlist.tris.push_back(base_addr    );
                 drawlist.tris.push_back(base_addr + 1);
@@ -215,15 +215,15 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
                     n_vid1 /= static_cast<double>(vid1_vis_pids.size());
                     n_vid2 /= static_cast<double>(vid2_vis_pids.size());
 
-                    drawlist.tri_v_norms.push_back(n_vid0.x());
-                    drawlist.tri_v_norms.push_back(n_vid0.y());
-                    drawlist.tri_v_norms.push_back(n_vid0.z());
-                    drawlist.tri_v_norms.push_back(n_vid1.x());
-                    drawlist.tri_v_norms.push_back(n_vid1.y());
-                    drawlist.tri_v_norms.push_back(n_vid1.z());
-                    drawlist.tri_v_norms.push_back(n_vid2.x());
-                    drawlist.tri_v_norms.push_back(n_vid2.y());
-                    drawlist.tri_v_norms.push_back(n_vid2.z());
+                    drawlist.tri_v_norms.push_back(float(n_vid0.x()));
+                    drawlist.tri_v_norms.push_back(float(n_vid0.y()));
+                    drawlist.tri_v_norms.push_back(float(n_vid0.z()));
+                    drawlist.tri_v_norms.push_back(float(n_vid1.x()));
+                    drawlist.tri_v_norms.push_back(float(n_vid1.y()));
+                    drawlist.tri_v_norms.push_back(float(n_vid1.z()));
+                    drawlist.tri_v_norms.push_back(float(n_vid2.x()));
+                    drawlist.tri_v_norms.push_back(float(n_vid2.y()));
+                    drawlist.tri_v_norms.push_back(float(n_vid2.z()));
                 }
                 else if (drawlist.draw_mode & DRAW_TRI_FLAT)
                 {
@@ -455,7 +455,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_texture1D(const int tex_type)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::show_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
+void AbstractDrawablePolygonMesh<Mesh>::show_texture2D(const int tex_type, const float tex_unit_scalar, const char *bitmap)
 {
     drawlist.draw_mode |=  DRAW_TRI_TEXTURE2D;
     drawlist.draw_mode &= ~DRAW_TRI_TEXTURE1D;

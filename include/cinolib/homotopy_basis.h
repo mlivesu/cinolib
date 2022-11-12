@@ -125,7 +125,7 @@ struct HomotopyBasisData
 
     // OUTPUT: BASIS AND LENGTH
     std::vector<std::vector<uint>> loops;
-    float length = 0.0; // length of the basis
+    double length = 0.0; // length of the basis
 
     // OUTPUT: AUXILIARY DATA (may be useful for visual inspection/debugging)
     // note: tree and cotree reference the input mesh. If loops are detached they are useless

@@ -51,7 +51,7 @@ int main(int argc, char **argv)
                 uint v1 = obj.edge_vert_id(eid,1);
                 int loop_id = obj.vert_data(v0).label;
                 if(loop_id<0) loop_id = obj.vert_data(v1).label;
-                Color c = Color::scatter(data.loops.size(),loop_id,1,1);
+                Color c = Color::scatter(data.loops.size(),loop_id,1.f,1.f);
                 obj_loops.push_seg(obj.vert(v0),obj.vert(v1),c);
                 cps_edges.push_seg(cps.vert(v0),cps.vert(v1),c);
             }

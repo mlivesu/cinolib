@@ -103,9 +103,9 @@ double homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
     {
         if(tree.at(eid)) continue;
         std::vector<uint> tmp;
-        edge_weights.at(eid) -= m.edge_length(eid);
-        edge_weights.at(eid) -= dijkstra_mask_on_edges(m, m.edge_vert_id(eid,0), root, edge_mask, tmp);
-        edge_weights.at(eid) -= dijkstra_mask_on_edges(m, m.edge_vert_id(eid,1), root, edge_mask, tmp);
+        edge_weights.at(eid) -= float(m.edge_length(eid));
+        edge_weights.at(eid) -= float(dijkstra_mask_on_edges(m, m.edge_vert_id(eid,0), root, edge_mask, tmp));
+        edge_weights.at(eid) -= float(dijkstra_mask_on_edges(m, m.edge_vert_id(eid,1), root, edge_mask, tmp));
     }
     MST_on_dual_mask_on_edges(m, edge_weights, tree, cotree); // use tree as edge mask
 
