@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/maxFace.obj";
     DrawableTrimesh<> m_xyz(s.c_str());
     m_xyz.show_wireframe(true);
-    m_xyz.show_wireframe_transparency(0.2);
+    m_xyz.show_wireframe_transparency(0.2f);
     m_xyz.show_texture2D(TEXTURE_2D_CHECKERBOARD, 1.0);
     SurfaceMeshControls<DrawableTrimesh<>> menu_xyz(&m_xyz, &gui_xyz, "OBJ space");
     gui_xyz.push(&m_xyz);

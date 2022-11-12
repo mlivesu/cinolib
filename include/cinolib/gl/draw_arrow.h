@@ -63,7 +63,7 @@ void draw_arrow(const mat<3,1,T>         & base,    // base
 {
     mat<3,1,T> Z     = mat<3,1,T>(0,0,1);
     mat<3,1,T> axis  = dir.cross(Z); axis.normalize();
-    float      angle = dir.angle_deg(Z,true);
+    float      angle = float(dir.angle_deg(Z,true));
 
     glEnable(GL_LIGHTING);
     glShadeModel(GL_SMOOTH);

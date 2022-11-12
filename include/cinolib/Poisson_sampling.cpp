@@ -174,7 +174,7 @@ void Poisson_sampling(const double          radius,
 
         if(found_sample)
         {
-            uint id=samples.size(); // the index of the new sample
+            uint id=uint(samples.size()); // the index of the new sample
             samples.push_back(x);
             active_list.push_back(id);
             index=serialize_nD_index<Dim,Point>(dim_extent, (x-min)/step);

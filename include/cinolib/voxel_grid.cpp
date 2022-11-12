@@ -45,9 +45,9 @@ uint voxel_corner_index(const uint dim[3],
                         const uint ijk[3],
                         const uint corner)
 {
-    return serialize_3D_index(ijk[0] + REFERENCE_HEX_VERTS[corner][0],
-                              ijk[1] + REFERENCE_HEX_VERTS[corner][1],
-                              ijk[2] + REFERENCE_HEX_VERTS[corner][2],
+    return serialize_3D_index(ijk[0] + uint(REFERENCE_HEX_VERTS[corner][0]),
+                              ijk[1] + uint(REFERENCE_HEX_VERTS[corner][1]),
+                              ijk[2] + uint(REFERENCE_HEX_VERTS[corner][2]),
                               dim[1]+1, dim[2]+1);
 }
 

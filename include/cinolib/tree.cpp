@@ -58,7 +58,7 @@ uint Tree<T>::add_children(T item, uint father)
 {
     assert(father >= 0 && father < tree.size());
 
-    uint fresh_id = tree.size();
+    uint fresh_id = uint(tree.size());
     node(father).children.push_back(fresh_id);
 
     TreeNode<T> n;

@@ -429,7 +429,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 int AbstractPolygonMesh<M,V,E,P>::genus() const
 {
-    return (2-Euler_characteristic())*0.5;
+    return int((2-Euler_characteristic())*0.5);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

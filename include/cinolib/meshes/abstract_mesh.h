@@ -137,9 +137,9 @@ class AbstractMesh
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint num_verts() const { return verts.size();     }
-        uint num_edges() const { return edges.size() / 2; }
-        uint num_polys() const { return polys.size();     }
+        uint num_verts() const { return uint(verts.size());   }
+        uint num_edges() const { return uint(edges.size()/2); }
+        uint num_polys() const { return uint(polys.size());   }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
