@@ -54,7 +54,7 @@ namespace cinolib
 template<class T>
 CINO_INLINE
 void draw_sphere(const mat<3,1,T>         & center,
-                 const T                    radius,
+                 const float                radius,
                  const Color              & color,
                  const std::vector<float> & verts,
                  const std::vector<uint>  & tris)
@@ -89,7 +89,7 @@ void draw_sphere(const mat<3,1,T>         & center,
 template<class T>
 CINO_INLINE
 void draw_sphere(const mat<3,1,T> & center,
-                 const T            radius,
+                 const float        radius,
                  const Color      & color,
                  const uint         subdiv = 1) // number of subdivisions of the regular icosahedron
 {
