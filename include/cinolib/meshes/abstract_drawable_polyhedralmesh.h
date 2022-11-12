@@ -65,8 +65,8 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void       draw(const float scene_size=1) const;
-        vec3d      scene_center() const { return this->bb.center();     }
-        float      scene_radius() const { return this->bb.diag() * 0.5; }
+        vec3d      scene_center() const { return this->bb.center();          }
+        float      scene_radius() const { return float(this->bb.diag()*0.5); }
         ObjectType object_type()  const = 0;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

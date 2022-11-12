@@ -50,7 +50,7 @@ class DrawableArrow : public DrawableObject
 
         DrawableArrow(const vec3d & beg, const vec3d & end) : beg(beg), end(end)
         {
-            size  = beg.dist(end) * 0.1;
+            size  = float(beg.dist(end))*0.1f;
             color = Color::RED();
         }
 

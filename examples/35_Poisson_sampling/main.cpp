@@ -47,7 +47,7 @@ int main(int, char **)
 
     gui_2d.callback_app_controls = [&]()
     {
-        ImGui::SliderFloat("Radius", &radius, 0.001, 0.1);
+        ImGui::SliderFloat("Radius", &radius, 0.001f, 0.1f);
         if(ImGui::SmallButton("Compute Samples"))
         {
             compute_samples();

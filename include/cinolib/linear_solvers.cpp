@@ -118,7 +118,7 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
         }
     }
 
-    uint size = A.rows() - bc.size();
+    uint size = uint(A.rows() - bc.size());
 
     std::vector<Entry> Aprime_entries;
     Eigen::VectorXd    bprime(size);
@@ -139,8 +139,8 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
     {
         for (Eigen::SparseMatrix<double>::InnerIterator it(A,i); it; ++it)
         {
-            uint    row = it.row();
-            uint    col = it.col();
+            uint    row = uint(it.row());
+            uint    col = uint(it.col());
             double val = it.value();
 
             if (col_map[row] < 0) continue;
