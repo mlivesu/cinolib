@@ -15,6 +15,11 @@ target_include_directories(cinolib INTERFACE $<BUILD_INTERFACE:${cinolib_DIR}/ex
 # https://cliutils.gitlab.io/modern-cmake/chapters/features/cpp11.html
 target_compile_features(cinolib INTERFACE cxx_std_11)
 
+# suppress MSVC's unsafe warning C4996
+if(MSVC)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # OPTIONAL MODULES ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
