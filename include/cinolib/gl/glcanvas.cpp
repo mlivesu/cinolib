@@ -375,9 +375,9 @@ void GLcanvas::draw_markers() const
             if(depth_cull_markers && fabs(z-z_buf[x+W*(H-y-1)])>0.01) continue;
         }
         // adjust marker size based on zoom
-        auto zoom_factor = clamp(camera.zoom_factor, 1e-5, 1e10); // avoids overflow inside ImGui radius calculation
-        uint zoom_radius = uint(0.5*m.disk_radius/zoom_factor);
-        uint zoom_font_s = uint(0.5*m.font_size/zoom_factor);
+        auto  zoom_factor = clamp(camera.zoom_factor, 1e-5, 1e10); // avoids overflow inside ImGui radius calculation
+        uint  zoom_radius = uint(0.5*m.disk_radius/zoom_factor);
+        float zoom_font_s = 0.5*m.font_size/zoom_factor;
         //
         if(m.disk_radius>0)
         {
@@ -503,9 +503,9 @@ CINO_INLINE
 GLfloat GLcanvas::query_Z_buffer(const vec2d & p) const
 {
     glfwMakeContextCurrent(window);
-    GLint x = p.x()         * DPI_factor;
-    GLint y = p.y()         * DPI_factor;
-    GLint H = camera.height * DPI_factor;
+    GLint x = GLint(p.x()         * DPI_factor);
+    GLint y = GLint(p.y()         * DPI_factor);
+    GLint H = GLint(camera.height * DPI_factor);
     GLfloat depth;
     glReadPixels(x, H-1-y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
     return depth;

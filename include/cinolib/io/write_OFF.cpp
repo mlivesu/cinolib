@@ -57,7 +57,7 @@ void write_OFF(const char                * filename,
         exit(-1);
     }
 
-    int n_poly = tri.size()/3 + quad.size()/4;
+    int n_poly = int(tri.size()/3 + quad.size()/4);
     fprintf (fp, "OFF\n%zu %d 0\n", xyz.size()/3, n_poly);
 
     for(size_t i=0; i<xyz.size(); i+=3)
@@ -97,7 +97,7 @@ void write_OFF(const char                           * filename,
         exit(-1);
     }
 
-    uint n_faces = faces.size();
+    uint n_faces = uint(faces.size());
     fprintf (fp, "OFF\n%zu %d 0\n", xyz.size()/3, n_faces);
 
     for(uint i=0; i<xyz.size(); i+=3)

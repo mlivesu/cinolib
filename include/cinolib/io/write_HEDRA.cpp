@@ -56,9 +56,9 @@ void write_HEDRA(const char                           * filename,
         exit(-1);
     }
 
-    uint nv = verts.size();
-    uint nf = faces.size();
-    uint np = polys.size();
+    uint nv = uint(verts.size());
+    uint nf = uint(faces.size());
+    uint np = uint(polys.size());
 
     fprintf(fp, "%d %d %d\n", nv, nf, np);
 
