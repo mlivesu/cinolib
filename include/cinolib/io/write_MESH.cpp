@@ -63,7 +63,7 @@ void write_MESH(const char                           * filename,
     fprintf(fp, "MeshVersionFormatted 1\n" );
     fprintf(fp, "Dimension 3\n" );
 
-    uint nv = verts.size();
+    uint nv = uint(verts.size());
     uint nt = 0;
     uint nh = 0;
     for(auto p : polys)

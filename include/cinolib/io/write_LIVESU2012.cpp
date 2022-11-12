@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/io/write_LIVESU2012.h>
-
+#include <cinolib/geometry/vec_mat.h>
 #include <vector>
 
 namespace cinolib
@@ -56,7 +56,7 @@ void write_Livesu2012(const char                       * filename,
         exit(-1);
     }
 
-    uint nv = adj_vtx2vtx.size();
+    uint nv = uint(adj_vtx2vtx.size());
 
     fprintf( f, "ID Cx Cy Cz RADIUS #NEIGHBORS NEIGHBORS_LIST\n%d\n", nv);
 

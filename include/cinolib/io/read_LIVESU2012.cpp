@@ -98,7 +98,7 @@ void read_Livesu2012(const char          * filename,
 
         if (n_arcs > 0) // discard isolated points
         {
-            id_map[id] = coords.size() / 3;
+            id_map[id] = int(coords.size()/3);
             coords.push_back(x);
             coords.push_back(y);
             coords.push_back(z);
