@@ -1,8 +1,8 @@
 #include <cinolib/meshes/meshes.h>
+#include <cinolib/harmonic_map.h>
+#include <cinolib/profiler.h>
 #include <cinolib/gl/glcanvas.h>
 #include <cinolib/gl/volume_mesh_controls.h>
-#include <cinolib/profiler.h>
-#include <cinolib/harmonic_map.h>
 
 int main(int argc, char **argv)
 {

@@ -104,7 +104,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
             uint vid1 = this->face_tessellation(fid).at(3*i+1);
             uint vid2 = this->face_tessellation(fid).at(3*i+2);
 
-            int base_addr = drawlist_marked.tri_coords.size()/3;
+            uint base_addr = uint(drawlist_marked.tri_coords.size()/3);
 
             drawlist_marked.tris.push_back(base_addr    );
             drawlist_marked.tris.push_back(base_addr + 1);
@@ -152,7 +152,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
         vec3d vid0 = this->edge_vert(eid,0);
         vec3d vid1 = this->edge_vert(eid,1);
 
-        int base_addr = drawlist_marked.seg_coords.size()/3;
+        uint base_addr = uint(drawlist_marked.seg_coords.size()/3);
         drawlist_marked.segs.push_back(base_addr    );
         drawlist_marked.segs.push_back(base_addr + 1);
 
@@ -219,7 +219,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             AO_vid1 /= static_cast<float>(vid1_vis_fids.size());
             AO_vid2 /= static_cast<float>(vid2_vis_fids.size());
 
-            int base_addr = drawlist_out.tri_coords.size()/3;
+            uint base_addr = uint(drawlist_out.tri_coords.size()/3);
 
             drawlist_out.tris.push_back(base_addr    );
             drawlist_out.tris.push_back(base_addr + 1);
@@ -355,7 +355,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             }
             if(hidden) continue;
 
-            int base_addr = drawlist_out.seg_coords.size()/3;
+            uint base_addr = uint(drawlist_out.seg_coords.size()/3);
             drawlist_out.segs.push_back(base_addr    );
             drawlist_out.segs.push_back(base_addr + 1);
 
@@ -378,7 +378,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
 
         if (this->edge_data(eid).flags[MARKED])
         {
-            int base_addr = drawlist_marked.seg_coords.size()/3;
+            uint base_addr = uint(drawlist_marked.seg_coords.size()/3);
             drawlist_marked.segs.push_back(base_addr    );
             drawlist_marked.segs.push_back(base_addr + 1);
 
@@ -602,7 +602,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
 
 //        if (this->edge_data(eid).flags[MARKED] && drawlist_in.draw_mode & DRAW_MARKED_SEGS)
 //        {
-//            int base_addr = drawlist_in.flags[MARKED]_seg_coords.size()/3;
+//            uint base_addr = uint(drawlist_in.flags[MARKED]_seg_coords.size()/3);
 //            drawlist_in.flags[MARKED]_segs.push_back(base_addr    );
 //            drawlist_in.flags[MARKED]_segs.push_back(base_addr + 1);
 

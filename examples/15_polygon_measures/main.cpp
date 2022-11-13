@@ -57,7 +57,7 @@ int main(int, char **)
     gui.callback_app_controls = [&]()
     {
         static float t = 0;
-        if(ImGui::SliderFloat("##t", &t, 0, 1))
+        if(ImGui::SliderFloat("##t", &t, 0.f, 1.f))
         {
             m.vert(2) = vec3d(2,  3,0)*t + vec3d(2,1,0)*(1.0-t);
             m.vert(3) = vec3d(1,0.1,0)*t + vec3d(1,1,0)*(1.0-t);

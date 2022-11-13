@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     Profiler profiler;
     gui.callback_app_controls = [&]()
     {
-        if(ImGui::SliderFloat("iso", &iso_val, 0.0, 1.0))
+        if(ImGui::SliderFloat("iso", &iso_val, 0.f, 1.f))
         {
             iso = DrawableIsocontour<>(m,iso_val);
             iso.thickness = 3.0;

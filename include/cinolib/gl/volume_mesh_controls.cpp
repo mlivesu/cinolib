@@ -151,7 +151,7 @@ void VolumeMeshControls<Mesh>::header_wireframe(const bool open)
             m->show_in_wireframe_width(wireframe_width);
             m->show_out_wireframe_width(wireframe_width);
         }
-        if(ImGui::SliderFloat("Transparency", &wireframe_alpha, 0, 1))
+        if(ImGui::SliderFloat("Transparency", &wireframe_alpha, 0.f, 1.f))
         {
             m->show_in_wireframe_transparency(wireframe_alpha);
             m->show_out_wireframe_transparency(wireframe_alpha);
@@ -237,7 +237,7 @@ void VolumeMeshControls<Mesh>::header_colors_textures_in(const bool open)
             }
             ImGui::EndTable();
             //
-            if(ImGui::SliderFloat("Tex scaling", &m->drawlist_in.texture.scaling_factor, 0.01, 100))
+            if(ImGui::SliderFloat("Tex scaling", &m->drawlist_in.texture.scaling_factor, 0.01f, 100.f))
             {
                 if(m->drawlist_in.texture.type!=TEXTURE_2D_BITMAP)
                 {
@@ -326,7 +326,7 @@ void VolumeMeshControls<Mesh>::header_colors_textures_out(const bool open)
             }
             ImGui::EndTable();
             //
-            if(ImGui::SliderFloat("Tex scaling", &m->drawlist_out.texture.scaling_factor, 0.01, 100))
+            if(ImGui::SliderFloat("Tex scaling", &m->drawlist_out.texture.scaling_factor, 0.01f, 100.f))
             {
                 if(m->drawlist_out.texture.type!=TEXTURE_2D_BITMAP)
                 {
@@ -459,7 +459,7 @@ void VolumeMeshControls<Mesh>::header_vector_field(const bool open)
             std::string filename = file_dialog_save();
             if(!filename.empty()) vec_field.serialize(filename.c_str());
         }
-        if(ImGui::SliderFloat("Size", &vecfield_size, 0.1, 5))
+        if(ImGui::SliderFloat("Size", &vecfield_size, 0.1f, 5.f))
         {
             vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
         }
@@ -499,13 +499,13 @@ void VolumeMeshControls<Mesh>::header_slicing(const bool open)
         }
         refresh |= ImGui::RadioButton("AND", (int*)&slicer.mode_AND, 1); ImGui::SameLine();
         refresh |= ImGui::RadioButton("OR ", (int*)&slicer.mode_AND, 0);
-        refresh |= ImGui::SliderFloat("X",   &slicer.X_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::SliderFloat("X",   &slicer.X_thresh, 0.f, 1.f); ImGui::SameLine();
         refresh |= ImGui::Checkbox   ("##x", &slicer.X_leq);
-        refresh |= ImGui::SliderFloat("Y",   &slicer.Y_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::SliderFloat("Y",   &slicer.Y_thresh, 0.f, 1.f); ImGui::SameLine();
         refresh |= ImGui::Checkbox   ("##y", &slicer.Y_leq);
-        refresh |= ImGui::SliderFloat("Z",   &slicer.Z_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::SliderFloat("Z",   &slicer.Z_thresh, 0.f, 1.f); ImGui::SameLine();
         refresh |= ImGui::Checkbox   ("##z", &slicer.Z_leq);
-        refresh |= ImGui::SliderFloat("Q",   &slicer.Q_thresh, 0, 1); ImGui::SameLine();
+        refresh |= ImGui::SliderFloat("Q",   &slicer.Q_thresh, 0.f, 1.f); ImGui::SameLine();
         refresh |= ImGui::Checkbox   ("##q", &slicer.Q_leq);
         refresh |= ImGui::SliderInt  ("L",   &slicer.L_filter, -1, 10); ImGui::SameLine();
         refresh |= ImGui::Checkbox   ("##l", &slicer.L_is);
