@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 
     float ang_thresh         = to_rad(60.0);
     float avg_edge_length    = m.edge_avg_length();
-    float target_edge_length = avg_edge_length*0.1;
+    float target_edge_length = avg_edge_length*0.1f;
     int   n_iters            = 10;
 
     GLcanvas gui;

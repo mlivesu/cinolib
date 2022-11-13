@@ -29,11 +29,11 @@ int main(int argc, char **argv)
     Profiler profiler;
     gui.callback_app_controls = [&]()
     {
-        if(ImGui::SliderFloat("iso", &iso_val, 0.0, 1.0))
+        if(ImGui::SliderFloat("iso", &iso_val, 0.f, 1.f))
         {
             iso = DrawableIsosurface<>(m,iso_val);
         }
-        if(ImGui::SliderFloat("slice", &ss.Z_thresh, 0, 1))
+        if(ImGui::SliderFloat("slice", &ss.Z_thresh, 0.f, 1.f))
         {
             ss.slice(m);
             m.updateGL();
