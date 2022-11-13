@@ -1,4 +1,8 @@
 # CinoLib
+![MacOS](https://github.com/mlivesu/cinolib/actions/workflows/macos-build.yml/badge.svg)
+![Ubuntu](https://github.com/mlivesu/cinolib/actions/workflows/ubuntu-build.yml/badge.svg)
+![windows](https://github.com/mlivesu/cinolib/actions/workflows/windows-build.yml/badge.svg)
+
 CinoLib is a C++ library for processing polygonal and polyhedral meshes. It supports surface meshes made of triangles, quads or general polygons as well as volumetric meshes made of tetrahedra, hexahedra or general polyhedra. 
 
 A distinctive feature of the library is that all supported meshes inherit from a unique base class that implements their common traits, permitting to deploy algorithms that operate on _abstract_ meshes that may be any of the above. This allows to implement algorithms just once and run the same code on any possible mesh, thus avoiding code duplication and reducing the debugging effort.
