@@ -1156,7 +1156,7 @@ void AbstractMesh<M,V,E,P>::poly_label_wrt_color()
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
         const Color & c = this->poly_data(pid).color;
-        if (DOES_NOT_CONTAIN(colormap,c)) colormap[c] = colormap.size();
+        if(DOES_NOT_CONTAIN(colormap,c)) colormap[c] = int(colormap.size());
     }
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {

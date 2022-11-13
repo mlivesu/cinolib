@@ -69,7 +69,7 @@ class DrawableIsocontour : public Isocontour<M,V,E,P>, public DrawableObject
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         Color color;
-        float thickness;
+        int   thickness;
 };
 
 }

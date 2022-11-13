@@ -283,9 +283,9 @@ void SurfaceMeshControls<Mesh>::header_isoline(const bool open)
         }
         if(ImGui::SmallButton("Update Range"))
         {
-            iso_max = m->vert_max_uvw_value(U_param);
-            iso_min = m->vert_min_uvw_value(U_param);
-            iso_val = (iso_max-iso_min)*0.5;
+            iso_max = float(m->vert_max_uvw_value(U_param));
+            iso_min = float(m->vert_min_uvw_value(U_param));
+            iso_val = (iso_max-iso_min)*0.5f;
         }
         if(ImGui::SliderInt("Width##isoline", &isoline_width, 1, 10))
         {
@@ -353,7 +353,7 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool open)
         }
         if(ImGui::SliderFloat("Size", &vecfield_size, 0.1f, 5.f))
         {
-            vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
+            vec_field.set_arrow_size(float(m->edge_avg_length())*vecfield_size);
         }
         if(ImGui::ColorEdit4("Color##vec", vec_color.rgba, color_edit_flags))
         {
@@ -425,7 +425,7 @@ void SurfaceMeshControls<Mesh>::header_marked_edges(const bool open)
         }
         if(ImGui::SliderInt("Width##2", &marked_edge_width, 1, 10))
         {
-            m->show_marked_edge_width(marked_edge_width);
+            m->show_marked_edge_width(float(marked_edge_width));
             m->updateGL();
         }
         if(ImGui::ColorEdit4("Color##markededge", marked_edge_color.rgba, color_edit_flags))
@@ -587,7 +587,7 @@ void SurfaceMeshControls<Mesh>::header_actions(const bool open)
         }
         if(ImGui::SmallButton("Mark Creases"))
         {
-            m->edge_mark_sharp_creases(to_rad(crease_deg));
+            m->edge_mark_sharp_creases(float(to_rad(crease_deg)));
             refresh = true;
         }
         ImGui::InputInt("deg", &crease_deg);

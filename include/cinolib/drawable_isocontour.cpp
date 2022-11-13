@@ -50,7 +50,7 @@ DrawableIsocontour<M,V,E,P>::DrawableIsocontour()
 : Isocontour<M,V,E,P>()
 {
     color     = Color::RED();
-    thickness = 1.0;
+    thickness = 1;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -61,7 +61,7 @@ DrawableIsocontour<M,V,E,P>::DrawableIsocontour(AbstractPolygonMesh<M,V,E,P> & m
 : Isocontour<M,V,E,P>(m, iso_value)
 {
     color     = Color::RED();
-    thickness = 1.0;
+    thickness = 1;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -70,7 +70,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void DrawableIsocontour<M,V,E,P>::draw(const float scene_size) const
 {
-    float cylind_rad = float(scene_size * 0.002 * thickness);
+    float cylind_rad = float(scene_size*0.002*float(thickness));
 
     for(vec3d p : this->segs) draw_sphere(p, cylind_rad, color);
 

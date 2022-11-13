@@ -77,10 +77,10 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
     std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
 
     // pre-allocate memory
-    uint nv = verts.size();
-    uint nf = faces.size();
-    uint np = polys.size();
-    uint ne = 1.5*nf;
+    uint nv = uint(verts.size());
+    uint nf = uint(faces.size());
+    uint np = uint(polys.size());
+    uint ne = uint(1.5*nf);
     this->verts.reserve(nv);
     this->edges.reserve(ne*2);
     this->faces.reserve(nf);
