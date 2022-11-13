@@ -43,6 +43,11 @@
  * https://www.glfw.org/docs/3.0/build.html#build_macros
 */
 #include <GLFW/glfw3.h>
+#ifdef _WIN32
+#undef APIENTRY
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>   // for glfwGetWin32Window
+#endif
 
 #endif // CINO_GL_GLFW_H
 
