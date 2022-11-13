@@ -207,7 +207,7 @@ void ambient_occlusion_vol_meshes(      Mesh & m,
     destroy_offline_GL_context(GL_context);
 
     // apply AO
-    float min_max = std::minmax_element(ao.begin(), ao.end());
+    auto  min_max = std::minmax_element(ao.begin(), ao.end());
     float min     = *min_max.first;
     float max     = *min_max.second;
     for(uint fid=0; fid<m.num_faces(); ++fid)
