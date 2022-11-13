@@ -1,10 +1,10 @@
-#include <cinolib/gl/glcanvas.h>
-#include <cinolib/gl/surface_mesh_controls.h>
-#include <cinolib/meshes/meshes.h>
 #include <cinolib/homotopy_basis.h>
 #include <cinolib/canonical_polygonal_schema.h>
 #include <cinolib/polycube.h>
 #include <cinolib/drawable_segment_soup.h>
+#include <cinolib/meshes/meshes.h>
+#include <cinolib/gl/glcanvas.h>
+#include <cinolib/gl/surface_mesh_controls.h>
 
 int main(int argc, char **argv)
 {

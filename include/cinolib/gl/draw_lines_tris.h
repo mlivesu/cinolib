@@ -38,13 +38,13 @@
 
 #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
-#include <cinolib/gl/gl_glfw.h>
 
 #include <vector>
 #include <cmath>
 #include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
+#include <cinolib/gl/gl_glfw.h>
 #include <cinolib/gl/load_texture.h>
 
 namespace cinolib

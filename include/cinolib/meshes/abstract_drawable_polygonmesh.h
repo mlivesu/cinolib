@@ -38,8 +38,8 @@
 
 #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
-#include <cinolib/drawable_object.h>
 #include <cinolib/meshes/mesh_slicer.h>
+#include <cinolib/drawable_object.h>
 #include <cinolib/gl/draw_lines_tris.h>
 
 namespace cinolib

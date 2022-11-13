@@ -36,14 +36,13 @@
 
 #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
-#include <cinolib/gl/gl_glfw.h>
+#include <cstdlib>
 #include <cinolib/meshes/drawable_skel.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/color.h>
+#include <cinolib/gl/gl_glfw.h>
 #include <cinolib/gl/draw_cylinder.h>
 #include <cinolib/gl/draw_sphere.h>
-
-#include <cstdlib>
 
 namespace cinolib
 {

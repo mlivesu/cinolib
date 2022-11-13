@@ -38,10 +38,10 @@
 
 #ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
-#include <cinolib/gl/gl_glfw.h>
 #include <cinolib/geometry/vec_mat.h>
 #include <cinolib/cylinder.h>
 #include <cinolib/color.h>
+#include <cinolib/gl/gl_glfw.h>
 
 namespace cinolib
 {
