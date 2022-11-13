@@ -61,7 +61,7 @@ void find_intersections(const std::vector<vec3d> & verts,
     o.build_from_vectors(verts, tris);
 
     std::mutex mutex;
-    PARALLEL_FOR(0, o.leaves.size(), 1, [&](uint i)
+    PARALLEL_FOR(0, uint(o.leaves.size()), 1, [&](uint i)
     {        
         auto & leaf = o.leaves.at(i);
         if(leaf->item_indices.empty()) return;

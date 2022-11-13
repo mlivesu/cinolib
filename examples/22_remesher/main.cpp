@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     m.show_mesh_flat();
 
     float ang_thresh         = float(to_rad(60.0));
-    float avg_edge_length    = m.edge_avg_length();
+    float avg_edge_length    = float(m.edge_avg_length());
     float target_edge_length = avg_edge_length*0.1f;
     int   n_iters            = 10;
 
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
         ImGui::Text("N Iterations");
         ImGui::SliderInt("##iter", &n_iters, 1, 100);
         ImGui::Text("Target Edge Length");
-        ImGui::SliderFloat("##target edge length", &target_edge_length, avg_edge_length*0.01, avg_edge_length*2);
+        ImGui::SliderFloat("##target edge length", &target_edge_length, avg_edge_length*0.01f, avg_edge_length*2.f);
         if(ImGui::SmallButton("Remesh"))
         {
             Profiler profiler;
