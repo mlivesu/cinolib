@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     std::vector<std::unordered_set<uint>> ccs;
     connected_components(m, ccs);
 
-    uint n_ccs = ccs.size();
+    uint n_ccs = uint(ccs.size());
     std::cout << n_ccs << " connected components were found.\nPress Key S to save them on separate files" << std::endl;
 
     for(uint i=0; i<n_ccs; ++i)

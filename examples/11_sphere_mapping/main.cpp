@@ -1,8 +1,8 @@
 #include <cinolib/meshes/meshes.h>
+#include <cinolib/mean_curv_flow.h>
+#include <cinolib/profiler.h>
 #include <cinolib/gl/glcanvas.h>
 #include <cinolib/gl/surface_mesh_controls.h>
-#include <cinolib/profiler.h>
-#include <cinolib/mean_curv_flow.h>
 
 int main(int argc, char **argv)
 {
@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     gui.callback_app_controls = [&]()
     {
         static int   n_iter        = 10;
-        static float time_step     = 0.005;
+        static float time_step     = 0.005f;
         ImGui::InputInt("Iter.", &n_iter);
         ImGui::InputFloat("t", &time_step);
         if(ImGui::SmallButton("Map to Sphere"))

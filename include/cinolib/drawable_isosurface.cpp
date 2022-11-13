@@ -50,7 +50,7 @@ DrawableIsosurface<M,V,E,F,P>::DrawableIsosurface() : Isosurface<M,V,E,F,P>()
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-DrawableIsosurface<M,V,E,F,P>::DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const double iso_value)
+DrawableIsosurface<M,V,E,F,P>::DrawableIsosurface(const Tetmesh<M,V,E,F,P> & m, const float iso_value)
     : Isosurface<M,V,E,F,P>(m, iso_value)
 {
     color = Color::RED();

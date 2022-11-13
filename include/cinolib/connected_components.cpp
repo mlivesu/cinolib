@@ -71,7 +71,7 @@ uint connected_components(const AbstractMesh<M,V,E,P> & m,
     }
     while (seed < m.num_verts());
 
-    return ccs.size();
+    return uint(ccs.size());
 }
 
 }

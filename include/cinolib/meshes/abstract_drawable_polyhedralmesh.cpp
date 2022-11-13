@@ -789,7 +789,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture1D(const int tex_type
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture2D(const int tex_type, const float tex_unit_scalar, const char *bitmap)
 {
     drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE2D;
     drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
@@ -920,7 +920,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture1D(const int tex_type)
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture2D(const int tex_type, const float tex_unit_scalar, const char *bitmap)
 {
     drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE2D;
     drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;

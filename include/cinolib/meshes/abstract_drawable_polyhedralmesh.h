@@ -109,7 +109,7 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         void show_out_poly_color();
         void show_out_poly_quality();
         void show_out_texture1D(const int tex_type);
-        void show_out_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap = NULL);
+        void show_out_texture2D(const int tex_type, const float tex_unit_scalar, const char *bitmap = NULL);
         void show_out_wireframe(const bool b);
         void show_out_wireframe_color(const Color & c);
         void show_out_wireframe_width(const float width);
@@ -120,7 +120,7 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         void show_in_poly_color();
         void show_in_poly_quality();
         void show_in_texture1D(const int tex_type);
-        void show_in_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap = NULL);
+        void show_in_texture2D(const int tex_type, const float tex_unit_scalar, const char *bitmap = NULL);
         void show_in_wireframe(const bool b);
         void show_in_wireframe_color(const Color & c);
         void show_in_wireframe_width(const float width);

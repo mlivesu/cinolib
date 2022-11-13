@@ -61,7 +61,7 @@ void export_visible(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
         }
         if(touches_visible)
         {
-            uint fresh_id = v_map.size();
+            uint fresh_id = uint(v_map.size());
             v_map[vid] = fresh_id;
             m_out.vert_add(m_in.vert(vid));
         }
@@ -82,7 +82,7 @@ void export_visible(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
         }
         if(touches_visible)
         {
-            uint fresh_id = f_map.size();
+            uint fresh_id = uint(f_map.size());
             f_map[fid] = fresh_id;
             std::vector<uint> f_verts;
             for(uint vid : m_in.adj_f2v(fid)) f_verts.push_back(v_map.at(vid));
