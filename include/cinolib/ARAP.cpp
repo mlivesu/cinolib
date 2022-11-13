@@ -84,7 +84,7 @@ void ARAP(AbstractMesh<M,V,E,P> & m, ARAP_data & data)
         uint size = m.num_verts() - uint(data.bcs.size());
         if(data.use_soft_constraints)
         {
-            size = m.num_verts() + data.bcs.size();
+            size = m.num_verts() + uint(data.bcs.size());
             data.W.resize(size);
         }
         for(uint vid=0; vid<m.num_verts(); ++vid)

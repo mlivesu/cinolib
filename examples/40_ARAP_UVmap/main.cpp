@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     m_uvw.normalize_bbox();
     m_uvw.update_normals();
     m_uvw.show_wireframe(true);
-    m_uvw.show_wireframe_transparency(0.2);
+    m_uvw.show_wireframe_transparency(0.2f);
     m_uvw.show_texture2D(TEXTURE_2D_CHECKERBOARD, 0.005f);
     gui_uvw.push(&m_uvw);
     m_uvw.updateGL();

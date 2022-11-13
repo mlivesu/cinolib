@@ -126,7 +126,7 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     std::map<uint,vec3d> dirichlet_bcs;
     for(uint i=0; i<poly.size(); ++i)
     {
-        std::vector<vec3d> e_bcs = sample_within_interval(poly.at(i), poly.at((i+1)%poly.size()), edges.at(i).size());
+        std::vector<vec3d> e_bcs = sample_within_interval(poly.at(i), poly.at((i+1)%poly.size()), uint(edges.at(i).size()));
         for(uint j=0; j<e_bcs.size(); ++j) dirichlet_bcs[edges.at(i).at(j)] = e_bcs.at(j);
     }
 

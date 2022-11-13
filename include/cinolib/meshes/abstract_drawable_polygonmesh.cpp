@@ -104,7 +104,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_marked()
         vec3d vid0 = this->edge_vert(eid,0);
         vec3d vid1 = this->edge_vert(eid,1);
 
-        int base_addr = drawlist_marked.seg_coords.size()/3;
+        uint base_addr = uint(drawlist_marked.seg_coords.size()/3);
         drawlist_marked.segs.push_back(base_addr    );
         drawlist_marked.segs.push_back(base_addr + 1);
 
@@ -317,7 +317,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_mesh()
             }
             if(hidden) continue;
 
-            int base_addr = drawlist.seg_coords.size()/3;
+            uint base_addr = uint(drawlist.seg_coords.size()/3);
             drawlist.segs.push_back(base_addr    );
             drawlist.segs.push_back(base_addr + 1);
 

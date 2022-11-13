@@ -1138,7 +1138,7 @@ void AbstractMesh<M,V,E,P>::poly_color_wrt_label(const bool sorted, const float 
             l_map[l] = fresh_label;
         }
     }
-    uint n_labels = l_map.size();
+    uint n_labels = uint(l_map.size());
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
         if(sorted) this->poly_data(pid).color = Color::hsv_ramp(n_labels, this->poly_data(pid).label);

@@ -161,8 +161,8 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
     std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
 
     // pre-allocate memory
-    uint nv = verts.size();
-    uint np = polys.size();
+    uint nv = uint(verts.size());
+    uint np = uint(polys.size());
     uint ne = 1.5*np;
     this->verts.reserve(nv);
     this->edges.reserve(ne*2);
