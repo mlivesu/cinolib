@@ -97,7 +97,7 @@ void triangle_wrap(const std::vector<double> & coords_in,
 
     assert(!coords_in.empty());
 
-    in.numberofpoints = coords_in.size()/2;
+    in.numberofpoints = int(coords_in.size()/2);
     in.pointlist      = (double*)calloc(coords_in.size(),sizeof(double));
     for(int vid=0; vid<in.numberofpoints; ++vid)
     {
@@ -117,7 +117,7 @@ void triangle_wrap(const std::vector<double> & coords_in,
     in.trianglelist               = NULL;
     in.triangleattributelist      = NULL;
 
-    in.numberofsegments = segs_in.size()/2;
+    in.numberofsegments = int(segs_in.size()/2);
     in.segmentlist      = (int*)calloc(segs_in.size(),sizeof(int));
     for(uint i=0; i<segs_in.size(); ++i)
     {
@@ -125,7 +125,7 @@ void triangle_wrap(const std::vector<double> & coords_in,
     }
     in.segmentmarkerlist = NULL;
 
-    in.numberofholes = holes_in.size()/2;
+    in.numberofholes = int(holes_in.size()/2);
     in.holelist      = (double*)calloc(holes_in.size(),sizeof(double));
     for(int hid=0; hid<in.numberofholes; ++hid)
     {

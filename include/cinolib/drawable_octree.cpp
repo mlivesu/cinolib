@@ -70,8 +70,8 @@ vec3d DrawableOctree::scene_center() const
 CINO_INLINE
 float DrawableOctree::scene_radius() const
 {
-    if(this->root==nullptr) return 0.0;
-    return this->root->bbox.diag();
+    if(this->root==nullptr) return 0.f;
+    return float(this->root->bbox.diag());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

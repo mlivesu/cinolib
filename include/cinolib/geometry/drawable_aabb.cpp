@@ -103,7 +103,7 @@ vec3d DrawableAABB::scene_center() const
 CINO_INLINE
 float DrawableAABB::scene_radius() const
 {
-    return this->diag();
+    return float(this->diag());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     m.show_wireframe(true);
     m.show_mesh_flat();
 
-    float ang_thresh         = to_rad(60.0);
+    float ang_thresh         = float(to_rad(60.0));
     float avg_edge_length    = m.edge_avg_length();
     float target_edge_length = avg_edge_length*0.1f;
     int   n_iters            = 10;

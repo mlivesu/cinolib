@@ -1437,6 +1437,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_shared_edge(const uint fid0, const 
         if (this->face_contains_edge(fid1, eid)) return eid;
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1870,7 +1871,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::vert_ordered_srf_one_ring(const uint    
         uint v1 = this->vert_opposite_to(e1,vid);
         if(!this->face_verts_are_CCW(f0,v1,v0))
         {
-            uint last = e_ring.size()-1;
+            uint last = uint(e_ring.size())-1;
             REVERSE_VEC(e_ring);
             REVERSE_VEC(f_ring);
             std::rotate(e_ring.begin(), e_ring.begin()+last, e_ring.end());

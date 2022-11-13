@@ -230,7 +230,7 @@ void detach_loops(Trimesh<M,V,E,P>  & m,
 
     data.refinement_stats.num_verts_now = m.num_verts();
     data.refinement_stats.num_polys_now = m.num_polys();
-    data.refinement_stats.vert_val_avg /= static_cast<double>(data.refinement_stats.splits_tot);
+    data.refinement_stats.vert_val_avg /= float(data.refinement_stats.splits_tot);
 
     detach_loops_postproc(m, data);
 }
@@ -683,7 +683,7 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
     }
 
     assert(edge_fan.size()>2);
-    uint eid = edge_fan.at(edge_fan.size()*0.5);
+    uint eid = edge_fan.at(uint(edge_fan.size()*0.5));
     uint v_opp = m.vert_opposite_to(eid, v_mid);
 
     vec3d  A = m.vert(v_opp);

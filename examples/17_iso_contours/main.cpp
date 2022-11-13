@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
     float iso_val = 0.5f;
     DrawableIsocontour<> iso(m, iso_val);
-    iso.thickness = 3.f;
+    iso.thickness = 3;
     gui.push(&iso, false);
 
     Profiler profiler;
@@ -29,7 +29,7 @@ int main(int argc, char **argv)
         if(ImGui::SliderFloat("iso", &iso_val, 0.f, 1.f))
         {
             iso = DrawableIsocontour<>(m,iso_val);
-            iso.thickness = 3.0;
+            iso.thickness = 3;
         }
         if(ImGui::SmallButton("Tessellate"))
         {
