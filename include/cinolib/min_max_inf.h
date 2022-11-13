@@ -36,12 +36,12 @@
 #ifndef CINO_MIN_MAX_INF
 #define CINO_MIN_MAX_INF
 
+#ifndef _WIN32
 #include <sys/types.h>
-#include <limits>
-
-#ifdef _WIN32
+#else
 typedef unsigned int uint;
 #endif
+#include <limits>
 
 namespace cinolib
 {
