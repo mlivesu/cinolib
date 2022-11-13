@@ -59,7 +59,7 @@ void cylinder(const T             height,
     // add remaining points and triangles
     mat<2,1,T> b(bot_radius,0);
     mat<2,1,T> t(top_radius,0);
-    mat<2,2,T> R = mat<2,2,T>::ROT_2D(2*M_PI/n_sides);
+    mat<2,2,T> R = mat<2,2,T>::ROT_2D(T(2*M_PI/n_sides));
     uint off = 0;
     for(uint i=1; i<n_sides; ++i)
     {

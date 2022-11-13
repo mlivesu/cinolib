@@ -76,7 +76,7 @@ class SurfaceMeshControls : public SideBarItem
     bool       show_vecfield     = false;
     bool       show_face_normals = false;
     bool       show_vert_normals = false;
-    int        wireframe_width   = 1;
+    float      wireframe_width   = 1.f;
     int        marked_edge_width = 1;
     int        isoline_width     = 1;
     float      wireframe_alpha   = 1.f;

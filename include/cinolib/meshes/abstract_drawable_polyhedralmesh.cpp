@@ -209,12 +209,12 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             auto  vid0_vis_fids = this->vert_adj_visible_faces(vid0, n, 60.0);
             auto  vid1_vis_fids = this->vert_adj_visible_faces(vid1, n, 60.0);
             auto  vid2_vis_fids = this->vert_adj_visible_faces(vid2, n, 60.0);
-            float AO_vid0 = 0.0;
-            float AO_vid1 = 0.0;
-            float AO_vid2 = 0.0;
-            for(auto fp : vid0_vis_fids) AO_vid0 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
-            for(auto fp : vid1_vis_fids) AO_vid1 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
-            for(auto fp : vid2_vis_fids) AO_vid2 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
+            float AO_vid0 = 0.f;
+            float AO_vid1 = 0.f;
+            float AO_vid2 = 0.f;
+            for(auto fp : vid0_vis_fids) AO_vid0 += this->face_data(fp.first).AO*AO_alpha + (1.f - AO_alpha);
+            for(auto fp : vid1_vis_fids) AO_vid1 += this->face_data(fp.first).AO*AO_alpha + (1.f - AO_alpha);
+            for(auto fp : vid2_vis_fids) AO_vid2 += this->face_data(fp.first).AO*AO_alpha + (1.f - AO_alpha);
             AO_vid0 /= static_cast<float>(vid0_vis_fids.size());
             AO_vid1 /= static_cast<float>(vid1_vis_fids.size());
             AO_vid2 /= static_cast<float>(vid2_vis_fids.size());
@@ -457,7 +457,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
             AO_vid1 /= static_cast<float>(vid1_vis_fids.size());
             AO_vid2 /= static_cast<float>(vid2_vis_fids.size());
 
-            int base_addr = drawlist_in.tri_coords.size()/3;
+            uint base_addr = uint(drawlist_in.tri_coords.size()/3);
 
             drawlist_in.tris.push_back(base_addr    );
             drawlist_in.tris.push_back(base_addr + 1);
@@ -577,7 +577,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
 
     for(uint eid : edges_to_render)
     {
-        uint base_addr = drawlist_in.seg_coords.size()/3;
+        uint base_addr = uint(drawlist_in.seg_coords.size()/3);
         drawlist_in.segs.push_back(base_addr    );
         drawlist_in.segs.push_back(base_addr + 1);
 

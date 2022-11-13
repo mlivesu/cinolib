@@ -116,7 +116,7 @@ void compute_coarse_hex_layout(Hexmesh<M,V,E,P> & m)
         if (m.edge_is_singular(eid)) sing_edges.push(eid);
     }
 
-    uint ne = sing_edges.size();
+    uint ne = uint(sing_edges.size());
     uint nv = 0;
     for(uint vid=0; vid<m.num_verts(); ++vid) if(m.vert_is_singular(vid)) ++nv;
 

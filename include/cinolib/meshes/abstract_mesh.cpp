@@ -761,7 +761,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint AbstractMesh<M,V,E,P>::edge_valence(const uint eid) const
 {
-    return this->adj_e2p(eid).size();
+    return uint(this->adj_e2p(eid).size());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1180,7 +1180,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint AbstractMesh<M,V,E,P>::polys_n_unique_colors() const
 {
-    return vector_poly_unique_colors().size();
+    return uint(vector_poly_unique_colors().size());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

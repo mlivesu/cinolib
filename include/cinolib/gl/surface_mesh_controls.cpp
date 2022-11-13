@@ -137,7 +137,7 @@ void SurfaceMeshControls<Mesh>::header_wireframe(const bool open)
     if(ImGui::TreeNode("Wireframe"))
     {
         if(ImGui::Checkbox   ("Show",         &show_wireframe          )) m->show_wireframe(show_wireframe);
-        if(ImGui::SliderInt  ("Width",        &wireframe_width,   1, 10)) m->show_wireframe_width(wireframe_width);
+        if(ImGui::SliderFloat("Width",        &wireframe_width, 1.f,10.f)) m->show_wireframe_width(wireframe_width);
         if(ImGui::SliderFloat("Transparency", &wireframe_alpha, 0.f,1.f)) m->show_wireframe_transparency(wireframe_alpha);
         ImGui::TreePop();
     }
@@ -220,7 +220,7 @@ void SurfaceMeshControls<Mesh>::header_colors_textures(const bool open)
             }
             ImGui::EndTable();
             //
-            if(ImGui::SliderFloat("Tex scaling", &m->drawlist.texture.scaling_factor, 0.01, 100))
+            if(ImGui::SliderFloat("Tex scaling", &m->drawlist.texture.scaling_factor, 0.01f, 100.f))
             {
                 if(m->drawlist.texture.type!=TEXTURE_2D_BITMAP)
                 {
@@ -326,7 +326,7 @@ void SurfaceMeshControls<Mesh>::header_vector_field(const bool open)
                     ScalarField f(m->serialize_uvw(U_param));
                     vec_field = gradient_matrix(*m) * f;
                     vec_field.normalize();
-                    vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
+                    vec_field.set_arrow_size(float(m->edge_avg_length())*vecfield_size);
                     vec_field.set_arrow_color(vec_color);
                 }
                 gui->push(&vec_field,false);

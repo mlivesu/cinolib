@@ -163,7 +163,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
     // pre-allocate memory
     uint nv = uint(verts.size());
     uint np = uint(polys.size());
-    uint ne = 1.5*np;
+    uint ne = uint(1.5*np);
     this->verts.reserve(nv);
     this->edges.reserve(ne*2);
     this->polys.reserve(np);

@@ -107,12 +107,12 @@ void icosphere(const float         radius, // sphere radius
             mat<3,1,T> v01 = v0 + v1;
             mat<3,1,T> v12 = v1 + v2;
             mat<3,1,T> v20 = v2 + v0;
-            v01 *= radius / v01.norm();
-            v12 *= radius / v12.norm();
-            v20 *= radius / v20.norm();
+            v01 *= T(radius/v01.norm());
+            v12 *= T(radius/v12.norm());
+            v20 *= T(radius/v20.norm());
 
             // add three new vertices to the list
-            uint vid01 = verts.size()/3.0;
+            uint vid01 = uint(verts.size()/3);
             uint vid12 = vid01 + 1;
             uint vid20 = vid01 + 2;
             verts.push_back(v01.x()); // v01

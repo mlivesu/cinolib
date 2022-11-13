@@ -63,7 +63,7 @@ void draw_cylinder(const mat<3,1,T>         & base,    // base
 {
     mat<3,1,T> Z     = mat<3,1,T>(0,0,1);
     mat<3,1,T> axis  = dir.cross(Z); axis.normalize();
-    float      angle = dir.angle_deg(Z,true);
+    double     angle = dir.angle_deg(Z,true);
 
     glEnable(GL_LIGHTING);
     glShadeModel(GL_SMOOTH);
@@ -75,8 +75,8 @@ void draw_cylinder(const mat<3,1,T>         & base,    // base
     glEnableClientState(GL_NORMAL_ARRAY);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    glTranslatef((float)base[0], (float)base[1], (float)base[2]);
-    glRotatef(-angle, (float)axis[0], (float)axis[1], (float)axis[2]);
+    glTranslated(base[0], base[1], base[2]);
+    glRotated(-angle, axis[0], axis[1], axis[2]);
     glVertexPointer(3, GL_FLOAT, 0, verts.data());
     glNormalPointer(GL_FLOAT, 0, normals.data());
     glDrawElements(GL_TRIANGLES, (GLsizei)tris.size(), GL_UNSIGNED_INT, tris.data());
