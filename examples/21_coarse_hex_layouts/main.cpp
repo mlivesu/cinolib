@@ -1,8 +1,8 @@
 #include <cinolib/meshes/meshes.h>
 #include <cinolib/profiler.h>
+#include <cinolib/coarse_layout.h>
 #include <cinolib/gl/glcanvas.h>
 #include <cinolib/gl/volume_mesh_controls.h>
-#include <cinolib/coarse_layout.h>
 
 int main(int argc, char **argv)
 {

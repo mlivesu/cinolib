@@ -1,8 +1,8 @@
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gl/glcanvas.h>
-#include <cinolib/gl/surface_mesh_controls.h>
 #include <cinolib/geodesics.h>
 #include <cinolib/profiler.h>
+#include <cinolib/gl/glcanvas.h>
+#include <cinolib/gl/surface_mesh_controls.h>
 
 int main(int argc, char **argv)
 {
