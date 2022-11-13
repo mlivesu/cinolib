@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     gui.push(&srf_target);
 
     // the BRHF interpolant is the zero level set of the so generated field
-    DrawableIsosurface<> iso(vol_sampling, 0);
+    DrawableIsosurface<> iso(vol_sampling, 0.f);
     gui.push(&iso);
 
     // slice the volume, hide the target surface (for visualization)

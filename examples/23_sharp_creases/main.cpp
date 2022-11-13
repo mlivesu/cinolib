@@ -1,9 +1,9 @@
-#include <fstream>
 #include <cinolib/meshes/meshes.h>
-#include <cinolib/gl/glcanvas.h>
 #include <cinolib/profiler.h>
 #include <cinolib/gl/file_dialog_save.h>
+#include <cinolib/gl/glcanvas.h>
 #include <cinolib/gl/surface_mesh_controls.h>
+#include <fstream>
 
 using namespace cinolib;
 
@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     m.show_mesh_flat();
     m.show_marked_edge_width(4);
 
-    float ang_thresh = to_rad(60);
+    float ang_thresh = float(to_rad(60));
 
     GLcanvas gui;
     SurfaceMeshControls<DrawableTrimesh<>> menu(&m, &gui);

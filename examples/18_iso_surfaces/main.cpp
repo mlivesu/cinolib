@@ -18,11 +18,11 @@ int main(int argc, char **argv)
     gui.push(&m);
 
     MeshSlicer ss;
-    ss.Z_thresh = 0.5;
+    ss.Z_thresh = 0.5f;
     ss.slice(m);
     m.updateGL();
 
-    float iso_val = 0.5;
+    float iso_val = 0.5f;
     DrawableIsosurface<> iso(m, iso_val);
     gui.push(&iso, false);
 

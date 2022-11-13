@@ -46,7 +46,7 @@ namespace cinolib
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 Isosurface<M,V,E,F,P>::Isosurface(const Tetmesh<M,V,E,F,P> & m,
-                                  const double               iso_value,
+                                  const float                iso_value,
                                   const bool                 run_marching_tets)
     : iso_value(iso_value)
 {

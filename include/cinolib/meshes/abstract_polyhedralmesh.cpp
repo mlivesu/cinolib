@@ -441,21 +441,21 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::update_p_quality(const uint pid)
 {
     if(this->poly_is_tetrahedron(pid))
     {
-        this->poly_data(pid).quality = tet_scaled_jacobian(this->poly_vert(pid,0),
-                                                           this->poly_vert(pid,1),
-                                                           this->poly_vert(pid,2),
-                                                           this->poly_vert(pid,3));
+        this->poly_data(pid).quality = float(tet_scaled_jacobian(this->poly_vert(pid,0),
+                                                                 this->poly_vert(pid,1),
+                                                                 this->poly_vert(pid,2),
+                                                                 this->poly_vert(pid,3)));
     }
     else if(this->poly_is_hexahedron(pid))
     {
-        this->poly_data(pid).quality = hex_scaled_jacobian(this->poly_vert(pid,0),
-                                                           this->poly_vert(pid,1),
-                                                           this->poly_vert(pid,2),
-                                                           this->poly_vert(pid,3),
-                                                           this->poly_vert(pid,4),
-                                                           this->poly_vert(pid,5),
-                                                           this->poly_vert(pid,6),
-                                                           this->poly_vert(pid,7));
+        this->poly_data(pid).quality = float(hex_scaled_jacobian(this->poly_vert(pid,0),
+                                                                 this->poly_vert(pid,1),
+                                                                 this->poly_vert(pid,2),
+                                                                 this->poly_vert(pid,3),
+                                                                 this->poly_vert(pid,4),
+                                                                 this->poly_vert(pid,5),
+                                                                 this->poly_vert(pid,6),
+                                                                 this->poly_vert(pid,7)));
     }
 }
 

@@ -52,9 +52,9 @@ void compute_coarse_quad_layout(Quadmesh<M,V,E,P> & m)
     std::queue<uint> sing_verts;
     for(uint vid=0; vid<m.num_verts(); ++vid)
     {
-        if (m.vert_is_singular(vid)) sing_verts.push(vid);
+        if(m.vert_is_singular(vid)) sing_verts.push(vid);
     }
-    uint nv = sing_verts.size();
+    uint nv = uint(sing_verts.size());
 
     // trace separatrices
     std::vector<bool> on_domain_border(m.num_edges(), false);

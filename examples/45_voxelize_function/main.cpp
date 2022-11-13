@@ -1,8 +1,8 @@
-#include <cinolib/gl/glcanvas.h>
-#include <cinolib/gl/volume_mesh_controls.h>
-#include <cinolib/profiler.h>
 #include <cinolib/voxelize.h>
 #include <cinolib/voxel_grid_to_hexmesh.h>
+#include <cinolib/profiler.h>
+#include <cinolib/gl/glcanvas.h>
+#include <cinolib/gl/volume_mesh_controls.h>
 
 using namespace cinolib;
 

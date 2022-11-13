@@ -586,7 +586,7 @@ CINO_INLINE
 uint AbstractMesh<M,V,E,P>::vert_valence(const uint vid) const
 {
     assert(adj_v2v(vid).size() == adj_v2e(vid).size());
-    return adj_v2v(vid).size();
+    return uint(adj_v2v(vid).size());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1189,7 +1189,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint AbstractMesh<M,V,E,P>::polys_n_unique_labels() const
 {
-    return vector_poly_unique_labels().size();
+    return uint(vector_poly_unique_labels().size());
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

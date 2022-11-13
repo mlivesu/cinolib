@@ -148,8 +148,8 @@ void VolumeMeshControls<Mesh>::header_wireframe(const bool open)
         }
         if(ImGui::SliderInt("Width", &wireframe_width, 1, 10))
         {
-            m->show_in_wireframe_width(wireframe_width);
-            m->show_out_wireframe_width(wireframe_width);
+            m->show_in_wireframe_width(float(wireframe_width));
+            m->show_out_wireframe_width(float(wireframe_width));
         }
         if(ImGui::SliderFloat("Transparency", &wireframe_alpha, 0.f, 1.f))
         {
@@ -369,9 +369,9 @@ void VolumeMeshControls<Mesh>::header_isosurface(const bool open)
         }
         if(ImGui::SmallButton("Update Range"))
         {
-            iso_max = m->vert_max_uvw_value(U_param);
-            iso_min = m->vert_min_uvw_value(U_param);
-            iso_val = (iso_max-iso_min)*0.5;
+            iso_max = float(m->vert_max_uvw_value(U_param));
+            iso_min = float(m->vert_min_uvw_value(U_param));
+            iso_val = (iso_max-iso_min)*0.5f;
         }
         if(ImGui::SmallButton("Export"))
         {
@@ -434,7 +434,7 @@ void VolumeMeshControls<Mesh>::header_vector_field(const bool open)
                     ScalarField f(m->serialize_uvw(U_param));
                     vec_field = gradient_matrix(*m) * f;
                     vec_field.normalize();
-                    vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
+                    vec_field.set_arrow_size(float(m->edge_avg_length())*vecfield_size);
                     vec_field.set_arrow_color(vec_color);
                 }
                 gui->push(&vec_field,false);
@@ -449,7 +449,7 @@ void VolumeMeshControls<Mesh>::header_vector_field(const bool open)
             {
                 vec_field = DrawableVectorField(*m);
                 vec_field.deserialize(filename.c_str());
-                vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
+                vec_field.set_arrow_size(float(m->edge_avg_length())*vecfield_size);
                 vec_field.set_arrow_color(vec_color);
             }
         }
@@ -461,7 +461,7 @@ void VolumeMeshControls<Mesh>::header_vector_field(const bool open)
         }
         if(ImGui::SliderFloat("Size", &vecfield_size, 0.1f, 5.f))
         {
-            vec_field.set_arrow_size(m->edge_avg_length()*vecfield_size);
+            vec_field.set_arrow_size(float(m->edge_avg_length())*vecfield_size);
         }
         if(ImGui::ColorEdit4("Color##vec", vec_color.rgba, color_edit_flags))
         {
@@ -533,7 +533,7 @@ void VolumeMeshControls<Mesh>::header_marked_edges(const bool open)
         }
         if(ImGui::SliderInt("Width##2", &marked_edge_width, 1, 10))
         {
-            m->show_marked_edge_width(marked_edge_width);
+            m->show_marked_edge_width(float(marked_edge_width));
             m->updateGL();
         }
         if(ImGui::ColorEdit4("Color##markededge", marked_edge_color.rgba, color_edit_flags))
@@ -829,7 +829,7 @@ void VolumeMeshControls<Mesh>::header_actions(const bool open)
         }
         if(ImGui::SmallButton("Mark Creases"))
         {
-            m->edge_mark_sharp_creases(to_rad(crease_deg));
+            m->edge_mark_sharp_creases(float(to_rad(crease_deg)));
             refresh = true;
         }
         ImGui::InputInt("deg", &crease_deg);

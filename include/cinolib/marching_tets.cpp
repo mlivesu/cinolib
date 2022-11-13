@@ -270,7 +270,7 @@ void make_triangle(const Tetmesh<M,V,E,F,P> & m,
     assert(isovalue <= *std::max_element(func, func+4));
 
     vec3d tri_verts[3];
-    uint  fresh_vid = verts.size();
+    uint  fresh_vid = uint(verts.size());
 
     for(uint i=0; i<3; ++i)
     {

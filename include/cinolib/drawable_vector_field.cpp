@@ -97,7 +97,7 @@ DrawableVectorField::DrawableVectorField(const AbstractMesh<M,V,E,P> &m, const b
         }
     }
     arrow_color = Color::RED();
-    arrow_size  = 0.5 * m.edge_avg_length();
+    arrow_size  = float(m.edge_avg_length())*0.5f;
     update_arrow_tessellation();
 }
 
