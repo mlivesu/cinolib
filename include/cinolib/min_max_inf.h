@@ -36,7 +36,6 @@
 #ifndef CINO_MIN_MAX_INF
 #define CINO_MIN_MAX_INF
 
-#include <sys/types.h>
 #include <limits>
 
 namespace cinolib
@@ -54,8 +53,8 @@ namespace cinolib
     const int          max_int    = std::numeric_limits<int>::max();
     const unsigned int max_uint   = std::numeric_limits<unsigned int>::max();
 
-    const double inf_double = std::numeric_limits<double>::infinity();
-    const float  inf_float  = std::numeric_limits<float>::infinity();
+    const double       inf_double = std::numeric_limits<double>::infinity();
+    const float        inf_float  = std::numeric_limits<float>::infinity();
     // NOTE: std::numeric_limits<T>::has_infinity is false for T=int,uint
 }
 
