@@ -76,7 +76,7 @@ void quad_barycentric_coords(const mat<3,1,T> & q0,
     T B1 = area(p,q0,q2);
 
     T D = B0*B0 + B1*B1 + 2*A0*A2 + 2*A1*A3;
-    T S = sqrt(D);
+    T S = sqrt(std::max(T(0),D)); // make sure sqrt argument is >=0
 
     T u = 2*A3/(2*A3 + B1 - B0 + S);
     T v = 2*A0/(2*A0 - B0 - B1 + S);
