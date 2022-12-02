@@ -51,9 +51,9 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void remesh_Botsch_Kobbelt_2004(DrawableTrimesh<M,V,E,P> & m,
-                                const double               target_edge_length = -1,
-                                const bool                 preserve_marked_features = true);
+void remesh_Botsch_Kobbelt_2004(Trimesh<M,V,E,P> & m,
+                                const double       target_edge_length = -1,
+                                const bool         preserve_marked_features = true);
 }
 
 #ifndef  CINO_STATIC_LIB
