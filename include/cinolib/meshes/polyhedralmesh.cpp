@@ -38,6 +38,7 @@
 #include <cinolib/geometry/aabb.h>
 #include <cinolib/geometry/vec_mat.h>
 #include <cinolib/vector_serialization.h>
+#include <cinolib/string_utilities.h>
 
 #include <algorithm>
 #include <cmath>
@@ -131,12 +132,17 @@ CINO_INLINE
 void Polyhedralmesh<M,V,E,F,P>::save(const char * filename) const
 {
     std::string str(filename);
-    std::string filetype = str.substr(str.size()-6,6);
+    std::string filetype = get_file_extension(str);
 
-    if (filetype.compare(".hedra") == 0 ||
-        filetype.compare(".HEDRA") == 0)
+    if(filetype.compare("hedra") == 0 ||
+       filetype.compare("HEDRA") == 0)
     {
         write_HEDRA(filename, this->verts, this->faces, this->polys, this->polys_face_winding);
+    }
+    else if(filetype.compare("ovm") == 0 ||
+            filetype.compare("OVM") == 0)
+    {
+        write_OVM(filename, *this);
     }
     else
     {

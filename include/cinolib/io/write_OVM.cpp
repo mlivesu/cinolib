@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2022: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,44 +33,64 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_READ_WRITE_H
-#define CINO_READ_WRITE_H
-
-// SURFACE READERS
-#include <cinolib/io/read_OBJ.h>
-#include <cinolib/io/read_OFF.h>
-#include <cinolib/io/read_IV.h>
-#include <cinolib/io/read_STL.h>
-// SURFACE WRITERS
-#include <cinolib/io/write_OBJ.h>
-#include <cinolib/io/write_OFF.h>
-#include <cinolib/io/write_STL.h>
-#include <cinolib/io/write_NODE_ELE.h>
-
-
-// VOLUME READERS
-#include <cinolib/io/read_HEDRA.h>
-#include <cinolib/io/read_HYBRID.h>
-#include <cinolib/io/read_MESH.h>
-#include <cinolib/io/read_TET.h>
-#include <cinolib/io/read_VTU.h>
-#include <cinolib/io/read_VTK.h>
-#include <cinolib/io/read_HEXEX.h>
-// VOLUME WRITERS
-#include <cinolib/io/write_HEDRA.h>
-#include <cinolib/io/write_MESH.h>
-#include <cinolib/io/write_TET.h>
-#include <cinolib/io/write_VTU.h>
-#include <cinolib/io/write_VTK.h>
 #include <cinolib/io/write_OVM.h>
+#include <fstream>
 
+namespace cinolib
+{
 
-// SKELETON READERS
-#include <cinolib/io/read_LIVESU2012.h>
-#include <cinolib/io/read_TAGLIASACCHI2012.h>
-#include <cinolib/io/read_DEYSUN2006.h>
-#include <cinolib/io/read_CSV.h>
-// SKELETON WRITERS
-#include <cinolib/io/write_LIVESU2012.h>
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void write_OVM(const char                              * filename,
+               const AbstractPolyhedralMesh<M,V,E,F,P> & m)
+{
+    std::ofstream f(filename);
+    f << "OVM ASCII\n";
 
-#endif // CINO_READ_WRITE
+    f << "Vertices\n" << m.num_verts() << "\n";
+    for(uint vid=0; vid<m.num_verts(); ++vid)
+    {
+        f << m.vert(vid).x() << " "
+          << m.vert(vid).y() << " "
+          << m.vert(vid).z() << "\n";
+    }
+
+    f << "Edges\n" << m.num_edges() << "\n";
+    for(uint eid=0; eid<m.num_edges(); ++eid)
+    {
+        f << m.edge_vert_id(eid,0) << " "
+          << m.edge_vert_id(eid,1) << "\n";
+    }
+
+    f << "Faces\n" << m.num_faces() << "\n";
+    for(uint fid=0; fid<m.num_faces(); ++fid)
+    {
+        f << m.verts_per_face(fid);
+        for(uint i=0; i<m.verts_per_face(fid); ++i)
+        {
+            uint v_beg = m.face_vert_id(fid,i);
+            uint v_end = m.face_vert_id(fid,(i+1)%m.verts_per_face(fid));
+            int  eid   = m.edge_id(v_beg,v_end);
+            assert(eid>=0);
+            int off = (m.edge_vert_id(eid,0)==v_beg)?0:1; // account for half-edge orientation
+            f << " " << eid*2+off;
+        }
+        f << "\n";
+    }
+
+    f << "Polyhedra\n" << m.num_polys() << "\n";
+    for(uint pid=0; pid<m.num_polys(); ++pid)
+    {
+        f << m.faces_per_poly(pid);
+        for(uint fid : m.adj_p2f(pid))
+        {
+            int off = m.poly_face_winding(pid,fid)?0:1; // account for half-face orientation
+            f << " " << fid*2+off;
+        }
+        f << "\n";
+    }
+
+    f.close();
+}
+
+}
