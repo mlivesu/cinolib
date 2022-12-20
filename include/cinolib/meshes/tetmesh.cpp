@@ -137,10 +137,10 @@ CINO_INLINE
 void Tetmesh<M,V,E,F,P>::save(const char * filename) const
 {
     std::string str(filename);
-    std::string filetype = "." + get_file_extension(str);
+    std::string filetype = get_file_extension(str);
 
-    if (filetype.compare(".mesh") == 0 ||
-        filetype.compare(".MESH") == 0)
+    if (filetype.compare("mesh") == 0 ||
+        filetype.compare("MESH") == 0)
     {
         if(this->polys_are_labeled())
         {
@@ -148,25 +148,30 @@ void Tetmesh<M,V,E,F,P>::save(const char * filename) const
         }
         else write_MESH(filename, this->verts, this->p2v);
     }
-    else if (filetype.compare(".tet") == 0 ||
-             filetype.compare(".TET") == 0)
+    else if (filetype.compare("tet") == 0 ||
+             filetype.compare("TET") == 0)
     {
         write_TET(filename, this->verts, this->p2v);
     }
-    else if (filetype.compare(".vtu") == 0 ||
-             filetype.compare(".VTU") == 0)
+    else if (filetype.compare("vtu") == 0 ||
+             filetype.compare("VTU") == 0)
     {
         write_VTU(filename, this->verts, this->p2v);
     }
-    else if (filetype.compare(".vtk") == 0 ||
-             filetype.compare(".VTK") == 0)
+    else if (filetype.compare("vtk") == 0 ||
+             filetype.compare("VTK") == 0)
     {
         write_VTK(filename, this->verts, this->p2v);
     }
-    else if (filetype.compare(".hedra") == 0 ||
-             filetype.compare(".HEDRA") == 0)
+    else if (filetype.compare("hedra") == 0 ||
+             filetype.compare("HEDRA") == 0)
     {
         write_HEDRA(filename, this->verts, this->faces, this->polys, this->polys_face_winding);
+    }
+    else if (filetype.compare("ovm") == 0 ||
+             filetype.compare("OVM") == 0)
+    {
+        write_OVM(filename, *this);
     }
     else
     {
