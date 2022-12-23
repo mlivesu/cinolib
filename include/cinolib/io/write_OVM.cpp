@@ -50,6 +50,7 @@ void write_OVM(const char                              * filename,
     f << "Vertices\n" << m.num_verts() << "\n";
     for(uint vid=0; vid<m.num_verts(); ++vid)
     {
+        f.precision(std::numeric_limits<double>::digits10+1);
         f << m.vert(vid).x() << " "
           << m.vert(vid).y() << " "
           << m.vert(vid).z() << "\n";
