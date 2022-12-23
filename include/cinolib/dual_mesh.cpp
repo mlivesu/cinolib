@@ -38,6 +38,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/dual_mesh.h>
+#include <cinolib/geometry/tetrahedron_utils.h>
 
 namespace cinolib
 {
@@ -77,7 +78,20 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     dual_verts.resize(primal.num_polys());
     for(uint pid=0; pid<primal.num_polys(); ++pid)
     {
-        dual_verts.at(pid) = primal.poly_centroid(pid);
+        vec3d c;
+        if(primal.poly_is_tetrahedron(pid))
+        {
+            // if the primal mesh is Delaunay, this will ensure that dual faces are planar
+            c = tetrahedron_circumcenter(primal.poly_vert(pid,0),
+                                         primal.poly_vert(pid,1),
+                                         primal.poly_vert(pid,2),
+                                         primal.poly_vert(pid,3));
+        }
+        else
+        {
+            c = primal.poly_centroid(pid);
+        }
+        dual_verts.at(pid) = c;
     }
 
     // vertex maps for clipped dual cells
