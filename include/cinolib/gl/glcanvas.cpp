@@ -787,7 +787,11 @@ void GLcanvas::scroll_event(GLFWwindow *window, double x_offset, double y_offset
     GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
 
     // if visual controls claim the event, let them handle it
-    if(ImGui::GetIO().WantCaptureMouse) return;
+    if(ImGui::GetIO().WantCaptureMouse)
+    {
+        ImGui_ImplGlfw_ScrollCallback(window, x_offset, y_offset);
+        return;
+    }
 
     if(v->callback_mouse_scroll)
     {
