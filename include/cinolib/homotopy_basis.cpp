@@ -597,6 +597,9 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
                            HomotopyBasisData & data)
 {
     // recompute basis
+    //  - loop edges are marked and labelled with loop id
+    //  - loop vertices are labelled with loop id
+    //  - root vertex receives null label (-1)
     data.loops.clear();
     m.edge_set_flag(MARKED,false);
     for(uint eid: m.adj_v2e(data.root))
@@ -629,9 +632,11 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
                 curr = next;
             }
             while(curr != data.root);
+            for(uint vid : loop) m.vert_data(vid).label = data.loops.size();
             data.loops.push_back(loop);
         }
     }
+    m.vert_data(data.root).label = -1;
     assert((int)data.loops.size() == m.genus()*2);
 }
 
