@@ -608,6 +608,7 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
             loop.push_back(data.root);
             loop.push_back(m.vert_opposite_to(eid, data.root));
             m.edge_data(eid).flags[MARKED] = true;
+            m.edge_data(eid).label = data.loops.size();
 
             uint curr = loop.back();
             do
@@ -620,6 +621,7 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
                         assert(next==-1);
                         next = m.vert_opposite_to(eid, curr);
                         m.edge_data(eid).flags[MARKED] = true;
+                        m.edge_data(eid).label = data.loops.size();
                     }
                 }
                 assert(next>=0);
