@@ -58,17 +58,6 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     assert(genus>0);
     std::cout << "genus: " << genus << std::endl;
 
-    // label vertices according to the basis loop they belong to.
-    // this serves to identify the edges of the 4g-gon
-    m_in.vert_apply_label(-1);
-    for(uint lid=0; lid<basis.loops.size(); ++lid)
-    {
-        for(uint vid : basis.loops.at(lid))
-        {
-            m_in.vert_data(vid).label = lid;
-        }
-    }
-    m_in.vert_data(basis.root).label = -1;
     std::unordered_map<uint,std::vector<uint>> v_map;
     cut_mesh_along_marked_edges(m_in, v_map);
 
