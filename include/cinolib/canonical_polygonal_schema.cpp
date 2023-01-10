@@ -77,20 +77,29 @@ void canonical_polygonal_schema(      Trimesh<M,V,E,P>  & m_in,
     std::vector<uint> split_list;
     for(uint eid=0; eid<m_in.num_edges(); ++eid)
     {
-        if(m_in.edge_is_boundary(eid)) continue;
-        uint v0 = m_in.edge_vert_id(eid,0);
-        uint v1 = m_in.edge_vert_id(eid,1);
-        if(m_in.vert_is_boundary(v0) && m_in.vert_is_boundary(v1) &&
-          (m_in.vert_data(v0).label==m_in.vert_data(v1).label))
+        if(!m_in.edge_is_boundary(eid))
         {
-            split_list.push_back(eid);
+            uint v0 = m_in.edge_vert_id(eid,0);
+            uint v1 = m_in.edge_vert_id(eid,1);
+            if(m_in.vert_is_boundary(v0) && m_in.vert_is_boundary(v1) &&
+              (m_in.vert_data(v0).label==m_in.vert_data(v1).label))
+            {
+                split_list.push_back(eid);
+            }
+        }
+        else
+        {
+            // restore edge flags and labels around the perimeter of the CPS
+            m_in.edge_data(eid).flags[MARKED] = true;
+            m_in.edge_data(eid).label = std::max(m_in.vert_data(m_in.edge_vert_id(eid,0)).label,
+                                                 m_in.vert_data(m_in.edge_vert_id(eid,1)).label);
         }
     }
     if(!split_list.empty())
     {
         std::cout << "splitting " << split_list.size() << " edges to avoid degenerate elements along the boundary" << std::endl;
         for(uint eid : split_list) m_in.edge_split(eid);
-    }
+    }    
 
     std::vector<uint> border = m_in.get_ordered_boundary_vertices();
     // rotate the list so as to have a polygon corner at the beginning of it
