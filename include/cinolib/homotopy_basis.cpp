@@ -597,7 +597,7 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
                            HomotopyBasisData & data)
 {
     // recompute basis
-    //  - loop edges are marked and labelled with loop id
+    //  - loop edges are marked and labelled with loop id, they are labelled -1 otherwise
     //  - loop vertices are labelled with loop id
     //  - root vertex receives null label (-1)
     data.loops.clear();
@@ -607,11 +607,12 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
         if(m.edge_data(eid).flags[MARKED]) continue;
         if(m.edge_data(eid).label>0)
         {
+            int loop_id = data.loops.size();
             std::vector<uint> loop;
             loop.push_back(data.root);
             loop.push_back(m.vert_opposite_to(eid, data.root));
             m.edge_data(eid).flags[MARKED] = true;
-            m.edge_data(eid).label = data.loops.size();
+            m.edge_data(eid).label = loop_id;
 
             uint curr = loop.back();
             do
@@ -624,7 +625,7 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
                         assert(next==-1);
                         next = m.vert_opposite_to(eid, curr);
                         m.edge_data(eid).flags[MARKED] = true;
-                        m.edge_data(eid).label = data.loops.size();
+                        m.edge_data(eid).label = loop_id;
                     }
                 }
                 assert(next>=0);
@@ -632,9 +633,13 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
                 curr = next;
             }
             while(curr != data.root);
-            for(uint vid : loop) m.vert_data(vid).label = data.loops.size();
+            for(uint vid : loop) m.vert_data(vid).label = loop_id;
             data.loops.push_back(loop);
-        }
+        }        
+    }
+    for(uint eid=0; eid<m.num_edges(); ++eid)
+    {
+        if(!m.edge_data(eid).flags[MARKED]) m.edge_data(eid).label = -1;
     }
     m.vert_data(data.root).label = -1;
     assert((int)data.loops.size() == m.genus()*2);
