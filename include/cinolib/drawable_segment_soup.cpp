@@ -65,6 +65,7 @@ void DrawableSegmentSoup::draw(const float scene_size) const
             if(draw_joint_spheres)
             {
                 draw_sphere(at(2*i+0), cylind_rad, c, joint_sphere_subd);
+                draw_sphere(at(2*i+1), cylind_rad, c, joint_sphere_subd);
             }
         }
     }
