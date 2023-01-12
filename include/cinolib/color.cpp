@@ -36,6 +36,7 @@
 #include "color.h"
 #include <cinolib/textures/texture_hsv.h>
 #include <cinolib/textures/texture_parula.h>
+#include <cinolib/clamp.h>
 #include <assert.h>
 #include <algorithm>
 #include <cmath>
@@ -234,7 +235,12 @@ Color Color::scatter(uint n_colors, uint pos, float sat, float val)
 {
     n_colors += 1; // for some reason I am getting duplicated colors without this... :(
 
-    assert(pos<n_colors);
+    if(pos>=n_colors)
+    {
+        std::cerr << "WARNING - clamping " << pos << " to stay within the color budget of " << n_colors << std::endl;
+        pos = clamp(pos,(uint)0,n_colors-1);
+        //assert(pos<n_colors);
+    }
 
     // Magic stolen from VCG :P
 
