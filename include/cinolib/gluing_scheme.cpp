@@ -193,27 +193,6 @@ void gluing_scheme_force_normal_form(Trimesh<M,V,E,P>  & m,
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    // is i^th element part of a A-B-A-B string?
-    auto is_normal_form = [&](const std::vector<int> & gs, const uint i) -> bool
-    {
-        uint n = gs.size();
-        uint a  = gs[i];
-        uint n1 = gs[(i  +1)%n];
-        uint n2 = gs[(i  +2)%n];
-        uint n3 = gs[(i  +3)%n];
-        uint p1 = gs[(i+n-1)%n];
-        uint p2 = gs[(i+n-2)%n];
-        uint p3 = gs[(i+n-3)%n];
-
-        if(a==n2 && n1==n3) return true;
-        if(a==n2 && p1==n1) return true;
-        if(a==p2 && p1==n1) return true;
-        if(a==p2 && p1==p3) return true;
-        return false;
-    };
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     auto find_and_normalize_pair = [&]()
     {
         auto gs = gluing_scheme(m,data,false);
