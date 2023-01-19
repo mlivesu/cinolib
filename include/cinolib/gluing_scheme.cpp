@@ -46,7 +46,9 @@ void gluing_scheme_force_normal_form(Trimesh<M,V,E,P>  & m,
 {
     int fresh_loop_id = m.genus()*2;
 
+    //**********************************************//
     //************** HELPER FUNCTIONS **************//
+    //**********************************************//
 
     // split mesh edges connecting adjacent loops
     auto pad_loops = [&]() -> void
@@ -151,8 +153,6 @@ void gluing_scheme_force_normal_form(Trimesh<M,V,E,P>  & m,
     // puts loops alpha and beta in normal form
     auto Fulton_step = [&](const uint alpha, const uint beta)
     {
-        std::cout << "fulton step " << alpha << " " << beta << std::endl;
-
         pad_loops();
         auto gs = gluing_scheme(m,data,true);
         uint n  = gs.size();
@@ -219,24 +219,6 @@ void gluing_scheme_force_normal_form(Trimesh<M,V,E,P>  & m,
         auto gs = gluing_scheme(m,data,false);
         uint n  = gs.size();
 
-        // is i^th element part of a A-B-A-B string?
-        auto is_normal_form = [&](const uint i) -> bool
-        {
-            uint a  = gs[i];
-            uint n1 = gs[(i  +1)%n];
-            uint n2 = gs[(i  +2)%n];
-            uint n3 = gs[(i  +3)%n];
-            uint p1 = gs[(i+n-1)%n];
-            uint p2 = gs[(i+n-2)%n];
-            uint p3 = gs[(i+n-3)%n];
-
-            if(a==n2 && n1==n3) return true;
-            if(a==n2 && p1==n1) return true;
-            if(a==p2 && p1==n1) return true;
-            if(a==p2 && p1==p3) return true;
-            return false;
-        };
-
         auto dist_from_next = [&](const uint val, const uint pos) -> int
         {
             uint dist = 1;
@@ -250,14 +232,14 @@ void gluing_scheme_force_normal_form(Trimesh<M,V,E,P>  & m,
 
         for(uint i=0; i<gs.size(); ++i)
         {
-            if(!is_normal_form(i))
+            if(!is_normal_form(gs,i))
             {
                 for(uint j=(i+1)%n,count=0; count<n; j=(j+1)%n,++count)
                 {
                     int d_next_i  = dist_from_next(gs[i],j);
                     int d_next_j  = dist_from_next(gs[j],j);
                     int d_next_ii = dist_from_next(gs[i],j+d_next_i) + d_next_i;
-                    if(d_next_i<d_next_j && d_next_j<d_next_ii && !is_normal_form(j))
+                    if(d_next_i<d_next_j && d_next_j<d_next_ii && !is_normal_form(gs,j))
                     {
                         Fulton_step(gs[i],gs[j]);
                         return true;
@@ -268,9 +250,10 @@ void gluing_scheme_force_normal_form(Trimesh<M,V,E,P>  & m,
         return false;
     };
 
+    //**********************************************//
     //************** ACTUAL ALGORITHM **************//
+    //**********************************************//
 
-    std::cout << "begin" << std::endl;
     while(find_and_normalize_pair()){}
 }
 
@@ -343,6 +326,26 @@ std::vector<int> radial_sorting(Trimesh<M,V,E,P>  & m,
         }
     }
     return rs;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+bool is_normal_form(const std::vector<int> & gs, const uint pos)
+{
+    uint n = gs.size();
+    uint a  = gs[pos];
+    uint n1 = gs[(pos  +1)%n];
+    uint n2 = gs[(pos  +2)%n];
+    uint n3 = gs[(pos  +3)%n];
+    uint p1 = gs[(pos+n-1)%n];
+    uint p2 = gs[(pos+n-2)%n];
+    uint p3 = gs[(pos+n-3)%n];
+
+    if(a==n2 && n1==n3) return true;
+    if(a==n2 && p1==n1) return true;
+    if(a==p2 && p1==n1) return true;
+    if(a==p2 && p1==p3) return true;
+    return false;
 }
 
 }

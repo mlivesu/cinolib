@@ -77,6 +77,12 @@ void gluing_scheme_force_normal_form(Trimesh<M,V,E,P>  & m,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// given a gluing scheme and a loop's index, states whether such loop
+// belongs to string in normal form (A-B-A-B)
+bool is_normal_form(const std::vector<int> & gs, const uint pos);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // radial loop sorting around the origin of the homotopy basis
 // the full version lists ALL incident labels, interleaved with vertex ids
 // the other version lists only loop labels
