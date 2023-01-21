@@ -140,6 +140,8 @@ Cmake will automatically detect and download the necessary external libraries (e
 #### 45 - Voxelize an analytic function
 [<p align="left"><img src="snapshots/45_voxelize_function.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/45_voxelize_function)
 
+#### 46 - Compute the eigenfunctions of the Laplacian matrix
+[<p align="left"><img src="snapshots/46_eigenfunctions.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/46_eigenfunctions)
 
 
 # Upcoming examples
