@@ -51,6 +51,11 @@ bool matrix_eigenfunctions(const Eigen::SparseMatrix<double> & m,
                                  std::vector<double>         & f_min,
                                  std::vector<double>         & f_max)
 {
+    uint nc = m.cols();
+    f.resize(m.cols()*nf);
+    f_min.resize(nf);
+    f_max.resize(nf);
+
     if(sym) // symmetric real matrix
     {
         // https://github.com/yixuan/spectra/issues/149#issuecomment-1398594081
@@ -60,10 +65,6 @@ bool matrix_eigenfunctions(const Eigen::SparseMatrix<double> & m,
         eigs.compute(Spectra::SortRule::LargestMagn); // largest beacuse it's inverted
         if(eigs.info()!=Spectra::CompInfo::Successful) return false;
         // assemble output data
-        uint nc = m.cols();
-        f.resize(m.cols()*nf);
-        f_min.resize(nf);
-        f_max.resize(nf);
         auto basis_func = eigs.eigenvectors();
         for(uint fid=0; fid<basis_func.cols(); ++fid)
         {
@@ -90,10 +91,6 @@ bool matrix_eigenfunctions(const Eigen::SparseMatrix<double> & m,
         eigs.compute(Spectra::SortRule::LargestMagn); // largest beacuse it's inverted
         if(eigs.info()!=Spectra::CompInfo::Successful) return false;
         // assemble output data
-        uint nc = m.cols();
-        f.resize(m.cols()*nf);
-        f_min.resize(nf);
-        f_max.resize(nf);
         auto basis_func = eigs.eigenvectors();
         for(uint fid=0; fid<basis_func.cols(); ++fid)
         {
