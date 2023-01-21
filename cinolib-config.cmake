@@ -153,6 +153,8 @@ if(CINOLIB_USES_SPECTRA)
     FetchContent_Declare(spectra GIT_REPOSITORY "https://github.com/yixuan/spectra.git")
     FetchContent_Populate(spectra)
     if(MSVC)
+        # because Spectra seems to trigger fatal error C1128 on MSVC
+        # https://learn.microsoft.com/en-us/cpp/error-messages/compiler-errors-1/fatal-error-c1128?view=msvc-170
         add_compile_options(/bigobj)
     endif()
     target_compile_definitions(cinolib INTERFACE CINOLIB_USES_SPECTRA)
