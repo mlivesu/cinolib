@@ -51,7 +51,7 @@ bool matrix_eigenfunctions(const Eigen::SparseMatrix<double> & m,
                                  std::vector<double>         & f_min,
                                  std::vector<double>         & f_max)
 {
-    uint nc = m.cols();
+    int nc = m.cols();
     f.resize(m.cols()*nf);
     f_min.resize(nf);
     f_max.resize(nf);
@@ -66,11 +66,11 @@ bool matrix_eigenfunctions(const Eigen::SparseMatrix<double> & m,
         if(eigs.info()!=Spectra::CompInfo::Successful) return false;
         // assemble output data
         auto basis_func = eigs.eigenvectors();
-        for(uint fid=0; fid<basis_func.cols(); ++fid)
+        for(int fid=0; fid<basis_func.cols(); ++fid)
         {
             double min = max_double;
             double max = min_double;
-            for(uint i=0; i<nc; ++i)
+            for(int i=0; i<nc; ++i)
             {
                 auto coeff = basis_func(i,fid);
                 f.at(fid*nc+i) = coeff;
@@ -91,12 +91,12 @@ bool matrix_eigenfunctions(const Eigen::SparseMatrix<double> & m,
         if(eigs.info()!=Spectra::CompInfo::Successful) return false;
         // assemble output data
         auto basis_func = eigs.eigenvectors();
-        for(uint fid=0; fid<basis_func.cols(); ++fid)
+        for(int fid=0; fid<basis_func.cols(); ++fid)
         {
             double min = max_double;
             double max = min_double;
-            uint   off = nf-1-fid; // reverse the order
-            for(uint i=0; i<nc; ++i)
+            int    off = nf-1-fid; // reverse the order
+            for(int i=0; i<nc; ++i)
             {
                 auto coeff = basis_func(i,fid);
                 if(coeff.imag()!=0) return false; // fail if there are complex coefficients
