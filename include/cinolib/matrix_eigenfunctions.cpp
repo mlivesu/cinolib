@@ -70,16 +70,15 @@ bool matrix_eigenfunctions(const Eigen::SparseMatrix<double> & m,
         {
             double min = max_double;
             double max = min_double;
-            uint   off = nf-1-fid; // reverse the order
             for(uint i=0; i<nc; ++i)
             {
                 auto coeff = basis_func(i,fid);
-                f.at(off*nc+i) = coeff;
+                f.at(fid*nc+i) = coeff;
                 max = std::max(max, std::fabs(coeff));
                 min = std::min(min, -max);
             }
-            f_min.at(off) = min;
-            f_max.at(off) = max;
+            f_min.at(fid) = min;
+            f_max.at(fid) = max;
         }
     }
     else // generic real matrix
