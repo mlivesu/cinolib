@@ -145,6 +145,6 @@ BibTeX entry:
 
 ## Acknowledgment
 The software collected in CinoLib spans across a large period of time, starting from the beginning of my PhD to today. Since 2015, this work has been partly supported by various research projects, such as
-* [CAxMan](https://cordis.europa.eu/project/id/680448)
+* [ProMED](http://arm.mi.imati.cnr.it/imati/detail_pages.php?language=ENG&view=GEN&voice_code=PRG&fcode=WHA&ref_idk=PJ-176)
 * [CHANGE](https://cordis.europa.eu/project/rcn/204834/en)
-
+* [CAxMan](https://cordis.europa.eu/project/id/680448)
