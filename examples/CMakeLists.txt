@@ -11,6 +11,7 @@ set(CINOLIB_USES_INDIRECT_PREDICATES  ON )
 set(CINOLIB_USES_GRAPH_CUT            OFF)
 set(CINOLIB_USES_BOOST                ON )
 set(CINOLIB_USES_VTK                  ON ) # optional, if added VTK formats will be supported everywhere
+set(CINOLIB_USES_SPECTRA              ON )
 
 # pass cinolib and the external dependencies to all examples
 set(cinolib_DIR "${PROJECT_SOURCE_DIR}/..")
@@ -91,4 +92,7 @@ add_subdirectory(43_hex2tet)
 if(CINOLIB_USES_OPENGL_GLFW_IMGUI)
         add_subdirectory(44_voxelize_mesh)
         add_subdirectory(45_voxelize_function)
+        if(CINOLIB_USES_SPECTRA)
+            add_subdirectory(46_eigenfunctions)
+        endif()
 endif()
