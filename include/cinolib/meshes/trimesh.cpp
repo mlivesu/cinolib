@@ -477,6 +477,7 @@ uint Trimesh<M,V,E,P>::poly_edge_id(const uint pid, const uint offset) const
         }
     }
     assert(false && "Something is off here...");
+    return 0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
