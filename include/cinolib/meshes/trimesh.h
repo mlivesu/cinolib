@@ -105,6 +105,7 @@ class Trimesh : public AbstractPolygonMesh<M,V,E,P>
         bool              edge_is_topologically_collapsible(const uint eid) const;
         uint              edge_split                       (const uint eid, const double lambda = 0.5);
         uint              edge_split                       (const uint eid, const vec3d & p);
+        uint              edge_split                       (const uint eid, const uint v_split); // useful in case the split vertex already existed
         bool              edge_is_flippable                (const uint eid);        
         double            edge_weight_cotangent            (const uint eid) const;
         double            edge_weight                      (const uint eid, const int type) const override;

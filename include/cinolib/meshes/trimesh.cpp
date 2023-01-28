@@ -322,7 +322,9 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint Trimesh<M,V,E,P>::edge_split(const uint eid, const double lambda)
 {
-    return edge_split(eid, this->edge_sample_at(eid,lambda));
+    vec3d split_point = this->edge_sample_at(eid,lambda);
+    uint  v_split     = this->vert_add(split_point);
+    return edge_split(eid,v_split);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -331,31 +333,40 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint Trimesh<M,V,E,P>::edge_split(const uint eid, const vec3d & p)
 {
-    uint new_vid = this->vert_add(p);
-    uint vid0    = this->edge_vert_id(eid,0);
-    uint vid1    = this->edge_vert_id(eid,1);
+    uint v_split = this->vert_add(p);
+    return edge_split(eid,v_split);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+uint Trimesh<M,V,E,P>::edge_split(const uint eid, const uint v_split)
+{
+    uint vid0 = this->edge_vert_id(eid,0);
+    uint vid1 = this->edge_vert_id(eid,1);
 
     for(uint pid : this->adj_e2p(eid))
     {
         uint v_opp = this->vert_opposite_to(pid, vid0, vid1);
         if (this->poly_verts_are_CCW(pid, vid0, vid1)) std::swap(vid0, vid1);
-        uint new_pid1 = this->poly_add(v_opp, vid0, new_vid);
-        uint new_pid2 = this->poly_add(v_opp, new_vid, vid1);
+        uint new_pid1 = this->poly_add(v_opp, vid0, v_split);
+        uint new_pid2 = this->poly_add(v_opp, v_split, vid1);
         this->poly_data(new_pid1) = this->poly_data(pid);
         this->poly_data(new_pid2) = this->poly_data(pid);
         if(this->mesh_data().update_normals) this->update_p_normal(new_pid1);
         if(this->mesh_data().update_normals) this->update_p_normal(new_pid2);
     }
-    if(this->mesh_data().update_normals) this->update_v_normal(new_vid);
+    if(this->mesh_data().update_normals) this->update_v_normal(v_split);
 
     // copy edge data
-    int eid0 = this->edge_id(vid0,new_vid); assert(eid0>=0);
-    int eid1 = this->edge_id(vid1,new_vid); assert(eid1>=0);
+    int eid0 = this->edge_id(vid0,v_split); assert(eid0>=0);
+    int eid1 = this->edge_id(vid1,v_split); assert(eid1>=0);
     this->edge_data(eid0) = this->edge_data(eid);
     this->edge_data(eid1) = this->edge_data(eid);
 
     this->polys_remove(this->adj_e2p(eid));
-    return new_vid;
+    return v_split;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
