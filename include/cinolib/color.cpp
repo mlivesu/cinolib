@@ -268,7 +268,8 @@ Color Color::scatter(uint n_colors, uint pos, float sat, float val)
 CINO_INLINE
 Color Color::hsv_ramp(uint n_colors, uint pos)
 {
-    assert(pos<n_colors);
+    pos = clamp(pos,0u,n_colors-1);
+    //assert(pos<n_colors);
 
     uint i = (uint)std::round(255 * static_cast<float>(pos)/static_cast<float>(n_colors));
 
