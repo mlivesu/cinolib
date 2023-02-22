@@ -183,7 +183,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
         bool               vert_is_on_srf             (const uint vid) const;
         double             vert_mass                  (const uint vid) const override;
         double             vert_volume                (const uint vid) const;
-        bool               vert_is_manifold           (const uint vid) const;
+        bool               vert_is_manifold           (const uint vid) const override;
         bool               vert_is_visible            (const uint vid) const;
         int                vert_shared_between_faces  (const std::vector<uint> & fids) const;
         std::vector<uint>  vert_verts_link            (const uint vid) const; // see https://en.wikipedia.org/wiki/Simplicial_complex#Closure,_star,_and_link for adefinition of link and star

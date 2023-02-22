@@ -70,6 +70,20 @@ bool AbstractMesh<M,V,E,P>::mesh_is_volumetric() const
 {
     return !mesh_is_surface();
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+bool AbstractMesh<M,V,E,P>::mesh_is_manifold() const
+{
+    for(uint vid=0; vid<this->num_verts(); ++vid)
+    {
+        if(!this->vert_is_manifold(vid)) return false;
+    }
+    return true;
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>

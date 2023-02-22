@@ -738,19 +738,6 @@ bool AbstractPolygonMesh<M,V,E,P>::vert_is_boundary(const uint vid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-bool AbstractPolygonMesh<M,V,E,P>::mesh_is_manifold() const
-{
-    for(uint vid=0; vid<this->num_verts(); ++vid)
-    {
-        if(!this->vert_is_manifold(vid)) return false;
-    }
-    return true;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class P>
-CINO_INLINE
 bool AbstractPolygonMesh<M,V,E,P>::vert_is_manifold(const uint vid) const
 {
     if(this->vert_valence(vid)==0) return true;

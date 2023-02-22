@@ -117,7 +117,6 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
 
         double mesh_volume()      const;
         double mesh_area()        const;
-        bool   mesh_is_manifold() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -130,7 +129,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         double            vert_area               (const uint vid) const;
         double            vert_mass               (const uint vid) const override;
         bool              vert_is_boundary        (const uint vid) const;
-        bool              vert_is_manifold        (const uint vid) const;
+        bool              vert_is_manifold        (const uint vid) const override;
         void              vert_switch_id          (const uint vid0, const uint vid1);
         void              vert_remove             (const uint vid);
         void              vert_remove_unreferenced(const uint vid);

@@ -104,6 +104,7 @@ class AbstractMesh
         virtual MeshType mesh_type() const = 0;
                 bool     mesh_is_surface() const;
                 bool     mesh_is_volumetric() const;
+                bool     mesh_is_manifold() const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -230,6 +231,7 @@ class AbstractMesh
         virtual void             vert_set_alpha             (const float alpha);
         virtual uint             vert_opposite_to           (const uint eid, const uint vid) const;
         virtual void             vert_weights               (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const;
+        virtual bool             vert_is_manifold           (const uint vid) const = 0;
                 void             vert_set_flag              (const int flag, const bool b);
                 void             vert_set_flag              (const int flag, const bool b, const std::vector<uint> & vids);
 
