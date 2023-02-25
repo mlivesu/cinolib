@@ -197,6 +197,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
         uint pid_beneath;
         if(!this->face_is_visible(fid,pid_beneath)) continue;
 
+        bool is_CW = this->poly_face_is_CW(pid_beneath, fid);
         vec3d n = this->poly_face_normal(pid_beneath, fid);
 
         for(uint i=0; i<this->face_tessellation(fid).size()/3; ++i)
@@ -204,6 +205,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             uint vid0 = this->face_tessellation(fid).at(3*i+0);
             uint vid1 = this->face_tessellation(fid).at(3*i+1);
             uint vid2 = this->face_tessellation(fid).at(3*i+2);
+            if(is_CW) std::swap(vid1,vid2); // flip triangle orientation
 
             // average AO with adjacent visible faces having dihedral angle lower than 60 degrees
             auto  vid0_vis_fids = this->vert_adj_visible_faces(vid0, n, 60.0);
