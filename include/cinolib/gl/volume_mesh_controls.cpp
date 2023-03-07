@@ -811,6 +811,26 @@ void VolumeMeshControls<Mesh>::header_actions(const bool open)
             m->poly_label_wrt_color();
             refresh = true;
         }
+        if(ImGui::SmallButton("Mark color discontinuities"))
+        {
+            for(uint fid=0; fid<m->num_faces(); ++fid)
+            {
+                if(m->face_is_on_srf(fid))continue;
+                uint p0 = m->adj_f2p(fid).front();
+                uint p1 = m->adj_f2p(fid).back();
+                m->face_data(fid).flags[MARKED] = (m->poly_data(p0).label!=m->poly_data(p1).label);
+            }
+            for(uint eid=0; eid<m->num_edges(); ++eid)
+            {
+                uint count = 0;
+                for(uint fid : m->adj_e2f(eid))
+                {
+                    if(m->face_data(fid).flags[MARKED]) ++count;
+                }
+                m->edge_data(eid).flags[MARKED] = (m->edge_is_on_srf(eid) && count>=2) || (count>2);
+            }
+            refresh = true;
+        }
         if(ImGui::SmallButton("Export Visible"))
         {
             Polyhedralmesh<M,V,E,F,P> tmp;
