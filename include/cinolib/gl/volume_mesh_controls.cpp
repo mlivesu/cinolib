@@ -42,6 +42,7 @@
 #include <cinolib/string_utilities.h>
 #include <cinolib/export_visible.h>
 #include <cinolib/export_surface.h>
+#include <cinolib/export_marked_faces.h>
 #include <cinolib/ambient_occlusion.h>
 #include <iostream>
 #include <sstream>
@@ -835,6 +836,14 @@ void VolumeMeshControls<Mesh>::header_actions(const bool open)
         {
             Polyhedralmesh<M,V,E,F,P> tmp;
             export_visible(*m, tmp);
+            std::string filename = file_dialog_save();
+            if(!filename.empty()) tmp.save(filename.c_str());
+            refresh = true;
+        }
+        if(ImGui::SmallButton("Export Marked Faces"))
+        {
+            Polygonmesh<M,V,E,F> tmp;
+            export_marked_faces(*m, tmp);
             std::string filename = file_dialog_save();
             if(!filename.empty()) tmp.save(filename.c_str());
             refresh = true;
