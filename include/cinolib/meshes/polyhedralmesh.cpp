@@ -134,7 +134,16 @@ void Polyhedralmesh<M,V,E,F,P>::save(const char * filename) const
     std::string str(filename);
     std::string filetype = get_file_extension(str);
 
-    if(filetype.compare("hedra") == 0 ||
+    if (filetype.compare("mesh") == 0 ||
+        filetype.compare("MESH") == 0)
+    {
+        if(this->polys_are_labeled())
+        {
+            write_MESH(filename, this->verts, this->p2v, std::vector<int>(this->num_verts(),0), this->vector_poly_labels());
+        }
+        else write_MESH(filename, this->verts, this->p2v);
+    }
+    else if(filetype.compare("hedra") == 0 ||
        filetype.compare("HEDRA") == 0)
     {
         write_HEDRA(filename, this->verts, this->faces, this->polys, this->polys_face_winding);
