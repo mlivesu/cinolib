@@ -64,7 +64,7 @@ enum class DistEnergy
     CONFORMAL,
     // Definition     : (s_max^2 + s_min^2) / (2*s_max*s_min)
     // Range          : [0,inf)
-    // Optimal Value  : 0
+    // Optimal Value  : 1
     // Scale Invariant: no
     // Flip Preventing: no
     // Reference      : Least squares conformal maps for automatic texture atlas generation (SIGGRAPH 2002)
