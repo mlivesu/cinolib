@@ -66,8 +66,10 @@ double distortion(const double       s_max,
         case DistEnergy::STRETCH_L2          : return sqrt((s_max*s_max + s_min*s_min)/2);
         case DistEnergy::STRETCH_Linf        : return s_max;
         case DistEnergy::STRETCH_SORKINE     : return std::max(s_max, 1.0/s_min);
-        default: assert(false && "unknonw energy");
+        default: throw("unkwnonw energy");
     }
+    throw("I shouldn't be here");
+    return 0.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -85,8 +87,10 @@ double distortion(const double       s_max,
         case DistEnergy::SYMMETRIC_DIRICHLET : return s_max*s_max + s_mid*s_mid + s_min*s_min + 1/(s_max*s_max) + 1/(s_mid*s_mid) + 1/(s_min*s_min);
         case DistEnergy::ARAP                : return pow(s_max-1, 2) + pow(s_mid-1, 2) + pow(s_min-1, 2);
         case DistEnergy::MIPS3D              : return 1./8. * (s_max/s_mid + s_mid/s_max) * (s_min/s_max + s_max/s_min) * (s_mid/s_min + s_min/s_mid);
-        default: assert(false && "unknonw energy");
+        default: throw("unkwnonw energy");
     }
+    throw("I shouldn't be here");
+    return 0.0;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
