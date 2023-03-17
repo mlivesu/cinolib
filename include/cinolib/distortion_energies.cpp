@@ -56,7 +56,7 @@ double distortion(const double       s_max,
 {
     switch(energy)
     {
-        case DistEnergy::CONFORMAL           : return pow(s_max - s_min, 2);
+        case DistEnergy::CONFORMAL           : return (s_max*s_max + s_min*s_min) / (2*s_max*s_min);
         case DistEnergy::ISOMETRIC_MAX       : return std::max(s_max*s_max, 1.0/(s_min*s_min));
         case DistEnergy::ISOMETRIC_SUM       : return s_max*s_max + 1/(s_min*s_min);
         case DistEnergy::DIRICHLET           : return s_max*s_max + s_min*s_min;
@@ -66,6 +66,25 @@ double distortion(const double       s_max,
         case DistEnergy::STRETCH_L2          : return sqrt((s_max*s_max + s_min*s_min)/2);
         case DistEnergy::STRETCH_Linf        : return s_max;
         case DistEnergy::STRETCH_SORKINE     : return std::max(s_max, 1.0/s_min);
+        default: assert(false && "unknonw energy");
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double distortion(const double       s_max,
+                  const double       s_mid,
+                  const double       s_min,
+                  const DistEnergy & energy)
+{
+    switch(energy)
+    {
+        case DistEnergy::CONFORMAL           : return (s_max*s_max + s_mid*s_mid + s_min*s_min) / (3*pow(s_max*s_mid*s_min, 2./3.));
+        case DistEnergy::DIRICHLET           : return s_max*s_max + s_mid*s_mid + s_min*s_min;
+        case DistEnergy::SYMMETRIC_DIRICHLET : return s_max*s_max + s_mid*s_mid + s_min*s_min + 1/(s_max*s_max) + 1/(s_mid*s_mid) + 1/(s_min*s_min);
+        case DistEnergy::ARAP                : return pow(s_max-1, 2) + pow(s_mid-1, 2) + pow(s_min-1, 2);
+        case DistEnergy::MIPS3D              : return 1./8. * (s_max/s_mid + s_mid/s_max) * (s_min/s_max + s_max/s_min) * (s_mid/s_min + s_min/s_mid);
         default: assert(false && "unknonw energy");
     }
 }
@@ -83,10 +102,11 @@ double distortion(const vec2d      & u0,
     mat2d T;
     linear_map(u0,v0,u1,v1,T);
 
-    vec2d eval;
-    T.eigenvalues(eval);
+    vec2d S;
+    mat2d U,V;
+    T.SVD(U,S,V);
 
-    return distortion(eval[1], eval[0], energy);
+    return distortion(S[0],S[1],energy);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -104,10 +124,35 @@ double distortion(const vec3d      & a0,
     mat2d T;
     linear_map(a0,a1,a2,b0,b1,b2,T);
 
-    vec2d eval;
-    T.eigenvalues(eval);
+    vec2d S;
+    mat2d U,V;
+    T.SVD(U,S,V);
 
-    return distortion(eval[1], eval[0], energy);
+    return distortion(S[1], S[0], energy);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// mapping distortion between 3D tetrahedra (a0,a1,a2,a3) and (b0,b1,b2,b3)
+CINO_INLINE
+double distortion(const vec3d      & a0,
+                  const vec3d      & a1,
+                  const vec3d      & a2,
+                  const vec3d      & a3,
+                  const vec3d      & b0,
+                  const vec3d      & b1,
+                  const vec3d      & b2,
+                  const vec3d      & b3,
+                  const DistEnergy & energy)
+{
+    mat3d T;
+    linear_map(a0,a1,a2,a3,b0,b1,b2,b3,T);
+
+    vec3d S;
+    mat3d U,V;
+    T.SVD(U,S,V);
+
+    return distortion(S[0],S[1],S[2], energy);
 }
 
 }

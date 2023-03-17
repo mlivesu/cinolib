@@ -62,7 +62,7 @@ enum class DistEnergy
     // when e_min goes to zero), and a reference to the paper that introduced it.
 
     CONFORMAL,
-    // Definition     : (s_max - s_min)^2
+    // Definition     : (s_max^2 + s_min^2) / (2*s_max*s_min)
     // Range          : [0,inf)
     // Optimal Value  : 0
     // Scale Invariant: no
@@ -120,6 +120,14 @@ enum class DistEnergy
     // Flip Preventing: yes
     // Reference      : MIPS - An efficient global parametrization method (2000)
 
+    MIPS3D,
+    // Definition     : 1/8 * (s_max/s_mid + s_mid/s_max) * (s_min/s_max + s_max/s_min) * (s_mid/s_min + s_min/s_mid)
+    // Range          : unbounded
+    // Optimal Value  : 1
+    // Scale Invariant: yes
+    // Flip Preventing: yes
+    // Reference      : Computing Locally Injective Mappings by Advanced MIPS (2015)
+
     STRETCH_L2,
     // Definition     : sqrt[(e_max*e_max + e_min*e_min)/2]
     // Range          : [0,inf)
@@ -154,6 +162,14 @@ double distortion(const double       s_max,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
+double distortion(const double       s_max,
+                  const double       s_mid,
+                  const double       s_min,
+                  const DistEnergy & energy);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // mapping distortion between 2D frames (u0,v0) and (u1,v1)
 CINO_INLINE
 double distortion(const vec2d      & u0,
@@ -176,6 +192,17 @@ double distortion(const vec3d      & a0,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// mapping distortion between 3D tetrahedra (a0,a1,a2,a3) and (b0,b1,b2,b3)
+CINO_INLINE
+double distortion(const vec3d      & a0,
+                  const vec3d      & a1,
+                  const vec3d      & a2,
+                  const vec3d      & a3,
+                  const vec3d      & b0,
+                  const vec3d      & b1,
+                  const vec3d      & b2,
+                  const vec3d      & b3,
+                  const DistEnergy & energy);
 }
 
 #ifndef  CINO_STATIC_LIB
