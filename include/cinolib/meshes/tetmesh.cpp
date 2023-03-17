@@ -934,4 +934,18 @@ std::vector<uint> Tetmesh<M,V,E,F,P>::poly_faces_opposite_to(const uint pid, con
     return this->poly_e2f(pid, this->poly_edge_opposite_to(pid,eid));
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::poly_local_frame(const uint    pid,
+                                          const uint    origin, // either 0,1,2 or 3
+                                                mat3d & xyz)
+{
+    auto verts = this->poly_verts(pid);
+    xyz = mat3d({verts[(origin+1)%4] - verts[origin],
+                 verts[(origin+2)%4] - verts[origin],
+                 verts[(origin+3)%4] - verts[origin]});
+}
+
 }
