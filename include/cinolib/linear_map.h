@@ -70,6 +70,20 @@ void linear_map(const vec3d & a0,
                 const vec3d & b1,
                 const vec3d & b2,
                       mat2d & T);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// Computes the linear component of the affine map that connects tetrahedra (a0,a1,a2,a3) and (b0,b1,b2,b3)
+CINO_INLINE
+void linear_map(const vec3d & a0,
+                const vec3d & a1,
+                const vec3d & a2,
+                const vec3d & a3,
+                const vec3d & b0,
+                const vec3d & b1,
+                const vec3d & b2,
+                const vec3d & b3,
+                      mat3d & T);
 }
 
 #ifndef  CINO_STATIC_LIB
