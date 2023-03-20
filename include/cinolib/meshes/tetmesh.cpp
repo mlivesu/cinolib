@@ -221,12 +221,9 @@ uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const double lambda)
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
+uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const uint split_point)
 {
     assert(this->edge_valence(eid)>0);
-
-    uint new_vid = this->vert_add(p);
-
     // create sub-elements
     for(uint pid : this->adj_e2p(eid))
     {
@@ -237,7 +234,7 @@ uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
                 this->face_vert_id(fid,0),
                 this->face_vert_id(fid,1),
                 this->face_vert_id(fid,2),
-                new_vid
+                split_point
             };
             if(this->poly_face_is_CCW(pid,fid)) std::swap(tet[1],tet[2]);
             uint new_pid = this->poly_add(tet);
@@ -248,24 +245,35 @@ uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
     // propagate attributes to sub-elements
     uint vid0 = this->edge_vert_id(eid,0);
     uint vid1 = this->edge_vert_id(eid,1);
-    int  e0   = this->edge_id(vid0, new_vid); assert(e0>=0);
-    int  e1   = this->edge_id(vid1, new_vid); assert(e1>=0);
+    int  e0   = this->edge_id(vid0, split_point); assert(e0>=0);
+    int  e1   = this->edge_id(vid1, split_point); assert(e1>=0);
     this->edge_data(e0) = this->edge_data(eid);
     this->edge_data(e1) = this->edge_data(eid);
     for(uint fid : this->adj_e2f(eid))
     {
         uint vopp = this->face_vert_opposite_to(fid,eid);
-         int f0   = this->face_id({vid0,new_vid,vopp}); assert(f0>=0);
-         int f1   = this->face_id({vid1,new_vid,vopp}); assert(f1>=0);
+         int f0   = this->face_id({vid0,split_point,vopp}); assert(f0>=0);
+         int f1   = this->face_id({vid1,split_point,vopp}); assert(f1>=0);
          this->face_data(f0) = this->face_data(fid);
          this->face_data(f1) = this->face_data(fid);
     }
 
-    if(this->mesh_data().update_normals && this->vert_is_on_srf(new_vid)) this->update_v_normal(new_vid);
+    if(this->mesh_data().update_normals && this->vert_is_on_srf(split_point)) this->update_v_normal(split_point);
 
     // remove old edge and all elements attached to it
     this->edge_remove(eid);
-    return new_vid;
+    return split_point;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
+{
+    assert(this->edge_valence(eid)>0);
+    uint split_point = this->vert_add(p);
+    return edge_split(eid,split_point);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
