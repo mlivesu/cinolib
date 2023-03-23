@@ -558,6 +558,7 @@ void GLcanvas::window_size_event(GLFWwindow *window, int width, int height)
     v->trackball.last_click_2d = vec2d(inf_double); // fixes crazy translation deltas after window resizing!
     v->camera.reset_projection();                   // update the camera frustum
     v->update_GL_projection();                      // update OpenGL's projection matrix
+    glViewport(0,0,width,height);                   // update viewport
     v->draw();                                      // refresh canvas while resizing
 }
 
