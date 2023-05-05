@@ -61,6 +61,8 @@ void write_VTK(const char                           * filename,
     vtkSmartPointer<vtkUnstructuredGrid>       grid   = vtkSmartPointer<vtkUnstructuredGrid>::New();
     vtkSmartPointer<vtkPoints>                 points = vtkSmartPointer<vtkPoints>::New();
 
+    points->SetDataTypeToDouble();
+
     // generate some arrays that allow each element type to be viewed alone by thresholding
     //
     vtkSmartPointer<vtkIntArray> tetselector = vtkSmartPointer<vtkIntArray>::New();
