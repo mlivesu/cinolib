@@ -102,7 +102,7 @@ std::vector<vec3d> n_sided_polygon(const uint n,
                 verts[i] = verts[i-1];
                 verts[i].rotate(vec3d(0,0,1), 2.0*M_PI/double(n));
             }
-            for(uint i=1; i<n; i+=2) verts[i] -= 0.5*verts[i];
+            for(uint i=1; i<n; i+=2) verts[i] -= 0.25*verts[i];
             break;
         }
 
