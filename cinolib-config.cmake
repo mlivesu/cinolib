@@ -39,6 +39,7 @@ option(CINOLIB_USES_GRAPH_CUT           "Use Graph Cut"              OFF)
 option(CINOLIB_USES_BOOST               "Use Boost"                  OFF)
 option(CINOLIB_USES_VTK                 "Use VTK"                    OFF)
 option(CINOLIB_USES_SPECTRA             "Use Spectra"                OFF)
+option(CINOLIB_USES_CGAL                "Use CGAL"                   OFF)
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -161,5 +162,19 @@ if(CINOLIB_USES_SPECTRA)
     endif()
     target_compile_definitions(cinolib INTERFACE CINOLIB_USES_SPECTRA)
     target_include_directories(cinolib INTERFACE ${spectra_SOURCE_DIR}/include)
+endif()
+
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+if(CINOLIB_USES_CGAL)
+    message("CINOLIB OPTIONAL MODULE: CGAL")
+    find_package(CGAL)
+    if(CGAL_FOUND)
+        target_link_libraries(cinolib INTERFACE CGAL::CGAL)
+        target_compile_definitions(cinolib INTERFACE CINOLIB_USES_CGAL)
+    else()
+        message("Could not find CGAL!")
+        set(CINOLIB_USES_CGAL OFF)
+    endif()
 endif()
 
