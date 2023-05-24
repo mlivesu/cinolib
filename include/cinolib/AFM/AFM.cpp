@@ -141,6 +141,7 @@ void AFM_init(AFM_data & data)
 
     data.tris_in = data.m0.num_polys();
 
+    // ensure the graph is 2-connected
     uint count = split_separating_simplices(data.m0);
     std::cout << count << " simplices were split to avoid inner elements with only boundary vertices" << std::endl;
     assert(split_separating_simplices(data.m0)==0);
@@ -150,7 +151,7 @@ void AFM_init(AFM_data & data)
     for(uint vid=0; vid<data.m0.num_verts(); ++vid) data.m1.vert_add(vec3d(0,0,0));
 
     // find the source of the front as the innest point in m0
-    // such a point always exists becaouse of the previous refinement
+    // such a point always exists because of the previous refinement
     std::vector<uint> border = data.m0.get_ordered_boundary_vertices();
     std::vector<double> dist;
     dijkstra_exhaustive(data.m0, border, dist);

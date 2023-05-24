@@ -88,7 +88,7 @@ bool advance_by_triangle_split(      AFM_data & data,
     data.m1.poly_data(new_pid).color = data.conquered_color;
     data.m1.poly_add(v0,v2,data.origin);
     data.m1.poly_add(v1,data.origin,v2);
-    if(update_split_point_coords) snap_rounding(data,v2); // do not snap of the poit was already CAREFULY placed!
+    if(update_split_point_coords) snap_rounding(data,v2); // do not snap if the point was already CAREFULLY placed (i.e. during concavification)!
     int rem = data.m1.poly_id({data.origin,v0,v1});
     assert(rem>=0);
     data.m1.poly_remove(rem);

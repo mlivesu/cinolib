@@ -43,10 +43,10 @@ namespace cinolib
 
 CINO_INLINE
 uint concavify_front(AFM_data & data,
-                                const uint v0,
-                                const uint v1,
-                                const uint v2,
-                                const uint v3) // next to v0 along the front, forms a triangle with v0,v1
+                     const uint v0,
+                     const uint v1,
+                     const uint v2,
+                     const uint v3) // next to v0 along the front, forms a triangle with v0,v1
 {
     // takes into account the possibility that v0,v1,v2 are not CCW
     bool CCW = !flipped(data,v0,v2,v1);

@@ -47,7 +47,7 @@ void update_vertex_pos(AFM_data & data, const uint vid, const CGAL_Q * p)
     vertex_unlock(data,vid,p);
     copy(p,&data.exact_coords[3*vid]);
     //snap_rounding(data,vid); // it is not safe to round it here, because there will be a flip after
-                          // returning from convexify_front, hence the new triangles will not be tested
+                               // returning from convexify_front, hence the new triangles will not be tested
     data.m1.vert(vid) = vec3d(CGAL::to_double(p[0]),
                               CGAL::to_double(p[1]),
                               CGAL::to_double(p[2]));
@@ -177,12 +177,6 @@ void unlock_by_edge_split(AFM_data & data,
     uint l0[2] = { e[off],       vid         };
     uint l1[2] = { e[(off+1)%2], data.origin };
 
-    vec3d p = segment_intersection(data.m1.vert(l0[0]),
-                                   data.m1.vert(l0[1]),
-                                   data.m1.vert(l1[0]),
-                                   data.m1.vert(l1[1]));
-    p = (p + data.m1.vert(vid))/2;
-
     CGAL_Q pp[3] = { 0, 0, 0 };
     line_intersection2d(&data.exact_coords[3*l0[0]],
                         &data.exact_coords[3*l0[1]],
@@ -194,10 +188,9 @@ void unlock_by_edge_split(AFM_data & data,
     data.exact_coords.push_back(pp[1]);
     data.exact_coords.push_back(pp[2]);
 
-    // this is a better version of p
-    p = vec3d(CGAL::to_double(pp[0]),
-              CGAL::to_double(pp[1]),
-              CGAL::to_double(pp[2]));
+    vec3d p = vec3d(CGAL::to_double(pp[0]),
+                    CGAL::to_double(pp[1]),
+                    CGAL::to_double(pp[2]));
 
     data.m0.edge_split(data.m0.edge_id(vid,e[off]), 0.5); // just split at the midpoint in the input mesh...
     data.m1.edge_split(data.m1.edge_id(vid,e[off]), p);

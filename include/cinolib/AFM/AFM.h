@@ -58,8 +58,8 @@ namespace cinolib
  *     data.target_domain = CIRCLE | SQUARE | STAR
  *     AFM(data);
  *
- * For interactive use, call AFM_init(data) first and then use data.stop to force the execution
- * of a finite number of steps. See the dedicated example in cinolib/examples.
+ * For interactive use, call AFM_init(data) first and then call AFM(data), using data.stop to force the execution
+ * of a finite number of steps. See the dedicated example (#47) in cinolib/examples.
 */
 
 struct AFM_data
