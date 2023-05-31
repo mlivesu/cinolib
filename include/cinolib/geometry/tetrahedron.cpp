@@ -66,7 +66,7 @@ bool Tetrahedron::intersects_ray(const vec3d & p, const vec3d & dir, double & t,
     if(*std::max_element(tt, tt+4)>=0)
     {
         // the smallest positive tt locates the correct intersection point
-        t = 0;
+        t = inf_double;
         for(uint i=0; i<4; ++i)
         {
             if(tt[i]>0 && tt[i]<t) t = tt[i];
