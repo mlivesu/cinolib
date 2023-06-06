@@ -78,6 +78,72 @@ vec3d tetrahedron_circumcenter(const vec3d & A,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+CINO_INLINE
+double tetrahedron_inradius(const vec3d & P0,
+                            const vec3d & P1,
+                            const vec3d & P2,
+                            const vec3d & P3)
+{
+    // source: Verdict Library (p.61)
+
+    vec3d L0 = P1 - P0;
+    vec3d L1 = P2 - P1;
+    vec3d L2 = P0 - P2;
+    vec3d L3 = P3 - P0;
+    vec3d L4 = P3 - P1;
+
+    double A = 0.5 * (L2.cross(L0).norm() +
+                      L3.cross(L0).norm() +
+                      L4.cross(L1).norm() +
+                      L3.cross(L2).norm());
+
+    double V = L2.cross(L0).dot(L3)/6.0;
+
+    return 3*V/A;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double tetrahedron_outradius(const vec3d & P0,
+                             const vec3d & P1,
+                             const vec3d & P2,
+                             const vec3d & P3)
+{
+    // source: Verdict Library (p.62)
+
+    vec3d L0 = P1 - P0;
+    vec3d L1 = P2 - P1;
+    vec3d L2 = P0 - P2;
+    vec3d L3 = P3 - P0;
+
+    double num = (pow(L3.norm(),2) * L2.cross(L0) +
+                  pow(L2.norm(),2) * L3.cross(L0) +
+                  pow(L0.norm(),2) * L3.cross(L2)).norm();
+
+    double V = L2.cross(L0).dot(L3)/6.0;
+
+    return num/(12*V);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double tetrahedron_radius_ratio(const vec3d & P0,
+                                const vec3d & P1,
+                                const vec3d & P2,
+                                const vec3d & P3)
+{
+    // source: Verdict Library (p.62, Sec 6.11)
+
+    double r = tetrahedron_inradius(P0,P1,P2,P3);
+    double R = tetrahedron_outradius(P0,P1,P2,P3);
+
+    return R/(3*r);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // Given a point P and a tetrahedron ABCD, finds the point in ABCD that
 // is closest to P. This code was taken directly from Ericson's seminal
 // book "Real Time Collision Detection", Section 5.1.6

@@ -53,6 +53,34 @@ void tet_barycentric_coords(const vec3d & A,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+// radius of the biggest inscribed sphere
+CINO_INLINE
+double tetrahedron_inradius(const vec3d & A,
+                            const vec3d & B,
+                            const vec3d & C,
+                            const vec3d & D);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// radius of the smallest outscribed sphere
+CINO_INLINE
+double tetrahedron_outradius(const vec3d & A,
+                             const vec3d & B,
+                             const vec3d & C,
+                             const vec3d & D);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// normalized ratio between in and out radii
+CINO_INLINE
+double tetrahedron_radius_ratio(const vec3d & A,
+                                const vec3d & B,
+                                const vec3d & C,
+                                const vec3d & D);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// center of the smallest outscribed sphere
 CINO_INLINE
 vec3d tetrahedron_circumcenter(const vec3d & A,
                                const vec3d & B,
