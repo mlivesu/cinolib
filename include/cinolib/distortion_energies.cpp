@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2023: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -42,7 +42,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/distortion_energies.h>
-#include <cinolib/linear_map.h>
+#include <cinolib/jacobian_matrix.h>
 
 namespace cinolib
 {
@@ -103,12 +103,12 @@ double distortion(const vec2d      & u0,
                   const vec2d      & v1,
                   const DistEnergy & energy)
 {
-    mat2d T;
-    linear_map(u0,v0,u1,v1,T);
+    mat2d J;
+    jacobian_matrix(u0,v0,u1,v1,J);
 
     vec2d S;
     mat2d U,V;
-    T.SVD(U,S,V);
+    J.SVD(U,S,V);
 
     return distortion(S[0],S[1],energy);
 }
@@ -125,12 +125,12 @@ double distortion(const vec3d      & a0,
                   const vec3d      & b2,
                   const DistEnergy & energy)
 {
-    mat2d T;
-    linear_map(a0,a1,a2,b0,b1,b2,T);
+    mat2d J;
+    jacobian_matrix(a0,a1,a2,b0,b1,b2,J);
 
     vec2d S;
     mat2d U,V;
-    T.SVD(U,S,V);
+    J.SVD(U,S,V);
 
     return distortion(S[1], S[0], energy);
 }
@@ -149,12 +149,12 @@ double distortion(const vec3d      & a0,
                   const vec3d      & b3,
                   const DistEnergy & energy)
 {
-    mat3d T;
-    linear_map(a0,a1,a2,a3,b0,b1,b2,b3,T);
+    mat3d J;
+    jacobian_matrix(a0,a1,a2,a3,b0,b1,b2,b3,J);
 
     vec3d S;
     mat3d U,V;
-    T.SVD(U,S,V);
+    J.SVD(U,S,V);
 
     return distortion(S[0],S[1],S[2], energy);
 }

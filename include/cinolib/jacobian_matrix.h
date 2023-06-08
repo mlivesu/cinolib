@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2023: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,61 +33,61 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_LINEAR_MAP_H
-#define CINO_LINEAR_MAP_H
+#ifndef CINO_JACOBIAN_MATRIX_H
+#define CINO_JACOBIAN_MATRIX_H
 
 #include <cinolib/geometry/vec_mat.h>
 
 namespace cinolib
 {
 
-// Computes the linear map that connects 2D frames (u0,v0) and (u1,v1)
+// Computes the jacobian of the linear map that connects 2D frames (u0,v0) and (u1,v1)
 CINO_INLINE
-void linear_map(const double u0[2],
-                const double v0[2],
-                const double u1[2],
-                const double v1[2],
-                      double T[2][2]);
+void jacobian_matrix(const double u0[2],
+                     const double v0[2],
+                     const double u1[2],
+                     const double v1[2],
+                           double T[2][2]);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// Computes the linear map that connects 2D frames (u0,v0) and (u1,v1)
+// Computes the jacobian of the linear map that connects 2D frames (u0,v0) and (u1,v1)
 CINO_INLINE
-void linear_map(const vec2d & u0,
-                const vec2d & v0,
-                const vec2d & u1,
-                const vec2d & v1,
-                      mat2d & T);
+void jacobian_matrix(const vec2d & u0,
+                     const vec2d & v0,
+                     const vec2d & u1,
+                     const vec2d & v1,
+                           mat2d & T);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// Computes the linear component of the affine map that connects triangles (a0,a1,a2) and (b0,b1,b2)
+// Computes the jacobian of the linear component of the affine map that connects triangles (a0,a1,a2) and (b0,b1,b2)
 CINO_INLINE
-void linear_map(const vec3d & a0,
-                const vec3d & a1,
-                const vec3d & a2,
-                const vec3d & b0,
-                const vec3d & b1,
-                const vec3d & b2,
-                      mat2d & T);
+void jacobian_matrix(const vec3d & a0,
+                     const vec3d & a1,
+                     const vec3d & a2,
+                     const vec3d & b0,
+                     const vec3d & b1,
+                     const vec3d & b2,
+                           mat2d & T);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// Computes the linear component of the affine map that connects tetrahedra (a0,a1,a2,a3) and (b0,b1,b2,b3)
+// Computes the jacobian of the linear component of the affine map that connects tetrahedra (a0,a1,a2,a3) and (b0,b1,b2,b3)
 CINO_INLINE
-void linear_map(const vec3d & a0,
-                const vec3d & a1,
-                const vec3d & a2,
-                const vec3d & a3,
-                const vec3d & b0,
-                const vec3d & b1,
-                const vec3d & b2,
-                const vec3d & b3,
-                      mat3d & T);
+void jacobian_matrix(const vec3d & a0,
+                     const vec3d & a1,
+                     const vec3d & a2,
+                     const vec3d & a3,
+                     const vec3d & b0,
+                     const vec3d & b1,
+                     const vec3d & b2,
+                     const vec3d & b3,
+                           mat3d & T);
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "linear_map.cpp"
+#include "jacobian_matrix.cpp"
 #endif
 
-#endif // CINO_LINEAR_MAP_H
+#endif // CINO_JACOBIAN_MATRIX_H

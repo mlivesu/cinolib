@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2023: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,18 +33,18 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/linear_map.h>
+#include <cinolib/jacobian_matrix.h>
 #include <cinolib/tangent_space.h>
 
 namespace cinolib
 {
 
 CINO_INLINE
-void linear_map(const double u0[2],
-                const double v0[2],
-                const double u1[2],
-                const double v1[2],
-                      double T[2][2])
+void jacobian_matrix(const double u0[2],
+                     const double v0[2],
+                     const double u1[2],
+                     const double v1[2],
+                           double T[2][2])
 {
     // compute the transformation as T = |u1 v1| * |u0 v0|^-1
 
@@ -58,11 +58,11 @@ void linear_map(const double u0[2],
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void linear_map(const vec2d & u0,
-                const vec2d & v0,
-                const vec2d & u1,
-                const vec2d & v1,
-                      mat2d & T)
+void jacobian_matrix(const vec2d & u0,
+                     const vec2d & v0,
+                     const vec2d & u1,
+                     const vec2d & v1,
+                           mat2d & T)
 {
     // compute the transformation as T = |u1 v1| * |u0 v0|^-1
 
@@ -75,13 +75,13 @@ void linear_map(const vec2d & u0,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void linear_map(const vec3d & a0,
-                const vec3d & a1,
-                const vec3d & a2,
-                const vec3d & b0,
-                const vec3d & b1,
-                const vec3d & b2,
-                      mat2d & T)
+void jacobian_matrix(const vec3d & a0,
+                     const vec3d & a1,
+                     const vec3d & a2,
+                     const vec3d & b0,
+                     const vec3d & b1,
+                     const vec3d & b2,
+                           mat2d & T)
 {
     // compute 2D coordinates in tangent space
     vec2d A0,A1,A2;
@@ -95,23 +95,21 @@ void linear_map(const vec3d & a0,
     vec2d u1 = B1 - B0;
     vec2d v1 = B2 - B0;
 
-    // solve for the mapping
-    linear_map(u0,v0,u1,v1,T);
+    jacobian_matrix(u0,v0,u1,v1,T);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// Computes the linear component of the affine map that connects tetrahedra (a0,a1,a2,a3) and (b0,b1,b2,b3)
 CINO_INLINE
-void linear_map(const vec3d & a0,
-                const vec3d & a1,
-                const vec3d & a2,
-                const vec3d & a3,
-                const vec3d & b0,
-                const vec3d & b1,
-                const vec3d & b2,
-                const vec3d & b3,
-                      mat3d & T)
+void jacobian_matrix(const vec3d & a0,
+                     const vec3d & a1,
+                     const vec3d & a2,
+                     const vec3d & a3,
+                     const vec3d & b0,
+                     const vec3d & b1,
+                     const vec3d & b2,
+                     const vec3d & b3,
+                           mat3d & T)
 {
     mat3d f0({a1-a0, a2-a0, a3-a0});
     mat3d f1({b1-b0, b2-b0, b3-b0});
