@@ -170,6 +170,26 @@ void AbstractMesh<M,V,E,P>::scale(const double scale_factor)
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+void AbstractMesh<M,V,E,P>::scale(const double sx,
+                                  const double sy,
+                                  const double sz)
+{
+    vec3d c = centroid();
+    translate(-c);
+    for(uint vid=0; vid<num_verts(); ++vid)
+    {
+        vert(vid).x() *= sx;
+        vert(vid).y() *= sy;
+        vert(vid).z() *= sz;
+    }
+    translate(c);
+    if(m_data.update_bbox) update_bbox();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 void AbstractMesh<M,V,E,P>::normalize_bbox()
 {
     double s = 1.0/bbox().diag();

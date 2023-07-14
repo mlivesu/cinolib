@@ -123,6 +123,7 @@ class AbstractMesh
         void  center_bbox();
         void  rotate(const vec3d & axis, const double angle);
         void  scale(const double scale_factor);
+        void  scale(const double sx, const double sy, const double sz);
         void  normalize_bbox();
         vec3d centroid() const;
 
