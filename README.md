@@ -126,7 +126,7 @@ The full list of callbacks exposed by `GLcanvas` to interact with user events (e
 A tutorial with detailed info on how to use the library is under developement. In the meanwhile, you can explore the [**examples**](https://github.com/mlivesu/cinolib/tree/master/examples#examples)  folder, which contains a constantly growing number of sample projects that showcase the core features of the library, and will be the backbone of the forthcoming tutorial.
 
 ## Contributors
-Marco Livesu is the creator and lead developer of the library. Over the years various friends and colleagues have helped me to improve the codebase, either submitting code or helping me to spot and fix bugs. A big thanks goes to: Claudio Mancinelli (University of Genoa), Daniela Cabiddu (CNR IMATI), Chrystiano Araújo (UBC), Thomas Alderighi (CNR ISTI), Fabrizio Corda (University of Cagliari), Gianmarco Cherchi (University of Cagliari) and Tommaso Sorgente (CNR IMATI)
+Marco Livesu is the creator and lead developer of the library. CinoLib has also received contributions from: Daniela Cabiddu (CNR IMATI), Claudio Mancinelli (University of Genoa), Chrystiano Araújo (UBC), Thomas Alderighi (CNR ISTI), Fabrizio Corda (University of Cagliari), Gianmarco Cherchi (University of Cagliari) and Tommaso Sorgente (CNR IMATI).
 
 ## Citing us
 If you use CinoLib in your academic projects, please consider citing the library using the following 
