@@ -190,7 +190,7 @@ mat<r,c,T> mat<r,c,T>::ROT_2D(const T angle_rad)
 
 template<uint r, uint c, class T>
 CINO_INLINE
-mat<r,c,T> mat<r,c,T>::ROT_3D(const mat<r,1,T> & axis, const T angle_rad)
+mat<r,c,T> mat<r,c,T>::ROT_3D(const mat<3,1,T> & axis, const T angle_rad)
 {
     assert(r==c);
     mat<r,c,T> m;
