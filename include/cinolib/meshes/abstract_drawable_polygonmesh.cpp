@@ -62,8 +62,11 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::draw(const float) const
 {
+    glPushMatrix();
+    glMultMatrixd(this->T.transpose()._vec);
     render(drawlist_marked);
     render(drawlist);
+    glPopMatrix();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -60,6 +60,11 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        // transformation matrix applied to the mesh to position it in world space
+        mat4d T = mat4d::DIAG(1);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         explicit AbstractDrawablePolyhedralMesh() : Mesh() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

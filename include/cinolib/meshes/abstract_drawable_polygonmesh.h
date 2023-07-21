@@ -58,6 +58,11 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+        // transformation matrix applied to the mesh to position it in world space
+        mat4d T = mat4d::DIAG(1);
+
+        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
         explicit AbstractDrawablePolygonMesh() : Mesh() {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
