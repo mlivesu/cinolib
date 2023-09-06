@@ -101,10 +101,9 @@ endif()
 
 if(CINOLIB_USES_INDIRECT_PREDICATES)
     message("CINOLIB OPTIONAL MODULE: Indirect Predicates")
-    target_compile_features(cinolib INTERFACE cxx_std_17) # Indirect predicates require C++17
     FetchContent_Declare(indirect_predicates GIT_REPOSITORY "https://github.com/cinolib-dev-team/Indirect_Predicates.git")
     FetchContent_MakeAvailable(indirect_predicates)
-    target_include_directories(cinolib INTERFACE ${indirect_predicates_SOURCE_DIR}/include)
+    target_link_libraries(cinolib INTERFACE indirectPredicates)
     target_compile_definitions(cinolib INTERFACE CINOLIB_USES_INDIRECT_PREDICATES)
 endif()
 
