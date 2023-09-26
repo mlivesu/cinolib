@@ -120,6 +120,18 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
         read_VTK(filename, tmp_verts, tmp_polys);
         this->init(tmp_verts, tmp_polys, vert_labels, poly_labels);
     }
+    else if (filetype.compare(".ele") == 0 ||
+             filetype.compare(".ELE") == 0)
+    {
+        read_RF(filename, tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
+        this->init(tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
+    }
+    else if (filetype.compare(".ovm") == 0 ||
+             filetype.compare(".OVM") == 0)
+    {
+        read_OVM(filename, tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
+        this->init(tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
+    }
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
@@ -149,8 +161,14 @@ void Polyhedralmesh<M,V,E,F,P>::save(const char * filename) const
     {
         write_HEDRA(filename, this->verts, this->faces, this->polys, this->polys_face_winding);
     }
-    else if(filetype.compare("ovm") == 0 ||
-            filetype.compare("OVM") == 0)
+    else if (filetype.compare(".ele") == 0 ||
+             filetype.compare(".ELE") == 0)
+    {
+        std::string basename = str.substr(0, str.size()-4);
+        write_RF(basename.c_str(), *this);
+    }
+    else if (filetype.compare(".ovm") == 0 ||
+             filetype.compare(".OVM") == 0)
     {
         write_OVM(filename, *this);
     }
