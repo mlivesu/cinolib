@@ -39,7 +39,6 @@
 #include <cinolib/geometry/vec_mat.h>
 #include <cinolib/vector_serialization.h>
 #include <cinolib/string_utilities.h>
-#include <cinolib/quality_tet.h>
 
 #include <algorithm>
 #include <cmath>
@@ -120,18 +119,6 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
         read_VTK(filename, tmp_verts, tmp_polys);
         this->init(tmp_verts, tmp_polys, vert_labels, poly_labels);
     }
-    else if (filetype.compare(".ele") == 0 ||
-             filetype.compare(".ELE") == 0)
-    {
-        read_RF(filename, tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
-        this->init(tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
-    }
-    else if (filetype.compare(".ovm") == 0 ||
-             filetype.compare(".OVM") == 0)
-    {
-        read_OVM(filename, tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
-        this->init(tmp_verts, tmp_faces, tmp_polys, tmp_polys_face_winding);
-    }
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
@@ -161,14 +148,8 @@ void Polyhedralmesh<M,V,E,F,P>::save(const char * filename) const
     {
         write_HEDRA(filename, this->verts, this->faces, this->polys, this->polys_face_winding);
     }
-    else if (filetype.compare(".ele") == 0 ||
-             filetype.compare(".ELE") == 0)
-    {
-        std::string basename = str.substr(0, str.size()-4);
-        write_RF(basename.c_str(), *this);
-    }
-    else if (filetype.compare(".ovm") == 0 ||
-             filetype.compare(".OVM") == 0)
+    else if(filetype.compare("ovm") == 0 ||
+            filetype.compare("OVM") == 0)
     {
         write_OVM(filename, *this);
     }
@@ -204,7 +185,7 @@ double Polyhedralmesh<M,V,E,F,P>::poly_volume(const uint pid) const
                                    this->poly_vert(pid,3));
     }
 
-    else if(this->poly_is_hexahedron(pid))
+    if(this->poly_is_hexahedron(pid))
     {
         return hex_unsigned_volume(this->poly_vert(pid,0),
                                    this->poly_vert(pid,1),
@@ -214,50 +195,6 @@ double Polyhedralmesh<M,V,E,F,P>::poly_volume(const uint pid) const
                                    this->poly_vert(pid,5),
                                    this->poly_vert(pid,6),
                                    this->poly_vert(pid,7));
-    }
-
-    /* From GEOGRAM:
-     * Arbitrary cells are decomposed into tetrahedra, with one vertex in the
-     * center of the cell, and one vertex in the center of each face.
-     * This ensures that two adjacent cells are not overlapping
-     * (if simply triangulating the faces, there would be tiny overlaps or
-     * tiny gaps that would introduce errors in the total volume of the mesh).
-     *
-     * Note that the center point may fall outside the cell in some degenerate
-     * configurations. It is not a problem since we compute signed tetrahedra
-     * volumes, in such a way that overlapping volumes will cancel-out in
-     * such a configuration.
-     * Therefore, we could take an arbitrary point as the enter point,
-     * including the origin, but taking the center probably makes computations
-     * more stable, by cancelling the translations.
-    */
-
-    else
-    {
-        double result = 0.0;
-        vec3d center = this->poly_centroid(pid);
-
-        for (uint fid = 0; fid < this->faces_per_poly(pid); ++fid) {
-            std::vector<vec3d> verts = this->face_verts(fid);
-            uint num_verts = verts.size();
-            if (num_verts == 3) {
-                result += tet_volume(center,
-                                     verts.at(0),
-                                     verts.at(1),
-                                     verts.at(2));
-            }
-            else {
-                vec3d face_center = this->face_centroid(fid);
-                for (uint vid0 = 0; vid0 < num_verts; ++vid0) {
-                    uint vid1 = (vid0 + 1) % num_verts;
-                    result += tet_volume(center,
-                                         face_center,
-                                         verts.at(vid0),
-                                         verts.at(vid1));
-                }
-            }
-        }
-        return fabs(result);
     }
 
     assert(false && "TODO!");
