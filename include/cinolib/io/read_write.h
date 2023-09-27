@@ -41,7 +41,6 @@
 #include <cinolib/io/read_OFF.h>
 #include <cinolib/io/read_IV.h>
 #include <cinolib/io/read_STL.h>
-#include <cinolib/io/read_PLY.h>
 // SURFACE WRITERS
 #include <cinolib/io/write_OBJ.h>
 #include <cinolib/io/write_OFF.h>
@@ -57,8 +56,6 @@
 #include <cinolib/io/read_VTU.h>
 #include <cinolib/io/read_VTK.h>
 #include <cinolib/io/read_HEXEX.h>
-#include <cinolib/io/read_OVM.h>
-#include <cinolib/io/read_RF.h>
 // VOLUME WRITERS
 #include <cinolib/io/write_HEDRA.h>
 #include <cinolib/io/write_MESH.h>
@@ -66,7 +63,6 @@
 #include <cinolib/io/write_VTU.h>
 #include <cinolib/io/write_VTK.h>
 #include <cinolib/io/write_OVM.h>
-#include <cinolib/io/write_RF.h>
 
 
 // SKELETON READERS

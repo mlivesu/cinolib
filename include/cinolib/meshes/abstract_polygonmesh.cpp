@@ -88,11 +88,6 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
         read_STL(filename, pos, tris);
         poly_pos = polys_from_serialized_vids(tris, 3);
     }
-    else if (filetype.compare(".ply") == 0 ||
-             filetype.compare(".PLY") == 0)
-    {
-        read_PLY(filename, pos, poly_pos);
-    }
     else
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
