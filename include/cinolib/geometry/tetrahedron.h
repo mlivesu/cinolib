@@ -64,7 +64,7 @@ class Tetrahedron : public SpatialDataStructureItem
             this->v[0] = v0;
             this->v[1] = v1;
             this->v[2] = v2;
-            this->v[2] = v3;
+            this->v[3] = v3;
             this->id   = id;
             item_type  = TETRAHEDRON;
             aabb.push(v0);
