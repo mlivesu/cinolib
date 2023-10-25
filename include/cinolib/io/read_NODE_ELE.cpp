@@ -35,6 +35,7 @@
 #include <cinolib/io/read_NODE_ELE.h>
 #include <cinolib/vector_serialization.h>
 #include <cinolib/io/io_utilities.h>
+#include <cinolib/quality_tet.h>
 #include <iostream>
 #include <unordered_set>
 
@@ -116,6 +117,9 @@ void read_NODE_ELE(const char                     * filename,
             assert(false && "failed reading tets");
         for(int j=0; j<4; j++)
             tet[j] -= 1;
+        if(tet_scaled_jacobian(verts[tet[0]],verts[tet[1]],verts[tet[2]],verts[tet[3]]) < 0)
+            std::swap(tet[0], tet[1]);
+
         polys.push_back({tet[0],tet[1],tet[2],tet[3]});
     }
 
