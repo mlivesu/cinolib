@@ -49,7 +49,7 @@ namespace cinolib
  * intersecting p_on_s0 and p_on_s1 coincide.
  *
  *      Ref: Real Time Collision Detection, Section 5.1.9
-*/
+ */
 template<class T>
 CINO_INLINE
 T closest_points_between_segments(const mat<3,1,T> & s00,
@@ -66,7 +66,7 @@ T closest_points_between_segments(const mat<3,1,T> & s00,
 /* WARNING: this assumes that the segments DO INTERSECT!
  * For exact and approximate intersection checks, please
  * refer to cinolib/predicates.h
-*/
+ */
 template<class T>
 CINO_INLINE
 mat<3,1,T> segment_intersection(const mat<3,1,T> & s00,
@@ -76,15 +76,16 @@ mat<3,1,T> segment_intersection(const mat<3,1,T> & s00,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-/* Given a segments S(s00,s01) and a point p, returns the squared distance between point p and segment S
- * Ref: Real Time Collision Detection, Section 5.1.2.1
+/* Given a segments S(s00,s01) and a point p, returns the squared distance between 
+ * point p and segment S
+ *
+ *      Ref: Real Time Collision Detection, Section 5.1.2.1
  */
-
-    template<class T>
-    CINO_INLINE
-    T point_segment_sqrd_dist(const mat<3,1,T> & s00,
-                              const mat<3,1,T> & s01,
-                              const mat<3,1,T> & p);
+template<class T>
+CINO_INLINE
+T point_segment_sqrd_dist(const mat<3,1,T> & s00,
+                          const mat<3,1,T> & s01,
+                          const mat<3,1,T> & p);
 }
 
 
