@@ -137,4 +137,33 @@ mat<3,1,T> segment_intersection(const mat<3,1,T> & s00,
     return p;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* Given a segments S(s00,s01) and a point p, returns the squared distance between point p and segment S
+ * Ref: Real Time Collision Detection, Section 5.1.2.1
+ */
+
+template<class T>
+CINO_INLINE
+T point_segment_sqrd_dist(const mat<3,1,T> & s00, //a
+                          const mat<3,1,T> & s01, //b
+                          const mat<3,1,T> & p)
+{
+    mat<3,1,T> ab = s01 - s00;
+    mat<3,1,T> ac = p - s00;
+    mat<3,1,T> bc = p - s01;
+    T e = ac.dot(ab);
+
+    // Handle cases where p projects outside S
+    if (e <= 0.0f)
+        return ac.dot(ac);
+
+    T f = ab.dot(ab);
+    if (e >= f)
+        return bc.dot(bc);
+
+    // Handle cases where p projects onto S
+    return ac.dot(ac) - (e * e) / f;
+}
+
 }
