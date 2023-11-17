@@ -672,6 +672,104 @@ void Tetmesh<M,V,E,F,P>::vert_weights_cotangent(const uint vid, std::vector<std:
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+uint Tetmesh<M,V,E,F,P>::vert_split(const uint vid, const std::vector<uint> & f_umbrella)
+{
+    vec3d p(inf_double,inf_double,inf_double);
+    return vert_split(vid,f_umbrella,p);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+uint Tetmesh<M,V,E,F,P>::vert_split(const uint vid, const std::vector<uint> & f_umbrella, vec3d & p)
+{
+    // reset local flags for faces and tets
+    for(uint pid : this->adj_v2p(vid)) this->poly_data(pid).flags[MARKED_LOCAL] = false;
+    for(uint fid : this->adj_v2f(vid)) this->face_data(fid).flags[MARKED_LOCAL] = false;
+    for(uint fid : f_umbrella)         this->face_data(fid).flags[MARKED_LOCAL] = true;
+
+    // partition the vert one ring along the face umbrella
+    uint seed = this->adj_v2p(vid).front();
+    std::queue<uint> q;
+    q.push(seed);
+    this->poly_data(seed).flags[MARKED_LOCAL] = true;
+    std::vector<uint> half_ring;
+    while(!q.empty())
+    {
+        uint pid=q.front();
+        q.pop();
+
+        half_ring.push_back(pid);
+
+        for(uint nbr : this->adj_p2p(pid))
+        {
+            if(!this->poly_contains_vert(nbr,vid)) continue;
+            if(this->poly_data(nbr).flags[MARKED_LOCAL]) continue;
+
+            int fid = this->poly_shared_face(pid,nbr);
+            assert(fid>=0);
+            if(this->face_data(fid).flags[MARKED_LOCAL]) continue;
+
+            q.push(nbr);
+            this->poly_data(nbr).flags[MARKED_LOCAL] = true;
+        }
+    }
+    // if this is false, f_umbrella does not bi-partition the vertex one ring
+    assert(half_ring.size() < this->adj_v2p(vid).size());
+    // WARNING: this check does not prevent from degenerate results in case the
+    // umbrella is not manifold! It's up to the user to ensure the condition holds
+
+    // if p is inf compute new vertex position as the
+    // average of the centroids of the tets in the half ring
+    if(p.is_inf())
+    {
+        p = vec3d(0,0,0);
+        for(uint pid : half_ring) p += this->poly_centroid(pid);
+        p /= static_cast<double>(half_ring.size());
+    }
+
+    // append it to the mesh
+    uint new_vid = this->vert_add(p);
+
+    // insert new tets around vid-new_vid
+    for(uint fid : f_umbrella)
+    {
+        // find tet sitting on the face umbrella on the side of the marked tets
+        uint pid = this->adj_f2p(fid).front();
+        if(!this->poly_data(pid).flags[MARKED_LOCAL]) this->adj_f2p(fid).back();
+        assert(this->poly_data(pid).flags[MARKED_LOCAL]);
+
+        // make a new element by substituting its vertex not in f_umbrella with new_vid
+        std::vector<uint> p_verts = this->poly_verts_id(pid);
+        for(uint & vid : p_verts)
+        {
+            if(!this->face_contains_vert(fid,vid)) vid = new_vid;
+        }
+        this->poly_add(p_verts);
+    }
+
+    // assign new_vid to tets in half_ring
+    for(uint pid : half_ring)
+    {
+        std::vector<uint> p_verts = this->poly_verts_id(pid);
+        for(uint & v : p_verts)
+        {
+            if(v==vid) v = new_vid;
+        }
+        this->poly_add(p_verts);
+    }
+
+    // remove old tets
+    this->polys_remove(half_ring);
+
+    return new_vid;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 double Tetmesh<M,V,E,F,P>::edge_weight(const uint eid, const int type) const
 {
     switch (type)
