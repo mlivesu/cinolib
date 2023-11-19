@@ -578,22 +578,6 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & p
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool AbstractPolyhedralMesh<M,V,E,F,P>::edge_is_visible(const uint eid) const
-{
-    for(uint pid : this->adj_e2p(eid))
-    {
-        if(!this->poly_data(pid).flags[HIDDEN])
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::face_apply_labels(const std::vector<int> & labels)
 {
     assert(labels.size() == this->num_faces());
