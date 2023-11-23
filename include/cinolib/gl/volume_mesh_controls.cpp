@@ -684,7 +684,7 @@ void VolumeMeshControls<Mesh>::header_manual_digging(const bool open)
         if(ImGui::RadioButton("Dig    ", &dig_choice, DIG    )) gui->callback_mouse_left_click = func_dig;
         if(ImGui::RadioButton("Undig  ", &dig_choice, UNDIG  )) gui->callback_mouse_left_click = func_undig;
         if(ImGui::RadioButton("Isolate", &dig_choice, ISOLATE)) gui->callback_mouse_left_click = func_isolate;
-        if(ImGui::RadioButton("Reset  ", &dig_choice, RESET  )) gui->callback_mouse_left_click = nullptr;
+        if(ImGui::RadioButton("Reset  ", &dig_choice, RESET  )) { m->poly_set_flag(HIDDEN,false); m->updateGL(); }
         ImGui::TreePop();
     }
 }
