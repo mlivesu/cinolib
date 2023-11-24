@@ -573,7 +573,7 @@ void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int acti
     // if visual controls claim the event, let them handle it!
     if(ImGui::GetIO().WantCaptureKeyboard)
     {
-        if (action==GLFW_PRESS || action==GLFW_RELEASE)
+        if(action==GLFW_PRESS || action==GLFW_RELEASE)
         {
             bool b = (action==GLFW_PRESS);
             switch(key)
