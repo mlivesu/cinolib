@@ -573,16 +573,18 @@ void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int acti
     // if visual controls claim the event, let them handle it!
     if(ImGui::GetIO().WantCaptureKeyboard)
     {
-        if(action==GLFW_PRESS && key==GLFW_KEY_BACKSPACE)
+        if (action==GLFW_PRESS || action==GLFW_RELEASE)
         {
-            ImGui::GetIO().AddKeyEvent(ImGuiKey_Backspace,true);
-        }
-        else if(action==GLFW_RELEASE)
-        {
+            bool b = (action==GLFW_PRESS);
             switch(key)
             {
-                case GLFW_KEY_BACKSPACE : ImGui::GetIO().AddKeyEvent(ImGuiKey_Backspace,false); break;
-                default                 : ImGui::GetIO().AddInputCharacter(key);
+                case GLFW_KEY_BACKSPACE : ImGui::GetIO().AddKeyEvent(ImGuiKey_Backspace,b);  break;
+                case GLFW_KEY_LEFT      : ImGui::GetIO().AddKeyEvent(ImGuiKey_LeftArrow,b);  break;
+                case GLFW_KEY_RIGHT     : ImGui::GetIO().AddKeyEvent(ImGuiKey_RightArrow,b); break;
+                case GLFW_KEY_UP        : ImGui::GetIO().AddKeyEvent(ImGuiKey_UpArrow,b);    break;
+                case GLFW_KEY_DOWN      : ImGui::GetIO().AddKeyEvent(ImGuiKey_DownArrow,b);  break;
+             // case GLFW_KEY_ENTER     : ImGui::GetIO().AddKeyEvent(ImGuiKey_Enter,b); break;
+                default                 : if(!b) ImGui::GetIO().AddInputCharacter(key);
             }
         }
         return;
