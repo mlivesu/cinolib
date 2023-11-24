@@ -664,7 +664,14 @@ CINO_INLINE
 void GLcanvas::mouse_button_event(GLFWwindow *window, int button, int action, int modifiers)
 {
     // if visual controls claim the event, let them handle it
-    if(ImGui::GetIO().WantCaptureMouse) return;
+    if(ImGui::GetIO().WantCaptureMouse)
+    {
+        // not sure why I have to explicitly call this callback. With the previous versions of ImGui this was not necessary.
+        // Even worse, this is still not necessary for any other ImGui::GetIO().WantCaptureXXX in this file.
+        // It may be a bug on their side...
+        ImGui_ImplGlfw_MouseButtonCallback(window, button, action, modifiers);
+        return;
+    }
 
     GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
 
