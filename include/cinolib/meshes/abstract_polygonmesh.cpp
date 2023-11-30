@@ -1381,6 +1381,7 @@ bool AbstractPolygonMesh<M,V,E,P>::poly_is_boundary(const uint pid) const
     {
         if(this->edge_is_boundary(eid)) return true;
     }
+    return false;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
