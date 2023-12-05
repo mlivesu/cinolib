@@ -108,6 +108,10 @@ class GLcanvas
          GLcanvas(const int width = 700, const int height = 700);
         ~GLcanvas();
 
+         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+         void resize(int width, int height);
+
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // Main application loop. This is the typical return statement in

@@ -537,6 +537,14 @@ bool GLcanvas::unproject(const vec2d & p2d, const GLdouble & depth, vec3d & p3d)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void GLcanvas::resize(int width, int height)
+{
+    glfwSetWindowSize(window,width,height);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::project(const vec3d & p3d, vec2d & p2d, GLdouble & depth) const
 {
     mat2i viewport({0,             camera.height,
@@ -555,9 +563,10 @@ void GLcanvas::window_size_event(GLFWwindow *window, int width, int height)
     GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
     v->camera.height           = height;
     v->camera.width            = width;
+    v->camera.reset();
     v->trackball.last_click_2d = vec2d(inf_double); // fixes crazy translation deltas after window resizing!
     v->camera.reset_projection();                   // update the camera frustum
-    v->update_GL_projection();                      // update OpenGL's projection matrix    
+    v->update_GL_projection();                      // update OpenGL's projection matrix
 #ifdef WIN32
     // this fixes canvas resize issues under Windows, but also breaks in on Mac....
     glViewport(0,0,width,height);                   // update viewport
