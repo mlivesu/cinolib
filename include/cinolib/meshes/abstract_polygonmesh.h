@@ -145,6 +145,7 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         std::vector<uint> vert_ordered_polys_star (const uint vid) const;
         std::vector<uint> vert_ordered_edges_star (const uint vid) const;
         std::vector<uint> vert_ordered_edges_link (const uint vid) const;
+        void              vert_order_all_one_rings();
         void              vert_ordered_one_ring   (const uint          vid,
                                                    std::vector<uint> & v_link,        // sorted list of adjacent vertices
                                                    std::vector<uint> & f_star,        // sorted list of adjacent triangles
