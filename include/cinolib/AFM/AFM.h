@@ -47,9 +47,9 @@ namespace cinolib
 
 /* Reference implementation of the article
  *
- * Advancing Front Mapping
+ * Advancing Front Surface Mapping
  * Marco Livesu
- * arXiv:2305.11552
+ * Eurographics 2024
  *
  * Example of usage:
  *
