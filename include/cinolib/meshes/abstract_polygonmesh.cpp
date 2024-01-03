@@ -562,15 +562,24 @@ void AbstractPolygonMesh<M,V,E,P>::vert_order_all_one_rings()
 {
     for(uint vid=0; vid<this->num_verts(); ++vid)
     {
-        std::vector<uint> v_link;
-        std::vector<uint> f_star;
-        std::vector<uint> e_star;
-        std::vector<uint> e_link;
-        this->vert_ordered_one_ring(vid,v_link,f_star,e_star,e_link);
-        this->adj_v2v(vid) = v_link;
-        this->adj_v2e(vid) = e_star;
-        this->adj_v2p(vid) = f_star;
+        vert_order_one_ring(vid);
     }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void AbstractPolygonMesh<M,V,E,P>::vert_order_one_ring(const uint vid)
+{
+    std::vector<uint> v_link;
+    std::vector<uint> f_star;
+    std::vector<uint> e_star;
+    std::vector<uint> e_link;
+    this->vert_ordered_one_ring(vid,v_link,f_star,e_star,e_link);
+    this->adj_v2v(vid) = v_link;
+    this->adj_v2e(vid) = e_star;
+    this->adj_v2p(vid) = f_star;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
