@@ -92,8 +92,8 @@ class VolumeMeshControls : public SideBarItem
     float      iso_min           = 0.f;
     float      iso_max           = 1.f;
     int        crease_deg        = 60;
-    int        marker_font_size  = 10;
-    int        marker_size       = 5;
+    float      marker_font_size  = 10.f;
+    float      marker_size       = 5.f;
     int        dig_choice        = RESET;
     bool       show_vert_ids     = false;
     bool       show_face_ids     = false;

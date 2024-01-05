@@ -165,8 +165,8 @@ CINO_INLINE
 void GLcanvas::push_marker(const vec2d       & p,
                            const std::string & text,
                            const Color         color,
-                           const uint          disk_radius,
-                           const uint          font_size)
+                           const float         disk_radius,
+                           const float         font_size)
 {
     Marker m;
     m.pos_2d      = p;
@@ -183,8 +183,8 @@ CINO_INLINE
 void GLcanvas::push_marker(const vec3d       & p,
                            const std::string & text,
                            const Color         color,
-                           const uint          disk_radius,
-                           const uint          font_size)
+                           const float         disk_radius,
+                           const float         font_size)
 {
     Marker m;
     m.pos_3d      = p;

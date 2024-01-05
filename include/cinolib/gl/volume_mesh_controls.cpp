@@ -747,11 +747,11 @@ void VolumeMeshControls<Mesh>::header_debug(const bool open)
                 gui->pop(&face_normals);
             }
         }
-        if(ImGui::Checkbox("Show Vert IDs", &show_vert_ids)                           ||
-           ImGui::Checkbox("Show Face IDs", &show_face_ids)                           ||
-           ImGui::Checkbox("Depth Cull IDs", &gui->depth_cull_markers)                ||
-           ImGui::SliderInt("Font", &marker_font_size, 1, 15)                         ||
-           ImGui::SliderInt("Disk", &marker_size, 0,10)                               ||
+        if(ImGui::Checkbox("Show Vert IDs", &show_vert_ids)                         ||
+           ImGui::Checkbox("Show Face IDs", &show_face_ids)                         ||
+           ImGui::Checkbox("Depth Cull IDs", &gui->depth_cull_markers)              ||
+           ImGui::SliderFloat("Font", &marker_font_size, 0.f, 15.f)                 ||
+           ImGui::SliderFloat("Disk", &marker_size, 0.f,10.f)                       ||
            ImGui::ColorEdit4("Vert Color", vert_debug_color.rgba, color_edit_flags) ||
            ImGui::ColorEdit4("Face Color", face_debug_color.rgba, color_edit_flags))
         {
