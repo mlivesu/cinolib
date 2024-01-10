@@ -34,6 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/bresenham.h>
+#include <algorithm>
 
 namespace cinolib
 {
@@ -43,16 +44,24 @@ std::vector<std::pair<int,int>> bresenham_line(int x0, int y0, int x1, int y1)
 {
     std::vector<std::pair<int,int>> line;
 
-    bool steep = std::abs(y1 - y0) > std::abs(x1 - x0);
-    if (steep) { std::swap(x0,y0); std::swap(x1,y1); }
+    bool steep = std::abs(y1-y0) > std::abs(x1-x0);
+    if(steep)
+    {
+        std::swap(x0,y0);
+        std::swap(x1,y1);
+    }
 
-    bool reverse = (x0 > x1);
-    if (reverse) { std::swap(x0,x1); std::swap(y0,y1); }
+    bool reverse = (x0>x1);
+    if(reverse)
+    {
+        std::swap(x0,x1);
+        std::swap(y0,y1);
+    }
 
     int delta_x = x1 - x0;
-    int delta_y = std::abs(y1 - y0);
-    int error   = delta_x / 2;
-    int y_step  = (y0 < y1) ? 1 : -1;
+    int delta_y = std::abs(y1-y0);
+    int error   = delta_x/2;
+    int y_step  = (y0<y1) ? 1 : -1;
     int y       = y0;
 
     for(int x=x0; x<=x1; ++x)
@@ -60,14 +69,14 @@ std::vector<std::pair<int,int>> bresenham_line(int x0, int y0, int x1, int y1)
         line.push_back(steep ? std::make_pair(y,x) : std::make_pair(x,y));
 
         error -= delta_y;
-        if (error < 0)
+        if(error < 0)
         {
             y += y_step;
             error += delta_x;
         }
     }
 
-    if (reverse) std::reverse(line.begin(), line.end());
+    if(reverse) std::reverse(line.begin(), line.end());
     return line;
 }
 
@@ -84,7 +93,7 @@ std::vector<std::pair<int,int>> bresenham_circle(int cx, int cy, int radius)
     int diag_inc = 10 - 4*radius;
     int right_inc = 6;
 
-    while(x <= y)
+    while(x<=y)
     {
         circle.push_back(std::make_pair( x+cx,  y+cy));
         circle.push_back(std::make_pair( x+cx, -y+cy));
@@ -95,7 +104,7 @@ std::vector<std::pair<int,int>> bresenham_circle(int cx, int cy, int radius)
         circle.push_back(std::make_pair(-y+cx,  x+cy));
         circle.push_back(std::make_pair(-y+cx, -x+cy));
 
-        if (g>=0)
+        if(g>=0)
         {
             g += diag_inc;
             diag_inc += 8;
