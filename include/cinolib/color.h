@@ -61,6 +61,7 @@ class Color
         static Color CYAN   (const float lum = 1.f) { return Color(     0.f, lum*1.f, lum*1.f); }
         static Color GRAY   (const float lum = 1.f) { return Color( lum*.5f, lum*.5f, lum*.5f); }
         //
+        static Color PASTEL_GRAY()    { return Color(160.f/255.f, 160.f/255.f, 160.f/255.f); }
         static Color PASTEL_YELLOW()  { return Color(254.f/255.f, 229.f/255.f, 157.f/255.f); }
         static Color PASTEL_MAGENTA() { return Color(252.f/255.f,  89.f/255.f, 148.f/255.f); }
         static Color PASTEL_GREEN()   { return Color(198.f/255.f, 223.f/255.f, 182.f/255.f); }
