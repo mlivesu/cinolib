@@ -37,6 +37,7 @@
 #include <cinolib/random_generator.h>
 #include <cinolib/serialize_index.h>
 #include <cinolib/min_max_inf.h>
+#include <array>
 
 namespace cinolib
 {
