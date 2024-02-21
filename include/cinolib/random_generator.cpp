@@ -34,6 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/random_generator.h>
+#include <cinolib/min_max_inf.h>
 
 namespace cinolib
 {
