@@ -91,6 +91,14 @@ void write_OBJ(const char                           * filename,
                const std::vector<std::vector<uint>> & poly,
                const std::vector<int>               & labels);
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void write_OBJ(const char                * filename,
+               const std::vector<double> & xyz,
+               const std::vector<double> & uv,
+               const std::vector<uint>   & tri);
+
 }
 
 #ifndef  CINO_STATIC_LIB
