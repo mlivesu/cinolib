@@ -238,6 +238,7 @@ class AbstractMesh
                 void             vert_set_flag              (const int flag, const bool b);
                 void             vert_set_flag              (const int flag, const bool b, const std::vector<uint> & vids);
                 bool             vert_is_visible            (const uint vid) const;
+                uint             vert_v2v_offset            (const uint vid, const uint nbr) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

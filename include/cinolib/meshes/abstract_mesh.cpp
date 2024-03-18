@@ -972,6 +972,21 @@ bool AbstractMesh<M,V,E,P>::vert_is_visible(const uint vid) const
 
 template<class M, class V, class E, class P>
 CINO_INLINE
+uint AbstractMesh<M,V,E,P>::vert_v2v_offset(const uint vid, const uint nbr) const
+{
+    assert(this->verts_are_adjacent(vid,nbr));
+    for(uint i=0; i<this->adj_v2v(vid).size(); ++i)
+    {
+        if(this->adj_v2v(vid)[i]==nbr) return i;
+    }
+    assert(false); // warning killer
+    return max_uint;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
 bool AbstractMesh<M,V,E,P>::edge_is_visible(const uint eid) const
 {
     for(uint pid : this->adj_e2p(eid))
