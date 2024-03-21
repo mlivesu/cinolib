@@ -158,8 +158,6 @@ CINO_INLINE
 void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & verts,
                                         const std::vector<std::vector<uint>> & polys)
 {
-    std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
-
     // pre-allocate memory
     uint nv = uint(verts.size());
     uint np = uint(polys.size());
@@ -190,14 +188,6 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
     {
         this->edge_data(eid).flags[MARKED] = (this->edge_is_boundary(eid) || !this->edge_is_manifold(eid));
     }
-
-    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
-
-    std::cout << "load mesh\t"     <<
-                 this->num_verts() << "V / " <<
-                 this->num_edges() << "E / " <<
-                 this->num_polys() << "P  [" <<
-                 how_many_seconds(t0,t1) << "s]" << std::endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
