@@ -280,8 +280,11 @@ void GLcanvas::update_GL_projection() const
 CINO_INLINE
 void GLcanvas::draw()
 {
-    glfwMakeContextCurrent(window);
-    glClearColor(1,1,1,1);
+    glfwMakeContextCurrent(window);    
+    glClearColor(color_background.r,
+                 color_background.g,
+                 color_background.b,
+                 color_background.a);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     // draw your 3D scene

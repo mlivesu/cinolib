@@ -81,6 +81,7 @@ class GLcanvas
         std::vector<Marker>                markers;
         std::vector<SideBarItem*>          side_bar_items;
         bool                               show_side_bar      = false;
+        Color                              color_background   = Color::WHITE();
         float                              side_bar_width     = 0.2f;
         float                              side_bar_alpha     = 1.f;
         float                              font_size          = 13.f;
