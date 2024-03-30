@@ -462,7 +462,8 @@ int GLcanvas::launch(std::initializer_list<GLcanvas*> additional_windows)
             if(glfwWindowShouldClose((*it)->window)) return EXIT_SUCCESS;
         }
 
-        glfwPollEvents();
+        if(lazy_polling) glfwWaitEvents();
+        else             glfwPollEvents();
     }
     return EXIT_SUCCESS;
 }

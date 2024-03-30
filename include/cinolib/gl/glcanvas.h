@@ -81,6 +81,7 @@ class GLcanvas
         std::vector<Marker>                markers;
         std::vector<SideBarItem*>          side_bar_items;
         bool                               show_side_bar      = false;
+        bool                               lazy_polling        = true; // wait for events if true, regular polling otherwise
         Color                              color_background   = Color::WHITE();
         float                              side_bar_width     = 0.2f;
         float                              side_bar_alpha     = 1.f;
