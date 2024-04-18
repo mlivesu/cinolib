@@ -347,11 +347,27 @@ EIGEN_MAKE_CONJ_HELPER_CPLX_REAL(Packet2cf,Packet4f)
 
 template<> EIGEN_STRONG_INLINE Packet1cf pdiv<Packet1cf>(const Packet1cf& a, const Packet1cf& b)
 {
-  return pdiv_complex(a, b);
+  // TODO optimize it for NEON
+  Packet1cf res = pmul(a, pconj(b));
+  Packet2f s, rev_s;
+
+  // this computes the norm
+  s = vmul_f32(b.v, b.v);
+  rev_s = vrev64_f32(s);
+
+  return Packet1cf(pdiv<Packet2f>(res.v, vadd_f32(s, rev_s)));
 }
 template<> EIGEN_STRONG_INLINE Packet2cf pdiv<Packet2cf>(const Packet2cf& a, const Packet2cf& b)
 {
-  return pdiv_complex(a, b);
+  // TODO optimize it for NEON
+  Packet2cf res = pmul(a,pconj(b));
+  Packet4f s, rev_s;
+
+  // this computes the norm
+  s = vmulq_f32(b.v, b.v);
+  rev_s = vrev64q_f32(s);
+
+  return Packet2cf(pdiv<Packet4f>(res.v, vaddq_f32(s, rev_s)));
 }
 
 EIGEN_DEVICE_FUNC inline void ptranspose(PacketBlock<Packet1cf, 1>& /*kernel*/) {}
@@ -537,7 +553,12 @@ EIGEN_MAKE_CONJ_HELPER_CPLX_REAL(Packet1cd,Packet2d)
 
 template<> EIGEN_STRONG_INLINE Packet1cd pdiv<Packet1cd>(const Packet1cd& a, const Packet1cd& b)
 {
-  return pdiv_complex(a, b);
+  // TODO optimize it for NEON
+  Packet1cd res = pmul(a,pconj(b));
+  Packet2d s = pmul<Packet2d>(b.v, b.v);
+  Packet2d rev_s = preverse<Packet2d>(s);
+
+  return Packet1cd(pdiv(res.v, padd<Packet2d>(s,rev_s)));
 }
 
 EIGEN_STRONG_INLINE Packet1cd pcplxflip/*<Packet1cd>*/(const Packet1cd& x)

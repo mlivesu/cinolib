@@ -169,7 +169,10 @@ EIGEN_MAKE_CONJ_HELPER_CPLX_REAL(Packet1cd,Packet2d)
 
 template<> EIGEN_STRONG_INLINE Packet1cd pdiv<Packet1cd>(const Packet1cd& a, const Packet1cd& b)
 {
-  return pdiv_complex(a, b);
+  // TODO optimize it for AltiVec
+  Packet1cd res = pmul(a,pconj(b));
+  Packet2d s = vec_madd(b.v, b.v, p2d_ZERO_);
+  return Packet1cd(pdiv(res.v, s + vec_perm(s, s, p16uc_REVERSE64)));
 }
 
 EIGEN_STRONG_INLINE Packet1cd pcplxflip/*<Packet1cd>*/(const Packet1cd& x)
@@ -305,7 +308,11 @@ EIGEN_MAKE_CONJ_HELPER_CPLX_REAL(Packet2cf,Packet4f)
 
 template<> EIGEN_STRONG_INLINE Packet2cf pdiv<Packet2cf>(const Packet2cf& a, const Packet2cf& b)
 {
-  return pdiv_complex(a, b);
+  // TODO optimize it for AltiVec
+  Packet2cf res;
+  res.cd[0] = pdiv<Packet1cd>(a.cd[0], b.cd[0]);
+  res.cd[1] = pdiv<Packet1cd>(a.cd[1], b.cd[1]);
+  return res;
 }
 
 EIGEN_STRONG_INLINE Packet2cf pcplxflip/*<Packet2cf>*/(const Packet2cf& x)
@@ -387,7 +394,10 @@ EIGEN_MAKE_CONJ_HELPER_CPLX_REAL(Packet2cf,Packet4f)
 
 template<> EIGEN_STRONG_INLINE Packet2cf pdiv<Packet2cf>(const Packet2cf& a, const Packet2cf& b)
 {
-  return pdiv_complex(a, b);
+  // TODO optimize it for AltiVec
+  Packet2cf res = pmul(a, pconj(b));
+  Packet4f s = pmul<Packet4f>(b.v, b.v);
+  return Packet2cf(pdiv(res.v, padd<Packet4f>(s, vec_perm(s, s, p16uc_COMPLEX32_REV))));
 }
 
 template<> EIGEN_STRONG_INLINE Packet2cf pcplxflip<Packet2cf>(const Packet2cf& x)

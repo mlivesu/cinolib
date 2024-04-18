@@ -45,10 +45,7 @@
     #pragma clang diagnostic ignored "-Wabsolute-value"
   #endif
   #if __clang_major__ >= 10
-    // https://stackoverflow.com/questions/40761120/unknown-warning-group-wmaybe-unintialized-mac-os-sierra
-    #if !defined(__has_warning) || __has_warning("-Wimplicit-int-float-conversion")
     #pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
-    #endif
   #endif
   #if ( defined(__ALTIVEC__) || defined(__VSX__) ) && __cplusplus < 201103L
     // warning: generic selections are a C11-specific feature

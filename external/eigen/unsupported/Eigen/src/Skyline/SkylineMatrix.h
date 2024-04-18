@@ -375,8 +375,8 @@ public:
     /** Removes all non zeros */
     inline void setZero() {
         m_data.clear();
-        std::fill_n(m_colStartIndex, m_outerSize + 1, Index(0));
-        std::fill_n(m_rowStartIndex, m_outerSize + 1, Index(0));
+        memset(m_colStartIndex, 0, (m_outerSize + 1) * sizeof (Index));
+        memset(m_rowStartIndex, 0, (m_outerSize + 1) * sizeof (Index));
     }
 
     /** \returns the number of non zero coefficients */
@@ -435,7 +435,7 @@ public:
                     }
 
                     //zeros new data
-                    std::fill_n(this->_upperPtr() + start, bandIncrement - 1, Scalar(0));
+                    memset(this->_upperPtr() + start, 0, (bandIncrement - 1) * sizeof (Scalar));
 
                     return m_data.upper(m_colStartIndex[inner]);
                 } else {
@@ -466,7 +466,7 @@ public:
                     }
 
                     //zeros new data
-                    std::fill_n(this->_lowerPtr() + start, bandIncrement - 1, Scalar(0));
+                    memset(this->_lowerPtr() + start, 0, (bandIncrement - 1) * sizeof (Scalar));
                     return m_data.lower(m_rowStartIndex[outer]);
                 } else {
                     return m_data.lower(m_rowStartIndex[outer] + inner - (outer - m_data.lowerProfile(outer)));
@@ -493,7 +493,7 @@ public:
                     for (Index innerIdx = inner + 1; innerIdx < outerSize() + 1; innerIdx++) {
                         m_rowStartIndex[innerIdx] += bandIncrement;
                     }
-                    std::fill_n(this->_upperPtr() + m_rowStartIndex[inner] + previousProfile + 1, bandIncrement - 1, Scalar(0));
+                    memset(this->_upperPtr() + m_rowStartIndex[inner] + previousProfile + 1, 0, (bandIncrement - 1) * sizeof (Scalar));
                     return m_data.upper(m_rowStartIndex[inner] + m_data.upperProfile(inner));
                 } else {
                     return m_data.upper(m_rowStartIndex[inner] + (outer - inner));
@@ -520,7 +520,7 @@ public:
                     for (Index innerIdx = outer + 1; innerIdx < outerSize() + 1; innerIdx++) {
                         m_colStartIndex[innerIdx] += bandIncrement;
                     }
-                    std::fill_n(this->_lowerPtr() + m_colStartIndex[outer] + previousProfile + 1, bandIncrement - 1, Scalar(0));
+                    memset(this->_lowerPtr() + m_colStartIndex[outer] + previousProfile + 1, 0, (bandIncrement - 1) * sizeof (Scalar));
                     return m_data.lower(m_colStartIndex[outer] + m_data.lowerProfile(outer));
                 } else {
                     return m_data.lower(m_colStartIndex[outer] + (inner - outer));
@@ -619,8 +619,8 @@ public:
         m_data.clear();
 
         m_outerSize = diagSize;
-        std::fill_n(m_colStartIndex, cols + 1, Index(0));
-        std::fill_n(m_rowStartIndex, rows + 1, Index(0));
+        memset(m_colStartIndex, 0, (cols + 1) * sizeof (Index));
+        memset(m_rowStartIndex, 0, (rows + 1) * sizeof (Index));
     }
 
     void resizeNonZeros(Index size) {
