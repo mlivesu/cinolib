@@ -106,6 +106,54 @@ std::vector<vec3d> n_sided_polygon(const uint n,
             break;
         }
 
+        case L_SHAPE:
+        {
+            assert(n>=10);
+            uint a = 0;
+            uint b = 2*n/10; assert(a<b);
+            uint c = 3*n/10; assert(b<c);
+            uint d = 4*n/10; assert(c<d);
+            uint e = 6*n/10; assert(d<e);
+            uint f = 7*n/10; assert(e<f);
+            verts.at(a) = vec3d(0, 0, 0);
+            verts.at(b) = vec3d(2, 0, 0);
+            verts.at(c) = vec3d(2, 1, 0);
+            verts.at(d) = vec3d(1, 1, 0);
+            verts.at(e) = vec3d(1, 3, 0);
+            verts.at(f) = vec3d(0, 3, 0);
+            for(uint i=a+1; i<b; ++i)
+            {
+                double t = (double)(i-a)/(double)(b-a);
+                verts.at(i) = (1-t)*verts.at(a) + t*verts.at(b);
+            }
+            for(uint i=b+1; i<c; ++i)
+            {
+                double t = (double)(i-b)/(double)(c-b);
+                verts.at(i) = (1-t)*verts.at(b) + t*verts.at(c);
+            }
+            for(uint i=c+1; i<d; ++i)
+            {
+                double t = (double)(i-c)/(double)(d-c);
+                verts.at(i) = (1-t)*verts.at(c) + t*verts.at(d);
+            }
+            for(uint i=d+1; i<e; ++i)
+            {
+                double t = (double)(i-d)/(double)(e-d);
+                verts.at(i) = (1-t)*verts.at(d) + t*verts.at(e);
+            }
+            for(uint i=e+1; i<f; ++i)
+            {
+                double t = (double)(i-e)/(double)(f-e);
+                verts.at(i) = (1-t)*verts.at(e) + t*verts.at(f);
+            }
+            for(uint i=f+1; i<n; ++i)
+            {
+                double t = (double)(i-f)/(double)(n-f);
+                verts.at(i) = (1-t)*verts.at(f) + t*verts.at(a);
+            }
+            break;
+        }
+
         default: assert(false && "Unknown polygon type");
     }
 
