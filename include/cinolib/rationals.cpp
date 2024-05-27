@@ -33,7 +33,7 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/AFM/rationals.h>
+#include <cinolib/rationals.h>
 #include <cinolib/predicates.h>
 
 namespace cinolib
@@ -65,21 +65,22 @@ bool rationals_are_working()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template <class T>
 CINO_INLINE
-CGAL_Q orient3d(const CGAL_Q * pa,
-                const CGAL_Q * pb,
-                const CGAL_Q * pc,
-                const CGAL_Q * pd)
+T orient3d(const T * pa,
+           const T * pb,
+           const T * pc,
+           const T * pd)
 {
-    CGAL_Q adx = pa[0] - pd[0];
-    CGAL_Q bdx = pb[0] - pd[0];
-    CGAL_Q cdx = pc[0] - pd[0];
-    CGAL_Q ady = pa[1] - pd[1];
-    CGAL_Q bdy = pb[1] - pd[1];
-    CGAL_Q cdy = pc[1] - pd[1];
-    CGAL_Q adz = pa[2] - pd[2];
-    CGAL_Q bdz = pb[2] - pd[2];
-    CGAL_Q cdz = pc[2] - pd[2];
+    T adx = pa[0] - pd[0];
+    T bdx = pb[0] - pd[0];
+    T cdx = pc[0] - pd[0];
+    T ady = pa[1] - pd[1];
+    T bdy = pb[1] - pd[1];
+    T cdy = pc[1] - pd[1];
+    T adz = pa[2] - pd[2];
+    T bdz = pb[2] - pd[2];
+    T cdz = pc[2] - pd[2];
 
     return adx * (bdy * cdz - bdz * cdy)
          + bdx * (cdy * adz - cdz * ady)
@@ -88,15 +89,16 @@ CGAL_Q orient3d(const CGAL_Q * pa,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template <class T>
 CINO_INLINE
-CGAL_Q orient2d(const CGAL_Q * pa,
-                const CGAL_Q * pb,
-                const CGAL_Q * pc)
+T orient2d(const T * pa,
+           const T * pb,
+           const T * pc)
 {
-    CGAL_Q acx = pa[0] - pc[0];
-    CGAL_Q bcx = pb[0] - pc[0];
-    CGAL_Q acy = pa[1] - pc[1];
-    CGAL_Q bcy = pb[1] - pc[1];
+    T acx = pa[0] - pc[0];
+    T bcx = pb[0] - pc[0];
+    T acy = pa[1] - pc[1];
+    T bcy = pb[1] - pc[1];
 
     return acx * bcy - acy * bcx;
 }

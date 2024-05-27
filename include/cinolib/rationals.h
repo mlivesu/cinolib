@@ -50,18 +50,20 @@ typedef CGAL::Lazy_exact_nt<CGAL::Gmpq> CGAL_Q;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template <class T>
 CINO_INLINE
-CGAL_Q orient3d(const CGAL_Q * pa,
-                const CGAL_Q * pb,
-                const CGAL_Q * pc,
-                const CGAL_Q * pd);
+T orient3d(const T * pa,
+           const T * pb,
+           const T * pc,
+           const T * pd);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+template <class T>
 CINO_INLINE
-CGAL_Q orient2d(const CGAL_Q * pa,
-                const CGAL_Q * pb,
-                const CGAL_Q * pc);
+T orient2d(const T * pa,
+           const T * pb,
+           const T * pc);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

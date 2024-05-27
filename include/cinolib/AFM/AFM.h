@@ -39,7 +39,7 @@
 #ifdef CINOLIB_USES_CGAL
 
 #include <cinolib/meshes/drawable_trimesh.h>
-#include <cinolib/AFM/rationals.h>
+#include <cinolib/rationals.h>
 #include <cinolib/profiler.h>
 
 namespace cinolib
