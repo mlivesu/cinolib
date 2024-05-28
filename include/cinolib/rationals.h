@@ -36,7 +36,7 @@
 #ifndef CINO_AFM_RATIONALS_H
 #define CINO_AFM_RATIONALS_H
 
-#ifdef CINOLIB_USES_CGAL
+#ifdef CINOLIB_USES_CGAL_GMP_MPFR
 
 #include <CGAL/Lazy_exact_nt.h>
 #include <CGAL/Gmpq.h>
@@ -111,5 +111,5 @@ bool rationals_are_working();
 #include "rationals.cpp"
 #endif
 
-#endif // CINOLIB_USES_CGAL
+#endif // CINOLIB_USES_CGAL_GMP_MPFR
 #endif // CINO_AFM_RATIONALS_H

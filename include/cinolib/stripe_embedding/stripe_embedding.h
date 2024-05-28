@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2023: Marco Livesu                                              *
+*  Copyright(C) 2024: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,89 +33,94 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_AFM_H
-#define CINO_AFM_H
+#ifndef CINO_STRIPE_EMBEDDING_H
+#define CINO_STRIPE_EMBEDDING_H
 
 #ifdef CINOLIB_USES_CGAL_GMP_MPFR
 
 #include <cinolib/meshes/drawable_trimesh.h>
+#include <mpreal.h>
 #include <cinolib/rationals.h>
-#include <cinolib/profiler.h>
 
 namespace cinolib
 {
 
 /* Reference implementation of the article
  *
- * Advancing Front Surface Mapping
+ * Stripe Embedding: Efficient Maps with Exact Numeric Computation
  * Marco Livesu
- * Eurographics 2024
+ * (under review)
  *
  * Example of usage:
  *
- *     AFM_data data;
- *     data.m0 = input_trimesh;
- *     data.target_domain = CIRCLE | SQUARE | STAR
- *     AFM(data);
+ *     SE_data data;
+ *     data.m = input_trimesh;
+ *     stripe_embedding(data);
  *
- * For interactive use, call AFM_init(data) first and then call AFM(data), using data.stop to force the execution
- * of a finite number of steps. See the dedicated example (#47) in cinolib/examples.
+ * For interactive use, call init(data) first and then call stripe_embedding(data).
+ * See the dedicated example (#48) in cinolib/examples.
 */
 
-struct AFM_data
+struct SE_data
 {
-    DrawableTrimesh<>   m0;                     // input mesh. May be refined during map generation
-    DrawableTrimesh<>   m1;                     // output mesh of the target domain, same connectivity as m0
-    std::deque<uint>    front;                  // serialized front edges
-    int                 target_domain = CIRCLE; // CIRCLE, SQUARE, STAR
-    uint                origin;                 // id of the vertex selected as the origin of the front
-    bool                initialized = false;    // true if m1 has already been initialized
-    std::vector<CGAL_Q> exact_coords;           // rational coordinates for exact computation
+    DrawableTrimesh<> m; // input mesh (may be refined during map generation)
 
-    // profiling / debugging / step-by-step execution
-    Profiler p;
-    bool     enable_snap_rounding = true;  // snap to float anytime this is possible (i.e., no flips generated)
-    bool     enable_sanity_checks = false; // toggle additional assertions for careful debug
-    bool     step_by_step         = false; // toggle step-by-step execution
-    int      step_size            = 1;     // moves for each step
-    bool     stop                 = false; // if set to true, stops after current iteration (for debug)
-    bool     refinement_enabled   = true;  // permit input mesh refinement to unlock deadlocks with convexification and concavification
-    bool     abort_if_too_slow    = true;  // stop execution if a moves takes more than max_time_per_step
-    double   max_time_per_step    = 2;     // seconds
+    // If provided, SE will use the input boundary conditions.
+    // Otherwise, it will generate a map to the polygon indicated in target_domain
+    std::map<uint,vec3d> bc;
+    int target_domain = CIRCLE;
+    std::vector<uint> boundary; // ordered boundary vertices of m
 
-    // statistics / colors
-    uint  tris_in;
-    uint  tris_out;
-    float mesh_growth = 0;
-    uint  moves_tot = 0;
-    uint  moves_split = 0;
-    uint  moves_flip = 0;
-    uint  convexifications = 0;
-    uint  concavifications = 0;
-    bool  converged = false;
-    bool  timeout = false;
-    float runtime = 0;
-    uint  flips_exact  = 0;
-    uint  flips_double = 0;
-    uint  snap_roundings_failed = 0;
-    Color conquered_color = Color(193.f/255.f,238.f/255.f,1.f);
+    // higher precision numerical models available
+    bool use_rationals = false;
+    bool use_MPFR      = false;
+
+    mpfr_prec_t MPFR_precision = 512; // # of bits for the mantissa when MPFR is used
+
+    // embeddings with the various numerical models
+    std::vector<double>       coords_d;
+    std::vector<CGAL_Q>       coords_q;
+    std::vector<mpfr::mpreal> coords_m;
+
+    // flipped elements' count, for all supported numeric types
+    uint flips_d = 0;
+    uint flips_q = 0;
+    uint flips_m = 0;
+
+    bool initialized  = false;
+    bool stop         = false;
+    bool step_by_step = false;
+    int  step_size    = 1;
+
+    std::queue<uint> q; // stripe espansion queue
+
+    // this is only for visuals. The following vectors will be filled only if store_stripes is true
+    std::vector<uint> stripes_offset; // stripe starting index
+    std::vector<uint> stripes;        // pivot + serialized chain of vertices opposite to the pivot
+    bool store_stripes = false;
+
+    uint embedded_verts = 0;
+    std::vector<bool> embedded;
+    std::vector<int>  edge_chain_id;
+    uint fresh_id = 1;
+
+    // stats
+    float runtime     = 0;
+    bool  converged   = false;
+    uint  edge_splits = 0;
+    uint  iters       = 0;
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void AFM(AFM_data & data);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void AFM_init(AFM_data & data);
+void stripe_embedding(SE_data & data);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "AFM.cpp"
+#include "stripe_embedding.cpp"
 #endif
 
 #endif // CINOLIB_USES_CGAL_GMP_MPFR
-#endif // CINO_AFM_H
+#endif // CINO_STRIPE_EMBEDDING_H

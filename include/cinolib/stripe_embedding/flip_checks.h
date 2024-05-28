@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2023: Marco Livesu                                              *
+*  Copyright(C) 2024: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,89 +33,40 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_AFM_H
-#define CINO_AFM_H
+#ifndef CINO_SE_FLIP_CHECKS_H
+#define CINO_SE_FLIP_CHECKS_H
 
-#ifdef CINOLIB_USES_CGAL_GMP_MPFR
-
-#include <cinolib/meshes/drawable_trimesh.h>
-#include <cinolib/rationals.h>
-#include <cinolib/profiler.h>
+#include <cinolib/stripe_embedding/stripe_embedding.h>
 
 namespace cinolib
 {
 
-/* Reference implementation of the article
- *
- * Advancing Front Surface Mapping
- * Marco Livesu
- * Eurographics 2024
- *
- * Example of usage:
- *
- *     AFM_data data;
- *     data.m0 = input_trimesh;
- *     data.target_domain = CIRCLE | SQUARE | STAR
- *     AFM(data);
- *
- * For interactive use, call AFM_init(data) first and then call AFM(data), using data.stop to force the execution
- * of a finite number of steps. See the dedicated example (#47) in cinolib/examples.
-*/
-
-struct AFM_data
-{
-    DrawableTrimesh<>   m0;                     // input mesh. May be refined during map generation
-    DrawableTrimesh<>   m1;                     // output mesh of the target domain, same connectivity as m0
-    std::deque<uint>    front;                  // serialized front edges
-    int                 target_domain = CIRCLE; // CIRCLE, SQUARE, STAR
-    uint                origin;                 // id of the vertex selected as the origin of the front
-    bool                initialized = false;    // true if m1 has already been initialized
-    std::vector<CGAL_Q> exact_coords;           // rational coordinates for exact computation
-
-    // profiling / debugging / step-by-step execution
-    Profiler p;
-    bool     enable_snap_rounding = true;  // snap to float anytime this is possible (i.e., no flips generated)
-    bool     enable_sanity_checks = false; // toggle additional assertions for careful debug
-    bool     step_by_step         = false; // toggle step-by-step execution
-    int      step_size            = 1;     // moves for each step
-    bool     stop                 = false; // if set to true, stops after current iteration (for debug)
-    bool     refinement_enabled   = true;  // permit input mesh refinement to unlock deadlocks with convexification and concavification
-    bool     abort_if_too_slow    = true;  // stop execution if a moves takes more than max_time_per_step
-    double   max_time_per_step    = 2;     // seconds
-
-    // statistics / colors
-    uint  tris_in;
-    uint  tris_out;
-    float mesh_growth = 0;
-    uint  moves_tot = 0;
-    uint  moves_split = 0;
-    uint  moves_flip = 0;
-    uint  convexifications = 0;
-    uint  concavifications = 0;
-    bool  converged = false;
-    bool  timeout = false;
-    float runtime = 0;
-    uint  flips_exact  = 0;
-    uint  flips_double = 0;
-    uint  snap_roundings_failed = 0;
-    Color conquered_color = Color(193.f/255.f,238.f/255.f,1.f);
-};
+CINO_INLINE
+bool flipped_d(SE_data & data,
+               const uint v0,
+               const uint v1,
+               const uint v2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void AFM(AFM_data & data);
+bool flipped_q(SE_data & data,
+               const uint v0,
+               const uint v1,
+               const uint v2);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void AFM_init(AFM_data & data);
+bool flipped_m(SE_data & data,
+               const uint v0,
+               const uint v1,
+               const uint v2);
 
 }
 
 #ifndef  CINO_STATIC_LIB
-#include "AFM.cpp"
+#include "flip_checks.cpp"
 #endif
 
-#endif // CINOLIB_USES_CGAL_GMP_MPFR
-#endif // CINO_AFM_H
+#endif // CINO_SE_FLIP_CHECKS_H

@@ -12,7 +12,7 @@ set(CINOLIB_USES_GRAPH_CUT            OFF)
 set(CINOLIB_USES_BOOST                OFF)
 set(CINOLIB_USES_VTK                  OFF) # optional, if added VTK formats will be supported everywhere
 set(CINOLIB_USES_SPECTRA              ON )
-set(CINOLIB_USES_CGAL                 ON )
+set(CINOLIB_USES_CGAL_GMP_MPFR        ON )
 
 # pass cinolib and the external dependencies to all examples
 set(cinolib_DIR "${PROJECT_SOURCE_DIR}/..")
@@ -96,7 +96,8 @@ if(CINOLIB_USES_OPENGL_GLFW_IMGUI)
         if(CINOLIB_USES_SPECTRA)
             add_subdirectory(46_eigenfunctions)
         endif()
-        if(CINOLIB_USES_CGAL)
+        if(CINOLIB_USES_CGAL_GMP_MPFR)
             add_subdirectory(47_AFM)
+	    add_subdirectory(48_SE)
         endif()
 endif()
