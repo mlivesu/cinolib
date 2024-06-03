@@ -89,9 +89,7 @@ int main(int argc, char **argv)
         data.store_stripes = true; // for visualization
         data.step_by_step  = true;
 
-        DrawableTrimesh<>res = data.m;
-        res.poly_set_flag(HIDDEN,true);
-        res.updateGL();
+        DrawableTrimesh<>res;
 
         GLcanvas gui0,gui1;
         gui0.show_side_bar = true;
@@ -124,6 +122,10 @@ int main(int argc, char **argv)
                 data.step_by_step = !(modifiers==GLFW_MOD_SHIFT);
                 stripe_embedding(data);
                 if(data.converged) stats(data);
+
+                res = data.m;
+                res.poly_set_flag(HIDDEN,true);
+                res.updateGL();
 
                 // copy coords to res mesh
                 for(uint vid=0; vid<data.m.num_verts(); ++vid)
