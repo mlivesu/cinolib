@@ -41,6 +41,12 @@
 namespace cinolib
 {
 
+template<class M, class V, class E, class P>
+CINO_INLINE
+void merge_meshes_at_coincident_vertices(const AbstractPolygonMesh<M,V,E,P> & m1,
+                                         const AbstractPolygonMesh<M,V,E,P> & m2,
+                                               AbstractPolygonMesh<M,V,E,P> & res);
+
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void merge_meshes_at_coincident_vertices(const AbstractPolyhedralMesh<M,V,E,F,P> & m1,
