@@ -27,6 +27,8 @@
 *     Marco Livesu (marco.livesu@gmail.com)                                     *
 *     http://pers.ge.imati.cnr.it/livesu/                                       *
 *                                                                               *
+*     Marianna Miola (marianna.miola@ge.imati.cnr.it)                           *
+*                                                                               *
 *     Italian National Research Council (CNR)                                   *
 *     Institute for Applied Mathematics and Information Technologies (IMATI)    *
 *     Via de Marini, 6                                                          *
