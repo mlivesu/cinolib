@@ -45,7 +45,7 @@ void merge_meshes_at_coincident_vertices(const AbstractPolygonMesh<M,V,E,P> & m1
                                          const AbstractPolygonMesh<M,V,E,P> & m2,
                                                AbstractPolygonMesh<M,V,E,P> & res)
 {
-    cinolib::Octree octree;
+    Octree octree;
     octree.build_from_mesh_points(m1);
 
     res = m1;
@@ -53,7 +53,7 @@ void merge_meshes_at_coincident_vertices(const AbstractPolygonMesh<M,V,E,P> & m1
     std::map<uint,uint> vmap;
     for(uint vid=0; vid<m2.num_verts(); ++vid)
     {
-        cinolib::vec3d p = m2.vert(vid);
+        vec3d p = m2.vert(vid);
 
         std::unordered_set<uint> ids;
         if(octree.contains(p, false, ids))
@@ -83,6 +83,8 @@ void merge_meshes_at_coincident_vertices(const AbstractPolygonMesh<M,V,E,P> & m1
         }
     }
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
