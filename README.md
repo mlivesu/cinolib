@@ -7,6 +7,8 @@ CinoLib is a C++ library for processing polygonal and polyhedral meshes. It supp
 
 A distinctive feature of the library is that all supported meshes inherit from a unique base class that implements their common traits, permitting to deploy algorithms that operate on _abstract_ meshes that may be any of the above. This allows to implement algorithms just once and run the same code on any possible mesh, thus avoiding code duplication and reducing the debugging effort.
 
+:boom:***CinoLib received the [Symposium on Geometry Processing Software Award](http://awards.geometryprocessing.org) in 2024***:boom:
+
 <p align="center"><img src="cinolib_rep_image.png" width="500"></p>
 
 ## Positioning
