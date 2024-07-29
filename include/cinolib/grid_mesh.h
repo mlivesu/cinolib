@@ -39,6 +39,7 @@
 #include <sys/types.h>
 #include <cinolib/cino_inline.h>
 #include <cinolib/meshes/quadmesh.h>
+#include <cinolib/meshes/hexmesh.h>
 
 namespace cinolib
 {
@@ -47,9 +48,13 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void grid_mesh(const uint                quads_per_row,
-               const uint                quads_per_col,
-                     Quadmesh<M,V,E,P> & m);
+void grid_mesh(const uint nx, const uint ny, Quadmesh<M,V,E,P> & m);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void grid_mesh(const uint nx, const uint ny, const uint nz, Hexmesh<M,V,E,F,P> & m);
 
 }
 

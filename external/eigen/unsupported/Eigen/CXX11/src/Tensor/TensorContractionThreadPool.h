@@ -912,9 +912,9 @@ struct TensorEvaluator<const TensorContractionOp<Indices, LeftArgType, RightArgT
           // On 10000x2x10000 mm zeroing can easily take half of time. Zero (bn
           // x m) row. Safe to do here because all kernels that will write to
           // this memory depend on completion of this task. Note: don't call
-          // device_.fill() here. device_.fill() blocks on thread pool
+          // device_.memset() here. device_.memset() blocks on thread pool
           // worker thread, which can lead to underutilization and deadlocks.
-          std::fill_n(buffer_ + n1 * bn_ * m_, bn(n1) * m_, Scalar(0));
+          memset(buffer_ + n1 * bn_ * m_, 0, bn(n1) * m_ * sizeof(Scalar));
         }
         kernel_.packRhs(&packed_rhs(n, k, n1, use_thread_local),
                         rhs_.getSubMapper(k * bk_, n1 * bn_), bk(k), bn(n1));

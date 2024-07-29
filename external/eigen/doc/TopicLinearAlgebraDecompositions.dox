@@ -72,7 +72,7 @@ To get an overview of the true relative speed of the different decompositions, c
         <td>Orthogonalization</td>
         <td>Yes</td>
         <td>Excellent</td>
-        <td><em>Soon: blocking</em></td>
+        <td><em>-</em></td>
     </tr>
 
     <tr>
@@ -88,6 +88,18 @@ To get an overview of the true relative speed of the different decompositions, c
     </tr>
 
     <tr class="alt">
+        <td>CompleteOrthogonalDecomposition</td>
+        <td>-</td>
+        <td>Fast</td>
+        <td>Good</td>
+        <td>Yes</td>
+        <td>Orthogonalization</td>
+        <td>Yes</td>
+        <td>Excellent</td>
+        <td><em>-</em></td>
+    </tr>
+
+    <tr>
         <td>LLT</td>
         <td>Positive definite</td>
         <td>Very fast</td>
@@ -99,7 +111,7 @@ To get an overview of the true relative speed of the different decompositions, c
         <td>Blocking</td>
     </tr>
 
-    <tr>
+    <tr class="alt">
         <td>LDLT</td>
         <td>Positive or negative semidefinite<sup><a href="#note1">1</a></sup></td>
         <td>Very fast</td>

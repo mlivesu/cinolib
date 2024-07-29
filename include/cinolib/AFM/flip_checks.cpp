@@ -34,7 +34,7 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/AFM/flip_checks.h>
-#include <cinolib/AFM/rationals.h>
+#include <cinolib/rationals.h>
 #include <cinolib/predicates.h>
 
 namespace cinolib

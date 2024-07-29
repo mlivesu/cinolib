@@ -39,17 +39,6 @@ struct DefaultDevice {
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void memset(void* buffer, int c, size_t n) const {
     ::memset(buffer, c, n);
   }
-  template<typename T>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void fill(T* begin, T* end, const T& value) const {
-#ifdef EIGEN_GPU_COMPILE_PHASE
-    // std::fill is not a device function, so resort to simple loop.
-    for (T* it = begin; it != end; ++it) {
-      *it = value;
-    }
-#else
-    std::fill(begin, end, value);
-#endif
-  }
   template<typename Type>
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Type get(Type data) const { 
     return data;

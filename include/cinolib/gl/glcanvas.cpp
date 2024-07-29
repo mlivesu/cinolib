@@ -165,8 +165,8 @@ CINO_INLINE
 void GLcanvas::push_marker(const vec2d       & p,
                            const std::string & text,
                            const Color         color,
-                           const uint          disk_radius,
-                           const uint          font_size)
+                           const float         disk_radius,
+                           const float         font_size)
 {
     Marker m;
     m.pos_2d      = p;
@@ -183,8 +183,8 @@ CINO_INLINE
 void GLcanvas::push_marker(const vec3d       & p,
                            const std::string & text,
                            const Color         color,
-                           const uint          disk_radius,
-                           const uint          font_size)
+                           const float         disk_radius,
+                           const float         font_size)
 {
     Marker m;
     m.pos_3d      = p;
@@ -280,8 +280,11 @@ void GLcanvas::update_GL_projection() const
 CINO_INLINE
 void GLcanvas::draw()
 {
-    glfwMakeContextCurrent(window);
-    glClearColor(1,1,1,1);
+    glfwMakeContextCurrent(window);    
+    glClearColor(color_background.r,
+                 color_background.g,
+                 color_background.b,
+                 color_background.a);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     // draw your 3D scene
@@ -459,7 +462,8 @@ int GLcanvas::launch(std::initializer_list<GLcanvas*> additional_windows)
             if(glfwWindowShouldClose((*it)->window)) return EXIT_SUCCESS;
         }
 
-        glfwPollEvents();
+        if(lazy_polling) glfwWaitEvents();
+        else             glfwPollEvents();
     }
     return EXIT_SUCCESS;
 }
@@ -537,6 +541,14 @@ bool GLcanvas::unproject(const vec2d & p2d, const GLdouble & depth, vec3d & p3d)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
+void GLcanvas::resize(int width, int height)
+{
+    glfwSetWindowSize(window,width,height);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void GLcanvas::project(const vec3d & p3d, vec2d & p2d, GLdouble & depth) const
 {
     mat2i viewport({0,             camera.height,
@@ -555,9 +567,10 @@ void GLcanvas::window_size_event(GLFWwindow *window, int width, int height)
     GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
     v->camera.height           = height;
     v->camera.width            = width;
+    v->camera.reset();
     v->trackball.last_click_2d = vec2d(inf_double); // fixes crazy translation deltas after window resizing!
     v->camera.reset_projection();                   // update the camera frustum
-    v->update_GL_projection();                      // update OpenGL's projection matrix    
+    v->update_GL_projection();                      // update OpenGL's projection matrix
 #ifdef WIN32
     // this fixes canvas resize issues under Windows, but also breaks in on Mac....
     glViewport(0,0,width,height);                   // update viewport
@@ -573,7 +586,20 @@ void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int acti
     // if visual controls claim the event, let them handle it!
     if(ImGui::GetIO().WantCaptureKeyboard)
     {
-        if(action==GLFW_RELEASE) ImGui::GetIO().AddInputCharacter(key);
+        if(action==GLFW_PRESS || action==GLFW_RELEASE)
+        {
+            bool b = (action==GLFW_PRESS);
+            switch(key)
+            {
+                case GLFW_KEY_BACKSPACE : ImGui::GetIO().AddKeyEvent(ImGuiKey_Backspace,b);  break;
+                case GLFW_KEY_LEFT      : ImGui::GetIO().AddKeyEvent(ImGuiKey_LeftArrow,b);  break;
+                case GLFW_KEY_RIGHT     : ImGui::GetIO().AddKeyEvent(ImGuiKey_RightArrow,b); break;
+                case GLFW_KEY_UP        : ImGui::GetIO().AddKeyEvent(ImGuiKey_UpArrow,b);    break;
+                case GLFW_KEY_DOWN      : ImGui::GetIO().AddKeyEvent(ImGuiKey_DownArrow,b);  break;
+             // case GLFW_KEY_ENTER     : ImGui::GetIO().AddKeyEvent(ImGuiKey_Enter,b); break;
+                default                 : if(!b) ImGui::GetIO().AddInputCharacter(key);
+            }
+        }
         return;
     }
 
@@ -664,7 +690,14 @@ CINO_INLINE
 void GLcanvas::mouse_button_event(GLFWwindow *window, int button, int action, int modifiers)
 {
     // if visual controls claim the event, let them handle it
-    if(ImGui::GetIO().WantCaptureMouse) return;
+    if(ImGui::GetIO().WantCaptureMouse)
+    {
+        // not sure why I have to explicitly call this callback. With the previous versions of ImGui this was not necessary.
+        // Even worse, this is still not necessary for any other ImGui::GetIO().WantCaptureXXX in this file.
+        // It may be a bug on their side...
+        ImGui_ImplGlfw_MouseButtonCallback(window, button, action, modifiers);
+        return;
+    }
 
     GLcanvas* v = static_cast<GLcanvas*>(glfwGetWindowUserPointer(window));
 

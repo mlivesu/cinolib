@@ -85,8 +85,8 @@ class SurfaceMeshControls : public SideBarItem
     float      iso_min           = 0.f;
     float      iso_max           = 1.f;
     int        crease_deg        = 60;
-    int        marker_font_size  = 10;
-    int        marker_size       = 5;
+    float      marker_font_size  = 10.f;
+    float      marker_size       = 3.f;
     bool       show_vert_ids     = false;
     bool       show_poly_ids     = false;
     Color      vert_color        = Color::WHITE();

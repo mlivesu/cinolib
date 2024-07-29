@@ -42,26 +42,53 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void grid_mesh(const uint                quads_per_row,
-               const uint                quads_per_col,
-                     Quadmesh<M,V,E,P> & m)
+void grid_mesh(const uint nx, const uint ny, Quadmesh<M,V,E,P> & m)
 {
-    std::vector<vec3d> points;
+    std::vector<vec3d> verts;
     std::vector<uint>  polys;
-    for(uint r=0; r<=quads_per_row; ++r)
-    for(uint c=0; c<=quads_per_col; ++c)
+    for(uint x=0; x<=nx; ++x)
+    for(uint y=0; y<=ny; ++y)
     {
-        points.push_back(vec3d(c,r,0));
+        verts.push_back(vec3d(x,y,0));
 
-        if (r<quads_per_row && c<quads_per_col)
+        if(x<nx && y<ny)
         {
-            polys.push_back(serialize_2D_index(r  , c,   quads_per_col+1));
-            polys.push_back(serialize_2D_index(r  , c+1, quads_per_col+1));
-            polys.push_back(serialize_2D_index(r+1, c+1, quads_per_col+1));
-            polys.push_back(serialize_2D_index(r+1, c,   quads_per_col+1));
+            polys.push_back(serialize_2D_index(x  , y,   ny+1));
+            polys.push_back(serialize_2D_index(x  , y+1, ny+1));
+            polys.push_back(serialize_2D_index(x+1, y+1, ny+1));
+            polys.push_back(serialize_2D_index(x+1, y,   ny+1));
         }
     }
-    m = Quadmesh<M,V,E,P>(points, polys);
+    m = Quadmesh<M,V,E,P>(verts, polys);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void grid_mesh(const uint nx, const uint ny, const uint nz, Hexmesh<M,V,E,F,P> & m)
+{
+    std::vector<vec3d> verts;
+    std::vector<uint>  polys;
+    for(uint x=0; x<=nx; ++x)
+    for(uint y=0; y<=ny; ++y)
+    for(uint z=0; z<=nz; ++z)
+    {
+        verts.push_back(vec3d(x,y,z));
+
+        if(x<nx && y<ny && z<nz)
+        {
+            polys.push_back(serialize_3D_index(x  , y,   z  , ny+1, nz+1));
+            polys.push_back(serialize_3D_index(x  , y+1, z  , ny+1, nz+1));
+            polys.push_back(serialize_3D_index(x+1, y+1, z  , ny+1, nz+1));
+            polys.push_back(serialize_3D_index(x+1, y,   z  , ny+1, nz+1));
+            polys.push_back(serialize_3D_index(x  , y,   z+1, ny+1, nz+1));
+            polys.push_back(serialize_3D_index(x  , y+1, z+1, ny+1, nz+1));
+            polys.push_back(serialize_3D_index(x+1, y+1, z+1, ny+1, nz+1));
+            polys.push_back(serialize_3D_index(x+1, y,   z+1, ny+1, nz+1));
+        }
+    }
+    m = Hexmesh<M,V,E,F,P>(verts, polys);
 }
 
 }

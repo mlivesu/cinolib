@@ -184,6 +184,48 @@ void dijkstra_exhaustive_srf_only(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
 template<class M, class V, class E, class P>
 CINO_INLINE
 void dijkstra_exhaustive_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
+                                       const uint                  & source,
+                                       const std::vector<bool>     & mask,    // if mask[e] = true, path cannot pass through edge e
+                                             std::vector<double>   & dist)
+{
+    dist = std::vector<double>(m.num_verts(), inf_double);
+    dist.at(source) = 0.0;
+
+    std::set<std::pair<double,uint>> q;
+    q.insert(std::make_pair(0.0,source));
+
+    while(!q.empty())
+    {
+        uint vid = q.begin()->second;
+        q.erase(q.begin());
+
+        for(uint eid : m.adj_v2e(vid))
+        {
+            if(mask.at(eid)) continue;
+
+            uint   nbr      = m.vert_opposite_to(eid,vid);
+            double new_dist = dist.at(vid) + m.edge_length(eid);
+
+            if(dist.at(nbr) > new_dist)
+            {
+                if(dist.at(nbr) < inf_double) // otherwise it won't be found (one order of magnitude faster than initializing the queue with all the elements with inf dist)
+                {
+                    auto it = q.find(std::make_pair(dist.at(nbr),nbr));
+                    assert(it!=q.end());
+                    q.erase(it);
+                }
+                dist.at(nbr) = new_dist;
+                q.insert(std::make_pair(new_dist,nbr));
+            }
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void dijkstra_exhaustive_mask_on_edges(const AbstractMesh<M,V,E,P> & m,
                                        const std::vector<uint>     & sources,
                                        const std::vector<double>   & weights, // per vert weights (used as metric instead of edge lengths)
                                        const std::vector<bool>     & mask,    // if mask[e] = true, path cannot pass through edge e

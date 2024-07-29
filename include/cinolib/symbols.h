@@ -94,6 +94,7 @@ enum
     CIRCLE,
     SQUARE,
     STAR,
+    L_SHAPE,
 
     //
     ROWS,

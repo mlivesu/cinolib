@@ -27,6 +27,8 @@
 *     Marco Livesu (marco.livesu@gmail.com)                                     *
 *     http://pers.ge.imati.cnr.it/livesu/                                       *
 *                                                                               *
+*     Marianna Miola (marianna.miola@ge.imati.cnr.it)                           *
+*                                                                               *
 *     Italian National Research Council (CNR)                                   *
 *     Institute for Applied Mathematics and Information Technologies (IMATI)    *
 *     Via de Marini, 6                                                          *
@@ -38,6 +40,53 @@
 
 namespace cinolib
 {
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void merge_meshes_at_coincident_vertices(const AbstractPolygonMesh<M,V,E,P> & m1,
+                                         const AbstractPolygonMesh<M,V,E,P> & m2,
+                                               AbstractPolygonMesh<M,V,E,P> & res)
+{
+    Octree octree;
+    octree.build_from_mesh_points(m1);
+
+    res = m1;
+
+    std::map<uint,uint> vmap;
+    for(uint vid=0; vid<m2.num_verts(); ++vid)
+    {
+        vec3d p = m2.vert(vid);
+
+        std::unordered_set<uint> ids;
+        if(octree.contains(p, false, ids))
+        {
+            // WARNING: I am assuming that the mapping is one to one at most
+            assert(ids.size()==1);
+            vmap[vid] = *ids.begin();
+        }
+        else
+        {
+            uint fresh_id = res.vert_add(p);
+            vmap[vid] = fresh_id;
+        }
+    }
+
+    for(uint pid=0; pid<m2.num_polys(); ++pid)
+    {
+        auto p = m2.poly_verts_id(pid);
+
+        for(auto & vid : p)
+            vid = vmap.at(vid);
+
+        int test_id = res.poly_id(p);
+        if(test_id<0)
+        {
+            uint fresh_id = res.poly_add(p);
+        }
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE

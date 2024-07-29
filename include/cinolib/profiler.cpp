@@ -76,6 +76,17 @@ double Profiler::pop(const bool print_time, const std::string extra_string)
     return t;
 }
 
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+double Profiler::pop_push(const std::string & new_key, const bool print_time, const std::string extra_string)
+{
+    double t = pop(print_time,extra_string);
+    push(new_key);
+    return t;
+}
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE

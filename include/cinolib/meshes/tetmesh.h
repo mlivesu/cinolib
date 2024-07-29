@@ -98,6 +98,8 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         void vert_weights          (const uint vid, const int type, std::vector<std::pair<uint,double>> & wgts) const override;
         void vert_weights_cotangent(const uint vid, std::vector<std::pair<uint,double>> & wgts) const;
+        uint vert_split            (const uint vid, const std::vector<uint> & f_umbrella);
+        uint vert_split            (const uint vid, const std::vector<uint> & f_umbrella, vec3d & p);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

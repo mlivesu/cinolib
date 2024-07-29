@@ -55,13 +55,11 @@ ei_add_test(FFT)
 
 ei_add_test(EulerAngles)
 
-find_package(MPFR 2.3.0)
-find_package(GMP)
-if(MPFR_FOUND AND EIGEN_COMPILER_SUPPORT_CPP11)
-  include_directories(${MPFR_INCLUDES} ./mpreal)
+find_package(MPREAL)
+if(MPREAL_FOUND AND EIGEN_COMPILER_SUPPORT_CPP11)
   ei_add_property(EIGEN_TESTED_BACKENDS "MPFR C++, ")
-  set(EIGEN_MPFR_TEST_LIBRARIES ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
- ei_add_test(mpreal_support "-std=c++11" "${EIGEN_MPFR_TEST_LIBRARIES}" )
+  include_directories(${MPREAL_INCLUDES})
+  ei_add_test(mpreal_support "-std=c++11" "${MPREAL_LIBRARIES}" )
 else()
   ei_add_property(EIGEN_MISSING_BACKENDS "MPFR C++, ")
 endif()
@@ -165,8 +163,8 @@ if(EIGEN_TEST_CXX11)
     endif()
 
     if(EIGEN_SYCL_TRISYCL)
-      set(CMAKE_CXX_STANDARD 14)
-      set(STD_CXX_FLAG "-std=c++1z")
+      # triSYCL now requires c++17.
+      set(CMAKE_CXX_STANDARD 17)
     else()
       if(MSVC)
         # Set the host and device compilers C++ standard to C++14. On Windows setting this to C++11

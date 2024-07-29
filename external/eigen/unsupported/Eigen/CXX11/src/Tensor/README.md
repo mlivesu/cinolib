@@ -1466,9 +1466,9 @@ the input tensor.
     Eigen::Tensor<int, 2> a(4, 3);
     a.setValues({{0, 100, 200}, {300, 400, 500},
                  {600, 700, 800}, {900, 1000, 1100}});
-    Eigen::array<Eigen::Index, 2> offsets = {1, 0};
-    Eigen::array<Eigen::Index, 2> extents = {2, 2};
-    Eigen::Tensor<int, 2> slice = a.slice(offsets, extents);
+    Eigen::array<int, 2> offsets = {1, 0};
+    Eigen::array<int, 2> extents = {2, 2};
+    Eigen::Tensor<int, 1> slice = a.slice(offsets, extents);
     cout << "a" << endl << a << endl;
     =>
     a

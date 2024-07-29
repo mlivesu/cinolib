@@ -641,21 +641,14 @@ bool test_is_equal(const T& actual, const U& expected, bool expect_equal)
     return false;
 }
 
+/** Creates a random Partial Isometry matrix of given rank.
+  *
+  * A partial isometry is a matrix all of whose singular values are either 0 or 1.
+  * This is very useful to test rank-revealing algorithms.
+  */
 // Forward declaration to avoid ICC warning
 template<typename MatrixType>
 void createRandomPIMatrixOfRank(Index desired_rank, Index rows, Index cols, MatrixType& m);
-/**
- * Creates a random partial isometry matrix of given rank.
- *
- * A partial isometry is a matrix all of whose singular values are either 0 or 1.
- * This is very useful to test rank-revealing algorithms.
- *
- * @tparam MatrixType type of random partial isometry matrix
- * @param desired_rank rank requested for the random partial isometry matrix
- * @param rows row dimension of requested random partial isometry matrix
- * @param cols column dimension of requested random partial isometry matrix
- * @param m random partial isometry matrix
- */
 template<typename MatrixType>
 void createRandomPIMatrixOfRank(Index desired_rank, Index rows, Index cols, MatrixType& m)
 {
@@ -696,13 +689,6 @@ void createRandomPIMatrixOfRank(Index desired_rank, Index rows, Index cols, Matr
 // Forward declaration to avoid ICC warning
 template<typename PermutationVectorType>
 void randomPermutationVector(PermutationVectorType& v, Index size);
-/**
- * Generate random permutation vector.
- *
- * @tparam PermutationVectorType type of vector used to store permutation
- * @param v permutation vector
- * @param size length of permutation vector
- */
 template<typename PermutationVectorType>
 void randomPermutationVector(PermutationVectorType& v, Index size)
 {
@@ -719,37 +705,16 @@ void randomPermutationVector(PermutationVectorType& v, Index size)
   }
 }
 
-/**
- * Check if number is "not a number" (NaN).
- *
- * @tparam T input type
- * @param x input value
- * @return true, if input value is "not a number" (NaN)
- */
 template<typename T> bool isNotNaN(const T& x)
 {
   return x==x;
 }
 
-/**
- * Check if number is plus infinity.
- *
- * @tparam T input type
- * @param x input value
- * @return true, if input value is plus infinity
- */
 template<typename T> bool isPlusInf(const T& x)
 {
   return x > NumTraits<T>::highest();
 }
 
-/**
- * Check if number is minus infinity.
- *
- * @tparam T input type
- * @param x input value
- * @return true, if input value is minus infinity
- */
 template<typename T> bool isMinusInf(const T& x)
 {
   return x < NumTraits<T>::lowest();
@@ -778,11 +743,6 @@ template<> std::string type_name<std::complex<int> >()          { return "comple
 
 using namespace Eigen;
 
-/**
- * Set number of repetitions for unit test from input string.
- *
- * @param str input string
- */
 inline void set_repeat_from_string(const char *str)
 {
   errno = 0;
@@ -795,11 +755,6 @@ inline void set_repeat_from_string(const char *str)
   g_has_set_repeat = true;
 }
 
-/**
- * Set seed for randomized unit tests from input string.
- *
- * @param str input string
- */
 inline void set_seed_from_string(const char *str)
 {
   errno = 0;

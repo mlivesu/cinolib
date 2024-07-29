@@ -56,8 +56,8 @@ struct Marker
     vec3d       pos_3d      = vec3d(inf_double); // used to position a 3D marker IFF pos_2d is INF
     std::string text        = "";                // text to render. Set to the empty string to not render the text
     Color       color       = Color::BLUE();     // color, for both the text and the disk
-    uint        disk_radius =  1;                // disk radius (in pixels). Set to zero to not render the disk
-    uint        font_size   = 12;                // font size;
+    float       disk_radius = 3.f;               // disk radius. Set to zero to not render the disk
+    float       font_size   = 10.f;              // font size;
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -81,9 +81,11 @@ class GLcanvas
         std::vector<Marker>                markers;
         std::vector<SideBarItem*>          side_bar_items;
         bool                               show_side_bar      = false;
+        bool                               lazy_polling        = true; // wait for events if true, regular polling otherwise
+        Color                              color_background   = Color::WHITE();
         float                              side_bar_width     = 0.2f;
         float                              side_bar_alpha     = 1.f;
-        int                                font_size          = 13;
+        float                              font_size          = 13.f;
         bool                               show_axis          = false;
         bool                               depth_cull_markers = true; // skip occluded 3D markers, testing their depth with the Z-buffer
         double                             DPI_factor;
@@ -107,6 +109,10 @@ class GLcanvas
 
          GLcanvas(const int width = 700, const int height = 700);
         ~GLcanvas();
+
+         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+         void resize(int width, int height);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -141,14 +147,14 @@ class GLcanvas
         void push_marker(const vec2d       & p,
                          const std::string & text        = "",
                          const Color         color       = Color::BLUE(),
-                         const uint          disk_radius =  5,
-                         const uint          font_size   = 10);
+                         const float         disk_radius =  3.f,
+                         const float         font_size   = 10.f);
 
         void push_marker(const vec3d       & p,
                          const std::string & text        = "",
                          const Color         color       = Color::BLUE(),
-                         const uint          disk_radius =  5,
-                         const uint          font_size   = 10);
+                         const float         disk_radius =  3.f,
+                         const float         font_size   = 10.f);
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

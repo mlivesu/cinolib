@@ -36,10 +36,10 @@
 #ifndef CINO_AFM_H
 #define CINO_AFM_H
 
-#ifdef CINOLIB_USES_CGAL
+#ifdef CINOLIB_USES_CGAL_GMP_MPFR
 
 #include <cinolib/meshes/drawable_trimesh.h>
-#include <cinolib/AFM/rationals.h>
+#include <cinolib/rationals.h>
 #include <cinolib/profiler.h>
 
 namespace cinolib
@@ -47,9 +47,9 @@ namespace cinolib
 
 /* Reference implementation of the article
  *
- * Advancing Front Mapping
+ * Advancing Front Surface Mapping
  * Marco Livesu
- * arXiv:2305.11552
+ * Eurographics 2024
  *
  * Example of usage:
  *
@@ -117,5 +117,5 @@ void AFM_init(AFM_data & data);
 #include "AFM.cpp"
 #endif
 
-#endif // CINOLIB_USES_CGAL
+#endif // CINOLIB_USES_CGAL_GMP_MPFR
 #endif // CINO_AFM_H

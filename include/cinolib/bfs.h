@@ -114,6 +114,15 @@ void bfs_on_dual_w_face_barriers(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                                  const uint                                source,
                                  const std::vector<bool>                 & mask_faces, // if mask[f] = true, bfs cannot expand through face f
                                  std::unordered_set<uint>                & visited);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void bfs_tree(const AbstractMesh<M,V,E,P> & m,
+              const uint                    root,
+              const std::vector<bool>     & mask, // edge mask
+                    std::vector<bool>     & tree);
 }
 
 #ifndef  CINO_STATIC_LIB

@@ -265,4 +265,45 @@ void bfs_on_dual_w_face_barriers(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void bfs_tree(const AbstractMesh<M,V,E,P> & m,
+              const uint                    root,
+              const std::vector<bool>     & mask, // edge mask
+                    std::vector<bool>     & tree)
+{
+    assert(mask.size()==m.num_edges());
+
+    // if true, the edge is on the tree
+    tree.resize(m.num_edges(), false);
+
+    std::queue<uint> q;
+    q.push(root);
+
+    std::vector<bool> visited(m.num_verts(),false);
+    visited[root] = true;
+
+    while(!q.empty())
+    {
+        uint vid = q.front();
+        q.pop();
+
+        for(uint nbr : m.adj_v2v(vid))
+        {
+            if(visited[nbr]) continue;
+
+            int eid = m.edge_id(vid,nbr);
+            assert(eid>=0);
+            if(mask[eid]) continue;
+
+            tree[eid]    = true;
+            visited[nbr] = true;
+
+            q.push(nbr);
+        }
+    }
+}
+
 }

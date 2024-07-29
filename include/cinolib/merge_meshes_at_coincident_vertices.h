@@ -27,6 +27,8 @@
 *     Marco Livesu (marco.livesu@gmail.com)                                     *
 *     http://pers.ge.imati.cnr.it/livesu/                                       *
 *                                                                               *
+*     Marianna Miola (marianna.miola@ge.imati.cnr.it)                           *
+*                                                                               *
 *     Italian National Research Council (CNR)                                   *
 *     Institute for Applied Mathematics and Information Technologies (IMATI)    *
 *     Via de Marini, 6                                                          *
@@ -40,6 +42,14 @@
 
 namespace cinolib
 {
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void merge_meshes_at_coincident_vertices(const AbstractPolygonMesh<M,V,E,P> & m1,
+                                         const AbstractPolygonMesh<M,V,E,P> & m2,
+                                               AbstractPolygonMesh<M,V,E,P> & res);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE

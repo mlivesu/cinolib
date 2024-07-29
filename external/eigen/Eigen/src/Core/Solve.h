@@ -77,7 +77,7 @@ public:
 
 protected:
   const Decomposition &m_dec;
-  const typename internal::ref_selector<RhsType>::type m_rhs;
+  const RhsType       &m_rhs;
 };
 
 

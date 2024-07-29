@@ -25,8 +25,10 @@ static void test_1d()
   vec1(4) = 23; vec2(4) = 4;
   vec1(5) = 42; vec2(5) = 5;
 
-  int col_major[6] = {0};
-  int row_major[6] = {0};
+  int col_major[6];
+  int row_major[6];
+  memset(col_major, 0, 6*sizeof(int));
+  memset(row_major, 0, 6*sizeof(int));
   TensorMap<Tensor<int, 1> > vec3(col_major, 6);
   TensorMap<Tensor<int, 1, RowMajor> > vec4(row_major, 6);
 
@@ -86,8 +88,10 @@ static void test_2d()
   mat2(1,1) = 4;
   mat2(1,2) = 5;
 
-  int col_major[6] = {0};
-  int row_major[6] = {0};
+  int col_major[6];
+  int row_major[6];
+  memset(col_major, 0, 6*sizeof(int));
+  memset(row_major, 0, 6*sizeof(int));
   TensorMap<Tensor<int, 2> > mat3(row_major, 2, 3);
   TensorMap<Tensor<int, 2, RowMajor> > mat4(col_major, 2, 3);
 
@@ -144,8 +148,10 @@ static void test_3d()
     }
   }
 
-  int col_major[2*3*7] = {0};
-  int row_major[2*3*7] = {0};
+  int col_major[2*3*7];
+  int row_major[2*3*7];
+  memset(col_major, 0, 2*3*7*sizeof(int));
+  memset(row_major, 0, 2*3*7*sizeof(int));
   TensorMap<Tensor<int, 3> > mat3(col_major, 2, 3, 7);
   TensorMap<Tensor<int, 3, RowMajor> > mat4(row_major, 2, 3, 7);
 

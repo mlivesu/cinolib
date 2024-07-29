@@ -237,6 +237,8 @@ class AbstractMesh
         virtual bool             vert_is_manifold           (const uint vid) const = 0;
                 void             vert_set_flag              (const int flag, const bool b);
                 void             vert_set_flag              (const int flag, const bool b, const std::vector<uint> & vids);
+                bool             vert_is_visible            (const uint vid) const;
+                uint             vert_v2v_offset            (const uint vid, const uint nbr) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -266,6 +268,7 @@ class AbstractMesh
                 void                   edge_set_flag              (const int flag, const bool b);
                 void                   edge_set_flag              (const int flag, const bool b, const std::vector<uint> & eids);
         virtual double                 edge_weight                (const uint eid, const int type) const;
+                bool                   edge_is_visible            (const uint eid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

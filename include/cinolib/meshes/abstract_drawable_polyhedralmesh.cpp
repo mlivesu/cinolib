@@ -102,6 +102,10 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
     {
         if(!this->face_data(fid).flags[MARKED]) continue;
 
+        // This allows to hide marked elements with the slicer...
+        //uint dummy;
+        //if(!this->face_is_visible(fid,dummy)) continue;
+
         for(uint i=0; i<this->face_tessellation(fid).size()/3; ++i)
         {
             uint vid0 = this->face_tessellation(fid).at(3*i+0);
@@ -151,7 +155,10 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
 
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        if(!this->edge_data(eid).flags[MARKED]) continue;
+        if(!this->edge_data(eid).flags[MARKED]) continue;        
+
+        // This allows to hide marked elements with the slicer...
+        //if(!this->edge_is_visible(eid)) continue;
 
         vec3d vid0 = this->edge_vert(eid,0);
         vec3d vid1 = this->edge_vert(eid,1);
@@ -381,29 +388,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             drawlist_out.seg_colors.push_back(this->edge_data(eid).color.b);
             drawlist_out.seg_colors.push_back(this->edge_data(eid).color.a);
         }
-
-        if (this->edge_data(eid).flags[MARKED])
-        {
-            uint base_addr = uint(drawlist_marked.seg_coords.size()/3);
-            drawlist_marked.segs.push_back(base_addr    );
-            drawlist_marked.segs.push_back(base_addr + 1);
-
-            drawlist_marked.seg_coords.push_back(float(vid0.x()));
-            drawlist_marked.seg_coords.push_back(float(vid0.y()));
-            drawlist_marked.seg_coords.push_back(float(vid0.z()));
-            drawlist_marked.seg_coords.push_back(float(vid1.x()));
-            drawlist_marked.seg_coords.push_back(float(vid1.y()));
-            drawlist_marked.seg_coords.push_back(float(vid1.z()));
-
-            drawlist_marked.seg_colors.push_back(marked_edge_color.r);
-            drawlist_marked.seg_colors.push_back(marked_edge_color.g);
-            drawlist_marked.seg_colors.push_back(marked_edge_color.b);
-            drawlist_marked.seg_colors.push_back(marked_edge_color.a);
-            drawlist_marked.seg_colors.push_back(marked_edge_color.r);
-            drawlist_marked.seg_colors.push_back(marked_edge_color.g);
-            drawlist_marked.seg_colors.push_back(marked_edge_color.b);
-            drawlist_marked.seg_colors.push_back(marked_edge_color.a);
-        }
     }
 }
 
@@ -438,7 +422,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
 
         for(uint eid : this->adj_f2e(fid))
         {
-            if (this->edge_is_on_srf(eid)) continue; // updateGL_out() will consider it
+            if(this->edge_is_on_srf(eid)) continue; // updateGL_out() will consider it
             edges_to_render.insert(eid);
         }
 
