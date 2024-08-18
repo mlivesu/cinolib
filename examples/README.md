@@ -146,6 +146,8 @@ Cmake will automatically detect and download the necessary external libraries (e
 #### 47 - Advancing Front Mapping
 [<p align="left"><img src="snapshots/47_AFM.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/47_AFM)
 
+#### 48 - Stripe Embedding
+[<p align="left"><img src="snapshots/48_SE.png" width="500"></p>](https://github.com/mlivesu/cinolib/tree/master/examples/48_SE)
 
 # Upcoming examples
 Maintaining a library alone is very time consuming, and the amount of time I can spend on CinoLib is limited. I do my best to keep the number of examples constantly growing. I am currently working on various code samples that showcase other core functionalities of CinoLib. All (but not only) these topics will be covered:
