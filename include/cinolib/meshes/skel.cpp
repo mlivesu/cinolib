@@ -297,7 +297,7 @@ void Skel::update_bbox()
     bb.reset();
     for(int vid=0; vid<num_vertices(); ++vid)
     {
-        vec3<double> v = vertex(vid);
+        vec3d v = vertex(vid);
         bb.min = bb.min.min(v);
         bb.max = bb.max.max(v);
     }
