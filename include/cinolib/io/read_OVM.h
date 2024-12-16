@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2022: Marco Livesu                                              *
+*  Copyright(C) 2019: Tommaso Sorgente
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -24,8 +24,7 @@
 *                                                                               *
 *  Author(s):                                                                   *
 *                                                                               *
-*     Marco Livesu (marco.livesu@gmail.com)                                     *
-*     http://pers.ge.imati.cnr.it/livesu/                                       *
+*     Tommaso Sorgente (tommaso.sorgente@.cnr.it)                         *
 *                                                                               *
 *     Italian National Research Council (CNR)                                   *
 *     Institute for Applied Mathematics and Information Technologies (IMATI)    *
@@ -33,70 +32,29 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#include <cinolib/io/write_OVM.h>
-#include <fstream>
+
+#ifndef CINO_READ_OVM_H
+#define CINO_READ_OVM_H
+
+#include <cinolib/cino_inline.h>
+#include <cinolib/geometry/vec_mat.h>
+#include <sys/types.h>
+#include <vector>
 
 namespace cinolib
 {
 
-template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void write_OVM(const char                              * filename,
-               const AbstractPolyhedralMesh<M,V,E,F,P> & m)
-{
-    std::ofstream f(filename);
-    if(!f)
-    {
-        std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OVM() : couldn't write output file " << filename << std::endl;
-        exit(-1);
-    }
-    f << "OVM ASCII\n";
-
-    f << "Vertices\n" << m.num_verts() << "\n";
-    for(uint vid=0; vid<m.num_verts(); ++vid)
-    {
-        f.precision(std::numeric_limits<double>::digits10+1);
-        f << m.vert(vid).x() << " "
-          << m.vert(vid).y() << " "
-          << m.vert(vid).z() << "\n";
-    }
-
-    f << "Edges\n" << m.num_edges() << "\n";
-    for(uint eid=0; eid<m.num_edges(); ++eid)
-    {
-        f << m.edge_vert_id(eid,0) << " "
-          << m.edge_vert_id(eid,1) << "\n";
-    }
-
-    f << "Faces\n" << m.num_faces() << "\n";
-    for(uint fid=0; fid<m.num_faces(); ++fid)
-    {
-        f << m.verts_per_face(fid);
-        for(uint i=0; i<m.verts_per_face(fid); ++i)
-        {
-            uint v_beg = m.face_vert_id(fid,i);
-            uint v_end = m.face_vert_id(fid,(i+1)%m.verts_per_face(fid));
-            int  eid   = m.edge_id(v_beg,v_end);
-            assert(eid>=0);
-            int off = (m.edge_vert_id(eid,0)==v_beg)?0:1; // account for half-edge orientation
-            f << " " << eid*2+off;
-        }
-        f << "\n";
-    }
-
-    f << "Polyhedra\n" << m.num_polys() << "\n";
-    for(uint pid=0; pid<m.num_polys(); ++pid)
-    {
-        f << m.faces_per_poly(pid);
-        for(uint fid : m.adj_p2f(pid))
-        {
-            int off = m.poly_face_winding(pid,fid)?0:1; // account for half-face orientation
-            f << " " << fid*2+off;
-        }
-        f << "\n";
-    }
-
-    f.close();
-}
+void read_OVM(const char                    * basename,
+             std::vector<vec3d>             & verts,
+             std::vector<std::vector<uint>> & faces,
+             std::vector<std::vector<uint>> & polys,
+             std::vector<std::vector<bool>> & polys_winding);
 
 }
+
+#ifndef CINO_STATIC_LIB
+#include "read_OVM.cpp"
+#endif
+
+#endif // CINO_READ_RF_H
