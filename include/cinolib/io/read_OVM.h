@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2023: Federico Meloni                                           *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -24,54 +24,35 @@
 *                                                                               *
 *  Author(s):                                                                   *
 *                                                                               *
-*     Marco Livesu (marco.livesu@gmail.com)                                     *
-*     http://pers.ge.imati.cnr.it/livesu/                                       *
+*     Federico Meloni (federico.meloni3@unica.it)                               *
 *                                                                               *
-*     Italian National Research Council (CNR)                                   *
-*     Institute for Applied Mathematics and Information Technologies (IMATI)    *
-*     Via de Marini, 6                                                          *
-*     16149 Genoa,                                                              *
+*     University of Cagliari                                                    *
+*     Via Ospedale, 72                                                          *
+*     09124 Cagliari,                                                           *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_READ_WRITE_H
-#define CINO_READ_WRITE_H
 
-// SURFACE READERS
-#include <cinolib/io/read_OBJ.h>
-#include <cinolib/io/read_OFF.h>
-#include <cinolib/io/read_IV.h>
-#include <cinolib/io/read_STL.h>
-// SURFACE WRITERS
-#include <cinolib/io/write_OBJ.h>
-#include <cinolib/io/write_OFF.h>
-#include <cinolib/io/write_STL.h>
-#include <cinolib/io/write_NODE_ELE.h>
+#ifndef CINO_READ_OVM_H
+#define CINO_READ_OVM_H
 
+#include <sys/types.h>
+#include <vector>
+#include <cinolib/cino_inline.h>
+#include <cinolib/geometry/vec_mat.h>
 
-// VOLUME READERS
-#include <cinolib/io/read_HEDRA.h>
-#include <cinolib/io/read_HYBRID.h>
-#include <cinolib/io/read_MESH.h>
-#include <cinolib/io/read_TET.h>
-#include <cinolib/io/read_VTU.h>
-#include <cinolib/io/read_VTK.h>
-#include <cinolib/io/read_HEXEX.h>
-#include <cinolib/io/read_OVM.h>
-// VOLUME WRITERS
-#include <cinolib/io/write_HEDRA.h>
-#include <cinolib/io/write_MESH.h>
-#include <cinolib/io/write_TET.h>
-#include <cinolib/io/write_VTU.h>
-#include <cinolib/io/write_VTK.h>
-#include <cinolib/io/write_OVM.h>
+namespace cinolib {
 
+CINO_INLINE
+void read_OVM(const char                     * filename,
+              std::vector<vec3d>             & verts,
+              std::vector<uint>              & edges,
+              std::vector<std::vector<uint>> & faces,
+              std::vector<uint>              & polys);
 
-// SKELETON READERS
-#include <cinolib/io/read_LIVESU2012.h>
-#include <cinolib/io/read_TAGLIASACCHI2012.h>
-#include <cinolib/io/read_DEYSUN2006.h>
-#include <cinolib/io/read_CSV.h>
-// SKELETON WRITERS
-#include <cinolib/io/write_LIVESU2012.h>
+}
 
-#endif // CINO_READ_WRITE
+#ifndef  CINO_STATIC_LIB
+#include "read_OVM.cpp"
+#endif
+
+#endif //CINO_READ_OVM_H
