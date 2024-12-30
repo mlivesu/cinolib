@@ -192,14 +192,14 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
     }
 
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
-/*
+
     std::cout << "load mesh\t"     <<
                  this->num_verts() << "V / " <<
                  this->num_edges() << "E / " <<
                  this->num_polys() << "P  [" <<
                  how_many_seconds(t0,t1) << "s]" << std::endl;
-*/
- }
+
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
