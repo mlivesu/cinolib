@@ -198,6 +198,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
                  this->num_edges() << "E / " <<
                  this->num_polys() << "P  [" <<
                  how_many_seconds(t0,t1) << "s]" << std::endl;
+
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

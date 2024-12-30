@@ -42,11 +42,11 @@ namespace cinolib
 CINO_INLINE
 bool seek_keyword(FILE * f, const char * keyword)
 {
-    static char s[256];
+    static char s[4097];
     s[0]='\0';
     do
     {
-        fscanf(f, "%255s", s);
+        fscanf(f, "%4096s", s);
     }
     while(strcmp(s, keyword) && !feof(f));
 

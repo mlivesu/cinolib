@@ -6,5 +6,6 @@ external/graph_cut/
 examples/build*
 *.DS_Store
 examples/bin/*
+*.idea
 
 examples/CMakeLists.txt.user

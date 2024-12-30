@@ -121,6 +121,13 @@ void Tetmesh<M,V,E,F,P>::load(const char * filename)
              filetype.compare(".TET") == 0)
     {
         read_TET(filename, tmp_verts, tmp_polys);
+    } else if (filetype.compare(".ovm") == 0 ||
+               filetype.compare(".OVM") == 0)
+    {
+        std::vector<uint> edges, polys;
+        std::vector<std::vector<uint>> faces;
+        read_OVM(filename, tmp_verts, edges, faces, polys);
+        tmp_polys = polys_from_serialized_vids(polys,4);
     }
     else
     {

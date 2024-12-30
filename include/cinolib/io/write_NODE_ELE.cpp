@@ -58,18 +58,20 @@ void write_NODE_ELE(const char                           * basename,
         exit(-1);
     }
 
-    fprintf(f_node, "%d 0\n", (int)verts.size());
+    int idx=0;
+    fprintf(f_node, "%d 3 0 0\n", (int)verts.size());
     for(auto p : verts)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
-        fprintf(f_node, "%.17g %.17g %.17g\n", p.x(), p.y(), p.z());
+        fprintf(f_node, "%d %.17g %.17g %.17g\n", ++idx, p.x(), p.y(), p.z());
     }
 
-    fprintf(f_ele, "%d\n", (int)poly.size());
+    idx=0;
+    fprintf(f_ele, "%d %d 0\n", (int)poly.size(), (int)poly[0].size());
     for(const std::vector<uint> & p : poly)
     {
-        fprintf(f_ele, "%d ", (int)p.size());
+        fprintf(f_ele, "%d ", ++idx);
         for(uint vid : p) fprintf(f_ele, "%d ", vid+1);
         fprintf(f_ele, "\n");
     }
