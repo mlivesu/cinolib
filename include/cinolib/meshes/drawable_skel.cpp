@@ -100,7 +100,7 @@ void DrawableSkel::draw(const float scene_size) const
             {
                 vec3d v = vertex(vid);
                 glDisable(GL_DEPTH_TEST);
-                sphere<vec3d>(v, max_sphere_radius(vid), std_bone_color);
+                draw_sphere(v, max_sphere_radius(vid), std_bone_color);
                 glEnable(GL_DEPTH_TEST);
             }
         }
@@ -119,11 +119,11 @@ void DrawableSkel::draw(const float scene_size) const
                     glDisable(GL_DEPTH_TEST);
                     if (draw_mode & DRAW_STD_COLOR)
                     {
-                        sphere<vec3d>(v, bone_thickness, std_bone_color);
+                        draw_sphere(v, bone_thickness, std_bone_color);
                     }
                     else if (draw_mode & DRAW_BONE_COLOR)
                     {
-                        sphere<vec3d>(v, bone_thickness, vertex_color(vid));
+                        draw_sphere(v, bone_thickness, vertex_color(vid));
                     }
                     glEnable(GL_DEPTH_TEST);
                 }
@@ -139,11 +139,11 @@ void DrawableSkel::draw(const float scene_size) const
                     glDisable(GL_DEPTH_TEST);
                     if (draw_mode & DRAW_STD_COLOR)
                     {
-                        cylinder<vec3d>(v0, v1, bone_thickness, bone_thickness, std_bone_color);
+                        draw_cylinder(v0, v1, bone_thickness, bone_thickness, std_bone_color);
                     }
                     else if (draw_mode & DRAW_BONE_COLOR)
                     {
-                        cylinder<vec3d>(v0, v1, bone_thickness, bone_thickness, segment_color(sid));
+                        draw_cylinder(v0, v1, bone_thickness, bone_thickness, segment_color(sid));
                     }
                     glEnable(GL_DEPTH_TEST);
                 }
@@ -158,11 +158,11 @@ void DrawableSkel::draw(const float scene_size) const
                 glDisable(GL_DEPTH_TEST);
                 if (draw_mode & DRAW_STD_COLOR)
                 {
-                    sphere<vec3d>(v, sphere_radius, std_bone_color);
+                    draw_sphere(v, sphere_radius, std_bone_color);
                 }
                 else if (draw_mode & DRAW_BONE_COLOR)
                 {
-                    sphere<vec3d>(v, sphere_radius, vertex_color(vid));
+                    draw_sphere(v, sphere_radius, vertex_color(vid));
                 }
                 glEnable(GL_DEPTH_TEST);
             }
@@ -175,7 +175,7 @@ void DrawableSkel::draw(const float scene_size) const
                 if (vertex_is_bone(vid)) continue;
                 vec3d v = vertex(vid);
                 glDisable(GL_DEPTH_TEST);
-                sphere<vec3d>(v, sphere_radius, (vertex_is_leaf(vid) ? std_leaf_color : std_joint_color));
+                draw_sphere(v, sphere_radius, (vertex_is_leaf(vid) ? std_leaf_color : std_joint_color));
                 glEnable(GL_DEPTH_TEST);
             }
         }
@@ -249,17 +249,17 @@ void DrawableSkel::set_std_leaf_color(float r, float g, float b)
 CINO_INLINE
 void DrawableSkel::set_std_bone_color(float r, float g, float b)
 {
-    std_bone_color[0] = r;
-    std_bone_color[1] = g;
-    std_bone_color[2] = b;
+    std_bone_color.r = r;
+    std_bone_color.g = g;
+    std_bone_color.b = b;
 }
 
 CINO_INLINE
 void DrawableSkel::set_std_joint_color(float r, float g, float b)
 {
-    std_joint_color[0] = r;
-    std_joint_color[1] = g;
-    std_joint_color[2] = b;
+    std_joint_color.r = r;
+    std_joint_color.g = g;
+    std_joint_color.b = b;
 }
 
 CINO_INLINE
@@ -269,7 +269,7 @@ void DrawableSkel::update_bone_colors()
     for(int sid=0; sid<num_segments(); ++sid)
     {
         Color c = Color::scatter(num_bones(), segment_bone_id(sid));
-        set_segment_color(sid, c.rgba);
+        set_segment_color(sid, c);
     }
 
     v_colors.resize(num_vertices()*3);
@@ -278,7 +278,7 @@ void DrawableSkel::update_bone_colors()
         if (vertex_is_feature(vid)) continue;
 
         Color c = Color::scatter(num_bones(), segment_bone_id(vid));
-        set_vertex_color(vid, c.rgba);
+        set_vertex_color(vid, c);
     }
 }
 

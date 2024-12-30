@@ -571,8 +571,8 @@ void GLcanvas::window_size_event(GLFWwindow *window, int width, int height)
     v->trackball.last_click_2d = vec2d(inf_double); // fixes crazy translation deltas after window resizing!
     v->camera.reset_projection();                   // update the camera frustum
     v->update_GL_projection();                      // update OpenGL's projection matrix
-#ifdef WIN32
-    // this fixes canvas resize issues under Windows, but also breaks in on Mac....
+#ifndef __APPLE__
+    // this fixes canvas resize issues under Windows and Linux
     glViewport(0,0,width,height);                   // update viewport
 #endif
     v->draw();                                      // refresh canvas while resizing

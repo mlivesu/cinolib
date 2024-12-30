@@ -105,33 +105,23 @@ class DrawableSkel : public Skel, public DrawableObject
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        inline const float * vertex_color (int vid) const { return &(v_colors[vid*3]); }
-        inline const float * segment_color(int sid) const { return &(s_colors[sid*3]); }
-        inline void bone_color(int bid, float * rgb) const
+        inline const Color & vertex_color (int vid) const { return v_colors.at(vid); }
+        inline const Color & segment_color(int sid) const { return s_colors.at(sid); }
+
+        inline void bone_color(int bid, Color & rgb) const
         {
             int first_segment = segment_bone(bid).front();
-            const float * c = segment_color(first_segment);
-            rgb[0] = c[0];
-            rgb[1] = c[1];
-            rgb[2] = c[2];
+            rgb = segment_color(first_segment);
         }
 
-        inline void set_vertex_color(int vid, float * color)
+        inline void set_vertex_color(int vid, Color & color)
         {
-            int vid_ptr = vid * 3;
-            CHECK_BOUNDS(v_colors, vid_ptr+2);
-            v_colors[vid_ptr + 0] = color[0];
-            v_colors[vid_ptr + 1] = color[1];
-            v_colors[vid_ptr + 2] = color[2];
+            v_colors[vid] = color;
         }
 
-        inline void set_segment_color(int sid, float * color)
+        inline void set_segment_color(int sid, Color & color)
         {
-            int sid_ptr = sid * 3;
-            CHECK_BOUNDS(s_colors, sid_ptr+2);
-            s_colors[sid_ptr + 0] = color[0];
-            s_colors[sid_ptr + 1] = color[1];
-            s_colors[sid_ptr + 2] = color[2];
+            s_colors[sid] = color;
         }
 
         inline void set_bone_thickness(float scalar)
@@ -153,12 +143,12 @@ class DrawableSkel : public Skel, public DrawableObject
         float bone_thickness_modifier; // useful for rendering
         float sphere_radius_modifier;  // useful for rendering
 
-        float std_bone_color[3];
-        float std_leaf_color[3];
-        float std_joint_color[3];
+        Color std_bone_color;
+        Color std_leaf_color;
+        Color std_joint_color;
 
-        std::vector<float> s_colors;
-        std::vector<float> v_colors;        
+        std::vector<Color> s_colors;
+        std::vector<Color> v_colors;
 };
 
 }

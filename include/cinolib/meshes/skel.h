@@ -200,7 +200,7 @@ class Skel
             return length;
         }
 
-        inline void set_vertex(int vid, const vec3<double> & v)
+        inline void set_vertex(int vid, const vec3d & v)
         {
             int vid_ptr = vid * 3;
             CHECK_BOUNDS(coords, vid_ptr+2);
@@ -209,11 +209,11 @@ class Skel
             coords[vid_ptr + 2] = v.z();
         }
 
-        inline vec3<double> vertex(int vid) const
+        inline vec3d vertex(int vid) const
         {
             int vid_ptr = vid * 3;
             CHECK_BOUNDS(coords, vid_ptr);
-            return vec3<double>(coords[vid_ptr+0], coords[vid_ptr+1], coords[vid_ptr+2]);
+            return vec3d(coords[vid_ptr+0], coords[vid_ptr+1], coords[vid_ptr+2]);
         }
 
         inline seg segment(int sid) const
@@ -230,7 +230,7 @@ class Skel
             segments[sid_ptr + i] = vid;
         }
 
-        inline vec3<double> segment_vertex(int sid, int i) const
+        inline vec3d segment_vertex(int sid, int i) const
         {
             return vertex(segment_vertex_id(sid,i));
         }

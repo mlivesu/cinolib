@@ -49,7 +49,7 @@ namespace cinolib
  *
  * Stripe Embedding: Efficient Maps with Exact Numeric Computation
  * Marco Livesu
- * (under review)
+ * ACM Transactions on Graphics (SIGGRAPH Asia 2024)
  *
  * Example of usage:
  *
