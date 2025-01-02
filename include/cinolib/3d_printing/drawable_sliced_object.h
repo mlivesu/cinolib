@@ -37,7 +37,7 @@
 #define CINO_DRAWABLE_SLICED_OBJ
 
 // Boost polygons and Triangle are used to create and tessellate slices...
-#ifdef CINOLIB_USES_BOOST
+#ifdef CINOLIB_USES_BOOST_LEGACY // It does not seem to compile anymore on Boost 1.87....
 #ifdef CINOLIB_USES_TRIANGLE
 
 #include <cinolib/meshes/meshes.h>
@@ -93,6 +93,6 @@ class DrawableSlicedObj : public AbstractDrawablePolygonMesh<SlicedObj<M,V,E,P>>
 }
 
 #endif // CINO_USES_TRIANGLE
-#endif // CINO_USES_BOOST
+#endif // CINO_USES_BOOST_LEGACY
 
 #endif // CINO_DRAWABLE_SLICED_OBJ
