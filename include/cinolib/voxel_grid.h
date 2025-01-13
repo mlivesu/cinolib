@@ -61,7 +61,15 @@ enum
     VOXEL_OUTSIDE  = 0x00000001,
     VOXEL_INSIDE   = 0x00000010,
     VOXEL_BOUNDARY = 0x00000100,
+    VOXEL_ANY      = 0x11111111,
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void voxel_grid_init(      VoxelGrid  & g,
+                     const uint         dim[3],
+                     const AABB       & bbox);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

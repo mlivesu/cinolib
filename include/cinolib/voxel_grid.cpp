@@ -40,6 +40,29 @@
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void voxel_grid_init(     VoxelGrid  & g,
+                    const uint         dim[3],
+                    const AABB       & bbox)
+{
+    assert(g.voxels==nullptr);
+
+    g.dim[0] = dim[0];
+    g.dim[1] = dim[1];
+    g.dim[2] = dim[2];
+    g.bbox   = bbox;
+
+    uint max_voxels_per_side = std::max(dim[0],std::max(dim[1],dim[2]));
+    g.len = g.bbox.delta().max_entry() / max_voxels_per_side;
+
+    uint size = dim[0]*dim[1]*dim[2];
+    g.voxels  = new int[size](); // https://stackoverflow.com/questions/12553154/initial-value-of-dynamically-allocated-memory-in-c
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
 uint voxel_corner_index(const uint dim[3],
                         const uint ijk[3],

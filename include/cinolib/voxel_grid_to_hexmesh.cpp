@@ -56,8 +56,9 @@ void voxel_grid_to_hexmesh(const VoxelGrid                         & g,
     std::vector<int> vert_map(n_verts,-1); // to keep track of already existing vertices
     for(uint id=0; id<n_voxel; ++id)
     {
-        if(g.voxels[id] & voxel_types)
+        if(voxel_types==VOXEL_ANY || g.voxels[id] & voxel_types)
         {
+
             vec3u ijk = deserialize_3D_index(id,g.dim[1],g.dim[2]);
 
             std::vector<uint> verts(8);
