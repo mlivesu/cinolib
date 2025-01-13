@@ -52,7 +52,8 @@ void hex_to_tets(const Hexmesh<M,V,E,F,P> & hm,
 {
     for(uint vid=0; vid<hm.num_verts(); ++vid)
     {
-        tm.vert_add(hm.vert(vid));
+        uint id = tm.vert_add(hm.vert(vid));
+        tm.vert_data(id) = hm.vert_data(vid);
     }
 
     for(uint pid=0; pid<hm.num_polys(); ++pid)
@@ -64,7 +65,7 @@ void hex_to_tets(const Hexmesh<M,V,E,F,P> & hm,
         for(auto tet : t)
         {
             uint id = tm.poly_add(tet);
-            tm.poly_data(id).label = pid;
+            tm.poly_data(id) = hm.poly_data(pid);
         }
     }
 }
