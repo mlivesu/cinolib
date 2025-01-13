@@ -111,7 +111,7 @@ class VolumeMeshControls : public SideBarItem
 
     public:
 
-        VolumeMeshControls(Mesh *m, GLcanvas *gui, const std::string & name = "");
+        VolumeMeshControls(Mesh *m, GLcanvas *gui, const std::string & name = "##");
        ~VolumeMeshControls() override {}
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
