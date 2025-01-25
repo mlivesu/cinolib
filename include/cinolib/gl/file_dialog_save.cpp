@@ -36,6 +36,7 @@
 #include <cinolib/gl/file_dialog_save.h>
 #include <cstdio>
 #include <cstring>
+#include <cinolib/string_utilities.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -77,6 +78,17 @@ std::string file_dialog_save()
         {
             // File name too long, buffer has been filled, so we return empty string instead
             buffer[0] = '\0';
+        }
+
+        // This fixes a weird bug in the MacOS save dialog for which if I
+        // want to save a mesh in .mesh format, the string that I get is
+        // "path/filename.mesh.m" instead of "path/filename.mesh"
+        std::string str(buffer);
+        if(get_file_extension(str).compare(".m"))
+        {
+            str.pop_back();
+            str.pop_back();
+            return str;
         }
     }
 
