@@ -13,8 +13,8 @@ jobs:
           sudo apt-get install -y mesa-utils xvfb libgl1 freeglut3-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
       - name: configure
         env:
-          CC: gcc-9
-          CXX: g++-9
+          CC: gcc-13
+          CXX: g++-13
         run: |
           cd examples
           mkdir build
