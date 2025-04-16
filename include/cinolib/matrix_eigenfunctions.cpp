@@ -65,7 +65,7 @@ bool matrix_eigenfunctions(const Eigen::SparseMatrix<double> & m,
         eigs.compute(Spectra::SortRule::LargestMagn); // largest beacuse it's inverted
         if(eigs.info()!=Spectra::CompInfo::Successful) return false;
         // assemble output data
-        auto basis_func = eigs.eigenvectors();
+        Eigen::MatrixXd basis_func = eigs.eigenvectors();
         for(int fid=0; fid<basis_func.cols(); ++fid)
         {
             double min = max_double;
