@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.7)
 
 project(examples)
 
@@ -10,7 +10,7 @@ set(CINOLIB_USES_SHEWCHUK_PREDICATES  ON )
 set(CINOLIB_USES_INDIRECT_PREDICATES  ON )
 set(CINOLIB_USES_GRAPH_CUT            OFF)
 set(CINOLIB_USES_BOOST                ON)
-set(CINOLIB_USES_VTK                  OFF) # optional, if added VTK formats will be supported everywhere
+set(CINOLIB_USES_VTK                  ON) # optional, if added VTK formats will be supported everywhere
 set(CINOLIB_USES_SPECTRA              ON )
 set(CINOLIB_USES_CGAL_GMP_MPFR        ON )
 
