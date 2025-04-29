@@ -154,7 +154,7 @@ endif()
 if(CINOLIB_USES_SPECTRA)
     message("CINOLIB OPTIONAL MODULE: Spectra")
     FetchContent_Declare(spectra GIT_REPOSITORY "https://github.com/yixuan/spectra.git")
-    FetchContent_MakeAvailable(spectra)
+    FetchContent_Populate(spectra)
     if(MSVC)
         # because Spectra seems to trigger fatal error C1128 on MSVC
         # https://learn.microsoft.com/en-us/cpp/error-messages/compiler-errors-1/fatal-error-c1128?view=msvc-170
