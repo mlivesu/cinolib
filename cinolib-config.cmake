@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.5)
 
 # https://cmake.org/cmake/help/git-stage/module/FetchContent.html
 include(FetchContent)
@@ -122,7 +122,7 @@ endif()
 
 if(CINOLIB_USES_BOOST)
     message("CINOLIB OPTIONAL MODULE: Boost")
-    find_package(Boost)
+    find_package(Boost NO_MODULE)
     if(Boost_FOUND)        
         target_compile_features(cinolib INTERFACE cxx_std_14) # Boost requires C++14
         target_include_directories(cinolib INTERFACE ${Boost_INCLUDE_DIRS})
@@ -154,7 +154,7 @@ endif()
 if(CINOLIB_USES_SPECTRA)
     message("CINOLIB OPTIONAL MODULE: Spectra")
     FetchContent_Declare(spectra GIT_REPOSITORY "https://github.com/yixuan/spectra.git")
-    FetchContent_Populate(spectra)
+    FetchContent_MakeAvailable(spectra)
     if(MSVC)
         # because Spectra seems to trigger fatal error C1128 on MSVC
         # https://learn.microsoft.com/en-us/cpp/error-messages/compiler-errors-1/fatal-error-c1128?view=msvc-170
