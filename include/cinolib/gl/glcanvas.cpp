@@ -665,7 +665,7 @@ void GLcanvas::key_event(GLFWwindow *window, int key, int /*scancode*/, int acti
                                       ":::::::::::::::::::::::: SHORTCUTS ::::::::::::::::::::::::\n"
                                       "              TAB  : toggle show side bar (if any)         \n"
                                       "                A  : toggle show axis                      \n"
-                                      "                P  : toggle perspective/orthographic camera\n"
+                                      "                O  : toggle perspective/orthographic camera\n"
                                       "                R  : reset camera                          \n"
                                       "       Left/Right  : rotate around Y                       \n"
                                       "          Up/Down  : rotate around X                       \n"
