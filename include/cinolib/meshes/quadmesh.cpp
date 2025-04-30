@@ -229,6 +229,7 @@ uint Quadmesh<M,V,E,P>::edge_opposite_to(const uint pid, const uint eid) const
         }
     }
     assert(false);
+    return 0; // warning killer
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
