@@ -36,6 +36,7 @@
 #include <cinolib/tetrahedralization.h>
 #include <cinolib/ipair.h>
 #include <cinolib/standard_elements_tables.h>
+#include <cinolib/hex_shift_indices.h>
 #include <set>
 
 namespace cinolib
@@ -84,92 +85,10 @@ void hex_to_tets(const std::vector<uint> & hex,
     assert(hex.size()==8);
     tets.clear();
 
-    // see Table 4 in "How to Subdivide Pyramids, Prisms and Hexahedra into Tetrahedra"
+    // shift hex indices so that the vertex with smallest index goes to H[0]
+    auto offset = INDEX_OF(hex, std::min_element(hex.begin(),hex.end()));
     uint ref_h[8];
-    switch(INDEX_OF(hex, std::min_element(hex.begin(),hex.end())))
-    {
-        case 0: ref_h[0] = hex[0];
-                ref_h[1] = hex[1];
-                ref_h[2] = hex[2];
-                ref_h[3] = hex[3];
-                ref_h[4] = hex[4];
-                ref_h[5] = hex[5];
-                ref_h[6] = hex[6];
-                ref_h[7] = hex[7];
-                break;
-
-        case 1: ref_h[0] = hex[1];
-                ref_h[1] = hex[0];
-                ref_h[2] = hex[4];
-                ref_h[3] = hex[5];
-                ref_h[4] = hex[2];
-                ref_h[5] = hex[3];
-                ref_h[6] = hex[7];
-                ref_h[7] = hex[6];
-                break;
-
-        case 2: ref_h[0] = hex[2];
-                ref_h[1] = hex[1];
-                ref_h[2] = hex[5];
-                ref_h[3] = hex[6];
-                ref_h[4] = hex[3];
-                ref_h[5] = hex[0];
-                ref_h[6] = hex[4];
-                ref_h[7] = hex[7];
-                break;
-
-        case 3: ref_h[0] = hex[3];
-                ref_h[1] = hex[0];
-                ref_h[2] = hex[1];
-                ref_h[3] = hex[2];
-                ref_h[4] = hex[7];
-                ref_h[5] = hex[4];
-                ref_h[6] = hex[5];
-                ref_h[7] = hex[6];
-                break;
-
-        case 4: ref_h[0] = hex[4];
-                ref_h[1] = hex[0];
-                ref_h[2] = hex[3];
-                ref_h[3] = hex[7];
-                ref_h[4] = hex[5];
-                ref_h[5] = hex[1];
-                ref_h[6] = hex[2];
-                ref_h[7] = hex[6];
-                break;
-
-        case 5: ref_h[0] = hex[5];
-                ref_h[1] = hex[1];
-                ref_h[2] = hex[0];
-                ref_h[3] = hex[4];
-                ref_h[4] = hex[6];
-                ref_h[5] = hex[2];
-                ref_h[6] = hex[3];
-                ref_h[7] = hex[7];
-                break;
-
-        case 6: ref_h[0] = hex[6];
-                ref_h[1] = hex[2];
-                ref_h[2] = hex[1];
-                ref_h[3] = hex[5];
-                ref_h[4] = hex[7];
-                ref_h[5] = hex[3];
-                ref_h[6] = hex[0];
-                ref_h[7] = hex[4];
-                break;
-
-        case 7: ref_h[0] = hex[7];
-                ref_h[1] = hex[3];
-                ref_h[2] = hex[2];
-                ref_h[3] = hex[6];
-                ref_h[4] = hex[4];
-                ref_h[5] = hex[0];
-                ref_h[6] = hex[1];
-                ref_h[7] = hex[5];
-                break;
-
-        default: assert(false);
-    }
+    hex_shift_indices(hex.data(),offset,ref_h);
 
     // putting the min vertex in ref_h[0] fixes the diagonal for the three faces incident to it.
     // there are still three quad faces not incident to ref_h[0] that can be diagonalized in two
