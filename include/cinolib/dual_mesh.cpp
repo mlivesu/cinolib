@@ -47,13 +47,14 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                      Polyhedralmesh<M,V,E,F,P>         & dual,
-               const bool                                with_clipped_cells)
+               const bool                                with_clipped_cells,
+               const bool                                use_tet_circumcenters)
 {
     std::vector<vec3d>             dual_verts;
     std::vector<std::vector<uint>> dual_faces;
     std::vector<std::vector<uint>> dual_polys;
     std::vector<std::vector<bool>> dual_polys_winding;
-    dual_mesh(primal, dual_verts, dual_faces, dual_polys, dual_polys_winding, with_clipped_cells);
+    dual_mesh(primal, dual_verts, dual_faces, dual_polys, dual_polys_winding, with_clipped_cells,use_tet_circumcenters);
     dual = Polyhedralmesh<M,V,E,F,P>(dual_verts, dual_faces, dual_polys, dual_polys_winding);
     dual.poly_fix_orientation();
 }
@@ -67,7 +68,8 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                      std::vector<std::vector<uint>>    & dual_faces,
                      std::vector<std::vector<uint>>    & dual_polys,
                      std::vector<std::vector<bool>>    & dual_polys_winding,
-                     const bool                          with_clipped_cells)
+               const bool                                with_clipped_cells,
+               const bool                                use_tet_circumcenters)
 {
     dual_verts.clear();
     dual_faces.clear();
@@ -79,7 +81,7 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
     for(uint pid=0; pid<primal.num_polys(); ++pid)
     {
         vec3d c;
-        if(primal.poly_is_tetrahedron(pid))
+        if(primal.poly_is_tetrahedron(pid) && use_tet_circumcenters)
         {
             // if the primal mesh is Delaunay, this will ensure that dual faces are planar
             c = tetrahedron_circumcenter(primal.poly_vert(pid,0),

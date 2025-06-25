@@ -58,7 +58,8 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                      Polyhedralmesh<M,V,E,F,P>         & dual,
-               const bool                                with_clipped_cells); // consider/discard boundary vertices
+               const bool                                with_clipped_cells, // consider/discard boundary vertices
+               const bool                                use_tet_circumcenters = false);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -69,7 +70,8 @@ void dual_mesh(const AbstractPolyhedralMesh<M,V,E,F,P> & primal,
                      std::vector<std::vector<uint>>    & dual_faces,
                      std::vector<std::vector<uint>>    & dual_polys,
                      std::vector<std::vector<bool>>    & dual_polys_winding,
-               const bool                                with_clipped_cells); // consider/discard boundary vertices
+               const bool                                with_clipped_cells, // consider/discard boundary vertices
+               const bool                                use_tet_circumcenters = false);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
