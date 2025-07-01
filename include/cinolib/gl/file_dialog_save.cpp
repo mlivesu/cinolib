@@ -84,7 +84,7 @@ std::string file_dialog_save()
         // want to save a mesh in .mesh format, the string that I get is
         // "path/filename.mesh.m" instead of "path/filename.mesh"
         std::string str(buffer);
-        if(get_file_extension(str).compare(".m"))
+        if(get_file_extension(str).compare(".m")==0)
         {
             str.pop_back();
             str.pop_back();
