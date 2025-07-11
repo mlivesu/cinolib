@@ -131,7 +131,7 @@ void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
 
         // reduces energy for mapping to distant points
         // because they are likely to be wrong assignments
-        double w_regular = opt.w_corner;
+        double w_regular = opt.w_regular;
         if(dist>m.edge_avg_length(vid)*2) w_regular *= 0.01; // TODO: this should be a Gaussian....
 
         uint  nv    = m.num_verts();
