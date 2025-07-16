@@ -54,7 +54,8 @@ void padding(AbstractPolyhedralMesh<M,V,E,F,P> & m, const bool inwards)
     {
         if(m.vert_is_on_srf(vid))
         {
-            uint  new_vid = m.vert_add(m.vert(vid));       // update position;
+			vec3d pos_to_add = m.vert(vid);
+            uint  new_vid = m.vert_add(pos_to_add);       // update position;
             vec3d off     = m.vert_data(vid).normal*l*0.5;
             if(inwards) m.vert(  vid  ) -= off;
             else        m.vert(new_vid) += off;
