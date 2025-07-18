@@ -35,6 +35,7 @@
 *********************************************************************************/
 #include <cinolib/ARAP.h>
 #include <cinolib/parallel_for.h>
+#include <cinolib/laplacian.h>
 
 namespace cinolib
 {
@@ -43,236 +44,137 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void ARAP(AbstractMesh<M,V,E,P> & m, ARAP_data & data)
 {
+    /////////////////////////////////////////////////////////////////////////
+
     auto init = [&]()
     {
         assert(m.mesh_type()==TRIMESH || m.mesh_type()==TETMESH);
 
-        data.init = false; // don't init next time
-        data.xyz_loc.resize(m.num_polys()*m.verts_per_poly(0));
+        data.init = false;
 
-        // per edge weights
+        data.R.resize(m.num_verts());
+        data.xyz_ref = m.vector_verts();
+
         data.w.resize(m.num_edges());
         for(uint eid=0; eid<m.num_edges(); ++eid)
         {
             data.w.at(eid) = m.edge_weight(eid,data.w_type);
         }
 
-        // compute a map between matrix columns and mesh vertices
-        // if hard constraints are used, boundary conditions will
-        // map to -1, meaning that they do not correspond to any
-        // column in the matrix
-        data.col_map.resize(m.num_verts(),0);
-        if(!data.use_soft_constraints)
+        if(data.hard_constrain_handles)
         {
-            for(const auto & bc : data.bcs)
-            {
-                data.col_map.at(bc.first) = -1;
-            }
-        }
-        uint fresh_id = 0;
-        for(uint vid=0; vid<m.num_verts(); ++vid)
-        {
-            if(data.col_map.at(vid)==0)
-            {
-                data.col_map.at(vid) = fresh_id++;
-            }
-        }
-
-        // Compute the Laplacian matrix and pre-factorize it
-        typedef Eigen::Triplet<double> Entry;
-        std::vector<Entry> entries;
-        uint size = m.num_verts() - uint(data.bcs.size());
-        if(data.use_soft_constraints)
-        {
-            size = m.num_verts() + uint(data.bcs.size());
-            data.W.resize(size);
-        }
-        for(uint vid=0; vid<m.num_verts(); ++vid)
-        {
-            int col = data.col_map.at(vid);
-            if(col==-1) continue; // skip, hard BC
-            if(data.use_soft_constraints) data.W[col] = data.w_laplace;
-            for(uint nbr : m.adj_v2v(vid))
-            {
-                int col_nbr = data.col_map.at(nbr);
-                int eid = m.edge_id(vid,nbr);
-                assert(eid>=0);
-                entries.push_back(Entry(col, col, data.w.at(eid)));
-                if(col_nbr==-1) continue; // skip, hard BC
-                entries.push_back(Entry(col, col_nbr, -data.w.at(eid)));
-            }
-        }
-        if(data.use_soft_constraints)
-        {
-            // models equation => x_bc = bc_value * w_constr
-            uint new_row = m.num_verts();
-            for(auto bc : data.bcs)
-            {
-                entries.push_back(Entry(new_row,bc.first,1));
-                data.W[new_row] = data.w_constr;
-                ++new_row;
-            }
-        }
-        data.A = Eigen::SparseMatrix<double>(size, (data.use_soft_constraints) ? m.num_verts() : size);
-        data.A.setFromTriplets(entries.begin(), entries.end());
-        if(data.use_soft_constraints) data.cache.derived().compute(data.A.transpose()*data.W.asDiagonal()*data.A);
-        else data.cache.derived().compute(data.A);
-
-        if(data.warm_start_with_laplacian)
-        {
-            Eigen::VectorXd rhs_x = Eigen::VectorXd::Zero(size);
-            Eigen::VectorXd rhs_y = Eigen::VectorXd::Zero(size);
-            Eigen::VectorXd rhs_z = Eigen::VectorXd::Zero(size);
-            for(uint vid=0; vid<m.num_verts(); ++vid)
-            {
-                int col = data.col_map.at(vid);
-                if(col==-1) continue; // skip BC
-                for(uint eid : m.adj_v2e(vid))
-                {
-                    uint nbr   = m.vert_opposite_to(eid,vid);
-                    rhs_x[col] += data.w.at(eid) * (m.vert(vid).x() - m.vert(nbr).x());
-                    rhs_y[col] += data.w.at(eid) * (m.vert(vid).y() - m.vert(nbr).y());
-                    rhs_z[col] += data.w.at(eid) * (m.vert(vid).z() - m.vert(nbr).z());
-                    // move the contribution of BCs to the RHS
-                    if(data.col_map.at(nbr)==-1)
-                    {
-                        vec3d p = data.bcs.at(nbr);
-                        rhs_x[col] += data.w.at(eid) * p.x();
-                        rhs_y[col] += data.w.at(eid) * p.y();
-                        rhs_z[col] += data.w.at(eid) * p.z();
-                    }
-                }
-            }
-            if(data.use_soft_constraints)
-            {
-                auto x = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_x).eval();
-                auto y = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_y).eval();
-                auto z = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_z).eval();
-                data.xyz_out.resize(m.num_verts());
-                for(uint vid=0; vid<m.num_verts(); ++vid)
-                {
-                    data.xyz_out[vid] = vec3d(x[vid],y[vid],z[vid]);
-                }
-            }
-            else
-            {
-                auto x = data.cache.solve(rhs_x).eval();
-                auto y = data.cache.solve(rhs_y).eval();
-                auto z = data.cache.solve(rhs_z).eval();
-                data.xyz_out.resize(m.num_verts());
-                for(uint vid=0; vid<m.num_verts(); ++vid)
-                {
-                    int col = data.col_map[vid];
-                    if(col>=0) data.xyz_out[vid] = vec3d(x[col],y[col],z[col]);
-                }
-                for(const auto & bc : data.bcs)
-                {
-                    data.xyz_out[bc.first] = bc.second;
-                }
-            }
+            data.A = -laplacian(m,data.w_type,1);
         }
         else
         {
-            data.xyz_out = m.vector_verts();
-            for(const auto & bc : data.bcs) data.xyz_out.at(bc.first) = bc.second;
+            uint nv = m.num_verts();
+            uint nh = data.handles.size();
+            std::vector<Eigen::Triplet<double>> entries;
+            for(uint vid=0; vid<m.num_verts(); ++vid)
+            {
+                double diag = 0;
+                for(uint nbr : m.adj_v2v(vid))
+                {
+                    int eid = m.edge_id(vid,nbr);
+                    entries.emplace_back(vid,nbr,-data.w.at(eid));
+                    diag += data.w.at(eid);
+                }
+                entries.emplace_back(vid,vid,diag);
+            }
+            uint off = 0;
+            for(uint vid : data.handles)
+            {
+                entries.emplace_back(nv+off,vid,1.0);
+                off++;
+            }
+            data.A.resize(nv+nh,nv);
+            data.A.setFromTriplets(entries.begin(), entries.end());
+            data.cache.derived().compute(data.A.transpose()*data.A);
         }
     };
+
+    /////////////////////////////////////////////////////////////////////////
 
     auto local_step = [&]()
     {
-        PARALLEL_FOR(0, m.num_polys(), 1000, [&](uint pid)
+        PARALLEL_FOR(0, m.num_verts(), 1000, [&](uint vid)
         {
-            mat3d cov = mat3d::ZERO();            
-            for(uint eid : m.adj_p2e(pid))
+            mat3d cov = mat3d::ZERO();
+            for(uint nbr : m.adj_v2v(vid))
             {
-                uint  v0    = m.edge_vert_id(eid,0);
-                uint  v1    = m.edge_vert_id(eid,1);
-                vec3d e_cur = data.xyz_out.at(v0) - data.xyz_out.at(v1);
-                vec3d e_ref = m.vert(v0) - m.vert(v1);
+                int   eid   = m.edge_id(vid,nbr);
+                vec3d e_ref = (data.xyz_ref.at(vid) - data.xyz_ref.at(nbr));
+                vec3d e_cur = (m.vert(vid) - m.vert(nbr));
+
                 cov += data.w.at(eid) * (e_cur * e_ref.transpose());
             }
 
-            // find closest rotation and store rotated point
-            uint  off = pid*m.verts_per_poly(pid);
-            mat3d rot = cov.closest_orthogonal_matrix(true);
-            for(uint i=0; i<m.verts_per_poly(pid); ++i)
-            {
-                data.xyz_loc.at(off+i) = rot * m.poly_vert(pid,i);
-            }
+            mat3d UU,VV;
+            vec3d S;
+            cov.SVD(UU,S,VV);
+            mat3d I = mat3d::DIAG(1);
+            I(2,2) = (UU*VV.transpose()).det();
+            data.R.at(vid) = UU*I*VV.transpose();
         });
     };
 
+    /////////////////////////////////////////////////////////////////////////
+
     auto global_step = [&]()
     {
-        uint size = (data.use_soft_constraints) ? m.num_verts() + uint(data.bcs.size())
-                                                : m.num_verts() - uint(data.bcs.size());
-        Eigen::VectorXd rhs_x = Eigen::VectorXd::Zero(size);
-        Eigen::VectorXd rhs_y = Eigen::VectorXd::Zero(size);
-        Eigen::VectorXd rhs_z = Eigen::VectorXd::Zero(size);
+        uint nv = m.num_verts();
+        uint nh = (data.hard_constrain_handles) ? 0 : data.handles.size();
+
+        Eigen::VectorXd rhs_x(nv+nh);
+        Eigen::VectorXd rhs_y(nv+nh);
+        Eigen::VectorXd rhs_z(nv+nh);
+
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
-            int col = data.col_map.at(vid);
-            if(col==-1) continue; // skip, vert is BC
+            vec3d rhs(0,0,0);
             for(uint nbr : m.adj_v2v(vid))
             {
-                int eid = m.edge_id(vid,nbr);
-                double w = 1.0/m.adj_e2p(eid).size();
-                for(uint pid : m.adj_e2p(eid))
-                {
-                    uint i = m.poly_vert_offset(pid,vid);
-                    uint j = m.poly_vert_offset(pid,nbr);
-                    vec3d Re = data.xyz_loc.at(pid*m.verts_per_poly(pid)+i) - data.xyz_loc.at(pid*m.verts_per_poly(pid)+j);
-                    rhs_x[col] += w * data.w.at(eid) * Re[0];
-                    rhs_y[col] += w * data.w.at(eid) * Re[1];
-                    rhs_z[col] += w * data.w.at(eid) * Re[2];
-                }
-                // if nbr is a hard BC sum its contibution to the Laplacian matrix to the rhs
-                if(data.col_map.at(nbr)==-1)
-                {
-                    vec3d p = data.bcs.at(nbr);
-                    rhs_x[col] += data.w.at(eid) * p.x();
-                    rhs_y[col] += data.w.at(eid) * p.y();
-                    rhs_z[col] += data.w.at(eid) * p.z();
-                }
+                mat3d Ravg = (data.R.at(vid)+data.R.at(nbr))/2.0;
+                vec3d e    = (data.xyz_ref.at(vid) - data.xyz_ref.at(nbr));
+                int eid    = m.edge_id(vid,nbr);
+
+                rhs += data.w.at(eid) * Ravg * e;
             }
+            rhs_x[vid] = rhs.x();
+            rhs_y[vid] = rhs.y();
+            rhs_z[vid] = rhs.z();
         }
-        if(data.use_soft_constraints)
+
+        Eigen::VectorXd x,y,z;
+        if(data.hard_constrain_handles)
         {
-            // models rhs of equation => x_bc = bc_value
-            uint new_row = m.num_verts();
-            for(auto bc : data.bcs)
-            {
-                rhs_x[new_row] = bc.second.x();
-                rhs_y[new_row] = bc.second.y();
-                rhs_z[new_row] = bc.second.z();
-                ++new_row;
-            }
-            auto x = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_x).eval();
-            auto y = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_y).eval();
-            auto z = data.cache.solve(data.A.transpose()*data.W.asDiagonal()*rhs_z).eval();
-            for(uint vid=0; vid<m.num_verts(); ++vid)
-            {
-                data.xyz_out[vid] = vec3d(x[vid],y[vid],z[vid]);
-            }
+            // TODO: use caching also with hard constraints!
+            solve_square_system_with_bc(data.A, rhs_x, x, data.handles_x);
+            solve_square_system_with_bc(data.A, rhs_y, y, data.handles_y);
+            solve_square_system_with_bc(data.A, rhs_z, z, data.handles_z);
         }
         else
         {
-            auto x = data.cache.solve(rhs_x).eval();
-            auto y = data.cache.solve(rhs_y).eval();
-            auto z = data.cache.solve(rhs_z).eval();
-            for(uint vid=0; vid<m.num_verts(); ++vid)
+            uint off = 0;
+            for(uint vid : data.handles)
             {
-                int col = data.col_map[vid];
-                if(col>=0) data.xyz_out[vid] = vec3d(x[col],y[col],z[col]);
+                rhs_x[nv+off] = data.handles_x.at(vid);
+                rhs_y[nv+off] = data.handles_y.at(vid);
+                rhs_z[nv+off] = data.handles_z.at(vid);
+                ++off;
             }
-            for(const auto & bc : data.bcs)
-            {
-                data.xyz_out[bc.first] = bc.second;
-            }
+            x = data.cache.solve(data.A.transpose()*rhs_x).eval();
+            y = data.cache.solve(data.A.transpose()*rhs_y).eval();
+            z = data.cache.solve(data.A.transpose()*rhs_z).eval();
+        }
+
+        for(uint vid=0; vid<m.num_verts(); ++vid)
+        {
+            m.vert(vid) = vec3d(x[vid],y[vid],z[vid]);
         }
     };
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    //////////////////////////////////////////////////////////////////////////
 
     if(data.init) init();
 
@@ -281,8 +183,6 @@ void ARAP(AbstractMesh<M,V,E,P> & m, ARAP_data & data)
         local_step();
         global_step();
     }
-
-    m.vector_verts() = data.xyz_out;
     m.update_normals();
 }
 

@@ -36,7 +36,7 @@
 #ifndef CINO_ARAP_H
 #define CINO_ARAP_H
 
-#include <cinolib/meshes/trimesh.h>
+#include <cinolib/meshes/abstract_mesh.h>
 #include <cinolib/linear_solvers.h>
 
 namespace cinolib
@@ -56,33 +56,21 @@ struct ARAP_data
     uint n_iters = 4;
     bool init = true; // initialize just once (useful for multiple calls, e.g. to make more iterations)
 
-    std::map<uint,vec3d> bcs;     // boundary conditions
-    std::vector<int>     col_map; // maps vertex ids to matrix columns
+    std::vector<mat3d> R;       // local (per vertex) rotation matrices
+    std::vector<vec3d> xyz_ref; // reference (original) vertex positions
 
-    std::vector<vec3d>  xyz_out; // current solution (will be the output, eventually)
-    std::vector<vec3d>  xyz_loc; // per element targets (100% rigid)
-    std::vector<double> w;       // edge weights { UNIFORM, COTANGENT }
-    int w_type = UNIFORM;        // WARNING: cot weights seem rather unstable on volume meshes in interactive deformations
+    std::vector<double> w; // edge weights { UNIFORM, COTANGENT }
+    int w_type = UNIFORM; // WARNING: cot weights seem rather unstable on volume meshes in interactive deformations
 
     Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> cache; // factorized matrix
-
-    // In my experience replacing hard with soft constraints works
-    // much better for interactive shape deformation (no artifacts
-    // due to C-0 continuity around boundary conditions).
-    // On the other hand, things like simplicial volume maps require
-    // the use of hard constraints to ensure boundary conformity.
-    bool   use_soft_constraints = true;
-    double w_constr  = 100.0;      // weight for soft constraints
-    double w_laplace = 1.0;        // weight for the laplacian component of the matrix
-    Eigen::VectorXd W;             // diagonal matrix of weights
     Eigen::SparseMatrix<double> A; // a copy of the matrix (to be pre-multiplied to the rhs to form the normal equations)
 
-    // if true (default), the warm start will be the minimizer of
-    // | Lx - delta |^2
-    // where delta are the differential mesh coordinates. If false,
-    // the warm start will simply be a copy of the input mesh, with
-    // constrained vertices moved onto their prescribed position
-    bool warm_start_with_laplacian = true;
+    // deformation handles, separated for x,y,z coords to make solver call easier
+    bool hard_constrain_handles = true;
+    std::vector<uint>     handles;
+    std::map<uint,double> handles_x;
+    std::map<uint,double> handles_y;
+    std::map<uint,double> handles_z;
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
