@@ -59,18 +59,21 @@ struct ARAP_data
     std::vector<mat3d> R;       // local (per vertex) rotation matrices
     std::vector<vec3d> xyz_ref; // reference (original) vertex positions
 
-    std::vector<double> w; // edge weights { UNIFORM, COTANGENT }
-    int w_type = UNIFORM; // WARNING: cot weights seem rather unstable on volume meshes in interactive deformations
+    // edge weights
+    std::vector<double> w;
+    int w_type = UNIFORM; // { UNIFORM, COTANGENT }
 
     Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> cache; // factorized matrix
     Eigen::SparseMatrix<double> A; // a copy of the matrix (to be pre-multiplied to the rhs to form the normal equations)
 
     // deformation handles, separated for x,y,z coords to make solver call easier
-    bool hard_constrain_handles = true;
     std::vector<uint>     handles;
     std::map<uint,double> handles_x;
     std::map<uint,double> handles_y;
     std::map<uint,double> handles_z;
+
+    bool hard_constrain_handles = false;
+    std::vector<int> col_map; // column map (to handle hard constrainted handles)
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

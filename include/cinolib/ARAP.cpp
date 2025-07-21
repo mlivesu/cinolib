@@ -61,29 +61,57 @@ void ARAP(AbstractMesh<M,V,E,P> & m, ARAP_data & data)
             data.w.at(eid) = m.edge_weight(eid,data.w_type);
         }
 
+        // compute a map between matrix columns and mesh vertices
+        // if hard constraints are used, boundary conditions will
+        // map to -1, meaning that they do not correspond to any
+        // column in the matrix
+        data.col_map.assign(m.num_verts(),0);
         if(data.hard_constrain_handles)
         {
-            data.A = -laplacian(m,data.w_type,1);
+            for(uint vid : data.handles)
+            {
+                data.col_map.at(vid) = -1;
+            }
+        }
+        uint fresh_id = 0;
+        for(uint vid=0; vid<m.num_verts(); ++vid)
+        {
+            if(data.col_map.at(vid)==0)
+            {
+                data.col_map.at(vid) = fresh_id++;
+            }
+        }
+
+        uint nv = m.num_verts();
+        uint nh = data.handles.size();
+        std::vector<Eigen::Triplet<double>> entries;
+        for(uint vid=0; vid<m.num_verts(); ++vid)
+        {
+            if(data.col_map.at(vid)<0) continue;
+            double diag = 0;
+            for(uint nbr : m.adj_v2v(vid))
+            {
+                int eid = m.edge_id(vid,nbr);
+                diag += data.w.at(eid);
+                if(data.col_map.at(nbr)<0) continue;
+                entries.emplace_back(data.col_map.at(vid), data.col_map.at(nbr), -data.w.at(eid));
+            }
+            entries.emplace_back(data.col_map.at(vid), data.col_map.at(vid), diag);
+        }
+
+        if(data.hard_constrain_handles)
+        {
+            data.A.resize(nv-nh,nv-nh);
+            data.A.setFromTriplets(entries.begin(), entries.end());
+            data.cache.derived().compute(data.A);
         }
         else
         {
-            uint nv = m.num_verts();
-            uint nh = data.handles.size();
-            std::vector<Eigen::Triplet<double>> entries;
-            for(uint vid=0; vid<m.num_verts(); ++vid)
-            {
-                double diag = 0;
-                for(uint nbr : m.adj_v2v(vid))
-                {
-                    int eid = m.edge_id(vid,nbr);
-                    entries.emplace_back(vid,nbr,-data.w.at(eid));
-                    diag += data.w.at(eid);
-                }
-                entries.emplace_back(vid,vid,diag);
-            }
+            // append soft constraint equations for handles
             uint off = 0;
             for(uint vid : data.handles)
             {
+                assert(vid>=0);
                 entries.emplace_back(nv+off,vid,1.0);
                 off++;
             }
@@ -122,15 +150,18 @@ void ARAP(AbstractMesh<M,V,E,P> & m, ARAP_data & data)
 
     auto global_step = [&]()
     {
-        uint nv = m.num_verts();
-        uint nh = (data.hard_constrain_handles) ? 0 : data.handles.size();
+        uint nv   = m.num_verts();
+        uint nh   = data.handles.size();
+        uint size = (data.hard_constrain_handles) ? nv-nh : nv+nh;
 
-        Eigen::VectorXd rhs_x(nv+nh);
-        Eigen::VectorXd rhs_y(nv+nh);
-        Eigen::VectorXd rhs_z(nv+nh);
+        Eigen::VectorXd rhs_x(size);
+        Eigen::VectorXd rhs_y(size);
+        Eigen::VectorXd rhs_z(size);
 
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
+            if(data.col_map.at(vid)<0) continue;
+
             vec3d rhs(0,0,0);
             for(uint nbr : m.adj_v2v(vid))
             {
@@ -139,19 +170,39 @@ void ARAP(AbstractMesh<M,V,E,P> & m, ARAP_data & data)
                 int eid    = m.edge_id(vid,nbr);
 
                 rhs += data.w.at(eid) * Ravg * e;
+
+                if(data.col_map.at(nbr)<0)
+                {
+                    rhs += data.w.at(eid) * vec3d(data.handles_x.at(nbr),
+                                                  data.handles_y.at(nbr),
+                                                  data.handles_z.at(nbr));
+                }
             }
-            rhs_x[vid] = rhs.x();
-            rhs_y[vid] = rhs.y();
-            rhs_z[vid] = rhs.z();
+            rhs_x[data.col_map.at(vid)] = rhs.x();
+            rhs_y[data.col_map.at(vid)] = rhs.y();
+            rhs_z[data.col_map.at(vid)] = rhs.z();
         }
 
         Eigen::VectorXd x,y,z;
         if(data.hard_constrain_handles)
         {
-            // TODO: use caching also with hard constraints!
-            solve_square_system_with_bc(data.A, rhs_x, x, data.handles_x);
-            solve_square_system_with_bc(data.A, rhs_y, y, data.handles_y);
-            solve_square_system_with_bc(data.A, rhs_z, z, data.handles_z);
+            x = data.cache.solve(rhs_x).eval();
+            y = data.cache.solve(rhs_y).eval();
+            z = data.cache.solve(rhs_z).eval();
+
+            for(uint vid=0; vid<m.num_verts(); ++vid)
+            {
+                if(data.col_map.at(vid)<0) continue;
+                m.vert(vid) = vec3d(x[data.col_map.at(vid)],
+                                    y[data.col_map.at(vid)],
+                                    z[data.col_map.at(vid)]);
+            }
+            for(uint vid : data.handles)
+            {
+                m.vert(vid) = vec3d(data.handles_x.at(vid),
+                                    data.handles_y.at(vid),
+                                    data.handles_z.at(vid));
+            }
         }
         else
         {
@@ -166,14 +217,16 @@ void ARAP(AbstractMesh<M,V,E,P> & m, ARAP_data & data)
             x = data.cache.solve(data.A.transpose()*rhs_x).eval();
             y = data.cache.solve(data.A.transpose()*rhs_y).eval();
             z = data.cache.solve(data.A.transpose()*rhs_z).eval();
-        }
 
-        for(uint vid=0; vid<m.num_verts(); ++vid)
-        {
-            m.vert(vid) = vec3d(x[vid],y[vid],z[vid]);
+            for(uint vid=0; vid<m.num_verts(); ++vid)
+            {
+                m.vert(vid) = vec3d(x[vid],y[vid],z[vid]);
+            }
         }
     };
 
+    //////////////////////////////////////////////////////////////////////////
+    ////////////////////////// ACTUAL ALGORITHM //////////////////////////////
     //////////////////////////////////////////////////////////////////////////
 
     if(data.init) init();
