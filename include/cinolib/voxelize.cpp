@@ -54,7 +54,10 @@ void voxelize(const AbstractPolygonMesh<M,V,E,P> & m,
     // pad the bbox to ease the subsequent inside/outside labeling
     g.bbox = m.bbox();
     g.len  = g.bbox.delta().max_entry() / max_voxels_per_side;
-    vec3d pad(g.len,g.len,g.len);
+    // https://github.com/mlivesu/cinolib/issues/189#issuecomment-3108963585
+    vec3d pad(g.len * 1.001,
+              g.len * 1.001,
+              g.len * 1.001);
     g.bbox.min -= pad;
     g.bbox.max += pad;
 
