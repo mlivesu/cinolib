@@ -75,6 +75,7 @@ void SurfaceMeshControls<Mesh>::draw()
     header_slicing          (false);
     header_marked_edges     (false);
     header_ambient_occlusion(false);
+    header_manual_digging   (false);
     header_actions          (false);
     header_debug            (false);
 }
@@ -455,6 +456,96 @@ void SurfaceMeshControls<Mesh>::header_ambient_occlusion(const bool open)
         {
             m->updateGL();
         }
+        ImGui::TreePop();
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class Mesh>
+CINO_INLINE
+void SurfaceMeshControls<Mesh>::header_manual_digging(const bool open)
+{
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    static auto func_dig = [&](int modifiers) -> bool
+    {
+        if(modifiers & GLFW_MOD_SHIFT)
+        {
+            vec3d p;
+            vec2d click = gui->cursor_pos();
+            if(gui->unproject(click, p)) // transform click in a 3d point
+            {
+                uint pid = m->pick_poly(p);
+                if(m->poly_data(pid).flags[HIDDEN] == false)
+                {
+                    m->poly_data(pid).flags[HIDDEN] = true;
+                }
+                m->updateGL();
+            }
+        }
+        return false;
+    };
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    static auto func_undig = [&](int modifiers) -> bool
+    {
+        if(modifiers & GLFW_MOD_SHIFT)
+        {
+            vec3d p;
+            vec2d click = gui->cursor_pos();
+            if(gui->unproject(click, p)) // transform click in a 3d point
+            {
+                uint eid = m->pick_edge(p);
+                for(uint pid : m->adj_e2p(eid))
+                {
+                    if(m->poly_data(pid).flags[HIDDEN] == true)
+                    {
+                        m->poly_data(pid).flags[HIDDEN] = false;
+                    }
+                }
+                m->updateGL();
+            }
+        }
+        return false;
+    };
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    static auto func_isolate = [&](int modifiers) -> bool
+    {
+        if(modifiers & GLFW_MOD_SHIFT)
+        {
+            vec3d p;
+            vec2d click = gui->cursor_pos();
+            if(gui->unproject(click, p)) // transform click in a 3d point
+            {
+                uint pid = m->pick_poly(p);
+                for(uint vid : m->adj_p2v(pid))
+                for(uint pid : m->adj_v2p(vid))
+                {
+                    if(m->poly_data(pid).flags[HIDDEN] == false)
+                    {
+                        m->poly_data(pid).flags[HIDDEN] = true;
+                    }
+                }
+                m->poly_data(pid).flags[HIDDEN] = false;
+                m->updateGL();
+            }
+        }
+        return false;
+    };
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    ImGui::SetNextItemOpen(open,ImGuiCond_Once);
+    if(ImGui::TreeNode("Manual Digging"))
+    {
+        if(ImGui::RadioButton("Dig    ", &dig_choice, DIG    )) gui->callback_mouse_left_click = func_dig;
+        if(ImGui::RadioButton("Undig  ", &dig_choice, UNDIG  )) gui->callback_mouse_left_click = func_undig;
+        if(ImGui::RadioButton("Isolate", &dig_choice, ISOLATE)) gui->callback_mouse_left_click = func_isolate;
+        if(ImGui::RadioButton("Reset  ", &dig_choice, RESET  )) { m->poly_set_flag(HIDDEN,false); m->updateGL(); }
         ImGui::TreePop();
     }
 }

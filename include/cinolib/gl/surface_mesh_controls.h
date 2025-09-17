@@ -57,6 +57,11 @@ class SurfaceMeshControls : public SideBarItem
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+    // choices for digging radio button
+    enum { RESET, DIG, UNDIG, ISOLATE };
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     Mesh     * m   = nullptr;
     GLcanvas * gui = nullptr;
 
@@ -87,6 +92,7 @@ class SurfaceMeshControls : public SideBarItem
     int        crease_deg        = 60;
     float      marker_font_size  = 10.f;
     float      marker_size       = 3.f;
+    int        dig_choice        = RESET;
     bool       show_vert_ids     = false;
     bool       show_poly_ids     = false;
     Color      vert_color        = Color::WHITE();
@@ -122,6 +128,7 @@ class SurfaceMeshControls : public SideBarItem
         void header_slicing          (const bool open);
         void header_marked_edges     (const bool open);
         void header_ambient_occlusion(const bool open);
+        void header_manual_digging   (const bool open);
         void header_actions          (const bool open);
         void header_debug            (const bool open);
 
