@@ -109,6 +109,7 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         std::vector<uint> face_sheet(const uint fid) const; // stop at singular edges
+        std::unordered_set<uint> hex_sheet(const uint eid) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
