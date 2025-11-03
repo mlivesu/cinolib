@@ -43,6 +43,8 @@
 #include <cinolib/meshes/mesh_attributes.h>
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
 
+#include <unordered_set>
+
 namespace cinolib
 {
 
@@ -108,18 +110,18 @@ class Hexmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        std::vector<uint> face_sheet(const uint fid) const; // stop at singular edges
-        std::unordered_set<uint> hex_sheet(const uint eid) const;
+        std::vector<uint>        face_sheet(const uint fid) const; // stop at singular edges
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        uint   poly_face_opposite_to(const uint pid, const uint fid) const;
-        uint   poly_vert_opposite_to(const uint pid, const uint fid, const uint vid) const;
-        void   poly_subdivide       (const std::vector<std::vector<std::vector<uint>>> & split_scheme);
-        double poly_volume          (const uint pid) const override;
-        bool   poly_fix_orientation ();
-        void   poly_local_frame     (const uint pid, vec3d & x, vec3d & y, vec3d & z);
-        void   poly_local_frame     (const uint pid, mat3d & xyz);
+        uint                     poly_face_opposite_to(const uint pid, const uint fid) const;
+        uint                     poly_vert_opposite_to(const uint pid, const uint fid, const uint vid) const;
+        void                     poly_subdivide       (const std::vector<std::vector<std::vector<uint>>> & split_scheme);
+        double                   poly_volume          (const uint pid) const override;
+        bool                     poly_fix_orientation ();
+        void                     poly_local_frame     (const uint pid, vec3d & x, vec3d & y, vec3d & z);
+        void                     poly_local_frame     (const uint pid, mat3d & xyz);
+        std::unordered_set<uint> poly_sheet           (const uint eid) const;
 };
 
 }

@@ -317,41 +317,43 @@ std::vector<uint> Hexmesh<M,V,E,F,P>::face_sheet(const uint fid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-std::unordered_set<uint> Hexmesh<M, V, E, F, P>::hex_sheet(const uint eid) const
+std::unordered_set<uint> Hexmesh<M,V,E,F,P>::poly_sheet(const uint eid) const
 {
-    std::unordered_set<uint> visitedEids;
-    std::unordered_set<uint> visitedPids;
-    std::queue<uint> toVisitEids;
-    toVisitEids.push(eid);
-    visitedEids.insert(eid);
-    while (!toVisitEids.empty())
+    std::unordered_set<uint> visited_eids;
+    std::unordered_set<uint> visited_pids;
+    std::queue<uint>         to_visit_eids;
+    to_visit_eids.push(eid);
+    visited_eids.insert(eid);
+
+    while(!to_visit_eids.empty())
     {
-        const uint currEid{ toVisitEids.front() };
-        toVisitEids.pop();
-        for (const uint adjPid : this->adj_e2p(currEid))
+        const uint eid = to_visit_eids.front();
+        to_visit_eids.pop();
+
+        for(const uint pid : this->adj_e2p(eid))
         {
-            if (!visitedPids.contains(adjPid))
+            if(DOES_NOT_CONTAIN(visited_pids,pid))
             {
-                visitedPids.insert(adjPid);
+                visited_pids.insert(pid);
             }
         }
-        for (const uint adjFid : this->adj_e2f(currEid))
+        for(const uint fid : this->adj_e2f(eid))
         {
-            for (const uint fidEid : this->adj_f2e(adjFid))
+            for(const uint fid_eid : this->adj_f2e(fid))
             {
-                if (fidEid != currEid && !this->edges_are_adjacent(currEid, fidEid))
+                if(fid_eid != eid && !this->edges_are_adjacent(eid,fid_eid))
                 {
-                    if (!visitedEids.contains(fidEid))
+                    if(DOES_NOT_CONTAIN(visited_eids,fid_eid))
                     {
-                        visitedEids.insert(fidEid);
-                        toVisitEids.push(fidEid);
+                        visited_eids.insert(fid_eid);
+                        to_visit_eids.push(fid_eid);
                     }
                     break;
                 }
             }
         }
     }
-    return visitedPids;
+    return visited_pids;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
