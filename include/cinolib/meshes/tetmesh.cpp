@@ -469,6 +469,16 @@ bool Tetmesh<M,V,E,F,P>::face_flip(const uint fid, bool geometric_check) // 2-to
     uint opp0 = this->poly_vert_opposite_to(pid0, fid);
     uint opp1 = this->poly_vert_opposite_to(pid1, fid);
 
+    // geometric reference
+    double orient_ref;
+    if(geometric_check)
+    {
+        orient_ref = orient3d(this->poly_vert(pid0,0),
+                              this->poly_vert(pid0,1),
+                              this->poly_vert(pid0,2),
+                              this->poly_vert(pid0,3));
+    }
+
     // "A face is topologically unflippable if the edge
     //  that would replace it is already in the complex"
     //
@@ -492,10 +502,10 @@ bool Tetmesh<M,V,E,F,P>::face_flip(const uint fid, bool geometric_check) // 2-to
         // this check is exact only if symbol CINOLIB_USES_SHEWCHUK_PREDICATES is defined
         if(geometric_check)
         {
-            if(orient3d(this->vert(tets[i][0]),
-                        this->vert(tets[i][1]),
-                        this->vert(tets[i][2]),
-                        this->vert(tets[i][3]))<=0) return false;
+            if(orient_ref * orient3d(this->vert(tets[i][0]),
+                                     this->vert(tets[i][1]),
+                                     this->vert(tets[i][2]),
+                                     this->vert(tets[i][3]))<=0) return false;
         }
         ++i;
     }
@@ -519,7 +529,7 @@ bool Tetmesh<M,V,E,F,P>::face_flip(const uint fid, bool geometric_check) // 2-to
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool Tetmesh<M,V,E,F,P>::edge_flip(const uint eid) // 3-to-2 flip
+bool Tetmesh<M,V,E,F,P>::edge_flip(const uint eid, const bool geometric_check) // 3-to-2 flip
 {
     // "An edge is topologically unflippable if does not
     //  have exactly three incident faces or the face that
@@ -541,6 +551,16 @@ bool Tetmesh<M,V,E,F,P>::edge_flip(const uint eid) // 3-to-2 flip
     }
     assert(opp < this->num_verts());
 
+    // geometric reference
+    double orient_ref;
+    if(geometric_check)
+    {
+        orient_ref = orient3d(this->poly_vert(pid, 0),
+                              this->poly_vert(pid, 1),
+                              this->poly_vert(pid, 2),
+                              this->poly_vert(pid, 3));
+    }
+
     // construct all new elements
     uint tets[2][4];
     uint i=0;
@@ -551,6 +571,15 @@ bool Tetmesh<M,V,E,F,P>::edge_flip(const uint eid) // 3-to-2 flip
         tets[i][2] = this->face_vert_id(fid,2),
         tets[i][3] = opp;
         if(this->poly_face_is_CCW(pid,fid)) std::swap(tets[i][0],tets[i][1]);
+        
+        // // this check is exact only if symbol CINOLIB_USES_SHEWCHUK_PREDICATES is defined
+        if(geometric_check)
+        {
+            if(orient_ref * orient3d(this->vert(tets[i][0]),
+                                     this->vert(tets[i][1]),
+                                     this->vert(tets[i][2]),
+                                     this->vert(tets[i][3]))<=0) return false;
+        }
         ++i;
     }
     assert(i==2);
