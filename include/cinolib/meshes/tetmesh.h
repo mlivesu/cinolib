@@ -103,18 +103,27 @@ class Tetmesh : public AbstractPolyhedralMesh<M,V,E,F,P>
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        bool   edge_flip                        (const uint eid); // 3-to-2 flip
-        uint   edge_split                       (const uint eid, const uint split_point);
-        uint   edge_split                       (const uint eid, const vec3d & p);
-        uint   edge_split                       (const uint eid, const double lambda = 0.5); // use linear interpolation: e0*(1-lambda) + e1*lambda
-        int    edge_collapse                    (const uint eid, const double lambda = 0.5, const double topologic_check = true, const double geometric_check = true);
-        int    edge_collapse                    (const uint eid, const vec3d & p, const double topologic_check = true, const double geometric_check = true);
-        bool   edge_is_collapsible              (const uint eid, const vec3d & p) const;
-        bool   edge_is_collapsible              (const uint eid, const double lambda) const;
-        bool   edge_is_geometrically_collapsible(const uint eid, const vec3d & p) const;
-        bool   edge_is_topologically_collapsible(const uint eid) const;
-        double edge_weight                      (const uint eid, const int type) const override;
-        double edge_weight_cotangent            (const uint eid) const;
+        bool              edge_flip                        (const uint eid); // 3-to-2 flip
+        uint              edge_split                       (const uint eid, const uint split_point);
+        uint              edge_split                       (const uint eid, const vec3d & p);
+        uint              edge_split                       (const uint eid, const double lambda = 0.5); // use linear interpolation: e0*(1-lambda) + e1*lambda
+        int               edge_collapse                    (const uint eid, const double lambda = 0.5, const double topologic_check = true, const double geometric_check = true);
+        int               edge_collapse                    (const uint eid, const vec3d & p, const double topologic_check = true, const double geometric_check = true);
+        bool              edge_is_collapsible              (const uint eid, const vec3d & p) const;
+        bool              edge_is_collapsible              (const uint eid, const double lambda) const;
+        bool              edge_is_geometrically_collapsible(const uint eid, const vec3d & p) const;
+        bool              edge_is_topologically_collapsible(const uint eid) const;
+        double            edge_weight                      (const uint eid, const int type) const override;
+        double            edge_weight_cotangent            (const uint eid) const;
+        std::vector<uint> edge_ordered_v_ring              (const uint eid) const;
+        std::vector<uint> edge_ordered_e_ring              (const uint eid) const;
+        std::vector<uint> edge_ordered_f_ring              (const uint eid) const;
+        std::vector<uint> edge_ordered_p_ring              (const uint eid) const;
+        void              edge_ordered_rings               (const uint                eid,
+                                                                  std::vector<uint> & v_ring,
+                                                                  std::vector<uint> & e_ring,
+                                                                  std::vector<uint> & f_ring,
+                                                                  std::vector<uint> & p_ring) const;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

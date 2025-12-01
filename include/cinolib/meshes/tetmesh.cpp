@@ -825,6 +825,108 @@ double Tetmesh<M,V,E,F,P>::edge_weight_cotangent(const uint eid) const
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+std::vector<uint> Tetmesh<M,V,E,F,P>::edge_ordered_v_ring(const uint eid) const
+{
+    std::vector<uint> v_ring;
+    std::vector<uint> e_ring;
+    std::vector<uint> f_ring;
+    std::vector<uint> p_ring;
+    this->edge_ordered_rings(eid,v_ring,e_ring,f_ring,p_ring);
+    return v_ring;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> Tetmesh<M,V,E,F,P>::edge_ordered_e_ring(const uint eid) const
+{
+    std::vector<uint> v_ring;
+    std::vector<uint> e_ring;
+    std::vector<uint> f_ring;
+    std::vector<uint> p_ring;
+    this->edge_ordered_rings(eid,v_ring,e_ring,f_ring,p_ring);
+    return e_ring;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> Tetmesh<M,V,E,F,P>::edge_ordered_f_ring(const uint eid) const
+{
+    std::vector<uint> v_ring;
+    std::vector<uint> e_ring;
+    std::vector<uint> f_ring;
+    std::vector<uint> p_ring;
+    this->edge_ordered_rings(eid,v_ring,e_ring,f_ring,p_ring);
+    return f_ring;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+std::vector<uint> Tetmesh<M,V,E,F,P>::edge_ordered_p_ring(const uint eid) const
+{
+    std::vector<uint> v_ring;
+    std::vector<uint> e_ring;
+    std::vector<uint> f_ring;
+    std::vector<uint> p_ring;
+    this->edge_ordered_rings(eid,v_ring,e_ring,f_ring,p_ring);
+    return p_ring;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void Tetmesh<M,V,E,F,P>::edge_ordered_rings(const uint                eid,
+                                                  std::vector<uint> & v_ring,
+                                                  std::vector<uint> & e_ring,
+                                                  std::vector<uint> & f_ring,
+                                                  std::vector<uint> & p_ring) const
+{
+    v_ring.clear();
+    e_ring.clear();
+    f_ring.clear();
+    p_ring.clear();
+
+    if(this->adj_e2f(eid).empty()) return;
+
+    // always start from a boundary face (if any), otherwise the ring will be incomplete
+    uint start_f = (this->edge_is_on_srf(eid)) ? this->edge_adj_srf_faces(eid).front() : this->adj_e2f(eid).front();
+    uint start_p = this->adj_f2p(start_f).front();
+
+    f_ring.push_back(start_f);
+    p_ring.push_back(start_p);
+    v_ring.push_back(this->face_vert_opposite_to(start_f,eid));
+    e_ring.push_back(this->poly_edge_opposite_to(start_p,eid));
+
+    while(p_ring.size() < this->adj_e2p(eid).size())
+    {
+        uint next_f = this->poly_face_adj_through_edge(p_ring.back(), f_ring.back(), eid);
+        int  next_p = this->poly_adj_through_face(p_ring.back(), next_f);
+        assert(next_p>=0);
+
+        p_ring.push_back(next_p);
+        f_ring.push_back(next_f);
+        e_ring.push_back(this->poly_edge_opposite_to(p_ring.back(),eid));
+        v_ring.push_back(this->face_vert_opposite_to(f_ring.back(),eid));
+    }
+
+    if(f_ring.size() < this->adj_e2f(eid).size())
+    {
+        f_ring.push_back(this->poly_face_adj_through_edge(p_ring.back(), f_ring.back(), eid));
+        v_ring.push_back(this->face_vert_opposite_to(f_ring.back(),eid));
+        assert(this->face_is_on_srf(f_ring.back()));
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 int Tetmesh<M,V,E,F,P>::poly_shared_vert(const uint pid, const std::vector<uint> & incident_edges) const
 {
     // TODO: move to global ids!!!!!!
