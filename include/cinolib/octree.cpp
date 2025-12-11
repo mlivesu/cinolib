@@ -299,10 +299,10 @@ vec3d Octree::closest_point(const vec3d & p) const
 
 // https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
 CINO_INLINE
-void Octree::closest_point(const vec3d  & p,          // query point
-                                 uint   & id,         // id of the item T closest to p
-                                 vec3d  & pos,        // point in T closest to p
-                                 double & dist) const // distance between pos and p
+void Octree::closest_point(const vec3d  & p,            // query point
+                                 uint   & id,           // id of the item T closest to p
+                                 vec3d  & pos,          // point in T closest to p
+                                 double & d_sqrd) const // SQUARED distance between pos and p
 {
     assert(root != nullptr);
 
@@ -369,7 +369,7 @@ void Octree::closest_point(const vec3d  & p,          // query point
     assert(q.top().index>=0);
     id   = items.at(q.top().index)->id;
     pos  = q.top().pos;
-    dist = q.top().dist;
+    d_sqrd = q.top().dist;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

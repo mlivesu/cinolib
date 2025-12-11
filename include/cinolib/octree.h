@@ -188,7 +188,7 @@ class Octree
         // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // returns pos, id and distance of the item that is closest to query point p
-        void  closest_point(const vec3d & p, uint & id, vec3d & pos, double & dist) const;
+        void  closest_point(const vec3d & p, uint & id, vec3d & pos, double & d_sqrd) const;
         vec3d closest_point(const vec3d & p) const;
 
         // returns respectively the first item and the full list of items containing query point p
