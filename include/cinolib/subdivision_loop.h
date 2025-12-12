@@ -1,6 +1,6 @@
 /********************************************************************************
 *  This file is part of CinoLib                                                 *
-*  Copyright(C) 2016: Marco Livesu                                              *
+*  Copyright(C) 2025: Marco Livesu                                              *
 *                                                                               *
 *  The MIT License                                                              *
 *                                                                               *
@@ -33,12 +33,32 @@
 *     16149 Genoa,                                                              *
 *     Italy                                                                     *
 *********************************************************************************/
-#ifndef CINO_SUBDIVISION_SCHEMAS_H
-#define CINO_SUBDIVISION_SCHEMAS_H
+#ifndef CINO_SUBDIVISION_LOOP_H
+#define CINO_SUBDIVISION_LOOP_H
 
-#include <cinolib/subdivision_loop.h>
-#include <cinolib/subdivision_midpoint.h>
-#include <cinolib/subdivision_barycentric.h>
-#include <cinolib/subdivision_legacy_hexa_schemes.h>
+#include <cinolib/meshes/meshes.h>
 
-#endif // CINO_SUBDIVISION_SCHEMAS_H
+namespace cinolib
+{
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+/* Volumetric Loop subdivision for tetrahedral meshes as described in
+ * the sixth configuration in:
+ *
+ * Data-driven Tetrahedral Mesh Subdivision
+ * L. Rodriguez, I. Navazo, A.Vinacua
+ * Ibero-American Symposium on Computer Graphics 2006
+ *
+ */
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void subdivision_Loop(Tetmesh<M,V,E,F,P> & m);
+
+}
+
+#ifndef  CINO_STATIC_LIB
+#include "subdivision_loop.cpp"
+#endif
+
+#endif // CINO_SUBDIVISION_LOOP_H
