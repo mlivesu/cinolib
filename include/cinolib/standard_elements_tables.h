@@ -192,8 +192,8 @@ static const uint HEXA_CORNER_TETS[8][4] =
 
 static const uint PRISM_FACES[5][4] =
 {
-    { 0 , 2 , 1 ,   } , // f0
-    { 4 , 5 , 3 ,   } , // f1
+    { 0 , 1 , 2 ,   } , // f0
+    { 3 , 4 , 5 ,   } , // f1
     { 4 , 3 , 0 , 1 } , // f2
     { 5 , 4 , 1 , 2 } , // f3
     { 3 , 5 , 2 , 0 } , // f4
