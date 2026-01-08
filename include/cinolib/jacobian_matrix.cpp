@@ -70,6 +70,9 @@ void jacobian_matrix(const vec2d & u0,
     mat2d uv1({u1[0],v1[0], u1[1],v1[1]});
 
     T = uv1 * uv0.inverse();
+
+    // TODO: hardcode 3x3 matrix inversion
+    // https://ardoris.wordpress.com/2008/07/18/general-formula-for-the-inverse-of-a-3x3-matrix/
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
