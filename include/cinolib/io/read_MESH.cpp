@@ -148,6 +148,48 @@ void read_MESH(const char                     * filename,
                 p_unique_labels.insert(l);
             }
         }
+
+        else if(strcmp(cell_type, "Prisms")==0)
+        {
+            if(!eat_int(f, nc)) assert(false && "failed reading num prisms");
+            for(int i=0; i<nc; ++i)
+            {
+                int l;
+                std::vector<uint> prism(6);
+                if(!eat_uint(f, prism[0]) ||
+                   !eat_uint(f, prism[1]) ||
+                   !eat_uint(f, prism[2]) ||
+                   !eat_uint(f, prism[3]) ||
+                   !eat_uint(f, prism[4]) ||
+                   !eat_uint(f, prism[5]) ||
+                   !eat_int(f, l)) assert(false && "failed reading prism");
+
+                for(uint & vid : prism) vid -= 1;
+                polys.push_back(prism);
+                poly_labels.push_back(l);
+                p_unique_labels.insert(l);
+            }
+        }
+        else if(strcmp(cell_type, "Pyramids")==0)
+        {
+            if(!eat_int(f, nc)) assert(false && "failed reading num pyramids");
+            for(int i=0; i<nc; ++i)
+            {
+                int l;
+                std::vector<uint> pyr(5);
+                if(!eat_uint(f, pyr[0]) ||
+                   !eat_uint(f, pyr[1]) ||
+                   !eat_uint(f, pyr[2]) ||
+                   !eat_uint(f, pyr[3]) ||
+                   !eat_uint(f, pyr[4]) ||
+                   !eat_int(f, l)) assert(false && "failed reading pyramid");
+
+                for(uint & vid : pyr) vid -= 1;
+                polys.push_back(pyr);
+                poly_labels.push_back(l);
+                p_unique_labels.insert(l);
+            }
+        }
         else if(strcmp(cell_type, "Triangles")==0)
         {
             if(!eat_int(f, nc))  assert(false && "failed reading num tris");
