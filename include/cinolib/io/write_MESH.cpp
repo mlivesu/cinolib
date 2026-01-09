@@ -66,9 +66,13 @@ void write_MESH(const char                           * filename,
     uint nv = uint(verts.size());
     uint nt = 0;
     uint nh = 0;
+    uint np = 0;
+    uint nw = 0;
     for(auto p : polys)
     {
         if (p.size() == 4) ++nt; else
+        if (p.size() == 5) ++np; else
+        if (p.size() == 6) ++nw; else
         if (p.size() == 8) ++nh;
     }
 
@@ -113,6 +117,38 @@ void write_MESH(const char                           * filename,
             }
         }
     }
+
+    if(np > 0)
+    {
+        fprintf(fp, "Pyramids\n" );
+        fprintf(fp, "%d\n", np );
+        for(uint pid=0; pid<polys.size(); ++pid)
+        {
+            const std::vector<uint> & pyr = polys.at(pid);
+            if (pyr.size() == 5)
+            {
+                fprintf(fp, "%d %d %d %d %d %d\n", pyr.at(0)+1, pyr.at(1)+1, pyr.at(2)+1, pyr.at(3)+1, pyr.at(4)+1,
+                        poly_labels.at(pid));
+            }
+        }
+    }
+
+    if (nw > 0)
+    {
+        fprintf(fp, "Prisms\n" );
+        fprintf(fp, "%d\n", nw );
+        for(uint pid=0; pid<polys.size(); ++pid)
+        {
+            const std::vector<uint> & prism = polys.at(pid);
+            if (prism.size() == 6)
+            {
+                fprintf(fp, "%d %d %d %d %d %d %d\n", prism.at(0)+1, prism.at(1)+1, prism.at(2)+1,
+                        prism.at(3)+1, prism.at(4)+1, prism.at(5)+1,
+                        poly_labels.at(pid));
+            }
+        }
+    }
+
 
     fprintf(fp, "End\n\n");
     fclose(fp);
