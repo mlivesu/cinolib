@@ -2635,15 +2635,15 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist
         if(this->face_verts_are_CCW(fid3, f3.at(1), f3.at(0))) w.at(3) = true;
         if(this->face_verts_are_CCW(fid4, f4.at(1), f4.at(0))) w.at(4) = true;
 
-        // add tet
+        // add prism
         uint pid = poly_add({static_cast<uint>(fid0),
                              static_cast<uint>(fid1),
                              static_cast<uint>(fid2),
                              static_cast<uint>(fid3),
                              static_cast<uint>(fid4)},w);
 
-        // enforce standard vertex ordering (I SHOULDN'T NEED IT FOR PRISMS...)
-
+        // restore standard vertex ordering from input file
+        this->adj_p2v(pid) = vlist;
         return pid;
     }
     else if(vlist.size()==5) // squared pyramid
@@ -2684,7 +2684,8 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & vlist
                              static_cast<uint>(fid3),
                              static_cast<uint>(fid4)},w);
 
-        // enforce standard vertex ordering (I SHOULDN'T NEED IT FOR PYRAMIDS...)
+        // restore standard vertex ordering from input file
+        this->adj_p2v(pid) = vlist;
         return pid;
     }
     else assert(false && "Unknown polyhedral element!");
