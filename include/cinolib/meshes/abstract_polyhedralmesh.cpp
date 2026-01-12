@@ -3209,6 +3209,25 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_prism(const uint pid, const uint
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_pyramid(const uint pid) const
+{
+    if(this->adj_p2f(pid).size()!=5) return false;
+
+    uint tris   = 0;
+    uint quads  = 0;
+    for(uint fid : this->adj_p2f(pid))
+    {
+        if(this->adj_f2v(fid).size()==3) ++tris; else
+        if(this->adj_f2v(fid).size()==4) ++quads;
+    }
+    if(tris==4 && quads==1) return true;
+    return false;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void AbstractPolyhedralMesh<M,V,E,F,P>::operator+=(const AbstractPolyhedralMesh<M,V,E,F,P> & m)
 {
     // THIS CODE IS RECOMPUTING CONNECTIVITY FROM SCRATCH

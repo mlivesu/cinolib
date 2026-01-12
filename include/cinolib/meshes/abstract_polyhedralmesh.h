@@ -308,6 +308,7 @@ class AbstractPolyhedralMesh : public AbstractMesh<M,V,E,P>
                 bool               poly_is_tetrahedron         (const uint pid) const;
                 bool               poly_is_prism               (const uint pid) const;
                 bool               poly_is_prism               (const uint pid, const uint fid) const; // check if it is a prism using fid as base
+                bool               poly_is_pyramid             (const uint pid) const;
                 bool               poly_is_hexable_w_midpoint  (const uint pid) const; // check if this element can be hexed with midpoint subdivision
 
 };
