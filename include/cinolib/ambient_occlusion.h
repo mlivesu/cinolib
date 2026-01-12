@@ -36,19 +36,29 @@
 #ifndef CINO_AMBIENT_OCCLUSION_H
 #define CINO_AMBIENT_OCCLUSION_H
 
-#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
-#include <cinolib/cino_inline.h>
+#include <cinolib/meshes/abstract_polygonmesh.h>
 #include <sys/types.h>
 
 namespace cinolib
 {
+
+/*
+ * Ray Casting methods for a better result
+ */
+
+template<class M, class V, class E, class P>
+CINO_INLINE
+void ambient_occlusion_ray_casting(AbstractPolygonMesh<M,V,E,P> & m, const uint n_samples = 50);
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 /* updates the ambient occlusion for the (visible portion of) an input mesh.
  * All surface and volumetric meshes are supported. AO values are approximated
  * with a dirty trick: the mesh is rendered from a given number of viepoints,
  * and visibility is checked for each render using the Z-buffer
 */
+#ifdef CINOLIB_USES_OPENGL_GLFW_IMGUI
 
 template<class Mesh>
 CINO_INLINE
@@ -63,11 +73,13 @@ CINO_INLINE
 void ambient_occlusion_vol_meshes(      Mesh & m,
                                   const int    buffer_size = 350,
                                   const uint   sample_dirs = 256);
+
+#endif // CINOLIB_USES_OPENGL_GLFW_IMGUI
+
 }
 
 #ifndef  CINO_STATIC_LIB
 #include "ambient_occlusion.cpp"
 #endif
 
-#endif // CINOLIB_USES_OPENGL_GLFW_IMGUI
 #endif // CINO_AMBIENT_OCCLUSION_H
