@@ -34,21 +34,18 @@
 *     Italy                                                                     *
 *********************************************************************************/
 #include <cinolib/ambient_occlusion.h>
-#include <cinolib/gl/gl_glfw.h>
-#include <cinolib/gl/glproject.h>
-#include <cinolib/gl/glunproject.h>
 #include <cinolib/sphere_coverage.h>
-#include <cinolib/meshes/meshes.h>
 #include <cinolib/parallel_for.h>
-#include <cinolib/gl/offline_gl_context.h>
 #include <cinolib/octree.h>
 
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class P>
 CINO_INLINE
-void ambient_occlusion_ray_casting(AbstractPolygonMesh<M,V,E,P> & m, const uint n_samples)
+void ambient_occlusion(AbstractPolygonMesh<M,V,E,P> & m, const uint n_samples)
 {
     Octree o;
     o.build_from_mesh_polys(m);
@@ -92,174 +89,28 @@ void ambient_occlusion_ray_casting(AbstractPolygonMesh<M,V,E,P> & m, const uint 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-template<class Mesh>
+template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void ambient_occlusion_srf_meshes(      Mesh & m,
-                                  const int    buffer_size,
-                                  const uint   sample_dirs)
+void ambient_occlusion(AbstractPolyhedralMesh<M,V,E,F,P> & m, const uint n_samples)
 {
-    std::vector<float> ao(m.num_polys(),0);
-    std::vector<vec3d> dirs;
-    sphere_coverage(sample_dirs, dirs);
-
-    GLFWwindow* GL_context = create_offline_GL_context(buffer_size, buffer_size);
-    if(GL_context==NULL)
-    {
-        std::cerr << "Impossible to create a GL context. Make sure GLFW has been initialized" << std::endl;
-        return;
-    }
-
-    glfwMakeContextCurrent(GL_context);
-    glEnable(GL_DEPTH_TEST);
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glViewport(0,0,buffer_size,buffer_size);
-
-    float* z_buffer = new float[buffer_size*buffer_size];
-
-    for(vec3d dir : dirs)
-    {
-        // for each POV render on a buffer, and do a visibility check
-        // by reading values from the Z buffer and comparing with the actual depth
-
-        glMatrixMode(GL_MODELVIEW);
-        vec3d  Z(0,0,1);
-        vec3d  a = dir.cross(Z); a.normalize();
-        vec3d  c = m.centroid();
-        double s = 2.0/m.bbox().diag();
-        glPushMatrix();
-        glLoadIdentity();
-        glRotated(Z.angle_deg(dir), a.x(), a.y(), a.z());
-        glScaled(s,s,s);
-        glTranslated(-c.x(), -c.y(), -c.z());
-
-        glClear(GL_DEPTH_BUFFER_BIT);
-        m.draw();
-        glReadPixels(0, 0, buffer_size, buffer_size, GL_DEPTH_COMPONENT, GL_FLOAT, z_buffer);
-
-        mat4d modelview;
-        glGetDoublev(GL_MODELVIEW_MATRIX, modelview.ptr());
-        modelview = modelview.transpose(); // from column-major to row-major
-        mat4d projection = mat4d::DIAG(1);
-        mat2i viewport({ 0, 0, buffer_size, buffer_size });
-        glViewport(0, 0, buffer_size, buffer_size);
-
-        // accumulate AO values, weighting views with the dot between
-        // local surface normal and ray direction
-        PARALLEL_FOR(0, m.num_polys(), 1000, [&](const uint pid)
-        {
-            if(!m.poly_data(pid).flags[HIDDEN])
-            {
-                vec2d  pp;
-                double depth;
-                gl_project(m.poly_centroid(pid), modelview, projection, viewport, pp, depth);
-
-                if(z_buffer[buffer_size*int(pp.y())+int(pp.x())]+0.0025 > depth)
-                {
-                    ao[pid] += float(std::max(-dir.dot(m.poly_data(pid).normal),0.0));
-                }
-            }
-        });
-    }
-    delete[] z_buffer;
-    destroy_offline_GL_context(GL_context);
-
-    // apply AO
-    auto min_max = std::minmax_element(ao.begin(), ao.end());
-    auto min     = *min_max.first;
-    auto max     = *min_max.second;
-    for(uint pid=0; pid<m.num_polys(); ++pid)
-    {
-        m.poly_data(pid).AO = (m.poly_data(pid).flags[HIDDEN]) ? 1.f : (ao[pid]-min)/max;
-    }
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class Mesh>
-CINO_INLINE
-void ambient_occlusion_vol_meshes(      Mesh & m,
-                                  const int    buffer_size,
-                                  const uint   sample_dirs)
-{
-    std::vector<float> ao(m.num_faces(),0);
-    std::vector<bool>  face_visible(m.num_faces(),false);
-    std::vector<vec3d> dirs;
-    sphere_coverage(sample_dirs, dirs);
-
-    GLFWwindow* GL_context = create_offline_GL_context(buffer_size, buffer_size);
-    if(GL_context==NULL)
-    {
-        std::cerr << "Impossible to create a GL context. Make sure GLFW has been initialized" << std::endl;
-        return;
-    }
-
-    glfwMakeContextCurrent(GL_context);
-    glEnable(GL_DEPTH_TEST);
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-
-    float* z_buffer = new float[buffer_size*buffer_size];
-
-    for(vec3d dir : dirs)
-    {
-        // for each POV render on a buffer, and do a visibility check
-        // by reading values from the Z buffer and comparing with the actual depth
-
-        glMatrixMode(GL_MODELVIEW);
-        vec3d  Z(0,0,1);
-        vec3d  a = dir.cross(Z); a.normalize();
-        vec3d  c = m.centroid();
-        double s = 2.0/m.bbox().diag();
-        glPushMatrix();
-        glLoadIdentity();
-        glRotated(Z.angle_deg(dir), a.x(), a.y(), a.z());
-        glScaled(s,s,s);
-        glTranslated(-c.x(), -c.y(), -c.z());
-        glViewport(0,0,buffer_size,buffer_size);
-
-        glClear(GL_DEPTH_BUFFER_BIT);
-        m.draw();
-        glReadPixels(0, 0, buffer_size, buffer_size, GL_DEPTH_COMPONENT, GL_FLOAT, z_buffer);
-
-        mat4d modelview;
-        glGetDoublev(GL_MODELVIEW_MATRIX, modelview.ptr());
-        modelview = modelview.transpose(); // from column-major to row-major
-        mat4d projection = mat4d::DIAG(1);
-        mat2i viewport({ 0, 0, buffer_size, buffer_size });
-        glViewport(0, 0, buffer_size, buffer_size);
-
-        // accumulate AO values, weighting views with the dot between
-        // local surface normal and ray direction
-        PARALLEL_FOR(0, m.num_faces(), 1000, [&](const uint fid)
-        {
-            uint pid_beneath;
-            if(m.face_is_visible(fid, pid_beneath))
-            {
-                face_visible.at(fid) = true;
-                vec2d  pp;
-                double depth;
-                gl_project(m.face_centroid(fid), modelview, projection, viewport, pp, depth);
-
-                if(z_buffer[buffer_size*int(pp.y())+int(pp.x())]+0.0025 > depth)
-                {                    
-                    ao[fid] += float(std::max(-dir.dot(m.poly_face_normal(pid_beneath,fid)), 0.0));
-                }
-            }
-        });
-    }
-    delete[] z_buffer;
-    destroy_offline_GL_context(GL_context);
-
-    // apply AO
-    auto  min_max = std::minmax_element(ao.begin(), ao.end());
-    float min     = *min_max.first;
-    float max     = *min_max.second;
+    // extract the surface of the visible portion of the volume mesh and do a surface AO on it
+    Polygonmesh<> srf(m.vector_verts(),{});
+    std::vector<uint> fmap;
     for(uint fid=0; fid<m.num_faces(); ++fid)
     {
-        m.face_data(fid).AO = (face_visible.at(fid)) ? (ao[fid]-min)/max : 1.f;
+        uint pid_beneath;
+        if(m.face_is_visible(fid,pid_beneath))
+        {
+            std::vector<uint> face = m.face_verts_id(fid);
+            if(m.poly_face_is_CW(pid_beneath,fid)) std::reverse(face.begin(),face.end());
+            srf.poly_add(face);
+            fmap.push_back(fid);
+        }
+    }
+    ambient_occlusion(srf);
+    for(uint pid=0; pid<srf.num_polys(); ++pid)
+    {
+        m.face_data(fmap.at(pid)).AO = srf.poly_data(pid).AO;
     }
 }
 

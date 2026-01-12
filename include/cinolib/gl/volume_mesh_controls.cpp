@@ -579,7 +579,7 @@ void VolumeMeshControls<Mesh>::header_ambient_occlusion(const bool open)
     {
         if(ImGui::SmallButton("Update AO"))
         {
-            ambient_occlusion_vol_meshes(*m);
+            ambient_occlusion(*m);
             m->updateGL();
         }
         if(ImGui::SliderFloat("Alpha",&m->AO_alpha, 0.f, 1.f))
