@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     GLcanvas gui;
     gui.push(&m);
 
-    ambient_occlusion_srf_meshes(m);
+    ambient_occlusion(m);
     m.updateGL();
 
     gui.callback_app_controls = [&]()
