@@ -45,13 +45,13 @@ namespace cinolib
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-void ambient_occlusion(AbstractPolygonMesh<M,V,E,P> & m, const uint n_samples = 50);
+void ambient_occlusion(AbstractPolygonMesh<M,V,E,P> & m, const uint n_samples = 200);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void ambient_occlusion(AbstractPolyhedralMesh<M,V,E,F,P> & m, const uint n_samples = 50);
+void ambient_occlusion(AbstractPolyhedralMesh<M,V,E,F,P> & m, const uint n_samples = 200);
 
 }
 

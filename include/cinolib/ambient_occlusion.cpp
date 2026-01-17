@@ -53,7 +53,7 @@ void ambient_occlusion(AbstractPolygonMesh<M,V,E,P> & m, const uint n_samples)
     std::vector<vec3d> dirs;
     sphere_coverage(n_samples,dirs);
 
-    std::vector<float> ao(m.num_polys(),0.5);
+    std::vector<float> ao(m.num_polys(),1.0);
     float min = inf_float;
     float max = 0.f;
     PARALLEL_FOR(0,m.num_polys(),100,[&](const uint pid)
