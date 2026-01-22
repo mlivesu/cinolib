@@ -49,10 +49,7 @@ CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::init_drawable_stuff()
 {
     drawlist.draw_mode        = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
-    drawlist_marked.draw_mode = DRAW_TRIS | DRAW_SEGS;
-    drawlist_marked.seg_width = 3;
-    marked_edge_color         = Color::RED();
-
+    marked_edges.use_gl_lines = true;
     updateGL();
 }
 
@@ -65,7 +62,7 @@ void AbstractDrawablePolygonMesh<Mesh>::draw(const float) const
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glMultMatrixd(this->T.transpose()._vec);
-    render(drawlist_marked);
+    if(show_marked_edges) marked_edges.draw();
     render(drawlist);
     glPopMatrix();
 }
@@ -86,9 +83,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::updateGL_marked()
 {
-    drawlist_marked.segs.clear();
-    drawlist_marked.seg_coords.clear();
-    drawlist_marked.seg_colors.clear();
+    marked_edges.clear();
 
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
@@ -108,25 +103,7 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_marked()
         vec3d vid0 = this->edge_vert(eid,0);
         vec3d vid1 = this->edge_vert(eid,1);
 
-        uint base_addr = uint(drawlist_marked.seg_coords.size()/3);
-        drawlist_marked.segs.push_back(base_addr    );
-        drawlist_marked.segs.push_back(base_addr + 1);
-
-        drawlist_marked.seg_coords.push_back(float(vid0.x()));
-        drawlist_marked.seg_coords.push_back(float(vid0.y()));
-        drawlist_marked.seg_coords.push_back(float(vid0.z()));
-        drawlist_marked.seg_coords.push_back(float(vid1.x()));
-        drawlist_marked.seg_coords.push_back(float(vid1.y()));
-        drawlist_marked.seg_coords.push_back(float(vid1.z()));
-
-        drawlist_marked.seg_colors.push_back(marked_edge_color.r);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.g);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.b);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.a);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.r);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.g);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.b);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.a);
+        marked_edges.push_seg(vid0,vid1);
     }
 }
 
@@ -522,10 +499,11 @@ void AbstractDrawablePolygonMesh<Mesh>::show_wireframe_transparency(const float 
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::show_marked_edge(const bool b)
+void AbstractDrawablePolygonMesh<Mesh>::show_marked_edge(const bool b, const bool fancy)
 {
-    if (b) drawlist_marked.draw_mode |=  DRAW_SEGS;
-    else   drawlist_marked.draw_mode &= ~DRAW_SEGS;
+    show_marked_edges = b;
+    marked_edges.use_gl_lines = !fancy;
+    marked_edges.draw_joint_spheres = fancy;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -534,8 +512,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::show_marked_edge_color(const Color & c)
 {
-    marked_edge_color = c;
-    updateGL_marked();
+    marked_edges.default_color = c;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -544,7 +521,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::show_marked_edge_width(const float width)
 {
-    drawlist_marked.seg_width = width;
+    marked_edges.thickness = width;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -553,8 +530,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::show_marked_edge_transparency(const float alpha)
 {
-    marked_edge_color.a = alpha;
-    updateGL_marked();
+    marked_edges.default_color.a = alpha;
 }
 
 }

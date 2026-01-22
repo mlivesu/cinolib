@@ -422,11 +422,17 @@ void SurfaceMeshControls<Mesh>::header_marked_edges(const bool open)
     {
         if(ImGui::Checkbox("Show##MarkedEdge", &show_marked_edges))
         {
-            m->show_marked_edge(show_marked_edges);
+            m->show_marked_edge(show_marked_edges, show_marked_fancy);
+            m->updateGL();
         }
-        if(ImGui::SliderInt("Width##2", &marked_edge_width, 1, 10))
+        if(ImGui::Checkbox("Fancy##MarkedEdge", &show_marked_fancy))
         {
-            m->show_marked_edge_width(float(marked_edge_width));
+            m->show_marked_edge(show_marked_edges, show_marked_fancy);
+            m->updateGL();
+        }
+        if(ImGui::SliderFloat("Width##2", &marked_edge_width, 1.f, 50.f))
+        {
+            m->show_marked_edge_width(marked_edge_width);
             m->updateGL();
         }
         if(ImGui::ColorEdit4("Color##markededge", marked_edge_color.rgba, color_edit_flags))
