@@ -41,6 +41,7 @@
 #include <cinolib/drawable_object.h>
 #include <cinolib/meshes/mesh_slicer.h>
 #include <cinolib/gl/draw_lines_tris.h>
+#include <cinolib/drawable_segment_soup.h>
 
 namespace cinolib
 {
@@ -54,9 +55,11 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         RenderData drawlist_in;
         RenderData drawlist_out;
         RenderData drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces/poly too)
-        Color      marked_edge_color;
         Color      marked_face_color;
         float      AO_alpha;
+
+        bool show_marked_edges;
+        DrawableSegmentSoup marked_edges;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -131,7 +134,7 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         void show_in_wireframe_width(const float width);
         void show_in_wireframe_transparency(const float alpha);
 
-        void show_marked_edge(const bool b);
+        void show_marked_edge(const bool b, const bool fancy = false);
         void show_marked_edge_color(const Color & c);
         void show_marked_edge_width(const float width);
         void show_marked_edge_transparency(const float alpha);

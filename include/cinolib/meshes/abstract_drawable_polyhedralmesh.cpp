@@ -50,11 +50,11 @@ void AbstractDrawablePolyhedralMesh<Mesh>::init_drawable_stuff()
     drawlist_in.draw_mode     = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_out.draw_mode    = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     drawlist_marked.draw_mode = DRAW_TRIS | DRAW_SEGS;
-    drawlist_marked.seg_width = 3;
-    marked_edge_color         = Color::RED();
     marked_face_color         = Color::BLUE();
-    AO_alpha                  = 1.0;
-
+    AO_alpha                  = 1.f;
+    show_marked_edges         = true;
+    marked_edges.use_gl_lines = true;
+    marked_edges.thickness    = 3.f;
     updateGL();
 }
 
@@ -70,6 +70,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::draw(const float) const
     render(drawlist_in );
     render(drawlist_out);
     render(drawlist_marked);
+    if(show_marked_edges) marked_edges.draw();
     glPopMatrix();
 }
 
@@ -94,9 +95,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
     drawlist_marked.tri_coords.clear();
     drawlist_marked.tri_v_norms.clear();
     drawlist_marked.tri_v_colors.clear();
-    drawlist_marked.segs.clear();
-    drawlist_marked.seg_coords.clear();
-    drawlist_marked.seg_colors.clear();
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
@@ -160,28 +158,8 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
         // This allows to hide marked elements with the slicer...
         //if(!this->edge_is_visible(eid)) continue;
 
-        vec3d vid0 = this->edge_vert(eid,0);
-        vec3d vid1 = this->edge_vert(eid,1);
-
-        uint base_addr = uint(drawlist_marked.seg_coords.size()/3);
-        drawlist_marked.segs.push_back(base_addr    );
-        drawlist_marked.segs.push_back(base_addr + 1);
-
-        drawlist_marked.seg_coords.push_back(float(vid0.x()));
-        drawlist_marked.seg_coords.push_back(float(vid0.y()));
-        drawlist_marked.seg_coords.push_back(float(vid0.z()));
-        drawlist_marked.seg_coords.push_back(float(vid1.x()));
-        drawlist_marked.seg_coords.push_back(float(vid1.y()));
-        drawlist_marked.seg_coords.push_back(float(vid1.z()));
-
-        drawlist_marked.seg_colors.push_back(marked_edge_color.r);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.g);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.b);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.a);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.r);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.g);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.b);
-        drawlist_marked.seg_colors.push_back(marked_edge_color.a);
+        marked_edges.push_seg(this->edge_vert(eid,0),
+                              this->edge_vert(eid,1));
     }
 }
 
@@ -979,10 +957,11 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_wireframe_transparency(const 
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge(const bool b)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge(const bool b, const bool fancy)
 {
-    if (b) drawlist_marked.draw_mode |=  DRAW_SEGS;
-    else   drawlist_marked.draw_mode &= ~DRAW_SEGS;
+    show_marked_edges = b;
+    marked_edges.use_gl_lines = !fancy;
+    marked_edges.draw_joint_spheres = fancy;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -991,8 +970,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge_color(const Color & c)
 {
-    marked_edge_color = c;
-    updateGL_marked();
+    marked_edges.default_color = c;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1001,7 +979,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge_width(const float width)
 {
-    drawlist_marked.seg_width = width;
+    marked_edges.thickness = width;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1010,8 +988,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge_transparency(const float alpha)
 {
-    marked_edge_color.a = alpha;
-    updateGL_marked();
+    marked_edges.default_color.a = alpha;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

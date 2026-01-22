@@ -55,7 +55,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         RenderData drawlist;
         float      AO_alpha = 1.f;
 
-        bool show_marked_edges = true;
+        bool show_marked_edges;
         DrawableSegmentSoup marked_edges;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

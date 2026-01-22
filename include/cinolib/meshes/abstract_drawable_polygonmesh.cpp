@@ -49,7 +49,9 @@ CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::init_drawable_stuff()
 {
     drawlist.draw_mode        = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
+    show_marked_edges         = true;
     marked_edges.use_gl_lines = true;
+    marked_edges.thickness    = 3.f;
     updateGL();
 }
 
@@ -100,10 +102,8 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_marked()
         }
         if(hidden) continue;
 
-        vec3d vid0 = this->edge_vert(eid,0);
-        vec3d vid1 = this->edge_vert(eid,1);
-
-        marked_edges.push_seg(vid0,vid1);
+        marked_edges.push_seg(this->edge_vert(eid,0),
+                              this->edge_vert(eid,1));
     }
 }
 
