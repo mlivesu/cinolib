@@ -77,8 +77,12 @@ void extrude_mesh(AbstractPolygonMesh<M,V,E,P> & m, const vec3d & dir) // encode
             if(!m.poly_verts_are_CCW(pid, A, B)) std::swap(A, B);
             uint Ap = v_map.at(A);
             uint Bp = v_map.at(B);
-            m.poly_add({A, B,  Bp});
-            m.poly_add({A, Bp, Ap});
+            if(m.mesh_type()==TRIMESH)
+            {
+                m.poly_add({A, B,  Bp});
+                m.poly_add({A, Bp, Ap});
+            }
+            else m.poly_add({A, B,  Bp, Ap});
         }
     }
 }
