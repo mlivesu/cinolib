@@ -78,7 +78,8 @@ class VolumeMeshControls : public SideBarItem
     bool       show_mesh         = true;
     bool       show_wireframe    = true;
     bool       show_marked_edges = true;
-    bool       show_marked_fancy = false;
+    bool       marked_edge_fancy = false;
+    bool       marked_edge_slice = true;
     bool       show_marked_faces = true;
     bool       show_isosurface   = false;
     bool       show_vecfield     = false;

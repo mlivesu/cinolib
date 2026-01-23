@@ -503,7 +503,7 @@ void AbstractDrawablePolygonMesh<Mesh>::show_wireframe_transparency(const float 
 
 template<class Mesh>
 CINO_INLINE
-    void AbstractDrawablePolygonMesh<Mesh>::show_marked_edge(const bool b, const bool fancy, const bool sliceable)
+void AbstractDrawablePolygonMesh<Mesh>::show_marked_edge(const bool b, const bool fancy, const bool sliceable)
 {
     show_marked_edges  = b;
     slice_marked_edges = sliceable;

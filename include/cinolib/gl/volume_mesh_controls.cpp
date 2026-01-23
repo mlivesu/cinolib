@@ -530,12 +530,17 @@ void VolumeMeshControls<Mesh>::header_marked_edges(const bool open)
     {
         if(ImGui::Checkbox("Show##MarkedEdge", &show_marked_edges))
         {
-            m->show_marked_edge(show_marked_edges, show_marked_fancy);
+            m->show_marked_edge(show_marked_edges, marked_edge_fancy, marked_edge_slice);
             m->updateGL();
         }
-        if(ImGui::Checkbox("Fancy##MarkedEdge", &show_marked_fancy))
+        if(ImGui::Checkbox("Fancy##MarkedEdge", &marked_edge_fancy))
         {
-            m->show_marked_edge(show_marked_edges, show_marked_fancy);
+            m->show_marked_edge(show_marked_edges, marked_edge_fancy, marked_edge_slice);
+            m->updateGL();
+        }
+        if(ImGui::Checkbox("Sliceable##MarkedEdge", &marked_edge_slice))
+        {
+            m->show_marked_edge(show_marked_edges, marked_edge_fancy, marked_edge_slice);
             m->updateGL();
         }
         if(ImGui::SliderFloat("Width##2", &marked_edge_width, 1.f, 50.f))

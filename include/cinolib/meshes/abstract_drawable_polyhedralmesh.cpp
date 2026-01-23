@@ -53,6 +53,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::init_drawable_stuff()
     marked_face_color         = Color::BLUE();
     AO_alpha                  = 1.f;
     show_marked_edges         = true;
+    slice_marked_edges        = true;
     marked_edges.use_gl_lines = true;
     marked_edges.thickness    = 3.f;
     updateGL();
@@ -95,6 +96,8 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
     drawlist_marked.tri_coords.clear();
     drawlist_marked.tri_v_norms.clear();
     drawlist_marked.tri_v_colors.clear();
+
+    marked_edges.clear();
 
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
@@ -156,7 +159,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
         if(!this->edge_data(eid).flags[MARKED]) continue;        
 
         // This allows to hide marked elements with the slicer...
-        //if(!this->edge_is_visible(eid)) continue;
+        if(slice_marked_edges && !this->edge_is_visible(eid)) continue;
 
         marked_edges.push_seg(this->edge_vert(eid,0),
                               this->edge_vert(eid,1));
@@ -957,9 +960,10 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_wireframe_transparency(const 
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge(const bool b, const bool fancy)
+void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge(const bool b, const bool fancy, const bool sliceable)
 {
-    show_marked_edges = b;
+    show_marked_edges  = b;
+    slice_marked_edges = sliceable;
     marked_edges.use_gl_lines = !fancy;
     marked_edges.draw_joint_spheres = fancy;
 }
