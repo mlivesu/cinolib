@@ -56,6 +56,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         float      AO_alpha = 1.f;
 
         bool show_marked_edges;
+        bool slice_marked_edges;
         DrawableSegmentSoup marked_edges;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -113,7 +114,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         void show_wireframe_color(const Color & c);
         void show_wireframe_width(const float width);
         void show_wireframe_transparency(const float alpha);
-        void show_marked_edge(const bool b, const bool fancy = true);
+        void show_marked_edge(const bool b, const bool fancy = false, const bool sliceable = true);
         void show_marked_edge_color(const Color & c);
         void show_marked_edge_width(const float width);
         void show_marked_edge_transparency(const float alpha);

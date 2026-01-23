@@ -50,8 +50,9 @@ void AbstractDrawablePolygonMesh<Mesh>::init_drawable_stuff()
 {
     drawlist.draw_mode        = DRAW_TRIS | DRAW_TRI_SMOOTH | DRAW_TRI_FACECOLOR | DRAW_SEGS;
     show_marked_edges         = true;
+    slice_marked_edges        = true;
     marked_edges.use_gl_lines = true;
-    marked_edges.thickness    = 3.f;
+    marked_edges.thickness    = 3.f;    
     updateGL();
 }
 
@@ -91,16 +92,19 @@ void AbstractDrawablePolygonMesh<Mesh>::updateGL_marked()
     {
         if(!this->edge_data(eid).flags[MARKED]) continue;
 
-        bool hidden = true;
-        for(uint pid : this->adj_e2p(eid))
+        if(slice_marked_edges)
         {
-            if(!this->poly_data(pid).flags[HIDDEN])
+            bool hidden = true;
+            for(uint pid : this->adj_e2p(eid))
             {
-                hidden = false;
-                break;
+                if(!this->poly_data(pid).flags[HIDDEN])
+                {
+                    hidden = false;
+                    break;
+                }
             }
+            if(hidden) continue;
         }
-        if(hidden) continue;
 
         marked_edges.push_seg(this->edge_vert(eid,0),
                               this->edge_vert(eid,1));
@@ -499,9 +503,10 @@ void AbstractDrawablePolygonMesh<Mesh>::show_wireframe_transparency(const float 
 
 template<class Mesh>
 CINO_INLINE
-void AbstractDrawablePolygonMesh<Mesh>::show_marked_edge(const bool b, const bool fancy)
+    void AbstractDrawablePolygonMesh<Mesh>::show_marked_edge(const bool b, const bool fancy, const bool sliceable)
 {
-    show_marked_edges = b;
+    show_marked_edges  = b;
+    slice_marked_edges = sliceable;
     marked_edges.use_gl_lines = !fancy;
     marked_edges.draw_joint_spheres = fancy;
 }
