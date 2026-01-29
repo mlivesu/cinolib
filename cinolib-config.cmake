@@ -21,6 +21,8 @@ if(MSVC)
     # necessary for using strdup without warnings
     # https://stackoverflow.com/questions/7582394/strdup-or-strdup
     add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+    # to avoid issues with std::min() and std::max()
+    add_definitions(-DNOMINMAX)
 endif()
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
