@@ -57,15 +57,15 @@ void DrawableSegmentSoup::draw(const float scene_size) const
     {
         float cylind_rad = scene_size*0.002f*thickness;
 
-        for(uint i=0; i<size()/2; ++i)
+        for(uint i=0; i<size(); i+=2)
         {
-            const Color & c = (colors.size()>i) ? colors.at(i) : default_color;
-            draw_cylinder(at(2*i+0), at(2*i+1), cylind_rad, cylind_rad, c, segment_n_sides);
+            const Color & c = colors.at(i/2);
+            draw_cylinder(at(i), at(i+1), cylind_rad, cylind_rad, c, segment_n_sides);
 
             if(draw_joint_spheres)
             {
-                draw_sphere(at(2*i+0), cylind_rad, c, joint_sphere_subd);
-                draw_sphere(at(2*i+1), cylind_rad, c, joint_sphere_subd);
+                draw_sphere(at(i  ), cylind_rad, c, joint_sphere_subd);
+                draw_sphere(at(i+1), cylind_rad, c, joint_sphere_subd);
             }
         }
     }
@@ -75,12 +75,12 @@ void DrawableSegmentSoup::draw(const float scene_size) const
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
         glDisable(GL_LIGHTING);
-        for(uint i=0; i<size()/2; ++i)
+        for(uint i=0; i<size(); i+=2)
         {
-            const Color & c = (colors.size()>i) ? colors.at(i) : default_color;
+            const Color & c = colors.at(i/2);
             glColor3fv(c.rgba);
-            vec3d a = at(2*i+0);
-            vec3d b = at(2*i+1);
+            vec3d a = at(i);
+            vec3d b = at(i+1);
             glBegin(GL_LINES);
                 glVertex3d(a.x(), a.y(), a.z());
                 glVertex3d(b.x(), b.y(), b.z());
@@ -101,6 +101,7 @@ void DrawableSegmentSoup::push_seg(const vec3d v0, const vec3d v1)
 {
     push_back(v0);
     push_back(v1);
+    colors.push_back(default_color);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -108,12 +109,9 @@ void DrawableSegmentSoup::push_seg(const vec3d v0, const vec3d v1)
 CINO_INLINE
 void DrawableSegmentSoup::push_seg(const vec3d v0, const vec3d v1, const Color & color)
 {
-    // if it is the first non default color, fill
-    uint n_segs = uint(this->size()/2);
-    if(colors.size()<n_segs) colors.resize(n_segs,default_color);
-    colors.push_back(color);
     push_back(v0);
     push_back(v1);
+    colors.push_back(color);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -124,6 +122,16 @@ void DrawableSegmentSoup::pop_seg()
     assert(size()>1);
     pop_back();
     pop_back();
+    colors.pop_back();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void DrawableSegmentSoup::clear()
+{
+    std::vector<vec3d>::clear();
+    colors.clear();
 }
 
 }
