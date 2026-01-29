@@ -104,6 +104,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         void show_mesh(const bool b);
         void show_AO_alpha(const float alpha);
         void show_mesh_flat();
+        void show_mesh_with_lighting(const bool);
         void show_mesh_smooth();
         void show_mesh_points();
         void show_vert_color();

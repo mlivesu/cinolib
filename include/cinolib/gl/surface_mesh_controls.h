@@ -43,6 +43,7 @@
 #include <cinolib/drawable_isocontour.h>
 #include <cinolib/drawable_vector_field.h>
 #include <cinolib/drawable_segment_soup.h>
+#include <cinolib/ambient_occlusion.h>
 
 namespace cinolib
 {
@@ -71,6 +72,15 @@ class SurfaceMeshControls : public SideBarItem
     DrawableVectorField         vec_field;
     DrawableSegmentSoup         poly_normals;
     DrawableSegmentSoup         vert_normals;
+
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    // ambient occlusion data and floor transformation parameters
+    AO_data ao_data;
+    float R[3]     = {0,0,0};
+    float T[3]     = {0,0,0};
+    float R_old[3] = {0,0,0};
+    float T_old[3] = {0,0,0};
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

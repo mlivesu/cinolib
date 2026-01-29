@@ -39,19 +39,34 @@
 
 #include <cinolib/meshes/abstract_polygonmesh.h>
 #include <cinolib/meshes/abstract_polyhedralmesh.h>
+#include <cinolib/meshes/drawable_trimesh.h>
 
 namespace cinolib
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+struct AO_data
+{
+    int   n_samples      = 50;  // sample dirs with spherical Fibonacci
+    float contrast       = 1.0; // default: no contrast
+    float contrast_floor = 2.5; // higher constrast for a more compact shadow
+    float ray_length     = 1.0; // w.r.t. bbox diag
+    bool  with_floor     = false;
+    DrawableTrimesh<> floor;
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class P>
 CINO_INLINE
-void ambient_occlusion(AbstractPolygonMesh<M,V,E,P> & m, const uint n_samples = 200);
+void ambient_occlusion(AbstractPolygonMesh<M,V,E,P> & m, AO_data & data);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void ambient_occlusion(AbstractPolyhedralMesh<M,V,E,F,P> & m, const uint n_samples = 200);
+void ambient_occlusion(AbstractPolyhedralMesh<M,V,E,F,P> & m, AO_data & data);
 
 }
 

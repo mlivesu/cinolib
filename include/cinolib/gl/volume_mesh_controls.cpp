@@ -43,7 +43,8 @@
 #include <cinolib/export_visible.h>
 #include <cinolib/export_surface.h>
 #include <cinolib/export_marked_faces.h>
-#include <cinolib/ambient_occlusion.h>
+#include <cinolib/extrude_mesh.h>
+#include <cinolib/triangle_wrap.h>
 #include <iostream>
 #include <sstream>
 
@@ -590,12 +591,117 @@ void VolumeMeshControls<Mesh>::header_ambient_occlusion(const bool open)
     {
         if(ImGui::SmallButton("Update AO"))
         {
-            ambient_occlusion(*m);
+            ambient_occlusion(*m,ao_data);
             m->updateGL();
+            if(ao_data.with_floor) ao_data.floor.updateGL();
         }
-        if(ImGui::SliderFloat("Alpha",&m->AO_alpha, 0.f, 1.f))
+        if(ImGui::SliderFloat("Alpha",&m->AO_alpha, 0.f, 1.f)) { m->updateGL(); }
+        if(ImGui::SliderInt  ("Dirs",&ao_data.n_samples,10,300)) {}
+        if(ImGui::SliderFloat("Contrast",&ao_data.contrast,1.f,10.f)) {}
+        if(ImGui::SliderFloat("Ray length",&ao_data.ray_length,0.001f,1.f)) {}
+        if(ImGui::Checkbox("Floor",&ao_data.with_floor))
         {
-            m->updateGL();
+#ifndef CINOLIB_USES_TRIANGLE
+            std::cerr << "ERROR : Triangle missing. Install Triangle and recompile defining symbol CINOLIB_USES_TRIANGLE" << std::endl;
+#else
+            if(ao_data.with_floor)
+            {
+                if(ao_data.floor.num_verts()==0)
+                {
+                    triangle_wrap({vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0)},{0,1,1,2,2,3,3,0},{},0,"-qa0.0001",ao_data.floor);
+                    ao_data.floor.normalize_bbox();
+                    ao_data.floor.scale(m->bbox().diag()*1.5);
+                    ao_data.floor.translate(m->bbox().center()-ao_data.floor.bbox().center());
+                    extrude_mesh(ao_data.floor,vec3d(0,0,-0.01));
+                    ao_data.floor.rotate(vec3d(1,0,0), to_rad(90));
+                    ao_data.floor.translate(vec3d(0,-m->bbox().delta_y()*0.5,0));
+                    ao_data.floor.show_wireframe(false);
+                    ao_data.floor.show_marked_edge(false);
+                    ao_data.floor.show_mesh_with_lighting(false);
+                    ao_data.floor.updateGL();
+                }
+                gui->push(&ao_data.floor,false);
+            }
+            else
+            {
+                gui->pop(&ao_data.floor);
+            }
+        }
+        if(ao_data.with_floor)
+        {
+            if(ImGui::SliderFloat("Floor Contrast",&ao_data.contrast_floor,1.f,10.f))
+            {}
+
+            if(ImGui::SliderFloat("Rx",&R[0],0.f,90.f))
+            {
+                float angle = R[0] - R_old[0];
+                R_old[0] = R[0];
+                ao_data.floor.rotate(vec3d(1,0,0),to_rad(angle));
+                ao_data.floor.updateGL();
+            }
+
+            if(ImGui::SliderFloat("Ry",&R[1],0.f,90.f))
+            {
+                float angle = R[1] - R_old[1];
+                R_old[1] = R[1];
+                ao_data.floor.rotate(vec3d(0,1,0),to_rad(angle));
+                ao_data.floor.updateGL();
+            }
+
+            if(ImGui::SliderFloat("Rz",&R[2],0.f,90.f))
+            {
+                float angle = R[2] - R_old[2];
+                R_old[2] = R[2];
+                ao_data.floor.rotate(vec3d(0,0,1),to_rad(angle));
+                ao_data.floor.updateGL();
+            }
+
+            if(ImGui::SliderFloat("Tx",&T[0],-1.f,1.f))
+            {
+                float delta = (T[0] - T_old[0])*m->bbox().delta_x();
+                T_old[0] = T[0];
+                ao_data.floor.translate(vec3d(delta,0,0));
+                ao_data.floor.updateGL();
+            }
+
+            if(ImGui::SliderFloat("Ty",&T[1],-1.f,1.f))
+            {
+                float delta = (T[1] - T_old[1])*m->bbox().delta_x();
+                T_old[1] = T[1];
+                ao_data.floor.translate(vec3d(0,delta,0));
+                ao_data.floor.updateGL();
+            }
+
+            if(ImGui::SliderFloat("Tz",&T[2],-1.f,1.f))
+            {
+                float delta = (T[2] - T_old[2])*m->bbox().delta_x();
+                T_old[2] = T[2];
+                ao_data.floor.translate(vec3d(0,0,delta));
+                ao_data.floor.updateGL();
+            }
+            if(ImGui::Button("Smooth floor"))
+            {
+                for(int i=0; i<50; ++i)
+                {
+                    for(uint pid=0; pid<ao_data.floor.num_polys(); ++pid)
+                    {
+                        if(ao_data.floor.poly_data(pid).AO>0.95)
+                        {
+                            ao_data.floor.poly_data(pid).AO = 1.f;
+                        }
+                        else
+                        {
+                            for(uint nbr : ao_data.floor.adj_p2p(pid))
+                            {
+                                ao_data.floor.poly_data(pid).AO += ao_data.floor.poly_data(nbr).AO;
+                            }
+                            ao_data.floor.poly_data(pid).AO /= double(ao_data.floor.adj_p2p(pid).size()+1);
+                        }
+                    }
+                    ao_data.floor.updateGL();
+                }
+            }
+#endif
         }
         ImGui::TreePop();
     }

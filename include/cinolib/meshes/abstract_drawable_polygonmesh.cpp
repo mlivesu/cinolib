@@ -352,6 +352,15 @@ void AbstractDrawablePolygonMesh<Mesh>::show_AO_alpha(const float alpha)
 
 template<class Mesh>
 CINO_INLINE
+void AbstractDrawablePolygonMesh<Mesh>::show_mesh_with_lighting(const bool b)
+{
+    drawlist.lighting = b;
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class Mesh>
+CINO_INLINE
 void AbstractDrawablePolygonMesh<Mesh>::show_mesh_flat()
 {
     drawlist.draw_mode |=  DRAW_TRI_FLAT;

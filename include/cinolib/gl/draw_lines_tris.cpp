@@ -153,13 +153,15 @@ void render(const RenderData & data)
         }
         else if(data.draw_mode & DRAW_TRI_SMOOTH)
         {
-            glEnable(GL_LIGHTING);
+            if(data.lighting) glEnable(GL_LIGHTING);
+            else              glDisable(GL_LIGHTING);
             glShadeModel(GL_SMOOTH);
             render_tris(data);
         }
         else // default: FLAT shading
         {
-            glEnable(GL_LIGHTING);
+            if(data.lighting) glEnable(GL_LIGHTING);
+            else              glDisable(GL_LIGHTING);
             glShadeModel(GL_SMOOTH); // flatness is given by input normals
             render_tris(data);
         }

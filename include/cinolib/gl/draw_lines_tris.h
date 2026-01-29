@@ -92,6 +92,8 @@ struct RenderData
 {
     Material           material;
     //
+    bool               lighting = true;
+    //
     int                draw_mode;
     //
     std::vector<uint>  tris;

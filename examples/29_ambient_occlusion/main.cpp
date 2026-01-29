@@ -13,7 +13,8 @@ int main(int argc, char **argv)
     GLcanvas gui;
     gui.push(&m);
 
-    ambient_occlusion(m);
+    AO_data data;
+    ambient_occlusion(m,data);
     m.updateGL();
 
     gui.callback_app_controls = [&]()
