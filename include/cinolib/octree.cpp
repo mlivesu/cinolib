@@ -378,6 +378,8 @@ void Octree::closest_point(const vec3d  & p,            // query point
 CINO_INLINE
 bool Octree::contains(const vec3d & p, const bool strict, uint & id) const
 {
+    assert(root != nullptr);
+
     typedef std::chrono::steady_clock Time;
     Time::time_point t0 = Time::now();
 
@@ -427,6 +429,8 @@ bool Octree::contains(const vec3d & p, const bool strict, uint & id) const
 CINO_INLINE
 bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uint> & ids) const
 {
+    assert(root != nullptr);
+
     typedef std::chrono::steady_clock Time;
     Time::time_point t0 = Time::now();
 
@@ -475,6 +479,8 @@ bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uin
 CINO_INLINE
 bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const
 {
+    assert(root != nullptr);
+
     typedef std::chrono::steady_clock Time;
     Time::time_point t0 = Time::now();
 
@@ -541,6 +547,8 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
 CINO_INLINE
 bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const
 {
+    assert(root != nullptr);
+
     typedef std::chrono::steady_clock Time;
     Time::time_point t0 = Time::now();
 
@@ -602,6 +610,8 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pa
 CINO_INLINE
 bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const
 {
+    assert(root != nullptr);
+
     typedef std::chrono::steady_clock Time;
     Time::time_point t0 = Time::now();
 
@@ -632,6 +642,8 @@ bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_com
 CINO_INLINE
 bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const
 {
+    assert(root != nullptr);
+
     typedef std::chrono::steady_clock Time;
     Time::time_point t0 = Time::now();
 
@@ -664,6 +676,8 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
 CINO_INLINE
 bool Octree::intersects_box(const AABB & b, std::unordered_set<uint> & ids) const
 {
+    assert(root != nullptr);
+
     typedef std::chrono::steady_clock Time;
     Time::time_point t0 = Time::now();
 
