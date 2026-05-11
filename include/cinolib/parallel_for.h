@@ -85,6 +85,14 @@ static void PARALLEL_FOR(      uint   beg,
                                uint   end,
                          const uint   serial_if_less_than,
                          const Func & func);
+
+template<typename Func>
+CINO_INLINE
+static void PARALLEL_FOR(      uint   beg,
+                               uint   end,
+                         const uint   serial_if_less_than,
+                         const uint   n_threads_hint,
+                         const Func & func);
 }
 
 #ifndef  CINO_STATIC_LIB
