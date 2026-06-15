@@ -48,6 +48,7 @@ CINO_INLINE
 void tetgen_wrap(const std::vector<double>            & coords_in,
                  const std::vector<std::vector<uint>> & polys_in,
                  const std::vector<uint>              & edges_in,
+                 const std::vector<vec3d>             & holes,
                  const std::string                    & flags, // options
                        std::vector<double>            & coords_out,
                        std::vector<uint>              & tets_out)
@@ -101,6 +102,18 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
         in.edgelist[i] = edges_in[i];
     }
 
+    // holes
+    //
+    in.numberofholes = int(holes.size());
+    in.holelist      = new REAL[holes.size()*3];
+    for(uint i=0; i<holes.size(); ++i)
+    {
+        uint ptr = 3*i;
+        in.holelist[ptr    ] = static_cast<REAL>(holes.at(i).x());
+        in.holelist[ptr + 1] = static_cast<REAL>(holes.at(i).y());
+        in.holelist[ptr + 2] = static_cast<REAL>(holes.at(i).z());
+    }
+
     // tetgen options
     //
     std::string s = "p" + flags;
@@ -139,6 +152,19 @@ void tetgen_wrap(const std::vector<double>            & /*coords_in*/,
     exit(-1);
 }
 #endif
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void tetgen_wrap(const std::vector<double>            & coords_in,
+                 const std::vector<std::vector<uint>> & polys_in,
+                 const std::vector<uint>              & edges_in,
+                 const std::string                    & flags, // options
+                       std::vector<double>            & coords_out,
+                       std::vector<uint>              & tets_out)
+{
+    tetgen_wrap(coords_in, polys_in, edges_in, {}, flags, coords_out, tets_out);
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -219,11 +245,40 @@ void tetgen_wrap(const std::vector<vec3d>             & verts_in,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+void tetgen_wrap(const std::vector<vec3d>             & verts_in,
+                 const std::vector<std::vector<uint>> & polys_in,
+                 const std::vector<uint>              & edges_in,
+                 const std::vector<vec3d>             & holes,
+                 const std::string                    & flags,
+                       Tetmesh<M,V,E,F,P>             & m)
+{
+    std::vector<double> coords_out;
+    std::vector<uint>   tets;
+    tetgen_wrap(serialized_xyz_from_vec3d(verts_in), polys_in, edges_in, holes, flags, coords_out, tets);
+    m = Tetmesh<M,V,E,F,P>(vec3d_from_serialized_xyz(coords_out), tets);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
 void tetgen_wrap(const AbstractPolygonMesh<M,V,E,F> & m_srf,
                  const std::string                  & flags,
                        Tetmesh<M,V,E,F,P>           & m)
 {
     tetgen_wrap(m_srf.vector_verts(), m_srf.vector_polys(), {}, flags, m);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void tetgen_wrap(const AbstractPolygonMesh<M,V,E,F> & m_srf,
+                 const std::vector<vec3d>           & holes,
+                 const std::string                  & flags,
+                       Tetmesh<M,V,E,F,P>           & m)
+{
+    tetgen_wrap(m_srf.vector_verts(), m_srf.vector_polys(), {}, holes, flags, m);
 }
 
 }
