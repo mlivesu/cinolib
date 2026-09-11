@@ -31,7 +31,7 @@ Here is an example of a toy program that reads a triangle mesh and displays it o
 int main()
 {
     using namespace cinolib;
-    DrawableTrimesh<> m("bunny.obj");
+    DrawableTrimesh<> m("../../../examples/data/bunny.obj");
     GLcanvas gui;
     gui.push(&m);
     return gui.launch();
